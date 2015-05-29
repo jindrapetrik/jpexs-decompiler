@@ -2012,22 +2012,11 @@ public class ActionScriptParser {
                     break;
             }
         }
-
-        switch (lookahead.type) {
-            case DOT: //member
-            case BRACKET_OPEN: //member
-            case PARENT_OPEN: //function call
-            case FILTER:
-                lhs = memberOrCall(thisType, pkg, needsActivation, importedClasses, openedNamespaces, lhs, registerVars, inFunction, inMethod, variables);
-                break;
-
-            default:
-                if (lhs instanceof ParenthesisItem) {
-                    GraphTargetItem coerced = expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, allowRemainder, variables);
-                    if (coerced != null && isType(((ParenthesisItem) lhs).value)) {
-                        lhs = new CoerceAVM2Item(null, ((ParenthesisItem) lhs).value, coerced);
-                    }
-                }
+        if (lhs instanceof ParenthesisItem) {
+            GraphTargetItem coerced = expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, allowRemainder, variables);
+            if (coerced != null && isType(((ParenthesisItem) lhs).value)) {
+                lhs = new CoerceAVM2Item(null, ((ParenthesisItem) lhs).value, coerced);
+            }
         }
 
         if (debugMode) {
@@ -2042,15 +2031,15 @@ public class ActionScriptParser {
         }
         GraphTargetItem ret = null;
         ParsedSymbol s = lex();
+        boolean allowMemberOrCall = false;
         switch (s.type) {
             case XML_STARTTAG_BEGIN:
                 lexer.pushback(s);
                 ret = xml(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, variables);
-
                 break;
             case STRING:
                 ret = new StringAVM2Item(null, s.value.toString());
-
+                allowMemberOrCall = true;
                 break;
             case NEGATE:
                 ret = expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables);
@@ -2086,7 +2075,6 @@ public class ActionScriptParser {
                 break;
             case TYPEOF:
                 ret = new TypeOfAVM2Item(null, expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
-
                 break;
             case TRUE:
                 ret = new BooleanAVM2Item(null, true);
@@ -2127,14 +2115,13 @@ public class ActionScriptParser {
                     }
                 }
                 ret = new NewObjectAVM2Item(null, nvs);
-                ret = memberOrCall(thisType, pkg, needsActivation, importedClasses, openedNamespaces, ret, registerVars, inFunction, inMethod, variables);
+                allowMemberOrCall = true;
                 break;
             case BRACKET_OPEN: //Array literal or just brackets
                 lexer.pushback(s);
                 List<GraphTargetItem> inBrackets = new ArrayList<>();
                 int arrCnt = brackets(thisType, pkg, needsActivation, importedClasses, openedNamespaces, inBrackets, registerVars, inFunction, inMethod, variables);
                 ret = new NewArrayAVM2Item(null, inBrackets);
-                ret = memberOrCall(thisType, pkg, needsActivation, importedClasses, openedNamespaces, ret, registerVars, inFunction, inMethod, variables);
 
                 break;
             case FUNCTION:
@@ -2147,7 +2134,7 @@ public class ActionScriptParser {
                 }
                 needsActivation.setVal(true);
                 ret = function(pkg, false, needsActivation, importedClasses, 0/*?*/, thisType, openedNamespaces, fname, false, variables);
-                ret = memberOrCall(thisType, pkg, needsActivation, importedClasses, openedNamespaces, ret, registerVars, inFunction, inMethod, variables);
+                allowMemberOrCall = true;
                 break;
             case NAN:
                 ret = new NanAVM2Item(null);
@@ -2193,8 +2180,7 @@ public class ActionScriptParser {
             case PARENT_OPEN:
                 ret = new ParenthesisItem(null, expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables));
                 expectedType(SymbolType.PARENT_CLOSE);
-                ret = memberOrCall(thisType, pkg, needsActivation, importedClasses, openedNamespaces, ret, registerVars, inFunction, inMethod, variables);
-
+                allowMemberOrCall = true;
                 break;
             case NEW:
                 s = lex();
@@ -2242,30 +2228,25 @@ public class ActionScriptParser {
             case SUPER:
             case ATTRIBUTE:
                 lexer.pushback(s);
-                GraphTargetItem var = name(thisType, pkg, needsActivation, false, openedNamespaces, registerVars, inFunction, inMethod, variables, importedClasses);
-                var = memberOrCall(thisType, pkg, needsActivation, importedClasses, openedNamespaces, var, registerVars, inFunction, inMethod, variables);
-                ret = var;
+                ret = name(thisType, pkg, needsActivation, false, openedNamespaces, registerVars, inFunction, inMethod, variables, importedClasses);
+                allowMemberOrCall = true;
 
+                //var = memberOrCall(thisType, pkg, needsActivation, importedClasses, openedNamespaces, var, registerVars, inFunction, inMethod, variables);
+                //ret = var;
                 break;
             default:
                 GraphTargetItem excmd = expressionCommands(s, registerVars, inFunction, inMethod, -1, variables);
                 if (excmd != null) {
                     //?
                     ret = excmd;
+                    allowMemberOrCall = true; //?
                     break;
                 }
                 lexer.pushback(s);
         }
-        /*if (allowRemainder && existsRemainder) {
-         GraphTargetItem rem = ret;
-         do {
-         rem = expressionRemainder(thisType, pkg, needsActivation, openedNamespaces, rem, registerVars, inFunction, inMethod, assocRight, variables, importedClasses);
-         if (rem != null) {
-         ret = rem;
-         }
-         } while ((!assocRight) && (rem != null));
-         ret = fixPrecedence(ret);
-         }*/
+        if (allowMemberOrCall && ret != null) {
+            ret = memberOrCall(thisType, pkg, needsActivation, importedClasses, openedNamespaces, ret, registerVars, inFunction, inMethod, variables);
+        }
         if (debugMode) {
             System.out.println("/primary");
         }

@@ -1565,6 +1565,7 @@ public class ActionScriptParser {
         if (debugMode) {
             System.out.println("primary:");
         }
+        boolean allowMemberOrCall = false;
         GraphTargetItem ret = null;
         ParsedSymbol s = lex();
 
@@ -1610,7 +1611,7 @@ public class ActionScriptParser {
                 break;
             case TYPEOF:
                 ret = new TypeOfActionItem(null, expression(inFunction, inMethod, false, variables));
-
+                allowMemberOrCall = true;
                 break;
             case TRUE:
                 ret = new DirectValueActionItem(null, 0, Boolean.TRUE, new ArrayList<String>());
@@ -1646,12 +1647,14 @@ public class ActionScriptParser {
                     }
                 }
                 ret = new InitObjectActionItem(null, objectNames, objectValues);
+                allowMemberOrCall = true;
                 break;
             case BRACKET_OPEN: //Array literal or just brackets
                 lexer.pushback(s);
                 List<GraphTargetItem> inBrackets = new ArrayList<>();
                 int arrCnt = brackets(inBrackets, inFunction, inMethod, variables);
                 ret = new InitArrayActionItem(null, inBrackets);
+                allowMemberOrCall = true;
                 break;
             case FUNCTION:
                 s = lex();
@@ -1662,15 +1665,15 @@ public class ActionScriptParser {
                     lexer.pushback(s);
                 }
                 ret = function(true, fname, false, variables);
+                allowMemberOrCall = true;
                 break;
             case STRING:
                 ret = pushConst(s.value.toString());
-                //ret = memberOrCall(ret, inFunction, inMethod, variables);
-
+                allowMemberOrCall = true;
                 break;
             case NEWLINE:
                 ret = new DirectValueActionItem(null, 0, "\r", new ArrayList<String>());
-
+                allowMemberOrCall = true;
                 break;
             case NAN:
                 ret = new DirectValueActionItem(null, 0, Double.NaN, new ArrayList<String>());
@@ -1713,7 +1716,7 @@ public class ActionScriptParser {
                 ret = new ParenthesisItem(null, expression(inFunction, inMethod, true, variables));
                 expectedType(SymbolType.PARENT_CLOSE);
                 //ret = memberOrCall(ret, inFunction, inMethod, variables);
-
+                allowMemberOrCall = true;
                 break;
             case NEW:
                 GraphTargetItem newvar = expressionPrimary(false, inFunction, inMethod, false, variables);//variable(inFunction, inMethod, variables);
@@ -1734,6 +1737,7 @@ public class ActionScriptParser {
                 expectedType(SymbolType.PARENT_CLOSE);
                 //evar = memberOrCall(evar, inFunction, inMethod, variables);
                 ret = evar;
+                allowMemberOrCall = true;
 
                 break;
             case IDENTIFIER:
@@ -1744,6 +1748,7 @@ public class ActionScriptParser {
                 } else {
                     ret = new VariableActionItem(s.value.toString(), null, false);
                     variables.add((VariableActionItem) ret);
+                    allowMemberOrCall = true;
                 }
 
                 break;
@@ -1752,47 +1757,50 @@ public class ActionScriptParser {
                 if (excmd != null) {
                     //?
                     ret = excmd;
+                    allowMemberOrCall = true; //?
                     break;
                 }
                 lexer.pushback(s);
         }
 
-        if (ret != null) {
-            while (true) {
-                ParsedSymbol op = lex();
-                if (op.type == SymbolType.PARENT_OPEN) {
-                    List<GraphTargetItem> args = call(inFunction, inMethod, variables);
-                    if (ret instanceof GetMemberActionItem) {
-                        GetMemberActionItem mem = (GetMemberActionItem) ret;
-                        ret = new CallMethodActionItem(null, mem.object, mem.memberName, args);
-                    } else if (ret instanceof VariableActionItem) {
-                        VariableActionItem var = (VariableActionItem) ret;
-                        ret = new CallFunctionActionItem(null, pushConst(var.getVariableName()), args);
-                    } else {
-                        ret = new CallFunctionActionItem(null, ret, args);
-                    }
-                    continue;
-                }
-                if (op.type == SymbolType.BRACKET_OPEN) {
-                    GraphTargetItem rhs = expression(inFunction, inMethod, false, variables);
-                    ret = new GetMemberActionItem(null, ret, rhs);
-                    expectedType(SymbolType.BRACKET_CLOSE);
-                    continue;
-                }
-                if (op.type == SymbolType.DOT) {
-                    s = lex();
-                    expected(s, lexer.yyline(), SymbolType.IDENTIFIER, SymbolType.THIS, SymbolType.SUPER, SymbolType.STRING_OP);
-
-                    ret = new GetMemberActionItem(null, ret, pushConst(s.value.toString()));
-                    continue;
-                }
-                lexer.pushback(op);
-                break;
-            }
+        if (allowMemberOrCall && ret != null) {
+            ret = memberOrCall(ret, inFunction, inMethod, variables);
         }
         if (debugMode) {
             System.out.println("/primary");
         }
+        return ret;
+    }
+
+    private GraphTargetItem memberOrCall(GraphTargetItem ret, boolean inFunction, boolean inMethod, List<VariableActionItem> variables) throws IOException, ActionParseException {
+        ParsedSymbol op = lex();
+        while (op.isType(SymbolType.PARENT_OPEN, SymbolType.BRACKET_OPEN, SymbolType.DOT)) {
+            if (op.type == SymbolType.PARENT_OPEN) {
+                List<GraphTargetItem> args = call(inFunction, inMethod, variables);
+                if (ret instanceof GetMemberActionItem) {
+                    GetMemberActionItem mem = (GetMemberActionItem) ret;
+                    ret = new CallMethodActionItem(null, mem.object, mem.memberName, args);
+                } else if (ret instanceof VariableActionItem) {
+                    VariableActionItem var = (VariableActionItem) ret;
+                    ret = new CallFunctionActionItem(null, pushConst(var.getVariableName()), args);
+                } else {
+                    ret = new CallFunctionActionItem(null, ret, args);
+                }
+            }
+            if (op.type == SymbolType.BRACKET_OPEN) {
+                GraphTargetItem rhs = expression(inFunction, inMethod, false, variables);
+                ret = new GetMemberActionItem(null, ret, rhs);
+                expectedType(SymbolType.BRACKET_CLOSE);
+            }
+            if (op.type == SymbolType.DOT) {
+                ParsedSymbol s = lex();
+                expected(s, lexer.yyline(), SymbolType.IDENTIFIER, SymbolType.THIS, SymbolType.SUPER, SymbolType.STRING_OP);
+
+                ret = new GetMemberActionItem(null, ret, pushConst(s.value.toString()));
+            }
+            op = lex();
+        }
+        lexer.pushback(op);
         return ret;
     }
 
