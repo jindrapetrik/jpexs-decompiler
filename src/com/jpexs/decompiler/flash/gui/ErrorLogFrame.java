@@ -162,6 +162,7 @@ public class ErrorLogFrame extends AppFrame {
 
     public void clearLog() {
         logViewInner.removeAll();
+        logItemCount.set(0);
         Main.clearLogFile();
         revalidate();
         repaint();
