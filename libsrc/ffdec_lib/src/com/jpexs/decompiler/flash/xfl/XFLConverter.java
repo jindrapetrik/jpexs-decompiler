@@ -1788,7 +1788,25 @@ public class XFLConverter {
         boolean lastShapeTween = false;
         MorphShapeTag shapeTweener = null;
 
-        for (Tag t : timelineTags) {
+        //Add ShowFrameTag to the end when there is one last missing
+        List<Tag> timTags = new ArrayList<>(timelineTags);
+        boolean needsFrameAdd = false;
+        SWF swf = null;
+        for (int i = timTags.size() - 1; i >= 0; i--) {
+            if (timTags.get(i) instanceof ShowFrameTag) {
+                break;
+            }
+            if (timTags.get(i) instanceof PlaceObjectTypeTag) {
+                needsFrameAdd = true;
+                swf = timTags.get(i).getSwf();
+                break;
+            }
+        }
+        if (needsFrameAdd) {
+            timTags.add(new ShowFrameTag(swf));
+        }
+
+        for (Tag t : timTags) {
             if (t instanceof PlaceObjectTypeTag) {
                 PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
                 if (po.getDepth() == depth) {
@@ -1935,6 +1953,9 @@ public class XFLConverter {
                 }
                 if (fontName == null) {
                     fontName = font.getFontNameIntag();
+                }
+                if (fontName == null) {
+                    fontName = FontTag.defaultFontName;
                 }
                 int fontStyle = font.getFontStyle();
                 String installedFont;
@@ -2420,6 +2441,9 @@ public class XFLConverter {
                     if ((fontName == null) && (font != null)) {
                         fontName = font.getFontNameIntag();
                     }
+                    if (fontName == null) {
+                        fontName = FontTag.defaultFontName;
+                    }
                     int fontStyle = 0;
                     if (font != null) {
                         fontStyle = font.getFontStyle();
@@ -2564,6 +2588,9 @@ public class XFLConverter {
                     if (ft != null) {
                         if (fontName == null) {
                             fontName = ft.getFontNameIntag();
+                        }
+                        if (fontName == null) {
+                            fontName = FontTag.defaultFontName;
                         }
                         italic = ft.isItalic();
                         bold = ft.isBold();
@@ -2997,6 +3024,7 @@ public class XFLConverter {
                 logger.log(Level.SEVERE, "Error during ActionScript3 export", ex);
             }
         }
+
     }
 
     private static int normHue(double h) {
@@ -3215,6 +3243,9 @@ public class XFLConverter {
                 if (ft != null) {
                     if (fontName == null) {
                         fontName = ft.getFontNameIntag();
+                    }
+                    if (fontName == null) {
+                        fontName = FontTag.defaultFontName;
                     }
                     italic = ft.isItalic();
                     bold = ft.isBold();

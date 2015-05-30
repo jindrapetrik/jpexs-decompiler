@@ -1839,7 +1839,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         } else {
                             swf.exportXfl(errorHandler, selfile.getAbsolutePath(), new File(swf.getFile()).getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), selectedVersion);
                         }
-                    } catch (IOException ex) {
+                    } catch (Exception ex) {
                         View.showMessageDialog(null, translate("error.export") + ": " + ex.getClass().getName() + " " + ex.getLocalizedMessage(), translate("error"), JOptionPane.ERROR_MESSAGE);
                     }
                     Helper.freeMem();
