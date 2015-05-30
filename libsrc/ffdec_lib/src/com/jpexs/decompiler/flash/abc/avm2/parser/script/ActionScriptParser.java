@@ -2042,7 +2042,7 @@ public class ActionScriptParser {
                 allowMemberOrCall = true;
                 break;
             case NEGATE:
-                ret = expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables);
+                ret = expressionPrimary(thisType, pkg, needsActivation, importedClasses, openedNamespaces, false, registerVars, inFunction, inMethod, false, variables);
                 ret = new NegAVM2Item(null, ret);
 
                 break;
@@ -2056,7 +2056,7 @@ public class ActionScriptParser {
 
                 } else {
                     lexer.pushback(s);
-                    GraphTargetItem num = expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
+                    GraphTargetItem num = expressionPrimary(thisType, pkg, needsActivation, importedClasses, openedNamespaces, false, registerVars, inFunction, inMethod, true, variables);
                     if (num instanceof IntegerValueAVM2Item) {
                         ((IntegerValueAVM2Item) num).value = -((IntegerValueAVM2Item) num).value;
                         ret = num;
@@ -2074,7 +2074,7 @@ public class ActionScriptParser {
                 }
                 break;
             case TYPEOF:
-                ret = new TypeOfAVM2Item(null, expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
+                ret = new TypeOfAVM2Item(null, expressionPrimary(thisType, pkg, needsActivation, importedClasses, openedNamespaces, false, registerVars, inFunction, inMethod, false, variables));
                 break;
             case TRUE:
                 ret = new BooleanAVM2Item(null, true);
@@ -2153,7 +2153,7 @@ public class ActionScriptParser {
 
                 break;
             case DELETE:
-                GraphTargetItem varDel = expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);//name(thisType,false, openedNamespaces, registerVars, inFunction, inMethod, variables);
+                GraphTargetItem varDel = expressionPrimary(thisType, pkg, needsActivation, importedClasses, openedNamespaces, false, registerVars, inFunction, inMethod, true, variables);//name(thisType,false, openedNamespaces, registerVars, inFunction, inMethod, variables);
                 if (!isNameOrProp(varDel)) {
                     throw new AVM2ParseException("Not a property or name", lexer.yyline());
                 }
@@ -2174,7 +2174,7 @@ public class ActionScriptParser {
 
                 break;
             case NOT:
-                ret = new NotItem(null, expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, false, variables));
+                ret = new NotItem(null, expressionPrimary(thisType, pkg, needsActivation, importedClasses, openedNamespaces, false, registerVars, inFunction, inMethod, false, variables));
 
                 break;
             case PARENT_OPEN:

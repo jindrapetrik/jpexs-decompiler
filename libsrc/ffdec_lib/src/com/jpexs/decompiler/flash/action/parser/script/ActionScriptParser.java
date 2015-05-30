@@ -1572,7 +1572,7 @@ public class ActionScriptParser {
         switch (s.type) {
             case NEGATE:
                 versionRequired(s, 5);
-                ret = expression(inFunction, inMethod, false, variables);
+                ret = expressionPrimary(false, inFunction, inMethod, false, variables);
                 ret = new BitXorActionItem(null, ret, new DirectValueActionItem(4.294967295E9));
 
                 break;
@@ -1586,7 +1586,7 @@ public class ActionScriptParser {
 
                 } else {
                     lexer.pushback(s);
-                    GraphTargetItem num = expression(inFunction, inMethod, true, variables);
+                    GraphTargetItem num = expressionPrimary(false, inFunction, inMethod, true, variables);
                     if ((num instanceof DirectValueActionItem)
                             && (((DirectValueActionItem) num).value instanceof Long)) {
                         ((DirectValueActionItem) num).value = -(Long) ((DirectValueActionItem) num).value;
@@ -1610,7 +1610,7 @@ public class ActionScriptParser {
                 }
                 break;
             case TYPEOF:
-                ret = new TypeOfActionItem(null, expression(inFunction, inMethod, false, variables));
+                ret = new TypeOfActionItem(null, expressionPrimary(false, inFunction, inMethod, false, variables));
                 allowMemberOrCall = true;
                 break;
             case TRUE:
@@ -1689,7 +1689,7 @@ public class ActionScriptParser {
 
                 break;
             case DELETE:
-                GraphTargetItem varDel = expression(inFunction, inMethod, false, variables);
+                GraphTargetItem varDel = expressionPrimary(false, inFunction, inMethod, false, variables);
                 if (varDel instanceof GetMemberActionItem) {
                     GetMemberActionItem gm = (GetMemberActionItem) varDel;
                     ret = new DeleteActionItem(null, gm.object, gm.memberName);
@@ -1709,7 +1709,7 @@ public class ActionScriptParser {
 
                 break;
             case NOT:
-                ret = new NotItem(null, expression(inFunction, inMethod, false, variables));
+                ret = new NotItem(null, expressionPrimary(false, inFunction, inMethod, false, variables));
 
                 break;
             case PARENT_OPEN:
@@ -1744,7 +1744,7 @@ public class ActionScriptParser {
             case THIS:
             case SUPER:
                 if (s.value.equals("not")) {
-                    ret = new NotItem(null, expression(inFunction, inMethod, false, variables));
+                    ret = new NotItem(null, expressionPrimary(false, inFunction, inMethod, false, variables));
                 } else {
                     ret = new VariableActionItem(s.value.toString(), null, false);
                     variables.add((VariableActionItem) ret);
