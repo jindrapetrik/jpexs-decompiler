@@ -1386,8 +1386,8 @@ public class ActionScriptParser {
                     GraphTargetItem firstCommand = command(thisType, pkg, needsActivation, importedClasses, openedNamespaces, loops, loopLabels, registerVars, inFunction, inMethod, forinlevel, false, variables);
                     if (firstCommand instanceof NameAVM2Item) {
                         NameAVM2Item nai = (NameAVM2Item) firstCommand;
-                        if (nai.isDefinition() && nai.getAssignedValue() == null) { //??? WUT
-                            firstCommand = expression1(firstCommand, firstCommand.getPrecedence(), thisType, pkg, needsActivation, importedClasses, openedNamespaces, true, registerVars, inFunction, inMethod, true, variables);
+                        if (nai.isDefinition() && nai.getAssignedValue() == null) { //Declared value in for..in
+                            firstCommand = expression1(firstCommand, GraphTargetItem.NOPRECEDENCE, thisType, pkg, needsActivation, importedClasses, openedNamespaces, true, registerVars, inFunction, inMethod, true, variables);
                         }
                     }
                     InAVM2Item inexpr = null;
