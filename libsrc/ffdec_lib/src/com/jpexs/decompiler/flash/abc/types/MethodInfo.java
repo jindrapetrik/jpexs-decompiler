@@ -41,7 +41,9 @@ public class MethodInfo {
         if (body != null) {
             for (AVM2Instruction ins : body.getCode().code) {
                 if (ins.definition instanceof NewFunctionIns) {
-                    abc.method_info.get(ins.operands[0]).delete(abc, d);
+                    if (ins.operands[0] < abc.method_info.size() && !abc.method_info.get(ins.operands[0]).deleted) {
+                        abc.method_info.get(ins.operands[0]).delete(abc, d);
+                    }
                 }
             }
         }
