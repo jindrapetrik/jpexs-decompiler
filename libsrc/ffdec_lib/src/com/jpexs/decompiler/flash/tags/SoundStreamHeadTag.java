@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.decompiler.flash.types.sound.SoundExportFormat;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayOutputStream;
@@ -143,23 +144,23 @@ public class SoundStreamHeadTag extends Tag implements SoundStreamHeadTypeTag {
     }
 
     @Override
-    public String getExportFormat() {
+    public SoundExportFormat getExportFormat() {
         if (streamSoundCompression == SoundFormat.FORMAT_MP3) {
-            return "mp3";
+            return SoundExportFormat.MP3;
         }
         if (streamSoundCompression == SoundFormat.FORMAT_ADPCM) {
-            return "wav";
+            return SoundExportFormat.WAV;
         }
         if (streamSoundCompression == SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN) {
-            return "wav";
+            return SoundExportFormat.WAV;
         }
         if (streamSoundCompression == SoundFormat.FORMAT_UNCOMPRESSED_NATIVE_ENDIAN) {
-            return "wav";
+            return SoundExportFormat.WAV;
         }
         if (streamSoundCompression == SoundFormat.FORMAT_NELLYMOSER || streamSoundCompression == SoundFormat.FORMAT_NELLYMOSER16KHZ || streamSoundCompression == SoundFormat.FORMAT_NELLYMOSER8KHZ) {
-            return "wav";
+            return SoundExportFormat.WAV;
         }
-        return "flv";
+        return SoundExportFormat.FLV;
     }
 
     @Override
@@ -250,5 +251,16 @@ public class SoundStreamHeadTag extends Tag implements SoundStreamHeadTypeTag {
     public String getCharacterExportFileName() {
         String exportName = swf.getExportName(getCharacterId());
         return getCharacterId() + (exportName != null ? "_" + exportName : "");
+    }
+
+    @Override
+    public void getTagInfo(TagInfo tagInfo) {
+        super.getTagInfo(tagInfo);
+        SoundFormat soundFormat = getSoundFormat();
+        tagInfo.addInfo("general", "codecName", soundFormat.getFormatName());
+        tagInfo.addInfo("general", "exportFormat", soundFormat.getNativeExportFormat());
+        tagInfo.addInfo("general", "samplingRate", soundFormat.samplingRate);
+        tagInfo.addInfo("general", "stereo", soundFormat.stereo);
+        tagInfo.addInfo("general", "sampleCount", streamSoundSampleCount);
     }
 }

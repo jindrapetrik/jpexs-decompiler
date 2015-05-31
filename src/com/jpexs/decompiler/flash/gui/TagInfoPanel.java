@@ -124,7 +124,13 @@ public class TagInfoPanel extends JPanel {
 
                         return name;
                     case 1:
-                        return "" + item.getValue();
+                        Object value = item.getValue();
+                        if (value instanceof Boolean) {
+                            boolean boolValue = (boolean) value;
+                            return boolValue ? AppStrings.translate("yes") : AppStrings.translate("no");
+                        }
+
+                        return "" + value;
                 }
             }
 

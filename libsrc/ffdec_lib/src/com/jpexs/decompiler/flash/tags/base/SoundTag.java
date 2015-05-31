@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
+import com.jpexs.decompiler.flash.types.sound.SoundExportFormat;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.InputStream;
@@ -28,7 +29,7 @@ import java.util.List;
  */
 public interface SoundTag extends TreeItem {
 
-    public String getExportFormat();
+    public SoundExportFormat getExportFormat();
 
     public boolean importSupported();
 

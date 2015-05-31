@@ -31,6 +31,7 @@ import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
+import com.jpexs.decompiler.flash.types.sound.SoundExportFormat;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
@@ -83,12 +84,12 @@ public class SoundExporter {
                 String ext = "wav";
                 SoundFormat fmt = st.getSoundFormat();
                 switch (fmt.getNativeExportFormat()) {
-                    case SoundFormat.EXPORT_MP3:
+                    case MP3:
                         if (settings.mode.hasMP3()) {
                             ext = "mp3";
                         }
                         break;
-                    case SoundFormat.EXPORT_FLV:
+                    case FLV:
                         if (settings.mode.hasFlv()) {
                             ext = "flv";
                         }
@@ -125,14 +126,14 @@ public class SoundExporter {
 
     public void exportSound(OutputStream fos, SoundTag st, SoundExportMode mode) throws IOException {
         SoundFormat fmt = st.getSoundFormat();
-        int nativeFormat = fmt.getNativeExportFormat();
+        SoundExportFormat nativeFormat = fmt.getNativeExportFormat();
 
-        if (nativeFormat == SoundFormat.EXPORT_MP3 && mode.hasMP3()) {
+        if (nativeFormat == SoundExportFormat.MP3 && mode.hasMP3()) {
             List<ByteArrayRange> datas = st.getRawSoundData();
             for (ByteArrayRange data : datas) {
                 fos.write(data.getRangeData());
             }
-        } else if ((nativeFormat == SoundFormat.EXPORT_FLV && mode.hasFlv()) || mode == SoundExportMode.FLV) {
+        } else if ((nativeFormat == SoundExportFormat.FLV && mode.hasFlv()) || mode == SoundExportMode.FLV) {
             if (st instanceof DefineSoundTag) {
                 FLVOutputStream flv = new FLVOutputStream(fos);
                 flv.writeHeader(true, false);

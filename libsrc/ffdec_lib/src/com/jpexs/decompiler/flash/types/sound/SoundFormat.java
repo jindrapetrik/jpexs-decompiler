@@ -57,31 +57,25 @@ public class SoundFormat {
 
     public static final int FORMAT_SPEEX = 11;
 
-    public static final int EXPORT_WAV = 0;
-
-    public static final int EXPORT_MP3 = 1;
-
-    public static final int EXPORT_FLV = 2;
-
     public SoundFormat() {
 
     }
 
-    public int getNativeExportFormat() {
+    public SoundExportFormat getNativeExportFormat() {
         switch (formatId) {
             case FORMAT_UNCOMPRESSED_NATIVE_ENDIAN:
             case FORMAT_UNCOMPRESSED_LITTLE_ENDIAN:
             case FORMAT_ADPCM:
-                return EXPORT_WAV;
+                return SoundExportFormat.WAV;
             case FORMAT_MP3:
-                return EXPORT_MP3;
+                return SoundExportFormat.MP3;
             case FORMAT_NELLYMOSER16KHZ:
             case FORMAT_NELLYMOSER8KHZ:
             case FORMAT_NELLYMOSER:
             case FORMAT_SPEEX:
-                return EXPORT_FLV;
+                return SoundExportFormat.FLV;
             default:
-                return EXPORT_FLV;
+                return SoundExportFormat.FLV;
         }
     }
 
@@ -165,6 +159,36 @@ public class SoundFormat {
             default:
                 return null;
         }
+    }
+
+    public String getFormatName() {
+        switch (formatId) {
+            case FORMAT_UNCOMPRESSED_NATIVE_ENDIAN:
+                return "Uncompressed native endian";
+
+            case FORMAT_ADPCM:
+                return "ADPCM";
+
+            case FORMAT_MP3:
+                return "MP3";
+
+            case FORMAT_UNCOMPRESSED_LITTLE_ENDIAN:
+                return "Uncompressed little endian";
+
+            case FORMAT_NELLYMOSER16KHZ:
+                return "NellyMoser 16kHz";
+
+            case FORMAT_NELLYMOSER8KHZ:
+                return "NellyMoser 8kHz";
+
+            case FORMAT_NELLYMOSER:
+                return "NellyMoser";
+
+            case FORMAT_SPEEX:
+                return "Speex";
+        }
+
+        return null;
     }
 
     private static void writeLE(OutputStream os, long val, int size) throws IOException {

@@ -1661,7 +1661,7 @@ public class XFLConverter {
         }
         String soundEnvelopeStr = "";
         if (soundStreamHead != null && startSound == null) {
-            String soundName = "sound" + soundStreamHead.getCharacterId() + "." + soundStreamHead.getExportFormat();
+            String soundName = "sound" + soundStreamHead.getCharacterId() + "." + soundStreamHead.getExportFormat().toString().toLowerCase();
             ret.append(" soundName=\"").append(soundName).append("\"");
             ret.append(" soundSync=\"stream\"");
             soundEnvelopeStr += "<SoundEnvelope>";
@@ -1669,7 +1669,7 @@ public class XFLConverter {
             soundEnvelopeStr += "</SoundEnvelope>";
         }
         if (startSound != null && sound != null) {
-            String soundName = "sound" + sound.soundId + "." + sound.getExportFormat();
+            String soundName = "sound" + sound.soundId + "." + sound.getExportFormat().toString().toLowerCase();
             ret.append(" soundName=\"").append(soundName).append("\"");
             if (startSound.soundInfo.hasInPoint) {
                 ret.append(" inPoint44=\"").append(startSound.soundInfo.inPoint).append("\"");
@@ -2141,7 +2141,7 @@ public class XFLConverter {
                     if (ta instanceof DefineSoundTag) {
                         DefineSoundTag s = (DefineSoundTag) ta;
                         if (s.soundId == startSound.soundId) {
-                            if (!files.containsKey("sound" + s.soundId + "." + s.getExportFormat())) { //Sound was not exported
+                            if (!files.containsKey("sound" + s.soundId + "." + s.getExportFormat().toString().toLowerCase())) { //Sound was not exported
                                 startSound = null; // ignore
                             }
                             break;
@@ -2152,7 +2152,7 @@ public class XFLConverter {
             }
             if (t instanceof SoundStreamHeadTypeTag) {
                 soundStreamHead = (SoundStreamHeadTypeTag) t;
-                if (!files.containsKey("sound" + soundStreamHead.getCharacterId() + "." + soundStreamHead.getExportFormat())) { //Sound was not exported
+                if (!files.containsKey("sound" + soundStreamHead.getCharacterId() + "." + soundStreamHead.getExportFormat().toString().toLowerCase())) { //Sound was not exported
                     soundStreamHead = null; // ignore
                 }
             }
