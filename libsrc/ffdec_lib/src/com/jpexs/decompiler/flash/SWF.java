@@ -69,7 +69,6 @@ import com.jpexs.decompiler.flash.exporters.script.AS3ScriptExporter;
 import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
 import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
-import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
@@ -1555,15 +1554,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 if (ch instanceof ImageTag) {
                     ImageTag image = (ImageTag) ch;
                     ImageFormat format = image.getImageFormat();
-                    InputStream imageStream = image.getImageData();
-                    byte[] imageData;
-                    if (imageStream != null) {
-                        imageData = Helper.readStream(image.getImageData());
-                    } else {
-                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                        ImageHelper.write(image.getImage().getBufferedImage(), format, baos);
-                        imageData = baos.toByteArray();
-                    }
+                    byte[] imageData = Helper.readStream(image.getImageData());
                     String base64ImgData = Helper.byteArrayToBase64String(imageData);
                     fos.write(Utf8Helper.getBytes("var imageObj" + c + " = document.createElement(\"img\");\r\nimageObj" + c + ".src=\"data:image/" + format + ";base64," + base64ImgData + "\";\r\n"));
                 }

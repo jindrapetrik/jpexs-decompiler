@@ -165,16 +165,12 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
     }
 
     @Override
-    public InputStream getImageData() {
-
+    public InputStream getOriginalImageData() {
         if (bitmapAlphaData.getLength() == 0) { //No alpha, then its JPEG
             return new ByteArrayInputStream(imageData.getArray(), imageData.getPos(), imageData.getLength());
         }
-        //Make PNG
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageHelper.write(getImage().getBufferedImage(), ImageFormat.PNG, baos);
-        return new ByteArrayInputStream(baos.toByteArray());
 
+        return null;
     }
 
     @Override

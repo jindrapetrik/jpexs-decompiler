@@ -28,8 +28,11 @@ import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -88,7 +91,9 @@ public class ImageExporter {
 
                     new RetryTask(() -> {
                         if (ffileFormat == originalFormat) {
-
+                            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
+                                fos.write(Helper.readStream(imageTag.getImageData()));
+                            }
                         } else if (ffileFormat == ImageFormat.BMP) {
                             BMPFile.saveBitmap(imageTag.getImage().getBufferedImage(), file);
                         } else {

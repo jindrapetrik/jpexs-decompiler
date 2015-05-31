@@ -106,7 +106,7 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
     }
 
     @Override
-    public InputStream getImageData() {
+    public InputStream getOriginalImageData() {
         int errorLength = hasErrorHeader(imageData) ? 4 : 0;
         return new ByteArrayInputStream(imageData.getArray(), imageData.getPos() + errorLength, imageData.getLength() - errorLength);
     }
@@ -117,7 +117,7 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
             return cachedImage;
         }
         try {
-            BufferedImage image = ImageHelper.read(getImageData());
+            BufferedImage image = ImageHelper.read(getOriginalImageData());
             if (image == null) {
                 Logger.getLogger(DefineBitsJPEG2Tag.class.getName()).log(Level.SEVERE, "Failed to load image");
                 return null;
