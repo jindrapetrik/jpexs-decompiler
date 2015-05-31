@@ -73,7 +73,7 @@ public class DirectEditingTest extends FileTestBase {
                     for (int s = 0; s < abc.script_info.size(); s++) {
                         String startAfter = null;
                         HighlightedTextWriter htw = new HighlightedTextWriter(new CodeFormatting(), false);
-                        ScriptPack en = abc.script_info.get(s).getPacks(abc, s, null).get(0);
+                        ScriptPack en = abc.script_info.get(s).getPacks(abc, s, null, allAbcs).get(0);
                         String classPathString = en.getClassPath().toString();
                         if (startAfter == null || classPathString.equals(startAfter)) {
                             dotest = true;
