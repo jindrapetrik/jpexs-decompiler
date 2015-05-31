@@ -642,7 +642,7 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     private String getHeaderBytes(SWFCompression compression, boolean gfx) {
-        if (compression == SWFCompression.LZMA_ABC || true) {
+        if (compression == SWFCompression.LZMA_ABC) {
             return "ABC";
         }
 
