@@ -698,7 +698,7 @@ public class AVM2Code implements Cloneable {
             if (ins.definition instanceof NewFunctionIns) {
                 //Only analyze NewFunction objects that are not immediately discarded by Pop.
                 //This avoids bogus functions used in obfuscation or special compilers that can lead to infinite recursion.
-                if ((pos+1 < code.size()) && !(code.get(pos+1).definition instanceof PopIns)) {
+                if ((pos + 1 < code.size()) && !(code.get(pos + 1).definition instanceof PopIns)) {
                     MethodBody innerBody = abc.findBody(ins.operands[0]);
                     innerBody.getCode().calculateDebugFileLine(debugFile, debugLine, 0, abc, new HashSet<Integer>());
                 }
@@ -1705,8 +1705,11 @@ public class AVM2Code implements Cloneable {
                         multinameIndex = ((FullMultinameAVM2Item) ((SetPropertyAVM2Item) ti).propertyName).multinameIndex;
                         value = ((SetPropertyAVM2Item) ti).value;
                     }
+                    Multiname m = abc.constants.getMultiname(multinameIndex);
                     for (Trait t : initTraits.traits) {
-                        if (t.name_index == multinameIndex) {
+                        Multiname tm = abc.constants.getMultiname(t.name_index);
+
+                        if (tm != null && tm.equals(m)) {
                             if ((t instanceof TraitSlotConst)) {
                                 if (((TraitSlotConst) t).isConst() || isStaticInitializer) {
                                     if ((((TraitSlotConst) t).assignedValue) == null) {

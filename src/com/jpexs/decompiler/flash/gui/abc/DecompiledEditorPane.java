@@ -36,6 +36,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
@@ -554,7 +555,10 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                     if (currentTrait instanceof TraitSlotConst) {
                         abcPanel.detailPanel.slotConstTraitPanel.load((TraitSlotConst) currentTrait, abc,
                                 abc.isStaticTraitId(classIndex, lastTraitIndex));
-                        abcPanel.detailPanel.showCard(DetailPanel.SLOT_CONST_TRAIT_CARD, currentTrait);
+                        final Trait ftrait = currentTrait;
+                        View.execInEventDispatch(() -> {
+                            abcPanel.detailPanel.showCard(DetailPanel.SLOT_CONST_TRAIT_CARD, ftrait);
+                        });
                         abcPanel.detailPanel.setEditMode(false);
                         currentMethodHighlight = null;
                         Highlighting spec = Highlighting.searchPos(specialHighlights, pos, currentTraitHighlight.startPos, currentTraitHighlight.startPos + currentTraitHighlight.len);

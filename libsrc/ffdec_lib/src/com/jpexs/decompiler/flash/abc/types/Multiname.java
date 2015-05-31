@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.helpers.Helper;
 import java.util.List;
+import java.util.Objects;
 
 public class Multiname {
 
@@ -323,4 +324,47 @@ public class Multiname {
             return constants.getNamespaceSet(namespace_set_index);
         }
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 53 * hash + this.kind;
+        hash = 53 * hash + this.name_index;
+        hash = 53 * hash + this.namespace_index;
+        hash = 53 * hash + this.namespace_set_index;
+        hash = 53 * hash + this.qname_index;
+        hash = 53 * hash + Objects.hashCode(this.params);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Multiname other = (Multiname) obj;
+        if (this.kind != other.kind) {
+            return false;
+        }
+        if (this.name_index != other.name_index) {
+            return false;
+        }
+        if (this.namespace_index != other.namespace_index) {
+            return false;
+        }
+        if (this.namespace_set_index != other.namespace_set_index) {
+            return false;
+        }
+        if (this.qname_index != other.qname_index) {
+            return false;
+        }
+        if (!Objects.equals(this.params, other.params)) {
+            return false;
+        }
+        return true;
+    }
+
 }
