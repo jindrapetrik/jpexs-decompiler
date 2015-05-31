@@ -740,7 +740,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
         try {
             String oldSp = null;
-            List<ScriptPack> packs = abc.script_info.get(oldIndex).getPacks(abc, oldIndex, null);
+            List<ScriptPack> packs = abc.script_info.get(oldIndex).getPacks(abc, oldIndex, null, pack.allABCs);
             if (!packs.isEmpty()) {
                 oldSp = packs.get(0).getClassPath().toString();
             }
@@ -766,6 +766,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
             abc.script_info.get(oldIndex).delete(abc, false);
             decompiledTextArea.gotoLine((int) ex.line);
             decompiledTextArea.markError();
+            ex.printStackTrace();
             View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
         } catch (Throwable ex) {
             Logger.getLogger(ABCPanel.class.getName()).log(Level.SEVERE, null, ex);

@@ -54,6 +54,8 @@ public class ScriptPack extends AS3ClassTreeItem {
 
     public final ABC abc;
 
+    public List<ABC> allABCs;
+
     public final int scriptIndex;
 
     public final List<Integer> traitIndices;
@@ -69,12 +71,13 @@ public class ScriptPack extends AS3ClassTreeItem {
         return path;
     }
 
-    public ScriptPack(ClassPath path, ABC abc, int scriptIndex, List<Integer> traitIndices) {
+    public ScriptPack(ClassPath path, ABC abc, List<ABC> allAbcs, int scriptIndex, List<Integer> traitIndices) {
         super(path.className, path);
         this.abc = abc;
         this.scriptIndex = scriptIndex;
         this.traitIndices = traitIndices;
         this.path = path;
+        this.allABCs = allAbcs;
     }
 
     public String getPathPackage() {

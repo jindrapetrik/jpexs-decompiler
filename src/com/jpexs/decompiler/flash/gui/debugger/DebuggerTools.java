@@ -27,6 +27,8 @@ import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.helpers.Helper;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -45,9 +47,13 @@ public class DebuggerTools {
     private static Debugger debugger;
 
     private static ScriptPack getDebuggerScriptPack(SWF swf) {
+        List<ABC> allAbcList = new ArrayList<>();
+        for (ABCContainerTag ac : swf.getAbcList()) {
+            allAbcList.add(ac.getABC());
+        }
         for (ABCContainerTag ac : swf.getAbcList()) {
             ABC a = ac.getABC();
-            for (ScriptPack m : a.getScriptPacks(DEBUGGER_PACKAGE)) {
+            for (ScriptPack m : a.getScriptPacks(DEBUGGER_PACKAGE, allAbcList)) {
                 if (isDebuggerClass(m.getClassPath().packageStr, null)) {
                     return m;
                 }

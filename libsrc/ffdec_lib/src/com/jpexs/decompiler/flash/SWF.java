@@ -183,8 +183,8 @@ public final class SWF implements SWFContainerItem, Timelined {
     public static final int DEFAULT_VERSION = 10;
 
     /**
-     * Maximum SWF file format version
-     * Needs to be fixed when SWF versions reaches this value
+     * Maximum SWF file format version Needs to be fixed when SWF versions
+     * reaches this value
      */
     public static final int MAX_VERSION = 30;
 
@@ -1208,9 +1208,14 @@ public final class SWF implements SWFContainerItem, Timelined {
         boolean exported = false;
 
         List<ABCContainerTag> abcList = getAbcList();
+        List<ABC> allAbcList = new ArrayList<>();
+        for (int i = 0; i < abcList.size(); i++) {
+            allAbcList.add(abcList.get(i).getABC());
+        }
+
         for (int i = 0; i < abcList.size(); i++) {
             ABC abc = abcList.get(i).getABC();
-            List<ScriptPack> scrs = abc.findScriptPacksByPath(className);
+            List<ScriptPack> scrs = abc.findScriptPacksByPath(className, allAbcList);
             for (int j = 0; j < scrs.size(); j++) {
                 ScriptPack scr = scrs.get(j);
                 String cnt = "";
@@ -1244,8 +1249,15 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     public List<ScriptPack> getAS3Packs() {
         List<ScriptPack> packs = new ArrayList<>();
-        for (ABCContainerTag abcTag : getAbcList()) {
-            packs.addAll(abcTag.getABC().getScriptPacks(null));
+
+        List<ABCContainerTag> abcList = getAbcList();
+        List<ABC> allAbcList = new ArrayList<>();
+        for (int i = 0; i < abcList.size(); i++) {
+            allAbcList.add(abcList.get(i).getABC());
+        }
+
+        for (ABCContainerTag abcTag : abcList) {
+            packs.addAll(abcTag.getABC().getScriptPacks(null, allAbcList));
         }
         return uniqueAS3Packs(packs);
     }

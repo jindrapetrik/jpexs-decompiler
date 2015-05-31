@@ -2221,7 +2221,7 @@ public class ActionScriptParser {
                     expectedType(SymbolType.PARENT_OPEN);
                     ret = new ConstructSomethingAVM2Item(lexer.yyline(), openedNamespaces, newvar, call(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, variables));
                 }
-
+                allowMemberOrCall = true;
                 break;
             case IDENTIFIER:
             case THIS:

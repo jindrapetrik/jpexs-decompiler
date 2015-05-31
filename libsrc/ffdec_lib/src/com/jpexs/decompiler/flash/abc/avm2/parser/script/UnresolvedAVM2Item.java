@@ -365,15 +365,6 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                             continue;
                         }
                         TypeItem ret = new TypeItem(fname);
-                        /*for (String s : subtypes) {
-                         UnresolvedAVM2Item su = new UnresolvedAVM2Item(new ArrayList<String>(), importedClasses, true, null, line, s, null, openedNamespaces);
-                         su.resolve(thisType, paramTypes, paramNames, abc, otherAbcs, callStack, variables);
-                         if (!(su.resolved instanceof TypeItem)) {
-                         throw new CompilationException("Not a type", line);
-                         }
-                         TypeItem st = (TypeItem) su.resolved;
-                         ret.subtypes.add(st.fullTypeName);
-                         }*/
                         resolved = ret;
                         for (int j = i + 1; j < parts.size(); j++) {
                             resolved = new PropertyAVM2Item(resolved, parts.get(j), abc, otherAbcs, openedNamespaces, new ArrayList<MethodBody>());

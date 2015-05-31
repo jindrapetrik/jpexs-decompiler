@@ -53,7 +53,7 @@ public class ScriptInfo {
         this.traits = traits;
     }
 
-    public List<ScriptPack> getPacks(ABC abc, int scriptIndex, String packagePrefix) {
+    public List<ScriptPack> getPacks(ABC abc, int scriptIndex, String packagePrefix, List<ABC> allAbcs) {
         List<ScriptPack> ret = new ArrayList<>();
 
         List<Integer> otherTraits = new ArrayList<>();
@@ -84,7 +84,7 @@ public class ScriptInfo {
 
                 if (packagePrefix == null || packageName.startsWith(packagePrefix)) {
                     ClassPath cp = new ClassPath(packageName, objectName);
-                    ret.add(new ScriptPack(cp, abc, scriptIndex, traitIndices));
+                    ret.add(new ScriptPack(cp, abc, allAbcs, scriptIndex, traitIndices));
                 }
             }
         }

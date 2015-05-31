@@ -2427,7 +2427,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         } else if (item instanceof ApplyTypeAVM2Item) {
             typeItem = ((ApplyTypeAVM2Item) item).object;
         } else {
-            throw new CompilationException("Invalid type:" + item.getClass().getName(), 0/*??*/);
+            throw new CompilationException("Invalid type:" + item + " (" + item.getClass().getName() + ")", 0/*??*/);
         }
         if (typeItem instanceof UnresolvedAVM2Item) {
             String fullClass = localData.getFullClass();

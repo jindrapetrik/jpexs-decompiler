@@ -868,10 +868,10 @@ public class ABC {
         }
     }
 
-    public List<ScriptPack> getScriptPacks(String packagePrefix) {
+    public List<ScriptPack> getScriptPacks(String packagePrefix, List<ABC> allAbcs) {
         List<ScriptPack> ret = new ArrayList<>();
         for (int i = 0; i < script_info.size(); i++) {
-            ret.addAll(script_info.get(i).getPacks(this, i, packagePrefix));
+            ret.addAll(script_info.get(i).getPacks(this, i, packagePrefix, allAbcs));
         }
         return ret;
     }
@@ -1045,9 +1045,9 @@ public class ABC {
         return -1;
     }
 
-    public List<ScriptPack> findScriptPacksByPath(String name) {
+    public List<ScriptPack> findScriptPacksByPath(String name, List<ABC> allAbcs) {
         List<ScriptPack> ret = new ArrayList<>();
-        List<ScriptPack> allPacks = getScriptPacks(null); // todo: honfika: use filter parameter
+        List<ScriptPack> allPacks = getScriptPacks(null, allAbcs); // todo: honfika: use filter parameter
         if (name.endsWith(".**") || name.equals("**") || name.endsWith(".++") || name.equals("++")) {
             name = name.substring(0, name.length() - 2);
 
@@ -1068,7 +1068,7 @@ public class ABC {
                 }
             }
         } else {
-            ScriptPack p = findScriptPackByPath(name);
+            ScriptPack p = findScriptPackByPath(name, allAbcs);
             if (p != null) {
                 ret.add(p);
             }
@@ -1077,8 +1077,8 @@ public class ABC {
 
     }
 
-    public ScriptPack findScriptPackByPath(String name) {
-        List<ScriptPack> packs = getScriptPacks(null);
+    public ScriptPack findScriptPackByPath(String name, List<ABC> allAbcs) {
+        List<ScriptPack> packs = getScriptPacks(null, allAbcs);
         for (ScriptPack en : packs) {
             if (en.getClassPath().toString().equals(name)) {
                 return en;
@@ -1245,7 +1245,9 @@ public class ABC {
                 newClassIndex = tc.class_info + 1;
             }
         }
-        ActionScriptParser.compile(as, this, new ArrayList<ABC>(), isDocumentClass, scriptName, newClassIndex);
+        List<ABC> otherAbcs = new ArrayList<>(pack.allABCs);
+        otherAbcs.remove(this);
+        ActionScriptParser.compile(as, this, otherAbcs, isDocumentClass, scriptName, newClassIndex);
         // Move newly added script to its position
         script_info.set(oldIndex, script_info.get(newIndex));
         script_info.remove(newIndex);
