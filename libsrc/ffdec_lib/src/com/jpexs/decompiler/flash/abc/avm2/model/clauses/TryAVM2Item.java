@@ -50,6 +50,8 @@ public class TryAVM2Item extends AVM2Item implements Block {
 
     public List<List<AssignableAVM2Item>> catchVariables = new ArrayList<>();
 
+    public String finCatchName = "";
+
     @Override
     public List<List<GraphTargetItem>> getSubs() {
         List<List<GraphTargetItem>> ret = new ArrayList<>();
@@ -63,12 +65,13 @@ public class TryAVM2Item extends AVM2Item implements Block {
         return ret;
     }
 
-    public TryAVM2Item(List<GraphTargetItem> tryCommands, List<ABCException> catchExceptions, List<List<GraphTargetItem>> catchCommands, List<GraphTargetItem> finallyCommands) {
+    public TryAVM2Item(List<GraphTargetItem> tryCommands, List<ABCException> catchExceptions, List<List<GraphTargetItem>> catchCommands, List<GraphTargetItem> finallyCommands, String finCatchName) {
         super(null, NOPRECEDENCE);
         this.tryCommands = tryCommands;
         this.catchExceptions = catchExceptions;
         this.catchCommands = catchCommands;
         this.finallyCommands = finallyCommands;
+        this.finCatchName = finCatchName;
     }
 
     @Override
@@ -84,6 +87,9 @@ public class TryAVM2Item extends AVM2Item implements Block {
             writer.newLine();
             writer.append("catch(");
             String localName = catchExceptions.get(e).getVarName(localData.constantsAvm2, localData.fullyQualifiedNames);
+            if (localName.isEmpty()) {
+                localName = finCatchName;
+            }
             HighlightData data = new HighlightData();
             data.localName = localName;
             data.declaration = true;

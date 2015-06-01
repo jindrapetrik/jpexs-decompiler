@@ -458,6 +458,11 @@ public class Graph {
                 }
             }
         }
+        finalProcessAfter(list, level, localData);
+    }
+
+    protected void finalProcessAfter(List<GraphTargetItem> list, int level, FinalProcessLocalData localData) {
+
     }
 
     protected void finalProcess(List<GraphTargetItem> list, int level, FinalProcessLocalData localData) {
@@ -1356,18 +1361,18 @@ public class Graph {
             if (currentLoop != null) {
                 currentLoop.phase = 0;
             }
-            switch (part.stopPartType) {
-                case AND_OR:
-                    part.setAndOrStack(stack); //Save stack for later use
-                    break;
+            /*switch (part.stopPartType) {
+             case AND_OR:
+             part.setAndOrStack(stack); //Save stack for later use
+             break;
 
-                case COMMONPART:
-                    part.setCommonPartStack(stack); //Save stack for later use
-                    break;
+             case COMMONPART:
+             part.setCommonPartStack(stack); //Save stack for later use
+             break;
 
-                case NONE:
-                    break;
-            }
+             case NONE:
+             break;
+             }*/
             return ret;
         }
 
@@ -1458,13 +1463,12 @@ public class Graph {
                 } else {
                     List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
                     GraphPart andOrStopPart = reversed ? sp1 : sp0;
-                    andOrStopPart.stopPartType = GraphPart.StopPartType.AND_OR;
                     stopPart2.add(andOrStopPart);
+                    GraphTargetItem first = ((NotItem) stack.pop()).getOriginal();
+                    stack.pop();
+                    stack.push(new MarkItem("disposable"));
                     printGraph(visited, localData, stack, allParts, parent, next, stopPart2, loops, null, staticOperation, path, recursionLevel + 1);
-                    stack = andOrStopPart.andOrStack; // Use stack that was stored upon reaching AND_OR stopPart
                     GraphTargetItem second = stack.pop();
-                    GraphTargetItem first = stack.pop();
-                    andOrStopPart.stopPartType = GraphPart.StopPartType.NONE; // Reset stopPartType
 
                     if (!reversed) {
                         AndItem a = new AndItem(null, first, second);
@@ -1513,13 +1517,16 @@ public class Graph {
                 } else {
                     List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
                     GraphPart andOrStopPart = reversed ? sp1 : sp0;
-                    andOrStopPart.stopPartType = GraphPart.StopPartType.AND_OR;
+                    //andOrStopPart.stopPartType = GraphPart.StopPartType.AND_OR;
                     stopPart2.add(andOrStopPart);
-                    printGraph(visited, localData, stack, allParts, parent, next, stopPart2, loops, null, staticOperation, path, recursionLevel + 1);
-                    stack = andOrStopPart.andOrStack; // Use stack that was stored upon reaching AND_OR stopPart
-                    GraphTargetItem second = stack.pop();
                     GraphTargetItem first = stack.pop();
-                    andOrStopPart.stopPartType = GraphPart.StopPartType.NONE; // Reset stopPartType
+                    stack.pop();
+                    stack.push(new MarkItem("disposable"));
+                    printGraph(visited, localData, stack, allParts, parent, next, stopPart2, loops, null, staticOperation, path, recursionLevel + 1);
+                    //stack = andOrStopPart.andOrStack; // Use stack that was stored upon reaching AND_OR stopPart
+                    GraphTargetItem second = stack.pop();
+                    //GraphTargetItem first = stack.pop();
+                    //andOrStopPart.stopPartType = GraphPart.StopPartType.NONE; // Reset stopPartType
 
                     if (reversed) {
                         AndItem a = new AndItem(null, first, second);
@@ -1558,7 +1565,7 @@ public class Graph {
 
         if (parseNext) {
 
-            if (false && part.nextParts.size() > 2) {//alchemy direct switch
+            if (part.nextParts.size() > 2) {//direct switch, seen in the wild...
                 GraphPart next = getMostCommonPart(localData, part.nextParts, loops);
                 List<GraphPart> vis = new ArrayList<>();
                 GraphTargetItem switchedItem = stack.pop();
@@ -1646,7 +1653,6 @@ public class Graph {
                      }*/
                     nps = part.nextParts;
                     GraphPart next = getCommonPart(localData, nps, loops);
-
                     TranslateStack trueStack = (TranslateStack) stack.clone();
                     TranslateStack falseStack = (TranslateStack) stack.clone();
                     int trueStackSizeBefore = trueStack.size();
@@ -1659,44 +1665,41 @@ public class Graph {
                     }
 
                     List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
-                    GraphPart.CommonPartStack commonPartStack = null;
+                    //GraphPart.CommonPartStack commonPartStack = null;
                     if ((!isEmpty) && (next != null)) {
-                        commonPartStack = next.new CommonPartStack();
-                        if (next.commonPartStacks == null) {
-                            next.commonPartStacks = new ArrayList<>();
-                        }
-                        next.stopPartType = GraphPart.StopPartType.COMMONPART;
+                        /*commonPartStack = next.new CommonPartStack();
+                         if (next.commonPartStacks == null) {
+                         next.commonPartStacks = new ArrayList<>();
+                         }
+                         next.stopPartType = GraphPart.StopPartType.COMMONPART;
+                         */
                         stopPart2.add(next);
                     }
+
                     if (!isEmpty) {
-                        if (next != null) {
-                            next.commonPartStacks.add(commonPartStack);
-                            commonPartStack.isTrueStack = true; //stopPart must know it needs to store trueStack
-                        }
                         onTrue = printGraph(visited, prepareBranchLocalData(localData), trueStack, allParts, part, nps.get(1), stopPart2, loops, null, staticOperation, path, recursionLevel + 1);
                     }
                     List<GraphTargetItem> onFalse = new ArrayList<>();
 
                     if (!isEmpty) {
-                        if (next != null) {
-                            commonPartStack.isTrueStack = false; //stopPart must know it needs to store falseStack
-                        }
+                        /*if (next != null) {
+                         commonPartStack.isTrueStack = false; //stopPart must know it needs to store falseStack
+                         }*/
                         onFalse = printGraph(visited, prepareBranchLocalData(localData), falseStack, allParts, part, nps.get(0), stopPart2, loops, null, staticOperation, path, recursionLevel + 1);
                     }
 
                     /* if there is a stopPart (next), then Graph will be further analyzed starting from the stopPart:
-                     * trueStack and falseStack must be set equal to corresponding stack that was built upon reaching stopPart. */
-                    if ((!isEmpty) && (next != null)) {
-                        if ((commonPartStack.trueStack != null) && (commonPartStack.falseStack != null)) {
-                            trueStack = commonPartStack.trueStack;
-                            falseStack = commonPartStack.falseStack;
-                        }
-                        next.commonPartStacks.remove(next.commonPartStacks.size() - 1);
-                        if (next.commonPartStacks.isEmpty()) {
-                            next.stopPartType = GraphPart.StopPartType.NONE; // reset StopPartType
-                        }
-                    }
-
+                     * trueStack and falseStack must be set equal to corresponding stack that was built upon reaching stopPart. 
+                     if ((!isEmpty) && (next != null)) {
+                     if ((commonPartStack.trueStack != null) && (commonPartStack.falseStack != null)) {
+                     trueStack = commonPartStack.trueStack;
+                     falseStack = commonPartStack.falseStack;
+                     }
+                     next.commonPartStacks.remove(next.commonPartStacks.size() - 1);
+                     if (next.commonPartStacks.isEmpty()) {
+                     next.stopPartType = GraphPart.StopPartType.NONE; // reset StopPartType
+                     }
+                     }*/
                     if (isEmpty(onTrue) && isEmpty(onFalse) && (trueStack.size() == trueStackSizeBefore + 1) && (falseStack.size() == falseStackSizeBefore + 1)) {
                         stack.push(new TernarOpItem(null, expr, trueStack.pop(), falseStack.pop()));
                     } else {

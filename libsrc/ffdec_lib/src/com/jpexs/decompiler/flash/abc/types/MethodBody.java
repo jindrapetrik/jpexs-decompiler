@@ -276,6 +276,7 @@ public final class MethodBody implements Cloneable {
         MethodBody b = clone();
         AVM2Code deobfuscated = b.getCode();
         deobfuscated.markMappedOffsets();
+        //deobfuscated.inlineJumpExit();
         if (Configuration.autoDeobfuscate.get()) {
             try {
                 deobfuscated.removeTraps(constants, trait, method_info.get(this.method_info), b, abc, scriptIndex, classIndex, isStatic, path);

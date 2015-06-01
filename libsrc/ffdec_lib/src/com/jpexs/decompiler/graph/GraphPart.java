@@ -62,34 +62,31 @@ public class GraphPart implements Serializable {
         NONE, AND_OR, COMMONPART
     }
 
-    public StopPartType stopPartType = StopPartType.NONE;
+    //public StopPartType stopPartType = StopPartType.NONE;
+    //public TranslateStack andOrStack; // Stores stack when AND_OR stopPart has been reached
+    /*public class CommonPartStack { // Stores stack when COMMONPART stopPart has been reached
 
-    public TranslateStack andOrStack; // Stores stack when AND_OR stopPart has been reached
+     boolean isTrueStack;
 
-    public class CommonPartStack { // Stores stack when COMMONPART stopPart has been reached
+     TranslateStack trueStack;
 
-        boolean isTrueStack;
+     TranslateStack falseStack;
+     }/
 
-        TranslateStack trueStack;
+     //public ArrayList<CommonPartStack> commonPartStacks;
 
-        TranslateStack falseStack;
-    }
+     /*    public void setAndOrStack(TranslateStack stack) {
+     andOrStack = stack;
+     }
 
-    public ArrayList<CommonPartStack> commonPartStacks;
-
-    public void setAndOrStack(TranslateStack stack) {
-        andOrStack = stack;
-    }
-
-    public void setCommonPartStack(TranslateStack stack) {
-        CommonPartStack currentStack = commonPartStacks.get(commonPartStacks.size() - 1);
-        if (currentStack.isTrueStack) {
-            currentStack.trueStack = stack;
-        } else {
-            currentStack.falseStack = stack;
-        }
-    }
-
+     public void setCommonPartStack(TranslateStack stack) {
+     CommonPartStack currentStack = commonPartStacks.get(commonPartStacks.size() - 1);
+     if (currentStack.isTrueStack) {
+     currentStack.trueStack = stack;
+     } else {
+     currentStack.falseStack = stack;
+     }
+     }*/
     public int setTime(int time, List<GraphPart> ordered, List<GraphPart> visited) {
         if (visited.contains(this)) {
             return time;

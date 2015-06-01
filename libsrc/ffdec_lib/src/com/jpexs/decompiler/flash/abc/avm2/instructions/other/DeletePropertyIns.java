@@ -55,8 +55,8 @@ public class DeletePropertyIns extends InstructionDefinition {
         int multinameIndex = ins.operands[0];
         FullMultinameAVM2Item multiname = resolveMultiname(stack, constants, multinameIndex, ins);
         GraphTargetItem obj = stack.pop();
-        stack.add(new BooleanAVM2Item(ins, Boolean.TRUE));//property successfully deleted
-        output.add(new DeletePropertyAVM2Item(ins, obj, multiname));
+        //stack.add(new BooleanAVM2Item(ins, Boolean.TRUE));//property successfully deleted
+        stack.add(new DeletePropertyAVM2Item(ins, obj, multiname));
     }
 
     @Override

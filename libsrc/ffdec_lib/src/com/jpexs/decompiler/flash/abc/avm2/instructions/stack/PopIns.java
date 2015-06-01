@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.MarkItem;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.HashMap;
@@ -47,7 +48,8 @@ public class PopIns extends InstructionDefinition {
         if (stack.size() > 0) {
             GraphTargetItem top = stack.pop();
             //Note: Commands like "5;" - numbers are unsupported as it collide with try..finally block decompilation. TODO: allow this somehow
-            if (!(top instanceof IntegerValueAVM2Item)) {
+
+            if (/*!(top instanceof IntegerValueAVM2Item) &&*/(!(top instanceof MarkItem))) {
                 output.add(top);
             }
         }

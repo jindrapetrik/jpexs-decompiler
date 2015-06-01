@@ -25,10 +25,11 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
+import com.jpexs.decompiler.graph.model.ExitItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 
-public class ThrowAVM2Item extends AVM2Item {
+public class ThrowAVM2Item extends AVM2Item implements ExitItem {
 
     //public GraphTargetItem value;
     public ThrowAVM2Item(AVM2Instruction instruction, GraphTargetItem value) {

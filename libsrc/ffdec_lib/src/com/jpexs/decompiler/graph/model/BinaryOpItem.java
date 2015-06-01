@@ -51,7 +51,7 @@ public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        if (leftSide.getPrecedence() > precedence) {
+        if (leftSide.getPrecedence() > precedence && leftSide.getPrecedence() != GraphTargetItem.NOPRECEDENCE) {
             writer.append("(");
             leftSide.toString(writer, localData);
             writer.append(")");
@@ -63,7 +63,7 @@ public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
         writer.append(operator);
         writer.append(" ");
 
-        if (rightSide.getPrecedence() > precedence) {
+        if (rightSide.getPrecedence() > precedence && rightSide.getPrecedence() != GraphTargetItem.NOPRECEDENCE) {
             writer.append("(");
             rightSide.toString(writer, localData);
             writer.append(")");

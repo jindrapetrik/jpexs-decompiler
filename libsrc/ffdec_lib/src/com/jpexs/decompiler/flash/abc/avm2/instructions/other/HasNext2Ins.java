@@ -42,7 +42,7 @@ public class HasNext2Ins extends InstructionDefinition {
         int objectReg = ins.operands[0];
         int indexReg = ins.operands[1];
         //stack.push("_loc_" + objectReg + ".hasNext(cnt=_loc_" + indexReg + ")");
-        stack.push(new HasNextAVM2Item(ins, new LocalRegAVM2Item(ins, indexReg, localRegs.get(indexReg)), localRegs.get(objectReg)));
+        stack.push(new HasNextAVM2Item(ins, new LocalRegAVM2Item(ins, indexReg, localRegs.get(indexReg)), localRegNames.containsKey(objectReg) ? new LocalRegAVM2Item(ins, objectReg, localRegs.get(objectReg)) : localRegs.get(objectReg)));
     }
 
     @Override

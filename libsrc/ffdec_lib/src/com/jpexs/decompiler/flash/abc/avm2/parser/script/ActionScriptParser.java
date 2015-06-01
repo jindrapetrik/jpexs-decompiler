@@ -1415,7 +1415,10 @@ public class ActionScriptParser {
                         }
                         forExpr = (expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables));
                         expectedType(SymbolType.SEMICOLON);
-                        forFinalCommands.add(command(thisType, pkg, needsActivation, importedClasses, openedNamespaces, loops, loopLabels, registerVars, inFunction, inMethod, forinlevel, true, variables));
+                        GraphTargetItem fcom = command(thisType, pkg, needsActivation, importedClasses, openedNamespaces, loops, loopLabels, registerVars, inFunction, inMethod, forinlevel, true, variables);
+                        if (fcom != null) {
+                            forFinalCommands.add(fcom);
+                        }
                     }
                     expectedType(SymbolType.PARENT_CLOSE);
                     List<GraphTargetItem> forBody = new ArrayList<>();
@@ -1627,7 +1630,7 @@ public class ActionScriptParser {
                         expected(s, lexer.yyline(), SymbolType.CATCH, SymbolType.FINALLY);
                     }
                     lexer.pushback(s);
-                    TryAVM2Item tai = new TryAVM2Item(tryCommands, null, catchCommands, finallyCommands);
+                    TryAVM2Item tai = new TryAVM2Item(tryCommands, null, catchCommands, finallyCommands, "");
                     tai.catchVariables = catchesVars;
                     tai.catchExceptions2 = catchExceptions;
                     ret = tai;

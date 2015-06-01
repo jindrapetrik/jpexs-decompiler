@@ -1074,7 +1074,10 @@ public class ActionScriptParser {
                     }
                     forExpr = (expression(inFunction, inMethod, true, variables));
                     expectedType(SymbolType.SEMICOLON);
-                    forFinalCommands.add(command(inFunction, inMethod, forinlevel, true, variables));
+                    GraphTargetItem fcom = command(inFunction, inMethod, forinlevel, true, variables);
+                    if (fcom != null) {
+                        forFinalCommands.add(fcom);
+                    }
                 }
                 expectedType(SymbolType.PARENT_CLOSE);
                 List<GraphTargetItem> forBody = new ArrayList<>();

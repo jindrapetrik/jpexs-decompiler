@@ -103,6 +103,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
+import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -569,8 +570,11 @@ public class AVM2SourceGenerator implements SourceGenerator {
         List<AVM2Instruction> forExpr = new ArrayList<>();
 
         List<GraphTargetItem> ex = new ArrayList<>();
-        ex.add(item.expression);
-
+        if (item.expression != null) {
+            ex.add(item.expression);
+        } else {
+            ex.add(new BooleanAVM2Item(null, true));
+        }
         GraphTargetItem lastItem = null;
         if (!ex.isEmpty()) {
             lastItem = ex.remove(ex.size() - 1);

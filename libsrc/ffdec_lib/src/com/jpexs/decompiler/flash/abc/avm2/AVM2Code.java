@@ -1284,7 +1284,7 @@ public class AVM2Code implements Cloneable {
         calcKilledStats(body);
         boolean debugMode = DEBUG_MODE;
         if (debugMode) {
-            System.out.println("OPEN SubSource:" + start + "-" + end + " " + code.get(start).toString() + " to " + code.get(end).toString());
+            System.err.println("OPEN SubSource:" + start + "-" + end + " " + code.get(start).toString() + " to " + code.get(end).toString());
         }
         if (visited == null) {
             visited = new boolean[code.size()];
@@ -1442,18 +1442,24 @@ public class AVM2Code implements Cloneable {
                             }
                         }
                         if (!isKilled(reg, 0, end)) {
-                            for (int i = ip; i >= start; i--) {
+                            GraphTargetItem vx = stack.pop();
+                            int dupCnt = 1;
+                            for (int i = ip - 1; i >= start; i--) {
                                 if (code.get(i).definition instanceof DupIns) {
                                     if (stack.isEmpty()) {
                                         break; // FIXME?o
                                     }
-                                    GraphTargetItem v = stack.pop();
-                                    stack.push(new LocalRegAVM2Item(ins, reg, v));
-                                    stack.push(v);
+                                    stack.pop();
+                                    dupCnt++;
+                                    //stack.push(v);
                                 } else {
                                     break;
                                 }
                             }
+                            for (int i = 0; i < dupCnt; i++) {
+                                stack.push(new LocalRegAVM2Item(ins, reg, vx));
+                            }
+                            stack.push(vx);
                         } else {
                             ins.definition.translate(isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames, path, localRegAssigmentIps, ip, refs, this);
                         }
@@ -1530,7 +1536,7 @@ public class AVM2Code implements Cloneable {
 
         }
         if (debugMode) {
-            System.out.println("CLOSE SubSource:" + start + "-" + end + " " + code.get(start).toString() + " to " + code.get(end).toString());
+            System.err.println("CLOSE SubSource:" + start + "-" + end + " " + code.get(start).toString() + " to " + code.get(end).toString());
         }
         /*if (hideTemporaryRegisters) {
          clearTemporaryRegisters(output);
@@ -2499,6 +2505,40 @@ public class AVM2Code implements Cloneable {
         return cnt;
     }
 
+    public void inlineJumpExit() {
+        int csize = code.size();
+        for (int i = 0; i < csize; i++) {
+            AVM2Instruction ins = code.get(i);
+            int insLen = code.get(i).getBytes().length;
+            int ofs = pos2adr(i);
+            if (ins.definition instanceof JumpIns) {
+                int targetOfs = ofs + insLen + ins.operands[0];
+                try {
+                    int ni = adr2pos(targetOfs);
+                    if (ni < code.size() && ni > -1) {
+                        AVM2Instruction ins2 = code.get(ni);
+                        if (ins2.isExit()) {
+                            code.set(i, new AVM2Instruction(ofs, ins2.definition, ins2.operands));
+                            AVM2Instruction nopIns;
+                            nopIns = new AVM2Instruction(ofs + 1, new NopIns(), new int[]{});
+                            code.add(i + 1, nopIns);
+                            nopIns = new AVM2Instruction(ofs + 2, new NopIns(), new int[]{});
+                            code.add(i + 2, nopIns);
+                            nopIns = new AVM2Instruction(ofs + 3, new NopIns(), new int[]{});
+                            code.add(i + 3, nopIns);
+                            i += 3;
+                            csize = code.size();
+                            buildCache();
+                        }
+                    }
+                } catch (ConvertException ex) {
+                    //ignore
+                }
+            }
+            //ofs += insLen;
+        }
+    }
+
     public void markMappedOffsets() {
         int ofs = 0;
         for (int i = 0; i < code.size(); i++) {
@@ -2910,7 +2950,7 @@ public class AVM2Code implements Cloneable {
             }
             ip++;
         }
-        if (ip < 0) {
+        if (ip < 0 && debugMode) {
             System.out.println("Visited Negative: " + ip);
         }
         return ret;

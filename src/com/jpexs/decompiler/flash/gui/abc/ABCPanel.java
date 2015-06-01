@@ -455,7 +455,9 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
     }
 
     private boolean hasDeclaration(int pos) {
-
+        if (decompiledTextArea == null) {
+            return false; //?
+        }
         SyntaxDocument sd = (SyntaxDocument) decompiledTextArea.getDocument();
         Token t = sd.getTokenAt(pos);
         if (t == null || (t.type != TokenType.IDENTIFIER && t.type != TokenType.KEYWORD && t.type != TokenType.REGEX)) {
