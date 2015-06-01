@@ -713,4 +713,14 @@ public class Timeline {
 
         return true;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Timeline) {
+            Timeline timelineObj = (Timeline) obj;
+            return timelined.equals(timelineObj.timelined) && parentTag == timelineObj.parentTag;
+        }
+
+        return false;
+    }
 }

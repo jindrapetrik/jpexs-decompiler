@@ -89,6 +89,21 @@ public class Frame implements TreeItem, Exportable {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Frame) {
+            Frame frameObj = (Frame) obj;
+            return timeline.equals(frameObj.timeline) && frame == frameObj.frame;
+        }
+
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return timeline.hashCode() ^ Integer.hashCode(frame);
+    }
+
+    @Override
     public boolean isModified() {
         for (Tag t : innerTags) {
             if (t.isModified()) {
