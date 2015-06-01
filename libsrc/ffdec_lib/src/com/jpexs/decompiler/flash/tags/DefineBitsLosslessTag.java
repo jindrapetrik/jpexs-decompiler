@@ -190,7 +190,7 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
     }
 
     @Override
-    public InputStream getImageData() {
+    public InputStream getOriginalImageData() {
         return null;
     }
 

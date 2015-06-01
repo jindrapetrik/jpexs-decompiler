@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.shape.BitmapExporter;
 import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
 import com.jpexs.decompiler.flash.exporters.shape.SVGShapeExporter;
+import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.TagInfo;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -41,6 +42,8 @@ import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Shape;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -61,7 +64,7 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
         super(swf, id, name, data);
     }
 
-    public abstract InputStream getImageData();
+    public abstract InputStream getOriginalImageData();
 
     public abstract SerializableImage getImage();
 
@@ -95,6 +98,17 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
         }
 
         return ImageFormat.UNKNOWN;
+    }
+
+    public InputStream getImageData() {
+        InputStream is = getOriginalImageData();
+        if (is != null) {
+            return is;
+        }
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageHelper.write(getImage().getBufferedImage(), getImageFormat(), baos);
+        return new ByteArrayInputStream(baos.toByteArray());
     }
 
     public static boolean hasErrorHeader(byte[] data) {

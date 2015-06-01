@@ -17,19 +17,23 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFCompression;
 import com.jpexs.decompiler.flash.gui.helpers.TableLayoutHelper;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
+import javax.swing.event.ChangeEvent;
 import layout.TableLayout;
 
 /**
@@ -55,6 +59,10 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
     private final JLabel displayRectTwipsLabel = new JLabel();
 
     private final JLabel displayRectPixelsLabel = new JLabel();
+
+    private final JPanel compressionEditorPanel = new JPanel();
+
+    private final JComboBox<ComboBoxItem<SWFCompression>> compressionComboBox = new JComboBox<>();
 
     private final JPanel versionEditorPanel = new JPanel();
 
@@ -86,6 +94,10 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
 
     private final JSpinner yMaxEditor = new JSpinner();
 
+    private final JPanel warningPanel = new JPanel();
+
+    private final JLabel warningLabel = new JLabel();
+
     private SWF swf;
 
     public HeaderInfoPanel() {
@@ -96,16 +108,33 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
             {TableLayout.PREFERRED, TableLayout.FILL},
             {TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED,
                 TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED,
-                TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED}
+                TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED,
+                TableLayout.PREFERRED}
         }));
 
         FlowLayout layout = new FlowLayout(SwingConstants.WEST);
         layout.setHgap(0);
         layout.setVgap(0);
 
+        compressionEditorPanel.setLayout(layout);
+        compressionComboBox.addItem(new ComboBoxItem<>(AppStrings.translate("header.uncompressed"), SWFCompression.NONE));
+        compressionComboBox.addItem(new ComboBoxItem<>("Zlib", SWFCompression.ZLIB));
+        compressionComboBox.addItem(new ComboBoxItem<>("LZMA", SWFCompression.LZMA));
+        compressionComboBox.addActionListener((ActionEvent e) -> {
+            validateHeader();
+        });
+        compressionEditorPanel.add(compressionComboBox);
+
         versionEditorPanel.setLayout(layout);
         versionEditor.setPreferredSize(new Dimension(80, versionEditor.getPreferredSize().height));
+        versionEditor.addChangeListener((ChangeEvent e) -> {
+            validateHeader();
+        });
         versionEditorPanel.add(versionEditor);
+
+        gfxCheckBox.addActionListener((ActionEvent e) -> {
+            validateHeader();
+        });
 
         frameRateEditorPanel.setLayout(layout);
         frameRateEditor.setPreferredSize(new Dimension(80, frameRateEditor.getPreferredSize().height));
@@ -126,10 +155,16 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
         displayRectEditorPanel.add(yMaxEditor);
         displayRectEditorPanel.add(new JLabel(" twips"));
 
+        warningLabel.setIcon(View.getIcon("warning16"));
+        warningPanel.setLayout(layout);
+        warningPanel.setBackground(new Color(255, 213, 29));
+        warningPanel.add(warningLabel);
+
         propertiesPanel.add(new JLabel(AppStrings.translate("header.signature")), "0,0");
         propertiesPanel.add(signatureLabel, "1,0");
         propertiesPanel.add(new JLabel(AppStrings.translate("header.compression")), "0,1");
         propertiesPanel.add(compressionLabel, "1,1");
+        propertiesPanel.add(compressionEditorPanel, "1,1");
         propertiesPanel.add(new JLabel(AppStrings.translate("header.version")), "0,2");
         propertiesPanel.add(versionLabel, "1,2");
         propertiesPanel.add(versionEditorPanel, "1,2");
@@ -148,6 +183,7 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
         propertiesPanel.add(displayRectEditorPanel, "1,7");
         propertiesPanel.add(new JLabel(""), "0,8");
         propertiesPanel.add(displayRectPixelsLabel, "1,8");
+        propertiesPanel.add(warningPanel, "0,9,1,9");
 
         add(propertiesPanel, BorderLayout.CENTER);
 
@@ -171,12 +207,23 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
         setEditMode(false);
     }
 
+    private int getVersionNumber() {
+        return (int) versionEditor.getModel().getValue();
+    }
+
+    private SWFCompression getCompression() {
+        @SuppressWarnings("unchecked")
+        ComboBoxItem<SWFCompression> item = (ComboBoxItem<SWFCompression>) compressionComboBox.getSelectedItem();
+        return item.getValue();
+    }
+
     private void editButtonActionPerformed(ActionEvent evt) {
         setEditMode(true);
     }
 
     private void saveButtonActionPerformed(ActionEvent evt) {
-        swf.version = (int) versionEditor.getModel().getValue();
+        swf.compression = getCompression();
+        swf.version = getVersionNumber();
         swf.gfx = gfxCheckBox.isSelected();
         swf.frameRate = (int) frameRateEditor.getModel().getValue();
         swf.displayRect.Xmin = (int) xMinEditor.getModel().getValue();
@@ -199,12 +246,15 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
         switch (swf.compression) {
             case LZMA:
                 compressionLabel.setText(AppStrings.translate("header.compression.lzma"));
+                compressionComboBox.setSelectedIndex(2);
                 break;
             case ZLIB:
                 compressionLabel.setText(AppStrings.translate("header.compression.zlib"));
+                compressionComboBox.setSelectedIndex(1);
                 break;
             case NONE:
                 compressionLabel.setText(AppStrings.translate("header.compression.none"));
+                compressionComboBox.setSelectedIndex(0);
                 break;
         }
 
@@ -253,20 +303,53 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
     }
 
     private void setEditMode(boolean edit) {
+        compressionLabel.setVisible(!edit);
+        compressionEditorPanel.setVisible(edit);
         versionLabel.setVisible(!edit);
-        versionEditor.setVisible(edit);
+        versionEditorPanel.setVisible(edit);
         gfxLabel.setVisible(!edit);
         gfxCheckBox.setVisible(edit);
         frameRateLabel.setVisible(!edit);
-        frameRateEditor.setVisible(edit);
+        frameRateEditorPanel.setVisible(edit);
 
         displayRectTwipsLabel.setVisible(!edit);
         displayRectPixelsLabel.setVisible(!edit);
         displayRectEditorPanel.setVisible(edit);
 
+        warningPanel.setVisible(false);
+
         editButton.setVisible(!edit);
         saveButton.setVisible(edit);
         cancelButton.setVisible(edit);
+    }
+
+    private boolean validateHeader() {
+        int version = getVersionNumber();
+        boolean gfx = gfxCheckBox.isSelected();
+        SWFCompression compression = getCompression();
+        String resultStr = "";
+        boolean result = true;
+        if (gfx && !(compression == SWFCompression.NONE || compression == SWFCompression.ZLIB)) {
+            resultStr += AppStrings.translate("header.warning.unsupportedGfxCompression") + " ";
+            result = false;
+        }
+
+        if (compression == SWFCompression.ZLIB && version < 6) {
+            resultStr += AppStrings.translate("header.warning.minimumZlibVersion") + " ";
+            result = false;
+        }
+
+        if (compression == SWFCompression.LZMA && version < 13) {
+            resultStr += AppStrings.translate("header.warning.minimumLzmaVersion") + " ";
+            result = false;
+        }
+
+        warningPanel.setVisible(!result);
+        if (!result) {
+            warningLabel.setText(resultStr);
+        }
+
+        return result;
     }
 
     @Override

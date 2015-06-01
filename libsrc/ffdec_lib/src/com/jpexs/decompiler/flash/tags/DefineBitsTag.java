@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -102,15 +103,7 @@ public class DefineBitsTag extends ImageTag implements TagChangedListener {
     }
 
     @Override
-    public InputStream getImageData() {
-        return null;
-    }
-
-    @Override
-    public SerializableImage getImage() {
-        if (cachedImage != null) {
-            return cachedImage;
-        }
+    public InputStream getOriginalImageData() {
         if (swf.getJtt() != null) {
             try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
                 byte[] jttdata = swf.getJtt().jpegData;
@@ -122,7 +115,26 @@ public class DefineBitsTag extends ImageTag implements TagChangedListener {
                 int errorLength = hasErrorHeader(jpegData) ? 4 : 0;
                 baos.write(jpegData.getArray(), jpegData.getPos() + errorLength, jpegData.getLength() - errorLength);
 
-                BufferedImage image = ImageHelper.read(baos.toByteArray());
+                return new ByteArrayInputStream(baos.toByteArray());
+            } catch (IOException ex) {
+                // this should never happen, since IOException comes from OutputStream, but ByteArrayOutputStream should never throw it
+                throw new Error(ex);
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public SerializableImage getImage() {
+        if (cachedImage != null) {
+            return cachedImage;
+        }
+
+        InputStream imageStream = getOriginalImageData();
+        if (imageStream != null) {
+            try {
+                BufferedImage image = ImageHelper.read(imageStream);
                 if (image == null) {
                     Logger.getLogger(DefineBitsTag.class.getName()).log(Level.SEVERE, "Failed to load image");
                     return null;
@@ -138,6 +150,7 @@ public class DefineBitsTag extends ImageTag implements TagChangedListener {
                 Logger.getLogger(DefineBitsTag.class.getName()).log(Level.SEVERE, "Failed to get image", ex);
             }
         }
+
         return null;
     }
 
