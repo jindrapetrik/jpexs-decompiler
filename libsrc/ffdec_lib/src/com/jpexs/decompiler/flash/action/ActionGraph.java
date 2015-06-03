@@ -47,6 +47,7 @@ import com.jpexs.decompiler.graph.Loop;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
+import com.jpexs.decompiler.graph.model.PopItem;
 import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
 import java.util.ArrayList;
@@ -94,7 +95,6 @@ public class ActionGraph extends Graph {
 
     @Override
     protected void finalProcess(List<GraphTargetItem> list, int level, FinalProcessLocalData localData) {
-        super.finalProcess(list, level, localData);
         List<GraphTargetItem> ret = Action.checkClass(list);
         if (ret != list) {
             list.clear();
@@ -120,7 +120,7 @@ public class ActionGraph extends Graph {
                             break;
                         }
                     } else {
-                        target = new DirectValueActionItem(null, 0, st.target, new ArrayList<>());
+                        target = new DirectValueActionItem(null, 0, st.target, new ArrayList<String>());
                         targetStart = t;
                         targetStartItem = it;
                     }
@@ -157,9 +157,8 @@ public class ActionGraph extends Graph {
                 again = true;
             }
         } while (again);
-        for (int t = 0; t < list.size(); t++) {
+        for (int t = 1/*not first*/; t < list.size(); t++) {
             GraphTargetItem it = list.get(t);
-
             if (it instanceof WhileItem) {
                 WhileItem wi = (WhileItem) it;
                 if ((!wi.commands.isEmpty()) && (wi.commands.get(0) instanceof SetTypeActionItem)) {
@@ -169,24 +168,25 @@ public class ActionGraph extends Graph {
                         if (ne.rightSide instanceof DirectValueActionItem) {
                             DirectValueActionItem dv = (DirectValueActionItem) ne.rightSide;
                             if (dv.value instanceof Null) {
-                                GraphTargetItem en = ne.leftSide;
-                                if (en instanceof StoreRegisterActionItem) {
-                                    en = ((StoreRegisterActionItem) en).value;
-                                }
+                                GraphTargetItem en = list.get(t - 1);
                                 if (en instanceof EnumerateActionItem) {
                                     EnumerateActionItem eti = (EnumerateActionItem) en;
                                     list.remove(t);
                                     wi.commands.remove(0);
                                     list.add(t, new ForInActionItem(null, wi.loop, sti.getObject(), eti.object, wi.commands));
+                                    list.remove(t - 1);
+                                    t--;
                                 }
                             }
+
                         }
                     }
                 }
 
             }
         }
-        //detectChained(list, temporaryRegisters);
+        //Handle for loops at the end:
+        super.finalProcess(list, level, localData);
     }
 
     @Override

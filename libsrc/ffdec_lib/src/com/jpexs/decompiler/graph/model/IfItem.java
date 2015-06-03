@@ -75,11 +75,7 @@ public class IfItem extends GraphTargetItem implements Block {
                     expr = ((NotItem) expr).getOriginal();
                 }
             } else {
-                if (expr instanceof LogicalOpItem) {
-                    expr = ((LogicalOpItem) expr).invert();
-                } else {
-                    expr = new NotItem(null, expr);
-                }
+                expr = expr.invert(null);
                 ifBranch = onFalse;
                 elseBranch = onTrue;
             }
@@ -112,7 +108,10 @@ public class IfItem extends GraphTargetItem implements Block {
             }
             for (GraphTargetItem ti : elseBranch) {
                 if (!ti.isEmpty()) {
-                    ti.toStringSemicoloned(writer, localData).newLine();
+                    ti.toStringSemicoloned(writer, localData);
+                    if (!elseIf) {
+                        writer.newLine();
+                    }
                 }
             }
             if (!elseIf) {

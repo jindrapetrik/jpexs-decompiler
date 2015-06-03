@@ -205,7 +205,8 @@ public enum SymbolType {
     XML_INSTRVARTAG_BEGIN(GraphTargetItem.PRECEDENCE_PRIMARY, false), // <?{
     FILTER(GraphTargetItem.PRECEDENCE_PRIMARY, false),
     DESCENDANTS(GraphTargetItem.PRECEDENCE_PRIMARY, false),
-    NATIVE;
+    NATIVE,
+    PREPROCESSOR(GraphTargetItem.PRECEDENCE_PRIMARY, false);
 
     private int precedence = GraphTargetItem.NOPRECEDENCE;
 

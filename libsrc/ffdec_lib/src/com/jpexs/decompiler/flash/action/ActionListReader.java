@@ -296,7 +296,7 @@ public class ActionListReader {
                 new ArrayList<GraphTargetItem>(),
                 new HashMap<Long, List<GraphSourceItemContainer>>(),
                 new ActionLocalData(),
-                new TranslateStack(),
+                new TranslateStack(path),
                 new ConstantPool(),
                 actionMap, ip, retMap, ip, endIp, path,
                 new HashMap<Integer, Integer>(), false,
@@ -888,10 +888,10 @@ public class ActionListReader {
                     } else if (!(a instanceof GraphSourceItemContainer)) {
                         //return in for..in,   TODO:Handle this better way
                         if (((a instanceof ActionEquals) || (a instanceof ActionEquals2)) && (stack.size() == 1) && (stack.peek() instanceof DirectValueActionItem)) {
-                            stack.push(new DirectValueActionItem(null, 0, new Null(), new ArrayList<>()));
+                            stack.push(new DirectValueActionItem(null, 0, new Null(), new ArrayList<String>()));
                         }
                         if ((a instanceof ActionStoreRegister) && stack.isEmpty()) {
-                            stack.push(new DirectValueActionItem(null, 0, new Null(), new ArrayList<>()));
+                            stack.push(new DirectValueActionItem(null, 0, new Null(), new ArrayList<String>()));
                         }
                         a.translate(localData, stack, output, Graph.SOP_USE_STATIC/*Graph.SOP_SKIP_STATIC*/, path);
                     }
@@ -930,7 +930,7 @@ public class ActionListReader {
                         } else {
                             localData2 = localData;
                         }
-                        deobfustaceActionListAtPosRecursive(listeners, output2, containers, localData2, new TranslateStack(), cpool, actions, (int) endAddr, ret, startIp, (int) (endAddr + size), path + (cntName == null ? "" : "/" + cntName), visited, indeterminate, decisionStates, version, recursionLevel + 1, maxRecursionLevel);
+                        deobfustaceActionListAtPosRecursive(listeners, output2, containers, localData2, new TranslateStack(path), cpool, actions, (int) endAddr, ret, startIp, (int) (endAddr + size), path + (cntName == null ? "" : "/" + cntName), visited, indeterminate, decisionStates, version, recursionLevel + 1, maxRecursionLevel);
                         output2s.add(output2);
                         endAddr += size;
                     }

@@ -45,13 +45,9 @@ public class PopIns extends InstructionDefinition {
 
     @Override
     public void translate(boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, AVM2ConstantPool constants, AVM2Instruction ins, List<MethodInfo> method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) {
-        if (stack.size() > 0) {
-            GraphTargetItem top = stack.pop();
-            //Note: Commands like "5;" - numbers are unsupported as it collide with try..finally block decompilation. TODO: allow this somehow
-
-            if (/*!(top instanceof IntegerValueAVM2Item) &&*/(!(top instanceof MarkItem))) {
-                output.add(top);
-            }
+        GraphTargetItem top = stack.pop();
+        if ((!(top instanceof MarkItem))) {
+            output.add(top);
         }
     }
 

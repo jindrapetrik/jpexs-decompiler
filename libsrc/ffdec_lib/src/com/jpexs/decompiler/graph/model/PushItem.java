@@ -16,29 +16,27 @@
  */
 package com.jpexs.decompiler.graph.model;
 
-import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
-import com.jpexs.decompiler.graph.CompilationException;
-import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.decompiler.graph.SimpleValue;
-import com.jpexs.decompiler.graph.SourceGenerator;
-import com.jpexs.decompiler.graph.TypeItem;
-import java.util.List;
 
 /**
  *
  * @author JPEXS
  */
-public class TrueItem extends GraphTargetItem implements LogicalOpItem, SimpleValue {
+public class PushItem extends GraphTargetItem {
 
-    public TrueItem(GraphSourceItem src) {
-        super(src, PRECEDENCE_PRIMARY);
+    public PushItem(GraphTargetItem val) {
+        super(val.src, val.getPrecedence());
+        this.value = val;
     }
 
     @Override
-    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
-        return writer.append("true");
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        //Logger.getLogger(PushItem.class.getName()).log(Level.WARNING, "Push item left in the source code");
+        writer.append("§§push(");
+        value.appendTo(writer, localData);
+        writer.append(")");
+        return writer;
     }
 
     @Override
@@ -48,21 +46,22 @@ public class TrueItem extends GraphTargetItem implements LogicalOpItem, SimpleVa
 
     @Override
     public GraphTargetItem returnType() {
-        return TypeItem.BOOLEAN;
+        return value.returnType();
     }
 
     @Override
-    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
-        return generator.generate(localData, this);
+    public GraphTargetItem getNotCoerced() {
+        return value.getNotCoerced();
     }
 
     @Override
-    public GraphTargetItem invert(GraphSourceItem neqSrc) {
-        return new FalseItem(null);
+    public GraphTargetItem getThroughDuplicate() {
+        return value.getThroughDuplicate();
     }
 
     @Override
-    public boolean isSimpleValue() {
-        return true;
+    public GraphTargetItem getThroughRegister() {
+        return value.getThroughRegister();
     }
+
 }

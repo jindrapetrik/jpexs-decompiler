@@ -202,7 +202,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
                 + "{\r\n"
                 + "trace(\"equals strict\");\r\n"
                 + "}\r\n"
-                + "if(!(i === 5))\r\n"
+                + "if(i !== 5)\r\n"
                 + "{\r\n"
                 + "trace(\"not equals strict\");\r\n"
                 + "}\r\n"
@@ -667,6 +667,7 @@ public class ActionScript2Test extends ActionStript2TestBase {
     @Test
     public void frame55_pushTest() {
         compareSrc(55, "trace(\"pushTest\");\r\n"
+                + "53;"
         );
     }
 

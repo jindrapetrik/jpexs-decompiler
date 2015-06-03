@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.SimpleValue;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -31,7 +32,7 @@ import com.jpexs.helpers.Helper;
 import java.util.List;
 import java.util.Set;
 
-public class StringAVM2Item extends AVM2Item {
+public class StringAVM2Item extends AVM2Item implements SimpleValue {
 
     public String value;
 
@@ -69,6 +70,11 @@ public class StringAVM2Item extends AVM2Item {
 
     @Override
     public boolean hasReturnValue() {
+        return true;
+    }
+
+    @Override
+    public boolean isSimpleValue() {
         return true;
     }
 }

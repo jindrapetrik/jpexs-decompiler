@@ -23,17 +23,21 @@ import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
 import com.jpexs.decompiler.graph.model.BinaryOp;
 import com.jpexs.decompiler.graph.model.LocalData;
+import com.jpexs.decompiler.graph.model.LogicalOpItem;
+import com.jpexs.decompiler.graph.model.NotItem;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author JPEXS
  */
-public abstract class GraphTargetItem implements Serializable {
+public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     public static final int PRECEDENCE_PRIMARY = 0;
 
@@ -295,4 +299,21 @@ public abstract class GraphTargetItem implements Serializable {
     }
 
     public abstract GraphTargetItem returnType();
+
+    @Override
+    protected GraphTargetItem clone() {
+        try {
+            return (GraphTargetItem) super.clone();
+        } catch (CloneNotSupportedException ex) {
+            return null;
+        }
+    }
+
+    /*public GraphTargetItem invert() {
+     return invert(null);
+     }*/
+    public GraphTargetItem invert(GraphSourceItem src) {
+        return new NotItem(src, this);
+    }
+
 }

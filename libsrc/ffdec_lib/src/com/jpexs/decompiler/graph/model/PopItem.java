@@ -14,35 +14,34 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.abc.avm2.model;
+package com.jpexs.decompiler.graph.model;
 
-import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TypeItem;
-import com.jpexs.decompiler.graph.model.LocalData;
 
 /**
  *
  * @author JPEXS
  */
-public class HasNextAVM2Item extends AVM2Item {
+public class PopItem extends GraphTargetItem {
 
-    public GraphTargetItem object;
-
-    public GraphTargetItem collection;
-
-    public HasNextAVM2Item(AVM2Instruction instruction, GraphTargetItem object, GraphTargetItem collection) {
-        super(instruction, NOPRECEDENCE);
-        this.object = object;
-        this.collection = collection;
+    public PopItem(GraphSourceItem src) {
+        super(src, PRECEDENCE_PRIMARY);
     }
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        collection.appendTo(writer, localData);
-        writer.append(" hasNext ");
-        return object.appendTo(writer, localData);
+        //Logger.getLogger(PopItem.class.getName()).log(Level.WARNING, "Pop item left in the source code");
+        writer.append("§§pop()");
+        return writer;
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return true;
     }
 
     @Override
@@ -51,7 +50,8 @@ public class HasNextAVM2Item extends AVM2Item {
     }
 
     @Override
-    public boolean hasReturnValue() {
-        return true;
+    public Object getResult() {
+        return new Null();
     }
+
 }

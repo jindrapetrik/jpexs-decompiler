@@ -63,7 +63,7 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
         }
         regAssignCount.put(regId, regAssignCount.get(regId) + 1);
         //localRegsAssignmentIps.put(regId, ip);
-        if (value instanceof NewActivationAVM2Item) {
+        if (value.getThroughDuplicate() instanceof NewActivationAVM2Item) {
             return;
         }
         if (value instanceof FindPropertyAVM2Item) {

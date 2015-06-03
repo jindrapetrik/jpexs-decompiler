@@ -223,7 +223,7 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
     private void executeActions(ActionList actions, int idx, int endIdx, ActionConstantPool constantPool, ExecutionResult result, Map<String, Object> fakeFunctions) {
         List<GraphTargetItem> output = new ArrayList<>();
         ActionLocalData localData = new ActionLocalData();
-        FixItemCounterTranslateStack stack = new FixItemCounterTranslateStack();
+        FixItemCounterTranslateStack stack = new FixItemCounterTranslateStack("");
         int instructionsProcessed = 0;
         ActionConstantPool lastConstantPool = null;
 
@@ -442,7 +442,7 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
 
         public Set<String> defines = new HashSet<>();
 
-        public TranslateStack stack = new TranslateStack();
+        public TranslateStack stack = new TranslateStack("?");
 
         public Object resultValue;
     }
