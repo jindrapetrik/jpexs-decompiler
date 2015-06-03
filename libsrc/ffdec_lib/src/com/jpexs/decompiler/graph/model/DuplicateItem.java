@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.graph.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -20,6 +21,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.SimpleValue;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import java.util.List;
@@ -29,7 +31,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
-public class DuplicateItem extends GraphTargetItem {
+public class DuplicateItem extends GraphTargetItem implements SimpleValue {
 
     public DuplicateItem(GraphSourceItem src, GraphTargetItem value) {
         super(src, value.getPrecedence());
@@ -43,7 +45,12 @@ public class DuplicateItem extends GraphTargetItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        return value.toString(writer, localData);
+        if ((value instanceof SimpleValue) && (((SimpleValue) value).isSimpleValue())) {
+            return value.appendTo(writer, localData);
+        }
+        writer.append("§§dup(");
+        value.appendTo(writer, localData);
+        return writer.append(")");
     }
 
     @Override
@@ -89,4 +96,14 @@ public class DuplicateItem extends GraphTargetItem {
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
     }
+
+    /*@Override
+     public GraphTargetItem invert(GraphSourceItem src) {
+     return //new DuplicateItem(src, value instanceof NotItem ? (value.value) : new NotItem(src, value));
+     }*/
+    @Override
+    public boolean isSimpleValue() {
+        return ((value instanceof SimpleValue) && ((SimpleValue) value).isSimpleValue());
+    }
+
 }

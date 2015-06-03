@@ -50,7 +50,7 @@ public class LeActionItem extends BinaryOpItem implements LogicalOpItem, Inverte
     }
 
     @Override
-    public GraphTargetItem invert() {
+    public GraphTargetItem invert(GraphSourceItem negSrc) {
         return new GtActionItem(src, leftSide, rightSide);
     }
 

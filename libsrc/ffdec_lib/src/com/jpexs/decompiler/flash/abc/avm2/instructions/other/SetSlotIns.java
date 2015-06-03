@@ -156,9 +156,7 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
                 }
             }
         }
-        if (slotname == null) {
-            System.err.println("SLOT NOT FOUND");
-        }
+
         output.add(new SetSlotAVM2Item(ins, obj, slotname, value));
     }
 

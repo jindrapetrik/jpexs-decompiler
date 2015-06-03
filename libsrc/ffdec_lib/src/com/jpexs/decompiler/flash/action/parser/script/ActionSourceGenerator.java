@@ -56,12 +56,14 @@ import com.jpexs.decompiler.graph.model.CommaExpressionItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.DoWhileItem;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
+import com.jpexs.decompiler.graph.model.FalseItem;
 import com.jpexs.decompiler.graph.model.ForItem;
 import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.NotItem;
 import com.jpexs.decompiler.graph.model.OrItem;
 import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.TernarOpItem;
+import com.jpexs.decompiler.graph.model.TrueItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
@@ -73,6 +75,16 @@ import java.util.List;
  * @author JPEXS
  */
 public class ActionSourceGenerator implements SourceGenerator {
+
+    @Override
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, FalseItem item) throws CompilationException {
+        return GraphTargetItem.toSourceMerge(localData, this, new ActionPush(Boolean.FALSE));
+    }
+
+    @Override
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, TrueItem item) throws CompilationException {
+        return GraphTargetItem.toSourceMerge(localData, this, new ActionPush(Boolean.TRUE));
+    }
 
     @Override
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, AndItem item) throws CompilationException {
@@ -122,7 +134,7 @@ public class ActionSourceGenerator implements SourceGenerator {
     private List<GraphSourceItem> generateIf(SourceGeneratorLocalData localData, GraphTargetItem expression, List<GraphTargetItem> onTrueCmds, List<GraphTargetItem> onFalseCmds, boolean ternar) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
         if (expression instanceof Inverted) {
-            ret.addAll(((Inverted) expression).invert().toSource(localData, this));
+            ret.addAll(((Inverted) expression).invert(null).toSource(localData, this));
         } else {
             ret.addAll(expression.toSource(localData, this));
             ret.add(new ActionNot());
@@ -400,7 +412,7 @@ public class ActionSourceGenerator implements SourceGenerator {
     @Override
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, NotItem item) throws CompilationException {
         if (item.getOriginal() instanceof Inverted) {
-            GraphTargetItem norig = ((Inverted) item).invert();
+            GraphTargetItem norig = ((Inverted) item).invert(null);
             return norig.toSource(localData, this);
         }
         List<GraphSourceItem> ret = new ArrayList<>();

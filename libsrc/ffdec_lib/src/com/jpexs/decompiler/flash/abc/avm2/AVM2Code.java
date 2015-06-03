@@ -282,6 +282,7 @@ import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TranslateException;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
+import com.jpexs.decompiler.graph.model.ExitItem;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
 import com.jpexs.helpers.Helper;
 import java.io.ByteArrayInputStream;
@@ -1243,8 +1244,8 @@ public class AVM2Code implements Cloneable {
                 if (isKilled(((SetLocalAVM2Item) output.get(i)).regIndex, 0, code.size() - 1)) {
                     SetLocalAVM2Item lsi = (SetLocalAVM2Item) output.get(i);
                     if (i + 1 < output.size()) {
-                        if (output.get(i + 1) instanceof ReturnValueAVM2Item) {
-                            ReturnValueAVM2Item rv = (ReturnValueAVM2Item) output.get(i + 1);
+                        if (output.get(i + 1) instanceof ExitItem) {
+                            GraphTargetItem rv = output.get(i + 1);
                             if (rv.value instanceof LocalRegAVM2Item) {
                                 LocalRegAVM2Item lr = (LocalRegAVM2Item) rv.value;
                                 if (lr.regIndex == lsi.regIndex) {
@@ -1442,7 +1443,7 @@ public class AVM2Code implements Cloneable {
                             }
                         }
                         if (!isKilled(reg, 0, end)) {
-                            GraphTargetItem vx = stack.pop();
+                            GraphTargetItem vx = stack.pop().getThroughDuplicate();
                             int dupCnt = 1;
                             for (int i = ip - 1; i >= start; i--) {
                                 if (code.get(i).definition instanceof DupIns) {
@@ -1899,6 +1900,7 @@ public class AVM2Code implements Cloneable {
         ret.parsedExceptions = localData.parsedExceptions;
         ret.finallyJumps = localData.finallyJumps;
         ret.ignoredSwitches = localData.ignoredSwitches;
+        ret.ignoredSwitches2 = localData.ignoredSwitches2;
         ret.scriptIndex = localData.scriptIndex;
         ret.localRegAssignmentIps = localData.localRegAssignmentIps;
         ret.ip = localData.ip;
@@ -1921,8 +1923,9 @@ public class AVM2Code implements Cloneable {
         localData.localRegNames = body.getLocalRegNames(abc);
         localData.fullyQualifiedNames = new ArrayList<>();
         localData.parsedExceptions = new ArrayList<>();
-        localData.finallyJumps = new ArrayList<>();
-        localData.ignoredSwitches = new ArrayList<>();
+        localData.finallyJumps = new HashMap<>();
+        localData.ignoredSwitches = new HashMap<>();
+        localData.ignoredSwitches2 = new ArrayList<>();
         localData.scriptIndex = scriptIndex;
         localData.localRegAssignmentIps = new HashMap<>();
         localData.ip = 0;
@@ -2958,7 +2961,7 @@ public class AVM2Code implements Cloneable {
 
     public static int removeTraps(AVM2ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, AVM2LocalData localData, AVM2GraphSource code, int addr, String path, HashMap<Integer, List<Integer>> refs) throws InterruptedException {
         HashMap<AVM2Instruction, AVM2Code.Decision> decisions = new HashMap<>();
-        removeTraps(refs, false, false, localData, new TranslateStack(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), new HashMap<Integer, Integer>(), new HashMap<Integer, HashMap<Integer, GraphTargetItem>>(), decisions, path, 0);
+        removeTraps(refs, false, false, localData, new TranslateStack(path), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), new HashMap<Integer, Integer>(), new HashMap<Integer, HashMap<Integer, GraphTargetItem>>(), decisions, path, 0);
         int cnt = 0;
         for (AVM2Instruction src : decisions.keySet()) {
             Decision dec = decisions.get(src);

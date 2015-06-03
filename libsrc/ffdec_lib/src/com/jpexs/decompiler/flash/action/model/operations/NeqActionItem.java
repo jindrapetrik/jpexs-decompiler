@@ -49,7 +49,7 @@ public class NeqActionItem extends BinaryOpItem implements LogicalOpItem, Invert
     }
 
     @Override
-    public GraphTargetItem invert() {
+    public GraphTargetItem invert(GraphSourceItem negSrc) {
         return new EqActionItem(src, leftSide, rightSide, version2);
     }
 

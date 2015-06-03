@@ -27,6 +27,7 @@ import com.jpexs.decompiler.graph.ScopeStack;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -56,9 +57,10 @@ public class AVM2LocalData extends BaseLocalData {
 
     public ArrayList<ABCException> parsedExceptions;
 
-    public ArrayList<Integer> finallyJumps;
+    public Map<Integer, List<Integer>> finallyJumps;
 
-    public ArrayList<Integer> ignoredSwitches;
+    public Map<Integer, Integer> ignoredSwitches;
+    public List<Integer> ignoredSwitches2;
 
     public Integer scriptIndex;
 
@@ -88,6 +90,7 @@ public class AVM2LocalData extends BaseLocalData {
         parsedExceptions = localData.parsedExceptions;
         finallyJumps = localData.finallyJumps;
         ignoredSwitches = localData.ignoredSwitches;
+        ignoredSwitches2 = localData.ignoredSwitches2;
         scriptIndex = localData.scriptIndex;
         localRegAssignmentIps = localData.localRegAssignmentIps;
         ip = localData.ip;

@@ -25,8 +25,6 @@ import java.util.Set;
 
 public abstract class UnaryOpItem extends GraphTargetItem implements UnaryOp {
 
-    public GraphTargetItem value;
-
     public String operator;
 
     public UnaryOpItem(GraphSourceItem instruction, int precedence, GraphTargetItem value, String operator) {

@@ -17,8 +17,8 @@ package jsyntaxpane.lexers;
 
 import jsyntaxpane.Token;
 import jsyntaxpane.TokenType;
- 
-%% 
+
+%%
 
 %public
 %class ActionScriptLexer
@@ -58,7 +58,7 @@ InputCharacter = [^\r\n]
 WhiteSpace = {LineTerminator} | [ \t\f]+
 
 /* comments */
-Comment = {TraditionalComment} | {EndOfLineComment} 
+Comment = {TraditionalComment} | {EndOfLineComment}
 
 TraditionalComment = "/*" [^*] ~"*/" | "/*" "*"+ "/"
 EndOfLineComment = "//" {InputCharacter}* {LineTerminator}?
@@ -92,13 +92,13 @@ HexDigit          = [0-9a-fA-F]
 
 OctIntegerLiteral = 0+ [1-3]? {OctDigit} {1,15}
 OctDigit          = [0-7]
-    
-/* floating point literals */        
+
+/* floating point literals */
 DoubleLiteral = ({FLit1}|{FLit2}|{FLit3}) {Exponent}?
 
-FLit1    = [0-9]+ \. [0-9]* 
-FLit2    = \. [0-9]+ 
-FLit3    = [0-9]+ 
+FLit1    = [0-9]+ \. [0-9]*
+FLit2    = \. [0-9]+
+FLit3    = [0-9]+
 Exponent = [eE] [+-]? [0-9]+
 
 NewVector = "new" {WhiteSpace}* "<"
@@ -108,6 +108,7 @@ StringCharacter = [^\r\n\"\\]
 SingleCharacter = [^\r\n\'\\]
 
 OIdentifierCharacter = [^\r\n\u00A7\\]
+Preprocessor = \u00A7\u00A7 {Identifier}
 
 %state STRING, CHARLITERAL, XMLSTARTTAG, XML, OIDENTIFIER
 
@@ -174,114 +175,117 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
   "}"                            { return token(TokenType.OPERATOR, -CURLY); }
   "["                            { return token(TokenType.OPERATOR,  BRACKET); }
   "]"                            { return token(TokenType.OPERATOR, -BRACKET); }
-  ";"                            | 
-  ","                            | 
-  "..."                          |   
-  "."                            | 
-  "="                            | 
-  ">"                            |  
+  ";"                            |
+  ","                            |
+  "..."                          |
+  "."                            |
+  "="                            |
+  ">"                            |
   "<"                            |
-  "!"                            | 
-  "~"                            | 
-  "?"                            | 
-  ":"                            | 
-  "=="                           | 
-  "<="                           | 
-  ">="                           | 
-  "!="                           | 
-  "&&"                           | 
-  "||"                           | 
-  "++"                           | 
-  "--"                           | 
-  "+"                            | 
-  "-"                            | 
-  "*"                            | 
-  "/"                            | 
-  "&"                            | 
-  "|"                            | 
-  "^"                            | 
-  "%"                            | 
-  "<<"                           | 
-  ">>"                           | 
-  ">>>"                          | 
-  "+="                           | 
-  "-="                           | 
-  "*="                           | 
-  "/="                           | 
-  "&="                           | 
-  "|="                           | 
-  "^="                           | 
-  "%="                           | 
-  "<<="                          | 
-  ">>="                          | 
+  "!"                            |
+  "~"                            |
+  "?"                            |
+  ":"                            |
+  "=="                           |
+  "<="                           |
+  ">="                           |
+  "!="                           |
+  "&&"                           |
+  "||"                           |
+  "++"                           |
+  "--"                           |
+  "+"                            |
+  "-"                            |
+  "*"                            |
+  "/"                            |
+  "&"                            |
+  "|"                            |
+  "^"                            |
+  "%"                            |
+  "<<"                           |
+  ">>"                           |
+  ">>>"                          |
+  "+="                           |
+  "-="                           |
+  "*="                           |
+  "/="                           |
+  "&="                           |
+  "|="                           |
+  "^="                           |
+  "%="                           |
+  "<<="                          |
+  ">>="                          |
   ">>>="                         |
-  "as"                           | 
-  "delete"                       | 
-  "instanceof"                   | 
-  "is"                           | 
-  "::"                           | 
-  "new"                          | 
-  "typeof"                       | 
-  "void"                         | 
+  "as"                           |
+  "delete"                       |
+  "instanceof"                   |
+  "is"                           |
+  "::"                           |
+  "new"                          |
+  "typeof"                       |
+  "void"                         |
  {NewVector}                     |
-  "@"                            { return token(TokenType.OPERATOR); } 
-  
+  "@"                            { return token(TokenType.OPERATOR); }
+
   /* string literal */
-  \"                             {  
-                                    yybegin(STRING); 
-                                    tokenStart = yychar; 
-                                    tokenLength = 1; 
+  \"                             {
+                                    yybegin(STRING);
+                                    tokenStart = yychar;
+                                    tokenLength = 1;
                                  }
- "\u00A7"                             {
-                                    yybegin(OIDENTIFIER); 
-                                    tokenStart = yychar; 
-                                    tokenLength = 1;    
+  {Preprocessor}                 {
+                                    return token(TokenType.REGEX);
+                                 }
+ "\u00A7"                        {
+                                    yybegin(OIDENTIFIER);
+                                    tokenStart = yychar;
+                                    tokenLength = 1;
                                  }
 
   /* character literal */
-  \'                             {  
-                                    yybegin(CHARLITERAL); 
-                                    tokenStart = yychar; 
-                                    tokenLength = 1; 
+  \'                             {
+                                    yybegin(CHARLITERAL);
+                                    tokenStart = yychar;
+                                    tokenLength = 1;
                                  }
 
   /* numeric literals */
 
   {DecIntegerLiteral}            |
-  
+
   {HexIntegerLiteral}            |
- 
+
   {OctIntegerLiteral}            |
-  
+
   {DoubleLiteral}                |
   {DoubleLiteral}[dD]            { return token(TokenType.NUMBER); }
-  
+
   // JavaDoc comments need a state so that we can highlight the @ controls
 
   /* comments */
   {Comment}                      { return token(TokenType.COMMENT); }
 
   /* whitespace */
-  {WhiteSpace}                   { }  
+  {WhiteSpace}                   { }
   {TypeNameSpec}                 { return token(TokenType.IDENTIFIER); }
-  {XMLBeginOneTag}                  {  yybegin(XML); 
+  {XMLBeginOneTag}                  {  yybegin(XML);
                                     tokenStart = yychar;
-                                    tokenLength = yylength(); 
-                                    String s=yytext();                                    
+                                    tokenLength = yylength();
+                                    String s=yytext();
                                     s=s.substring(1,s.length()-1);
                                     if(s.contains(" ")){
                                        s=s.substring(0,s.indexOf(" "));
                                     }
                                     xmlTagName = s;
                                  }
-  /*{XMLBeginTag}                  {  yybegin(XMLSTARTTAG); 
+  /*{XMLBeginTag}                  {  yybegin(XMLSTARTTAG);
                                     tokenStart = yychar;
-                                    tokenLength = yylength(); 
-                                    String s=yytext();                                    
+                                    tokenLength = yylength();
+                                    String s=yytext();
                                     xmlTagName = s.substring(1);
                                  }*/
-  /* identifiers */ 
-  {Identifier}                   { return token(TokenType.IDENTIFIER); }  
+  /* identifiers */
+  {Identifier}                   { return token(TokenType.IDENTIFIER); }
 }
 
 <XMLSTARTTAG> {
@@ -293,7 +297,7 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
    {XMLBeginOneTag}                 { tokenLength += yylength();}
    {XMLEndTag}                   { tokenLength += yylength();
                                    String endtagname=yytext();
-                                   endtagname=endtagname.substring(2,endtagname.length()-1);                                   
+                                   endtagname=endtagname.substring(2,endtagname.length()-1);
                                    if(endtagname.equals(xmlTagName)){
                                        yybegin(YYINITIAL);
                                        return token(TokenType.STRING, tokenStart, tokenLength);
@@ -303,16 +307,16 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
 }
 
 <STRING> {
-  \"                             { 
-                                     yybegin(YYINITIAL); 
+  \"                             {
+                                     yybegin(YYINITIAL);
                                      // length also includes the trailing quote
                                      return token(TokenType.STRING, tokenStart, tokenLength + 1);
                                  }
-  
+
   {StringCharacter}+             { tokenLength += yylength(); }
 
   \\[0-3]?{OctDigit}?{OctDigit}  { tokenLength += yylength(); }
-  
+
   /* escape sequences */
 
   \\.                            { tokenLength += 2; }
@@ -320,15 +324,15 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
 }
 
 <OIDENTIFIER> {
-  "\u00A7"                            { 
-                                     yybegin(YYINITIAL); 
+  "\u00A7"                            {
+                                     yybegin(YYINITIAL);
                                      // length also includes the trailing quote
                                      return token(TokenType.REGEX, tokenStart, tokenLength + 1);
                                  }
-  
+
   {OIdentifierCharacter}+             { tokenLength += yylength(); }
 
-  
+
   /* escape sequences */
 
   \\.                            { tokenLength += 2; }
@@ -336,14 +340,14 @@ OIdentifierCharacter = [^\r\n\u00A7\\]
 }
 
 <CHARLITERAL> {
-  \'                             { 
-                                     yybegin(YYINITIAL); 
+  \'                             {
+                                     yybegin(YYINITIAL);
                                      // length also includes the trailing quote
                                      return token(TokenType.STRING, tokenStart, tokenLength + 1);
                                  }
-  
+
   {SingleCharacter}+             { tokenLength += yylength(); }
-  
+
   /* escape sequences */
 
   \\.                            { tokenLength += 2; }

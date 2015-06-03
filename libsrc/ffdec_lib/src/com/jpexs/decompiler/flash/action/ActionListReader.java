@@ -296,7 +296,7 @@ public class ActionListReader {
                 new ArrayList<GraphTargetItem>(),
                 new HashMap<Long, List<GraphSourceItemContainer>>(),
                 new ActionLocalData(),
-                new TranslateStack(),
+                new TranslateStack(path),
                 new ConstantPool(),
                 actionMap, ip, retMap, ip, endIp, path,
                 new HashMap<Integer, Integer>(), false,
@@ -930,7 +930,7 @@ public class ActionListReader {
                         } else {
                             localData2 = localData;
                         }
-                        deobfustaceActionListAtPosRecursive(listeners, output2, containers, localData2, new TranslateStack(), cpool, actions, (int) endAddr, ret, startIp, (int) (endAddr + size), path + (cntName == null ? "" : "/" + cntName), visited, indeterminate, decisionStates, version, recursionLevel + 1, maxRecursionLevel);
+                        deobfustaceActionListAtPosRecursive(listeners, output2, containers, localData2, new TranslateStack(path), cpool, actions, (int) endAddr, ret, startIp, (int) (endAddr + size), path + (cntName == null ? "" : "/" + cntName), visited, indeterminate, decisionStates, version, recursionLevel + 1, maxRecursionLevel);
                         output2s.add(output2);
                         endAddr += size;
                     }

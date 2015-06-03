@@ -42,7 +42,7 @@ public class StrictEqActionItem extends BinaryOpItem implements LogicalOpItem, I
     }
 
     @Override
-    public GraphTargetItem invert() {
+    public GraphTargetItem invert(GraphSourceItem negSrc) {
         return new StrictNeqActionItem(src, leftSide, rightSide);
     }
 
