@@ -100,7 +100,7 @@ public final class MethodBody implements Cloneable {
     }
 
     public synchronized byte[] getCodeBytes() {
-        if (code == null) {
+        if (codeBytes != null) {
             return codeBytes;
         } else {
             return code.getBytes();
@@ -125,6 +125,7 @@ public final class MethodBody implements Cloneable {
 
     public void setCode(AVM2Code code) {
         this.code = code;
+        this.codeBytes = null;
     }
 
     public List<Integer> getExceptionEntries() {

@@ -182,7 +182,7 @@ public class ABCInputStream implements AutoCloseable {
             ret += (((long) i) << bytePos);
             byteCount++;
             bytePos += 7;
-        } while (nextByte);
+        } while (nextByte && byteCount < 5);
         return ret;
     }
 
@@ -243,7 +243,7 @@ public class ABCInputStream implements AutoCloseable {
                 }
                 break;
             }
-        } while (nextByte);
+        } while (nextByte && byteCount < 5);
         endDumpLevel(ret);
         return ret;
     }

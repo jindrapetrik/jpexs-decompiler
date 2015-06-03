@@ -114,7 +114,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
             changeContentType("text/plain");
             if (textHexOnly == null) {
                 HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
-                Helper.byteArrayToHexWithHeader(writer, abc.bodies.get(bodyIndex).getCode().getBytes());
+                Helper.byteArrayToHexWithHeader(writer, abc.bodies.get(bodyIndex).getCodeBytes());
                 textHexOnly = new HighlightedText(writer);
             }
             setText(textHexOnly);

@@ -1779,6 +1779,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             ABC abc = abcTag.getABC();
             for (MethodBody body : abc.bodies) {
                 AVM2Code code = body.getCode();
+                body.setCodeBytes(code.getBytes());
             }
 
             ((Tag) abcTag).setModified(true);

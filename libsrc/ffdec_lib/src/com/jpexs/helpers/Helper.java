@@ -892,7 +892,7 @@ public class Helper {
     }
 
     public static GraphTextWriter byteArrayToHexWithHeader(GraphTextWriter writer, byte[] data) {
-        writer.appendNoHilight("#hexdata").newLine().newLine();
+        writer.appendNoHilight(hexData).newLine().newLine();
         return byteArrayToHex(writer, data, 8, 8, false, false);
     }
 
