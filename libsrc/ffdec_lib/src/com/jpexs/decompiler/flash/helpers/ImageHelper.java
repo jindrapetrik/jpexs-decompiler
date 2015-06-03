@@ -26,12 +26,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Iterator;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import org.monte.media.jpeg.CMYKJPEGImageReader;
 import org.monte.media.jpeg.CMYKJPEGImageReaderSpi;
@@ -55,9 +53,9 @@ public class ImageHelper {
             in = r.read(0);
         } catch (IOException ex) {
             try {
-                return ImageIO.read(ImageIO.createImageInputStream(new ByteArrayInputStream(data)));
+                in = ImageIO.read(ImageIO.createImageInputStream(new ByteArrayInputStream(data)));
             } catch (IOException ex1) {
-                in = null;
+                return null;
             }
         }
 
