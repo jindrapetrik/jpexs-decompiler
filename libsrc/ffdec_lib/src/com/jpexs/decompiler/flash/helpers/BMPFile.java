@@ -142,44 +142,28 @@ public class BMPFile extends Component {
      */
 
     private void writeBitmap() throws IOException {
-        int size;
-        int value;
-        int j;
-        int i;
-        int rowCount;
-        int rowIndex;
-        int lastRowIndex;
-        int pad;
-        int padCount;
         byte[] rgb = new byte[3];
-        size = biWidth * biHeight;
-        pad = ((4 - ((biWidth * 3) % 4)) % 4);
-        rowCount = 1;
-        padCount = 0;
-        rowIndex = size - biWidth;
-        lastRowIndex = rowIndex;
-        for (j = 0; j < size; j++) {
-            value = bitmap[rowIndex];
-            rgb[0] = (byte) (value & 0xFF);
-            rgb[1] = (byte) ((value >> 8) & 0xFF);
-            rgb[2] = (byte) ((value >> 16) & 0xFF);
-            fo.write(rgb);
-            if (rowCount == biWidth) {
-                padCount += pad;
-                for (i = 1; i <= pad; i++) {
-                    fo.write(0x00);
-                }
-                rowCount = 1;
-                rowIndex = lastRowIndex - biWidth;
-                lastRowIndex = rowIndex;
-            } else {
-                rowCount++;
+        int width = biWidth;
+        int height = biHeight;
+        int pad = ((4 - ((width * 3) % 4)) % 4);
+        int padCount = 0;
+        for (int y = height - 1; y >= 0; y--) {
+            for (int x = 0; x < width; x++) {
+                int value = bitmap[y * width + x];
+                rgb[0] = (byte) (value & 0xFF);
+                rgb[1] = (byte) ((value >> 8) & 0xFF);
+                rgb[2] = (byte) ((value >> 16) & 0xFF);
+                fo.write(rgb);
             }
-            rowIndex++;
+
+            padCount += pad;
+            for (int i = 0; i < pad; i++) {
+                fo.write(0x00);
+            }
         }
         //--- Update the size of the file
-        bfSize += padCount - pad;
-        biSizeImage += padCount - pad;
+        bfSize += padCount;
+        biSizeImage += padCount;
     }
     /*
      * writeBitmapFileHeader writes the bitmap file header to the file.
