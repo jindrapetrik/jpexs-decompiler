@@ -120,7 +120,7 @@ public class ActionGraph extends Graph {
                             break;
                         }
                     } else {
-                        target = new DirectValueActionItem(null, 0, st.target, new ArrayList<String>());
+                        target = new DirectValueActionItem(null, 0, st.target, new ArrayList<>());
                         targetStart = t;
                         targetStartItem = it;
                     }

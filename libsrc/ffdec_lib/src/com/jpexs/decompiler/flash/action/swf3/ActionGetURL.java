@@ -96,7 +96,7 @@ public class ActionGetURL extends Action {
                 if (urlString.isEmpty()) {
                     output.add(new UnLoadMovieNumActionItem(this, new DirectValueActionItem((Long) (long) (int) num)));
                 } else {
-                    DirectValueActionItem urlStringDi = new DirectValueActionItem(null, 0, urlString, new ArrayList<String>());
+                    DirectValueActionItem urlStringDi = new DirectValueActionItem(null, 0, urlString, new ArrayList<>());
                     output.add(new LoadMovieNumActionItem(this, urlStringDi, new DirectValueActionItem((Long) (long) (int) num), 1/*GET*/));
                 }
                 return;
@@ -106,7 +106,7 @@ public class ActionGetURL extends Action {
         }
 
         if (urlString.isEmpty()) {
-            DirectValueActionItem targetStringDi = new DirectValueActionItem(null, 0, targetString, new ArrayList<String>());
+            DirectValueActionItem targetStringDi = new DirectValueActionItem(null, 0, targetString, new ArrayList<>());
             output.add(new UnLoadMovieActionItem(this, targetStringDi));
         } else {
             output.add(new GetURLActionItem(this, urlString, targetString));

@@ -39,7 +39,7 @@ public class ActionEnumerate extends Action {
     @Override
     public void translate(TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem object = stack.pop();
-        stack.push(new DirectValueActionItem(null, 0, new Null(), new ArrayList<String>()));
+        stack.push(new DirectValueActionItem(null, 0, new Null(), new ArrayList<>()));
         stack.push(new EnumerateActionItem(this, object));
     }
 }

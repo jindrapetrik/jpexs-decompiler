@@ -97,7 +97,7 @@ public class InstanceInfo {
         }
 
         writer.appendNoHilight(modifiers + objType);
-        writer.hilightSpecial(abc.constants.getMultiname(name_index).getName(abc.constants, new ArrayList<String>()/* No full names here*/, false), HighlightSpecialType.CLASS_NAME);
+        writer.hilightSpecial(abc.constants.getMultiname(name_index).getName(abc.constants, new ArrayList<>()/* No full names here*/, false), HighlightSpecialType.CLASS_NAME);
 
         if (super_index > 0) {
             String typeName = abc.constants.getMultiname(super_index).getNameWithNamespace(abc.constants, true);

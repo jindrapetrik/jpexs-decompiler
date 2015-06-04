@@ -43,7 +43,7 @@ public class DirectValueActionItem extends ActionItem {
     public GraphTargetItem computedRegValue;
 
     public DirectValueActionItem(Object o) {
-        this(null, 0, o, new ArrayList<String>());
+        this(null, 0, o, new ArrayList<>());
     }
 
     public DirectValueActionItem(GraphSourceItem instruction, int instructionPos, Object value, List<String> constants) {

@@ -120,7 +120,7 @@ public class ActionGetURL2 extends Action {
         }
         if (loadVariablesFlag) {
             if (num != null) {
-                output.add(new LoadVariablesNumActionItem(this, urlString, new DirectValueActionItem(null, 0, (Long) (long) (int) num, new ArrayList<String>()), sendVarsMethod));
+                output.add(new LoadVariablesNumActionItem(this, urlString, new DirectValueActionItem(null, 0, (Long) (long) (int) num, new ArrayList<>()), sendVarsMethod));
             } else {
                 output.add(new LoadVariablesActionItem(this, urlString, targetString, sendVarsMethod));
             }
@@ -140,14 +140,14 @@ public class ActionGetURL2 extends Action {
 
             if (num != null) {
                 if ("".equals(urlStr)) {
-                    output.add(new UnLoadMovieNumActionItem(this, new DirectValueActionItem(null, 0, (Long) (long) (int) num, new ArrayList<String>())));
+                    output.add(new UnLoadMovieNumActionItem(this, new DirectValueActionItem(null, 0, (Long) (long) (int) num, new ArrayList<>())));
                 } else if (urlStr != null && urlStr.startsWith(printPrefix)) {
                     output.add(new PrintNumActionItem(this, new DirectValueActionItem((Long) (long) (int) num),
                             new DirectValueActionItem(urlStr.substring(printPrefix.length()))));
                 } else if (urlStr != null && urlStr.startsWith(printAsBitmapPrefix)) {
                     output.add(new PrintAsBitmapNumActionItem(this, new DirectValueActionItem((Long) (long) (int) num), new DirectValueActionItem(urlStr.substring(printAsBitmapPrefix.length()))));
                 } else {
-                    output.add(new LoadMovieNumActionItem(this, urlString, new DirectValueActionItem(null, 0, (Long) (long) (int) num, new ArrayList<String>()), sendVarsMethod));
+                    output.add(new LoadMovieNumActionItem(this, urlString, new DirectValueActionItem(null, 0, (Long) (long) (int) num, new ArrayList<>()), sendVarsMethod));
                 }
             } else {
                 if (urlStr != null && urlStr.startsWith(printPrefix)) {

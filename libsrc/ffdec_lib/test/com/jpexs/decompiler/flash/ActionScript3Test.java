@@ -74,9 +74,9 @@ public class ActionScript3Test extends ActionScriptTestBase {
         assertTrue(bodyIndex > -1);
         HighlightedTextWriter writer = null;
         try {
-            abc.bodies.get(bodyIndex).convert(methodName, ScriptExportMode.AS, isStatic, -1/*FIX?*/, clsIndex, abc, null, abc.constants, abc.method_info, new ScopeStack(), false, new NulWriter(), new ArrayList<String>(), abc.instance_info.get(clsIndex).instance_traits, true);
+            abc.bodies.get(bodyIndex).convert(methodName, ScriptExportMode.AS, isStatic, -1/*FIX?*/, clsIndex, abc, null, abc.constants, abc.method_info, new ScopeStack(), false, new NulWriter(), new ArrayList<>(), abc.instance_info.get(clsIndex).instance_traits, true);
             writer = new HighlightedTextWriter(new CodeFormatting(), false);
-            abc.bodies.get(bodyIndex).toString(methodName, ScriptExportMode.AS, abc, null, abc.constants, abc.method_info, writer, new ArrayList<String>());
+            abc.bodies.get(bodyIndex).toString(methodName, ScriptExportMode.AS, abc, null, abc.constants, abc.method_info, writer, new ArrayList<>());
         } catch (InterruptedException ex) {
             fail();
         }
@@ -936,7 +936,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
         assertTrue(methodInfo > -1);
         assertTrue(bodyIndex > -1);
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
-        abc.method_info.get(methodInfo).getParamStr(writer, abc.constants, abc.bodies.get(bodyIndex), abc, new ArrayList<String>());
+        abc.method_info.get(methodInfo).getParamStr(writer, abc.constants, abc.bodies.get(bodyIndex), abc, new ArrayList<>());
         String actualResult = writer.toString().replaceAll("[ \r\n]", "");
         String expectedResult = "p1:Event=null,p2:Number=1,p3:Number=-1,p4:Number=-1.1,p5:Number=-1.1,p6:String=\"a\"";
         expectedResult = expectedResult.replaceAll("[ \r\n]", "");

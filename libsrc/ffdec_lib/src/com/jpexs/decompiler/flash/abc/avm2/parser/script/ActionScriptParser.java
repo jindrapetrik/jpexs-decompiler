@@ -931,7 +931,7 @@ public class ActionScriptParser {
             List<String> names = new ArrayList<>();
             List<String> namespaces = new ArrayList<>();
             //FIXME for Private classes in script!!!
-            AVM2SourceGenerator.parentNamesAddNames(abc, otherABCs, AVM2SourceGenerator.resolveType(new SourceGeneratorLocalData(new HashMap<String, Integer>(), 0, false, 0), ((TypeItem) ((UnresolvedAVM2Item) extendsStr).resolve(null, new ArrayList<GraphTargetItem>(), new ArrayList<String>(), abc, otherABCs, new ArrayList<MethodBody>(), new ArrayList<AssignableAVM2Item>())), abc, otherABCs), indices, names, namespaces);
+            AVM2SourceGenerator.parentNamesAddNames(abc, otherABCs, AVM2SourceGenerator.resolveType(new SourceGeneratorLocalData(new HashMap<String, Integer>(), 0, false, 0), ((TypeItem) ((UnresolvedAVM2Item) extendsStr).resolve(null, new ArrayList<GraphTargetItem>(), new ArrayList<>(), abc, otherABCs, new ArrayList<MethodBody>(), new ArrayList<AssignableAVM2Item>())), abc, otherABCs), indices, names, namespaces);
             for (int i = 0; i < names.size(); i++) {
                 if (namespaces.get(i).isEmpty()) {
                     continue;
@@ -1585,7 +1585,7 @@ public class ActionScriptParser {
                                 UnresolvedAVM2Item ui = (UnresolvedAVM2Item) a;
                                 if (ui.getVariableName().equals(e.getVariableName())) {
                                     try {
-                                        ui.resolve(null, new ArrayList<GraphTargetItem>(), new ArrayList<String>(), abc, otherABCs, new ArrayList<MethodBody>(), variables);
+                                        ui.resolve(null, new ArrayList<GraphTargetItem>(), new ArrayList<>(), abc, otherABCs, new ArrayList<MethodBody>(), variables);
                                     } catch (CompilationException ex) {
                                         // ignore
                                     }
@@ -1608,7 +1608,7 @@ public class ActionScriptParser {
                             for (NameAVM2Item e : catchExceptions) {
                                 if (ui.getVariableName().equals(e.getVariableName())) {
                                     try {
-                                        ui.resolve(null, new ArrayList<GraphTargetItem>(), new ArrayList<String>(), abc, otherABCs, new ArrayList<MethodBody>(), variables);
+                                        ui.resolve(null, new ArrayList<GraphTargetItem>(), new ArrayList<>(), abc, otherABCs, new ArrayList<MethodBody>(), variables);
                                     } catch (CompilationException ex) {
                                         // ignore
                                     }
@@ -2348,7 +2348,7 @@ public class ActionScriptParser {
         openedNamespaces.add(publicNs = abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, abc.constants.getStringId("", true)), 0, true));
 
         List<GraphTargetItem> items = new ArrayList<>();
-        traits(fileName, true, new ArrayList<AssignableAVM2Item>(), new Reference<>(false), new ArrayList<GraphTargetItem>(), new ArrayList<String>(), scriptPrivateNs, 0, publicNs, 0, 0, openedNamespaces, null, null, false, items);
+        traits(fileName, true, new ArrayList<AssignableAVM2Item>(), new Reference<>(false), new ArrayList<GraphTargetItem>(), new ArrayList<>(), scriptPrivateNs, 0, publicNs, 0, 0, openedNamespaces, null, null, false, items);
         return items;
     }
 

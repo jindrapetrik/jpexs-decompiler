@@ -98,7 +98,7 @@ public class ScriptPack extends AS3ClassTreeItem {
             Multiname name = abc.script_info.get(scriptIndex).traits.traits.get(t).getName(abc);
             Namespace ns = name.getNamespace(abc.constants);
             if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
-                scriptName = name.getName(abc.constants, new ArrayList<String>(), false);
+                scriptName = name.getName(abc.constants, new ArrayList<>(), false);
             }
         }
         return scriptName;
@@ -112,7 +112,7 @@ public class ScriptPack extends AS3ClassTreeItem {
      Namespace ns = name.getNamespace(abc.constants);
      if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
      packageName = ns.getName(abc.constants);
-     scriptName = name.getName(abc.constants, new ArrayList<String>());
+     scriptName = name.getName(abc.constants, new ArrayList<>());
      }
      }
      return packageName.equals("") ? scriptName : packageName + "." + scriptName;
@@ -139,9 +139,9 @@ public class ScriptPack extends AS3ClassTreeItem {
             Multiname name = trait.getName(abc);
             Namespace ns = name.getNamespace(abc.constants);
             if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
-                trait.convertPackaged(null, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<String>(), parallel);
+                trait.convertPackaged(null, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel);
             } else {
-                trait.convert(null, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<String>(), parallel);
+                trait.convert(null, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel);
             }
         }
     }
@@ -157,9 +157,9 @@ public class ScriptPack extends AS3ClassTreeItem {
             Multiname name = trait.getName(abc);
             Namespace ns = name.getNamespace(abc.constants);
             if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
-                trait.toStringPackaged(null, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<String>(), parallel);
+                trait.toStringPackaged(null, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel);
             } else {
-                trait.toString(null, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<String>(), parallel);
+                trait.toString(null, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel);
             }
 
             first = false;

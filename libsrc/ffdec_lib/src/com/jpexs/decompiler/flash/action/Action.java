@@ -967,9 +967,9 @@ public abstract class Action implements GraphSourceItem {
              List<GraphTargetItem> tryCommands = ActionGraph.translateViaGraph(registerNames, variables, functions, atry.tryBody, version);
              ActionItem catchName;
              if (atry.catchInRegisterFlag) {
-             catchName = new DirectValueActionItem(atry, -1, new RegisterNumber(atry.catchRegister), new ArrayList<String>());
+             catchName = new DirectValueActionItem(atry, -1, new RegisterNumber(atry.catchRegister), new ArrayList<>());
              } else {
-             catchName = new DirectValueActionItem(atry, -1, atry.catchName, new ArrayList<String>());
+             catchName = new DirectValueActionItem(atry, -1, atry.catchName, new ArrayList<>());
              }
              List<GraphTargetItem> catchExceptions = new ArrayList<GraphTargetItem>();
              catchExceptions.add(catchName);

@@ -379,7 +379,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         //imports
         List<String> imports = new ArrayList<>();
         List<String> uses = new ArrayList<>();
-        getImportsUsages(abc, imports, uses, new ArrayList<String>());
+        getImportsUsages(abc, imports, uses, new ArrayList<>());
 
         fullyQualifiedNames = new ArrayList<>();
 
@@ -398,7 +398,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
                 importnames.add(name);
             }
         }
-        /*List<String> imports2 = new ArrayList<String>();
+        /*List<String> imports2 = new ArrayList<>();
          for (String path : imports) {
          String name = path;
          String pkg = "";
@@ -500,7 +500,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
             writer.startMethod(abc.instance_info.get(class_info).iinit_index);
             writer.appendNoHilight(modifier);
             writer.appendNoHilight("function ");
-            writer.appendNoHilight(abc.constants.getMultiname(abc.instance_info.get(class_info).name_index).getName(abc.constants, new ArrayList<String>()/*do not want full names here*/, false));
+            writer.appendNoHilight(abc.constants.getMultiname(abc.instance_info.get(class_info).name_index).getName(abc.constants, new ArrayList<>()/*do not want full names here*/, false));
             writer.appendNoHilight("(");
             bodyIndex = abc.findBodyIndex(abc.instance_info.get(class_info).iinit_index);
             if (bodyIndex != -1) {

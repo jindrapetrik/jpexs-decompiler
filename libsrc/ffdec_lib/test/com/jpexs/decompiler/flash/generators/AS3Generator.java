@@ -57,7 +57,7 @@ public class AS3Generator {
         StringBuilder s = new StringBuilder();
         for (Trait t : abc.instance_info.get(classId).instance_traits.traits) {
             if (t instanceof TraitMethodGetterSetter) {
-                String name = t.getName(abc).getName(abc.constants, new ArrayList<String>(), true);
+                String name = t.getName(abc).getName(abc.constants, new ArrayList<>(), true);
                 if (name.startsWith("test")) {
                     s.append("@Test\r\npublic void ");
                     s.append(name);
@@ -66,8 +66,8 @@ public class AS3Generator {
                     s.append("\", ");
                     HighlightedTextWriter src = new HighlightedTextWriter(new CodeFormatting(), false);
                     MethodBody b = abc.findBody(((TraitMethodGetterSetter) t).method_info);
-                    b.convert("", ScriptExportMode.AS, false, -1/*FIX?*/, classId, abc, null, abc.constants, abc.method_info, new ScopeStack(), false, new NulWriter(), new ArrayList<String>(), abc.instance_info.get(classId).instance_traits, true);
-                    b.toString("", ScriptExportMode.AS, abc, null, abc.constants, abc.method_info, src, new ArrayList<String>());
+                    b.convert("", ScriptExportMode.AS, false, -1/*FIX?*/, classId, abc, null, abc.constants, abc.method_info, new ScopeStack(), false, new NulWriter(), new ArrayList<>(), abc.instance_info.get(classId).instance_traits, true);
+                    b.toString("", ScriptExportMode.AS, abc, null, abc.constants, abc.method_info, src, new ArrayList<>());
                     String[] srcs = src.toString().split("[\r\n]+");
                     for (int i = 0; i < srcs.length; i++) {
                         String ss = srcs[i];

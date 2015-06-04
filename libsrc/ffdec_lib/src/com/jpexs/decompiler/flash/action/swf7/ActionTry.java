@@ -256,9 +256,9 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
         List<GraphTargetItem> tryCommands = contents.get(0);
         ActionItem catchName;
         if (catchInRegisterFlag) {
-            catchName = new DirectValueActionItem(this, -1, new RegisterNumber(this.catchRegister), new ArrayList<String>());
+            catchName = new DirectValueActionItem(this, -1, new RegisterNumber(this.catchRegister), new ArrayList<>());
         } else {
-            catchName = new DirectValueActionItem(this, -1, this.catchName, new ArrayList<String>());
+            catchName = new DirectValueActionItem(this, -1, this.catchName, new ArrayList<>());
         }
         List<GraphTargetItem> catchExceptions = new ArrayList<>();
         if (catchBlockFlag) {

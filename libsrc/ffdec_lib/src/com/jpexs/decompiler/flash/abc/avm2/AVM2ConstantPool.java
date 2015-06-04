@@ -426,7 +426,7 @@ public class AVM2ConstantPool {
         }
 
         for (int i = 1; i < constant_multiname.size(); i++) {
-            writer.println("Multiname[" + i + "]=" + constant_multiname.get(i).toString(this, new ArrayList<String>()));
+            writer.println("Multiname[" + i + "]=" + constant_multiname.get(i).toString(this, new ArrayList<>()));
         }
     }
 
@@ -434,7 +434,7 @@ public class AVM2ConstantPool {
         if (index == 0) {
             return "null";
         }
-        return constant_multiname.get(index).toString(this, new ArrayList<String>());
+        return constant_multiname.get(index).toString(this, new ArrayList<>());
     }
 
     public String namespaceToString(int index) {

@@ -580,7 +580,7 @@ public class ABC {
          MethodBody bod=bodies.get(bodyIdxFromMethodIdx.get(script_info.get(i).init_index));
          GraphTextWriter t=new HighlightedTextWriter(Configuration.getCodeFormatting(),false);
          try {
-         bod.toString("script", ScriptExportMode.PCODE,  this, null, constants, method_info, t, new ArrayList<String>());
+         bod.toString("script", ScriptExportMode.PCODE,  this, null, constants, method_info, t, new ArrayList<>());
          } catch (InterruptedException ex) {
          Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, null, ex);
          }
@@ -714,11 +714,11 @@ public class ABC {
 
     public MethodBody findBodyByClassAndName(String className, String methodName) {
         for (int i = 0; i < instance_info.size(); i++) {
-            if (className.equals(constants.getMultiname(instance_info.get(i).name_index).getName(constants, new ArrayList<String>(), true))) {
+            if (className.equals(constants.getMultiname(instance_info.get(i).name_index).getName(constants, new ArrayList<>(), true))) {
                 for (Trait t : instance_info.get(i).instance_traits.traits) {
                     if (t instanceof TraitMethodGetterSetter) {
                         TraitMethodGetterSetter t2 = (TraitMethodGetterSetter) t;
-                        if (methodName.equals(t2.getName(this).getName(constants, new ArrayList<String>(), true))) {
+                        if (methodName.equals(t2.getName(this).getName(constants, new ArrayList<>(), true))) {
                             for (MethodBody body : bodies) {
                                 if (body.method_info == t2.method_info) {
                                     return body;
@@ -731,11 +731,11 @@ public class ABC {
             }
         }
         for (int i = 0; i < class_info.size(); i++) {
-            if (className.equals(constants.getMultiname(instance_info.get(i).name_index).getName(constants, new ArrayList<String>(), true))) {
+            if (className.equals(constants.getMultiname(instance_info.get(i).name_index).getName(constants, new ArrayList<>(), true))) {
                 for (Trait t : class_info.get(i).static_traits.traits) {
                     if (t instanceof TraitMethodGetterSetter) {
                         TraitMethodGetterSetter t2 = (TraitMethodGetterSetter) t;
-                        if (methodName.equals(t2.getName(this).getName(constants, new ArrayList<String>(), true))) {
+                        if (methodName.equals(t2.getName(this).getName(constants, new ArrayList<>(), true))) {
                             for (MethodBody body : bodies) {
                                 if (body.method_info == t2.method_info) {
                                     return body;
@@ -881,19 +881,19 @@ public class ABC {
         output = new Utf8PrintWriter(os);
         constants.dump(output);
         for (int i = 0; i < method_info.size(); i++) {
-            output.println("MethodInfo[" + i + "]:" + method_info.get(i).toString(constants, new ArrayList<String>()));
+            output.println("MethodInfo[" + i + "]:" + method_info.get(i).toString(constants, new ArrayList<>()));
         }
         for (int i = 0; i < metadata_info.size(); i++) {
             output.println("MetadataInfo[" + i + "]:" + metadata_info.get(i).toString(constants));
         }
         for (int i = 0; i < instance_info.size(); i++) {
-            output.println("InstanceInfo[" + i + "]:" + instance_info.get(i).toString(this, new ArrayList<String>()));
+            output.println("InstanceInfo[" + i + "]:" + instance_info.get(i).toString(this, new ArrayList<>()));
         }
         for (int i = 0; i < class_info.size(); i++) {
-            output.println("ClassInfo[" + i + "]:" + class_info.get(i).toString(this, new ArrayList<String>()));
+            output.println("ClassInfo[" + i + "]:" + class_info.get(i).toString(this, new ArrayList<>()));
         }
         for (int i = 0; i < script_info.size(); i++) {
-            output.println("ScriptInfo[" + i + "]:" + script_info.get(i).toString(this, new ArrayList<String>()));
+            output.println("ScriptInfo[" + i + "]:" + script_info.get(i).toString(this, new ArrayList<>()));
         }
         for (int i = 0; i < bodies.size(); i++) {
             output.println("MethodBody[" + i + "]:"); //+ bodies[i].toString(this, constants, method_info));
@@ -1008,7 +1008,7 @@ public class ABC {
         if (classId > -1) {
             for (Trait t : instance_info.get(classId).instance_traits.traits) {
                 if (t instanceof TraitMethodGetterSetter) {
-                    if (t.getName(this).getName(constants, new ArrayList<String>(), true).equals(methodName)) {
+                    if (t.getName(this).getName(constants, new ArrayList<>(), true).equals(methodName)) {
                         return ((TraitMethodGetterSetter) t).method_info;
                     }
                 }
@@ -1021,7 +1021,7 @@ public class ABC {
         if (classId > -1) {
             for (Trait t : instance_info.get(classId).instance_traits.traits) {
                 if (t instanceof TraitMethodGetterSetter) {
-                    if (t.getName(this).getName(constants, new ArrayList<String>(), true).equals(methodName)) {
+                    if (t.getName(this).getName(constants, new ArrayList<>(), true).equals(methodName)) {
                         return findBodyIndex(((TraitMethodGetterSetter) t).method_info);
                     }
                 }

@@ -1018,10 +1018,10 @@ public class AVM2Code implements Cloneable {
             offsets.add((long) body.exceptions[e].target);
 
             writer.appendNoHilight(" type ");
-            writer.hilightSpecial(body.exceptions[e].type_index == 0 ? "null" : constants.getMultiname(body.exceptions[e].type_index).toString(constants, new ArrayList<String>()), HighlightSpecialType.TRY_TYPE, e);
+            writer.hilightSpecial(body.exceptions[e].type_index == 0 ? "null" : constants.getMultiname(body.exceptions[e].type_index).toString(constants, new ArrayList<>()), HighlightSpecialType.TRY_TYPE, e);
 
             writer.appendNoHilight(" name ");
-            writer.hilightSpecial(body.exceptions[e].name_index == 0 ? "null" : constants.getMultiname(body.exceptions[e].name_index).toString(constants, new ArrayList<String>()), HighlightSpecialType.TRY_NAME, e);
+            writer.hilightSpecial(body.exceptions[e].name_index == 0 ? "null" : constants.getMultiname(body.exceptions[e].name_index).toString(constants, new ArrayList<>()), HighlightSpecialType.TRY_NAME, e);
             writer.newLine();
         }
 
@@ -1079,7 +1079,7 @@ public class AVM2Code implements Cloneable {
                                 continue;
                             }
                             writer.append("", ins2.mappedOffset > -1 ? ins2.mappedOffset : ofs);
-                            writer.appendNoHilight(ins2.toStringNoAddress(constants, new ArrayList<String>()) + " ;copy from " + Helper.formatAddress(pos2adr((Integer) o)));
+                            writer.appendNoHilight(ins2.toStringNoAddress(constants, new ArrayList<>()) + " ;copy from " + Helper.formatAddress(pos2adr((Integer) o)));
                             writer.newLine();
                             outputMap.add((Integer) o);
                         } else if (o instanceof ControlFlowTag) {
@@ -1115,7 +1115,7 @@ public class AVM2Code implements Cloneable {
                             if (ins.changeJumpTo > -1) {
                                 writer.appendNoHilight(ins.definition.instructionName + " ofs" + Helper.formatAddress(pos2adr(ins.changeJumpTo)));
                             } else {
-                                writer.appendNoHilight(ins.toStringNoAddress(constants, new ArrayList<String>()));
+                                writer.appendNoHilight(ins.toStringNoAddress(constants, new ArrayList<>()));
                             }
                         }
                         writer.newLine();
@@ -1930,7 +1930,7 @@ public class AVM2Code implements Cloneable {
         localData.refs = refs;
         localData.code = this;
         int ret = 0;
-        ret += removeTraps(constants, trait, info, body, localData, new AVM2GraphSource(this, false, -1, -1, new HashMap<Integer, GraphTargetItem>(), new ScopeStack(), abc, body, new HashMap<Integer, String>(), new ArrayList<String>(), new HashMap<Integer, Integer>(), refs), 0, path, refs);
+        ret += removeTraps(constants, trait, info, body, localData, new AVM2GraphSource(this, false, -1, -1, new HashMap<Integer, GraphTargetItem>(), new ScopeStack(), abc, body, new HashMap<Integer, String>(), new ArrayList<>(), new HashMap<Integer, Integer>(), refs), 0, path, refs);
         removeIgnored(constants, trait, info, body);
         removeDeadCode(constants, trait, info, body);
 

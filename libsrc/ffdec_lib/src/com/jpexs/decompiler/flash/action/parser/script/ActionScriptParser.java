@@ -632,7 +632,7 @@ public class ActionScriptParser {
                     }
                 } else {
                     lexer.pushback(s);
-                    target = new DirectValueActionItem(null, 0, "", new ArrayList<String>());
+                    target = new DirectValueActionItem(null, 0, "", new ArrayList<>());
                 }
                 expectedType(SymbolType.PARENT_CLOSE);
                 ret = new GetURL2ActionItem(null, url, target, getuMethod);
@@ -816,7 +816,7 @@ public class ActionScriptParser {
                     lockCenter = (expression(inFunction, inMethod, true, variables));
                     s = lex();
                     if (s.type == SymbolType.COMMA) {
-                        constrain = new DirectValueActionItem(null, 0, 1L, new ArrayList<String>());
+                        constrain = new DirectValueActionItem(null, 0, 1L, new ArrayList<>());
                         x1 = (expression(inFunction, inMethod, true, variables));
                         s = lex();
                         if (s.type == SymbolType.COMMA) {
@@ -829,28 +829,28 @@ public class ActionScriptParser {
                                     y2 = (expression(inFunction, inMethod, true, variables));
                                 } else {
                                     lexer.pushback(s);
-                                    y2 = new DirectValueActionItem(null, 0, 0L, new ArrayList<String>());
+                                    y2 = new DirectValueActionItem(null, 0, 0L, new ArrayList<>());
                                 }
                             } else {
                                 lexer.pushback(s);
-                                x2 = new DirectValueActionItem(null, 0, 0L, new ArrayList<String>());
-                                y2 = new DirectValueActionItem(null, 0, 0L, new ArrayList<String>());
+                                x2 = new DirectValueActionItem(null, 0, 0L, new ArrayList<>());
+                                y2 = new DirectValueActionItem(null, 0, 0L, new ArrayList<>());
                             }
                         } else {
                             lexer.pushback(s);
-                            x2 = new DirectValueActionItem(null, 0, 0L, new ArrayList<String>());
-                            y2 = new DirectValueActionItem(null, 0, 0L, new ArrayList<String>());
-                            y1 = new DirectValueActionItem(null, 0, 0L, new ArrayList<String>());
+                            x2 = new DirectValueActionItem(null, 0, 0L, new ArrayList<>());
+                            y2 = new DirectValueActionItem(null, 0, 0L, new ArrayList<>());
+                            y1 = new DirectValueActionItem(null, 0, 0L, new ArrayList<>());
 
                         }
                     } else {
                         lexer.pushback(s);
-                        constrain = new DirectValueActionItem(null, 0, 0L, new ArrayList<String>());
+                        constrain = new DirectValueActionItem(null, 0, 0L, new ArrayList<>());
                         //ret.add(new ActionPush(Boolean.FALSE));
                     }
                 } else {
-                    lockCenter = new DirectValueActionItem(null, 0, 0L, new ArrayList<String>());
-                    constrain = new DirectValueActionItem(null, 0, 0L, new ArrayList<String>());
+                    lockCenter = new DirectValueActionItem(null, 0, 0L, new ArrayList<>());
+                    constrain = new DirectValueActionItem(null, 0, 0L, new ArrayList<>());
                     lexer.pushback(s);
                 }
                 expectedType(SymbolType.PARENT_CLOSE);
@@ -1142,7 +1142,7 @@ public class ActionScriptParser {
             case RETURN:
                 GraphTargetItem retexpr = expression(inFunction, inMethod, true, variables);
                 if (retexpr == null) {
-                    retexpr = new DirectValueActionItem(null, 0, new Undefined(), new ArrayList<String>());
+                    retexpr = new DirectValueActionItem(null, 0, new Undefined(), new ArrayList<>());
                 }
                 ret = new ReturnActionItem(null, retexpr);
                 break;
@@ -1582,10 +1582,10 @@ public class ActionScriptParser {
             case MINUS:
                 s = lex();
                 if (s.isType(SymbolType.DOUBLE)) {
-                    ret = new DirectValueActionItem(null, 0, -(double) (Double) s.value, new ArrayList<String>());
+                    ret = new DirectValueActionItem(null, 0, -(double) (Double) s.value, new ArrayList<>());
 
                 } else if (s.isType(SymbolType.INTEGER)) {
-                    ret = new DirectValueActionItem(null, 0, -(long) (Long) s.value, new ArrayList<String>());
+                    ret = new DirectValueActionItem(null, 0, -(long) (Long) s.value, new ArrayList<>());
 
                 } else {
                     lexer.pushback(s);
@@ -1608,7 +1608,7 @@ public class ActionScriptParser {
                         ((DirectValueActionItem) num).value = -(Float) ((DirectValueActionItem) num).value;
                         ret = (num);
                     } else {;
-                        ret = (new SubtractActionItem(null, new DirectValueActionItem(null, 0, (Long) 0L, new ArrayList<String>()), num));
+                        ret = (new SubtractActionItem(null, new DirectValueActionItem(null, 0, (Long) 0L, new ArrayList<>()), num));
                     }
                 }
                 break;
@@ -1617,18 +1617,18 @@ public class ActionScriptParser {
                 allowMemberOrCall = true;
                 break;
             case TRUE:
-                ret = new DirectValueActionItem(null, 0, Boolean.TRUE, new ArrayList<String>());
+                ret = new DirectValueActionItem(null, 0, Boolean.TRUE, new ArrayList<>());
 
                 break;
             case NULL:
-                ret = new DirectValueActionItem(null, 0, new Null(), new ArrayList<String>());
+                ret = new DirectValueActionItem(null, 0, new Null(), new ArrayList<>());
 
                 break;
             case UNDEFINED:
-                ret = new DirectValueActionItem(null, 0, new Undefined(), new ArrayList<String>());
+                ret = new DirectValueActionItem(null, 0, new Undefined(), new ArrayList<>());
                 break;
             case FALSE:
-                ret = new DirectValueActionItem(null, 0, Boolean.FALSE, new ArrayList<String>());
+                ret = new DirectValueActionItem(null, 0, Boolean.FALSE, new ArrayList<>());
 
                 break;
             case CURLY_OPEN: //Object literal
@@ -1675,20 +1675,20 @@ public class ActionScriptParser {
                 allowMemberOrCall = true;
                 break;
             case NEWLINE:
-                ret = new DirectValueActionItem(null, 0, "\r", new ArrayList<String>());
+                ret = new DirectValueActionItem(null, 0, "\r", new ArrayList<>());
                 allowMemberOrCall = true;
                 break;
             case NAN:
-                ret = new DirectValueActionItem(null, 0, Double.NaN, new ArrayList<String>());
+                ret = new DirectValueActionItem(null, 0, Double.NaN, new ArrayList<>());
 
                 break;
             case INFINITY:
-                ret = new DirectValueActionItem(null, 0, Double.POSITIVE_INFINITY, new ArrayList<String>());
+                ret = new DirectValueActionItem(null, 0, Double.POSITIVE_INFINITY, new ArrayList<>());
 
                 break;
             case INTEGER:
             case DOUBLE:
-                ret = new DirectValueActionItem(null, 0, s.value, new ArrayList<String>());
+                ret = new DirectValueActionItem(null, 0, s.value, new ArrayList<>());
 
                 break;
             case DELETE:
