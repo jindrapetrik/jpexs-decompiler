@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions.bitwise;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.URShiftAVM2Item;
@@ -34,6 +35,14 @@ public class URShiftIns extends InstructionDefinition {
 
     public URShiftIns() {
         super(0xa7, "urshift", new int[]{}, true);
+    }
+
+    @Override
+    public void execute(LocalDataArea lda, AVM2ConstantPool constants, List<Object> arguments) {
+        Long value2 = ((Long) lda.operandStack.pop() & 0x1F);
+        Long value1 = (Long) lda.operandStack.pop();
+        Long value3 = value1 >>> value2;
+        lda.operandStack.push(value3);
     }
 
     @Override
