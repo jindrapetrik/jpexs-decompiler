@@ -17,9 +17,11 @@
 package com.jpexs.decompiler.flash.configuration;
 
 import com.jpexs.decompiler.flash.ApplicationInfo;
+import com.jpexs.decompiler.flash.exporters.modes.ExeExportMode;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.importers.TextImportResizeTextBoundsMode;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,6 +34,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.URL;
+import java.net.URLConnection;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -46,6 +52,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 
 /**
@@ -295,6 +303,10 @@ public class Configuration {
     @ConfigurationDefaultInt(3)
     @ConfigurationCategory("export")
     public static final ConfigurationItem<Integer> saveAsExeScaleMode = null;
+
+    @ConfigurationDefaultInt(3)
+    @ConfigurationCategory("export")
+    public static final ConfigurationItem<ExeExportMode> exeExportMode = null;
 
     @ConfigurationDefaultInt(1024 * 1024/*1MiB*/)
     @ConfigurationCategory("limit")
@@ -782,16 +794,93 @@ public class Configuration {
         return count;
     }
 
-    public static File getFlashLibPath() {
+    public static File getPath(String folder) {
         String home = getFFDecHome();
-        File libsdir = new File(home + "flashlib");
-        if (!libsdir.exists()) {
-            libsdir.mkdirs();
+        File dir = new File(home + folder);
+        if (!dir.exists()) {
+            dir.mkdirs();
         }
-        return libsdir;
+        return dir;
+    }
+
+    public static File getFlashLibPath() {
+        return getPath("flashlib");
+    }
+
+    public static File getProjectorPath() {
+        return getPath("projector");
+    }
+
+    private static byte[] downloadsUrl(String urlString) throws IOException {
+        String proxyAddress = Configuration.updateProxyAddress.get();
+        URL url = new URL(urlString);
+
+        URLConnection uc = null;
+        if (proxyAddress != null && !proxyAddress.isEmpty()) {
+            int port = 8080;
+            if (proxyAddress.contains(":")) {
+                String[] parts = proxyAddress.split(":");
+                port = Integer.parseInt(parts[1]);
+                proxyAddress = parts[0];
+            }
+
+            uc = url.openConnection(new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyAddress, port)));
+        } else {
+            uc = url.openConnection();
+        }
+        uc.setRequestProperty("User-Agent", ApplicationInfo.shortApplicationVerName);
+
+        uc.connect();
+
+        return Helper.readStream(uc.getInputStream());
+    }
+
+    private static String getDownloadsHtml() throws IOException {
+        byte[] data = downloadsUrl("https://www.adobe.com/support/flashplayer/downloads.html");
+        String html = new String(data, Utf8Helper.charset);
+        return html;
+    }
+
+    private static String getUrlFromDownloadsHtml(String urlPatternString) {
+        try {
+            String html = getDownloadsHtml();
+            Pattern urlPattern = Pattern.compile(urlPatternString, Pattern.DOTALL);
+            Matcher matcher = urlPattern.matcher(html);
+            if (matcher.matches()) {
+                String url = matcher.group(1);
+                int a = url.length();
+                return url;
+            }
+
+            return null;
+        } catch (IOException ex) {
+            Logger.getLogger(Configuration.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+    }
+
+    private static String getLatestPlayerGlobalUrl() {
+        return getUrlFromDownloadsHtml(".*<a href=\"([^\"]*playerglobal[^\"]*\\.swc)\".*");
+    }
+
+    private static String getLatestProjectorUrlWin() {
+        return getUrlFromDownloadsHtml(".*<a href=\"([^\"]*flashplayer[^\"]*_sa\\.exe)\".*");
+    }
+
+    private static String getLatestProjectorUrlMac() {
+        return getUrlFromDownloadsHtml(".*<a href=\"([^\"]*flashplayer[^\"]*_sa\\.dmg)\".*");
+    }
+
+    private static String getLatestProjectorUrlLinux() {
+        // This is a compressed file
+        return getUrlFromDownloadsHtml(".*<a href=\"([^\"]*flashplayer[^\"]*_sa\\.i386\\.tar\\.gz)\".*");
     }
 
     public static File getPlayerSWC() {
+        String a = getLatestPlayerGlobalUrl();
+        String b = getLatestProjectorUrlWin();
+        String c = getLatestProjectorUrlMac();
+        String d = getLatestProjectorUrlLinux();
         File libsdir = getFlashLibPath();
         if (libsdir != null && libsdir.exists()) {
             File[] libs = libsdir.listFiles(new FilenameFilter() {
