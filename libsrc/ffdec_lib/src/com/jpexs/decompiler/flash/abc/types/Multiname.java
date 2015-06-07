@@ -19,7 +19,9 @@ package com.jpexs.decompiler.flash.abc.types;
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -288,23 +290,28 @@ public class Multiname {
         } else {
             String name = constants.getString(name_index);
             if (fullyQualifiedNames != null && fullyQualifiedNames.contains(name)) {
-                return getNameWithNamespace(constants, raw);
+                DottedChain dc = getNameWithNamespace(constants);
+                return raw ? dc.toString() : dc.toPrintableString();
             }
             return (isAttribute() ? "@" : "") + (raw ? name : IdentifiersDeobfuscation.printIdentifier(true, name));
         }
     }
 
-    public String getNameWithNamespace(AVM2ConstantPool constants, boolean raw) {
+    public DottedChain getNameWithNamespace(AVM2ConstantPool constants) {
         StringBuilder ret = new StringBuilder();
         Namespace ns = getNamespace(constants);
+        List<String> chain = new ArrayList<>();
         if (ns != null) {
-            String nsname = ns.getName(constants, raw);
+            String nsname = ns.getName(constants, true);
             if (nsname != null && !nsname.isEmpty()) {
-                ret.append(nsname).append(".");
+                String parts[] = nsname.split("\\.");
+                for (String p : parts) {
+                    chain.add(p);
+                }
             }
         }
-        ret.append(getName(constants, null, raw));
-        return ret.toString();
+        chain.add(getName(constants, null, true));
+        return new DottedChain(chain);
     }
 
     public Namespace getNamespace(AVM2ConstantPool constants) {

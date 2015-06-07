@@ -37,6 +37,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
@@ -90,57 +91,53 @@ public class TraitClass extends Trait implements TraitWithSlot {
         return "Class " + abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " slot=" + slot_id + " class_info=" + class_info + " metadata=" + Helper.intArrToString(metadata);
     }
 
-    private boolean parseUsagesFromNS(ABC abc, List<String> imports, List<String> uses, int namespace_index, String ignorePackage, String name) {
+    private boolean parseUsagesFromNS(ABC abc, List<DottedChain> imports, List<String> uses, int namespace_index, String ignorePackage, String name) {
         Namespace ns = abc.constants.getNamespace(namespace_index);
         if (name.isEmpty()) {
             name = "*";
         }
-        String newimport = ns.getName(abc.constants, ns.kind == Namespace.KIND_NAMESPACE);
+        String nsname = ns.getName(abc.constants, ns.kind == Namespace.KIND_NAMESPACE);
+        DottedChain newimport = nsname == null ? new DottedChain() : new DottedChain(nsname.split("\\."));
         /*if ((ns.kind != Namespace.KIND_PACKAGE)
          && (ns.kind != Namespace.KIND_NAMESPACE)
          && (ns.kind != Namespace.KIND_STATIC_PROTECTED)) {
          return false;
          }*/
         /*if (ns.kind == Namespace.KIND_NAMESPACE)*/ {
-            String oldimport = newimport;
-            newimport = null;
+            DottedChain oldimport = newimport;
+            newimport = new DottedChain();
             for (ABCContainerTag abcTag : abc.getAbcTags()) {
-                String newname = abcTag.getABC().nsValueToName(oldimport);
-                if (newname.equals("-")) {
+                DottedChain newname = abcTag.getABC().nsValueToName(oldimport == null ? null : oldimport.toString());
+                if (newname.toString().equals("-")) {
                     return true;
                 }
-                if (!newname.isEmpty()) {
+                if (!newname.toString().isEmpty()) {
                     newimport = newname;
                     break;
                 }
             }
-            if (newimport == null) {
+            if (newimport.parts.isEmpty()) {
                 newimport = oldimport;
-                newimport += "." + name;
+                newimport.parts.add(name);
             }
-            if (newimport != null && newimport.isEmpty()) {
-                newimport = null;
+            if (!newimport.parts.isEmpty() && newimport.toString().isEmpty()) {
+                newimport.parts.clear();
             }
-            if (newimport != null) {
+            if (newimport.parts.isEmpty()) {
                 /*                if(ns.kind==Namespace.KIND_PACKAGE){
                  newimport+=".*";
                  }*/
 
                 if (!imports.contains(newimport)) {
-                    if (newimport.contains(":")) {
-                        return true;
-                    }
-                    String pkg = "";
-                    if (newimport.contains(".")) {
-                        pkg = newimport.substring(0, newimport.lastIndexOf('.'));
-                    }
-                    String usname = newimport;
-                    if (usname.contains(".")) {
-                        usname = usname.substring(usname.lastIndexOf('.') + 1);
-                    }
+                    //??
+                    /*if (newimport.contains(":")) {
+                     return true;
+                     }*/
+                    DottedChain pkg = newimport.getWithoutLast();
+                    String usname = newimport.getLast();
                     if (ns.kind == Namespace.KIND_PACKAGE) {
                         if (!pkg.equals(ignorePackage)) {
-                            if (!pkg.equals("__AS3__.vec")) { //Automatic import
+                            if (!pkg.toString().equals("__AS3__.vec")) { //Automatic import
                                 imports.add(newimport);
                             }
                         }
@@ -162,38 +159,39 @@ public class TraitClass extends Trait implements TraitWithSlot {
         return false;
     }
 
-    private void parseImportsUsagesFromNS(ABC abc, List<String> imports, List<String> uses, int namespace_index, String ignorePackage, String name) {
+    private void parseImportsUsagesFromNS(ABC abc, List<DottedChain> imports, List<String> uses, int namespace_index, String ignorePackage, String name) {
         Namespace ns = abc.constants.getNamespace(namespace_index);
         if (name.isEmpty()) {
             name = "*";
         }
-        String newimport = ns.getName(abc.constants, false);
+        String niS = ns.getName(abc.constants, false);
+        DottedChain newimport = niS == null ? new DottedChain() : new DottedChain(niS.split("\\."));
         if (parseUsagesFromNS(abc, imports, uses, namespace_index, ignorePackage, name)) {
             return;
         } else if ((ns.kind != Namespace.KIND_PACKAGE) && (ns.kind != Namespace.KIND_PACKAGE_INTERNAL)) {
             return;
         }
-        if (newimport == null) {
-            newimport = "";
+        if (newimport.parts.isEmpty()) {
+            newimport = new DottedChain("");
         }
-        //if (!newimport.equals("")) {
-        newimport += "." + name;
-        if (newimport.contains(":")) {
-            return;
-        }
+        newimport.parts.add(name);
+        //WUT?
+        /*if (newimport.contains(":")) {
+         return;
+         }*/
         if (!imports.contains(newimport)) {
-            String pkg = newimport.substring(0, newimport.lastIndexOf('.'));
-            if (pkg.equals("__AS3__.vec")) { //special case - is imported always
+            DottedChain pkg = newimport.getWithoutLast(); //.substring(0, newimport.lastIndexOf('.'));
+            if (pkg.toString().equals("__AS3__.vec")) { //special case - is imported always
                 return;
             }
-            if (!pkg.equals(ignorePackage)) {
+            if (!pkg.toString().equals(ignorePackage)) {
                 imports.add(newimport);
             }
         }
         //}
     }
 
-    private void parseUsagesFromMultiname(ABC abc, List<String> imports, List<String> uses, Multiname m, String ignorePackage, List<String> fullyQualifiedNames) {
+    private void parseUsagesFromMultiname(ABC abc, List<DottedChain> imports, List<String> uses, Multiname m, String ignorePackage, List<String> fullyQualifiedNames) {
         if (m != null) {
             if (m.kind == Multiname.TYPENAME) {
                 if (m.qname_index != 0) {
@@ -224,7 +222,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         }
     }
 
-    private void parseImportsUsagesFromMultiname(ABC abc, List<String> imports, List<String> uses, Multiname m, String ignorePackage, List<String> fullyQualifiedNames) {
+    private void parseImportsUsagesFromMultiname(ABC abc, List<DottedChain> imports, List<String> uses, Multiname m, String ignorePackage, List<String> fullyQualifiedNames) {
         if (m != null) {
             if (m.kind == Multiname.TYPENAME) {
                 if (m.qname_index != 0) {
@@ -251,7 +249,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         }
     }
 
-    private void parseImportsUsagesFromMethodInfo(ABC abc, int method_index, List<String> imports, List<String> uses, String ignorePackage, List<String> fullyQualifiedNames, List<Integer> visitedMethods) {
+    private void parseImportsUsagesFromMethodInfo(ABC abc, int method_index, List<DottedChain> imports, List<String> uses, String ignorePackage, List<String> fullyQualifiedNames, List<Integer> visitedMethods) {
         if ((method_index < 0) || (method_index >= abc.method_info.size())) {
             return;
         }
@@ -272,7 +270,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
             }
             for (AVM2Instruction ins : body.getCode().code) {
                 if (ins.definition instanceof AlchemyTypeIns) {
-                    String nimport = AlchemyTypeIns.ALCHEMY_PACKAGE + "." + ins.definition.instructionName;
+                    DottedChain nimport = new DottedChain((AlchemyTypeIns.ALCHEMY_PACKAGE + "." + ins.definition.instructionName).split("\\."));
                     if (!imports.contains(nimport)) {
                         imports.add(nimport);
                     }
@@ -306,13 +304,13 @@ public class TraitClass extends Trait implements TraitWithSlot {
         }
     }
 
-    private void parseImportsUsagesFromTraits(ABC abc, Traits ts, List<String> imports, List<String> uses, String ignorePackage, List<String> fullyQualifiedNames) {
+    private void parseImportsUsagesFromTraits(ABC abc, Traits ts, List<DottedChain> imports, List<String> uses, String ignorePackage, List<String> fullyQualifiedNames) {
         for (Trait t : ts.traits) {
             parseImportsUsagesFromTrait(abc, t, imports, uses, ignorePackage, fullyQualifiedNames);
         }
     }
 
-    private void parseImportsUsagesFromTrait(ABC abc, Trait t, List<String> imports, List<String> uses, String ignorePackage, List<String> fullyQualifiedNames) {
+    private void parseImportsUsagesFromTrait(ABC abc, Trait t, List<DottedChain> imports, List<String> uses, String ignorePackage, List<String> fullyQualifiedNames) {
         if (t instanceof TraitMethodGetterSetter) {
             TraitMethodGetterSetter tm = (TraitMethodGetterSetter) t;
             parseImportsUsagesFromMultiname(abc, imports, uses, abc.constants.getMultiname(tm.name_index), ignorePackage, fullyQualifiedNames);
@@ -328,7 +326,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         }
     }
 
-    private List<String> getImportsUsages(ABC abc, List<String> imports, List<String> uses, List<String> fullyQualifiedNames) {
+    private List<DottedChain> getImportsUsages(ABC abc, List<DottedChain> imports, List<String> uses, List<String> fullyQualifiedNames) {
         //constructor
 
         String packageName = abc.instance_info.get(class_info).getName(abc.constants).getNamespace(abc.constants).getName(abc.constants, false); //assume not null name
@@ -384,7 +382,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         }
 
         //imports
-        List<String> imports = new ArrayList<>();
+        List<DottedChain> imports = new ArrayList<>();
         List<String> uses = new ArrayList<>();
         getImportsUsages(abc, imports, uses, new ArrayList<>());
 
@@ -392,20 +390,16 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
         List<String> importnames = new ArrayList<>();
         importnames.addAll(namesInThisPackage);
-        for (String ipath : imports) {
-            String name = ipath;
-            String pkg = "";
-            if (name.contains(".")) {
-                pkg = name.substring(0, name.lastIndexOf('.'));
-                name = name.substring(name.lastIndexOf('.') + 1);
-            }
-            if (importnames.contains(name) || ((!pkg.isEmpty()) && isBuiltInClass(name))) {
+        for (DottedChain ipath : imports) {
+            String name = ipath.getLast();
+            DottedChain pkg = ipath.getWithoutLast();
+            if (importnames.contains(name) || ((!pkg.toString().isEmpty()) && isBuiltInClass(name))) {
                 fullyQualifiedNames.add(name);
             } else {
                 importnames.add(name);
             }
         }
-        /*List<String> imports2 = new ArrayList<>();
+        /*List<DottedChain> imports2 = new ArrayList<String>();
          for (String path : imports) {
          String name = path;
          String pkg = "";
@@ -421,21 +415,23 @@ public class TraitClass extends Trait implements TraitWithSlot {
          imports = imports2;*/
 
         for (int i = 0; i < imports.size(); i++) {
-            String imp = imports.get(i);
-            String pkg = imp.substring(0, imp.lastIndexOf('.'));
-            String name = imp.substring(imp.lastIndexOf('.') + 1);
+            DottedChain imp = imports.get(i);
+            DottedChain pkg = imp.getWithoutLast(); //imp.substring(0, imp.lastIndexOf('.'));
+            String name = imp.getLast();//imp.substring(imp.lastIndexOf('.') + 1);
             if (name.equals("*")) {
                 continue;
             }
-            if (imports.contains(pkg + ".*")) {
+            DottedChain dAll = new DottedChain(pkg.parts);
+            dAll.parts.add("*");
+            if (imports.contains(dAll)) {
                 imports.remove(i);
                 i--;
             }
         }
 
         boolean hasImport = false;
-        for (String imp : imports) {
-            if (!imp.startsWith(".")) {
+        for (DottedChain imp : imports) {
+            if (!imp.parts.get(0).isEmpty()) {  //No imports from root package
                 writer.appendNoHilight("import " + imp + ";").newLine();
                 hasImport = true;
             }

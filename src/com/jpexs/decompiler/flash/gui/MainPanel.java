@@ -2885,6 +2885,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                             } catch (CancellationException ex) {
                                 getABCPanel().decompiledTextArea.setText("// " + AppStrings.translate("work.canceled"));
                             } catch (Exception ex) {
+                                Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, "Error", ex);
                                 getABCPanel().decompiledTextArea.setText("// " + AppStrings.translate("decompilationError") + ": " + ex);
                             }
                         });
@@ -2892,6 +2893,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 };
                 worker.execute();
                 setSourceWorker = worker;
+
                 Main.startWork(translate("work.decompiling") + "...", worker);
             }
 

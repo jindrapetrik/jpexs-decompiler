@@ -61,6 +61,7 @@ public class ScriptPack extends AS3ClassTreeItem {
     public final List<Integer> traitIndices;
 
     private final ClassPath path;
+    public boolean isSimple = false;
 
     @Override
     public SWF getSwf() {

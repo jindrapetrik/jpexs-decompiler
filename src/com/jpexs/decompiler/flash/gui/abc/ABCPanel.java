@@ -741,11 +741,11 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         SWF.uncache(pack);
 
         try {
-            String oldSp = null;
-            List<ScriptPack> packs = abc.script_info.get(oldIndex).getPacks(abc, oldIndex, null, pack.allABCs);
-            if (!packs.isEmpty()) {
-                oldSp = packs.get(0).getClassPath().toString();
-            }
+            String oldSp = pack.getClassPath().toString();
+            /*List<ScriptPack> packs = abc.script_info.get(oldIndex).getPacks(abc, oldIndex, null, pack.allABCs);
+             if (!packs.isEmpty()) {
+              
+             }*/
 
             String as = decompiledTextArea.getText();
             abc.replaceScriptPack(pack, as);
