@@ -143,8 +143,8 @@ public class Helper {
     }
 
     /**
-     * Formats specified address to four numbers xxxx
-     * (or five numbers when showing decimal addresses)
+     * Formats specified address to four numbers xxxx (or five numbers when
+     * showing decimal addresses)
      *
      * @param number Address to format
      * @return String representation of the address
@@ -154,8 +154,8 @@ public class Helper {
     }
 
     /**
-     * Formats specified address to four numbers xxxx
-     * (or five numbers when showing decimal addresses)
+     * Formats specified address to four numbers xxxx (or five numbers when
+     * showing decimal addresses)
      *
      * @param number Address to format
      * @param decimal Use decimal format
@@ -282,8 +282,7 @@ public class Helper {
      * character.</li>
      * </ul>
      *
-     * @param st
-     * A string optionally containing standard java escape sequences.
+     * @param st A string optionally containing standard java escape sequences.
      * @return The translated string.
      */
     public static String unescapeJavaString(String st) {
@@ -1324,5 +1323,21 @@ public class Helper {
         int exp = (int) (Math.log(bytes) / Math.log(unit));
         String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp - 1) + (si ? "" : "i");
         return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
+    }
+
+    public static List<String> safePackageSplit(String name) {
+        List<String> parts = new ArrayList<>();
+        if (name.contains(".")) {
+            String[] partsArr = name.split("\\.");
+            parts.addAll(Arrays.asList(partsArr));
+            //Fix for name starting with "." - Obfuscated handling
+            if (parts.get(0).equals("")) {
+                parts.remove(0);
+                parts.set(0, "." + parts.get(0));
+            }
+        } else {
+            parts.add(name);
+        }
+        return parts;
     }
 }

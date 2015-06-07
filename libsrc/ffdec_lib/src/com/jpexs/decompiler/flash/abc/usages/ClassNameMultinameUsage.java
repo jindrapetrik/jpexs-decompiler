@@ -30,6 +30,6 @@ public class ClassNameMultinameUsage extends InsideClassMultinameUsage implement
 
     @Override
     public String toString() {
-        return "class " + abc.constants.getMultiname(abc.instance_info.get(classIndex).name_index).getNameWithNamespace(abc.constants, false);
+        return "class " + abc.constants.getMultiname(abc.instance_info.get(classIndex).name_index).getNameWithNamespace(abc.constants).toPrintableString();
     }
 }

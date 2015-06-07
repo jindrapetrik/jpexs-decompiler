@@ -85,7 +85,7 @@ public class DeclarationAVM2Item extends AVM2Item {
             if (lti.value instanceof ConvertAVM2Item) {
                 coerType = ((ConvertAVM2Item) lti.value).type;
             }
-            srcData.declaredType = (coerType instanceof TypeItem) ? ((TypeItem) coerType).fullTypeName : "*";
+            srcData.declaredType = (coerType instanceof TypeItem) ? ((TypeItem) coerType).fullTypeName.toPrintableString() : "*";
             writer.append("var ");
             writer.append(localName);
             writer.append(":");
@@ -97,7 +97,7 @@ public class DeclarationAVM2Item extends AVM2Item {
             SetSlotAVM2Item ssti = (SetSlotAVM2Item) assignment;
             srcData.localName = ssti.getNameAsStr(localData);
             srcData.declaration = true;
-            srcData.declaredType = (type instanceof TypeItem) ? ((TypeItem) type).fullTypeName : "*";
+            srcData.declaredType = (type instanceof TypeItem) ? ((TypeItem) type).fullTypeName.toPrintableString() : "*";
             writer.append("var ");
             ssti.getName(writer, localData);
             writer.append(":");

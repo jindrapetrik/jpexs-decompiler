@@ -31,33 +31,37 @@ import java.util.Objects;
  * @author JPEXS
  */
 public class TypeItem extends GraphTargetItem {
-
+    
     public static TypeItem BOOLEAN = new TypeItem("Boolean");
-
+    
     public static TypeItem STRING = new TypeItem("String");
-
+    
     public static TypeItem ARRAY = new TypeItem("Array");
-
+    
     public static UnboundedTypeItem UNBOUNDED = new UnboundedTypeItem();
-
-    public String fullTypeName;
-
-    public TypeItem(String fullTypeName) {
+    
+    public DottedChain fullTypeName;
+    
+    public TypeItem(String s) {
+        this(s == null ? new DottedChain() : new DottedChain(s.split("\\.")));
+    }
+    
+    public TypeItem(DottedChain fullTypeName) {
         this(fullTypeName, new ArrayList<GraphTargetItem>());
     }
-
-    public TypeItem(String fullTypeName, List<GraphTargetItem> subtypes) {
+    
+    public TypeItem(DottedChain fullTypeName, List<GraphTargetItem> subtypes) {
         super(null, NOPRECEDENCE);
         this.fullTypeName = fullTypeName;
     }
-
+    
     @Override
     public int hashCode() {
         int hash = 7;
         hash = 83 * hash + Objects.hashCode(this.fullTypeName);
         return hash;
     }
-
+    
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -72,37 +76,33 @@ public class TypeItem extends GraphTargetItem {
         }
         return true;
     }
-
+    
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         if (localData.fullyQualifiedNames.contains(fullTypeName)) {
-            writer.hilightSpecial(IdentifiersDeobfuscation.printNamespace(localData.constantsAvm2 != null, fullTypeName), HighlightSpecialType.TYPE_NAME, fullTypeName);
+            writer.hilightSpecial(IdentifiersDeobfuscation.printNamespace(localData.constantsAvm2 != null, fullTypeName.toPrintableString()), HighlightSpecialType.TYPE_NAME, fullTypeName.toPrintableString());
         } else {
-            String simpleName = fullTypeName;
-            if (simpleName.contains(".")) {
-                simpleName = simpleName.substring(simpleName.lastIndexOf('.') + 1);
-            }
-            writer.hilightSpecial(IdentifiersDeobfuscation.printNamespace(localData.constantsAvm2 != null, simpleName), HighlightSpecialType.TYPE_NAME, fullTypeName);
+            writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(localData.constantsAvm2 != null, fullTypeName.getLast()), HighlightSpecialType.TYPE_NAME, fullTypeName.toPrintableString());
         }
-
+        
         return writer;
     }
-
+    
     @Override
     public GraphTargetItem returnType() {
         return this;
     }
-
+    
     @Override
     public boolean hasReturnValue() {
         return true;
     }
-
+    
     @Override
     public String toString() {
-        return fullTypeName;
+        return fullTypeName.toString();
     }
-
+    
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return generator.generate(localData, this);

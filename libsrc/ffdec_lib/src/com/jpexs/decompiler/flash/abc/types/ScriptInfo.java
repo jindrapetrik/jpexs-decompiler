@@ -88,6 +88,9 @@ public class ScriptInfo {
                 }
             }
         }
+        if (ret.size() == 1) {
+            ret.get(0).isSimple = true;
+        }
         return ret;
     }
 

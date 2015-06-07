@@ -1140,20 +1140,17 @@ public class Main {
 
     private static void reloadLastSession() {
         if (Configuration.saveSessionOnExit.get()) {
-            String lastSession = Configuration.lastSessionData.get();
+            String lastSession = Configuration.lastSessionFiles.get();
             if (lastSession != null && lastSession.length() > 0) {
                 String[] filesToOpen = lastSession.split(File.pathSeparator, -1);
-                int cnt = filesToOpen.length - 1;
-                SWFSourceInfo[] sourceInfos = new SWFSourceInfo[cnt];
-                for (int i = 0; i < cnt; i++) {
+                SWFSourceInfo[] sourceInfos = new SWFSourceInfo[filesToOpen.length];
+                for (int i = 0; i < filesToOpen.length; i++) {
                     String fileToOpen = filesToOpen[i];
                     sourceInfos[i] = new SWFSourceInfo(null, fileToOpen, null);
                 }
 
                 openFile(sourceInfos, () -> {
-                    // last part contains the selected node in the tagtree
-                    String pathStr = filesToOpen[filesToOpen.length - 1];
-                    mainFrame.getPanel().tagTree.setSelectionPathString(pathStr);
+                    mainFrame.getPanel().tagTree.setSelectionPathString(Configuration.lastSessionSelection.get());
                 });
             }
         }

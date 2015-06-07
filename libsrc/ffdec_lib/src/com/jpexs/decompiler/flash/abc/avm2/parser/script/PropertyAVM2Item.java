@@ -44,6 +44,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -115,7 +116,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
             }
             return new ApplyTypeAVM2Item(null, obj, params);
         } else {
-            return new TypeItem(m.getNameWithNamespace(constants, true));
+            return new TypeItem(m.getNameWithNamespace(constants));
         }
     }
 

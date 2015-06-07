@@ -59,17 +59,21 @@ import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.graph.CompilationException;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.utf8.Utf8PrintWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.collections.transformation.SortedList;
 
 public class ABC {
 
@@ -107,7 +111,7 @@ public class ABC {
     public ABCContainerTag parentTag;
 
     /* Map from multiname index of namespace value to namespace name**/
-    private Map<String, String> namespaceMap;
+    private Map<String, DottedChain> namespaceMap;
 
     public ABC(ABCContainerTag tag) {
         this.parentTag = tag;
@@ -323,7 +327,7 @@ public class ABC {
                     int mIndex = body.getCode().code.get(ip).operands[0];
                     if (mIndex > 0) {
                         Multiname m = constants.getMultiname(mIndex);
-                        if (m.getNameWithNamespace(constants, true).equals("flash.utils.getDefinitionByName")) {
+                        if (m.getNameWithNamespace(constants).equals("flash.utils.getDefinitionByName")) {
                             if (ip > 0) {
                                 if (body.getCode().code.get(ip - 1).definition instanceof PushStringIns) {
                                     int strIndex = body.getCode().code.get(ip - 1).operands[0];
@@ -812,16 +816,16 @@ public class ABC {
         }
     }
 
-    private Map<String, String> getNamespaceMap() {
+    private Map<String, DottedChain> getNamespaceMap() {
         if (namespaceMap == null) {
-            Map<String, String> map = new HashMap<>();
+            Map<String, DottedChain> map = new HashMap<>();
             for (ScriptInfo si : script_info) {
                 for (Trait t : si.traits.traits) {
                     if (t instanceof TraitSlotConst) {
                         TraitSlotConst s = ((TraitSlotConst) t);
                         if (s.isNamespace()) {
                             String key = constants.getNamespace(s.value_index).getName(constants, true); // assume not null
-                            String val = constants.getMultiname(s.name_index).getNameWithNamespace(constants, true);
+                            DottedChain val = constants.getMultiname(s.name_index).getNameWithNamespace(constants);
                             map.put(key, val);
                         }
                     }
@@ -855,15 +859,15 @@ public class ABC {
         return bodyIdxFromMethodIdx;
     }
 
-    public String nsValueToName(String value) {
+    public DottedChain nsValueToName(String value) {
         if (getNamespaceMap().containsKey(value)) {
             return getNamespaceMap().get(value);
         } else {
             String ns = getDeobfuscation().builtInNs(value);
             if (ns == null) {
-                return "";
+                return new DottedChain("");
             } else {
-                return ns;
+                return new DottedChain(ns);
             }
         }
     }
@@ -1037,8 +1041,8 @@ public class ABC {
 
     public int findClassByName(String name) {
         for (int c = 0; c < instance_info.size(); c++) {
-            String s = constants.getMultiname(instance_info.get(c).name_index).getNameWithNamespace(constants, true);
-            if (name.equals(s)) {
+            DottedChain s = constants.getMultiname(instance_info.get(c).name_index).getNameWithNamespace(constants);
+            if (name.equals(s.toString())) {
                 return c;
             }
         }
@@ -1229,31 +1233,54 @@ public class ABC {
         method_info.remove(index);
     }
 
-    public void replaceScriptPack(ScriptPack pack, String as) throws AVM2ParseException, CompilationException, IOException, InterruptedException {
+    public boolean replaceScriptPack(ScriptPack pack, String as) throws AVM2ParseException, CompilationException, IOException, InterruptedException {
         String scriptName = pack.getPathScriptName() + ".as";
         int oldIndex = pack.scriptIndex;
         int newIndex = script_info.size();
         String documentClass = getSwf().getDocumentClass();
         boolean isDocumentClass = documentClass != null && documentClass.equals(pack.getClassPath().toString());
 
+        boolean isSimple = pack.isSimple;
+
         ScriptInfo si = script_info.get(oldIndex);
-        si.delete(this, true);
-        int newClassIndex = instance_info.size();
-        for (Trait t : si.traits.traits) {
-            if (t instanceof TraitClass) {
-                TraitClass tc = (TraitClass) t;
-                newClassIndex = tc.class_info + 1;
+        if (isSimple) {
+            si.delete(this, true);
+        } else {
+            for (int t : pack.traitIndices) {
+                si.traits.traits.get(t).delete(this, true);
             }
         }
+
+        int newClassIndex = instance_info.size();
+        for (int t : pack.traitIndices) {
+            if (si.traits.traits.get(t) instanceof TraitClass) {
+                TraitClass tc = (TraitClass) si.traits.traits.get(t);
+                newClassIndex = tc.class_info + 1;
+            }
+
+        }
         List<ABC> otherAbcs = new ArrayList<>(pack.allABCs);
+
         otherAbcs.remove(this);
         ActionScriptParser.compile(as, this, otherAbcs, isDocumentClass, scriptName, newClassIndex);
-        // Move newly added script to its position
-        script_info.set(oldIndex, script_info.get(newIndex));
-        script_info.remove(newIndex);
+
+        if (isSimple) {
+            // Move newly added script to its position
+            script_info.set(oldIndex, script_info.get(newIndex));
+            script_info.remove(newIndex);
+        } else {
+            script_info.get(newIndex).setModified(true);
+            //Note: Is deleting traits safe?
+            List<Integer> todel = new ArrayList<>(new TreeSet<>(pack.traitIndices));
+            for (int i = todel.size() - 1; i >= 0; i--) {
+                si.traits.traits.remove((int) todel.get(i));
+            }
+        }
+
         script_info.get(oldIndex).setModified(true);
         pack(); // removes old classes/methods
         ((Tag) parentTag).setModified(true);
+        return !isSimple;
     }
 
     public void pack() {
