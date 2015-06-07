@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.SwfSpecificConfiguration;
 import com.jpexs.decompiler.flash.console.CommandLineArgumentParser;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
+import com.jpexs.decompiler.flash.exporters.modes.ExeExportMode;
 import com.jpexs.decompiler.flash.gui.pipes.FirstInstance;
 import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
@@ -381,10 +382,10 @@ public class Main {
     }
 
     public static void saveFile(SWF swf, String outfile) throws IOException {
-        saveFile(swf, outfile, SaveFileMode.SAVE);
+        saveFile(swf, outfile, SaveFileMode.SAVE, null);
     }
 
-    public static void saveFile(SWF swf, String outfile, SaveFileMode mode) throws IOException {
+    public static void saveFile(SWF swf, String outfile, SaveFileMode mode, ExeExportMode exeExportMode) throws IOException {
         if (mode == SaveFileMode.SAVEAS && !swf.swfList.isBundle()) {
             swf.setFile(outfile);
             swf.swfList.sourceInfo.setFile(outfile);
@@ -393,23 +394,33 @@ public class Main {
         File tmpFile = new File(outfile + ".tmp");
         try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(tmpFile))) {
             if (mode == SaveFileMode.EXE) {
-                InputStream exeStream = View.class.getClassLoader().getResourceAsStream("com/jpexs/helpers/resource/Swf2Exe.bin");
-                byte[] buffer = new byte[4096];
-                int bytesRead;
-                while ((bytesRead = exeStream.read(buffer)) != -1) {
-                    fos.write(buffer, 0, bytesRead);
+                switch (exeExportMode) {
+                    case WRAPPER:
+                        InputStream exeStream = View.class.getClassLoader().getResourceAsStream("com/jpexs/helpers/resource/Swf2Exe.bin");
+                        byte[] buffer = new byte[4096];
+                        int bytesRead;
+                        while ((bytesRead = exeStream.read(buffer)) != -1) {
+                            fos.write(buffer, 0, bytesRead);
+                        }
+                        int width = swf.displayRect.Xmax - swf.displayRect.Xmin;
+                        int height = swf.displayRect.Ymax - swf.displayRect.Ymin;
+                        fos.write(width & 0xff);
+                        fos.write((width >> 8) & 0xff);
+                        fos.write((width >> 16) & 0xff);
+                        fos.write((width >> 24) & 0xff);
+                        fos.write(height & 0xff);
+                        fos.write((height >> 8) & 0xff);
+                        fos.write((height >> 16) & 0xff);
+                        fos.write((height >> 24) & 0xff);
+                        fos.write(Configuration.saveAsExeScaleMode.get());
+                        break;
+                    case PROJECTOR_WIN:
+                        // todo
+                        break;
+                    case PROJECTOR_MAC:
+                        // todo
+                        break;
                 }
-                int width = swf.displayRect.Xmax - swf.displayRect.Xmin;
-                int height = swf.displayRect.Ymax - swf.displayRect.Ymin;
-                fos.write(width & 0xff);
-                fos.write((width >> 8) & 0xff);
-                fos.write((width >> 16) & 0xff);
-                fos.write((width >> 24) & 0xff);
-                fos.write(height & 0xff);
-                fos.write((height >> 8) & 0xff);
-                fos.write((height >> 16) & 0xff);
-                fos.write((height >> 24) & 0xff);
-                fos.write(Configuration.saveAsExeScaleMode.get());
             }
             swf.saveTo(fos);
         }
@@ -663,7 +674,7 @@ public class Main {
                 ext = ".exe";
                 break;
         }
-        final String extension = ext;
+
         FileFilter swfFilter = new FileFilter() {
             @Override
             public boolean accept(File f) {
@@ -676,24 +687,6 @@ public class Main {
             }
         };
 
-        FileFilter exeFilter = new FileFilter() {
-            @Override
-            public boolean accept(File f) {
-                return (f.getName().toLowerCase().endsWith(".exe")) || (f.isDirectory());
-            }
-
-            @Override
-            public String getDescription() {
-                return AppStrings.translate("filter.exe");
-            }
-        };
-        if (mode == SaveFileMode.EXE) {
-            fc.setFileFilter(exeFilter);
-        } else if (!swf.gfx) {
-            fc.setFileFilter(swfFilter);
-        } else {
-            fc.addChoosableFileFilter(swfFilter);
-        }
         FileFilter gfxFilter = new FileFilter() {
             @Override
             public boolean accept(File f) {
@@ -705,13 +698,56 @@ public class Main {
                 return AppStrings.translate("filter.gfx");
             }
         };
-        if (mode == SaveFileMode.SAVE || mode == SaveFileMode.SAVEAS) {
+
+        ExeExportMode exeExportMode = null;
+        if (mode == SaveFileMode.EXE) {
+            exeExportMode = Configuration.exeExportMode.get();
+            String filterDescription = null;
+            switch (exeExportMode) {
+                case WRAPPER:
+                    ext = ".exe";
+                    filterDescription = "filter.exe";
+                    break;
+                case PROJECTOR_WIN:
+                    ext = ".exe";
+                    filterDescription = "filter.exe";
+                    break;
+                case PROJECTOR_MAC:
+                    ext = ".dmg";
+                    filterDescription = "filter.dmg";
+                    break;
+                /*case PROJECTOR_LINUX:
+                 // linux projector is compressed with tar.gz
+                 // todo: decompress
+                 ext = "";
+                 filterDescription = "filter.linuxExe";
+                 break;*/
+            }
+
+            String fext = ext;
+            String ffilterDescription = filterDescription;
+            FileFilter exeFilter = new FileFilter() {
+                @Override
+                public boolean accept(File f) {
+                    return (f.getName().toLowerCase().endsWith(fext)) || (f.isDirectory());
+                }
+
+                @Override
+                public String getDescription() {
+                    return AppStrings.translate(ffilterDescription);
+                }
+            };
+            fc.setFileFilter(exeFilter);
+        } else {
             if (swf.gfx) {
+                fc.addChoosableFileFilter(swfFilter);
                 fc.setFileFilter(gfxFilter);
             } else {
+                fc.setFileFilter(swfFilter);
                 fc.addChoosableFileFilter(gfxFilter);
             }
         }
+        final String extension = ext;
         fc.setAcceptAllFileFilterUsed(false);
         JFrame f = new JFrame();
         View.setWindowIcon(f);
@@ -732,7 +768,7 @@ public class Main {
                     }
                     swf.gfx = true;
                 }
-                Main.saveFile(swf, fileName, mode);
+                Main.saveFile(swf, fileName, mode, exeExportMode);
                 Configuration.lastSaveDir.set(file.getParentFile().getAbsolutePath());
                 return true;
             } catch (IOException ex) {
