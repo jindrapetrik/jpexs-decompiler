@@ -1143,15 +1143,21 @@ public class Main {
             String lastSession = Configuration.lastSessionFiles.get();
             if (lastSession != null && lastSession.length() > 0) {
                 String[] filesToOpen = lastSession.split(File.pathSeparator, -1);
-                SWFSourceInfo[] sourceInfos = new SWFSourceInfo[filesToOpen.length];
+                List<String> exfiles = new ArrayList<>();
                 for (int i = 0; i < filesToOpen.length; i++) {
-                    String fileToOpen = filesToOpen[i];
-                    sourceInfos[i] = new SWFSourceInfo(null, fileToOpen, null);
+                    if (new File(filesToOpen[i]).exists()) {
+                        exfiles.add(filesToOpen[i]);
+                    }
                 }
-
-                openFile(sourceInfos, () -> {
-                    mainFrame.getPanel().tagTree.setSelectionPathString(Configuration.lastSessionSelection.get());
-                });
+                SWFSourceInfo[] sourceInfos = new SWFSourceInfo[exfiles.size()];
+                for (int i = 0; i < exfiles.size(); i++) {
+                    sourceInfos[i] = new SWFSourceInfo(null, exfiles.get(i), null);
+                }
+                if (sourceInfos.length > 0) {
+                    openFile(sourceInfos, () -> {
+                        mainFrame.getPanel().tagTree.setSelectionPathString(Configuration.lastSessionSelection.get());
+                    });
+                }
             }
         }
     }
