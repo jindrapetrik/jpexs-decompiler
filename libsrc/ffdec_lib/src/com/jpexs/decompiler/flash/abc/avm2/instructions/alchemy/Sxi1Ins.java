@@ -34,10 +34,10 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class Sxi1Ins extends InstructionDefinition {
+public class Sxi1Ins extends InstructionDefinition implements AlchemyTypeIns {
 
     public Sxi1Ins() {
-        super(0x50, "sxi_1", new int[]{}, false);
+        super(0x50, "sxi1", new int[]{}, false);
     }
 
     @Override
@@ -53,6 +53,6 @@ public class Sxi1Ins extends InstructionDefinition {
     @Override
     public void translate(boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, AVM2ConstantPool constants, AVM2Instruction ins, List<MethodInfo> method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) {
         GraphTargetItem value = stack.pop();
-        stack.push(new AlchemySignExtendAVM2Item(ins, value, instructionName));
+        stack.push(new AlchemySignExtendAVM2Item(ins, value, 1));
     }
 }

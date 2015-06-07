@@ -34,7 +34,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class Si16Ins extends InstructionDefinition {
+public class Si16Ins extends InstructionDefinition implements AlchemyTypeIns {
 
     public Si16Ins() {
         super(0x3B, "si16", new int[]{}, true);
@@ -54,6 +54,6 @@ public class Si16Ins extends InstructionDefinition {
     public void translate(boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, AVM2ConstantPool constants, AVM2Instruction ins, List<MethodInfo> method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) {
         GraphTargetItem ofs = stack.pop();
         GraphTargetItem value = stack.pop();
-        stack.push(new AlchemyStoreAVM2Item(ins, value, ofs, instructionName));
+        output.add(new AlchemyStoreAVM2Item(ins, value, ofs, 'i', 16));
     }
 }

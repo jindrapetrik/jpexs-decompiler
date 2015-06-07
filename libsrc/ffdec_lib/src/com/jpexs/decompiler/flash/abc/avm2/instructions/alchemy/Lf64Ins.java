@@ -34,7 +34,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class Lf64Ins extends InstructionDefinition {
+public class Lf64Ins extends InstructionDefinition implements AlchemyTypeIns {
 
     public Lf64Ins() {
         super(0x39, "lf64", new int[]{}, true);
@@ -53,6 +53,6 @@ public class Lf64Ins extends InstructionDefinition {
     @Override
     public void translate(boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, AVM2ConstantPool constants, AVM2Instruction ins, List<MethodInfo> method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) {
         GraphTargetItem ofs = stack.pop();
-        stack.push(new AlchemyLoadAVM2Item(ins, ofs, instructionName));
+        stack.push(new AlchemyLoadAVM2Item(ins, ofs, 'f', 64));
     }
 }
