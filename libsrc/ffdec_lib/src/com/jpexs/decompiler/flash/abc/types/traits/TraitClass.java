@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.AlchemyTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewFunctionIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrictIns;
@@ -270,6 +271,12 @@ public class TraitClass extends Trait implements TraitWithSlot {
                 parseImportsUsagesFromMultiname(abc, imports, uses, abc.constants.getMultiname(ex.type_index), ignorePackage, fullyQualifiedNames);
             }
             for (AVM2Instruction ins : body.getCode().code) {
+                if (ins.definition instanceof AlchemyTypeIns) {
+                    String nimport = AlchemyTypeIns.ALCHEMY_PACKAGE + "." + ins.definition.instructionName;
+                    if (!imports.contains(nimport)) {
+                        imports.add(nimport);
+                    }
+                }
                 if (ins.definition instanceof NewFunctionIns) {
                     if (ins.operands[0] != method_index) {
                         if (!visitedMethods.contains(ins.operands[0])) {
