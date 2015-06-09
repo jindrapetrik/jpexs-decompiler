@@ -120,20 +120,25 @@ public final class MainFrameRibbon extends AppRibbonFrame {
             public void windowClosing(WindowEvent e) {
                 if (Configuration.saveSessionOnExit.get()) {
                     StringBuilder sb = new StringBuilder();
+                    boolean first = true;
                     for (SWFList swf : panel.getSwfs()) {
+                        if (!first) {
+                            sb.append(File.pathSeparator);
+                        }
+                        first = false;
                         String file = swf.sourceInfo.getFile();
                         if (file != null) {
                             sb.append(file);
-                            sb.append(File.pathSeparator);
                         }
                     }
 
+                    Configuration.lastSessionFiles.set(sb.toString());
+
                     String path = panel.tagTree.getSelectionPathString();
                     if (path != null) {
-                        sb.append(path);
+                        Configuration.lastSessionSelection.set(path);
                     }
 
-                    Configuration.lastSessionData.set(sb.toString());
                 }
 
                 boolean closeResult = panel.closeAll();

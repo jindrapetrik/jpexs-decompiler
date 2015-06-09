@@ -1176,21 +1176,24 @@ public class Main {
 
     private static void reloadLastSession() {
         if (Configuration.saveSessionOnExit.get()) {
-            String lastSession = Configuration.lastSessionData.get();
+            String lastSession = Configuration.lastSessionFiles.get();
             if (lastSession != null && lastSession.length() > 0) {
                 String[] filesToOpen = lastSession.split(File.pathSeparator, -1);
-                int cnt = filesToOpen.length - 1;
-                SWFSourceInfo[] sourceInfos = new SWFSourceInfo[cnt];
-                for (int i = 0; i < cnt; i++) {
-                    String fileToOpen = filesToOpen[i];
-                    sourceInfos[i] = new SWFSourceInfo(null, fileToOpen, null);
+                List<String> exfiles = new ArrayList<>();
+                for (int i = 0; i < filesToOpen.length; i++) {
+                    if (new File(filesToOpen[i]).exists()) {
+                        exfiles.add(filesToOpen[i]);
+                    }
                 }
-
-                openFile(sourceInfos, () -> {
-                    // last part contains the selected node in the tagtree
-                    String pathStr = filesToOpen[filesToOpen.length - 1];
-                    mainFrame.getPanel().tagTree.setSelectionPathString(pathStr);
-                });
+                SWFSourceInfo[] sourceInfos = new SWFSourceInfo[exfiles.size()];
+                for (int i = 0; i < exfiles.size(); i++) {
+                    sourceInfos[i] = new SWFSourceInfo(null, exfiles.get(i), null);
+                }
+                if (sourceInfos.length > 0) {
+                    openFile(sourceInfos, () -> {
+                        mainFrame.getPanel().tagTree.setSelectionPathString(Configuration.lastSessionSelection.get());
+                    });
+                }
             }
         }
     }
