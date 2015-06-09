@@ -467,7 +467,9 @@ public class Configuration {
     @ConfigurationCategory("ui")
     public static final ConfigurationItem<Boolean> saveSessionOnExit = null;
 
-    public static final ConfigurationItem<String> lastSessionData = null;
+    public static final ConfigurationItem<String> lastSessionFiles = null;
+
+    public static final ConfigurationItem<String> lastSessionSelection = null;
 
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("ui")
