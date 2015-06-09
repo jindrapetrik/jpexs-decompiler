@@ -691,7 +691,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
                             chs.put(ch, charId);
                         }
 
-                        Element charImage = exporter.addUse(mat, bounds, charId);
+                        Element charImage = exporter.addUse(mat, bounds, charId, null);
                         RGBA colorA = new RGBA(textColor);
                         charImage.setAttribute("fill", colorA.toHexRGB());
                         if (colorA.alpha != 255) {
