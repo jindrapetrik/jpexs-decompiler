@@ -2304,12 +2304,12 @@ public final class SWF implements SWFContainerItem, Timelined {
                     clips.add(clip);
                     prevClips.add(exporter.getClip());
                     Matrix mat = Matrix.getTranslateInstance(rect.xMin, rect.yMin).preConcatenate(new Matrix(layer.matrix));
-                    exporter.addUse(mat, boundRect, assetName);
+                    exporter.addUse(mat, boundRect, assetName, layer.instanceName);
                     exporter.setClip(clip.shape);
                     exporter.endGroup();
                 } else {
                     Matrix mat = Matrix.getTranslateInstance(rect.xMin, rect.yMin).preConcatenate(new Matrix(layer.matrix));
-                    exporter.addUse(mat, boundRect, assetName);
+                    exporter.addUse(mat, boundRect, assetName, layer.instanceName);
                 }
             }
         }

@@ -207,12 +207,15 @@ public class SVGExporter {
         attr.setValue("background: " + new RGBA(backGroundColor).toHexARGB());
     }
 
-    public Element addUse(Matrix transform, RECT boundRect, String href) {
+    public Element addUse(Matrix transform, RECT boundRect, String href, String instanceName) {
         Element image = _svg.createElement("use");
         if (transform != null) {
             image.setAttribute("transform", transform.getTransformationString(SWF.unitDivisor, 1));
             image.setAttribute("width", Double.toString(boundRect.getWidth() / (double) SWF.unitDivisor));
             image.setAttribute("height", Double.toString(boundRect.getHeight() / (double) SWF.unitDivisor));
+        }
+        if (instanceName != null) {
+            image.setAttribute("id", instanceName);
         }
         image.setAttribute("xlink:href", "#" + href);
         if (clip != null) {
