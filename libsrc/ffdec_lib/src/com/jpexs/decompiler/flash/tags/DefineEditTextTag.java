@@ -933,12 +933,12 @@ public class DefineEditTextTag extends TextTag {
         return render(TextRenderMode.HTML5_CANVAS, null, null, new Matrix(), new ColorTransform(), 0);
     }
 
-    private String render(TextRenderMode renderModeMode, SerializableImage image, SVGExporter svgExporter, Matrix transformation, ColorTransform colorTransform, double zoom) {
+    private String render(TextRenderMode renderMode, SerializableImage image, SVGExporter svgExporter, Matrix transformation, ColorTransform colorTransform, double zoom) {
         if (border) {
             // border is always black, fill color is always white?
             RGB borderColor = new RGBA(Color.black);
             RGB fillColor = new RGBA(Color.white);
-            if (renderModeMode == TextRenderMode.BITMAP) {
+            if (renderMode == TextRenderMode.BITMAP) {
                 drawBorder(swf, image, borderColor, fillColor, getRect(), getTextMatrix(), transformation, colorTransform);
             } else {
                 // TODO: draw border
@@ -1119,7 +1119,7 @@ public class DefineEditTextTag extends TextTag {
                 }
             }
 
-            switch (renderModeMode) {
+            switch (renderMode) {
                 case BITMAP:
                     staticTextToImage(swf, allTextRecords, 2, image, getTextMatrix(), transformation, colorTransform);
                     break;
