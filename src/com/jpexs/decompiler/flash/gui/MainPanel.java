@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFBundle;
+import com.jpexs.decompiler.flash.SWFSourceInfo;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
@@ -903,8 +904,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         @SuppressWarnings("unchecked")
                         List<File> droppedFiles = (List<File>) dtde.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
                         if (!droppedFiles.isEmpty()) {
-                            String path = droppedFiles.get(0).getAbsolutePath();
-                            Main.openFile(path, null);
+                            SWFSourceInfo[] sourceInfos = new SWFSourceInfo[droppedFiles.size()];
+                            for (int i = 0; i < droppedFiles.size(); i++) {
+                                sourceInfos[i] = new SWFSourceInfo(null, droppedFiles.get(i).getAbsolutePath(), null);
+                            }
+                            Main.openFile(sourceInfos, null);
                         }
                     } catch (UnsupportedFlavorException | IOException ex) {
                     }
