@@ -1059,7 +1059,7 @@ public class DefineEditTextTag extends TextTag {
 
             List<TEXTRECORD> allTextRecords = new ArrayList<>();
             int lastHeight = 0;
-            int yOffset = 0;
+            int yOffset = -leading;
             for (List<SameStyleTextRecord> line : lines) {
                 int width = 0;
                 int currentOffset = 0;
