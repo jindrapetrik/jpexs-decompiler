@@ -395,6 +395,27 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
         BitmapExporter.export(swf, getBorderShape(borderColor, fillColor, rect), null, image, mat, colorTransform);
     }
 
+    public static String drawBorderHtmlCanvas(SWF swf, RGB borderColor, RGB fillColor, RECT rect, MATRIX textMatrix, ColorTransform colorTransform, double unitDivisor) {
+        String ret = "";
+        Matrix mat = new Matrix(textMatrix);
+        ret += "\tctx.save();\r\n";
+        ret += "\tctx.transform(" + mat.scaleX + "," + mat.rotateSkew0 + "," + mat.rotateSkew1 + "," + mat.scaleY + "," + mat.translateX + "," + mat.translateY + ");\r\n";
+        SHAPE shape = getBorderShape(borderColor, fillColor, rect);
+        CanvasShapeExporter cse = new CanvasShapeExporter(null, unitDivisor, swf, shape, colorTransform, 0, 0);
+        cse.export();
+        ret += cse.getShapeData();
+        ret += "\tctx.restore();\r\n";
+        return ret;
+    }
+
+    public static void drawBorderSVG(SWF swf, SVGExporter exporter, RGB borderColor, RGB fillColor, RECT rect, MATRIX textMatrix, ColorTransform colorTransform, double zoom) {
+        exporter.createSubGroup(new Matrix(textMatrix), null);
+        SHAPE shape = getBorderShape(borderColor, fillColor, rect);
+        SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, shape, exporter, null, colorTransform, zoom);
+        shapeExporter.export();
+        exporter.endGroup();
+    }
+
     public static void staticTextToImage(SWF swf, List<TEXTRECORD> textRecords, int numText, SerializableImage image, MATRIX textMatrix, Matrix transformation, ColorTransform colorTransform) {
         int textColor = 0;
         FontTag font = null;

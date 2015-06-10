@@ -149,13 +149,13 @@ public class SVGExporter {
     }
 
     public final Element createSubGroup(Matrix transform, String id) {
-        Element group = createSubGroup(transform, id, "g");
+        Element group = createSubGroup(id, "g");
         group.setAttribute("transform", transform.getTransformationString(SWF.unitDivisor, 1));
         return group;
     }
 
     public final Element createClipPath(Matrix transform, String id) {
-        Element group = createSubGroup(transform, id, "clipPath");
+        Element group = createSubGroup(id, "clipPath");
         Node parent = group.getParentNode();
         if (parent instanceof Element) {
             Element parentElement = (Element) parent;
@@ -164,7 +164,7 @@ public class SVGExporter {
         return group;
     }
 
-    private Element createSubGroup(Matrix transform, String id, String tagName) {
+    private Element createSubGroup(String id, String tagName) {
         Element group = _svg.createElement(tagName);
         if (id != null) {
             group.setAttribute("id", id);
