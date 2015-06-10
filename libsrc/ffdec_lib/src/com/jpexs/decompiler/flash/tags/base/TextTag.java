@@ -395,17 +395,15 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
         BitmapExporter.export(swf, getBorderShape(borderColor, fillColor, rect), null, image, mat, colorTransform);
     }
 
-    public static String drawBorderHtmlCanvas(SWF swf, RGB borderColor, RGB fillColor, RECT rect, MATRIX textMatrix, ColorTransform colorTransform, double unitDivisor) {
-        String ret = "";
+    public static void drawBorderHtmlCanvas(SWF swf, StringBuilder result, RGB borderColor, RGB fillColor, RECT rect, MATRIX textMatrix, ColorTransform colorTransform, double unitDivisor) {
         Matrix mat = new Matrix(textMatrix);
-        ret += "\tctx.save();\r\n";
-        ret += "\tctx.transform(" + mat.scaleX + "," + mat.rotateSkew0 + "," + mat.rotateSkew1 + "," + mat.scaleY + "," + mat.translateX + "," + mat.translateY + ");\r\n";
+        result.append("\tctx.save();\r\n");
+        result.append("\tctx.transform(").append(mat.scaleX).append(",").append(mat.rotateSkew0).append(",").append(mat.rotateSkew1).append(",").append(mat.scaleY).append(",").append(mat.translateX).append(",").append(mat.translateY).append(");\r\n");
         SHAPE shape = getBorderShape(borderColor, fillColor, rect);
         CanvasShapeExporter cse = new CanvasShapeExporter(null, unitDivisor, swf, shape, colorTransform, 0, 0);
         cse.export();
-        ret += cse.getShapeData();
-        ret += "\tctx.restore();\r\n";
-        return ret;
+        result.append(cse.getShapeData());
+        result.append("\tctx.restore();\r\n");
     }
 
     public static void drawBorderSVG(SWF swf, SVGExporter exporter, RGB borderColor, RGB fillColor, RECT rect, MATRIX textMatrix, ColorTransform colorTransform, double zoom) {
@@ -564,9 +562,8 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
         }
     }
 
-    public static String staticTextToHtmlCanvas(double unitDivisor, SWF swf, List<TEXTRECORD> textRecords, int numText, RECT bounds, MATRIX textMatrix, ColorTransform colorTransform) {
+    public static void staticTextToHtmlCanvas(double unitDivisor, SWF swf, List<TEXTRECORD> textRecords, int numText, StringBuilder result, RECT bounds, MATRIX textMatrix, ColorTransform colorTransform) {
         int textColor = 0;
-        String ret = "";
         FontTag font = null;
         int fontId = -1;
         int textHeight = 12;
@@ -597,20 +594,19 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
 
             double rat = textHeight / 1024.0 / font.getDivider();
 
-            ret += "\tvar textColor = " + CanvasShapeExporter.color(textColor) + ";\r\n";
+            result.append("\tvar textColor = ").append(CanvasShapeExporter.color(textColor)).append(";\r\n");
             for (GLYPHENTRY entry : rec.glyphEntries) {
                 Matrix mat = (new Matrix(textMatrix).concatenate(Matrix.getTranslateInstance(x, y))).concatenate(Matrix.getScaleInstance(rat));
                 if (entry.glyphIndex != -1) {
                     // shapeNum: 1
-                    ret += "\tctx.save();\r\n";
-                    ret += "\tctx.transform(" + mat.scaleX + "," + mat.rotateSkew0 + "," + mat.rotateSkew1 + "," + mat.scaleY + "," + mat.translateX + "," + mat.translateY + ");\r\n";
-                    ret += "\tfont" + fontId + "(ctx,\"" + ("" + font.glyphToChar(entry.glyphIndex)).replace("\\", "\\\\").replace("\"", "\\\"") + "\",textColor);\r\n";
-                    ret += "\tctx.restore();\r\n";
+                    result.append("\tctx.save();\r\n");
+                    result.append("\tctx.transform(").append(mat.scaleX).append(",").append(mat.rotateSkew0).append(",").append(mat.rotateSkew1).append(",").append(mat.scaleY).append(",").append(mat.translateX).append(",").append(mat.translateY).append(");\r\n");
+                    result.append("\tfont").append(fontId).append("(ctx,\"").append(("" + font.glyphToChar(entry.glyphIndex)).replace("\\", "\\\\").replace("\"", "\\\"")).append("\",textColor);\r\n");
+                    result.append("\tctx.restore();\r\n");
                     x += entry.glyphAdvance;
                 }
             }
         }
-        return ret;
     }
 
     public static void staticTextToSVG(SWF swf, List<TEXTRECORD> textRecords, int numText, SVGExporter exporter, RECT bounds, MATRIX textMatrix, ColorTransform colorTransform, double zoom) {

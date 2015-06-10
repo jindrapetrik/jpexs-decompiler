@@ -210,50 +210,52 @@ public class FrameExporter {
 
                     String currentName = ftim.id == 0 ? "main" : SWF.getTypePrefix(fswf.getCharacter(ftim.id)) + ftim.id;
 
-                    fos.write(Utf8Helper.getBytes("function " + currentName + "(ctx,ctrans,frame,ratio,time){\r\n"));
-                    fos.write(Utf8Helper.getBytes("\tctx.save();\r\n"));
-                    fos.write(Utf8Helper.getBytes("\tctx.transform(1,0,0,1," + (-ftim.displayRect.Xmin * settings.zoom / SWF.unitDivisor) + "," + (-ftim.displayRect.Ymin * settings.zoom / SWF.unitDivisor) + ");\r\n"));
-                    fos.write(Utf8Helper.getBytes(framesToHtmlCanvas(SWF.unitDivisor / settings.zoom, ftim, fframes, 0, null, 0, ftim.displayRect, new ColorTransform(), fbackgroundColor)));
-                    fos.write(Utf8Helper.getBytes("\tctx.restore();\r\n"));
-                    fos.write(Utf8Helper.getBytes("}\r\n\r\n"));
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("function ").append(currentName).append("(ctx,ctrans,frame,ratio,time){\r\n");
+                    sb.append("\tctx.save();\r\n");
+                    sb.append("\tctx.transform(1,0,0,1,").append(-ftim.displayRect.Xmin * settings.zoom / SWF.unitDivisor).append(",").append(-ftim.displayRect.Ymin * settings.zoom / SWF.unitDivisor).append(");\r\n");
+                    framesToHtmlCanvas(sb, SWF.unitDivisor / settings.zoom, ftim, fframes, 0, null, 0, ftim.displayRect, new ColorTransform(), fbackgroundColor);
+                    sb.append("\tctx.restore();\r\n");
+                    sb.append("}\r\n\r\n");
 
-                    fos.write(Utf8Helper.getBytes("var frame = -1;\r\n"));
-                    fos.write(Utf8Helper.getBytes("var time = 0;\r\n"));
-                    fos.write(Utf8Helper.getBytes("var frames = [];\r\n"));
+                    sb.append("var frame = -1;\r\n");
+                    sb.append("var time = 0;\r\n");
+                    sb.append("var frames = [];\r\n");
                     for (int i : fframes) {
-                        fos.write(Utf8Helper.getBytes("frames.push(" + i + ");\r\n"));
+                        sb.append("frames.push(").append(i).append(");\r\n");
                     }
-                    fos.write(Utf8Helper.getBytes("\r\n"));
+                    sb.append("\r\n");
                     RGB backgroundColor1 = new RGB(255, 255, 255);
                     for (Tag t : fswf.tags) {
                         if (t instanceof SetBackgroundColorTag) {
-                            SetBackgroundColorTag sb = (SetBackgroundColorTag) t;
-                            backgroundColor1 = sb.backgroundColor;
+                            SetBackgroundColorTag sbgct = (SetBackgroundColorTag) t;
+                            backgroundColor1 = sbgct.backgroundColor;
                         }
                     }
 
-                    fos.write(Utf8Helper.getBytes("var backgroundColor = \"" + backgroundColor1.toHexRGB() + "\";\r\n"));
-                    fos.write(Utf8Helper.getBytes("var originalWidth = " + width + ";\r\n"));
-                    fos.write(Utf8Helper.getBytes("var originalHeight= " + height + ";\r\n"));
-                    fos.write(Utf8Helper.getBytes("function nextFrame(ctx,ctrans){\r\n"));
-                    fos.write(Utf8Helper.getBytes("\tvar oldframe = frame;\r\n"));
-                    fos.write(Utf8Helper.getBytes("\tframe = (frame+1)%frames.length;\r\n"));
-                    fos.write(Utf8Helper.getBytes("\tif(frame==oldframe){time++;}else{time=0;};\r\n"));
-                    fos.write(Utf8Helper.getBytes("\tdrawFrame();\r\n"));
-                    fos.write(Utf8Helper.getBytes("}\r\n\r\n"));
+                    sb.append("var backgroundColor = \"").append(backgroundColor1.toHexRGB()).append("\";\r\n");
+                    sb.append("var originalWidth = ").append(width).append(";\r\n");
+                    sb.append("var originalHeight= ").append(height).append(";\r\n");
+                    sb.append("function nextFrame(ctx,ctrans){\r\n");
+                    sb.append("\tvar oldframe = frame;\r\n");
+                    sb.append("\tframe = (frame+1)%frames.length;\r\n");
+                    sb.append("\tif(frame==oldframe){time++;}else{time=0;};\r\n");
+                    sb.append("\tdrawFrame();\r\n");
+                    sb.append("}\r\n\r\n");
 
-                    fos.write(Utf8Helper.getBytes("function drawFrame(){\r\n"));
-                    fos.write(Utf8Helper.getBytes("\tctx.fillStyle = backgroundColor;\r\n"));
-                    fos.write(Utf8Helper.getBytes("\tctx.fillRect(0,0,canvas.width,canvas.height);\r\n"));
-                    fos.write(Utf8Helper.getBytes("\tctx.save();\r\n"));
-                    fos.write(Utf8Helper.getBytes("\tctx.transform(canvas.width/originalWidth,0,0,canvas.height/originalHeight,0,0);\r\n"));
-                    fos.write(Utf8Helper.getBytes("\t" + currentName + "(ctx,ctrans,frames[frame],0,time);\r\n"));
-                    fos.write(Utf8Helper.getBytes("\tctx.restore();\r\n"));
-                    fos.write(Utf8Helper.getBytes("}\r\n\r\n"));
+                    sb.append("function drawFrame(){\r\n");
+                    sb.append("\tctx.fillStyle = backgroundColor;\r\n");
+                    sb.append("\tctx.fillRect(0,0,canvas.width,canvas.height);\r\n");
+                    sb.append("\tctx.save();\r\n");
+                    sb.append("\tctx.transform(canvas.width/originalWidth,0,0,canvas.height/originalHeight,0,0);\r\n");
+                    sb.append("\t").append(currentName).append("(ctx,ctrans,frames[frame],0,time);\r\n");
+                    sb.append("\tctx.restore();\r\n");
+                    sb.append("}\r\n\r\n");
                     if (ftim.swf.frameRate > 0) {
-                        fos.write(Utf8Helper.getBytes("window.setInterval(function(){nextFrame(ctx,ctrans);}," + (int) (1000.0 / ftim.swf.frameRate) + ");\r\n"));
+                        sb.append("window.setInterval(function(){nextFrame(ctx,ctrans);},").append((int) (1000.0 / ftim.swf.frameRate)).append(");\r\n");
                     }
-                    fos.write(Utf8Helper.getBytes("nextFrame(ctx,ctrans);\r\n"));
+                    sb.append("nextFrame(ctx,ctrans);\r\n");
+                    fos.write(Utf8Helper.getBytes(sb.toString()));
                 }
 
                 boolean packed = false;
@@ -455,8 +457,7 @@ public class FrameExporter {
         }
     }
 
-    public static String framesToHtmlCanvas(double unitDivisor, Timeline timeline, List<Integer> frames, int time, DepthState stateUnderCursor, int mouseButton, RECT displayRect, ColorTransform colorTransform, Color backGroundColor) {
-        StringBuilder sb = new StringBuilder();
+    public static void framesToHtmlCanvas(StringBuilder result, double unitDivisor, Timeline timeline, List<Integer> frames, int time, DepthState stateUnderCursor, int mouseButton, RECT displayRect, ColorTransform colorTransform, Color backGroundColor) {
         if (frames == null) {
             frames = new ArrayList<>();
             for (int i = 0; i < timeline.getFrameCount(); i++) {
@@ -464,29 +465,29 @@ public class FrameExporter {
             }
         }
 
-        sb.append("\tvar clips = [];\r\n");
-        sb.append("\tvar frame_cnt = ").append(timeline.getFrameCount()).append(";\r\n");
-        sb.append("\tframe = frame % frame_cnt;\r\n");
-        sb.append("\tswitch(frame){\r\n");
+        result.append("\tvar clips = [];\r\n");
+        result.append("\tvar frame_cnt = ").append(timeline.getFrameCount()).append(";\r\n");
+        result.append("\tframe = frame % frame_cnt;\r\n");
+        result.append("\tswitch(frame){\r\n");
         int maxDepth = timeline.getMaxDepth();
         Stack<Integer> clipDepths = new Stack<>();
         for (int frame : frames) {
-            sb.append("\t\tcase ").append(frame).append(":\r\n");
+            result.append("\t\tcase ").append(frame).append(":\r\n");
             Frame frameObj = timeline.getFrame(frame);
             for (int i = 1; i <= maxDepth + 1; i++) {
                 while (!clipDepths.isEmpty() && clipDepths.peek() <= i) {
                     clipDepths.pop();
-                    sb.append("\t\t\tvar o = clips.pop();\r\n");
-                    sb.append("\t\t\tctx.globalCompositeOperation = \"destination-in\";\r\n");
-                    sb.append("\t\t\tctx.setTransform(1,0,0,1,0,0);\r\n");
-                    sb.append("\t\t\tctx.drawImage(o.clipCanvas,0,0);\r\n");
-                    sb.append("\t\t\tvar ms=o.ctx._matrix;\r\n");
-                    sb.append("\t\t\to.ctx.setTransform(1,0,0,1,0,0);\r\n");
-                    sb.append("\t\t\to.ctx.globalCompositeOperation = \"source-over\";\r\n");
-                    sb.append("\t\t\to.ctx.drawImage(canvas,0,0);\r\n");
-                    sb.append("\t\t\to.ctx.applyTransforms(ms);\r\n");
-                    sb.append("\t\t\tctx = o.ctx;\r\n");
-                    sb.append("\t\t\tcanvas = o.canvas;\r\n");
+                    result.append("\t\t\tvar o = clips.pop();\r\n");
+                    result.append("\t\t\tctx.globalCompositeOperation = \"destination-in\";\r\n");
+                    result.append("\t\t\tctx.setTransform(1,0,0,1,0,0);\r\n");
+                    result.append("\t\t\tctx.drawImage(o.clipCanvas,0,0);\r\n");
+                    result.append("\t\t\tvar ms=o.ctx._matrix;\r\n");
+                    result.append("\t\t\to.ctx.setTransform(1,0,0,1,0,0);\r\n");
+                    result.append("\t\t\to.ctx.globalCompositeOperation = \"source-over\";\r\n");
+                    result.append("\t\t\to.ctx.drawImage(canvas,0,0);\r\n");
+                    result.append("\t\t\to.ctx.applyTransforms(ms);\r\n");
+                    result.append("\t\t\tctx = o.ctx;\r\n");
+                    result.append("\t\t\tcanvas = o.canvas;\r\n");
                 }
                 if (!frameObj.layers.containsKey(i)) {
                     continue;
@@ -525,22 +526,22 @@ public class FrameExporter {
 
                 if (layer.clipDepth != -1) {
                     clipDepths.push(layer.clipDepth);
-                    sb.append("\t\t\tclips.push({ctx:ctx,canvas:canvas});\r\n");
-                    sb.append("\t\t\tvar ccanvas = createCanvas(canvas.width,canvas.height);\r\n");
-                    sb.append("\t\t\tvar cctx = ccanvas.getContext(\"2d\");\r\n");
-                    sb.append("\t\t\tenhanceContext(cctx);\r\n");
-                    sb.append("\t\t\tcctx.applyTransforms(ctx._matrix);\r\n");
-                    sb.append("\t\t\tcanvas = ccanvas;\r\n");
-                    sb.append("\t\t\tctx = cctx;\r\n");
+                    result.append("\t\t\tclips.push({ctx:ctx,canvas:canvas});\r\n");
+                    result.append("\t\t\tvar ccanvas = createCanvas(canvas.width,canvas.height);\r\n");
+                    result.append("\t\t\tvar cctx = ccanvas.getContext(\"2d\");\r\n");
+                    result.append("\t\t\tenhanceContext(cctx);\r\n");
+                    result.append("\t\t\tcctx.applyTransforms(ctx._matrix);\r\n");
+                    result.append("\t\t\tcanvas = ccanvas;\r\n");
+                    result.append("\t\t\tctx = cctx;\r\n");
                 }
 
                 if (layer.filters != null && layer.filters.size() > 0) {
-                    sb.append("\t\t\tvar oldctx = ctx;\r\n");
-                    sb.append("\t\t\tvar fcanvas = createCanvas(canvas.width,canvas.height);");
-                    sb.append("\t\t\tvar fctx = fcanvas.getContext(\"2d\");\r\n");
-                    sb.append("\t\t\tenhanceContext(fctx);\r\n");
-                    sb.append("\t\t\tfctx.applyTransforms(ctx._matrix);\r\n");
-                    sb.append("\t\t\tctx = fctx;\r\n");
+                    result.append("\t\t\tvar oldctx = ctx;\r\n");
+                    result.append("\t\t\tvar fcanvas = createCanvas(canvas.width,canvas.height);");
+                    result.append("\t\t\tvar fctx = fcanvas.getContext(\"2d\");\r\n");
+                    result.append("\t\t\tenhanceContext(fctx);\r\n");
+                    result.append("\t\t\tfctx.applyTransforms(ctx._matrix);\r\n");
+                    result.append("\t\t\tctx = fctx;\r\n");
                 }
 
                 ColorTransform ctrans = layer.colorTransForm;
@@ -553,7 +554,7 @@ public class FrameExporter {
                             + ctrans.getRedMulti() + "," + ctrans.getGreenMulti() + "," + ctrans.getBlueMulti() + "," + ctrans.getAlphaMulti()
                             + "))";
                 }
-                sb.append("\t\t\tplace(\"").append(SWF.getTypePrefix(character)).append(layer.characterId).append("\",canvas,ctx,[").append(placeMatrix.scaleX).append(",")
+                result.append("\t\t\tplace(\"").append(SWF.getTypePrefix(character)).append(layer.characterId).append("\",canvas,ctx,[").append(placeMatrix.scaleX).append(",")
                         .append(placeMatrix.rotateSkew0).append(",")
                         .append(placeMatrix.rotateSkew1).append(",")
                         .append(placeMatrix.scaleY).append(",")
@@ -564,15 +565,15 @@ public class FrameExporter {
                     for (FILTER filter : layer.filters) {
                         if (filter instanceof COLORMATRIXFILTER) {
                             COLORMATRIXFILTER cmf = (COLORMATRIXFILTER) filter;
-                            sb.append("\t\t\tfcanvas = Filters.colorMatrix(fcanvas,fcanvas.getContext(\"2d\"),[");
+                            result.append("\t\t\tfcanvas = Filters.colorMatrix(fcanvas,fcanvas.getContext(\"2d\"),[");
                             for (int k = 0; k < cmf.matrix.length; k++) {
                                 if (k > 0) {
-                                    sb.append(",");
+                                    result.append(",");
                                 }
-                                sb.append(cmf.matrix[k]);
+                                result.append(cmf.matrix[k]);
                             }
-                            sb.append("]");
-                            sb.append(");\r\n");
+                            result.append("]");
+                            result.append(");\r\n");
                         }
 
                         if (filter instanceof CONVOLUTIONFILTER) {
@@ -593,17 +594,17 @@ public class FrameExporter {
                                 mat += matrix2[k];
                             }
                             mat += "]";
-                            sb.append("\t\t\tfcanvas = Filters.convolution(fcanvas,fcanvas.getContext(\"2d\"),").append(mat).append(",false);\r\n");
+                            result.append("\t\t\tfcanvas = Filters.convolution(fcanvas,fcanvas.getContext(\"2d\"),").append(mat).append(",false);\r\n");
                         }
 
                         if (filter instanceof GLOWFILTER) {
                             GLOWFILTER gf = (GLOWFILTER) filter;
-                            sb.append("\t\t\tfcanvas = Filters.glow(fcanvas,fcanvas.getContext(\"2d\"),").append(gf.blurX).append(",").append(gf.blurY).append(",").append(gf.strength).append(",").append(jsArrColor(gf.glowColor)).append(",").append(gf.innerGlow ? "true" : "false").append(",").append(gf.knockout ? "true" : "false").append(",").append(gf.passes).append(");\r\n");
+                            result.append("\t\t\tfcanvas = Filters.glow(fcanvas,fcanvas.getContext(\"2d\"),").append(gf.blurX).append(",").append(gf.blurY).append(",").append(gf.strength).append(",").append(jsArrColor(gf.glowColor)).append(",").append(gf.innerGlow ? "true" : "false").append(",").append(gf.knockout ? "true" : "false").append(",").append(gf.passes).append(");\r\n");
                         }
 
                         if (filter instanceof DROPSHADOWFILTER) {
                             DROPSHADOWFILTER ds = (DROPSHADOWFILTER) filter;
-                            sb.append("\t\t\tfcanvas = Filters.dropShadow(fcanvas,fcanvas.getContext(\"2d\"),").append(ds.blurX).append(",").append(ds.blurY).append(",").append((int) (ds.angle * 180 / Math.PI)).append(",").append(ds.distance).append(",").append(jsArrColor(ds.dropShadowColor)).append(",").append(ds.innerShadow ? "true" : "false").append(",").append(ds.passes).append(",").append(ds.strength).append(",").append(ds.knockout ? "true" : "false").append(");\r\n");
+                            result.append("\t\t\tfcanvas = Filters.dropShadow(fcanvas,fcanvas.getContext(\"2d\"),").append(ds.blurX).append(",").append(ds.blurY).append(",").append((int) (ds.angle * 180 / Math.PI)).append(",").append(ds.distance).append(",").append(jsArrColor(ds.dropShadowColor)).append(",").append(ds.innerShadow ? "true" : "false").append(",").append(ds.passes).append(",").append(ds.strength).append(",").append(ds.knockout ? "true" : "false").append(");\r\n");
                         }
                         if (filter instanceof BEVELFILTER) {
                             BEVELFILTER bv = (BEVELFILTER) filter;
@@ -613,7 +614,7 @@ public class FrameExporter {
                             } else if (!bv.innerShadow) {
                                 type = "Filters.OUTER";
                             }
-                            sb.append("\t\t\tfcanvas = Filters.bevel(fcanvas,fcanvas.getContext(\"2d\"),").append(bv.blurX).append(",").append(bv.blurY).append(",").append(bv.strength).append(",").append(type).append(",").append(jsArrColor(bv.highlightColor)).append(",").append(jsArrColor(bv.shadowColor)).append(",").append((int) (bv.angle * 180 / Math.PI)).append(",").append(bv.distance).append(",").append(bv.knockout ? "true" : "false").append(",").append(bv.passes).append(");\r\n");
+                            result.append("\t\t\tfcanvas = Filters.bevel(fcanvas,fcanvas.getContext(\"2d\"),").append(bv.blurX).append(",").append(bv.blurY).append(",").append(bv.strength).append(",").append(type).append(",").append(jsArrColor(bv.highlightColor)).append(",").append(jsArrColor(bv.shadowColor)).append(",").append((int) (bv.angle * 180 / Math.PI)).append(",").append(bv.distance).append(",").append(bv.knockout ? "true" : "false").append(",").append(bv.passes).append(");\r\n");
                         }
 
                         if (filter instanceof GRADIENTBEVELFILTER) {
@@ -637,7 +638,7 @@ public class FrameExporter {
                                 type = "Filters.OUTER";
                             }
 
-                            sb.append("\t\t\tfcanvas = Filters.gradientBevel(fcanvas,fcanvas.getContext(\"2d\"),").append(colArr).append(",").append(ratArr).append(",").append(gbf.blurX).append(",").append(gbf.blurY).append(",").append(gbf.strength).append(",").append(type).append(",").append((int) (gbf.angle * 180 / Math.PI)).append(",").append(gbf.distance).append(",").append(gbf.knockout ? "true" : "false").append(",").append(gbf.passes).append(");\r\n");
+                            result.append("\t\t\tfcanvas = Filters.gradientBevel(fcanvas,fcanvas.getContext(\"2d\"),").append(colArr).append(",").append(ratArr).append(",").append(gbf.blurX).append(",").append(gbf.blurY).append(",").append(gbf.strength).append(",").append(type).append(",").append((int) (gbf.angle * 180 / Math.PI)).append(",").append(gbf.distance).append(",").append(gbf.knockout ? "true" : "false").append(",").append(gbf.passes).append(");\r\n");
                         }
 
                         if (filter instanceof GRADIENTGLOWFILTER) {
@@ -661,28 +662,27 @@ public class FrameExporter {
                                 type = "Filters.OUTER";
                             }
 
-                            sb.append("\t\t\tfcanvas = Filters.gradientGlow(fcanvas,fcanvas.getContext(\"2d\"),").append(ggf.blurX).append(",").append(ggf.blurY).append(",").append((int) (ggf.angle * 180 / Math.PI)).append(",").append(ggf.distance).append(",").append(colArr).append(",").append(ratArr).append(",").append(type).append(",").append(ggf.passes).append(",").append(ggf.strength).append(",").append(ggf.knockout ? "true" : "false").append(");\r\n");
+                            result.append("\t\t\tfcanvas = Filters.gradientGlow(fcanvas,fcanvas.getContext(\"2d\"),").append(ggf.blurX).append(",").append(ggf.blurY).append(",").append((int) (ggf.angle * 180 / Math.PI)).append(",").append(ggf.distance).append(",").append(colArr).append(",").append(ratArr).append(",").append(type).append(",").append(ggf.passes).append(",").append(ggf.strength).append(",").append(ggf.knockout ? "true" : "false").append(");\r\n");
                         }
                     }
-                    sb.append("\t\t\tctx = oldctx;\r\n");
-                    sb.append("\t\t\tvar ms=ctx._matrix;\r\n");
-                    sb.append("\t\t\tctx.setTransform(1,0,0,1,0,0);\r\n");
-                    sb.append("\t\t\tctx.drawImage(fcanvas,0,0);\r\n");
-                    sb.append("\t\t\tctx.applyTransforms(ms);\r\n");
+                    result.append("\t\t\tctx = oldctx;\r\n");
+                    result.append("\t\t\tvar ms=ctx._matrix;\r\n");
+                    result.append("\t\t\tctx.setTransform(1,0,0,1,0,0);\r\n");
+                    result.append("\t\t\tctx.drawImage(fcanvas,0,0);\r\n");
+                    result.append("\t\t\tctx.applyTransforms(ms);\r\n");
                 }
 
                 if (layer.clipDepth != -1) {
-                    sb.append("\t\t\tclips[clips.length-1].clipCanvas = canvas;\r\n");
-                    sb.append("\t\t\tcanvas = createCanvas(canvas.width,canvas.height);\r\n");
-                    sb.append("\t\t\tvar nctx = canvas.getContext(\"2d\");\r\n");
-                    sb.append("\t\t\tenhanceContext(nctx);\r\n");
-                    sb.append("\t\t\tnctx.applyTransforms(ctx._matrix);\r\n");
-                    sb.append("\t\t\tctx = nctx;\r\n");
+                    result.append("\t\t\tclips[clips.length-1].clipCanvas = canvas;\r\n");
+                    result.append("\t\t\tcanvas = createCanvas(canvas.width,canvas.height);\r\n");
+                    result.append("\t\t\tvar nctx = canvas.getContext(\"2d\");\r\n");
+                    result.append("\t\t\tenhanceContext(nctx);\r\n");
+                    result.append("\t\t\tnctx.applyTransforms(ctx._matrix);\r\n");
+                    result.append("\t\t\tctx = nctx;\r\n");
                 }
             }
-            sb.append("\t\t\tbreak;\r\n");
+            result.append("\t\t\tbreak;\r\n");
         }
-        sb.append("\t}\r\n");
-        return sb.toString();
+        result.append("\t}\r\n");
     }
 }

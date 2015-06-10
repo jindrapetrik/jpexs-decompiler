@@ -642,7 +642,7 @@ public abstract class StaticTextTag extends TextTag {
     }
 
     @Override
-    public String toHtmlCanvas(double unitDivisor) {
-        return staticTextToHtmlCanvas(unitDivisor, swf, textRecords, getTextNum(), textBounds, textMatrix, new ColorTransform());
+    public void toHtmlCanvas(StringBuilder result, double unitDivisor) {
+        staticTextToHtmlCanvas(unitDivisor, swf, textRecords, getTextNum(), result, textBounds, textMatrix, new ColorTransform());
     }
 }

@@ -112,7 +112,7 @@ public class MorphShapeExporter {
                                 ct.getNeededCharactersDeep(needed);
                                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                                 SWF.writeLibrary(ct.getSwf(), needed, baos);
-                                fos.write(Utf8Helper.getBytes(cse.getHtml(new String(baos.toByteArray(), "UTF-8"), SWF.getTypePrefix(mst) + mst.getCharacterId(), mst.getRect())));
+                                fos.write(Utf8Helper.getBytes(cse.getHtml(new String(baos.toByteArray(), Utf8Helper.charset), SWF.getTypePrefix(mst) + mst.getCharacterId(), mst.getRect())));
                             }
                             break;
                     }

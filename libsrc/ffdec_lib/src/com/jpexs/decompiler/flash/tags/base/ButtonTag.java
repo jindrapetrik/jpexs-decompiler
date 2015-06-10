@@ -93,7 +93,7 @@ public abstract class ButtonTag extends CharacterTag implements DrawableTag, Tim
     }
 
     @Override
-    public String toHtmlCanvas(double unitDivisor) {
-        return getTimeline().toHtmlCanvas(unitDivisor, Arrays.asList(0)); //TODO: handle states?
+    public void toHtmlCanvas(StringBuilder result, double unitDivisor) {
+        getTimeline().toHtmlCanvas(result, unitDivisor, Arrays.asList(0)); //TODO: handle states?
     }
 }

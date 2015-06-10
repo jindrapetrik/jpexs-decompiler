@@ -106,6 +106,7 @@ import com.jpexs.decompiler.graph.model.TernarOpItem;
 import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -2410,7 +2411,7 @@ public class ActionScriptParser {
             initPlayer();
             ABC abc = new ABC(null);
             ActionScriptParser parser = new ActionScriptParser(abc, playerABCs);
-            parser.addScript(new String(Helper.readFile(src), "UTF-8"), true, src, classPos);
+            parser.addScript(new String(Helper.readFile(src), Utf8Helper.charset), true, src, classPos);
             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(new File(dst)))) {
                 abc.saveToStream(fos);
             }

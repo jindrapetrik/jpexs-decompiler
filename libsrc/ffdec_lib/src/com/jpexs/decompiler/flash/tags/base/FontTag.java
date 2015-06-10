@@ -317,23 +317,21 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
     }
 
     @Override
-    public String toHtmlCanvas(double unitDivisor) {
+    public void toHtmlCanvas(StringBuilder result, double unitDivisor) {
         List<SHAPE> shapes = getGlyphShapeTable();
-        StringBuilder sb = new StringBuilder();
-        sb.append("\tdefaultFill = textColor;\r\n");
-        sb.append("\tswitch(ch){\r\n");
+        result.append("\tdefaultFill = textColor;\r\n");
+        result.append("\tswitch(ch){\r\n");
         for (int i = 0; i < shapes.size(); i++) {
             char c = glyphToChar(i);
             String cs = "" + c;
             cs = cs.replace("\\", "\\\\").replace("\"", "\\\"");
-            sb.append("\t\tcase \"").append(cs).append("\":\r\n");
+            result.append("\t\tcase \"").append(cs).append("\":\r\n");
             CanvasShapeExporter exporter = new CanvasShapeExporter(null, unitDivisor, swf, shapes.get(i), new ColorTransform(), 0, 0);
             exporter.export();
-            sb.append("\t\t").append(exporter.getShapeData().replaceAll("\r\n", "\r\n\t\t"));
-            sb.append("\tbreak;\r\n");
+            result.append("\t\t").append(exporter.getShapeData().replaceAll("\r\n", "\r\n\t\t"));
+            result.append("\tbreak;\r\n");
         }
-        sb.append("\t}\r\n");
-        return sb.toString();
+        result.append("\t}\r\n");
     }
 
     @Override

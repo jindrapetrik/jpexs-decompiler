@@ -920,21 +920,20 @@ public class DefineEditTextTag extends TextTag {
 
     @Override
     public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
-        render(TextRenderMode.BITMAP, image, null, transformation, colorTransform, 1);
+        render(TextRenderMode.BITMAP, image, null, null, transformation, colorTransform, 1);
     }
 
     @Override
     public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level, double zoom) {
-        render(TextRenderMode.SVG, null, exporter, new Matrix(), colorTransform, zoom);
+        render(TextRenderMode.SVG, null, exporter, null, new Matrix(), colorTransform, zoom);
     }
 
     @Override
-    public String toHtmlCanvas(double unitDivisor) {
-        return render(TextRenderMode.HTML5_CANVAS, null, null, new Matrix(), new ColorTransform(), unitDivisor);
+    public void toHtmlCanvas(StringBuilder result, double unitDivisor) {
+        render(TextRenderMode.HTML5_CANVAS, null, null, result, new Matrix(), new ColorTransform(), unitDivisor);
     }
 
-    private String render(TextRenderMode renderMode, SerializableImage image, SVGExporter svgExporter, Matrix transformation, ColorTransform colorTransform, double zoom) {
-        String result = "";
+    private void render(TextRenderMode renderMode, SerializableImage image, SVGExporter svgExporter, StringBuilder htmlCanvasBuilder, Matrix transformation, ColorTransform colorTransform, double zoom) {
         if (border) {
             // border is always black, fill color is always white?
             RGB borderColor = new RGBA(Color.black);
@@ -944,7 +943,7 @@ public class DefineEditTextTag extends TextTag {
                     drawBorder(swf, image, borderColor, fillColor, getRect(), getTextMatrix(), transformation, colorTransform);
                     break;
                 case HTML5_CANVAS:
-                    result += drawBorderHtmlCanvas(swf, borderColor, fillColor, getRect(), getTextMatrix(), colorTransform, zoom);
+                    drawBorderHtmlCanvas(swf, htmlCanvasBuilder, borderColor, fillColor, getRect(), getTextMatrix(), colorTransform, zoom);
                     break;
                 case SVG:
                     drawBorderSVG(swf, svgExporter, borderColor, fillColor, getRect(), getTextMatrix(), colorTransform, zoom);
@@ -1131,15 +1130,13 @@ public class DefineEditTextTag extends TextTag {
                     staticTextToImage(swf, allTextRecords, 2, image, getTextMatrix(), transformation, colorTransform);
                     break;
                 case HTML5_CANVAS:
-                    result += staticTextToHtmlCanvas(zoom, swf, allTextRecords, 2, getBounds(), getTextMatrix(), colorTransform);
+                    staticTextToHtmlCanvas(zoom, swf, allTextRecords, 2, htmlCanvasBuilder, getBounds(), getTextMatrix(), colorTransform);
                     break;
                 case SVG:
                     staticTextToSVG(swf, allTextRecords, 2, svgExporter, getBounds(), getTextMatrix(), colorTransform, zoom);
                     break;
             }
         }
-
-        return result;
     }
 
     @Override

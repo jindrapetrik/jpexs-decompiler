@@ -319,9 +319,9 @@ public abstract class MorphShapeTag extends CharacterTag implements DrawableTag 
     }
 
     @Override
-    public String toHtmlCanvas(double unitDivisor) {
+    public void toHtmlCanvas(StringBuilder result, double unitDivisor) {
         CanvasMorphShapeExporter cmse = new CanvasMorphShapeExporter(swf, getShapeAtRatio(0), getShapeAtRatio(MAX_RATIO), new ColorTransform(), unitDivisor, 0, 0);
         cmse.export();
-        return cmse.getShapeData();
+        result.append(cmse.getShapeData());
     }
 }

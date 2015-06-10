@@ -1547,9 +1547,11 @@ public final class SWF implements SWFContainerItem, Timelined {
         for (int c : library) {
             CharacterTag ch = fswf.getCharacter(c);
             if (ch instanceof FontTag) {
-                fos.write(Utf8Helper.getBytes("function " + getTypePrefix(ch) + c + "(ctx,ch,textColor){\r\n"));
-                fos.write(Utf8Helper.getBytes(((FontTag) ch).toHtmlCanvas(1)));
-                fos.write(Utf8Helper.getBytes("}\r\n\r\n"));
+                StringBuilder sb = new StringBuilder();
+                sb.append("function ").append(getTypePrefix(ch)).append(c).append("(ctx,ch,textColor){\r\n");
+                ((FontTag) ch).toHtmlCanvas(sb, 1);
+                sb.append("}\r\n\r\n");
+                fos.write(Utf8Helper.getBytes(sb.toString()));
             } else {
                 if (ch instanceof ImageTag) {
                     ImageTag image = (ImageTag) ch;
@@ -1560,7 +1562,9 @@ public final class SWF implements SWFContainerItem, Timelined {
                 }
                 fos.write(Utf8Helper.getBytes("function " + getTypePrefix(ch) + c + "(ctx,ctrans,frame,ratio,time){\r\n"));
                 if (ch instanceof DrawableTag) {
-                    fos.write(Utf8Helper.getBytes(((DrawableTag) ch).toHtmlCanvas(1)));
+                    StringBuilder sb = new StringBuilder();
+                    ((DrawableTag) ch).toHtmlCanvas(sb, 1);
+                    fos.write(Utf8Helper.getBytes(sb.toString()));
                 }
                 fos.write(Utf8Helper.getBytes("}\r\n\r\n"));
             }

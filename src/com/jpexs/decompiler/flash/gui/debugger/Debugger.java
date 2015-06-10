@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui.debugger;
 
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
@@ -90,7 +91,7 @@ public class Debugger {
                 }
                 buf[i] = (byte) rd;
             }
-            return new String(buf, "UTF-8");
+            return new String(buf, Utf8Helper.charset);
         }
 
         @Override

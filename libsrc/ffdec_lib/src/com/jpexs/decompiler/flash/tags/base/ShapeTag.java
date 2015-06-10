@@ -182,10 +182,10 @@ public abstract class ShapeTag extends CharacterTag implements DrawableTag, Lazy
     }
 
     @Override
-    public String toHtmlCanvas(double unitDivisor) {
+    public void toHtmlCanvas(StringBuilder result, double unitDivisor) {
         CanvasShapeExporter cse = new CanvasShapeExporter(null, unitDivisor, swf, getShapes(), new ColorTransform(), 0, 0);
         cse.export();
-        return cse.getShapeData();
+        result.append(cse.getShapeData());
     }
 
     @Override

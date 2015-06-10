@@ -351,8 +351,8 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
     }
 
     @Override
-    public String toHtmlCanvas(double unitDivisor) {
-        return getTimeline().toHtmlCanvas(unitDivisor, null);
+    public void toHtmlCanvas(StringBuilder result, double unitDivisor) {
+        getTimeline().toHtmlCanvas(result, unitDivisor, null);
     }
 
     @Override
