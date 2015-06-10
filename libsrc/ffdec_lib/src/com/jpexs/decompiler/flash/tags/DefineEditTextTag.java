@@ -38,6 +38,7 @@ import com.jpexs.decompiler.flash.tags.dynamictext.Paragraph;
 import com.jpexs.decompiler.flash.tags.dynamictext.SameStyleTextRecord;
 import com.jpexs.decompiler.flash.tags.dynamictext.TextStyle;
 import com.jpexs.decompiler.flash.tags.dynamictext.Word;
+import com.jpexs.decompiler.flash.tags.enums.TextRenderMode;
 import com.jpexs.decompiler.flash.tags.text.ParsedSymbol;
 import com.jpexs.decompiler.flash.tags.text.TextAlign;
 import com.jpexs.decompiler.flash.tags.text.TextLexer;
@@ -919,25 +920,25 @@ public class DefineEditTextTag extends TextTag {
 
     @Override
     public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
-        render(false, image, transformation, colorTransform);
+        render(TextRenderMode.BITMAP, image, null, transformation, colorTransform, 0);
     }
 
     @Override
     public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level, double zoom) {
-        // todo: implement
+        render(TextRenderMode.SVG, null, exporter, new Matrix(), colorTransform, zoom);
     }
 
     @Override
     public String toHtmlCanvas(double unitDivisor) {
-        return render(true, null, new Matrix(), new ColorTransform());
+        return render(TextRenderMode.HTML5_CANVAS, null, null, new Matrix(), new ColorTransform(), 0);
     }
 
-    private String render(boolean canvas, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+    private String render(TextRenderMode renderModeMode, SerializableImage image, SVGExporter svgExporter, Matrix transformation, ColorTransform colorTransform, double zoom) {
         if (border) {
             // border is always black, fill color is always white?
             RGB borderColor = new RGBA(Color.black);
             RGB fillColor = new RGBA(Color.white);
-            if (!canvas) {
+            if (renderModeMode == TextRenderMode.BITMAP) {
                 drawBorder(swf, image, borderColor, fillColor, getRect(), getTextMatrix(), transformation, colorTransform);
             } else {
                 // TODO: draw border
@@ -1118,10 +1119,15 @@ public class DefineEditTextTag extends TextTag {
                 }
             }
 
-            if (canvas) {
-                return staticTextToHtmlCanvas(1, swf, allTextRecords, 2, getBounds(), getTextMatrix(), colorTransform);
-            } else {
-                staticTextToImage(swf, allTextRecords, 2, image, getTextMatrix(), transformation, colorTransform);
+            switch (renderModeMode) {
+                case BITMAP:
+                    staticTextToImage(swf, allTextRecords, 2, image, getTextMatrix(), transformation, colorTransform);
+                    break;
+                case HTML5_CANVAS:
+                    return staticTextToHtmlCanvas(1, swf, allTextRecords, 2, getBounds(), getTextMatrix(), colorTransform);
+                case SVG:
+                    staticTextToSVG(swf, allTextRecords, 2, svgExporter, getBounds(), getTextMatrix(), colorTransform, zoom);
+                    break;
             }
         }
 
