@@ -45,7 +45,13 @@ public class ShapeImporter {
 
         DefineBitsJPEG2Tag jpeg2Tag = new DefineBitsJPEG2Tag(swf, null, swf.getNextCharacterId(), newData);
         jpeg2Tag.setModified(true);
-        swf.tags.add(jpeg2Tag);
+        int idx = swf.tags.indexOf(st);
+        if (idx != -1) {
+            swf.tags.add(idx, jpeg2Tag);
+        } else {
+            swf.tags.add(jpeg2Tag);
+        }
+
         swf.updateCharacters();
         st.setModified(true);
         SHAPEWITHSTYLE shapes = jpeg2Tag.getShape(st.getRect(), true);
