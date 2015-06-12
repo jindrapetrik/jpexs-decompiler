@@ -36,6 +36,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreIncrementAVM2Item
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.NotCompileTimeItem;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.HashMap;
@@ -116,7 +117,7 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
         }
 
         //if(val.startsWith("catchscope ")) return;
-        //if(val.startsWith("newactivation()")) return;
+        //if(val.startsWith("newactivation()")) return;        
         output.add(new SetLocalAVM2Item(ins, regId, value));
     }
 

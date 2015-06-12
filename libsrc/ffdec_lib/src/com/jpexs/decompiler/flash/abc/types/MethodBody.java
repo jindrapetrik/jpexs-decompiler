@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ABCInputStream;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2Deobfuscator;
 import com.jpexs.decompiler.flash.abc.avm2.CodeStats;
 import com.jpexs.decompiler.flash.abc.avm2.UnknownInstructionCode;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
@@ -279,13 +280,9 @@ public final class MethodBody implements Cloneable {
         deobfuscated.markMappedOffsets();
         //deobfuscated.inlineJumpExit();
         if (Configuration.autoDeobfuscate.get()) {
-            try {
-                deobfuscated.removeTraps(constants, trait, method_info.get(this.method_info), b, abc, scriptIndex, classIndex, isStatic, path);
-            } catch (StackOverflowError ex) {
-                logger.log(Level.SEVERE, "Error during remove traps in " + path, ex);
-            }
+            AVM2Deobfuscator deo = new AVM2Deobfuscator();
+            deo.deobfuscate(classIndex, isStatic, scriptIndex, abc, constants, trait, method_info.get(this.method_info), b);
         }
-        //deobfuscated.restoreControlFlow(constants, b);
 
         return b;
     }
