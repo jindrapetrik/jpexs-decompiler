@@ -66,6 +66,7 @@ public enum FLAVersion {
         versionToPlayerMap.put(26, "FlashPlayer15.0");
         versionToPlayerMap.put(27, "FlashPlayer16.0");
         versionToPlayerMap.put(28, "FlashPlayer17.0");
+        versionToPlayerMap.put(29, "FlashPlayer18.0");
     }
 
     private FLAVersion(String shortName, String applicationName, String xflVersion, int maxSwfVersion) {
