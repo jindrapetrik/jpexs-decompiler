@@ -40,6 +40,17 @@ public class TranslateStack extends Stack<GraphTargetItem> {
     }
 
     @Override
+    public synchronized GraphTargetItem get(int index) {
+        if (path != null) {
+            if (index >= this.size() || index < 0) {
+                Logger.getLogger(TranslateStack.class.getName()).log(Level.FINE, "{0}: Attemp to Get item outside of bounds of stack", path);
+                return pop;
+            }
+        }
+        return super.get(index);
+    }
+
+    @Override
     public synchronized GraphTargetItem peek() {
         if (path != null) {
             if (this.isEmpty()) {
