@@ -39,11 +39,11 @@ import java.io.OutputStream;
  *
  * @author JPEXS
  */
-public class DoABCDefineTag extends Tag implements ABCContainerTag {
+public class DoABC2Tag extends Tag implements ABCContainerTag {
 
     public static final int ID = 82;
 
-    public static final String NAME = "DoABCDefine";
+    public static final String NAME = "DoABC2";
 
     /**
      * ActionScript 3 bytecodes
@@ -71,7 +71,7 @@ public class DoABCDefineTag extends Tag implements ABCContainerTag {
      *
      * @param swf
      */
-    public DoABCDefineTag(SWF swf) {
+    public DoABC2Tag(SWF swf) {
         super(swf, ID, NAME, null);
         name = "New DoABC";
         abc = new ABC(this);
@@ -84,7 +84,7 @@ public class DoABCDefineTag extends Tag implements ABCContainerTag {
      * @param data
      * @throws IOException
      */
-    public DoABCDefineTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
+    public DoABC2Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
@@ -136,8 +136,8 @@ public class DoABCDefineTag extends Tag implements ABCContainerTag {
 
     @Override
     public int compareTo(ABCContainerTag o) {
-        if (o instanceof DoABCDefineTag) {
-            DoABCDefineTag n = (DoABCDefineTag) o;
+        if (o instanceof DoABC2Tag) {
+            DoABC2Tag n = (DoABC2Tag) o;
             int lastCmp = name.compareTo(n.name);
             return (lastCmp != 0 ? lastCmp
                     : name.compareTo(n.name));

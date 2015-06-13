@@ -226,7 +226,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
                     addTagInfo(map, map2, DefineText2Tag.ID, DefineText2Tag.class, DefineText2Tag.NAME);
                     addTagInfo(map, map2, DefineTextTag.ID, DefineTextTag.class, DefineTextTag.NAME);
                     addTagInfo(map, map2, DefineVideoStreamTag.ID, DefineVideoStreamTag.class, DefineVideoStreamTag.NAME);
-                    addTagInfo(map, map2, DoABCDefineTag.ID, DoABCDefineTag.class, DoABCDefineTag.NAME);
+                    addTagInfo(map, map2, DoABC2Tag.ID, DoABC2Tag.class, DoABC2Tag.NAME);
                     addTagInfo(map, map2, DoABCTag.ID, DoABCTag.class, DoABCTag.NAME);
                     addTagInfo(map, map2, DoActionTag.ID, DoActionTag.class, DoActionTag.NAME);
                     addTagInfo(map, map2, DoInitActionTag.ID, DoInitActionTag.class, DoInitActionTag.NAME);
@@ -330,7 +330,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
                             DefineText2Tag.ID,
                             DefineTextTag.ID,
                             DefineVideoStreamTag.ID,
-                            DoABCDefineTag.ID,
+                            DoABC2Tag.ID,
                             DoABCTag.ID,
                             DoActionTag.ID,
                             DoInitActionTag.ID,

@@ -155,7 +155,7 @@ import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineText2Tag;
 import com.jpexs.decompiler.flash.tags.DefineTextTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
-import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
+import com.jpexs.decompiler.flash.tags.DoABC2Tag;
 import com.jpexs.decompiler.flash.tags.DoABCTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
@@ -1268,7 +1268,7 @@ public class SWFInputStream implements AutoCloseable {
                 case 24:
                     ret = new ProtectTag(sis, data);
                     break;
-                //case 25: PathsArePostscript
+                //case 25: PathsArePostScript
                 case 26:
                     ret = new PlaceObject2Tag(sis, data);
                     break;
@@ -1297,7 +1297,7 @@ public class SWFInputStream implements AutoCloseable {
                 case 37:
                     ret = new DefineEditTextTag(sis, data);
                     break;
-                //case 38: DefineVideo
+                //case 38: DefineMouseTarget (DefineVideo?)
                 case 39:
                     ret = new DefineSpriteTag(sis, level, data, parallel, skipUnusualTags);
                     break;
@@ -1316,14 +1316,14 @@ public class SWFInputStream implements AutoCloseable {
                 case 46:
                     ret = new DefineMorphShapeTag(sis, data);
                     break;
-                //case 47: GenerateFrame
+                //case 47: FrameTag
                 case 48:
                     ret = new DefineFont2Tag(sis, data);
                     break;
-                //case 49: GeneratorCommand
-                //case 50: DefineCommandObject
+                //case 49: GenCommand
+                //case 50: DefineCommandObj
                 //case 51: CharacterSet
-                //case 52: ExternalFont
+                //case 52: FontRef
                 //case 53: DefineFunction
                 //case 54: PlaceFunction
                 //case 55: GenTagObject
@@ -1392,9 +1392,10 @@ public class SWFInputStream implements AutoCloseable {
                 case 78:
                     ret = new DefineScalingGridTag(sis, data);
                     break;
-                //case 79-81:
+                //case 79: DefineDeviceVideo
+                //case 80-81:
                 case 82:
-                    ret = new DoABCDefineTag(sis, data);
+                    ret = new DoABC2Tag(sis, data);
                     break;
                 case 83:
                     ret = new DefineShape4Tag(sis, data, lazy);
@@ -1402,7 +1403,7 @@ public class SWFInputStream implements AutoCloseable {
                 case 84:
                     ret = new DefineMorphShape2Tag(sis, data);
                     break;
-                //case 85:
+                //case 85: PlaceImagePrivate
                 case 86:
                     ret = new DefineSceneAndFrameLabelDataTag(sis, data);
                     break;
