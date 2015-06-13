@@ -21,11 +21,13 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.ImportTag;
 import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.Table;
 import com.jpexs.helpers.ByteArrayRange;
+import com.jpexs.helpers.Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -47,13 +49,14 @@ public class ImportAssets2Tag extends Tag implements ImportTag {
 
     public String url;
 
-    @Reserved
     @SWFType(BasicType.UI8)
-    public int reserved1 = 1;
+    public int downloadNow = 1;
 
-    @Reserved
     @SWFType(BasicType.UI8)
-    public int reserved2 = 0;
+    public int hasDigest = 0;
+
+    @Conditional(value = "hasDigest", options = {1})
+    String sha1 = "";
 
     /**
      * HashMap with assets
@@ -95,8 +98,11 @@ public class ImportAssets2Tag extends Tag implements ImportTag {
         tags = new ArrayList<>();
         names = new ArrayList<>();
         url = sis.readString("url");
-        reserved1 = sis.readUI8("reserved1");//reserved, must be 1
-        reserved2 = sis.readUI8("reserved2");//reserved, must be 0
+        downloadNow = sis.readUI8("downloadNow");
+        hasDigest = sis.readUI8("hasDigest");
+        if (hasDigest == 1) {
+            sha1 = Helper.bytesToHexString(sis.readBytes(20, "SHA1"));
+        }
         int count = sis.readUI16("count");
         for (int i = 0; i < count; i++) {
             int charId = sis.readUI16("charId");
@@ -118,8 +124,14 @@ public class ImportAssets2Tag extends Tag implements ImportTag {
         SWFOutputStream sos = new SWFOutputStream(os, getVersion());
         try {
             sos.writeString(url);
-            sos.writeUI8(reserved1);
-            sos.writeUI8(reserved2);
+            sos.writeUI8(downloadNow);
+
+            if (hasDigest == 1 && sha1 != null && sha1.matches("[0-9a-fA-F]{40}")) {
+                sos.writeUI8(1);
+                sos.write(Helper.hexToByteArray(sha1));
+            } else {
+                sos.writeUI8(0);
+            }
             sos.writeUI16(tags.size());
             for (int i = 0; i < tags.size(); i++) {
                 sos.writeUI16(tags.get(i));
