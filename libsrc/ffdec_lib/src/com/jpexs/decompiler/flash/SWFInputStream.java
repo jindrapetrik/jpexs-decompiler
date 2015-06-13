@@ -166,10 +166,14 @@ import com.jpexs.decompiler.flash.tags.EndTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
 import com.jpexs.decompiler.flash.tags.FrameLabelTag;
+import com.jpexs.decompiler.flash.tags.FreeAllTag;
+import com.jpexs.decompiler.flash.tags.FreeCharacterTag;
 import com.jpexs.decompiler.flash.tags.ImportAssets2Tag;
 import com.jpexs.decompiler.flash.tags.ImportAssetsTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
 import com.jpexs.decompiler.flash.tags.MetadataTag;
+import com.jpexs.decompiler.flash.tags.NameCharacterTag;
+import com.jpexs.decompiler.flash.tags.PathsArePostScriptTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject3Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject4Tag;
@@ -188,6 +192,7 @@ import com.jpexs.decompiler.flash.tags.SoundStreamHeadTag;
 import com.jpexs.decompiler.flash.tags.StartSound2Tag;
 import com.jpexs.decompiler.flash.tags.StartSoundTag;
 import com.jpexs.decompiler.flash.tags.SymbolClassTag;
+import com.jpexs.decompiler.flash.tags.SyncFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.TagStub;
 import com.jpexs.decompiler.flash.tags.UnknownTag;
@@ -1206,7 +1211,9 @@ public class SWFInputStream implements AutoCloseable {
                 case 2:
                     ret = new DefineShapeTag(sis, data, lazy);
                     break;
-                //case 3: FreeCharacter
+                case 3:
+                    ret = new FreeCharacterTag(sis, data);
+                    break;
                 case 4:
                     ret = new PlaceObjectTag(sis, data);
                     break;
@@ -1268,7 +1275,9 @@ public class SWFInputStream implements AutoCloseable {
                 case 24:
                     ret = new ProtectTag(sis, data);
                     break;
-                //case 25: PathsArePostScript
+                case 25:
+                    ret = new PathsArePostScriptTag(sis, data);
+                    break;
                 case 26:
                     ret = new PlaceObject2Tag(sis, data);
                     break;
@@ -1276,9 +1285,13 @@ public class SWFInputStream implements AutoCloseable {
                 case 28:
                     ret = new RemoveObject2Tag(sis, data);
                     break;
-                //case 29: SyncFrame
+                case 29:
+                    ret = new SyncFrameTag(sis, data);
+                    break;
                 //case 30:
-                //case 31: FreeAll
+                case 31:
+                    ret = new FreeAllTag(sis, data);
+                    break;
                 case 32:
                     ret = new DefineShape3Tag(sis, data, lazy);
                     break;
@@ -1297,12 +1310,14 @@ public class SWFInputStream implements AutoCloseable {
                 case 37:
                     ret = new DefineEditTextTag(sis, data);
                     break;
-                //case 38: DefineMouseTarget (DefineVideo?)
+                //case 38: DefineMouseTarget
                 case 39:
                     ret = new DefineSpriteTag(sis, level, data, parallel, skipUnusualTags);
                     break;
-                //case 40: NameCharacter
-                case 41:
+                case 40:
+                    ret = new NameCharacterTag(sis, data);
+                    break;
+                case 41: //or NameObject
                     ret = new ProductInfoTag(sis, data);
                     break;
                 //case 42: DefineTextFormat
