@@ -51,7 +51,7 @@ import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineText2Tag;
 import com.jpexs.decompiler.flash.tags.DefineTextTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
-import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
+import com.jpexs.decompiler.flash.tags.DoABC2Tag;
 import com.jpexs.decompiler.flash.tags.DoABCTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
@@ -144,7 +144,7 @@ public class TagIdClassMap {
         addTag(DefineText2Tag.ID, DefineText2Tag.class);
         addTag(DefineTextTag.ID, DefineTextTag.class);
         addTag(DefineVideoStreamTag.ID, DefineVideoStreamTag.class);
-        addTag(DoABCDefineTag.ID, DoABCDefineTag.class);
+        addTag(DoABC2Tag.ID, DoABC2Tag.class);
         addTag(DoABCTag.ID, DoABCTag.class);
         addTag(DoActionTag.ID, DoActionTag.class);
         addTag(DoInitActionTag.ID, DoInitActionTag.class);

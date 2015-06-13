@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.generators;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -20,7 +21,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
-import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
+import com.jpexs.decompiler.flash.tags.DoABC2Tag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -40,7 +41,7 @@ public class AS2Generator {
     public static void main(String[] args) throws Exception {
         Configuration.autoDeobfuscate.set(false);
         SWF swf = new SWF(new BufferedInputStream(new FileInputStream("testdata/as2/as2.swf")), false);
-        DoABCDefineTag tag = null;
+        DoABC2Tag tag = null;
         DoActionTag doa = null;
         int frame = 0;
         StringBuilder s = new StringBuilder();

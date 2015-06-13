@@ -22,7 +22,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
-import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
+import com.jpexs.decompiler.flash.tags.DoABC2Tag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.graph.ScopeStack;
 import java.io.BufferedInputStream;
@@ -52,10 +52,10 @@ public class ActionScript3Test extends ActionScriptTestBase {
     public void init() throws IOException, InterruptedException {
         //Main.initLogging(false);
         swf = new SWF(new BufferedInputStream(new FileInputStream("testdata/as3/as3.swf")), false);
-        DoABCDefineTag tag = null;
+        DoABC2Tag tag = null;
         for (Tag t : swf.tags) {
-            if (t instanceof DoABCDefineTag) {
-                tag = (DoABCDefineTag) t;
+            if (t instanceof DoABC2Tag) {
+                tag = (DoABC2Tag) t;
                 break;
             }
         }
