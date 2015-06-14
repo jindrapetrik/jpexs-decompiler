@@ -57,6 +57,7 @@ import com.jpexs.decompiler.flash.exporters.modes.MovieExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ShapeExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.SoundExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.SpriteExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.TextExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.BinaryDataExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.ButtonExportSettings;
@@ -68,6 +69,7 @@ import com.jpexs.decompiler.flash.exporters.settings.MovieExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.ShapeExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.SoundExportSettings;
+import com.jpexs.decompiler.flash.exporters.settings.SpriteExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
 import com.jpexs.decompiler.flash.exporters.swf.SwfXmlExporter;
 import com.jpexs.decompiler.flash.gui.Main;
@@ -177,6 +179,8 @@ public class CommandLineArgumentParser {
         out.println("        movie - Movies (Default format: FLV without sound)");
         out.println("        font - Fonts (Default format: TTF)");
         out.println("        frame - Frames (Default format: PNG)");
+        out.println("        sprite - Sprites (Default format: PNG)");
+        out.println("        button - Buttons (Default format: PNG)");
         out.println("        sound - Sounds (Default format: MP3/WAV/FLV only sound)");
         out.println("        binaryData - Binary data (Default format:  Raw data)");
         out.println("        text - Texts (Default format: Plain text)");
@@ -209,6 +213,13 @@ public class CommandLineArgumentParser {
         out.println("         frame:canvas - HTML5 Canvas format for Frames");
         out.println("         frame:pdf - PDF format for Frames");
         out.println("         frame:bmp - BMP format for Frames");
+        out.println("         sprite:png - PNG format for Sprites");
+        out.println("         sprite:gif - GIF format for Sprites");
+        out.println("         sprite:avi - AVI format for Sprites");
+        out.println("         sprite:svg - SVG format for Sprites");
+        out.println("         sprite:canvas - HTML5 Canvas format for Sprites");
+        out.println("         sprite:pdf - PDF format for Sprites");
+        out.println("         sprite:bmp - BMP format for Sprites");
         out.println("         button:png - PNG format for Buttons");
         out.println("         button:svg - SVG format for Buttons");
         out.println("         button:bmp - BMP format for Buttons");
@@ -1104,9 +1115,14 @@ public class CommandLineArgumentParser {
                     }
                     FrameExportSettings fes = new FrameExportSettings(enumFromStr(formats.get("frame"), FrameExportMode.class), zoom);
                     frameExporter.exportFrames(handler, outDir + (multipleExportTypes ? File.separator + FrameExportSettings.EXPORT_FOLDER_NAME : ""), swf, 0, frames, fes, evl);
+                }
+
+                if (exportAll || exportFormats.contains("sprite")) {
+                    System.out.println("Exporting sprite...");
+                    SpriteExportSettings ses = new SpriteExportSettings(enumFromStr(formats.get("sprite"), SpriteExportMode.class), zoom);
                     for (CharacterTag c : swf.getCharacters().values()) {
                         if (c instanceof DefineSpriteTag) {
-                            frameExporter.exportFrames(handler, outDir + (multipleExportTypes ? File.separator + FrameExportSettings.EXPORT_FOLDER_NAME_SPRITE : ""), swf, c.getCharacterId(), null, fes, evl);
+                            frameExporter.exportFrames(handler, outDir + (multipleExportTypes ? File.separator + SpriteExportSettings.EXPORT_FOLDER_NAME : ""), swf, c.getCharacterId(), null, ses, evl);
                         }
                     }
                 }

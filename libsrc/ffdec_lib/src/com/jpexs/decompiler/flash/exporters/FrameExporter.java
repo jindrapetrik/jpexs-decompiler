@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.modes.FrameExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.ButtonExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.FrameExportSettings;
+import com.jpexs.decompiler.flash.exporters.settings.SpriteExportSettings;
 import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
 import com.jpexs.decompiler.flash.helpers.BMPFile;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
@@ -104,6 +105,38 @@ public class FrameExporter {
                 break;
             default:
                 throw new Error("Unsupported button export mode");
+        }
+
+        FrameExportSettings fes = new FrameExportSettings(fem, settings.zoom);
+        return exportFrames(handler, outdir, swf, containerId, frames, fes, evl);
+    }
+
+    public List<File> exportFrames(AbortRetryIgnoreHandler handler, String outdir, SWF swf, int containerId, List<Integer> frames, SpriteExportSettings settings, EventListener evl) throws IOException {
+        FrameExportMode fem;
+        switch (settings.mode) {
+            case PNG:
+                fem = FrameExportMode.PNG;
+                break;
+            case GIF:
+                fem = FrameExportMode.GIF;
+                break;
+            case AVI:
+                fem = FrameExportMode.AVI;
+                break;
+            case SVG:
+                fem = FrameExportMode.SVG;
+                break;
+            case CANVAS:
+                fem = FrameExportMode.CANVAS;
+                break;
+            case PDF:
+                fem = FrameExportMode.PDF;
+                break;
+            case BMP:
+                fem = FrameExportMode.BMP;
+                break;
+            default:
+                throw new Error("Unsupported sprite export mode");
         }
 
         FrameExportSettings fes = new FrameExportSettings(fem, settings.zoom);

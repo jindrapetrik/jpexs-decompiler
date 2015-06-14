@@ -52,6 +52,7 @@ import com.jpexs.decompiler.flash.exporters.modes.MovieExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ShapeExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.SoundExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.SpriteExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.SymbolClassExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.TextExportMode;
 import com.jpexs.decompiler.flash.exporters.script.AS2ScriptExporter;
@@ -65,6 +66,7 @@ import com.jpexs.decompiler.flash.exporters.settings.MovieExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.ShapeExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.SoundExportSettings;
+import com.jpexs.decompiler.flash.exporters.settings.SpriteExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
 import com.jpexs.decompiler.flash.exporters.swf.SwfJavaExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfXmlExporter;
@@ -1190,8 +1192,21 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 FrameExportSettings fes = new FrameExportSettings(export.getValue(FrameExportMode.class), export.getZoom());
                 for (Entry<Integer, List<Integer>> entry : frames.entrySet()) {
                     int containerId = entry.getKey();
-                    String subFolder = containerId == 0 ? FrameExportSettings.EXPORT_FOLDER_NAME : FrameExportSettings.EXPORT_FOLDER_NAME_SPRITE;
-                    ret.addAll(frameExporter.exportFrames(handler, selFile + File.separator + subFolder, swf, containerId, entry.getValue(), fes, evl));
+                    if (containerId == 0) {
+                        String subFolder = FrameExportSettings.EXPORT_FOLDER_NAME;
+                        ret.addAll(frameExporter.exportFrames(handler, selFile + File.separator + subFolder, swf, containerId, entry.getValue(), fes, evl));
+                    }
+                }
+            }
+
+            if (export.isOptionEnabled(SpriteExportMode.class)) {
+                SpriteExportSettings ses = new SpriteExportSettings(export.getValue(SpriteExportMode.class), export.getZoom());
+                for (Entry<Integer, List<Integer>> entry : frames.entrySet()) {
+                    int containerId = entry.getKey();
+                    if (containerId != 0) {
+                        String subFolder = SpriteExportSettings.EXPORT_FOLDER_NAME;
+                        ret.addAll(frameExporter.exportFrames(handler, selFile + File.separator + subFolder, swf, containerId, entry.getValue(), ses, evl));
+                    }
                 }
             }
 
@@ -1294,9 +1309,13 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (export.isOptionEnabled(FrameExportMode.class)) {
             FrameExportSettings fes = new FrameExportSettings(export.getValue(FrameExportMode.class), export.getZoom());
             frameExporter.exportFrames(handler, Path.combine(selFile, FrameExportSettings.EXPORT_FOLDER_NAME), swf, 0, null, fes, evl);
+        }
+
+        if (export.isOptionEnabled(SpriteExportMode.class)) {
+            SpriteExportSettings ses = new SpriteExportSettings(export.getValue(SpriteExportMode.class), export.getZoom());
             for (CharacterTag c : swf.getCharacters().values()) {
                 if (c instanceof DefineSpriteTag) {
-                    frameExporter.exportFrames(handler, Path.combine(selFile, FrameExportSettings.EXPORT_FOLDER_NAME_SPRITE), swf, c.getCharacterId(), null, fes, evl);
+                    frameExporter.exportFrames(handler, Path.combine(selFile, SpriteExportSettings.EXPORT_FOLDER_NAME), swf, c.getCharacterId(), null, ses, evl);
                 }
             }
         }
@@ -1396,9 +1415,15 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             for (FrameExportMode exportMode : FrameExportMode.values()) {
                 FrameExportSettings fes = new FrameExportSettings(exportMode, export.getZoom());
                 frameExporter.exportFrames(handler, Path.combine(selFile, FrameExportSettings.EXPORT_FOLDER_NAME, exportMode.name()), swf, 0, null, fes, evl);
+            }
+        }
+
+        if (export.isOptionEnabled(SpriteExportMode.class)) {
+            for (SpriteExportMode exportMode : SpriteExportMode.values()) {
+                SpriteExportSettings ses = new SpriteExportSettings(exportMode, export.getZoom());
                 for (CharacterTag c : swf.getCharacters().values()) {
                     if (c instanceof DefineSpriteTag) {
-                        frameExporter.exportFrames(handler, Path.combine(selFile, FrameExportSettings.EXPORT_FOLDER_NAME_SPRITE, exportMode.name()), swf, c.getCharacterId(), null, fes, evl);
+                        frameExporter.exportFrames(handler, Path.combine(selFile, SpriteExportSettings.EXPORT_FOLDER_NAME, exportMode.name()), swf, c.getCharacterId(), null, ses, evl);
                     }
                 }
             }
