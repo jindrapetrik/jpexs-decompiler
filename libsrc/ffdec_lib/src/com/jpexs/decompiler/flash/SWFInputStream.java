@@ -1478,10 +1478,10 @@ public class SWFInputStream implements AutoCloseable {
                                 ret = new DefineExternalImage2(sis, data);
                                 break;
                             default:
-                                ret = new UnknownTag(swf, tag.getId(), data);
+                                ret = new UnknownTag(sis, tag.getId(), data);
                         }
                     } else {
-                        ret = new UnknownTag(swf, tag.getId(), data);
+                        ret = new UnknownTag(sis, tag.getId(), data);
                     }
             }
 

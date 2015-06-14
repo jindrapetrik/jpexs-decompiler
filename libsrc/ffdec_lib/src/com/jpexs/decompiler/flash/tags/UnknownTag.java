@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
-import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.helpers.ByteArrayRange;
@@ -28,12 +27,14 @@ import java.io.IOException;
  */
 public class UnknownTag extends Tag {
 
-    public UnknownTag(SWF swf, int id, ByteArrayRange data) {
-        super(swf, id, "Unknown", data);
+    public UnknownTag(SWFInputStream sis, int id, ByteArrayRange data) throws IOException {
+        super(sis.getSwf(), id, "Unknown", data);
+        readData(sis, data, 0, false, false, false);
     }
 
     @Override
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
+        sis.skipBytes(sis.available());
     }
 
     /**
