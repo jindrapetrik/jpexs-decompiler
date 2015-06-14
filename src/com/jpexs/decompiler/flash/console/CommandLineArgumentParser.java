@@ -1142,8 +1142,6 @@ public class CommandLineArgumentParser {
                 }
 
                 boolean parallel = Configuration.parallelSpeedUp.get();
-                String scriptsFolder = Path.combine(outDir, ScriptExportSettings.EXPORT_FOLDER_NAME);
-                Path.createDirectorySafe(new File(scriptsFolder));
                 Boolean singleScriptFile = parseBooleanConfigValue(formats.get("singlescript"));
                 if (singleScriptFile == null) {
                     singleScriptFile = Configuration.scriptExportSingleFile.get();
@@ -1161,6 +1159,8 @@ public class CommandLineArgumentParser {
                         as3classes = parseSelectClassOld(args);
                     }
 
+                    String scriptsFolder = Path.combine(outDir, ScriptExportSettings.EXPORT_FOLDER_NAME);
+                    Path.createDirectorySafe(new File(scriptsFolder));
                     String singleFileName = Path.combine(scriptsFolder, swf.getShortFileName() + scriptExportSettings.getFileExtension());
                     try (FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
                         scriptExportSettings.singleFileWriter = writer;

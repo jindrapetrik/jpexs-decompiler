@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.exporters.modes.MovieExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ShapeExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.SoundExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.SpriteExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.SymbolClassExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.TextExportMode;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
@@ -76,6 +77,7 @@ public class ExportDialog extends AppDialog {
         TagTreeModel.FOLDER_SCRIPTS,
         TagTreeModel.FOLDER_BINARY_DATA,
         TagTreeModel.FOLDER_FRAMES,
+        TagTreeModel.FOLDER_SPRITES,
         TagTreeModel.FOLDER_BUTTONS,
         TagTreeModel.FOLDER_FONTS,
         TagTreeModel.FOLDER_MORPHSHAPES,
@@ -91,6 +93,7 @@ public class ExportDialog extends AppDialog {
         {SoundTag.class},
         {ASMSource.class, ScriptPack.class},
         {DefineBinaryDataTag.class},
+        {Frame.class},
         {Frame.class},
         {ButtonTag.class},
         {FontTag.class},
@@ -108,6 +111,7 @@ public class ExportDialog extends AppDialog {
         ScriptExportMode.class,
         BinaryDataExportMode.class,
         FrameExportMode.class,
+        SpriteExportMode.class,
         ButtonExportMode.class,
         FontExportMode.class,
         MorphShapeExportMode.class,
