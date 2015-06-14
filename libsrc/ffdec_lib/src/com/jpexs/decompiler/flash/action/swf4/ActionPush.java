@@ -141,34 +141,34 @@ public class ActionPush extends Action {
                 if (o instanceof String) {
                     sos.writeUI8(0);
                     sos.writeString((String) o);
-                }
-                if (o instanceof Float) {
+                } else if (o instanceof Float) {
                     sos.writeUI8(1);
                     sos.writeFLOAT((Float) o);
-                }
-                if (o instanceof Null) {
+                } else if (o instanceof Null) {
                     sos.writeUI8(2);
-                }
-                if (o instanceof Undefined) {
+                } else if (o instanceof Undefined) {
                     sos.writeUI8(3);
-                }
-                if (o instanceof RegisterNumber) {
+                } else if (o instanceof RegisterNumber) {
                     sos.writeUI8(4);
                     sos.writeUI8(((RegisterNumber) o).number);
-                }
-                if (o instanceof Boolean) {
+                } else if (o instanceof Boolean) {
                     sos.writeUI8(5);
                     sos.writeUI8((Boolean) o ? 1 : 0);
-                }
-                if (o instanceof Double) {
-                    sos.writeUI8(6);
-                    sos.writeDOUBLE((Double) o);
-                }
-                if (o instanceof Long) {
-                    sos.writeUI8(7);
-                    sos.writeSI32((Long) o);
-                }
-                if (o instanceof ConstantIndex) {
+                } else if (o instanceof Double || o instanceof Long) {
+                    if (o instanceof Long) {
+                        long l = (Long) o;
+                        if (l < -0x80000000 || l > 0x7fffffff) {
+                            o = (double) l;
+                        }
+                    }
+                    if (o instanceof Double) {
+                        sos.writeUI8(6);
+                        sos.writeDOUBLE((Double) o);
+                    } else if (o instanceof Long) {
+                        sos.writeUI8(7);
+                        sos.writeSI32((Long) o);
+                    }
+                } else if (o instanceof ConstantIndex) {
                     int cIndex = ((ConstantIndex) o).index;
                     if (cIndex < 256) {
                         sos.writeUI8(8);
@@ -196,7 +196,7 @@ public class ActionPush extends Action {
         }
         if (value instanceof Long) {
             long l = (Long) value;
-            if (l < 0x8000000 || l > 0x7ffffff) {
+            if (l < -0x80000000 || l > 0x7fffffff) {
                 return false;
             }
         }
