@@ -150,7 +150,15 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
                 }
                 newIstructionCount += 2 * result.variables.size();
 
-                if (newIstructionCount * 2 < result.instructionsProcessed) {
+                boolean allValueValid = true;
+                for (Object value : result.variables.values()) {
+                    if (!ActionPush.isValidValue(value)) {
+                        allValueValid = false;
+                        break;
+                    }
+                }
+
+                if (allValueValid && newIstructionCount * 2 < result.instructionsProcessed) {
                     Action target = actions.get(result.idx);
                     Action prevAction = actions.get(i);
 

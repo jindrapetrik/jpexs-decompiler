@@ -186,6 +186,23 @@ public class ActionPush extends Action {
         return surroundWithAction(baos.toByteArray(), version);
     }
 
+    public static boolean isValidValue(Object value) {
+        if (value instanceof String) {
+            for (char ch : ((String) value).toCharArray()) {
+                if (ch == 0) {
+                    return false;
+                }
+            }
+        }
+        if (value instanceof Long) {
+            long l = (Long) value;
+            if (l < 0x8000000 || l > 0x7ffffff) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public ActionPush(Object value) {
         super(0x96, 0);
         this.values = new ArrayList<>();
