@@ -924,6 +924,8 @@ public class CommandLineArgumentParser {
             "movie",
             "font",
             "frame",
+            "sprite",
+            "button",
             "sound",
             "binarydata",
             "text",
