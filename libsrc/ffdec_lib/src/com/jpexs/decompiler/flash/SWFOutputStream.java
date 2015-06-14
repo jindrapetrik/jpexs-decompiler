@@ -434,6 +434,11 @@ public class SWFOutputStream extends OutputStream {
      */
     public void writeRECT(RECT value) throws IOException {
         int nBits = 0;
+
+        if (Configuration.debugCopy.get()) {
+            nBits = Math.max(nBits, value.nbits);
+        }
+
         int xMin = truncateTo31Bit(value.Xmin);
         int xMax = truncateTo31Bit(value.Xmax);
         int yMin = truncateTo31Bit(value.Ymin);
