@@ -89,10 +89,10 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable {
     };
 
     @Internal
-    private final SWF swf;
+    private SWF swf;
 
     @Internal
-    private final Tag tag;
+    private Tag tag;
 
     // Constructor for Generic tag editor. TODO:Handle this somehow better
     public CLIPACTIONRECORD() {
@@ -289,5 +289,11 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable {
     @Override
     public Tag getSourceTag() {
         return tag;
+    }
+
+    @Override
+    public void setSourceTag(Tag t) {
+        this.tag = t;
+        this.swf = t.getSwf();
     }
 }

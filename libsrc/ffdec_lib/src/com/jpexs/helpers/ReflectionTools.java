@@ -170,7 +170,7 @@ public class ReflectionTools {
     }
 
     @SuppressWarnings("unchecked")
-    public static boolean addToList(Object object, Field field, int index) {
+    public static boolean addToList(Object object, Field field, int index, Class<?> cls) {
         if (!List.class.isAssignableFrom(field.getType())) {
             return false;
         }
@@ -184,7 +184,7 @@ public class ReflectionTools {
         ParameterizedType listType = (ParameterizedType) field.getGenericType();
         Class<?> parameterClass = (Class<?>) listType.getActualTypeArguments()[0];
         try {
-            Object val = newInstanceOf(parameterClass);
+            Object val = newInstanceOf(cls == null ? parameterClass : cls);
             if (val == null) {
                 return false;
             }
@@ -213,7 +213,7 @@ public class ReflectionTools {
         return null;
     }
 
-    public static boolean addToArray(Object object, Field field, int index, boolean notnull) {
+    public static boolean addToArray(Object object, Field field, int index, boolean notnull, Class<?> cls) {
         if (!field.getType().isArray()) {
             return false;
         }
@@ -228,7 +228,7 @@ public class ReflectionTools {
         Object val = null;
         if (!componentClass.isPrimitive()) {
             try {
-                val = newInstanceOf(componentClass);
+                val = newInstanceOf(cls == null ? componentClass : cls);
             } catch (InstantiationException | IllegalAccessException ex) {
                 logger.log(Level.SEVERE, null, ex);
                 return false;
@@ -261,13 +261,13 @@ public class ReflectionTools {
         return true;
     }
 
-    public static boolean addToField(Object object, Field field, int index, boolean notnull) {
+    public static boolean addToField(Object object, Field field, int index, boolean notnull, Class<?> cls) {
         if (List.class.isAssignableFrom(field.getType())) {
-            return addToList(object, field, index);
+            return addToList(object, field, index, cls);
         }
 
         if (field.getType().isArray()) {
-            return addToArray(object, field, index, notnull);
+            return addToArray(object, field, index, notnull, cls);
         }
         return false;
     }

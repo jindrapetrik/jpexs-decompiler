@@ -45,19 +45,26 @@ import java.util.logging.Logger;
  */
 public class BUTTONCONDACTION implements ASMSource, Serializable {
 
-    private final SWF swf;
+    private SWF swf;
 
-    private final Tag tag;
+    private Tag tag;
 
     @Override
     public SWF getSwf() {
         return swf;
     }
 
-    // Constructor for Generic tag editor. TODO:Handle this somehow better
+    // Constructor for Generic tag editor.
     public BUTTONCONDACTION() {
         swf = null;
         tag = null;
+        actionBytes = new ByteArrayRange(new byte[0]);
+    }
+
+    @Override
+    public void setSourceTag(Tag t) {
+        this.tag = t;
+        this.swf = t.getSwf();
     }
 
     public BUTTONCONDACTION(SWF swf, SWFInputStream sis, Tag tag) throws IOException {

@@ -12,11 +12,13 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types.filters;
 
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.helpers.ConcreteClasses;
 import com.jpexs.helpers.SerializableImage;
 import java.io.Serializable;
 
@@ -25,6 +27,7 @@ import java.io.Serializable;
  *
  * @author JPEXS
  */
+@ConcreteClasses({BLURFILTER.class, GRADIENTBEVELFILTER.class, GLOWFILTER.class, GRADIENTGLOWFILTER.class, COLORMATRIXFILTER.class, CONVOLUTIONFILTER.class, BEVELFILTER.class, DROPSHADOWFILTER.class})
 public abstract class FILTER implements Serializable {
 
     /**

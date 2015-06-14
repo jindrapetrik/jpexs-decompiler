@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.SHAPE;
+import com.jpexs.helpers.ConcreteClasses;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
 import java.awt.Font;
@@ -47,6 +48,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
+@ConcreteClasses({CurvedEdgeRecord.class, StraightEdgeRecord.class, StyleChangeRecord.class, EndShapeRecord.class})
 public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Serializable {
 
     public static final int MAX_CHARACTERS_IN_FONT_PREVIEW = 400;

@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
+import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
 import com.jpexs.helpers.ByteArrayRange;
@@ -185,6 +186,7 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
      * If PlaceFlagHasFilterList, List of filters on this object
      */
     @Conditional("placeFlagHasFilterList")
+    @SWFArray("filter")
     public List<FILTER> surfaceFilterList;
 
     /**
@@ -206,7 +208,6 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
      * @since SWF 5 If PlaceFlagHasClipActions, Clip Actions Data
      */
     @Conditional(value = "placeFlagHasClipActions", minSwfVersion = 5)
-    @HideInRawEdit //TODO: make editable
     public CLIPACTIONS clipActions;
 
     /**
