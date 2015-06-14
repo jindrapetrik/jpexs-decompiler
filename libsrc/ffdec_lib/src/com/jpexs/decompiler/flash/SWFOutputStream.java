@@ -489,6 +489,10 @@ public class SWFOutputStream extends OutputStream {
      * @return Number of bits
      */
     public static int getNeededBitsU(int value) {
+        if (value == 0) {
+            return 0;
+        }
+
         value = Math.abs(value);
         long x = 1;
         int nBits;
@@ -1378,7 +1382,12 @@ public class SWFOutputStream extends OutputStream {
                 CurvedEdgeRecord cer = (CurvedEdgeRecord) sh;
                 writeUB(1, 1); // typeFlag
                 writeUB(1, 0); // curvedEdge
-                cer.numBits = Math.max(getNeededBitsS(cer.controlDeltaX, cer.controlDeltaY, cer.anchorDeltaX, cer.anchorDeltaY) - 2, 0);
+                int numBits = Math.max(getNeededBitsS(cer.controlDeltaX, cer.controlDeltaY, cer.anchorDeltaX, cer.anchorDeltaY) - 2, 0);
+                if (Configuration.debugCopy.get()) {
+                    numBits = Math.max(numBits, cer.numBits);
+                }
+
+                cer.numBits = numBits;
                 writeUB(4, cer.numBits);
                 writeSB(cer.numBits + 2, cer.controlDeltaX);
                 writeSB(cer.numBits + 2, cer.controlDeltaY);
@@ -1388,7 +1397,12 @@ public class SWFOutputStream extends OutputStream {
                 StraightEdgeRecord ser = (StraightEdgeRecord) sh;
                 writeUB(1, 1); // typeFlag
                 writeUB(1, 1); // straightEdge
-                ser.numBits = Math.max(getNeededBitsS(ser.deltaX, ser.deltaY) - 2, 0);
+                int numBits = Math.max(getNeededBitsS(ser.deltaX, ser.deltaY) - 2, 0);
+                if (Configuration.debugCopy.get()) {
+                    numBits = Math.max(numBits, ser.numBits);
+                }
+
+                ser.numBits = numBits;
                 writeUB(4, ser.numBits);
                 writeUB(1, ser.generalLineFlag ? 1 : 0);
                 if (!ser.generalLineFlag) {
@@ -1409,7 +1423,12 @@ public class SWFOutputStream extends OutputStream {
                 writeUB(1, scr.stateFillStyle0 ? 1 : 0);
                 writeUB(1, scr.stateMoveTo ? 1 : 0);
                 if (scr.stateMoveTo) {
-                    scr.moveBits = getNeededBitsS(scr.moveDeltaX, scr.moveDeltaY);
+                    int moveBits = getNeededBitsS(scr.moveDeltaX, scr.moveDeltaY);
+                    if (Configuration.debugCopy.get()) {
+                        moveBits = Math.max(moveBits, scr.moveBits);
+                    }
+
+                    scr.moveBits = moveBits;
                     writeUB(5, scr.moveBits);
                     writeSB(scr.moveBits, scr.moveDeltaX);
                     writeSB(scr.moveBits, scr.moveDeltaY);
@@ -1426,10 +1445,16 @@ public class SWFOutputStream extends OutputStream {
                 if (scr.stateNewStyles) {
                     writeFILLSTYLEARRAY(scr.fillStyles, shapeNum);
                     writeLINESTYLEARRAY(scr.lineStyles, shapeNum);
-                    scr.numFillBits = getNeededBitsU(scr.fillStyles.fillStyles.length);
-                    scr.numLineBits = getNeededBitsU(scr.lineStyles.lineStyles.length);
-                    fillBits = scr.numFillBits;
-                    lineBits = scr.numLineBits;
+                    fillBits = getNeededBitsU(scr.fillStyles.fillStyles.length);
+                    lineBits = getNeededBitsU(scr.lineStyles.lineStyles.length);
+
+                    if (Configuration.debugCopy.get()) {
+                        fillBits = Math.max(fillBits, scr.numFillBits);
+                        lineBits = Math.max(lineBits, scr.numLineBits);
+                    }
+
+                    scr.numFillBits = fillBits;
+                    scr.numLineBits = lineBits;
                     writeUB(4, scr.numFillBits);
                     writeUB(4, scr.numLineBits);
                 }

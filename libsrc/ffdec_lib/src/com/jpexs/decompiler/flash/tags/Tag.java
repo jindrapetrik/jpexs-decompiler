@@ -469,7 +469,10 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
                     || this instanceof DefineFont3Tag
                     || this instanceof DoABCTag || this instanceof DoABC2Tag
                     || this instanceof PlaceObject2Tag || this instanceof PlaceObject3Tag || this instanceof PlaceObject4Tag) {
-                os = new CopyOutputStream(os, new ByteArrayInputStream(getOriginalData()));
+                byte[] originalData = getOriginalData();
+                if (originalData != null) {
+                    os = new CopyOutputStream(os, new ByteArrayInputStream(getOriginalData()));
+                }
             }
         }
 
