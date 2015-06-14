@@ -1293,7 +1293,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         if (export.isOptionEnabled(FrameExportMode.class)) {
             FrameExportSettings fes = new FrameExportSettings(export.getValue(FrameExportMode.class), export.getZoom());
-            frameExporter.exportFrames(handler, selFile + File.separator + FrameExportSettings.EXPORT_FOLDER_NAME, swf, 0, null, fes, evl);
+            frameExporter.exportFrames(handler, Path.combine(selFile, FrameExportSettings.EXPORT_FOLDER_NAME), swf, 0, null, fes, evl);
             for (CharacterTag c : swf.getCharacters().values()) {
                 if (c instanceof DefineSpriteTag) {
                     frameExporter.exportFrames(handler, Path.combine(selFile, FrameExportSettings.EXPORT_FOLDER_NAME_SPRITE), swf, c.getCharacterId(), null, fes, evl);
