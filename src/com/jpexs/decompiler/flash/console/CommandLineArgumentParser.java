@@ -48,6 +48,7 @@ import com.jpexs.decompiler.flash.exporters.SoundExporter;
 import com.jpexs.decompiler.flash.exporters.TextExporter;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.modes.BinaryDataExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.ButtonExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.FrameExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ImageExportMode;
@@ -58,6 +59,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ShapeExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.SoundExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.TextExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.BinaryDataExportSettings;
+import com.jpexs.decompiler.flash.exporters.settings.ButtonExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.FontExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.FrameExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.ImageExportSettings;
@@ -78,6 +80,7 @@ import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
+import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
@@ -202,9 +205,13 @@ public class CommandLineArgumentParser {
         out.println("         frame:png - PNG format for Frames");
         out.println("         frame:gif - GIF format for Frames");
         out.println("         frame:avi - AVI format for Frames");
+        out.println("         frame:svg - SVG format for Frames");
         out.println("         frame:canvas - HTML5 Canvas format for Frames");
         out.println("         frame:pdf - PDF format for Frames");
         out.println("         frame:bmp - BMP format for Frames");
+        out.println("         button:png - PNG format for Buttons");
+        out.println("         button:svg - SVG format for Buttons");
+        out.println("         button:bmp - BMP format for Buttons");
         out.println("         image:png_gif_jpeg - PNG/GIF/JPEG format for Images");
         out.println("         image:png - PNG format for Images");
         out.println("         image:jpeg - JPEG format for Images");
@@ -1085,6 +1092,8 @@ public class CommandLineArgumentParser {
                     new TextExporter().exportTexts(handler, outDir + (multipleExportTypes ? File.separator + TextExportSettings.EXPORT_FOLDER_NAME : ""), extags, new TextExportSettings(enumFromStr(formats.get("text"), TextExportMode.class), singleTextFile, zoom), evl);
                 }
 
+                FrameExporter frameExporter = new FrameExporter();
+
                 if (exportAll || exportFormats.contains("frame")) {
                     System.out.println("Exporting frames...");
                     List<Integer> frames = new ArrayList<>();
@@ -1093,7 +1102,25 @@ public class CommandLineArgumentParser {
                             frames.add(i);
                         }
                     }
-                    new FrameExporter().exportFrames(handler, outDir + (multipleExportTypes ? File.separator + FrameExportSettings.EXPORT_FOLDER_NAME : ""), swf, 0, frames, new FrameExportSettings(enumFromStr(formats.get("frame"), FrameExportMode.class), zoom), evl);
+                    FrameExportSettings fes = new FrameExportSettings(enumFromStr(formats.get("frame"), FrameExportMode.class), zoom);
+                    frameExporter.exportFrames(handler, outDir + (multipleExportTypes ? File.separator + FrameExportSettings.EXPORT_FOLDER_NAME : ""), swf, 0, frames, fes, evl);
+                    for (CharacterTag c : swf.getCharacters().values()) {
+                        if (c instanceof DefineSpriteTag) {
+                            frameExporter.exportFrames(handler, outDir + (multipleExportTypes ? File.separator + FrameExportSettings.EXPORT_FOLDER_NAME_SPRITE : ""), swf, c.getCharacterId(), null, fes, evl);
+                        }
+                    }
+                }
+
+                if (exportAll || exportFormats.contains("button")) {
+                    System.out.println("Exporting buttons...");
+                    ButtonExportSettings bes = new ButtonExportSettings(enumFromStr(formats.get("button"), ButtonExportMode.class), zoom);
+                    for (CharacterTag c : swf.getCharacters().values()) {
+                        if (c instanceof ButtonTag) {
+                            List<Integer> frameNums = new ArrayList<>();
+                            frameNums.add(0); // todo: export all frames
+                            frameExporter.exportFrames(handler, outDir + (multipleExportTypes ? File.separator + ButtonExportSettings.EXPORT_FOLDER_NAME : ""), swf, c.getCharacterId(), frameNums, bes, evl);
+                        }
+                    }
                 }
 
                 boolean parallel = Configuration.parallelSpeedUp.get();
