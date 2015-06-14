@@ -20,11 +20,9 @@ import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.ActionListReader;
-import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
@@ -44,10 +42,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Helper;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -125,26 +120,15 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
     /**
      * Gets data bytes
      *
-     * @return Bytes of data
+     * @param sos SWF output stream
+     * @throws java.io.IOException
      */
     @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        if (Configuration.debugCopy.get()) {
-            os = new CopyOutputStream(os, new ByteArrayInputStream(getOriginalData()));
-        }
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeUI16(buttonId);
-            sos.writeBUTTONRECORDList(characters, false);
-            sos.write(getActionBytes());
-            //sos.write(Action.actionsToBytes(actions, true, version));
-            sos.close();
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos.toByteArray();
+    public void getData(SWFOutputStream sos) throws IOException {
+        sos.writeUI16(buttonId);
+        sos.writeBUTTONRECORDList(characters, false);
+        sos.write(getActionBytes());
+        //sos.write(Action.actionsToBytes(actions, true, version));
     }
 
     @Override

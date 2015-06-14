@@ -33,7 +33,6 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -107,26 +106,18 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
     /**
      * Gets data bytes
      *
-     * @return Bytes of data
+     * @param sos SWF output stream
+     * @throws java.io.IOException
      */
     @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeUI16(soundId);
-            sos.writeUB(4, soundFormat);
-            sos.writeUB(2, soundRate);
-            sos.writeUB(1, soundSize ? 1 : 0);
-            sos.writeUB(1, soundType ? 1 : 0);
-            sos.writeUI32(soundSampleCount);
-            sos.write(soundData);
-
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos.toByteArray();
+    public void getData(SWFOutputStream sos) throws IOException {
+        sos.writeUI16(soundId);
+        sos.writeUB(4, soundFormat);
+        sos.writeUB(2, soundRate);
+        sos.writeUB(1, soundSize ? 1 : 0);
+        sos.writeUB(1, soundType ? 1 : 0);
+        sos.writeUI32(soundSampleCount);
+        sos.write(soundData);
     }
 
     @Override

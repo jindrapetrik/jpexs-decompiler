@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 
@@ -51,10 +52,10 @@ public class TagStub extends Tag {
     /**
      * Gets data bytes
      *
-     * @return Bytes of data
+     * @param sos SWF output stream
      */
     @Override
-    public byte[] getData() {
+    public void getData(SWFOutputStream sos) {
         throw new Error("TagStub.getData call is not supported.");
     }
 

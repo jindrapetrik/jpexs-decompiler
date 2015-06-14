@@ -23,9 +23,7 @@ import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 public class FileAttributesTag extends Tag {
 
@@ -87,26 +85,19 @@ public class FileAttributesTag extends Tag {
     /**
      * Gets data bytes
      *
-     * @return Bytes of data
+     * @param sos SWF output stream
+     * @throws java.io.IOException
      */
     @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeUB(1, reserved1 ? 1 : 0); //reserved
-            sos.writeUB(1, useDirectBlit ? 1 : 0);
-            sos.writeUB(1, useGPU ? 1 : 0);
-            sos.writeUB(1, hasMetadata ? 1 : 0);
-            sos.writeUB(1, actionScript3 ? 1 : 0);
-            sos.writeUB(1, noCrossDomainCache ? 1 : 0);
-            sos.writeUB(1, reserved2 ? 1 : 0); //reserved
-            sos.writeUB(1, useNetwork ? 1 : 0);
-            sos.writeUB(24, reserved3); //reserved
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos.toByteArray();
+    public void getData(SWFOutputStream sos) throws IOException {
+        sos.writeUB(1, reserved1 ? 1 : 0); //reserved
+        sos.writeUB(1, useDirectBlit ? 1 : 0);
+        sos.writeUB(1, useGPU ? 1 : 0);
+        sos.writeUB(1, hasMetadata ? 1 : 0);
+        sos.writeUB(1, actionScript3 ? 1 : 0);
+        sos.writeUB(1, noCrossDomainCache ? 1 : 0);
+        sos.writeUB(1, reserved2 ? 1 : 0); //reserved
+        sos.writeUB(1, useNetwork ? 1 : 0);
+        sos.writeUB(24, reserved3); //reserved
     }
 }

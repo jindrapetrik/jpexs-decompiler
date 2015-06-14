@@ -22,9 +22,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 public class ProductInfoTag extends Tag {
 
@@ -98,23 +96,21 @@ public class ProductInfoTag extends Tag {
         compilationDateHigh = sis.readUI32("compilationDateHigh");
     }
 
+    /**
+     * Gets data bytes
+     *
+     * @param sos SWF output stream
+     * @throws java.io.IOException
+     */
     @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeUI32(productID);
-            sos.writeUI32(edition);
-            sos.writeUI8(majorVersion);
-            sos.writeUI8(minorVersion);
-            sos.writeUI32(buildLow);
-            sos.writeUI32(buildHigh);
-            sos.writeUI32(compilationDateLow);
-            sos.writeUI32(compilationDateHigh);
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos.toByteArray();
+    public void getData(SWFOutputStream sos) throws IOException {
+        sos.writeUI32(productID);
+        sos.writeUI32(edition);
+        sos.writeUI8(majorVersion);
+        sos.writeUI8(minorVersion);
+        sos.writeUI32(buildLow);
+        sos.writeUI32(buildHigh);
+        sos.writeUI32(compilationDateLow);
+        sos.writeUI32(compilationDateHigh);
     }
 }

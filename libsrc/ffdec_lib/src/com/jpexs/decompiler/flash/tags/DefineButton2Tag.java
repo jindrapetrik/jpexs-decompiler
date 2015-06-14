@@ -19,8 +19,6 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.abc.CopyOutputStream;
-import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.tags.base.ASMSourceContainer;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
@@ -37,10 +35,8 @@ import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Cache;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -128,39 +124,27 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
     /**
      * Gets data bytes
      *
-     * @return Bytes of data
+     * @param sos SWF output stream
+     * @throws java.io.IOException
      */
     @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        if (Configuration.debugCopy.get()) {
-            ByteArrayInputStream bais = new ByteArrayInputStream(getOriginalData());
-            os = new CopyOutputStream(os, bais);
-        }
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeUI16(buttonId);
-            sos.writeUB(7, reserved);
-            sos.writeUB(1, trackAsMenu ? 1 : 0);
+    public void getData(SWFOutputStream sos) throws IOException {
+        sos.writeUI16(buttonId);
+        sos.writeUB(7, reserved);
+        sos.writeUB(1, trackAsMenu ? 1 : 0);
 
-            ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
-            try (SWFOutputStream sos2 = new SWFOutputStream(baos2, getVersion())) {
-                sos2.writeBUTTONRECORDList(characters, true);
-            }
-            byte[] brdata = baos2.toByteArray();
-            if ((actions == null) || (actions.isEmpty())) {
-                sos.writeUI16(0);
-            } else {
-                sos.writeUI16(2 + brdata.length);
-            }
-            sos.write(brdata);
-            sos.writeBUTTONCONDACTIONList(actions);
-            sos.close();
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
+        ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
+        try (SWFOutputStream sos2 = new SWFOutputStream(baos2, getVersion())) {
+            sos2.writeBUTTONRECORDList(characters, true);
         }
-        return baos.toByteArray();
+        byte[] brdata = baos2.toByteArray();
+        if ((actions == null) || (actions.isEmpty())) {
+            sos.writeUI16(0);
+        } else {
+            sos.writeUI16(2 + brdata.length);
+        }
+        sos.write(brdata);
+        sos.writeBUTTONCONDACTIONList(actions);
     }
 
     @Override

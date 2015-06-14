@@ -24,9 +24,7 @@ import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 /**
  *
@@ -86,25 +84,18 @@ public class DefineFont4Tag extends CharacterTag {
     /**
      * Gets data bytes
      *
-     * @return Bytes of data
+     * @param sos SWF output stream
+     * @throws java.io.IOException
      */
     @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeUI16(fontID);
-            sos.writeUB(5, reserved);
-            sos.writeUB(1, fontFlagsHasFontData ? 1 : 0);
-            sos.writeUB(1, fontFlagsItalic ? 1 : 0);
-            sos.writeUB(1, fontFlagsBold ? 1 : 0);
-            sos.writeString(fontName);
-            sos.write(fontData);
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos.toByteArray();
+    public void getData(SWFOutputStream sos) throws IOException {
+        sos.writeUI16(fontID);
+        sos.writeUB(5, reserved);
+        sos.writeUB(1, fontFlagsHasFontData ? 1 : 0);
+        sos.writeUB(1, fontFlagsItalic ? 1 : 0);
+        sos.writeUB(1, fontFlagsBold ? 1 : 0);
+        sos.writeString(fontName);
+        sos.write(fontData);
     }
 
     @Override

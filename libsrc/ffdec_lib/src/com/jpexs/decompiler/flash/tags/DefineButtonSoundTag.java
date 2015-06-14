@@ -24,9 +24,7 @@ import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.SOUNDINFO;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 /**
  *
@@ -106,35 +104,28 @@ public class DefineButtonSoundTag extends Tag implements CharacterIdTag {
     /**
      * Gets data bytes
      *
-     * @return Bytes of data
+     * @param sos SWF output stream
+     * @throws java.io.IOException
      */
     @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeUI16(buttonId);
-            sos.writeUI16(buttonSoundChar0);
-            if (buttonSoundChar0 != 0) {
-                sos.writeSOUNDINFO(buttonSoundInfo0);
-            }
-            sos.writeUI16(buttonSoundChar1);
-            if (buttonSoundChar1 != 0) {
-                sos.writeSOUNDINFO(buttonSoundInfo1);
-            }
-            sos.writeUI16(buttonSoundChar2);
-            if (buttonSoundChar2 != 0) {
-                sos.writeSOUNDINFO(buttonSoundInfo2);
-            }
-            sos.writeUI16(buttonSoundChar3);
-            if (buttonSoundChar3 != 0) {
-                sos.writeSOUNDINFO(buttonSoundInfo3);
-            }
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
+    public void getData(SWFOutputStream sos) throws IOException {
+        sos.writeUI16(buttonId);
+        sos.writeUI16(buttonSoundChar0);
+        if (buttonSoundChar0 != 0) {
+            sos.writeSOUNDINFO(buttonSoundInfo0);
         }
-        return baos.toByteArray();
+        sos.writeUI16(buttonSoundChar1);
+        if (buttonSoundChar1 != 0) {
+            sos.writeSOUNDINFO(buttonSoundInfo1);
+        }
+        sos.writeUI16(buttonSoundChar2);
+        if (buttonSoundChar2 != 0) {
+            sos.writeSOUNDINFO(buttonSoundInfo2);
+        }
+        sos.writeUI16(buttonSoundChar3);
+        if (buttonSoundChar3 != 0) {
+            sos.writeSOUNDINFO(buttonSoundInfo3);
+        }
     }
 
     @Override

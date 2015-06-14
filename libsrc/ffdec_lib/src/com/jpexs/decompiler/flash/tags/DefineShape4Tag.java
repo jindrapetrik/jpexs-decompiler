@@ -26,7 +26,6 @@ import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 /**
@@ -82,31 +81,26 @@ public class DefineShape4Tag extends ShapeTag {
             shapes = sis.readSHAPEWITHSTYLE(getShapeNum(), false, "shapes");
         } else {
             shapeData = new ByteArrayRange(data.getArray(), (int) sis.getPos(), sis.available());
+            sis.skipBytes(sis.available());
         }
     }
 
     /**
      * Gets data bytes
      *
-     * @return Bytes of data
+     * @param sos SWF output stream
+     * @throws java.io.IOException
      */
     @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        SWFOutputStream sos = new SWFOutputStream(baos, getVersion());
-        try {
-            sos.writeUI16(shapeId);
-            sos.writeRECT(shapeBounds);
-            sos.writeRECT(edgeBounds);
-            sos.writeUB(5, reserved);
-            sos.writeUB(1, usesFillWindingRule ? 1 : 0);
-            sos.writeUB(1, usesNonScalingStrokes ? 1 : 0);
-            sos.writeUB(1, usesScalingStrokes ? 1 : 0);
-            sos.writeSHAPEWITHSTYLE(getShapes(), getShapeNum());
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos.toByteArray();
+    public void getData(SWFOutputStream sos) throws IOException {
+        sos.writeUI16(shapeId);
+        sos.writeRECT(shapeBounds);
+        sos.writeRECT(edgeBounds);
+        sos.writeUB(5, reserved);
+        sos.writeUB(1, usesFillWindingRule ? 1 : 0);
+        sos.writeUB(1, usesNonScalingStrokes ? 1 : 0);
+        sos.writeUB(1, usesScalingStrokes ? 1 : 0);
+        sos.writeSHAPEWITHSTYLE(getShapes(), getShapeNum());
     }
 
     @Override

@@ -39,7 +39,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.InflaterInputStream;
@@ -119,26 +118,19 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
     /**
      * Gets data bytes
      *
-     * @return Bytes of data
+     * @param sos SWF output stream
+     * @throws java.io.IOException
      */
     @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeUI16(characterID);
-            sos.writeUI8(bitmapFormat);
-            sos.writeUI16(bitmapWidth);
-            sos.writeUI16(bitmapHeight);
-            if (bitmapFormat == FORMAT_8BIT_COLORMAPPED) {
-                sos.writeUI8(bitmapColorTableSize);
-            }
-            sos.write(zlibBitmapData);
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
+    public void getData(SWFOutputStream sos) throws IOException {
+        sos.writeUI16(characterID);
+        sos.writeUI8(bitmapFormat);
+        sos.writeUI16(bitmapWidth);
+        sos.writeUI16(bitmapHeight);
+        if (bitmapFormat == FORMAT_8BIT_COLORMAPPED) {
+            sos.writeUI8(bitmapColorTableSize);
         }
-        return baos.toByteArray();
+        sos.write(zlibBitmapData);
     }
 
     private byte[] createEmptyImage() {

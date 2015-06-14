@@ -20,9 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.helpers.ByteArrayRange;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 /**
  * Marks the file is not importable for editing
@@ -70,20 +68,13 @@ public class EnableDebuggerTag extends Tag {
     /**
      * Gets data bytes
      *
-     * @return Bytes of data
+     * @param sos SWF output stream
+     * @throws java.io.IOException
      */
     @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            if (passwordHash != null) {
-                sos.writeString(passwordHash);
-            }
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
+    public void getData(SWFOutputStream sos) throws IOException {
+        if (passwordHash != null) {
+            sos.writeString(passwordHash);
         }
-        return baos.toByteArray();
     }
 }

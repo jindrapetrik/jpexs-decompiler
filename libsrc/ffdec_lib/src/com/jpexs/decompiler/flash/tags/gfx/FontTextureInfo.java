@@ -25,9 +25,7 @@ import com.jpexs.decompiler.flash.types.gfx.GFxOutputStream;
 import com.jpexs.decompiler.flash.types.gfx.TEXGLYPH;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.MemoryInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 /**
  *
@@ -67,35 +65,28 @@ public class FontTextureInfo extends Tag {
     /**
      * Gets data bytes
      *
-     * @return Bytes of data
+     * @param sos SWF output stream
+     * @throws java.io.IOException
      */
     @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeUI32(textureID);
-            sos.writeUI16(textureFormat);
-            byte[] fileNameBytes = fileName.getBytes();
-            sos.writeUI8(fileNameBytes.length);
-            sos.write(fileNameBytes);
-            sos.writeUI16(textureWidth);
-            sos.writeUI16(textureHeight);
-            sos.writeUI8(padPixels);
-            sos.writeUI16(nominalGlyphSz);
-            sos.writeUI16(texGlyphs.length);
-            for (int i = 0; i < texGlyphs.length; i++) {
-                texGlyphs[i].write(new GFxOutputStream(sos));
-            }
-            sos.writeUI16(fonts.length);
-            for (int i = 0; i < fonts.length; i++) {
-                fonts[i].write(new GFxOutputStream(sos));
-            }
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
+    public void getData(SWFOutputStream sos) throws IOException {
+        sos.writeUI32(textureID);
+        sos.writeUI16(textureFormat);
+        byte[] fileNameBytes = fileName.getBytes();
+        sos.writeUI8(fileNameBytes.length);
+        sos.write(fileNameBytes);
+        sos.writeUI16(textureWidth);
+        sos.writeUI16(textureHeight);
+        sos.writeUI8(padPixels);
+        sos.writeUI16(nominalGlyphSz);
+        sos.writeUI16(texGlyphs.length);
+        for (int i = 0; i < texGlyphs.length; i++) {
+            texGlyphs[i].write(new GFxOutputStream(sos));
         }
-        return baos.toByteArray();
+        sos.writeUI16(fonts.length);
+        for (int i = 0; i < fonts.length; i++) {
+            fonts[i].write(new GFxOutputStream(sos));
+        }
     }
 
     /**

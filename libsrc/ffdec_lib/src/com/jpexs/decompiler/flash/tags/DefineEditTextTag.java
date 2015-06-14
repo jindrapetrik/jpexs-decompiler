@@ -59,9 +59,7 @@ import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.Color;
 import java.awt.Font;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -245,63 +243,55 @@ public class DefineEditTextTag extends TextTag {
     /**
      * Gets data bytes
      *
-     * @return Bytes of data
+     * @param sos SWF output stream
+     * @throws java.io.IOException
      */
     @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeUI16(characterID);
-            sos.writeRECT(bounds);
-            sos.writeUB(1, hasText ? 1 : 0);
-            sos.writeUB(1, wordWrap ? 1 : 0);
-            sos.writeUB(1, multiline ? 1 : 0);
-            sos.writeUB(1, password ? 1 : 0);
-            sos.writeUB(1, readOnly ? 1 : 0);
-            sos.writeUB(1, hasTextColor ? 1 : 0);
-            sos.writeUB(1, hasMaxLength ? 1 : 0);
-            sos.writeUB(1, hasFont ? 1 : 0);
-            sos.writeUB(1, hasFontClass ? 1 : 0);
-            sos.writeUB(1, autoSize ? 1 : 0);
-            sos.writeUB(1, hasLayout ? 1 : 0);
-            sos.writeUB(1, noSelect ? 1 : 0);
-            sos.writeUB(1, border ? 1 : 0);
-            sos.writeUB(1, wasStatic ? 1 : 0);
-            sos.writeUB(1, html ? 1 : 0);
-            sos.writeUB(1, useOutlines ? 1 : 0);
-            if (hasFont) {
-                sos.writeUI16(fontId);
-            }
-            if (hasFontClass) {
-                sos.writeString(fontClass);
-            }
-            if (hasFont) {
-                sos.writeUI16(fontHeight);
-            }
-            if (hasTextColor) {
-                sos.writeRGBA(textColor);
-            }
-            if (hasMaxLength) {
-                sos.writeUI16(maxLength);
-            }
-            if (hasLayout) {
-                sos.writeUI8(align);
-                sos.writeUI16(leftMargin);
-                sos.writeUI16(rightMargin);
-                sos.writeUI16(indent);
-                sos.writeSI16(leading);
-            }
-            sos.writeString(variableName);
-            if (hasText) {
-                sos.writeString(initialText);
-            }
-
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
+    public void getData(SWFOutputStream sos) throws IOException {
+        sos.writeUI16(characterID);
+        sos.writeRECT(bounds);
+        sos.writeUB(1, hasText ? 1 : 0);
+        sos.writeUB(1, wordWrap ? 1 : 0);
+        sos.writeUB(1, multiline ? 1 : 0);
+        sos.writeUB(1, password ? 1 : 0);
+        sos.writeUB(1, readOnly ? 1 : 0);
+        sos.writeUB(1, hasTextColor ? 1 : 0);
+        sos.writeUB(1, hasMaxLength ? 1 : 0);
+        sos.writeUB(1, hasFont ? 1 : 0);
+        sos.writeUB(1, hasFontClass ? 1 : 0);
+        sos.writeUB(1, autoSize ? 1 : 0);
+        sos.writeUB(1, hasLayout ? 1 : 0);
+        sos.writeUB(1, noSelect ? 1 : 0);
+        sos.writeUB(1, border ? 1 : 0);
+        sos.writeUB(1, wasStatic ? 1 : 0);
+        sos.writeUB(1, html ? 1 : 0);
+        sos.writeUB(1, useOutlines ? 1 : 0);
+        if (hasFont) {
+            sos.writeUI16(fontId);
         }
-        return baos.toByteArray();
+        if (hasFontClass) {
+            sos.writeString(fontClass);
+        }
+        if (hasFont) {
+            sos.writeUI16(fontHeight);
+        }
+        if (hasTextColor) {
+            sos.writeRGBA(textColor);
+        }
+        if (hasMaxLength) {
+            sos.writeUI16(maxLength);
+        }
+        if (hasLayout) {
+            sos.writeUI8(align);
+            sos.writeUI16(leftMargin);
+            sos.writeUI16(rightMargin);
+            sos.writeUI16(indent);
+            sos.writeSI16(leading);
+        }
+        sos.writeString(variableName);
+        if (hasText) {
+            sos.writeString(initialText);
+        }
     }
 
     @Override

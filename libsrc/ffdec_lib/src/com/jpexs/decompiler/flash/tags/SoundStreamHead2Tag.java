@@ -29,10 +29,8 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.sound.SoundExportFormat;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.helpers.ByteArrayRange;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -118,30 +116,23 @@ public class SoundStreamHead2Tag extends Tag implements SoundStreamHeadTypeTag {
     /**
      * Gets data bytes
      *
-     * @return Bytes of data
+     * @param sos SWF output stream
+     * @throws java.io.IOException
      */
     @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeUB(4, reserved);
-            sos.writeUB(2, playBackSoundRate);
-            sos.writeUB(1, playBackSoundSize ? 1 : 0);
-            sos.writeUB(1, playBackSoundType ? 1 : 0);
-            sos.writeUB(4, streamSoundCompression);
-            sos.writeUB(2, streamSoundRate);
-            sos.writeUB(1, streamSoundSize ? 1 : 0);
-            sos.writeUB(1, streamSoundType ? 1 : 0);
-            sos.writeUI16(streamSoundSampleCount);
-            if (streamSoundCompression == 2) {
-                sos.writeSI16(latencySeek);
-            }
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
+    public void getData(SWFOutputStream sos) throws IOException {
+        sos.writeUB(4, reserved);
+        sos.writeUB(2, playBackSoundRate);
+        sos.writeUB(1, playBackSoundSize ? 1 : 0);
+        sos.writeUB(1, playBackSoundType ? 1 : 0);
+        sos.writeUB(4, streamSoundCompression);
+        sos.writeUB(2, streamSoundRate);
+        sos.writeUB(1, streamSoundSize ? 1 : 0);
+        sos.writeUB(1, streamSoundType ? 1 : 0);
+        sos.writeUI16(streamSoundSampleCount);
+        if (streamSoundCompression == 2) {
+            sos.writeSI16(latencySeek);
         }
-        return baos.toByteArray();
     }
 
     @Override

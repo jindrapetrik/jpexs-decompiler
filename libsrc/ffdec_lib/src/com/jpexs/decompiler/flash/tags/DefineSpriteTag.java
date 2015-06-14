@@ -19,8 +19,6 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.abc.CopyOutputStream;
-import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
@@ -41,10 +39,7 @@ import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -131,28 +126,17 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
     /**
      * Gets data bytes
      *
-     * @return Bytes of data
+     * @param sos SWF output stream
+     * @throws java.io.IOException
      */
     @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        if (Configuration.debugCopy.get()) {
-            os = new CopyOutputStream(os, new ByteArrayInputStream(getOriginalData()));
+    public void getData(SWFOutputStream sos) throws IOException {
+        sos.writeUI16(spriteId);
+        sos.writeUI16(frameCount);
+        sos.writeTags(subTags);
+        if (hasEndTag) {
+            sos.writeUI16(0);
         }
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeUI16(spriteId);
-            sos.writeUI16(frameCount);
-            sos.writeTags(subTags);
-            if (hasEndTag) {
-                sos.writeUI16(0);
-            }
-            sos.close();
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos.toByteArray();
     }
 
     @Override

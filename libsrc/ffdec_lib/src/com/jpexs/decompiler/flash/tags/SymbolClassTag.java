@@ -25,9 +25,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.Table;
 import com.jpexs.helpers.ByteArrayRange;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,23 +76,16 @@ public class SymbolClassTag extends SymbolClassTypeTag {
     /**
      * Gets data bytes
      *
-     * @return Bytes of data
+     * @param sos SWF output stream
+     * @throws java.io.IOException
      */
     @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            int numSymbols = tags.size();
-            sos.writeUI16(numSymbols);
-            for (int i = 0; i < numSymbols; i++) {
-                sos.writeUI16(tags.get(i));
-                sos.writeString(names.get(i));
-            }
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
+    public void getData(SWFOutputStream sos) throws IOException {
+        int numSymbols = tags.size();
+        sos.writeUI16(numSymbols);
+        for (int i = 0; i < numSymbols; i++) {
+            sos.writeUI16(tags.get(i));
+            sos.writeString(names.get(i));
         }
-        return baos.toByteArray();
     }
 }

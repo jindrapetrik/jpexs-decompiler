@@ -20,9 +20,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.helpers.ByteArrayRange;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 /**
  *
@@ -58,31 +56,24 @@ public class DefineExternalImage2 extends Tag {
     /**
      * Gets data bytes
      *
-     * @return Bytes of data
+     * @param sos SWF output stream
+     * @throws java.io.IOException
      */
     @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeUI32(characterId);
-            sos.writeUI16(bitmapFormat);
-            sos.writeUI16(targetWidth);
-            sos.writeUI16(targetHeight);
-            byte[] exportNameBytes = exportName.getBytes();
-            sos.writeUI8(exportNameBytes.length);
-            sos.write(exportNameBytes);
-            byte[] fileNameBytes = fileName.getBytes();
-            sos.writeUI8(fileNameBytes.length);
-            sos.write(fileNameBytes);
-            if (extraData != null) {
-                sos.write(extraData);
-            }
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
+    public void getData(SWFOutputStream sos) throws IOException {
+        sos.writeUI32(characterId);
+        sos.writeUI16(bitmapFormat);
+        sos.writeUI16(targetWidth);
+        sos.writeUI16(targetHeight);
+        byte[] exportNameBytes = exportName.getBytes();
+        sos.writeUI8(exportNameBytes.length);
+        sos.write(exportNameBytes);
+        byte[] fileNameBytes = fileName.getBytes();
+        sos.writeUI8(fileNameBytes.length);
+        sos.write(fileNameBytes);
+        if (extraData != null) {
+            sos.write(extraData);
         }
-        return baos.toByteArray();
     }
 
     /**

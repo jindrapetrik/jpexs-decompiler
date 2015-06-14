@@ -32,7 +32,6 @@ import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -92,21 +91,14 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
     /**
      * Gets data bytes
      *
-     * @return Bytes of data
+     * @param sos SWF output stream
+     * @throws java.io.IOException
      */
     @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        SWFOutputStream sos = new SWFOutputStream(baos, getVersion());
-        try {
-            sos.writeUI16(spriteId);
-            sos.write(getActionBytes());
-            //sos.write(Action.actionsToBytes(actions, true, version));
-            sos.close();
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos.toByteArray();
+    public void getData(SWFOutputStream sos) throws IOException {
+        sos.writeUI16(spriteId);
+        sos.write(getActionBytes());
+        //sos.write(Action.actionsToBytes(actions, true, version));
     }
 
     /**

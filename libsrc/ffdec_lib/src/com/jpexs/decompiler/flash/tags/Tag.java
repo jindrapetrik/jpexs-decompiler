@@ -19,6 +19,8 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.abc.CopyOutputStream;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
@@ -39,8 +41,10 @@ import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -87,6 +91,9 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
     private ByteArrayRange originalRange;
 
     private final HashSet<TagChangedListener> listeners = new HashSet<>();
+
+    @Internal
+    public byte[] remainingData;
 
     /**
      * Constructor
@@ -349,12 +356,12 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         return swf.version;
     }
 
-    protected byte[] getHeader(byte[] data) {
+    protected byte[] getHeader(int dataLength) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
 
             SWFOutputStream sos = new SWFOutputStream(baos, swf.version);
-            int tagLength = data.length;
+            int tagLength = dataLength;
             int tagID = getId();
             int tagIDLength = (tagID << 6);
             if ((tagLength <= 62) && (!forceWriteAsLong)) {
@@ -395,7 +402,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
     public void writeTag(SWFOutputStream sos) throws IOException {
         if (isModified()) {
             byte[] newData = getData();
-            byte[] newHeaderData = getHeader(newData);
+            byte[] newHeaderData = getHeader(newData.length);
             sos.write(newHeaderData);
             sos.write(newData);
         } else {
@@ -442,9 +449,41 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
     /**
      * Gets data bytes
      *
+     * @param sos SWF output stream
+     * @throws java.io.IOException
+     */
+    public abstract void getData(SWFOutputStream sos) throws IOException;
+
+    /**
+     * Gets data bytes
+     *
      * @return Bytes of data
      */
-    public abstract byte[] getData();
+    public byte[] getData() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        if (Configuration.debugCopy.get()) {
+            // todo: honfika: why only the following tags?
+            if (this instanceof DefineSpriteTag
+                    || this instanceof DefineButtonTag || this instanceof DefineButton2Tag
+                    || this instanceof DefineFont3Tag
+                    || this instanceof DoABCTag || this instanceof DoABC2Tag
+                    || this instanceof PlaceObject2Tag || this instanceof PlaceObject3Tag || this instanceof PlaceObject4Tag) {
+                os = new CopyOutputStream(os, new ByteArrayInputStream(getOriginalData()));
+            }
+        }
+
+        try (SWFOutputStream sos = new SWFOutputStream(os, getVersion())) {
+            getData(sos);
+            if (remainingData != null) {
+                sos.write(remainingData);
+            }
+        } catch (IOException e) {
+            throw new Error("This should never happen.", e);
+        }
+
+        return baos.toByteArray();
+    }
 
     public final ByteArrayRange getOriginalRange() {
         return originalRange;
@@ -521,7 +560,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
 
     public void createOriginalData() {
         byte[] data = getData();
-        byte[] headerData = getHeader(data);
+        byte[] headerData = getHeader(data.length);
         byte[] tagData = new byte[data.length + headerData.length];
         System.arraycopy(headerData, 0, tagData, 0, headerData.length);
         System.arraycopy(data, 0, tagData, headerData.length, data.length);

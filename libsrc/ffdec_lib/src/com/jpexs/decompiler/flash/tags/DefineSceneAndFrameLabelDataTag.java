@@ -24,9 +24,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.Table;
 import com.jpexs.helpers.ByteArrayRange;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 /**
  *
@@ -103,29 +101,22 @@ public class DefineSceneAndFrameLabelDataTag extends Tag {
     /**
      * Gets data bytes
      *
-     * @return Bytes of data
+     * @param sos SWF output stream
+     * @throws java.io.IOException
      */
     @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            int sceneCount = sceneOffsets.length;
-            sos.writeEncodedU32(sceneCount);
-            for (int i = 0; i < sceneCount; i++) {
-                sos.writeEncodedU32(sceneOffsets[i]);
-                sos.writeString(sceneNames[i]);
-            }
-            int frameLabelCount = frameNums.length;
-            sos.writeEncodedU32(frameLabelCount);
-            for (int i = 0; i < frameLabelCount; i++) {
-                sos.writeEncodedU32(frameNums[i]);
-                sos.writeString(frameNames[i]);
-            }
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
+    public void getData(SWFOutputStream sos) throws IOException {
+        int sceneCount = sceneOffsets.length;
+        sos.writeEncodedU32(sceneCount);
+        for (int i = 0; i < sceneCount; i++) {
+            sos.writeEncodedU32(sceneOffsets[i]);
+            sos.writeString(sceneNames[i]);
         }
-        return baos.toByteArray();
+        int frameLabelCount = frameNums.length;
+        sos.writeEncodedU32(frameLabelCount);
+        for (int i = 0; i < frameLabelCount; i++) {
+            sos.writeEncodedU32(frameNums[i]);
+            sos.writeString(frameNames[i]);
+        }
     }
 }

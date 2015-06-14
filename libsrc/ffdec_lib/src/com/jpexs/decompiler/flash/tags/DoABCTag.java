@@ -21,16 +21,11 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ABCInputStream;
-import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
-import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.decompiler.flash.types.annotations.SWFField;
 import com.jpexs.helpers.ByteArrayRange;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 /**
  * Defines a series of ActionScript 3 bytecodes to be executed
@@ -83,23 +78,12 @@ public class DoABCTag extends Tag implements ABCContainerTag {
     /**
      * Gets data bytes
      *
-     * @return Bytes of data
+     * @param sos SWF output stream
+     * @throws java.io.IOException
      */
     @Override
-    public byte[] getData() {
-        try {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            OutputStream os = bos;
-            if (Configuration.debugCopy.get()) {
-                os = new CopyOutputStream(os, new ByteArrayInputStream(getOriginalData()));
-            }
-            try (SWFOutputStream sos = new SWFOutputStream(os, getVersion())) {
-                abc.saveToStream(sos);
-            }
-            return bos.toByteArray();
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
+    public void getData(SWFOutputStream sos) throws IOException {
+        abc.saveToStream(sos);
     }
 
     @Override

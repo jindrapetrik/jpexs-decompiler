@@ -25,9 +25,7 @@ import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.utf8.Utf8Helper;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -117,36 +115,29 @@ public class DefineFontInfoTag extends Tag implements CharacterIdTag {
     /**
      * Gets data bytes
      *
-     * @return Bytes of data
+     * @param sos SWF output stream
+     * @throws java.io.IOException
      */
     @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeUI16(fontId);
-            byte[] fontNameBytes = Utf8Helper.getBytes(fontName);
-            sos.writeUI8(fontNameBytes.length);
-            sos.write(fontNameBytes);
-            sos.writeUB(2, reserved);
-            sos.writeUB(1, fontFlagsSmallText ? 1 : 0);
-            sos.writeUB(1, fontFlagsShiftJIS ? 1 : 0);
-            sos.writeUB(1, fontFlagsANSI ? 1 : 0);
-            sos.writeUB(1, fontFlagsItalic ? 1 : 0);
-            sos.writeUB(1, fontFlagsBold ? 1 : 0);
-            sos.writeUB(1, fontFlagsWideCodes ? 1 : 0);
-            for (int code : codeTable) {
-                if (fontFlagsWideCodes) {
-                    sos.writeUI16(code);
-                } else {
-                    sos.writeUI8(code);
-                }
+    public void getData(SWFOutputStream sos) throws IOException {
+        sos.writeUI16(fontId);
+        byte[] fontNameBytes = Utf8Helper.getBytes(fontName);
+        sos.writeUI8(fontNameBytes.length);
+        sos.write(fontNameBytes);
+        sos.writeUB(2, reserved);
+        sos.writeUB(1, fontFlagsSmallText ? 1 : 0);
+        sos.writeUB(1, fontFlagsShiftJIS ? 1 : 0);
+        sos.writeUB(1, fontFlagsANSI ? 1 : 0);
+        sos.writeUB(1, fontFlagsItalic ? 1 : 0);
+        sos.writeUB(1, fontFlagsBold ? 1 : 0);
+        sos.writeUB(1, fontFlagsWideCodes ? 1 : 0);
+        for (int code : codeTable) {
+            if (fontFlagsWideCodes) {
+                sos.writeUI16(code);
+            } else {
+                sos.writeUI8(code);
             }
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
         }
-        return baos.toByteArray();
     }
 
     @Override

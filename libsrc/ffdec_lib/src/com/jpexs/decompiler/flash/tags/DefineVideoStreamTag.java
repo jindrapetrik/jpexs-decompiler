@@ -26,9 +26,7 @@ import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Set;
 
 /**
@@ -110,26 +108,19 @@ public class DefineVideoStreamTag extends CharacterTag implements BoundedTag {
     /**
      * Gets data bytes
      *
-     * @return Bytes of data
+     * @param sos SWF output stream
+     * @throws java.io.IOException
      */
     @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeUI16(characterID);
-            sos.writeUI16(numFrames);
-            sos.writeUI16(width);
-            sos.writeUI16(height);
-            sos.writeUB(4, reserved);
-            sos.writeUB(3, videoFlagsDeblocking);
-            sos.writeUB(1, videoFlagsSmoothing ? 1 : 0);
-            sos.writeUI8(codecID);
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos.toByteArray();
+    public void getData(SWFOutputStream sos) throws IOException {
+        sos.writeUI16(characterID);
+        sos.writeUI16(numFrames);
+        sos.writeUI16(width);
+        sos.writeUI16(height);
+        sos.writeUB(4, reserved);
+        sos.writeUB(3, videoFlagsDeblocking);
+        sos.writeUB(1, videoFlagsSmoothing ? 1 : 0);
+        sos.writeUI8(codecID);
     }
 
     @Override

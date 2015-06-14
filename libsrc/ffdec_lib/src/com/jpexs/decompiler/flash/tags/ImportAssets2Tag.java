@@ -22,15 +22,12 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.ImportTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
-import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.Table;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -115,32 +112,25 @@ public class ImportAssets2Tag extends Tag implements ImportTag {
     /**
      * Gets data bytes
      *
-     * @return Bytes of data
+     * @param sos SWF output stream
+     * @throws java.io.IOException
      */
     @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeString(url);
-            sos.writeUI8(downloadNow);
+    public void getData(SWFOutputStream sos) throws IOException {
+        sos.writeString(url);
+        sos.writeUI8(downloadNow);
 
-            if (hasDigest == 1 && sha1 != null && sha1.matches("[0-9a-fA-F]{40}")) {
-                sos.writeUI8(1);
-                sos.write(Helper.hexToByteArray(sha1));
-            } else {
-                sos.writeUI8(0);
-            }
-            sos.writeUI16(tags.size());
-            for (int i = 0; i < tags.size(); i++) {
-                sos.writeUI16(tags.get(i));
-                sos.writeString(names.get(i));
-            }
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
+        if (hasDigest == 1 && sha1 != null && sha1.matches("[0-9a-fA-F]{40}")) {
+            sos.writeUI8(1);
+            sos.write(Helper.hexToByteArray(sha1));
+        } else {
+            sos.writeUI8(0);
         }
-        return baos.toByteArray();
+        sos.writeUI16(tags.size());
+        for (int i = 0; i < tags.size(); i++) {
+            sos.writeUI16(tags.get(i));
+            sos.writeString(names.get(i));
+        }
     }
 
     @Override

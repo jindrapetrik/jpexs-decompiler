@@ -23,7 +23,6 @@ import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.helpers.ByteArrayRange;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 /**
@@ -61,26 +60,21 @@ public class DefineShape3Tag extends ShapeTag {
             shapes = sis.readSHAPEWITHSTYLE(getShapeNum(), false, "shapes");
         } else {
             shapeData = new ByteArrayRange(data.getArray(), (int) sis.getPos(), sis.available());
+            sis.skipBytes(sis.available());
         }
     }
 
     /**
      * Gets data bytes
      *
-     * @return Bytes of data
+     * @param sos SWF output stream
+     * @throws java.io.IOException
      */
     @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        SWFOutputStream sos = new SWFOutputStream(baos, getVersion());
-        try {
-            sos.writeUI16(shapeId);
-            sos.writeRECT(shapeBounds);
-            sos.writeSHAPEWITHSTYLE(getShapes(), getShapeNum());
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos.toByteArray();
+    public void getData(SWFOutputStream sos) throws IOException {
+        sos.writeUI16(shapeId);
+        sos.writeRECT(shapeBounds);
+        sos.writeSHAPEWITHSTYLE(getShapes(), getShapeNum());
     }
 
     @Override

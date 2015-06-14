@@ -24,9 +24,7 @@ import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 /**
  *
@@ -96,25 +94,18 @@ public class CSMTextSettingsTag extends Tag implements CharacterIdTag {
     /**
      * Gets data bytes
      *
-     * @return Bytes of data
+     * @param sos SWF output stream
+     * @throws java.io.IOException
      */
     @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeUI16(textID);
-            sos.writeUB(2, useFlashType);
-            sos.writeUB(3, gridFit);
-            sos.writeUB(3, reserved);
-            sos.writeFLOAT(thickness); //F32 = FLOAT
-            sos.writeFLOAT(sharpness); //F32 = FLOAT
-            sos.writeUI8(reserved2);
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos.toByteArray();
+    public void getData(SWFOutputStream sos) throws IOException {
+        sos.writeUI16(textID);
+        sos.writeUB(2, useFlashType);
+        sos.writeUB(3, gridFit);
+        sos.writeUB(3, reserved);
+        sos.writeFLOAT(thickness); //F32 = FLOAT
+        sos.writeFLOAT(sharpness); //F32 = FLOAT
+        sos.writeUI8(reserved2);
     }
 
     @Override

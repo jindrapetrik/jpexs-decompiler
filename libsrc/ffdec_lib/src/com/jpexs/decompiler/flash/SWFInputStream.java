@@ -1484,6 +1484,10 @@ public class SWFInputStream implements AutoCloseable {
                         ret = new UnknownTag(swf, tag.getId(), data);
                     }
             }
+
+            if (sis.available() > 0) {
+                ret.remainingData = sis.readBytesEx(sis.available(), "remaining");
+            }
         } catch (IOException ex) {
             logger.log(Level.SEVERE, "Error during tag reading. SWF: " + swf.getShortFileName() + " ID: " + tag.getId() + " name: " + tag.getName() + " pos: " + data.getPos(), ex);
             ret = new TagStub(swf, tag.getId(), "ErrorTag", data, null);

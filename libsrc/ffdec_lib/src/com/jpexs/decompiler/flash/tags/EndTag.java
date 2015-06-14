@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 
@@ -60,10 +61,9 @@ public class EndTag extends Tag {
     /**
      * Gets data bytes
      *
-     * @return Bytes of data
+     * @param sos SWF output stream
      */
     @Override
-    public byte[] getData() {
-        return new byte[0];
+    public void getData(SWFOutputStream sos) {
     }
 }

@@ -43,9 +43,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -95,42 +93,35 @@ public abstract class StaticTextTag extends TextTag {
     /**
      * Gets data bytes
      *
-     * @return Bytes of data
+     * @param sos SWF output stream
+     * @throws java.io.IOException
      */
     @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, getVersion());
-        try {
-            sos.writeUI16(characterID);
-            sos.writeRECT(textBounds);
-            sos.writeMatrix(textMatrix);
+    public void getData(SWFOutputStream sos) throws IOException {
+        sos.writeUI16(characterID);
+        sos.writeRECT(textBounds);
+        sos.writeMatrix(textMatrix);
 
-            int glyphBits = 0;
-            int advanceBits = 0;
-            for (TEXTRECORD tr : textRecords) {
-                for (GLYPHENTRY ge : tr.glyphEntries) {
-                    glyphBits = SWFOutputStream.enlargeBitCountU(glyphBits, ge.glyphIndex);
-                    advanceBits = SWFOutputStream.enlargeBitCountS(advanceBits, ge.glyphAdvance);
-                }
+        int glyphBits = 0;
+        int advanceBits = 0;
+        for (TEXTRECORD tr : textRecords) {
+            for (GLYPHENTRY ge : tr.glyphEntries) {
+                glyphBits = SWFOutputStream.enlargeBitCountU(glyphBits, ge.glyphIndex);
+                advanceBits = SWFOutputStream.enlargeBitCountS(advanceBits, ge.glyphAdvance);
             }
-
-            if (Configuration.debugCopy.get()) {
-                glyphBits = Math.max(glyphBits, this.glyphBits);
-                advanceBits = Math.max(advanceBits, this.advanceBits);
-            }
-
-            sos.writeUI8(glyphBits);
-            sos.writeUI8(advanceBits);
-            for (TEXTRECORD tr : textRecords) {
-                sos.writeTEXTRECORD(tr, getTextNum(), glyphBits, advanceBits);
-            }
-            sos.writeUI8(0);
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
         }
-        return baos.toByteArray();
+
+        if (Configuration.debugCopy.get()) {
+            glyphBits = Math.max(glyphBits, this.glyphBits);
+            advanceBits = Math.max(advanceBits, this.advanceBits);
+        }
+
+        sos.writeUI8(glyphBits);
+        sos.writeUI8(advanceBits);
+        for (TEXTRECORD tr : textRecords) {
+            sos.writeTEXTRECORD(tr, getTextNum(), glyphBits, advanceBits);
+        }
+        sos.writeUI8(0);
     }
 
     @Override

@@ -20,9 +20,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.helpers.ByteArrayRange;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,34 +62,27 @@ public class ExporterInfo extends Tag {
     /**
      * Gets data bytes
      *
-     * @return Bytes of data
+     * @param sos SWF output stream
+     * @throws java.io.IOException
      */
     @Override
-    public byte[] getData() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream os = baos;
-        SWFOutputStream sos = new SWFOutputStream(os, version);
-        try {
-            sos.writeUI16(this.version);
-            if (this.version >= 0x10a) {
-                sos.writeUI32(flags);
-            }
-            sos.writeUI16(bitmapFormat);
-            sos.writeUI8(prefix.length);
-            sos.write(prefix);
-            byte[] swfNameBytes = swfName.getBytes();
-            sos.writeUI8(swfNameBytes.length);
-            sos.write(swfNameBytes);
-            if (codeOffsets != null) {
-                sos.writeUI16(codeOffsets.size());
-                for (long l : codeOffsets) {
-                    sos.writeUI32(l);
-                }
-            }
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
+    public void getData(SWFOutputStream sos) throws IOException {
+        sos.writeUI16(this.version);
+        if (this.version >= 0x10a) {
+            sos.writeUI32(flags);
         }
-        return baos.toByteArray();
+        sos.writeUI16(bitmapFormat);
+        sos.writeUI8(prefix.length);
+        sos.write(prefix);
+        byte[] swfNameBytes = swfName.getBytes();
+        sos.writeUI8(swfNameBytes.length);
+        sos.write(swfNameBytes);
+        if (codeOffsets != null) {
+            sos.writeUI16(codeOffsets.size());
+            for (long l : codeOffsets) {
+                sos.writeUI32(l);
+            }
+        }
     }
 
     /**
