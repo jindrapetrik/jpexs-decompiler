@@ -242,7 +242,7 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
 
     public void load(SWF swf) {
         this.swf = swf;
-        signatureLabel.setText(swf.getHeaderBytes());
+        signatureLabel.setText(new String(swf.getHeaderBytes()));
         switch (swf.compression) {
             case LZMA:
                 compressionLabel.setText(AppStrings.translate("header.compression.lzma"));

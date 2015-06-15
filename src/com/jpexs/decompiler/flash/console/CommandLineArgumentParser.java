@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFBundle;
+import com.jpexs.decompiler.flash.SWFCompression;
 import com.jpexs.decompiler.flash.SWFSourceInfo;
 import com.jpexs.decompiler.flash.SearchMode;
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -265,8 +266,8 @@ public class CommandLineArgumentParser {
         out.println("  ...dumps list of AS1/2 sctipts to console");
         out.println(" " + (cnt++) + ") -dumpAS3 <infile>");
         out.println("  ...dumps list of AS3 sctipts to console");
-        out.println(" " + (cnt++) + ") -compress <infile> <outfile>");
-        out.println("  ...Compress SWF <infile> and save it to <outfile>");
+        out.println(" " + (cnt++) + ") -compress <infile> <outfile> [(zlib|lzma)]");
+        out.println("  ...Compress SWF <infile> and save it to <outfile>. If <infile> is already compressed, it will be re-compressed. Default compression method is ZLIB");
         out.println(" " + (cnt++) + ") -decompress <infile> <outfile>");
         out.println("  ...Decompress <infile> and save it to <outfile>");
         out.println(" " + (cnt++) + ") -swf2xml <infile> <outfile>");
@@ -1226,7 +1227,24 @@ public class CommandLineArgumentParser {
         try {
             try (InputStream fis = new BufferedInputStream(new FileInputStream(args.pop()));
                     OutputStream fos = new BufferedOutputStream(new FileOutputStream(args.pop()))) {
-                if (SWF.fws2cws(fis, fos)) {
+                SWFCompression compression = SWFCompression.ZLIB;
+                String compressionString = !args.isEmpty() ? args.pop() : null;
+                if (compressionString != null) {
+                    switch (compressionString.toLowerCase()) {
+                        case "zlib":
+                            compression = SWFCompression.ZLIB;
+                            break;
+                        case "lzma":
+                            compression = SWFCompression.LZMA;
+                            break;
+                        default:
+                            System.out.println("Unsupported compression method: " + compressionString);
+                            System.exit(0);
+                            break;
+                    }
+                }
+
+                if (SWF.compress(fis, fos, compression)) {
                     System.out.println("OK");
                 } else {
                     System.err.println("FAIL");

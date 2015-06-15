@@ -633,53 +633,53 @@ public final class SWF implements SWFContainerItem, Timelined {
      * @throws IOException
      */
     public void saveTo(OutputStream os) throws IOException {
-        saveTo(os, compression);
+        byte[] uncompressedData = saveToByteArray();
+        compress(new ByteArrayInputStream(uncompressedData), os, compression, lzmaProperties);
     }
 
-    public String getHeaderBytes() {
+    public byte[] getHeaderBytes() {
         return getHeaderBytes(compression, gfx);
     }
 
-    private String getHeaderBytes(SWFCompression compression, boolean gfx) {
+    private static byte[] getHeaderBytes(SWFCompression compression, boolean gfx) {
         if (compression == SWFCompression.LZMA_ABC) {
-            return "ABC";
+            return new byte[]{'A', 'B', 'C'};
         }
 
-        String ret = "";
+        byte[] ret = new byte[3];
+
         if (compression == SWFCompression.LZMA) {
-            ret += 'Z';
+            ret[0] = 'Z';
         } else if (compression == SWFCompression.ZLIB) {
-            ret += 'C';
+            ret[0] = 'C';
         } else {
             if (gfx) {
-                ret += 'G';
+                ret[0] = 'G';
             } else {
-                ret += 'F';
+                ret[0] = 'F';
             }
         }
+
         if (gfx) {
-            ret += 'F';
-            ret += 'X';
+            ret[1] = 'F';
+            ret[2] = 'X';
         } else {
-            ret += 'W';
-            ret += 'S';
+            ret[1] = 'W';
+            ret[2] = 'S';
         }
+
         return ret;
     }
 
-    /**
-     * Saves this SWF into new file
-     *
-     * @param os OutputStream to save SWF in
-     * @param compression
-     * @throws IOException
-     */
-    public void saveTo(OutputStream os, SWFCompression compression) throws IOException {
-        try {
-            fixCharactersOrder(false);
+    private byte[] saveToByteArray() throws IOException {
+        fixCharactersOrder(false);
 
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            SWFOutputStream sos = new SWFOutputStream(baos, version);
+        byte[] data;
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                SWFOutputStream sos = new SWFOutputStream(baos, version)) {
+            sos.write(getHeaderBytes(SWFCompression.NONE, gfx));
+            sos.writeUI8(version);
+            sos.writeUI32(0); // placeholder for file length
             sos.writeRECT(displayRect);
             sos.writeUI8(0);
             sos.writeUI8(frameRate);
@@ -690,16 +690,68 @@ public final class SWF implements SWFContainerItem, Timelined {
                 sos.writeUI16(0);
             }
 
-            sos.close();
-            os.write(Utf8Helper.getBytes(getHeaderBytes(compression, gfx)));
-            os.write(version);
-            byte[] data = baos.toByteArray();
-            sos = new SWFOutputStream(os, version);
-            sos.writeUI32(data.length + 8);
+            data = baos.toByteArray();
+        }
+
+        // update file size
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                SWFOutputStream sos = new SWFOutputStream(baos, version)) {
+            sos.writeUI32(data.length);
+            byte[] lengthData = baos.toByteArray();
+            System.arraycopy(lengthData, 0, data, 4, lengthData.length);
+        }
+
+        return data;
+    }
+
+    /**
+     * Compress SWF file
+     *
+     * @param is InputStream
+     * @param os OutputStream to save SWF in
+     * @param compression
+     * @param lzmaProperties
+     * @throws IOException
+     */
+    public static void compress(InputStream is, OutputStream os, SWFCompression compression, byte[] lzmaProperties) throws IOException {
+        try {
+            byte[] hdr = new byte[8];
+
+            // SWFheader: signature, version and fileSize
+            if (is.read(hdr) != 8) {
+                throw new SwfOpenException("SWF header is too short");
+            }
+
+            boolean uncompressed = hdr[0] == 'F' || hdr[0] == 'G'; // FWS or GFX
+            if (!uncompressed) {
+                // fisrt decompress, then compress to the given format
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                decompress(is, baos, false);
+                ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+                compress(bais, os, compression, lzmaProperties);
+                return;
+            }
+
+            boolean gfx = hdr[1] == 'F' && hdr[2] == 'X';
+            int version = hdr[3];
+            long fileSize;
+            try (SWFInputStream sis = new SWFInputStream(null, Arrays.copyOfRange(hdr, 4, 8), 4, 4)) {
+                fileSize = sis.readUI32("fileSize");
+            }
+
+            SWFOutputStream sos = new SWFOutputStream(os, version);
+            sos.write(getHeaderBytes(compression, gfx));
+            sos.writeUI8(version);
+            sos.writeUI32(fileSize);
 
             if (compression == SWFCompression.LZMA || compression == SWFCompression.LZMA_ABC) {
-                long uncompressedLength = data.length;
+                long uncompressedLength = fileSize - 8;
                 Encoder enc = new Encoder();
+                if (lzmaProperties == null) {
+                    // todo: the bytes are from a sample swf
+                    lzmaProperties = new byte[]{93, 0, 0, 32, 0};
+                }
+
                 int val = lzmaProperties[0] & 0xFF;
                 int lc = val % 9;
                 int remainder = val / 9;
@@ -714,10 +766,10 @@ public final class SWF implements SWFContainerItem, Timelined {
                 }
                 enc.SetDictionarySize(dictionarySize);
                 enc.SetLcLpPb(lc, lp, pb);
-                baos = new ByteArrayOutputStream();
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 enc.SetEndMarkerMode(true);
-                enc.Code(new ByteArrayInputStream(data), baos, -1, -1, null);
-                data = baos.toByteArray();
+                enc.Code(is, baos, -1, -1, null);
+                byte[] data = baos.toByteArray();
                 if (compression == SWFCompression.LZMA) {
                     byte[] udata = new byte[4];
                     udata[0] = (byte) (data.length & 0xFF);
@@ -739,11 +791,13 @@ public final class SWF implements SWFContainerItem, Timelined {
                     udata[7] = (byte) ((uncompressedLength >> 56) & 0xFF);
                     os.write(udata);
                 }
+                os.write(data);
             } else if (compression == SWFCompression.ZLIB) {
                 os = new DeflaterOutputStream(os);
+                Helper.copyStream(is, os, Long.MAX_VALUE);
+            } else {
+                Helper.copyStream(is, os, Long.MAX_VALUE);
             }
-
-            os.write(data);
         } finally {
             if (os != null) {
                 os.close();
@@ -768,11 +822,8 @@ public final class SWF implements SWFContainerItem, Timelined {
             }
         }
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-            saveTo(baos, SWFCompression.NONE);
-            byte[] swfData = baos.toByteArray();
-            uncompressedData = swfData;
+            uncompressedData = saveToByteArray();
         } catch (IOException ex) {
             logger.log(Level.SEVERE, "Cannot save SWF", ex);
         }
@@ -1059,25 +1110,9 @@ public final class SWF implements SWFContainerItem, Timelined {
      * @param fos Output stream
      * @return True on success
      */
-    public static boolean fws2cws(InputStream fis, OutputStream fos) {
+    public static boolean compress(InputStream fis, OutputStream fos, SWFCompression compression) {
         try {
-            byte[] swfHead = new byte[8];
-            fis.read(swfHead);
-
-            if (swfHead[0] != 'F') {
-                fis.close();
-                return false;
-            }
-            swfHead[0] = 'C';
-            fos.write(swfHead);
-            fos = new DeflaterOutputStream(fos);
-            int i;
-            while ((i = fis.read()) != -1) {
-                fos.write(i);
-            }
-
-            fis.close();
-            fos.close();
+            compress(fis, fos, compression, null);
         } catch (IOException ex) {
             return false;
         }
@@ -1124,18 +1159,18 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
 
         int version = hdr[3];
-        SWFInputStream sis = new SWFInputStream(null, Arrays.copyOfRange(hdr, 4, 8), 4, 4);
-        long fileSize = sis.readUI32("fileSize");
+        long fileSize;
+        try (SWFInputStream sis = new SWFInputStream(null, Arrays.copyOfRange(hdr, 4, 8), 4, 4)) {
+            fileSize = sis.readUI32("fileSize");
+        }
+
         SWFHeader header = new SWFHeader();
         header.version = version;
         header.fileSize = fileSize;
-
-        if (hdr[1] == 'F' && hdr[2] == 'X') {
-            header.gfx = true;
-        }
+        header.gfx = hdr[1] == 'F' && hdr[2] == 'X';
 
         try (SWFOutputStream sos = new SWFOutputStream(os, version)) {
-            sos.write(Utf8Helper.getBytes(header.gfx ? "GFX" : "FWS"));
+            sos.write(getHeaderBytes(SWFCompression.NONE, header.gfx));
             sos.writeUI8(version);
             sos.writeUI32(fileSize);
 
@@ -1148,19 +1183,21 @@ public final class SWF implements SWFContainerItem, Timelined {
                 case 'Z': { // ZWS
                     byte[] lzmaprop = new byte[9];
                     is.read(lzmaprop);
-                    sis = new SWFInputStream(null, lzmaprop);
-                    sis.readUI32("LZMAsize"); // compressed LZMA data size = compressed SWF - 17 byte,
-                    // where 17 = 8 byte header + this 4 byte + 5 bytes decoder properties
-                    int propertiesSize = 5;
-                    byte[] lzmaProperties = sis.readBytes(propertiesSize, "lzmaproperties");
-                    if (lzmaProperties.length != propertiesSize) {
-                        throw new IOException("LZMA:input .lzma file is too short");
+                    try (SWFInputStream sis = new SWFInputStream(null, lzmaprop)) {
+                        sis.readUI32("LZMAsize"); // compressed LZMA data size = compressed SWF - 17 byte,
+                        // where 17 = 8 byte header + this 4 byte + 5 bytes decoder properties
+
+                        int propertiesSize = 5;
+                        byte[] lzmaProperties = sis.readBytes(propertiesSize, "lzmaproperties");
+                        if (lzmaProperties.length != propertiesSize) {
+                            throw new IOException("LZMA:input .lzma file is too short");
+                        }
+
+                        decodeLZMAStream(is, os, lzmaProperties, fileSize);
+
+                        header.compression = SWFCompression.LZMA;
+                        header.lzmaProperties = lzmaProperties;
                     }
-
-                    decodeLZMAStream(is, os, lzmaProperties, fileSize);
-
-                    header.compression = SWFCompression.LZMA;
-                    header.lzmaProperties = lzmaProperties;
                     break;
                 }
                 case 'A': { // ABC
