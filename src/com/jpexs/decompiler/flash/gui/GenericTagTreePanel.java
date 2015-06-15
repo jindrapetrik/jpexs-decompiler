@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.gui.generictageditors.GenericTagEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.NumberEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.StringEditor;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.types.ARGB;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.RGB;
@@ -36,6 +37,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.Table;
 import com.jpexs.decompiler.flash.types.annotations.parser.AnnotationParseException;
 import com.jpexs.decompiler.flash.types.annotations.parser.ConditionEvaluator;
+import com.jpexs.helpers.ConcreteClasses;
 import com.jpexs.helpers.ReflectionTools;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -62,6 +64,7 @@ import java.util.logging.Logger;
 import javax.swing.AbstractCellEditor;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -271,7 +274,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                                 if (swfArray != null) {
                                     itemStr = swfArray.value();
                                 }
-                                if (!fnode.fieldSet.itemName.isEmpty()) {
+                                if (fnode.fieldSet.itemName != null && !fnode.fieldSet.itemName.isEmpty()) {
                                     itemStr = fnode.fieldSet.itemName;
                                 }
                                 if (itemStr.isEmpty()) {
@@ -285,70 +288,116 @@ public class GenericTagTreePanel extends GenericTagPanel {
                                     }
                                     JPopupMenu p = new JPopupMenu();
                                     JMenuItem mi;
-                                    mi = new JMenuItem(AppStrings.translate("generictag.array.insertbeginning").replace("%item%", itemStr));
-                                    mi.addActionListener(new ActionListener() {
-
-                                        @Override
-                                        public void actionPerformed(ActionEvent e) {
-                                            addItem(fnode.obj, fnode.fieldSet.get(FIELD_INDEX), 0);
-                                        }
-                                    });
-                                    if (!canAdd) {
-                                        mi.setEnabled(false);
-                                    }
-                                    p.add(mi);
-
-                                    if (fnode.index > -1) {
-                                        mi = new JMenuItem(AppStrings.translate("generictag.array.insertbefore").replace("%item%", itemStr));
-                                        mi.addActionListener(new ActionListener() {
-
-                                            @Override
-                                            public void actionPerformed(ActionEvent e) {
-                                                addItem(fnode.obj, fnode.fieldSet.get(FIELD_INDEX), fnode.index);
-                                            }
-                                        });
-                                        if (!canAdd) {
-                                            mi.setEnabled(false);
-                                        }
-                                        p.add(mi);
-
+                                    Class<?> subtype = ReflectionTools.getFieldSubType(fnode.obj, fnode.fieldSet.get(FIELD_INDEX));
+                                    if (!canAdd && subtype.isAnnotationPresent(ConcreteClasses.class)) {
+                                        Class<?>[] availableClasses = subtype.getAnnotation(ConcreteClasses.class).value();
+                                        JMenu mBegin = new JMenu(AppStrings.translate("generictag.array.insertbeginning").replace("%item%", itemStr));
+                                        p.add(mBegin);
+                                        JMenu mBefore = new JMenu(AppStrings.translate("generictag.array.insertbefore").replace("%item%", itemStr));
+                                        p.add(mBefore);
                                         mi = new JMenuItem(AppStrings.translate("generictag.array.remove").replace("%item%", itemStr));
-                                        mi.addActionListener(new ActionListener() {
-
-                                            @Override
-                                            public void actionPerformed(ActionEvent e) {
-                                                removeItem(fnode.obj, fnode.fieldSet.get(FIELD_INDEX), fnode.index);
-                                            }
+                                        mi.addActionListener((ActionEvent e1) -> {
+                                            removeItem(fnode.obj, fnode.fieldSet.get(FIELD_INDEX), fnode.index);
                                         });
                                         p.add(mi);
+                                        JMenu mAfter = new JMenu(AppStrings.translate("generictag.array.insertafter").replace("%item%", itemStr));
+                                        p.add(mAfter);
 
-                                        mi = new JMenuItem(AppStrings.translate("generictag.array.insertafter").replace("%item%", itemStr));
+                                        JMenu mEnd = new JMenu(AppStrings.translate("generictag.array.insertend").replace("%item%", itemStr));
+                                        p.add(mEnd);
+
+                                        for (Class<?> c : availableClasses) {
+                                            mi = new JMenuItem(c.getSimpleName());
+                                            mi.addActionListener((ActionEvent e1) -> {
+                                                addItem(fnode.obj, fnode.fieldSet.get(FIELD_INDEX), 0, c);
+                                            });
+                                            mBegin.add(mi);
+
+                                            mi = new JMenuItem(c.getSimpleName());
+                                            mi.addActionListener((ActionEvent e1) -> {
+                                                addItem(fnode.obj, fnode.fieldSet.get(FIELD_INDEX), fnode.index, c);
+                                            });
+                                            mBefore.add(mi);
+
+                                            mi = new JMenuItem(c.getSimpleName());
+                                            mi.addActionListener((ActionEvent e1) -> {
+                                                addItem(fnode.obj, fnode.fieldSet.get(FIELD_INDEX), fnode.index + 1, c);
+                                            });
+                                            mAfter.add(mi);
+
+                                            mi = new JMenuItem(c.getSimpleName());
+                                            mi.addActionListener((ActionEvent e1) -> {
+                                                addItem(fnode.obj, fnode.fieldSet.get(FIELD_INDEX), ReflectionTools.getFieldSubSize(fnode.obj, fnode.fieldSet.get(FIELD_INDEX)), c);
+                                            });
+                                            mEnd.add(mi);
+                                        }
+                                    } else {
+
+                                        mi = new JMenuItem(AppStrings.translate("generictag.array.insertbeginning").replace("%item%", itemStr));
                                         mi.addActionListener(new ActionListener() {
 
                                             @Override
                                             public void actionPerformed(ActionEvent e) {
-                                                addItem(fnode.obj, fnode.fieldSet.get(FIELD_INDEX), fnode.index + 1);
+                                                addItem(fnode.obj, fnode.fieldSet.get(FIELD_INDEX), 0, null);
                                             }
                                         });
                                         if (!canAdd) {
                                             mi.setEnabled(false);
                                         }
                                         p.add(mi);
-                                    }
 
-                                    mi = new JMenuItem(AppStrings.translate("generictag.array.insertend").replace("%item%", itemStr));
-                                    mi.addActionListener(new ActionListener() {
+                                        if (fnode.index > -1) {
+                                            mi = new JMenuItem(AppStrings.translate("generictag.array.insertbefore").replace("%item%", itemStr));
+                                            mi.addActionListener(new ActionListener() {
 
-                                        @Override
-                                        public void actionPerformed(ActionEvent e) {
-                                            addItem(fnode.obj, fnode.fieldSet.get(FIELD_INDEX), ReflectionTools.getFieldSubSize(fnode.obj, fnode.fieldSet.get(FIELD_INDEX)));
+                                                @Override
+                                                public void actionPerformed(ActionEvent e) {
+                                                    addItem(fnode.obj, fnode.fieldSet.get(FIELD_INDEX), fnode.index, null);
+                                                }
+                                            });
+                                            if (!canAdd) {
+                                                mi.setEnabled(false);
+                                            }
+                                            p.add(mi);
+
+                                            mi = new JMenuItem(AppStrings.translate("generictag.array.remove").replace("%item%", itemStr));
+                                            mi.addActionListener(new ActionListener() {
+
+                                                @Override
+                                                public void actionPerformed(ActionEvent e) {
+                                                    removeItem(fnode.obj, fnode.fieldSet.get(FIELD_INDEX), fnode.index);
+                                                }
+                                            });
+                                            p.add(mi);
+
+                                            mi = new JMenuItem(AppStrings.translate("generictag.array.insertafter").replace("%item%", itemStr));
+                                            mi.addActionListener(new ActionListener() {
+
+                                                @Override
+                                                public void actionPerformed(ActionEvent e) {
+                                                    addItem(fnode.obj, fnode.fieldSet.get(FIELD_INDEX), fnode.index + 1, null);
+                                                }
+                                            });
+                                            if (!canAdd) {
+                                                mi.setEnabled(false);
+                                            }
+                                            p.add(mi);
                                         }
-                                    });
-                                    if (!canAdd) {
-                                        mi.setEnabled(false);
+
+                                        mi = new JMenuItem(AppStrings.translate("generictag.array.insertend").replace("%item%", itemStr));
+                                        mi.addActionListener(new ActionListener() {
+
+                                            @Override
+                                            public void actionPerformed(ActionEvent e) {
+                                                addItem(fnode.obj, fnode.fieldSet.get(FIELD_INDEX), ReflectionTools.getFieldSubSize(fnode.obj, fnode.fieldSet.get(FIELD_INDEX)), null);
+                                            }
+                                        });
+                                        if (!canAdd) {
+                                            mi.setEnabled(false);
+                                        }
+                                        p.add(mi);
+                                        //}                                        
                                     }
-                                    p.add(mi);
-                                    //}
                                     p.show(tree, e.getX(), e.getY());
                                 }
                             }
@@ -498,7 +547,21 @@ public class GenericTagTreePanel extends GenericTagPanel {
             if (swfArray != null) {
                 name = swfArray.value();
             }
-            return (index > -1 ? name + "[" + index + "]" : fieldSet.get(fieldIndex).getName());
+
+            Object val = null;
+            try {
+                if (index > -1) {
+                    val = ReflectionTools.getValue(obj, fieldSet.get(fieldIndex), index);
+                }
+            } catch (IllegalArgumentException | IllegalAccessException ex) {
+                //ignore
+            }
+            String typeAdd = "";
+            if (val != null) {
+                typeAdd = " : " + val.getClass().getSimpleName();
+            }
+
+            return (index > -1 ? name + "[" + index + "]" + typeAdd : fieldSet.get(fieldIndex).getName());
         }
 
         public Object getValue(int fieldIndex) {
@@ -953,7 +1016,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
         return ret;
     }
 
-    private void addItem(Object obj, Field field, int index) {
+    private void addItem(Object obj, Field field, int index, Class<?> cls) {
         SWFArray swfArray = field.getAnnotation(SWFArray.class);
         if (swfArray != null && !swfArray.countField().isEmpty()) { //Fields with same countField must be enlarged too
             Field fields[] = obj.getClass().getDeclaredFields();
@@ -962,7 +1025,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 SWFArray fieldSwfArray = fields[f].getAnnotation(SWFArray.class);
                 if (fieldSwfArray != null && fieldSwfArray.countField().equals(swfArray.countField())) {
                     sameFlds.add(f);
-                    if (!ReflectionTools.canAddToField(obj, fields[f])) {
+                    if (cls == null && !ReflectionTools.canAddToField(obj, fields[f])) {
                         JOptionPane.showMessageDialog(this, "This field is abstract, cannot be instantiated, sorry."); //TODO!!!
                         return;
                     }
@@ -970,7 +1033,16 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 }
             }
             for (int f : sameFlds) {
-                ReflectionTools.addToField(obj, fields[f], index, true);
+                ReflectionTools.addToField(obj, fields[f], index, true, cls);
+                try {
+                    Object v = ReflectionTools.getValue(obj, fields[f], index);
+                    if (v instanceof ASMSource) {
+                        ASMSource asv = (ASMSource) v;
+                        asv.setSourceTag(editedTag);
+                    }
+                } catch (IllegalArgumentException | IllegalAccessException ex) {
+                    //ignore
+                }
             }
             try {
                 //If countField exists, increment, otherwise do nothing
@@ -982,11 +1054,20 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 //ignored
             }
         } else {
-            if (!ReflectionTools.canAddToField(obj, field)) {
+            if (cls == null && !ReflectionTools.canAddToField(obj, field)) {
                 JOptionPane.showMessageDialog(this, "This field is abstract, cannot be instantiated, sorry."); //TODO!!!
                 return;
             }
-            ReflectionTools.addToField(obj, field, index, true);
+            ReflectionTools.addToField(obj, field, index, true, cls);
+            try {
+                Object v = ReflectionTools.getValue(obj, field, index);
+                if (v instanceof ASMSource) {
+                    ASMSource asv = (ASMSource) v;
+                    asv.setSourceTag(editedTag);
+                }
+            } catch (IllegalArgumentException | IllegalAccessException ex) {
+                //ignore
+            }
         }
         refreshTree();
     }

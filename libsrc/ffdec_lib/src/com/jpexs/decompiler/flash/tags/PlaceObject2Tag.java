@@ -137,7 +137,6 @@ public class PlaceObject2Tag extends PlaceObjectTypeTag implements ASMSourceCont
      * @since SWF 5 If PlaceFlagHasClipActions, Clip Actions Data
      */
     @Conditional("placeFlagHasClipActions")
-    @HideInRawEdit //TODO: make editable
     public CLIPACTIONS clipActions;
 
     /**

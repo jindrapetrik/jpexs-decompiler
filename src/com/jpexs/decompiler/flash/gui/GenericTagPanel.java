@@ -335,7 +335,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
             for (int f = 0; f < fields.length; f++) {
                 SWFType fieldSwfType = fields[f].getAnnotation(SWFType.class);
                 if (fieldSwfType != null && fieldSwfType.countField().equals(swfType.countField())) {
-                    ReflectionTools.addToField(obj, fields[f], ReflectionTools.getFieldSubSize(obj, fields[f]), true);
+                    ReflectionTools.addToField(obj, fields[f], ReflectionTools.getFieldSubSize(obj, fields[f]), true, null);
                 }
             }
             try {
@@ -348,7 +348,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
                 //ignored
             }
         } else {
-            ReflectionTools.addToField(obj, field, ReflectionTools.getFieldSubSize(obj, field), true);
+            ReflectionTools.addToField(obj, field, ReflectionTools.getFieldSubSize(obj, field), true, null);
         }
         generateEditControls(editedTag, false);
 
