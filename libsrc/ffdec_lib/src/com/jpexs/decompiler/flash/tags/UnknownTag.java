@@ -27,6 +27,8 @@ import java.io.IOException;
  */
 public class UnknownTag extends Tag {
 
+    private ByteArrayRange unknownData;
+
     public UnknownTag(SWFInputStream sis, int id, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), id, "Unknown", data);
         readData(sis, data, 0, false, false, false);
@@ -34,6 +36,7 @@ public class UnknownTag extends Tag {
 
     @Override
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
+        unknownData = new ByteArrayRange(data.getArray(), (int) sis.getPos(), sis.available());
         sis.skipBytes(sis.available());
     }
 
@@ -45,7 +48,7 @@ public class UnknownTag extends Tag {
      */
     @Override
     public void getData(SWFOutputStream sos) throws IOException {
-        sos.write(getOriginalRange().getRangeData());
+        sos.write(unknownData);
     }
 
     @Override

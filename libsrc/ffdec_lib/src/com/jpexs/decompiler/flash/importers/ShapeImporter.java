@@ -19,7 +19,9 @@ package com.jpexs.decompiler.flash.importers;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
+import com.jpexs.decompiler.flash.tags.DefineBitsLossless2Tag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
@@ -43,18 +45,26 @@ public class ShapeImporter {
             newData = baos.toByteArray();
         }
 
-        DefineBitsJPEG2Tag jpeg2Tag = new DefineBitsJPEG2Tag(swf, null, swf.getNextCharacterId(), newData);
-        jpeg2Tag.setModified(true);
+        ImageTag imageTag;
+        if (ImageTag.getImageFormat(newData) == ImageFormat.JPEG) {
+            DefineBitsJPEG2Tag jpeg2Tag = new DefineBitsJPEG2Tag(swf, null, swf.getNextCharacterId(), newData);
+            imageTag = jpeg2Tag;
+        } else {
+            DefineBitsLossless2Tag lossless2Tag = new DefineBitsLossless2Tag(swf);
+            lossless2Tag.setImage(newData);
+            imageTag = lossless2Tag;
+        }
+
         int idx = swf.tags.indexOf(st);
         if (idx != -1) {
-            swf.tags.add(idx, jpeg2Tag);
+            swf.tags.add(idx, imageTag);
         } else {
-            swf.tags.add(jpeg2Tag);
+            swf.tags.add(imageTag);
         }
 
         swf.updateCharacters();
         st.setModified(true);
-        SHAPEWITHSTYLE shapes = jpeg2Tag.getShape(st.getRect(), true);
+        SHAPEWITHSTYLE shapes = imageTag.getShape(st.getRect(), true);
 
         st.shapes = shapes;
         return (Tag) st;
