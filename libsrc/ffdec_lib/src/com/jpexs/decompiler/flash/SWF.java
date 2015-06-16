@@ -713,95 +713,92 @@ public final class SWF implements SWFContainerItem, Timelined {
      * @param lzmaProperties
      * @throws IOException
      */
-    public static void compress(InputStream is, OutputStream os, SWFCompression compression, byte[] lzmaProperties) throws IOException {
-        try {
-            byte[] hdr = new byte[8];
+    private static void compress(InputStream is, OutputStream os, SWFCompression compression, byte[] lzmaProperties) throws IOException {
+        byte[] hdr = new byte[8];
 
-            // SWFheader: signature, version and fileSize
-            if (is.read(hdr) != 8) {
-                throw new SwfOpenException("SWF header is too short");
+        is.mark(8);
+
+        // SWFheader: signature, version and fileSize
+        if (is.read(hdr) != 8) {
+            throw new SwfOpenException("SWF header is too short");
+        }
+
+        boolean uncompressed = hdr[0] == 'F' || hdr[0] == 'G'; // FWS or GFX
+        if (!uncompressed) {
+            // fisrt decompress, then compress to the given format
+            is.reset();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            decompress(is, baos, false);
+            ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+            compress(bais, os, compression, lzmaProperties);
+            return;
+        }
+
+        boolean gfx = hdr[1] == 'F' && hdr[2] == 'X';
+        int version = hdr[3];
+        long fileSize;
+        try (SWFInputStream sis = new SWFInputStream(null, Arrays.copyOfRange(hdr, 4, 8), 4, 4)) {
+            fileSize = sis.readUI32("fileSize");
+        }
+
+        SWFOutputStream sos = new SWFOutputStream(os, version);
+        sos.write(getHeaderBytes(compression, gfx));
+        sos.writeUI8(version);
+        sos.writeUI32(fileSize);
+
+        if (compression == SWFCompression.LZMA || compression == SWFCompression.LZMA_ABC) {
+            long uncompressedLength = fileSize - 8;
+            Encoder enc = new Encoder();
+            if (lzmaProperties == null) {
+                // todo: the bytes are from a sample swf
+                lzmaProperties = new byte[]{93, 0, 0, 32, 0};
             }
 
-            boolean uncompressed = hdr[0] == 'F' || hdr[0] == 'G'; // FWS or GFX
-            if (!uncompressed) {
-                // fisrt decompress, then compress to the given format
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                decompress(is, baos, false);
-                ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-                compress(bais, os, compression, lzmaProperties);
-                return;
+            int val = lzmaProperties[0] & 0xFF;
+            int lc = val % 9;
+            int remainder = val / 9;
+            int lp = remainder % 5;
+            int pb = remainder / 5;
+            int dictionarySize = 0;
+            for (int i = 0; i < 4; i++) {
+                dictionarySize += ((int) (lzmaProperties[1 + i]) & 0xFF) << (i * 8);
             }
-
-            boolean gfx = hdr[1] == 'F' && hdr[2] == 'X';
-            int version = hdr[3];
-            long fileSize;
-            try (SWFInputStream sis = new SWFInputStream(null, Arrays.copyOfRange(hdr, 4, 8), 4, 4)) {
-                fileSize = sis.readUI32("fileSize");
+            if (Configuration.lzmaFastBytes.get() > 0) {
+                enc.SetNumFastBytes(Configuration.lzmaFastBytes.get());
             }
-
-            SWFOutputStream sos = new SWFOutputStream(os, version);
-            sos.write(getHeaderBytes(compression, gfx));
-            sos.writeUI8(version);
-            sos.writeUI32(fileSize);
-
-            if (compression == SWFCompression.LZMA || compression == SWFCompression.LZMA_ABC) {
-                long uncompressedLength = fileSize - 8;
-                Encoder enc = new Encoder();
-                if (lzmaProperties == null) {
-                    // todo: the bytes are from a sample swf
-                    lzmaProperties = new byte[]{93, 0, 0, 32, 0};
-                }
-
-                int val = lzmaProperties[0] & 0xFF;
-                int lc = val % 9;
-                int remainder = val / 9;
-                int lp = remainder % 5;
-                int pb = remainder / 5;
-                int dictionarySize = 0;
-                for (int i = 0; i < 4; i++) {
-                    dictionarySize += ((int) (lzmaProperties[1 + i]) & 0xFF) << (i * 8);
-                }
-                if (Configuration.lzmaFastBytes.get() > 0) {
-                    enc.SetNumFastBytes(Configuration.lzmaFastBytes.get());
-                }
-                enc.SetDictionarySize(dictionarySize);
-                enc.SetLcLpPb(lc, lp, pb);
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                enc.SetEndMarkerMode(true);
-                enc.Code(is, baos, -1, -1, null);
-                byte[] data = baos.toByteArray();
-                if (compression == SWFCompression.LZMA) {
-                    byte[] udata = new byte[4];
-                    udata[0] = (byte) (data.length & 0xFF);
-                    udata[1] = (byte) ((data.length >> 8) & 0xFF);
-                    udata[2] = (byte) ((data.length >> 16) & 0xFF);
-                    udata[3] = (byte) ((data.length >> 24) & 0xFF);
-                    os.write(udata);
-                }
-                enc.WriteCoderProperties(os);
-                if (compression == SWFCompression.LZMA_ABC) {
-                    byte[] udata = new byte[8];
-                    udata[0] = (byte) (uncompressedLength & 0xFF);
-                    udata[1] = (byte) ((uncompressedLength >> 8) & 0xFF);
-                    udata[2] = (byte) ((uncompressedLength >> 16) & 0xFF);
-                    udata[3] = (byte) ((uncompressedLength >> 24) & 0xFF);
-                    udata[4] = (byte) ((uncompressedLength >> 32) & 0xFF);
-                    udata[5] = (byte) ((uncompressedLength >> 40) & 0xFF);
-                    udata[6] = (byte) ((uncompressedLength >> 48) & 0xFF);
-                    udata[7] = (byte) ((uncompressedLength >> 56) & 0xFF);
-                    os.write(udata);
-                }
-                os.write(data);
-            } else if (compression == SWFCompression.ZLIB) {
-                os = new DeflaterOutputStream(os);
-                Helper.copyStream(is, os, Long.MAX_VALUE);
-            } else {
-                Helper.copyStream(is, os, Long.MAX_VALUE);
+            enc.SetDictionarySize(dictionarySize);
+            enc.SetLcLpPb(lc, lp, pb);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            enc.SetEndMarkerMode(true);
+            enc.Code(is, baos, -1, -1, null);
+            byte[] data = baos.toByteArray();
+            if (compression == SWFCompression.LZMA) {
+                byte[] udata = new byte[4];
+                udata[0] = (byte) (data.length & 0xFF);
+                udata[1] = (byte) ((data.length >> 8) & 0xFF);
+                udata[2] = (byte) ((data.length >> 16) & 0xFF);
+                udata[3] = (byte) ((data.length >> 24) & 0xFF);
+                os.write(udata);
             }
-        } finally {
-            if (os != null) {
-                os.close();
+            enc.WriteCoderProperties(os);
+            if (compression == SWFCompression.LZMA_ABC) {
+                byte[] udata = new byte[8];
+                udata[0] = (byte) (uncompressedLength & 0xFF);
+                udata[1] = (byte) ((uncompressedLength >> 8) & 0xFF);
+                udata[2] = (byte) ((uncompressedLength >> 16) & 0xFF);
+                udata[3] = (byte) ((uncompressedLength >> 24) & 0xFF);
+                udata[4] = (byte) ((uncompressedLength >> 32) & 0xFF);
+                udata[5] = (byte) ((uncompressedLength >> 40) & 0xFF);
+                udata[6] = (byte) ((uncompressedLength >> 48) & 0xFF);
+                udata[7] = (byte) ((uncompressedLength >> 56) & 0xFF);
+                os.write(udata);
             }
+            os.write(data);
+        } else if (compression == SWFCompression.ZLIB) {
+            os = new DeflaterOutputStream(os);
+            Helper.copyStream(is, os, Long.MAX_VALUE);
+        } else {
+            Helper.copyStream(is, os, Long.MAX_VALUE);
         }
     }
 
