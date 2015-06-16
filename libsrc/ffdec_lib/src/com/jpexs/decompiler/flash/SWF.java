@@ -795,8 +795,9 @@ public final class SWF implements SWFContainerItem, Timelined {
             }
             os.write(data);
         } else if (compression == SWFCompression.ZLIB) {
-            os = new DeflaterOutputStream(os);
-            Helper.copyStream(is, os, Long.MAX_VALUE);
+            try (DeflaterOutputStream dos = new DeflaterOutputStream(os)) {
+                Helper.copyStream(is, dos, Long.MAX_VALUE);
+            }
         } else {
             Helper.copyStream(is, os, Long.MAX_VALUE);
         }
