@@ -16,37 +16,51 @@
  */
 package com.jpexs.decompiler.flash.exporters.shape;
 
-import com.jpexs.decompiler.flash.exporters.commonshape.PointInt;
-
 /**
  *
  * @author JPEXS
  */
 public class StraightEdge implements IEdge {
 
-    protected final PointInt from;
+    protected final int fromX;
 
-    protected final PointInt to;
+    protected final int fromY;
+
+    protected final int toX;
+
+    protected final int toY;
 
     protected final int lineStyleIdx;
 
     private final int fillStyleIdx;
 
-    StraightEdge(PointInt from, PointInt to, int lineStyleIdx, int fillStyleIdx) {
-        this.from = from;
-        this.to = to;
+    StraightEdge(int fromX, int fromY, int toX, int toY, int lineStyleIdx, int fillStyleIdx) {
+        this.fromX = fromX;
+        this.fromY = fromY;
+        this.toX = toX;
+        this.toY = toY;
         this.lineStyleIdx = lineStyleIdx;
         this.fillStyleIdx = fillStyleIdx;
     }
 
     @Override
-    public PointInt getFrom() {
-        return from;
+    public int getFromX() {
+        return fromX;
     }
 
     @Override
-    public PointInt getTo() {
-        return to;
+    public int getFromY() {
+        return fromY;
+    }
+
+    @Override
+    public int getToX() {
+        return toX;
+    }
+
+    @Override
+    public int getToY() {
+        return toY;
     }
 
     @Override
@@ -61,6 +75,6 @@ public class StraightEdge implements IEdge {
 
     @Override
     public IEdge reverseWithNewFillStyle(int newFillStyleIdx) {
-        return new StraightEdge(to, from, lineStyleIdx, newFillStyleIdx);
+        return new StraightEdge(toX, toY, fromX, fromY, lineStyleIdx, newFillStyleIdx);
     }
 }

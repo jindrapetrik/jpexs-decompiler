@@ -16,53 +16,83 @@
  */
 package com.jpexs.decompiler.flash.exporters.morphshape;
 
-import com.jpexs.decompiler.flash.exporters.commonshape.PointInt;
-
 /**
  *
  * @author JPEXS
  */
 public class StraightMorphEdge implements IMorphEdge {
 
-    protected final PointInt from;
+    protected final int fromX;
 
-    protected final PointInt to;
+    protected final int fromY;
 
-    protected final PointInt fromEnd;
+    protected final int toX;
 
-    protected final PointInt toEnd;
+    protected final int toY;
+
+    protected final int fromEndX;
+
+    protected final int fromEndY;
+
+    protected final int toEndX;
+
+    protected final int toEndY;
 
     protected final int lineStyleIdx;
 
     private final int fillStyleIdx;
 
-    StraightMorphEdge(PointInt from, PointInt to, PointInt fromEnd, PointInt toEnd, int lineStyleIdx, int fillStyleIdx) {
-        this.from = from;
-        this.to = to;
-        this.fromEnd = fromEnd;
-        this.toEnd = toEnd;
+    StraightMorphEdge(int fromX, int fromY, int toX, int toY, int fromEndX, int fromEndY, int toEndX, int toEndY, int lineStyleIdx, int fillStyleIdx) {
+        this.fromX = fromX;
+        this.fromY = fromY;
+        this.toX = toX;
+        this.toY = toY;
+        this.fromEndX = fromEndX;
+        this.fromEndY = fromEndY;
+        this.toEndX = toEndX;
+        this.toEndY = toEndY;
         this.lineStyleIdx = lineStyleIdx;
         this.fillStyleIdx = fillStyleIdx;
     }
 
     @Override
-    public PointInt getFrom() {
-        return from;
+    public int getFromX() {
+        return fromX;
     }
 
     @Override
-    public PointInt getTo() {
-        return to;
+    public int getFromY() {
+        return fromY;
     }
 
     @Override
-    public PointInt getFromEnd() {
-        return fromEnd;
+    public int getToX() {
+        return toX;
     }
 
     @Override
-    public PointInt getToEnd() {
-        return toEnd;
+    public int getToY() {
+        return toY;
+    }
+
+    @Override
+    public int getFromEndX() {
+        return fromEndX;
+    }
+
+    @Override
+    public int getFromEndY() {
+        return fromEndY;
+    }
+
+    @Override
+    public int getToEndX() {
+        return toEndX;
+    }
+
+    @Override
+    public int getToEndY() {
+        return toEndY;
     }
 
     @Override
@@ -77,6 +107,6 @@ public class StraightMorphEdge implements IMorphEdge {
 
     @Override
     public IMorphEdge reverseWithNewFillStyle(int newFillStyleIdx) {
-        return new StraightMorphEdge(to, from, toEnd, fromEnd, lineStyleIdx, newFillStyleIdx);
+        return new StraightMorphEdge(toX, toY, fromX, fromY, toEndX, toEndY, fromEndX, fromEndY, lineStyleIdx, newFillStyleIdx);
     }
 }

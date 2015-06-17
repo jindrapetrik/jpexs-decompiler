@@ -16,35 +16,47 @@
  */
 package com.jpexs.decompiler.flash.exporters.morphshape;
 
-import com.jpexs.decompiler.flash.exporters.commonshape.PointInt;
-
 /**
  *
  * @author JPEXS
  */
 public class CurvedMorphEdge extends StraightMorphEdge implements IMorphEdge {
 
-    private final PointInt control;
+    private final int controlX;
 
-    private final PointInt controlEnd;
+    private final int controlY;
 
-    CurvedMorphEdge(PointInt from, PointInt control, PointInt to,
-            PointInt fromEnd, PointInt controlEnd, PointInt toEnd, int lineStyleIdx, int fillStyleIdx) {
-        super(from, to, fromEnd, toEnd, lineStyleIdx, fillStyleIdx);
-        this.control = control;
-        this.controlEnd = controlEnd;
+    private final int controlEndX;
+
+    private final int controlEndY;
+
+    CurvedMorphEdge(int fromX, int fromY, int controlX, int controlY, int toX, int toY,
+            int fromEndX, int fromEndY, int controlEndX, int controlEndY, int toEndX, int toEndY, int lineStyleIdx, int fillStyleIdx) {
+        super(fromX, fromY, toX, toY, fromEndX, fromEndY, toEndX, toEndY, lineStyleIdx, fillStyleIdx);
+        this.controlX = controlX;
+        this.controlY = controlY;
+        this.controlEndX = controlEndX;
+        this.controlEndY = controlEndY;
     }
 
-    public PointInt getControl() {
-        return control;
+    public int getControlX() {
+        return controlX;
     }
 
-    public PointInt getControlEnd() {
-        return controlEnd;
+    public int getControlY() {
+        return controlY;
+    }
+
+    public int getControlEndX() {
+        return controlEndX;
+    }
+
+    public int getControlEndY() {
+        return controlEndY;
     }
 
     @Override
     public IMorphEdge reverseWithNewFillStyle(int newFillStyleIdx) {
-        return new CurvedMorphEdge(to, control, from, toEnd, controlEnd, fromEnd, lineStyleIdx, newFillStyleIdx);
+        return new CurvedMorphEdge(toX, toY, controlX, controlY, fromX, fromY, toEndX, toEndY, controlEndX, controlEndY, fromEndX, fromEndY, lineStyleIdx, newFillStyleIdx);
     }
 }
