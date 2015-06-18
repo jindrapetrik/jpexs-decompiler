@@ -67,7 +67,6 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
@@ -392,37 +391,63 @@ public class Main {
         }
         File outfileF = new File(outfile);
         File tmpFile = new File(outfile + ".tmp");
-        try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(tmpFile))) {
+        try (FileOutputStream fos = new FileOutputStream(tmpFile);
+                BufferedOutputStream bos = new BufferedOutputStream(fos)) {
             if (mode == SaveFileMode.EXE) {
                 switch (exeExportMode) {
                     case WRAPPER:
                         InputStream exeStream = View.class.getClassLoader().getResourceAsStream("com/jpexs/helpers/resource/Swf2Exe.bin");
-                        byte[] buffer = new byte[4096];
-                        int bytesRead;
-                        while ((bytesRead = exeStream.read(buffer)) != -1) {
-                            fos.write(buffer, 0, bytesRead);
-                        }
+                        Helper.copyStream(exeStream, bos);
                         int width = swf.displayRect.Xmax - swf.displayRect.Xmin;
                         int height = swf.displayRect.Ymax - swf.displayRect.Ymin;
-                        fos.write(width & 0xff);
-                        fos.write((width >> 8) & 0xff);
-                        fos.write((width >> 16) & 0xff);
-                        fos.write((width >> 24) & 0xff);
-                        fos.write(height & 0xff);
-                        fos.write((height >> 8) & 0xff);
-                        fos.write((height >> 16) & 0xff);
-                        fos.write((height >> 24) & 0xff);
-                        fos.write(Configuration.saveAsExeScaleMode.get());
+                        bos.write(width & 0xff);
+                        bos.write((width >> 8) & 0xff);
+                        bos.write((width >> 16) & 0xff);
+                        bos.write((width >> 24) & 0xff);
+                        bos.write(height & 0xff);
+                        bos.write((height >> 8) & 0xff);
+                        bos.write((height >> 16) & 0xff);
+                        bos.write((height >> 24) & 0xff);
+                        bos.write(Configuration.saveAsExeScaleMode.get());
                         break;
                     case PROJECTOR_WIN:
-                        // todo
-                        break;
                     case PROJECTOR_MAC:
-                        // todo
+                    case PROJECTOR_LINUX:
+                        File projectorFile = Configuration.getProjectorFile(exeExportMode);
+                        if (projectorFile == null) {
+                            String message = "Projector not found, please place it to " + Configuration.getProjectorPath();
+                            logger.log(Level.SEVERE, message);
+                            throw new IOException(message);
+                        }
+                        Helper.copyStream(new FileInputStream(projectorFile), bos);
+                        bos.flush();
                         break;
                 }
             }
-            swf.saveTo(fos);
+
+            long pos = fos.getChannel().position();
+            swf.saveTo(bos);
+
+            if (mode == SaveFileMode.EXE) {
+                switch (exeExportMode) {
+                    case PROJECTOR_WIN:
+                    case PROJECTOR_MAC:
+                    case PROJECTOR_LINUX:
+                        bos.flush();
+                        int swfSize = (int) (fos.getChannel().position() - pos);
+
+                        // write magic number
+                        bos.write(0x56);
+                        bos.write(0x34);
+                        bos.write(0x12);
+                        bos.write(0xfa);
+
+                        bos.write(swfSize & 0xff);
+                        bos.write((swfSize >> 8) & 0xff);
+                        bos.write((swfSize >> 16) & 0xff);
+                        bos.write((swfSize >> 24) & 0xff);
+                }
+            }
         }
         if (tmpFile.exists()) {
             if (tmpFile.length() > 0) {

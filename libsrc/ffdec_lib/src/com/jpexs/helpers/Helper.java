@@ -655,6 +655,19 @@ public class Helper {
         return baos.toByteArray();
     }
 
+    public static void copyStream(InputStream is, OutputStream os) {
+        try {
+            final int bufSize = 4096;
+            byte[] buf = new byte[bufSize];
+            int cnt = 0;
+            while ((cnt = is.read(buf)) > 0) {
+                os.write(buf, 0, cnt);
+            }
+        } catch (IOException ex) {
+            // ignore
+        }
+    }
+
     public static void copyStream(InputStream is, OutputStream os, long maxLength) {
         try {
             final int bufSize = 4096;

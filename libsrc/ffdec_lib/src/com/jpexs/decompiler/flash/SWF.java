@@ -795,14 +795,18 @@ public final class SWF implements SWFContainerItem, Timelined {
             }
             os.write(data);
         } else if (compression == SWFCompression.ZLIB) {
-            try (DeflaterOutputStream dos = new DeflaterOutputStream(os)) {
-                Helper.copyStream(is, dos, Long.MAX_VALUE);
+            DeflaterOutputStream dos = new DeflaterOutputStream(os);
+            try {
+                Helper.copyStream(is, dos);
+            } finally {
+                dos.finish();
             }
         } else {
-            Helper.copyStream(is, os, Long.MAX_VALUE);
+            Helper.copyStream(is, os);
         }
     }
 
+    @Override
     public boolean isModified() {
         for (Tag tag : tags) {
             if (tag.isModified()) {

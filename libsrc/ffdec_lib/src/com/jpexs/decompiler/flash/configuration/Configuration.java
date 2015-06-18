@@ -879,26 +879,56 @@ public class Configuration {
     }
 
     public static File getPlayerSWC() {
-        String a = getLatestPlayerGlobalUrl();
-        String b = getLatestProjectorUrlWin();
-        String c = getLatestProjectorUrlMac();
-        String d = getLatestProjectorUrlLinux();
-        File libsdir = getFlashLibPath();
-        if (libsdir != null && libsdir.exists()) {
-            File[] libs = libsdir.listFiles(new FilenameFilter() {
+        File libsDir = getFlashLibPath();
+        if (libsDir != null && libsDir.exists()) {
+            File[] libs = libsDir.listFiles(new FilenameFilter() {
 
                 @Override
                 public boolean accept(File dir, String name) {
                     return name.toLowerCase().startsWith("playerglobal");
                 }
             });
-            List<String> libnames = new ArrayList<>();
+            List<String> libNames = new ArrayList<>();
             for (File f : libs) {
-                libnames.add(f.getName());
+                libNames.add(f.getName());
             }
-            Collections.sort(libnames);
-            if (!libnames.isEmpty()) {
-                return new File(libsdir.getAbsolutePath() + File.separator + libnames.get(libnames.size() - 1));
+            Collections.sort(libNames);
+            if (!libNames.isEmpty()) {
+                return new File(libsDir.getAbsolutePath() + File.separator + libNames.get(libNames.size() - 1));
+            } else {
+                return null;
+            }
+        }
+
+        return null;
+    }
+
+    public static File getProjectorFile(ExeExportMode exportMode) {
+        File projectoDir = getProjectorPath();
+        if (projectoDir != null && projectoDir.exists()) {
+            File[] projectors = projectoDir.listFiles(new FilenameFilter() {
+
+                @Override
+                public boolean accept(File dir, String name) {
+                    switch (exportMode) {
+                        case PROJECTOR_WIN:
+                            return name.toLowerCase().endsWith(".exe");
+                        case PROJECTOR_MAC:
+                            return name.toLowerCase().endsWith(".dmg");
+                        case PROJECTOR_LINUX:
+                            return name.toLowerCase().endsWith(".gz");
+                    }
+
+                    return false;
+                }
+            });
+            List<String> projectorNames = new ArrayList<>();
+            for (File f : projectors) {
+                projectorNames.add(f.getName());
+            }
+            Collections.sort(projectorNames);
+            if (!projectorNames.isEmpty()) {
+                return new File(projectoDir.getAbsolutePath() + File.separator + projectorNames.get(projectorNames.size() - 1));
             } else {
                 return null;
             }
