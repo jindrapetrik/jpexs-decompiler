@@ -26,7 +26,9 @@ import java.awt.event.ActionListener;
 public interface MenuBuilder {
 
     public static final int PRIORITY_LOW = 1;
+
     public static final int PRIORITY_MEDIUM = 2;
+
     public static final int PRIORITY_TOP = 3;
 
     /**
@@ -133,5 +135,4 @@ public interface MenuBuilder {
      * @return True if supports
      */
     public boolean supportsAppMenu();
-
 }

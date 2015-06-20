@@ -70,7 +70,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.event.TreeModelListener;
 import javax.swing.plaf.basic.BasicLabelUI;
@@ -95,6 +94,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
     private Tag editedTag;
 
     private static final Map<Class, List<Field>> fieldCache = new HashMap<>();
+
     private static final int FIELD_INDEX = 0;
 
     private class MyTree extends JTree {
@@ -396,7 +396,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                                             mi.setEnabled(false);
                                         }
                                         p.add(mi);
-                                        //}                                        
+                                        //}
                                     }
                                     p.show(tree, e.getX(), e.getY());
                                 }
@@ -708,7 +708,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
             }
             FieldNode fnode = (FieldNode) parent;
             Field field = fnode.fieldSet.get(FIELD_INDEX);
-            if (ReflectionTools.needsIndex(field) && (fnode.index == -1)) { //Arrays ot Lists                
+            if (ReflectionTools.needsIndex(field) && (fnode.index == -1)) { //Arrays ot Lists
                 return new FieldNode(fnode.obj, fnode.fieldSet, index);
             }
             parent = fnode.getValue(FIELD_INDEX);
@@ -908,7 +908,9 @@ public class GenericTagTreePanel extends GenericTagPanel {
     private static class FieldSet {
 
         public List<Field> fields;
+
         public String name;
+
         public String itemName;
 
         public FieldSet(Field field) {
@@ -930,7 +932,6 @@ public class GenericTagTreePanel extends GenericTagPanel {
         public int size() {
             return fields.size();
         }
-
     }
 
     private static List<FieldSet> filterFields(MyTreeModel mod, String parentPath, Class<?> cls, boolean limited) {
