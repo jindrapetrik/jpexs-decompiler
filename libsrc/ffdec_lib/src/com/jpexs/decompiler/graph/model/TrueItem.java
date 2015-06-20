@@ -65,4 +65,15 @@ public class TrueItem extends GraphTargetItem implements LogicalOpItem, SimpleVa
     public boolean isSimpleValue() {
         return true;
     }
+
+    @Override
+    public boolean isCompileTime() {
+        return true;
+    }
+
+    @Override
+    public Object getResult() {
+        return Boolean.TRUE;
+    }
+
 }

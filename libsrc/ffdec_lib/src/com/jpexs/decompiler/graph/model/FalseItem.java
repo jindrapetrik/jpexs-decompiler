@@ -65,4 +65,14 @@ public class FalseItem extends GraphTargetItem implements LogicalOpItem, SimpleV
         return true;
     }
 
+    @Override
+    public boolean isCompileTime() {
+        return true;
+    }
+
+    @Override
+    public Object getResult() {
+        return Boolean.FALSE;
+    }
+
 }

@@ -39,6 +39,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.NotCompileTimeItem;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.model.PopItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -58,7 +59,9 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
          } else {
          localRegs.put(regId, value);
          }*/
-        localRegs.put(regId, value);
+        if (!(value instanceof PopItem)) {
+            localRegs.put(regId, value);
+        }
         if (!regAssignCount.containsKey(regId)) {
             regAssignCount.put(regId, 0);
         }

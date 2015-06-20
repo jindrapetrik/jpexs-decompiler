@@ -1150,7 +1150,7 @@ public class AVM2Code implements Cloneable {
         }
         int ret = posCache.indexOf(address);
         if (ret == -1) {
-            throw new ConvertException("Bad jump try conver ofs" + Helper.formatAddress(address) + " ", -1);
+            throw new ConvertException("Invalid jump to ofs" + Helper.formatAddress(address), -1);
         }
         return ret;
     }
@@ -1843,7 +1843,20 @@ public class AVM2Code implements Cloneable {
         invalidateCache();
     }
 
+    /**
+     * @param pos
+     * @param instruction
+     */
     public void insertInstruction(int pos, AVM2Instruction instruction) {
+        insertInstruction(pos, instruction, true, false);
+    }
+
+    public void replaceInstruction(int idx, AVM2Instruction ins, MethodBody body) {
+        insertInstruction(idx, ins, true, true);
+        removeInstruction(idx + 1, body);
+    }
+
+    public void insertInstruction(int pos, AVM2Instruction instruction, boolean preRefsToThis, boolean postRefsToThis) {
         if (pos < 0) {
             pos = 0;
         }
@@ -1857,31 +1870,43 @@ public class AVM2Code implements Cloneable {
             instruction.offset = code.get(pos).offset;
         }
 
-        for (int i = 0; i < pos; i++) {
-            for (int j = 0; j < code.get(i).definition.operands.length; j++) {
-                if (code.get(i).definition.operands[j] == AVM2Code.DAT_OFFSET) {
-                    long target = code.get(i).offset + code.get(i).getBytes().length + code.get(i).operands[j];
-                    if (target >= instruction.offset) {
-                        code.get(i).operands[j] += byteCount;
+        {
+            for (int i = 0; i < pos; i++) {
+                for (int j = 0; j < code.get(i).definition.operands.length; j++) {
+                    if (code.get(i).definition.operands[j] == AVM2Code.DAT_OFFSET) {
+                        long target = code.get(i).offset + code.get(i).getBytes().length + code.get(i).operands[j];
+                        if (target > instruction.offset) {
+                            code.get(i).operands[j] += byteCount;
+                        }
+                        if (target == instruction.offset && !preRefsToThis) {
+                            code.get(i).operands[j] += byteCount;
+                        }
+
                     }
                 }
             }
         }
-        for (int i = pos; i < code.size(); i++) {
-            for (int j = 0; j < code.get(i).definition.operands.length; j++) {
-                if (code.get(i).definition.operands[j] == AVM2Code.DAT_OFFSET) {
-                    long target = code.get(i).offset + code.get(i).getBytes().length + code.get(i).operands[j];
-                    if (target < instruction.offset) {
-                        code.get(i).operands[j] -= byteCount;
+        {
+            for (int i = pos; i < code.size(); i++) {
+                for (int j = 0; j < code.get(i).definition.operands.length; j++) {
+                    if (code.get(i).definition.operands[j] == AVM2Code.DAT_OFFSET) {
+                        long target = code.get(i).offset + code.get(i).getBytes().length + code.get(i).operands[j];
+                        if (target < instruction.offset) {
+                            code.get(i).operands[j] -= byteCount;
+                        }
+                        if (target == instruction.offset && postRefsToThis) {
+                            code.get(i).operands[j] -= byteCount;
+                        }
                     }
                 }
             }
         }
 
-        for (int i = pos + 1; i < code.size(); i++) {
+        for (int i = pos; i < code.size(); i++) {
             code.get(i).offset += byteCount;
         }
         code.add(pos, instruction);
+        invalidateCache();
     }
 
     @SuppressWarnings("unchecked")
