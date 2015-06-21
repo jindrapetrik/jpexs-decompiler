@@ -178,7 +178,7 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
                                 }
                                 AVM2Instruction ins = makePush(graphTargetItem.getResult(), cpool);
                                 if (ins != null) {
-                                    code.insertInstruction(i + (idelta++), ins);
+                                    code.insertInstruction(i + (idelta++), ins, body);
                                     //prevAction = ins;
                                 } else {
                                     throw new TranslateException("Cannot push: " + graphTargetItem);
@@ -188,7 +188,7 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
                         }
 
                         AVM2Instruction jump = new AVM2Instruction(0, new JumpIns(), new int[]{0});
-                        code.insertInstruction(i + (idelta++), jump);
+                        code.insertInstruction(i + (idelta++), jump, body);
 
                         jump.operands[0] = ((int) (target.offset - jump.offset - jump.getBytes().length));
 

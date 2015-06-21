@@ -1847,16 +1847,16 @@ public class AVM2Code implements Cloneable {
      * @param pos
      * @param instruction
      */
-    public void insertInstruction(int pos, AVM2Instruction instruction) {
-        insertInstruction(pos, instruction, true, false);
+    public void insertInstruction(int pos, AVM2Instruction instruction, MethodBody body) {
+        insertInstruction(pos, instruction, true, false, body);
     }
 
     public void replaceInstruction(int idx, AVM2Instruction ins, MethodBody body) {
-        insertInstruction(idx, ins, true, true);
+        insertInstruction(idx, ins, true, true, body);
         removeInstruction(idx + 1, body);
     }
 
-    public void insertInstruction(int pos, AVM2Instruction instruction, boolean preRefsToThis, boolean postRefsToThis) {
+    public void insertInstruction(int pos, AVM2Instruction instruction, boolean preRefsToThis, boolean postRefsToThis, MethodBody body) {
         if (pos < 0) {
             pos = 0;
         }
@@ -1868,6 +1868,18 @@ public class AVM2Code implements Cloneable {
             instruction.offset = code.get(pos - 1).offset + code.get(pos - 1).getBytes().length;
         } else {
             instruction.offset = code.get(pos).offset;
+        }
+
+        for (ABCException ex : body.exceptions) {
+            if (ex.start > instruction.offset) {
+                ex.start += byteCount;
+            }
+            if (ex.end > instruction.offset) {
+                ex.end += byteCount;
+            }
+            if (ex.target > instruction.offset) {
+                ex.target += byteCount;
+            }
         }
 
         {
