@@ -1126,6 +1126,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         swf.clearImageCache();
         swf.updateCharacters();
         tag.getTimelined().resetTimeline();
+        swf.assignClassesToSymbols();
+        swf.assignExportNamesToSymbols();
         mainPanel.repaintTree();
         mainPanel.setTagTreeSelectedNode(tag);
         genericEditButton.setVisible(true);
