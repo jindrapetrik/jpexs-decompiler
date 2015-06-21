@@ -2525,35 +2525,13 @@ public class AVM2Code implements Cloneable {
         //restoreControlFlowPass(constants, body, true);
     }
 
-    /*private void removeIgnored(MethodBody body) {
-     for (int rem = code.size() - 1; rem >= 0; rem--) {
-     if (code.get(rem).ignored) {
-     removeInstruction(rem, body);
-     }
-     }
-     }*/
     public void removeIgnored(AVM2ConstantPool constants, Trait trait, MethodInfo info, MethodBody body) throws InterruptedException {
-        try {
-            List<Integer> outputMap = new ArrayList<>();
-            HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
-            toASMSource(constants, trait, info, body, outputMap, ScriptExportMode.PCODE, writer);
-            String src = writer.toString();
-            AVM2Code acode = ASM3Parser.parse(new StringReader(src), constants, trait, body, info);
-            for (int i = 0; i < acode.code.size(); i++) {
-                if (outputMap.size() > i) {
-                    int tpos = outputMap.get(i);
-                    if (tpos == -1) {
-                    } else if (code.get(tpos).mappedOffset >= 0) {
-                        acode.code.get(i).mappedOffset = code.get(tpos).mappedOffset;
-                    } else {
-                        acode.code.get(i).mappedOffset = pos2adr(tpos);
-                    }
-                }
+        for (int i = 0; i < code.size(); i++) {
+            if (code.get(i).ignored) {
+                removeInstruction(i, body);
+                i--;
             }
-            this.code = acode.code;
-        } catch (IOException | AVM2ParseException ex) {
         }
-        invalidateCache();
     }
 
     public int removeDeadCode(AVM2ConstantPool constants, Trait trait, MethodInfo info, MethodBody body) throws InterruptedException {

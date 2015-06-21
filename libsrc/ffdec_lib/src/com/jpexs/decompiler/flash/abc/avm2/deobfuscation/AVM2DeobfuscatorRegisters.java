@@ -233,7 +233,7 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
                 }
             }
         } catch (EmptyStackException | TranslateException | InterruptedException ex) {
-            ex.printStackTrace();
+            //ignore
         }
     }
 
