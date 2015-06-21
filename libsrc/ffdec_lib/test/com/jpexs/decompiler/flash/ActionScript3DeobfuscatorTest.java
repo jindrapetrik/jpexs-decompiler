@@ -17,9 +17,14 @@
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorJumps;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
+import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.ASM3Parser;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScriptParser;
+import com.jpexs.decompiler.flash.abc.types.MethodBody;
+import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
@@ -29,8 +34,10 @@ import com.jpexs.decompiler.graph.CompilationException;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.concurrent.TimeoutException;
+import org.testng.Assert;
 import static org.testng.Assert.fail;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
@@ -48,6 +55,39 @@ public class ActionScript3DeobfuscatorTest extends ActionStript2TestBase {
         Configuration.autoDeobfuscate.set(true);
         Configuration.deobfuscationMode.set(1);
         swf = new SWF(new BufferedInputStream(new FileInputStream("testdata/as3/as3.swf")), false);
+    }
+
+    private String recompilePCode(String str) throws IOException, AVM2ParseException, InterruptedException {
+        str = "code\r\n"
+                + "getlocal_0\r\n"
+                + "pushscope\r\n"
+                + str
+                + "returnvoid\r\n";
+        final ABC abc = new ABC(new ABCContainerTag() {
+
+            @Override
+            public ABC getABC() {
+                return null;
+            }
+
+            @Override
+            public SWF getSwf() {
+                return swf;
+            }
+
+            @Override
+            public int compareTo(ABCContainerTag o) {
+                return 0;
+            }
+        });
+        MethodBody b = new MethodBody();
+        AVM2Code code = ASM3Parser.parse(new StringReader(str), abc.constants, null, b, new MethodInfo());
+        b.setCode(code);
+        new AVM2DeobfuscatorJumps().deobfuscate("test", 0, true, 0, abc, abc.constants, null, new MethodInfo(), b);
+        HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
+        code.toASMSource(abc.constants, null, new MethodInfo(), new MethodBody(), ScriptExportMode.PCODE, writer);
+        String ret = writer.toString();
+        return ret.substring(ret.lastIndexOf("code\r\n") + 6);
     }
 
     private String recompile(String str) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
@@ -180,6 +220,26 @@ public class ActionScript3DeobfuscatorTest extends ActionStript2TestBase {
         if (res.contains("\"FAIL1\"")) {
             fail("FAIL1");
         }
+    }
+
+    @Test
+    public void testJumps() throws Exception {
+        String res = recompilePCode("pushbyte 3\r\n"
+                + "pushbyte 4\r\n"
+                + "ifeq a\r\n" //should change to ifeq c                
+                + "jump b\r\n" //should not change
+                + "a:jump c\r\n"
+                + "c:pushbyte 4\r\n"
+                + "b:pushbyte 3\r\n");
+        Assert.assertEquals(res, "getlocal_0\r\n"
+                + "pushscope\r\n"
+                + "pushbyte 3\r\n"
+                + "pushbyte 4\r\n"
+                + "ifeq ofs000e\r\n"
+                + "jump ofs0010\r\n"
+                + "ofs000e:pushbyte 4\r\n"
+                + "ofs0010:pushbyte 3\r\n"
+                + "returnvoid\r\n");
     }
 
     // TODO: JPEXS @Test

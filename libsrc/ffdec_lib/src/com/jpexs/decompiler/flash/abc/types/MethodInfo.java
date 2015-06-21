@@ -49,7 +49,7 @@ public class MethodInfo {
         }
     }
 
-    public int[] param_types;
+    public int[] param_types = new int[]{};
 
     public int ret_type;
 
@@ -74,9 +74,9 @@ public class MethodInfo {
 
     public int flags;
 
-    public ValueKind[] optional;
+    public ValueKind[] optional = new ValueKind[0];
 
-    public int[] paramNames;
+    public int[] paramNames = new int[0];
 
     private MethodBody body;
 

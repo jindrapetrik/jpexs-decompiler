@@ -14,12 +14,14 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.abc.avm2;
+package com.jpexs.decompiler.flash.abc.avm2.deobfuscation;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2GraphSource;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.DeobfuscatePopIns;
@@ -139,13 +141,6 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
                 AVM2Instruction action = code.code.get(idx);
                 instructionsProcessed++;
 
-
-                /*if (action.definition instanceof GetLocalTypeIns) {
-                 int regId = ((GetLocalTypeIns) action.definition).getRegisterId(action);//stack.peek().getResult().toString();
-                 if (!localData.localRegs.containsKey(regId)) {
-                 break;
-                 }
-                 }*/
                 action.translate(localData, stack, output, Graph.SOP_USE_STATIC, "");
                 InstructionDefinition def = action.definition;
 

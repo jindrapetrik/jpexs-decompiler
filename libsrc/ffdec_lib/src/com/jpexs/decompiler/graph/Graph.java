@@ -431,11 +431,12 @@ public class Graph {
         TranslateStack stack = new TranslateStack(path);
         List<Loop> loops = new ArrayList<>();
         getLoops(localData, heads.get(0), loops, null);
-        /*System.out.println("<loops>");
+        /*1
+         System.err.println("<loops>");
          for (Loop el : loops) {
-         System.out.println(el);
+         System..println(el);
          }
-         System.out.println("</loops>");*/
+         System.err.println("</loops>");*/
         getPrecontinues(path, localData, null, heads.get(0), allParts, loops, null);
         /*System.err.println("<loopspre>");
          for (Loop el : loops) {
@@ -1378,7 +1379,7 @@ public class Graph {
             }
             if (el.phase != 1) {
                 if (debugMode) {
-                    //System.err.println("ignoring loop "+el);
+                    System.err.println("ignoring loop " + el);
                 }
                 continue;
             }
@@ -1418,18 +1419,9 @@ public class Graph {
             if (currentLoop != null) {
                 currentLoop.phase = 0;
             }
-            /*switch (part.stopPartType) {
-             case AND_OR:
-             part.setAndOrStack(stack); //Save stack for later use
-             break;
-
-             case COMMONPART:
-             part.setCommonPartStack(stack); //Save stack for later use
-             break;
-
-             case NONE:
-             break;
-             }*/
+            if (debugMode) {
+                System.err.println("Stopped on part " + part);
+            }
             return ret;
         }
 
@@ -1562,19 +1554,19 @@ public class Graph {
 
                     List<GraphPart> nps;
                     nps = part.nextParts;
+                    boolean isEmpty = nps.get(0) == nps.get(1);
+
                     GraphPart next = getCommonPart(localData, nps, loops);
                     TranslateStack trueStack = (TranslateStack) stack.clone();
                     TranslateStack falseStack = (TranslateStack) stack.clone();
                     trueStack.clear();
                     falseStack.clear();
-                    /*int trueStackSizeBefore = trueStack.size();
-                     int falseStackSizeBefore = falseStack.size();
-                     */
-                    boolean isEmpty = nps.get(0) == nps.get(1);
 
                     if (isEmpty) {
                         next = nps.get(0);
                     }
+                    boolean hasOntrue = nps.get(1) != next;
+                    boolean hasOnFalse = nps.get(0) != next;
 
                     List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
 
@@ -1583,12 +1575,12 @@ public class Graph {
                     }
 
                     List<GraphTargetItem> onTrue = new ArrayList<>();
-                    if (!isEmpty) {
+                    if (!isEmpty && hasOntrue) {
                         onTrue = printGraph(visited, prepareBranchLocalData(localData), trueStack, allParts, part, nps.get(1), stopPart2, loops, null, staticOperation, path, recursionLevel + 1);
                     }
                     List<GraphTargetItem> onFalse = new ArrayList<>();
 
-                    if (!isEmpty) {
+                    if (!isEmpty && hasOnFalse) {
                         onFalse = printGraph(visited, prepareBranchLocalData(localData), falseStack, allParts, part, nps.get(0), stopPart2, loops, null, staticOperation, path, recursionLevel + 1);
                     }
                     //List<GraphTargetItem> out2 = new ArrayList<>();

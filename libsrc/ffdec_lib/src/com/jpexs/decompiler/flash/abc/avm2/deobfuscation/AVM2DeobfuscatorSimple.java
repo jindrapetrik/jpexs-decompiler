@@ -14,11 +14,14 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.abc.avm2;
+package com.jpexs.decompiler.flash.abc.avm2.deobfuscation;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.FixItemCounterTranslateStack;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.DeobfuscatePopIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.IfTypeIns;
@@ -37,6 +40,11 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.bitwise.LShiftIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.bitwise.RShiftIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.bitwise.URShiftIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.EqualsIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.GreaterEqualsIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.GreaterThanIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.LessEqualsIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.LessThanIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.StrictEqualsIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.DupIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
@@ -311,7 +319,14 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
                     EqualsIns.class,
                     NotIns.class,
                     IfTypeIns.class,
-                    JumpIns.class
+                    JumpIns.class,
+                    EqualsIns.class,
+                    LessEqualsIns.class,
+                    GreaterEqualsIns.class,
+                    GreaterThanIns.class,
+                    LessThanIns.class,
+                    StrictEqualsIns.class,
+                    PopIns.class
                 };
 
                 boolean ok = false;
