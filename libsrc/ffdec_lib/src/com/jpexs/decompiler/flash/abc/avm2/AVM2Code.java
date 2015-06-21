@@ -1872,30 +1872,68 @@ public class AVM2Code implements Cloneable {
 
         {
             for (int i = 0; i < pos; i++) {
-                for (int j = 0; j < code.get(i).definition.operands.length; j++) {
-                    if (code.get(i).definition.operands[j] == AVM2Code.DAT_OFFSET) {
-                        long target = code.get(i).offset + code.get(i).getBytes().length + code.get(i).operands[j];
+                if (code.get(i).definition instanceof LookupSwitchIns) {
+                    long target = code.get(i).offset + code.get(i).operands[0];
+                    if (target > instruction.offset) {
+                        code.get(i).operands[0] += byteCount;
+                    }
+                    if (target == instruction.offset && !preRefsToThis) {
+                        code.get(i).operands[0] += byteCount;
+                    }
+                    for (int k = 2; k < code.get(i).operands.length; k++) {
+                        target = code.get(i).offset + code.get(i).operands[k];
                         if (target > instruction.offset) {
-                            code.get(i).operands[j] += byteCount;
+                            code.get(i).operands[k] += byteCount;
                         }
                         if (target == instruction.offset && !preRefsToThis) {
-                            code.get(i).operands[j] += byteCount;
+                            code.get(i).operands[k] += byteCount;
                         }
+                    }
+                } else {
+                    for (int j = 0; j < code.get(i).definition.operands.length; j++) {
+                        if (code.get(i).definition.operands[j] == AVM2Code.DAT_OFFSET) {
+                            long target = code.get(i).offset + code.get(i).getBytes().length + code.get(i).operands[j];
+                            if (target > instruction.offset) {
+                                code.get(i).operands[j] += byteCount;
+                            }
+                            if (target == instruction.offset && !preRefsToThis) {
+                                code.get(i).operands[j] += byteCount;
+                            }
 
+                        }
                     }
                 }
             }
         }
         {
             for (int i = pos; i < code.size(); i++) {
-                for (int j = 0; j < code.get(i).definition.operands.length; j++) {
-                    if (code.get(i).definition.operands[j] == AVM2Code.DAT_OFFSET) {
-                        long target = code.get(i).offset + code.get(i).getBytes().length + code.get(i).operands[j];
+                if (code.get(i).definition instanceof LookupSwitchIns) {
+                    long target = code.get(i).offset + code.get(i).operands[0];
+                    if (target < instruction.offset) {
+                        code.get(i).operands[0] -= byteCount;
+                    }
+                    if (target == instruction.offset && postRefsToThis) {
+                        code.get(i).operands[0] -= byteCount;
+                    }
+                    for (int k = 2; k < code.get(i).operands.length; k++) {
+                        target = code.get(i).offset + code.get(i).operands[k];
                         if (target < instruction.offset) {
-                            code.get(i).operands[j] -= byteCount;
+                            code.get(i).operands[k] -= byteCount;
                         }
                         if (target == instruction.offset && postRefsToThis) {
-                            code.get(i).operands[j] -= byteCount;
+                            code.get(i).operands[k] -= byteCount;
+                        }
+                    }
+                } else {
+                    for (int j = 0; j < code.get(i).definition.operands.length; j++) {
+                        if (code.get(i).definition.operands[j] == AVM2Code.DAT_OFFSET) {
+                            long target = code.get(i).offset + code.get(i).getBytes().length + code.get(i).operands[j];
+                            if (target < instruction.offset) {
+                                code.get(i).operands[j] -= byteCount;
+                            }
+                            if (target == instruction.offset && postRefsToThis) {
+                                code.get(i).operands[j] -= byteCount;
+                            }
                         }
                     }
                 }

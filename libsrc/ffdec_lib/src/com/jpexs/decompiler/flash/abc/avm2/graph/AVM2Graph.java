@@ -528,7 +528,7 @@ public class AVM2Graph extends Graph {
                 GraphTargetItem nt = sstack.peek();
 
                 if (!(nt instanceof IntegerValueAVM2Item)) {
-                    throw new RuntimeException("Invalid integer value in Switch");
+                    throw new RuntimeException("Invalid integer value in Switch:" + nt);
                 }
                 IntegerValueAVM2Item iv = (IntegerValueAVM2Item) nt;
                 caseValuesMap.put((int) (long) iv.value, tar);

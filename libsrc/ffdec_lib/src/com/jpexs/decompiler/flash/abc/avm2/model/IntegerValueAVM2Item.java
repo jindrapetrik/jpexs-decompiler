@@ -49,7 +49,7 @@ public class IntegerValueAVM2Item extends NumberValueAVM2Item {
 
     @Override
     public Object getResult() {
-        return (Double) (double) (long) value;
+        return value;//(Double) (double) (long) value;
     }
 
     @Override
