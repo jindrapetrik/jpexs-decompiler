@@ -73,7 +73,6 @@ public class AVM2DeobfuscatorJumps extends AVM2DeobfuscatorSimple {
                                         srcIns.operands[0] = (int) (targetAddr - (srcIns.offset + srcIns.getBytes().length));
                                         if (srcIns.operands[0] != oldop) {
                                             found = true;
-                                            System.err.println("found");
                                         }
                                     }
                                 }

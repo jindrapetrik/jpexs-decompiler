@@ -91,7 +91,7 @@ public class Configuration {
     public static final ConfigurationItem<Boolean> autoDeobfuscate = null;
 
     @ConfigurationDefaultInt(1)
-    @ConfigurationCategory("script")
+    @ConfigurationCategory("")
     public static final ConfigurationItem<Integer> deobfuscationMode = null;
 
     @ConfigurationDefaultBoolean(false)
