@@ -2635,9 +2635,25 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         } else {
             if (!detailPanel.isVisible()) {
                 detailPanel.setVisible(true);
+
+                new Thread() {
+
+                    @Override
+                    public void run() {
+                        try {
+                            Thread.sleep(10);
+                        } catch (InterruptedException ex) {
+                            logger.log(Level.SEVERE, null, ex);
+                        }
+
+                        View.execInEventDispatch(() -> {
+                            tagTree.scrollPathToVisible(tagTree.getSelectionPath());
+                        });
+                    }
+
+                }.start();
             }
         }
-
     }
 
     private void showCard(String card) {
@@ -2829,6 +2845,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void reload(boolean forceReload) {
+        tagTree.scrollPathToVisible(tagTree.getSelectionPath());
         if (Configuration.dumpView.get()) {
             dumpViewReload(forceReload);
             return;
