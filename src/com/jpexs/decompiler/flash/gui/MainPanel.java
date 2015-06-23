@@ -535,15 +535,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
         });
 
-        tagTree.addComponentListener(new ComponentAdapter() {
-
-            @Override
-            public void componentResized(ComponentEvent e) {
-                tagTree.scrollPathToVisible(tagTree.getSelectionPath());
-            }
-
-        });
-
         DragSource dragSource = DragSource.getDefaultDragSource();
         dragSource.createDefaultDragGestureRecognizer(tagTree, DnDConstants.ACTION_COPY_OR_MOVE, new DragGestureListener() {
             @Override
@@ -2758,6 +2749,16 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 treePanel.add(new JScrollPane(tagTree), BorderLayout.CENTER);
                 treePanel.add(searchPanel, BorderLayout.SOUTH);
                 treePanelMode = TreePanelMode.TAG_TREE;
+
+                treePanel.addComponentListener(new ComponentAdapter() {
+
+                    @Override
+                    public void componentResized(ComponentEvent e) {
+                        tagTree.scrollPathToVisible(tagTree.getSelectionPath());
+                    }
+
+                });
+
                 reload(true);
                 treePanel.revalidate();
                 return true;
