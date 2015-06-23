@@ -162,6 +162,8 @@ import java.awt.dnd.DragSourceListener;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -531,6 +533,15 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
                 super.removeSelectionPaths(paths);
             }
+        });
+
+        tagTree.addComponentListener(new ComponentAdapter() {
+
+            @Override
+            public void componentResized(ComponentEvent e) {
+                tagTree.scrollPathToVisible(tagTree.getSelectionPath());
+            }
+
         });
 
         DragSource dragSource = DragSource.getDefaultDragSource();
@@ -2635,23 +2646,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         } else {
             if (!detailPanel.isVisible()) {
                 detailPanel.setVisible(true);
-
-                new Thread() {
-
-                    @Override
-                    public void run() {
-                        try {
-                            Thread.sleep(10);
-                        } catch (InterruptedException ex) {
-                            logger.log(Level.SEVERE, null, ex);
-                        }
-
-                        View.execInEventDispatch(() -> {
-                            tagTree.scrollPathToVisible(tagTree.getSelectionPath());
-                        });
-                    }
-
-                }.start();
             }
         }
     }
