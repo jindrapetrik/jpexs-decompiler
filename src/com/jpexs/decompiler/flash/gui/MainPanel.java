@@ -1960,9 +1960,13 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             String selFile = Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath();
             String scriptsFolder = Path.combine(selFile, ScriptExportSettings.EXPORT_FOLDER_NAME);
 
-            new ScriptImporter().importScripts(scriptsFolder, swf.getASMs(true));
-
-            reload(true);
+            int count = new ScriptImporter().importScripts(scriptsFolder, swf.getASMs(true));
+            if (count == 0 && swf.isAS3()) {
+                View.showMessageDialog(this, translate("import.script.as12warning"));
+            } else {
+                View.showMessageDialog(this, translate("import.script.result").replace("%count%", Integer.toString(count)));
+                reload(true);
+            }
         }
     }
 

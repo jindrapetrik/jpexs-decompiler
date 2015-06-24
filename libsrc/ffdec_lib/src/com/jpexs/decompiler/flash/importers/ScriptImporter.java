@@ -38,13 +38,14 @@ public class ScriptImporter {
 
     private static final Logger logger = Logger.getLogger(ScriptImporter.class.getName());
 
-    public void importScripts(String scriptsFolder, Map<String, ASMSource> asms) {
+    public int importScripts(String scriptsFolder, Map<String, ASMSource> asms) {
         if (!scriptsFolder.endsWith(File.separator)) {
             scriptsFolder += File.separator;
         }
 
         Map<String, List<String>> existingNamesMap = new HashMap<>();
 
+        int importCount = 0;
         for (String key : asms.keySet()) {
             ASMSource asm = asms.get(key);
             String currentOutDir = scriptsFolder + key + File.separator;
@@ -81,7 +82,10 @@ public class ScriptImporter {
                 }
 
                 asm.setModified();
+                importCount++;
             }
         }
+
+        return importCount;
     }
 }
