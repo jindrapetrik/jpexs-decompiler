@@ -101,7 +101,7 @@ public class DefineBitsTag extends ImageTag implements TagChangedListener {
                 byte[] jttdata = swf.getJtt().jpegData;
                 if (jttdata.length != 0) {
                     int jttErrorLength = hasErrorHeader(jttdata) ? 4 : 0;
-                    baos.write(jttdata, jttErrorLength, jttdata.length - jttErrorLength - 2);
+                    baos.write(jttdata, jttErrorLength, jttdata.length - jttErrorLength);
                 }
 
                 int errorLength = hasErrorHeader(jpegData) ? 4 : 0;
