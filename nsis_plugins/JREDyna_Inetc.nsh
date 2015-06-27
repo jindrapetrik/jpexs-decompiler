@@ -158,7 +158,7 @@ JREPathStorage:
  
 ExitInstallJRE:
   Pop $1
-  MessageBox MB_ABORTRETRYIGNORE|MB_ICONSTOP "Unable to install Java. You can installl it later manually.\n$\n$1" /SD IDIGNORE IDRETRY downloadJRE IDIGNORE End
+  MessageBox MB_ABORTRETRYIGNORE|MB_ICONSTOP "Unable to install Java. You can installl it later manually.$\n$\n$1" /SD IDIGNORE IDRETRY downloadJRE IDIGNORE End
   Pop $1 	; Restore $1
   Pop $0 	; Restore $0
   Abort
