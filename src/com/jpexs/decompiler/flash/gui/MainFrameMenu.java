@@ -624,47 +624,49 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
     public void updateComponents(SWF swf) {
         this.swf = swf;
-        boolean swfLoaded = swf != null;
+        boolean swfSelected = swf != null;
         boolean isWorking = Main.isWorking();
         List<ABCContainerTag> abcList = swf != null ? swf.getAbcList() : null;
-        boolean hasAbc = swfLoaded && abcList != null && !abcList.isEmpty();
+        boolean hasAbc = swfSelected && abcList != null && !abcList.isEmpty();
         boolean hasDebugger = hasAbc && DebuggerTools.hasDebugger(swf);
+        MainPanel mainPanel = mainFrame.getPanel();
+        boolean swfLoaded = mainPanel != null ? !mainPanel.getSwfs().isEmpty() : false;
 
         setMenuEnabled("_/open", !isWorking);
         setMenuEnabled("/file/open", !isWorking);
-        setMenuEnabled("_/save", swfLoaded && !isWorking);
-        setMenuEnabled("/file/save", swfLoaded && !isWorking);
-        setMenuEnabled("_/saveAs", swfLoaded && !isWorking);
-        setMenuEnabled("/file/saveAs", swfLoaded && !isWorking);
-        setMenuEnabled("/file/saveAsExe", swfLoaded && !isWorking);
-        setMenuEnabled("_/close", swfLoaded && !isWorking);
-        setMenuEnabled("/file/close", swfLoaded && !isWorking);
+        setMenuEnabled("_/save", swfSelected && !isWorking);
+        setMenuEnabled("/file/save", swfSelected && !isWorking);
+        setMenuEnabled("_/saveAs", swfSelected && !isWorking);
+        setMenuEnabled("/file/saveAs", swfSelected && !isWorking);
+        setMenuEnabled("/file/saveAsExe", swfSelected && !isWorking);
+        setMenuEnabled("_/close", swfSelected && !isWorking);
+        setMenuEnabled("/file/close", swfSelected && !isWorking);
         setMenuEnabled("_/closeAll", swfLoaded && !isWorking);
         setMenuEnabled("/file/closeAll", swfLoaded && !isWorking);
 
-        setMenuEnabled("/file/export", swfLoaded);
-        setMenuEnabled("_/exportAll", swfLoaded && !isWorking);
-        setMenuEnabled("/file/export/exportAll", swfLoaded && !isWorking);
-        setMenuEnabled("_/exportFla", swfLoaded && !isWorking);
-        setMenuEnabled("/file/export/exportFla", swfLoaded && !isWorking);
-        setMenuEnabled("_/exportSelected", swfLoaded && !isWorking);
-        setMenuEnabled("/file/export/exportSelected", swfLoaded && !isWorking);
-        setMenuEnabled("/file/export/exportXml", swfLoaded && !isWorking);
+        setMenuEnabled("/file/export", swfSelected);
+        setMenuEnabled("_/exportAll", swfSelected && !isWorking);
+        setMenuEnabled("/file/export/exportAll", swfSelected && !isWorking);
+        setMenuEnabled("_/exportFla", swfSelected && !isWorking);
+        setMenuEnabled("/file/export/exportFla", swfSelected && !isWorking);
+        setMenuEnabled("_/exportSelected", swfSelected && !isWorking);
+        setMenuEnabled("/file/export/exportSelected", swfSelected && !isWorking);
+        setMenuEnabled("/file/export/exportXml", swfSelected && !isWorking);
 
-        setMenuEnabled("/file/import", swfLoaded);
-        setMenuEnabled("/file/import/importText", swfLoaded && !isWorking);
-        setMenuEnabled("/file/import/importScript", swfLoaded && !isWorking);
-        setMenuEnabled("/file/import/importSymbolClass", swfLoaded && !isWorking);
-        setMenuEnabled("/file/import/importXml", swfLoaded && !isWorking);
+        setMenuEnabled("/file/import", swfSelected);
+        setMenuEnabled("/file/import/importText", swfSelected && !isWorking);
+        setMenuEnabled("/file/import/importScript", swfSelected && !isWorking);
+        setMenuEnabled("/file/import/importSymbolClass", swfSelected && !isWorking);
+        setMenuEnabled("/file/import/importXml", swfSelected && !isWorking);
 
-        setMenuEnabled("/tools/deobfuscation", swfLoaded);
-        setMenuEnabled("/tools/deobfuscation/renameOneIdentifier", swfLoaded && !isWorking);
-        setMenuEnabled("/tools/deobfuscation/renameInvalidIdentifiers", swfLoaded && !isWorking);
+        setMenuEnabled("/tools/deobfuscation", swfSelected);
+        setMenuEnabled("/tools/deobfuscation/renameOneIdentifier", swfSelected && !isWorking);
+        setMenuEnabled("/tools/deobfuscation/renameInvalidIdentifiers", swfSelected && !isWorking);
         setMenuEnabled("/tools/deobfuscation/deobfuscation", hasAbc);
 
-        setMenuEnabled("/tools/search", swfLoaded);
-        setMenuEnabled("/tools/replace", swfLoaded);
-        setMenuEnabled("/tools/timeline", swfLoaded);
+        setMenuEnabled("/tools/search", swfSelected);
+        setMenuEnabled("/tools/replace", swfSelected);
+        setMenuEnabled("/tools/timeline", swfSelected);
         setMenuEnabled("/tools/showProxy", !isWorking);
 
         setMenuEnabled("/tools/gotoDocumentClass", hasAbc);
