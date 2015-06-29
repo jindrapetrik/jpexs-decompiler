@@ -236,7 +236,12 @@ public class PlaceObjectTag extends PlaceObjectTypeTag {
         matrix = m;
         boolean mod = isModified();
         setModified(true);
-        super.writeTag(sos);
+        try {
+            super.writeTag(sos);
+        } finally {
+            setModified(mod);
+        }
+
         setModified(mod);
         matrix = old;
     }
