@@ -571,8 +571,7 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
             super.writeTag(sos);
         } finally {
             setModified(mod);
+            matrix = old;
         }
-
-        matrix = old;
     }
 }

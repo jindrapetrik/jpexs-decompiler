@@ -240,9 +240,7 @@ public class PlaceObjectTag extends PlaceObjectTypeTag {
             super.writeTag(sos);
         } finally {
             setModified(mod);
+            matrix = old;
         }
-
-        setModified(mod);
-        matrix = old;
     }
 }
