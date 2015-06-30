@@ -125,10 +125,10 @@ downloadsuccessful:
   DetailPrint "Launching JRE setup"
   
   IfSilent doSilent
-  ExecWait '"$TEMP\jre_setup.exe" /passive REBOOT=Suppress JAVAUPDATE=0 WEBSTARTICON=0 /L \"$TEMP\jre_setup.log\"' $0
+  ExecWait '"$TEMP\jre_setup.exe" REBOOT=Suppress /L \"$TEMP\jre_setup.log\"' $0
   goto jreSetupfinished
 doSilent:
-  ExecWait '"$TEMP\jre_setup.exe" /S REBOOT=Suppress JAVAUPDATE=0 WEBSTARTICON=0 /L \"$TEMP\jre_setup.log\"' $0
+  ExecWait '"$TEMP\jre_setup.exe" /S REBOOT=Suppress /L \"$TEMP\jre_setup.log\"' $0
   
 
 jreSetupFinished:
