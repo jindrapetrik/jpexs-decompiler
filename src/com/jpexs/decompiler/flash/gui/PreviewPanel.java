@@ -753,7 +753,16 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                             if (isSprite && chtId == n) {
                                 continue;
                             }
-                            classicTag(swf.getCharacter(n)).writeTag(sos2);
+
+                            CharacterTag characterTag = swf.getCharacter(n);
+                            if (characterTag instanceof DefineBitsTag) {
+                                JPEGTablesTag jtt = swf.getJtt();
+                                if (jtt != null) {
+                                    jtt.writeTag(sos2);
+                                }
+                            }
+
+                            classicTag(characterTag).writeTag(sos2);
                         }
                     }
 
