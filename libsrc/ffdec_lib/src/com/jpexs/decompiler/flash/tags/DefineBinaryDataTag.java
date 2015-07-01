@@ -30,7 +30,6 @@ import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 
 /**
  *
@@ -115,13 +114,7 @@ public class DefineBinaryDataTag extends CharacterTag {
         try {
             if (binaryData.getLength() > 8) {
                 String signature = new String(binaryData.getRangeData(0, 3), Utf8Helper.charset);
-                if (Arrays.asList(
-                        "FWS", //Uncompressed Flash
-                        "CWS", //ZLib compressed Flash
-                        "ZWS", //LZMA compressed Flash
-                        "GFX", //Uncompressed ScaleForm GFx
-                        "CFX" //Compressed ScaleForm GFx
-                ).contains(signature)) {
+                if (SWF.swfSignatures.contains(signature)) {
                     return true;
                 }
             }

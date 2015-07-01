@@ -300,6 +300,15 @@ public final class SWF implements SWFContainerItem, Timelined {
     @Internal
     private final Cache<ScriptPack, CachedDecompilation> as3Cache = Cache.getInstance(true, false, "as3");
 
+    public static List<String> swfSignatures = Arrays.asList(
+            "FWS", // Uncompressed Flash
+            "CWS", // ZLib compressed Flash
+            "ZWS", // LZMA compressed Flash
+            "GFX", // Uncompressed ScaleForm GFx
+            "CFX", // Compressed ScaleForm GFx
+            "ABC" // Non-standard LZMA compressed Flash
+    );
+
     public void updateCharacters() {
         characters = null;
     }
@@ -1149,14 +1158,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
 
         String signature = new String(hdr, 0, 3, Utf8Helper.charset);
-        if (!Arrays.asList(
-                "FWS", // Uncompressed Flash
-                "CWS", // ZLib compressed Flash
-                "ZWS", // LZMA compressed Flash
-                "GFX", // Uncompressed ScaleForm GFx
-                "CFX", // Compressed ScaleForm GFx
-                "ABC" // Non-standard LZMA compressed Flash
-        ).contains(signature)) {
+        if (!swfSignatures.contains(signature)) {
             throw new SwfOpenException("Invalid SWF file, wrong signature.");
         }
 
