@@ -844,6 +844,17 @@ public class CommandLineArgumentParser {
                     tagId = Tag.getKnownClassesByName().get(tagIdOrName).getId();
                 }
 
+                PrintStream oldOut = System.out;
+                PrintStream oldErr = System.err;
+                PrintStream nullStream = new PrintStream(new OutputStream() {
+                    @Override
+                    public void write(int b) {
+                    }
+                });
+                System.setOut(nullStream);
+                System.setErr(nullStream);
+                Main.initLogging(Configuration.debugMode.get());
+
                 File[] files = new File(folder).listFiles(getSwfFilter());
                 for (File file : files) {
                     SWFSourceInfo sourceInfo = new SWFSourceInfo(null, file.getAbsolutePath(), file.getName());
@@ -851,10 +862,26 @@ public class CommandLineArgumentParser {
                         SWF swf = new SWF(new FileInputStream(file), sourceInfo.getFile(), sourceInfo.getFileTitle(), Configuration.parallelSpeedUp.get());
                         swf.swfList = new SWFList();
                         swf.swfList.sourceInfo = sourceInfo;
+                        boolean found = false;
+                        for (Tag tag : swf.tags) {
+                            if (tag.getId() == tagId) {
+                                found = true;
+                                break;
+                            }
+                        }
+
+                        if (found) {
+                            oldOut.println("Tag found in file: " + file.getAbsolutePath());
+                        }
                     } catch (IOException | InterruptedException ex) {
                         logger.log(Level.SEVERE, null, ex);
                     }
+
                 }
+
+                System.setOut(oldOut);
+                System.setErr(oldErr);
+                Main.initLogging(Configuration.debugMode.get());
                 break;
         }
     }
