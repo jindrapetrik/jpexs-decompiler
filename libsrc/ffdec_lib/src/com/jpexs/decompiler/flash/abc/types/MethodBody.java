@@ -204,7 +204,7 @@ public final class MethodBody implements Cloneable {
         if (exportMode != ScriptExportMode.AS) {
             getCode().toASMSource(constants, trait, method_info.get(this.method_info), this, exportMode, writer);
         } else {
-            //if (!path.contains("RemoveAllPopup")) {
+            //if (!path.contains("_addGarbageLineMulti")) {
             if (!Configuration.decompile.get()) {
                 writer.appendNoHilight(Helper.getDecompilationSkippedComment()).newLine();
                 return;
@@ -248,7 +248,7 @@ public final class MethodBody implements Cloneable {
         if (exportMode != ScriptExportMode.AS) {
             getCode().toASMSource(constants, trait, method_info.get(this.method_info), this, exportMode, writer);
         } else {
-            //if (!path.contains("RemoveAllPopup")) {
+            //if (!path.contains("_addGarbageLineMulti")) {
             if (!Configuration.decompile.get()) {
                 //writer.startMethod(this.method_info);
                 writer.appendNoHilight(Helper.getDecompilationSkippedComment()).newLine();

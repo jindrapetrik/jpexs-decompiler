@@ -1770,193 +1770,191 @@ public class AVM2Code implements Cloneable {
         return list;
     }
 
+    public void updateOffsets(OffsetUpdater updater, MethodBody body) {
+        for (AVM2Instruction ins : code) {
+            if (ins.definition instanceof LookupSwitchIns) {
+                long target = ins.offset + ins.operands[0];
+                ins.operands[0] = updater.updateOperandOffset(target, ins.operands[0]);
+                for (int k = 2; k < ins.operands.length; k++) {
+                    target = ins.offset + ins.operands[k];
+                    ins.operands[k] = updater.updateOperandOffset(target, ins.operands[k]);
+                }
+            } else {
+                /*for (int j = 0; j < ins.definition.operands.length; j++) {
+                 if (ins.definition.operands[j] == AVM2Code.DAT_OFFSET) {
+                 long target = ins.offset + ins.getBytes().length + ins.operands[j];
+                 ins.operands[j] = updater.updateOperandOffset(target, ins.operands[j]);
+                 }
+                 }*/
+                //Faster, but not so universal
+                if ((ins.definition instanceof JumpIns) || (ins.definition instanceof IfTypeIns)) {
+                    long target = ins.offset + ins.getBytes().length + ins.operands[0];
+                    ins.operands[0] = updater.updateOperandOffset(target, ins.operands[0]);
+                }
+            }
+        }
+
+        for (ABCException ex : body.exceptions) {
+            ex.start = updater.updateOperandOffset(ex.start, ex.start);
+            ex.end = updater.updateOperandOffset(ex.end, ex.end);
+            ex.target = updater.updateOperandOffset(ex.target, ex.target);
+        }
+        for (AVM2Instruction ins : code) {
+            ins.offset = updater.updateInstructionOffset(ins.offset);
+        }
+    }
+
+    private void checkValidOffsets(MethodBody body) {
+        updateOffsets(new OffsetUpdater() {
+
+            @Override
+            public long updateInstructionOffset(long offset) {
+                adr2pos(offset);
+                return offset;
+            }
+
+            @Override
+            public int updateOperandOffset(long targetAddress, int offset) {
+                adr2pos(targetAddress);
+                return offset;
+            }
+
+        }, body);
+    }
+
     public void removeInstruction(int pos, MethodBody body) {
         if ((pos < 0) || (pos >= code.size())) {
             throw new IndexOutOfBoundsException();
         }
-        int byteCount = code.get(pos).getBytes().length;
-        long remOffset = code.get(pos).offset;
-        for (int i = pos + 1; i < code.size(); i++) {
-            code.get(i).offset -= byteCount;
-        }
+        //checkValidOffsets(body);
+        final long remOffset = code.get(pos).offset;
+        final int byteCount = code.get(pos).getBytes().length;
+        updateOffsets(new OffsetUpdater() {
+            @Override
+            public long updateInstructionOffset(long address) {
+                if (address > remOffset) {
+                    return address - byteCount;
+                }
+                return address;
+            }
 
-        for (ABCException ex : body.exceptions) {
-            if (ex.start > remOffset) {
-                ex.start -= byteCount;
+            @Override
+            public int updateOperandOffset(long targetAddress, int offset) {
+                if (targetAddress > remOffset) {
+                    return offset - byteCount;
+                }
+                return offset;
             }
-            if (ex.end > remOffset) {
-                ex.end -= byteCount;
-            }
-            if (ex.target > remOffset) {
-                ex.target -= byteCount;
-            }
-        }
-
-        for (int i = 0; i < pos; i++) {
-            if (code.get(i).definition instanceof LookupSwitchIns) {
-                long target = code.get(i).offset + code.get(i).operands[0];
-                if (target > remOffset) {
-                    code.get(i).operands[0] -= byteCount;
-                }
-                for (int k = 2; k < code.get(i).operands.length; k++) {
-                    target = code.get(i).offset + code.get(i).operands[k];
-                    if (target > remOffset) {
-                        code.get(i).operands[k] -= byteCount;
-                    }
-                }
-            } else {
-                for (int j = 0; j < code.get(i).definition.operands.length; j++) {
-                    if (code.get(i).definition.operands[j] == AVM2Code.DAT_OFFSET) {
-                        long target = code.get(i).offset + code.get(i).getBytes().length + code.get(i).operands[j];
-                        if (target > remOffset) {
-                            code.get(i).operands[j] -= byteCount;
-                        }
-                    }
-                }
-            }
-        }
-        for (int i = pos + 1; i < code.size(); i++) {
-            if (code.get(i).definition instanceof LookupSwitchIns) {
-                long target = code.get(i).offset + code.get(i).operands[0];
-                if (target < remOffset) {
-                    code.get(i).operands[0] += byteCount;
-                }
-                for (int k = 2; k < code.get(i).operands.length; k++) {
-                    target = code.get(i).offset + code.get(i).operands[k];
-                    if (target < remOffset) {
-                        code.get(i).operands[k] += byteCount;
-                    }
-                }
-            } else {
-                for (int j = 0; j < code.get(i).definition.operands.length; j++) {
-                    if (code.get(i).definition.operands[j] == AVM2Code.DAT_OFFSET) {
-                        long target = code.get(i).offset + code.get(i).getBytes().length + code.get(i).operands[j];
-                        if (target < remOffset) {
-                            code.get(i).operands[j] += byteCount;
-                        }
-                    }
-                }
-            }
-        }
-
+        }, body);
         code.remove(pos);
         invalidateCache();
+        //checkValidOffsets(body);
+        //System.exit(0);
+
     }
 
     /**
-     * @param pos
-     * @param instruction
+     * Inserts instuction at specified point. Handles offsets properly. Note: If
+     * newinstruction is jump, the offset operand must be handled properly by
+     * caller. All old jump offsets to pos are targeted before new instruction.
+     *
+     * @param pos Position in the list
+     * @param instruction Instruction False means before new instruction
+     * @param body Method body (used for try handling)
      */
     public void insertInstruction(int pos, AVM2Instruction instruction, MethodBody body) {
-        insertInstruction(pos, instruction, true, false, body);
+        insertInstruction(pos, instruction, false, body);
     }
 
-    public void replaceInstruction(int idx, AVM2Instruction ins, MethodBody body) {
-        insertInstruction(idx, ins, true, true, body);
-        removeInstruction(idx + 1, body);
-    }
-
-    public void insertInstruction(int pos, AVM2Instruction instruction, boolean preRefsToThis, boolean postRefsToThis, MethodBody body) {
+    /**
+     * Replaces instrunction by another. Properly handles offsets. Note: If
+     * newinstruction is jump, the offset operand must be handled properly by
+     * caller.
+     *
+     * @param pos
+     * @param instruction
+     * @param body
+     */
+    public void replaceInstruction(int pos, AVM2Instruction instruction, MethodBody body) {
         if (pos < 0) {
             pos = 0;
         }
         if (pos > code.size()) {
             pos = code.size();
         }
-        int byteCount = instruction.getBytes().length;
+        instruction.offset = code.get(pos).offset;
+        int oldByteCount = code.get(pos).getBytes().length;
+        int newByteCount = instruction.getBytes().length;
+        int byteDelta = newByteCount - oldByteCount;
+
+        if (byteDelta != 0) {
+            updateOffsets(new OffsetUpdater() {
+
+                @Override
+                public long updateInstructionOffset(long offset) {
+                    if (offset > instruction.offset) {
+                        return offset + byteDelta;
+                    }
+                    return offset;
+                }
+
+                @Override
+                public int updateOperandOffset(long targetAddress, int offset) {
+                    if (targetAddress > instruction.offset) {
+                        return offset + byteDelta;
+                    }
+                    return offset;
+                }
+            }, body);
+        }
+        code.set(pos, instruction);
+    }
+
+    /**
+     * Inserts instuction at specified point. Handles offsets properly. Note: If
+     * newinstruction is jump, the offset operand must be handled properly by
+     * caller.
+     *
+     * @param pos Position in the list
+     * @param instruction Instruction
+     * @param mapOffsetsAfterIns Map all jumps to the pos after new instruction?
+     * False means before new instruction
+     * @param body Method body (used for try handling)
+     */
+    public void insertInstruction(int pos, AVM2Instruction instruction, boolean mapOffsetsAfterIns, MethodBody body) {
+        if (pos < 0) {
+            pos = 0;
+        }
+        if (pos > code.size()) {
+            pos = code.size();
+        }
+        final int byteCount = instruction.getBytes().length;
         if (pos == code.size()) {
             instruction.offset = code.get(pos - 1).offset + code.get(pos - 1).getBytes().length;
         } else {
             instruction.offset = code.get(pos).offset;
         }
+        updateOffsets(new OffsetUpdater() {
 
-        for (ABCException ex : body.exceptions) {
-            if (ex.start > instruction.offset) {
-                ex.start += byteCount;
-            }
-            if (ex.end > instruction.offset) {
-                ex.end += byteCount;
-            }
-            if (ex.target > instruction.offset) {
-                ex.target += byteCount;
-            }
-        }
-
-        {
-            for (int i = 0; i < pos; i++) {
-                if (code.get(i).definition instanceof LookupSwitchIns) {
-                    long target = code.get(i).offset + code.get(i).operands[0];
-                    if (target > instruction.offset) {
-                        code.get(i).operands[0] += byteCount;
-                    }
-                    if (target == instruction.offset && !preRefsToThis) {
-                        code.get(i).operands[0] += byteCount;
-                    }
-                    for (int k = 2; k < code.get(i).operands.length; k++) {
-                        target = code.get(i).offset + code.get(i).operands[k];
-                        if (target > instruction.offset) {
-                            code.get(i).operands[k] += byteCount;
-                        }
-                        if (target == instruction.offset && !preRefsToThis) {
-                            code.get(i).operands[k] += byteCount;
-                        }
-                    }
-                } else {
-                    for (int j = 0; j < code.get(i).definition.operands.length; j++) {
-                        if (code.get(i).definition.operands[j] == AVM2Code.DAT_OFFSET) {
-                            long target = code.get(i).offset + code.get(i).getBytes().length + code.get(i).operands[j];
-                            if (target > instruction.offset) {
-                                code.get(i).operands[j] += byteCount;
-                            }
-                            if (target == instruction.offset && !preRefsToThis) {
-                                code.get(i).operands[j] += byteCount;
-                            }
-
-                        }
-                    }
+            @Override
+            public long updateInstructionOffset(long offset) {
+                if (offset >= instruction.offset) {
+                    return offset + byteCount;
                 }
+                return offset;
             }
-        }
-        {
-            for (int i = pos; i < code.size(); i++) {
-                if (code.get(i).definition instanceof LookupSwitchIns) {
-                    long target = code.get(i).offset + code.get(i).operands[0];
-                    if (target < instruction.offset) {
-                        code.get(i).operands[0] -= byteCount;
-                    }
-                    if (target == instruction.offset && postRefsToThis) {
-                        code.get(i).operands[0] -= byteCount;
-                    }
-                    for (int k = 2; k < code.get(i).operands.length; k++) {
-                        target = code.get(i).offset + code.get(i).operands[k];
-                        if (target < instruction.offset) {
-                            code.get(i).operands[k] -= byteCount;
-                        }
-                        if (target == instruction.offset && postRefsToThis) {
-                            code.get(i).operands[k] -= byteCount;
-                        }
-                    }
-                } else {
-                    for (int j = 0; j < code.get(i).definition.operands.length; j++) {
-                        if (code.get(i).definition.operands[j] == AVM2Code.DAT_OFFSET) {
-                            long target = code.get(i).offset + code.get(i).getBytes().length + code.get(i).operands[j];
-                            if (target < instruction.offset) {
-                                code.get(i).operands[j] -= byteCount;
-                            }
-                            if (target == instruction.offset && postRefsToThis) {
-                                code.get(i).operands[j] -= byteCount;
-                            }
-                        }
-                    }
-                }
-            }
-        }
 
-        for (int i = pos; i < code.size(); i++) {
-            code.get(i).offset += byteCount;
-        }
+            @Override
+            public int updateOperandOffset(long targetAddress, int offset) {
+                if ((targetAddress > instruction.offset) || (mapOffsetsAfterIns && (targetAddress == instruction.offset))) {
+                    return offset + byteCount;
+                }
+                return offset;
+            }
+        }, body);
         code.add(pos, instruction);
         invalidateCache();
+        checkValidOffsets(body);
     }
 
     @SuppressWarnings("unchecked")
@@ -2524,6 +2522,30 @@ public class AVM2Code implements Cloneable {
         restoreControlFlowPass(constants, trait, info, body, false);
         //restoreControlFlowPass(constants, body, true);
     }
+    /*
+     public void removeIgnored(AVM2ConstantPool constants, Trait trait, MethodInfo info, MethodBody body) throws InterruptedException {
+     try {
+     List<Integer> outputMap = new ArrayList<>();
+     HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
+     toASMSource(constants, trait, info, body, outputMap, ScriptExportMode.PCODE, writer);
+     String src = writer.toString();
+     AVM2Code acode = ASM3Parser.parse(new StringReader(src), constants, trait, body, info);
+     for (int i = 0; i < acode.code.size(); i++) {
+     if (outputMap.size() > i) {
+     int tpos = outputMap.get(i);
+     if (tpos == -1) {
+     } else if (code.get(tpos).mappedOffset >= 0) {
+     acode.code.get(i).mappedOffset = code.get(tpos).mappedOffset;
+     } else {
+     acode.code.get(i).mappedOffset = pos2adr(tpos);
+     }
+     }
+     }
+     this.code = acode.code;
+     } catch (IOException | AVM2ParseException ex) {
+     }
+     invalidateCache();
+     }*/
 
     public void removeIgnored(AVM2ConstantPool constants, Trait trait, MethodInfo info, MethodBody body) throws InterruptedException {
         for (int i = 0; i < code.size(); i++) {
