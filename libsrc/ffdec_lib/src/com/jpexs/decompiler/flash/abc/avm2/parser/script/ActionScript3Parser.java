@@ -125,7 +125,7 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-public class ActionScriptParser {
+public class ActionScript3Parser {
 
     private long uniqLast = 0;
 
@@ -2376,7 +2376,7 @@ public class ActionScriptParser {
         addScriptFromTree(traits, documentClass, classPos);
     }
 
-    public ActionScriptParser(ABC abc, List<ABC> otherABCs) {
+    public ActionScript3Parser(ABC abc, List<ABC> otherABCs) {
         this.abc = abc;
         this.otherABCs = otherABCs;
     }
@@ -2401,7 +2401,7 @@ public class ActionScriptParser {
         initPlayer();
         parABCs.addAll(playerABCs);
         parABCs.addAll(otherABCs);
-        ActionScriptParser parser = new ActionScriptParser(abc, parABCs);
+        ActionScript3Parser parser = new ActionScript3Parser(abc, parABCs);
         parser.addScript(src, documentClass, fileName, classPos);
     }
 
@@ -2410,13 +2410,13 @@ public class ActionScriptParser {
         try {
             initPlayer();
             ABC abc = new ABC(null);
-            ActionScriptParser parser = new ActionScriptParser(abc, playerABCs);
+            ActionScript3Parser parser = new ActionScript3Parser(abc, playerABCs);
             parser.addScript(new String(Helper.readFile(src), Utf8Helper.charset), true, src, classPos);
             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(new File(dst)))) {
                 abc.saveToStream(fos);
             }
         } catch (Exception ex) {
-            Logger.getLogger(ActionScriptParser.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ActionScript3Parser.class.getName()).log(Level.SEVERE, null, ex);
         }
         System.exit(0);
     }

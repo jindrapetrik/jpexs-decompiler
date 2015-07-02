@@ -17,6 +17,8 @@
 package com.jpexs.decompiler.flash.importers;
 
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
+import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
+import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.helpers.Helper;
@@ -34,9 +36,9 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-public class ScriptImporter {
+public class AS2ScriptImporter {
 
-    private static final Logger logger = Logger.getLogger(ScriptImporter.class.getName());
+    private static final Logger logger = Logger.getLogger(AS2ScriptImporter.class.getName());
 
     public int importScripts(String scriptsFolder, Map<String, ASMSource> asms) {
         if (!scriptsFolder.endsWith(File.separator)) {
@@ -68,11 +70,11 @@ public class ScriptImporter {
 
             String fileName = Path.combine(currentOutDir, name) + ".as";
             if (new File(fileName).exists()) {
-                String as = Helper.readTextFile(fileName);
+                String txt = Helper.readTextFile(fileName);
 
-                com.jpexs.decompiler.flash.action.parser.script.ActionScriptParser par = new com.jpexs.decompiler.flash.action.parser.script.ActionScriptParser(asm.getSwf().version);
+                ActionScript2Parser par = new ActionScript2Parser(asm.getSwf().version);
                 try {
-                    asm.setActions(par.actionsFromString(as));
+                    asm.setActions(par.actionsFromString(txt));
                 } catch (ActionParseException ex) {
                     logger.log(Level.SEVERE, "%error% on line %line%, file: %file%".replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)).replace("%file%", fileName), ex);
                 } catch (CompilationException ex) {
@@ -81,6 +83,40 @@ public class ScriptImporter {
                     logger.log(Level.SEVERE, "error during script import, file: %file%".replace("%file%", fileName), ex);
                 }
 
+                asm.setModified();
+                importCount++;
+            }
+
+            fileName = Path.combine(currentOutDir, name) + ".pcode";
+            if (new File(fileName).exists()) {
+                String txt = Helper.readTextFile(fileName);
+
+                try {
+                    asm.setActions(ASMParser.parse(0, true, txt, asm.getSwf().version, false));
+                } catch (IOException ex) {
+                    logger.log(Level.SEVERE, "error during script import, file: %file%".replace("%file%", fileName), ex);
+                } catch (ActionParseException ex) {
+                    logger.log(Level.SEVERE, "%error% on line %line%, file: %file%".replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)).replace("%file%", fileName), ex);
+                }
+
+                asm.setModified();
+                importCount++;
+            }
+
+            fileName = Path.combine(currentOutDir, name) + ".hex";
+            if (new File(fileName).exists()) {
+                String txt = Helper.readTextFile(fileName);
+
+                asm.setActionBytes(Helper.getBytesFromHexaText(txt));
+                asm.setModified();
+                importCount++;
+            }
+
+            fileName = Path.combine(currentOutDir, name) + ".txt";
+            if (new File(fileName).exists()) {
+                String txt = Helper.readTextFile(fileName);
+
+                asm.setConstantPools(Helper.getConstantPoolsFromText(txt));
                 asm.setModified();
                 importCount++;
             }

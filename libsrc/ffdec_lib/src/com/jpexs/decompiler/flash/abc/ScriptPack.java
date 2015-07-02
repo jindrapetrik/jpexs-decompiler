@@ -104,6 +104,15 @@ public class ScriptPack extends AS3ClassTreeItem {
         return scriptName;
     }
 
+    public File getExportFile(String directory, ScriptExportSettings exportSettings) throws IOException {
+        String scriptName = getPathScriptName();
+        String packageName = getPathPackage();
+        File outDir = new File(directory + File.separatorChar + makeDirPath(packageName));
+        Path.createDirectorySafe(outDir);
+        String fileName = outDir.toString() + File.separator + Helper.makeFileName(scriptName) + exportSettings.getFileExtension();
+        return new File(fileName);
+    }
+
     /*public String getPath() {
      String packageName = "";
      String scriptName = "";
@@ -197,12 +206,7 @@ public class ScriptPack extends AS3ClassTreeItem {
         File file = null;
 
         if (!exportSettings.singleFile) {
-            String scriptName = getPathScriptName();
-            String packageName = getPathPackage();
-            File outDir = new File(directory + File.separatorChar + makeDirPath(packageName));
-            Path.createDirectorySafe(outDir);
-            String fileName = outDir.toString() + File.separator + Helper.makeFileName(scriptName) + exportSettings.getFileExtension();
-            file = new File(fileName);
+            file = getExportFile(directory, exportSettings);
         }
 
         try (FileTextWriter writer = exportSettings.singleFile ? null : new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(file))) {

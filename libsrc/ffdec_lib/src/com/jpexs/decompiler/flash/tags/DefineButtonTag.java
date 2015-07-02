@@ -200,8 +200,7 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
 
     @Override
     public void setActions(List<Action> actions) {
-        byte[] bytes = Action.actionsToBytes(actions, true, swf.version);
-        actionBytes = new ByteArrayRange(bytes, 0, bytes.length);
+        actionBytes = Action.actionsToByteArrayRange(actions, true, swf.version);
     }
 
     @Override
@@ -212,6 +211,11 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
     @Override
     public void setActionBytes(byte[] actionBytes) {
         this.actionBytes = new ByteArrayRange(actionBytes);
+    }
+
+    @Override
+    public void setConstantPools(List<List<String>> constantPools) {
+        Action.setConstantPools(this, constantPools);
     }
 
     @Override
@@ -437,5 +441,4 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
     public void setSourceTag(Tag t) {
         //nothing
     }
-
 }

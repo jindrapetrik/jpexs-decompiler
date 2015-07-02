@@ -155,11 +155,11 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class ActionScriptParser {
+public class ActionScript2Parser {
 
     private final int swfVersion;
 
-    public ActionScriptParser(int swfVersion) {
+    public ActionScript2Parser(int swfVersion) {
         this.swfVersion = swfVersion;
     }
 

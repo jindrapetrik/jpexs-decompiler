@@ -24,13 +24,12 @@ import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.CachedScript;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
+import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScriptLexer;
-import com.jpexs.decompiler.flash.action.parser.script.ActionScriptParser;
 import com.jpexs.decompiler.flash.action.parser.script.ParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.script.SymbolType;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
-import com.jpexs.decompiler.flash.action.swf5.ActionConstantPool;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.gui.AppStrings;
@@ -794,7 +793,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
             if (trimmed.startsWith(Helper.hexData)) {
                 src.setActionBytes(Helper.getBytesFromHexaText(text));
             } else if (trimmed.startsWith(Helper.constants)) {
-                setConstantPools(Helper.getConstantPoolsFromText(text));
+                src.setConstantPools(Helper.getConstantPoolsFromText(text));
             } else {
                 src.setActions(ASMParser.parse(0, true, text, src.getSwf().version, false));
             }
@@ -817,29 +816,6 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         }
     }
 
-    private void setConstantPools(List<List<String>> constantPools) {
-        try {
-            ActionList actions = src.getActions();
-            int poolIdx = 0;
-            for (Action action : actions) {
-                if (action instanceof ActionConstantPool) {
-                    ActionConstantPool cPool = (ActionConstantPool) action;
-                    List<String> constantPool = constantPools.get(poolIdx);
-                    cPool.constantPool = constantPool;
-
-                    poolIdx++;
-                    if (constantPools.size() <= poolIdx) {
-                        break;
-                    }
-                }
-            }
-
-            src.setActions(actions);
-        } catch (InterruptedException ex) {
-            logger.log(Level.SEVERE, null, ex);
-        }
-    }
-
     private void editDecompiledButtonActionPerformed(ActionEvent evt) {
         if (View.showConfirmDialog(null, AppStrings.translate("message.confirm.experimental.function"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, Configuration.warningExperimentalAS12Edit, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION) {
             setDecompiledEditMode(true);
@@ -852,7 +828,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
 
     private void saveDecompiledButtonActionPerformed(ActionEvent evt) {
         try {
-            ActionScriptParser par = new ActionScriptParser(mainPanel.getCurrentSwf().version);
+            ActionScript2Parser par = new ActionScript2Parser(mainPanel.getCurrentSwf().version);
             src.setActions(par.actionsFromString(decompiledEditor.getText()));
             src.setModified();
             setSource(src, false);

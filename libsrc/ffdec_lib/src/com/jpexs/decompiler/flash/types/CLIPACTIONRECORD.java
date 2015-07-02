@@ -212,8 +212,7 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable {
 
     @Override
     public void setActions(List<Action> actions) {
-        byte[] bytes = Action.actionsToBytes(actions, true, swf.version);
-        actionBytes = new ByteArrayRange(bytes);
+        actionBytes = Action.actionsToByteArrayRange(actions, true, swf.version);
     }
 
     @Override
@@ -224,6 +223,11 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable {
     @Override
     public void setActionBytes(byte[] actionBytes) {
         this.actionBytes = new ByteArrayRange(actionBytes);
+    }
+
+    @Override
+    public void setConstantPools(List<List<String>> constantPools) {
+        Action.setConstantPools(this, constantPools);
     }
 
     @Override

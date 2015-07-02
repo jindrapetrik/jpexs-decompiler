@@ -25,7 +25,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushStringIns;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
-import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScriptParser;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScript3Parser;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.ClassInfo;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
@@ -1247,7 +1247,7 @@ public class ABC {
         }
         List<ABC> otherAbcs = new ArrayList<>(pack.allABCs);
         otherAbcs.remove(this);
-        ActionScriptParser.compile(as, this, otherAbcs, isDocumentClass, scriptName, newClassIndex);
+        ActionScript3Parser.compile(as, this, otherAbcs, isDocumentClass, scriptName, newClassIndex);
         // Move newly added script to its position
         script_info.set(oldIndex, script_info.get(newIndex));
         script_info.remove(newIndex);

@@ -31,11 +31,12 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.ASM3Parser;
 import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.MissingSymbolHandler;
-import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScriptParser;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScript3Parser;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
+import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
 import com.jpexs.decompiler.flash.exporters.BinaryDataExporter;
@@ -80,7 +81,10 @@ import com.jpexs.decompiler.flash.importers.BinaryDataImporter;
 import com.jpexs.decompiler.flash.importers.ImageImporter;
 import com.jpexs.decompiler.flash.importers.SwfXmlImporter;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
+import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
+import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
+import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
@@ -476,7 +480,7 @@ public class CommandLineArgumentParser {
         } else if (command.equals("replace")) {
             parseReplace(args);
         } else if (command.equals("as3compiler")) {
-            ActionScriptParser.compile(null /*?*/, args.pop(), args.pop(), 0);
+            ActionScript3Parser.compile(null /*?*/, args.pop(), args.pop(), 0);
         } else if (nextParam.equals("-help") || nextParam.equals("--help") || nextParam.equals("/?") || nextParam.equals("\\_") /* /? translates as this on windows */) {
             printHeader();
             printCmdLineUsage();
@@ -834,7 +838,7 @@ public class CommandLineArgumentParser {
     private static void parseDebugTool(Stack<String> args) {
         String cmd = args.pop().toLowerCase();
         switch (cmd) {
-            case "findtag":
+            case "findtag": {
                 String folder = args.pop();
                 String tagIdOrName = args.pop();
                 int tagId;
@@ -876,13 +880,70 @@ public class CommandLineArgumentParser {
                     } catch (IOException | InterruptedException ex) {
                         logger.log(Level.SEVERE, null, ex);
                     }
-
                 }
 
                 System.setOut(oldOut);
                 System.setErr(oldErr);
                 Main.initLogging(Configuration.debugMode.get());
                 break;
+            }
+            case "finderrorheader": {
+                String folder = args.pop();
+
+                PrintStream oldOut = System.out;
+                PrintStream oldErr = System.err;
+                PrintStream nullStream = new PrintStream(new OutputStream() {
+                    @Override
+                    public void write(int b) {
+                    }
+                });
+                System.setOut(nullStream);
+                System.setErr(nullStream);
+                Main.initLogging(Configuration.debugMode.get());
+
+                File[] files = new File(folder).listFiles(getSwfFilter());
+                for (File file : files) {
+                    SWFSourceInfo sourceInfo = new SWFSourceInfo(null, file.getAbsolutePath(), file.getName());
+                    try {
+                        SWF swf = new SWF(new FileInputStream(file), sourceInfo.getFile(), sourceInfo.getFileTitle(), Configuration.parallelSpeedUp.get());
+                        swf.swfList = new SWFList();
+                        swf.swfList.sourceInfo = sourceInfo;
+                        boolean found = false;
+                        for (Tag tag : swf.tags) {
+                            if (tag instanceof JPEGTablesTag) {
+                                JPEGTablesTag jtt = (JPEGTablesTag) tag;
+                                if (ImageTag.hasErrorHeader(jtt.jpegData)) {
+                                    found = true;
+                                    break;
+                                }
+                            } else if (tag instanceof DefineBitsJPEG2Tag) {
+                                DefineBitsJPEG2Tag jpeg = (DefineBitsJPEG2Tag) tag;
+                                if (ImageTag.hasErrorHeader(jpeg.imageData)) {
+                                    found = true;
+                                    break;
+                                }
+                            } else if (tag instanceof DefineBitsJPEG3Tag) {
+                                DefineBitsJPEG3Tag jpeg = (DefineBitsJPEG3Tag) tag;
+                                if (ImageTag.hasErrorHeader(jpeg.imageData)) {
+                                    found = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (found) {
+                            oldOut.println("Tag found in file: " + file.getAbsolutePath());
+                        }
+                    } catch (IOException | InterruptedException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    }
+                }
+
+                System.setOut(oldOut);
+                System.setErr(oldErr);
+                Main.initLogging(Configuration.debugMode.get());
+                break;
+            }
         }
     }
 
@@ -1713,7 +1774,7 @@ public class CommandLineArgumentParser {
     private static void replaceAS2(String as, ASMSource src) throws IOException, InterruptedException {
         System.out.println("Replace AS1/2");
         System.out.println("Warning: This feature is EXPERIMENTAL");
-        com.jpexs.decompiler.flash.action.parser.script.ActionScriptParser par = new com.jpexs.decompiler.flash.action.parser.script.ActionScriptParser(src.getSwf().version);
+        ActionScript2Parser par = new ActionScript2Parser(src.getSwf().version);
         try {
             src.setActions(par.actionsFromString(as));
         } catch (ActionParseException ex) {

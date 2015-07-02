@@ -47,6 +47,8 @@ public class ScriptExportSettings {
                 return ".pcode";
             case HEX:
                 return ".hex";
+            case CONSTANTS:
+                return ".txt";
             default:
                 throw new Error("Unsupported script export mode: " + mode);
         }

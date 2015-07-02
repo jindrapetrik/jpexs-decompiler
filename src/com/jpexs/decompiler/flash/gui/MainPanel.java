@@ -86,9 +86,10 @@ import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
 import com.jpexs.decompiler.flash.gui.timeline.TimelineViewPanel;
 import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.helpers.Freed;
+import com.jpexs.decompiler.flash.importers.AS2ScriptImporter;
+import com.jpexs.decompiler.flash.importers.AS3ScriptImporter;
 import com.jpexs.decompiler.flash.importers.BinaryDataImporter;
 import com.jpexs.decompiler.flash.importers.ImageImporter;
-import com.jpexs.decompiler.flash.importers.ScriptImporter;
 import com.jpexs.decompiler.flash.importers.ShapeImporter;
 import com.jpexs.decompiler.flash.importers.SwfXmlImporter;
 import com.jpexs.decompiler.flash.importers.SymbolClassImporter;
@@ -1960,11 +1961,17 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             String selFile = Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath();
             String scriptsFolder = Path.combine(selFile, ScriptExportSettings.EXPORT_FOLDER_NAME);
 
-            int count = new ScriptImporter().importScripts(scriptsFolder, swf.getASMs(true));
-            if (count == 0 && swf.isAS3()) {
+            int countAs2 = new AS2ScriptImporter().importScripts(scriptsFolder, swf.getASMs(true));
+            int countAs3 = new AS3ScriptImporter().importScripts(scriptsFolder, swf.getAS3Packs());
+
+            if (countAs3 > 0) {
+                updateClassesList();
+            }
+
+            if (countAs2 == 0 && countAs3 == 0 && swf.isAS3()) {
                 View.showMessageDialog(this, translate("import.script.as12warning"));
             } else {
-                View.showMessageDialog(this, translate("import.script.result").replace("%count%", Integer.toString(count)));
+                View.showMessageDialog(this, translate("import.script.result").replace("%count%", Integer.toString(countAs2)));
                 reload(true);
             }
         }

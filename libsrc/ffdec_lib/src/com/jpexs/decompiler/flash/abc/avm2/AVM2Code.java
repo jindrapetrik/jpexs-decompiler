@@ -903,6 +903,7 @@ public class AVM2Code implements Cloneable {
                 writer.newLine();
             }
         }
+
         if (info != null) {
             writer.appendNoHilight("method").newLine();
             writer.appendNoHilight("name ");
@@ -1049,7 +1050,7 @@ public class AVM2Code implements Cloneable {
 
         if (exportMode == ScriptExportMode.HEX) {
             Helper.byteArrayToHexWithHeader(writer, getBytes());
-        } else {
+        } else if (exportMode == ScriptExportMode.PCODE || exportMode == ScriptExportMode.PCODE_HEX) {
             for (AVM2Instruction ins : code) {
                 long ofs = ins.offset;
                 if (exportMode == ScriptExportMode.PCODE_HEX) {
@@ -1124,7 +1125,10 @@ public class AVM2Code implements Cloneable {
                 }
                 ip++;
             }
+        } else if (exportMode == ScriptExportMode.CONSTANTS) {
+            writer.appendNoHilight("Constant export mode is not supported.").newLine();
         }
+
         return writer;
     }
 

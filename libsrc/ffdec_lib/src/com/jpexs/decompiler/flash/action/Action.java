@@ -75,6 +75,7 @@ import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.NotItem;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
+import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import java.io.ByteArrayOutputStream;
@@ -368,6 +369,34 @@ public abstract class Action implements GraphSourceItem {
             baos.write(0);
         }
         return baos.toByteArray();
+    }
+
+    public static ByteArrayRange actionsToByteArrayRange(List<Action> list, boolean addZero, int version) {
+        byte[] bytes = Action.actionsToBytes(list, addZero, version);
+        return new ByteArrayRange(bytes);
+    }
+
+    public static void setConstantPools(ASMSource src, List<List<String>> constantPools) {
+        try {
+            ActionList actions = src.getActions();
+            int poolIdx = 0;
+            for (Action action : actions) {
+                if (action instanceof ActionConstantPool) {
+                    ActionConstantPool cPool = (ActionConstantPool) action;
+                    List<String> constantPool = constantPools.get(poolIdx);
+                    cPool.constantPool = constantPool;
+
+                    poolIdx++;
+                    if (constantPools.size() <= poolIdx) {
+                        break;
+                    }
+                }
+            }
+
+            src.setActions(actions);
+        } catch (InterruptedException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
