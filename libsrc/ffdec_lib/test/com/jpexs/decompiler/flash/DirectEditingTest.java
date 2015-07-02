@@ -19,9 +19,10 @@ package com.jpexs.decompiler.flash;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScript3Parser;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
-import com.jpexs.decompiler.flash.action.parser.script.ActionScriptParser;
+import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
@@ -86,7 +87,7 @@ public class DirectEditingTest extends FileTestBase {
                         System.out.println("Recompiling:" + classPathString + "...");
                         en.toSource(htw, abc.script_info.get(s).traits.traits, ScriptExportMode.AS, false);
                         String original = htw.toString();
-                        com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScriptParser.compile(original, abc, allAbcs, false, en.getClassPath().className + ".as", abc.instance_info.size());
+                        ActionScript3Parser.compile(original, abc, allAbcs, false, en.getClassPath().className + ".as", abc.instance_info.size());
 
                         //remove last compiled script:
                         abc.script_info.remove(abc.script_info.size() - 1);
@@ -101,7 +102,7 @@ public class DirectEditingTest extends FileTestBase {
                         Action.actionsToSource(asm, asm.getActions(), asm.toString()/*FIXME?*/, writer);
                         String as = writer.toString();
                         as = asm.removePrefixAndSuffix(as);
-                        ActionScriptParser par = new ActionScriptParser(swf.version);
+                        ActionScript2Parser par = new ActionScript2Parser(swf.version);
                         try {
                             asm.setActions(par.actionsFromString(as));
                         } catch (ActionParseException | CompilationException ex) {

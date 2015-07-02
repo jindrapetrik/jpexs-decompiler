@@ -21,7 +21,7 @@ import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.ActionListReader;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
-import com.jpexs.decompiler.flash.action.parser.script.ActionScriptParser;
+import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
@@ -54,7 +54,7 @@ public class ActionScript2DeobfuscatorTest extends ActionStript2TestBase {
     }
 
     private String recompile(String str) throws ActionParseException, IOException, CompilationException, InterruptedException, TimeoutException {
-        ActionScriptParser par = new ActionScriptParser(SWF.DEFAULT_VERSION);
+        ActionScript2Parser par = new ActionScript2Parser(SWF.DEFAULT_VERSION);
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
         List<Action> actions = par.actionsFromString(str);
         byte[] hex = Action.actionsToBytes(actions, true, SWF.DEFAULT_VERSION);

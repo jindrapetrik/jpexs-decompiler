@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash;
 
-import com.jpexs.decompiler.flash.action.parser.script.ActionScriptParser;
+import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.graph.CompilationException;
 import java.io.IOException;
@@ -38,7 +38,7 @@ public class ActionScript2ParserTest extends ActionStript2TestBase {
 
     private void parseAS2(String script) {
         try {
-            ActionScriptParser par = new ActionScriptParser(SWF.DEFAULT_VERSION);
+            ActionScript2Parser par = new ActionScript2Parser(SWF.DEFAULT_VERSION);
             par.actionsFromString(script);
         } catch (IOException | CompilationException | ParseException ex) {
             fail("Unable to parse: " + script, ex);
