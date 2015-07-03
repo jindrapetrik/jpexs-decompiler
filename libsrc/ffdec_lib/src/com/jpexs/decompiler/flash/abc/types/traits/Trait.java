@@ -81,7 +81,8 @@ public abstract class Trait implements Serializable {
                     if (m.namespace_index == -1) {
                         break;
                     }
-                    nsname = abcTag.getABC().nsValueToName(abc.constants.getNamespace(m.namespace_index).getName(abc.constants, true));
+                    nsname = abcTag.getABC().nsValueToName(abc.constants.getNamespace(m.namespace_index).getName(abc.constants, true)).toString();
+
                     if (nsname == null) {
                         break;
                     }
@@ -194,7 +195,7 @@ public abstract class Trait implements Serializable {
         Multiname name = getName(abc);
         Namespace ns = name.getNamespace(abc.constants);
         String packageName = ns.getName(abc.constants, false);
-        String objectName = name.getName(abc.constants, new ArrayList<>(), false);
+        String objectName = name.getName(abc.constants, new ArrayList<String>(), false);
         return new ClassPath(packageName, objectName); //assume not null name
     }
 }

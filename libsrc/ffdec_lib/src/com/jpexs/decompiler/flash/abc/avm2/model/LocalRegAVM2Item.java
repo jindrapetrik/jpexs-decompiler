@@ -90,7 +90,7 @@ public class LocalRegAVM2Item extends AVM2Item {
 
     @Override
     public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
-        return isCT;
+        return false; //isCT;
     }
 
     @Override

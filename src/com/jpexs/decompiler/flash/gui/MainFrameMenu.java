@@ -806,16 +806,15 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addMenuItem("/settings/language/setLanguage", translate("menu.settings.language"), "setlanguage32", this::setLanguageActionPerformed, PRIORITY_TOP, null, true);
         finishMenu("/settings/language");
 
-        addMenuItem("/settings/deobfuscation", translate("menu.deobfuscation"), null, null, 0, null, false);
-        addToggleMenuItem("/settings/deobfuscation/old", translate("menu.file.deobfuscation.old"), "deobfuscation", "deobfuscateold16", (ActionEvent e) -> {
-            deobfuscationMode(e, 0);
-        }, 0);
-        addToggleMenuItem("/settings/deobfuscation/new", translate("menu.file.deobfuscation.new"), "deobfuscation", "deobfuscatenew16", (ActionEvent e) -> {
-            deobfuscationMode(e, 1);
-        }, 0);
-
-        finishMenu("/settings/deobfuscation");
-
+        /*addMenuItem("/settings/deobfuscation", translate("menu.deobfuscation"), null, null, 0, null, false);
+         addToggleMenuItem("/settings/deobfuscation/old", translate("menu.file.deobfuscation.old"), "deobfuscation", "deobfuscateold16", (ActionEvent e) -> {
+         deobfuscationMode(e, 0);
+         }, 0);
+         addToggleMenuItem("/settings/deobfuscation/new", translate("menu.file.deobfuscation.new"), "deobfuscation", "deobfuscatenew16", (ActionEvent e) -> {
+         deobfuscationMode(e, 1);
+         }, 0);
+         
+         finishMenu("/settings/deobfuscation");*/
         addMenuItem("/settings/advancedSettings", translate("menu.advancedsettings.advancedsettings"), null, null, 0, null, false);
         addMenuItem("/settings/advancedSettings/advancedSettings", translate("menu.advancedsettings.advancedsettings"), "settings32", this::advancedSettingsActionPerformed, PRIORITY_TOP, null, true);
         addMenuItem("/settings/advancedSettings/clearRecentFiles", translate("menu.tools.otherTools.clearRecentFiles"), "clearrecent16", this::clearRecentFilesActionPerformed, PRIORITY_MEDIUM, null, true);
@@ -862,16 +861,15 @@ public abstract class MainFrameMenu implements MenuBuilder {
             setMenuEnabled("/settings/internalViewer", false);
         }
 
-        int deobfuscationMode = Configuration.deobfuscationMode.get();
-        switch (deobfuscationMode) {
-            case 0:
-                setGroupSelection("deobfuscation", "/settings/deobfuscation/old");
-                break;
-            case 1:
-                setGroupSelection("deobfuscation", "/settings/deobfuscation/new");
-                break;
-        }
-
+        /*int deobfuscationMode = Configuration.deobfuscationMode.get();
+         switch (deobfuscationMode) {
+         case 0:
+         setGroupSelection("deobfuscation", "/settings/deobfuscation/old");
+         break;
+         case 1:
+         setGroupSelection("deobfuscation", "/settings/deobfuscation/new");
+         break;
+         }*/
         if (Platform.isWindows()) {
             setMenuChecked("/settings/associate", ContextMenuTools.isAddedToContextMenu());
         }

@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.action.Action;
@@ -35,13 +36,7 @@ public class ActionPop extends Action {
 
     @Override
     public void translate(TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
-        if (stack.isEmpty()) {
-            return;
-        }
         GraphTargetItem val = stack.pop();
-        if (val instanceof DirectValueActionItem) {
-            return;
-        }
         output.add(val);
     }
 }

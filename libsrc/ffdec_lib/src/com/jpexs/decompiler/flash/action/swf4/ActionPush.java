@@ -37,6 +37,8 @@ import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.model.FalseItem;
+import com.jpexs.decompiler.graph.model.TrueItem;
 import com.jpexs.helpers.Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -377,18 +379,27 @@ public class ActionPush extends Action {
              }
              }
              }*/
-            DirectValueActionItem dvt = new DirectValueActionItem(this, pos, o, constantPool);
-
-            if (o instanceof RegisterNumber) {//TemporaryRegister
-                dvt.computedRegValue = variables.get("__register" + ((RegisterNumber) o).number);
-                if (regNames.containsKey(((RegisterNumber) o).number)) {
-                    ((RegisterNumber) o).name = regNames.get(((RegisterNumber) o).number);
+            if (o instanceof Boolean) {
+                Boolean b = (Boolean) o;
+                if (b) {
+                    stack.push(new TrueItem(this));
+                } else {
+                    stack.push(new FalseItem(this));
                 }
-            }
-            if (dvt.computedRegValue instanceof TemporaryRegister) {
-                stack.push(new TemporaryRegister(((RegisterNumber) o).number, ((TemporaryRegister) dvt.computedRegValue).value));
             } else {
-                stack.push(dvt);
+                DirectValueActionItem dvt = new DirectValueActionItem(this, pos, o, constantPool);
+
+                if (o instanceof RegisterNumber) {//TemporaryRegister
+                    dvt.computedRegValue = variables.get("__register" + ((RegisterNumber) o).number);
+                    if (regNames.containsKey(((RegisterNumber) o).number)) {
+                        ((RegisterNumber) o).name = regNames.get(((RegisterNumber) o).number);
+                    }
+                }
+                if (dvt.computedRegValue instanceof TemporaryRegister) {
+                    stack.push(new TemporaryRegister(((RegisterNumber) o).number, ((TemporaryRegister) dvt.computedRegValue).value));
+                } else {
+                    stack.push(dvt);
+                }
             }
             pos++;
         }

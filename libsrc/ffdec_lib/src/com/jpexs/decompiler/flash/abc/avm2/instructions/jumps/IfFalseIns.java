@@ -40,7 +40,8 @@ public class IfFalseIns extends InstructionDefinition implements IfTypeIns {
     @Override
     public void translate(boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, AVM2ConstantPool constants, AVM2Instruction ins, List<MethodInfo> method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) {
         GraphTargetItem v1 = stack.pop();
-        stack.push(new NotItem(ins, v1));
+        //stack.push(new NotItem(ins, v1));
+        stack.push(v1.invert(ins));
     }
 
     @Override

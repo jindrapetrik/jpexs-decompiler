@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.Block;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -54,7 +55,7 @@ public class ClassAVM2Item extends AVM2Item implements Block {
 
     public List<AssignableAVM2Item> sinitVariables;
 
-    public List<String> importedClasses;
+    public List<DottedChain> importedClasses;
 
     public String pkg;
 
@@ -67,7 +68,7 @@ public class ClassAVM2Item extends AVM2Item implements Block {
         return ret;
     }
 
-    public ClassAVM2Item(List<String> importedClasses, String pkg, List<Integer> openedNamespaces, int protectedNs, boolean isDynamic, boolean isFinal, int namespace, String className, GraphTargetItem extendsOp, List<GraphTargetItem> implementsOp, List<GraphTargetItem> staticInit, boolean staticInitActivation, List<AssignableAVM2Item> sinitVariables, GraphTargetItem constructor, List<GraphTargetItem> traits) {
+    public ClassAVM2Item(List<DottedChain> importedClasses, String pkg, List<Integer> openedNamespaces, int protectedNs, boolean isDynamic, boolean isFinal, int namespace, String className, GraphTargetItem extendsOp, List<GraphTargetItem> implementsOp, List<GraphTargetItem> staticInit, boolean staticInitActivation, List<AssignableAVM2Item> sinitVariables, GraphTargetItem constructor, List<GraphTargetItem> traits) {
         super(null, NOPRECEDENCE);
         this.importedClasses = importedClasses;
         this.pkg = pkg;

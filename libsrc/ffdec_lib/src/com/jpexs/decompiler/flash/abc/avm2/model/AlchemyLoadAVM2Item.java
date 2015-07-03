@@ -16,11 +16,21 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Lf32Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Lf64Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Li16Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Li32Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Li8Ins;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import java.util.List;
 
 /**
  *
@@ -28,25 +38,57 @@ import com.jpexs.decompiler.graph.model.LocalData;
  */
 public class AlchemyLoadAVM2Item extends AVM2Item {
 
-    private final String name;
+    private final char type;
+    private final int size;
 
     private final GraphTargetItem ofs;
 
-    public AlchemyLoadAVM2Item(GraphSourceItem instruction, GraphTargetItem ofs, String name) {
+    public AlchemyLoadAVM2Item(GraphSourceItem instruction, GraphTargetItem ofs, char type, int size) {
         super(instruction, PRECEDENCE_PRIMARY);
-        this.name = name;
         this.ofs = ofs;
+        this.type = type;
+        this.size = size;
     }
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        writer.append("op_" + name + "(");
+        writer.append("l" + type + size + "(");
         ofs.toString(writer, localData);
-        return writer.append(") /*Alchemy*/");
+        return writer.append(")");
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        String ts = "" + type + size;
+        InstructionDefinition def = null;
+        switch (ts) {
+            case "i8":
+                def = new Li8Ins();
+                break;
+            case "i16":
+                def = new Li16Ins();
+                break;
+            case "i32":
+                def = new Li32Ins();
+                break;
+            case "f":
+                def = new Lf32Ins();
+                break;
+            case "f32":
+                def = new Lf64Ins();
+                break;
+        }
+        return toSourceMerge(localData, generator, ofs, ins(def));
     }
 
     @Override
     public GraphTargetItem returnType() {
+        switch (type) {
+            case 'i':
+                return new TypeItem("int");
+            case 'f':
+                return new TypeItem("Number");
+        }
         return TypeItem.UNBOUNDED;
     }
 

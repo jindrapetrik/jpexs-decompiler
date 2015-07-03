@@ -36,8 +36,10 @@ import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreIncrementAVM2Item
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.NotCompileTimeItem;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.model.PopItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -57,13 +59,15 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
          } else {
          localRegs.put(regId, value);
          }*/
-        localRegs.put(regId, value);
+        if (!(value instanceof PopItem)) {
+            localRegs.put(regId, value);
+        }
         if (!regAssignCount.containsKey(regId)) {
             regAssignCount.put(regId, 0);
         }
         regAssignCount.put(regId, regAssignCount.get(regId) + 1);
         //localRegsAssignmentIps.put(regId, ip);
-        if (value instanceof NewActivationAVM2Item) {
+        if (value.getThroughDuplicate() instanceof NewActivationAVM2Item) {
             return;
         }
         if (value instanceof FindPropertyAVM2Item) {
@@ -116,7 +120,7 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
         }
 
         //if(val.startsWith("catchscope ")) return;
-        //if(val.startsWith("newactivation()")) return;
+        //if(val.startsWith("newactivation()")) return;        
         output.add(new SetLocalAVM2Item(ins, regId, value));
     }
 

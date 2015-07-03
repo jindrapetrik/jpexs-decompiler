@@ -273,7 +273,7 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
     private void executeActions(ActionList actions, int idx, int endIdx, ExecutionResult result) {
         List<GraphTargetItem> output = new ArrayList<>();
         ActionLocalData localData = new ActionLocalData();
-        FixItemCounterTranslateStack stack = new FixItemCounterTranslateStack();
+        FixItemCounterTranslateStack stack = new FixItemCounterTranslateStack("");
         int instructionsProcessed = 0;
 
         try {
@@ -388,7 +388,7 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
 
         public int instructionsProcessed = -1;
 
-        public TranslateStack stack = new TranslateStack();
+        public TranslateStack stack = new TranslateStack("?");
 
         public Object resultValue;
     }

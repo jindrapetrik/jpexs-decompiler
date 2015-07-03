@@ -47,11 +47,13 @@ import com.jpexs.decompiler.graph.Loop;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
+import com.jpexs.decompiler.graph.model.PopItem;
 import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -94,7 +96,6 @@ public class ActionGraph extends Graph {
 
     @Override
     protected void finalProcess(List<GraphTargetItem> list, int level, FinalProcessLocalData localData) {
-        super.finalProcess(list, level, localData);
         List<GraphTargetItem> ret = Action.checkClass(list);
         if (ret != list) {
             list.clear();
@@ -120,7 +121,7 @@ public class ActionGraph extends Graph {
                             break;
                         }
                     } else {
-                        target = new DirectValueActionItem(null, 0, st.target, new ArrayList<>());
+                        target = new DirectValueActionItem(null, 0, st.target, new ArrayList<String>());
                         targetStart = t;
                         targetStartItem = it;
                     }
@@ -157,9 +158,8 @@ public class ActionGraph extends Graph {
                 again = true;
             }
         } while (again);
-        for (int t = 0; t < list.size(); t++) {
+        for (int t = 1/*not first*/; t < list.size(); t++) {
             GraphTargetItem it = list.get(t);
-
             if (it instanceof WhileItem) {
                 WhileItem wi = (WhileItem) it;
                 if ((!wi.commands.isEmpty()) && (wi.commands.get(0) instanceof SetTypeActionItem)) {
@@ -169,24 +169,26 @@ public class ActionGraph extends Graph {
                         if (ne.rightSide instanceof DirectValueActionItem) {
                             DirectValueActionItem dv = (DirectValueActionItem) ne.rightSide;
                             if (dv.value instanceof Null) {
-                                GraphTargetItem en = ne.leftSide;
-                                if (en instanceof StoreRegisterActionItem) {
-                                    en = ((StoreRegisterActionItem) en).value;
-                                }
+                                GraphTargetItem en = list.get(t - 1);
                                 if (en instanceof EnumerateActionItem) {
                                     EnumerateActionItem eti = (EnumerateActionItem) en;
                                     list.remove(t);
                                     wi.commands.remove(0);
                                     list.add(t, new ForInActionItem(null, wi.loop, sti.getObject(), eti.object, wi.commands));
+                                    list.remove(t - 1);
+                                    t--;
                                 }
                             }
+
                         }
                     }
                 }
 
             }
         }
-        //detectChained(list, temporaryRegisters);
+        //Handle for loops at the end:
+        super.finalProcess(list, level, localData);
+
     }
 
     @Override
@@ -247,7 +249,7 @@ public class ActionGraph extends Graph {
     }
 
     @Override
-    protected List<GraphTargetItem> check(GraphSource code, BaseLocalData localData, List<GraphPart> allParts, TranslateStack stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> output, Loop currentLoop, int staticOperation, String path) throws InterruptedException {
+    protected List<GraphTargetItem> check(Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, GraphSource code, BaseLocalData localData, List<GraphPart> allParts, TranslateStack stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> output, Loop currentLoop, int staticOperation, String path) throws InterruptedException {
         if (!output.isEmpty()) {
             if (output.get(output.size() - 1) instanceof StoreRegisterActionItem) {
                 StoreRegisterActionItem str = (StoreRegisterActionItem) output.get(output.size() - 1);
@@ -310,7 +312,7 @@ public class ActionGraph extends Graph {
                 List<GraphTargetItem> defaultCommands = new ArrayList<>();
                 List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
                 stopPart2.add(defaultPart2);
-                defaultCommands = printGraph(localData, stack, allParts, null, defaultPart, stopPart2, loops, staticOperation, path);
+                defaultCommands = printGraph(partCodes, partCodePos, localData, stack, allParts, null, defaultPart, stopPart2, loops, staticOperation, path);
 
                 List<GraphPart> loopContinues = new ArrayList<>();
                 for (Loop l : loops) {
@@ -384,7 +386,7 @@ public class ActionGraph extends Graph {
                 if ((defaultPart != null) && (defaultCommands.isEmpty())) {
                     List<GraphPart> stopPart2x = new ArrayList<>(stopPart);
                     stopPart2x.add(next);
-                    defaultCommands = printGraph(localData, stack, allParts, null, defaultPart, stopPart2x, loops, staticOperation, path);
+                    defaultCommands = printGraph(partCodes, partCodePos, localData, stack, allParts, null, defaultPart, stopPart2x, loops, staticOperation, path);
                 }
 
                 if (!defaultCommands.isEmpty()) {
@@ -433,7 +435,7 @@ public class ActionGraph extends Graph {
                     if (breakPart != null) {
                         stopPart2x.add(breakPart);
                     }
-                    cc.addAll(0, printGraph(localData, stack, allParts, null, caseBodies.get(i), stopPart2x, loops, staticOperation, path));
+                    cc.addAll(0, printGraph(partCodes, partCodePos, localData, stack, allParts, null, caseBodies.get(i), stopPart2x, loops, staticOperation, path));
                     if (cc.size() >= 2) {
                         if (cc.get(cc.size() - 1) instanceof BreakItem) {
                             if ((cc.get(cc.size() - 2) instanceof ContinueItem) || (cc.get(cc.size() - 2) instanceof BreakItem)) {
@@ -452,7 +454,7 @@ public class ActionGraph extends Graph {
                     if (ti != null) {
                         ret.add(ti);
                     } else {
-                        ret.addAll(printGraph(localData, stack, allParts, null, next, stopPart, loops, staticOperation, path));
+                        ret.addAll(printGraph(partCodes, partCodePos, localData, stack, allParts, null, next, stopPart, loops, staticOperation, path));
                     }
                 }
             }

@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.graph.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -57,11 +58,6 @@ public class NotItem extends UnaryOpItem implements LogicalOpItem, Inverted {
         return value.isCompileTime(dependencies);
     }
 
-    @Override
-    public GraphTargetItem invert() {
-        return value;
-    }
-
     public GraphTargetItem getOriginal() {
         return value;
     }
@@ -80,4 +76,10 @@ public class NotItem extends UnaryOpItem implements LogicalOpItem, Inverted {
     public GraphTargetItem returnType() {
         return TypeItem.BOOLEAN;
     }
+
+    @Override
+    public GraphTargetItem invert(GraphSourceItem src) {
+        return value;
+    }
+
 }

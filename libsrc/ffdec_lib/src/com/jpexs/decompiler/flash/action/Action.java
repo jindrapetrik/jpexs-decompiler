@@ -74,8 +74,9 @@ import com.jpexs.decompiler.graph.model.CommentItem;
 import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.NotItem;
-import com.jpexs.decompiler.graph.model.ScriptEndItem;
 import com.jpexs.helpers.ByteArrayRange;
+import com.jpexs.decompiler.graph.model.PopItem;
+import com.jpexs.decompiler.graph.model.ScriptEndItem;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import java.io.ByteArrayOutputStream;
@@ -996,9 +997,15 @@ public abstract class Action implements GraphSourceItem {
              List<GraphTargetItem> tryCommands = ActionGraph.translateViaGraph(registerNames, variables, functions, atry.tryBody, version);
              ActionItem catchName;
              if (atry.catchInRegisterFlag) {
+             <<<<<<< HEAD
              catchName = new DirectValueActionItem(atry, -1, new RegisterNumber(atry.catchRegister), new ArrayList<>());
              } else {
              catchName = new DirectValueActionItem(atry, -1, atry.catchName, new ArrayList<>());
+             =======
+             catchName = new DirectValueActionItem(atry, -1, new RegisterNumber(atry.catchRegister), new ArrayList<String>());
+             } else {
+             catchName = new DirectValueActionItem(atry, -1, atry.catchName, new ArrayList<String>());
+             >>>>>>> v6
              }
              List<GraphTargetItem> catchExceptions = new ArrayList<GraphTargetItem>();
              catchExceptions.add(catchName);
@@ -1145,9 +1152,8 @@ public abstract class Action implements GraphSourceItem {
                                 className = getWithoutGlobal(nti.value);
                                 if (parts.size() >= 1) {
                                     int ipos = 0;
-                                    while ((parts.get(ipos) instanceof IfItem)
-                                            && ((((IfItem) parts.get(ipos)).onTrue.size() == 1) && (((IfItem) parts.get(ipos)).onTrue.get(0) instanceof SetMemberActionItem) && (((SetMemberActionItem) ((IfItem) parts.get(ipos)).onTrue.get(0)).value instanceof NewObjectActionItem))) {
 
+                                    while ((parts.get(ipos) instanceof PopItem) || ((parts.get(ipos) instanceof IfItem) && ((((IfItem) parts.get(ipos)).onTrue.size() == 1) && (((IfItem) parts.get(ipos)).onTrue.get(0) instanceof SetMemberActionItem) && (((SetMemberActionItem) ((IfItem) parts.get(ipos)).onTrue.get(0)).value instanceof NewObjectActionItem)))) {
                                         ipos++;
                                     }
                                     if (parts.get(ipos) instanceof ExtendsActionItem) {
@@ -1256,7 +1262,7 @@ public abstract class Action implements GraphSourceItem {
                 } else {
                     ok = false;
                 }
-            } else {
+            } else if (!(t instanceof PopItem)) {
                 prevCount++;
                 //ok = false;
             }

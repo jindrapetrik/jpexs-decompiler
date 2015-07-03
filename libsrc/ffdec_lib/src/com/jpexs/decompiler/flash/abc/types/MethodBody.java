@@ -20,8 +20,11 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ABCInputStream;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorRegisters;
+import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorSimple;
 import com.jpexs.decompiler.flash.abc.avm2.CodeStats;
 import com.jpexs.decompiler.flash.abc.avm2.UnknownInstructionCode;
+import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorJumps;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -201,6 +204,7 @@ public final class MethodBody implements Cloneable {
         if (exportMode != ScriptExportMode.AS) {
             getCode().toASMSource(constants, trait, method_info.get(this.method_info), this, exportMode, writer);
         } else {
+            //if (!path.contains("_addGarbageLineMulti")) {
             if (!Configuration.decompile.get()) {
                 writer.appendNoHilight(Helper.getDecompilationSkippedComment()).newLine();
                 return;
@@ -244,6 +248,7 @@ public final class MethodBody implements Cloneable {
         if (exportMode != ScriptExportMode.AS) {
             getCode().toASMSource(constants, trait, method_info.get(this.method_info), this, exportMode, writer);
         } else {
+            //if (!path.contains("_addGarbageLineMulti")) {
             if (!Configuration.decompile.get()) {
                 //writer.startMethod(this.method_info);
                 writer.appendNoHilight(Helper.getDecompilationSkippedComment()).newLine();
@@ -275,17 +280,22 @@ public final class MethodBody implements Cloneable {
 
     public MethodBody convertMethodBody(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, Trait trait, AVM2ConstantPool constants, List<MethodInfo> method_info, ScopeStack scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits) throws InterruptedException {
         MethodBody b = clone();
-        AVM2Code deobfuscated = b.getCode();
-        deobfuscated.markMappedOffsets();
-        //deobfuscated.inlineJumpExit();
+        b.getCode().markMappedOffsets();
+
         if (Configuration.autoDeobfuscate.get()) {
-            try {
-                deobfuscated.removeTraps(constants, trait, method_info.get(this.method_info), b, abc, scriptIndex, classIndex, isStatic, path);
-            } catch (StackOverflowError ex) {
-                logger.log(Level.SEVERE, "Error during remove traps in " + path, ex);
+            if (Configuration.deobfuscationMode.get() == 0) {
+                try {
+                    b.getCode().removeTraps(constants, trait, method_info.get(this.method_info), b, abc, scriptIndex, classIndex, isStatic, path);
+                } catch (Throwable ex) {
+                    logger.log(Level.SEVERE, "Error during old deobfuscation: " + path, ex);
+                }
+            } else {
+                new AVM2DeobfuscatorSimple().deobfuscate(path, classIndex, isStatic, scriptIndex, abc, constants, trait, method_info.get(this.method_info), b);
+                new AVM2DeobfuscatorRegisters().deobfuscate(path, classIndex, isStatic, scriptIndex, abc, constants, trait, method_info.get(this.method_info), b);
+                new AVM2DeobfuscatorJumps().deobfuscate(path, classIndex, isStatic, scriptIndex, abc, constants, trait, method_info.get(this.method_info), b);
+
             }
         }
-        //deobfuscated.restoreControlFlow(constants, b);
 
         return b;
     }

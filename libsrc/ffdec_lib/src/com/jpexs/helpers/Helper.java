@@ -143,8 +143,13 @@ public class Helper {
     }
 
     /**
+     * <<<<<<< HEAD
      * Formats specified address to four numbers xxxx (or five numbers when
      * showing decimal addresses)
+     * =======
+     * Formats specified address to four numbers xxxx
+     * (or five numbers when showing decimal addresses)
+     * >>>>>>> v6
      *
      * @param number Address to format
      * @return String representation of the address
@@ -154,8 +159,13 @@ public class Helper {
     }
 
     /**
+     * <<<<<<< HEAD
      * Formats specified address to four numbers xxxx (or five numbers when
      * showing decimal addresses)
+     * =======
+     * Formats specified address to four numbers xxxx
+     * (or five numbers when showing decimal addresses)
+     * >>>>>>> v6
      *
      * @param number Address to format
      * @param decimal Use decimal format
@@ -282,7 +292,12 @@ public class Helper {
      * character.</li>
      * </ul>
      *
+     * <<<<<<< HEAD
+     *
      * @param st A string optionally containing standard java escape sequences.
+     * =======
+     * @param st A string optionally containing standard java escape sequences.
+     * >>>>>>> v6
      * @return The translated string.
      */
     public static String unescapeJavaString(String st) {
@@ -1347,4 +1362,5 @@ public class Helper {
         }
         return data;
     }
+
 }

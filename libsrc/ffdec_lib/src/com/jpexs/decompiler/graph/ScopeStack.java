@@ -16,11 +16,17 @@
  */
 package com.jpexs.decompiler.graph;
 
-import java.util.Stack;
-
 /**
  *
  * @author JPEXS
  */
-public class ScopeStack extends Stack<GraphTargetItem> {
+public class ScopeStack extends TranslateStack {
+
+    public ScopeStack(boolean allowEmpty) {
+        super(allowEmpty ? "scope" : null);
+    }
+
+    public ScopeStack() {
+        this(true);
+    }
 }

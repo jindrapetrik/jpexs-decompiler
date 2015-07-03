@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
@@ -48,7 +49,7 @@ import java.util.List;
  */
 public class UnresolvedAVM2Item extends AssignableAVM2Item {
 
-    private String name;
+    private DottedChain name;
 
     private int nsKind = -1;
 
@@ -65,7 +66,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
 
     private final boolean mustBeType;
 
-    public List<String> importedClasses;
+    public List<DottedChain> importedClasses;
 
     public List<GraphTargetItem> scopeStack = new ArrayList<>();
 
@@ -128,7 +129,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
      */
 
     public void appendName(String name) {
-        this.name += "." + name;
+        this.name.parts.add(name);
     }
 
     public void setDefinition(boolean definition) {
@@ -150,15 +151,15 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         this.assignedValue = storeValue;
     }
 
-    public String getVariableName() {
+    public DottedChain getVariableName() {
         return name;
     }
 
-    public void setVariableName(String name) {
+    public void setVariableName(DottedChain name) {
         this.name = name;
     }
 
-    public UnresolvedAVM2Item(List<GraphTargetItem> subtypes, List<String> importedClasses, boolean mustBeType, GraphTargetItem type, int line, String name, GraphTargetItem storeValue, List<Integer> openedNamespaces) {
+    public UnresolvedAVM2Item(List<GraphTargetItem> subtypes, List<DottedChain> importedClasses, boolean mustBeType, GraphTargetItem type, int line, DottedChain name, GraphTargetItem storeValue, List<Integer> openedNamespaces) {
         super(storeValue);
         this.name = name;
         this.assignedValue = storeValue;
@@ -264,7 +265,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         if (resolved != null) {
             return resolved.toString();
         }
-        return name;
+        return name.toString();
     }
 
     @Override
@@ -290,14 +291,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
     }
 
     public GraphTargetItem resolve(GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, ABC abc, List<ABC> otherAbcs, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {
-        List<String> parts = new ArrayList<>();
-        if (name.contains(".")) {
-            String[] partsArr = name.split("\\.");
-            parts.addAll(Arrays.asList(partsArr));
-        } else {
-            parts.add(name);
-        }
-
+        List<String> parts = name.parts;
         if (scopeStack.isEmpty()) { //Everything is multiname property in with command
 
             //search for variable
@@ -326,13 +320,9 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
             }
         }
         //Search for types in imported classes
-        for (String imp : importedClasses) {
-            String impName = imp;
-            String impPkg = "";
-            if (impName.contains(".")) {
-                impPkg = impName.substring(0, impName.lastIndexOf('.'));
-                impName = impName.substring(impName.lastIndexOf('.') + 1);
-            }
+        for (DottedChain imp : importedClasses) {
+            String impName = imp.getLast();
+
             if (impName.equals(parts.get(0))) {
                 TypeItem ret = new TypeItem(imp);
                 resolved = ret;
@@ -354,13 +344,13 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         allAbcs.add(abc);
         allAbcs.addAll(otherAbcs);
         for (int i = 0; i < parts.size(); i++) {
-            String fname = Helper.joinStrings(parts.subList(0, i + 1), ".");
+            DottedChain fname = new DottedChain(parts.subList(0, i + 1)); //Helper.joinStrings(parts.subList(0, i + 1), ".");
             for (ABC a : allAbcs) {
                 for (int c = 0; c < a.instance_info.size(); c++) {
                     if (a.instance_info.get(c).deleted) {
                         continue;
                     }
-                    if (a.instance_info.get(c).name_index > 0 && fname.equals(a.instance_info.get(c).getName(a.constants).getNameWithNamespace(a.constants, true))) {
+                    if (a.instance_info.get(c).name_index > 0 && fname.equals(a.instance_info.get(c).getName(a.constants).getNameWithNamespace(a.constants))) {
                         if (!subtypes.isEmpty() && parts.size() > i + 1) {
                             continue;
                         }
@@ -400,7 +390,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                             if (!subtypes.isEmpty() && parts.size() > 1) {
                                 continue;
                             }
-                            TypeItem ret = new TypeItem(a.instance_info.get(c).getName(a.constants).getNameWithNamespace(a.constants, true));
+                            TypeItem ret = new TypeItem(a.instance_info.get(c).getName(a.constants).getNameWithNamespace(a.constants));
                             /*for (String s : subtypes) {
                              UnresolvedAVM2Item su = new UnresolvedAVM2Item(new ArrayList<>(), importedClasses, true, null, line, s, null, openedNamespaces);
                              su.resolve(thisType, paramTypes, paramNames, abc, otherAbcs, callStack, variables);

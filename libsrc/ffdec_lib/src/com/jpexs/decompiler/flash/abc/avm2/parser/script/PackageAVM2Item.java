@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
@@ -34,11 +35,11 @@ public class PackageAVM2Item extends AVM2Item {
 
     public String packageName;
 
-    public List<String> importedClasses = new ArrayList<>();
+    public List<DottedChain> importedClasses = new ArrayList<>();
 
     public int publicNs = 0;
 
-    public PackageAVM2Item(int publicNs, List<String> importedClasses, String packageName, List<GraphTargetItem> items) {
+    public PackageAVM2Item(int publicNs, List<DottedChain> importedClasses, String packageName, List<GraphTargetItem> items) {
         super(null, NOPRECEDENCE);
         this.publicNs = publicNs;
         this.importedClasses = importedClasses;

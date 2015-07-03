@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.SimpleValue;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
@@ -34,7 +35,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-public class DirectValueActionItem extends ActionItem {
+public class DirectValueActionItem extends ActionItem implements SimpleValue {
 
     public Object value;
 
@@ -89,6 +90,11 @@ public class DirectValueActionItem extends ActionItem {
             return new Undefined(); //has not computed value
         }
         return value;
+    }
+
+    @Override
+    public boolean isSimpleValue() {
+        return !(value instanceof RegisterNumber);
     }
 
     @Override

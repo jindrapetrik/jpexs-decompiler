@@ -57,9 +57,11 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.DupIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopScopeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushByteIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushFalseIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushNullIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushScopeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushStringIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushTrueIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushUndefinedIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushWithIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.SwapIns;
@@ -103,10 +105,10 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
-import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.Loop;
@@ -118,6 +120,7 @@ import com.jpexs.decompiler.graph.model.CommaExpressionItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.DoWhileItem;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
+import com.jpexs.decompiler.graph.model.FalseItem;
 import com.jpexs.decompiler.graph.model.ForItem;
 import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -125,6 +128,7 @@ import com.jpexs.decompiler.graph.model.NotItem;
 import com.jpexs.decompiler.graph.model.OrItem;
 import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.TernarOpItem;
+import com.jpexs.decompiler.graph.model.TrueItem;
 import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
 import java.io.ByteArrayOutputStream;
@@ -159,6 +163,16 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
     private AVM2Instruction ins(InstructionDefinition def, int... operands) {
         return new AVM2Instruction(0, def, operands);
+    }
+
+    @Override
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, FalseItem item) throws CompilationException {
+        return GraphTargetItem.toSourceMerge(localData, this, ins(new PushFalseIns()));
+    }
+
+    @Override
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, TrueItem item) throws CompilationException {
+        return GraphTargetItem.toSourceMerge(localData, this, ins(new PushTrueIns()));
     }
 
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, GetDescendantsAVM2Item item) throws CompilationException {
@@ -1181,7 +1195,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return abc;
     }
 
-    public void generateClass(List<String> importedClasses, List<AssignableAVM2Item> sinitVariables, boolean staticNeedsActivation, List<GraphTargetItem> staticInit, List<Integer> openedNamespaces, int namespace, int initScope, String pkg, ClassInfo classInfo, InstanceInfo instanceInfo, SourceGeneratorLocalData localData, boolean isInterface, String name, String superName, GraphTargetItem extendsVal, List<GraphTargetItem> implementsStr, GraphTargetItem constructor, List<GraphTargetItem> traitItems, Reference<Integer> class_index) throws AVM2ParseException, CompilationException {
+    public void generateClass(List<DottedChain> importedClasses, List<AssignableAVM2Item> sinitVariables, boolean staticNeedsActivation, List<GraphTargetItem> staticInit, List<Integer> openedNamespaces, int namespace, int initScope, String pkg, ClassInfo classInfo, InstanceInfo instanceInfo, SourceGeneratorLocalData localData, boolean isInterface, String name, String superName, GraphTargetItem extendsVal, List<GraphTargetItem> implementsStr, GraphTargetItem constructor, List<GraphTargetItem> traitItems, Reference<Integer> class_index) throws AVM2ParseException, CompilationException {
         localData.currentClass = name;
         localData.pkg = pkg;
         List<GraphSourceItem> ret = new ArrayList<>();
@@ -1693,7 +1707,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                             TraitSlotConst tsc = (TraitSlotConst) mbody.traits.traits.get(i);
                             GraphTargetItem type = TypeItem.UNBOUNDED;
                             if (tsc.type_index > 0) {
-                                type = new TypeItem(abc.constants.constant_multiname.get(tsc.type_index).getNameWithNamespace(abc.constants, true));
+                                type = new TypeItem(abc.constants.constant_multiname.get(tsc.type_index).getNameWithNamespace(abc.constants));
                             }
                             NameAVM2Item d = new NameAVM2Item(type, 0, tsc.getName(abc).getName(abc.constants, new ArrayList<>(), true), NameAVM2Item.getDefaultValue("" + type), true, new ArrayList<Integer>());
                             d.setSlotNumber(tsc.slot_id);
@@ -1854,7 +1868,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return null;
     }
 
-    private int genNs(List<String> importedClasses, String pkg, String custom, int namespace, List<Integer> openedNamespaces, SourceGeneratorLocalData localData, int line) throws CompilationException {
+    private int genNs(List<DottedChain> importedClasses, String pkg, String custom, int namespace, List<Integer> openedNamespaces, SourceGeneratorLocalData localData, int line) throws CompilationException {
         if (custom != null) {
             PropertyAVM2Item prop = new PropertyAVM2Item(null, custom, abc, allABCs, openedNamespaces, new ArrayList<MethodBody>());
             Reference<ValueKind> value = new Reference<>(null);
@@ -1865,11 +1879,9 @@ public class AVM2SourceGenerator implements SourceGenerator {
             }
             if (!resolved) {
 
-                String customPkg = "";
-                String fullCustom = "";
-                for (String imp : importedClasses) {
-                    if (imp.endsWith("." + custom)) {
-                        customPkg = imp.substring(0, imp.lastIndexOf('.'));
+                DottedChain fullCustom = null;
+                for (DottedChain imp : importedClasses) {
+                    if (imp.getLast().equals(custom)) {
                         fullCustom = imp;
                         break;
                     }
@@ -1882,7 +1894,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     for (ScriptInfo si : a.script_info) {
                         for (Trait t : si.traits.traits) {
                             Multiname m = t.getName(a);
-                            if (fullCustom.equals(m.getNameWithNamespace(a.constants, true))) {
+                            if (fullCustom != null && fullCustom.equals(m.getNameWithNamespace(a.constants))) {
                                 if (t instanceof TraitSlotConst) {
                                     if (((TraitSlotConst) t).isNamespace()) {
                                         Namespace ns = a.constants.getNamespace(((TraitSlotConst) t).value_index);
@@ -1901,7 +1913,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return namespace;
     }
 
-    public void generateTraitsPhase2(List<String> importedClasses, String pkg, List<GraphTargetItem> items, Trait[] traits, List<Integer> openedNamespaces, SourceGeneratorLocalData localData) throws CompilationException {
+    public void generateTraitsPhase2(List<DottedChain> importedClasses, String pkg, List<GraphTargetItem> items, Trait[] traits, List<Integer> openedNamespaces, SourceGeneratorLocalData localData) throws CompilationException {
         for (int k = 0; k < items.size(); k++) {
             GraphTargetItem item = items.get(k);
             if (traits[k] == null) {
@@ -2132,7 +2144,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         ScriptInfo si = new ScriptInfo();
         localData.currentScript = si;
         Trait[] traitArr = generateTraitsPhase1(null, null, true, localData, commands, si.traits, class_index);
-        generateTraitsPhase2(new ArrayList<>(), null/*FIXME*/, commands, traitArr, new ArrayList<Integer>(), localData);
+        generateTraitsPhase2(new ArrayList<DottedChain>(), null/*FIXME*/, commands, traitArr, new ArrayList<Integer>(), localData);
         MethodInfo mi = new MethodInfo(new int[0], 0, 0, 0, new ValueKind[0], new int[0]);
         MethodBody mb = new MethodBody();
         mb.method_info = abc.addMethodInfo(mi);
@@ -2444,12 +2456,9 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
         TypeItem type = (TypeItem) typeItem;
 
-        String name = type.fullTypeName;
-        String pkg = "";
-        if (name.contains(".")) {
-            pkg = name.substring(0, name.lastIndexOf('.'));
-            name = name.substring(name.lastIndexOf('.') + 1);
-        }
+        DottedChain dname = type.fullTypeName;
+        String pkg = dname.getWithoutLast().toString();
+        String name = dname.getLast();
         for (InstanceInfo ii : abc.instance_info) {
             Multiname mname = abc.constants.constant_multiname.get(ii.name_index);
             if (mname != null && name.equals(mname.getName(abc.constants, new ArrayList<>(), true))) {

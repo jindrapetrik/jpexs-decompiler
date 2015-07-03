@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -58,7 +59,7 @@ public class GeActionItem extends BinaryOpItem implements LogicalOpItem, Inverte
     }
 
     @Override
-    public GraphTargetItem invert() {
+    public GraphTargetItem invert(GraphSourceItem negSrc) {
         return new LtActionItem(src, leftSide, rightSide, version2);
     }
 

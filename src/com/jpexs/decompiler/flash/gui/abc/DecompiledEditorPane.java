@@ -275,7 +275,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                 Highlighting ch = Highlighting.searchPos(classHighlights, pos);
                 int cindex = (int) ch.getProperties().index;
                 ABC abc = getABC();
-                type.setVal(abc.instance_info.get(cindex).getName(abc.constants).getNameWithNamespace(abc.constants, true));
+                type.setVal(abc.instance_info.get(cindex).getName(abc.constants).getNameWithNamespace(abc.constants).toString());
                 return ch.startPos;
             }
 
@@ -356,7 +356,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                             traitIndex.setVal(j);
                             classTrait.setVal(false);
                             multinameIndex.setVal(tr.name_index);
-                            currentType = ii.getName(a.constants).getNameWithNamespace(a.constants, true);
+                            currentType = ii.getName(a.constants).getNameWithNamespace(a.constants).toString();
                             found = true;
                             break loopi;
                         }
@@ -371,7 +371,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                             traitIndex.setVal(j);
                             classTrait.setVal(true);
                             multinameIndex.setVal(tr.name_index);
-                            currentType = ii.getName(a.constants).getNameWithNamespace(a.constants, true);
+                            currentType = ii.getName(a.constants).getNameWithNamespace(a.constants).toString();
                             found = true;
                             break loopi;
                         }
@@ -465,7 +465,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                     for (int i = 1; i < abc.constants.constant_multiname.size(); i++) {
                         Multiname m = abc.constants.constant_multiname.get(i);
                         if (m != null) {
-                            if (typeName.equals(m.getNameWithNamespace(abc.constants, true))) {
+                            if (typeName.equals(m.getNameWithNamespace(abc.constants).toString())) {
                                 return i;
                             }
                         }
@@ -520,7 +520,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
             if (tm != null) {
                 String name = "";
                 if (classIndex > -1) {
-                    name = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants, false);
+                    name = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants).toPrintableString();
                 }
 
                 Trait currentTrait = null;
@@ -571,7 +571,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                 }
                 currentMethodHighlight = null;
                 currentTrait = null;
-                String name = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants, false);
+                String name = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants).toPrintableString();
                 currentTrait = getCurrentTrait();
                 isStatic = abc.isStaticTraitId(classIndex, lastTraitIndex);
                 if (currentTrait != null) {

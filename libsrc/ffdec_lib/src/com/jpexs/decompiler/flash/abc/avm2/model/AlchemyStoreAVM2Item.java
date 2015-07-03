@@ -16,11 +16,21 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Sf32Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Sf64Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Si16Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Si32Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Si8Ins;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import java.util.List;
 
 /**
  *
@@ -28,24 +38,26 @@ import com.jpexs.decompiler.graph.model.LocalData;
  */
 public class AlchemyStoreAVM2Item extends AVM2Item {
 
-    private final String name;
+    private final char type;
+    private final int size;
 
     private final GraphTargetItem ofs;
 
-    public AlchemyStoreAVM2Item(GraphSourceItem instruction, GraphTargetItem value, GraphTargetItem ofs, String name) {
+    public AlchemyStoreAVM2Item(GraphSourceItem instruction, GraphTargetItem value, GraphTargetItem ofs, char type, int size) {
         super(instruction, PRECEDENCE_PRIMARY);
-        this.name = name;
         this.ofs = ofs;
         this.value = value;
+        this.type = type;
+        this.size = size;
     }
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        writer.append("op_" + name + "(");
+        writer.append("s" + type + size + "(");
         ofs.toString(writer, localData);
         writer.append(",");
         value.toString(writer, localData);
-        return writer.append(") /*Alchemy*/");
+        return writer.append(")");
     }
 
     @Override
@@ -57,4 +69,29 @@ public class AlchemyStoreAVM2Item extends AVM2Item {
     public boolean hasReturnValue() {
         return false;
     }
+
+    @Override
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        String ts = "" + type + size;
+        InstructionDefinition def = null;
+        switch (ts) {
+            case "i8":
+                def = new Si8Ins();
+                break;
+            case "i16":
+                def = new Si16Ins();
+                break;
+            case "i32":
+                def = new Si32Ins();
+                break;
+            case "f32":
+                def = new Sf32Ins();
+                break;
+            case "f64":
+                def = new Sf64Ins();
+                break;
+        }
+        return toSourceMerge(localData, generator, ofs, ins(def));
+    }
+
 }

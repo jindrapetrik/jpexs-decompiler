@@ -48,7 +48,7 @@ public class StringLtActionItem extends BinaryOpItem implements Inverted {
     }
 
     @Override
-    public GraphTargetItem invert() {
+    public GraphTargetItem invert(GraphSourceItem negSrc) {
         return new StringGeActionItem(src, leftSide, rightSide);
     }
 }
