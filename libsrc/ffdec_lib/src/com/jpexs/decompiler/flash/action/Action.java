@@ -74,9 +74,9 @@ import com.jpexs.decompiler.graph.model.CommentItem;
 import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.NotItem;
-import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.decompiler.graph.model.PopItem;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
+import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import java.io.ByteArrayOutputStream;
@@ -997,15 +997,9 @@ public abstract class Action implements GraphSourceItem {
              List<GraphTargetItem> tryCommands = ActionGraph.translateViaGraph(registerNames, variables, functions, atry.tryBody, version);
              ActionItem catchName;
              if (atry.catchInRegisterFlag) {
-             <<<<<<< HEAD
              catchName = new DirectValueActionItem(atry, -1, new RegisterNumber(atry.catchRegister), new ArrayList<>());
              } else {
              catchName = new DirectValueActionItem(atry, -1, atry.catchName, new ArrayList<>());
-             =======
-             catchName = new DirectValueActionItem(atry, -1, new RegisterNumber(atry.catchRegister), new ArrayList<String>());
-             } else {
-             catchName = new DirectValueActionItem(atry, -1, atry.catchName, new ArrayList<String>());
-             >>>>>>> v6
              }
              List<GraphTargetItem> catchExceptions = new ArrayList<GraphTargetItem>();
              catchExceptions.add(catchName);
