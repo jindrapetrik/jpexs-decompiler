@@ -1700,7 +1700,10 @@ public class Graph {
                     } else if (loopItem.commands.size() == 2 && (loopItem.commands.get(1) instanceof BreakItem)) {
                         BreakItem bi = (BreakItem) loopItem.commands.get(1);
                         if (bi.loopId == currentLoop.id) {
-                            bodyBranch = ifi.onTrue;
+                            if (ifi.onTrue.isEmpty()) {
+                                inverted = true;
+                            }
+                            bodyBranch = inverted ? ifi.onFalse : ifi.onTrue;
                             breakpos2 = true;
                         }
                     }
