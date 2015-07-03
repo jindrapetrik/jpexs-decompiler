@@ -1843,11 +1843,11 @@ public class AVM2Code implements Cloneable {
 
             @Override
             public int updateOperandOffset(long insAddr, long targetAddress, int offset) {
-                if (targetAddress > remOffset) {
-                    if (insAddr > remOffset) {
-                        return offset;
-                    }
+                if (targetAddress > remOffset && insAddr < remOffset) {
                     return offset - byteCount;
+                }
+                if (targetAddress < remOffset && insAddr > remOffset) {
+                    return offset + byteCount;
                 }
                 return offset;
             }
