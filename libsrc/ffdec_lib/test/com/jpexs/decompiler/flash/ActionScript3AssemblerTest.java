@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
-import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorJumps;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.DeobfuscatePopIns;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
@@ -26,18 +25,11 @@ import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.ASM3Parser;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.configuration.Configuration;
-import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
-import com.jpexs.decompiler.flash.helpers.CodeFormatting;
-import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
-import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
-import com.jpexs.decompiler.flash.tags.Tag;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringReader;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 

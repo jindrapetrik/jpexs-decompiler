@@ -18,11 +18,10 @@ package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
-import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorJumps;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.ASM3Parser;
-import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScriptParser;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScript3Parser;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -109,7 +108,7 @@ public class ActionScript3DeobfuscatorTest extends ActionStript2TestBase {
                 return 0;
             }
         });
-        ActionScriptParser par = new ActionScriptParser(abc, new ArrayList<>());
+        ActionScript3Parser par = new ActionScript3Parser(abc, new ArrayList<>());
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
         par.addScript(str, true, "Test.as", 0);
 
