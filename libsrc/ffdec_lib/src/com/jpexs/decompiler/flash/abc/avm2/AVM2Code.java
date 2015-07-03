@@ -1771,13 +1771,14 @@ public class AVM2Code implements Cloneable {
     }
 
     public void updateOffsets(OffsetUpdater updater, MethodBody body) {
-        for (AVM2Instruction ins : code) {
+        for (int i = 0; i < code.size(); i++) {
+            AVM2Instruction ins = code.get(i);
             if (ins.definition instanceof LookupSwitchIns) {
                 long target = ins.offset + ins.operands[0];
-                ins.operands[0] = updater.updateOperandOffset(target, ins.operands[0]);
+                ins.operands[0] = updater.updateOperandOffset(ins.offset, target, ins.operands[0]);
                 for (int k = 2; k < ins.operands.length; k++) {
                     target = ins.offset + ins.operands[k];
-                    ins.operands[k] = updater.updateOperandOffset(target, ins.operands[k]);
+                    ins.operands[k] = updater.updateOperandOffset(ins.offset, target, ins.operands[k]);
                 }
             } else {
                 /*for (int j = 0; j < ins.definition.operands.length; j++) {
@@ -1789,18 +1790,16 @@ public class AVM2Code implements Cloneable {
                 //Faster, but not so universal
                 if ((ins.definition instanceof JumpIns) || (ins.definition instanceof IfTypeIns)) {
                     long target = ins.offset + ins.getBytes().length + ins.operands[0];
-                    ins.operands[0] = updater.updateOperandOffset(target, ins.operands[0]);
+                    ins.operands[0] = updater.updateOperandOffset(ins.offset, target, ins.operands[0]);
                 }
             }
+            ins.offset = updater.updateInstructionOffset(ins.offset);
         }
 
         for (ABCException ex : body.exceptions) {
-            ex.start = updater.updateOperandOffset(ex.start, ex.start);
-            ex.end = updater.updateOperandOffset(ex.end, ex.end);
-            ex.target = updater.updateOperandOffset(ex.target, ex.target);
-        }
-        for (AVM2Instruction ins : code) {
-            ins.offset = updater.updateInstructionOffset(ins.offset);
+            ex.start = updater.updateOperandOffset(-1, ex.start, ex.start);
+            ex.end = updater.updateOperandOffset(-1, ex.end, ex.end);
+            ex.target = updater.updateOperandOffset(-1, ex.target, ex.target);
         }
     }
 
@@ -1814,7 +1813,7 @@ public class AVM2Code implements Cloneable {
             }
 
             @Override
-            public int updateOperandOffset(long targetAddress, int offset) {
+            public int updateOperandOffset(long insAddr, long targetAddress, int offset) {
                 adr2pos(targetAddress);
                 return offset;
             }
@@ -1826,7 +1825,7 @@ public class AVM2Code implements Cloneable {
         if ((pos < 0) || (pos >= code.size())) {
             throw new IndexOutOfBoundsException();
         }
-        //checkValidOffsets(body);
+        checkValidOffsets(body);
         final long remOffset = code.get(pos).offset;
         final int byteCount = code.get(pos).getBytes().length;
         updateOffsets(new OffsetUpdater() {
@@ -1839,8 +1838,11 @@ public class AVM2Code implements Cloneable {
             }
 
             @Override
-            public int updateOperandOffset(long targetAddress, int offset) {
+            public int updateOperandOffset(long insAddr, long targetAddress, int offset) {
                 if (targetAddress > remOffset) {
+                    if (insAddr > remOffset) {
+                        return offset;
+                    }
                     return offset - byteCount;
                 }
                 return offset;
@@ -1848,7 +1850,7 @@ public class AVM2Code implements Cloneable {
         }, body);
         code.remove(pos);
         invalidateCache();
-        //checkValidOffsets(body);
+        checkValidOffsets(body);
         //System.exit(0);
 
     }
@@ -1891,23 +1893,28 @@ public class AVM2Code implements Cloneable {
             updateOffsets(new OffsetUpdater() {
 
                 @Override
-                public long updateInstructionOffset(long offset) {
-                    if (offset > instruction.offset) {
-                        return offset + byteDelta;
+                public long updateInstructionOffset(long addr) {
+                    if (addr > instruction.offset) {
+                        return addr + byteDelta;
                     }
-                    return offset;
+                    return addr;
                 }
 
                 @Override
-                public int updateOperandOffset(long targetAddress, int offset) {
-                    if (targetAddress > instruction.offset) {
+                public int updateOperandOffset(long insAddr, long targetAddress, int offset) {
+                    if (targetAddress > instruction.offset && insAddr <= instruction.offset) {
                         return offset + byteDelta;
+                    }
+                    if (targetAddress <= instruction.offset && insAddr > instruction.offset) {
+                        return offset - byteDelta;
                     }
                     return offset;
                 }
             }, body);
         }
         code.set(pos, instruction);
+        invalidateCache();
+        checkValidOffsets(body);
     }
 
     /**
@@ -1922,6 +1929,7 @@ public class AVM2Code implements Cloneable {
      * @param body Method body (used for try handling)
      */
     public void insertInstruction(int pos, AVM2Instruction instruction, boolean mapOffsetsAfterIns, MethodBody body) {
+        checkValidOffsets(body);
         if (pos < 0) {
             pos = 0;
         }
@@ -1945,8 +1953,12 @@ public class AVM2Code implements Cloneable {
             }
 
             @Override
-            public int updateOperandOffset(long targetAddress, int offset) {
+            public int updateOperandOffset(long insAddr, long targetAddress, int offset) {
+                //System.err.println("instruction.offset=" + instruction.offset);
                 if ((targetAddress > instruction.offset) || (mapOffsetsAfterIns && (targetAddress == instruction.offset))) {
+                    if (insAddr >= instruction.offset) {
+                        return offset;
+                    }
                     return offset + byteCount;
                 }
                 return offset;

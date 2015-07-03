@@ -22,7 +22,7 @@ package com.jpexs.decompiler.flash.abc.avm2;
  */
 public interface OffsetUpdater {
 
-    public long updateInstructionOffset(long offset);
+    public long updateInstructionOffset(long addr);
 
-    public int updateOperandOffset(long targetAddress, int offset);
+    public int updateOperandOffset(long jumpAddr, long targetAddress, int offset);
 }
