@@ -17,8 +17,15 @@
 package com.jpexs.decompiler.flash.importers;
 
 import com.jpexs.decompiler.flash.abc.ScriptPack;
+import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
+import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
+import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
+import com.jpexs.decompiler.graph.CompilationException;
+import com.jpexs.helpers.Helper;
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -36,7 +43,27 @@ public class AS3ScriptImporter {
 
         int importCount = 0;
         for (ScriptPack pack : packs) {
-            // todo honfika
+            try {
+                File file = pack.getExportFile(scriptsFolder, new ScriptExportSettings(ScriptExportMode.AS, false));
+                if (file.exists()) {
+                    String fileName = file.getAbsolutePath();
+                    String txt = Helper.readTextFile(fileName);
+
+                    try {
+                        pack.abc.replaceScriptPack(pack, txt);
+                    } catch (AVM2ParseException ex) {
+                        logger.log(Level.SEVERE, "%error% on line %line%, file: %file%".replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)).replace("%file%", fileName));
+                    } catch (CompilationException ex) {
+                        logger.log(Level.SEVERE, "%error% on line %line%, file: %file%".replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)).replace("%file%", fileName));
+                    } catch (InterruptedException ex) {
+                        logger.log(Level.SEVERE, "error during script import, file: %file%".replace("%file%", fileName), ex);
+                    }
+
+                    importCount++;
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(AS3ScriptImporter.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
 
         return importCount;
