@@ -1958,12 +1958,13 @@ public class AVM2Code implements Cloneable {
 
             @Override
             public int updateOperandOffset(long insAddr, long targetAddress, int offset) {
-                //System.err.println("instruction.offset=" + instruction.offset);
-                if ((targetAddress > instruction.offset) || (mapOffsetsAfterIns && (targetAddress == instruction.offset))) {
-                    if (insAddr >= instruction.offset) {
-                        return offset;
-                    }
+                if (((targetAddress > instruction.offset) || (mapOffsetsAfterIns && (targetAddress == instruction.offset)))
+                        && (insAddr < instruction.offset)) {
                     return offset + byteCount;
+                }
+                if (((targetAddress < instruction.offset) || (mapOffsetsAfterIns && (targetAddress == instruction.offset)))
+                        && (insAddr > instruction.offset)) {
+                    return offset - byteCount;
                 }
                 return offset;
             }

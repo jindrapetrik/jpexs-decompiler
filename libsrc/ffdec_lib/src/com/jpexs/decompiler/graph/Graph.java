@@ -1432,6 +1432,9 @@ public class Graph {
             String labelName = "addr" + part.start;
             List<GraphTargetItem> firstCode = partCodes.get(part);
             int firstCodePos = partCodePos.get(part);
+            if (firstCodePos > firstCode.size()) {
+                firstCodePos = firstCode.size();
+            }
             if (firstCode.size() > firstCodePos && (firstCode.get(firstCodePos) instanceof LabelItem)) {
                 labelName = ((LabelItem) firstCode.get(firstCodePos)).labelName;
             } else {
