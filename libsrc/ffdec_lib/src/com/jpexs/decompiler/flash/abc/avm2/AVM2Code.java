@@ -243,7 +243,6 @@ import com.jpexs.decompiler.flash.abc.avm2.model.HasNextAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.InitPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewFunctionAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.ReturnValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ReturnVoidAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetPropertyAVM2Item;
@@ -868,6 +867,12 @@ public class AVM2Code implements Cloneable {
         return s.toString();
     }
 
+    public String toASMSource() {
+        HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
+        toASMSource(new AVM2ConstantPool(), null, null, null, new ArrayList<>(), ScriptExportMode.PCODE, writer);
+        return writer.toString();
+    }
+
     public GraphTextWriter toASMSource(AVM2ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, ScriptExportMode exportMode, GraphTextWriter writer) {
         return toASMSource(constants, trait, info, body, new ArrayList<>(), exportMode, writer);
     }
@@ -982,49 +987,52 @@ public class AVM2Code implements Cloneable {
             writer.newLine();
         }
         writer.newLine();
-        writer.appendNoHilight("body").newLine();
-
-        writer.appendNoHilight("maxstack ");
-        writer.appendNoHilight(body.max_stack);
-        writer.newLine();
-
-        writer.appendNoHilight("localcount ");
-        writer.appendNoHilight(body.max_regs);
-        writer.newLine();
-
-        writer.appendNoHilight("initscopedepth ");
-        writer.appendNoHilight(body.init_scope_depth);
-        writer.newLine();
-
-        writer.appendNoHilight("maxscopedepth ");
-        writer.appendNoHilight(body.max_scope_depth);
-        writer.newLine();
 
         List<Long> offsets = new ArrayList<>();
-        for (int e = 0; e < body.exceptions.length; e++) {
-            writer.appendNoHilight("try");
+        if (body != null) {
+            writer.appendNoHilight("body").newLine();
 
-            writer.appendNoHilight(" from ");
-            writer.appendNoHilight("ofs");
-            writer.appendNoHilight(Helper.formatAddress(body.exceptions[e].start));
-            offsets.add((long) body.exceptions[e].start);
-
-            writer.appendNoHilight(" to ");
-            writer.appendNoHilight("ofs");
-            writer.appendNoHilight(Helper.formatAddress(body.exceptions[e].end));
-            offsets.add((long) body.exceptions[e].end);
-
-            writer.appendNoHilight(" target ");
-            writer.appendNoHilight("ofs");
-            writer.appendNoHilight(Helper.formatAddress(body.exceptions[e].target));
-            offsets.add((long) body.exceptions[e].target);
-
-            writer.appendNoHilight(" type ");
-            writer.hilightSpecial(body.exceptions[e].type_index == 0 ? "null" : constants.getMultiname(body.exceptions[e].type_index).toString(constants, new ArrayList<>()), HighlightSpecialType.TRY_TYPE, e);
-
-            writer.appendNoHilight(" name ");
-            writer.hilightSpecial(body.exceptions[e].name_index == 0 ? "null" : constants.getMultiname(body.exceptions[e].name_index).toString(constants, new ArrayList<>()), HighlightSpecialType.TRY_NAME, e);
+            writer.appendNoHilight("maxstack ");
+            writer.appendNoHilight(body.max_stack);
             writer.newLine();
+
+            writer.appendNoHilight("localcount ");
+            writer.appendNoHilight(body.max_regs);
+            writer.newLine();
+
+            writer.appendNoHilight("initscopedepth ");
+            writer.appendNoHilight(body.init_scope_depth);
+            writer.newLine();
+
+            writer.appendNoHilight("maxscopedepth ");
+            writer.appendNoHilight(body.max_scope_depth);
+            writer.newLine();
+
+            for (int e = 0; e < body.exceptions.length; e++) {
+                writer.appendNoHilight("try");
+
+                writer.appendNoHilight(" from ");
+                writer.appendNoHilight("ofs");
+                writer.appendNoHilight(Helper.formatAddress(body.exceptions[e].start));
+                offsets.add((long) body.exceptions[e].start);
+
+                writer.appendNoHilight(" to ");
+                writer.appendNoHilight("ofs");
+                writer.appendNoHilight(Helper.formatAddress(body.exceptions[e].end));
+                offsets.add((long) body.exceptions[e].end);
+
+                writer.appendNoHilight(" target ");
+                writer.appendNoHilight("ofs");
+                writer.appendNoHilight(Helper.formatAddress(body.exceptions[e].target));
+                offsets.add((long) body.exceptions[e].target);
+
+                writer.appendNoHilight(" type ");
+                writer.hilightSpecial(body.exceptions[e].type_index == 0 ? "null" : constants.getMultiname(body.exceptions[e].type_index).toString(constants, new ArrayList<>()), HighlightSpecialType.TRY_TYPE, e);
+
+                writer.appendNoHilight(" name ");
+                writer.hilightSpecial(body.exceptions[e].name_index == 0 ? "null" : constants.getMultiname(body.exceptions[e].name_index).toString(constants, new ArrayList<>()), HighlightSpecialType.TRY_NAME, e);
+                writer.newLine();
+            }
         }
 
         writer.newLine();
@@ -1830,8 +1838,9 @@ public class AVM2Code implements Cloneable {
             throw new IndexOutOfBoundsException();
         }
         checkValidOffsets(body);
-        final long remOffset = code.get(pos).offset;
-        final int byteCount = code.get(pos).getBytes().length;
+        AVM2Instruction ins = code.get(pos);
+        final long remOffset = ins.offset;
+        final int byteCount = ins.getBytes().length;
         updateOffsets(new OffsetUpdater() {
             @Override
             public long updateInstructionOffset(long address) {
@@ -1846,7 +1855,7 @@ public class AVM2Code implements Cloneable {
                 if (targetAddress > remOffset && insAddr < remOffset) {
                     return offset - byteCount;
                 }
-                if (targetAddress < remOffset && insAddr > remOffset) {
+                if (targetAddress <= remOffset && insAddr > remOffset) {
                     return offset + byteCount;
                 }
                 return offset;
@@ -1860,8 +1869,8 @@ public class AVM2Code implements Cloneable {
     }
 
     /**
-     * Inserts instuction at specified point. Handles offsets properly. Note: If
-     * newinstruction is jump, the offset operand must be handled properly by
+     * Inserts instruction at specified point. Handles offsets properly. Note:
+     * If newinstruction is jump, the offset operand must be handled properly by
      * caller. All old jump offsets to pos are targeted before new instruction.
      *
      * @param pos Position in the list
@@ -1922,8 +1931,8 @@ public class AVM2Code implements Cloneable {
     }
 
     /**
-     * Inserts instuction at specified point. Handles offsets properly. Note: If
-     * newinstruction is jump, the offset operand must be handled properly by
+     * Inserts instruction at specified point. Handles offsets properly. Note:
+     * If newinstruction is jump, the offset operand must be handled properly by
      * caller.
      *
      * @param pos Position in the list
@@ -2586,6 +2595,7 @@ public class AVM2Code implements Cloneable {
         }
 
         removeIgnored(constants, trait, info, body);
+
         for (int i = code.size() - 1; i >= 0; i--) {
             AVM2Instruction ins = code.get(i);
             if (ins.definition instanceof JumpIns) {
@@ -2596,7 +2606,9 @@ public class AVM2Code implements Cloneable {
                 }
             }
         }
+
         removeIgnored(constants, trait, info, body);
+
         return cnt;
     }
 

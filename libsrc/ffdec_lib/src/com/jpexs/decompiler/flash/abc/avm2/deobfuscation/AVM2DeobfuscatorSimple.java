@@ -58,7 +58,6 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushStringIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushTrueIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushUndefinedIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.SwapIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceOrConvertTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.FloatValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
@@ -78,7 +77,6 @@ import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TranslateException;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.FalseItem;
-import com.jpexs.decompiler.graph.model.PopItem;
 import com.jpexs.decompiler.graph.model.TrueItem;
 import java.util.ArrayList;
 import java.util.EmptyStackException;
@@ -413,6 +411,5 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
         public int instructionsProcessed = -1;
 
         public TranslateStack stack = new TranslateStack("?");
-
     }
 }

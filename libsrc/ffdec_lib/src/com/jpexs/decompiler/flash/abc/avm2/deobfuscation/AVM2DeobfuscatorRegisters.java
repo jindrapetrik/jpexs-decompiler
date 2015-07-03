@@ -22,10 +22,8 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
-import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2GraphSource;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.DeobfuscatePopIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.IfTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocalTypeIns;
@@ -125,7 +123,7 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
     private void visitCode(Set<Integer> visited, TranslateStack stack, int classIndex, boolean isStatic, MethodBody body, int scriptIndex, ABC abc, AVM2Code code, int idx, int endIdx, ExecutionResult result) {
         List<GraphTargetItem> output = new ArrayList<>();
         AVM2LocalData localData = newLocalData(scriptIndex, abc, abc.constants, body, isStatic, classIndex);
-        localData.localRegs.put(0, new NullAVM2Item(null));//this       
+        localData.localRegs.put(0, new NullAVM2Item(null));//this
         int instructionsProcessed = 0;
 
         try {
@@ -240,6 +238,7 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
     class ExecutionResult {
 
         public Map<Integer, Integer> assignCount = new HashMap<>();
+
         public Map<Integer, GraphTargetItem> lastAssigned = new HashMap<>();
     }
 }
