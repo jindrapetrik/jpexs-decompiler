@@ -1,8 +1,11 @@
 JPEXS Free Flash Decompiler 
 ================
 
-source code of opensource SWF decompiler
+*Opensource flash SWF decompiler and editor. Extract resources, convert SWF to FLA, edit ActionScript, replace images, sounds, texts or fonts. Various output formats available. Works with Java on Windows, Linux or MacOS.*
 
-Homepage: http://www.free-decompiler.com/flash/
+You can find more information on homepage at: 
+https://www.free-decompiler.com/flash/
 
-You can download ZIP / EXE releases on homepage.
+**This page on GitHub contains only source code.** Everything else is on homepage.
+You can download stable releases on GitHub here too and in fact, homepage redirects here for nonnightly builds,
+but we still recommend to visit the page.
