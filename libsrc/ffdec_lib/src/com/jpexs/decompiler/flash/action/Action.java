@@ -775,7 +775,7 @@ public abstract class Action implements GraphSourceItem {
                 @Override
                 public List<GraphTargetItem> call() throws Exception {
                     int staticOperation = Graph.SOP_USE_STATIC; //(Boolean) Configuration.getConfig("autoDeobfuscate", true) ? Graph.SOP_SKIP_STATIC : Graph.SOP_USE_STATIC;
-                    List<GraphTargetItem> tree = actionsToTree(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>(), actions, version, staticOperation, path);
+                    List<GraphTargetItem> tree = actionsToTree(new HashMap<>(), new HashMap<>(), new HashMap<>(), actions, version, staticOperation, path);
                     Graph.graphToString(tree, new NulWriter(), new LocalData());
                     return tree;
                 }
@@ -802,7 +802,7 @@ public abstract class Action implements GraphSourceItem {
         if (convertException == null) {
             Graph.graphToString(tree, writer, new LocalData());
         } else if (convertException instanceof TimeoutException) {
-            Helper.appendTimeoutComment(writer, timeout);
+            Helper.appendTimeoutCommentAs2(writer, timeout, actions.size());
         } else {
             Helper.appendErrorComment(writer, convertException);
         }

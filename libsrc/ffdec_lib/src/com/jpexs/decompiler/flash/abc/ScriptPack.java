@@ -61,6 +61,7 @@ public class ScriptPack extends AS3ClassTreeItem {
     public final List<Integer> traitIndices;
 
     private final ClassPath path;
+
     public boolean isSimple = false;
 
     @Override
@@ -190,7 +191,7 @@ public class ScriptPack extends AS3ClassTreeItem {
         } catch (TimeoutException ex) {
             writer.continueMeasure();
             logger.log(Level.SEVERE, "Decompilation error", ex);
-            Helper.appendTimeoutComment(writer, timeout);
+            Helper.appendTimeoutCommentAs3(writer, timeout, 0);
             return;
         } catch (ExecutionException ex) {
             writer.continueMeasure();

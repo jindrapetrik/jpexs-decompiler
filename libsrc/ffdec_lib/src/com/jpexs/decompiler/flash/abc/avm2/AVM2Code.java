@@ -1149,9 +1149,11 @@ public class AVM2Code implements Cloneable {
         posCache = new ArrayList<>();
         long a = 0;
         for (int i = 0; i < code.size(); i++) {
-            posCache.add(a);
-            a += code.get(i).getBytesLength();
+            AVM2Instruction ins = code.get(i);
+            posCache.add(ins.offset);
+            a = ins.offset + ins.getBytesLength();
         }
+
         posCache.add(a);
         cacheActual = true;
     }
@@ -1830,6 +1832,9 @@ public class AVM2Code implements Cloneable {
                 if (targetAddress > endOffset) {
                     return (int) (offset - targetAddress + endOffset);
                 }
+                if (targetAddress < 0) {
+                    return (int) (offset - targetAddress);
+                }
                 return offset;
             }
 
@@ -2228,7 +2233,7 @@ public class AVM2Code implements Cloneable {
         }
         while (ip < code.size()) {
             if (!refs.containsKey(ip)) {
-                refs.put(ip, new ArrayList<Integer>());
+                refs.put(ip, new ArrayList<>());
             }
             refs.get(ip).add(lastIp);
             lastIp = ip;
@@ -2276,7 +2281,7 @@ public class AVM2Code implements Cloneable {
     public HashMap<Integer, List<Integer>> visitCode(MethodBody body) throws InterruptedException {
         HashMap<Integer, List<Integer>> refs = new HashMap<>();
         for (int i = 0; i < code.size(); i++) {
-            refs.put(i, new ArrayList<Integer>());
+            refs.put(i, new ArrayList<>());
         }
         visitCode(0, 0, refs);
         int pos = 0;

@@ -1048,10 +1048,28 @@ public class Helper {
         return "// " + AppResources.translate("decompilation.skipped");
     }
 
-    public static void appendTimeoutComment(GraphTextWriter writer, int timeout) {
+    public static void appendTimeoutCommentAs2(GraphTextWriter writer, int timeout, int actionCount) {
         writer.appendNoHilight("/*").newLine();
         writer.appendNoHilight(" * ").appendNoHilight(AppResources.translate("decompilationError")).newLine();
         writer.appendNoHilight(" * ").appendNoHilight(MessageFormat.format(AppResources.translate("decompilationError.timeout"), Helper.formatTimeToText(timeout))).newLine();
+        if (actionCount > 0) {
+            writer.appendNoHilight(" * ").appendNoHilight(AppResources.translate("decompilationError.instructionCount") + " " + actionCount).newLine();
+        }
+
+        writer.appendNoHilight(" */").newLine();
+        writer.appendNoHilight("throw new Error(\"").
+                appendNoHilight(AppResources.translate("decompilationError.timeout.description")).
+                appendNoHilight("\");").newLine();
+    }
+
+    public static void appendTimeoutCommentAs3(GraphTextWriter writer, int timeout, int instructionCount) {
+        writer.appendNoHilight("/*").newLine();
+        writer.appendNoHilight(" * ").appendNoHilight(AppResources.translate("decompilationError")).newLine();
+        writer.appendNoHilight(" * ").appendNoHilight(MessageFormat.format(AppResources.translate("decompilationError.timeout"), Helper.formatTimeToText(timeout))).newLine();
+        if (instructionCount > 0) {
+            writer.appendNoHilight(" * ").appendNoHilight(AppResources.translate("decompilationError.actionCount") + " " + instructionCount).newLine();
+        }
+
         writer.appendNoHilight(" */").newLine();
         writer.appendNoHilight("throw new flash.errors.IllegalOperationError(\"").
                 appendNoHilight(AppResources.translate("decompilationError.timeout.description")).

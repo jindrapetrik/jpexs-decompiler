@@ -316,7 +316,7 @@ public final class MethodBody implements Cloneable {
                 //writer.endMethod();
             } else if (convertException instanceof TimeoutException) {
                 // exception was logged in convert method
-                Helper.appendTimeoutComment(writer, timeout);
+                Helper.appendTimeoutCommentAs3(writer, timeout, getCode().code.size());
             } else {
                 // exception was logged in convert method
                 Helper.appendErrorComment(writer, convertException);
