@@ -1687,7 +1687,7 @@ public class CommandLineArgumentParser {
                                 System.exit(1);
                             }
                         } else {
-                            System.err.println("The specified tag type it not supported for import");
+                            System.err.println("The specified tag type is not supported for import");
                             System.exit(1);
                         }
                     } else {

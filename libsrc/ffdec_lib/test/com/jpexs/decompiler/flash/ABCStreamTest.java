@@ -39,7 +39,7 @@ public class ABCStreamTest {
         //Main.initLogging(false);
     }
 
-    private List<Long> getTestNumebers(long min, long max) {
+    private List<Long> getTestNumbers(long min, long max) {
         List<Long> res = new ArrayList<>();
         addWhenBetween(res, 1531, min, max);
         long x = 1;
@@ -64,7 +64,7 @@ public class ABCStreamTest {
 
     @Test
     public void testU30() {
-        for (long number : getTestNumebers(0, (1L << 30) - 1)) {
+        for (long number : getTestNumbers(0, (1L << 30) - 1)) {
             try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     ABCOutputStream aos = new ABCOutputStream(baos);) {
                 aos.writeU30(number);
@@ -82,7 +82,7 @@ public class ABCStreamTest {
 
     @Test
     public void testU32() {
-        for (long number : getTestNumebers(0, (1L << 32) - 1)) {
+        for (long number : getTestNumbers(0, (1L << 32) - 1)) {
             try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     ABCOutputStream aos = new ABCOutputStream(baos);) {
                 aos.writeU32(number);
@@ -100,7 +100,7 @@ public class ABCStreamTest {
 
     @Test
     public void testS32() {
-        for (long number : getTestNumebers(-(1L << 31), (1 << 31) - 1)) {
+        for (long number : getTestNumbers(-(1L << 31), (1 << 31) - 1)) {
             try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     ABCOutputStream aos = new ABCOutputStream(baos);) {
                 aos.writeS32(number);
