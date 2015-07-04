@@ -23,7 +23,7 @@ import com.jpexs.helpers.Helper;
 import java.io.Serializable;
 import java.util.List;
 
-public class ABCException implements Serializable {
+public class ABCException implements Serializable, Cloneable {
 
     public int start;
 
@@ -68,5 +68,11 @@ public class ABCException implements Serializable {
             return "*";
         }
         return constants.getMultiname(type_index).getName(constants, fullyQualifiedNames, false);
+    }
+
+    @Override
+    public ABCException clone() throws CloneNotSupportedException {
+        ABCException ret = (ABCException) super.clone();
+        return ret;
     }
 }

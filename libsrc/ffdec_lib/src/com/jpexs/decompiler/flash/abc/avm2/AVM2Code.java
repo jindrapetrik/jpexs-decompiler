@@ -1882,7 +1882,7 @@ public class AVM2Code implements Cloneable {
     }
 
     /**
-     * Replaces instrunction by another. Properly handles offsets. Note: If
+     * Replaces instruction by another. Properly handles offsets. Note: If
      * newinstruction is jump, the offset operand must be handled properly by
      * caller.
      *

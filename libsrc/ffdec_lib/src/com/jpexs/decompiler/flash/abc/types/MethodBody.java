@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.abc.avm2.UnknownInstructionCode;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorJumps;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorRegisters;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorSimple;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -169,6 +170,48 @@ public final class MethodBody implements Cloneable {
         return getCode().removeTraps(constants, trait, abc.method_info.get(method_info), this, abc, scriptIndex, classIndex, isStatic, path);
     }
 
+    public void removeInstruction(int pos) {
+        getCode().removeInstruction(pos, this);
+    }
+
+    /**
+     * Replaces instruction by another. Properly handles offsets. Note: If
+     * newinstruction is jump, the offset operand must be handled properly by
+     * caller.
+     *
+     * @param pos
+     * @param instruction
+     */
+    public void replaceInstruction(int pos, AVM2Instruction instruction) {
+        getCode().replaceInstruction(pos, instruction, this);
+    }
+
+    /**
+     * Inserts instruction at specified point. Handles offsets properly. Note:
+     * If newinstruction is jump, the offset operand must be handled properly by
+     * caller. All old jump offsets to pos are targeted before new instruction.
+     *
+     * @param pos Position in the list
+     * @param instruction Instruction False means before new instruction
+     */
+    public void insertInstruction(int pos, AVM2Instruction instruction) {
+        getCode().insertInstruction(pos, instruction, this);
+    }
+
+    /**
+     * Inserts instruction at specified point. Handles offsets properly. Note:
+     * If newinstruction is jump, the offset operand must be handled properly by
+     * caller.
+     *
+     * @param pos Position in the list
+     * @param instruction Instruction
+     * @param mapOffsetsAfterIns Map all jumps to the pos after new instruction?
+     * False means before new instruction
+     */
+    public void insertInstruction(int pos, AVM2Instruction instruction, boolean mapOffsetsAfterIns) {
+        getCode().insertInstruction(pos, instruction, mapOffsetsAfterIns, this);
+    }
+
     public HashMap<Integer, String> getLocalRegNames(ABC abc) {
         HashMap<Integer, String> ret = new HashMap<>();
         for (int i = 1; i <= abc.method_info.get(this.method_info).param_types.length; i++) {
@@ -198,13 +241,15 @@ public final class MethodBody implements Cloneable {
     }
 
     public void convert(final String path, ScriptExportMode exportMode, final boolean isStatic, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final AVM2ConstantPool constants, final List<MethodInfo> method_info, final ScopeStack scopeStack, final boolean isStaticInitializer, final GraphTextWriter writer, final List<String> fullyQualifiedNames, final Traits initTraits, boolean firstLevel) throws InterruptedException {
+        /*if (!path.contains("testCatchFinally")) {
+         return;
+         }*/
         if (debugMode) {
             System.err.println("Decompiling " + path);
         }
         if (exportMode != ScriptExportMode.AS) {
             getCode().toASMSource(constants, trait, method_info.get(this.method_info), this, exportMode, writer);
         } else {
-            //if (!path.contains("_addGarbageLineMulti")) {
             if (!Configuration.decompile.get()) {
                 writer.appendNoHilight(Helper.getDecompilationSkippedComment()).newLine();
                 return;
@@ -245,10 +290,12 @@ public final class MethodBody implements Cloneable {
     }
 
     public GraphTextWriter toString(final String path, ScriptExportMode exportMode, final ABC abc, final Trait trait, final AVM2ConstantPool constants, final List<MethodInfo> method_info, final GraphTextWriter writer, final List<String> fullyQualifiedNames) throws InterruptedException {
+        /*if (!path.contains("testCatchFinally")) {
+         return writer;
+         }*/
         if (exportMode != ScriptExportMode.AS) {
             getCode().toASMSource(constants, trait, method_info.get(this.method_info), this, exportMode, writer);
         } else {
-            //if (!path.contains("_addGarbageLineMulti")) {
             if (!Configuration.decompile.get()) {
                 //writer.startMethod(this.method_info);
                 writer.appendNoHilight(Helper.getDecompilationSkippedComment()).newLine();
@@ -306,6 +353,14 @@ public final class MethodBody implements Cloneable {
             if (code != null) {
                 ret.code = code.clone();
             }
+
+            if (exceptions != null) {
+                ret.exceptions = new ABCException[exceptions.length];
+                for (int i = 0; i < exceptions.length; i++) {
+                    ret.exceptions[i] = exceptions[i].clone();
+                }
+            }
+
             //maybe deep clone traits
             return ret;
         } catch (CloneNotSupportedException ex) {
