@@ -21,6 +21,8 @@ import com.jpexs.decompiler.flash.abc.ABCOutputStream;
 import com.jpexs.helpers.MemoryInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 import org.testng.annotations.BeforeClass;
@@ -37,20 +39,80 @@ public class ABCStreamTest {
         //Main.initLogging(false);
     }
 
+    private List<Long> getTestNumebers(long min, long max) {
+        List<Long> res = new ArrayList<>();
+        addWhenBetween(res, 1531, min, max);
+        long x = 1;
+        for (int i = 0; i < 32; i++) {
+            x <<= 1;
+            addWhenBetween(res, x - 1, min, max);
+            addWhenBetween(res, x, min, max);
+            addWhenBetween(res, x + 1, min, max);
+            addWhenBetween(res, -(x - 1), min, max);
+            addWhenBetween(res, -x, min, max);
+            addWhenBetween(res, -(x + 1), min, max);
+        }
+
+        return res;
+    }
+
+    private void addWhenBetween(List<Long> list, long num, long min, long max) {
+        if (num >= min && num <= max) {
+            list.add(num);
+        }
+    }
+
     @Test
     public void testU30() {
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                ABCOutputStream aos = new ABCOutputStream(baos);) {
-            long number = 1531;
-            aos.writeU30(number);
-            aos.close();
-            try (MemoryInputStream mis = new MemoryInputStream(baos.toByteArray());
-                    ABCInputStream ais = new ABCInputStream(mis);) {
-                assertEquals(number, ais.readU30("test"));
-                assertEquals(0, mis.available());
+        for (long number : getTestNumebers(0, (1L << 30) - 1)) {
+            try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    ABCOutputStream aos = new ABCOutputStream(baos);) {
+                aos.writeU30(number);
+                aos.close();
+                try (MemoryInputStream mis = new MemoryInputStream(baos.toByteArray());
+                        ABCInputStream ais = new ABCInputStream(mis);) {
+                    assertEquals(number, ais.readU30("test"));
+                    assertEquals(0, mis.available());
+                }
+            } catch (IOException ex) {
+                fail();
             }
-        } catch (IOException ex) {
-            fail();
+        }
+    }
+
+    @Test
+    public void testU32() {
+        for (long number : getTestNumebers(0, (1L << 32) - 1)) {
+            try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    ABCOutputStream aos = new ABCOutputStream(baos);) {
+                aos.writeU32(number);
+                aos.close();
+                try (MemoryInputStream mis = new MemoryInputStream(baos.toByteArray());
+                        ABCInputStream ais = new ABCInputStream(mis);) {
+                    assertEquals(number, ais.readU32("test"));
+                    assertEquals(0, mis.available());
+                }
+            } catch (IOException ex) {
+                fail();
+            }
+        }
+    }
+
+    @Test
+    public void testS32() {
+        for (long number : getTestNumebers(-(1L << 31), (1 << 31) - 1)) {
+            try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    ABCOutputStream aos = new ABCOutputStream(baos);) {
+                aos.writeU32(number);
+                aos.close();
+                try (MemoryInputStream mis = new MemoryInputStream(baos.toByteArray());
+                        ABCInputStream ais = new ABCInputStream(mis);) {
+                    assertEquals(number, ais.readS32("test"));
+                    assertEquals(0, mis.available());
+                }
+            } catch (IOException ex) {
+                fail();
+            }
         }
     }
 }

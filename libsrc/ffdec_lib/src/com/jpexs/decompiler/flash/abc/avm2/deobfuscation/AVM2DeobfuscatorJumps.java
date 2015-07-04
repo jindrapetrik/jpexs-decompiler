@@ -61,7 +61,7 @@ public class AVM2DeobfuscatorJumps extends AVM2DeobfuscatorSimple {
             for (int i = 0; i < code.code.size(); i++) {
                 AVM2Instruction ins = code.code.get(i);
                 if (ins.definition instanceof JumpIns) {
-                    long targetAddr = ins.offset + ins.operands[0] + ins.getBytes().length;
+                    long targetAddr = ins.offset + ins.operands[0] + ins.getBytesLength();
                     {
                         for (int r : refs.get(i)) {
                             if (r >= 0) { //Not Exception start/end
@@ -70,7 +70,7 @@ public class AVM2DeobfuscatorJumps extends AVM2DeobfuscatorSimple {
                                 if ((srcIns.definition instanceof JumpIns) || ((srcIns.definition instanceof IfTypeIns) && (r != i - 1))) {
                                     {
                                         int oldop = srcIns.operands[0];
-                                        srcIns.operands[0] = (int) (targetAddr - (srcIns.offset + srcIns.getBytes().length));
+                                        srcIns.operands[0] = (int) (targetAddr - (srcIns.offset + srcIns.getBytesLength()));
                                         if (srcIns.operands[0] != oldop) {
                                             found = true;
                                         }
@@ -85,5 +85,4 @@ public class AVM2DeobfuscatorJumps extends AVM2DeobfuscatorSimple {
         } while (found);
 
     }
-
 }

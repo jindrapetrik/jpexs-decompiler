@@ -324,7 +324,7 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
                 boolean ifed = false;
                 if (def instanceof JumpIns) {
                     //ActionJump jump = (ActionJump) action;
-                    long address = action.offset + action.getBytes().length + action.operands[0];
+                    long address = action.offset + action.getBytesLength() + action.operands[0];
                     idx = code.adr2pos(address);
 
                     if (idx == -1) {
@@ -334,7 +334,7 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
                     //ActionIf aif = (ActionIf) action;
                     GraphTargetItem top = stack.pop();
                     Object res = top.getResult();
-                    long address = action.offset + action.getBytes().length + action.operands[0];
+                    long address = action.offset + action.getBytesLength() + action.operands[0];
                     int nidx = code.adr2pos(address);//code.indexOf(code.getByAddress(address));
                     AVM2Instruction tarIns = code.code.get(nidx);
 
@@ -345,11 +345,11 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
                         AVM2Instruction jumpIns = new AVM2Instruction(0, new JumpIns(), new int[]{0});
                         //jumpIns.operands[0] = action.operands[0] /*- action.getBytes().length*/ + jumpIns.getBytes().length;
                         code.replaceInstruction(idx, jumpIns, body);
-                        jumpIns.operands[0] = (int) (tarIns.offset - jumpIns.offset - jumpIns.getBytes().length);
+                        jumpIns.operands[0] = (int) (tarIns.offset - jumpIns.offset - jumpIns.getBytesLength());
 
                         code.insertInstruction(idx, new AVM2Instruction(action.offset, new DeobfuscatePopIns(), new int[]{}), true, body);
 
-                        idx = code.adr2pos(jumpIns.offset + jumpIns.getBytes().length + jumpIns.operands[0]);
+                        idx = code.adr2pos(jumpIns.offset + jumpIns.getBytesLength() + jumpIns.operands[0]);
                     } else {
                         code.replaceInstruction(idx, new AVM2Instruction(action.offset, new DeobfuscatePopIns(), new int[]{}), body);
                         //action.definition = new DeobfuscatePopIns();
@@ -399,9 +399,11 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
     }
 
     public void deobfuscate(String path, int classIndex, boolean isStatic, int scriptIndex, ABC abc, AVM2ConstantPool cpool, Trait trait, MethodInfo minfo, MethodBody body) throws InterruptedException {
-        removeUnreachableActions(body.getCode(), cpool, trait, minfo, body);
+        AVM2Code code = body.getCode();
+        code.fixJumps(body);
+        removeUnreachableActions(code, cpool, trait, minfo, body);
         removeObfuscationIfs(classIndex, isStatic, scriptIndex, abc, cpool, trait, minfo, body);
-        removeZeroJumps(body.getCode(), body);
+        removeZeroJumps(code, body);
     }
 
     class ExecutionResult {

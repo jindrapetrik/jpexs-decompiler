@@ -164,7 +164,7 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
 
                 if (action.definition instanceof JumpIns) {
 
-                    long address = action.offset + action.getBytes().length + action.operands[0];
+                    long address = action.offset + action.getBytesLength() + action.operands[0];
                     idx = code.adr2pos(address);//code.indexOf(code.getByAddress(address));
                     if (idx == -1) {
                         throw new TranslateException("Jump target not found: " + address);

@@ -712,14 +712,14 @@ public class AVM2Code implements Cloneable {
             }
             if (ins.definition instanceof JumpIns) {
                 try {
-                    pos = adr2pos(pos2adr(pos) + ins.getBytes().length + ins.operands[0]);
+                    pos = adr2pos(pos2adr(pos) + ins.getBytesLength() + ins.operands[0]);
                     continue;
                 } catch (ConvertException ex) {
                     return false;
                 }
             } else if (ins.definition instanceof IfTypeIns) {
                 try {
-                    int newpos = adr2pos(pos2adr(pos) + ins.getBytes().length + ins.operands[0]);
+                    int newpos = adr2pos(pos2adr(pos) + ins.getBytesLength() + ins.operands[0]);
                     calculateDebugFileLine(debugFile, debugLine, newpos, abc, seen);
                 } catch (ConvertException ex) {
                     return false;
@@ -1115,7 +1115,7 @@ public class AVM2Code implements Cloneable {
                                     writer.appendNoHilight(new DeobfuscatePopIns().instructionName).newLine();
                                 }
                                 if (fixBranch == 0) { // jump
-                                    writer.appendNoHilight(new JumpIns().instructionName + " ofs" + Helper.formatAddress(ofs + ins.getBytes().length + ins.operands[0]));
+                                    writer.appendNoHilight(new JumpIns().instructionName + " ofs" + Helper.formatAddress(ofs + ins.getBytesLength() + ins.operands[0]));
                                 } else {
                                     // nojump, ignore
                                 }
@@ -1150,7 +1150,7 @@ public class AVM2Code implements Cloneable {
         long a = 0;
         for (int i = 0; i < code.size(); i++) {
             posCache.add(a);
-            a += code.get(i).getBytes().length;
+            a += code.get(i).getBytesLength();
         }
         posCache.add(a);
         cacheActual = true;
@@ -1801,7 +1801,7 @@ public class AVM2Code implements Cloneable {
                  }*/
                 //Faster, but not so universal
                 if ((ins.definition instanceof JumpIns) || (ins.definition instanceof IfTypeIns)) {
-                    long target = ins.offset + ins.getBytes().length + ins.operands[0];
+                    long target = ins.offset + ins.getBytesLength() + ins.operands[0];
                     ins.operands[0] = updater.updateOperandOffset(ins.offset, target, ins.operands[0]);
                 }
             }
@@ -1815,13 +1815,34 @@ public class AVM2Code implements Cloneable {
         }
     }
 
+    public void fixJumps(MethodBody body) {
+        AVM2Instruction lastInstuction = code.get(code.size() - 1);
+        final long endOffset = lastInstuction.offset + lastInstuction.getBytesLength();
+        updateOffsets(new OffsetUpdater() {
+
+            @Override
+            public long updateInstructionOffset(long address) {
+                return address;
+            }
+
+            @Override
+            public int updateOperandOffset(long insAddr, long targetAddress, int offset) {
+                if (targetAddress > endOffset) {
+                    return (int) (offset - targetAddress + endOffset);
+                }
+                return offset;
+            }
+
+        }, body);
+    }
+
     private void checkValidOffsets(MethodBody body) {
         updateOffsets(new OffsetUpdater() {
 
             @Override
-            public long updateInstructionOffset(long offset) {
-                adr2pos(offset);
-                return offset;
+            public long updateInstructionOffset(long address) {
+                adr2pos(address);
+                return address;
             }
 
             @Override
@@ -1840,7 +1861,7 @@ public class AVM2Code implements Cloneable {
         checkValidOffsets(body);
         AVM2Instruction ins = code.get(pos);
         final long remOffset = ins.offset;
-        final int byteCount = ins.getBytes().length;
+        final int byteCount = ins.getBytesLength();
         updateOffsets(new OffsetUpdater() {
             @Override
             public long updateInstructionOffset(long address) {
@@ -1898,19 +1919,19 @@ public class AVM2Code implements Cloneable {
             pos = code.size();
         }
         instruction.offset = code.get(pos).offset;
-        int oldByteCount = code.get(pos).getBytes().length;
-        int newByteCount = instruction.getBytes().length;
+        int oldByteCount = code.get(pos).getBytesLength();
+        int newByteCount = instruction.getBytesLength();
         int byteDelta = newByteCount - oldByteCount;
 
         if (byteDelta != 0) {
             updateOffsets(new OffsetUpdater() {
 
                 @Override
-                public long updateInstructionOffset(long addr) {
-                    if (addr > instruction.offset) {
-                        return addr + byteDelta;
+                public long updateInstructionOffset(long address) {
+                    if (address > instruction.offset) {
+                        return address + byteDelta;
                     }
-                    return addr;
+                    return address;
                 }
 
                 @Override
@@ -1949,9 +1970,9 @@ public class AVM2Code implements Cloneable {
         if (pos > code.size()) {
             pos = code.size();
         }
-        final int byteCount = instruction.getBytes().length;
+        final int byteCount = instruction.getBytesLength();
         if (pos == code.size()) {
-            instruction.offset = code.get(pos - 1).offset + code.get(pos - 1).getBytes().length;
+            instruction.offset = code.get(pos - 1).offset + code.get(pos - 1).getBytesLength();
         } else {
             instruction.offset = code.get(pos).offset;
         }
@@ -2108,14 +2129,14 @@ public class AVM2Code implements Cloneable {
             }
             if (ins.definition instanceof JumpIns) {
                 try {
-                    pos = adr2pos(pos2adr(pos) + ins.getBytes().length + ins.operands[0]);
+                    pos = adr2pos(pos2adr(pos) + ins.getBytesLength() + ins.operands[0]);
                     continue;
                 } catch (ConvertException ex) {
                     return false;
                 }
             } else if (ins.definition instanceof IfTypeIns) {
                 try {
-                    int newpos = adr2pos(pos2adr(pos) + ins.getBytes().length + ins.operands[0]);
+                    int newpos = adr2pos(pos2adr(pos) + ins.getBytesLength() + ins.operands[0]);
                     walkCode(stats, newpos, stack, scope, abc);
                 } catch (ConvertException ex) {
                     return false;
@@ -2236,14 +2257,14 @@ public class AVM2Code implements Cloneable {
             }
             if (ins.definition instanceof JumpIns) {
                 try {
-                    ip = adr2pos(pos2adr(ip) + ins.getBytes().length + ins.operands[0]);
+                    ip = adr2pos(pos2adr(ip) + ins.getBytesLength() + ins.operands[0]);
                     continue;
                 } catch (ConvertException ex) {
                     logger.log(Level.FINE, null, ex);
                 }
             } else if (ins.definition instanceof IfTypeIns) {
                 try {
-                    visitCode(adr2pos(pos2adr(ip) + ins.getBytes().length + ins.operands[0]), ip, refs);
+                    visitCode(adr2pos(pos2adr(ip) + ins.getBytesLength() + ins.operands[0]), ip, refs);
                 } catch (ConvertException ex) {
                     logger.log(Level.FINE, null, ex);
                 }
@@ -2304,7 +2325,7 @@ public class AVM2Code implements Cloneable {
             }
             if (ins.definition instanceof JumpIns) {
                 try {
-                    ip = adr2pos(pos2adr(ip) + ins.getBytes().length + ins.operands[0]);
+                    ip = adr2pos(pos2adr(ip) + ins.getBytesLength() + ins.operands[0]);
                     prev2 = prev;
                     prev = ins;
                     continue;
@@ -2373,7 +2394,7 @@ public class AVM2Code implements Cloneable {
                     }
                 }
                 try {
-                    ret += visitCodeTrap(adr2pos(pos2adr(ip) + ins.getBytes().length + ins.operands[0]), visited, prev, prev2);
+                    ret += visitCodeTrap(adr2pos(pos2adr(ip) + ins.getBytesLength() + ins.operands[0]), visited, prev, prev2);
                 } catch (ConvertException ex) {
                     logger.log(Level.FINE, null, ex);
                 }
@@ -2616,7 +2637,7 @@ public class AVM2Code implements Cloneable {
         int csize = code.size();
         for (int i = 0; i < csize; i++) {
             AVM2Instruction ins = code.get(i);
-            int insLen = code.get(i).getBytes().length;
+            int insLen = code.get(i).getBytesLength();
             int ofs = pos2adr(i);
             if (ins.definition instanceof JumpIns) {
                 int targetOfs = ofs + insLen + ins.operands[0];
@@ -2650,7 +2671,7 @@ public class AVM2Code implements Cloneable {
         int ofs = 0;
         for (int i = 0; i < code.size(); i++) {
             code.get(i).mappedOffset = ofs;
-            ofs += code.get(i).getBytes().length;
+            ofs += code.get(i).getBytesLength();
 
         }
     }
