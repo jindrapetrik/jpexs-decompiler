@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.SWFBundle;
 import com.jpexs.decompiler.flash.SWFCompression;
 import com.jpexs.decompiler.flash.SWFSourceInfo;
 import com.jpexs.decompiler.flash.SearchMode;
+import com.jpexs.decompiler.flash.SwfOpenException;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
@@ -1086,7 +1087,14 @@ public class CommandLineArgumentParser {
                 }
 
                 SWFSourceInfo sourceInfo = new SWFSourceInfo(null, inFile.getAbsolutePath(), inFile.getName());
-                SWF swf = new SWF(new FileInputStream(inFile), sourceInfo.getFile(), sourceInfo.getFileTitle(), Configuration.parallelSpeedUp.get());
+                SWF swf;
+                try {
+                    swf = new SWF(new FileInputStream(inFile), sourceInfo.getFile(), sourceInfo.getFileTitle(), Configuration.parallelSpeedUp.get());
+                } catch (SwfOpenException ex) {
+                    logger.log(Level.SEVERE, "Failed to open swf: " + inFile.getName(), ex);
+                    break;
+                }
+
                 swf.swfList = new SWFList();
                 swf.swfList.sourceInfo = sourceInfo;
                 String outDir = outDirBase.getAbsolutePath();
