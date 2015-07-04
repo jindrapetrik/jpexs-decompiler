@@ -591,20 +591,18 @@ public class Graph {
 
         for (int i = 0; i < list.size(); i++) {
             GraphTargetItem item = list.get(i);
-            if (item instanceof Block) {
-                List<List<GraphTargetItem>> subs = ((Block) item).getSubs();
-                for (List<GraphTargetItem> sub : subs) {
-                    processIfs(sub);
-                }
-            }
             if ((item instanceof LoopItem) && (item instanceof Block)) {
                 List<List<GraphTargetItem>> subs = ((Block) item).getSubs();
                 for (List<GraphTargetItem> sub : subs) {
                     processIfs(sub);
                     checkContinueAtTheEnd(sub, ((LoopItem) item).loop);
                 }
-            }
-            if (item instanceof IfItem) {
+            } else if (item instanceof Block) {
+                List<List<GraphTargetItem>> subs = ((Block) item).getSubs();
+                for (List<GraphTargetItem> sub : subs) {
+                    processIfs(sub);
+                }
+            } else if (item instanceof IfItem) {
                 IfItem ifi = (IfItem) item;
                 List<GraphTargetItem> onTrue = ifi.onTrue;
                 List<GraphTargetItem> onFalse = ifi.onFalse;
@@ -1520,6 +1518,7 @@ public class Graph {
                 Map<Integer, GraphTargetItem> caseExpressionRightSides = new HashMap<>();
                 GraphTargetItem it = switchedItem;
                 int defaultBranch = 0;
+                boolean hasExpr = false;
 
                 while (it instanceof TernarOpItem) {
                     TernarOpItem to = (TernarOpItem) it;
@@ -1555,6 +1554,7 @@ public class Graph {
                     if (sameRight) {
                         caseExpressions = caseExpressionLeftSides;
                         switchedItem = firstItem;
+                        hasExpr = true;
                     } else {
                         firstItem = (GraphTargetItem) caseExpressionLeftSides.values().toArray()[0];
 
@@ -1568,14 +1568,15 @@ public class Graph {
                         if (sameLeft) {
                             caseExpressions = caseExpressionRightSides;
                             switchedItem = firstItem;
+                            hasExpr = true;
                         }
                     }
 
                 }
                 first = true;
                 pos = 0;
-                //This is tied to AS3 switch implementation which has nextparts switched from index 1. TODO: Make more universal
-                GraphPart defaultPart = part.nextParts.get(1 + defaultBranch);
+                //This is tied to AS3 switch implementation which has nextparts switched from index 1. TODO: Make more universal                
+                GraphPart defaultPart = hasExpr ? part.nextParts.get(1 + defaultBranch) : part.nextParts.get(0);
 
                 for (GraphPart p : part.nextParts) {
                     if (p != defaultPart) {
@@ -1590,7 +1591,7 @@ public class Graph {
 
                 first = true;
                 pos = 0;
-                List<GraphTargetItem> nextCommands = null;
+                List<GraphTargetItem> nextCommands = new ArrayList<>();
                 for (GraphPart p : part.nextParts) {
 
                     /*if (pos == ignoredBranch) {
