@@ -60,6 +60,7 @@ public class AVM2LocalData extends BaseLocalData {
     public Map<Integer, List<Integer>> finallyJumps;
 
     public Map<Integer, Integer> ignoredSwitches;
+
     public List<Integer> ignoredSwitches2;
 
     public Integer scriptIndex;

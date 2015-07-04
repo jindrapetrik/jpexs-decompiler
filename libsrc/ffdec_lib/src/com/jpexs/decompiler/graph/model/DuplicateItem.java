@@ -105,5 +105,4 @@ public class DuplicateItem extends GraphTargetItem implements SimpleValue {
     public boolean isSimpleValue() {
         return ((value instanceof SimpleValue) && ((SimpleValue) value).isSimpleValue());
     }
-
 }

@@ -73,5 +73,4 @@ public class TranslateStack extends Stack<GraphTargetItem> {
         }
         return super.pop();
     }
-
 }

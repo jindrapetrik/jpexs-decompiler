@@ -39,6 +39,7 @@ import java.util.List;
 public class AlchemyStoreAVM2Item extends AVM2Item {
 
     private final char type;
+
     private final int size;
 
     private final GraphTargetItem ofs;
@@ -93,5 +94,4 @@ public class AlchemyStoreAVM2Item extends AVM2Item {
         }
         return toSourceMerge(localData, generator, ofs, ins(def));
     }
-
 }

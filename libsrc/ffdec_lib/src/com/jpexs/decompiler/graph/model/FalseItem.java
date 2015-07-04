@@ -74,5 +74,4 @@ public class FalseItem extends GraphTargetItem implements LogicalOpItem, SimpleV
     public Object getResult() {
         return Boolean.FALSE;
     }
-
 }

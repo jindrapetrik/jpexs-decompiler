@@ -147,5 +147,4 @@ public class LocalRegAVM2Item extends AVM2Item {
         }
         return true;
     }
-
 }

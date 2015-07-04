@@ -53,5 +53,4 @@ public class PopItem extends GraphTargetItem {
     public Object getResult() {
         return new Null();
     }
-
 }

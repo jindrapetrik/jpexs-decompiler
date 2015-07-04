@@ -26,7 +26,6 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.decompiler.graph.SimpleValue;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.IntegerValueTypeItem;
@@ -86,5 +85,4 @@ public class IntegerValueAVM2Item extends NumberValueAVM2Item implements Integer
     public int intValue() {
         return (int) (long) value;
     }
-
 }

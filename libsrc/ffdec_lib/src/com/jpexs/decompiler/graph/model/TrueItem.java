@@ -75,5 +75,4 @@ public class TrueItem extends GraphTargetItem implements LogicalOpItem, SimpleVa
     public Object getResult() {
         return Boolean.TRUE;
     }
-
 }

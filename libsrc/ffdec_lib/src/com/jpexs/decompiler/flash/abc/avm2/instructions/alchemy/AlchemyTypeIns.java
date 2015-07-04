@@ -23,5 +23,4 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy;
 public interface AlchemyTypeIns {
 
     public static final String ALCHEMY_PACKAGE = "avm2.intrinsics.memory";
-
 }

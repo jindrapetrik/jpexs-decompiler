@@ -39,6 +39,7 @@ import java.util.List;
 public class AlchemyLoadAVM2Item extends AVM2Item {
 
     private final char type;
+
     private final int size;
 
     private final GraphTargetItem ofs;

@@ -312,5 +312,4 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     public GraphTargetItem invert(GraphSourceItem src) {
         return new NotItem(src, this);
     }
-
 }

@@ -7,5 +7,4 @@ import com.jpexs.decompiler.graph.model.BinaryOp;
  * @author JPEXS
  */
 public interface EqualsTypeItem extends BinaryOp {
-
 }

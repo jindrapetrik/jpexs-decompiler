@@ -31,37 +31,37 @@ import java.util.Objects;
  * @author JPEXS
  */
 public class TypeItem extends GraphTargetItem {
-    
+
     public static TypeItem BOOLEAN = new TypeItem("Boolean");
-    
+
     public static TypeItem STRING = new TypeItem("String");
-    
+
     public static TypeItem ARRAY = new TypeItem("Array");
-    
+
     public static UnboundedTypeItem UNBOUNDED = new UnboundedTypeItem();
-    
+
     public DottedChain fullTypeName;
-    
+
     public TypeItem(String s) {
         this(s == null ? new DottedChain() : new DottedChain(s.split("\\.")));
     }
-    
+
     public TypeItem(DottedChain fullTypeName) {
         this(fullTypeName, new ArrayList<GraphTargetItem>());
     }
-    
+
     public TypeItem(DottedChain fullTypeName, List<GraphTargetItem> subtypes) {
         super(null, NOPRECEDENCE);
         this.fullTypeName = fullTypeName;
     }
-    
+
     @Override
     public int hashCode() {
         int hash = 7;
         hash = 83 * hash + Objects.hashCode(this.fullTypeName);
         return hash;
     }
-    
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -76,7 +76,7 @@ public class TypeItem extends GraphTargetItem {
         }
         return true;
     }
-    
+
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         if (localData.fullyQualifiedNames.contains(fullTypeName)) {
@@ -84,25 +84,25 @@ public class TypeItem extends GraphTargetItem {
         } else {
             writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(localData.constantsAvm2 != null, fullTypeName.getLast()), HighlightSpecialType.TYPE_NAME, fullTypeName.toPrintableString());
         }
-        
+
         return writer;
     }
-    
+
     @Override
     public GraphTargetItem returnType() {
         return this;
     }
-    
+
     @Override
     public boolean hasReturnValue() {
         return true;
     }
-    
+
     @Override
     public String toString() {
         return fullTypeName.toString();
     }
-    
+
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return generator.generate(localData, this);
