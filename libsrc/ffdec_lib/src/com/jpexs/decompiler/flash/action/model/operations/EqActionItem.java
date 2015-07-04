@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.swf5.ActionEquals2;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.CompilationException;
+import com.jpexs.decompiler.graph.EqualsTypeItem;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -29,7 +30,7 @@ import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import com.jpexs.decompiler.graph.model.LogicalOpItem;
 import java.util.List;
 
-public class EqActionItem extends BinaryOpItem implements LogicalOpItem {
+public class EqActionItem extends BinaryOpItem implements LogicalOpItem, EqualsTypeItem {
 
     boolean version2;
 

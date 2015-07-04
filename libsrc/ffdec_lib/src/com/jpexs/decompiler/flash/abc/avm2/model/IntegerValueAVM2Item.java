@@ -29,11 +29,12 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SimpleValue;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
+import com.jpexs.decompiler.graph.model.IntegerValueTypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 import java.util.Set;
 
-public class IntegerValueAVM2Item extends NumberValueAVM2Item {
+public class IntegerValueAVM2Item extends NumberValueAVM2Item implements IntegerValueTypeItem {
 
     public Long value;
 
@@ -79,6 +80,11 @@ public class IntegerValueAVM2Item extends NumberValueAVM2Item {
     @Override
     public boolean hasReturnValue() {
         return true;
+    }
+
+    @Override
+    public int intValue() {
+        return (int) (long) value;
     }
 
 }

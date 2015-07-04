@@ -444,7 +444,7 @@ public class AVM2Graph extends Graph {
             ret.addAll(output);
             return ret;
         }
-        if (((part.nextParts.size() == 2)
+        if (false && (((part.nextParts.size() == 2)
                 && (!stack.isEmpty())
                 && (stack.peek() instanceof StrictEqAVM2Item)
                 && (part.nextParts.get(0).getHeight() >= 2)
@@ -457,7 +457,7 @@ public class AVM2Graph extends Graph {
                 && (part.nextParts.get(1).getHeight() >= 2)
                 && (this.avm2code.code.get(this.avm2code.fixIPAfterDebugLine(part.nextParts.get(1).start)).definition instanceof PushIntegerTypeIns)
                 && (!part.nextParts.get(1).nextParts.isEmpty())
-                && (this.avm2code.code.get(part.nextParts.get(1).nextParts.get(0).end).definition instanceof LookupSwitchIns))) {
+                && (this.avm2code.code.get(part.nextParts.get(1).nextParts.get(0).end).definition instanceof LookupSwitchIns)))) {
 
             if (stack.peek() instanceof StrictEqAVM2Item) {
                 ignoredSwitches2.add(part.nextParts.get(0).nextParts.get(0).end);
@@ -815,6 +815,16 @@ public class AVM2Graph extends Graph {
                     }
                 }
                 if (avm2code.isKilled(ri.regIndex, 0, Integer.MAX_VALUE)) {
+                    if (i + 1 < list.size()) {
+                        if (list.get(i + 1) instanceof SwitchItem) {
+                            SwitchItem si = (SwitchItem) list.get(i + 1);
+                            if (si.switchedObject instanceof LocalRegAVM2Item) {
+                                if (((LocalRegAVM2Item) si.switchedObject).regIndex == ri.regIndex) {
+                                    si.switchedObject = ri.value;
+                                }
+                            }
+                        }
+                    }
                     if (i + 2 < list.size()) {
                         if ((list.get(i + 1) instanceof IntegerValueAVM2Item) && (list.get(i + 2) instanceof ReturnValueAVM2Item)) {
                             ReturnValueAVM2Item r = (ReturnValueAVM2Item) list.get(i + 2);

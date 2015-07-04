@@ -125,4 +125,27 @@ public class LocalRegAVM2Item extends AVM2Item {
     public boolean hasReturnValue() {
         return true;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 67 * hash + this.regIndex;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final LocalRegAVM2Item other = (LocalRegAVM2Item) obj;
+        if (this.regIndex != other.regIndex) {
+            return false;
+        }
+        return true;
+    }
+
 }

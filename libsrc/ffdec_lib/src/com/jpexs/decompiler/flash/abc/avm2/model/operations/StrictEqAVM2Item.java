@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfStrictEqIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfStrictNeIns;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.CompilationException;
+import com.jpexs.decompiler.graph.EqualsTypeItem;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -32,7 +33,7 @@ import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import com.jpexs.decompiler.graph.model.LogicalOpItem;
 import java.util.List;
 
-public class StrictEqAVM2Item extends BinaryOpItem implements LogicalOpItem, IfCondition {
+public class StrictEqAVM2Item extends BinaryOpItem implements LogicalOpItem, IfCondition, EqualsTypeItem {
 
     public StrictEqAVM2Item(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
         super(instruction, PRECEDENCE_EQUALITY, leftSide, rightSide, "===");

@@ -34,6 +34,7 @@ import com.jpexs.decompiler.graph.model.ForItem;
 import com.jpexs.decompiler.graph.model.GotoItem;
 import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.IntegerValueItem;
+import com.jpexs.decompiler.graph.model.IntegerValueTypeItem;
 import com.jpexs.decompiler.graph.model.LabelItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.LogicalOpItem;
@@ -1498,7 +1499,7 @@ public class Graph {
 //********************************END PART DECOMPILING
         if (parseNext) {
 
-            if (part.nextParts.size() > 2) {//direct switch, seen in the wild...
+            if (part.nextParts.size() > 2) {
                 GraphPart next = getMostCommonPart(localData, part.nextParts, loops);
                 List<GraphPart> vis = new ArrayList<>();
                 GraphTargetItem switchedItem = stack.pop();
@@ -1513,15 +1514,94 @@ public class Graph {
                 loops.add(swLoop);
                 boolean first = false;
                 int pos = 0;
+
+                Map<Integer, GraphTargetItem> caseExpressions = new HashMap<>();
+                Map<Integer, GraphTargetItem> caseExpressionLeftSides = new HashMap<>();
+                Map<Integer, GraphTargetItem> caseExpressionRightSides = new HashMap<>();
+                GraphTargetItem it = switchedItem;
+                int defaultBranch = 0;
+
+                while (it instanceof TernarOpItem) {
+                    TernarOpItem to = (TernarOpItem) it;
+                    if (to.expression instanceof EqualsTypeItem) {
+                        if (to.onTrue instanceof IntegerValueTypeItem) {
+                            int cpos = ((IntegerValueTypeItem) to.onTrue).intValue();
+                            caseExpressionLeftSides.put(cpos, ((EqualsTypeItem) to.expression).getLeftSide());
+                            caseExpressionRightSides.put(cpos, ((EqualsTypeItem) to.expression).getRightSide());
+                            it = to.onFalse;
+                        } else {
+                            break;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+                //int ignoredBranch = -1;
+                if (it instanceof IntegerValueTypeItem) {
+                    defaultBranch = ((IntegerValueTypeItem) it).intValue();
+                }
+
+                if (!caseExpressionRightSides.isEmpty()) {
+                    GraphTargetItem firstItem;
+                    firstItem = (GraphTargetItem) caseExpressionRightSides.values().toArray()[0];
+                    boolean sameRight = true;
+                    for (GraphTargetItem cit : caseExpressionRightSides.values()) {
+                        if (!cit.equals(firstItem)) {
+                            sameRight = false;
+                            break;
+                        }
+                    }
+
+                    if (sameRight) {
+                        caseExpressions = caseExpressionLeftSides;
+                        switchedItem = firstItem;
+                    } else {
+                        firstItem = (GraphTargetItem) caseExpressionLeftSides.values().toArray()[0];
+
+                        boolean sameLeft = true;
+                        for (GraphTargetItem cit : caseExpressionLeftSides.values()) {
+                            if (!cit.equals(firstItem)) {
+                                sameLeft = false;
+                                break;
+                            }
+                        }
+                        if (sameLeft) {
+                            caseExpressions = caseExpressionRightSides;
+                            switchedItem = firstItem;
+                        }
+                    }
+
+                }
+                first = true;
+                pos = 0;
+                //This is tied to AS3 switch implementation which has nextparts switched from index 1. TODO: Make more universal
+                GraphPart defaultPart = part.nextParts.get(1 + defaultBranch);
+
+                for (GraphPart p : part.nextParts) {
+                    if (p != defaultPart) {
+                        if (caseExpressions.containsKey(pos)) {
+                            caseValues.add(caseExpressions.get(pos));
+                        } else {
+                            caseValues.add(new IntegerValueItem(null, pos));
+                        }
+                        pos++;
+                    }
+                }
+
+                first = true;
+                pos = 0;
+                List<GraphTargetItem> nextCommands = null;
                 for (GraphPart p : part.nextParts) {
 
-                    if (!first) {
-                        caseValues.add(new IntegerValueItem(null, pos++));
+                    /*if (pos == ignoredBranch) {
+                     pos++;
+                     continue;
+                     }*/
+                    if (p != defaultPart) {
                         if (vis.contains(p)) {
                             valueMappings.add(caseCommands.size() - 1);
                             continue;
                         }
-
                         valueMappings.add(caseCommands.size());
                     }
                     List<GraphPart> stopPart2 = new ArrayList<>();
@@ -1539,19 +1619,37 @@ public class Graph {
                         }
                     }
                     if (next != p) {
-                        //int stackLenBefore = stack.size();
-                        TranslateStack s2 = (TranslateStack) stack.clone();
-                        s2.clear();
-                        List<GraphTargetItem> nextCommands = printGraph(partCodes, partCodePos, visited, prepareBranchLocalData(localData), s2, allParts, part, p, stopPart2, loops, null, staticOperation, path, recursionLevel + 1);
-                        makeAllCommands(nextCommands, s2);
-                        if (first) {
+
+                        if (p == defaultPart && !defaultCommands.isEmpty()) {
+                            //ignore
+                        } else {
+                            TranslateStack s2 = (TranslateStack) stack.clone();
+                            s2.clear();
+                            nextCommands = printGraph(partCodes, partCodePos, visited, prepareBranchLocalData(localData), s2, allParts, part, p, stopPart2, loops, null, staticOperation, path, recursionLevel + 1);
+                            makeAllCommands(nextCommands, s2);
+                            if (p == defaultPart) {
+                                defaultCommands = nextCommands;
+                            } else {
+                                caseCommands.add(nextCommands);
+                            }
+                            vis.add(p);
+                        }
+                    } else {
+                        if (p == defaultPart) {
                             defaultCommands = nextCommands;
                         } else {
                             caseCommands.add(nextCommands);
                         }
-                        vis.add(p);
                     }
                     first = false;
+                    pos++;
+                }
+                //remove last break from default clause
+                if (!defaultCommands.isEmpty() && (defaultCommands.get(defaultCommands.size() - 1) instanceof BreakItem)) {
+                    BreakItem bi = (BreakItem) defaultCommands.get(defaultCommands.size() - 1);
+                    if (bi.loopId == swLoop.id) {
+                        defaultCommands.remove(defaultCommands.size() - 1);
+                    }
                 }
                 SwitchItem sw = new SwitchItem(null, swLoop, switchedItem, caseValues, caseCommands, defaultCommands, valueMappings);
                 currentRet.add(sw);
@@ -1559,6 +1657,7 @@ public class Graph {
                 if (next != null) {
                     currentRet.addAll(printGraph(partCodes, partCodePos, visited, localData, stack, allParts, part, next, stopPart, loops, null, staticOperation, path, recursionLevel + 1));
                 }
+                pos++;
             } //else
             GraphPart nextOnePart = null;
             if (part.nextParts.size() == 2) {

@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.graph.model;
 
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -25,7 +26,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
-public class IntegerValueItem extends GraphTargetItem {
+public class IntegerValueItem extends GraphTargetItem implements IntegerValueTypeItem {
 
     private final int intValue;
 
@@ -46,7 +47,7 @@ public class IntegerValueItem extends GraphTargetItem {
 
     @Override
     public Object getResult() {
-        return (double) intValue;
+        return (long) intValue;
     }
 
     @Override
@@ -57,5 +58,10 @@ public class IntegerValueItem extends GraphTargetItem {
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
+    }
+
+    @Override
+    public int intValue() {
+        return intValue;
     }
 }
