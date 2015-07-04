@@ -1092,7 +1092,7 @@ public class CommandLineArgumentParser {
                     swf = new SWF(new FileInputStream(inFile), sourceInfo.getFile(), sourceInfo.getFileTitle(), Configuration.parallelSpeedUp.get());
                 } catch (SwfOpenException ex) {
                     logger.log(Level.SEVERE, "Failed to open swf: " + inFile.getName(), ex);
-                    break;
+                    continue;
                 }
 
                 swf.swfList = new SWFList();
