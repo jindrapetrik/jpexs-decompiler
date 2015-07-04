@@ -52,7 +52,7 @@ public class ActionScript3DeobfuscatorTest extends ActionStript2TestBase {
     public void init() throws IOException, InterruptedException {
         //Main.initLogging(false);
         Configuration.autoDeobfuscate.set(true);
-        Configuration.deobfuscationMode.set(1);
+        Configuration.deobfuscationOldMode.set(false);
         Configuration.decimalAddress.set(false);
         swf = new SWF(new BufferedInputStream(new FileInputStream("testdata/as3/as3.swf")), false);
     }
