@@ -330,7 +330,7 @@ public final class MethodBody implements Cloneable {
         b.getCode().markMappedOffsets();
 
         if (Configuration.autoDeobfuscate.get()) {
-            if (Configuration.deobfuscationMode.get() == 0) {
+            if (Configuration.deobfuscationOldMode.get()) {
                 try {
                     b.getCode().removeTraps(constants, trait, method_info.get(this.method_info), b, abc, scriptIndex, classIndex, isStatic, path);
                 } catch (Throwable ex) {
