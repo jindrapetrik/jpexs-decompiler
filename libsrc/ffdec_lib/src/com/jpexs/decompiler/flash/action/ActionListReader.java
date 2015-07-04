@@ -92,7 +92,7 @@ public class ActionListReader {
      */
     public static ActionList readActionListTimeout(final List<DisassemblyListener> listeners, final SWFInputStream sis, final int version, final int ip, final int endIp, final String path) throws IOException, InterruptedException, TimeoutException {
         try {
-            final int deobfuscationMode = Configuration.autoDeobfuscate.get() ? Configuration.deobfuscationMode.get() : -1;
+            final int deobfuscationMode = Configuration.autoDeobfuscate.get() ? (Configuration.deobfuscationOldMode.get() ? 0 : 1) : -1;
             ActionList actions = CancellableWorker.call(new Callable<ActionList>() {
 
                 @Override
