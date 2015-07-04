@@ -608,11 +608,10 @@ public abstract class MainFrameMenu implements MenuBuilder {
         }
     }
 
-    protected void deobfuscationMode(ActionEvent evt, int mode) {
-        Configuration.deobfuscationMode.set(mode);
-        mainFrame.getPanel().autoDeobfuscateChanged();
-    }
-
+    /*protected void deobfuscationMode(ActionEvent evt, int mode) {
+     Configuration.deobfuscationMode.set(mode);
+     mainFrame.getPanel().autoDeobfuscateChanged();
+     }*/
     protected void exitActionPerformed(ActionEvent evt) {
         JFrame frame = (JFrame) mainFrame;
         frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
