@@ -50,8 +50,11 @@ public class CallFunctionActionItem extends ActionItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        String paramStr = "";
-        writer.append(IdentifiersDeobfuscation.printIdentifier(false, (functionName).toStringNoQuotes(localData)));
+        if (functionName instanceof DirectValueActionItem) {
+            writer.append(IdentifiersDeobfuscation.printIdentifier(false, (functionName).toStringNoQuotes(localData)));
+        } else {
+            functionName.appendTo(writer, localData);
+        }
         writer.spaceBeforeCallParenthesies(arguments.size());
         writer.append("(");
         for (int t = 0; t < arguments.size(); t++) {
