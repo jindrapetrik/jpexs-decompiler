@@ -103,7 +103,7 @@ public class ABCStreamTest {
         for (long number : getTestNumebers(-(1L << 31), (1 << 31) - 1)) {
             try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     ABCOutputStream aos = new ABCOutputStream(baos);) {
-                aos.writeU32(number);
+                aos.writeS32(number);
                 aos.close();
                 try (MemoryInputStream mis = new MemoryInputStream(baos.toByteArray());
                         ABCInputStream ais = new ABCInputStream(mis);) {
