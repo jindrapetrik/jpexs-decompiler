@@ -82,9 +82,9 @@ public class Configuration {
     @ConfigurationCategory("decompilation")
     public static final ConfigurationItem<Boolean> parallelSpeedUp = null;
 
-    @ConfigurationDefaultInt(20)
+    @ConfigurationDefaultInt(10)
     @ConfigurationCategory("decompilation")
-    public static final ConfigurationItem<Integer> parallelThreadCount = null;
+    public static final ConfigurationItem<Integer> parallelSpeedUpThreadCount = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("script")
@@ -686,10 +686,8 @@ public class Configuration {
         } else {
             logLevel = Level.WARNING;
         }
-        int processorCount = Runtime.getRuntime().availableProcessors();
-        if (parallelThreadCount.get() > processorCount) {
-            parallelThreadCount.set(processorCount);
-        }
+        //limit paralel threads?
+        //int processorCount = Runtime.getRuntime().availableProcessors(); 
 
         if (lastUpdatesCheckDate.get() == null) {
             GregorianCalendar mingc = new GregorianCalendar();
@@ -788,7 +786,7 @@ public class Configuration {
     }
 
     public static int getParallelThreadCount() {
-        int count = parallelThreadCount.get();
+        int count = parallelSpeedUpThreadCount.get();
         if (count < 2) {
             count = 2;
         }
