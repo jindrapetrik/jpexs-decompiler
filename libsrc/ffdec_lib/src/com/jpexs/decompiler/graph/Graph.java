@@ -602,7 +602,8 @@ public class Graph {
                 for (List<GraphTargetItem> sub : subs) {
                     processIfs(sub);
                 }
-            } else if (item instanceof IfItem) {
+            }
+            if (item instanceof IfItem) {
                 IfItem ifi = (IfItem) item;
                 List<GraphTargetItem> onTrue = ifi.onTrue;
                 List<GraphTargetItem> onFalse = ifi.onFalse;
