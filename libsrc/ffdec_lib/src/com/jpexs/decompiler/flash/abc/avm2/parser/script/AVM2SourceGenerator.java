@@ -394,7 +394,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         int pos = 0;
         for (int a = 0; a < code.size(); a++) {
             AVM2Instruction ins = code.get(a);
-            pos += ins.getBytes().length;
+            pos += ins.getBytesLength();
             if (ins.definition instanceof JumpIns) {
                 if (ins.definition instanceof ContinueJumpIns) {
                     if (continueOffset != Integer.MAX_VALUE) {
@@ -924,7 +924,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
             List<AVM2Instruction> finallySwitchCmds = new ArrayList<>();
 
             finSwitch = new AVM2Instruction(0, new LookupSwitchIns(), new int[1 + 1 + 1]);
-            finSwitch.operands[0] = finSwitch.getBytes().length;
+            finSwitch.operands[0] = finSwitch.getBytesLength();
             finSwitch.operands[1] = 0; //switch cnt
 
             List<AVM2Instruction> preFinallySwitch = new ArrayList<>();
@@ -1004,7 +1004,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                         continue;
                     }
                 }
-                pos += ins.getBytes().length;
+                pos += ins.getBytesLength();
             }
 
         }
@@ -1028,13 +1028,13 @@ public class AVM2SourceGenerator implements SourceGenerator {
                             if (wasDef) {
                                 ins.operands[0] = 0;
                             } else {
-                                ins.operands[0] = finallyPos - (pos + ins.getBytes().length);
+                                ins.operands[0] = finallyPos - (pos + ins.getBytesLength());
                             }
                             ins.definition = new JumpIns();
-                            switchLoc.add(pos + ins.getBytes().length + betLen - switchPos);
+                            switchLoc.add(pos + ins.getBytesLength() + betLen - switchPos);
                         }
                     }
-                    pos += ins.getBytes().length;
+                    pos += ins.getBytesLength();
                 }
                 if (defPos == switchLoc.size() - 1) {
                     switchLoc.add(defLoc);
@@ -1043,7 +1043,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
             }
             finSwitch.operands = new int[1 + 1 + switchLoc.size()];
             pushDefIns.operands[0] = defPos + 1;
-            int afterLoc = finSwitch.getBytes().length;
+            int afterLoc = finSwitch.getBytesLength();
             finSwitch.operands[0] = afterLoc;
             finSwitch.operands[1] = switchLoc.size() - 1;
             for (int j = 0; j < switchLoc.size(); j++) {
@@ -1806,7 +1806,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     i--;
                     continue;
                 }
-                offset += ins.getBytes().length;
+                offset += ins.getBytesLength();
             }
 
             mbody.markOffsets();

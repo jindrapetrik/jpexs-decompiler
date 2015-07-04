@@ -92,11 +92,11 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
                         aos.writeU8(0xff & operands[i]);
                         break;
                     case AVM2Code.OPT_CASE_OFFSETS:
-
                         aos.writeU30(operands[i]); //case count
                         for (int j = i + 1; j < operands.length; j++) {
                             aos.writeS24(operands[j]);
                         }
+
                         break;
                 }
             }
@@ -104,6 +104,40 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
             // ignored
         }
         return bos.toByteArray();
+    }
+
+    public int getBytesLength() {
+        int refCnt = getBytes().length;
+        int cnt = 1;
+        for (int i = 0; i < definition.operands.length; i++) {
+            int opt = definition.operands[i] & 0xff00;
+            switch (opt) {
+                case AVM2Code.OPT_S24:
+                    cnt += 3;
+                    break;
+                case AVM2Code.OPT_U30:
+                    cnt += ABCOutputStream.getU30ByteLength(operands[i]);
+                    break;
+                case AVM2Code.OPT_U8:
+                    cnt++;
+                    break;
+                case AVM2Code.OPT_BYTE:
+                    cnt++;
+                    break;
+                case AVM2Code.OPT_CASE_OFFSETS:
+                    cnt += ABCOutputStream.getU30ByteLength(operands[i]); //case count
+                    for (int j = i + 1; j < operands.length; j++) {
+                        cnt += 3;
+                    }
+
+                    break;
+            }
+        }
+
+        if (refCnt != cnt) {
+            throw new Error("aaa");
+        }
+        return cnt;
     }
 
     @Override
@@ -125,7 +159,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
         for (int i = 0; i < definition.operands.length; i++) {
             switch (definition.operands[i]) {
                 case AVM2Code.DAT_OFFSET:
-                    ret.add(offset + operands[i] + getBytes().length);
+                    ret.add(offset + operands[i] + getBytesLength());
                     break;
                 case AVM2Code.DAT_CASE_BASEOFFSET:
                     ret.add(offset + operands[i]);
@@ -161,7 +195,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
                     s.add(constants.getDouble(operands[i]));
                     break;
                 case AVM2Code.DAT_OFFSET:
-                    s.add(offset + operands[i] + getBytes().length);
+                    s.add(offset + operands[i] + getBytesLength());
                     break;
                 case AVM2Code.DAT_CASE_BASEOFFSET:
                     s.add(offset + operands[i]);
@@ -243,7 +277,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
                 case AVM2Code.DAT_OFFSET:
                     s.append(" ");
                     s.append("ofs");
-                    s.append(Helper.formatAddress(offset + operands[i] + getBytes().length));
+                    s.append(Helper.formatAddress(offset + operands[i] + getBytesLength()));
                     break;
                 case AVM2Code.DAT_CASE_BASEOFFSET:
                     s.append(" ");
@@ -338,11 +372,11 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
         if (definition instanceof IfTypeIns) {
 
             if (fixedBranch == -1 || fixedBranch == 0) {
-                ret.add(code.adr2pos(offset + getBytes().length + operands[0]));
+                ret.add(code.adr2pos(offset + getBytesLength() + operands[0]));
             }
             if (!(definition instanceof JumpIns)) {
                 if (fixedBranch == -1 || fixedBranch == 1) {
-                    ret.add(code.adr2pos(offset + getBytes().length));
+                    ret.add(code.adr2pos(offset + getBytesLength()));
                 }
             }
         }

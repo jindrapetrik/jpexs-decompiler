@@ -53,6 +53,7 @@ public class ActionScript3DeobfuscatorTest extends ActionStript2TestBase {
         //Main.initLogging(false);
         Configuration.autoDeobfuscate.set(true);
         Configuration.deobfuscationMode.set(1);
+        Configuration.decimalAddress.set(false);
         swf = new SWF(new BufferedInputStream(new FileInputStream("testdata/as3/as3.swf")), false);
     }
 
@@ -225,7 +226,7 @@ public class ActionScript3DeobfuscatorTest extends ActionStript2TestBase {
     public void testJumps() throws Exception {
         String res = recompilePCode("pushbyte 3\r\n"
                 + "pushbyte 4\r\n"
-                + "ifeq a\r\n" //should change to ifeq c                
+                + "ifeq a\r\n" //should change to ifeq c
                 + "jump b\r\n" //should not change
                 + "a:jump c\r\n"
                 + "c:pushbyte 4\r\n"

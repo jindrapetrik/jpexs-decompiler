@@ -905,14 +905,14 @@ public class ASM3Parser {
                         }
                         lastIns = new AVM2Instruction(offset, def, operands);
                         code.code.add(lastIns);
-                        offset += lastIns.getBytes().length;
+                        offset += lastIns.getBytesLength();
                         break;
                     }
                 }
                 if (symb.value.toString().toLowerCase().equals("ffdec_deobfuscatepop")) {
                     lastIns = new AVM2Instruction(offset, new DeobfuscatePopIns(), null);
                     code.code.add(lastIns);
-                    offset += lastIns.getBytes().length;
+                    offset += lastIns.getBytesLength();
                     insFound = true;
                 }
                 if (!insFound) {
@@ -956,7 +956,7 @@ public class ASM3Parser {
                     if (oi instanceof CaseOffsetItem) {
                         relOffset = li.offset - (int) ins.offset;
                     } else {
-                        relOffset = li.offset - ((int) ins.offset + ins.getBytes().length);
+                        relOffset = li.offset - ((int) ins.offset + ins.getBytesLength());
                     }
                     ins.operands[oi.insOperandIndex] = relOffset;
                 }

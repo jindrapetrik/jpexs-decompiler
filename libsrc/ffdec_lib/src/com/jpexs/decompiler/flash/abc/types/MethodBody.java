@@ -146,7 +146,7 @@ public final class MethodBody implements Cloneable {
         long offset = 0;
         for (int i = 0; i < getCode().code.size(); i++) {
             getCode().code.get(i).offset = offset;
-            offset += getCode().code.get(i).getBytes().length;
+            offset += getCode().code.get(i).getBytesLength();
         }
     }
 
@@ -241,7 +241,7 @@ public final class MethodBody implements Cloneable {
     }
 
     public void convert(final String path, ScriptExportMode exportMode, final boolean isStatic, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final AVM2ConstantPool constants, final List<MethodInfo> method_info, final ScopeStack scopeStack, final boolean isStaticInitializer, final GraphTextWriter writer, final List<String> fullyQualifiedNames, final Traits initTraits, boolean firstLevel) throws InterruptedException {
-        /*if (!path.contains("testCatchFinally")) {
+        /*if (!path.contains("forcedWidth")) {
          return;
          }*/
         if (debugMode) {
@@ -290,7 +290,7 @@ public final class MethodBody implements Cloneable {
     }
 
     public GraphTextWriter toString(final String path, ScriptExportMode exportMode, final ABC abc, final Trait trait, final AVM2ConstantPool constants, final List<MethodInfo> method_info, final GraphTextWriter writer, final List<String> fullyQualifiedNames) throws InterruptedException {
-        /*if (!path.contains("testCatchFinally")) {
+        /*if (!path.contains("forcedWidth")) {
          return writer;
          }*/
         if (exportMode != ScriptExportMode.AS) {

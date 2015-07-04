@@ -36,7 +36,6 @@ import com.jpexs.decompiler.flash.abc.avm2.model.HasNextAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.InAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.NewActivationAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NextNameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NextValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
@@ -71,7 +70,6 @@ import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.LoopItem;
 import com.jpexs.decompiler.graph.model.NotItem;
 import com.jpexs.decompiler.graph.model.PopItem;
-import com.jpexs.decompiler.graph.model.PushItem;
 import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
 import java.util.ArrayList;
@@ -231,7 +229,7 @@ public class AVM2Graph extends Graph {
                                 AVM2Instruction jmpIns = this.avm2code.code.get(code.adr2pos(this.avm2code.fixAddrAfterDebugLine(body.exceptions[e].end)));
 
                                 if (jmpIns.definition instanceof JumpIns) {
-                                    finStart = code.adr2pos(this.avm2code.fixAddrAfterDebugLine(body.exceptions[e].end) + jmpIns.getBytes().length + jmpIns.operands[0]);
+                                    finStart = code.adr2pos(this.avm2code.fixAddrAfterDebugLine(body.exceptions[e].end) + jmpIns.getBytesLength() + jmpIns.operands[0]);
 
                                     GraphPart fpart = null;
                                     for (GraphPart p : allParts) {
@@ -247,7 +245,7 @@ public class AVM2Graph extends Graph {
                                         if (this.avm2code.code.get(f).definition instanceof LookupSwitchIns) {
                                             AVM2Instruction swins = this.avm2code.code.get(f);
                                             if (swins.operands.length >= 3) {
-                                                if (swins.operands[0] == swins.getBytes().length) {
+                                                if (swins.operands[0] == swins.getBytesLength()) {
                                                     if (code.adr2pos(code.pos2adr(f) + swins.operands[2]) < finStart) {
                                                         //st.push(new ExceptionAVM2Item(body.exceptions[e]));
                                                         GraphPart fepart = null;
@@ -694,7 +692,7 @@ public class AVM2Graph extends Graph {
                     if (true) { //afterCatchPos + 1 == code.adr2pos(this.code.fixAddrAfterDebugLine(body.exceptions[e].end))) {
                         AVM2Instruction jmpIns = this.avm2code.code.get(avm2code.adr2pos(this.avm2code.fixAddrAfterDebugLine(body.exceptions[e].end)));
                         if (jmpIns.definition instanceof JumpIns) {
-                            int finStart = avm2code.adr2pos(this.avm2code.fixAddrAfterDebugLine(body.exceptions[e].end) + jmpIns.getBytes().length + jmpIns.operands[0]);
+                            int finStart = avm2code.adr2pos(this.avm2code.fixAddrAfterDebugLine(body.exceptions[e].end) + jmpIns.getBytesLength() + jmpIns.operands[0]);
                             if (!finallyJumps.containsKey(e)) {
                                 finallyJumps.put(e, new ArrayList<>());
                             }

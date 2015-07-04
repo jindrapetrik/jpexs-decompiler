@@ -40,4 +40,9 @@ public class ExceptionMarkAVM2Instruction extends AVM2Instruction {
     public byte[] getBytes() {
         return new byte[0];
     }
+
+    @Override
+    public int getBytesLength() {
+        return 0;
+    }
 }
