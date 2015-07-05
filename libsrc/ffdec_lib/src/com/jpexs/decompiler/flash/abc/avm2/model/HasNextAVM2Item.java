@@ -40,9 +40,21 @@ public class HasNextAVM2Item extends AVM2Item {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        collection.appendTo(writer, localData);
-        writer.append(" hasNext ");
-        return object.appendTo(writer, localData);
+
+        writer.append("§§hasnext(");
+        if (collection != null) {
+            collection.appendTo(writer, localData);
+        } else {
+            writer.append("null");
+        }
+        writer.append(",");
+        if (object != null) {
+            object.appendTo(writer, localData);
+        } else {
+            writer.append("null");
+        }
+        writer.append(")");
+        return writer;
     }
 
     @Override

@@ -40,7 +40,7 @@ public class NextValueAVM2Item extends AVM2Item {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        writer.append("nextValue");
+        writer.append("§§nextvalue");
         writer.spaceBeforeCallParenthesies(2);
         writer.append("(");
         index.toString(writer, localData);

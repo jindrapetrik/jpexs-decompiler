@@ -1439,7 +1439,7 @@ public class AVM2Code implements Cloneable {
                 throw new UnknownJumpException(stack, ip, output);
             }
             if (visited[ip]) {
-                logger.warning("Code already visited, ofs:" + Helper.formatAddress(pos2adr(ip)) + ", ip:" + ip);
+                //logger.warning(path + ": Code already visited, ofs:" + Helper.formatAddress(pos2adr(ip)) + ", ip:" + ip);
                 break;
             }
             visited[ip] = true;
@@ -1548,11 +1548,14 @@ public class AVM2Code implements Cloneable {
                                     if (code.get(t + 1).definition instanceof KillIns) {
                                         if (code.get(t + 1).operands[0] == reg) {
                                             ConvertOutput assignment = toSourceOutput(path, part, processJumps, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, abc, constants, method_info, body, ip + 2, t - 1, localRegNames, fullyQualifiedNames, visited, localRegAssigmentIps, refs);
-                                            GraphTargetItem tar = assignment.output.remove(assignment.output.size() - 1);
-                                            tar.firstPart = part;
-                                            stack.push(tar);
-                                            ip = t + 2;
-                                            continue iploop;
+                                            if (!assignment.output.isEmpty()) {
+                                                GraphTargetItem tar = assignment.output.remove(assignment.output.size() - 1);
+                                                tar.firstPart = part;
+                                                stack.push(tar);
+                                                ip = t + 2;
+
+                                                continue iploop;
+                                            }
                                         }
                                     }
                                 }
