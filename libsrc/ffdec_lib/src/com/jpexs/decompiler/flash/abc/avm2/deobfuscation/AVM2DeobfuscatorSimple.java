@@ -367,6 +367,8 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
                     long address = action.offset + action.getBytesLength() + action.operands[0];
                     int nidx = code.adr2pos(address);//code.indexOf(code.getByAddress(address));
                     AVM2Instruction tarIns = code.code.get(nidx);
+                    //Some IfType instructions need more than 1 operand, we must pop out all of them
+                    int stackCount = -action.definition.getStackDelta(action, abc);
 
                     if (EcmaScript.toBoolean(res)) {
                         //System.err.println("replacing " + action + " on " + idx + " with jump");
@@ -374,13 +376,17 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
                         //jumpIns.operands[0] = action.operands[0] /*- action.getBytes().length*/ + jumpIns.getBytes().length;
                         code.replaceInstruction(idx, jumpIns, body);
                         jumpIns.operands[0] = (int) (tarIns.offset - jumpIns.offset - jumpIns.getBytesLength());
-
-                        code.insertInstruction(idx, new AVM2Instruction(action.offset, new DeobfuscatePopIns(), new int[]{}), true, body);
+                        for (int s = 0; s < stackCount; s++) {
+                            code.insertInstruction(idx, new AVM2Instruction(action.offset, new DeobfuscatePopIns(), new int[]{}), true, body);
+                        }
 
                         idx = code.adr2pos(jumpIns.offset + jumpIns.getBytesLength() + jumpIns.operands[0]);
                     } else {
                         //System.err.println("replacing " + action + " on " + idx + " with pop");
                         code.replaceInstruction(idx, new AVM2Instruction(action.offset, new DeobfuscatePopIns(), new int[]{}), body);
+                        for (int s = 1 /*first is replaced*/; s < stackCount; s++) {
+                            code.insertInstruction(idx, new AVM2Instruction(action.offset, new DeobfuscatePopIns(), new int[]{}), true, body);
+                        }
                         //action.definition = new DeobfuscatePopIns();
                         idx++;
                     }

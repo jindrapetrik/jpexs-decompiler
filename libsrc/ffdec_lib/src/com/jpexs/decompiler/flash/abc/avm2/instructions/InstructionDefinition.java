@@ -93,7 +93,7 @@ public class InstructionDefinition implements Serializable {
     protected FullMultinameAVM2Item resolveMultiname(TranslateStack stack, AVM2ConstantPool constants, int multinameIndex, AVM2Instruction ins) {
         GraphTargetItem ns = null;
         GraphTargetItem name = null;
-        if (multinameIndex < constants.constant_multiname.size()) {
+        if (multinameIndex > 0 && multinameIndex < constants.constant_multiname.size()) {
             if (constants.getMultiname(multinameIndex).needsName()) {
                 name = stack.pop();
             }

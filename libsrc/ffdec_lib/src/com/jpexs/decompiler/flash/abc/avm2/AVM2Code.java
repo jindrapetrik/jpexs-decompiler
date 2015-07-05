@@ -777,6 +777,8 @@ public class AVM2Code implements Cloneable {
         Map<Long, AVM2Instruction> codeMap = new TreeMap<>();
         DumpInfo diParent = ais.dumpInfo;
         List<Long> addresses = new ArrayList<>();
+        //Do not add new jumps when processing these addresses (unreachable code,etc.)
+        List<Long> unAdresses = new ArrayList<>();
         //Handle lookupswitches at the end - they can be invalid. Handle other instruction first so we can decide lookupswitch to be invalid based on other instructions inside it
         //Flashplayer does not check casecount in lookupswitch instruction so the instruction can "be" long and over other instructions
         List<Long> switchAddresses = new ArrayList<>();
@@ -789,14 +791,18 @@ public class AVM2Code implements Cloneable {
         addresses.add(startPos);
 
         loopaddr:
-        while (!addresses.isEmpty() || !switchAddresses.isEmpty()) {
+        while (!addresses.isEmpty() || !switchAddresses.isEmpty() || !unAdresses.isEmpty()) {
             long address;
             boolean isSwitch = false;
+            boolean handleJumps = true;
             if (!addresses.isEmpty()) {
                 address = addresses.remove(0);
-            } else {
+            } else if (!switchAddresses.isEmpty()) {
                 address = switchAddresses.remove(0);
                 isSwitch = true;
+            } else {
+                address = unAdresses.remove(0);
+                handleJumps = false;
             }
             if (codeMap.containsKey(address) && !(codeMap.get(address).definition instanceof NopIns)) {
                 continue;
@@ -805,6 +811,7 @@ public class AVM2Code implements Cloneable {
             {
                 continue;
             }
+            boolean afterExit = false;
             try {
                 ais.seek(address);
                 while (ais.available() > 0) {
@@ -847,7 +854,6 @@ public class AVM2Code implements Cloneable {
                             if (afterCasePos > totalBytes) {
                                 invalidSwitch = true;
                             }
-
                             if (invalidSwitch) {
                                 continue loopaddr;
                             } else {
@@ -889,28 +895,33 @@ public class AVM2Code implements Cloneable {
 
                         ais.endDumpLevel(instr.instructionCode);
 
-                        if ((instr instanceof IfTypeIns)) {
-                            long target = ais.getPosition() + actualOperands[0];
-                            addresses.add(target);
-                            //addresses.add(ais.getPosition());
+                        if (handleJumps) {
+                            if ((instr instanceof IfTypeIns)) {
+                                long target = ais.getPosition() + actualOperands[0];
+                                addresses.add(target);
+                                //addresses.add(ais.getPosition());
+                            }
+
+                            if (instr instanceof JumpIns) {
+                                long target = ais.getPosition() + actualOperands[0];
+                                addresses.add(target);
+                                unAdresses.add(ais.getPosition());
+                                continue loopaddr;
+                            }
+
+                            if (instr.isExitInstruction()) { //do not process jumps if there is return/throw instruction
+                                unAdresses.add(ais.getPosition());
+                                continue loopaddr;
+                            }
+                            if (instr instanceof LookupSwitchIns) {
+                                addresses.add(beforeSwitchPos + actualOperands[0]);
+
+                                for (int c = 2; c < actualOperands.length; c++) {
+                                    addresses.add(beforeSwitchPos + actualOperands[c]);
+                                }
+                                continue loopaddr;
+                            }
                         }
-                        /*if (instr instanceof JumpIns) {
-                         long target = ais.getPosition() + actualOperands[0];
-                         addresses.add(target);
-                         continue loopaddr;
-                         }
-
-                         if (instr.isExitInstruction()) { //do not process jumps if there is return/throw instruction
-                         continue loopaddr;
-                         }
-                         if (instr instanceof LookupSwitchIns) {
-                         addresses.add(beforeSwitchPos + actualOperands[0]);
-
-                         for (int c = 2; c < actualOperands.length; c++) {
-                         addresses.add(beforeSwitchPos + actualOperands[c]);
-                         }
-                         continue loopaddr;
-                         }*/
                     } else {
                         ais.endDumpLevel();
                         break; // Unknown instructions are ignored (Some of the obfuscators add unknown instructions)
