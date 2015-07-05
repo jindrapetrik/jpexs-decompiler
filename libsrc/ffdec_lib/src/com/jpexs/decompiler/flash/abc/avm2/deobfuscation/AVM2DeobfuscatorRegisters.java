@@ -72,7 +72,6 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
     public void deobfuscate(String path, int classIndex, boolean isStatic, int scriptIndex, ABC abc, AVM2ConstantPool cpool, Trait trait, MethodInfo minfo, MethodBody abody) throws InterruptedException {
 
         MethodBody body = abody.clone();
-        System.err.println("A");
         removeUnreachableActions(body.getCode(), cpool, trait, minfo, body);
 
         Map<Integer, GraphTargetItem> outFirstAssigned = new HashMap<>();
@@ -84,27 +83,21 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
 
         List<AVM2Instruction> ignored = new ArrayList<>();
         Map<Integer, GraphTargetItem> registers = new HashMap<>();
-        System.err.println("B");
         getFirstRegistersUsage(outAssignCount1, outFirstAssigned, outFirstAssignments, classIndex, isStatic, scriptIndex, abc, cpool, trait, minfo, body, ignored, registers);
         ignored.addAll(outFirstAssignments.values());
         registers.putAll(outFirstAssigned);
 
-        System.err.println("C");
         replaceSingleUseRegisters(registers, ignored, classIndex, isStatic, scriptIndex, abc, cpool, trait, minfo, body);
 
-        System.err.println("C1");
         super.deobfuscate(path, classIndex, isStatic, scriptIndex, abc, cpool, trait, minfo, body);
-        System.err.println("C2");
         removeUnreachableActions(body.getCode(), cpool, trait, minfo, body);
 
-        System.err.println("D");
         //second pass - ignore all first assignments
         registers.clear();
         ignored.clear();
         outFirstAssignments.clear();
         getFirstRegistersUsage(outAssignCount2, new HashMap<>(), outFirstAssignments, classIndex, isStatic, scriptIndex, abc, cpool, trait, minfo, body, ignored, registers);
 
-        System.err.println("E");
         for (int regId : outAssignCount1.keySet()) {
             int ac = outAssignCount2.containsKey(regId) ? outAssignCount2.get(regId) : 0;
             if (ac == 0) {
@@ -114,19 +107,14 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
 
         body = abody;
         replaceSingleUseRegisters(singleRegisters, null, classIndex, isStatic, scriptIndex, abc, cpool, trait, minfo, body);
-        System.err.println("F");
         super.deobfuscate(path, classIndex, isStatic, scriptIndex, abc, cpool, trait, minfo, body);
-        System.err.println("G");
         removeUnreachableActions(body.getCode(), cpool, trait, minfo, body);
-        System.err.println("H");
-
     }
 
     private void replaceSingleUseRegisters(Map<Integer, GraphTargetItem> singleRegisters, List<AVM2Instruction> setInss, int classIndex, boolean isStatic, int scriptIndex, ABC abc, AVM2ConstantPool cpool, Trait trait, MethodInfo minfo, MethodBody body) {
         AVM2Code code = body.getCode();
 
         for (int i = 0; i < code.code.size(); i++) {
-            System.err.println("replacesingle: " + i + "/" + code.code.size());
             AVM2Instruction ins = code.code.get(i);
             if (((setInss == null) || setInss.contains(ins)) && (ins.definition instanceof SetLocalTypeIns)) {
                 SetLocalTypeIns slt = (SetLocalTypeIns) ins.definition;

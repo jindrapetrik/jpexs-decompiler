@@ -2092,7 +2092,7 @@ public class AVM2Code implements Cloneable {
      * @param body Method body (used for try handling)
      */
     public void insertInstruction(int pos, AVM2Instruction instruction, boolean mapOffsetsAfterIns, MethodBody body) {
-        checkValidOffsets(body);
+        //checkValidOffsets(body);
         if (pos < 0) {
             pos = 0;
         }
@@ -2130,7 +2130,7 @@ public class AVM2Code implements Cloneable {
         }, body);
         code.add(pos, instruction);
         invalidateCache();
-        checkValidOffsets(body);
+        //checkValidOffsets(body);
     }
 
     @SuppressWarnings("unchecked")
