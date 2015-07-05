@@ -234,7 +234,7 @@ Preprocessor = \u00A7\u00A7 {Identifier}
                                     tokenLength = 1;
                                  }
   {Preprocessor}                 {
-                                    return token(TokenType.REGEX);
+                                    return token(TokenType.ERROR);
                                  }
  "\u00A7"                        {
                                     yybegin(OIDENTIFIER);
