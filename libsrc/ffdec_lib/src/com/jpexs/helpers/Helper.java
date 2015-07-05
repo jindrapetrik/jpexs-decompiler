@@ -1053,7 +1053,7 @@ public class Helper {
         writer.appendNoHilight(" * ").appendNoHilight(AppResources.translate("decompilationError")).newLine();
         writer.appendNoHilight(" * ").appendNoHilight(MessageFormat.format(AppResources.translate("decompilationError.timeout"), Helper.formatTimeToText(timeout))).newLine();
         if (actionCount > 0) {
-            writer.appendNoHilight(" * ").appendNoHilight(AppResources.translate("decompilationError.instructionCount") + " " + actionCount).newLine();
+            writer.appendNoHilight(" * ").appendNoHilight(AppResources.translate("decompilationError.actionCount") + " " + actionCount).newLine();
         }
 
         writer.appendNoHilight(" */").newLine();
@@ -1067,7 +1067,7 @@ public class Helper {
         writer.appendNoHilight(" * ").appendNoHilight(AppResources.translate("decompilationError")).newLine();
         writer.appendNoHilight(" * ").appendNoHilight(MessageFormat.format(AppResources.translate("decompilationError.timeout"), Helper.formatTimeToText(timeout))).newLine();
         if (instructionCount > 0) {
-            writer.appendNoHilight(" * ").appendNoHilight(AppResources.translate("decompilationError.actionCount") + " " + instructionCount).newLine();
+            writer.appendNoHilight(" * ").appendNoHilight(AppResources.translate("decompilationError.instructionCount") + " " + instructionCount).newLine();
         }
 
         writer.appendNoHilight(" */").newLine();

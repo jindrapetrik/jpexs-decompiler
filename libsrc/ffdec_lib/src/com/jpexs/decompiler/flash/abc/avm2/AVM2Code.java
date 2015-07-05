@@ -1956,7 +1956,7 @@ public class AVM2Code implements Cloneable {
         }, body);
     }
 
-    private void checkValidOffsets(MethodBody body) {
+    public void checkValidOffsets(MethodBody body) {
         updateOffsets(new OffsetUpdater() {
 
             @Override
@@ -1978,14 +1978,15 @@ public class AVM2Code implements Cloneable {
         if ((pos < 0) || (pos >= code.size())) {
             throw new IndexOutOfBoundsException();
         }
-        checkValidOffsets(body);
+
+        //checkValidOffsets(body);
         AVM2Instruction ins = code.get(pos);
         final long remOffset = ins.offset;
         int bc;
         if (pos < code.size() - 1) {
             // Checking the instuction length is not enough because in some
             // obfuscated files the length of the lookupswitch is not the same
-            // as the diference of the offsets
+            // as the difference of the offsets
             bc = (int) (code.get(pos + 1).offset - remOffset);
         } else {
             bc = ins.getBytesLength();
@@ -2014,9 +2015,7 @@ public class AVM2Code implements Cloneable {
         }, body);
         code.remove(pos);
         invalidateCache();
-        checkValidOffsets(body);
-        //System.exit(0);
-
+        //checkValidOffsets(body);
     }
 
     /**
