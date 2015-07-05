@@ -98,7 +98,7 @@ public class FontHelper {
                 continue;
             }
             if (!ret.containsKey(fam)) {
-                ret.put(fam, new HashMap<String, Font>());
+                ret.put(fam, new HashMap<>());
             }
 
             ret.get(fam).put(f.getFontName(Locale.ENGLISH), f);

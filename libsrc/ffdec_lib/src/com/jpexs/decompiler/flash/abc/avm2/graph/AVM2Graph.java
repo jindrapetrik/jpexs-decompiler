@@ -348,7 +348,7 @@ public class AVM2Graph extends Graph {
                             if (!ncatchedCommands.isEmpty() && (ncatchedCommands.get(0) instanceof SetLocalAVM2Item)) {
                                 SetLocalAVM2Item sl = (SetLocalAVM2Item) ncatchedCommands.get(0);
                                 if (sl.value.getNotCoerced() instanceof ExceptionAVM2Item) {
-                                    finCatchName = AVM2Item.localRegName(new HashMap<Integer, String>(), sl.regIndex);
+                                    finCatchName = AVM2Item.localRegName(new HashMap<>(), sl.regIndex);
                                 }
                             }
                         }
@@ -515,7 +515,7 @@ public class AVM2Graph extends Graph {
                         if (ins.definition instanceof LookupSwitchIns) {
                             break;
                         }
-                        ins.translate(localData, sstack, new ArrayList<GraphTargetItem>(), staticOperation, path);
+                        ins.translate(localData, sstack, new ArrayList<>(), staticOperation, path);
                     }
                     if (numPart.nextParts.size() > 1) {
                         break;
@@ -556,7 +556,7 @@ public class AVM2Graph extends Graph {
                     if (ins.definition instanceof LookupSwitchIns) {
                         break;
                     }
-                    ins.translate(localData, sstack, new ArrayList<GraphTargetItem>(), staticOperation, path);
+                    ins.translate(localData, sstack, new ArrayList<>(), staticOperation, path);
                 }
                 if (numPart.nextParts.size() > 1) {
                     break;

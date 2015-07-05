@@ -61,7 +61,7 @@ import java.util.Map;
 public class ActionGraph extends Graph {
 
     public ActionGraph(List<Action> code, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int version) {
-        super(new ActionGraphSource(code, version, registerNames, variables, functions), new ArrayList<Integer>());
+        super(new ActionGraphSource(code, version, registerNames, variables, functions), new ArrayList<>());
         //this.version = version;
       /*heads = makeGraph(code, new ArrayList<GraphPart>());
          for (GraphPart head : heads) {
@@ -120,7 +120,7 @@ public class ActionGraph extends Graph {
                             break;
                         }
                     } else {
-                        target = new DirectValueActionItem(null, 0, st.target, new ArrayList<String>());
+                        target = new DirectValueActionItem(null, 0, st.target, new ArrayList<>());
                         targetStart = t;
                         targetStartItem = it;
                     }

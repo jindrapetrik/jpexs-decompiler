@@ -104,8 +104,8 @@ public class InitVectorAVM2Item extends AVM2Item {
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
         List<GraphSourceItem> ret = toSourceMerge(localData, generator,
-                ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAME, g.abc.constants.getStringId("Vector", true), 0, g.abc.constants.getNamespaceSetId(new NamespaceSet(new int[]{g.abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, g.abc.constants.getStringId("__AS3__.vec", true)), 0, true)}), true), 0, new ArrayList<Integer>()), true)),
-                ins(new GetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAME, g.abc.constants.getStringId("Vector", true), 0, allNsSet(g.abc), 0, new ArrayList<Integer>()), true)),
+                ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAME, g.abc.constants.getStringId("Vector", true), 0, g.abc.constants.getNamespaceSetId(new NamespaceSet(new int[]{g.abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, g.abc.constants.getStringId("__AS3__.vec", true)), 0, true)}), true), 0, new ArrayList<>()), true)),
+                ins(new GetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAME, g.abc.constants.getStringId("Vector", true), 0, allNsSet(g.abc), 0, new ArrayList<>()), true)),
                 subtype,
                 ins(new ApplyTypeIns(), 1),
                 new IntegerValueAVM2Item(null, (long) arguments.size()),

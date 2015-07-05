@@ -1119,6 +1119,7 @@ public final class SWF implements SWFContainerItem, Timelined {
      *
      * @param fis Input stream
      * @param fos Output stream
+     * @param compression
      * @return True on success
      */
     public static boolean compress(InputStream fis, OutputStream fos, SWFCompression compression) {
@@ -1683,11 +1684,11 @@ public final class SWF implements SWFContainerItem, Timelined {
                     ip = nextip;
                 }
                 List<List<GraphTargetItem>> r = new ArrayList<>();
-                r.add(new ArrayList<GraphTargetItem>());
-                r.add(new ArrayList<GraphTargetItem>());
-                r.add(new ArrayList<GraphTargetItem>());
+                r.add(new ArrayList<>());
+                r.add(new ArrayList<>());
+                r.add(new ArrayList<>());
                 try {
-                    ((GraphSourceItemContainer) ins).translateContainer(r, stack, output, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
+                    ((GraphSourceItemContainer) ins).translateContainer(r, stack, output, new HashMap<>(), new HashMap<>(), new HashMap<>());
                 } catch (EmptyStackException ex) {
                 }
 
@@ -1777,14 +1778,14 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     private static void getVariables(List<MyEntry<DirectValueActionItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, HashMap<DirectValueActionItem, String> usageTypes, ActionGraphSource code, int addr, String path) throws InterruptedException {
         ActionLocalData localData = new ActionLocalData();
-        getVariables(null, localData, new TranslateStack(path), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), variables, functions, strings, new ArrayList<Integer>(), usageTypes, path);
+        getVariables(null, localData, new TranslateStack(path), new ArrayList<>(), code, code.adr2pos(addr), variables, functions, strings, new ArrayList<>(), usageTypes, path);
     }
 
     private List<MyEntry<DirectValueActionItem, ConstantPool>> getVariables(List<MyEntry<DirectValueActionItem, ConstantPool>> variables, HashMap<ASMSource, ActionList> actionsMap, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, HashMap<DirectValueActionItem, String> usageTypes, ASMSource src, String path) throws InterruptedException {
         List<MyEntry<DirectValueActionItem, ConstantPool>> ret = new ArrayList<>();
         ActionList actions = src.getActions();
         actionsMap.put(src, actions);
-        getVariables(variables, functions, strings, usageTypes, new ActionGraphSource(actions, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0, path);
+        getVariables(variables, functions, strings, usageTypes, new ActionGraphSource(actions, version, new HashMap<>(), new HashMap<>(), new HashMap<>()), 0, path);
         return ret;
     }
 
@@ -1856,7 +1857,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 sc.setModified(true);
             }
         }
-        deobfuscation.deobfuscateInstanceNames(true, deobfuscated, renameType, tags, new HashMap<String, String>());
+        deobfuscation.deobfuscateInstanceNames(true, deobfuscated, renameType, tags, new HashMap<>());
         return deobfuscated.size();
     }
 

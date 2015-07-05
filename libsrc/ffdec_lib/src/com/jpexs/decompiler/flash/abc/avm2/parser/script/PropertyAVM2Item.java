@@ -230,7 +230,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                     propType = outPropType.getVal();
                                     propIndex = abc.constants.getMultinameId(new Multiname(Multiname.QNAME,
                                             abc.constants.getStringId(propertyName, true),
-                                            abc.constants.getNamespaceId(new Namespace(outPropNsKind.getVal(), abc.constants.getStringId(outPropNs.getVal(), true)), outPropNsIndex.getVal(), true), 0, 0, new ArrayList<Integer>()), true
+                                            abc.constants.getNamespaceId(new Namespace(outPropNsKind.getVal(), abc.constants.getStringId(outPropNs.getVal(), true)), outPropNsIndex.getVal(), true), 0, 0, new ArrayList<>()), true
                                     );
                                     propValue = outPropValue.getVal();
 
@@ -252,7 +252,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                     propType = multinameToType(tsc.type_index, abc.constants);
                                     propIndex = tsc.name_index;
                                     if (!localData.traitUsages.containsKey(b)) {
-                                        localData.traitUsages.put(b, new ArrayList<Integer>());
+                                        localData.traitUsages.put(b, new ArrayList<>());
                                     }
                                     localData.traitUsages.get(b).add(i);
                                 }
@@ -348,7 +348,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                                 propType = outPropType.getVal();
                                                 propIndex = abc.constants.getMultinameId(new Multiname(Multiname.QNAME,
                                                         abc.constants.getStringId(propertyName, true),
-                                                        abc.constants.getNamespaceId(new Namespace(outPropNsKind.getVal(), abc.constants.getStringId(outPropNs.getVal(), true)), outPropNsIndex.getVal(), true), 0, 0, new ArrayList<Integer>()), true
+                                                        abc.constants.getNamespaceId(new Namespace(outPropNsKind.getVal(), abc.constants.getStringId(outPropNs.getVal(), true)), outPropNsIndex.getVal(), true), 0, 0, new ArrayList<>()), true
                                                 );
                                                 propValue = outPropValue.getVal();
                                                 break loopobjType;
@@ -372,7 +372,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
             }
             propIndex = abc.constants.getMultinameId(new Multiname(attr ? (pname.isEmpty() ? Multiname.MULTINAMELA : Multiname.MULTINAMEA) : Multiname.MULTINAME,
                     abc.constants.getStringId("*".equals(pname) ? null : pname, true), 0, //Note: name = * is for .@* attribute
-                    attr && pname.isEmpty() ? abc.constants.getNamespaceSetId(new NamespaceSet(new int[]{abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE_INTERNAL, abc.constants.getStringId(localData.pkg, true)), 0, true)}), true) : allNsSet(), 0, new ArrayList<Integer>()), true);
+                    attr && pname.isEmpty() ? abc.constants.getNamespaceSetId(new NamespaceSet(new int[]{abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE_INTERNAL, abc.constants.getStringId(localData.pkg, true)), 0, true)}), true) : allNsSet(), 0, new ArrayList<>()), true);
             propType = TypeItem.UNBOUNDED;
             objType = TypeItem.UNBOUNDED;
             propValue = null;
@@ -558,7 +558,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
         Reference<GraphTargetItem> propType = new Reference<>(null);
         Reference<Integer> propIndex = new Reference<>(0);
         Reference<ValueKind> outPropValue = new Reference<>(null);
-        resolve(new SourceGeneratorLocalData(new HashMap<String, Integer>(), 0, false, 0)/*???*/, objType, propType, propIndex, outPropValue);
+        resolve(new SourceGeneratorLocalData(new HashMap<>(), 0, false, 0)/*???*/, objType, propType, propIndex, outPropValue);
 
         return propType.getVal();
     }

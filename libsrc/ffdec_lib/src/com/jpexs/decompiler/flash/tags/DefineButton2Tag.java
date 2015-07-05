@@ -275,7 +275,7 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
             return timeline;
         }
 
-        timeline = new Timeline(swf, this, new ArrayList<Tag>(), buttonId, getRect());
+        timeline = new Timeline(swf, this, new ArrayList<>(), buttonId, getRect());
         initTimeline(timeline);
         return timeline;
     }
@@ -283,7 +283,7 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
     @Override
     public void resetTimeline() {
         if (timeline != null) {
-            timeline.reset(swf, this, new ArrayList<Tag>(), buttonId, getRect());
+            timeline.reset(swf, this, new ArrayList<>(), buttonId, getRect());
             initTimeline(timeline);
         }
     }

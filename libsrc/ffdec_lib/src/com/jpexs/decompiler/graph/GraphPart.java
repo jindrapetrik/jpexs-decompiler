@@ -174,7 +174,7 @@ public class GraphPart implements Serializable {
         for (Loop l : loops) {
             l.leadsToMark = 0;
         }
-        return leadsTo(localData, gr, code, part, new ArrayList<GraphPart>(), loops);
+        return leadsTo(localData, gr, code, part, new ArrayList<>(), loops);
     }
 
     public GraphPart(int start, int end) {
@@ -279,7 +279,7 @@ public class GraphPart implements Serializable {
     }
 
     public boolean containsPart(GraphPart what) {
-        return containsPart(this, what, new ArrayList<GraphPart>());
+        return containsPart(this, what, new ArrayList<>());
     }
 
     public List<GraphPart> getSubParts() {

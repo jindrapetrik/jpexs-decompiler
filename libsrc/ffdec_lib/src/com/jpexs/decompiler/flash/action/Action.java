@@ -488,7 +488,7 @@ public abstract class Action implements GraphSourceItem {
                         continue;
                     }
                     if (!containers.containsKey(addr)) {
-                        containers.put(addr, new ArrayList<GraphSourceItemContainer>());
+                        containers.put(addr, new ArrayList<>());
                     }
                     containers.get(addr).add(cnt);
                 }
@@ -737,7 +737,7 @@ public abstract class Action implements GraphSourceItem {
     }
 
     public static List<GraphTargetItem> actionsToTree(List<Action> actions, int version, int staticOperation, String path) throws InterruptedException {
-        return actionsToTree(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>(), actions, version, staticOperation, path);
+        return actionsToTree(new HashMap<>(), new HashMap<>(), new HashMap<>(), actions, version, staticOperation, path);
     }
 
     /**
@@ -937,7 +937,7 @@ public abstract class Action implements GraphSourceItem {
                 }
                 for (long size : cnt.getContainerSizes()) {
                     if (size == 0) {
-                        outs.add(new ArrayList<GraphTargetItem>());
+                        outs.add(new ArrayList<>());
                         continue;
                     }
                     List<GraphTargetItem> out;

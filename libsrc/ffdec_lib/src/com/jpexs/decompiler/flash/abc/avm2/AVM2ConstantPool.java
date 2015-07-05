@@ -314,7 +314,7 @@ public class AVM2ConstantPool {
     }
 
     public int getQnameId(String name, int namespaceKind, String namespaceName, boolean add) {
-        return getMultinameId(new Multiname(Multiname.QNAME, getStringId(name, add), getNamespaceId(new Namespace(namespaceKind, getStringId(namespaceName, add)), 0, add), 0, 0, new ArrayList<Integer>()), add);
+        return getMultinameId(new Multiname(Multiname.QNAME, getStringId(name, add), getNamespaceId(new Namespace(namespaceKind, getStringId(namespaceName, add)), 0, add), 0, 0, new ArrayList<>()), add);
     }
 
     public int getPublicQnameId(String name, boolean add) {

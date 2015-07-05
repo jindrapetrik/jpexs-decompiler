@@ -75,11 +75,11 @@ public class DeletePropertyAVM2Item extends AVM2Item {
         }
         if (p instanceof IndexAVM2Item) {
             IndexAVM2Item ind = (IndexAVM2Item) p;
-            return ind.toSource(localData, generator, true, false, new ArrayList<GraphTargetItem>(), true, false);
+            return ind.toSource(localData, generator, true, false, new ArrayList<>(), true, false);
         }
         if (p instanceof NamespacedAVM2Item) {
             NamespacedAVM2Item n = (NamespacedAVM2Item) p;
-            return n.toSource(localData, generator, true, false, new ArrayList<GraphTargetItem>(), true, false);
+            return n.toSource(localData, generator, true, false, new ArrayList<>(), true, false);
         }
 
         throw new CompilationException("Not a property", line); //TODO: handle line better way

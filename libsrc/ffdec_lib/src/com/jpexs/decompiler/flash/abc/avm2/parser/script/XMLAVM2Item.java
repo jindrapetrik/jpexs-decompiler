@@ -62,7 +62,7 @@ public class XMLAVM2Item extends AVM2Item {
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
         return toSourceMerge(localData, generator,
-                ins(new GetLexIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.QNAME, g.abc.constants.getStringId("XML", true), g.abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, g.abc.constants.getStringId("", true)), 0, true), 0, 0, new ArrayList<Integer>()), true)),
+                ins(new GetLexIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.QNAME, g.abc.constants.getStringId("XML", true), g.abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, g.abc.constants.getStringId("", true)), 0, true), 0, 0, new ArrayList<>()), true)),
                 value,
                 ins(new ConstructIns(), 1)
         );

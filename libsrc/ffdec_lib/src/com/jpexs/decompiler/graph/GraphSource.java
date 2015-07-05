@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
@@ -93,7 +94,7 @@ public abstract class GraphSource implements Serializable {
         HashMap<Integer, List<Integer>> refs = new HashMap<>();
         int siz = size();
         for (int i = 0; i < siz; i++) {
-            refs.put(i, new ArrayList<Integer>());
+            refs.put(i, new ArrayList<>());
         }
         visitCode(0, 0, refs, -1);
         int pos = 0;

@@ -288,7 +288,7 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
 
     @Override
     public void translateContainer(List<List<GraphTargetItem>> content, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-        FunctionActionItem fti = new FunctionActionItem(this, functionName, paramNames, content.get(0), constantPool, getFirstRegister(), new ArrayList<VariableActionItem>());
+        FunctionActionItem fti = new FunctionActionItem(this, functionName, paramNames, content.get(0), constantPool, getFirstRegister(), new ArrayList<>());
         functions.put(functionName, fti);
         stack.push(fti);
     }

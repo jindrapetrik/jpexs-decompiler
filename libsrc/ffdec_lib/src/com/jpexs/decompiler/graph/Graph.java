@@ -83,7 +83,7 @@ public class Graph {
         if (heads != null) {
             return;
         }
-        heads = makeGraph(code, new ArrayList<GraphPart>(), alternateEntries);
+        heads = makeGraph(code, new ArrayList<>(), alternateEntries);
         int time = 1;
         List<GraphPart> ordered = new ArrayList<>();
         List<GraphPart> visited = new ArrayList<>();
@@ -870,7 +870,7 @@ public class Graph {
 
     private void markLevels(String path, BaseLocalData localData, GraphPart part, List<GraphPart> allParts, List<Loop> loops) throws InterruptedException {
         clearLoops(loops);
-        markLevels(path, localData, part, allParts, loops, new ArrayList<GraphPart>(), 1, new ArrayList<GraphPart>(), 0);
+        markLevels(path, localData, part, allParts, loops, new ArrayList<>(), 1, new ArrayList<>(), 0);
         clearLoops(loops);
     }
 
@@ -1021,7 +1021,7 @@ public class Graph {
 
     private void getLoops(BaseLocalData localData, GraphPart part, List<Loop> loops, List<GraphPart> stopPart) throws InterruptedException {
         clearLoops(loops);
-        getLoops(localData, part, loops, stopPart, true, 1, new ArrayList<GraphPart>());
+        getLoops(localData, part, loops, stopPart, true, 1, new ArrayList<>());
         clearLoops(loops);
     }
 
@@ -1841,7 +1841,7 @@ public class Graph {
                             checkContinueAtTheEnd(finalComm, currentLoop);
                         }
                         if (!finalComm.isEmpty()) {
-                            ret.add(index, li = new ForItem(expr.src, currentLoop, new ArrayList<GraphTargetItem>(), exprList.get(exprList.size() - 1), finalComm, commands));
+                            ret.add(index, li = new ForItem(expr.src, currentLoop, new ArrayList<>(), exprList.get(exprList.size() - 1), finalComm, commands));
                         } else {
                             ret.add(index, li = new WhileItem(expr.src, currentLoop, exprList, commands));
                         }

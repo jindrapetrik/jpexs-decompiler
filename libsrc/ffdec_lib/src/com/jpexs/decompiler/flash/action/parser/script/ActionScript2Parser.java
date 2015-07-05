@@ -392,9 +392,9 @@ public class ActionScript2Parser {
                     }
                     if (s.type == SymbolType.ASSIGN) {
                         if (isStatic) {
-                            staticVars.add(new MyEntry<GraphTargetItem, GraphTargetItem>(pushConst(ident), expression(false, false, true, variables)));
+                            staticVars.add(new MyEntry<>(pushConst(ident), expression(false, false, true, variables)));
                         } else {
-                            vars.add(new MyEntry<GraphTargetItem, GraphTargetItem>(pushConst(ident), expression(false, false, true, variables)));
+                            vars.add(new MyEntry<>(pushConst(ident), expression(false, false, true, variables)));
                         }
                         s = lex();
                     }
@@ -1850,7 +1850,7 @@ public class ActionScript2Parser {
         ActionSourceGenerator gen = new ActionSourceGenerator(swfVersion, constantPool);
         List<Action> ret = new ArrayList<>();
         SourceGeneratorLocalData localData = new SourceGeneratorLocalData(
-                new HashMap<String, Integer>(), 0, Boolean.FALSE, 0);
+                new HashMap<>(), 0, Boolean.FALSE, 0);
         List<GraphSourceItem> srcList = gen.generate(localData, tree);
         for (GraphSourceItem s : srcList) {
             if (s instanceof Action) {

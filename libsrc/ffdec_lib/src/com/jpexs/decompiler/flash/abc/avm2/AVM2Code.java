@@ -674,7 +674,7 @@ public class AVM2Code implements Cloneable {
     }
 
     public void calculateDebugFileLine(ABC abc) {
-        calculateDebugFileLine(null, 0, 0, abc, new HashSet<Integer>());
+        calculateDebugFileLine(null, 0, 0, abc, new HashSet<>());
     }
 
     private boolean calculateDebugFileLine(String debugFile, int debugLine, int pos, ABC abc, Set<Integer> seen) {
@@ -701,7 +701,7 @@ public class AVM2Code implements Cloneable {
                 //This avoids bogus functions used in obfuscation or special compilers that can lead to infinite recursion.
                 if ((pos + 1 < code.size()) && !(code.get(pos + 1).definition instanceof PopIns)) {
                     MethodBody innerBody = abc.findBody(ins.operands[0]);
-                    innerBody.getCode().calculateDebugFileLine(debugFile, debugLine, 0, abc, new HashSet<Integer>());
+                    innerBody.getCode().calculateDebugFileLine(debugFile, debugLine, 0, abc, new HashSet<>());
                 }
             }
 
@@ -1355,7 +1355,7 @@ public class AVM2Code implements Cloneable {
                 if (code.get(k).definition instanceof KillIns) {
                     int regid = code.get(k).operands[0];
                     if (!killedRegs.containsKey(regid)) {
-                        killedRegs.put(regid, new HashSet<Integer>());
+                        killedRegs.put(regid, new HashSet<>());
                     }
                     killedRegs.get(regid).add(k);
                 }
@@ -1890,7 +1890,7 @@ public class AVM2Code implements Cloneable {
             }
         }
         // Declarations
-        injectDeclarations(list, new boolean[regCount], new ArrayList<Slot>(), abc, body);
+        injectDeclarations(list, new boolean[regCount], new ArrayList<>(), abc, body);
 
         int lastPos = list.size() - 1;
         if (lastPos < 0) {
@@ -2205,7 +2205,7 @@ public class AVM2Code implements Cloneable {
         localData.refs = refs;
         localData.code = this;
         int ret = 0;
-        ret += removeTraps(constants, trait, info, body, localData, new AVM2GraphSource(this, false, -1, -1, new HashMap<Integer, GraphTargetItem>(), new ScopeStack(), abc, body, new HashMap<Integer, String>(), new ArrayList<>(), new HashMap<Integer, Integer>(), refs), 0, path, refs);
+        ret += removeTraps(constants, trait, info, body, localData, new AVM2GraphSource(this, false, -1, -1, new HashMap<>(), new ScopeStack(), abc, body, new HashMap<>(), new ArrayList<>(), new HashMap<>(), refs), 0, path, refs);
         removeIgnored(constants, trait, info, body);
         removeDeadCode(constants, trait, info, body);
 
@@ -2928,7 +2928,7 @@ public class AVM2Code implements Cloneable {
     }
 
     public static boolean isDirectAncestor(int currentIp, int ancestor, HashMap<Integer, List<Integer>> refs) {
-        return isDirectAncestor(currentIp, ancestor, refs, new ArrayList<Integer>());
+        return isDirectAncestor(currentIp, ancestor, refs, new ArrayList<>());
     }
 
     private static boolean isDirectAncestor(int currentIp, int ancestor, HashMap<Integer, List<Integer>> refs, List<Integer> visited) {
@@ -3250,7 +3250,7 @@ public class AVM2Code implements Cloneable {
 
     public static int removeTraps(AVM2ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, AVM2LocalData localData, AVM2GraphSource code, int addr, String path, HashMap<Integer, List<Integer>> refs) throws InterruptedException {
         HashMap<AVM2Instruction, AVM2Code.Decision> decisions = new HashMap<>();
-        removeTraps(refs, false, false, localData, new TranslateStack(path), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), new HashMap<Integer, Integer>(), new HashMap<Integer, HashMap<Integer, GraphTargetItem>>(), decisions, path, 0);
+        removeTraps(refs, false, false, localData, new TranslateStack(path), new ArrayList<>(), code, code.adr2pos(addr), new HashMap<>(), new HashMap<>(), decisions, path, 0);
         int cnt = 0;
         for (AVM2Instruction src : decisions.keySet()) {
             Decision dec = decisions.get(src);
