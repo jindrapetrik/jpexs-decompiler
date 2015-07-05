@@ -553,7 +553,7 @@ public class ABC {
         bodies = new ArrayList<>(bodies_count);
         for (int i = 0; i < bodies_count; i++) {
             ais.newDumpLevel("method_body", "method_body_info");
-            MethodBody mb = new MethodBody(null, null, null); // do not create Traits in constructor
+            MethodBody mb = new MethodBody(this, null, null, null); // do not create Traits in constructor
             mb.method_info = ais.readU30("method_info");
             mb.max_stack = ais.readU30("max_stack");
             mb.max_regs = ais.readU30("max_regs");

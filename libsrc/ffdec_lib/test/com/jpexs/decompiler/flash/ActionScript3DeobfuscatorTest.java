@@ -80,12 +80,12 @@ public class ActionScript3DeobfuscatorTest extends ActionStript2TestBase {
                 return 0;
             }
         });
-        MethodBody b = new MethodBody();
+        MethodBody b = new MethodBody(abc);
         AVM2Code code = ASM3Parser.parse(new StringReader(str), abc.constants, null, b, new MethodInfo());
         b.setCode(code);
         new AVM2DeobfuscatorJumps().deobfuscate("test", 0, true, 0, abc, abc.constants, null, new MethodInfo(), b);
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
-        code.toASMSource(abc.constants, null, new MethodInfo(), new MethodBody(), ScriptExportMode.PCODE, writer);
+        code.toASMSource(abc.constants, null, new MethodInfo(), new MethodBody(abc), ScriptExportMode.PCODE, writer);
         String ret = writer.toString();
         return ret.substring(ret.lastIndexOf("code\r\n") + 6);
     }

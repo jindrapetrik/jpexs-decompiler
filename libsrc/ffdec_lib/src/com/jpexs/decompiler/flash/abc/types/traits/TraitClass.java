@@ -289,14 +289,18 @@ public class TraitClass extends Trait implements TraitWithSlot {
                         || (ins.definition instanceof AsTypeIns)) {
                     int m = ins.operands[0];
                     if (m != 0) {
-                        parseImportsUsagesFromMultiname(abc, imports, uses, abc.constants.getMultiname(m), ignorePackage, fullyQualifiedNames);
+                        if (m < abc.constants.constant_multiname.size()) {
+                            parseImportsUsagesFromMultiname(abc, imports, uses, abc.constants.getMultiname(m), ignorePackage, fullyQualifiedNames);
+                        }
                     }
                 } else {
                     for (int k = 0; k < ins.definition.operands.length; k++) {
 
                         if (ins.definition.operands[k] == AVM2Code.DAT_MULTINAME_INDEX) {
                             int multinameIndex = ins.operands[k];
-                            parseUsagesFromMultiname(abc, imports, uses, abc.constants.getMultiname(multinameIndex), ignorePackage, fullyQualifiedNames);
+                            if (multinameIndex < abc.constants.constant_multiname.size()) {
+                                parseUsagesFromMultiname(abc, imports, uses, abc.constants.getMultiname(multinameIndex), ignorePackage, fullyQualifiedNames);
+                            }
                         }
                     }
                 }

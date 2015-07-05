@@ -1665,7 +1665,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
         int mindex;
         if (!isInterface) {
-            MethodBody mbody = new MethodBody();
+            MethodBody mbody = new MethodBody(abc);
 
             if (needsActivation) {
                 int slotId = 1;
@@ -2146,7 +2146,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         Trait[] traitArr = generateTraitsPhase1(null, null, true, localData, commands, si.traits, class_index);
         generateTraitsPhase2(new ArrayList<DottedChain>(), null/*FIXME*/, commands, traitArr, new ArrayList<Integer>(), localData);
         MethodInfo mi = new MethodInfo(new int[0], 0, 0, 0, new ValueKind[0], new int[0]);
-        MethodBody mb = new MethodBody();
+        MethodBody mb = new MethodBody(abc);
         mb.method_info = abc.addMethodInfo(mi);
         mb.setCode(new AVM2Code());
         List<AVM2Instruction> mbCode = mb.getCode().code;

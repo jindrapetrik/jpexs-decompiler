@@ -373,9 +373,7 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
                     break;
                 }
             }
-        } catch (EmptyStackException | TranslateException | InterruptedException ex) {
-            //result.idx = -1;
-            //result.isIf = false;
+        } catch (Exception ex) {
             //ignore
         }
     }

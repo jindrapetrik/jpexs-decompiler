@@ -86,16 +86,21 @@ public final class MethodBody implements Cloneable {
     @Internal
     public transient Throwable convertException;
 
-    public MethodBody() {
+    @Internal
+    private ABC abc;
+
+    public MethodBody(ABC abc) {
         this.traits = new Traits();
         this.codeBytes = new byte[0];
         this.exceptions = new ABCException[0];
+        this.abc = abc;
     }
 
-    public MethodBody(Traits traits, byte[] codeBytes, ABCException[] exceptions) {
+    public MethodBody(ABC abc, Traits traits, byte[] codeBytes, ABCException[] exceptions) {
         this.traits = traits;
         this.codeBytes = codeBytes;
         this.exceptions = exceptions;
+        this.abc = abc;
     }
 
     public synchronized void setCodeBytes(byte codeBytes[]) {
@@ -117,6 +122,7 @@ public final class MethodBody implements Cloneable {
             try {
                 ABCInputStream ais = new ABCInputStream(new MemoryInputStream(codeBytes));
                 avm2Code = new AVM2Code(ais);
+                avm2Code.removeWrongIndices(abc.constants);
             } catch (UnknownInstructionCode | IOException ex) {
                 avm2Code = new AVM2Code();
                 logger.log(Level.SEVERE, null, ex);

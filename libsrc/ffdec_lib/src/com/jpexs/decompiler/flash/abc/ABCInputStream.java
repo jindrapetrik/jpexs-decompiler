@@ -194,7 +194,9 @@ public class ABCInputStream implements AutoCloseable {
     }
 
     private int readU30Internal() throws IOException {
-        return (int) readU32Internal();
+        long u32 = readU32Internal();
+        //no bits above bit 30
+        return (int) (u32 & 0x3FFFFFFF);
     }
 
     public int readU30(String name) throws IOException {

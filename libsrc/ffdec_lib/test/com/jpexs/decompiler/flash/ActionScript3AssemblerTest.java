@@ -80,7 +80,7 @@ public class ActionScript3AssemblerTest extends ActionScriptTestBase {
                 + str
                 + "returnvoid\r\n";
 
-        MethodBody b = new MethodBody();
+        MethodBody b = new MethodBody(getABC());
         AVM2Code code = ASM3Parser.parse(new StringReader(str), getABC().constants, null, b, new MethodInfo());
         b.setCode(code);
         return b;
