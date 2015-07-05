@@ -2078,7 +2078,7 @@ public class AVM2Code implements Cloneable {
         }
         code.set(pos, instruction);
         invalidateCache();
-        checkValidOffsets(body);
+        //checkValidOffsets(body);
     }
 
     /**
@@ -2353,53 +2353,65 @@ public class AVM2Code implements Cloneable {
     }
 
     private void visitCode(int ip, int lastIp, HashMap<Integer, List<Integer>> refs) throws InterruptedException {
-        if (Thread.currentThread().isInterrupted()) {
-            throw new InterruptedException();
-        }
-        while (ip < code.size()) {
-            if (!refs.containsKey(ip)) {
-                refs.put(ip, new ArrayList<>());
+        List<Integer> toVisit = new ArrayList<>();
+        List<Integer> toVisitLast = new ArrayList<>();
+        toVisit.add(ip);
+        toVisitLast.add(lastIp);
+        while (!toVisit.isEmpty()) {
+            if (Thread.currentThread().isInterrupted()) {
+                throw new InterruptedException();
             }
-            refs.get(ip).add(lastIp);
-            lastIp = ip;
-            if (refs.get(ip).size() > 1) {
-                break;
-            }
-            AVM2Instruction ins = code.get(ip);
-            if (ins.definition instanceof ThrowIns) {
-                break;
-            }
-            if (ins.definition instanceof ReturnValueIns) {
-                break;
-            }
-            if (ins.definition instanceof ReturnVoidIns) {
-                break;
-            }
-            if (ins.definition instanceof LookupSwitchIns) {
-                try {
-                    for (int i = 2; i < ins.operands.length; i++) {
-                        visitCode(adr2pos(pos2adr(ip) + ins.operands[i]), ip, refs);
+            ip = toVisit.remove(0);
+            lastIp = toVisitLast.remove(0);
+            while (ip < code.size()) {
+                if (!refs.containsKey(ip)) {
+                    refs.put(ip, new ArrayList<>());
+                }
+                refs.get(ip).add(lastIp);
+                lastIp = ip;
+                if (refs.get(ip).size() > 1) {
+                    break;
+                }
+                AVM2Instruction ins = code.get(ip);
+                if (ins.definition instanceof ThrowIns) {
+                    break;
+                }
+                if (ins.definition instanceof ReturnValueIns) {
+                    break;
+                }
+                if (ins.definition instanceof ReturnVoidIns) {
+                    break;
+                }
+                if (ins.definition instanceof LookupSwitchIns) {
+                    try {
+                        for (int i = 2; i < ins.operands.length; i++) {
+                            toVisit.add(adr2pos(pos2adr(ip) + ins.operands[i]));
+                            toVisitLast.add(ip);
+                            //visitCode(, ip, refs);
+                        }
+                        ip = adr2pos(pos2adr(ip) + ins.operands[0]);
+                        continue;
+                    } catch (ConvertException ex) {
                     }
-                    ip = adr2pos(pos2adr(ip) + ins.operands[0]);
-                    continue;
-                } catch (ConvertException ex) {
                 }
+                if (ins.definition instanceof JumpIns) {
+                    try {
+                        ip = adr2pos(pos2adr(ip) + ins.getBytesLength() + ins.operands[0]);
+                        continue;
+                    } catch (ConvertException ex) {
+                        logger.log(Level.FINE, null, ex);
+                    }
+                } else if (ins.definition instanceof IfTypeIns) {
+                    try {
+                        toVisit.add(adr2pos(pos2adr(ip) + ins.getBytesLength() + ins.operands[0]));
+                        toVisitLast.add(ip);
+                        //visitCode(adr2pos(pos2adr(ip) + ins.getBytesLength() + ins.operands[0]), ip, refs);
+                    } catch (ConvertException ex) {
+                        logger.log(Level.FINE, null, ex);
+                    }
+                }
+                ip++;
             }
-            if (ins.definition instanceof JumpIns) {
-                try {
-                    ip = adr2pos(pos2adr(ip) + ins.getBytesLength() + ins.operands[0]);
-                    continue;
-                } catch (ConvertException ex) {
-                    logger.log(Level.FINE, null, ex);
-                }
-            } else if (ins.definition instanceof IfTypeIns) {
-                try {
-                    visitCode(adr2pos(pos2adr(ip) + ins.getBytesLength() + ins.operands[0]), ip, refs);
-                } catch (ConvertException ex) {
-                    logger.log(Level.FINE, null, ex);
-                }
-            }
-            ip++;
         };
     }
 

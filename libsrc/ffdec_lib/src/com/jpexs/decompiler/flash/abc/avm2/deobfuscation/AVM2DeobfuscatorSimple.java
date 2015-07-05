@@ -398,9 +398,13 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
 
     public void deobfuscate(String path, int classIndex, boolean isStatic, int scriptIndex, ABC abc, AVM2ConstantPool cpool, Trait trait, MethodInfo minfo, MethodBody body) throws InterruptedException {
         AVM2Code code = body.getCode();
+        System.err.println("1");
         code.fixJumps(body);
+        System.err.println("2");
         removeUnreachableActions(code, cpool, trait, minfo, body);
+        System.err.println("3");
         removeObfuscationIfs(classIndex, isStatic, scriptIndex, abc, cpool, trait, minfo, body);
+        System.err.println("4");
         removeZeroJumps(code, body);
     }
 
