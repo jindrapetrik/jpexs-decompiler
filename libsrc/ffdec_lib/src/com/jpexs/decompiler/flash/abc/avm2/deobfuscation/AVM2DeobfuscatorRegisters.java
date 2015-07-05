@@ -71,8 +71,7 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
     @Override
     public void deobfuscate(String path, int classIndex, boolean isStatic, int scriptIndex, ABC abc, AVM2ConstantPool cpool, Trait trait, MethodInfo minfo, MethodBody abody) throws InterruptedException {
 
-        MethodBody body = abody.clone();
-        removeUnreachableActions(body.getCode(), cpool, trait, minfo, body);
+        removeUnreachableActions(abody.getCode(), cpool, trait, minfo, abody);
 
         Map<Integer, GraphTargetItem> outFirstAssigned = new HashMap<>();
         Map<Integer, AVM2Instruction> outFirstAssignments = new HashMap<>();
@@ -83,29 +82,46 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
 
         List<AVM2Instruction> ignored = new ArrayList<>();
         Map<Integer, GraphTargetItem> registers = new HashMap<>();
-        getFirstRegistersUsage(outAssignCount1, outFirstAssigned, outFirstAssignments, classIndex, isStatic, scriptIndex, abc, cpool, trait, minfo, body, ignored, registers);
-        ignored.addAll(outFirstAssignments.values());
-        registers.putAll(outFirstAssigned);
 
-        replaceSingleUseRegisters(registers, ignored, classIndex, isStatic, scriptIndex, abc, cpool, trait, minfo, body);
+        boolean extended = true;
 
-        super.deobfuscate(path, classIndex, isStatic, scriptIndex, abc, cpool, trait, minfo, body);
-        removeUnreachableActions(body.getCode(), cpool, trait, minfo, body);
+        MethodBody body = abody;
 
-        //second pass - ignore all first assignments
-        registers.clear();
-        ignored.clear();
-        outFirstAssignments.clear();
-        getFirstRegistersUsage(outAssignCount2, new HashMap<>(), outFirstAssignments, classIndex, isStatic, scriptIndex, abc, cpool, trait, minfo, body, ignored, registers);
+        if (extended) {
+            body = abody.clone();
+            getFirstRegistersUsage(outAssignCount1, outFirstAssigned, outFirstAssignments, classIndex, isStatic, scriptIndex, abc, cpool, trait, minfo, body, ignored, registers);
+            ignored.addAll(outFirstAssignments.values());
+            registers.putAll(outFirstAssigned);
 
-        for (int regId : outAssignCount1.keySet()) {
-            int ac = outAssignCount2.containsKey(regId) ? outAssignCount2.get(regId) : 0;
-            if (ac == 0) {
-                singleRegisters.put(regId, outFirstAssigned.get(regId));
+            replaceSingleUseRegisters(registers, ignored, classIndex, isStatic, scriptIndex, abc, cpool, trait, minfo, body);
+
+            super.deobfuscate(path, classIndex, isStatic, scriptIndex, abc, cpool, trait, minfo, body);
+            removeUnreachableActions(body.getCode(), cpool, trait, minfo, body);
+
+            //second pass - ignore all first assignments
+            registers.clear();
+            ignored.clear();
+            outFirstAssignments.clear();
+            getFirstRegistersUsage(outAssignCount2, new HashMap<>(), outFirstAssignments, classIndex, isStatic, scriptIndex, abc, cpool, trait, minfo, body, ignored, registers);
+
+            for (int regId : outAssignCount1.keySet()) {
+                int ac = outAssignCount2.containsKey(regId) ? outAssignCount2.get(regId) : 0;
+                if (ac == 0) {
+                    singleRegisters.put(regId, outFirstAssigned.get(regId));
+                }
+            }
+            body = abody;
+        } else {
+            getFirstRegistersUsage(outAssignCount1, outFirstAssigned, outFirstAssignments, classIndex, isStatic, scriptIndex, abc, cpool, trait, minfo, body, ignored, registers);
+            for (int regId : outAssignCount1.keySet()) {
+                int ac = outAssignCount1.get(regId);
+                if (ac == 1) {
+                    singleRegisters.put(regId, outFirstAssigned.get(regId));
+                }
             }
         }
 
-        body = abody;
+        //body.max_regs        
         replaceSingleUseRegisters(singleRegisters, null, classIndex, isStatic, scriptIndex, abc, cpool, trait, minfo, body);
         super.deobfuscate(path, classIndex, isStatic, scriptIndex, abc, cpool, trait, minfo, body);
         removeUnreachableActions(body.getCode(), cpool, trait, minfo, body);

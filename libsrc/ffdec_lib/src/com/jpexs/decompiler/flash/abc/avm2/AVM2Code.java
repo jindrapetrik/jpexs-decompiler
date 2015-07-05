@@ -247,6 +247,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.ReturnVoidAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetSlotAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.UndefinedAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.WithAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.DeclarationAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ForEachInAVM2Item;
@@ -1516,7 +1517,12 @@ public class AVM2Code implements Cloneable {
             } else if (ins.definition instanceof DupIns) {
                 int nextPos;
                 do {
-                    AVM2Instruction insAfter = code.get(ip + 1);
+                    AVM2Instruction insAfter = ip + 1 < code.size() ? code.get(ip + 1) : null;
+                    if (insAfter == null) {
+                        ins.definition.translate(isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames, path, localRegAssigmentIps, ip, refs, this);
+                        ip++;
+                        break;
+                    }
                     AVM2Instruction insBefore = ins;
                     if (ip - 1 >= start) {
                         insBefore = code.get(ip - 1);
@@ -1813,6 +1819,9 @@ public class AVM2Code implements Cloneable {
         HashMap<Integer, GraphTargetItem> localRegs = new HashMap<>();
 
         int regCount = getRegisterCount();
+        for (int i = 0; i < regCount; i++) {
+            localRegs.put(0, new UndefinedAVM2Item(null));
+        }
 
         //try {
         list = AVM2Graph.translateViaGraph(path, this, abc, body, isStatic, scriptIndex, classIndex, localRegs, scopeStack, localRegNames, fullyQualifiedNames, staticOperation, localRegAssigmentIps, refs);

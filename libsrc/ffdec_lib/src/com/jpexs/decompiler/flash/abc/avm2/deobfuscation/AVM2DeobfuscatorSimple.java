@@ -45,7 +45,9 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.GreaterThanIn
 import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.LessEqualsIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.LessThanIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.StrictEqualsIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewFunctionIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocalTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.DupIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushByteIns;
@@ -60,6 +62,8 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushUndefinedIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.SwapIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.FloatValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.NewFunctionAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.StringAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.UndefinedAVM2Item;
@@ -233,6 +237,9 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
         localData.isStatic = isStatic;
         localData.classIndex = classIndex;
         localData.localRegs = new HashMap<>();
+        for (int i = 0; i < body.max_regs; i++) {
+            localData.localRegs.put(i, new UndefinedAVM2Item(null));
+        }
         localData.scopeStack = new ScopeStack(true);
         localData.constants = cpool;
         localData.methodInfo = abc.method_info;
@@ -270,7 +277,17 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
                 }
 
                 AVM2Instruction action = code.code.get(idx);
-                action.translate(localData, stack, output, Graph.SOP_USE_STATIC, "");
+                if (action.definition instanceof NewFunctionIns) {
+                    if (idx + 1 < code.code.size()) {
+                        if (code.code.get(idx + 1).definition instanceof PopIns) {
+                            code.removeInstruction(idx + 1, body);
+                            code.removeInstruction(idx, body);
+                            continue;
+                        }
+                    }
+                } else {
+                    action.translate(localData, stack, output, Graph.SOP_USE_STATIC, "");
+                }
                 InstructionDefinition def = action.definition;
 
                 Class allowedDefs[] = new Class[]{
@@ -307,7 +324,9 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
                     GreaterThanIns.class,
                     LessThanIns.class,
                     StrictEqualsIns.class,
-                    PopIns.class
+                    PopIns.class,
+                    GetLocalTypeIns.class,
+                    NewFunctionIns.class
                 };
 
                 boolean ok = false;
@@ -319,6 +338,17 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
                 }
                 if (!ok) {
                     break;
+                }
+
+                if (def instanceof GetLocalTypeIns) {
+                    int regId = ((GetLocalTypeIns) def).getRegisterId(action);
+                    if (regId > 0 && localData.localRegs.get(regId) instanceof UndefinedAVM2Item) {
+                        //System.err.println(""+);
+                        stack.pop();
+                        stack.push(new UndefinedAVM2Item(action));
+                    } else {
+                        break;
+                    }
                 }
 
                 boolean ifed = false;
@@ -339,9 +369,7 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
                     AVM2Instruction tarIns = code.code.get(nidx);
 
                     if (EcmaScript.toBoolean(res)) {
-                        /*if (nidx == -1) {
-                         throw new TranslateException("If target not found: " + address);
-                         }*/
+                        //System.err.println("replacing " + action + " on " + idx + " with jump");
                         AVM2Instruction jumpIns = new AVM2Instruction(0, new JumpIns(), new int[]{0});
                         //jumpIns.operands[0] = action.operands[0] /*- action.getBytes().length*/ + jumpIns.getBytes().length;
                         code.replaceInstruction(idx, jumpIns, body);
@@ -351,6 +379,7 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
 
                         idx = code.adr2pos(jumpIns.offset + jumpIns.getBytesLength() + jumpIns.operands[0]);
                     } else {
+                        //System.err.println("replacing " + action + " on " + idx + " with pop");
                         code.replaceInstruction(idx, new AVM2Instruction(action.offset, new DeobfuscatePopIns(), new int[]{}), body);
                         //action.definition = new DeobfuscatePopIns();
                         idx++;
