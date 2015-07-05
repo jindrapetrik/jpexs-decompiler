@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.SystemColor;
 import java.awt.geom.GeneralPath;

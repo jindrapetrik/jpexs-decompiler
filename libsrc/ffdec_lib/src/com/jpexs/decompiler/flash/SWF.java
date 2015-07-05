@@ -581,7 +581,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         for (int i = 0; i < tags.size(); i++) {
             Tag t = tags.get(i);
             if (t instanceof DefineSpriteTag) {
-                if (!isSpriteValid((DefineSpriteTag) t, new ArrayList<Integer>())) {
+                if (!isSpriteValid((DefineSpriteTag) t, new ArrayList<>())) {
                     tags.set(i, new TagStub(this, t.getId(), "InvalidSprite", t.getOriginalRange(), null));
                 }
             }
@@ -1349,7 +1349,7 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     public Map<String, ASMSource> getASMs(boolean exportFileNames) {
-        return getASMs(exportFileNames, new ArrayList<TreeItem>(), true);
+        return getASMs(exportFileNames, new ArrayList<>(), true);
     }
 
     public Map<String, ASMSource> getASMs(boolean exportFileNames, List<TreeItem> nodesToExport, boolean exportAll) {
@@ -1621,7 +1621,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             GraphSourceItem ins = code.get(ip);
 
             if (debugMode) {
-                System.err.println("Visit " + ip + ": ofs" + Helper.formatAddress(((Action) ins).getAddress()) + ":" + ((Action) ins).getASMSource(new ActionList(), new HashSet<Long>(), ScriptExportMode.PCODE) + " stack:" + Helper.stackToString(stack, LocalData.create(new ConstantPool())));
+                System.err.println("Visit " + ip + ": ofs" + Helper.formatAddress(((Action) ins).getAddress()) + ":" + ((Action) ins).getASMSource(new ActionList(), new HashSet<>(), ScriptExportMode.PCODE) + " stack:" + Helper.stackToString(stack, LocalData.create(new ConstantPool())));
             }
             if (ins.isExit()) {
                 break;
@@ -1679,7 +1679,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                     ip = code.adr2pos(addr);
                     addr += size;
                     int nextip = code.adr2pos(addr);
-                    getVariables(variables, functions, strings, usageTypes, new ActionGraphSource(code.getActions().subList(ip, nextip), code.version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0, path + (cntName == null ? "" : "/" + cntName));
+                    getVariables(variables, functions, strings, usageTypes, new ActionGraphSource(code.getActions().subList(ip, nextip), code.version, new HashMap<>(), new HashMap<>(), new HashMap<>()), 0, path + (cntName == null ? "" : "/" + cntName));
                     ip = nextip;
                 }
                 List<List<GraphTargetItem>> r = new ArrayList<>();

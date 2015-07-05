@@ -21,15 +21,7 @@ import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
-import com.jpexs.decompiler.flash.types.filters.BEVELFILTER;
-import com.jpexs.decompiler.flash.types.filters.BLURFILTER;
-import com.jpexs.decompiler.flash.types.filters.COLORMATRIXFILTER;
-import com.jpexs.decompiler.flash.types.filters.CONVOLUTIONFILTER;
-import com.jpexs.decompiler.flash.types.filters.DROPSHADOWFILTER;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
-import com.jpexs.decompiler.flash.types.filters.GLOWFILTER;
-import com.jpexs.decompiler.flash.types.filters.GRADIENTBEVELFILTER;
-import com.jpexs.decompiler.flash.types.filters.GRADIENTGLOWFILTER;
 import java.io.Serializable;
 import java.util.List;
 

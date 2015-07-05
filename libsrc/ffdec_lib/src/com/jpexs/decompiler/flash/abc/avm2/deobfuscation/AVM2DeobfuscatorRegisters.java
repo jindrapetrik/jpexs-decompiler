@@ -43,9 +43,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateException;
 import com.jpexs.decompiler.graph.TranslateStack;
-import java.util.AbstractList;
 import java.util.ArrayList;
-import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -121,7 +119,7 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
             }
         }
 
-        //body.max_regs        
+        //body.max_regs
         replaceSingleUseRegisters(singleRegisters, null, classIndex, isStatic, scriptIndex, abc, cpool, trait, minfo, body);
         super.deobfuscate(path, classIndex, isStatic, scriptIndex, abc, cpool, trait, minfo, body);
         removeUnreachableActions(body.getCode(), cpool, trait, minfo, body);
@@ -335,7 +333,9 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
         public Map<Integer, Integer> assignCount = new HashMap<>();
 
         public Map<Integer, GraphTargetItem> lastAssigned = new HashMap<>();
+
         public Map<Integer, GraphTargetItem> firstAssigned = new HashMap<>();
+
         public Map<Integer, AVM2Instruction> firstAssignInstruction = new HashMap<>();
     }
 }

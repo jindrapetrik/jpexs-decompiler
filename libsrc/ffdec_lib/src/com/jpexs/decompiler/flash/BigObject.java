@@ -22,7 +22,7 @@ package com.jpexs.decompiler.flash;
  */
 public class BigObject {
 
-    private byte[] dummy = new byte[512 * 1024 * 1024];
+    private final byte[] dummy = new byte[512 * 1024 * 1024];
 
     @Override
     protected void finalize() throws Throwable {
