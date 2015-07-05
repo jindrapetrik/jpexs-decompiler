@@ -1818,6 +1818,7 @@ public class AVM2Code implements Cloneable {
     }
 
     public void fixJumps(MethodBody body) {
+        buildCache();
         AVM2Instruction lastInstuction = code.get(code.size() - 1);
         final long endOffset = lastInstuction.offset + lastInstuction.getBytesLength();
         updateOffsets(new OffsetUpdater() {
@@ -1830,11 +1831,20 @@ public class AVM2Code implements Cloneable {
             @Override
             public int updateOperandOffset(long insAddr, long targetAddress, int offset) {
                 if (targetAddress > endOffset) {
+                    // jump to the end
                     return (int) (offset - targetAddress + endOffset);
                 }
                 if (targetAddress < 0) {
+                    // jump to the first instuction
                     return (int) (offset - targetAddress);
                 }
+
+                int targetPos = posCache.indexOf(targetAddress);
+                if (targetPos == -1) {
+                    // jump to the end
+                    return (int) (offset - targetAddress + endOffset);
+                }
+
                 return offset;
             }
 
@@ -1866,7 +1876,17 @@ public class AVM2Code implements Cloneable {
         checkValidOffsets(body);
         AVM2Instruction ins = code.get(pos);
         final long remOffset = ins.offset;
-        final int byteCount = ins.getBytesLength();
+        int bc;
+        if (pos < code.size() - 1) {
+            // Checking the instuction length is not enough because in some
+            // obfuscated files the length of the lookupswitch is not the same
+            // as the diference of the offsets
+            bc = (int) (code.get(pos + 1).offset - remOffset);
+        } else {
+            bc = ins.getBytesLength();
+        }
+
+        final int byteCount = bc;
         updateOffsets(new OffsetUpdater() {
             @Override
             public long updateInstructionOffset(long address) {
