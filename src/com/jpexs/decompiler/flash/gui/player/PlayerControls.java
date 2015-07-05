@@ -67,8 +67,6 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
 
     private final JButton loopButton;
 
-    private boolean paused = false;
-
     private MediaDisplay display;
 
     private JProgressBar progress;

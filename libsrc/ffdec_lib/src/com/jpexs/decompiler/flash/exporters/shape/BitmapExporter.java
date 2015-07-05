@@ -67,7 +67,7 @@ public class BitmapExporter extends ShapeExporterBase {
 
     private final SWF swf;
 
-    private GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);  //For correct intersections display;
+    private final GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);  //For correct intersections display;
 
     private Paint fillPathPaint;
 

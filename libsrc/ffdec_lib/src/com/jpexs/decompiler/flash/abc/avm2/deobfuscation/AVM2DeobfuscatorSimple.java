@@ -155,7 +155,7 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
 
     private boolean removeObfuscationIfs(int classIndex, boolean isStatic, int scriptIndex, ABC abc, AVM2ConstantPool cpool, Trait trait, MethodInfo minfo, MethodBody body) throws InterruptedException {
         AVM2Code code = body.getCode();
-        if (code.code.size() == 0) {
+        if (code.code.isEmpty()) {
             return false;
         }
 

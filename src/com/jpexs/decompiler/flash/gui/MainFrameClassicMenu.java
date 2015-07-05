@@ -60,7 +60,7 @@ public class MainFrameClassicMenu extends MainFrameMenu {
         }
         String parentPath = "";
         if (path.contains("/")) {
-            parentPath = path.substring(0, path.lastIndexOf("/"));
+            parentPath = path.substring(0, path.lastIndexOf('/'));
         }
         MenuElement parentMenu = menuElements.get(parentPath);
         if (parentMenu == null) {
@@ -110,7 +110,7 @@ public class MainFrameClassicMenu extends MainFrameMenu {
         }
         String parentPath = "";
         if (path.contains("/")) {
-            parentPath = path.substring(0, path.lastIndexOf("/"));
+            parentPath = path.substring(0, path.lastIndexOf('/'));
         }
         MenuElement parentMenu = menuElements.get(parentPath);
         if (parentMenu == null) {
@@ -136,7 +136,7 @@ public class MainFrameClassicMenu extends MainFrameMenu {
         path = mapping(path);
         String parentPath = "";
         if (path.contains("/")) {
-            parentPath = path.substring(0, path.lastIndexOf("/"));
+            parentPath = path.substring(0, path.lastIndexOf('/'));
         }
         MenuElement parentMenu = menuElements.get(parentPath);
         if (parentMenu == null) {
@@ -287,7 +287,7 @@ public class MainFrameClassicMenu extends MainFrameMenu {
         if (me instanceof JMenu) {
             JMenu jm = (JMenu) me;
             if (jm.getMenuComponentCount() == 1) {
-                String parentPath = path.contains("/") ? path.substring(0, path.lastIndexOf("/")) : "";
+                String parentPath = path.contains("/") ? path.substring(0, path.lastIndexOf('/')) : "";
                 MenuElement parMe = menuElements.get(parentPath);
                 JMenuItem mi = (JMenuItem) jm.getMenuComponent(0);
                 jm.remove(mi);

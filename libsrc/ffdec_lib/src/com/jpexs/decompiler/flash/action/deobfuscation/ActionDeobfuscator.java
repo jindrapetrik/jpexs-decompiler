@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.action.deobfuscation;
 
-import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.abc.ABC;
