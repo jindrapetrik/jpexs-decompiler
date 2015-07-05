@@ -834,7 +834,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
                 MethodInfo mi = new MethodInfo(new int[0], void_type, abc.constants.getStringId(name, true), 0, new ValueKind[0], new int[0]);
                 int method_info = abc.addMethodInfo(mi);
                 tm.method_info = method_info;
-                MethodBody body = new MethodBody();
+                MethodBody body = new MethodBody(abc);
                 body.method_info = method_info;
                 body.init_scope_depth = 1;
                 body.max_regs = 1;
