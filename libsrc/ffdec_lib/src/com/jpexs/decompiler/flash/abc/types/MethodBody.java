@@ -332,24 +332,27 @@ public final class MethodBody implements Cloneable {
     }
 
     public MethodBody convertMethodBody(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, Trait trait, AVM2ConstantPool constants, List<MethodInfo> method_info, ScopeStack scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits) throws InterruptedException {
-        MethodBody b = clone();
-        b.getCode().markMappedOffsets();
+        MethodBody body = clone();
+        body.getCode().markMappedOffsets();
 
         if (Configuration.autoDeobfuscate.get()) {
             if (Configuration.deobfuscationOldMode.get()) {
                 try {
-                    b.getCode().removeTraps(constants, trait, method_info.get(this.method_info), b, abc, scriptIndex, classIndex, isStatic, path);
+                    body.getCode().removeTraps(constants, trait, method_info.get(this.method_info), body, abc, scriptIndex, classIndex, isStatic, path);
                 } catch (Throwable ex) {
                     logger.log(Level.SEVERE, "Error during old deobfuscation: " + path, ex);
                 }
             } else {
-                new AVM2DeobfuscatorSimple().deobfuscate(path, classIndex, isStatic, scriptIndex, abc, constants, trait, method_info.get(this.method_info), b);
-                new AVM2DeobfuscatorRegisters().deobfuscate(path, classIndex, isStatic, scriptIndex, abc, constants, trait, method_info.get(this.method_info), b);
-                new AVM2DeobfuscatorJumps().deobfuscate(path, classIndex, isStatic, scriptIndex, abc, constants, trait, method_info.get(this.method_info), b);
+                new AVM2DeobfuscatorSimple().deobfuscate(path, classIndex, isStatic, scriptIndex, abc, constants, trait, method_info.get(this.method_info), body);
+                new AVM2DeobfuscatorRegisters().deobfuscate(path, classIndex, isStatic, scriptIndex, abc, constants, trait, method_info.get(this.method_info), body);
+                new AVM2DeobfuscatorJumps().deobfuscate(path, classIndex, isStatic, scriptIndex, abc, constants, trait, method_info.get(this.method_info), body);
             }
+
+            // todo: only for debugging. checkValidOffsets can be made private later
+            body.getCode().checkValidOffsets(body);
         }
 
-        return b;
+        return body;
     }
 
     @Override
