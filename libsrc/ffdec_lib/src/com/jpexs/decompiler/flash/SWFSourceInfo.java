@@ -77,7 +77,7 @@ public class SWFSourceInfo {
                 return false;
             }
             String extension = Path.getExtension(fileObj);
-            return !(extension.equals(".swf") || extension.equals(".gfx"));
+            return extension == null || !(extension.equals(".swf") || extension.equals(".gfx"));
         }
         return false;
     }
@@ -88,13 +88,15 @@ public class SWFSourceInfo {
         }
 
         String extension = Path.getExtension(new File(file));
-        switch (extension) {
-            case ".swc":
-                return new SWC(new File(file));
-            case ".zip":
-                return new ZippedSWFBundle(new File(file));
-            default:
-                return new BinarySWFBundle(new BufferedInputStream(new FileInputStream(file)), noCheck, searchMode);
+        if (extension != null) {
+            switch (extension) {
+                case ".swc":
+                    return new SWC(new File(file));
+                case ".zip":
+                    return new ZippedSWFBundle(new File(file));
+            }
         }
+
+        return new BinarySWFBundle(new BufferedInputStream(new FileInputStream(file)), noCheck, searchMode);
     }
 }

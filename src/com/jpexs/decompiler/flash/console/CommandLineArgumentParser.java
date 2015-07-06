@@ -86,6 +86,7 @@ import com.jpexs.decompiler.flash.importers.SwfXmlImporter;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
+import com.jpexs.decompiler.flash.tags.DefineBitsJPEG4Tag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -315,6 +316,8 @@ public class CommandLineArgumentParser {
         out.println(" " + (cnt++) + ") -replace <infile> <outfile> (<characterId1>|<scriptName1>) <importDataFile1> [methodBodyIndex1] [(<characterId2>|<scriptName2>) <importDataFile2> [methodBodyIndex2]]...");
         out.println(" ...replaces the data of the specified BinaryData, Image, DefineSound tag or Script");
         out.println(" ...methodBodyIndexN parameter should be specified if and only if the imported entity is an AS3 P-Code");
+        out.println(" " + (cnt++) + ") -replaceAlpha <infile> <outfile> <imageId1> <importDataFile1> [<imageId2> <importDataFile2>]...");
+        out.println(" ...replaces the alpha channel of the specified JPEG3 or JPEG4 tag");
         out.println(" " + (cnt++) + ") -deobfuscate <level> <infile> <outfile>");
         out.println("  ...Deobfuscates AS3 P-code in <infile> and saves result to <outfile>");
         out.println("  ...<level> can be one of: controlflow/3/max, traps/2, deadcode/1");
@@ -490,6 +493,8 @@ public class CommandLineArgumentParser {
             parseFlashPaperToPdf(selection, zoom, args);
         } else if (command.equals("replace")) {
             parseReplace(args);
+        } else if (command.equals("replacealpha")) {
+            parseReplaceAlpha(args);
         } else if (command.equals("as3compiler")) {
             ActionScript3Parser.compile(null /*?*/, args.pop(), args.pop(), 0);
         } else if (nextParam.equals("-help") || nextParam.equals("--help") || nextParam.equals("/?") || nextParam.equals("\\_") /* /? translates as this on windows */) {
@@ -1824,6 +1829,62 @@ public class CommandLineArgumentParser {
                             System.err.println(objectToReplace + " is not reocginized as a CharacterId or a script name.");
                             System.exit(1);
                         }
+                    }
+
+                    if (args.isEmpty() || args.peek().startsWith("-")) {
+                        break;
+                    }
+                }
+
+                try {
+                    try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(outFile))) {
+                        swf.saveTo(fos);
+                    }
+                } catch (IOException e) {
+                    System.err.println("I/O error during writing");
+                    System.exit(2);
+                }
+            }
+        } catch (IOException | InterruptedException e) {
+            System.err.println("I/O error during reading");
+            System.exit(2);
+        }
+    }
+
+    private static void parseReplaceAlpha(Stack<String> args) {
+        if (args.size() < 4) {
+            badArguments();
+        }
+
+        File inFile = new File(args.pop());
+        File outFile = new File(args.pop());
+        try {
+            try (FileInputStream is = new FileInputStream(inFile)) {
+                SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
+                while (true) {
+                    String objectToReplace = args.pop();
+
+                    int imageId = 0;
+                    try {
+                        imageId = Integer.parseInt(objectToReplace);
+                    } catch (NumberFormatException nfe) {
+                        System.err.println("ImageId should be integer");
+                        System.exit(1);
+                    }
+                    if (!swf.getCharacters().containsKey(imageId)) {
+                        System.err.println("ImageId does not exist");
+                        System.exit(1);
+                    }
+
+                    CharacterTag characterTag = swf.getCharacter(imageId);
+                    String repFile = args.pop();
+                    byte[] data = Helper.readFile(repFile);
+                    if (characterTag instanceof DefineBitsJPEG3Tag || characterTag instanceof DefineBitsJPEG4Tag) {
+                        ImageTag imageTag = (ImageTag) characterTag;
+                        new ImageImporter().importImageAlpha(imageTag, data);
+                    } else {
+                        System.err.println("The specified tag type is not supported for alpha channel import");
+                        System.exit(1);
                     }
 
                     if (args.isEmpty() || args.peek().startsWith("-")) {
