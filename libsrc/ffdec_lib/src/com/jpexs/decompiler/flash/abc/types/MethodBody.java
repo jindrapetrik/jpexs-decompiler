@@ -173,6 +173,7 @@ public final class MethodBody implements Cloneable {
     }
 
     public int removeTraps(AVM2ConstantPool constants, ABC abc, Trait trait, int scriptIndex, int classIndex, boolean isStatic, String path) throws InterruptedException {
+
         return getCode().removeTraps(constants, trait, abc.method_info.get(method_info), this, abc, scriptIndex, classIndex, isStatic, path);
     }
 
@@ -341,20 +342,11 @@ public final class MethodBody implements Cloneable {
         body.getCode().markMappedOffsets();
 
         if (Configuration.autoDeobfuscate.get()) {
-            if (Configuration.deobfuscationOldMode.get()) {
-                try {
-                    body.getCode().removeTraps(constants, trait, method_info.get(this.method_info), body, abc, scriptIndex, classIndex, isStatic, path);
-                } catch (Throwable ex) {
-                    logger.log(Level.SEVERE, "Error during old deobfuscation: " + path, ex);
-                }
-            } else {
-                new AVM2DeobfuscatorSimple().deobfuscate(path, classIndex, isStatic, scriptIndex, abc, constants, trait, method_info.get(this.method_info), body);
-                new AVM2DeobfuscatorRegisters().deobfuscate(path, classIndex, isStatic, scriptIndex, abc, constants, trait, method_info.get(this.method_info), body);
-                new AVM2DeobfuscatorJumps().deobfuscate(path, classIndex, isStatic, scriptIndex, abc, constants, trait, method_info.get(this.method_info), body);
+            try {
+                body.getCode().removeTraps(constants, trait, method_info.get(this.method_info), body, abc, scriptIndex, classIndex, isStatic, path);
+            } catch (Throwable ex) {
+                logger.log(Level.SEVERE, "Error during deobfuscation: " + path, ex);
             }
-
-            // todo: only for debugging. checkValidOffsets can be made private later
-            body.getCode().checkValidOffsets(body);
         }
 
         return body;

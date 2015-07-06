@@ -21,6 +21,9 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ABCInputStream;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
+import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorJumps;
+import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorRegisters;
+import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorSimple;
 import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2Graph;
 import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2GraphSource;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
@@ -2189,7 +2192,7 @@ public class AVM2Code implements Cloneable {
         return ret;
     }
 
-    public int removeTraps(AVM2ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, ABC abc, int scriptIndex, int classIndex, boolean isStatic, String path) throws InterruptedException {
+    private int removeTrapsOld(AVM2ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, ABC abc, int scriptIndex, int classIndex, boolean isStatic, String path) throws InterruptedException {
         removeDeadCode(constants, trait, info, body);
         AVM2LocalData localData = new AVM2LocalData();
         localData.isStatic = isStatic;
@@ -2218,6 +2221,18 @@ public class AVM2Code implements Cloneable {
         removeDeadCode(constants, trait, info, body);
 
         return ret;
+    }
+
+    public int removeTraps(AVM2ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, ABC abc, int scriptIndex, int classIndex, boolean isStatic, String path) throws InterruptedException {
+        if (Configuration.deobfuscationOldMode.get()) {
+            return removeTrapsOld(constants, trait, info, body, abc, scriptIndex, classIndex, isStatic, path);
+        } else {
+            new AVM2DeobfuscatorSimple().deobfuscate(path, classIndex, isStatic, scriptIndex, abc, constants, trait, info, body);
+            new AVM2DeobfuscatorRegisters().deobfuscate(path, classIndex, isStatic, scriptIndex, abc, constants, trait, info, body);
+            new AVM2DeobfuscatorJumps().deobfuscate(path, classIndex, isStatic, scriptIndex, abc, constants, trait, info, body);
+            body.getCode().checkValidOffsets(body); // todo: only for debugging. checkValidOffsets can be made private later
+            return 1;
+        }
     }
 
     private void handleRegister(CodeStats stats, int reg) {
