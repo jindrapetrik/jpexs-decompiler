@@ -239,12 +239,12 @@
         <tempfile deleteonexit="true" property="app.cpio.temp" prefix="cpio"/>
         
         <cpio destfile="${app.cpio.temp}" format="odc">
-            <tarfileset dir="${app.installer.dir}/root" uid="0" gid="80" includes="Applications/${app.osx.dir}.app/Contents/MacOS/${app.osx.dir}"  filemode="755" />            
+            <tarfileset dir="${app.installer.dir}/root" uid="0" gid="80" includes="Applications/${app.osx.dir}.app/Contents/MacOS/${app.osx.dir}"  filemode="777" />            
             <tarfileset dir="${app.installer.dir}/root" uid="0" gid="80">
                 <exclude name="Applications/${app.osx.dir}.app/Contents/Resources/${app.script}" />
                 <exclude name="Applications/${app.osx.dir}.app/Contents/MacOS/${app.osx.dir}" />
             </tarfileset>
-            <tarfileset dir="${app.installer.dir}/root" uid="0" gid="80" includes="Applications/${app.osx.dir}.app/Contents/Resources/${app.script}" filemode="755" />        
+            <tarfileset dir="${app.installer.dir}/root" uid="0" gid="80" includes="Applications/${app.osx.dir}.app/Contents/Resources/${app.script}" filemode="777" />        
         </cpio>
         <gzip src="${app.cpio.temp}" destfile="${app.installer.dir}/flat/base.pkg/Payload" />
         <delete file="${app.cpio.temp}" />
@@ -352,13 +352,13 @@
         <mkdir dir="${releases.dir}"/>        
         <property  name="osx.zip.file" value="${releases.dir}/${prefix.filename}_${version}${version.suffix}_macosx.zip" />        
         <zip destfile="${osx.zip.file}">
-            <zipfileset dir="${app.bundle.dir}" includes="${app.osx.dir}.app/Contents/MacOS/${app.osx.dir}"  filemode="755" />
+            <zipfileset dir="${app.bundle.dir}" includes="${app.osx.dir}.app/Contents/MacOS/${app.osx.dir}"  filemode="777" />
             <zipfileset dir="${app.bundle.dir}">
                 <exclude name="${app.osx.dir}.app/Contents/Resources/${app.script}" />
                 <exclude name="${app.osx.dir}.app/Contents/MacOS/${app.osx.dir}" />
             </zipfileset>
             
-            <zipfileset dir="${app.bundle.dir}" includes="${app.osx.dir}.app/Contents/Resources/${app.script}" filemode="755" />           
+            <zipfileset dir="${app.bundle.dir}" includes="${app.osx.dir}.app/Contents/Resources/${app.script}" filemode="777" />           
         </zip>           
     </target>
     
