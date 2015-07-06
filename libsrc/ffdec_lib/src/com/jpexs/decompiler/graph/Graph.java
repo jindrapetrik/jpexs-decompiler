@@ -817,7 +817,13 @@ public class Graph {
     }
 
     private void getPrecontinues(String path, BaseLocalData localData, GraphPart parent, GraphPart part, List<GraphPart> allParts, List<Loop> loops, List<GraphPart> stopPart) throws InterruptedException {
-        markLevels(path, localData, part, allParts, loops);
+        try {
+            markLevels(path, localData, part, allParts, loops);
+        } catch (InterruptedException iex) {
+            throw iex;
+        } catch (Throwable ex) {
+            //It is unusual code so markLevels failed, nevermind, it can still work
+        }
         //Note: this also marks part as precontinue when there is if
         /*
          while(k<10){
@@ -880,8 +886,7 @@ public class Graph {
             stopPart = new ArrayList<>();
         }
         if (recursionLevel > allParts.size() + 1) {
-            Logger.getLogger(Graph.class.getName()).log(Level.WARNING, "{0} : markLevels max recursion level reached", path);
-            return;
+            throw new RuntimeException(path + ": markLevels max recursion level reached");
         }
 
         if (debugMode) {
