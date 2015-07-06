@@ -41,6 +41,8 @@ public class RetryTask {
             retry = false;
             try {
                 r.run();
+            } catch (InterruptedException ex) {
+                throw ex;
             } catch (Exception ex) {
                 switch (handler.handle(ex)) {
                     case AbortRetryIgnoreHandler.ABORT:
