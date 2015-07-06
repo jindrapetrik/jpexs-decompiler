@@ -792,6 +792,10 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                         int fontId = ft.getFontId();
                         int cols = (int) Math.ceil(Math.sqrt(countGlyphs));
                         int rows = (int) Math.ceil(((float) countGlyphs) / ((float) cols));
+                        if (rows == 0) {
+                            rows = 1;
+                            cols = 1;
+                        }
                         int x = 0;
                         int y = 0;
                         int firstGlyphIndex = fontPageNum * SHAPERECORD.MAX_CHARACTERS_IN_FONT_PREVIEW;
