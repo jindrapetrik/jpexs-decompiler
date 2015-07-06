@@ -26,7 +26,6 @@ import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TranslateStack;
-import com.jpexs.decompiler.graph.model.NotItem;
 import java.util.HashMap;
 import java.util.List;
 

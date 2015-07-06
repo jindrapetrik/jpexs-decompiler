@@ -16,12 +16,9 @@
  */
 package com.jpexs.decompiler.graph;
 
-import com.jpexs.decompiler.graph.model.PushItem;
-import com.jpexs.decompiler.graph.model.PopItem;
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.FinalProcessLocalData;
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.model.AndItem;
 import com.jpexs.decompiler.graph.model.BreakItem;
@@ -41,13 +38,14 @@ import com.jpexs.decompiler.graph.model.LogicalOpItem;
 import com.jpexs.decompiler.graph.model.LoopItem;
 import com.jpexs.decompiler.graph.model.NotItem;
 import com.jpexs.decompiler.graph.model.OrItem;
+import com.jpexs.decompiler.graph.model.PopItem;
+import com.jpexs.decompiler.graph.model.PushItem;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
 import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.TernarOpItem;
 import com.jpexs.decompiler.graph.model.TrueItem;
 import com.jpexs.decompiler.graph.model.UniversalLoopItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
-import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -85,7 +83,7 @@ public class Graph {
         if (heads != null) {
             return;
         }
-        heads = makeGraph(code, new ArrayList<GraphPart>(), alternateEntries);
+        heads = makeGraph(code, new ArrayList<>(), alternateEntries);
         int time = 1;
         List<GraphPart> ordered = new ArrayList<>();
         List<GraphPart> visited = new ArrayList<>();
@@ -872,7 +870,7 @@ public class Graph {
 
     private void markLevels(String path, BaseLocalData localData, GraphPart part, List<GraphPart> allParts, List<Loop> loops) throws InterruptedException {
         clearLoops(loops);
-        markLevels(path, localData, part, allParts, loops, new ArrayList<GraphPart>(), 1, new ArrayList<GraphPart>(), 0);
+        markLevels(path, localData, part, allParts, loops, new ArrayList<>(), 1, new ArrayList<>(), 0);
         clearLoops(loops);
     }
 
@@ -1023,7 +1021,7 @@ public class Graph {
 
     private void getLoops(BaseLocalData localData, GraphPart part, List<Loop> loops, List<GraphPart> stopPart) throws InterruptedException {
         clearLoops(loops);
-        getLoops(localData, part, loops, stopPart, true, 1, new ArrayList<GraphPart>());
+        getLoops(localData, part, loops, stopPart, true, 1, new ArrayList<>());
         clearLoops(loops);
     }
 
@@ -1576,7 +1574,7 @@ public class Graph {
                 }
                 first = true;
                 pos = 0;
-                //This is tied to AS3 switch implementation which has nextparts switched from index 1. TODO: Make more universal                
+                //This is tied to AS3 switch implementation which has nextparts switched from index 1. TODO: Make more universal
                 GraphPart defaultPart = hasExpr ? part.nextParts.get(1 + defaultBranch) : part.nextParts.get(0);
 
                 for (GraphPart p : part.nextParts) {
@@ -1843,7 +1841,7 @@ public class Graph {
                             checkContinueAtTheEnd(finalComm, currentLoop);
                         }
                         if (!finalComm.isEmpty()) {
-                            ret.add(index, li = new ForItem(expr.src, currentLoop, new ArrayList<GraphTargetItem>(), exprList.get(exprList.size() - 1), finalComm, commands));
+                            ret.add(index, li = new ForItem(expr.src, currentLoop, new ArrayList<>(), exprList.get(exprList.size() - 1), finalComm, commands));
                         } else {
                             ret.add(index, li = new WhileItem(expr.src, currentLoop, exprList, commands));
                         }

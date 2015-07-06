@@ -67,7 +67,7 @@ public class Cache<K, V> implements Freed {
 
     public static <K, V> Cache<K, V> getInstance(boolean weak, boolean memoryOnly, String name) {
         Cache<K, V> instance = new Cache<>(weak, memoryOnly, name);
-        instances.add(new WeakReference<Cache>(instance));
+        instances.add(new WeakReference<>(instance));
         return instance;
     }
 

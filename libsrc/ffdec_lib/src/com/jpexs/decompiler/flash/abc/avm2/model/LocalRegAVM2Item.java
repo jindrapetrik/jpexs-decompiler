@@ -24,7 +24,6 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal2Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal3Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocalIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.FilterAVM2Item;
-import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;

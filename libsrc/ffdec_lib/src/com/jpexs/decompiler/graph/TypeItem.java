@@ -47,7 +47,7 @@ public class TypeItem extends GraphTargetItem {
     }
 
     public TypeItem(DottedChain fullTypeName) {
-        this(fullTypeName, new ArrayList<GraphTargetItem>());
+        this(fullTypeName, new ArrayList<>());
     }
 
     public TypeItem(DottedChain fullTypeName, List<GraphTargetItem> subtypes) {

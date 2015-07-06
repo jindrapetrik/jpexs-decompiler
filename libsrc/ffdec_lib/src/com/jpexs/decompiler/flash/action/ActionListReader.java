@@ -137,7 +137,7 @@ public class ActionListReader {
         Map<Long, Long> nextOffsets = new HashMap<>();
         Action entryAction = readActionListAtPos(listeners, null,
                 sis, actionMap, nextOffsets,
-                ip, 0, endIp, path, false, new ArrayList<Long>());
+                ip, 0, endIp, path, false, new ArrayList<>());
 
         if (actionMap.isEmpty()) {
             return new ActionList();
@@ -239,9 +239,9 @@ public class ActionListReader {
         // Map of the actions. Use TreeMap to sort the keys in ascending order
         Map<Long, Action> actionMap = new TreeMap<>();
         Map<Long, Long> nextOffsets = new HashMap<>();
-        readActionListAtPos(new ArrayList<DisassemblyListener>(), null,
+        readActionListAtPos(new ArrayList<>(), null,
                 sis, actionMap, nextOffsets,
-                startIp, startIp, endIp + 1, "", false, new ArrayList<Long>());
+                startIp, startIp, endIp + 1, "", false, new ArrayList<>());
 
         return new ArrayList<>(actionMap.values());
     }
@@ -293,14 +293,14 @@ public class ActionListReader {
         }
 
         deobfustaceActionListAtPosRecursive(listeners,
-                new ArrayList<GraphTargetItem>(),
-                new HashMap<Long, List<GraphSourceItemContainer>>(),
+                new ArrayList<>(),
+                new HashMap<>(),
                 new ActionLocalData(),
                 new TranslateStack(path),
                 new ConstantPool(),
                 actionMap, ip, retMap, ip, endIp, path,
-                new HashMap<Integer, Integer>(), false,
-                new HashMap<Integer, HashMap<String, GraphTargetItem>>(),
+                new HashMap<>(), false,
+                new HashMap<>(),
                 version, 0, maxRecursionLevel);
 
         ActionList ret = new ActionList();
@@ -800,7 +800,7 @@ public class ActionListReader {
             }
 
             if (debugMode) {
-                String atos = a.getASMSource(new ActionList(), new HashSet<Long>(), ScriptExportMode.PCODE);
+                String atos = a.getASMSource(new ActionList(), new HashSet<>(), ScriptExportMode.PCODE);
                 if (a instanceof GraphSourceItemContainer) {
                     atos = a.toString();
                 }
@@ -888,10 +888,10 @@ public class ActionListReader {
                     } else if (!(a instanceof GraphSourceItemContainer)) {
                         //return in for..in,   TODO:Handle this better way
                         if (((a instanceof ActionEquals) || (a instanceof ActionEquals2)) && (stack.size() == 1) && (stack.peek() instanceof DirectValueActionItem)) {
-                            stack.push(new DirectValueActionItem(null, 0, new Null(), new ArrayList<String>()));
+                            stack.push(new DirectValueActionItem(null, 0, new Null(), new ArrayList<>()));
                         }
                         if ((a instanceof ActionStoreRegister) && stack.isEmpty()) {
-                            stack.push(new DirectValueActionItem(null, 0, new Null(), new ArrayList<String>()));
+                            stack.push(new DirectValueActionItem(null, 0, new Null(), new ArrayList<>()));
                         }
                         a.translate(localData, stack, output, Graph.SOP_USE_STATIC/*Graph.SOP_SKIP_STATIC*/, path);
                     }
@@ -920,7 +920,7 @@ public class ActionListReader {
                     List<List<GraphTargetItem>> output2s = new ArrayList<>();
                     for (long size : cnt.getContainerSizes()) {
                         if (size == 0) {
-                            output2s.add(new ArrayList<GraphTargetItem>());
+                            output2s.add(new ArrayList<>());
                             continue;
                         }
                         ActionLocalData localData2;

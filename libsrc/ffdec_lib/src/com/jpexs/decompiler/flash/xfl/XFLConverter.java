@@ -172,7 +172,6 @@ public class XFLConverter {
             //p = mat.apply(p);
             if (scr.stateMoveTo) {
                 ret.append("! ").append(p.x).append(" ").append(p.y);
-                return;
             }
         } else if (record instanceof StraightEdgeRecord) {
             StraightEdgeRecord ser = (StraightEdgeRecord) record;

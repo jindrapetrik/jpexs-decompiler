@@ -29,7 +29,7 @@ public class TranslateStack extends Stack<GraphTargetItem> {
 
     private static PopItem pop = new PopItem(null);
 
-    private String path;
+    private final String path;
 
     public TranslateStack(String path) {
         this.path = path;

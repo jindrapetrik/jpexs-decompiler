@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -47,7 +47,6 @@ import com.jpexs.decompiler.graph.Loop;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
-import com.jpexs.decompiler.graph.model.PopItem;
 import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
 import java.util.ArrayList;
@@ -62,7 +61,7 @@ import java.util.Map;
 public class ActionGraph extends Graph {
 
     public ActionGraph(List<Action> code, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int version) {
-        super(new ActionGraphSource(code, version, registerNames, variables, functions), new ArrayList<Integer>());
+        super(new ActionGraphSource(code, version, registerNames, variables, functions), new ArrayList<>());
         //this.version = version;
       /*heads = makeGraph(code, new ArrayList<GraphPart>());
          for (GraphPart head : heads) {
@@ -121,7 +120,7 @@ public class ActionGraph extends Graph {
                             break;
                         }
                     } else {
-                        target = new DirectValueActionItem(null, 0, st.target, new ArrayList<String>());
+                        target = new DirectValueActionItem(null, 0, st.target, new ArrayList<>());
                         targetStart = t;
                         targetStartItem = it;
                     }

@@ -22,9 +22,9 @@ package com.jpexs.decompiler.flash.gui;
  */
 public class ComboBoxItem<E> {
 
-    private String title;
+    private final String title;
 
-    private E value;
+    private final E value;
 
     public ComboBoxItem(String title, E value) {
         this.title = title;

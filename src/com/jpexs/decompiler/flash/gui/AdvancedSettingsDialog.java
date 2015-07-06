@@ -122,9 +122,9 @@ public class AdvancedSettingsDialog extends AppDialog {
 
     private static class SkinSelect {
 
-        private String name;
+        private final String name;
 
-        private String className;
+        private final String className;
 
         public SkinSelect(String name, String className) {
             this.name = name;
@@ -267,7 +267,7 @@ public class AdvancedSettingsDialog extends AppDialog {
         for (String name : keys) {
             Field field = fields.get(name);
             ConfigurationCategory cat = field.getAnnotation(ConfigurationCategory.class);
-            String scat = (cat == null || cat.value().equals("")) ? "other" : cat.value();
+            String scat = (cat == null || cat.value().isEmpty()) ? "other" : cat.value();
             if (!categorized.containsKey(scat)) {
                 categorized.put(scat, new HashMap<>());
             }

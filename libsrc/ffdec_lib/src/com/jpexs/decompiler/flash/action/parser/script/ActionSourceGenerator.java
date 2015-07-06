@@ -582,7 +582,7 @@ public class ActionSourceGenerator implements SourceGenerator {
         } while (item instanceof GetMemberActionItem);
         if (item instanceof GetVariableActionItem) {
             GetVariableActionItem v = (GetVariableActionItem) item;
-            item = new GetMemberActionItem(null, new GetVariableActionItem(null, new DirectValueActionItem(null, 0, "_global", new ArrayList<String>())), v.name);
+            item = new GetMemberActionItem(null, new GetVariableActionItem(null, new DirectValueActionItem(null, 0, "_global", new ArrayList<>())), v.name);
             if (mem != null) {
                 mem.object = item;
             }
@@ -682,7 +682,7 @@ public class ActionSourceGenerator implements SourceGenerator {
 
         if (constructor == null) {
             List<Action> val = new ArrayList<>();
-            val.add(new ActionDefineFunction("", new ArrayList<String>(), 0, SWF.DEFAULT_VERSION));
+            val.add(new ActionDefineFunction("", new ArrayList<>(), 0, SWF.DEFAULT_VERSION));
             if (!isInterface) {
                 val.add(new ActionStoreRegister(1));
             }
@@ -734,7 +734,7 @@ public class ActionSourceGenerator implements SourceGenerator {
 
         if (constr.isEmpty()) {
             List<Action> val = new ArrayList<>();
-            val.add(new ActionDefineFunction("", new ArrayList<String>(), 0, SWF.DEFAULT_VERSION));
+            val.add(new ActionDefineFunction("", new ArrayList<>(), 0, SWF.DEFAULT_VERSION));
             if (!isInterface) {
                 val.add(new ActionStoreRegister(1));
             }

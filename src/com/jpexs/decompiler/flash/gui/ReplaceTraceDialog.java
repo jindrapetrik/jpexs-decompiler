@@ -31,11 +31,11 @@ import javax.swing.JRadioButton;
  */
 public class ReplaceTraceDialog extends AppDialog {
 
-    private JRadioButton debugAlertRadio;
+    private final JRadioButton debugAlertRadio;
 
-    private JRadioButton debugConsoleRadio;
+    private final JRadioButton debugConsoleRadio;
 
-    private JRadioButton debugSocketRadio;
+    private final JRadioButton debugSocketRadio;
 
     private String value = null;
 

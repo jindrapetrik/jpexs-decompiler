@@ -319,7 +319,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
             TraitMethodGetterSetter tm = (TraitMethodGetterSetter) t;
             parseImportsUsagesFromMultiname(abc, imports, uses, abc.constants.getMultiname(tm.name_index), ignorePackage, fullyQualifiedNames);
             if (tm.method_info != 0) {
-                parseImportsUsagesFromMethodInfo(abc, tm.method_info, imports, uses, ignorePackage, fullyQualifiedNames, new ArrayList<Integer>());
+                parseImportsUsagesFromMethodInfo(abc, tm.method_info, imports, uses, ignorePackage, fullyQualifiedNames, new ArrayList<>());
             }
         }
         parseImportsUsagesFromMultiname(abc, imports, uses, t.getName(abc), ignorePackage, fullyQualifiedNames);
@@ -348,13 +348,13 @@ public class TraitClass extends Trait implements TraitWithSlot {
         parseImportsUsagesFromTraits(abc, abc.class_info.get(class_info).static_traits, imports, uses, packageName, fullyQualifiedNames);
 
         //static initializer
-        parseImportsUsagesFromMethodInfo(abc, abc.class_info.get(class_info).cinit_index, imports, uses, packageName, fullyQualifiedNames, new ArrayList<Integer>());
+        parseImportsUsagesFromMethodInfo(abc, abc.class_info.get(class_info).cinit_index, imports, uses, packageName, fullyQualifiedNames, new ArrayList<>());
 
         //instance
         parseImportsUsagesFromTraits(abc, abc.instance_info.get(class_info).instance_traits, imports, uses, packageName, fullyQualifiedNames);
 
         //instance initializer
-        parseImportsUsagesFromMethodInfo(abc, abc.instance_info.get(class_info).iinit_index, imports, uses, packageName, fullyQualifiedNames, new ArrayList<Integer>());
+        parseImportsUsagesFromMethodInfo(abc, abc.instance_info.get(class_info).iinit_index, imports, uses, packageName, fullyQualifiedNames, new ArrayList<>());
         return imports;
     }
 

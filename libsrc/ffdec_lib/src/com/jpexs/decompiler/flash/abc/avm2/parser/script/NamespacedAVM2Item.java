@@ -117,14 +117,14 @@ public class NamespacedAVM2Item extends AssignableAVM2Item {
         if (name != null) {
             return toSourceMerge(localData, generator,
                     ns, NameAVM2Item.generateCoerce(localData, generator, new TypeItem("Namespace")),
-                    ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAME, g.abc.constants.getStringId(name, true), 0, 0, 0, new ArrayList<Integer>()), true)),
+                    ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAME, g.abc.constants.getStringId(name, true), 0, 0, 0, new ArrayList<>()), true)),
                     dupSetTemp(localData, generator, name_temp),
                     ns, NameAVM2Item.generateCoerce(localData, generator, new TypeItem("Namespace")),
                     dupSetTemp(localData, generator, ns_temp),
                     //Start get original
                     //getTemp(localData, generator, ns_temp), generateCoerce(generator, "Namespace"), ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAME, g.abc.constants.getStringId(variableName, true), 0, 0, 0, new ArrayList<Integer>()), true)),
                     //getTemp(localData, generator, ns_temp), generateCoerce(generator, "Namespace"),
-                    ins(new GetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, allNsSet(g.abc), 0, new ArrayList<Integer>()), true)),
+                    ins(new GetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, allNsSet(g.abc), 0, new ArrayList<>()), true)),
                     !isInteger ? ins(new ConvertDIns()) : null,
                     //End get original
                     (!post) ? (decrement ? ins(isInteger ? new DecrementIIns() : new DecrementIns()) : ins(isInteger ? new IncrementIIns() : new IncrementIns())) : null,
@@ -134,7 +134,7 @@ public class NamespacedAVM2Item extends AssignableAVM2Item {
                     getTemp(localData, generator, name_temp),
                     getTemp(localData, generator, ns_temp),
                     getTemp(localData, generator, ret_temp),
-                    ins(new SetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, allNsSet(g.abc), 0, new ArrayList<Integer>()), true)),
+                    ins(new SetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, allNsSet(g.abc), 0, new ArrayList<>()), true)),
                     killTemp(localData, generator, Arrays.asList(ret_temp, name_temp, ns_temp))
             );
         } else {
@@ -168,20 +168,20 @@ public class NamespacedAVM2Item extends AssignableAVM2Item {
         if (name == null) {
             if (assignedValue != null) {
                 return toSourceMerge(localData, generator,
-                        obj == null ? ns : null, obj == null ? NameAVM2Item.generateCoerce(localData, generator, new TypeItem("Namespace")) : null, nameItem, ins(new ConvertSIns()), obj != null ? obj : ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<Integer>()), true)),
+                        obj == null ? ns : null, obj == null ? NameAVM2Item.generateCoerce(localData, generator, new TypeItem("Namespace")) : null, nameItem, ins(new ConvertSIns()), obj != null ? obj : ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<>()), true)),
                         ns, NameAVM2Item.generateCoerce(localData, generator, new TypeItem("Namespace")), nameItem, ins(new ConvertSIns()), assignedValue,
                         needsReturn ? dupSetTemp(localData, generator, ret_temp) : null,
-                        ins(new SetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<Integer>()), true)),
+                        ins(new SetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<>()), true)),
                         needsReturn ? getTemp(localData, generator, ret_temp) : null,
                         killTemp(localData, generator, Arrays.asList(ns_temp, index_temp, ret_temp))
                 );
             } else {
                 return toSourceMerge(localData, generator,
-                        obj == null ? ns : null, obj == null ? NameAVM2Item.generateCoerce(localData, generator, new TypeItem("Namespace")) : null, nameItem, ins(new ConvertSIns()), obj != null ? obj : ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<Integer>()), true)),
+                        obj == null ? ns : null, obj == null ? NameAVM2Item.generateCoerce(localData, generator, new TypeItem("Namespace")) : null, nameItem, ins(new ConvertSIns()), obj != null ? obj : ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<>()), true)),
                         call ? dupSetTemp(localData, generator, obj_temp) : null,
                         ns, NameAVM2Item.generateCoerce(localData, generator, new TypeItem("Namespace")), nameItem, ins(new ConvertSIns()),
                         construct ? callargs : null,
-                        ins(construct ? new ConstructPropIns() : delete ? new DeletePropertyIns() : new GetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<Integer>()), true), construct ? callargs.size() : null),
+                        ins(construct ? new ConstructPropIns() : delete ? new DeletePropertyIns() : new GetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<>()), true), construct ? callargs.size() : null),
                         call ? getTemp(localData, generator, obj_temp) : null,
                         call ? callargs : null,
                         call ? ins(new CallIns(), callargs.size()) : null,
@@ -192,20 +192,20 @@ public class NamespacedAVM2Item extends AssignableAVM2Item {
         } else {
             if (assignedValue != null) {
                 return toSourceMerge(localData, generator,
-                        obj == null ? ns : null, obj == null ? NameAVM2Item.generateCoerce(localData, generator, new TypeItem("Namespace")) : null, obj != null ? obj : ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(attr ? Multiname.RTQNAMEA : Multiname.RTQNAME, g.abc.constants.getStringId(name, true), 0, 0, 0, new ArrayList<Integer>()), true)),
+                        obj == null ? ns : null, obj == null ? NameAVM2Item.generateCoerce(localData, generator, new TypeItem("Namespace")) : null, obj != null ? obj : ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(attr ? Multiname.RTQNAMEA : Multiname.RTQNAME, g.abc.constants.getStringId(name, true), 0, 0, 0, new ArrayList<>()), true)),
                         ns, NameAVM2Item.generateCoerce(localData, generator, new TypeItem("Namespace")), assignedValue,
                         needsReturn ? dupSetTemp(localData, generator, ret_temp) : null,
-                        ins(new SetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(attr ? Multiname.RTQNAMEA : Multiname.RTQNAME, g.abc.constants.getStringId(name, true), 0, 0, 0, new ArrayList<Integer>()), true)),
+                        ins(new SetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(attr ? Multiname.RTQNAMEA : Multiname.RTQNAME, g.abc.constants.getStringId(name, true), 0, 0, 0, new ArrayList<>()), true)),
                         needsReturn ? getTemp(localData, generator, ret_temp) : null,
                         killTemp(localData, generator, Arrays.asList(ns_temp, index_temp, ret_temp))
                 );
             } else {
                 return toSourceMerge(localData, generator,
-                        obj == null ? ns : null, obj == null ? NameAVM2Item.generateCoerce(localData, generator, new TypeItem("Namespace")) : null, obj != null ? obj : ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(attr ? Multiname.RTQNAMEA : Multiname.RTQNAME, g.abc.constants.getStringId(name, true), 0, 0, 0, new ArrayList<Integer>()), true)),
+                        obj == null ? ns : null, obj == null ? NameAVM2Item.generateCoerce(localData, generator, new TypeItem("Namespace")) : null, obj != null ? obj : ins(new FindPropertyStrictIns(), g.abc.constants.getMultinameId(new Multiname(attr ? Multiname.RTQNAMEA : Multiname.RTQNAME, g.abc.constants.getStringId(name, true), 0, 0, 0, new ArrayList<>()), true)),
                         call ? dupSetTemp(localData, generator, obj_temp) : null,
                         ns, NameAVM2Item.generateCoerce(localData, generator, new TypeItem("Namespace")),
                         construct ? callargs : null,
-                        ins(construct ? new ConstructPropIns() : delete ? new DeletePropertyIns() : new GetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(attr ? Multiname.RTQNAMEA : Multiname.RTQNAME, g.abc.constants.getStringId(name, true), 0, 0, 0, new ArrayList<Integer>()), true), construct ? callargs.size() : null),
+                        ins(construct ? new ConstructPropIns() : delete ? new DeletePropertyIns() : new GetPropertyIns(), g.abc.constants.getMultinameId(new Multiname(attr ? Multiname.RTQNAMEA : Multiname.RTQNAME, g.abc.constants.getStringId(name, true), 0, 0, 0, new ArrayList<>()), true), construct ? callargs.size() : null),
                         call ? getTemp(localData, generator, obj_temp) : null,
                         call ? callargs : null,
                         call ? ins(new CallIns(), callargs.size()) : null,
@@ -218,11 +218,11 @@ public class NamespacedAVM2Item extends AssignableAVM2Item {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
-        return toSource(localData, generator, true, false, new ArrayList<GraphTargetItem>(), false, false);
+        return toSource(localData, generator, true, false, new ArrayList<>(), false, false);
     }
 
     @Override
     public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
-        return toSource(localData, generator, false, false, new ArrayList<GraphTargetItem>(), false, false);
+        return toSource(localData, generator, false, false, new ArrayList<>(), false, false);
     }
 }

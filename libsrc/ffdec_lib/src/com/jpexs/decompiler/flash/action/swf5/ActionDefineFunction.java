@@ -23,7 +23,6 @@ import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
-import com.jpexs.decompiler.flash.action.parser.script.VariableActionItem;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
@@ -148,7 +147,7 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
 
     @Override
     public void translateContainer(List<List<GraphTargetItem>> content, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-        FunctionActionItem fti = new FunctionActionItem(this, functionName, paramNames, content.get(0), constantPool, 1, new ArrayList<VariableActionItem>());
+        FunctionActionItem fti = new FunctionActionItem(this, functionName, paramNames, content.get(0), constantPool, 1, new ArrayList<>());
         //ActionGraph.translateViaGraph(regNames, variables, functions, code, version)
         stack.push(fti);
         functions.put(functionName, fti);

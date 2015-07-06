@@ -411,7 +411,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
 
     @Override
     public void addMenuItem(String path, String title, String icon, ActionListener action, int priority, ActionListener subLoader, boolean isLeaf) {
-        String parentPath = path.contains("/") ? path.substring(0, path.lastIndexOf("/")) : "";
+        String parentPath = path.contains("/") ? path.substring(0, path.lastIndexOf('/')) : "";
         if (!menuSubs.containsKey(parentPath)) {
             throw new IllegalArgumentException("No parent menu exists: " + parentPath);
         }

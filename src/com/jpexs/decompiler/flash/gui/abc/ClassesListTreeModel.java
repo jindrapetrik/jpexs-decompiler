@@ -33,11 +33,11 @@ import javax.swing.tree.TreePath;
 
 public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel {
 
-    private SWF swf;
+    private final SWF swf;
 
     private List<ScriptPack> list;
 
-    private AS3Package root;
+    private final AS3Package root;
 
     private final List<TreeModelListener> listeners = new ArrayList<>();
 

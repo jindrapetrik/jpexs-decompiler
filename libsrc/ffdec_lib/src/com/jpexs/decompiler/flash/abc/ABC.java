@@ -64,7 +64,6 @@ import com.jpexs.helpers.utf8.Utf8PrintWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -73,7 +72,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.collections.transformation.SortedList;
 
 public class ABC {
 

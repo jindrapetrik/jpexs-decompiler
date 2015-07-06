@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
-import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
@@ -33,14 +32,13 @@ import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
-import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -305,7 +303,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                         ret.setRegNumber(n.getRegNumber());
                         resolved = ret;
                         for (int i = 1; i < parts.size(); i++) {
-                            resolved = new PropertyAVM2Item(resolved, parts.get(i), abc, otherAbcs, openedNamespaces, new ArrayList<MethodBody>());
+                            resolved = new PropertyAVM2Item(resolved, parts.get(i), abc, otherAbcs, openedNamespaces, new ArrayList<>());
                             if (i == parts.size() - 1) {
                                 ((PropertyAVM2Item) resolved).assignedValue = assignedValue;
                             }
@@ -327,7 +325,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                 TypeItem ret = new TypeItem(imp);
                 resolved = ret;
                 for (int i = 1; i < parts.size(); i++) {
-                    resolved = new PropertyAVM2Item(resolved, parts.get(i), abc, otherAbcs, openedNamespaces, new ArrayList<MethodBody>());
+                    resolved = new PropertyAVM2Item(resolved, parts.get(i), abc, otherAbcs, openedNamespaces, new ArrayList<>());
                     if (i == parts.size() - 1) {
                         ((PropertyAVM2Item) resolved).assignedValue = assignedValue;
                     }
@@ -357,7 +355,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                         TypeItem ret = new TypeItem(fname);
                         resolved = ret;
                         for (int j = i + 1; j < parts.size(); j++) {
-                            resolved = new PropertyAVM2Item(resolved, parts.get(j), abc, otherAbcs, openedNamespaces, new ArrayList<MethodBody>());
+                            resolved = new PropertyAVM2Item(resolved, parts.get(j), abc, otherAbcs, openedNamespaces, new ArrayList<>());
                             if (j == parts.size() - 1) {
                                 ((PropertyAVM2Item) resolved).assignedValue = assignedValue;
                             }
@@ -402,7 +400,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                              }*/
                             resolved = ret;
                             for (int i = 1; i < parts.size(); i++) {
-                                resolved = new PropertyAVM2Item(resolved, parts.get(i), abc, otherAbcs, openedNamespaces, new ArrayList<MethodBody>());
+                                resolved = new PropertyAVM2Item(resolved, parts.get(i), abc, otherAbcs, openedNamespaces, new ArrayList<>());
                                 if (i == parts.size() - 1) {
                                     ((PropertyAVM2Item) resolved).assignedValue = assignedValue;
                                 }
@@ -425,7 +423,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
             NameAVM2Item ret = new NameAVM2Item(thisType, line, parts.get(0), null, false, openedNamespaces);
             resolved = ret;
             for (int i = 1; i < parts.size(); i++) {
-                resolved = new PropertyAVM2Item(resolved, parts.get(i), abc, otherAbcs, openedNamespaces, new ArrayList<MethodBody>());
+                resolved = new PropertyAVM2Item(resolved, parts.get(i), abc, otherAbcs, openedNamespaces, new ArrayList<>());
                 if (i == parts.size() - 1) {
                     ((PropertyAVM2Item) resolved).assignedValue = assignedValue;
                 }
@@ -448,7 +446,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
             GraphTargetItem ret = new NameAVM2Item(t, line, parts.get(0), null, false, openedNamespaces);
             resolved = ret;
             for (int i = 1; i < parts.size(); i++) {
-                resolved = new PropertyAVM2Item(resolved, parts.get(i), abc, otherAbcs, openedNamespaces, new ArrayList<MethodBody>());
+                resolved = new PropertyAVM2Item(resolved, parts.get(i), abc, otherAbcs, openedNamespaces, new ArrayList<>());
                 if (i == parts.size() - 1) {
                     ((PropertyAVM2Item) resolved).assignedValue = assignedValue;
                 }

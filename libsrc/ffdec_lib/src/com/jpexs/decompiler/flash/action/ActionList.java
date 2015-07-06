@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.action;
 
-import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.action.special.ActionNop;
 import com.jpexs.decompiler.flash.action.special.ActionStore;
@@ -179,7 +178,7 @@ public class ActionList extends ArrayList<Action> {
     public void saveToFile(String fileName) {
         File file = new File(fileName);
         try (FileTextWriter writer = new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(file))) {
-            Action.actionsToString(new ArrayList<DisassemblyListener>(), 0, this, SWF.DEFAULT_VERSION, ScriptExportMode.PCODE, writer);
+            Action.actionsToString(new ArrayList<>(), 0, this, SWF.DEFAULT_VERSION, ScriptExportMode.PCODE, writer);
         } catch (IOException ex) {
             Logger.getLogger(ActionList.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -187,7 +186,7 @@ public class ActionList extends ArrayList<Action> {
 
     @Override
     public String toString() {
-        return Action.actionsToString(new ArrayList<DisassemblyListener>(), 0, this, SWF.DEFAULT_VERSION, ScriptExportMode.PCODE);
+        return Action.actionsToString(new ArrayList<>(), 0, this, SWF.DEFAULT_VERSION, ScriptExportMode.PCODE);
     }
 
     public String toSource() {

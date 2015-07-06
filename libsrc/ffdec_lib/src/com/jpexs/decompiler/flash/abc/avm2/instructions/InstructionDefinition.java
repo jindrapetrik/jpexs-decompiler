@@ -142,7 +142,7 @@ public class InstructionDefinition implements Serializable {
 
     protected boolean isRegisterCompileTime(int regId, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) {
         Set<Integer> previous = new HashSet<>();
-        AVM2Code.getPreviousReachableIps(ip, refs, previous, new HashSet<Integer>());
+        AVM2Code.getPreviousReachableIps(ip, refs, previous, new HashSet<>());
         for (int p : previous) {
             if (p < 0) {
                 continue;

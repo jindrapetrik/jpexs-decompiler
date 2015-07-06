@@ -37,7 +37,7 @@ import jsyntaxpane.DefaultSyntaxKit;
  */
 public class SelectLanguageDialog extends AppDialog {
 
-    private JComboBox<Language> languageCombobox = new JComboBox<>();
+    private final JComboBox<Language> languageCombobox = new JComboBox<>();
 
     public String languageCode = null;
 

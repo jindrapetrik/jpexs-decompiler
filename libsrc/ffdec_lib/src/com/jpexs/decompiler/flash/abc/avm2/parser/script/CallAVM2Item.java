@@ -28,7 +28,6 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallSuperVoidI
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrictIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetGlobalScopeIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
-import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.ValueKind;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -95,7 +94,7 @@ public class CallAVM2Item extends AVM2Item {
                 nobj.setRegNumber(0);
                 obj = nobj;
             }
-            PropertyAVM2Item p = new PropertyAVM2Item(obj, n.getVariableName(), g.abc, g.allABCs, n.openedNamespaces, new ArrayList<MethodBody>());
+            PropertyAVM2Item p = new PropertyAVM2Item(obj, n.getVariableName(), g.abc, g.allABCs, n.openedNamespaces, new ArrayList<>());
             p.setAssignedValue(n.getAssignedValue());
             callable = p;
         }
@@ -127,7 +126,7 @@ public class CallAVM2Item extends AVM2Item {
                 Reference<GraphTargetItem> outPropType = new Reference<>(null);
                 Reference<ValueKind> outPropValue = new Reference<>(null);
                 if (cname != null && AVM2SourceGenerator.searchPrototypeChain(true, allAbcs, pkgName, cname, prop.propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue) && (localData.currentClass.equals("".equals(outNs.getVal()) ? outName.getVal() : outNs.getVal() + "." + outName.getVal()))) {
-                    NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.getFullClass()), 0, "this", null, false, new ArrayList<Integer>());
+                    NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.getFullClass()), 0, "this", null, false, new ArrayList<>());
                     nobj.setRegNumber(0);
                     obj = nobj;
                 }
