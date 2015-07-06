@@ -2287,7 +2287,7 @@ public class XFLConverter {
         return ret.toString();
     }
 
-    private static void writeFile(AbortRetryIgnoreHandler handler, final byte[] data, final String file) throws IOException {
+    private static void writeFile(AbortRetryIgnoreHandler handler, final byte[] data, final String file) throws IOException, InterruptedException {
         new RetryTask(() -> {
             try (FileOutputStream fos = new FileOutputStream(file)) {
                 fos.write(data);
@@ -2654,7 +2654,7 @@ public class XFLConverter {
         return ret.toString();
     }
 
-    public static void convertSWF(AbortRetryIgnoreHandler handler, SWF swf, String swfFileName, String outfile, boolean compressed, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion flaVersion) throws IOException {
+    public static void convertSWF(AbortRetryIgnoreHandler handler, SWF swf, String swfFileName, String outfile, boolean compressed, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion flaVersion) throws IOException, InterruptedException {
 
         FileAttributesTag fa = swf.getFileAttributes();
 

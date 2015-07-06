@@ -35,12 +35,14 @@ public class RetryTask {
         this.handler = handler;
     }
 
-    public void run() throws IOException {
+    public void run() throws IOException, InterruptedException {
         boolean retry;
         do {
             retry = false;
             try {
                 r.run();
+            } catch (InterruptedException ex) {
+                throw ex;
             } catch (Exception ex) {
                 switch (handler.handle(ex)) {
                     case AbortRetryIgnoreHandler.ABORT:

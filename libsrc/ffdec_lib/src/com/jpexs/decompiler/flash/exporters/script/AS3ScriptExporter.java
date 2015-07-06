@@ -58,9 +58,14 @@ public class AS3ScriptExporter {
                     @Override
                     public Void call() throws Exception {
                         for (ScriptPack item : packs) {
+                            if (Thread.currentThread().isInterrupted()) {
+                                throw new InterruptedException();
+                            }
+
                             if (!item.isSimple && Configuration.ignoreCLikePackages.get()) {
                                 continue;
                             }
+
                             ExportPackTask task = new ExportPackTask(handler, cnt, packs.size(), item.getClassPath(), item, outdir, exportSettings, parallel, evl);
                             ret.add(task.call());
                         }

@@ -74,7 +74,7 @@ public class ExportPackTask implements Callable<File> {
     public File call() throws Exception {
         RunnableIOExResult<File> rio = new RunnableIOExResult<File>() {
             @Override
-            public void run() throws IOException {
+            public void run() throws IOException, InterruptedException {
                 startTime = System.currentTimeMillis();
                 this.result = pack.export(directory, exportSettings, parallel);
                 stopTime = System.currentTimeMillis();

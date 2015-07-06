@@ -48,7 +48,7 @@ import java.util.List;
  */
 public class MovieExporter {
 
-    public List<File> exportMovies(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final MovieExportSettings settings, EventListener evl) throws IOException {
+    public List<File> exportMovies(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final MovieExportSettings settings, EventListener evl) throws IOException, InterruptedException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;

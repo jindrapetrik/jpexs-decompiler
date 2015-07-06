@@ -52,7 +52,7 @@ import java.util.List;
  */
 public class SoundExporter {
 
-    public List<File> exportSounds(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final SoundExportSettings settings, EventListener evl) throws IOException {
+    public List<File> exportSounds(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final SoundExportSettings settings, EventListener evl) throws IOException, InterruptedException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;

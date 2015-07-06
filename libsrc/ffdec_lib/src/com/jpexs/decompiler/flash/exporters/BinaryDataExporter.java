@@ -37,7 +37,7 @@ import java.util.List;
  */
 public class BinaryDataExporter {
 
-    public List<File> exportBinaryData(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, BinaryDataExportSettings settings, EventListener evl) throws IOException {
+    public List<File> exportBinaryData(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, BinaryDataExportSettings settings, EventListener evl) throws IOException, InterruptedException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;
@@ -72,6 +72,7 @@ public class BinaryDataExporter {
                         fos.write(((DefineBinaryDataTag) t).binaryData.getRangeData());
                     }
                 }, handler).run();
+
                 ret.add(file);
 
                 if (evl != null) {

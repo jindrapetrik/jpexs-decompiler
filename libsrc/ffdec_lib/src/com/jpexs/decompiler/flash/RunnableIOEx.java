@@ -25,5 +25,5 @@ import java.io.IOException;
 @FunctionalInterface
 public interface RunnableIOEx {
 
-    public void run() throws IOException;
+    public void run() throws IOException, InterruptedException;
 }

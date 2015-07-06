@@ -42,7 +42,7 @@ import java.util.List;
  */
 public class ImageExporter {
 
-    public List<File> exportImages(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, ImageExportSettings settings, EventListener evl) throws IOException {
+    public List<File> exportImages(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, ImageExportSettings settings, EventListener evl) throws IOException, InterruptedException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;

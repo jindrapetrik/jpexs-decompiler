@@ -1238,9 +1238,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             swf.assignClassesToSymbols();
             System.out.println(cnt + " identifiers renamed.");
             swf.saveTo(fos);
-        } catch (InterruptedException ex) {
-            return false;
-        } catch (IOException ex) {
+        } catch (InterruptedException | IOException ex) {
             return false;
         }
         return true;
@@ -2129,12 +2127,12 @@ public final class SWF implements SWFContainerItem, Timelined {
         return ret;
     }
 
-    public void exportFla(AbortRetryIgnoreHandler handler, String outfile, String swfName, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion version) throws IOException {
+    public void exportFla(AbortRetryIgnoreHandler handler, String outfile, String swfName, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion version) throws IOException, InterruptedException {
         XFLConverter.convertSWF(handler, this, swfName, outfile, true, generator, generatorVerName, generatorVersion, parallel, version);
         clearAllCache();
     }
 
-    public void exportXfl(AbortRetryIgnoreHandler handler, String outfile, String swfName, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion version) throws IOException {
+    public void exportXfl(AbortRetryIgnoreHandler handler, String outfile, String swfName, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion version) throws IOException, InterruptedException {
         XFLConverter.convertSWF(handler, this, swfName, outfile, false, generator, generatorVerName, generatorVersion, parallel, version);
         clearAllCache();
     }

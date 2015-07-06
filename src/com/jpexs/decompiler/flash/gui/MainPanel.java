@@ -567,7 +567,13 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
                             File ftemp = new File(tempDir);
                             ExportDialog exd = new ExportDialog(null);
-                            files = exportSelection(new GuiAbortRetryIgnoreHandler(), tempDir, exd);
+                            try {
+                                files = exportSelection(new GuiAbortRetryIgnoreHandler(), tempDir, exd);
+                            } catch (InterruptedException ex) {
+                                Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
+                                return null;
+                            }
+
                             files.clear();
 
                             File[] fs = ftemp.listFiles();
@@ -1035,7 +1041,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         return View.showConfirmDialog(null, translate("message.confirm.experimental"), translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION;
     }
 
-    public List<File> exportSelection(AbortRetryIgnoreHandler handler, String selFile, ExportDialog export) throws IOException {
+    public List<File> exportSelection(AbortRetryIgnoreHandler handler, String selFile, ExportDialog export) throws IOException, InterruptedException {
 
         List<File> ret = new ArrayList<>();
         List<TreeItem> sel = folderPreviewPanel.selectedItems.isEmpty() ? tagTree.getAllSelected(tagTree) : new ArrayList<>(folderPreviewPanel.selectedItems.values());
@@ -1259,7 +1265,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         return ret;
     }
 
-    public void exportAll(SWF swf, AbortRetryIgnoreHandler handler, String selFile, ExportDialog export) throws IOException {
+    public void exportAll(SWF swf, AbortRetryIgnoreHandler handler, String selFile, ExportDialog export) throws IOException, InterruptedException {
         boolean exportAll = false;
         if (exportAll) {
             exportAllDebug(swf, handler, selFile, export);
@@ -1352,7 +1358,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
     }
 
-    public void exportAllDebug(SWF swf, AbortRetryIgnoreHandler handler, String selFile, ExportDialog export) throws IOException {
+    public void exportAllDebug(SWF swf, AbortRetryIgnoreHandler handler, String selFile, ExportDialog export) throws IOException, InterruptedException {
         EventListener evl = swf.getExportEventListener();
 
         if (export.isOptionEnabled(ImageExportMode.class)) {

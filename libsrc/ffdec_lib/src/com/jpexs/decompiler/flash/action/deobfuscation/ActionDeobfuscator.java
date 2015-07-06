@@ -83,7 +83,7 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
     private final int executionLimit = 30000;
 
     @Override
-    public void actionListParsed(ActionList actions, SWF swf) {
+    public void actionListParsed(ActionList actions, SWF swf) throws InterruptedException {
         combinePushs(actions);
         Map<String, Object> fakeFunctions = getFakeFunctionResults(actions);
         removeUnreachableActions(actions);
@@ -117,19 +117,19 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
         }
     }
 
-    private boolean rereadActionList(ActionList actions, SWF swf) {
+    private boolean rereadActionList(ActionList actions, SWF swf) throws InterruptedException {
         byte[] actionBytes = Action.actionsToBytes(actions, true, SWF.DEFAULT_VERSION);
         try {
             SWFInputStream rri = new SWFInputStream(swf, actionBytes);
             ActionList newActions = ActionListReader.readActionList(new ArrayList<>(), rri, SWF.DEFAULT_VERSION, 0, actionBytes.length, "", -1);
             actions.setActions(newActions);
-        } catch (IOException | InterruptedException ex) {
+        } catch (IOException ex) {
             Logger.getLogger(ActionDeobfuscator.class.getName()).log(Level.SEVERE, null, ex);
         }
         return true;
     }
 
-    private boolean removeObfuscationIfs(ActionList actions, Map<String, Object> fakeFunctions) {
+    private boolean removeObfuscationIfs(ActionList actions, Map<String, Object> fakeFunctions) throws InterruptedException {
         if (actions.size() == 0) {
             return false;
         }
@@ -227,7 +227,7 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
         return cPool;
     }
 
-    private void executeActions(ActionList actions, int idx, int endIdx, ActionConstantPool constantPool, ExecutionResult result, Map<String, Object> fakeFunctions) {
+    private void executeActions(ActionList actions, int idx, int endIdx, ActionConstantPool constantPool, ExecutionResult result, Map<String, Object> fakeFunctions) throws InterruptedException {
         List<GraphTargetItem> output = new ArrayList<>();
         ActionLocalData localData = new ActionLocalData();
         FixItemCounterTranslateStack stack = new FixItemCounterTranslateStack("");
@@ -384,11 +384,11 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
                     break;
                 }
             }
-        } catch (EmptyStackException | TranslateException | InterruptedException ex) {
+        } catch (EmptyStackException | TranslateException ex) {
         }
     }
 
-    private Map<String, Object> getFakeFunctionResults(ActionList actions) {
+    private Map<String, Object> getFakeFunctionResults(ActionList actions) throws InterruptedException {
         /*
          DefineFunction "fakeName" 0  {
          Push 1777
