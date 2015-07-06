@@ -153,7 +153,7 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
         }
     }
 
-    private int getFirstRegisterSetter(Reference<AVM2Instruction> assignment, int classIndex, boolean isStatic, int scriptIndex, ABC abc, AVM2ConstantPool cpool, Trait trait, MethodInfo minfo, MethodBody body, Set<Integer> ignoredRegisters, Set<Integer> ignoredGets) {
+    private int getFirstRegisterSetter(Reference<AVM2Instruction> assignment, int classIndex, boolean isStatic, int scriptIndex, ABC abc, AVM2ConstantPool cpool, Trait trait, MethodInfo minfo, MethodBody body, Set<Integer> ignoredRegisters, Set<Integer> ignoredGets) throws InterruptedException {
         AVM2Code code = body.getCode();
         Map<Integer, GraphTargetItem> ret = new HashMap<>();
 
@@ -165,7 +165,7 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
         return visitCode(assignment, new HashSet<>(), new TranslateStack("deo"), classIndex, isStatic, body, scriptIndex, abc, code, 0, code.code.size() - 1, res, ignoredRegisters, ignoredGets);
     }
 
-    private int visitCode(Reference<AVM2Instruction> assignment, Set<Integer> visited, TranslateStack stack, int classIndex, boolean isStatic, MethodBody body, int scriptIndex, ABC abc, AVM2Code code, int idx, int endIdx, ExecutionResult result, Set<Integer> ignored, Set<Integer> ignoredGets) {
+    private int visitCode(Reference<AVM2Instruction> assignment, Set<Integer> visited, TranslateStack stack, int classIndex, boolean isStatic, MethodBody body, int scriptIndex, ABC abc, AVM2Code code, int idx, int endIdx, ExecutionResult result, Set<Integer> ignored, Set<Integer> ignoredGets) throws InterruptedException {
         List<GraphTargetItem> output = new ArrayList<>();
         AVM2LocalData localData = newLocalData(scriptIndex, abc, abc.constants, body, isStatic, classIndex);
         localData.localRegs.put(0, new NullAVM2Item(null));//this
@@ -295,7 +295,9 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
                         break;
                     }
                 }
-            } catch (Exception ex) {
+            } catch (InterruptedException ex) {
+                throw ex;
+            } catch (Throwable ex) {
                 //ignore
             }
         }

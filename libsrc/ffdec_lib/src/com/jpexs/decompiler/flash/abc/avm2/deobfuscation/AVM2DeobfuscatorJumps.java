@@ -83,6 +83,5 @@ public class AVM2DeobfuscatorJumps extends AVM2DeobfuscatorSimple {
             }
             removeUnreachableActions(body.getCode(), cpool, trait, minfo, body);
         } while (found);
-
     }
 }

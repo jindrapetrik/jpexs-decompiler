@@ -145,18 +145,18 @@ public class AVM2Graph extends Graph {
     @Override
     protected void checkGraph(List<GraphPart> allBlocks) {
         for (ABCException ex : body.exceptions) {
-            int startIp = avm2code.adr2pos(ex.start);
-            int endIp = avm2code.adr2pos(ex.end);
-            int targetIp = avm2code.adr2pos(ex.target);
+            /*int startAddr = avm2code.adr2pos(ex.start);
+             int endAddr = avm2code.adr2pos(ex.end);
+             int targetIp = avm2code.adr2pos(ex.target);*/
             GraphPart target = null;
             for (GraphPart p : allBlocks) {
-                if (p.start == targetIp) {
+                if (avm2code.pos2adr(p.start) == ex.target) {
                     target = p;
                     break;
                 }
             }
             for (GraphPart p : allBlocks) {
-                if (p.start >= startIp && p.end <= endIp) {
+                if (avm2code.pos2adr(p.start) >= ex.start && avm2code.pos2adr(p.end) <= ex.end) {
                     p.throwParts.add(target);
                     target.refs.add(p);
                 }

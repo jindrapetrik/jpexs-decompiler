@@ -777,7 +777,7 @@ public class AVM2Code implements Cloneable {
     }
 
     public AVM2Code(ABCInputStream ais, MethodBody body) throws IOException {
-        Map<Long, AVM2Instruction> codeMap = new TreeMap<>();
+        Map<Long, AVM2Instruction> codeMap = new HashMap<>();
         DumpInfo diParent = ais.dumpInfo;
         List<Long> addresses = new ArrayList<>();
         //Do not add new jumps when processing these addresses (unreachable code,etc.)
@@ -814,19 +814,20 @@ public class AVM2Code implements Cloneable {
                 address = unAdresses.remove(0);
                 handleJumps = false;
             }
-            if (codeMap.containsKey(address) && !(codeMap.get(address).definition instanceof NopIns)) {
-                continue;
-            }
             if (address < startPos) // no jump outside block
             {
                 continue;
             }
-            boolean afterExit = false;
             try {
                 ais.seek(address);
                 while (ais.available() > 0) {
                     DumpInfo di = ais.newDumpLevel("instruction", "instruction");
                     long startOffset = ais.getPosition();
+
+                    if (codeMap.containsKey(startOffset) && !(codeMap.get(startOffset).definition instanceof NopIns)) {
+                        continue loopaddr;
+                    }
+
                     int instructionCode = ais.read("instructionCode");
                     InstructionDefinition instr = instructionSet[instructionCode];
                     if (instr instanceof LookupSwitchIns) {
@@ -842,7 +843,6 @@ public class AVM2Code implements Cloneable {
                     }
                     if (instr != null) {
                         int[] actualOperands = null;
-                        long beforeSwitchPos = ais.getPosition();
 
                         if (instructionCode == 0x1b) { // switch
                             int firstOperand = ais.readS24("default_offset");
@@ -851,7 +851,7 @@ public class AVM2Code implements Cloneable {
 
                             boolean invalidSwitch = false;
                             //If there are already some instructions in the lookupswitch bytes, the lookupswitch is invalid (obfuscation)
-                            for (long a = beforeSwitchPos; a < afterCasePos; a++) {
+                            for (long a = startOffset; a < afterCasePos; a++) {
                                 if (codeMap.containsKey(a) && (!(codeMap.get(a).definition instanceof NopIns))) {
                                     invalidSwitch = true;
                                     break;
@@ -899,40 +899,67 @@ public class AVM2Code implements Cloneable {
                         AVM2Instruction ai = new AVM2Instruction(startOffset, instr, actualOperands);
                         long endOffset = ais.getPosition();
 
+                        boolean hasRoom = true;
+                        for (long p = startOffset; p < endOffset; p++) {
+                            if (codeMap.containsKey(p) && !(codeMap.get(p).definition instanceof NopIns)) {
+                                hasRoom = false;
+                            }
+                        }
+
+                        //There is no room for this instruction (it is invalid?)
+                        if (!hasRoom) {
+                            continue loopaddr;
+                        }
                         for (long p = startOffset; p < endOffset; p++) {
                             codeMap.put(p, ai);
                         }
 
                         ais.endDumpLevel(instr.instructionCode);
 
-                        if (handleJumps) {
-                            if ((instr instanceof IfTypeIns)) {
+                        if ((instr instanceof IfTypeIns)) {
+                            if (handleJumps) {
                                 long target = ais.getPosition() + actualOperands[0];
                                 addresses.add(target);
-                                //addresses.add(ais.getPosition());
+                            } else {
+                                actualOperands[0] = 0;
                             }
+                        }
 
-                            if (instr instanceof JumpIns) {
+                        if (instr instanceof JumpIns) {
+                            if (handleJumps) {
                                 long target = ais.getPosition() + actualOperands[0];
                                 addresses.add(target);
                                 unAdresses.add(ais.getPosition());
                                 continue loopaddr;
+                            } else {
+                                actualOperands[0] = 0;
                             }
+                        }
 
-                            if (instr.isExitInstruction()) { //do not process jumps if there is return/throw instruction
-                                unAdresses.add(ais.getPosition());
-                                continue loopaddr;
-                            }
-                            if (instr instanceof LookupSwitchIns) {
-                                addresses.add(beforeSwitchPos + actualOperands[0]);
-
-                                for (int c = 2; c < actualOperands.length; c++) {
-                                    addresses.add(beforeSwitchPos + actualOperands[c]);
-                                }
+                        if (instr.isExitInstruction()) { //do not process jumps if there is return/throw instruction
+                            if (handleJumps) {
                                 unAdresses.add(ais.getPosition());
                                 continue loopaddr;
                             }
                         }
+                        if (instr instanceof LookupSwitchIns) {
+                            if (handleJumps) {
+                                addresses.add(startOffset + actualOperands[0]);
+
+                                for (int c = 2; c < actualOperands.length; c++) {
+                                    addresses.add(startOffset + actualOperands[c]);
+                                }
+                                unAdresses.add(ais.getPosition());
+                                continue loopaddr;
+                            } else {
+                                int swlen = (int) (endOffset - startOffset);
+                                actualOperands[0] = swlen;
+                                for (int c = 2; c < actualOperands.length; c++) {
+                                    actualOperands[c] = swlen;
+                                }
+                            }
+                        }
+
                     } else {
                         ais.endDumpLevel();
                         break; // Unknown instructions are ignored (Some of the obfuscators add unknown instructions)
@@ -945,7 +972,8 @@ public class AVM2Code implements Cloneable {
             }
         }
         AVM2Instruction prev = null;
-        for (AVM2Instruction ins : codeMap.values()) {
+        for (int i = 0; i < availableBytes; i++) {
+            AVM2Instruction ins = codeMap.get((long) i);
             if (prev != ins) {
                 code.add(ins);
             }
@@ -1284,11 +1312,22 @@ public class AVM2Code implements Cloneable {
     }
 
     public int adr2pos(long address) throws ConvertException {
+        return adr2pos(address, false);
+    }
+
+    public int adr2pos(long address, boolean nearest) throws ConvertException {
         if (!cacheActual) {
             buildCache();
         }
         int ret = posCache.indexOf(address);
         if (ret == -1) {
+            if (nearest) {
+                for (long a : posCache) {
+                    if (a > address) {
+                        return posCache.indexOf(a);
+                    }
+                }
+            }
             throw new ConvertException("Invalid jump to ofs" + Helper.formatAddress(address), -1);
         }
         return ret;
@@ -1417,7 +1456,7 @@ public class AVM2Code implements Cloneable {
     }
 
     public int fixAddrAfterDebugLine(int addr) throws ConvertException {
-        return pos2adr(fixIPAfterDebugLine(adr2pos(addr)));
+        return pos2adr(fixIPAfterDebugLine(adr2pos(addr, true)));
     }
 
     public ConvertOutput toSourceOutput(String path, GraphPart part, boolean processJumps, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, ABC abc, AVM2ConstantPool constants, List<MethodInfo> method_info, MethodBody body, int start, int end, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, boolean[] visited, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) throws ConvertException, InterruptedException {
@@ -1940,7 +1979,11 @@ public class AVM2Code implements Cloneable {
                 //Faster, but not so universal
                 if ((ins.definition instanceof JumpIns) || (ins.definition instanceof IfTypeIns)) {
                     long target = ins.offset + ins.getBytesLength() + ins.operands[0];
-                    ins.operands[0] = updater.updateOperandOffset(ins.offset, target, ins.operands[0]);
+                    try {
+                        ins.operands[0] = updater.updateOperandOffset(ins.offset, target, ins.operands[0]);
+                    } catch (ConvertException cex) {
+                        throw new ConvertException("Invalid offset (" + ins + ")", i);
+                    }
                 }
             }
             ins.offset = updater.updateInstructionOffset(ins.offset);
@@ -1991,6 +2034,7 @@ public class AVM2Code implements Cloneable {
     }
 
     public void checkValidOffsets(MethodBody body) {
+        invalidateCache();
         updateOffsets(new OffsetUpdater() {
 
             @Override
@@ -2001,6 +2045,9 @@ public class AVM2Code implements Cloneable {
 
             @Override
             public int updateOperandOffset(long insAddr, long targetAddress, int offset) {
+                if (insAddr == -1) { //do not check exceptions
+                    return offset;
+                }
                 adr2pos(targetAddress);
                 return offset;
             }
@@ -2013,18 +2060,9 @@ public class AVM2Code implements Cloneable {
             throw new IndexOutOfBoundsException();
         }
 
-        //checkValidOffsets(body);
         AVM2Instruction ins = code.get(pos);
         final long remOffset = ins.offset;
-        int bc;
-        if (pos < code.size() - 1) {
-            // Checking the instuction length is not enough because in some
-            // obfuscated files the length of the lookupswitch is not the same
-            // as the difference of the offsets
-            bc = (int) (code.get(pos + 1).offset - remOffset);
-        } else {
-            bc = ins.getBytesLength();
-        }
+        int bc = ins.getBytesLength();
 
         final int byteCount = bc;
         updateOffsets(new OffsetUpdater() {
@@ -2230,7 +2268,7 @@ public class AVM2Code implements Cloneable {
             new AVM2DeobfuscatorSimple().deobfuscate(path, classIndex, isStatic, scriptIndex, abc, constants, trait, info, body);
             new AVM2DeobfuscatorRegisters().deobfuscate(path, classIndex, isStatic, scriptIndex, abc, constants, trait, info, body);
             new AVM2DeobfuscatorJumps().deobfuscate(path, classIndex, isStatic, scriptIndex, abc, constants, trait, info, body);
-            body.getCode().checkValidOffsets(body); // todo: only for debugging. checkValidOffsets can be made private later
+            //body.getCode().checkValidOffsets(body); // todo: only for debugging. checkValidOffsets can be made private later            
             return 1;
         }
     }
@@ -2470,12 +2508,12 @@ public class AVM2Code implements Cloneable {
         for (ABCException e : body.exceptions) {
             pos++;
             try {
-                visitCode(adr2pos(e.start), adr2pos(e.start) - 1, refs);
-                visitCode(adr2pos(e.start), -1, refs);
-                visitCode(adr2pos(e.target), adr2pos(e.end), refs);
-                visitCode(adr2pos(e.end), -pos, refs);
+                visitCode(adr2pos(e.start, true), adr2pos(e.start, true) - 1, refs);
+                visitCode(adr2pos(e.start, true), -1, refs);
+                visitCode(adr2pos(e.target), adr2pos(e.end, true), refs);
+                visitCode(adr2pos(e.end, true), -pos, refs);
             } catch (ConvertException ex) {
-                logger.log(Level.FINE, null, ex);
+                logger.log(Level.SEVERE, "Visitcode error", ex);
             }
         }
         return refs;
@@ -2708,9 +2746,9 @@ public class AVM2Code implements Cloneable {
                 restoreControlFlow(0, refs, visited2, appended);
                 for (ABCException e : body.exceptions) {
                     try {
-                        restoreControlFlow(adr2pos(e.start), refs, visited2, appended);
+                        restoreControlFlow(adr2pos(e.start, true), refs, visited2, appended);
                         restoreControlFlow(adr2pos(e.target), refs, visited2, appended);
-                        restoreControlFlow(adr2pos(e.end), refs, visited2, appended);
+                        restoreControlFlow(adr2pos(e.end, true), refs, visited2, appended);
                     } catch (ConvertException ex) {
                         logger.log(Level.FINE, null, ex);
                     }
@@ -2782,17 +2820,19 @@ public class AVM2Code implements Cloneable {
      }*/
 
     public void removeIgnored(AVM2ConstantPool constants, Trait trait, MethodInfo info, MethodBody body) throws InterruptedException {
+        //System.err.println("removing ignored...");
         for (int i = 0; i < code.size(); i++) {
             if (code.get(i).ignored) {
                 removeInstruction(i, body);
                 i--;
             }
         }
+        //System.err.println("/ignored removed");
     }
 
     public int removeDeadCode(AVM2ConstantPool constants, Trait trait, MethodInfo info, MethodBody body) throws InterruptedException {
+        invalidateCache();
         HashMap<Integer, List<Integer>> refs = visitCode(body);
-
         int cnt = 0;
         for (int i = code.size() - 1; i >= 0; i--) {
             if (refs.get(i).isEmpty()) {
@@ -2808,8 +2848,7 @@ public class AVM2Code implements Cloneable {
             AVM2Instruction ins = code.get(i);
             if (ins.definition instanceof JumpIns) {
                 if (ins.operands[0] == 0) {
-                    code.get(i).ignored = true;
-                    //removeInstruction(i, body);
+                    ins.ignored = true;
                     cnt++;
                 }
             }
