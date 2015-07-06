@@ -141,8 +141,8 @@ public final class MethodBody implements Cloneable {
     public List<Integer> getExceptionEntries() {
         List<Integer> ret = new ArrayList<>();
         for (ABCException e : exceptions) {
-            //ret.add(getCode().adr2pos(e.start));
-            //ret.add(getCode().adr2pos(e.end));
+            ret.add(getCode().adr2pos(e.start, true));
+            ret.add(getCode().adr2pos(e.end, true));
             ret.add(getCode().adr2pos(e.target));
         }
         return ret;
