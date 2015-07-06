@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.DeobfuscationLevel;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.action.Action;
@@ -2858,5 +2859,20 @@ public final class SWF implements SWFContainerItem, Timelined {
     @Override
     public String toString() {
         return getShortFileName();
+    }
+
+    public void deobfuscate(DeobfuscationLevel level) throws InterruptedException {
+        List<ABCContainerTag> atags = getAbcList();
+
+        for (ABCContainerTag tag : atags) {
+            if (level == DeobfuscationLevel.LEVEL_REMOVE_DEAD_CODE) {
+                tag.getABC().removeDeadCode();
+            } else if (level == DeobfuscationLevel.LEVEL_REMOVE_TRAPS) {
+                tag.getABC().removeTraps();
+            } else if (level == DeobfuscationLevel.LEVEL_RESTORE_CONTROL_FLOW) {
+                tag.getABC().removeTraps();
+                tag.getABC().restoreControlFlow();
+            }
+        }
     }
 }

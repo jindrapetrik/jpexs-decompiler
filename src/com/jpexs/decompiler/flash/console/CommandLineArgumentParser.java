@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.DeobfuscationLevel;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.ASM3Parser;
 import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.MissingSymbolHandler;
@@ -314,6 +315,10 @@ public class CommandLineArgumentParser {
         out.println(" " + (cnt++) + ") -replace <infile> <outfile> (<characterId1>|<scriptName1>) <importDataFile1> [methodBodyIndex1] [(<characterId2>|<scriptName2>) <importDataFile2> [methodBodyIndex2]]...");
         out.println(" ...replaces the data of the specified BinaryData, Image, DefineSound tag or Script");
         out.println(" ...methodBodyIndexN parameter should be specified if and only if the imported entity is an AS3 P-Code");
+        out.println(" " + (cnt++) + ") -deobfuscate <level> <infile> <outfile>");
+        out.println("  ...Deobfuscates AS3 P-code in <infile> and saves result to <outfile>");
+        out.println("  ...<level> can be one of: controlflow/3/max, traps/2, deadcode/1");
+        out.println("  ...WARNING: The deobfuscation result is still probably far enough to be openable by other decompilers.");
         printCmdLineUsageExamples(out);
     }
 
@@ -329,11 +334,12 @@ public class CommandLineArgumentParser {
         out.println("java -jar ffdec.jar -format script:pcode,text:plain -export script,text,image \"C:\\decompiled\" myfile.swf");
         out.println("java -jar ffdec.jar -format fla:cs5.5 -export fla \"C:\\sources\\myfile.fla\" myfile.swf");
         out.println("java -jar ffdec.jar -dumpSWF myfile.swf");
-        out.println("java -jar ffdec.jar -compress myfile.swf myfiledec.swf");
-        out.println("java -jar ffdec.jar -decompress myfiledec.swf myfile.swf");
+        out.println("java -jar ffdec.jar -compress myfile.swf myfilecomp.swf");
+        out.println("java -jar ffdec.jar -decompress myfile.swf myfiledec.swf");
         out.println("java -jar ffdec.jar -onerror ignore -export script \"C:\\decompiled\" myfile.swf");
         out.println("java -jar ffdec.jar -onerror retry 5 -export script \"C:\\decompiled\" myfile.swf");
         out.println("java -jar ffdec.jar -config autoDeobfuscate=1,parallelSpeedUp=0 -export script \"C:\\decompiled\" myfile.swf");
+        out.println("java -jar ffdec.jar -deobfuscate max myas3file_secure.swf myas3file.swf");
         out.println("");
         out.println("Instead of \"java -jar ffdec.jar\" you can use ffdec.bat on Windows, ffdec.sh on Linux/MacOs");
     }
@@ -470,6 +476,8 @@ public class CommandLineArgumentParser {
             parseXml2Swf(args);
         } else if (command.equals("extract")) {
             parseExtract(args);
+        } else if (command.equals("deobfuscate")) {
+            parseDeobfuscate(args);
         } else if (command.equals("renameinvalididentifiers")) {
             parseRenameInvalidIdentifiers(args);
         } else if (command.equals("dumpswf")) {
@@ -1314,6 +1322,75 @@ public class CommandLineArgumentParser {
         } else {
             System.err.println("FAIL");
             System.exit(1);
+        }
+    }
+
+    private static void parseDeobfuscate(Stack<String> args) {
+        if (args.size() < 3) {
+            badArguments();
+        }
+        String mode = args.pop();
+        DeobfuscationLevel lev = null;
+        switch (mode) {
+            case "controlflow":
+            case "max":
+            case "3":
+                lev = DeobfuscationLevel.LEVEL_RESTORE_CONTROL_FLOW;
+                break;
+            case "traps":
+            case "2":
+                lev = DeobfuscationLevel.LEVEL_REMOVE_TRAPS;
+                break;
+            case "deadcode":
+            case "1":
+                lev = DeobfuscationLevel.LEVEL_REMOVE_DEAD_CODE;
+                break;
+            default:
+                System.err.println("Invalid level, must be one of: controlflow,traps,deadcode or 1,2, 3/max");
+                System.exit(1);
+                break;
+        }
+        File inFile = new File(args.pop());
+        File outFile = new File(args.pop());
+        File tmpFile = null;
+        if (inFile.equals(outFile)) {
+            try {
+                tmpFile = File.createTempFile("ffdec_deobf_", ".swf");
+                outFile = tmpFile;
+            } catch (IOException ex) {
+                System.err.println("Unable to create temp file");
+                System.exit(1);
+            }
+        }
+        try (FileInputStream is = new FileInputStream(inFile);
+                FileOutputStream fos = new FileOutputStream(outFile)) {
+            SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
+            if (!swf.isAS3()) {
+                System.out.println("Warning: The file is not AS3. Only AS3 deobfuscation from commandline is available.");
+                System.exit(0);
+            }
+            swf.deobfuscate(lev);
+            swf.saveTo(fos);
+            if (tmpFile != null) {
+                inFile.delete();
+                tmpFile.renameTo(inFile);
+                tmpFile = null;
+                System.out.println("" + inFile + " overwritten.");
+            }
+            System.out.println("OK");
+        } catch (FileNotFoundException ex) {
+            System.err.println("File not found.");
+            System.exit(1);
+        } catch (InterruptedException ex) {
+            logger.log(Level.SEVERE, null, ex);
+            System.exit(1);
+        } catch (IOException ex) {
+            Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, "Error", ex);
+            System.exit(1);
+        } finally {
+            if (tmpFile != null && tmpFile.exists()) {
+                tmpFile.delete();
+            }
         }
     }
 

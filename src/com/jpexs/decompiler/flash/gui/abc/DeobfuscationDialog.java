@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.gui.abc;
 
+import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.DeobfuscationLevel;
 import com.jpexs.decompiler.flash.gui.AppDialog;
 import com.jpexs.decompiler.flash.gui.View;
 import java.awt.Component;
@@ -43,12 +45,6 @@ public class DeobfuscationDialog extends AppDialog {
 
     private int result = ERROR_OPTION;
 
-    public static final int LEVEL_REMOVE_DEAD_CODE = 1;
-
-    public static final int LEVEL_REMOVE_TRAPS = 2;
-
-    public static final int LEVEL_RESTORE_CONTROL_FLOW = 3;
-
     @SuppressWarnings("unchecked")
     public DeobfuscationDialog() {
         setDefaultCloseOperation(HIDE_ON_CLOSE);
@@ -68,9 +64,9 @@ public class DeobfuscationDialog extends AppDialog {
         Hashtable<Integer, JLabel> labelTable = new Hashtable<>();
         //labelTable.put(LEVEL_NONE, new JLabel("None"));
 
-        labelTable.put(LEVEL_REMOVE_DEAD_CODE, new JLabel(translate("deobfuscation.removedeadcode")));
-        labelTable.put(LEVEL_REMOVE_TRAPS, new JLabel(translate("deobfuscation.removetraps")));
-        labelTable.put(LEVEL_RESTORE_CONTROL_FLOW, new JLabel(translate("deobfuscation.restorecontrolflow")));
+        labelTable.put(DeobfuscationLevel.LEVEL_REMOVE_DEAD_CODE.getLevel(), new JLabel(translate("deobfuscation.removedeadcode")));
+        labelTable.put(DeobfuscationLevel.LEVEL_REMOVE_TRAPS.getLevel(), new JLabel(translate("deobfuscation.removetraps")));
+        labelTable.put(DeobfuscationLevel.LEVEL_RESTORE_CONTROL_FLOW.getLevel(), new JLabel(translate("deobfuscation.restorecontrolflow")));
         codeProcessingLevel.setLabelTable(labelTable);
 
         codeProcessingLevel.setPaintLabels(true);

@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.DeobfuscationLevel;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
@@ -2222,11 +2223,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         ABCPanel aBCPanel = getABCPanel();
                         if (deobfuscationDialog.processAllCheckbox.isSelected()) {
                             for (ABCContainerTag tag : abcPanel.getAbcList()) {
-                                if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_DEAD_CODE) {
+                                if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationLevel.LEVEL_REMOVE_DEAD_CODE.getLevel()) {
                                     tag.getABC().removeDeadCode();
-                                } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_TRAPS) {
+                                } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationLevel.LEVEL_REMOVE_TRAPS.getLevel()) {
                                     tag.getABC().removeTraps();
-                                } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_RESTORE_CONTROL_FLOW) {
+                                } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationLevel.LEVEL_RESTORE_CONTROL_FLOW.getLevel()) {
                                     tag.getABC().removeTraps();
                                     tag.getABC().restoreControlFlow();
                                 }
@@ -2237,11 +2238,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                             Trait t = abcPanel.decompiledTextArea.getCurrentTrait();
                             ABC abc = abcPanel.abc;
                             if (bi != -1) {
-                                if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_DEAD_CODE) {
+                                if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationLevel.LEVEL_REMOVE_DEAD_CODE.getLevel()) {
                                     abc.bodies.get(bi).removeDeadCode(abc.constants, t, abc.method_info.get(abc.bodies.get(bi).method_info));
-                                } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_TRAPS) {
+                                } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationLevel.LEVEL_REMOVE_TRAPS.getLevel()) {
                                     abc.bodies.get(bi).removeTraps(abc.constants, abc, t, decompiledTextArea.getScriptLeaf().scriptIndex, decompiledTextArea.getClassIndex(), decompiledTextArea.getIsStatic(), ""/*FIXME*/);
-                                } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_RESTORE_CONTROL_FLOW) {
+                                } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationLevel.LEVEL_RESTORE_CONTROL_FLOW.getLevel()) {
                                     abc.bodies.get(bi).removeTraps(abc.constants, abc, t, decompiledTextArea.getScriptLeaf().scriptIndex, decompiledTextArea.getClassIndex(), decompiledTextArea.getIsStatic(), ""/*FIXME*/);
                                     abc.bodies.get(bi).restoreControlFlow(abc.constants, t, abc.method_info.get(abc.bodies.get(bi).method_info));
                                 }
