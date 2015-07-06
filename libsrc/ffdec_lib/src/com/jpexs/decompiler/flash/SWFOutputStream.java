@@ -81,6 +81,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 
@@ -235,8 +237,10 @@ public class SWFOutputStream extends OutputStream {
      * @throws IOException
      */
     public void writeSI16(int value) throws IOException {
+
         if (value > 0x7fff) {
-            throw new Error("Value is too large for SI16: " + value);
+            Logger.getLogger(SWFOutputStream.class.getName()).log(Level.WARNING, "Value is too large for SI16: " + value + ", 0 written", new Exception());
+            value = 0;
         }
 
         writeUI16(value);

@@ -192,8 +192,7 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
                         ActionPush push = new ActionPush(0);
                         push.values.clear();
                         for (GraphTargetItem graphTargetItem : result.stack) {
-                            DirectValueActionItem dv = (DirectValueActionItem) graphTargetItem;
-                            push.values.add(dv.value);
+                            push.values.add(graphTargetItem.getResult());
                         }
                         push.setAddress(prevAction.getAddress());
                         actions.addAction(i++, push);

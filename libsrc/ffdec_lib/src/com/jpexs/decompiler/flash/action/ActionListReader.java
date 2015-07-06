@@ -697,6 +697,7 @@ public class ActionListReader {
                     ActionJump aJump = new ActionDeobfuscateJump(0);
                     int jumpLength = aJump.getTotalActionLength();
                     aJump.setAddress(a.getAddress());
+                    //FIXME! This offset can be larger than SI16 value!
                     aJump.setJumpOffset(actionLengthWithHeader - jumpLength);
                     a = aJump;
                     actionLengthWithHeader = a.getTotalActionLength();
