@@ -479,6 +479,10 @@ public class Configuration {
     @ConfigurationCategory("ui")
     public static final ConfigurationItem<Boolean> allowOnlyOneInstance = null;
 
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("script")
+    public static final ConfigurationItem<Boolean> ignoreCLikePackages = null;
+
     private enum OSId {
 
         WINDOWS, OSX, UNIX

@@ -1259,6 +1259,9 @@ public final class SWF implements SWFContainerItem, Timelined {
             List<ScriptPack> scrs = abc.findScriptPacksByPath(className, allAbcList);
             for (int j = 0; j < scrs.size(); j++) {
                 ScriptPack scr = scrs.get(j);
+                if (!scr.isSimple && Configuration.ignoreCLikePackages.get()) {
+                    continue;
+                }
                 String cnt = "";
                 if (scrs.size() > 1) {
                     cnt = "script " + (j + 1) + "/" + scrs.size() + " ";

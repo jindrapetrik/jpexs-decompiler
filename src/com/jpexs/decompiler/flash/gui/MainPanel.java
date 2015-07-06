@@ -1235,7 +1235,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         try (FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
                             scriptExportSettings.singleFileWriter = writer;
                             for (int i = 0; i < as3scripts.size(); i++) {
+
                                 ScriptPack tls = as3scripts.get(i);
+                                if (!tls.isSimple && Configuration.ignoreCLikePackages.get()) {
+                                    continue;
+                                }
                                 Main.startWork(translate("work.exporting") + " " + (i + 1) + "/" + as3scripts.size() + " " + tls.getPath() + " ...");
                                 ret.add(tls.export(scriptsFolder, scriptExportSettings, parallel));
                             }

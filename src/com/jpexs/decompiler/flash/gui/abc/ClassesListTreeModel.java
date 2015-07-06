@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.timeline.AS3Package;
 import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
@@ -75,6 +76,9 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
                 if (!item.getClassPath().toString().toLowerCase().contains(filter)) {
                     continue;
                 }
+            }
+            if (!item.isSimple && Configuration.ignoreCLikePackages.get()) {
+                continue;
             }
 
             String packageStr = item.getClassPath().packageStr;

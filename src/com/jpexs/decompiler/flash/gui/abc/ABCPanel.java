@@ -175,6 +175,9 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
                 int pos = 0;
                 for (final ScriptPack pack : allpacks) {
                     pos++;
+                    if (!pack.isSimple && Configuration.ignoreCLikePackages.get()) {
+                        continue;
+                    }
                     String workText = AppStrings.translate("work.searching");
                     String decAdd = "";
                     if (!SWF.isCached(pack)) {
@@ -646,6 +649,9 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
             ClassesListTreeModel clModel = (ClassesListTreeModel) scriptsNode;
             ScriptPack pack = null;
             for (ScriptPack item : clModel.getList()) {
+                if (!pack.isSimple && Configuration.ignoreCLikePackages.get()) {
+                    continue;
+                }
                 ClassPath classPath = item.getClassPath();
 
                 // first check the className to avoid calling unnecessary toString

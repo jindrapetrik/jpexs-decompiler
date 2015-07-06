@@ -58,6 +58,9 @@ public class AS3ScriptExporter {
                     @Override
                     public Void call() throws Exception {
                         for (ScriptPack item : packs) {
+                            if (!item.isSimple && Configuration.ignoreCLikePackages.get()) {
+                                continue;
+                            }
                             ExportPackTask task = new ExportPackTask(handler, cnt, packs.size(), item.getClassPath(), item, outdir, exportSettings, parallel, evl);
                             ret.add(task.call());
                         }
@@ -73,6 +76,9 @@ public class AS3ScriptExporter {
             ExecutorService executor = Executors.newFixedThreadPool(Configuration.getParallelThreadCount());
             List<Future<File>> futureResults = new ArrayList<>();
             for (ScriptPack item : packs) {
+                if (!item.isSimple && Configuration.ignoreCLikePackages.get()) {
+                    continue;
+                }
                 Future<File> future = executor.submit(new ExportPackTask(handler, cnt, packs.size(), item.getClassPath(), item, outdir, exportSettings, parallel, evl));
                 futureResults.add(future);
             }
