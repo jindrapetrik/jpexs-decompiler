@@ -224,7 +224,7 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
         return localData;
     }
 
-    private void executeActions(Map<Integer, GraphTargetItem> staticRegs, int classIndex, boolean isStatic, MethodBody body, int scriptIndex, ABC abc, AVM2Code code, int idx, int endIdx, ExecutionResult result, List<AVM2Instruction> inlineIns) {
+    private void executeActions(Map<Integer, GraphTargetItem> staticRegs, int classIndex, boolean isStatic, MethodBody body, int scriptIndex, ABC abc, AVM2Code code, int idx, int endIdx, ExecutionResult result, List<AVM2Instruction> inlineIns) throws InterruptedException {
         List<GraphTargetItem> output = new ArrayList<>();
         AVM2LocalData localData = newLocalData(scriptIndex, abc, abc.constants, body, isStatic, classIndex);
 
@@ -393,6 +393,8 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
                     break;
                 }
             }
+        } catch (InterruptedException ex) {
+            throw ex;
         } catch (Exception ex) {
             //ignore
         }

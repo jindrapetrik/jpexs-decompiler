@@ -67,7 +67,7 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
     private final int executionLimit = 30000;
 
     @Override
-    public void actionListParsed(ActionList actions, SWF swf) {
+    public void actionListParsed(ActionList actions, SWF swf) throws InterruptedException {
         removeGetTimes(actions);
         removeObfuscationIfs(actions);
     }
@@ -125,7 +125,7 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
         return false;
     }
 
-    private boolean removeObfuscationIfs(ActionList actions) {
+    private boolean removeObfuscationIfs(ActionList actions) throws InterruptedException {
         if (actions.size() == 0) {
             return false;
         }
@@ -270,7 +270,7 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
         return result;
     }
 
-    private void executeActions(ActionList actions, int idx, int endIdx, ExecutionResult result) {
+    private void executeActions(ActionList actions, int idx, int endIdx, ExecutionResult result) throws InterruptedException {
         List<GraphTargetItem> output = new ArrayList<>();
         ActionLocalData localData = new ActionLocalData();
         FixItemCounterTranslateStack stack = new FixItemCounterTranslateStack("");
@@ -361,7 +361,7 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
                     result.stack.addAll(stack);
                 }
             }
-        } catch (EmptyStackException | TranslateException | InterruptedException ex) {
+        } catch (EmptyStackException | TranslateException ex) {
         }
     }
 

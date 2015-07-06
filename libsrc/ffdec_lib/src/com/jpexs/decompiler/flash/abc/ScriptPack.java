@@ -204,7 +204,7 @@ public class ScriptPack extends AS3ClassTreeItem {
         appendTo(writer, traits, exportMode, parallel);
     }
 
-    public File export(String directory, ScriptExportSettings exportSettings, boolean parallel) throws IOException {
+    public File export(String directory, ScriptExportSettings exportSettings, boolean parallel) throws IOException, InterruptedException {
         File file = null;
 
         if (!exportSettings.singleFile) {
@@ -212,12 +212,8 @@ public class ScriptPack extends AS3ClassTreeItem {
         }
 
         try (FileTextWriter writer = exportSettings.singleFile ? null : new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(file))) {
-            try {
-                FileTextWriter writer2 = exportSettings.singleFile ? exportSettings.singleFileWriter : writer;
-                toSource(writer2, abc.script_info.get(scriptIndex).traits.traits, exportSettings.mode, parallel);
-            } catch (InterruptedException ex) {
-                logger.log(Level.SEVERE, null, ex);
-            }
+            FileTextWriter writer2 = exportSettings.singleFile ? exportSettings.singleFileWriter : writer;
+            toSource(writer2, abc.script_info.get(scriptIndex).traits.traits, exportSettings.mode, parallel);
         } catch (FileNotFoundException ex) {
             logger.log(Level.SEVERE, "The file path is probably too long", ex);
         }

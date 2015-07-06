@@ -455,7 +455,7 @@ public class ProxyFrame extends AppFrame implements CatchedListener, MouseListen
                             Files.copy(new File(r.targetFile).toPath(), outfile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                         }
                     }, handler).run();
-                } catch (IOException ex) {
+                } catch (IOException | InterruptedException ex) {
                     break;
                 }
             }

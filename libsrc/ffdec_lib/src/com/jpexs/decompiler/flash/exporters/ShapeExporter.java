@@ -57,7 +57,7 @@ import java.util.Set;
  */
 public class ShapeExporter {
 
-    public List<File> exportShapes(AbortRetryIgnoreHandler handler, final String outdir, List<Tag> tags, final ShapeExportSettings settings, EventListener evl) throws IOException {
+    public List<File> exportShapes(AbortRetryIgnoreHandler handler, final String outdir, List<Tag> tags, final ShapeExportSettings settings, EventListener evl) throws IOException, InterruptedException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;

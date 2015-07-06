@@ -56,7 +56,7 @@ import java.util.logging.Logger;
  */
 public class FontExporter {
 
-    public List<File> exportFonts(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final FontExportSettings settings, EventListener evl) throws IOException {
+    public List<File> exportFonts(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final FontExportSettings settings, EventListener evl) throws IOException, InterruptedException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;

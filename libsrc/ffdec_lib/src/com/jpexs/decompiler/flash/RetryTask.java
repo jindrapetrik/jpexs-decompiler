@@ -35,7 +35,7 @@ public class RetryTask {
         this.handler = handler;
     }
 
-    public void run() throws IOException {
+    public void run() throws IOException, InterruptedException {
         boolean retry;
         do {
             retry = false;

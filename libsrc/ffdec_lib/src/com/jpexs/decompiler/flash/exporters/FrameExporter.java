@@ -91,7 +91,7 @@ public class FrameExporter {
 
     private static final Logger logger = Logger.getLogger(FrameExporter.class.getName());
 
-    public List<File> exportFrames(AbortRetryIgnoreHandler handler, String outdir, SWF swf, int containerId, List<Integer> frames, ButtonExportSettings settings, EventListener evl) throws IOException {
+    public List<File> exportFrames(AbortRetryIgnoreHandler handler, String outdir, SWF swf, int containerId, List<Integer> frames, ButtonExportSettings settings, EventListener evl) throws IOException, InterruptedException {
         FrameExportMode fem;
         switch (settings.mode) {
             case BMP:
@@ -111,7 +111,7 @@ public class FrameExporter {
         return exportFrames(handler, outdir, swf, containerId, frames, fes, evl);
     }
 
-    public List<File> exportFrames(AbortRetryIgnoreHandler handler, String outdir, SWF swf, int containerId, List<Integer> frames, SpriteExportSettings settings, EventListener evl) throws IOException {
+    public List<File> exportFrames(AbortRetryIgnoreHandler handler, String outdir, SWF swf, int containerId, List<Integer> frames, SpriteExportSettings settings, EventListener evl) throws IOException, InterruptedException {
         FrameExportMode fem;
         switch (settings.mode) {
             case PNG:
@@ -143,7 +143,7 @@ public class FrameExporter {
         return exportFrames(handler, outdir, swf, containerId, frames, fes, evl);
     }
 
-    public List<File> exportFrames(AbortRetryIgnoreHandler handler, String outdir, final SWF swf, int containerId, List<Integer> frames, final FrameExportSettings settings, final EventListener evl) throws IOException {
+    public List<File> exportFrames(AbortRetryIgnoreHandler handler, String outdir, final SWF swf, int containerId, List<Integer> frames, final FrameExportSettings settings, final EventListener evl) throws IOException, InterruptedException {
         final List<File> ret = new ArrayList<>();
         if (swf.tags.isEmpty()) {
             return ret;

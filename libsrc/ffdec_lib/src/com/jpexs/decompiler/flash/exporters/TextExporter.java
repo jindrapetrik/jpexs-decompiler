@@ -48,7 +48,7 @@ public class TextExporter {
 
     public static final String TEXT_EXPORT_FILENAME_PLAIN = "textsplain.txt";
 
-    public List<File> exportTexts(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final TextExportSettings settings, EventListener evl) throws IOException {
+    public List<File> exportTexts(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final TextExportSettings settings, EventListener evl) throws IOException, InterruptedException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;

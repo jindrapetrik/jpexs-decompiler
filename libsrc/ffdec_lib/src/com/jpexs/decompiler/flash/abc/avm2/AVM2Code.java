@@ -1355,25 +1355,21 @@ public class AVM2Code implements Cloneable {
 
     private Map<Integer, Set<Integer>> killedRegs = new HashMap<>();
 
-    public void calcKilledStats(MethodBody body) {
+    public void calcKilledStats(MethodBody body) throws InterruptedException {
         killedRegs.clear();
-        try {
-            HashMap<Integer, List<Integer>> vis = visitCode(body);
-            for (int k = 0; k < code.size(); k++) {
-                if (vis.get(k).isEmpty()) {
-                    continue;
-                }
-                if (code.get(k).definition instanceof KillIns) {
-                    int regid = code.get(k).operands[0];
-                    if (!killedRegs.containsKey(regid)) {
-                        killedRegs.put(regid, new HashSet<>());
-                    }
-                    killedRegs.get(regid).add(k);
-                }
-            }
+        HashMap<Integer, List<Integer>> vis = visitCode(body);
 
-        } catch (InterruptedException ex) {
-            // ignored
+        for (int k = 0; k < code.size(); k++) {
+            if (vis.get(k).isEmpty()) {
+                continue;
+            }
+            if (code.get(k).definition instanceof KillIns) {
+                int regid = code.get(k).operands[0];
+                if (!killedRegs.containsKey(regid)) {
+                    killedRegs.put(regid, new HashSet<>());
+                }
+                killedRegs.get(regid).add(k);
+            }
         }
     }
 

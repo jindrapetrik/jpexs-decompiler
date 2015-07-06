@@ -74,7 +74,7 @@ public class AS2ScriptExporter {
         return new ArrayList<>();
     }
 
-    private List<File> exportAS2Scripts(AbortRetryIgnoreHandler handler, String outdir, Map<String, ASMSource> asms, ScriptExportSettings exportSettings, EventListener evl) throws IOException {
+    private List<File> exportAS2Scripts(AbortRetryIgnoreHandler handler, String outdir, Map<String, ASMSource> asms, ScriptExportSettings exportSettings, EventListener evl) throws IOException, InterruptedException {
         List<File> ret = new ArrayList<>();
         if (!outdir.endsWith(File.separator)) {
             outdir += File.separator;
@@ -111,7 +111,7 @@ public class AS2ScriptExporter {
         return ret;
     }
 
-    private File exportAS2Script(AbortRetryIgnoreHandler handler, String outdir, ASMSource asm, ScriptExportSettings exportSettings, EventListener evl, AtomicInteger index, int count, String name) throws IOException {
+    private File exportAS2Script(AbortRetryIgnoreHandler handler, String outdir, ASMSource asm, ScriptExportSettings exportSettings, EventListener evl, AtomicInteger index, int count, String name) throws IOException, InterruptedException {
         boolean retry;
         do {
             retry = false;
@@ -157,6 +157,7 @@ public class AS2ScriptExporter {
 
                 return file;
             } catch (InterruptedException ex) {
+                throw ex;
             } catch (IOException | OutOfMemoryError | TranslateException | StackOverflowError ex) {
                 logger.log(Level.SEVERE, "Decompilation error in script: " + name, ex);
                 if (handler != null) {
