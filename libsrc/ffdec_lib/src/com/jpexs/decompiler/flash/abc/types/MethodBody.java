@@ -141,8 +141,8 @@ public final class MethodBody implements Cloneable {
     public List<Integer> getExceptionEntries() {
         List<Integer> ret = new ArrayList<>();
         for (ABCException e : exceptions) {
-            ret.add(getCode().adr2pos(e.start));
-            ret.add(getCode().adr2pos(e.end));
+            ret.add(getCode().adr2pos(e.start, true));
+            ret.add(getCode().adr2pos(e.end, true));
             ret.add(getCode().adr2pos(e.target));
         }
         return ret;
@@ -344,8 +344,11 @@ public final class MethodBody implements Cloneable {
         if (Configuration.autoDeobfuscate.get()) {
             try {
                 body.getCode().removeTraps(constants, trait, method_info.get(this.method_info), body, abc, scriptIndex, classIndex, isStatic, path);
+            } catch (InterruptedException ex) {
+                throw ex;
             } catch (Throwable ex) {
-                logger.log(Level.SEVERE, "Error during deobfuscation: " + path, ex);
+                //ignore
+                return this;
             }
         }
 

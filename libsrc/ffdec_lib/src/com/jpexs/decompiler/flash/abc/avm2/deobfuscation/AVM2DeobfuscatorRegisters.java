@@ -297,7 +297,7 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
                 }
             } catch (InterruptedException ex) {
                 throw ex;
-            } catch (Exception ex) {
+            } catch (Throwable ex) {
                 //ignore
             }
         }
