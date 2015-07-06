@@ -773,7 +773,7 @@ public class AVM2Code implements Cloneable {
         }
     }
 
-    public AVM2Code(ABCInputStream ais) throws IOException {
+    public AVM2Code(ABCInputStream ais, MethodBody body) throws IOException {
         Map<Long, AVM2Instruction> codeMap = new TreeMap<>();
         DumpInfo diParent = ais.dumpInfo;
         List<Long> addresses = new ArrayList<>();
@@ -789,6 +789,13 @@ public class AVM2Code implements Cloneable {
 
         long startPos = ais.getPosition();
         addresses.add(startPos);
+        if (body != null) {
+            for (ABCException e : body.exceptions) {
+                addresses.add((long) e.start);
+                addresses.add((long) e.end);
+                addresses.add((long) e.target);
+            }
+        }
 
         loopaddr:
         while (!addresses.isEmpty() || !switchAddresses.isEmpty() || !unAdresses.isEmpty()) {
@@ -919,6 +926,7 @@ public class AVM2Code implements Cloneable {
                                 for (int c = 2; c < actualOperands.length; c++) {
                                     addresses.add(beforeSwitchPos + actualOperands[c]);
                                 }
+                                unAdresses.add(ais.getPosition());
                                 continue loopaddr;
                             }
                         }

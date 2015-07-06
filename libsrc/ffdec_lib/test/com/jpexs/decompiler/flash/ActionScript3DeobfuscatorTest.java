@@ -54,6 +54,7 @@ public class ActionScript3DeobfuscatorTest extends ActionStript2TestBase {
         Configuration.autoDeobfuscate.set(true);
         Configuration.deobfuscationOldMode.set(false);
         Configuration.decimalAddress.set(false);
+        Configuration.decompilationTimeoutSingleMethod.set(Integer.MAX_VALUE);
         swf = new SWF(new BufferedInputStream(new FileInputStream("testdata/as3/as3.swf")), false);
     }
 
@@ -178,10 +179,10 @@ public class ActionScript3DeobfuscatorTest extends ActionStript2TestBase {
             fail("if true OnTrue removed");
         }
         if (!res.contains("\"OK2\"")) {
-            fail("if false OnFalse removed" + res);
+            fail("if false OnFalse removed");
         }
         if (res.contains("\"FAIL1\"")) {
-            fail("if true OnFalse not removed");
+            fail("if true OnFalse not removed:");
         }
         if (res.contains("\"FAIL2\"")) {
             fail("if false OnTrue not removed");

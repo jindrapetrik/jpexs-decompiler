@@ -253,7 +253,7 @@ public class DumpTree extends JTree {
             ABCInputStream ais = new ABCInputStream(new MemoryInputStream(data, 0, prevLength + (int) dumpInfo.lengthBytes));
             ais.seek(prevLength);
             ais.dumpInfo = dumpInfo;
-            new AVM2Code(ais);
+            new AVM2Code(ais, null /*FIXME! Pass correct body!*/);
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
         }

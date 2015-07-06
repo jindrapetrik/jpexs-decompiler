@@ -121,7 +121,7 @@ public final class MethodBody implements Cloneable {
             AVM2Code avm2Code;
             try {
                 ABCInputStream ais = new ABCInputStream(new MemoryInputStream(codeBytes));
-                avm2Code = new AVM2Code(ais);
+                avm2Code = new AVM2Code(ais, this);
                 avm2Code.removeWrongIndices(abc.constants);
             } catch (UnknownInstructionCode | IOException ex) {
                 avm2Code = new AVM2Code();
@@ -218,6 +218,17 @@ public final class MethodBody implements Cloneable {
         getCode().insertInstruction(pos, instruction, mapOffsetsAfterIns, this);
     }
 
+    public int getLocalReservedCount() {
+        int pos = abc.method_info.get(this.method_info).param_types.length + 1;
+        if (abc.method_info.get(this.method_info).flagNeed_arguments()) {
+            pos++;
+        }
+        if (abc.method_info.get(this.method_info).flagNeed_rest()) {
+            pos++;
+        }
+        return pos;
+    }
+
     public HashMap<Integer, String> getLocalRegNames(ABC abc) {
         HashMap<Integer, String> ret = new HashMap<>();
         for (int i = 1; i <= abc.method_info.get(this.method_info).param_types.length; i++) {
@@ -247,9 +258,6 @@ public final class MethodBody implements Cloneable {
     }
 
     public void convert(final String path, ScriptExportMode exportMode, final boolean isStatic, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final AVM2ConstantPool constants, final List<MethodInfo> method_info, final ScopeStack scopeStack, final boolean isStaticInitializer, final GraphTextWriter writer, final List<String> fullyQualifiedNames, final Traits initTraits, boolean firstLevel) throws InterruptedException {
-        /*if (!path.contains("forcedWidth")) {
-         return;
-         }*/
         if (debugMode) {
             System.err.println("Decompiling " + path);
         }
@@ -296,9 +304,6 @@ public final class MethodBody implements Cloneable {
     }
 
     public GraphTextWriter toString(final String path, ScriptExportMode exportMode, final ABC abc, final Trait trait, final AVM2ConstantPool constants, final List<MethodInfo> method_info, final GraphTextWriter writer, final List<String> fullyQualifiedNames) throws InterruptedException {
-        /*if (!path.contains("forcedWidth")) {
-         return writer;
-         }*/
         if (exportMode != ScriptExportMode.AS) {
             getCode().toASMSource(constants, trait, method_info.get(this.method_info), this, exportMode, writer);
         } else {

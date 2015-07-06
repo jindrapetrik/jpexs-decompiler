@@ -32,6 +32,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnValueIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnVoidIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ThrowIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.Reference;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
@@ -43,9 +44,8 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateException;
 import com.jpexs.decompiler.graph.TranslateStack;
-import java.util.AbstractList;
 import java.util.ArrayList;
-import java.util.EmptyStackException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -70,61 +70,65 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
 
     @Override
     public void deobfuscate(String path, int classIndex, boolean isStatic, int scriptIndex, ABC abc, AVM2ConstantPool cpool, Trait trait, MethodInfo minfo, MethodBody abody) throws InterruptedException {
+        //System.err.println("regdeo:" + path);
 
         removeUnreachableActions(abody.getCode(), cpool, trait, minfo, abody);
-
-        Map<Integer, GraphTargetItem> outFirstAssigned = new HashMap<>();
-        Map<Integer, AVM2Instruction> outFirstAssignments = new HashMap<>();
-        Map<Integer, Integer> outAssignCount1 = new HashMap<>();
-        Map<Integer, Integer> outAssignCount2 = new HashMap<>();
-
-        Map<Integer, GraphTargetItem> singleRegisters = new HashMap<>();
-
-        List<AVM2Instruction> ignored = new ArrayList<>();
-        Map<Integer, GraphTargetItem> registers = new HashMap<>();
-
-        boolean extended = true;
+        /*for (AVM2Instruction ins : abody.getCode().code) {
+         System.err.println("" + ins.offset + ": " + ins);
+         }*/
+        Set<Integer> ignoredRegs = new HashSet<>();
 
         MethodBody body = abody;
 
-        if (extended) {
-            body = abody.clone();
-            getFirstRegistersUsage(outAssignCount1, outFirstAssigned, outFirstAssignments, classIndex, isStatic, scriptIndex, abc, cpool, trait, minfo, body, ignored, registers);
-            ignored.addAll(outFirstAssignments.values());
-            registers.putAll(outFirstAssigned);
-
-            replaceSingleUseRegisters(registers, ignored, classIndex, isStatic, scriptIndex, abc, cpool, trait, minfo, body);
-
-            super.deobfuscate(path, classIndex, isStatic, scriptIndex, abc, cpool, trait, minfo, body);
-            removeUnreachableActions(body.getCode(), cpool, trait, minfo, body);
-
-            //second pass - ignore all first assignments
-            registers.clear();
-            ignored.clear();
-            outFirstAssignments.clear();
-            getFirstRegistersUsage(outAssignCount2, new HashMap<>(), outFirstAssignments, classIndex, isStatic, scriptIndex, abc, cpool, trait, minfo, body, ignored, registers);
-
-            for (int regId : outAssignCount1.keySet()) {
-                int ac = outAssignCount2.containsKey(regId) ? outAssignCount2.get(regId) : 0;
-                if (ac == 0) {
-                    singleRegisters.put(regId, outFirstAssigned.get(regId));
-                }
-            }
-            body = abody;
-        } else {
-            getFirstRegistersUsage(outAssignCount1, outFirstAssigned, outFirstAssignments, classIndex, isStatic, scriptIndex, abc, cpool, trait, minfo, body, ignored, registers);
-            for (int regId : outAssignCount1.keySet()) {
-                int ac = outAssignCount1.get(regId);
-                if (ac == 1) {
-                    singleRegisters.put(regId, outFirstAssigned.get(regId));
-                }
-            }
+        body = abody.clone();
+        Reference<AVM2Instruction> assignment = new Reference<>(null);
+        ignoredRegs.clear();
+        for (int i = 0; i < body.getLocalReservedCount(); i++) {
+            ignoredRegs.add(i);
         }
 
-        //body.max_regs        
-        replaceSingleUseRegisters(singleRegisters, null, classIndex, isStatic, scriptIndex, abc, cpool, trait, minfo, body);
-        super.deobfuscate(path, classIndex, isStatic, scriptIndex, abc, cpool, trait, minfo, body);
+        int setReg = 0;
+        List<Integer> listedRegs = new ArrayList<>();
+        List<MethodBody> listedLastBodies = new ArrayList<>();
+        Set<Integer> ignoredRegGets = new HashSet<>();
+
+        while (setReg > -1) {
+            MethodBody bodybefore = body;
+            body = bodybefore.clone();
+            setReg = getFirstRegisterSetter(assignment, classIndex, isStatic, scriptIndex, abc, cpool, trait, minfo, body, ignoredRegs, ignoredRegGets);
+            //System.err.println("setreg " + setReg + " ass:" + assignment.getVal());
+            if (setReg < 0) {
+                break;
+            }
+            //if there is second assignment
+            if (listedRegs.contains(setReg)) {
+                //System.err.println("second assignment of loc" + setReg + ", ignoring");
+                int lindex = listedRegs.indexOf(setReg);
+                body = listedLastBodies.get(lindex); //switch to body before
+                ignoredRegs.add(setReg); //this is not obfuscated
+                for (int i = listedRegs.size() - 1; i >= lindex; i--) {
+                    int r = listedRegs.get(i);
+                    listedRegs.remove(i);
+                    listedLastBodies.remove(i);
+                    ignoredRegGets.remove(r);
+                }
+                continue;
+            }
+
+            if ((assignment.getVal().definition instanceof SetLocalTypeIns) || (assignment.getVal().definition instanceof GetLocalTypeIns /*First usage -> value undefined*/)) {
+                super.removeObfuscationIfs(classIndex, isStatic, scriptIndex, abc, cpool, trait, minfo, body, Arrays.asList(assignment.getVal()));
+            }
+            if (assignment.getVal().definition instanceof GetLocalTypeIns) {
+                ignoredRegGets.add(setReg);
+            }
+            listedRegs.add(setReg);
+            listedLastBodies.add(bodybefore);
+        }
+
+        abody.exceptions = body.exceptions;
+        abody.setCode(body.getCode());
         removeUnreachableActions(body.getCode(), cpool, trait, minfo, body);
+        //System.err.println("/deo");
     }
 
     private void replaceSingleUseRegisters(Map<Integer, GraphTargetItem> singleRegisters, List<AVM2Instruction> setInss, int classIndex, boolean isStatic, int scriptIndex, ABC abc, AVM2ConstantPool cpool, Trait trait, MethodInfo minfo, MethodBody body) {
@@ -149,45 +153,19 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
         }
     }
 
-    private void getFirstRegistersUsage(Map<Integer, Integer> outAssignCount, Map<Integer, GraphTargetItem> outFirstAssigned, Map<Integer, AVM2Instruction> outFirstAssignments, int classIndex, boolean isStatic, int scriptIndex, ABC abc, AVM2ConstantPool cpool, Trait trait, MethodInfo minfo, MethodBody body, List<AVM2Instruction> ignoredAss, Map<Integer, GraphTargetItem> registers) {
+    private int getFirstRegisterSetter(Reference<AVM2Instruction> assignment, int classIndex, boolean isStatic, int scriptIndex, ABC abc, AVM2ConstantPool cpool, Trait trait, MethodInfo minfo, MethodBody body, Set<Integer> ignoredRegisters, Set<Integer> ignoredGets) {
         AVM2Code code = body.getCode();
         Map<Integer, GraphTargetItem> ret = new HashMap<>();
 
         if (code.code.isEmpty()) {
-            return;
+            return -1;
         }
 
         ExecutionResult res = new ExecutionResult();
-        visitCode(new HashSet<>(), new TranslateStack("deo"), classIndex, isStatic, body, scriptIndex, abc, code, 0, code.code.size() - 1, res, registers, ignoredAss);
-        for (int reg : res.assignCount.keySet()) {
-            if (res.firstAssigned.get(reg) != null && res.firstAssigned.get(reg).isCompileTime()) {
-                outAssignCount.put(reg, res.assignCount.get(reg));
-                outFirstAssigned.put(reg, res.firstAssigned.get(reg));
-                outFirstAssignments.put(reg, res.firstAssignInstruction.get(reg));
-            }
-        }
+        return visitCode(assignment, new HashSet<>(), new TranslateStack("deo"), classIndex, isStatic, body, scriptIndex, abc, code, 0, code.code.size() - 1, res, ignoredRegisters, ignoredGets);
     }
-    /*
-     private Map<Integer, GraphTargetItem> getSingleUseRegisters(int classIndex, boolean isStatic, int scriptIndex, ABC abc, AVM2ConstantPool cpool, Trait trait, MethodInfo minfo, MethodBody body) {
-     AVM2Code code = body.getCode();
-     Map<Integer, GraphTargetItem> ret = new HashMap<>();
 
-     if (code.code.isEmpty()) {
-     return ret;
-     }
-
-     ExecutionResult res = new ExecutionResult();
-     visitCode(new HashSet<>(), new TranslateStack("deo"), classIndex, isStatic, body, scriptIndex, abc, code, 0, code.code.size() - 1, res);
-     for (int reg : res.assignCount.keySet()) {
-     if (res.assignCount.get(reg) == 1) {
-     ret.put(reg, res.lastAssigned.get(reg));
-     }
-     }
-
-     return ret;
-     }*/
-
-    private void visitCode(Set<Integer> visited, TranslateStack stack, int classIndex, boolean isStatic, MethodBody body, int scriptIndex, ABC abc, AVM2Code code, int idx, int endIdx, ExecutionResult result, Map<Integer, GraphTargetItem> registers, List<AVM2Instruction> ignoredAss) {
+    private int visitCode(Reference<AVM2Instruction> assignment, Set<Integer> visited, TranslateStack stack, int classIndex, boolean isStatic, MethodBody body, int scriptIndex, ABC abc, AVM2Code code, int idx, int endIdx, ExecutionResult result, Set<Integer> ignored, Set<Integer> ignoredGets) {
         List<GraphTargetItem> output = new ArrayList<>();
         AVM2LocalData localData = newLocalData(scriptIndex, abc, abc.constants, body, isStatic, classIndex);
         localData.localRegs.put(0, new NullAVM2Item(null));//this
@@ -212,40 +190,33 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
                     AVM2Instruction action = code.code.get(idx);
                     InstructionDefinition def = action.definition;
                     //System.err.println("" + idx + ": " + action + " stack:" + stack.size());
-                    if (action.definition instanceof GetLocalTypeIns) {
-                        stack.push(registers.get(((GetLocalTypeIns) action.definition).getRegisterId(action)));
-                    } else if (action.definition instanceof SetLocalTypeIns) {
-                        SetLocalTypeIns slt = (SetLocalTypeIns) def;
-                        GraphTargetItem regVal = stack.pop();//localData.localRegs.get(regId);
-                        int regId = slt.getRegisterId(action);
-                        if (!result.assignCount.containsKey(regId)) {
-                            result.assignCount.put(regId, 0);
-                        }
-                        boolean isIgnored = false;
-                        for (AVM2Instruction ins : ignoredAss) {
-                            if (action == ins) {
-                                isIgnored = true;
-                                break;
-                            }
-                        }
-                        if (isIgnored) {
-                        } else {
-                            result.assignCount.put(regId, result.assignCount.get(regId) + 1);
 
-                            //GraphTargetItem regVal = localData.localRegs.get(regId);
-                            if (regVal == null || !regVal.getNotCoerced().isCompileTime()) {
-                                result.assignCount.put(regId, Integer.MAX_VALUE);
-                            } else {
-                                if (result.assignCount.get(regId) == 1) {
-                                    result.firstAssigned.put(regId, regVal.getNotCoerced());
-                                    result.firstAssignInstruction.put(regId, action);
+                    action.translate(localData, stack, output, Graph.SOP_USE_STATIC, "");
+
+                    //if (!(def instanceof KillIns)) 
+                    if (def instanceof SetLocalTypeIns) {
+                        int regId = ((SetLocalTypeIns) def).getRegisterId(action);
+                        if (!ignored.contains(regId)) {
+                            assignment.setVal(action);
+                            return regId;
+                        }
+                    } else if (def instanceof GetLocalTypeIns) {
+                        int regId = ((GetLocalTypeIns) def).getRegisterId(action);
+                        if (!ignored.contains(regId) && !ignoredGets.contains(regId)) {
+                            assignment.setVal(action);
+                            return regId;
+                        }
+                    } else {
+                        for (int p = 0; p < action.definition.operands.length; p++) {
+                            int op = action.definition.operands[p];
+                            if (op == AVM2Code.DAT_REGISTER_INDEX) {
+                                int regId = action.operands[p];
+                                if (!ignored.contains(regId)) {
+                                    assignment.setVal(action);
+                                    return regId;
                                 }
-                                result.lastAssigned.put(regId, regVal.getNotCoerced());
                             }
                         }
-                        //assignCount
-                    } else {
-                        action.translate(localData, stack, output, Graph.SOP_USE_STATIC, "");
                     }
 
                     idx++;
@@ -328,14 +299,6 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
                 //ignore
             }
         }
-    }
-
-    class ExecutionResult {
-
-        public Map<Integer, Integer> assignCount = new HashMap<>();
-
-        public Map<Integer, GraphTargetItem> lastAssigned = new HashMap<>();
-        public Map<Integer, GraphTargetItem> firstAssigned = new HashMap<>();
-        public Map<Integer, AVM2Instruction> firstAssignInstruction = new HashMap<>();
+        return -1;
     }
 }
