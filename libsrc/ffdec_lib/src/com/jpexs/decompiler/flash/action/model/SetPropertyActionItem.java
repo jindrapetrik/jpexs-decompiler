@@ -77,11 +77,11 @@ public class SetPropertyActionItem extends ActionItem implements SetTypeActionIt
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         if (isEmptyString(target)) {
-            writer.append(Action.propertyNames[propertyIndex] + " = ");
+            writer.append(Action.propertyNames[propertyIndex]).append(" = ");
             return value.toString(writer, localData);
         }
         target.toString(writer, localData);
-        writer.append("." + Action.propertyNames[propertyIndex] + " = ");
+        writer.append("." + Action.propertyNames[propertyIndex]).append(" = ");
         return value.toString(writer, localData);
     }
 

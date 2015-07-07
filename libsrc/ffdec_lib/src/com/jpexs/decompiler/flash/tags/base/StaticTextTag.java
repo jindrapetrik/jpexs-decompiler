@@ -231,23 +231,23 @@ public abstract class StaticTextTag extends TextTag {
         FontTag fnt = null;
         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
         writer.append("[").newLine();
-        writer.append("xmin " + textBounds.Xmin).newLine();
-        writer.append("ymin " + textBounds.Ymin).newLine();
-        writer.append("xmax " + textBounds.Xmax).newLine();
-        writer.append("ymax " + textBounds.Ymax).newLine();
+        writer.append("xmin ").append(textBounds.Xmin).newLine();
+        writer.append("ymin ").append(textBounds.Ymin).newLine();
+        writer.append("xmax ").append(textBounds.Xmax).newLine();
+        writer.append("ymax ").append(textBounds.Ymax).newLine();
         if (textMatrix.translateX != 0) {
-            writer.append("translatex " + textMatrix.translateX).newLine();
+            writer.append("translatex ").append(textMatrix.translateX).newLine();
         }
         if (textMatrix.translateY != 0) {
-            writer.append("translatey " + textMatrix.translateY).newLine();
+            writer.append("translatey ").append(textMatrix.translateY).newLine();
         }
         if (textMatrix.hasScale) {
-            writer.append("scalex " + textMatrix.scaleX).newLine();
-            writer.append("scaley " + textMatrix.scaleY).newLine();
+            writer.append("scalex ").append(textMatrix.scaleX).newLine();
+            writer.append("scaley ").append(textMatrix.scaleY).newLine();
         }
         if (textMatrix.hasRotate) {
-            writer.append("rotateskew0 " + textMatrix.rotateSkew0).newLine();
-            writer.append("rotateskew1 " + textMatrix.rotateSkew1).newLine();
+            writer.append("rotateskew0 ").append(textMatrix.rotateSkew0).newLine();
+            writer.append("rotateskew1 ").append(textMatrix.rotateSkew1).newLine();
         }
         writer.append("]");
         for (TEXTRECORD rec : textRecords) {
@@ -258,21 +258,21 @@ public abstract class StaticTextTag extends TextTag {
                     if (fnt2 != null) {
                         fnt = fnt2;
                     }
-                    writer.append("font " + rec.fontId).newLine();
-                    writer.append("height " + rec.textHeight).newLine();
+                    writer.append("font ").append(rec.fontId).newLine();
+                    writer.append("height ").append(rec.textHeight).newLine();
                 }
                 if (rec.styleFlagsHasColor) {
                     if (getTextNum() == 1) {
-                        writer.append("color " + rec.textColor.toHexRGB()).newLine();
+                        writer.append("color ").append(rec.textColor.toHexRGB()).newLine();
                     } else {
-                        writer.append("color " + rec.textColorA.toHexARGB()).newLine();
+                        writer.append("color ").append(rec.textColorA.toHexARGB()).newLine();
                     }
                 }
                 if (rec.styleFlagsHasXOffset) {
-                    writer.append("x " + rec.xOffset).newLine();
+                    writer.append("x ").append(rec.xOffset).newLine();
                 }
                 if (rec.styleFlagsHasYOffset) {
-                    writer.append("y " + rec.yOffset).newLine();
+                    writer.append("y ").append(rec.yOffset).newLine();
                 }
                 writer.append("]");
             }

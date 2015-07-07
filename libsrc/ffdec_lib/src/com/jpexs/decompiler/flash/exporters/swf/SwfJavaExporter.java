@@ -242,11 +242,11 @@ public class SwfJavaExporter {
                 }
             }
 
-            writer.append("private " + className + " " + tagObjName + "(" + (isSwf ? "" : "SWF swf") + ") {").newLine();
+            writer.append("private ").append(className).append(" ").append(tagObjName).append("(").append(isSwf ? "" : "SWF swf").append(") {").newLine();
             writer.indent();
-            writer.append(className + " " + resultName + " = new " + className + "(" + (obj instanceof Tag ? "swf" : "") + ");" + Helper.newLine);
+            writer.append(className).append(" ").append(resultName).append(" = new ").append(className).append("(").append(obj instanceof Tag ? "swf" : "").append(");").newLine();
             writer.append(sb2.toString());
-            writer.append(indent + "return " + resultName + ";").newLine();
+            writer.append(indent).append("return ").append(resultName).append(";").newLine();
             writer.unindent();
             writer.append("}").newLine().newLine();
             value = tagObjName + "(swf)";

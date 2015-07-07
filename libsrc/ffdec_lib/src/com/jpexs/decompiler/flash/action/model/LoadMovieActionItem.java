@@ -69,7 +69,7 @@ public class LoadMovieActionItem extends ActionItem {
         urlString.toString(writer, localData);
         writer.append(",");
         targetString.toString(writer, localData);
-        return writer.append(methodStr + ")");
+        return writer.append(methodStr).append(")");
     }
 
     @Override

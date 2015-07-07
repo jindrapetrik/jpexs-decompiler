@@ -36,7 +36,7 @@ public class LabelItem extends GraphTargetItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        writer.append(labelName + ":");
+        writer.append(labelName).append(":");
         return writer;
     }
 

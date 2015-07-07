@@ -55,7 +55,7 @@ public class GetPropertyActionItem extends ActionItem {
             return writer.append(Action.propertyNames[propertyIndex]);
         }
         target.toString(writer, localData);
-        return writer.append("." + Action.propertyNames[propertyIndex]);
+        return writer.append(".").append(Action.propertyNames[propertyIndex]);
     }
 
     @Override

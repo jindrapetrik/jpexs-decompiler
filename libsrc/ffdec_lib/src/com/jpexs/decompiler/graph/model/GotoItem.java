@@ -36,7 +36,7 @@ public class GotoItem extends GraphTargetItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        writer.append("§§goto(" + labelName + ")");
+        writer.append("§§goto(").append(labelName).append(")");
         return writer;
     }
 

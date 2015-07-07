@@ -172,10 +172,10 @@ public class DirectValueActionItem extends ActionItem implements SimpleValue {
             }
         }
         if (value instanceof String) {
-            return writer.append("\"" + Helper.escapeActionScriptString((String) value) + "\"");
+            return writer.append("\"").append(Helper.escapeActionScriptString((String) value)).append("\"");
         }
         if (value instanceof ConstantIndex) {
-            return writer.append("\"" + Helper.escapeActionScriptString(this.constants.get(((ConstantIndex) value).index)) + "\"");
+            return writer.append("\"").append(Helper.escapeActionScriptString(this.constants.get(((ConstantIndex) value).index))).append("\"");
         }
         if (value instanceof RegisterNumber) {
             return writer.append(((RegisterNumber) value).translate());

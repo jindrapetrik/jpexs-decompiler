@@ -43,7 +43,7 @@ public class StringAVM2Item extends AVM2Item implements SimpleValue {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
-        return writer.append("\"" + Helper.escapeActionScriptString(value) + "\"");
+        return writer.append("\"").append(Helper.escapeActionScriptString(value)).append("\"");
     }
 
     @Override

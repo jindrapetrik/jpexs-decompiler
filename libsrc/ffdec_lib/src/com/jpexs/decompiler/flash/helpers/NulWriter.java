@@ -102,6 +102,24 @@ public class NulWriter extends GraphTextWriter {
     }
 
     @Override
+    public GraphTextWriter append(char value) {
+        stringAdded = true;
+        return this;
+    }
+
+    @Override
+    public GraphTextWriter append(int value) {
+        stringAdded = true;
+        return this;
+    }
+
+    @Override
+    public GraphTextWriter append(long value) {
+        stringAdded = true;
+        return this;
+    }
+
+    @Override
     public NulWriter append(String str) {
         stringAdded = true;
         return this;

@@ -71,7 +71,7 @@ public class LoadVariablesNumActionItem extends ActionItem {
         urlString.toString(writer, localData);
         writer.append(",");
         num.toString(writer, localData);
-        return writer.append(methodStr + ")");
+        return writer.append(methodStr).append(")");
     }
 
     @Override

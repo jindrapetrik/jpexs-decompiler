@@ -505,10 +505,10 @@ public class DefineEditTextTag extends TextTag {
             alignment = "unknown";
         }
         writer.newLine();
-        writer.append("xmin " + bounds.Xmin).newLine();
-        writer.append("ymin " + bounds.Ymin).newLine();
-        writer.append("xmax " + bounds.Xmax).newLine();
-        writer.append("ymax " + bounds.Ymax).newLine();
+        writer.append("xmin ").append(bounds.Xmin).newLine();
+        writer.append("ymin ").append(bounds.Ymin).newLine();
+        writer.append("xmax ").append(bounds.Xmax).newLine();
+        writer.append("ymax ").append(bounds.Ymax).newLine();
         if (wordWrap) {
             writer.append("wordwrap 1").newLine();
         }
@@ -540,27 +540,27 @@ public class DefineEditTextTag extends TextTag {
             writer.append("useoutlines 1").newLine();
         }
         if (hasFont) {
-            writer.append("font " + fontId).newLine();
-            writer.append("height " + fontHeight).newLine();
+            writer.append("font ").append(fontId).newLine();
+            writer.append("height ").append(fontHeight).newLine();
         }
         if (hasTextColor) {
-            writer.append("color " + textColor.toHexARGB()).newLine();
+            writer.append("color ").append(textColor.toHexARGB()).newLine();
         }
         if (hasFontClass) {
-            writer.append("fontclass " + fontClass).newLine();
+            writer.append("fontclass ").append(fontClass).newLine();
         }
         if (hasMaxLength) {
-            writer.append("maxlength " + maxLength).newLine();
+            writer.append("maxlength ").append(maxLength).newLine();
         }
-        writer.append("align " + alignment).newLine();
+        writer.append("align ").append(alignment).newLine();
         if (hasLayout) {
-            writer.append("leftmargin " + leftMargin).newLine();
-            writer.append("rightmargin " + rightMargin).newLine();
-            writer.append("indent " + indent).newLine();
-            writer.append("leading " + leading).newLine();
+            writer.append("leftmargin ").append(leftMargin).newLine();
+            writer.append("rightmargin ").append(rightMargin).newLine();
+            writer.append("indent ").append(indent).newLine();
+            writer.append("leading ").append(leading).newLine();
         }
         if (!variableName.isEmpty()) {
-            writer.append("variablename " + variableName).newLine();
+            writer.append("variablename ").append(variableName).newLine();
         }
         writer.append("]");
         if (hasText) {

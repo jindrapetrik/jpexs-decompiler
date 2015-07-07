@@ -148,6 +148,10 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     }
 
     public GraphTextWriter toString(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        if (Thread.currentThread().isInterrupted()) {
+            throw new InterruptedException();
+        }
+
         writer.startOffset(src, pos, srcData);
         appendTo(writer, localData);
         writer.endOffset();

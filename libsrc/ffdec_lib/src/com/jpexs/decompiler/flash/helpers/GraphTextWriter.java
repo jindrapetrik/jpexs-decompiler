@@ -130,6 +130,22 @@ public abstract class GraphTextWriter {
 
     public abstract GraphTextWriter appendWithData(String str, HighlightData data);
 
+    public GraphTextWriter append(char value) {
+        return append(Character.toString(value));
+    }
+
+    public GraphTextWriter append(int value) {
+        return append(Integer.toString(value));
+    }
+
+    public GraphTextWriter append(long value) {
+        return append(Long.toString(value));
+    }
+
+    public GraphTextWriter append(double value) {
+        return append(Double.toString(value));
+    }
+
     public abstract GraphTextWriter append(String str);
 
     public abstract GraphTextWriter append(String str, long offset);

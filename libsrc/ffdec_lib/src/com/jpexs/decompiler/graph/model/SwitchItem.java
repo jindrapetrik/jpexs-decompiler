@@ -74,7 +74,7 @@ public class SwitchItem extends LoopItem implements Block {
             ((NulWriter) writer).startLoop(loop.id, LoopWithType.LOOP_TYPE_SWITCH);
         }
         if (labelUsed) {
-            writer.append("loop" + loop.id + ":").newLine();
+            writer.append("loop").append(loop.id).append(":").newLine();
         }
         writer.append("switch");
         if (writer.getFormatting().spaceBeforeParenthesesSwitchParentheses) {

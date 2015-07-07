@@ -81,7 +81,7 @@ public class ForInActionItem extends LoopActionItem implements Block {
             ((NulWriter) writer).startLoop(loop.id, LoopWithType.LOOP_TYPE_LOOP);
         }
         if (labelUsed) {
-            writer.append("loop" + loop.id + ":").newLine();
+            writer.append("loop").append(loop.id).append(":").newLine();
         }
         writer.append("for");
         if (writer.getFormatting().spaceBeforeParenthesesForParentheses) {
