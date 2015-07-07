@@ -16,6 +16,19 @@ public enum DeobfuscationLevel {
         return level;
     }
 
+    public static DeobfuscationLevel getByLevel(int level) {
+        switch (level) {
+            case 1:
+                return LEVEL_REMOVE_DEAD_CODE;
+            case 2:
+                return LEVEL_REMOVE_TRAPS;
+            case 3:
+                return LEVEL_RESTORE_CONTROL_FLOW;
+        }
+
+        return null;
+    }
+
     DeobfuscationLevel(int level) {
         this.level = level;
     }
