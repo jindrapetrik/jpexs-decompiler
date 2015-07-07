@@ -197,7 +197,7 @@ public class ActionScript2Parser {
         s = lex();
         while (s.type == SymbolType.DOT) {
             s = lex();
-            expected(s, lexer.yyline(), SymbolType.IDENTIFIER, SymbolType.STRING_OP);
+            expected(s, lexer.yyline(), SymbolType.IDENTIFIER, SymbolType.STRING_OP, SymbolGroup.GLOBALFUNC);
             ret = new GetMemberActionItem(null, ret, pushConst(s.value.toString()));
             s = lex();
         }
@@ -1797,7 +1797,7 @@ public class ActionScript2Parser {
             }
             if (op.type == SymbolType.DOT) {
                 ParsedSymbol s = lex();
-                expected(s, lexer.yyline(), SymbolType.IDENTIFIER, SymbolType.THIS, SymbolType.SUPER, SymbolType.STRING_OP);
+                expected(s, lexer.yyline(), SymbolType.IDENTIFIER, SymbolType.THIS, SymbolType.SUPER, SymbolType.STRING_OP, SymbolGroup.GLOBALFUNC);
 
                 ret = new GetMemberActionItem(null, ret, pushConst(s.value.toString()));
             }
