@@ -66,6 +66,9 @@ public abstract class CancellableWorker<T> implements RunnableFuture<T> {
         future.run();
     }
 
+    protected void onStart() {
+    }
+
     protected void done() {
     }
 

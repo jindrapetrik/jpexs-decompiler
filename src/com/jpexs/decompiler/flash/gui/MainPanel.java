@@ -72,10 +72,12 @@ import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
 import com.jpexs.decompiler.flash.exporters.swf.SwfJavaExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfXmlExporter;
 import com.jpexs.decompiler.flash.gui.abc.ABCPanel;
+import com.jpexs.decompiler.flash.gui.abc.ABCPanelSearchResult;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.gui.abc.DecompiledEditorPane;
 import com.jpexs.decompiler.flash.gui.abc.DeobfuscationDialog;
 import com.jpexs.decompiler.flash.gui.action.ActionPanel;
+import com.jpexs.decompiler.flash.gui.action.ActionSearchResult;
 import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
 import com.jpexs.decompiler.flash.gui.dumpview.DumpTree;
 import com.jpexs.decompiler.flash.gui.dumpview.DumpTreeModel;
@@ -1143,13 +1145,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 }
             }
 
-            if (selFile == null) {
-                selFile = selectExportDir();
-                if (selFile == null) {
-                    return new ArrayList<>();
-                }
-            }
-
             EventListener evl = swf.getExportEventListener();
 
             if (export.isOptionEnabled(ImageExportMode.class)) {
@@ -1247,7 +1242,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                                 if (!tls.isSimple && Configuration.ignoreCLikePackages.get()) {
                                     continue;
                                 }
-                                Main.startWork(translate("work.exporting") + " " + (i + 1) + "/" + as3scripts.size() + " " + tls.getPath() + " ...");
+
+                                Main.startWork(translate("work.exporting") + " " + (i + 1) + "/" + as3scripts.size() + " " + tls.getPath() + " ...", null);
                                 ret.add(tls.export(scriptsFolder, scriptExportSettings, parallel));
                             }
                         }
@@ -1575,44 +1571,96 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             final String txt = searchDialog.searchField.getText();
             if (!txt.isEmpty()) {
                 final SWF swf = getCurrentSwf();
+                if (swf.isAS3()) {
+                    getABCPanel();
+                } else {
+                    getActionPanel();
+                }
 
-                new CancellableWorker() {
-                    @Override
-                    protected Void doInBackground() throws Exception {
-                        boolean found = false;
-                        if (searchDialog.searchInASRadioButton.isSelected()) {
+                boolean ignoreCase = searchDialog.ignoreCaseCheckBox.isSelected();
+                boolean regexp = searchDialog.regexpCheckBox.isSelected();
+
+                if (searchDialog.searchInASRadioButton.isSelected()) {
+                    new CancellableWorker<Void>() {
+                        @Override
+                        protected Void doInBackground() throws Exception {
+                            List<ABCPanelSearchResult> abcResult = null;
+                            List<ActionSearchResult> actionResult = null;
                             if (swf.isAS3()) {
-                                // todo: honfika: do not call this from background thread
-                                View.execInEventDispatch(() -> {
-                                    getActionPanel();
-                                });
-
-                                if (getABCPanel().search(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected())) {
-                                    found = true;
-                                }
+                                abcResult = getABCPanel().search(txt, ignoreCase, regexp, this);
                             } else {
-                                // todo: honfika: do not call this from background thread
-                                View.execInEventDispatch(() -> {
-                                    getActionPanel();
-                                });
+                                actionResult = getActionPanel().search(txt, ignoreCase, regexp, this);
+                            }
 
-                                if (getActionPanel().search(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected())) {
+                            List<ABCPanelSearchResult> fAbcResult = abcResult;
+                            List<ActionSearchResult> fActionResult = actionResult;
+                            View.execInEventDispatch(() -> {
+                                boolean found = false;
+                                if (fAbcResult != null) {
                                     found = true;
+                                    getABCPanel().searchPanel.setSearchText(txt);
+                                    SearchResultsDialog<ABCPanelSearchResult> sr = new SearchResultsDialog<>(getMainFrame().getWindow(), txt, getABCPanel());
+                                    sr.setResults(fAbcResult);
+                                    sr.setVisible(true);
+                                } else if (fActionResult != null) {
+                                    found = true;
+                                    getActionPanel().searchPanel.setSearchText(txt);
+
+                                    SearchResultsDialog<ActionSearchResult> sr = new SearchResultsDialog<>(getMainFrame().getWindow(), txt, getActionPanel());
+                                    sr.setResults(fActionResult);
+                                    sr.setVisible(true);
                                 }
-                            }
-                        } else if (searchDialog.searchInTextsRadioButton.isSelected()) {
-                            if (searchText(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected(), swf)) {
-                                found = true;
-                            }
+
+                                if (!found) {
+                                    View.showMessageDialog(null, translate("message.search.notfound").replace("%searchtext%", txt), translate("message.search.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
+                                }
+
+                                Main.stopWork();
+                            });
+
+                            return null;
                         }
 
-                        if (!found) {
-                            View.showMessageDialog(null, translate("message.search.notfound").replace("%searchtext%", txt), translate("message.search.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
+                        @Override
+                        protected void done() {
+                            View.execInEventDispatch(() -> {
+                                Main.stopWork();
+                            });
+
+                        }
+                    }.execute();
+                } else if (searchDialog.searchInTextsRadioButton.isSelected()) {
+                    new CancellableWorker<Void>() {
+                        @Override
+                        protected Void doInBackground() throws Exception {
+                            List<TextTag> textResult = null;
+                            SearchPanel<TextTag> textSearchPanel = previewPanel.getTextPanel().getSearchPanel();
+                            textSearchPanel.setOptions(ignoreCase, regexp);
+                            textResult = searchText(txt, ignoreCase, regexp, swf);
+
+                            List<TextTag> fTextResult = textResult;
+                            View.execInEventDispatch(() -> {
+                                textSearchPanel.setSearchText(txt);
+                                boolean found = textSearchPanel.setResults(fTextResult);
+                                if (!found) {
+                                    View.showMessageDialog(null, translate("message.search.notfound").replace("%searchtext%", txt), translate("message.search.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
+                                }
+
+                                Main.stopWork();
+                            });
+
+                            return null;
                         }
 
-                        return null;
-                    }
-                }.execute();
+                        @Override
+                        protected void done() {
+                            View.execInEventDispatch(() -> {
+                                Main.stopWork();
+                            });
+
+                        }
+                    }.execute();
+                }
             }
         }
     }
@@ -1683,10 +1731,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
     }
 
-    private boolean searchText(String txt, boolean ignoreCase, boolean regexp, SWF swf) {
+    private List<TextTag> searchText(String txt, boolean ignoreCase, boolean regexp, SWF swf) {
         if (txt != null && !txt.isEmpty()) {
-            SearchPanel<TextTag> textSearchPanel = previewPanel.getTextPanel().getSearchPanel();
-            textSearchPanel.setOptions(ignoreCase, regexp);
             List<TextTag> found = new ArrayList<>();
             Pattern pat;
             if (regexp) {
@@ -1702,10 +1748,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     }
                 }
             }
-            textSearchPanel.setSearchText(txt);
-            return textSearchPanel.setResults(found);
+
+            return found;
         }
-        return false;
+
+        return null;
     }
 
     @Override
@@ -1759,9 +1806,13 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 new CancellableWorker() {
                     @Override
                     public Void doInBackground() throws Exception {
-                        Main.startWork(translate("work.renaming") + "...");
                         renameMultiname(abcList, multiName);
                         return null;
+                    }
+
+                    @Override
+                    protected void onStart() {
+                        Main.startWork(translate("work.renaming") + "...", this);
                     }
 
                     @Override
@@ -1779,13 +1830,17 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 new CancellableWorker() {
                     @Override
                     public Void doInBackground() throws Exception {
-                        Main.startWork(translate("work.renaming") + "...");
                         try {
                             renameIdentifier(swf, identifier);
                         } catch (InterruptedException ex) {
                             logger.log(Level.SEVERE, null, ex);
                         }
                         return null;
+                    }
+
+                    @Override
+                    protected void onStart() {
+                        Main.startWork(translate("work.renaming") + "...", this);
                     }
 
                     @Override
@@ -1862,7 +1917,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             Configuration.lastOpenDir.set(Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
             File sf = Helper.fixDialogFile(fc.getSelectedFile());
 
-            Main.startWork(translate("work.exporting.fla") + "...");
             final boolean compressed = flaFilters.contains(fc.getFileFilter());
             if (!compressed) {
                 if (sf.getName().endsWith(".fla")) {
@@ -1890,8 +1944,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 }
 
                 @Override
+                protected void onStart() {
+                    Main.startWork(translate("work.exporting.fla") + "...", this);
+                }
+
+                @Override
                 protected void done() {
-                    Main.stopWork();
                     if (Configuration.openFolderAfterFlaExport.get()) {
                         try {
                             Desktop.getDesktop().open(selfile.getAbsoluteFile().getParentFile());
@@ -1899,6 +1957,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                             logger.log(Level.SEVERE, null, ex);
                         }
                     }
+
+                    Main.stopWork();
                 }
             }.execute();
         }
@@ -2012,7 +2072,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         chooser.setAcceptAllFileFilterUsed(false);
         if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-            Main.startWork(translate("work.exporting") + "...");
             final String selFile = Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath();
             Configuration.lastExportDir.set(Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath());
             return selFile;
@@ -2036,9 +2095,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             final String selFile = selectExportDir();
             if (selFile != null) {
                 final long timeBefore = System.currentTimeMillis();
-                Main.startWork(translate("work.exporting") + "...");
 
-                new CancellableWorker() {
+                new CancellableWorker<Void>() {
                     @Override
                     public Void doInBackground() throws Exception {
                         try {
@@ -2053,6 +2111,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                             View.showMessageDialog(null, translate("error.export") + ": " + ex.getClass().getName() + " " + ex.getLocalizedMessage());
                         }
                         return null;
+                    }
+
+                    @Override
+                    protected void onStart() {
+                        Main.startWork(translate("work.exporting") + "...", this);
                     }
 
                     @Override
@@ -2078,6 +2141,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 SWF swf = (SWF) item;
                 final String selFile = selectExportDir();
                 if (selFile != null) {
+                    Main.startWork(translate("work.exporting") + "...", null);
+
                     try {
                         new SwfJavaExporter().exportJavaCode(swf, selFile);
                         Main.stopWork();
@@ -2100,6 +2165,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         for (SWF swf : swfs) {
             final String selFile = selectExportDir();
             if (selFile != null) {
+                Main.startWork(translate("work.exporting") + "...", null);
+
                 try {
                     File outFile = new File(selFile + File.separator + Helper.makeFileName("swf.xml"));
                     new SwfXmlExporter().exportXml(swf, outFile);
@@ -2140,11 +2207,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void restoreControlFlow(final boolean all) {
-        Main.startWork(translate("work.restoringControlFlow"));
         if ((!all) || confirmExperimental()) {
-            new CancellableWorker() {
+            new CancellableWorker<Void>() {
                 @Override
-                protected Object doInBackground() throws Exception {
+                protected Void doInBackground() throws Exception {
                     ABCPanel abcPanel = getABCPanel();
                     if (all) {
                         for (ABCContainerTag tag : abcPanel.getAbcList()) {
@@ -2159,7 +2225,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
                         abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abc, abcPanel.decompiledTextArea.getCurrentTrait(), abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getScriptIndex());
                     }
-                    return true;
+                    return null;
+                }
+
+                @Override
+                protected void onStart() {
+                    Main.startWork(translate("work.restoringControlFlow"), this);
                 }
 
                 @Override
@@ -2184,12 +2255,16 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             RenameDialog renameDialog = new RenameDialog();
             if (renameDialog.showRenameDialog() == AppDialog.OK_OPTION) {
                 final RenameType renameType = renameDialog.getRenameType();
-                Main.startWork(translate("work.renaming.identifiers") + "...");
                 new CancellableWorker<Integer>() {
                     @Override
                     protected Integer doInBackground() throws Exception {
                         int cnt = swf.deobfuscateIdentifiers(renameType);
                         return cnt;
+                    }
+
+                    @Override
+                    protected void onStart() {
+                        Main.startWork(translate("work.renaming.identifiers") + "...", this);
                     }
 
                     @Override
@@ -2221,12 +2296,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public void deobfuscate() {
         DeobfuscationDialog deobfuscationDialog = new DeobfuscationDialog();
         if (deobfuscationDialog.showDialog() == AppDialog.OK_OPTION) {
-            Main.startWork(translate("work.deobfuscating") + "...");
             new CancellableWorker() {
                 @Override
-                protected Object doInBackground() throws Exception {
+                protected Void doInBackground() throws Exception {
                     try {
-                        ABCPanel aBCPanel = getABCPanel();
+                        ABCPanel abcPanel = getABCPanel();
                         if (deobfuscationDialog.processAllCheckbox.isSelected()) {
                             for (ABCContainerTag tag : abcPanel.getAbcList()) {
                                 if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationLevel.LEVEL_REMOVE_DEAD_CODE.getLevel()) {
@@ -2259,7 +2333,13 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     } catch (Exception ex) {
                         logger.log(Level.SEVERE, "Deobfuscation error", ex);
                     }
-                    return true;
+
+                    return null;
+                }
+
+                @Override
+                protected void onStart() {
+                    Main.startWork(translate("work.deobfuscating") + "...", this);
                 }
 
                 @Override
@@ -2823,11 +2903,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public void loadFromBinaryTag(final List<DefineBinaryDataTag> binaryDataTags) {
 
         Main.loadingDialog.setVisible(true);
-        Main.startWork(AppStrings.translate("work.reading.swf") + "...");
-        new Thread() {
+        new CancellableWorker<Void>() {
 
             @Override
-            public void run() {
+            protected Void doInBackground() throws Exception {
                 try {
                     for (DefineBinaryDataTag binaryDataTag : binaryDataTags) {
                         try {
@@ -2849,12 +2928,22 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     //ignore
                 }
 
-                Main.loadingDialog.setVisible(false);
-                Main.stopWork();
+                return null;
             }
 
-        }.start();
+            @Override
+            protected void onStart() {
+                Main.startWork(AppStrings.translate("work.reading.swf") + "...", this);
+            }
 
+            @Override
+            protected void done() {
+                View.execInEventDispatch(() -> {
+                    Main.loadingDialog.setVisible(false);
+                    Main.stopWork();
+                });
+            }
+        }.execute();
     }
 
     private void closeTag() {
@@ -2920,7 +3009,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 setSourceWorker = null;
             }
             if (!Main.isWorking()) {
-                Main.startWork(AppStrings.translate("work.decompiling") + "...");
                 CancellableWorker worker = new CancellableWorker() {
 
                     @Override
@@ -2934,10 +3022,13 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     }
 
                     @Override
+                    protected void onStart() {
+                        Main.startWork(translate("work.decompiling") + "...", this);
+                    }
+
+                    @Override
                     protected void done() {
                         View.execInEventDispatch(() -> {
-                            Main.stopWork();
-
                             setSourceWorker = null;
                             try {
                                 get();
@@ -2947,13 +3038,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                                 Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, "Error", ex);
                                 getABCPanel().decompiledTextArea.setText("// " + AppStrings.translate("decompilationError") + ": " + ex);
                             }
+
+                            Main.stopWork();
                         });
                     }
                 };
+
                 worker.execute();
                 setSourceWorker = worker;
-
-                Main.startWork(translate("work.decompiling") + "...", worker);
             }
 
             showDetail(DETAILCARDAS3NAVIGATOR);

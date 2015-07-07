@@ -47,7 +47,6 @@ import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.SearchListener;
 import com.jpexs.decompiler.flash.gui.SearchPanel;
-import com.jpexs.decompiler.flash.gui.SearchResultsDialog;
 import com.jpexs.decompiler.flash.gui.TagEditorPanel;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.abc.tablemodels.DecimalTableModel;
@@ -83,7 +82,6 @@ import java.awt.event.MouseMotionListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -140,7 +138,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
     public final JTabbedPane tabbedPane;
 
-    private final SearchPanel<ABCPanelSearchResult> searchPanel;
+    public final SearchPanel<ABCPanelSearchResult> searchPanel;
 
     private NewTraitDialog newTraitDialog;
 
@@ -160,8 +158,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         return mainPanel;
     }
 
-    public boolean search(final String txt, boolean ignoreCase, boolean regexp) {
-        if ((txt != null) && (!txt.isEmpty())) {
+    public List<ABCPanelSearchResult> search(final String txt, boolean ignoreCase, boolean regexp, CancellableWorker<Void> worker) {
+        if (txt != null && !txt.isEmpty()) {
             searchPanel.setOptions(ignoreCase, regexp);
             TagTreeModel ttm = (TagTreeModel) mainPanel.tagTree.getModel();
             TreeItem scriptsNode = ttm.getScriptsNode(mainPanel.getCurrentSwf());
@@ -184,45 +182,23 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
                         decAdd = ", " + AppStrings.translate("work.decompiling");
                     }
 
+                    Main.startWork(workText + " \"" + txt + "\"" + decAdd + " - (" + pos + "/" + allpacks.size() + ") " + pack.getClassPath().toString() + "... ", worker);
                     try {
-                        CancellableWorker worker = new CancellableWorker() {
-
-                            @Override
-                            public Void doInBackground() throws Exception {
-                                if (pat.matcher(SWF.getCached(pack).text).find()) {
-                                    ABCPanelSearchResult searchResult = new ABCPanelSearchResult();
-                                    searchResult.scriptPack = pack;
-                                    found.add(searchResult);
-                                }
-                                return null;
-                            }
-                        };
-                        worker.execute();
-                        Main.startWork(workText + " \"" + txt + "\"" + decAdd + " - (" + pos + "/" + allpacks.size() + ") " + pack.getClassPath().toString() + "... ", worker);
-                        worker.get();
+                        if (pat.matcher(SWF.getCached(pack).text).find()) {
+                            ABCPanelSearchResult searchResult = new ABCPanelSearchResult();
+                            searchResult.scriptPack = pack;
+                            found.add(searchResult);
+                        }
                     } catch (InterruptedException ex) {
                         break;
-                    } catch (ExecutionException ex) {
-                        Logger.getLogger(ABCPanel.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
             }
 
-            Main.stopWork();
-
-            searchPanel.setSearchText(txt);
-
-            View.execInEventDispatch(() -> {
-                SearchResultsDialog<ABCPanelSearchResult> sr = new SearchResultsDialog<>(ABCPanel.this.mainPanel.getMainFrame().getWindow(), txt, ABCPanel.this);
-                sr.setResults(found);
-                sr.setVisible(true);
-            });
-
-            return true;
-
-            //return searchPanel.setResults(found);
+            return found;
         }
-        return false;
+
+        return null;
     }
 
     public void setAbc(ABC abc) {
@@ -750,7 +726,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
             String oldSp = pack.getClassPath().toString();
             /*List<ScriptPack> packs = abc.script_info.get(oldIndex).getPacks(abc, oldIndex, null, pack.allABCs);
              if (!packs.isEmpty()) {
-              
+
              }*/
 
             String as = decompiledTextArea.getText();

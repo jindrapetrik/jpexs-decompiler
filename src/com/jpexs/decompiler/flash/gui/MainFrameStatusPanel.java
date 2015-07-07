@@ -22,7 +22,6 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.BoxLayout;
@@ -70,18 +69,14 @@ public class MainFrameStatusPanel extends JPanel {
         cancelButton.setPreferredSize(new Dimension(100, 30));
         cancelButton.setBorderPainted(false);
         cancelButton.setOpaque(false);
-        cancelButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (currentWorker != null) {
-                    currentWorker.cancel(true);
-                }
+        cancelButton.addActionListener((ActionEvent e) -> {
+            if (currentWorker != null) {
+                currentWorker.cancel(true);
             }
         });
         statusLeftPanel.add(loadingPanel);
-        statusLeftPanel.add(statusLabel);
         statusLeftPanel.add(cancelButton);
+        statusLeftPanel.add(statusLabel);
         setPreferredSize(new Dimension(1, 30));
         setBorder(new BevelBorder(BevelBorder.LOWERED));
         setLayout(new BorderLayout());

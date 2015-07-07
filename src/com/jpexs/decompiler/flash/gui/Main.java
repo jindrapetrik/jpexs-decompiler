@@ -200,14 +200,6 @@ public class Main {
         proxyFrame.setState(Frame.NORMAL);
     }
 
-    public static void startWork(String name) {
-        startWork(name, -1, null);
-    }
-
-    public static void startWork(String name, int percent) {
-        startWork(name, percent, null);
-    }
-
     public static void startWork(String name, CancellableWorker worker) {
         startWork(name, -1, worker);
     }
@@ -275,10 +267,11 @@ public class Main {
                 CancellableWorker<SWF> worker = new CancellableWorker<SWF>() {
                     @Override
                     public SWF doInBackground() throws Exception {
+                        final CancellableWorker worker = this;
                         SWF swf = new SWF(stream, null, streamEntry.getKey(), new ProgressListener() {
                             @Override
                             public void progress(int p) {
-                                startWork(AppStrings.translate("work.reading.swf"), p);
+                                startWork(AppStrings.translate("work.reading.swf"), p, worker);
                             }
                         }, Configuration.parallelSpeedUp.get());
                         return swf;
@@ -298,10 +291,11 @@ public class Main {
             CancellableWorker<SWF> worker = new CancellableWorker<SWF>() {
                 @Override
                 public SWF doInBackground() throws Exception {
+                    final CancellableWorker worker = this;
                     SWF swf = new SWF(fInputStream, sourceInfo.getFile(), sourceInfo.getFileTitle(), new ProgressListener() {
                         @Override
                         public void progress(int p) {
-                            startWork(AppStrings.translate("work.reading.swf"), p);
+                            startWork(AppStrings.translate("work.reading.swf"), p, worker);
                         }
                     }, Configuration.parallelSpeedUp.get());
                     return swf;
@@ -346,7 +340,7 @@ public class Main {
                         text += " " + type;
                     }
 
-                    startWork(text + " " + index + "/" + count + " " + data);
+                    startWork(text + " " + index + "/" + count + " " + data, null);
                 }
 
                 @Override
@@ -356,7 +350,7 @@ public class Main {
                         text += " " + type;
                     }
 
-                    startWork(text + " " + index + "/" + count + " " + data);
+                    startWork(text + " " + index + "/" + count + " " + data, null);
                 }
 
                 @Override
@@ -365,13 +359,13 @@ public class Main {
                         throw new Error("Event is not supported by this handler.");
                     }
                     if (event.equals("getVariables")) {
-                        startWork(AppStrings.translate("work.gettingvariables") + "..." + (String) data);
+                        startWork(AppStrings.translate("work.gettingvariables") + "..." + (String) data, null);
                     }
                     if (event.equals("deobfuscate")) {
-                        startWork(AppStrings.translate("work.deobfuscating") + "..." + (String) data);
+                        startWork(AppStrings.translate("work.deobfuscating") + "..." + (String) data, null);
                     }
                     if (event.equals("rename")) {
-                        startWork(AppStrings.translate("work.renaming") + "..." + (String) data);
+                        startWork(AppStrings.translate("work.renaming") + "..." + (String) data, null);
                     }
                 }
             });
@@ -493,7 +487,7 @@ public class Main {
             for (final SWFSourceInfo sourceInfo : sourceInfos) {
                 SWFList swfs = null;
                 try {
-                    Main.startWork(AppStrings.translate("work.reading.swf") + "...");
+                    Main.startWork(AppStrings.translate("work.reading.swf") + "...", null);
                     try {
                         swfs = parseSWF(sourceInfo);
                     } catch (ExecutionException ex) {
@@ -527,7 +521,7 @@ public class Main {
 
                 try {
                     View.execInEventDispatch(() -> {
-                        Main.startWork(AppStrings.translate("work.creatingwindow") + "...");
+                        Main.startWork(AppStrings.translate("work.creatingwindow") + "...", null);
                         ensureMainFrame();
                         mainFrame.getPanel().load(swfs1, first1);
                     });

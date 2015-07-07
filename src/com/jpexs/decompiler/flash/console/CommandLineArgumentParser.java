@@ -1103,7 +1103,8 @@ public class CommandLineArgumentParser {
                 SWF swf;
                 try {
                     swf = new SWF(new FileInputStream(inFile), sourceInfo.getFile(), sourceInfo.getFileTitle(), Configuration.parallelSpeedUp.get());
-                } catch (SwfOpenException ex) {
+                } catch (FileNotFoundException | SwfOpenException ex) {
+                    // FileNotFoundException when anti virus software blocks to open the file
                     logger.log(Level.SEVERE, "Failed to open swf: " + inFile.getName(), ex);
                     continue;
                 }

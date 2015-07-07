@@ -39,7 +39,6 @@ import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.SearchListener;
 import com.jpexs.decompiler.flash.gui.SearchPanel;
-import com.jpexs.decompiler.flash.gui.SearchResultsDialog;
 import com.jpexs.decompiler.flash.gui.TagEditorPanel;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
@@ -236,8 +235,8 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         return null;
     }
 
-    public boolean search(final String txt, boolean ignoreCase, boolean regexp) {
-        if ((txt != null) && (!txt.isEmpty())) {
+    public List<ActionSearchResult> search(final String txt, boolean ignoreCase, boolean regexp, CancellableWorker<Void> worker) {
+        if (txt != null && !txt.isEmpty()) {
             searchPanel.setOptions(ignoreCase, regexp);
             SWF swf = mainPanel.getCurrentSwf();
             Map<String, ASMSource> asms = swf.getASMs(false);
@@ -257,7 +256,8 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
                 if (!SWF.isCached(asm)) {
                     decAdd = ", " + AppStrings.translate("work.decompiling");
                 }
-                Main.startWork(workText + " \"" + txt + "\"" + decAdd + " - (" + pos + "/" + asms.size() + ") " + item.getKey() + "... ");
+
+                Main.startWork(workText + " \"" + txt + "\"" + decAdd + " - (" + pos + "/" + asms.size() + ") " + item.getKey() + "... ", worker);
                 try {
                     if (pat.matcher(SWF.getCached(asm, null).text).find()) {
                         found.add(new ActionSearchResult(asm, item.getKey()));
@@ -267,17 +267,10 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
                 }
             }
 
-            Main.stopWork();
-            searchPanel.setSearchText(txt);
-            View.execInEventDispatch(() -> {
-                SearchResultsDialog<ActionSearchResult> sr = new SearchResultsDialog<>(ActionPanel.this.mainPanel.getMainFrame().getWindow(), txt, ActionPanel.this);
-                sr.setResults(found);
-                sr.setVisible(true);
-            });
-            return true;
-            //return searchPanel.setResults(found);
+            return found;
         }
-        return false;
+
+        return null;
     }
 
     private void setDecompiledText(final String text) {
