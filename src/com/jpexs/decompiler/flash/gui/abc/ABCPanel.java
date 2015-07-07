@@ -61,6 +61,7 @@ import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
 import com.jpexs.decompiler.flash.gui.editor.LinkHandler;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.helpers.CancellableWorker;
@@ -853,6 +854,11 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
             } else {
                 traitId = abc.class_info.get(class_index).static_traits.traits.size() + abc.instance_info.get(class_index).instance_traits.addTrait(t);
             }
+            int scriptIndex = decompiledTextArea.getScriptLeaf().scriptIndex;
+            if (scriptIndex >= 0 && scriptIndex < abc.script_info.size()) {
+                abc.script_info.get(scriptIndex).setModified(true);
+            }
+            ((Tag) abc.parentTag).setModified(true);
             reload();
             decompiledTextArea.gotoTrait(traitId);
         }
