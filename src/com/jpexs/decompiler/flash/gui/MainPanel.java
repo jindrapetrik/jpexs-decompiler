@@ -2295,6 +2295,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public void deobfuscate() {
         DeobfuscationDialog deobfuscationDialog = new DeobfuscationDialog();
+        DeobfuscationLevel level = DeobfuscationLevel.getByLevel(deobfuscationDialog.codeProcessingLevel.getValue());
         if (deobfuscationDialog.showDialog() == AppDialog.OK_OPTION) {
             new CancellableWorker() {
                 @Override
@@ -2302,16 +2303,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     try {
                         ABCPanel abcPanel = getABCPanel();
                         if (deobfuscationDialog.processAllCheckbox.isSelected()) {
-                            for (ABCContainerTag tag : abcPanel.getAbcList()) {
-                                if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationLevel.LEVEL_REMOVE_DEAD_CODE.getLevel()) {
-                                    tag.getABC().removeDeadCode();
-                                } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationLevel.LEVEL_REMOVE_TRAPS.getLevel()) {
-                                    tag.getABC().removeTraps();
-                                } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationLevel.LEVEL_RESTORE_CONTROL_FLOW.getLevel()) {
-                                    tag.getABC().removeTraps();
-                                    tag.getABC().restoreControlFlow();
-                                }
-                            }
+                            SWF swf = abcPanel.getSwf();
+                            swf.deobfuscate(level);
                         } else {
                             int bi = abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex();
                             DecompiledEditorPane decompiledTextArea = abcPanel.decompiledTextArea;

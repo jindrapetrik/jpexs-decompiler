@@ -73,6 +73,7 @@ public abstract class CancellableWorker<T> implements RunnableFuture<T> {
     }
 
     public final void execute() {
+        onStart();
         THREAD_POOL.execute(this);
     }
 

@@ -103,6 +103,7 @@ import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.decompiler.flash.xfl.FLAVersion;
 import com.jpexs.decompiler.graph.CompilationException;
+import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.streams.SeekableInputStream;
@@ -1312,6 +1313,7 @@ public class CommandLineArgumentParser {
                 }
 
                 swf.clearAllCache();
+                CancellableWorker.cancelBackgroundThreads();
             }
         } catch (OutOfMemoryError | Exception ex) {
             System.err.print("FAIL: Exporting Failed on Exception - ");
