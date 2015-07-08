@@ -27,6 +27,8 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -128,7 +130,11 @@ public abstract class CancellableWorker<T> implements RunnableFuture<T> {
         List<CancellableWorker> oldWorkers = workers;
         workers = new ArrayList<>();
         for (CancellableWorker worker : oldWorkers) {
-            worker.cancel(true);
+            if (worker != null) {
+                worker.cancel(true);
+            } else {
+                Logger.getLogger(CancellableWorker.class.getName()).log(Level.SEVERE, "worker is null");
+            }
         }
     }
 }
