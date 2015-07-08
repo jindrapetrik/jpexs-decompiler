@@ -144,7 +144,7 @@ public class AS2ScriptExporter {
                     } else {
                         List<Action> as = asm.getActions();
                         Action.setActionsAddresses(as, 0);
-                        Action.actionsToSource(asm, as, ""/*FIXME*/, writer2);
+                        Action.actionsToSource(asm, as, asm.toString()/*FIXME?*/, writer2);
                     }
                 }
 

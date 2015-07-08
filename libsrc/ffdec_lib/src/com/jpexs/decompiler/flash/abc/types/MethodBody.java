@@ -22,9 +22,7 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.CodeStats;
 import com.jpexs.decompiler.flash.abc.avm2.UnknownInstructionCode;
-import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorJumps;
-import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorRegisters;
-import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorSimple;
+import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.DeobfuscationLevel;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
@@ -177,6 +175,17 @@ public final class MethodBody implements Cloneable {
         return getCode().removeTraps(constants, trait, abc.method_info.get(method_info), this, abc, scriptIndex, classIndex, isStatic, path);
     }
 
+    public void deobfuscate(DeobfuscationLevel level, Trait trait, int scriptIndex, int classIndex, boolean isStatic, String path) throws InterruptedException {
+        if (level == DeobfuscationLevel.LEVEL_REMOVE_DEAD_CODE) {
+            removeDeadCode(abc.constants, trait, abc.method_info.get(method_info));
+        } else if (level == DeobfuscationLevel.LEVEL_REMOVE_TRAPS) {
+            removeTraps(abc.constants, abc, trait, scriptIndex, classIndex, isStatic, path);
+        } else if (level == DeobfuscationLevel.LEVEL_RESTORE_CONTROL_FLOW) {
+            removeTraps(abc.constants, abc, trait, scriptIndex, classIndex, isStatic, path);
+            restoreControlFlow(abc.constants, trait, abc.method_info.get(method_info));
+        }
+    }
+
     public void removeInstruction(int pos) {
         getCode().removeInstruction(pos, this);
     }
@@ -291,9 +300,9 @@ public final class MethodBody implements Cloneable {
                 throw ex;
             } catch (Exception | OutOfMemoryError | StackOverflowError ex) {
                 if (ex instanceof TimeoutException) {
-                    logger.log(Level.SEVERE, "Decompilation timeout in " + path, ex);
+                    logger.log(Level.SEVERE, "Decompilation timeout in: " + path, ex);
                 } else {
-                    logger.log(Level.SEVERE, "Decompilation error in " + path, ex);
+                    logger.log(Level.SEVERE, "Decompilation error in: " + path, ex);
                 }
                 convertException = ex;
                 Throwable cause = ex.getCause();

@@ -2311,14 +2311,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                             Trait t = abcPanel.decompiledTextArea.getCurrentTrait();
                             ABC abc = abcPanel.abc;
                             if (bi != -1) {
-                                if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationLevel.LEVEL_REMOVE_DEAD_CODE.getLevel()) {
-                                    abc.bodies.get(bi).removeDeadCode(abc.constants, t, abc.method_info.get(abc.bodies.get(bi).method_info));
-                                } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationLevel.LEVEL_REMOVE_TRAPS.getLevel()) {
-                                    abc.bodies.get(bi).removeTraps(abc.constants, abc, t, decompiledTextArea.getScriptLeaf().scriptIndex, decompiledTextArea.getClassIndex(), decompiledTextArea.getIsStatic(), ""/*FIXME*/);
-                                } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationLevel.LEVEL_RESTORE_CONTROL_FLOW.getLevel()) {
-                                    abc.bodies.get(bi).removeTraps(abc.constants, abc, t, decompiledTextArea.getScriptLeaf().scriptIndex, decompiledTextArea.getClassIndex(), decompiledTextArea.getIsStatic(), ""/*FIXME*/);
-                                    abc.bodies.get(bi).restoreControlFlow(abc.constants, t, abc.method_info.get(abc.bodies.get(bi).method_info));
-                                }
+                                int scriptIndex = decompiledTextArea.getScriptLeaf().scriptIndex;
+                                int classIndex = decompiledTextArea.getClassIndex();
+                                boolean isStatic = decompiledTextArea.getIsStatic();
+                                abc.bodies.get(bi).deobfuscate(level, t, scriptIndex, classIndex, isStatic, ""/*FIXME*/);
                             }
 
                             abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abc, t, abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getScriptIndex());

@@ -1156,7 +1156,7 @@ public class XFLConverter {
     private static String convertActionScript(ASMSource as) {
         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
         try {
-            Action.actionsToSource(as, as.getActions(), as.toString(), writer);
+            Action.actionsToSource(as, as.getActions(), as.toString()/*FIXME?*/, writer);
         } catch (InterruptedException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
