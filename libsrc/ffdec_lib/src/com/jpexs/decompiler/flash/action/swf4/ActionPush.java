@@ -345,7 +345,7 @@ public class ActionPush extends Action {
             }
             if (o instanceof ConstantIndex) {
                 if ((constantPool == null) || (((ConstantIndex) o).index >= constantPool.size())) {
-                    o = "CONSTANT" + ((ConstantIndex) o).index;
+                    o = "§§constant" + ((ConstantIndex) o).index;
                 } else {
                     o = constantPool.get(((ConstantIndex) o).index);
                 }
