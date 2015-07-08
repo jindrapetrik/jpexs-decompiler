@@ -107,7 +107,6 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
     }
 
     public int getBytesLength() {
-        int refCnt = getBytes().length;
         int cnt = 1;
         for (int i = 0; i < definition.operands.length; i++) {
             int opt = definition.operands[i] & 0xff00;
@@ -134,9 +133,6 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
             }
         }
 
-        if (refCnt != cnt) {
-            throw new Error("aaa");
-        }
         return cnt;
     }
 
