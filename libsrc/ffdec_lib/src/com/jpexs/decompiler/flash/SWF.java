@@ -2854,6 +2854,20 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
     }
 
+    public void replaceCharacterTags(CharacterTag characterTag, int newCharacterId) {
+        int characterId = characterTag.getCharacterId();
+        CharacterTag newCharacter = getCharacter(newCharacterId);
+        newCharacter.setCharacterId(characterId);
+        characterTag.setCharacterId(newCharacterId);
+        newCharacter.setModified(true);
+        characterTag.setModified(true);
+
+        assignExportNamesToSymbols();
+        assignClassesToSymbols();
+        clearImageCache();
+        updateCharacters();
+    }
+
     @Override
     public String toString() {
         return getShortFileName();

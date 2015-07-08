@@ -624,16 +624,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         ReplaceCharacterDialog replaceCharacterDialog = new ReplaceCharacterDialog();
         if (replaceCharacterDialog.showDialog(swf, characterId) == AppDialog.OK_OPTION) {
             int newCharacterId = replaceCharacterDialog.getCharacterId();
-            CharacterTag newCharacter = swf.getCharacter(newCharacterId);
-            newCharacter.setCharacterId(characterId);
-            characterTag.setCharacterId(newCharacterId);
-            newCharacter.setModified(true);
-            characterTag.setModified(true);
-
-            swf.assignExportNamesToSymbols();
-            swf.assignClassesToSymbols();
-            swf.clearImageCache();
-            swf.updateCharacters();
+            swf.replaceCharacterTags(characterTag, newCharacterId);
             mainPanel.refreshTree(swf);
         }
     }

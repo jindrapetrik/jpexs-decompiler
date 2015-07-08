@@ -131,6 +131,7 @@ import java.io.PrintStream;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -319,6 +320,12 @@ public class CommandLineArgumentParser {
         out.println(" ...methodBodyIndexN parameter should be specified if and only if the imported entity is an AS3 P-Code");
         out.println(" " + (cnt++) + ") -replaceAlpha <infile> <outfile> <imageId1> <importDataFile1> [<imageId2> <importDataFile2>]...");
         out.println(" ...replaces the alpha channel of the specified JPEG3 or JPEG4 tag");
+        out.println(" " + (cnt++) + ") -replaceCharacter <infile> <outfile> <characterId1> <newCharacterId1> [<characterId2> <newCharacterId2>]...");
+        out.println(" ...replaces a character tag with another chatacter tag from the same SWF");
+        out.println(" " + (cnt++) + ") -remove <infile> <outfile> <tagNo1> [<tagNo2>]...");
+        out.println(" ...removes a tag from the SWF");
+        out.println(" " + (cnt++) + ") -removeCharacter[WithDependencies] <infile> <outfile> <characterId1> [<characterId2>]...");
+        out.println(" ...removes a character tag from the SWF");
         out.println(" " + (cnt++) + ") -deobfuscate <level> <infile> <outfile>");
         out.println("  ...Deobfuscates AS3 P-code in <infile> and saves result to <outfile>");
         out.println("  ...<level> can be one of: controlflow/3/max, traps/2, deadcode/1");
@@ -496,6 +503,14 @@ public class CommandLineArgumentParser {
             parseReplace(args);
         } else if (command.equals("replacealpha")) {
             parseReplaceAlpha(args);
+        } else if (command.equals("replacecharacter")) {
+            parseReplaceCharacter(args);
+        } else if (command.equals("remove")) {
+            parseRemove(args);
+        } else if (command.equals("removecharacter")) {
+            parseRemoveCharacter(args, false);
+        } else if (command.equals("removecharacterwithdependencies")) {
+            parseRemoveCharacter(args, true);
         } else if (command.equals("as3compiler")) {
             ActionScript3Parser.compile(null /*?*/, args.pop(), args.pop(), 0);
         } else if (nextParam.equals("-help") || nextParam.equals("--help") || nextParam.equals("/?") || nextParam.equals("\\_") /* /? translates as this on windows */) {
@@ -1889,6 +1904,171 @@ public class CommandLineArgumentParser {
                         System.err.println("The specified tag type is not supported for alpha channel import");
                         System.exit(1);
                     }
+
+                    if (args.isEmpty() || args.peek().startsWith("-")) {
+                        break;
+                    }
+                }
+
+                try {
+                    try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(outFile))) {
+                        swf.saveTo(fos);
+                    }
+                } catch (IOException e) {
+                    System.err.println("I/O error during writing");
+                    System.exit(2);
+                }
+            }
+        } catch (IOException | InterruptedException e) {
+            System.err.println("I/O error during reading");
+            System.exit(2);
+        }
+    }
+
+    private static void parseReplaceCharacter(Stack<String> args) {
+        if (args.size() < 4) {
+            badArguments();
+        }
+
+        File inFile = new File(args.pop());
+        File outFile = new File(args.pop());
+        try {
+            try (FileInputStream is = new FileInputStream(inFile)) {
+                SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
+                while (true) {
+                    String objectToReplace = args.pop();
+
+                    int characterId = 0;
+                    try {
+                        characterId = Integer.parseInt(objectToReplace);
+                    } catch (NumberFormatException nfe) {
+                        System.err.println("CharacterId should be integer");
+                        System.exit(1);
+                    }
+                    if (!swf.getCharacters().containsKey(characterId)) {
+                        System.err.println("CharacterId does not exist");
+                        System.exit(1);
+                    }
+
+                    CharacterTag characterTag = swf.getCharacter(characterId);
+                    String newCharacterIdStr = args.pop();
+
+                    int newCharacterId = 0;
+                    try {
+                        newCharacterId = Integer.parseInt(newCharacterIdStr);
+                    } catch (NumberFormatException nfe) {
+                        System.err.println("NewCharacterId should be integer");
+                        System.exit(1);
+                    }
+                    if (!swf.getCharacters().containsKey(newCharacterId)) {
+                        System.err.println("NewCharacterId does not exist");
+                        System.exit(1);
+                    }
+
+                    swf.replaceCharacterTags(characterTag, newCharacterId);
+
+                    if (args.isEmpty() || args.peek().startsWith("-")) {
+                        break;
+                    }
+                }
+
+                try {
+                    try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(outFile))) {
+                        swf.saveTo(fos);
+                    }
+                } catch (IOException e) {
+                    System.err.println("I/O error during writing");
+                    System.exit(2);
+                }
+            }
+        } catch (IOException | InterruptedException e) {
+            System.err.println("I/O error during reading");
+            System.exit(2);
+        }
+    }
+
+    private static void parseRemove(Stack<String> args) {
+        if (args.size() < 3) {
+            badArguments();
+        }
+
+        File inFile = new File(args.pop());
+        File outFile = new File(args.pop());
+        try {
+            try (FileInputStream is = new FileInputStream(inFile)) {
+                SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
+                List<Integer> tagNumbersToRemove = new ArrayList<>();
+                while (true) {
+                    String tagNoToRemoveStr = args.pop();
+
+                    int tagNo = 0;
+                    try {
+                        tagNo = Integer.parseInt(tagNoToRemoveStr);
+                    } catch (NumberFormatException nfe) {
+                        System.err.println("Tag number should be integer");
+                        System.exit(1);
+                    }
+                    if (swf.tags.size() >= tagNo) {
+                        System.err.println("Tag number does not exist. Last tag number is: " + (swf.tags.size() - 1));
+                        System.exit(1);
+                    }
+
+                    if (!tagNumbersToRemove.contains(tagNo)) {
+                        tagNumbersToRemove.add(tagNo);
+                    }
+
+                    if (args.isEmpty() || args.peek().startsWith("-")) {
+                        break;
+                    }
+                }
+
+                Collections.sort(tagNumbersToRemove);
+                for (int i = tagNumbersToRemove.size() - 1; i >= 0; i--) {
+                    swf.tags.remove(tagNumbersToRemove.get(i));
+                }
+
+                try {
+                    try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(outFile))) {
+                        swf.saveTo(fos);
+                    }
+                } catch (IOException e) {
+                    System.err.println("I/O error during writing");
+                    System.exit(2);
+                }
+            }
+        } catch (IOException | InterruptedException e) {
+            System.err.println("I/O error during reading");
+            System.exit(2);
+        }
+    }
+
+    private static void parseRemoveCharacter(Stack<String> args, boolean removeDependencies) {
+        if (args.size() < 3) {
+            badArguments();
+        }
+
+        File inFile = new File(args.pop());
+        File outFile = new File(args.pop());
+        try {
+            try (FileInputStream is = new FileInputStream(inFile)) {
+                SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
+                while (true) {
+                    String objectToRemove = args.pop();
+
+                    int characterId = 0;
+                    try {
+                        characterId = Integer.parseInt(objectToRemove);
+                    } catch (NumberFormatException nfe) {
+                        System.err.println("CharacterId should be integer");
+                        System.exit(1);
+                    }
+                    if (!swf.getCharacters().containsKey(characterId)) {
+                        System.err.println("CharacterId does not exist");
+                        System.exit(1);
+                    }
+
+                    CharacterTag characterTag = swf.getCharacter(characterId);
+                    swf.removeTag(characterTag, removeDependencies);
 
                     if (args.isEmpty() || args.peek().startsWith("-")) {
                         break;
