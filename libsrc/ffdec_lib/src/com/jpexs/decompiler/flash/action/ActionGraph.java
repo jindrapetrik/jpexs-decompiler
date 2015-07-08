@@ -467,7 +467,7 @@ public class ActionGraph extends Graph {
         //return in for..in
         GraphSourceItem action = code.get(ip);
         if ((action instanceof ActionPush) && (((ActionPush) action).values.size() == 1) && (((ActionPush) action).values.get(0) instanceof Null)) {
-            if (ip + 3 < code.size()) {
+            if (ip + 4 < code.size()) {
                 if ((code.get(ip + 1) instanceof ActionEquals) || (code.get(ip + 1) instanceof ActionEquals2)) {
                     if (code.get(ip + 2) instanceof ActionNot) {
                         if (code.get(ip + 3) instanceof ActionIf) {
