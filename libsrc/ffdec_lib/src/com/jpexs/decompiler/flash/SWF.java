@@ -2090,7 +2090,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 if (stringsNoVarH.contains(h)) {
                     addNew = true;
                 }
-                ActionPush pu = (ActionPush) it.getKey().src;
+                ActionPush pu = (ActionPush) it.getKey().getSrc();
                 if (pu.replacement == null) {
                     pu.replacement = new ArrayList<>();
                     pu.replacement.addAll(pu.values);

@@ -67,7 +67,7 @@ public class PrintActionItem extends ActionItem {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
-        return toSourceMerge(localData, generator, new AddActionItem(src, asGenerator.pushConstTargetItem("print:#"), boundingBox, true), target, new ActionGetURL2(0, false, false));
+        return toSourceMerge(localData, generator, new AddActionItem(getSrc(), asGenerator.pushConstTargetItem("print:#"), boundingBox, true), target, new ActionGetURL2(0, false, false));
     }
 
     @Override

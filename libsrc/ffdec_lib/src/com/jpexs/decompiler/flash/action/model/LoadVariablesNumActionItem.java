@@ -81,7 +81,7 @@ public class LoadVariablesNumActionItem extends ActionItem {
         if ((num instanceof DirectValueActionItem) && (((DirectValueActionItem) num).value instanceof Long)) {
             lev = asGenerator.pushConstTargetItem("_level" + ((DirectValueActionItem) num).value);
         } else {
-            lev = new AddActionItem(src, asGenerator.pushConstTargetItem("_level"), num, true);
+            lev = new AddActionItem(getSrc(), asGenerator.pushConstTargetItem("_level"), num, true);
         }
         return toSourceMerge(localData, generator, urlString, lev, new ActionGetURL2(method, true, false));
     }

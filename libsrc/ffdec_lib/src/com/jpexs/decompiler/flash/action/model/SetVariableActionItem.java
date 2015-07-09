@@ -94,7 +94,7 @@ public class SetVariableActionItem extends ActionItem implements SetTypeActionIt
 
     @Override
     public GraphTargetItem getObject() {
-        return new GetVariableActionItem(src, name);
+        return new GetVariableActionItem(getSrc(), name);
     }
 
     @Override

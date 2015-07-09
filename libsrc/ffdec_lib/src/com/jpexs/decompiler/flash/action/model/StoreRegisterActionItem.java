@@ -89,7 +89,7 @@ public class StoreRegisterActionItem extends ActionItem implements SetTypeAction
 
     @Override
     public GraphTargetItem getObject() {
-        return new DirectValueActionItem(src, -1, register, null);
+        return new DirectValueActionItem(getSrc(), -1, register, null);
     }
 
     @Override

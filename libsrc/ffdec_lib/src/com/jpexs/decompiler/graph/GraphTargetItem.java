@@ -70,7 +70,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     public static final int NOPRECEDENCE = 16;
 
-    public GraphSourceItem src;
+    private GraphSourceItem src;
 
     public int pos = -1;
 
@@ -116,6 +116,18 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     public GraphTargetItem(GraphSourceItem src, int precedence) {
         this.src = src;
         this.precedence = precedence;
+    }
+
+    public GraphSourceItem getSrc() {
+        return src;
+    }
+
+    protected HighlightData getSrcData() {
+        if (srcData == null) {
+            srcData = new HighlightData();
+        }
+
+        return srcData;
     }
 
     public List<GraphSourceItemPos> getNeededSources() {
@@ -312,13 +324,5 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     public GraphTargetItem invert(GraphSourceItem src) {
         return new NotItem(src, this);
-    }
-
-    protected HighlightData getSrcData() {
-        if (srcData == null) {
-            srcData = new HighlightData();
-        }
-
-        return srcData;
     }
 }

@@ -87,7 +87,7 @@ public class SetPropertyActionItem extends ActionItem implements SetTypeActionIt
 
     @Override
     public GraphTargetItem getObject() {
-        return new GetPropertyActionItem(src, target, propertyIndex);
+        return new GetPropertyActionItem(getSrc(), target, propertyIndex);
     }
 
     @Override

@@ -99,7 +99,7 @@ public class DefineLocalActionItem extends ActionItem implements SetTypeActionIt
 
     @Override
     public GraphTargetItem getObject() {
-        return new DefineLocalActionItem(src, name, null);
+        return new DefineLocalActionItem(getSrc(), name, null);
     }
 
     @Override

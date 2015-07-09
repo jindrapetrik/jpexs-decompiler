@@ -148,7 +148,7 @@ public class ActionGraph extends Graph {
                 for (int i = targetStart + 1; i < targetEnd; i++) {
                     tellist.add(list.get(i));
                 }
-                newlist.add(new TellTargetActionItem(targetStartItem.src, target, tellist));
+                newlist.add(new TellTargetActionItem(targetStartItem.getSrc(), target, tellist));
                 for (int i = targetEnd + 1; i < list.size(); i++) {
                     newlist.add(list.get(i));
                 }

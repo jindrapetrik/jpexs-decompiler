@@ -102,7 +102,7 @@ public class SetMemberActionItem extends ActionItem implements SetTypeActionItem
 
     @Override
     public GraphTargetItem getObject() {
-        return new GetMemberActionItem(src, object, objectName);
+        return new GetMemberActionItem(getSrc(), object, objectName);
     }
 
     @Override

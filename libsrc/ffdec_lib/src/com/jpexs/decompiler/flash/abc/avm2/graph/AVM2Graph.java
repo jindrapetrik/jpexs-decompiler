@@ -756,9 +756,9 @@ public class AVM2Graph extends Graph {
                             SetTypeAVM2Item sti = (SetTypeAVM2Item) w.commands.remove(0);
                             GraphTargetItem gti = sti.getValue().getNotCoerced();
                             if (gti instanceof NextValueAVM2Item) {
-                                return new ForEachInAVM2Item(w.src, w.loop, new InAVM2Item(hn.getInstruction(), sti.getObject(), ((HasNextAVM2Item) w.expression.get(w.expression.size() - 1)).collection), w.commands);
+                                return new ForEachInAVM2Item(w.getSrc(), w.loop, new InAVM2Item(hn.getInstruction(), sti.getObject(), ((HasNextAVM2Item) w.expression.get(w.expression.size() - 1)).collection), w.commands);
                             } else if (gti instanceof NextNameAVM2Item) {
-                                return new ForInAVM2Item(w.src, w.loop, new InAVM2Item(hn.getInstruction(), sti.getObject(), ((HasNextAVM2Item) w.expression.get(w.expression.size() - 1)).collection), w.commands);
+                                return new ForInAVM2Item(w.getSrc(), w.loop, new InAVM2Item(hn.getInstruction(), sti.getObject(), ((HasNextAVM2Item) w.expression.get(w.expression.size() - 1)).collection), w.commands);
                             }
                         }
                     }
@@ -885,9 +885,9 @@ public class AVM2Graph extends Graph {
                             GraphTargetItem repl = null;
 
                             if (gti instanceof NextValueAVM2Item) {
-                                repl = new ForEachInAVM2Item(ifi.src, new Loop(0, null, null), new InAVM2Item(null, sti.getObject(), hnt.collection), body);
+                                repl = new ForEachInAVM2Item(ifi.getSrc(), new Loop(0, null, null), new InAVM2Item(null, sti.getObject(), hnt.collection), body);
                             } else if (gti instanceof NextNameAVM2Item) {
-                                repl = new ForInAVM2Item(ifi.src, new Loop(0, null, null), new InAVM2Item(null, sti.getObject(), hnt.collection), body);
+                                repl = new ForInAVM2Item(ifi.getSrc(), new Loop(0, null, null), new InAVM2Item(null, sti.getObject(), hnt.collection), body);
                             }
                             if (repl != null) {
                                 list.remove(i);

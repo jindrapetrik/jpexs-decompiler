@@ -348,12 +348,13 @@ public final class MethodBody implements Cloneable {
 
     public MethodBody convertMethodBody(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, Trait trait, AVM2ConstantPool constants, List<MethodInfo> method_info, ScopeStack scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits) throws InterruptedException {
         MethodBody body = clone();
-        body.getCode().markMappedOffsets();
-        body.getCode().fixJumps(path, body);
+        AVM2Code code = body.getCode();
+        code.markMappedOffsets();
+        code.fixJumps(path, body);
 
         if (Configuration.autoDeobfuscate.get()) {
             try {
-                body.getCode().removeTraps(constants, trait, method_info.get(this.method_info), body, abc, scriptIndex, classIndex, isStatic, path);
+                code.removeTraps(constants, trait, method_info.get(this.method_info), body, abc, scriptIndex, classIndex, isStatic, path);
             } catch (InterruptedException ex) {
                 throw ex;
             } catch (Throwable ex) {

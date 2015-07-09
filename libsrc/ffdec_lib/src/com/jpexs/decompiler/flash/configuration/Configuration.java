@@ -691,7 +691,7 @@ public class Configuration {
             logLevel = Level.WARNING;
         }
         //limit paralel threads?
-        //int processorCount = Runtime.getRuntime().availableProcessors(); 
+        //int processorCount = Runtime.getRuntime().availableProcessors();
 
         if (lastUpdatesCheckDate.get() == null) {
             GregorianCalendar mingc = new GregorianCalendar();

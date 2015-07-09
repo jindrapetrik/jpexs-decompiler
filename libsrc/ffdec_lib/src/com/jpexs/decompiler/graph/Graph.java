@@ -52,8 +52,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -572,7 +570,7 @@ public class Graph {
                     if (!forFirstCommands.isEmpty() || !forFinalCommands.isEmpty()) {
                         GraphTargetItem lastExpr = whi.expression.remove(whi.expression.size() - 1);
                         forFirstCommands.addAll(whi.expression);
-                        list.set(i, new ForItem(whi.src, whi.loop, forFirstCommands, lastExpr, forFinalCommands, whi.commands));
+                        list.set(i, new ForItem(whi.getSrc(), whi.loop, forFirstCommands, lastExpr, forFinalCommands, whi.commands));
                     }
                 }
             }
@@ -1846,9 +1844,9 @@ public class Graph {
                             checkContinueAtTheEnd(finalComm, currentLoop);
                         }
                         if (!finalComm.isEmpty()) {
-                            ret.add(index, li = new ForItem(expr.src, currentLoop, new ArrayList<>(), exprList.get(exprList.size() - 1), finalComm, commands));
+                            ret.add(index, li = new ForItem(expr.getSrc(), currentLoop, new ArrayList<>(), exprList.get(exprList.size() - 1), finalComm, commands));
                         } else {
-                            ret.add(index, li = new WhileItem(expr.src, currentLoop, exprList, commands));
+                            ret.add(index, li = new WhileItem(expr.getSrc(), currentLoop, exprList, commands));
                         }
 
                         loopTypeFound = true;

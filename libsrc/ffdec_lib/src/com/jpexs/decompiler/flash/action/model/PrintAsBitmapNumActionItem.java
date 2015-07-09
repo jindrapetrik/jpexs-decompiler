@@ -71,9 +71,9 @@ public class PrintAsBitmapNumActionItem extends ActionItem {
         if ((num instanceof DirectValueActionItem) && (((DirectValueActionItem) num).value instanceof Long)) {
             lev = asGenerator.pushConstTargetItem("_level" + ((DirectValueActionItem) num).value);
         } else {
-            lev = new AddActionItem(src, asGenerator.pushConstTargetItem("_level"), num, true);
+            lev = new AddActionItem(getSrc(), asGenerator.pushConstTargetItem("_level"), num, true);
         }
-        return toSourceMerge(localData, generator, new AddActionItem(src, asGenerator.pushConstTargetItem("printasbitmap:#"), boundingBox, true), lev, new ActionGetURL2(0, false, false));
+        return toSourceMerge(localData, generator, new AddActionItem(getSrc(), asGenerator.pushConstTargetItem("printasbitmap:#"), boundingBox, true), lev, new ActionGetURL2(0, false, false));
     }
 
     @Override
