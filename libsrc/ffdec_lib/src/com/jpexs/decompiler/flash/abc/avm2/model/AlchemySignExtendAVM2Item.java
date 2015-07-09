@@ -39,8 +39,7 @@ public class AlchemySignExtendAVM2Item extends AVM2Item {
     private final int size;
 
     public AlchemySignExtendAVM2Item(GraphSourceItem instruction, GraphTargetItem value, int size) {
-        super(instruction, PRECEDENCE_PRIMARY);
-        this.value = value;
+        super(instruction, PRECEDENCE_PRIMARY, value);
         this.size = size;
     }
 

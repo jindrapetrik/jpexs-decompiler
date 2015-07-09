@@ -40,9 +40,8 @@ public class SetLocalAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assig
     //public GraphTargetItem value;
 
     public SetLocalAVM2Item(AVM2Instruction instruction, int regIndex, GraphTargetItem value) {
-        super(instruction, PRECEDENCE_ASSIGMENT);
+        super(instruction, PRECEDENCE_ASSIGMENT, value);
         this.regIndex = regIndex;
-        this.value = value;
     }
 
     @Override

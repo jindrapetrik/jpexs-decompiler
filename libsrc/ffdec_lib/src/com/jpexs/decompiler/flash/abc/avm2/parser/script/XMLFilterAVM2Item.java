@@ -38,8 +38,7 @@ public class XMLFilterAVM2Item extends AVM2Item {
     public GraphTargetItem object;
 
     public XMLFilterAVM2Item(GraphTargetItem object, GraphTargetItem value, List<Integer> openedNamespaces) {
-        super(null, NOPRECEDENCE);
-        this.value = value;
+        super(null, NOPRECEDENCE, value);
         this.openedNamespaces = openedNamespaces;
         this.object = object;
     }

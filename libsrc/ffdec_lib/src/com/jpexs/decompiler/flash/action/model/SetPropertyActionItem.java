@@ -68,10 +68,9 @@ public class SetPropertyActionItem extends ActionItem implements SetTypeActionIt
     }
 
     public SetPropertyActionItem(GraphSourceItem instruction, GraphTargetItem target, int propertyIndex, GraphTargetItem value) {
-        super(instruction, PRECEDENCE_ASSIGMENT);
+        super(instruction, PRECEDENCE_ASSIGMENT, value);
         this.target = target;
         this.propertyIndex = propertyIndex;
-        this.value = value;
     }
 
     @Override

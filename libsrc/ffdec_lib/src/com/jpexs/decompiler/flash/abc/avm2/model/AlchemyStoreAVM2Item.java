@@ -45,9 +45,8 @@ public class AlchemyStoreAVM2Item extends AVM2Item {
     private final GraphTargetItem ofs;
 
     public AlchemyStoreAVM2Item(GraphSourceItem instruction, GraphTargetItem value, GraphTargetItem ofs, char type, int size) {
-        super(instruction, PRECEDENCE_PRIMARY);
+        super(instruction, PRECEDENCE_PRIMARY, value);
         this.ofs = ofs;
-        this.value = value;
         this.type = type;
         this.size = size;
     }

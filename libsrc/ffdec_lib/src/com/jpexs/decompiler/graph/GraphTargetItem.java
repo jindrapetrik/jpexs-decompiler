@@ -72,8 +72,6 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     private GraphSourceItem src;
 
-    public int pos = -1;
-
     protected int precedence;
 
     private List<GraphSourceItemPos> moreSrc;
@@ -118,6 +116,12 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
         this.precedence = precedence;
     }
 
+    public GraphTargetItem(GraphSourceItem src, int precedence, GraphTargetItem value) {
+        this.src = src;
+        this.precedence = precedence;
+        this.value = value;
+    }
+
     public GraphSourceItem getSrc() {
         return src;
     }
@@ -138,9 +142,13 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
         return srcData;
     }
 
+    protected int getPos() {
+        return 0;
+    }
+
     public List<GraphSourceItemPos> getNeededSources() {
         List<GraphSourceItemPos> ret = new ArrayList<>();
-        ret.add(new GraphSourceItemPos(src, pos));
+        ret.add(new GraphSourceItemPos(src, getPos()));
         if (moreSrc != null) {
             ret.addAll(moreSrc);
         }
@@ -153,7 +161,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     }
 
     public GraphTextWriter toStringSemicoloned(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        writer.startOffset(src, pos, srcData);
+        writer.startOffset(src, getPos(), srcData);
         appendTo(writer, localData);
         if (needsSemicolon()) {
             writer.appendNoHilight(";");
@@ -176,7 +184,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
             throw new InterruptedException();
         }
 
-        writer.startOffset(src, pos, srcData);
+        writer.startOffset(src, getPos(), srcData);
         appendTo(writer, localData);
         writer.endOffset();
         return writer;
@@ -221,7 +229,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     }
 
     public GraphTextWriter toStringNoQuotes(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        writer.startOffset(src, pos, srcData);
+        writer.startOffset(src, getPos(), srcData);
         appendToNoQuotes(writer, localData);
         writer.endOffset();
         return writer;
@@ -244,7 +252,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     }
 
     public GraphTextWriter toStringNL(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        writer.startOffset(src, pos, srcData);
+        writer.startOffset(src, getPos(), srcData);
         appendTo(writer, localData);
         if (needsNewLine()) {
             writer.newLine();

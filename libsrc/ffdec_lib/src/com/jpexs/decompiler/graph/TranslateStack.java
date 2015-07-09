@@ -27,7 +27,7 @@ import java.util.logging.Logger;
  */
 public class TranslateStack extends Stack<GraphTargetItem> {
 
-    private static PopItem pop = new PopItem(null);
+    private static PopItem pop;
 
     private final String path;
 
@@ -39,12 +39,20 @@ public class TranslateStack extends Stack<GraphTargetItem> {
         return path;
     }
 
+    private PopItem getPop() {
+        if (pop == null) {
+            pop = new PopItem(null);
+        }
+
+        return pop;
+    }
+
     @Override
     public synchronized GraphTargetItem get(int index) {
         if (path != null) {
             if (index >= this.size() || index < 0) {
                 Logger.getLogger(TranslateStack.class.getName()).log(Level.FINE, "{0}: Attemp to Get item outside of bounds of stack", path);
-                return pop;
+                return getPop();
             }
         }
         return super.get(index);
@@ -55,7 +63,7 @@ public class TranslateStack extends Stack<GraphTargetItem> {
         if (path != null) {
             if (this.isEmpty()) {
                 Logger.getLogger(TranslateStack.class.getName()).log(Level.FINE, "{0}: Attemp to Peek empty stack", path);
-                return pop;
+                return getPop();
             }
         }
         return super.peek();
@@ -65,8 +73,8 @@ public class TranslateStack extends Stack<GraphTargetItem> {
     public synchronized GraphTargetItem pop() {
         if (path != null) {
             if (this.isEmpty()) {
-                PopItem oldpop = pop;
-                pop = new PopItem(null);
+                PopItem oldpop = getPop();
+                pop = null;
                 Logger.getLogger(TranslateStack.class.getName()).log(Level.FINE, "{0}: Attemp to Pop empty stack", path);
                 return oldpop;
             }

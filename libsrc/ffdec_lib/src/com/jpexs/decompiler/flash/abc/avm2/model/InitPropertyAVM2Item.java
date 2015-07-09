@@ -31,10 +31,9 @@ public class InitPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, A
     //public GraphTargetItem value;
 
     public InitPropertyAVM2Item(AVM2Instruction instruction, GraphTargetItem object, FullMultinameAVM2Item propertyName, GraphTargetItem value) {
-        super(instruction, PRECEDENCE_ASSIGMENT);
+        super(instruction, PRECEDENCE_ASSIGMENT, value);
         this.object = object;
         this.propertyName = propertyName;
-        this.value = value;
     }
 
     @Override

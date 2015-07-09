@@ -50,11 +50,10 @@ public class ConstAVM2Item extends AVM2Item {
     }
 
     public ConstAVM2Item(String pkg, String customNamespace, boolean isStatic, int namespace, String var, GraphTargetItem type, GraphTargetItem value, int line) {
-        super(null, NOPRECEDENCE);
+        super(null, NOPRECEDENCE, value);
         this.pkg = pkg;
         this.line = line;
         this.namespace = namespace;
-        this.value = value;
         this.isStatic = isStatic;
         this.var = var;
         this.type = type;

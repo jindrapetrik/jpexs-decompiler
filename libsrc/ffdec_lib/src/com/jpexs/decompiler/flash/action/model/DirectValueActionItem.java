@@ -43,6 +43,8 @@ public class DirectValueActionItem extends ActionItem implements SimpleValue {
 
     public GraphTargetItem computedRegValue;
 
+    public int pos = -1;
+
     public DirectValueActionItem(Object o) {
         this(null, 0, o, new ArrayList<>());
     }
@@ -52,6 +54,11 @@ public class DirectValueActionItem extends ActionItem implements SimpleValue {
         this.constants = constants;
         this.value = value;
         this.pos = instructionPos;
+    }
+
+    @Override
+    protected int getPos() {
+        return pos;
     }
 
     @Override

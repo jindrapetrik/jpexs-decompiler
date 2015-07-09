@@ -28,9 +28,8 @@ public class NameValuePair extends AVM2Item {
     //public GraphTargetItem value;
 
     public NameValuePair(GraphTargetItem name, GraphTargetItem value) {
-        super(name.getSrc(), NOPRECEDENCE);
+        super(name.getSrc(), NOPRECEDENCE, value);
         this.name = name;
-        this.value = value;
     }
 
     @Override

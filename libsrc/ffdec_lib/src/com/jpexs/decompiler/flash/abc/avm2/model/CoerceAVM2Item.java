@@ -50,8 +50,7 @@ public class CoerceAVM2Item extends AVM2Item {
      this.type = type;
      }*/
     public CoerceAVM2Item(AVM2Instruction instruction, GraphTargetItem value, GraphTargetItem typeObj) {
-        super(instruction, value.getPrecedence());
-        this.value = value;
+        super(instruction, value.getPrecedence(), value);
         this.typeObj = typeObj;
     }
 

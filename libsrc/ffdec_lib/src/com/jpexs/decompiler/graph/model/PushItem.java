@@ -25,9 +25,8 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
  */
 public class PushItem extends GraphTargetItem {
 
-    public PushItem(GraphTargetItem val) {
-        super(val.getSrc(), val.getPrecedence());
-        this.value = val;
+    public PushItem(GraphTargetItem value) {
+        super(value.getSrc(), value.getPrecedence(), value);
     }
 
     @Override

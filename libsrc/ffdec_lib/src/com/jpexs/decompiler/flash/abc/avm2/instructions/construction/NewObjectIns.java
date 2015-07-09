@@ -39,10 +39,15 @@ public class NewObjectIns extends InstructionDefinition {
     }
 
     @Override
-    public void translate(boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, AVM2ConstantPool constants, AVM2Instruction ins, List<MethodInfo> method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) {
+    public void translate(boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, AVM2ConstantPool constants, AVM2Instruction ins, List<MethodInfo> method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) throws InterruptedException {
         int argCount = ins.operands[0];
-        List<NameValuePair> args = new ArrayList<>();
+        List<NameValuePair> args = new ArrayList<>(argCount);
         for (int a = 0; a < argCount; a++) {
+            if (Thread.currentThread().isInterrupted()) {
+                // int obfuscated method argCount can be 16M
+                throw new InterruptedException();
+            }
+
             GraphTargetItem value = stack.pop();
             GraphTargetItem name = stack.pop();
             args.add(0, new NameValuePair(name, value));

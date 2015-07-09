@@ -45,8 +45,7 @@ public class MBStringExtractActionItem extends ActionItem {
     }
 
     public MBStringExtractActionItem(GraphSourceItem instruction, GraphTargetItem value, GraphTargetItem index, GraphTargetItem count) {
-        super(instruction, PRECEDENCE_PRIMARY);
-        this.value = value;
+        super(instruction, PRECEDENCE_PRIMARY, value);
         this.index = index;
         this.count = count;
     }

@@ -33,9 +33,8 @@ public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assign
     public GraphTargetItem scope;
 
     public SetSlotAVM2Item(AVM2Instruction instruction, GraphTargetItem scope, Multiname slotName, GraphTargetItem value) {
-        super(instruction, PRECEDENCE_ASSIGMENT);
+        super(instruction, PRECEDENCE_ASSIGMENT, value);
         this.slotName = slotName;
-        this.value = value;
         this.scope = scope;
     }
 

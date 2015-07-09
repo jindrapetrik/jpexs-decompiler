@@ -35,8 +35,7 @@ import java.util.List;
 public class EscapeXElemAVM2Item extends AVM2Item {
 
     public EscapeXElemAVM2Item(AVM2Instruction instruction, GraphTargetItem expression) {
-        super(instruction, NOPRECEDENCE);
-        this.value = expression;
+        super(instruction, NOPRECEDENCE, expression);
     }
 
     @Override

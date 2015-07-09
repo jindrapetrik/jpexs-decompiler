@@ -36,8 +36,7 @@ public class SetSuperAVM2Item extends AVM2Item {
     }
 
     public SetSuperAVM2Item(AVM2Instruction instruction, GraphTargetItem value, GraphTargetItem object, FullMultinameAVM2Item propertyName) {
-        super(instruction, PRECEDENCE_ASSIGMENT);
-        this.value = value;
+        super(instruction, PRECEDENCE_ASSIGMENT, value);
         this.object = object;
         this.propertyName = propertyName;
     }

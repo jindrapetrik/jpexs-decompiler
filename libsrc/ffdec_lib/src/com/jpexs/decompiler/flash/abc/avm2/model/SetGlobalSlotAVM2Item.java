@@ -34,9 +34,8 @@ public class SetGlobalSlotAVM2Item extends AVM2Item {
     }
 
     public SetGlobalSlotAVM2Item(AVM2Instruction instruction, int slotId, GraphTargetItem value) {
-        super(instruction, PRECEDENCE_ASSIGMENT);
+        super(instruction, PRECEDENCE_ASSIGMENT, value);
         this.slotId = slotId;
-        this.value = value;
     }
 
     @Override

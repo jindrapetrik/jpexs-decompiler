@@ -44,6 +44,13 @@ public abstract class AVM2Item extends GraphTargetItem {
         }
     }
 
+    public AVM2Item(GraphSourceItem instruction, int precedence, GraphTargetItem value) {
+        super(instruction, precedence, value);
+        if (instruction instanceof AVM2Instruction) {
+            this.instruction = (AVM2Instruction) instruction;
+        }
+    }
+
     public AVM2Instruction getInstruction() {
         return instruction;
     }

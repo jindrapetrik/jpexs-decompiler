@@ -68,9 +68,8 @@ public class DefineLocalActionItem extends ActionItem implements SetTypeActionIt
     }
 
     public DefineLocalActionItem(GraphSourceItem instruction, GraphTargetItem name, GraphTargetItem value) {
-        super(instruction, PRECEDENCE_PRIMARY);
+        super(instruction, PRECEDENCE_PRIMARY, value);
         this.name = name;
-        this.value = value;
     }
 
     @Override

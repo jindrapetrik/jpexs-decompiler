@@ -33,8 +33,7 @@ public class ThrowAVM2Item extends AVM2Item implements ExitItem {
 
     //public GraphTargetItem value;
     public ThrowAVM2Item(AVM2Instruction instruction, GraphTargetItem value) {
-        super(instruction, NOPRECEDENCE);
-        this.value = value;
+        super(instruction, NOPRECEDENCE, value);
     }
 
     @Override

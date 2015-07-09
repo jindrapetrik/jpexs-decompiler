@@ -77,10 +77,9 @@ public class SetMemberActionItem extends ActionItem implements SetTypeActionItem
     }
 
     public SetMemberActionItem(GraphSourceItem instruction, GraphTargetItem object, GraphTargetItem objectName, GraphTargetItem value) {
-        super(instruction, PRECEDENCE_ASSIGMENT);
+        super(instruction, PRECEDENCE_ASSIGMENT, value);
         this.object = object;
         this.objectName = objectName;
-        this.value = value;
     }
 
     @Override
