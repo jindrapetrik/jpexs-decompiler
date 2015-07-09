@@ -1992,12 +1992,13 @@ public class AVM2Code implements Cloneable {
         }
     }
 
-    public void fixJumps(MethodBody body) {
+    public void fixJumps(final String path, MethodBody body) throws InterruptedException {
         buildCache();
         if (code.isEmpty()) {
             return;
         }
         AVM2Instruction lastInstuction = code.get(code.size() - 1);
+        final List<Long> insAddrToRemove = new ArrayList<>();
         final long endOffset = lastInstuction.offset + lastInstuction.getBytesLength();
         updateOffsets(new OffsetUpdater() {
 
@@ -2008,25 +2009,26 @@ public class AVM2Code implements Cloneable {
 
             @Override
             public int updateOperandOffset(long insAddr, long targetAddress, int offset) {
-                if (targetAddress > endOffset) {
-                    // jump to the end
-                    return (int) (offset - targetAddress + endOffset);
+                if (targetAddress > endOffset || targetAddress < 0 || posCache.indexOf(targetAddress) == -1) {
+                    insAddrToRemove.add(insAddr);
                 }
-                if (targetAddress < 0) {
-                    // jump to the first instuction
-                    return (int) (offset - targetAddress);
-                }
-
-                int targetPos = posCache.indexOf(targetAddress);
-                if (targetPos == -1) {
-                    // jump to the end
-                    return (int) (offset - targetAddress + endOffset);
-                }
-
                 return offset;
             }
 
         }, body);
+
+        boolean someIgnored = false;
+        for (Long insAddr : insAddrToRemove) {
+            int pos = posCache.indexOf(insAddr);
+            if (pos > -1) {
+                code.get(pos).ignored = true;
+                someIgnored = true;
+            }
+        }
+        if (someIgnored) {
+            Logger.getLogger(AVM2Code.class.getName()).log(Level.WARNING, path + ": One or more invalid jump offsets found in the code. Those instructions were ignored.");
+        }
+        removeIgnored(body);
     }
 
     public void checkValidOffsets(MethodBody body) {
@@ -2227,7 +2229,7 @@ public class AVM2Code implements Cloneable {
     }
 
     private int removeTrapsOld(AVM2ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, ABC abc, int scriptIndex, int classIndex, boolean isStatic, String path) throws InterruptedException {
-        removeDeadCode(constants, trait, info, body);
+        removeDeadCode(body);
         AVM2LocalData localData = new AVM2LocalData();
         localData.isStatic = isStatic;
         localData.classIndex = classIndex;
@@ -2250,9 +2252,9 @@ public class AVM2Code implements Cloneable {
         localData.refs = refs;
         localData.code = this;
         int ret = 0;
-        ret += removeTraps(constants, trait, info, body, localData, new AVM2GraphSource(this, false, -1, -1, new HashMap<>(), new ScopeStack(), abc, body, new HashMap<>(), new ArrayList<>(), new HashMap<>(), refs), 0, path, refs);
-        removeIgnored(constants, trait, info, body);
-        removeDeadCode(constants, trait, info, body);
+        ret += removeTrapsOld(constants, trait, info, body, localData, new AVM2GraphSource(this, false, -1, -1, new HashMap<>(), new ScopeStack(), abc, body, new HashMap<>(), new ArrayList<>(), new HashMap<>(), refs), 0, path, refs);
+        removeIgnored(body);
+        removeDeadCode(body);
 
         return ret;
     }
@@ -2783,7 +2785,7 @@ public class AVM2Code implements Cloneable {
             logger.log(Level.FINE, null, ex);
         }
         invalidateCache();
-        removeDeadCode(constants, trait, info, body);
+        removeDeadCode(body);
     }
 
     public void restoreControlFlow(AVM2ConstantPool constants, Trait trait, MethodInfo info, MethodBody body) throws InterruptedException {
@@ -2815,7 +2817,7 @@ public class AVM2Code implements Cloneable {
      invalidateCache();
      }*/
 
-    public void removeIgnored(AVM2ConstantPool constants, Trait trait, MethodInfo info, MethodBody body) throws InterruptedException {
+    public void removeIgnored(MethodBody body) throws InterruptedException {
         //System.err.println("removing ignored...");
         for (int i = 0; i < code.size(); i++) {
             if (code.get(i).ignored) {
@@ -2826,7 +2828,7 @@ public class AVM2Code implements Cloneable {
         //System.err.println("/ignored removed");
     }
 
-    public int removeDeadCode(AVM2ConstantPool constants, Trait trait, MethodInfo info, MethodBody body) throws InterruptedException {
+    public int removeDeadCode(MethodBody body) throws InterruptedException {
         invalidateCache();
         HashMap<Integer, List<Integer>> refs = visitCode(body);
         int cnt = 0;
@@ -2838,7 +2840,7 @@ public class AVM2Code implements Cloneable {
             }
         }
 
-        removeIgnored(constants, trait, info, body);
+        removeIgnored(body);
 
         for (int i = code.size() - 1; i >= 0; i--) {
             AVM2Instruction ins = code.get(i);
@@ -2850,7 +2852,7 @@ public class AVM2Code implements Cloneable {
             }
         }
 
-        removeIgnored(constants, trait, info, body);
+        removeIgnored(body);
 
         return cnt;
     }
@@ -3053,7 +3055,7 @@ public class AVM2Code implements Cloneable {
     }
 
     @SuppressWarnings("unchecked")
-    private static int removeTraps(HashMap<Integer, List<Integer>> refs, boolean secondPass, boolean indeterminate, AVM2LocalData localData, TranslateStack stack, List<GraphTargetItem> output, AVM2GraphSource code, int ip, HashMap<Integer, Integer> visited, HashMap<Integer, HashMap<Integer, GraphTargetItem>> visitedStates, HashMap<AVM2Instruction, Decision> decisions, String path, int recursionLevel) throws InterruptedException {
+    private static int removeTrapsOld(HashMap<Integer, List<Integer>> refs, boolean secondPass, boolean indeterminate, AVM2LocalData localData, TranslateStack stack, List<GraphTargetItem> output, AVM2GraphSource code, int ip, HashMap<Integer, Integer> visited, HashMap<Integer, HashMap<Integer, GraphTargetItem>> visitedStates, HashMap<AVM2Instruction, Decision> decisions, String path, int recursionLevel) throws InterruptedException {
         if (Thread.currentThread().isInterrupted()) {
             throw new InterruptedException();
         }
@@ -3288,7 +3290,7 @@ public class AVM2Code implements Cloneable {
                     for (int b : branches) {
                         TranslateStack brStack = (TranslateStack) stack.clone();
                         if (b >= 0) { //useVisited || (!ins.isJump())
-                            ret += removeTraps(refs, secondPass, indeterminate, prepareBranchLocalData(localData), brStack, output, code, b, visited, visitedStates, decisions, path, recursionLevel + 1);
+                            ret += removeTrapsOld(refs, secondPass, indeterminate, prepareBranchLocalData(localData), brStack, output, code, b, visited, visitedStates, decisions, path, recursionLevel + 1);
                         } else {
                             if (debugMode) {
                                 System.out.println("Negative branch:" + b);
@@ -3306,9 +3308,9 @@ public class AVM2Code implements Cloneable {
         return ret;
     }
 
-    public static int removeTraps(AVM2ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, AVM2LocalData localData, AVM2GraphSource code, int addr, String path, HashMap<Integer, List<Integer>> refs) throws InterruptedException {
+    public static int removeTrapsOld(AVM2ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, AVM2LocalData localData, AVM2GraphSource code, int addr, String path, HashMap<Integer, List<Integer>> refs) throws InterruptedException {
         HashMap<AVM2Instruction, AVM2Code.Decision> decisions = new HashMap<>();
-        removeTraps(refs, false, false, localData, new TranslateStack(path), new ArrayList<>(), code, code.adr2pos(addr), new HashMap<>(), new HashMap<>(), decisions, path, 0);
+        removeTrapsOld(refs, false, false, localData, new TranslateStack(path), new ArrayList<>(), code, code.adr2pos(addr), new HashMap<>(), new HashMap<>(), decisions, path, 0);
         int cnt = 0;
         for (AVM2Instruction src : decisions.keySet()) {
             Decision dec = decisions.get(src);
@@ -3332,8 +3334,7 @@ public class AVM2Code implements Cloneable {
                 }
             }
         }
-        //int cnt = removeTraps(refs, true, false, localData, new TranslateStack(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), new HashMap<Integer, Integer>(), new HashMap<Integer, HashMap<Integer, GraphTargetItem>>(), decisions, path);
-        code.getCode().removeIgnored(constants, trait, info, body);
+        code.getCode().removeIgnored(body);
         return cnt;
     }
     /*public static int removeTraps(AVM2LocalData localData, AVM2GraphSource code, int addr) {
