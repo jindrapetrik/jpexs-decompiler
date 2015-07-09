@@ -1072,7 +1072,7 @@ public class SWFInputStream implements AutoCloseable {
      * @throws java.lang.InterruptedException
      */
     public List<Tag> readTagList(Timelined timelined, int level, boolean parallel, boolean skipUnusualTags, boolean parseTags, boolean lazy) throws IOException, InterruptedException {
-        if (Thread.currentThread().interrupted()) {
+        if (Thread.currentThread().isInterrupted()) {
             throw new InterruptedException();
         }
 

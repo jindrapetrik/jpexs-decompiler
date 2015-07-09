@@ -50,7 +50,7 @@ public class AVM2DeobfuscatorJumps extends AVM2DeobfuscatorSimple {
     public void deobfuscate(String path, int classIndex, boolean isStatic, int scriptIndex, ABC abc, AVM2ConstantPool cpool, Trait trait, MethodInfo minfo, MethodBody body) throws InterruptedException {
 
         //body.getCode().markMappedOffsets();
-        //removeUnreachableActions(body.getCode(), cpool, trait, minfo, body);
+        //removeUnreachableInstructions(body.getCode(), cpool, trait, minfo, body);
         AVM2Code code = body.getCode();
 
         boolean found;
@@ -81,7 +81,7 @@ public class AVM2DeobfuscatorJumps extends AVM2DeobfuscatorSimple {
                     }
                 }
             }
-            removeUnreachableActions(body.getCode(), cpool, trait, minfo, body);
+            removeUnreachableInstructions(body.getCode(), cpool, trait, minfo, body);
         } while (found);
     }
 }

@@ -44,7 +44,7 @@ public class NewObjectIns extends InstructionDefinition {
         List<NameValuePair> args = new ArrayList<>(argCount);
         for (int a = 0; a < argCount; a++) {
             if (Thread.currentThread().isInterrupted()) {
-                // int obfuscated method argCount can be 16M
+                // in obfuscated method argCount can be 16M
                 throw new InterruptedException();
             }
 
