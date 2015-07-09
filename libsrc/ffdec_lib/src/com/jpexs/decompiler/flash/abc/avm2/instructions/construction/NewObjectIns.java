@@ -23,11 +23,13 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.NameValuePair;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewObjectAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.model.PopItem;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,13 +45,17 @@ public class NewObjectIns extends InstructionDefinition {
         int argCount = ins.operands[0];
         List<NameValuePair> args = new ArrayList<>(argCount);
         for (int a = 0; a < argCount; a++) {
-            if (Thread.currentThread().isInterrupted()) {
-                // in obfuscated method argCount can be 16M
-                throw new InterruptedException();
-            }
-
+            //No PopItems in this loop, since some obfuscators put there large numbers
             GraphTargetItem value = stack.pop();
+            if (value instanceof PopItem) {
+                stack.push(new NullAVM2Item(ins));
+                return;
+            }
             GraphTargetItem name = stack.pop();
+            if (value instanceof PopItem) {
+                stack.push(new NullAVM2Item(ins));
+                return;
+            }
             args.add(0, new NameValuePair(name, value));
         }
         stack.push(new NewObjectAVM2Item(ins, args));

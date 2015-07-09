@@ -22,11 +22,13 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewArrayAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.model.PopItem;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,7 +44,13 @@ public class NewArrayIns extends InstructionDefinition {
         int argCount = ins.operands[0];
         List<GraphTargetItem> args = new ArrayList<>();
         for (int a = 0; a < argCount; a++) {
-            args.add(0, stack.pop());
+            GraphTargetItem item = stack.pop();
+            //No PopItems in this loop, since some obfuscators put there large numbers                      
+            if (item instanceof PopItem) {
+                stack.push(new NullAVM2Item(ins));
+                return;
+            }
+            args.add(0, item);
         }
         stack.push(new NewArrayAVM2Item(ins, args));
     }
