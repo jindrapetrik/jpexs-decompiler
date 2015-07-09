@@ -124,7 +124,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     public List<GraphSourceItemPos> getMoreSrc() {
         if (moreSrc == null) {
-            moreSrc = new ArrayList<>()
+            moreSrc = new ArrayList<>();
         }
 
         return moreSrc;
