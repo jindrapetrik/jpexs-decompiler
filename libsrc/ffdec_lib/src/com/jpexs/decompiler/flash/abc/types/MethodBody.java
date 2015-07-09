@@ -163,7 +163,7 @@ public final class MethodBody implements Cloneable {
     }
 
     public int removeDeadCode(AVM2ConstantPool constants, Trait trait, MethodInfo info) throws InterruptedException {
-        return getCode().removeDeadCode(constants, trait, info, this);
+        return getCode().removeDeadCode(this);
     }
 
     public void restoreControlFlow(AVM2ConstantPool constants, Trait trait, MethodInfo info) throws InterruptedException {
@@ -349,6 +349,7 @@ public final class MethodBody implements Cloneable {
     public MethodBody convertMethodBody(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, Trait trait, AVM2ConstantPool constants, List<MethodInfo> method_info, ScopeStack scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits) throws InterruptedException {
         MethodBody body = clone();
         body.getCode().markMappedOffsets();
+        body.getCode().fixJumps(path, body);
 
         if (Configuration.autoDeobfuscate.get()) {
             try {
