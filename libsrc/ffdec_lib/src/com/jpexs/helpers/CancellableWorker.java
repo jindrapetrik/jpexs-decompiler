@@ -128,7 +128,7 @@ public abstract class CancellableWorker<T> implements RunnableFuture<T> {
 
     public static void cancelBackgroundThreads() {
         List<CancellableWorker> oldWorkers = workers;
-        workers = new ArrayList<>();
+        workers = Collections.synchronizedList(new ArrayList<CancellableWorker>());
         for (CancellableWorker worker : oldWorkers) {
             if (worker != null) {
                 worker.cancel(true);
