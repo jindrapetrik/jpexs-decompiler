@@ -16,8 +16,10 @@
  */
 package com.jpexs.decompiler.flash.abc.types.traits;
 
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ClassPath;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2Deobfuscation;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
@@ -75,33 +77,23 @@ public abstract class Trait implements Serializable {
         Multiname m = getName(abc);
         if (m != null) {
             String nsname = "";
-            //if (abc.constants.getNamespace(m.namespace_index).kind == Namespace.KIND_NAMESPACE) {
-            {
-                for (ABCContainerTag abcTag : abc.getAbcTags()) {
-                    if (m.namespace_index == -1) {
-                        break;
-                    }
-                    nsname = abcTag.getABC().nsValueToName(abc.constants.getNamespace(m.namespace_index).getName(abc.constants, true)).toString();
+            for (ABCContainerTag abcTag : abc.getAbcTags()) {
+                if (m.namespace_index == -1) {
+                    break;
+                }
+                nsname = abcTag.getABC().nsValueToName(abc.constants.getNamespace(m.namespace_index).getName(abc.constants, true)).getLast();
 
-                    if (nsname == null) {
-                        break;
-                    }
-                    if (nsname.contains(".")) {
-                        nsname = nsname.substring(nsname.lastIndexOf('.') + 1);
-                    }
-                    if (!nsname.isEmpty()) {
-                        break;
-                    }
+                if (nsname == null) {
+                    break;
+                }
+                if (!nsname.isEmpty()) {
+                    break;
                 }
             }
+
             Namespace ns = m.getNamespace(abc.constants);
 
-            if (nsname.contains(":")) {
-                nsname = "";
-            }
-
-            if ((!nsname.isEmpty()) && (!nsname.equals("-"))) {
-            } else {
+            if (nsname.isEmpty() || (nsname.equals("-"))) {
                 if (ns != null) {
                     if (ns.kind == Namespace.KIND_NAMESPACE) {
                         nsname = ns.getName(abc.constants, true);
@@ -109,8 +101,8 @@ public abstract class Trait implements Serializable {
                 }
             }
 
-            if (nsname != null && (!nsname.contains(":")) && (!nsname.isEmpty())) {
-                ret += " " + nsname;
+            if (nsname != null) {
+                ret += " " + IdentifiersDeobfuscation.printIdentifier(true, nsname);
             }
             if (ns != null) {
                 ret += " " + ns.getPrefix(abc);
