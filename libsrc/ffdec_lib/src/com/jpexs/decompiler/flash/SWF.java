@@ -2849,7 +2849,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                     sprite.setModified(true);
                 }
             } else {
-                removeTagFromTimeline(tag, timeline);
+                removeTagFromTimeline(tag, timelined.getTimeline());
             }
         }
     }

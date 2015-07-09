@@ -2008,8 +2008,8 @@ public class CommandLineArgumentParser {
                         System.err.println("Tag number should be integer");
                         System.exit(1);
                     }
-                    if (swf.tags.size() >= tagNo) {
-                        System.err.println("Tag number does not exist. Last tag number is: " + (swf.tags.size() - 1));
+                    if (tagNo < 0 || tagNo >= swf.tags.size()) {
+                        System.err.println("Tag number does not exist. Tag number should be between 0 and " + (swf.tags.size() - 1));
                         System.exit(1);
                     }
 
