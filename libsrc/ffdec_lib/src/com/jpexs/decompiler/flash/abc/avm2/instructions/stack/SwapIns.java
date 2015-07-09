@@ -52,8 +52,8 @@ public class SwapIns extends InstructionDefinition {
         GraphTargetItem o2 = stack.pop();
         stack.push(o1);
         stack.push(o2);
-        o1.moreSrc.add(new GraphSourceItemPos(ins, 0));
-        o2.moreSrc.add(new GraphSourceItemPos(ins, 0));
+        o1.getMoreSrc().add(new GraphSourceItemPos(ins, 0));
+        o2.getMoreSrc().add(new GraphSourceItemPos(ins, 0));
     }
 
     @Override

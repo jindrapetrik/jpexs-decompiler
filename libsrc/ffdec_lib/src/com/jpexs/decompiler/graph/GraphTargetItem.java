@@ -76,7 +76,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     protected int precedence;
 
-    public List<GraphSourceItemPos> moreSrc = new ArrayList<>();
+    private List<GraphSourceItemPos> moreSrc;
 
     public GraphPart firstPart;
 
@@ -122,6 +122,14 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
         return src;
     }
 
+    public List<GraphSourceItemPos> getMoreSrc() {
+        if (moreSrc == null) {
+            moreSrc = new ArrayList<>()
+        }
+
+        return moreSrc;
+    }
+
     protected HighlightData getSrcData() {
         if (srcData == null) {
             srcData = new HighlightData();
@@ -133,10 +141,14 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     public List<GraphSourceItemPos> getNeededSources() {
         List<GraphSourceItemPos> ret = new ArrayList<>();
         ret.add(new GraphSourceItemPos(src, pos));
-        ret.addAll(moreSrc);
+        if (moreSrc != null) {
+            ret.addAll(moreSrc);
+        }
+
         if (value != null) {
             ret.addAll(value.getNeededSources());
         }
+
         return ret;
     }
 
