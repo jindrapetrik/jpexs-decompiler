@@ -109,7 +109,7 @@ public abstract class GraphTextWriter {
     }
 
     public final GraphTextWriter hilightSpecial(String text, HighlightSpecialType type, int specialValue) {
-        return hilightSpecial(text, type, Integer.toString(specialValue), new HighlightData());
+        return hilightSpecial(text, type, Integer.toString(specialValue), null);
     }
 
     public final GraphTextWriter hilightSpecial(String text, HighlightSpecialType type, int specialValue, HighlightData data) {
@@ -117,7 +117,7 @@ public abstract class GraphTextWriter {
     }
 
     public final GraphTextWriter hilightSpecial(String text, HighlightSpecialType type, String specialValue) {
-        return hilightSpecial(text, type, specialValue, new HighlightData());
+        return hilightSpecial(text, type, specialValue, null);
     }
 
     protected GraphTextWriter hilightSpecial(String text, HighlightSpecialType type, String specialValue, HighlightData data) {

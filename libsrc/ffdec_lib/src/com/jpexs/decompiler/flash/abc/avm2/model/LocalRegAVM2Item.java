@@ -65,8 +65,9 @@ public class LocalRegAVM2Item extends AVM2Item {
         if (computedValue instanceof FilterAVM2Item) {
             return computedValue.toString(writer, localData);
         }
+
         String localName = localRegName(localData.localRegNames, regIndex);
-        srcData.localName = localName;
+        getSrcData().localName = localName;
         return writer.append(localName);
     }
 

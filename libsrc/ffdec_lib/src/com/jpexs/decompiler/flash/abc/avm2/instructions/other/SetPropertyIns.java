@@ -129,7 +129,7 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
                 c.args.clear();
                 List<GraphTargetItem> vals = new ArrayList<>();
                 vals.add(value);
-                c.object = new InitVectorAVM2Item(c.instruction, at.params.get(0), vals);
+                c.object = new InitVectorAVM2Item(c.getInstruction(), at.params.get(0), vals);
                 return;
             } else if (c.object instanceof InitVectorAVM2Item) {
                 InitVectorAVM2Item iv = (InitVectorAVM2Item) c.object;

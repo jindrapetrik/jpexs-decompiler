@@ -756,9 +756,9 @@ public class AVM2Graph extends Graph {
                             SetTypeAVM2Item sti = (SetTypeAVM2Item) w.commands.remove(0);
                             GraphTargetItem gti = sti.getValue().getNotCoerced();
                             if (gti instanceof NextValueAVM2Item) {
-                                return new ForEachInAVM2Item(w.src, w.loop, new InAVM2Item(hn.instruction, sti.getObject(), ((HasNextAVM2Item) w.expression.get(w.expression.size() - 1)).collection), w.commands);
+                                return new ForEachInAVM2Item(w.src, w.loop, new InAVM2Item(hn.getInstruction(), sti.getObject(), ((HasNextAVM2Item) w.expression.get(w.expression.size() - 1)).collection), w.commands);
                             } else if (gti instanceof NextNameAVM2Item) {
-                                return new ForInAVM2Item(w.src, w.loop, new InAVM2Item(hn.instruction, sti.getObject(), ((HasNextAVM2Item) w.expression.get(w.expression.size() - 1)).collection), w.commands);
+                                return new ForInAVM2Item(w.src, w.loop, new InAVM2Item(hn.getInstruction(), sti.getObject(), ((HasNextAVM2Item) w.expression.get(w.expression.size() - 1)).collection), w.commands);
                             }
                         }
                     }

@@ -46,7 +46,7 @@ public class InitPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, A
 
     @Override
     public GraphTargetItem getObject() {
-        return new GetPropertyAVM2Item(instruction, object, propertyName);
+        return new GetPropertyAVM2Item(getInstruction(), object, propertyName);
     }
 
     @Override

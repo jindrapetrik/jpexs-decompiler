@@ -90,6 +90,7 @@ public class TryAVM2Item extends AVM2Item implements Block {
             if (localName.isEmpty()) {
                 localName = finCatchName;
             }
+
             HighlightData data = new HighlightData();
             data.localName = localName;
             data.declaration = true;

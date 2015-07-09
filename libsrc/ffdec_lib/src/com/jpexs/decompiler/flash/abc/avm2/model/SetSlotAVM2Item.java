@@ -46,7 +46,7 @@ public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assign
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        srcData.localName = slotName == null ? "/*UnknownSlot*/" : slotName.getName(localData.constantsAvm2, localData.fullyQualifiedNames, false);
+        getSrcData().localName = slotName == null ? "/*UnknownSlot*/" : slotName.getName(localData.constantsAvm2, localData.fullyQualifiedNames, false);
         getName(writer, localData);
         writer.append(" = ");
         return value.toString(writer, localData);
@@ -65,7 +65,7 @@ public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assign
 
     @Override
     public GraphTargetItem getObject() {
-        return new GetSlotAVM2Item(instruction, scope, slotName);
+        return new GetSlotAVM2Item(getInstruction(), scope, slotName);
     }
 
     @Override

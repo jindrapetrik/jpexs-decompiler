@@ -82,7 +82,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     public GraphTargetItem value;
 
-    protected HighlightData srcData = new HighlightData();
+    private HighlightData srcData;
 
     public int getLine() {
         if (src != null) {
@@ -310,10 +310,15 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
         }
     }
 
-    /*public GraphTargetItem invert() {
-     return invert(null);
-     }*/
     public GraphTargetItem invert(GraphSourceItem src) {
         return new NotItem(src, this);
+    }
+
+    protected HighlightData getSrcData() {
+        if (srcData == null) {
+            srcData = new HighlightData();
+        }
+
+        return srcData;
     }
 }

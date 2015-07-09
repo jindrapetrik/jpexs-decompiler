@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetSlotAVM2Item;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -54,6 +55,7 @@ public class DeclarationAVM2Item extends AVM2Item {
         if (assignment instanceof LocalRegAVM2Item) { //for..in
             LocalRegAVM2Item lti = (LocalRegAVM2Item) assignment;
             String localName = localRegName(localData.localRegNames, lti.regIndex);
+            HighlightData srcData = getSrcData();
             srcData.localName = localName;
             srcData.declaration = true;
             srcData.declaredType = "*";
@@ -64,6 +66,7 @@ public class DeclarationAVM2Item extends AVM2Item {
 
         if (assignment instanceof GetSlotAVM2Item) { //for..in
             GetSlotAVM2Item sti = (GetSlotAVM2Item) assignment;
+            HighlightData srcData = getSrcData();
             srcData.localName = sti.getNameAsStr(localData);
             srcData.declaration = true;
             srcData.declaredType = "*";
@@ -75,6 +78,7 @@ public class DeclarationAVM2Item extends AVM2Item {
         if (assignment instanceof SetLocalAVM2Item) {
             SetLocalAVM2Item lti = (SetLocalAVM2Item) assignment;
             String localName = localRegName(localData.localRegNames, lti.regIndex);
+            HighlightData srcData = getSrcData();
             srcData.localName = localName;
             srcData.declaration = true;
 
@@ -95,6 +99,7 @@ public class DeclarationAVM2Item extends AVM2Item {
         }
         if (assignment instanceof SetSlotAVM2Item) {
             SetSlotAVM2Item ssti = (SetSlotAVM2Item) assignment;
+            HighlightData srcData = getSrcData();
             srcData.localName = ssti.getNameAsStr(localData);
             srcData.declaration = true;
             srcData.declaredType = (type instanceof TypeItem) ? ((TypeItem) type).fullTypeName.toPrintableString() : "*";
