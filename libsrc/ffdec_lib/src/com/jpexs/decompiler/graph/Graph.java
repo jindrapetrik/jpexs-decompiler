@@ -537,7 +537,7 @@ public class Graph {
                 if (exprLine > 0) {
                     List<GraphTargetItem> forFirstCommands = new ArrayList<>();
                     for (int j = i - 1; j >= 0; j--) {
-                        if (list.get(j).getLine() == exprLine) {
+                        if (list.get(j).getLine() == exprLine && !(list.get(j) instanceof LoopItem /*to avoid recursion and StackOverflow*/)) {
                             forFirstCommands.add(0, list.get(j));
                             removeFromList.add(j);
                         } else {
@@ -571,6 +571,11 @@ public class Graph {
                         }
                     }
                     if (!forFirstCommands.isEmpty() || !forFinalCommands.isEmpty()) {
+                        //Do not allow more than 2 first/final commands, since it can be obfuscated
+                        if (forFirstCommands.size() > 2 || forFinalCommands.size() > 2) {
+                            removeFromList.clear();
+                            whi.commands.addAll(forFinalCommands); //put it back
+                        }
                         if (whi.commands.isEmpty() && forFirstCommands.isEmpty()) {
                             //it would be for(;expr;commands) {}  which looks better as while(expr){commands}
                             whi.commands.addAll(forFinalCommands); //put it back

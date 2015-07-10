@@ -347,13 +347,17 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     }
 
     public GraphTextWriter appendBlock(GraphTargetItem prevLineItem, GraphTextWriter writer, LocalData localData, List<GraphTargetItem> commands) throws InterruptedException {
+
+        //This may be useful in the future, but we must handle obfuscated SWFs where there is only one debugline instruction on the beggining.
+        final boolean useLineInfo = false;
+
         int prevLine = prevLineItem == null ? 0 : prevLineItem.getLine();
         writer.startBlock();
         boolean first = true;
         for (GraphTargetItem ti : commands) {
             if (!ti.isEmpty()) {
                 //Use stored line information if available to place commands on same line
-                if (!first && (ti.getLine() < 1 || prevLine < 1 || (prevLine >= 1 && prevLine != ti.getLine()))) {
+                if (!first && (!useLineInfo || (ti.getLine() < 1 || prevLine < 1 || (prevLine >= 1 && prevLine != ti.getLine())))) {
                     writer.newLine();
                 }
                 prevLine = ti.getLine();
