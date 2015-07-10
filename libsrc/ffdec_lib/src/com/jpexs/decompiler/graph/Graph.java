@@ -553,7 +553,7 @@ public class Graph {
                     List<GraphTargetItem> forFinalCommands = new ArrayList<>();
 
                     for (int j = i - 1; j >= 0; j--) {
-                        if (list.get(j).getLine() == whileExprLine) {
+                        if (list.get(j).getLine() == whileExprLine && !(list.get(j) instanceof LoopItem /*to avoid recursion and StackOverflow*/)) {
                             forFirstCommands.add(0, list.get(j));
                             removeFromList.add(j);
                         } else {
@@ -561,16 +561,21 @@ public class Graph {
                         }
                     }
                     for (int j = whi.commands.size() - 1; j >= 0; j--) {
-                        if (whi.commands.get(j).getLine() == whileExprLine) {
+                        if (whi.commands.get(j).getLine() == whileExprLine && !(whi.commands.get(j) instanceof LoopItem /*to avoid recursion and StackOverflow*/)) {
                             forFinalCommands.add(0, whi.commands.remove(j));
                         } else {
                             break;
                         }
                     }
                     if (!forFirstCommands.isEmpty() || !forFinalCommands.isEmpty()) {
-                        GraphTargetItem lastExpr = whi.expression.remove(whi.expression.size() - 1);
-                        forFirstCommands.addAll(whi.expression);
-                        list.set(i, new ForItem(whi.getSrc(), whi.loop, forFirstCommands, lastExpr, forFinalCommands, whi.commands));
+                        if (whi.commands.isEmpty() && forFirstCommands.isEmpty()) {
+                            //it would be for(;expr;commands) {}  which looks better as while(expr){commands}
+                            whi.commands.addAll(forFinalCommands); //put it back
+                        } else {
+                            GraphTargetItem lastExpr = whi.expression.remove(whi.expression.size() - 1);
+                            forFirstCommands.addAll(whi.expression);
+                            list.set(i, new ForItem(whi.getSrc(), whi.loop, forFirstCommands, lastExpr, forFinalCommands, whi.commands));
+                        }
                     }
                 }
             }
