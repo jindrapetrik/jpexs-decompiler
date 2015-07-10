@@ -94,7 +94,7 @@ public class ActionGraph extends Graph {
     }
 
     @Override
-    protected void finalProcess(List<GraphTargetItem> list, int level, FinalProcessLocalData localData) {
+    protected void finalProcess(List<GraphTargetItem> list, int level, FinalProcessLocalData localData) throws InterruptedException {
         List<GraphTargetItem> ret = Action.checkClass(list);
         if (ret != list) {
             list.clear();

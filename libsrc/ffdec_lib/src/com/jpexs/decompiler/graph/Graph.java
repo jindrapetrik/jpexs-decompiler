@@ -454,7 +454,7 @@ public class Graph {
     public void finalProcessStack(TranslateStack stack, List<GraphTargetItem> output) {
     }
 
-    private void finalProcessAll(List<GraphTargetItem> list, int level, FinalProcessLocalData localData) {
+    private void finalProcessAll(List<GraphTargetItem> list, int level, FinalProcessLocalData localData) throws InterruptedException {
         finalProcess(list, level, localData);
         for (GraphTargetItem item : list) {
             if (item instanceof Block) {
@@ -522,11 +522,14 @@ public class Graph {
         }
     }
 
-    protected void finalProcess(List<GraphTargetItem> list, int level, FinalProcessLocalData localData) {
+    protected void finalProcess(List<GraphTargetItem> list, int level, FinalProcessLocalData localData) throws InterruptedException {
 
         //For detection based on debug line information
         Set<Integer> removeFromList = new HashSet<>();
         for (int i = 0; i < list.size(); i++) {
+            if (Thread.currentThread().isInterrupted()) {
+                throw new InterruptedException();
+            }
 
             if (list.get(i) instanceof ForItem) {
                 ForItem fori = (ForItem) list.get(i);

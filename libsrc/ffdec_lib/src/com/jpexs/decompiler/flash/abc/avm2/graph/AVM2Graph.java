@@ -783,7 +783,7 @@ public class AVM2Graph extends Graph {
     }
 
     @Override
-    protected void finalProcess(List<GraphTargetItem> list, int level, FinalProcessLocalData localData) {
+    protected void finalProcess(List<GraphTargetItem> list, int level, FinalProcessLocalData localData) throws InterruptedException {
 
         if (level == 0) {
             if (!list.isEmpty()) {
