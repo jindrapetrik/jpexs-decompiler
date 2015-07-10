@@ -1717,25 +1717,29 @@ public class Graph {
                         stack.push(new TernarOpItem(null, expr.invert(null), ((PushItem) onTrue.get(0)).value, ((PushItem) onFalse.get(0)).value));
                     } else {
                         boolean isIf = true;
-                        if (!stack.isEmpty() && onFalse.isEmpty() && onTrue.size() == 2 && (onTrue.get(0) instanceof PopItem) && (onTrue.get(1) instanceof PushItem)) {
-                            GraphTargetItem prevExpr = stack.pop();
-                            GraphTargetItem leftSide = expr;
+                        if (!stack.isEmpty() && onFalse.isEmpty() && ((onTrue.size() == 1 && (onTrue.get(0) instanceof PopItem)) || ((onTrue.size() == 2) && (onTrue.get(0) instanceof PopItem) && (onTrue.get(1) instanceof PushItem)))) {
+                            if (onTrue.size() == 2) {
+                                GraphTargetItem rightSide = ((PushItem) onTrue.get(1)).value;
+                                GraphTargetItem prevExpr = stack.pop();
+                                GraphTargetItem leftSide = expr;
 
-                            GraphTargetItem rightSide = ((PushItem) onTrue.get(1)).value;
-                            if (leftSide instanceof DuplicateItem) {
-                                isIf = false;
-                                stack.push(new OrItem(null, prevExpr, rightSide));
-                            } else if (leftSide.invert(null) instanceof DuplicateItem) {
-                                isIf = false;
-                                stack.push(new AndItem(null, prevExpr, rightSide));
-                            } else if (prevExpr instanceof FalseItem) {
-                                isIf = false;
-                                stack.push(new OrItem(null, leftSide, rightSide));
-                            } else if (prevExpr instanceof TrueItem) {
-                                isIf = false;
-                                stack.push(new AndItem(null, leftSide, rightSide));
+                                if (leftSide instanceof DuplicateItem) {
+                                    isIf = false;
+                                    stack.push(new OrItem(null, prevExpr, rightSide));
+                                } else if (leftSide.invert(null) instanceof DuplicateItem) {
+                                    isIf = false;
+                                    stack.push(new AndItem(null, prevExpr, rightSide));
+                                } else if (prevExpr instanceof FalseItem) {
+                                    isIf = false;
+                                    stack.push(new OrItem(null, leftSide, rightSide));
+                                } else if (prevExpr instanceof TrueItem) {
+                                    isIf = false;
+                                    stack.push(new AndItem(null, leftSide, rightSide));
+                                } else {
+                                    //:-(
+                                }
                             } else {
-                                //:-(
+                                isIf = false;
                             }
                         }
 
