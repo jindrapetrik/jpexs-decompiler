@@ -525,7 +525,7 @@ public class Graph {
     protected void finalProcess(List<GraphTargetItem> list, int level, FinalProcessLocalData localData) throws InterruptedException {
 
         //For detection based on debug line information
-        Set<Integer> removeFromList = new HashSet<>();
+        boolean todelete[] = new boolean[list.size()];
         for (int i = 0; i < list.size(); i++) {
             if (Thread.currentThread().isInterrupted()) {
                 throw new InterruptedException();
@@ -539,7 +539,7 @@ public class Graph {
                     for (int j = i - 1; j >= 0; j--) {
                         if (list.get(j).getLine() == exprLine && !(list.get(j) instanceof LoopItem /*to avoid recursion and StackOverflow*/)) {
                             forFirstCommands.add(0, list.get(j));
-                            removeFromList.add(j);
+                            todelete[j] = true;
                         } else {
                             break;
                         }
@@ -558,7 +558,7 @@ public class Graph {
                     for (int j = i - 1; j >= 0; j--) {
                         if (list.get(j).getLine() == whileExprLine && !(list.get(j) instanceof LoopItem /*to avoid recursion and StackOverflow*/)) {
                             forFirstCommands.add(0, list.get(j));
-                            removeFromList.add(j);
+                            todelete[j] = true;
                         } else {
                             break;
                         }
@@ -573,10 +573,12 @@ public class Graph {
                     if (!forFirstCommands.isEmpty() || !forFinalCommands.isEmpty()) {
                         //Do not allow more than 2 first/final commands, since it can be obfuscated
                         if (forFirstCommands.size() > 2 || forFinalCommands.size() > 2) {
-                            removeFromList.clear();
+                            //put it back
+                            for (int k = 0; k < forFirstCommands.size(); k++) {
+                                todelete[i - 1 - k] = false;
+                            }
                             whi.commands.addAll(forFinalCommands); //put it back
-                        }
-                        if (whi.commands.isEmpty() && forFirstCommands.isEmpty()) {
+                        } else if (whi.commands.isEmpty() && forFirstCommands.isEmpty()) {
                             //it would be for(;expr;commands) {}  which looks better as while(expr){commands}
                             whi.commands.addAll(forFinalCommands); //put it back
                         } else {
@@ -589,8 +591,8 @@ public class Graph {
             }
         }
 
-        for (int i = list.size() - 1; i >= 0; i--) {
-            if (removeFromList.contains(i)) {
+        for (int i = todelete.length - 1; i >= 0; i--) {
+            if (todelete[i]) {
                 list.remove(i);
             }
         }
