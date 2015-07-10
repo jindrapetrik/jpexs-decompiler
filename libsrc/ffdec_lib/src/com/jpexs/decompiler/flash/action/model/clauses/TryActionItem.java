@@ -68,13 +68,8 @@ public class TryActionItem extends ActionItem implements Block {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        writer.append("try").startBlock();
-        for (GraphTargetItem ti : tryCommands) {
-            if (!ti.isEmpty()) {
-                ti.toStringSemicoloned(writer, localData).newLine();
-            }
-        }
-        writer.endBlock();
+        writer.append("try");
+        appendBlock(null, writer, localData, tryCommands);
         for (int e = 0; e < catchExceptions.size(); e++) {
             writer.newLine();
             writer.append("catch");
@@ -83,24 +78,14 @@ public class TryActionItem extends ActionItem implements Block {
             }
             writer.append("(");
             catchExceptions.get(e).toStringNoQuotes(writer, localData);
-            writer.append(")").startBlock();
+            writer.append(")");
             List<GraphTargetItem> commands = catchCommands.get(e);
-            for (GraphTargetItem ti : commands) {
-                if (!ti.isEmpty()) {
-                    ti.toStringSemicoloned(writer, localData).newLine();
-                }
-            }
-            writer.endBlock();
+            appendBlock(null, writer, localData, commands);
         }
         if (finallyCommands.size() > 0) {
             writer.newLine();
-            writer.append("finally").startBlock();
-            for (GraphTargetItem ti : finallyCommands) {
-                if (!ti.isEmpty()) {
-                    ti.toStringSemicoloned(writer, localData).newLine();
-                }
-            }
-            writer.endBlock();
+            writer.append("finally");
+            appendBlock(null, writer, localData, finallyCommands);
         }
         return writer;
     }

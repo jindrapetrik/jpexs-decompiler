@@ -76,13 +76,7 @@ public class WhileItem extends LoopItem implements Block {
             expression.get(i).toString(writer, localData);
         }
         writer.append(")");
-        writer.startBlock();
-        for (GraphTargetItem ti : commands) {
-            if (!ti.isEmpty()) {
-                ti.toStringSemicoloned(writer, localData).newLine();
-            }
-        }
-        writer.endBlock();
+        appendBlock(expression.get(expression.size() - 1), writer, localData, commands);
         if (writer instanceof NulWriter) {
             LoopWithType loopOjb = ((NulWriter) writer).endLoop(loop.id);
             labelUsed = loopOjb.used;

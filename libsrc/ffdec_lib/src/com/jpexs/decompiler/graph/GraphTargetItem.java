@@ -345,4 +345,26 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     public GraphTargetItem invert(GraphSourceItem src) {
         return new NotItem(src, this);
     }
+
+    public GraphTextWriter appendBlock(GraphTargetItem prevLineItem, GraphTextWriter writer, LocalData localData, List<GraphTargetItem> commands) throws InterruptedException {
+        int prevLine = prevLineItem == null ? 0 : prevLineItem.getLine();
+        writer.startBlock();
+        boolean first = true;
+        for (GraphTargetItem ti : commands) {
+            if (!ti.isEmpty()) {
+                //Use stored line information if available to place commands on same line
+                if (!first && (ti.getLine() < 1 || prevLine < 1 || (prevLine >= 1 && prevLine != ti.getLine()))) {
+                    writer.newLine();
+                }
+                prevLine = ti.getLine();
+                first = false;
+                ti.toStringSemicoloned(writer, localData);
+            }
+        }
+        if (!first) {
+            writer.newLine();
+        }
+        writer.endBlock();
+        return writer;
+    }
 }

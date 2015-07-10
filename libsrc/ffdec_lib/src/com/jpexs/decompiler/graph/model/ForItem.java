@@ -104,13 +104,8 @@ public class ForItem extends LoopItem implements Block {
             finalCommands.get(i).toString(writer, localData);
             p++;
         }
-        writer.append(")").startBlock();
-        for (GraphTargetItem ti : commands) {
-            if (!ti.isEmpty()) {
-                ti.toStringSemicoloned(writer, localData).newLine();
-            }
-        }
-        writer.endBlock();
+        writer.append(")");
+        appendBlock(expression, writer, localData, commands);
         if (writer instanceof NulWriter) {
             LoopWithType loopOjb = ((NulWriter) writer).endLoop(loop.id);
             labelUsed = loopOjb.used;

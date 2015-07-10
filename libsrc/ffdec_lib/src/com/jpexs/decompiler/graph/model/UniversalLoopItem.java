@@ -58,13 +58,8 @@ public class UniversalLoopItem extends LoopItem implements Block {
         if (writer.getFormatting().spaceBeforeParenthesesWhileParentheses) {
             writer.append(" ");
         }
-        writer.append("(true)").startBlock();
-        for (GraphTargetItem ti : commands) {
-            if (!ti.isEmpty()) {
-                ti.toStringSemicoloned(writer, localData).newLine();
-            }
-        }
-        writer.endBlock();
+        writer.append("(true)");
+        appendBlock(null, writer, localData, commands);
         if (writer instanceof NulWriter) {
             LoopWithType loopOjb = ((NulWriter) writer).endLoop(loop.id);
             labelUsed = loopOjb.used;

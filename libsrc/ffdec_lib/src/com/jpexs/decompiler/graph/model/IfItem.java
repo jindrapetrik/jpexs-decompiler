@@ -86,13 +86,8 @@ public class IfItem extends GraphTargetItem implements Block {
         }
         writer.append("(");
         expr.toString(writer, localData);
-        writer.append(")").startBlock();
-        for (GraphTargetItem ti : ifBranch) {
-            if (!ti.isEmpty()) {
-                ti.toStringSemicoloned(writer, localData).newLine();
-            }
-        }
-        writer.endBlock();
+        writer.append(")");
+        appendBlock(expr, writer, localData, ifBranch);
         if (elseBranch.size() > 0) {
             boolean elseIf = elseBranch.size() == 1 && (elseBranch.get(0) instanceof IfItem);
             if (writer.getFormatting().beginBlockOnNewLine) {
@@ -102,21 +97,12 @@ public class IfItem extends GraphTargetItem implements Block {
             }
             writer.append("else");
             if (!elseIf) {
-                writer.startBlock();
+                appendBlock(expr, writer, localData, elseBranch);
             } else {
                 writer.append(" ");
+                elseBranch.get(0).toStringSemicoloned(writer, localData);
             }
-            for (GraphTargetItem ti : elseBranch) {
-                if (!ti.isEmpty()) {
-                    ti.toStringSemicoloned(writer, localData);
-                    if (!elseIf) {
-                        writer.newLine();
-                    }
-                }
-            }
-            if (!elseIf) {
-                writer.endBlock();
-            }
+
         }
         return writer;
     }
