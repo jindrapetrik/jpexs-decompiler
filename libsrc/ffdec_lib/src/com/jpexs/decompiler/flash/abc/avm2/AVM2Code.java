@@ -299,7 +299,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -2268,7 +2267,7 @@ public class AVM2Code implements Cloneable {
             new AVM2DeobfuscatorSimple().deobfuscate(path, classIndex, isStatic, scriptIndex, abc, constants, trait, info, body);
             new AVM2DeobfuscatorRegisters().deobfuscate(path, classIndex, isStatic, scriptIndex, abc, constants, trait, info, body);
             new AVM2DeobfuscatorJumps().deobfuscate(path, classIndex, isStatic, scriptIndex, abc, constants, trait, info, body);
-            //body.getCode().checkValidOffsets(body); // todo: only for debugging. checkValidOffsets can be made private later            
+            //body.getCode().checkValidOffsets(body); // todo: only for debugging. checkValidOffsets can be made private later
             return 1;
         }
     }

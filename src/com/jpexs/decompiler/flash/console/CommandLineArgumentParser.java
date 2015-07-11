@@ -1295,10 +1295,10 @@ public class CommandLineArgumentParser {
                         scriptExportSettings.singleFileWriter = writer;
                         if (!as3classes.isEmpty()) {
                             for (String as3class : as3classes) {
-                                exportOK = exportOK && swf.exportAS3Class(as3class, scriptsFolder, scriptExportSettings, parallel, evl);
+                                exportOK = swf.exportAS3Class(as3class, scriptsFolder, scriptExportSettings, parallel, evl) && exportOK;
                             }
                         } else {
-                            exportOK = exportOK && swf.exportActionScript(handler, scriptsFolder, scriptExportSettings, parallel, evl) != null;
+                            exportOK = swf.exportActionScript(handler, scriptsFolder, scriptExportSettings, parallel, evl) != null && exportOK;
                         }
                     }
                 }

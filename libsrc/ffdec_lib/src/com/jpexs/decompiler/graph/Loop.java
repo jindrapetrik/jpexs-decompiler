@@ -32,9 +32,9 @@ public class Loop implements Serializable {
 
     public GraphPart loopPreContinue;
 
-    public List<GraphPart> breakCandidates = new ArrayList<>();
+    public final List<GraphPart> breakCandidates = new ArrayList<>();
 
-    public List<Integer> breakCandidatesLevels = new ArrayList<>();
+    public final List<Integer> breakCandidatesLevels = new ArrayList<>();
 
     public long id;
 
