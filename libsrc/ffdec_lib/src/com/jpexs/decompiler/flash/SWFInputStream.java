@@ -992,11 +992,13 @@ public class SWFInputStream implements AutoCloseable {
         return ret;
     }
 
-    private static void dumpTag(PrintStream out, int version, Tag tag, int level) {
+    private static void dumpTag(PrintStream out, Tag tag, int index, int level) {
         StringBuilder sb = new StringBuilder();
         sb.append(Helper.formatHex((int) tag.getPos(), 8));
         sb.append(": ");
         sb.append(Helper.indent(level, "", "  "));
+        sb.append(Helper.formatInt(index, 4));
+        sb.append(". ");
         sb.append(Helper.format(tag.toString(), 25 - 2 * level));
         sb.append(" tagId=");
         sb.append(Helper.formatInt(tag.getId(), 3));
@@ -1007,8 +1009,9 @@ public class SWFInputStream implements AutoCloseable {
         out.println(sb.toString());
         // out.println(Utils.formatHex((int)tag.getPos(), 8) + ": " + Utils.indent(level, "") + Utils.format(tag.toString(), 25 - 2*level) + " tagId="+tag.getId()+" len="+tag.getOrigDataLength()+": "+Utils.bytesToHexString(64, tag.getData(version), 0));
         if (tag instanceof DefineSpriteTag) {
+            int i = 0;
             for (Tag subTag : ((DefineSpriteTag) tag).getSubTags()) {
-                dumpTag(out, version, subTag, level + 1);
+                dumpTag(out, subTag, i++, level + 1);
             }
         }
     }
@@ -1108,7 +1111,7 @@ public class SWFInputStream implements AutoCloseable {
                 tags.add(tag);
             }
             if (Configuration.dumpTags.get() && level == 0) {
-                dumpTag(System.out, swf.version, tag, level);
+                dumpTag(System.out, tag, tags.size() - 1, level);
             }
 
             boolean doParse;

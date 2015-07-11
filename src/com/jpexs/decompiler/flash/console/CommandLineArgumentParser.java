@@ -2024,7 +2024,7 @@ public class CommandLineArgumentParser {
 
                 Collections.sort(tagNumbersToRemove);
                 for (int i = tagNumbersToRemove.size() - 1; i >= 0; i--) {
-                    swf.tags.remove(tagNumbersToRemove.get(i));
+                    swf.tags.remove((int) tagNumbersToRemove.get(i));
                 }
 
                 try {
