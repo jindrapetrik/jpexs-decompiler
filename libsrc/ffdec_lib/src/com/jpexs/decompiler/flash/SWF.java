@@ -1346,7 +1346,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         if (isAS3()) {
             ret.addAll(new AS3ScriptExporter().exportActionScript3(this, handler, outdir, exportSettings, parallel, evl));
         } else {
-            ret.addAll(new AS2ScriptExporter().exportAS2ScriptsTimeout(handler, outdir, getASMs(true), exportSettings, evl));
+            ret.addAll(new AS2ScriptExporter().exportAS2Scripts(handler, outdir, getASMs(true), exportSettings, parallel, evl));
         }
         return ret;
     }

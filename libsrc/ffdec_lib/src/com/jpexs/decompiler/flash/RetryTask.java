@@ -28,8 +28,6 @@ public class RetryTask {
 
     private final AbortRetryIgnoreHandler handler;
 
-    public Object result;
-
     public RetryTask(RunnableIOEx r, AbortRetryIgnoreHandler handler) {
         this.r = r;
         this.handler = handler;

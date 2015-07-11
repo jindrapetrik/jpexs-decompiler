@@ -1251,7 +1251,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         Map<String, ASMSource> asmsToExport = swf.getASMs(true, as12scripts, false);
                         try (FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
                             scriptExportSettings.singleFileWriter = writer;
-                            ret.addAll(new AS2ScriptExporter().exportAS2ScriptsTimeout(handler, scriptsFolder, asmsToExport, scriptExportSettings, evl));
+                            ret.addAll(new AS2ScriptExporter().exportAS2Scripts(handler, scriptsFolder, asmsToExport, scriptExportSettings, parallel, evl));
                         }
                     }
                 }

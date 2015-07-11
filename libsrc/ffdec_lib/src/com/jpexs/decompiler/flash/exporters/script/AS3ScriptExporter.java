@@ -34,7 +34,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,27 +45,30 @@ public class AS3ScriptExporter {
 
     private static final Logger logger = Logger.getLogger(AS3ScriptExporter.class.getName());
 
-    public List<File> exportActionScript3(SWF swf, final AbortRetryIgnoreHandler handler, final String outdir, final ScriptExportSettings exportSettings, final boolean parallel, final EventListener evl) {
-        final AtomicInteger cnt = new AtomicInteger(1);
-
+    public List<File> exportActionScript3(SWF swf, AbortRetryIgnoreHandler handler, String outdir, ScriptExportSettings exportSettings, boolean parallel, EventListener evl) {
         final List<File> ret = new ArrayList<>();
         final List<ScriptPack> packs = swf.getAS3Packs();
 
-        if (!parallel || packs.size() < 2) {
+        int cnt = 1;
+        List<ExportPackTask> tasks = new ArrayList<>();
+        for (ScriptPack item : packs) {
+            if (!item.isSimple && Configuration.ignoreCLikePackages.get()) {
+                continue;
+            }
+
+            tasks.add(new ExportPackTask(handler, cnt++, packs.size(), item.getClassPath(), item, outdir, exportSettings, parallel, evl));
+        }
+
+        if (!parallel || tasks.size() < 2) {
             try {
                 CancellableWorker.call(new Callable<Void>() {
                     @Override
                     public Void call() throws Exception {
-                        for (ScriptPack item : packs) {
+                        for (ExportPackTask task : tasks) {
                             if (Thread.currentThread().isInterrupted()) {
                                 throw new InterruptedException();
                             }
 
-                            if (!item.isSimple && Configuration.ignoreCLikePackages.get()) {
-                                continue;
-                            }
-
-                            ExportPackTask task = new ExportPackTask(handler, cnt, packs.size(), item.getClassPath(), item, outdir, exportSettings, parallel, evl);
                             ret.add(task.call());
                         }
                         return null;
@@ -74,17 +76,14 @@ public class AS3ScriptExporter {
                 }, Configuration.exportTimeout.get(), TimeUnit.SECONDS);
             } catch (TimeoutException ex) {
                 logger.log(Level.SEVERE, Helper.formatTimeToText(Configuration.exportTimeout.get()) + " ActionScript export limit reached", ex);
-            } catch (Exception ex) {
+            } catch (ExecutionException | InterruptedException ex) {
                 logger.log(Level.SEVERE, "Error during ABC export", ex);
             }
         } else {
             ExecutorService executor = Executors.newFixedThreadPool(Configuration.getParallelThreadCount());
             List<Future<File>> futureResults = new ArrayList<>();
-            for (ScriptPack item : packs) {
-                if (!item.isSimple && Configuration.ignoreCLikePackages.get()) {
-                    continue;
-                }
-                Future<File> future = executor.submit(new ExportPackTask(handler, cnt, packs.size(), item.getClassPath(), item, outdir, exportSettings, parallel, evl));
+            for (ExportPackTask task : tasks) {
+                Future<File> future = executor.submit(task);
                 futureResults.add(future);
             }
 

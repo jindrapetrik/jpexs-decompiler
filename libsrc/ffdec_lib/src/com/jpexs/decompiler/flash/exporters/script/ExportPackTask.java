@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.RunnableIOExResult;
-import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
@@ -28,7 +27,6 @@ import com.jpexs.helpers.Helper;
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  *
@@ -44,7 +42,7 @@ public class ExportPackTask implements Callable<File> {
 
     ClassPath path;
 
-    AtomicInteger index;
+    int index;
 
     int count;
 
@@ -58,7 +56,7 @@ public class ExportPackTask implements Callable<File> {
 
     EventListener eventListener;
 
-    public ExportPackTask(AbortRetryIgnoreHandler handler, AtomicInteger index, int count, ClassPath path, ScriptPack pack, String directory, ScriptExportSettings exportSettings, boolean parallel, EventListener evl) {
+    public ExportPackTask(AbortRetryIgnoreHandler handler, int index, int count, ClassPath path, ScriptPack pack, String directory, ScriptExportSettings exportSettings, boolean parallel, EventListener evl) {
         this.pack = pack;
         this.directory = directory;
         this.exportSettings = exportSettings;
@@ -71,7 +69,7 @@ public class ExportPackTask implements Callable<File> {
     }
 
     @Override
-    public File call() throws Exception {
+    public File call() throws IOException, InterruptedException {
         RunnableIOExResult<File> rio = new RunnableIOExResult<File>() {
             @Override
             public void run() throws IOException, InterruptedException {
@@ -80,19 +78,18 @@ public class ExportPackTask implements Callable<File> {
                 stopTime = System.currentTimeMillis();
             }
         };
-        int currentIndex = index.getAndIncrement();
+
         if (eventListener != null) {
-            synchronized (ABC.class) {
-                eventListener.handleExportingEvent("script", currentIndex, count, path);
-            }
+            eventListener.handleExportingEvent("script", index, count, path);
         }
+
         new RetryTask(rio, handler).run();
+
         if (eventListener != null) {
-            synchronized (ABC.class) {
-                long time = stopTime - startTime;
-                eventListener.handleExportedEvent("script", currentIndex, count, path + ", " + Helper.formatTimeSec(time));
-            }
+            long time = stopTime - startTime;
+            eventListener.handleExportedEvent("script", index, count, path + ", " + Helper.formatTimeSec(time));
         }
+
         return rio.result;
     }
 }
