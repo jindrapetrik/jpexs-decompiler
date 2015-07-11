@@ -355,7 +355,7 @@ public final class MethodBody implements Cloneable {
         if (Configuration.autoDeobfuscate.get()) {
             try {
                 code.removeTraps(constants, trait, method_info.get(this.method_info), body, abc, scriptIndex, classIndex, isStatic, path);
-            } catch (InterruptedException ex) {
+            } catch (ThreadDeath | InterruptedException ex) {
                 throw ex;
             } catch (Throwable ex) {
                 //ignore

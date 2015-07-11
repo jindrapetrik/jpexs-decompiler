@@ -52,8 +52,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -559,7 +557,7 @@ public class Graph {
                     List<GraphTargetItem> forFinalCommands = new ArrayList<>();
 
                     for (int j = i - 1; j >= 0; j--) {
-                        GraphTargetItem itemJ = list.get(i);
+                        GraphTargetItem itemJ = list.get(j);
                         if (itemJ.getLine() == whileExprLine && !(itemJ instanceof LoopItem /*to avoid recursion and StackOverflow*/)) {
                             forFirstCommands.add(0, itemJ);
                             toDelete[j] = true;
@@ -836,7 +834,7 @@ public class Graph {
     private void getPrecontinues(String path, BaseLocalData localData, GraphPart parent, GraphPart part, List<GraphPart> allParts, List<Loop> loops, List<GraphPart> stopPart) throws InterruptedException {
         try {
             markLevels(path, localData, part, allParts, loops);
-        } catch (InterruptedException iex) {
+        } catch (ThreadDeath | InterruptedException iex) {
             throw iex;
         } catch (Throwable ex) {
             //It is unusual code so markLevels failed, nevermind, it can still work
