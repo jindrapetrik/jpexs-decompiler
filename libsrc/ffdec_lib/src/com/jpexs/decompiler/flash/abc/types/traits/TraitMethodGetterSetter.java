@@ -49,10 +49,6 @@ public class TraitMethodGetterSetter extends Trait {
 
     @Override
     public GraphTextWriter toStringHeader(Trait parent, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
-        String modifier = getModifiers(abc, isStatic) + " ";
-        if (modifier.equals(" ")) {
-            modifier = "";
-        }
         String addKind = "";
         if (kindType == TRAIT_GETTER) {
             addKind = "get ";
@@ -63,10 +59,10 @@ public class TraitMethodGetterSetter extends Trait {
         MethodBody body = abc.findBody(method_info);
 
         if (((classIndex == -1) || (!abc.instance_info.get(classIndex).isInterface())) && (body == null)) {
-            modifier = "native " + modifier;
+            writer.appendNoHilight("native ");
         }
 
-        writer.appendNoHilight(modifier);
+        getModifiers(abc, isStatic, writer);
         writer.hilightSpecial("function " + addKind, HighlightSpecialType.TRAIT_TYPE);
         writer.hilightSpecial(getName(abc).getName(abc.constants, fullyQualifiedNames, false), HighlightSpecialType.TRAIT_NAME);
         writer.appendNoHilight("(");

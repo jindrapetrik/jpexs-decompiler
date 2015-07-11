@@ -137,10 +137,6 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
 
     @Override
     public GraphTextWriter toString(Trait parent, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) throws InterruptedException {
-        String modifier = getModifiers(abc, isStatic) + " ";
-        if (modifier.equals(" ")) {
-            modifier = "";
-        }
         Multiname n = getName(abc);
         boolean showModifier = true;
         if ((classIndex == -1) && (n != null)) {
@@ -153,10 +149,9 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
                 }
             }
         }
-        if (!showModifier) {
-            modifier = "";
+        if (showModifier) {
+            getModifiers(abc, isStatic, writer);
         }
-        writer.appendNoHilight(modifier);
         getNameStr(writer, abc, fullyQualifiedNames);
         if (assignedValue != null || value_kind != 0) {
             writer.appendNoHilight(" = ");

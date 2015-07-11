@@ -100,7 +100,7 @@ public class ScriptPack extends AS3ClassTreeItem {
             Multiname name = abc.script_info.get(scriptIndex).traits.traits.get(t).getName(abc);
             Namespace ns = name.getNamespace(abc.constants);
             if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
-                scriptName = name.getName(abc.constants, new ArrayList<>(), false);
+                scriptName = name.getName(abc.constants, null, false);
             }
         }
         return scriptName;

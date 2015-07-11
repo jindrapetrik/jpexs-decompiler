@@ -525,21 +525,22 @@ public class Graph {
     protected void finalProcess(List<GraphTargetItem> list, int level, FinalProcessLocalData localData) throws InterruptedException {
 
         //For detection based on debug line information
-        boolean todelete[] = new boolean[list.size()];
+        boolean toDelete[] = new boolean[list.size()];
         for (int i = 0; i < list.size(); i++) {
             if (Thread.currentThread().isInterrupted()) {
                 throw new InterruptedException();
             }
 
-            if (list.get(i) instanceof ForItem) {
-                ForItem fori = (ForItem) list.get(i);
+            GraphTargetItem itemI = list.get(i);
+            if (itemI instanceof ForItem) {
+                ForItem fori = (ForItem) itemI;
                 int exprLine = fori.getLine();
                 if (exprLine > 0) {
                     List<GraphTargetItem> forFirstCommands = new ArrayList<>();
                     for (int j = i - 1; j >= 0; j--) {
                         if (list.get(j).getLine() == exprLine && !(list.get(j) instanceof LoopItem /*to avoid recursion and StackOverflow*/)) {
                             forFirstCommands.add(0, list.get(j));
-                            todelete[j] = true;
+                            toDelete[j] = true;
                         } else {
                             break;
                         }
@@ -548,17 +549,18 @@ public class Graph {
                 }
             }
 
-            if (list.get(i) instanceof WhileItem) {
-                WhileItem whi = (WhileItem) list.get(i);
+            if (itemI instanceof WhileItem) {
+                WhileItem whi = (WhileItem) itemI;
                 int whileExprLine = whi.getLine();
                 if (whileExprLine > 0) {
                     List<GraphTargetItem> forFirstCommands = new ArrayList<>();
                     List<GraphTargetItem> forFinalCommands = new ArrayList<>();
 
                     for (int j = i - 1; j >= 0; j--) {
-                        if (list.get(j).getLine() == whileExprLine && !(list.get(j) instanceof LoopItem /*to avoid recursion and StackOverflow*/)) {
-                            forFirstCommands.add(0, list.get(j));
-                            todelete[j] = true;
+                        GraphTargetItem itemJ = list.get(i);
+                        if (itemJ.getLine() == whileExprLine && !(itemJ instanceof LoopItem /*to avoid recursion and StackOverflow*/)) {
+                            forFirstCommands.add(0, itemJ);
+                            toDelete[j] = true;
                         } else {
                             break;
                         }
@@ -575,7 +577,7 @@ public class Graph {
                         if (forFirstCommands.size() > 2 || forFinalCommands.size() > 2) {
                             //put it back
                             for (int k = 0; k < forFirstCommands.size(); k++) {
-                                todelete[i - 1 - k] = false;
+                                toDelete[i - 1 - k] = false;
                             }
                             whi.commands.addAll(forFinalCommands); //put it back
                         } else if (whi.commands.isEmpty() && forFirstCommands.isEmpty()) {
@@ -591,8 +593,8 @@ public class Graph {
             }
         }
 
-        for (int i = todelete.length - 1; i >= 0; i--) {
-            if (todelete[i]) {
+        for (int i = toDelete.length - 1; i >= 0; i--) {
+            if (toDelete[i]) {
                 list.remove(i);
             }
         }

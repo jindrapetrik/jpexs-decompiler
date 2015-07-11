@@ -347,7 +347,7 @@ public class IdentifiersDeobfuscation {
             nameCache.put(pkg, pkg);
             return pkg;
         }
-        String[] parts = null;
+        String[] parts;
         if (pkg.contains(".")) {
             parts = pkg.split("\\.");
         } else {

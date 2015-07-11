@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.abc.types.traits;
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ClassPath;
-import com.jpexs.decompiler.flash.abc.avm2.AVM2Deobfuscation;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
@@ -28,7 +27,6 @@ import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.helpers.Helper;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Trait implements Serializable {
@@ -69,10 +67,9 @@ public abstract class Trait implements Serializable {
 
     public abstract void delete(ABC abc, boolean d);
 
-    public String getModifiers(ABC abc, boolean isStatic) {
-        String ret = "";
+    public GraphTextWriter getModifiers(ABC abc, boolean isStatic, GraphTextWriter writer) {
         if ((kindFlags & ATTR_Override) > 0) {
-            ret += "override";
+            writer.appendNoHilight("override ");
         }
         Multiname m = getName(abc);
         if (m != null) {
@@ -102,25 +99,31 @@ public abstract class Trait implements Serializable {
             }
 
             if (nsname != null) {
-                ret += " " + IdentifiersDeobfuscation.printIdentifier(true, nsname);
+                String identifier = IdentifiersDeobfuscation.printIdentifier(true, nsname);
+                if (identifier != null && !identifier.isEmpty()) {
+                    writer.appendNoHilight(identifier).appendNoHilight(" ");
+                }
             }
             if (ns != null) {
-                ret += " " + ns.getPrefix(abc);
+                String nsPrefix = ns.getPrefix(abc);
+                if (nsPrefix != null && !nsPrefix.isEmpty()) {
+                    writer.appendNoHilight(nsPrefix).appendNoHilight(" ");
+                }
             }
         }
         if (isStatic) {
             if ((this instanceof TraitSlotConst) && ((TraitSlotConst) this).isNamespace()) {
                 //static is automatic
             } else {
-                ret += " static";
+                writer.appendNoHilight("static ");
             }
         }
         if ((kindFlags & ATTR_Final) > 0) {
             if (!isStatic) {
-                ret += " final";
+                writer.appendNoHilight("final ");
             }
         }
-        return ret.trim();
+        return writer;
     }
 
     @Override
@@ -187,7 +190,7 @@ public abstract class Trait implements Serializable {
         Multiname name = getName(abc);
         Namespace ns = name.getNamespace(abc.constants);
         String packageName = ns.getName(abc.constants, false);
-        String objectName = name.getName(abc.constants, new ArrayList<>(), false);
+        String objectName = name.getName(abc.constants, null, false);
         return new ClassPath(packageName, objectName); //assume not null name
     }
 }

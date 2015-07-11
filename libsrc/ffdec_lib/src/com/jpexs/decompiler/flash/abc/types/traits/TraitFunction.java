@@ -50,15 +50,11 @@ public class TraitFunction extends Trait implements TraitWithSlot {
 
     @Override
     public GraphTextWriter toStringHeader(Trait parent, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
-        String modifier = getModifiers(abc, isStatic) + " ";
         MethodBody body = abc.findBody(method_info);
         if (body == null) {
-            modifier = "native " + modifier;
+            writer.appendNoHilight("native ");
         }
-        if (modifier.equals(" ")) {
-            modifier = "";
-        }
-        writer.appendNoHilight(modifier);
+        getModifiers(abc, isStatic, writer);
         writer.hilightSpecial("function ", HighlightSpecialType.TRAIT_TYPE);
         writer.hilightSpecial(abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false), HighlightSpecialType.TRAIT_NAME);
         writer.appendNoHilight("(");

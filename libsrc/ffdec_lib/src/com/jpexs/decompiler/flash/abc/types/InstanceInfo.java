@@ -23,7 +23,6 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.helpers.Helper;
-import java.util.ArrayList;
 import java.util.List;
 
 public class InstanceInfo {
@@ -97,7 +96,7 @@ public class InstanceInfo {
         }
 
         writer.appendNoHilight(modifiers + objType);
-        writer.hilightSpecial(abc.constants.getMultiname(name_index).getName(abc.constants, new ArrayList<>()/* No full names here*/, false), HighlightSpecialType.CLASS_NAME);
+        writer.hilightSpecial(abc.constants.getMultiname(name_index).getName(abc.constants, null/* No full names here*/, false), HighlightSpecialType.CLASS_NAME);
 
         if (super_index > 0) {
             String typeName = abc.constants.getMultiname(super_index).getNameWithNamespace(abc.constants).toPrintableString();
