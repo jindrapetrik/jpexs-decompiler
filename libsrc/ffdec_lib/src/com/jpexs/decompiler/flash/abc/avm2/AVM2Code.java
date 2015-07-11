@@ -704,7 +704,9 @@ public class AVM2Code implements Cloneable {
                 //This avoids bogus functions used in obfuscation or special compilers that can lead to infinite recursion.
                 if ((pos + 1 < code.size()) && !(code.get(pos + 1).definition instanceof PopIns)) {
                     MethodBody innerBody = abc.findBody(ins.operands[0]);
-                    innerBody.getCode().calculateDebugFileLine(debugFile, debugLine, 0, abc, new HashSet<>());
+                    if (innerBody != null) { //Ignore functions without body
+                        innerBody.getCode().calculateDebugFileLine(debugFile, debugLine, 0, abc, new HashSet<>());
+                    }
                 }
             }
 
