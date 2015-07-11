@@ -114,4 +114,10 @@ public class TraitMethodGetterSetter extends Trait {
         }
         return 0;
     }
+
+    @Override
+    public TraitMethodGetterSetter clone() {
+        TraitMethodGetterSetter ret = (TraitMethodGetterSetter) super.clone();
+        return ret;
+    }
 }

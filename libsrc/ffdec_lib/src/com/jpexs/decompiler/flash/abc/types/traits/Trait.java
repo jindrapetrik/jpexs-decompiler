@@ -29,7 +29,7 @@ import com.jpexs.helpers.Helper;
 import java.io.Serializable;
 import java.util.List;
 
-public abstract class Trait implements Serializable {
+public abstract class Trait implements Cloneable, Serializable {
 
     private static final int[] EMPTY_METADATA_ARRAY = new int[0];
 
@@ -192,5 +192,15 @@ public abstract class Trait implements Serializable {
         String packageName = ns.getName(abc.constants, false);
         String objectName = name.getName(abc.constants, null, false);
         return new ClassPath(packageName, objectName); //assume not null name
+    }
+
+    @Override
+    public Trait clone() {
+        try {
+            Trait ret = (Trait) super.clone();
+            return ret;
+        } catch (CloneNotSupportedException ex) {
+            throw new RuntimeException();
+        }
     }
 }

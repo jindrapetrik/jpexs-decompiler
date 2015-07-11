@@ -595,4 +595,10 @@ public class TraitClass extends Trait implements TraitWithSlot {
         ret += classInfo.static_traits.removeTraps(scriptIndex, class_info, true, abc, path);
         return ret;
     }
+
+    @Override
+    public TraitClass clone() {
+        TraitClass ret = (TraitClass) super.clone();
+        return ret;
+    }
 }

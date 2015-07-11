@@ -1468,7 +1468,7 @@ public class AVM2Code implements Cloneable {
         //if(true) return "";
         toSourceCount++;
         if (toSourceLimit > 0) {
-            if (toSourceCount > toSourceLimit) {
+            if (toSourceCount >= toSourceLimit) {
                 throw new ConvertException("Limit of subs(" + toSourceLimit + ") was reached", start);
             }
         }
@@ -2897,7 +2897,6 @@ public class AVM2Code implements Cloneable {
         for (int i = 0; i < code.size(); i++) {
             code.get(i).mappedOffset = ofs;
             ofs += code.get(i).getBytesLength();
-
         }
     }
 
@@ -3353,6 +3352,11 @@ public class AVM2Code implements Cloneable {
             }
             ret.code = codeCopy;
         }
+
+        cacheActual = false;
+        ignoredIns = new ArrayList<>();
+        killedRegs = new HashMap<>();
+        unknownJumps = new ArrayList<>();
         return ret;
     }
 }

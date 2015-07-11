@@ -109,4 +109,10 @@ public class TraitFunction extends Trait implements TraitWithSlot {
         }
         return 0;
     }
+
+    @Override
+    public TraitFunction clone() {
+        TraitFunction ret = (TraitFunction) super.clone();
+        return ret;
+    }
 }

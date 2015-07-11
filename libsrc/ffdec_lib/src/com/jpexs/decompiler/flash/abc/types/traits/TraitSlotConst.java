@@ -181,4 +181,10 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         //do nothing
         return 0;
     }
+
+    @Override
+    public TraitSlotConst clone() {
+        TraitSlotConst ret = (TraitSlotConst) super.clone();
+        return ret;
+    }
 }
