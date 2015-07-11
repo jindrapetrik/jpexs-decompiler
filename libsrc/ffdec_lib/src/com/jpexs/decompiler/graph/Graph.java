@@ -52,6 +52,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -1727,6 +1729,13 @@ public class Graph {
                         stack.push(new TernarOpItem(null, expr.invert(null), ((PushItem) onTrue.get(0)).value, ((PushItem) onFalse.get(0)).value));
                     } else {
                         boolean isIf = true;
+                        //If the ontrue is empty, switch ontrue and onfalse
+                        if (onTrue.isEmpty() && !onFalse.isEmpty()) {
+                            expr = expr.invert(null);
+                            List<GraphTargetItem> tmp = onTrue;
+                            onTrue = onFalse;
+                            onFalse = tmp;
+                        }
                         if (!stack.isEmpty() && onFalse.isEmpty() && ((onTrue.size() == 1 && (onTrue.get(0) instanceof PopItem)) || ((onTrue.size() == 2) && (onTrue.get(0) instanceof PopItem) && (onTrue.get(1) instanceof PushItem)))) {
                             if (onTrue.size() == 2) {
                                 GraphTargetItem rightSide = ((PushItem) onTrue.get(1)).value;
