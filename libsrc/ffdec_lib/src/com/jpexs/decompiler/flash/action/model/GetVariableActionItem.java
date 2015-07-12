@@ -29,11 +29,12 @@ import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 public class GetVariableActionItem extends ActionItem {
 
-    public GraphTargetItem name;
+    public final GraphTargetItem name;
 
     private GraphTargetItem computedValue;
 
@@ -115,7 +116,7 @@ public class GetVariableActionItem extends ActionItem {
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 13 * hash + (this.name != null ? this.name.hashCode() : 0);
+        hash = 13 * hash + Objects.hashCode(name);
         return hash;
     }
 
@@ -128,7 +129,7 @@ public class GetVariableActionItem extends ActionItem {
             return false;
         }
         final GetVariableActionItem other = (GetVariableActionItem) obj;
-        if (this.name != other.name && (this.name == null || !this.name.equals(other.name))) {
+        if (!Objects.equals(name, other.name)) {
             return false;
         }
         return true;

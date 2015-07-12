@@ -28,12 +28,13 @@ import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class GetMemberActionItem extends ActionItem {
 
-    public GraphTargetItem object;
+    public final GraphTargetItem object;
 
-    public GraphTargetItem memberName;
+    public final GraphTargetItem memberName;
 
     @Override
     public List<GraphTargetItem> getAllSubItems() {
@@ -71,8 +72,8 @@ public class GetMemberActionItem extends ActionItem {
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 47 * hash + (this.object != null ? this.object.hashCode() : 0);
-        hash = 47 * hash + (this.memberName != null ? this.memberName.hashCode() : 0);
+        hash = 47 * hash + Objects.hashCode(object);
+        hash = 47 * hash + Objects.hashCode(memberName);
         return hash;
     }
 
@@ -85,10 +86,10 @@ public class GetMemberActionItem extends ActionItem {
             return false;
         }
         final GetMemberActionItem other = (GetMemberActionItem) obj;
-        if (this.object != other.object && (this.object == null || !this.object.equals(other.object))) {
+        if (!Objects.equals(object, other.object)) {
             return false;
         }
-        if (this.memberName != other.memberName && (this.memberName == null || !this.memberName.equals(other.memberName))) {
+        if (!Objects.equals(memberName, other.memberName)) {
             return false;
         }
         return true;

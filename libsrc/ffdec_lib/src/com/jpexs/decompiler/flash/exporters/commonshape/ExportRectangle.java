@@ -25,13 +25,13 @@ import java.awt.geom.Rectangle2D;
  */
 public class ExportRectangle {
 
-    public double xMin;
+    public final double xMin;
 
-    public double yMin;
+    public final double yMin;
 
-    public double xMax;
+    public final double xMax;
 
-    public double yMax;
+    public final double yMax;
 
     public ExportRectangle(double xMin, double yMin, double xMax, double yMax) {
         this.xMin = xMin;
@@ -77,6 +77,6 @@ public class ExportRectangle {
             ExportRectangle r = (ExportRectangle) obj;
             return (xMin == r.xMin) && (yMin == r.yMin) && (xMax == r.xMax) && (yMax == r.yMax);
         }
-        return super.equals(obj);
+        return false;
     }
 }

@@ -24,9 +24,9 @@ import java.util.Objects;
  */
 public class ClassPath {
 
-    public String packageStr;
+    public final String packageStr;
 
-    public String className;
+    public final String className;
 
     public ClassPath(String packageStr, String className) {
         this.packageStr = packageStr;
@@ -41,8 +41,8 @@ public class ClassPath {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 37 * hash + Objects.hashCode(this.packageStr);
-        hash = 37 * hash + Objects.hashCode(this.className);
+        hash = 37 * hash + Objects.hashCode(packageStr);
+        hash = 37 * hash + Objects.hashCode(className);
         return hash;
     }
 
@@ -55,9 +55,9 @@ public class ClassPath {
             return false;
         }
         final ClassPath other = (ClassPath) obj;
-        if (!Objects.equals(this.packageStr, other.packageStr)) {
+        if (!Objects.equals(packageStr, other.packageStr)) {
             return false;
         }
-        return Objects.equals(this.className, other.className);
+        return Objects.equals(className, other.className);
     }
 }

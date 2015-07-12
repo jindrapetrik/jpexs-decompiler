@@ -22,9 +22,9 @@ package com.jpexs.decompiler.flash.exporters.commonshape;
  */
 public class Point {
 
-    public double x;
+    public final double x;
 
-    public double y;
+    public final double y;
 
     public Point(double x, double y) {
         this.x = x;
@@ -44,6 +44,6 @@ public class Point {
             Point pt = (Point) obj;
             return (x == pt.x) && (y == pt.y);
         }
-        return super.equals(obj);
+        return false;
     }
 }

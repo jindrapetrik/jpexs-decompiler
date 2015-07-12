@@ -27,13 +27,14 @@ import java.util.Objects;
  */
 public class DottedChain {
 
-    public List<String> parts = new ArrayList<>();
+    public final List<String> parts;
 
     public DottedChain(List<String> parts) {
         this.parts = new ArrayList<>(parts);
     }
 
     public DottedChain(String... parts) {
+        this.parts = new ArrayList<>();
         for (int i = 0; i < parts.length; i++) {
             this.parts.add(parts[i]);
         }
@@ -81,7 +82,7 @@ public class DottedChain {
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 89 * hash + Objects.hashCode(this.parts);
+        hash = 89 * hash + Objects.hashCode(parts);
         return hash;
     }
 
@@ -97,7 +98,7 @@ public class DottedChain {
             return false;
         }
         final DottedChain other = (DottedChain) obj;
-        if (!Objects.equals(this.parts, other.parts)) {
+        if (!Objects.equals(parts, other.parts)) {
             return false;
         }
         return true;

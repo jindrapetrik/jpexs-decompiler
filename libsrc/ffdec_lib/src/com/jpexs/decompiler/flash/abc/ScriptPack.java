@@ -224,9 +224,9 @@ public class ScriptPack extends AS3ClassTreeItem {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 79 * hash + Objects.hashCode(this.abc);
-        hash = 79 * hash + this.scriptIndex;
-        hash = 79 * hash + Objects.hashCode(this.path);
+        hash = 79 * hash + Objects.hashCode(abc);
+        hash = 79 * hash + scriptIndex;
+        hash = 79 * hash + Objects.hashCode(path);
         return hash;
     }
 
@@ -239,13 +239,13 @@ public class ScriptPack extends AS3ClassTreeItem {
             return false;
         }
         final ScriptPack other = (ScriptPack) obj;
-        if (!Objects.equals(this.abc, other.abc)) {
+        if (!Objects.equals(abc, other.abc)) {
             return false;
         }
-        if (this.scriptIndex != other.scriptIndex) {
+        if (scriptIndex != other.scriptIndex) {
             return false;
         }
-        if (!Objects.equals(this.path, other.path)) {
+        if (!Objects.equals(path, other.path)) {
             return false;
         }
         return true;

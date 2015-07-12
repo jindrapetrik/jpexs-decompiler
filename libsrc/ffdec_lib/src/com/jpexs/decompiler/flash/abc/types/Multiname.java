@@ -53,17 +53,17 @@ public class Multiname {
 
     private static final String[] multinameKindNames = new String[]{"Qname", "QnameA", "Multiname", "MultinameA", "RTQname", "RTQnameA", "MultinameL", "RTQnameL", "RTQnameLA", "MultinameLA", "TypeName"};
 
-    public int kind = -1;
+    public final int kind;
 
-    public int name_index = 0;
+    public int name_index;
 
-    public int namespace_index = 0;
+    public final int namespace_index;
 
-    public int namespace_set_index = 0;
+    public final int namespace_set_index;
 
-    public int qname_index = 0; //for TypeName
+    public final int qname_index; //for TypeName
 
-    public List<Integer> params; //for TypeName
+    public final List<Integer> params; //for TypeName
 
     @Internal
     public boolean deleted;
@@ -79,6 +79,11 @@ public class Multiname {
     }
 
     public Multiname() {
+        kind = -1;
+        namespace_index = 0;
+        namespace_set_index = 0;
+        qname_index = 0;
+        params = null;
     }
 
     public Multiname(int kind, int name_index, int namespace_index, int namespace_set_index, int qname_index, List<Integer> params) {
@@ -335,12 +340,12 @@ public class Multiname {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 53 * hash + this.kind;
-        hash = 53 * hash + this.name_index;
-        hash = 53 * hash + this.namespace_index;
-        hash = 53 * hash + this.namespace_set_index;
-        hash = 53 * hash + this.qname_index;
-        hash = 53 * hash + Objects.hashCode(this.params);
+        hash = 53 * hash + kind;
+        hash = 53 * hash + name_index;
+        hash = 53 * hash + namespace_index;
+        hash = 53 * hash + namespace_set_index;
+        hash = 53 * hash + qname_index;
+        hash = 53 * hash + Objects.hashCode(params);
         return hash;
     }
 
@@ -368,7 +373,7 @@ public class Multiname {
         if (this.qname_index != other.qname_index) {
             return false;
         }
-        if (!Objects.equals(this.params, other.params)) {
+        if (!Objects.equals(params, other.params)) {
             return false;
         }
         return true;

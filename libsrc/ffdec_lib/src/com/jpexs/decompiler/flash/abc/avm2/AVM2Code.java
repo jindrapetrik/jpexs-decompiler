@@ -298,6 +298,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -1767,9 +1768,9 @@ public class AVM2Code implements Cloneable {
 
     private class Slot {
 
-        public GraphTargetItem scope;
+        public final GraphTargetItem scope;
 
-        public Multiname multiname;
+        public final Multiname multiname;
 
         public Slot(GraphTargetItem scope, Multiname multiname) {
             this.scope = scope;
@@ -1779,8 +1780,9 @@ public class AVM2Code implements Cloneable {
         @Override
         public boolean equals(Object obj) {
             if (obj instanceof Slot) {
-                return (((Slot) obj).scope.getThroughRegister() == scope.getThroughRegister())
-                        && (((Slot) obj).multiname == multiname);
+                Slot slot = (Slot) obj;
+                return (slot.scope.getThroughRegister() == scope.getThroughRegister())
+                        && (slot.multiname == multiname);
             }
             return false;
         }
@@ -1788,8 +1790,8 @@ public class AVM2Code implements Cloneable {
         @Override
         public int hashCode() {
             int hash = 7;
-            hash = 59 * hash + (this.scope != null ? this.scope.hashCode() : 0);
-            hash = 59 * hash + (this.multiname != null ? this.multiname.hashCode() : 0);
+            hash = 59 * hash + (scope != null ? Objects.hashCode(scope.getThroughRegister()) : 0);
+            hash = 59 * hash + Objects.hashCode(multiname);
             return hash;
         }
     }

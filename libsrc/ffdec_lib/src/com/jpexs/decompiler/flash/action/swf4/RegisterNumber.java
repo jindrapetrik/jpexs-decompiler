@@ -21,14 +21,14 @@ import java.io.Serializable;
 
 public class RegisterNumber implements Serializable {
 
-    public int number;
+    public final int number;
 
     public String name = null;
 
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 47 * hash + this.number;
+        hash = 47 * hash + number;
         return hash;
     }
 
@@ -41,7 +41,7 @@ public class RegisterNumber implements Serializable {
             return false;
         }
         final RegisterNumber other = (RegisterNumber) obj;
-        if (this.number != other.number) {
+        if (number != other.number) {
             return false;
         }
         return true;

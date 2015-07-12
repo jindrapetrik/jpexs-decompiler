@@ -39,11 +39,11 @@ public class DirectValueActionItem extends ActionItem implements SimpleValue {
 
     public Object value;
 
-    public List<String> constants;
+    public final List<String> constants;
 
     public GraphTargetItem computedRegValue;
 
-    public int pos = -1;
+    public final int pos;
 
     public DirectValueActionItem(Object o) {
         this(null, 0, o, new ArrayList<>());
@@ -204,8 +204,8 @@ public class DirectValueActionItem extends ActionItem implements SimpleValue {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 71 * hash + Objects.hashCode(this.value);
-        hash = 71 * hash + System.identityHashCode(this.constants);
+        hash = 71 * hash + Objects.hashCode(value);
+        hash = 71 * hash + Objects.hashCode(constants);
         hash = 71 * hash + pos;
         return hash;
     }
@@ -219,10 +219,10 @@ public class DirectValueActionItem extends ActionItem implements SimpleValue {
             return false;
         }
         final DirectValueActionItem other = (DirectValueActionItem) obj;
-        if (!Objects.equals(this.value, other.value)) {
+        if (!Objects.equals(value, other.value)) {
             return false;
         }
-        if (!Objects.equals(this.constants, other.constants)) {
+        if (!Objects.equals(constants, other.constants)) {
             return false;
         }
         return true;

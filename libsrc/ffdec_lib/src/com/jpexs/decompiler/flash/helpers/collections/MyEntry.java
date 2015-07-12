@@ -44,8 +44,8 @@ public class MyEntry<K, V> implements Entry<K, V> {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 61 * hash + Objects.hashCode(this.key);
-        hash = 61 * hash + Objects.hashCode(this.value);
+        hash = 61 * hash + Objects.hashCode(key);
+        hash = 61 * hash + Objects.hashCode(value);
         return hash;
     }
 
@@ -57,12 +57,11 @@ public class MyEntry<K, V> implements Entry<K, V> {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        @SuppressWarnings("unchecked")
-        final MyEntry<K, V> other = (MyEntry<K, V>) obj;
-        if (!Objects.equals(this.key, other.key)) {
+        final MyEntry<?, ?> other = (MyEntry<?, ?>) obj;
+        if (!Objects.equals(key, other.key)) {
             return false;
         }
-        if (!Objects.equals(this.value, other.value)) {
+        if (!Objects.equals(value, other.value)) {
             return false;
         }
         return true;

@@ -36,7 +36,7 @@ public class Loop implements Serializable {
 
     public List<Integer> breakCandidatesLevels = new ArrayList<>();
 
-    public long id;
+    public final long id;
 
     public int leadsToMark;
 
@@ -73,10 +73,9 @@ public class Loop implements Serializable {
             return false;
         }
         final Loop other = (Loop) obj;
-        if (this.id != other.id) {
+        if (id != other.id) {
             return false;
         }
         return true;
     }
-
 }

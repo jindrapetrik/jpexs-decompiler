@@ -40,7 +40,7 @@ public class TypeItem extends GraphTargetItem {
 
     public static UnboundedTypeItem UNBOUNDED = new UnboundedTypeItem();
 
-    public DottedChain fullTypeName;
+    public final DottedChain fullTypeName;
 
     public TypeItem(String s) {
         this(s == null ? new DottedChain() : new DottedChain(s.split("\\.")));
@@ -58,7 +58,7 @@ public class TypeItem extends GraphTargetItem {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 83 * hash + Objects.hashCode(this.fullTypeName);
+        hash = 83 * hash + Objects.hashCode(fullTypeName);
         return hash;
     }
 
@@ -71,7 +71,7 @@ public class TypeItem extends GraphTargetItem {
             return false;
         }
         final TypeItem other = (TypeItem) obj;
-        if (!Objects.equals(this.fullTypeName, other.fullTypeName)) {
+        if (!Objects.equals(fullTypeName, other.fullTypeName)) {
             return false;
         }
         return true;

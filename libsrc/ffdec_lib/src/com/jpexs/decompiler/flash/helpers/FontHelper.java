@@ -217,9 +217,9 @@ public class FontHelper {
 
     public static class KerningPair {
 
-        public char char1;
+        public final char char1;
 
-        public char char2;
+        public final char char2;
 
         public int kerning;
 
@@ -247,13 +247,13 @@ public class FontHelper {
                 return false;
             }
             final KerningPair other = (KerningPair) obj;
-            if (this.char1 != other.char1) {
+            if (char1 != other.char1) {
                 return false;
             }
-            if (this.char2 != other.char2) {
+            if (char2 != other.char2) {
                 return false;
             }
-            if (this.kerning != other.kerning) {
+            if (kerning != other.kerning) {
                 return false;
             }
             return true;
