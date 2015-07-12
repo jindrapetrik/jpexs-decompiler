@@ -32,9 +32,9 @@ public class Loop implements Serializable {
 
     public GraphPart loopPreContinue;
 
-    public final List<GraphPart> breakCandidates = new ArrayList<>();
+    public List<GraphPart> breakCandidates = new ArrayList<>();
 
-    public final List<Integer> breakCandidatesLevels = new ArrayList<>();
+    public List<Integer> breakCandidatesLevels = new ArrayList<>();
 
     public long id;
 
@@ -56,4 +56,27 @@ public class Loop implements Serializable {
     public String toString() {
         return "loop(id:" + id + (loopPreContinue != null ? ",precontinue:" + loopPreContinue : "") + ",continue:" + loopContinue + ", break:" + loopBreak + ", phase:" + phase + ")";
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 53 * hash + (int) (this.id ^ (this.id >>> 32));
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Loop other = (Loop) obj;
+        if (this.id != other.id) {
+            return false;
+        }
+        return true;
+    }
+
 }

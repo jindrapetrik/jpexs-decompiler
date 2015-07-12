@@ -27,6 +27,17 @@ import java.util.List;
  */
 public class GraphPart implements Serializable {
 
+    public static final int TYPE_NONE = 0;
+    public static final int TYPE_LOOP_HEADER = 1;
+    public static final int TYPE_PRELOOP = 3;
+    public static final int TYPE_REENTRY = 2;
+
+    public boolean traversed = false;
+    public int DFSP_pos = 0;
+    public GraphPart iloop_header;
+    public int type = TYPE_NONE;
+    public boolean irreducible = false;
+
     public int start = 0;
 
     public int end = 0;
@@ -290,7 +301,8 @@ public class GraphPart implements Serializable {
 
     @Override
     public int hashCode() {
-        int hash = 7;
+        int hash = 3;
+        hash = 83 * hash + this.start;
         return hash;
     }
 
