@@ -54,6 +54,8 @@ public final class MethodBody implements Cloneable {
 
     private static final Logger logger = Logger.getLogger(MethodBody.class.getName());
 
+    private static final String DEBUG_FIXED = null;
+
     @Internal
     public boolean deleted;
 
@@ -274,7 +276,7 @@ public final class MethodBody implements Cloneable {
         if (exportMode != ScriptExportMode.AS) {
             getCode().toASMSource(constants, trait, method_info.get(this.method_info), this, exportMode, writer);
         } else {
-            if (!Configuration.decompile.get()) {
+            if ((DEBUG_FIXED != null && !path.endsWith(DEBUG_FIXED)) || (!Configuration.decompile.get())) {
                 writer.appendNoHilight(Helper.getDecompilationSkippedComment()).newLine();
                 return;
             }
@@ -317,7 +319,7 @@ public final class MethodBody implements Cloneable {
         if (exportMode != ScriptExportMode.AS) {
             getCode().toASMSource(constants, trait, method_info.get(this.method_info), this, exportMode, writer);
         } else {
-            if (!Configuration.decompile.get()) {
+            if ((DEBUG_FIXED != null && !path.endsWith(DEBUG_FIXED)) || (!Configuration.decompile.get())) {
                 //writer.startMethod(this.method_info);
                 writer.appendNoHilight(Helper.getDecompilationSkippedComment()).newLine();
                 //writer.endMethod();
