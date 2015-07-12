@@ -84,8 +84,6 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
 
     private boolean isSingleFrame;
 
-    private static final Cache<DefineButtonTag, RECT> rectCache = Cache.getInstance(true, true, "rect_button");
-
     /**
      * Constructor
      *
@@ -269,9 +267,12 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
 
     @Override
     public RECT getRect(Set<BoundedTag> added) {
-        if (rectCache.contains(this)) {
-            return rectCache.get(this);
+        Cache<CharacterTag, RECT> cache = swf == null ? null : swf.getRectCache();
+        RECT ret = cache == null ? null : cache.get(this);
+        if (ret != null) {
+            return ret;
         }
+
         RECT rect = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
         for (BUTTONRECORD r : characters) {
             CharacterTag ch = swf.getCharacter(r.characterId);
@@ -293,12 +294,11 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
             }
         }
 
-        rectCache.put(this, rect);
-        return rect;
-    }
+        if (cache != null) {
+            cache.put(this, ret);
+        }
 
-    public static void clearCache() {
-        rectCache.clear();
+        return rect;
     }
 
     List<DisassemblyListener> listeners = new ArrayList<>();

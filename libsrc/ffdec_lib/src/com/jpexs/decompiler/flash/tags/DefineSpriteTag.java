@@ -82,8 +82,6 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
 
     private boolean isSingleFrame;
 
-    private static final Cache<DefineSpriteTag, RECT> rectCache = Cache.getInstance(true, true, "rect_sprite");
-
     /**
      * Constructor
      *
@@ -199,10 +197,13 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
 
     @Override
     public RECT getRect(Set<BoundedTag> added) {
-        if (rectCache.contains(this)) {
-            return rectCache.get(this);
+        Cache<CharacterTag, RECT> cache = swf == null ? null : swf.getRectCache();
+        RECT ret = cache == null ? null : cache.get(this);
+        if (ret != null) {
+            return ret;
         }
-        RECT ret = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
+
+        ret = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
         HashMap<Integer, Integer> depthMap = new HashMap<>();
         boolean foundSomething = false;
         for (Tag t : subTags) {
@@ -253,10 +254,15 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
             ret.Ymax = Math.max(r.Ymax, ret.Ymax);
             foundSomething = true;
         }
+
         if (!foundSomething) {
             ret = new RECT();
         }
-        rectCache.put(this, ret);
+
+        if (cache != null) {
+            cache.put(this, ret);
+        }
+
         return ret;
     }
 
@@ -281,10 +287,6 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
         for (Tag subTag : subTags) {
             subTag.createOriginalData();
         }
-    }
-
-    public static void clearCache() {
-        rectCache.clear();
     }
 
     @Override

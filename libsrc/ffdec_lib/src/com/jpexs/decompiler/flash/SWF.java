@@ -68,6 +68,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.script.AS2ScriptExporter;
 import com.jpexs.decompiler.flash.exporters.script.AS3ScriptExporter;
 import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
+import com.jpexs.decompiler.flash.exporters.shape.ShapeExportData;
 import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
@@ -75,8 +76,6 @@ import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
-import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
-import com.jpexs.decompiler.flash.tags.DefineButtonTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.EndTag;
@@ -120,6 +119,7 @@ import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.filters.BlendComposite;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
@@ -290,10 +290,16 @@ public final class SWF implements SWFContainerItem, Timelined {
     private final IdentifiersDeobfuscation deobfuscation = new IdentifiersDeobfuscation();
 
     @Internal
-    private Cache<String, SerializableImage> frameCache = Cache.getInstance(false, false, "frame");
+    private final Cache<String, SerializableImage> frameCache = Cache.getInstance(false, false, "frame");
 
     @Internal
-    private Cache<SoundTag, byte[]> soundCache = Cache.getInstance(false, false, "sound");
+    private final Cache<CharacterTag, RECT> rectCache = Cache.getInstance(true, true, "rect");
+
+    @Internal
+    private final Cache<SHAPE, ShapeExportData> shapeExportDataCache = Cache.getInstance(true, true, "shapeExportData");
+
+    @Internal
+    private final Cache<SoundTag, byte[]> soundCache = Cache.getInstance(false, false, "sound");
 
     @Internal
     private final Cache<ASMSource, CachedScript> as2Cache = Cache.getInstance(true, false, "as2");
@@ -2127,6 +2133,10 @@ public final class SWF implements SWFContainerItem, Timelined {
         return ret;
     }
 
+    public IdentifiersDeobfuscation getDeobfuscation() {
+        return deobfuscation;
+    }
+
     public void exportFla(AbortRetryIgnoreHandler handler, String outfile, String swfName, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion version) throws IOException, InterruptedException {
         XFLConverter.convertSWF(handler, this, swfName, outfile, true, generator, generatorVerName, generatorVersion, parallel, version);
         clearAllCache();
@@ -2169,9 +2179,7 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     public void clearImageCache() {
         frameCache.clear();
-        DefineSpriteTag.clearCache();
-        DefineButtonTag.clearCache();
-        DefineButton2Tag.clearCache();
+        rectCache.clear();
         for (Tag tag : tags) {
             if (tag instanceof ImageTag) {
                 ((ImageTag) tag).clearCache();
@@ -2182,6 +2190,7 @@ public final class SWF implements SWFContainerItem, Timelined {
     public void clearScriptCache() {
         as2Cache.clear();
         as3Cache.clear();
+        IdentifiersDeobfuscation.clearCache();
     }
 
     public void clearAllCache() {
@@ -2253,6 +2262,14 @@ public final class SWF implements SWFContainerItem, Timelined {
         swf.as3Cache.put(pack, res);
 
         return res;
+    }
+
+    public Cache<CharacterTag, RECT> getRectCache() {
+        return rectCache;
+    }
+
+    public Cache<SHAPE, ShapeExportData> getShapeExportDataCache() {
+        return shapeExportDataCache;
     }
 
     public static RECT fixRect(RECT rect) {

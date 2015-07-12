@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.exporters.shape;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.commonshape.FillStyle;
 import com.jpexs.decompiler.flash.exporters.commonshape.LineStyle;
 import com.jpexs.decompiler.flash.types.ColorTransform;
@@ -57,13 +58,12 @@ public abstract class ShapeExporterBase implements IShapeExporter {
 
     private final ColorTransform colorTransform;
 
-    private static final Cache<SHAPE, ShapeExportData> exportDataCache = Cache.getInstance(true, true, "shapeExportDataCache");
-
-    public ShapeExporterBase(SHAPE shape, ColorTransform colorTransform) {
+    public ShapeExporterBase(SWF swf, SHAPE shape, ColorTransform colorTransform) {
         this.shape = shape;
         this.colorTransform = colorTransform;
 
-        ShapeExportData cachedData = exportDataCache.get(shape);
+        Cache<SHAPE, ShapeExportData> cache = swf.getShapeExportDataCache();
+        ShapeExportData cachedData = cache.get(shape);
         if (cachedData == null) {
             List<FillStyle> fillStyles = new ArrayList<>();
             List<LineStyle> lineStyles = new ArrayList<>();
@@ -95,7 +95,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
             cachedData.linePaths = linePaths;
             cachedData.fillStyles = fillStyles;
             cachedData.lineStyles = lineStyles;
-            exportDataCache.put(shape, cachedData);
+            cache.put(shape, cachedData);
         }
 
         _fillStyles = cachedData.fillStyles;
@@ -518,9 +518,5 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         for (int i = 0; i < v2.size(); i++) {
             v1.add(v2.get(i));
         }
-    }
-
-    public static void clearCache() {
-        exportDataCache.clear();
     }
 }

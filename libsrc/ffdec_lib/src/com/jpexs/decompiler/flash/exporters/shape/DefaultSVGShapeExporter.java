@@ -39,8 +39,8 @@ public abstract class DefaultSVGShapeExporter extends ShapeExporterBase {
 
     protected double zoom;
 
-    public DefaultSVGShapeExporter(SHAPE shape, ColorTransform colorTransform, double zoom) {
-        super(shape, colorTransform);
+    public DefaultSVGShapeExporter(SWF swf, SHAPE shape, ColorTransform colorTransform, double zoom) {
+        super(swf, shape, colorTransform);
         this.zoom = zoom;
     }
 

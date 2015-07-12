@@ -64,7 +64,7 @@ public class GetVariableActionItem extends ActionItem {
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
 
         if (((name instanceof DirectValueActionItem)) && (((DirectValueActionItem) name).isString()) && (!IdentifiersDeobfuscation.isValidName(false, ((DirectValueActionItem) name).toStringNoQuotes(localData), "this", "super"))) {
-            return writer.append(IdentifiersDeobfuscation.makeObfuscatedIdentifier(((DirectValueActionItem) name).toStringNoQuotes(localData)));
+            return IdentifiersDeobfuscation.appendObfuscatedIdentifier(((DirectValueActionItem) name).toStringNoQuotes(localData), writer);
         } else if ((!(name instanceof DirectValueActionItem)) || (!((DirectValueActionItem) name).isString())) {
             writer.append("eval(");
             name.appendTo(writer, localData);

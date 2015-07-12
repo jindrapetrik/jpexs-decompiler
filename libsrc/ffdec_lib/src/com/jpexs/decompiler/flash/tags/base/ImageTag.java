@@ -244,7 +244,7 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
 
     @Override
     public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation) {
-        return transformation.toTransform().createTransformedShape(getShape().getOutline());
+        return transformation.toTransform().createTransformedShape(getShape().getOutline(swf));
     }
 
     @Override

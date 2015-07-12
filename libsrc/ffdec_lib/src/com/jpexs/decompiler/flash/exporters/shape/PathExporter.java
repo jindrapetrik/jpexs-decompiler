@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.exporters.shape;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.GRADRECORD;
@@ -35,14 +36,14 @@ public class PathExporter extends ShapeExporterBase {
 
     private GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
 
-    public static List<GeneralPath> export(SHAPE shape) {
-        PathExporter exporter = new PathExporter(shape, new ColorTransform());
+    public static List<GeneralPath> export(SWF swf, SHAPE shape) {
+        PathExporter exporter = new PathExporter(swf, shape, new ColorTransform());
         exporter.export();
         return exporter.paths;
     }
 
-    protected PathExporter(SHAPE shape, ColorTransform colorTransform) {
-        super(shape, colorTransform);
+    protected PathExporter(SWF swf, SHAPE shape, ColorTransform colorTransform) {
+        super(swf, shape, colorTransform);
     }
 
     @Override

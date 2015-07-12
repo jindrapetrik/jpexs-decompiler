@@ -77,7 +77,7 @@ public class DefineLocalActionItem extends ActionItem implements SetTypeActionIt
         writer.append("var ");
 
         if (((name instanceof DirectValueActionItem)) && (((DirectValueActionItem) name).isString()) && (!IdentifiersDeobfuscation.isValidName(false, ((DirectValueActionItem) name).toStringNoQuotes(localData), "this", "super"))) {
-            writer.append(IdentifiersDeobfuscation.makeObfuscatedIdentifier(((DirectValueActionItem) name).toStringNoQuotes(localData)));
+            IdentifiersDeobfuscation.appendObfuscatedIdentifier(((DirectValueActionItem) name).toStringNoQuotes(localData), writer);
         } else {
             stripQuotes(name, localData, writer);
         }

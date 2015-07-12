@@ -315,7 +315,7 @@ public abstract class MorphShapeTag extends CharacterTag implements DrawableTag 
 
     @Override
     public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation) {
-        return transformation.toTransform().createTransformedShape(getShapeAtRatio(ratio).getOutline());
+        return transformation.toTransform().createTransformedShape(getShapeAtRatio(ratio).getOutline(swf));
     }
 
     @Override

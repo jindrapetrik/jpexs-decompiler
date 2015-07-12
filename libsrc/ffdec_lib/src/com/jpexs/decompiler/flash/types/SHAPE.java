@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.shape.PathExporter;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
@@ -74,12 +75,12 @@ public class SHAPE implements NeedsCharacters, Serializable {
         return SHAPERECORD.getBounds(shapeRecords);
     }
 
-    public Shape getOutline() {
+    public Shape getOutline(SWF swf) {
         if (cachedOutline != null) {
             return cachedOutline;
         }
 
-        List<GeneralPath> paths = PathExporter.export(this);
+        List<GeneralPath> paths = PathExporter.export(swf, this);
         Area area = new Area();
         for (GeneralPath path : paths) {
             area.add(new Area(path));

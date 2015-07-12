@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.abc.RenameType;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
@@ -43,6 +44,10 @@ public class IdentifiersDeobfuscation {
     public HashSet<String> allVariableNamesStr = new HashSet<>();
 
     private final HashMap<String, Integer> typeCounts = new HashMap<>();
+
+    private static final Cache<String, String> as2NameCache = Cache.getInstance(false, true, "as2_ident");
+
+    private static final Cache<String, String> as3NameCache = Cache.getInstance(false, true, "as3_ident");
 
     public static final String VALID_FIRST_CHARACTERS = "\\p{Lu}\\p{Ll}\\p{Lt}\\p{Lm}\\p{Lo}_$";
 
@@ -296,13 +301,11 @@ public class IdentifiersDeobfuscation {
         return null;
     }
 
-    public static String makeObfuscatedIdentifier(String s) {
-        return "\u00A7" + escapeOIdentifier(s) + "\u00A7";
+    public static GraphTextWriter appendObfuscatedIdentifier(String s, GraphTextWriter writer) {
+        writer.append("\u00A7");
+        escapeOIdentifier(s, writer);
+        return writer.append("\u00A7");
     }
-
-    private static final Cache<String, String> as3NameCache = Cache.getInstance(false, true, "as3_ident");
-
-    private static final Cache<String, String> as2NameCache = Cache.getInstance(false, true, "as2_ident");
 
     /**
      * Ensures identifier is valid and if not, uses paragraph syntax
@@ -323,17 +326,19 @@ public class IdentifiersDeobfuscation {
                 return s;
             }
         }
+
         Cache<String, String> nameCache = as3 ? as3NameCache : as2NameCache;
 
         if (nameCache.contains(s)) {
             return nameCache.get(s);
         }
 
-        if (isValidName(as3, s, validExceptions)) {
+        if (isValidName(as3, s)) {
             nameCache.put(s, s);
             return s;
         }
-        String ret = makeObfuscatedIdentifier(s);
+
+        String ret = "\u00A7" + escapeOIdentifier(s) + "\u00A7";
         nameCache.put(s, ret);
         return ret;
     }
@@ -343,26 +348,60 @@ public class IdentifiersDeobfuscation {
         if (nameCache.contains(pkg)) {
             return nameCache.get(pkg);
         }
+
         if (pkg.isEmpty()) {
             nameCache.put(pkg, pkg);
             return pkg;
         }
+
         String[] parts;
         if (pkg.contains(".")) {
             parts = pkg.split("\\.");
         } else {
             parts = new String[]{pkg};
         }
+
         StringBuilder ret = new StringBuilder();
         for (int i = 0; i < parts.length; i++) {
             if (i > 0) {
                 ret.append(".");
             }
+
             ret.append(printIdentifier(as3, parts[i], validNameExceptions));
         }
+
         String retStr = ret.toString();
         nameCache.put(pkg, retStr);
         return retStr;
+    }
+
+    public static GraphTextWriter escapeOIdentifier(String s, GraphTextWriter writer) {
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '\n') {
+                writer.append("\\n");
+            } else if (c == '\r') {
+                writer.append("\\r");
+            } else if (c == '\t') {
+                writer.append("\\t");
+            } else if (c == '\b') {
+                writer.append("\\b");
+            } else if (c == '\t') {
+                writer.append("\\t");
+            } else if (c == '\f') {
+                writer.append("\\f");
+            } else if (c == '\\') {
+                writer.append("\\\\");
+            } else if (c == '\u00A7') {
+                writer.append("\\\u00A7");
+            } else if (c < 32) {
+                writer.append("\\x").append(Helper.byteToHex((byte) c));
+            } else {
+                writer.append(c);
+            }
+        }
+
+        return writer;
     }
 
     public static String escapeOIdentifier(String s) {
@@ -393,5 +432,10 @@ public class IdentifiersDeobfuscation {
         }
 
         return ret.toString();
+    }
+
+    public static void clearCache() {
+        as2NameCache.clear();
+        as3NameCache.clear();
     }
 }

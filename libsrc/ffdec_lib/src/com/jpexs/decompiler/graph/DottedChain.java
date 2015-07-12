@@ -56,26 +56,26 @@ public class DottedChain {
     }
 
     public String toPrintableString() {
-        String ret = "";
+        StringBuilder ret = new StringBuilder();
         for (int i = 0; i < parts.size(); i++) {
             if (i > 0) {
-                ret += ".";
+                ret.append(".");
             }
-            ret += IdentifiersDeobfuscation.printIdentifier(true, parts.get(0));
+            ret.append(IdentifiersDeobfuscation.printIdentifier(true, parts.get(0)));
         }
-        return ret;
+        return ret.toString();
     }
 
     @Override
     public String toString() {
-        String ret = "";
+        StringBuilder ret = new StringBuilder();
         for (int i = 0; i < parts.size(); i++) {
             if (i > 0) {
-                ret += ".";
+                ret.append(".");
             }
-            ret += parts.get(i);
+            ret.append(parts.get(i));
         }
-        return ret;
+        return ret.toString();
     }
 
     @Override

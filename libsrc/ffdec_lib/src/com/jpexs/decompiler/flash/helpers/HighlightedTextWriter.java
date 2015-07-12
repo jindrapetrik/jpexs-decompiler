@@ -167,7 +167,7 @@ public class HighlightedTextWriter extends GraphTextWriter {
 
     @Override
     public HighlightedTextWriter append(String str) {
-        return appendWithData(str, new HighlightData());
+        return appendWithData(str, null);
     }
 
     @Override

@@ -179,7 +179,7 @@ public class FontExporter {
         for (int i = 0; i < shapes.size(); i++) {
             SHAPE s = shapes.get(i);
             final List<FPoint[]> contours = new ArrayList<>();
-            PathExporter seb = new PathExporter(s, new ColorTransform()) {
+            PathExporter seb = new PathExporter(swf, s, new ColorTransform()) {
 
                 private double transformX(double x) {
                     return Math.ceil((double) (x / divider));

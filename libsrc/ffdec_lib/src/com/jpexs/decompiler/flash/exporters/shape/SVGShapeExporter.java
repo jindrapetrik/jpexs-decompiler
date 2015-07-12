@@ -51,7 +51,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
     private final SVGExporter exporter;
 
     public SVGShapeExporter(SWF swf, SHAPE shape, SVGExporter exporter, Color defaultColor, ColorTransform colorTransform, double zoom) {
-        super(shape, colorTransform, zoom);
+        super(swf, shape, colorTransform, zoom);
         this.swf = swf;
         this.defaultColor = defaultColor;
         this.exporter = exporter;

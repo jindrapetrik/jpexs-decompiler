@@ -144,7 +144,7 @@ public class BitmapExporter extends ShapeExporterBase {
     }
 
     private BitmapExporter(SWF swf, SHAPE shape, Color defaultColor, ColorTransform colorTransform) {
-        super(shape, colorTransform);
+        super(swf, shape, colorTransform);
         this.swf = swf;
         this.defaultColor = defaultColor;
     }
