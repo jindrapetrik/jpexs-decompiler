@@ -57,7 +57,7 @@ public class Multiname {
 
     public int name_index;
 
-    public final int namespace_index;
+    public int namespace_index;
 
     public final int namespace_set_index;
 
