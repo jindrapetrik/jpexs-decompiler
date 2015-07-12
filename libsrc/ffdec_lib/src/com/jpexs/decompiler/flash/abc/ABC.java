@@ -861,11 +861,11 @@ public class ABC {
         if (getNamespaceMap().containsKey(value)) {
             return getNamespaceMap().get(value);
         } else {
-            String ns = getDeobfuscation().builtInNs(value);
+            DottedChain ns = getDeobfuscation().builtInNs(value);
             if (ns == null) {
                 return new DottedChain("");
             } else {
-                return new DottedChain(ns);
+                return ns;
             }
         }
     }

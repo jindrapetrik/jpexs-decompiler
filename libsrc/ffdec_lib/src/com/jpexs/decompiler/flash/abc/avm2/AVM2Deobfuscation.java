@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2;
 
 import com.jpexs.decompiler.flash.abc.RenameType;
+import com.jpexs.decompiler.graph.DottedChain;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -91,15 +92,15 @@ public class AVM2Deobfuscation {
         return isValid;
     }
 
-    public String builtInNs(String ns) {
+    public DottedChain builtInNs(String ns) {
         if (ns == null) {
             return null;
         }
         if (ns.equals("http://www.adobe.com/2006/actionscript/flash/proxy")) {
-            return "flash.utils.flash_proxy";
+            return new DottedChain("flash", "utils", "flash_proxy");
         }
         if (ns.equals("http://adobe.com/AS3/2006/builtin")) {
-            return "-";
+            return new DottedChain("-");
         }
         return null;
     }

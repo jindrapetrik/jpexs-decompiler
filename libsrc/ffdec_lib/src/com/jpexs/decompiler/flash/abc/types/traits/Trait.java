@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
 import java.io.Serializable;
 import java.util.List;
@@ -78,7 +79,8 @@ public abstract class Trait implements Cloneable, Serializable {
                 if (m.namespace_index == -1) {
                     break;
                 }
-                nsname = abcTag.getABC().nsValueToName(abc.constants.getNamespace(m.namespace_index).getName(abc.constants, true)).getLast();
+                DottedChain dc = abcTag.getABC().nsValueToName(abc.constants.getNamespace(m.namespace_index).getName(abc.constants, true));
+                nsname = dc.getLast();
 
                 if (nsname == null) {
                     break;
@@ -89,14 +91,6 @@ public abstract class Trait implements Cloneable, Serializable {
             }
 
             Namespace ns = m.getNamespace(abc.constants);
-
-            if (nsname.isEmpty() || (nsname.equals("-"))) {
-                if (ns != null) {
-                    if (ns.kind == Namespace.KIND_NAMESPACE) {
-                        nsname = ns.getName(abc.constants, true);
-                    }
-                }
-            }
 
             if (nsname != null) {
                 String identifier = IdentifiersDeobfuscation.printIdentifier(true, nsname);
