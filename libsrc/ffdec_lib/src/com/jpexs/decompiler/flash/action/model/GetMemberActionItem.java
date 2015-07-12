@@ -32,7 +32,7 @@ import java.util.Objects;
 
 public class GetMemberActionItem extends ActionItem {
 
-    public final GraphTargetItem object;
+    public GraphTargetItem object;
 
     public final GraphTargetItem memberName;
 
