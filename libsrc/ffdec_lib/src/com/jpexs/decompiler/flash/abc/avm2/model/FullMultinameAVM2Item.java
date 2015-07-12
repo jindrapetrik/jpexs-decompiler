@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -59,7 +60,7 @@ public class FullMultinameAVM2Item extends AVM2Item {
         return (name != null) || (namespace != null);
     }
 
-    public boolean isXML(AVM2ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) throws InterruptedException {
+    public boolean isXML(AVM2ConstantPool constants, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
         String cname;
         if (name != null) {
             cname = name.toString(LocalData.create(constants, localRegNames, fullyQualifiedNames));
@@ -95,7 +96,7 @@ public class FullMultinameAVM2Item extends AVM2Item {
             writer.append("]");
         } else {
             AVM2ConstantPool constants = localData.constantsAvm2;
-            List<String> fullyQualifiedNames = localData.fullyQualifiedNames;
+            List<DottedChain> fullyQualifiedNames = localData.fullyQualifiedNames;
             if (multinameIndex > 0 && multinameIndex < constants.constant_multiname.size()) {
                 writer.append(constants.getMultiname(multinameIndex).getName(constants, fullyQualifiedNames, false));
             } else {

@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnVoidIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ThrowIns;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSource;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -210,7 +211,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
         return s;
     }
 
-    public String getParams(AVM2ConstantPool constants, List<String> fullyQualifiedNames) {
+    public String getParams(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames) {
         StringBuilder s = new StringBuilder();
         for (int i = 0; i < definition.operands.length; i++) {
             switch (definition.operands[i]) {
@@ -319,7 +320,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
         return writer;
     }
 
-    public String toStringNoAddress(AVM2ConstantPool constants, List<String> fullyQualifiedNames) {
+    public String toStringNoAddress(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames) {
         String s = definition.instructionName;
         s += getParams(constants, fullyQualifiedNames) + getComment();
         return s;

@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
+import com.jpexs.decompiler.graph.DottedChain;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -75,7 +76,7 @@ public class Traits implements Cloneable, Serializable {
         return s;
     }
 
-    public String toString(ABC abc, List<String> fullyQualifiedNames) {
+    public String toString(ABC abc, List<DottedChain> fullyQualifiedNames) {
         String s = "";
         for (int t = 0; t < traits.size(); t++) {
             if (t > 0) {
@@ -106,7 +107,7 @@ public class Traits implements Cloneable, Serializable {
 
         NulWriter writer;
 
-        List<String> fullyQualifiedNames;
+        List<DottedChain> fullyQualifiedNames;
 
         int traitIndex;
 
@@ -114,7 +115,7 @@ public class Traits implements Cloneable, Serializable {
 
         Trait parent;
 
-        public TraitConvertTask(Trait trait, Trait parent, boolean makePackages, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<String> fullyQualifiedNames, int traitIndex, boolean parallel) {
+        public TraitConvertTask(Trait trait, Trait parent, boolean makePackages, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, int traitIndex, boolean parallel) {
             this.trait = trait;
             this.parent = parent;
             this.makePackages = makePackages;
@@ -141,7 +142,7 @@ public class Traits implements Cloneable, Serializable {
         }
     }
 
-    public GraphTextWriter toString(Class[] traitTypes, Trait parent, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, boolean makePackages, int scriptIndex, int classIndex, GraphTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) throws InterruptedException {
+    public GraphTextWriter toString(Class[] traitTypes, Trait parent, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, boolean makePackages, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
         for (int t = 0; t < traits.size(); t++) {
             Trait trait = traits.get(t);
             if (traitTypes != null) {
@@ -182,7 +183,7 @@ public class Traits implements Cloneable, Serializable {
         return writer;
     }
 
-    public void convert(Trait parent, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, boolean makePackages, int scriptIndex, int classIndex, NulWriter writer, List<String> fullyQualifiedNames, boolean parallel) throws InterruptedException {
+    public void convert(Trait parent, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, boolean makePackages, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
         if (!parallel || traits.size() < 2) {
             for (int t = 0; t < traits.size(); t++) {
                 TraitConvertTask task = new TraitConvertTask(traits.get(t), parent, makePackages, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, t, parallel);

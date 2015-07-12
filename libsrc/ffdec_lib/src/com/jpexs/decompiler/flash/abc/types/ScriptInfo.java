@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
+import com.jpexs.decompiler.graph.DottedChain;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -103,7 +104,7 @@ public class ScriptInfo {
         return "method_index=" + init_index + "\r\n" + traits.toString();
     }
 
-    public String toString(ABC abc, List<String> fullyQualifiedNames) {
+    public String toString(ABC abc, List<DottedChain> fullyQualifiedNames) {
         return "method_index=" + init_index + "\r\n" + traits.toString(abc, fullyQualifiedNames);
     }
 

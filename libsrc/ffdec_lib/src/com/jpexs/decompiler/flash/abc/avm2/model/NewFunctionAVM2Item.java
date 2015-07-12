@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TypeItem;
@@ -45,7 +46,7 @@ public class NewFunctionAVM2Item extends AVM2Item {
 
     public ABC abc;
 
-    public List<String> fullyQualifiedNames;
+    public List<DottedChain> fullyQualifiedNames;
 
     public AVM2ConstantPool constants;
 
@@ -53,7 +54,7 @@ public class NewFunctionAVM2Item extends AVM2Item {
 
     public int methodIndex;
 
-    public NewFunctionAVM2Item(AVM2Instruction instruction, String functionName, String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, List<String> fullyQualifiedNames, AVM2ConstantPool constants, List<MethodInfo> methodInfo, int methodIndex) {
+    public NewFunctionAVM2Item(AVM2Instruction instruction, String functionName, String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, List<DottedChain> fullyQualifiedNames, AVM2ConstantPool constants, List<MethodInfo> methodInfo, int methodIndex) {
         super(instruction, PRECEDENCE_PRIMARY);
         this.functionName = functionName;
         this.path = path;

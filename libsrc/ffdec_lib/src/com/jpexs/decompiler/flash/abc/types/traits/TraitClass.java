@@ -91,7 +91,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public String toString(ABC abc, List<String> fullyQualifiedNames) {
+    public String toString(ABC abc, List<DottedChain> fullyQualifiedNames) {
         return "Class " + abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " slot=" + slot_id + " class_info=" + class_info + " metadata=" + Helper.intArrToString(metadata);
     }
 
@@ -195,7 +195,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         //}
     }
 
-    private void parseUsagesFromMultiname(ABC abc, List<DottedChain> imports, List<String> uses, Multiname m, String ignorePackage, List<String> fullyQualifiedNames) {
+    private void parseUsagesFromMultiname(ABC abc, List<DottedChain> imports, List<String> uses, Multiname m, String ignorePackage, List<DottedChain> fullyQualifiedNames) {
         if (m != null) {
             if (m.kind == Multiname.TYPENAME) {
                 if (m.qname_index != 0) {
@@ -226,7 +226,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         }
     }
 
-    private void parseImportsUsagesFromMultiname(ABC abc, List<DottedChain> imports, List<String> uses, Multiname m, String ignorePackage, List<String> fullyQualifiedNames) {
+    private void parseImportsUsagesFromMultiname(ABC abc, List<DottedChain> imports, List<String> uses, Multiname m, String ignorePackage, List<DottedChain> fullyQualifiedNames) {
         if (m != null) {
             if (m.kind == Multiname.TYPENAME) {
                 if (m.qname_index != 0) {
@@ -253,7 +253,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         }
     }
 
-    private void parseImportsUsagesFromMethodInfo(ABC abc, int method_index, List<DottedChain> imports, List<String> uses, String ignorePackage, List<String> fullyQualifiedNames, List<Integer> visitedMethods) {
+    private void parseImportsUsagesFromMethodInfo(ABC abc, int method_index, List<DottedChain> imports, List<String> uses, String ignorePackage, List<DottedChain> fullyQualifiedNames, List<Integer> visitedMethods) {
         if ((method_index < 0) || (method_index >= abc.method_info.size())) {
             return;
         }
@@ -312,13 +312,13 @@ public class TraitClass extends Trait implements TraitWithSlot {
         }
     }
 
-    private void parseImportsUsagesFromTraits(ABC abc, Traits ts, List<DottedChain> imports, List<String> uses, String ignorePackage, List<String> fullyQualifiedNames) {
+    private void parseImportsUsagesFromTraits(ABC abc, Traits ts, List<DottedChain> imports, List<String> uses, String ignorePackage, List<DottedChain> fullyQualifiedNames) {
         for (Trait t : ts.traits) {
             parseImportsUsagesFromTrait(abc, t, imports, uses, ignorePackage, fullyQualifiedNames);
         }
     }
 
-    private void parseImportsUsagesFromTrait(ABC abc, Trait t, List<DottedChain> imports, List<String> uses, String ignorePackage, List<String> fullyQualifiedNames) {
+    private void parseImportsUsagesFromTrait(ABC abc, Trait t, List<DottedChain> imports, List<String> uses, String ignorePackage, List<DottedChain> fullyQualifiedNames) {
         if (t instanceof TraitMethodGetterSetter) {
             TraitMethodGetterSetter tm = (TraitMethodGetterSetter) t;
             parseImportsUsagesFromMultiname(abc, imports, uses, abc.constants.getMultiname(tm.name_index), ignorePackage, fullyQualifiedNames);
@@ -334,7 +334,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         }
     }
 
-    private List<DottedChain> getImportsUsages(ABC abc, List<DottedChain> imports, List<String> uses, List<String> fullyQualifiedNames) {
+    private List<DottedChain> getImportsUsages(ABC abc, List<DottedChain> imports, List<String> uses, List<DottedChain> fullyQualifiedNames) {
         //constructor
 
         ClassInfo classInfo = abc.class_info.get(class_info);
@@ -365,17 +365,17 @@ public class TraitClass extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public GraphTextWriter toStringHeader(Trait parent, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
+    public GraphTextWriter toStringHeader(Trait parent, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) {
         abc.instance_info.get(class_info).getClassHeaderStr(writer, abc, fullyQualifiedNames, false);
         return writer;
     }
 
     @Override
-    public void convertHeader(Trait parent, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<String> fullyQualifiedNames, boolean parallel) {
+    public void convertHeader(Trait parent, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) {
     }
 
     @Override
-    public GraphTextWriter toString(Trait parent, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) throws InterruptedException {
+    public GraphTextWriter toString(Trait parent, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
 
         InstanceInfo instanceInfo = abc.instance_info.get(class_info);
         Multiname instanceInfoMultiname = instanceInfo.getName(abc.constants);
@@ -406,8 +406,8 @@ public class TraitClass extends Trait implements TraitWithSlot {
         for (DottedChain ipath : imports) {
             String name = ipath.getLast();
             DottedChain pkg = ipath.getWithoutLast();
-            if (importnames.contains(name) || ((!pkg.toString().isEmpty()) && isBuiltInClass(name))) {
-                fullyQualifiedNames.add(name);
+            if (importnames.contains(name) || ((!pkg.parts.isEmpty()) && isBuiltInClass(name))) {
+                fullyQualifiedNames.add(new DottedChain(name));
             } else {
                 importnames.add(name);
             }
@@ -545,7 +545,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public void convert(Trait parent, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<String> fullyQualifiedNames, boolean parallel) throws InterruptedException {
+    public void convert(Trait parent, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
 
         fullyQualifiedNames = new ArrayList<>();
 

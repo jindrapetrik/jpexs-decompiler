@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.types;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
+import com.jpexs.decompiler.graph.DottedChain;
 import java.util.List;
 
 public class ClassInfo {
@@ -43,7 +44,7 @@ public class ClassInfo {
         return "method_index=" + cinit_index + "\r\n" + static_traits.toString();
     }
 
-    public String toString(ABC abc, List<String> fullyQualifiedNames) {
+    public String toString(ABC abc, List<DottedChain> fullyQualifiedNames) {
         return "method_index=" + cinit_index + "\r\n" + static_traits.toString(abc, fullyQualifiedNames);
     }
 }

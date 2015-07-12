@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
 import java.util.HashMap;
 import java.util.List;
@@ -249,7 +250,7 @@ public class MethodInfo {
         return ret.toString();
     }
 
-    public String toString(AVM2ConstantPool constants, List<String> fullyQualifiedNames) {
+    public String toString(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames) {
         String optionalStr = "[";
         if (optional != null) {
             for (int i = 0; i < optional.length; i++) {
@@ -298,7 +299,7 @@ public class MethodInfo {
         return constants.getString(name_index);
     }
 
-    public GraphTextWriter getParamStr(GraphTextWriter writer, AVM2ConstantPool constants, MethodBody body, ABC abc, List<String> fullyQualifiedNames) {
+    public GraphTextWriter getParamStr(GraphTextWriter writer, AVM2ConstantPool constants, MethodBody body, ABC abc, List<DottedChain> fullyQualifiedNames) {
         Map<Integer, String> localRegNames = new HashMap<>();
         if (body != null && Configuration.getLocalNamesFromDebugInfo.get()) {
             localRegNames = body.getCode().getLocalRegNamesFromDebug(abc);
@@ -363,7 +364,7 @@ public class MethodInfo {
         return writer;
     }
 
-    public GraphTextWriter getReturnTypeStr(GraphTextWriter writer, AVM2ConstantPool constants, List<String> fullyQualifiedNames) {
+    public GraphTextWriter getReturnTypeStr(GraphTextWriter writer, AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames) {
         String rname = "*";
         if (ret_type > 0) {
             Multiname multiname = constants.getMultiname(ret_type);

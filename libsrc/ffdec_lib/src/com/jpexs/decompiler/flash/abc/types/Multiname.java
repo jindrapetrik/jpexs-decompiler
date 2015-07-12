@@ -219,14 +219,14 @@ public class Multiname {
         return ret.toString();
     }
 
-    private static String multinameToString(AVM2ConstantPool constants, int index, List<String> fullyQualifiedNames) {
+    private static String multinameToString(AVM2ConstantPool constants, int index, List<DottedChain> fullyQualifiedNames) {
         if (index == 0) {
             return "null";
         }
         return constants.getMultiname(index).toString(constants, fullyQualifiedNames);
     }
 
-    public String toString(AVM2ConstantPool constants, List<String> fullyQualifiedNames) {
+    public String toString(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames) {
 
         switch (kind) {
             case QNAME:
@@ -261,7 +261,7 @@ public class Multiname {
         return null;
     }
 
-    private String typeNameToStr(AVM2ConstantPool constants, List<String> fullyQualifiedNames, boolean raw) {
+    private String typeNameToStr(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames, boolean raw) {
         if (constants.getMultiname(qname_index).name_index == name_index) {
             return "ambiguousTypeName";
         }
@@ -283,7 +283,7 @@ public class Multiname {
         return typeNameStr;
     }
 
-    public String getName(AVM2ConstantPool constants, List<String> fullyQualifiedNames, boolean raw) {
+    public String getName(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames, boolean raw) {
         if (kind == TYPENAME) {
             return typeNameToStr(constants, fullyQualifiedNames, raw);
         }

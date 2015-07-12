@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
 import java.util.List;
 
@@ -65,7 +66,7 @@ public class InstanceInfo {
         return "name_index=" + name_index + " super_index=" + super_index + " flags=" + flags + " protectedNS=" + protectedNS + " interfaces=" + Helper.intArrToString(interfaces) + " method_index=" + iinit_index + "\r\n" + instance_traits.toString();
     }
 
-    public String toString(ABC abc, List<String> fullyQualifiedNames) {
+    public String toString(ABC abc, List<DottedChain> fullyQualifiedNames) {
         String supIndexStr = "[nothing]";
         if (super_index > 0) {
             supIndexStr = abc.constants.getMultiname(super_index).toString(abc.constants, fullyQualifiedNames);
@@ -73,7 +74,7 @@ public class InstanceInfo {
         return "name_index=" + abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " super_index=" + supIndexStr + " flags=" + flags + " protectedNS=" + protectedNS + " interfaces=" + Helper.intArrToString(interfaces) + " method_index=" + iinit_index + "\r\n" + instance_traits.toString(abc, fullyQualifiedNames);
     }
 
-    public GraphTextWriter getClassHeaderStr(GraphTextWriter writer, ABC abc, List<String> fullyQualifiedNames, boolean allowPrivate) {
+    public GraphTextWriter getClassHeaderStr(GraphTextWriter writer, ABC abc, List<DottedChain> fullyQualifiedNames, boolean allowPrivate) {
         String modifiers;
         Namespace ns = abc.constants.getMultiname(name_index).getNamespace(abc.constants);
         modifiers = ns.getPrefix(abc);

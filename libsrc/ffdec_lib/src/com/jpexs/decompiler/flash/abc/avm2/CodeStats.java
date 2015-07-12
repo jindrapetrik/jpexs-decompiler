@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 
@@ -41,7 +42,7 @@ public class CodeStats {
 
     public InstructionStats[] instructionStats;
 
-    public GraphTextWriter toString(GraphTextWriter writer, ABC abc, List<String> fullyQualifiedNames) {
+    public GraphTextWriter toString(GraphTextWriter writer, ABC abc, List<DottedChain> fullyQualifiedNames) {
         writer.appendNoHilight("Stats: maxstack=" + maxstack + ", maxscope=" + maxscope + ", maxlocal=" + maxlocal).newLine();
         int i = 0;
         int ms = 0;
