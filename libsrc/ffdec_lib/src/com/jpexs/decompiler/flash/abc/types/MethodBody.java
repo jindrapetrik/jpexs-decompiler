@@ -288,8 +288,9 @@ public final class MethodBody implements Cloneable {
                     public Void call() throws InterruptedException {
                         MethodBody converted = convertMethodBody(path, isStatic, scriptIndex, classIndex, abc, trait, constants, method_info, scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits);
                         HashMap<Integer, String> localRegNames = getLocalRegNames(abc);
-                        convertedItems = converted.getCode().toGraphTargetItems(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, converted, localRegNames, scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits, Graph.SOP_USE_STATIC, new HashMap<>(), converted.getCode().visitCode(converted));
-                        Graph.graphToString(convertedItems, writer, LocalData.create(constants, localRegNames, fullyQualifiedNames));
+                        List<GraphTargetItem> convertedItems1 = converted.getCode().toGraphTargetItems(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, converted, localRegNames, scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits, Graph.SOP_USE_STATIC, new HashMap<>(), converted.getCode().visitCode(converted));
+                        Graph.graphToString(convertedItems1, writer, LocalData.create(constants, localRegNames, fullyQualifiedNames));
+                        convertedItems = convertedItems1;
                         return null;
                     }
                 };
@@ -361,7 +362,11 @@ public final class MethodBody implements Cloneable {
                 throw ex;
             } catch (Throwable ex) {
                 //ignore
-                return this;
+                body = clone();
+                code = body.getCode();
+                code.markMappedOffsets();
+                code.fixJumps(path, body);
+                return body;
             }
         }
 
@@ -383,7 +388,13 @@ public final class MethodBody implements Cloneable {
                 }
             }
 
-            //maybe deep clone traits
+            // maybe deep clone traits
+            /*if (traits != null) {
+             ret.traits = traits.clone();
+             }*/
+            convertedItems = null;
+            convertException = null;
+
             return ret;
         } catch (CloneNotSupportedException ex) {
             throw new RuntimeException();

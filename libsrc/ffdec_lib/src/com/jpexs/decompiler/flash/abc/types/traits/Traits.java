@@ -32,7 +32,7 @@ import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Traits implements Serializable {
+public class Traits implements Cloneable, Serializable {
 
     public List<Trait> traits;
 
@@ -211,6 +211,24 @@ public class Traits implements Serializable {
                 }
             }
             executor.shutdown();
+        }
+    }
+
+    @Override
+    public Traits clone() {
+        try {
+            Traits ret = (Traits) super.clone();
+
+            if (traits != null) {
+                ret.traits = new ArrayList<>(traits.size());
+                for (int i = 0; i < traits.size(); i++) {
+                    ret.traits.add(traits.get(i).clone());
+                }
+            }
+
+            return ret;
+        } catch (CloneNotSupportedException ex) {
+            throw new RuntimeException();
         }
     }
 }

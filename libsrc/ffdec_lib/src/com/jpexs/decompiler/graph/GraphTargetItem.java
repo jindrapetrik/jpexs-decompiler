@@ -161,6 +161,10 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     }
 
     public GraphTextWriter toStringSemicoloned(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        if (Thread.currentThread().isInterrupted()) {
+            throw new InterruptedException();
+        }
+
         writer.startOffset(src, getPos(), srcData);
         appendTo(writer, localData);
         if (needsSemicolon()) {

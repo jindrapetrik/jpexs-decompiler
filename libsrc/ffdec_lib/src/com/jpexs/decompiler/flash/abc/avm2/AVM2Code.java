@@ -299,7 +299,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -1469,7 +1468,7 @@ public class AVM2Code implements Cloneable {
         //if(true) return "";
         toSourceCount++;
         if (toSourceLimit > 0) {
-            if (toSourceCount > toSourceLimit) {
+            if (toSourceCount >= toSourceLimit) {
                 throw new ConvertException("Limit of subs(" + toSourceLimit + ") was reached", start);
             }
         }
@@ -2268,7 +2267,7 @@ public class AVM2Code implements Cloneable {
             new AVM2DeobfuscatorSimple().deobfuscate(path, classIndex, isStatic, scriptIndex, abc, constants, trait, info, body);
             new AVM2DeobfuscatorRegisters().deobfuscate(path, classIndex, isStatic, scriptIndex, abc, constants, trait, info, body);
             new AVM2DeobfuscatorJumps().deobfuscate(path, classIndex, isStatic, scriptIndex, abc, constants, trait, info, body);
-            //body.getCode().checkValidOffsets(body); // todo: only for debugging. checkValidOffsets can be made private later            
+            //body.getCode().checkValidOffsets(body); // todo: only for debugging. checkValidOffsets can be made private later
             return 1;
         }
     }
@@ -2898,7 +2897,6 @@ public class AVM2Code implements Cloneable {
         for (int i = 0; i < code.size(); i++) {
             code.get(i).mappedOffset = ofs;
             ofs += code.get(i).getBytesLength();
-
         }
     }
 
@@ -3354,6 +3352,11 @@ public class AVM2Code implements Cloneable {
             }
             ret.code = codeCopy;
         }
+
+        cacheActual = false;
+        ignoredIns = new ArrayList<>();
+        killedRegs = new HashMap<>();
+        unknownJumps = new ArrayList<>();
         return ret;
     }
 }
