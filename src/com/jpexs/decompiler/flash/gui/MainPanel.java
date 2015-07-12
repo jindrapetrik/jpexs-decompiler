@@ -2295,8 +2295,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public void deobfuscate() {
         DeobfuscationDialog deobfuscationDialog = new DeobfuscationDialog();
-        DeobfuscationLevel level = DeobfuscationLevel.getByLevel(deobfuscationDialog.codeProcessingLevel.getValue());
         if (deobfuscationDialog.showDialog() == AppDialog.OK_OPTION) {
+            DeobfuscationLevel level = DeobfuscationLevel.getByLevel(deobfuscationDialog.codeProcessingLevel.getValue());
             new CancellableWorker() {
                 @Override
                 protected Void doInBackground() throws Exception {
