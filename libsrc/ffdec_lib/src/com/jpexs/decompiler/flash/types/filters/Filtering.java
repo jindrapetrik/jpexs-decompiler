@@ -571,14 +571,14 @@ public class Filtering {
             int g = (rgb >> 8) & 0xff;
             int b = rgb & 0xff;
             float[] mr = matrix[0];
-            r = cut(mr[0] * r + mr[1] * g + mr[2] * b + mr[3] * a + mr[4]);
+            int r2 = cut(mr[0] * r + mr[1] * g + mr[2] * b + mr[3] * a + mr[4]);
             float[] mg = matrix[1];
-            g = cut(mg[0] * r + mg[1] * g + mg[2] * b + mg[3] * a + mg[4]);
+            int g2 = cut(mg[0] * r + mg[1] * g + mg[2] * b + mg[3] * a + mg[4]);
             float[] mb = matrix[2];
-            b = cut(mb[0] * r + mb[1] * g + mb[2] * b + mb[3] * a + mb[4]);
+            int b2 = cut(mb[0] * r + mb[1] * g + mb[2] * b + mb[3] * a + mb[4]);
             float[] ma = matrix[3];
-            a = cut(ma[0] * r + ma[1] * g + ma[2] * b + ma[3] * a + ma[4]);
-            pixels[i] = (a << 24) | (r << 16) | (g << 8) | b;
+            int a2 = cut(ma[0] * r + ma[1] * g + ma[2] * b + ma[3] * a + ma[4]);
+            pixels[i] = (a2 << 24) | (r2 << 16) | (g2 << 8) | b2;
         }
         setRGB(dst, src.getWidth(), src.getHeight(), pixels);
         return new SerializableImage(dst);
