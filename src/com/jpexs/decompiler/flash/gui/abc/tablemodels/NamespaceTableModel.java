@@ -125,7 +125,7 @@ public class NamespaceTableModel implements TableModel {
                 if (rowIndex == 0) {
                     return "-";
                 }
-                DottedChain chain = abc.constants.getNamespace(rowIndex).getName(abc.constants, true);
+                DottedChain chain = abc.constants.getNamespace(rowIndex).getName(abc.constants);
                 if (chain == null) {
                     return "-";
                 }
