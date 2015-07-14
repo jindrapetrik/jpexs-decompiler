@@ -208,9 +208,18 @@ public class DottedChain implements Serializable {
             return false;
         }
         final DottedChain other = (DottedChain) obj;
-        if (!Arrays.equals(parts, other.parts)) {
+        if (length != other.length) {
             return false;
         }
+
+        for (int i = 0; i < length; i++) {
+            String s1 = parts[i];
+            String s2 = other.parts[i];
+            if (!s1.equals(s2)) {
+                return false;
+            }
+        }
+
         return true;
     }
 }
