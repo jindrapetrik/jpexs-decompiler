@@ -16,11 +16,13 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy;
 
+import com.jpexs.decompiler.graph.DottedChain;
+
 /**
  *
  * @author JPEXS
  */
 public interface AlchemyTypeIns {
 
-    public static final String ALCHEMY_PACKAGE = "avm2.intrinsics.memory";
+    public static final DottedChain ALCHEMY_PACKAGE = new DottedChain("avm2", "intrinsics", "memory");
 }

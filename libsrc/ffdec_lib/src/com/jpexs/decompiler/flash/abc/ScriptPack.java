@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
@@ -82,8 +83,8 @@ public class ScriptPack extends AS3ClassTreeItem {
         this.allABCs = allAbcs;
     }
 
-    public String getPathPackage() {
-        String packageName = "";
+    public DottedChain getPathPackage() {
+        DottedChain packageName = DottedChain.EMPTY;
         for (int t : traitIndices) {
             Multiname name = abc.script_info.get(scriptIndex).traits.traits.get(t).getName(abc);
             Namespace ns = name.getNamespace(abc.constants);
@@ -108,8 +109,8 @@ public class ScriptPack extends AS3ClassTreeItem {
 
     public File getExportFile(String directory, ScriptExportSettings exportSettings) throws IOException {
         String scriptName = getPathScriptName();
-        String packageName = getPathPackage();
-        File outDir = new File(directory + File.separatorChar + makeDirPath(packageName));
+        DottedChain packageName = getPathPackage();
+        File outDir = new File(directory + File.separatorChar + packageName.toFilePath());
         Path.createDirectorySafe(outDir);
         String fileName = outDir.toString() + File.separator + Helper.makeFileName(scriptName) + exportSettings.getFileExtension();
         return new File(fileName);
@@ -128,22 +129,6 @@ public class ScriptPack extends AS3ClassTreeItem {
      }
      return packageName.equals("") ? scriptName : packageName + "." + scriptName;
      }*/
-    private static String makeDirPath(String packageName) {
-        if (packageName.isEmpty()) {
-            return "";
-        }
-        String[] pathParts;
-        if (packageName.contains(".")) {
-            pathParts = packageName.split("\\.");
-        } else {
-            pathParts = new String[]{packageName};
-        }
-        for (int i = 0; i < pathParts.length; i++) {
-            pathParts[i] = Helper.makeFileName(pathParts[i]);
-        }
-        return Helper.joinStrings(pathParts, File.separator);
-    }
-
     public void convert(final NulWriter writer, final List<Trait> traits, final ScriptExportMode exportMode, final boolean parallel) throws InterruptedException {
         for (int t : traitIndices) {
             Trait trait = traits.get(t);

@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc;
 
+import com.jpexs.decompiler.graph.DottedChain;
 import java.util.Objects;
 
 /**
@@ -24,18 +25,18 @@ import java.util.Objects;
  */
 public class ClassPath {
 
-    public final String packageStr;
+    public final DottedChain packageStr;
 
     public final String className;
 
-    public ClassPath(String packageStr, String className) {
+    public ClassPath(DottedChain packageStr, String className) {
         this.packageStr = packageStr;
         this.className = className;
     }
 
     @Override
     public String toString() {
-        return (packageStr == null || packageStr.isEmpty()) ? className : packageStr + "." + className;
+        return (packageStr == null || packageStr.isEmpty()) ? className : packageStr.toPrintableString(true) + "." + className;
     }
 
     @Override

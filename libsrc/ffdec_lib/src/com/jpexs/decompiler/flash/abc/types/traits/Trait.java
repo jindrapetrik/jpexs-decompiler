@@ -140,7 +140,7 @@ public abstract class Trait implements Cloneable, Serializable {
     public GraphTextWriter toStringPackaged(Trait parent, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
         Namespace ns = abc.constants.getMultiname(name_index).getNamespace(abc.constants);
         if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
-            String nsname = ns.getName(abc.constants, false);
+            String nsname = ns.getName(abc.constants, false).toPrintableString(true);
             writer.appendNoHilight("package");
             if (!nsname.isEmpty()) {
                 writer.appendNoHilight(" " + nsname); //assume not null name
@@ -156,7 +156,7 @@ public abstract class Trait implements Cloneable, Serializable {
     public void convertPackaged(Trait parent, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
         Namespace ns = abc.constants.getMultiname(name_index).getNamespace(abc.constants);
         if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
-            String nsname = ns.getName(abc.constants, false);
+            String nsname = ns.getName(abc.constants, false).toPrintableString(true);
             convert(parent, path + nsname, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
         }
     }
@@ -183,8 +183,8 @@ public abstract class Trait implements Cloneable, Serializable {
     public ClassPath getPath(ABC abc) {
         Multiname name = getName(abc);
         Namespace ns = name.getNamespace(abc.constants);
-        String packageName = ns.getName(abc.constants, false);
-        String objectName = name.getName(abc.constants, null, false);
+        DottedChain packageName = ns.getName(abc.constants, false);
+        String objectName = name.getName(abc.constants, null, true);
         return new ClassPath(packageName, objectName); //assume not null name
     }
 

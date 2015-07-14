@@ -20,9 +20,12 @@ import com.jpexs.decompiler.flash.abc.types.Decimal;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.utf8.Utf8PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,6 +49,8 @@ public class AVM2ConstantPool {
     public List<NamespaceSet> constant_namespace_set = new ArrayList<>();
 
     public List<Multiname> constant_multiname = new ArrayList<>();
+
+    public Map<String, DottedChain> dottedChainCache = new HashMap<>();
 
     public synchronized int addInt(long value) {
         constant_int.add(value);
@@ -340,6 +345,14 @@ public class AVM2ConstantPool {
         return id;
     }
 
+    public int getStringId(DottedChain val, boolean add) {
+        if (val == null) {
+            return 0;
+        }
+
+        return getStringId(val.toRawString(), add);
+    }
+
     public int getIntId(long val, boolean add) {
         int id = getIntId(val);
         if (add && id == 0) {
@@ -402,6 +415,22 @@ public class AVM2ConstantPool {
             id = addDouble(val);
         }
         return id;
+    }
+
+    public DottedChain getDottedChain(int index) {
+        String str = getString(index);
+        DottedChain chain = dottedChainCache.get(str);
+        if (chain == null) {
+            if (str.isEmpty()) {
+                chain = DottedChain.EMPTY;
+            } else {
+                chain = new DottedChain(str.split("\\."));
+            }
+
+            dottedChainCache.put(str, chain);
+        }
+
+        return chain;
     }
 
     public void dump(Utf8PrintWriter writer) {

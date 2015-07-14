@@ -100,7 +100,7 @@ public class InstanceInfo {
         writer.hilightSpecial(abc.constants.getMultiname(name_index).getName(abc.constants, null/* No full names here*/, false), HighlightSpecialType.CLASS_NAME);
 
         if (super_index > 0) {
-            String typeName = abc.constants.getMultiname(super_index).getNameWithNamespace(abc.constants).toPrintableString();
+            String typeName = abc.constants.getMultiname(super_index).getNameWithNamespace(abc.constants).toPrintableString(true);
             writer.appendNoHilight(" extends ");
             writer.hilightSpecial(abc.constants.getMultiname(super_index).getName(abc.constants, fullyQualifiedNames, false), HighlightSpecialType.TYPE_NAME, typeName);
         }
@@ -114,7 +114,7 @@ public class InstanceInfo {
                 if (i > 0) {
                     writer.append(", ");
                 }
-                String typeName = abc.constants.getMultiname(interfaces[i]).getNameWithNamespace(abc.constants).toPrintableString();
+                String typeName = abc.constants.getMultiname(interfaces[i]).getNameWithNamespace(abc.constants).toPrintableString(true);
                 writer.hilightSpecial(abc.constants.getMultiname(interfaces[i]).getName(abc.constants, fullyQualifiedNames, false), HighlightSpecialType.TYPE_NAME, typeName);
             }
         }

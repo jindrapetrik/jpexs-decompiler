@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushShortIns;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -73,7 +74,7 @@ public class IntegerValueAVM2Item extends NumberValueAVM2Item implements Integer
 
     @Override
     public GraphTargetItem returnType() {
-        return new TypeItem("int");
+        return new TypeItem(new DottedChain("int"));
     }
 
     @Override

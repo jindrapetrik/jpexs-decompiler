@@ -311,7 +311,7 @@ public class MethodInfo {
             }
             String ptype = "*";
             if (param_types[i] > 0) {
-                ptype = constants.getMultiname(param_types[i]).getNameWithNamespace(constants).toPrintableString();
+                ptype = constants.getMultiname(param_types[i]).getNameWithNamespace(constants).toPrintableString(true);
             }
 
             HighlightData pdata = new HighlightData();

@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -54,7 +55,7 @@ public class XMLAVM2Item extends AVM2Item {
 
     @Override
     public GraphTargetItem returnType() {
-        return new TypeItem("XML");
+        return new TypeItem(new DottedChain("XML"));
     }
 
     @Override

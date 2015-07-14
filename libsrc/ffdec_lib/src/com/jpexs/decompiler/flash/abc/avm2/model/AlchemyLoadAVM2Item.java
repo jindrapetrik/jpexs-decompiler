@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Li32Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Li8Ins;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -86,9 +87,9 @@ public class AlchemyLoadAVM2Item extends AVM2Item {
     public GraphTargetItem returnType() {
         switch (type) {
             case 'i':
-                return new TypeItem("int");
+                return new TypeItem(new DottedChain("int"));
             case 'f':
-                return new TypeItem("Number");
+                return new TypeItem(new DottedChain("Number"));
         }
         return TypeItem.UNBOUNDED;
     }

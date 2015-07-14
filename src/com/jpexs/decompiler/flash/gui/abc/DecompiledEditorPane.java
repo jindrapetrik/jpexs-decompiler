@@ -520,7 +520,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
             if (tm != null) {
                 String name = "";
                 if (classIndex > -1) {
-                    name = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants).toPrintableString();
+                    name = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants).toPrintableString(true);
                 }
 
                 Trait currentTrait = null;
@@ -571,7 +571,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                 }
                 currentMethodHighlight = null;
                 currentTrait = null;
-                String name = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants).toPrintableString();
+                String name = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants).toPrintableString(true);
                 currentTrait = getCurrentTrait();
                 isStatic = abc.isStaticTraitId(classIndex, lastTraitIndex);
                 if (currentTrait != null) {

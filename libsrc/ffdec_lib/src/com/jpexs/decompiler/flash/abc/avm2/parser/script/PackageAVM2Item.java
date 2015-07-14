@@ -33,13 +33,13 @@ public class PackageAVM2Item extends AVM2Item {
 
     public List<GraphTargetItem> items;
 
-    public String packageName;
+    public DottedChain packageName;
 
     public List<DottedChain> importedClasses = new ArrayList<>();
 
     public int publicNs = 0;
 
-    public PackageAVM2Item(int publicNs, List<DottedChain> importedClasses, String packageName, List<GraphTargetItem> items) {
+    public PackageAVM2Item(int publicNs, List<DottedChain> importedClasses, DottedChain packageName, List<GraphTargetItem> items) {
         super(null, NOPRECEDENCE);
         this.publicNs = publicNs;
         this.importedClasses = importedClasses;

@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
@@ -37,7 +38,7 @@ public class MethodAVM2Item extends FunctionAVM2Item {
 
     public boolean isInterface;
 
-    public MethodAVM2Item(String pkg, boolean isInterface, String customNamespace, boolean needsActivation, boolean hasRest, int line, boolean override, boolean isFinal, boolean isStatic, int namespace, String methodName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<AssignableAVM2Item> subvariables, GraphTargetItem retType) {
+    public MethodAVM2Item(DottedChain pkg, boolean isInterface, String customNamespace, boolean needsActivation, boolean hasRest, int line, boolean override, boolean isFinal, boolean isStatic, int namespace, String methodName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<AssignableAVM2Item> subvariables, GraphTargetItem retType) {
         super(pkg, isInterface, needsActivation, namespace, hasRest, line, methodName, paramTypes, paramNames, paramValues, body, subvariables, retType);
         this.isStatic = isStatic;
         this.override = override;

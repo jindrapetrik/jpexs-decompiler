@@ -201,31 +201,21 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
 
     @Override
     public String getExportFileName() {
-        String expName = swf.getExportName(spriteId);
-        if ((expName == null) || expName.isEmpty()) {
+        String expName = swf == null ? "" : swf.getExportName(spriteId);
+        if (expName == null || expName.isEmpty()) {
             return super.getExportFileName();
         }
-        String[] pathParts;
-        if (expName.contains(".")) {
-            pathParts = expName.split("\\.");
-        } else {
-            pathParts = new String[]{expName};
-        }
+        String[] pathParts = expName.contains(".") ? expName.split("\\.") : new String[]{expName};
         return pathParts[pathParts.length - 1];
     }
 
     @Override
     public String getName() {
         String expName = swf == null ? "" : swf.getExportName(spriteId);
-        if ((expName == null) || expName.isEmpty()) {
+        if (expName == null || expName.isEmpty()) {
             return super.getName();
         }
-        String[] pathParts;
-        if (expName.contains(".")) {
-            pathParts = expName.split("\\.");
-        } else {
-            pathParts = new String[]{expName};
-        }
+        String[] pathParts = expName.contains(".") ? expName.split("\\.") : new String[]{expName};
         return pathParts[pathParts.length - 1];
     }
 

@@ -24,9 +24,9 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.timeline.AS3Package;
 import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
+import com.jpexs.decompiler.graph.DottedChain;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
@@ -81,17 +81,16 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
                 continue;
             }
 
-            String packageStr = item.getClassPath().packageStr;
+            DottedChain packageStr = item.getClassPath().packageStr;
             AS3Package pkg = ensurePackage(packageStr);
             pkg.addScriptPack(item);
         }
     }
 
-    private AS3Package ensurePackage(String packageStr) {
-        StringTokenizer st = new StringTokenizer(packageStr, ".");
+    private AS3Package ensurePackage(DottedChain packageStr) {
         AS3Package parent = root;
-        while (st.hasMoreTokens()) {
-            String pathElement = st.nextToken();
+        for (int i = 0; i < packageStr.size(); i++) {
+            String pathElement = packageStr.get(i);
             AS3Package pkg = parent.getSubPackage(pathElement);
             if (pkg == null) {
                 pkg = new AS3Package(pathElement, swf);

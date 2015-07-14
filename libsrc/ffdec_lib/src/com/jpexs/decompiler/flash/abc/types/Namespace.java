@@ -16,10 +16,10 @@
  */
 package com.jpexs.decompiler.flash.abc.types;
 
-import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
+import com.jpexs.decompiler.graph.DottedChain;
 
 public class Namespace {
 
@@ -94,7 +94,7 @@ public class Namespace {
     }
 
     public String toString(AVM2ConstantPool constants) {
-        return getName(constants, false);
+        return getName(constants, false).toPrintableString(true);
     }
 
     public String getNameWithKind(AVM2ConstantPool constants) {
@@ -114,14 +114,12 @@ public class Namespace {
         return kindStr;
     }
 
-    public String getName(AVM2ConstantPool constants, boolean raw) {
+    public DottedChain getName(AVM2ConstantPool constants, boolean raw) {
         if (name_index == 0) {
-            return null;
+            return DottedChain.EMPTY;
         }
-        if (raw) {
-            return constants.getString(name_index);
-        }
-        return IdentifiersDeobfuscation.printNamespace(true, constants.getString(name_index));
+
+        return constants.getDottedChain(name_index);
     }
 
     public boolean hasName(String name, AVM2ConstantPool constants) {

@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfGtIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfNGtIns;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.CompilationException;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -67,6 +68,6 @@ public class GtAVM2Item extends BinaryOpItem implements LogicalOpItem, IfConditi
 
     @Override
     public GraphTargetItem returnType() {
-        return new TypeItem("Boolean");
+        return new TypeItem(new DottedChain("Boolean"));
     }
 }

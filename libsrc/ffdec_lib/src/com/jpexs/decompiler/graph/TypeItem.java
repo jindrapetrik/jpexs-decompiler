@@ -32,11 +32,11 @@ import java.util.Objects;
  */
 public class TypeItem extends GraphTargetItem {
 
-    public static TypeItem BOOLEAN = new TypeItem("Boolean");
+    public static TypeItem BOOLEAN = new TypeItem(new DottedChain("Boolean"));
 
-    public static TypeItem STRING = new TypeItem("String");
+    public static TypeItem STRING = new TypeItem(new DottedChain("String"));
 
-    public static TypeItem ARRAY = new TypeItem("Array");
+    public static TypeItem ARRAY = new TypeItem(new DottedChain("Array"));
 
     public static UnboundedTypeItem UNBOUNDED = new UnboundedTypeItem();
 
@@ -79,10 +79,11 @@ public class TypeItem extends GraphTargetItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        boolean as3 = localData.constantsAvm2 != null;
         if (localData.fullyQualifiedNames.contains(fullTypeName)) {
-            writer.hilightSpecial(IdentifiersDeobfuscation.printNamespace(localData.constantsAvm2 != null, fullTypeName.toPrintableString()), HighlightSpecialType.TYPE_NAME, fullTypeName.toPrintableString());
+            writer.hilightSpecial(fullTypeName.toPrintableString(as3), HighlightSpecialType.TYPE_NAME, fullTypeName.toPrintableString(as3));
         } else {
-            writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(localData.constantsAvm2 != null, fullTypeName.getLast()), HighlightSpecialType.TYPE_NAME, fullTypeName.toPrintableString());
+            writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(as3, fullTypeName.getLast()), HighlightSpecialType.TYPE_NAME, fullTypeName.toPrintableString(as3));
         }
 
         return writer;
@@ -100,7 +101,7 @@ public class TypeItem extends GraphTargetItem {
 
     @Override
     public String toString() {
-        return fullTypeName.toString();
+        return fullTypeName.toRawString();
     }
 
     @Override

@@ -317,6 +317,10 @@ public class IdentifiersDeobfuscation {
      * @return
      */
     public static String printIdentifier(boolean as3, String s, String... validExceptions) {
+        if (s.isEmpty()) {
+            return "";
+        }
+
         if (s.startsWith("\u00A7") && s.endsWith("\u00A7")) { // Assuming already printed - TODO:detect better
             return s;
         }
@@ -341,38 +345,6 @@ public class IdentifiersDeobfuscation {
         String ret = "\u00A7" + escapeOIdentifier(s) + "\u00A7";
         nameCache.put(s, ret);
         return ret;
-    }
-
-    public static String printNamespace(boolean as3, String pkg, String... validNameExceptions) {
-        Cache<String, String> nameCache = as3 ? as3NameCache : as2NameCache;
-        if (nameCache.contains(pkg)) {
-            return nameCache.get(pkg);
-        }
-
-        if (pkg.isEmpty()) {
-            nameCache.put(pkg, pkg);
-            return pkg;
-        }
-
-        String[] parts;
-        if (pkg.contains(".")) {
-            parts = pkg.split("\\.");
-        } else {
-            parts = new String[]{pkg};
-        }
-
-        StringBuilder ret = new StringBuilder();
-        for (int i = 0; i < parts.length; i++) {
-            if (i > 0) {
-                ret.append(".");
-            }
-
-            ret.append(printIdentifier(as3, parts[i], validNameExceptions));
-        }
-
-        String retStr = ret.toString();
-        nameCache.put(pkg, retStr);
-        return retStr;
     }
 
     public static GraphTextWriter escapeOIdentifier(String s, GraphTextWriter writer) {

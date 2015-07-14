@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui.abc.tablemodels;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.graph.DottedChain;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
@@ -124,11 +125,11 @@ public class NamespaceTableModel implements TableModel {
                 if (rowIndex == 0) {
                     return "-";
                 }
-                String val = abc.constants.getNamespace(rowIndex).getName(abc.constants, true);
-                if (val == null) {
-                    val = "-";
+                DottedChain chain = abc.constants.getNamespace(rowIndex).getName(abc.constants, true);
+                if (chain == null) {
+                    return "-";
                 }
-                return val;
+                return chain.toRawString();
             default:
                 return null;
         }

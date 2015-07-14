@@ -21,7 +21,6 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -189,7 +188,7 @@ public class Multiname {
         }
         int type = constants.getNamespace(index).kind;
         int name_index = constants.getNamespace(index).name_index;
-        String name = name_index == 0 ? null : constants.getNamespace(index).getName(constants, true);
+        String name = name_index == 0 ? null : constants.getNamespace(index).getName(constants, true).toRawString();
         int sub = -1;
         for (int n = 1; n < constants.getNamespaceCount(); n++) {
             if (constants.getNamespace(n).kind == type && constants.getNamespace(n).name_index == name_index) {
@@ -296,27 +295,19 @@ public class Multiname {
             String name = constants.getString(name_index);
             if (fullyQualifiedNames != null && fullyQualifiedNames.contains(name)) {
                 DottedChain dc = getNameWithNamespace(constants);
-                return raw ? dc.toString() : dc.toPrintableString();
+                return raw ? dc.toString() : dc.toPrintableString(true);
             }
             return (isAttribute() ? "@" : "") + (raw ? name : IdentifiersDeobfuscation.printIdentifier(true, name));
         }
     }
 
     public DottedChain getNameWithNamespace(AVM2ConstantPool constants) {
-        StringBuilder ret = new StringBuilder();
         Namespace ns = getNamespace(constants);
-        List<String> chain = new ArrayList<>();
+        String name = getName(constants, null, true);
         if (ns != null) {
-            String nsname = ns.getName(constants, true);
-            if (nsname != null && !nsname.isEmpty()) {
-                String parts[] = nsname.split("\\.");
-                for (String p : parts) {
-                    chain.add(p);
-                }
-            }
+            return ns.getName(constants, true).add(name);
         }
-        chain.add(getName(constants, null, true));
-        return new DottedChain(chain);
+        return new DottedChain(name);
     }
 
     public Namespace getNamespace(AVM2ConstantPool constants) {

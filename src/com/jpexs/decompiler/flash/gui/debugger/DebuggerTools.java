@@ -54,7 +54,7 @@ public class DebuggerTools {
         for (ABCContainerTag ac : swf.getAbcList()) {
             ABC a = ac.getABC();
             for (ScriptPack m : a.getScriptPacks(DEBUGGER_PACKAGE, allAbcList)) {
-                if (isDebuggerClass(m.getClassPath().packageStr, null)) {
+                if (isDebuggerClass(m.getClassPath().packageStr.toRawString(), null)) {
                     return m;
                 }
             }
@@ -87,7 +87,7 @@ public class DebuggerTools {
 
     public static void replaceTraceCalls(SWF swf, String fname) {
         if (hasDebugger(swf)) {
-            String debuggerPkg = getDebuggerScriptPack(swf).getClassPath().packageStr;
+            String debuggerPkg = getDebuggerScriptPack(swf).getClassPath().packageStr.toRawString();
             //change trace to fname
             for (ABCContainerTag ct : swf.getAbcList()) {
                 ABC a = ct.getABC();

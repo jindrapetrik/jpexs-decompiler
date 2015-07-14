@@ -42,11 +42,11 @@ public class InterfaceAVM2Item extends AVM2Item {
 
     public List<Integer> openedNamespaces;
 
-    public String pkg;
+    public DottedChain pkg;
 
     public List<DottedChain> importedClasses;
 
-    public InterfaceAVM2Item(List<DottedChain> importedClasses, String pkg, List<Integer> openedNamespaces, boolean isFinal, int namespace, String name, List<GraphTargetItem> superInterfaces, List<GraphTargetItem> traits) {
+    public InterfaceAVM2Item(List<DottedChain> importedClasses, DottedChain pkg, List<Integer> openedNamespaces, boolean isFinal, int namespace, String name, List<GraphTargetItem> superInterfaces, List<GraphTargetItem> traits) {
         super(null, NOPRECEDENCE);
         this.importedClasses = importedClasses;
         this.pkg = pkg;

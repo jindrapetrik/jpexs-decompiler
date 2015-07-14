@@ -73,7 +73,7 @@ public class ScriptInfo {
             Namespace ns = name.getNamespace(abc.constants);
             if ((ns.kind == Namespace.KIND_PACKAGE_INTERNAL)
                     || (ns.kind == Namespace.KIND_PACKAGE)) {
-                String packageName = ns.getName(abc.constants, false); // assume not null package
+                DottedChain packageName = ns.getName(abc.constants, false); // assume not null package
                 String objectName = name.getName(abc.constants, null, false);
                 List<Integer> traitIndices = new ArrayList<>();
 
@@ -83,7 +83,7 @@ public class ScriptInfo {
                     otherTraits.clear();
                 }
 
-                if (packagePrefix == null || packageName.startsWith(packagePrefix)) {
+                if (packagePrefix == null || packageName.toPrintableString(true).startsWith(packagePrefix)) {
                     ClassPath cp = new ClassPath(packageName, objectName);
                     ret.add(new ScriptPack(cp, abc, allAbcs, scriptIndex, traitIndices));
                 }

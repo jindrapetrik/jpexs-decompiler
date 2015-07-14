@@ -57,7 +57,7 @@ public class ClassAVM2Item extends AVM2Item implements Block {
 
     public List<DottedChain> importedClasses;
 
-    public String pkg;
+    public DottedChain pkg;
 
     @Override
     public List<List<GraphTargetItem>> getSubs() {
@@ -68,7 +68,7 @@ public class ClassAVM2Item extends AVM2Item implements Block {
         return ret;
     }
 
-    public ClassAVM2Item(List<DottedChain> importedClasses, String pkg, List<Integer> openedNamespaces, int protectedNs, boolean isDynamic, boolean isFinal, int namespace, String className, GraphTargetItem extendsOp, List<GraphTargetItem> implementsOp, List<GraphTargetItem> staticInit, boolean staticInitActivation, List<AssignableAVM2Item> sinitVariables, GraphTargetItem constructor, List<GraphTargetItem> traits) {
+    public ClassAVM2Item(List<DottedChain> importedClasses, DottedChain pkg, List<Integer> openedNamespaces, int protectedNs, boolean isDynamic, boolean isFinal, int namespace, String className, GraphTargetItem extendsOp, List<GraphTargetItem> implementsOp, List<GraphTargetItem> staticInit, boolean staticInitActivation, List<AssignableAVM2Item> sinitVariables, GraphTargetItem constructor, List<GraphTargetItem> traits) {
         super(null, NOPRECEDENCE);
         this.importedClasses = importedClasses;
         this.pkg = pkg;

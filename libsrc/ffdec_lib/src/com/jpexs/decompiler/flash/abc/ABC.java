@@ -109,7 +109,7 @@ public class ABC {
     public ABCContainerTag parentTag;
 
     /* Map from multiname index of namespace value to namespace name**/
-    private Map<String, DottedChain> namespaceMap;
+    private Map<DottedChain, DottedChain> namespaceMap;
 
     public ABC(ABCContainerTag tag) {
         this.parentTag = tag;
@@ -814,15 +814,15 @@ public class ABC {
         }
     }
 
-    private Map<String, DottedChain> getNamespaceMap() {
+    private Map<DottedChain, DottedChain> getNamespaceMap() {
         if (namespaceMap == null) {
-            Map<String, DottedChain> map = new HashMap<>();
+            Map<DottedChain, DottedChain> map = new HashMap<>();
             for (ScriptInfo si : script_info) {
                 for (Trait t : si.traits.traits) {
                     if (t instanceof TraitSlotConst) {
                         TraitSlotConst s = ((TraitSlotConst) t);
                         if (s.isNamespace()) {
-                            String key = constants.getNamespace(s.value_index).getName(constants, true); // assume not null
+                            DottedChain key = constants.getNamespace(s.value_index).getName(constants, true); // assume not null
                             DottedChain val = constants.getMultiname(s.name_index).getNameWithNamespace(constants);
                             map.put(key, val);
                         }
@@ -857,13 +857,13 @@ public class ABC {
         return bodyIdxFromMethodIdx;
     }
 
-    public DottedChain nsValueToName(String value) {
+    public DottedChain nsValueToName(DottedChain value) {
         if (getNamespaceMap().containsKey(value)) {
             return getNamespaceMap().get(value);
         } else {
             DottedChain ns = getDeobfuscation().builtInNs(value);
             if (ns == null) {
-                return new DottedChain("");
+                return DottedChain.EMPTY;
             } else {
                 return ns;
             }

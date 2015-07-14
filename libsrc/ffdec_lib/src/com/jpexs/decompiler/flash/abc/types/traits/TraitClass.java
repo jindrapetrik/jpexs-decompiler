@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrict
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetLexIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.AsTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceIns;
+import com.jpexs.decompiler.flash.abc.avm2.model.InitVectorAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.ClassInfo;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
@@ -95,13 +96,13 @@ public class TraitClass extends Trait implements TraitWithSlot {
         return "Class " + abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " slot=" + slot_id + " class_info=" + class_info + " metadata=" + Helper.intArrToString(metadata);
     }
 
-    private boolean parseUsagesFromNS(ABC abc, List<DottedChain> imports, List<String> uses, int namespace_index, String ignorePackage, String name) {
+    private boolean parseUsagesFromNS(ABC abc, List<DottedChain> imports, List<String> uses, int namespace_index, DottedChain ignorePackage, String name) {
         Namespace ns = abc.constants.getNamespace(namespace_index);
         if (name.isEmpty()) {
             name = "*";
         }
-        String nsname = ns.getName(abc.constants, ns.kind == Namespace.KIND_NAMESPACE);
-        DottedChain newimport = nsname == null ? new DottedChain() : new DottedChain(nsname.split("\\."));
+        boolean raw = ns.kind == Namespace.KIND_NAMESPACE;
+        DottedChain newimport = ns.getName(abc.constants, raw);
         /*if ((ns.kind != Namespace.KIND_PACKAGE)
          && (ns.kind != Namespace.KIND_NAMESPACE)
          && (ns.kind != Namespace.KIND_STATIC_PROTECTED)) {
@@ -111,23 +112,21 @@ public class TraitClass extends Trait implements TraitWithSlot {
             DottedChain oldimport = newimport;
             newimport = new DottedChain();
             for (ABCContainerTag abcTag : abc.getAbcTags()) {
-                DottedChain newname = abcTag.getABC().nsValueToName(oldimport == null ? null : oldimport.toString());
-                if (newname.toString().equals("-")) {
+                DottedChain newname = abcTag.getABC().nsValueToName(oldimport);
+                if (newname.size() == 1 && newname.get(0).equals("-")) {
                     return true;
                 }
-                if (!newname.toString().isEmpty()) {
+
+                if (!newname.isEmpty()) {
                     newimport = newname;
                     break;
                 }
             }
-            if (newimport.parts.isEmpty()) {
-                newimport = oldimport;
-                newimport.parts.add(name);
+            if (newimport.isEmpty()) {
+                newimport = oldimport.add(name);
             }
-            if (!newimport.parts.isEmpty() && newimport.toString().isEmpty()) {
-                newimport.parts.clear();
-            }
-            if (newimport.parts.isEmpty()) {
+
+            if (newimport.isEmpty()) {
                 /*                if(ns.kind==Namespace.KIND_PACKAGE){
                  newimport+=".*";
                  }*/
@@ -141,7 +140,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
                     String usname = newimport.getLast();
                     if (ns.kind == Namespace.KIND_PACKAGE) {
                         if (!pkg.equals(ignorePackage)) {
-                            if (!pkg.toString().equals("__AS3__.vec")) { //Automatic import
+                            if (!pkg.equals(InitVectorAVM2Item.VECTOR_PACKAGE)) { //Automatic import
                                 imports.add(newimport);
                             }
                         }
@@ -163,39 +162,35 @@ public class TraitClass extends Trait implements TraitWithSlot {
         return false;
     }
 
-    private void parseImportsUsagesFromNS(ABC abc, List<DottedChain> imports, List<String> uses, int namespace_index, String ignorePackage, String name) {
+    private void parseImportsUsagesFromNS(ABC abc, List<DottedChain> imports, List<String> uses, int namespace_index, DottedChain ignorePackage, String name) {
         Namespace ns = abc.constants.getNamespace(namespace_index);
         if (name.isEmpty()) {
             name = "*";
         }
-        String niS = ns.getName(abc.constants, false);
-        DottedChain newimport = niS == null ? new DottedChain() : new DottedChain(niS.split("\\."));
+        DottedChain newimport = ns.getName(abc.constants, false);
         if (parseUsagesFromNS(abc, imports, uses, namespace_index, ignorePackage, name)) {
             return;
         } else if ((ns.kind != Namespace.KIND_PACKAGE) && (ns.kind != Namespace.KIND_PACKAGE_INTERNAL)) {
             return;
         }
-        if (newimport.parts.isEmpty()) {
-            newimport = new DottedChain("");
-        }
-        newimport.parts.add(name);
+        newimport = newimport.add(name);
         //WUT?
         /*if (newimport.contains(":")) {
          return;
          }*/
         if (!imports.contains(newimport)) {
             DottedChain pkg = newimport.getWithoutLast(); //.substring(0, newimport.lastIndexOf('.'));
-            if (pkg.toString().equals("__AS3__.vec")) { //special case - is imported always
+            if (pkg.equals(InitVectorAVM2Item.VECTOR_PACKAGE)) { //special case - is imported always
                 return;
             }
-            if (!pkg.toString().equals(ignorePackage)) {
+            if (!pkg.equals(ignorePackage)) {
                 imports.add(newimport);
             }
         }
         //}
     }
 
-    private void parseUsagesFromMultiname(ABC abc, List<DottedChain> imports, List<String> uses, Multiname m, String ignorePackage, List<DottedChain> fullyQualifiedNames) {
+    private void parseUsagesFromMultiname(ABC abc, List<DottedChain> imports, List<String> uses, Multiname m, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) {
         if (m != null) {
             if (m.kind == Multiname.TYPENAME) {
                 if (m.qname_index != 0) {
@@ -226,7 +221,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         }
     }
 
-    private void parseImportsUsagesFromMultiname(ABC abc, List<DottedChain> imports, List<String> uses, Multiname m, String ignorePackage, List<DottedChain> fullyQualifiedNames) {
+    private void parseImportsUsagesFromMultiname(ABC abc, List<DottedChain> imports, List<String> uses, Multiname m, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) {
         if (m != null) {
             if (m.kind == Multiname.TYPENAME) {
                 if (m.qname_index != 0) {
@@ -240,7 +235,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
                 return;
             }
             Namespace ns = m.getNamespace(abc.constants);
-            String name = m.getName(abc.constants, fullyQualifiedNames, false);
+            String name = m.getName(abc.constants, fullyQualifiedNames, true);
             NamespaceSet nss = m.getNamespaceSet(abc.constants);
             if (ns != null) {
                 parseImportsUsagesFromNS(abc, imports, uses, m.namespace_index, ignorePackage, name);
@@ -253,7 +248,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         }
     }
 
-    private void parseImportsUsagesFromMethodInfo(ABC abc, int method_index, List<DottedChain> imports, List<String> uses, String ignorePackage, List<DottedChain> fullyQualifiedNames, List<Integer> visitedMethods) {
+    private void parseImportsUsagesFromMethodInfo(ABC abc, int method_index, List<DottedChain> imports, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<Integer> visitedMethods) {
         if ((method_index < 0) || (method_index >= abc.method_info.size())) {
             return;
         }
@@ -274,7 +269,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
             }
             for (AVM2Instruction ins : body.getCode().code) {
                 if (ins.definition instanceof AlchemyTypeIns) {
-                    DottedChain nimport = new DottedChain((AlchemyTypeIns.ALCHEMY_PACKAGE + "." + ins.definition.instructionName).split("\\."));
+                    DottedChain nimport = AlchemyTypeIns.ALCHEMY_PACKAGE.add(ins.definition.instructionName);
                     if (!imports.contains(nimport)) {
                         imports.add(nimport);
                     }
@@ -312,13 +307,13 @@ public class TraitClass extends Trait implements TraitWithSlot {
         }
     }
 
-    private void parseImportsUsagesFromTraits(ABC abc, Traits ts, List<DottedChain> imports, List<String> uses, String ignorePackage, List<DottedChain> fullyQualifiedNames) {
+    private void parseImportsUsagesFromTraits(ABC abc, Traits ts, List<DottedChain> imports, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) {
         for (Trait t : ts.traits) {
             parseImportsUsagesFromTrait(abc, t, imports, uses, ignorePackage, fullyQualifiedNames);
         }
     }
 
-    private void parseImportsUsagesFromTrait(ABC abc, Trait t, List<DottedChain> imports, List<String> uses, String ignorePackage, List<DottedChain> fullyQualifiedNames) {
+    private void parseImportsUsagesFromTrait(ABC abc, Trait t, List<DottedChain> imports, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) {
         if (t instanceof TraitMethodGetterSetter) {
             TraitMethodGetterSetter tm = (TraitMethodGetterSetter) t;
             parseImportsUsagesFromMultiname(abc, imports, uses, abc.constants.getMultiname(tm.name_index), ignorePackage, fullyQualifiedNames);
@@ -339,7 +334,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
         ClassInfo classInfo = abc.class_info.get(class_info);
         InstanceInfo instanceInfo = abc.instance_info.get(class_info);
-        String packageName = instanceInfo.getName(abc.constants).getNamespace(abc.constants).getName(abc.constants, false); //assume not null name
+        DottedChain packageName = instanceInfo.getName(abc.constants).getNamespace(abc.constants).getName(abc.constants, false); //assume not null name
 
         parseImportsUsagesFromMultiname(abc, imports, uses, abc.constants.getMultiname(instanceInfo.name_index), packageName, fullyQualifiedNames);
 
@@ -380,13 +375,13 @@ public class TraitClass extends Trait implements TraitWithSlot {
         InstanceInfo instanceInfo = abc.instance_info.get(class_info);
         Multiname instanceInfoMultiname = instanceInfo.getName(abc.constants);
         String instanceInfoName = instanceInfoMultiname.getName(abc.constants, fullyQualifiedNames, false);
-        String packageName = instanceInfoMultiname.getNamespace(abc.constants).getName(abc.constants, false); //assume not null name
+        DottedChain packageName = instanceInfoMultiname.getNamespace(abc.constants).getName(abc.constants, false); //assume not null name
         List<String> namesInThisPackage = new ArrayList<>();
         for (ABCContainerTag tag : abc.getAbcTags()) {
             for (ScriptInfo si : tag.getABC().script_info) {
                 for (Trait t : si.traits.traits) {
                     ClassPath classPath = t.getPath(tag.getABC());
-                    String pkg = classPath.packageStr == null ? "" : classPath.packageStr;
+                    DottedChain pkg = classPath.packageStr == null ? DottedChain.EMPTY : classPath.packageStr;
                     if (pkg.equals(packageName)) {
                         namesInThisPackage.add(classPath.className);
                     }
@@ -406,7 +401,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         for (DottedChain ipath : imports) {
             String name = ipath.getLast();
             DottedChain pkg = ipath.getWithoutLast();
-            if (importnames.contains(name) || ((!pkg.parts.isEmpty()) && isBuiltInClass(name))) {
+            if (importnames.contains(name) || isBuiltInClass(name)) {
                 fullyQualifiedNames.add(new DottedChain(name));
             } else {
                 importnames.add(name);
@@ -429,13 +424,12 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
         for (int i = 0; i < imports.size(); i++) {
             DottedChain imp = imports.get(i);
-            DottedChain pkg = imp.getWithoutLast(); //imp.substring(0, imp.lastIndexOf('.'));
-            String name = imp.getLast();//imp.substring(imp.lastIndexOf('.') + 1);
+            DottedChain pkg = imp.getWithoutLast();
+            String name = imp.getLast();
             if (name.equals("*")) {
                 continue;
             }
-            DottedChain dAll = new DottedChain(pkg.parts);
-            dAll.parts.add("*");
+            DottedChain dAll = pkg.add("*");
             if (imports.contains(dAll)) {
                 imports.remove(i);
                 i--;
@@ -444,8 +438,8 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
         boolean hasImport = false;
         for (DottedChain imp : imports) {
-            if (!imp.parts.get(0).isEmpty()) {  //No imports from root package
-                writer.appendNoHilight("import " + imp + ";").newLine();
+            if (imp.size() > 1) {  //No imports from root package
+                writer.appendNoHilight("import " + imp.toPrintableString(true) + ";").newLine();
                 hasImport = true;
             }
         }
