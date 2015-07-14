@@ -56,6 +56,10 @@ public class AVM2Deobfuscation {
 
     private final Map<String, Integer> usageTypesCount = new HashMap<>();
 
+    public static final DottedChain FLASH_PROXY = new DottedChain("flash", "utils", "flash_proxy");
+
+    public static final DottedChain BUILTIN = new DottedChain("-");
+
     public AVM2Deobfuscation(AVM2ConstantPool constants) {
         this.constants = constants;
     }
@@ -104,10 +108,10 @@ public class AVM2Deobfuscation {
             return null;
         }
         if (ns.equals("http://www.adobe.com/2006/actionscript/flash/proxy")) {
-            return new DottedChain("flash", "utils", "flash_proxy");
+            return FLASH_PROXY;
         }
         if (ns.equals("http://adobe.com/AS3/2006/builtin")) {
-            return new DottedChain("-");
+            return BUILTIN;
         }
         return null;
     }

@@ -382,7 +382,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                         continue;
                     }
                     if ((a.instance_info.get(c).getName(a.constants) != null && a == abc && a.instance_info.get(c).getName(a.constants).namespace_index == ni)
-                            || (ons.kind != Namespace.KIND_PRIVATE && a.instance_info.get(c).getName(a.constants) != null && a.instance_info.get(c).getName(a.constants).getNamespace(a.constants) != null && a.instance_info.get(c).getName(a.constants).getNamespace(a.constants).hasName(ons.getName(abc.constants, true).toRawString(), a.constants))) {
+                            || (ons.kind != Namespace.KIND_PRIVATE && a.instance_info.get(c).getName(a.constants) != null && a.instance_info.get(c).getName(a.constants).getNamespace(a.constants) != null && a.instance_info.get(c).getName(a.constants).getNamespace(a.constants).hasName(ons.getName(abc.constants).toRawString(), a.constants))) {
                         String cname = a.instance_info.get(c).getName(a.constants).getName(a.constants, null, true);
                         if (name.get(0).equals(cname)) {
                             if (!subtypes.isEmpty() && name.size() > 1) {

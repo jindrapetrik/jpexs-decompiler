@@ -822,7 +822,7 @@ public class ABC {
                     if (t instanceof TraitSlotConst) {
                         TraitSlotConst s = ((TraitSlotConst) t);
                         if (s.isNamespace()) {
-                            DottedChain key = constants.getNamespace(s.value_index).getName(constants, true); // assume not null
+                            DottedChain key = constants.getNamespace(s.value_index).getName(constants); // assume not null
                             DottedChain val = constants.getMultiname(s.name_index).getNameWithNamespace(constants);
                             map.put(key, val);
                         }
@@ -1037,10 +1037,15 @@ public class ABC {
         return findMethodBodyByName(classId, methodName);
     }
 
+    public int findClassByName(DottedChain name) {
+        String str = name == null ? null : name.toRawString();
+        return findClassByName(str);
+    }
+
     public int findClassByName(String name) {
         for (int c = 0; c < instance_info.size(); c++) {
             DottedChain s = constants.getMultiname(instance_info.get(c).name_index).getNameWithNamespace(constants);
-            if (name.equals(s.toString())) {
+            if (name.equals(s.toRawString())) {
                 return c;
             }
         }

@@ -32,11 +32,11 @@ import java.util.Objects;
  */
 public class TypeItem extends GraphTargetItem {
 
-    public static TypeItem BOOLEAN = new TypeItem(new DottedChain("Boolean"));
+    public static TypeItem BOOLEAN = new TypeItem(DottedChain.BOOLEAN);
 
-    public static TypeItem STRING = new TypeItem(new DottedChain("String"));
+    public static TypeItem STRING = new TypeItem(DottedChain.STRING);
 
-    public static TypeItem ARRAY = new TypeItem(new DottedChain("Array"));
+    public static TypeItem ARRAY = new TypeItem(DottedChain.ARRAY);
 
     public static UnboundedTypeItem UNBOUNDED = new UnboundedTypeItem();
 

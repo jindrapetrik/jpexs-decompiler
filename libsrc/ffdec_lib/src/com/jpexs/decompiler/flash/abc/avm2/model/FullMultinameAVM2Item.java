@@ -73,7 +73,7 @@ public class FullMultinameAVM2Item extends AVM2Item {
         } else {
             Namespace ns = constants.getMultiname(multinameIndex).getNamespace(constants);
             if ((ns != null) && (ns.name_index != 0)) {
-                cns = ns.getName(constants, false).toPrintableString(true);
+                cns = ns.getName(constants).toPrintableString(true);
             }
         }
         return cname.equals("XML") && cns.isEmpty();

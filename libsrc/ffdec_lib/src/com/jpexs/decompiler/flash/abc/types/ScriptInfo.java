@@ -73,7 +73,7 @@ public class ScriptInfo {
             Namespace ns = name.getNamespace(abc.constants);
             if ((ns.kind == Namespace.KIND_PACKAGE_INTERNAL)
                     || (ns.kind == Namespace.KIND_PACKAGE)) {
-                DottedChain packageName = ns.getName(abc.constants, false); // assume not null package
+                DottedChain packageName = ns.getName(abc.constants); // assume not null package
                 String objectName = name.getName(abc.constants, null, false);
                 List<Integer> traitIndices = new ArrayList<>();
 

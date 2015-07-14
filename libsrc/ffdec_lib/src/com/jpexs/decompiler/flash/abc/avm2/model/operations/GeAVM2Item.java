@@ -75,6 +75,6 @@ public class GeAVM2Item extends BinaryOpItem implements LogicalOpItem, IfConditi
 
     @Override
     public GraphTargetItem returnType() {
-        return new TypeItem(new DottedChain("Boolean"));
+        return new TypeItem(DottedChain.BOOLEAN);
     }
 }

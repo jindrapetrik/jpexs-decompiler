@@ -93,7 +93,7 @@ public class DebuggerTools {
                 ABC a = ct.getABC();
                 for (int i = 1; i < a.constants.constant_multiname.size(); i++) {
                     Multiname m = a.constants.constant_multiname.get(i);
-                    if ("trace".equals(m.getNameWithNamespace(a.constants).toString())) {
+                    if ("trace".equals(m.getNameWithNamespace(a.constants).toRawString())) {
                         m.namespace_index = a.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, a.constants.getStringId(debuggerPkg, true)), 0, true);
                         m.name_index = a.constants.getStringId(fname, true);
                         ((Tag) ct).setModified(true);

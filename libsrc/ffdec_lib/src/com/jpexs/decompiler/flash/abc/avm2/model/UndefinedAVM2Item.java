@@ -54,7 +54,7 @@ public class UndefinedAVM2Item extends AVM2Item {
 
     @Override
     public GraphTargetItem returnType() {
-        return new TypeItem(new DottedChain("Undefined"));
+        return new TypeItem(DottedChain.UNDEFINED);
     }
 
     @Override

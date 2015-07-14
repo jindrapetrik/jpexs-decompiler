@@ -164,7 +164,7 @@ public class ActionScript3Parser {
         if (s.type == SymbolType.MULTIPLY) {
             return new UnboundedTypeItem();
         } else if (s.type == SymbolType.VOID) {
-            return new TypeItem(new DottedChain("void"));
+            return new TypeItem(DottedChain.VOID);
         } else {
             lexer.pushback(s);
         }
@@ -824,7 +824,7 @@ public class ActionScript3Parser {
                         lexer.pushback(s);
                     }
 
-                    ConstAVM2Item ns = new ConstAVM2Item(pkg, customAccess, true, namespace, nname, new TypeItem(new DottedChain("Namespace")), new StringAVM2Item(null, nval), lexer.yyline());
+                    ConstAVM2Item ns = new ConstAVM2Item(pkg, customAccess, true, namespace, nname, new TypeItem(DottedChain.NAMESPACE), new StringAVM2Item(null, nval), lexer.yyline());
                     traits.add(ns);
                     break;
                 case CONST:

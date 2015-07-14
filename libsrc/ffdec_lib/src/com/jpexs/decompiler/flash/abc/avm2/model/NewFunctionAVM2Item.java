@@ -98,7 +98,7 @@ public class NewFunctionAVM2Item extends AVM2Item {
 
     @Override
     public GraphTargetItem returnType() {
-        return new TypeItem(new DottedChain("Function"));
+        return new TypeItem(DottedChain.FUNCTION);
     }
 
     @Override

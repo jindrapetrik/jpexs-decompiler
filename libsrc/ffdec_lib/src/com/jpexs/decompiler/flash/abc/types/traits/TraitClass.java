@@ -102,7 +102,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
             name = "*";
         }
         boolean raw = ns.kind == Namespace.KIND_NAMESPACE;
-        DottedChain newimport = ns.getName(abc.constants, raw);
+        DottedChain newimport = ns.getName(abc.constants);
         /*if ((ns.kind != Namespace.KIND_PACKAGE)
          && (ns.kind != Namespace.KIND_NAMESPACE)
          && (ns.kind != Namespace.KIND_STATIC_PROTECTED)) {
@@ -167,7 +167,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         if (name.isEmpty()) {
             name = "*";
         }
-        DottedChain newimport = ns.getName(abc.constants, false);
+        DottedChain newimport = ns.getName(abc.constants);
         if (parseUsagesFromNS(abc, imports, uses, namespace_index, ignorePackage, name)) {
             return;
         } else if ((ns.kind != Namespace.KIND_PACKAGE) && (ns.kind != Namespace.KIND_PACKAGE_INTERNAL)) {
@@ -334,7 +334,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
         ClassInfo classInfo = abc.class_info.get(class_info);
         InstanceInfo instanceInfo = abc.instance_info.get(class_info);
-        DottedChain packageName = instanceInfo.getName(abc.constants).getNamespace(abc.constants).getName(abc.constants, false); //assume not null name
+        DottedChain packageName = instanceInfo.getName(abc.constants).getNamespace(abc.constants).getName(abc.constants); //assume not null name
 
         parseImportsUsagesFromMultiname(abc, imports, uses, abc.constants.getMultiname(instanceInfo.name_index), packageName, fullyQualifiedNames);
 
@@ -375,7 +375,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         InstanceInfo instanceInfo = abc.instance_info.get(class_info);
         Multiname instanceInfoMultiname = instanceInfo.getName(abc.constants);
         String instanceInfoName = instanceInfoMultiname.getName(abc.constants, fullyQualifiedNames, false);
-        DottedChain packageName = instanceInfoMultiname.getNamespace(abc.constants).getName(abc.constants, false); //assume not null name
+        DottedChain packageName = instanceInfoMultiname.getNamespace(abc.constants).getName(abc.constants); //assume not null name
         List<String> namesInThisPackage = new ArrayList<>();
         for (ABCContainerTag tag : abc.getAbcTags()) {
             for (ScriptInfo si : tag.getABC().script_info) {

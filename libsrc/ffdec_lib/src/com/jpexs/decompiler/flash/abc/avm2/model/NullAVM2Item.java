@@ -61,7 +61,7 @@ public class NullAVM2Item extends AVM2Item {
 
     @Override
     public GraphTargetItem returnType() {
-        return new TypeItem(new DottedChain("null"));
+        return new TypeItem(DottedChain.NULL);
     }
 
     @Override

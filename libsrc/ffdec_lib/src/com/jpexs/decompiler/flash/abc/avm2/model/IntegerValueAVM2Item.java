@@ -74,7 +74,7 @@ public class IntegerValueAVM2Item extends NumberValueAVM2Item implements Integer
 
     @Override
     public GraphTargetItem returnType() {
-        return new TypeItem(new DottedChain("int"));
+        return new TypeItem(DottedChain.INT);
     }
 
     @Override

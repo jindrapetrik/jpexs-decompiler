@@ -43,6 +43,6 @@ public class InstanceOfAVM2Item extends BinaryOpItem {
 
     @Override
     public GraphTargetItem returnType() {
-        return new TypeItem(new DottedChain("Boolean"));
+        return new TypeItem(DottedChain.BOOLEAN);
     }
 }

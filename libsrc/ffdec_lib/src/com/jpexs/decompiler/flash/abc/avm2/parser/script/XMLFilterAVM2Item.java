@@ -56,7 +56,7 @@ public class XMLFilterAVM2Item extends AVM2Item {
 
     @Override
     public GraphTargetItem returnType() {
-        return new TypeItem(new DottedChain("String"));
+        return new TypeItem(DottedChain.STRING);
     }
 
     @Override

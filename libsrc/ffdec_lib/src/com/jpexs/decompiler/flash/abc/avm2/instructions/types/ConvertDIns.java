@@ -75,6 +75,6 @@ public class ConvertDIns extends InstructionDefinition implements CoerceOrConver
 
     @Override
     public GraphTargetItem getTargetType(AVM2ConstantPool constants, AVM2Instruction ins, List<DottedChain> fullyQualifiedNames) {
-        return new TypeItem(new DottedChain("Number"));
+        return new TypeItem(DottedChain.NUMBER);
     }
 }

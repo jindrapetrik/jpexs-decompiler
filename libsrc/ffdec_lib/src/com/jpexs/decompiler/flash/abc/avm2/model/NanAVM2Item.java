@@ -49,7 +49,7 @@ public class NanAVM2Item extends AVM2Item {
 
     @Override
     public GraphTargetItem returnType() {
-        return new TypeItem(new DottedChain("Number"));
+        return new TypeItem(DottedChain.NUMBER);
     }
 
     @Override

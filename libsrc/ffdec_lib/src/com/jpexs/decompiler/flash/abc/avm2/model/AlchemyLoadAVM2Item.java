@@ -87,9 +87,9 @@ public class AlchemyLoadAVM2Item extends AVM2Item {
     public GraphTargetItem returnType() {
         switch (type) {
             case 'i':
-                return new TypeItem(new DottedChain("int"));
+                return new TypeItem(DottedChain.INT);
             case 'f':
-                return new TypeItem(new DottedChain("Number"));
+                return new TypeItem(DottedChain.NUMBER);
         }
         return TypeItem.UNBOUNDED;
     }

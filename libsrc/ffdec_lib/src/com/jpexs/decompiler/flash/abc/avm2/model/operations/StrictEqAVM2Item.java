@@ -72,6 +72,6 @@ public class StrictEqAVM2Item extends BinaryOpItem implements LogicalOpItem, IfC
 
     @Override
     public GraphTargetItem returnType() {
-        return new TypeItem(new DottedChain("Boolean"));
+        return new TypeItem(DottedChain.BOOLEAN);
     }
 }

@@ -56,6 +56,6 @@ public class ConvertOIns extends InstructionDefinition implements CoerceOrConver
 
     @Override
     public GraphTargetItem getTargetType(AVM2ConstantPool constants, AVM2Instruction ins, List<DottedChain> fullyQualifiedNames) {
-        return new TypeItem(new DottedChain("Object"));
+        return new TypeItem(DottedChain.OBJECT);
     }
 }

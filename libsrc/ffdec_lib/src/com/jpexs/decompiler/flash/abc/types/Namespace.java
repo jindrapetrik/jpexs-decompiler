@@ -94,7 +94,7 @@ public class Namespace {
     }
 
     public String toString(AVM2ConstantPool constants) {
-        return getName(constants, false).toPrintableString(true);
+        return getName(constants).toPrintableString(true);
     }
 
     public String getNameWithKind(AVM2ConstantPool constants) {
@@ -114,7 +114,7 @@ public class Namespace {
         return kindStr;
     }
 
-    public DottedChain getName(AVM2ConstantPool constants, boolean raw) {
+    public DottedChain getName(AVM2ConstantPool constants) {
         if (name_index == 0) {
             return DottedChain.EMPTY;
         }

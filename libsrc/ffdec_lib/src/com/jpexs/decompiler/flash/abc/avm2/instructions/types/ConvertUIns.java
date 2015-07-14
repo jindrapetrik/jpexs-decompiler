@@ -56,6 +56,6 @@ public class ConvertUIns extends InstructionDefinition implements CoerceOrConver
 
     @Override
     public GraphTargetItem getTargetType(AVM2ConstantPool constants, AVM2Instruction ins, List<DottedChain> fullyQualifiedNames) {
-        return new TypeItem(new DottedChain("uint"));
+        return new TypeItem(DottedChain.UINT);
     }
 }

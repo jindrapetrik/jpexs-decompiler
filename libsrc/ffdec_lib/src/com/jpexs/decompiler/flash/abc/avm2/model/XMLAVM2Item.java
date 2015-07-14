@@ -51,7 +51,7 @@ public class XMLAVM2Item extends AVM2Item {
 
     @Override
     public GraphTargetItem returnType() {
-        return new TypeItem(new DottedChain("XML"));
+        return new TypeItem(DottedChain.XML);
     }
 
     @Override

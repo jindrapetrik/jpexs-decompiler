@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.CompilationException;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -92,7 +93,7 @@ public class TryAVM2Item extends AVM2Item implements Block {
 
             int eti = catchExceptions.get(e).type_index;
 
-            data.declaredType = eti <= 0 ? "*" : localData.constantsAvm2.constant_multiname.get(eti).getNameWithNamespace(localData.constantsAvm2).toPrintableString(true);
+            data.declaredType = eti <= 0 ? DottedChain.ALL : localData.constantsAvm2.constant_multiname.get(eti).getNameWithNamespace(localData.constantsAvm2);
             writer.hilightSpecial(localName, HighlightSpecialType.TRY_NAME, e, data);
             writer.append(":");
             writer.hilightSpecial(catchExceptions.get(e).getTypeName(localData.constantsAvm2, localData.fullyQualifiedNames), HighlightSpecialType.TRY_TYPE, e);

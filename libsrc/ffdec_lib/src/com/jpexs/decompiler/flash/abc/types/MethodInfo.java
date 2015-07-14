@@ -309,9 +309,9 @@ public class MethodInfo {
             if (i > 0) {
                 writer.appendNoHilight(", ");
             }
-            String ptype = "*";
+            DottedChain ptype = DottedChain.ALL;
             if (param_types[i] > 0) {
-                ptype = constants.getMultiname(param_types[i]).getNameWithNamespace(constants).toPrintableString(true);
+                ptype = constants.getMultiname(param_types[i]).getNameWithNamespace(constants);
             }
 
             HighlightData pdata = new HighlightData();
@@ -356,7 +356,7 @@ public class MethodInfo {
 
             HighlightData pdata = new HighlightData();
             pdata.declaration = true;
-            pdata.declaredType = "*";
+            pdata.declaredType = DottedChain.ALL;
             pdata.localName = restName;
             writer.append(restAdd);
             writer.hilightSpecial(restName, HighlightSpecialType.FLAG_NEED_REST, 0, pdata);

@@ -188,7 +188,7 @@ public class Multiname {
         }
         int type = constants.getNamespace(index).kind;
         int name_index = constants.getNamespace(index).name_index;
-        String name = name_index == 0 ? null : constants.getNamespace(index).getName(constants, true).toRawString();
+        String name = name_index == 0 ? null : constants.getNamespace(index).getName(constants).toRawString();
         int sub = -1;
         for (int n = 1; n < constants.getNamespaceCount(); n++) {
             if (constants.getNamespace(n).kind == type && constants.getNamespace(n).name_index == name_index) {
@@ -305,7 +305,7 @@ public class Multiname {
         Namespace ns = getNamespace(constants);
         String name = getName(constants, null, true);
         if (ns != null) {
-            return ns.getName(constants, true).add(name);
+            return ns.getName(constants).add(name);
         }
         return new DottedChain(name);
     }

@@ -227,7 +227,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                 Reference<Integer> outPropNsIndex = new Reference<>(0);
                                 Reference<GraphTargetItem> outPropType = new Reference<>(null);
                                 Reference<ValueKind> outPropValue = new Reference<>(null);
-                                if (AVM2SourceGenerator.searchPrototypeChain(false, abcs, m.getNamespace(a.constants).getName(a.constants, true), m.getName(a.constants, null, true), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue)) {
+                                if (AVM2SourceGenerator.searchPrototypeChain(false, abcs, m.getNamespace(a.constants).getName(a.constants), m.getName(a.constants, null, true), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue)) {
                                     objType = new TypeItem("".equals(outNs.getVal()) ? outName.getVal() : outNs.getVal() + "." + outName.getVal());
                                     propType = outPropType.getVal();
                                     propIndex = abc.constants.getMultinameId(new Multiname(Multiname.QNAME,
@@ -250,7 +250,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                             if (t.getName(abc).getName(abc.constants, null, true).equals(propertyName)) {
                                 if (t instanceof TraitSlotConst) {
                                     TraitSlotConst tsc = (TraitSlotConst) t;
-                                    objType = new TypeItem(new DottedChain("Function"));
+                                    objType = new TypeItem(DottedChain.FUNCTION);
                                     propType = multinameToType(tsc.type_index, abc.constants);
                                     propIndex = tsc.name_index;
                                     if (!localData.traitUsages.containsKey(b)) {
@@ -266,7 +266,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                         for (int i = 0; i < openedNamespaces.size(); i++) {
                             int nsindex = openedNamespaces.get(i);
                             int nsKind = abc.constants.constant_namespace.get(openedNamespaces.get(i)).kind;
-                            DottedChain nsname = abc.constants.constant_namespace.get(openedNamespaces.get(i)).getName(abc.constants, true);
+                            DottedChain nsname = abc.constants.constant_namespace.get(openedNamespaces.get(i)).getName(abc.constants);
                             int name_index = 0;
                             for (int m = 1; m < abc.constants.constant_multiname.size(); m++) {
                                 Multiname mname = abc.constants.constant_multiname.get(m);
@@ -312,7 +312,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                     }
                                     for (Trait t : si.traits.traits) {
                                         if (t.name_index == name_index) {
-                                            objType = new TypeItem(new DottedChain("Object"));
+                                            objType = new TypeItem(DottedChain.OBJECT);
                                             propType = AVM2SourceGenerator.getTraitReturnType(abc, t);
                                             propIndex = t.name_index;
                                             if (t instanceof TraitSlotConst) {
@@ -336,7 +336,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                             continue;
                                         }
                                         Multiname n = a.constants.constant_multiname.get(ii.name_index);
-                                        if (n.getNamespace(a.constants).kind == Namespace.KIND_PACKAGE && n.getNamespace(a.constants).getName(a.constants, true).equals(nsname)) {
+                                        if (n.getNamespace(a.constants).kind == Namespace.KIND_PACKAGE && n.getNamespace(a.constants).getName(a.constants).equals(nsname)) {
                                             Reference<String> outName = new Reference<>("");
                                             Reference<DottedChain> outNs = new Reference<>(DottedChain.EMPTY);
                                             Reference<DottedChain> outPropNs = new Reference<>(DottedChain.EMPTY);

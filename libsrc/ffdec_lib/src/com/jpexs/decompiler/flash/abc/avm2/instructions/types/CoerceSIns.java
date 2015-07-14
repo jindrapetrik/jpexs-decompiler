@@ -57,6 +57,6 @@ public class CoerceSIns extends InstructionDefinition implements CoerceOrConvert
 
     @Override
     public GraphTargetItem getTargetType(AVM2ConstantPool constants, AVM2Instruction ins, List<DottedChain> fullyQualifiedNames) {
-        return new TypeItem(new DottedChain("String"));
+        return new TypeItem(DottedChain.STRING);
     }
 }

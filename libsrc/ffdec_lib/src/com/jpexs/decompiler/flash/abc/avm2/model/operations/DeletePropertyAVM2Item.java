@@ -88,7 +88,7 @@ public class DeletePropertyAVM2Item extends AVM2Item {
 
     @Override
     public GraphTargetItem returnType() {
-        return new TypeItem(new DottedChain("Boolean"));
+        return new TypeItem(DottedChain.BOOLEAN);
     }
 
     @Override

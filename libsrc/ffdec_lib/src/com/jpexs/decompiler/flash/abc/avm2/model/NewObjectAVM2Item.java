@@ -64,7 +64,7 @@ public class NewObjectAVM2Item extends AVM2Item {
 
     @Override
     public GraphTargetItem returnType() {
-        return new TypeItem(new DottedChain("Object"));
+        return new TypeItem(DottedChain.OBJECT);
     }
 
     @Override
