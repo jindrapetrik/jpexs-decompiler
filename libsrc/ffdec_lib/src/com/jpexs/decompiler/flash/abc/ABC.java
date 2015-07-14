@@ -109,7 +109,7 @@ public class ABC {
     public ABCContainerTag parentTag;
 
     /* Map from multiname index of namespace value to namespace name**/
-    private Map<DottedChain, DottedChain> namespaceMap;
+    private Map<String, DottedChain> namespaceMap;
 
     public ABC(ABCContainerTag tag) {
         this.parentTag = tag;
@@ -814,15 +814,15 @@ public class ABC {
         }
     }
 
-    private Map<DottedChain, DottedChain> getNamespaceMap() {
+    private Map<String, DottedChain> getNamespaceMap() {
         if (namespaceMap == null) {
-            Map<DottedChain, DottedChain> map = new HashMap<>();
+            Map<String, DottedChain> map = new HashMap<>();
             for (ScriptInfo si : script_info) {
                 for (Trait t : si.traits.traits) {
                     if (t instanceof TraitSlotConst) {
                         TraitSlotConst s = ((TraitSlotConst) t);
                         if (s.isNamespace()) {
-                            DottedChain key = constants.getNamespace(s.value_index).getName(constants); // assume not null
+                            String key = constants.getNamespace(s.value_index).getName(constants).toRawString(); // assume not null
                             DottedChain val = constants.getMultiname(s.name_index).getNameWithNamespace(constants);
                             map.put(key, val);
                         }
@@ -858,10 +858,16 @@ public class ABC {
     }
 
     public DottedChain nsValueToName(DottedChain value) {
-        if (getNamespaceMap().containsKey(value)) {
-            return getNamespaceMap().get(value);
+        if (value == null) {
+            return null;
+        }
+
+        String valueStr = value.toRawString();
+
+        if (getNamespaceMap().containsKey(valueStr)) {
+            return getNamespaceMap().get(valueStr);
         } else {
-            DottedChain ns = getDeobfuscation().builtInNs(value);
+            DottedChain ns = getDeobfuscation().builtInNs(valueStr);
             if (ns == null) {
                 return DottedChain.EMPTY;
             } else {

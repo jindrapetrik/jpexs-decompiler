@@ -96,13 +96,6 @@ public class AVM2Deobfuscation {
         return isValid;
     }
 
-    public DottedChain builtInNs(DottedChain ns) {
-        if (ns == null || ns.size() != 1) {
-            return null;
-        }
-        return builtInNs(ns.get(0));
-    }
-
     public DottedChain builtInNs(String ns) {
         if (ns == null) {
             return null;
