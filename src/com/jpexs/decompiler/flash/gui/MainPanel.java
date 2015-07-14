@@ -1981,12 +1981,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 private final ConfigurationItem<Boolean> showAgainInvalidText = new ConfigurationItem<>("showAgainInvalidText", true, true);
 
                 private String getTextTagInfo(TextTag textTag) {
-                    String ret = "";
+                    StringBuilder ret = new StringBuilder();
                     if (textTag != null) {
-                        ret += " TextId: " + textTag.getCharacterId() + " (" + String.join(", ", textTag.getTexts()) + ")";
+                        ret.append(" TextId: ").append(textTag.getCharacterId()).append(" (").append(String.join(", ", textTag.getTexts())).append(")");
                     }
 
-                    return ret;
+                    return ret.toString();
                 }
 
                 @Override
