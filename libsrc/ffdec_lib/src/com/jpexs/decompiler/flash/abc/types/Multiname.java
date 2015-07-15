@@ -264,7 +264,7 @@ public class Multiname {
         if (constants.getMultiname(qname_index).name_index == name_index) {
             return "ambiguousTypeName";
         }
-        StringBuilder typeNameStr = new StringBuilder()
+        StringBuilder typeNameStr = new StringBuilder();
         typeNameStr.append(constants.getMultiname(qname_index).getName(constants, fullyQualifiedNames, raw));
         if (!params.isEmpty()) {
             typeNameStr.append(".<");
