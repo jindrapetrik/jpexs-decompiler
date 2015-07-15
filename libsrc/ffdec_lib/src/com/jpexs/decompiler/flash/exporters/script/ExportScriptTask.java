@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.exporters.script;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.EventListener;
+import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.RunnableIOExResult;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -113,6 +114,8 @@ public class ExportScriptTask implements Callable<File> {
         if (eventListener != null) {
             eventListener.handleExportingEvent("script", index, count, f);
         }
+
+        new RetryTask(rio, handler).run();
 
         if (eventListener != null) {
             long time = stopTime - startTime;
