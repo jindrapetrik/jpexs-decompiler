@@ -228,7 +228,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                 Reference<GraphTargetItem> outPropType = new Reference<>(null);
                                 Reference<ValueKind> outPropValue = new Reference<>(null);
                                 if (AVM2SourceGenerator.searchPrototypeChain(false, abcs, m.getNamespace(a.constants).getName(a.constants), m.getName(a.constants, null, true), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue)) {
-                                    objType = new TypeItem("".equals(outNs.getVal()) ? outName.getVal() : outNs.getVal() + "." + outName.getVal());
+                                    objType = new TypeItem(outNs.getVal().isEmpty() ? outName.getVal() : outNs.getVal().toRawString() + "." + outName.getVal());
                                     propType = outPropType.getVal();
                                     propIndex = abc.constants.getMultinameId(new Multiname(Multiname.QNAME,
                                             abc.constants.getStringId(propertyName, true),

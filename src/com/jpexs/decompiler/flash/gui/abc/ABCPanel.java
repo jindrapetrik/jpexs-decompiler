@@ -626,7 +626,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
             ClassesListTreeModel clModel = (ClassesListTreeModel) scriptsNode;
             ScriptPack pack = null;
             for (ScriptPack item : clModel.getList()) {
-                if (!pack.isSimple && Configuration.ignoreCLikePackages.get()) {
+                if (!item.isSimple && Configuration.ignoreCLikePackages.get()) {
                     continue;
                 }
                 ClassPath classPath = item.getClassPath();

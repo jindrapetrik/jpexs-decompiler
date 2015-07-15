@@ -920,8 +920,8 @@ public class ActionScript3Parser {
         //int publicNs = namespace;
         int protectedStaticNs = 0;
 
-        openedNamespaces.add(protectedNs = abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PROTECTED, abc.constants.getStringId(packageName == null ? (scriptName + "$0:"/*FIXME?*/ + classNameStr) : packageName.isEmpty() ? classNameStr : packageName + ":" + classNameStr, true)), 0, true));
-        openedNamespaces.add(protectedStaticNs = abc.constants.getNamespaceId(new Namespace(Namespace.KIND_STATIC_PROTECTED, abc.constants.getStringId(packageName == null || packageName.isEmpty() ? classNameStr : packageName + ":" + classNameStr, true)), 0, true));
+        openedNamespaces.add(protectedNs = abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PROTECTED, abc.constants.getStringId(packageName == null ? (scriptName + "$0:"/*FIXME?*/ + classNameStr) : packageName.isEmpty() ? classNameStr : packageName.toRawString() + ":" + classNameStr, true)), 0, true));
+        openedNamespaces.add(protectedStaticNs = abc.constants.getNamespaceId(new Namespace(Namespace.KIND_STATIC_PROTECTED, abc.constants.getStringId(packageName == null || packageName.isEmpty() ? classNameStr : packageName.toRawString() + ":" + classNameStr, true)), 0, true));
 
         if (extendsStr != null) {
             List<Integer> indices = new ArrayList<>();

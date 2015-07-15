@@ -1401,7 +1401,7 @@ public class CommandLineArgumentParser {
                 inFile.delete();
                 tmpFile.renameTo(inFile);
                 tmpFile = null;
-                System.out.println("" + inFile + " overwritten.");
+                System.out.println(inFile + " overwritten.");
             }
             System.out.println("OK");
         } catch (FileNotFoundException ex) {

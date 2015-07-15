@@ -1458,7 +1458,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         List<String> registerNames = new ArrayList<>();
         List<String> registerTypes = new ArrayList<>();
         if (className != null) {
-            String fullClassName = pkg == null || pkg.isEmpty() ? className : pkg + "." + className;
+            String fullClassName = pkg == null || pkg.isEmpty() ? className : pkg.toRawString() + "." + className;
             registerTypes.add(fullClassName);
             localData.scopeStack.add(new LocalRegAVM2Item(null, registerNames.size(), null));
             registerNames.add("this");
@@ -2444,7 +2444,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         TypeItem type = (TypeItem) typeItem;
 
         DottedChain dname = type.fullTypeName;
-        String pkg = dname.getWithoutLast().toString();
+        String pkg = dname.getWithoutLast().toRawString();
         String name = dname.getLast();
         for (InstanceInfo ii : abc.instance_info) {
             Multiname mname = abc.constants.constant_multiname.get(ii.name_index);

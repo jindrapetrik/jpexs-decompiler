@@ -264,7 +264,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         if (resolved != null) {
             return resolved.toString();
         }
-        return name.toString();
+        return name.toRawString();
     }
 
     @Override

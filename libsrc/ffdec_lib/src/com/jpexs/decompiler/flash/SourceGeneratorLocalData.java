@@ -69,7 +69,7 @@ public class SourceGeneratorLocalData implements Serializable {
     public boolean subMethod = false;
 
     public String getFullClass() {
-        return pkg == null || pkg.isEmpty() ? currentClass : pkg + "." + currentClass;
+        return pkg == null || pkg.isEmpty() ? currentClass : pkg.toRawString() + "." + currentClass;
     }
 
     public SourceGeneratorLocalData(HashMap<String, Integer> registerVars, Integer inFunction, Boolean inMethod, Integer forInLevel) {
