@@ -164,7 +164,8 @@ public class CommandLineArgumentParser {
         Configuration.parallelSpeedUp,
         Configuration.internalFlashViewer,
         Configuration.autoDeobfuscate,
-        Configuration.cacheOnDisk
+        Configuration.cacheOnDisk,
+        Configuration.overwriteExistingFiles
     };
 
     public static boolean isCommandLineMode() {
@@ -584,9 +585,6 @@ public class CommandLineArgumentParser {
             }
             String key = cp[0];
             String value = cp[1];
-            if (key.toLowerCase().equals("paralelSpeedUp".toLowerCase())) {
-                key = "parallelSpeedUp";
-            }
             for (ConfigurationItem<Boolean> item : commandlineConfigBoolean) {
                 if (key.toLowerCase().equals(item.getName().toLowerCase())) {
                     Boolean bValue = parseBooleanConfigValue(value);

@@ -194,6 +194,9 @@ public class ScriptPack extends AS3ClassTreeItem {
 
         if (!exportSettings.singleFile) {
             file = getExportFile(directory, exportSettings);
+            if (file.exists() && !Configuration.overwriteExistingFiles.get()) {
+                return file;
+            }
         }
 
         try (FileTextWriter writer = exportSettings.singleFile ? null : new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(file))) {

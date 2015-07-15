@@ -82,11 +82,15 @@ public class ExportScriptTask implements Callable<File> {
             public void run() throws IOException, InterruptedException {
                 startTime = System.currentTimeMillis();
 
+                File file = new File(f);
                 if (!exportSettings.singleFile) {
                     Path.createDirectorySafe(new File(directory));
+                    if (file.exists() && !Configuration.overwriteExistingFiles.get()) {
+                        this.result = file;
+                        return;
+                    }
                 }
 
-                File file = new File(f);
                 try (FileTextWriter writer = exportSettings.singleFile ? null : new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(f))) {
                     FileTextWriter writer2 = exportSettings.singleFile ? exportSettings.singleFileWriter : writer;
                     ScriptExportMode exportMode = exportSettings.mode;
