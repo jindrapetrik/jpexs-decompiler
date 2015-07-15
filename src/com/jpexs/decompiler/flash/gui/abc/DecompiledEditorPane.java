@@ -351,7 +351,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                     InstanceInfo ii = a.instance_info.get(cindex);
                     for (int j = 0; j < ii.instance_traits.traits.size(); j++) {
                         Trait tr = ii.instance_traits.traits.get(j);
-                        if (ident.equals(tr.getName(a).getName(a.constants, new ArrayList<>(), false /*NOT RAW!*/))) {
+                        if (ident.equals(tr.getName(a).getName(a.constants, null, false /*NOT RAW!*/))) {
                             classIndex.setVal(cindex);
                             abcIndex.setVal(i);
                             traitIndex.setVal(j);
@@ -366,7 +366,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                     ClassInfo ci = a.class_info.get(cindex);
                     for (int j = 0; j < ci.static_traits.traits.size(); j++) {
                         Trait tr = ci.static_traits.traits.get(j);
-                        if (ident.equals(tr.getName(a).getName(a.constants, new ArrayList<>(), false /*NOT RAW!*/))) {
+                        if (ident.equals(tr.getName(a).getName(a.constants, null, false /*NOT RAW!*/))) {
                             classIndex.setVal(cindex);
                             abcIndex.setVal(i);
                             traitIndex.setVal(j);
@@ -532,7 +532,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                         currentTrait = getCurrentTrait();
                         isStatic = abc.isStaticTraitId(classIndex, lastTraitIndex);
                         if (currentTrait != null) {
-                            name += ":" + currentTrait.getName(abc).getName(abc.constants, new ArrayList<>(), false);
+                            name += ":" + currentTrait.getName(abc).getName(abc.constants, null, false);
                         }
                     }
                 }
@@ -576,7 +576,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                 currentTrait = getCurrentTrait();
                 isStatic = abc.isStaticTraitId(classIndex, lastTraitIndex);
                 if (currentTrait != null) {
-                    name += ":" + currentTrait.getName(abc).getName(abc.constants, new ArrayList<>(), false);
+                    name += ":" + currentTrait.getName(abc).getName(abc.constants, null, false);
                 }
 
                 displayMethod(pos, abc.findMethodIdByTraitId(classIndex, lastTraitIndex), name, currentTrait, isStatic);

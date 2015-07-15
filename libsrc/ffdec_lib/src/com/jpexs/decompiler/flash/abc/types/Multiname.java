@@ -264,22 +264,23 @@ public class Multiname {
         if (constants.getMultiname(qname_index).name_index == name_index) {
             return "ambiguousTypeName";
         }
-        String typeNameStr = constants.getMultiname(qname_index).getName(constants, fullyQualifiedNames, raw);
+        StringBuilder typeNameStr = new StringBuilder()
+        typeNameStr.append(constants.getMultiname(qname_index).getName(constants, fullyQualifiedNames, raw));
         if (!params.isEmpty()) {
-            typeNameStr += ".<";
+            typeNameStr.append(".<");
             for (int i = 0; i < params.size(); i++) {
                 if (i > 0) {
-                    typeNameStr += ",";
+                    typeNameStr.append(",");
                 }
                 if (params.get(i) == 0) {
-                    typeNameStr += "*";
+                    typeNameStr.append("*");
                 } else {
-                    typeNameStr += constants.getMultiname(params.get(i)).getName(constants, fullyQualifiedNames, raw);
+                    typeNameStr.append(constants.getMultiname(params.get(i)).getName(constants, fullyQualifiedNames, raw));
                 }
             }
-            typeNameStr += ">";
+            typeNameStr.append(">");
         }
-        return typeNameStr;
+        return typeNameStr.toString();
     }
 
     public String getName(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames, boolean raw) {
@@ -295,7 +296,7 @@ public class Multiname {
             String name = constants.getString(name_index);
             if (fullyQualifiedNames != null && fullyQualifiedNames.contains(name)) {
                 DottedChain dc = getNameWithNamespace(constants);
-                return raw ? dc.toString() : dc.toPrintableString(true);
+                return raw ? dc.toRawString() : dc.toPrintableString(true);
             }
             return (isAttribute() ? "@" : "") + (raw ? name : IdentifiersDeobfuscation.printIdentifier(true, name));
         }

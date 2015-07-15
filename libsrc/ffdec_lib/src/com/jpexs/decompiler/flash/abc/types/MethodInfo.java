@@ -251,42 +251,43 @@ public class MethodInfo {
     }
 
     public String toString(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames) {
-        String optionalStr = "[";
+        StringBuilder optionalStr = new StringBuilder();
+        optionalStr.append("[");
         if (optional != null) {
             for (int i = 0; i < optional.length; i++) {
                 if (i > 0) {
-                    optionalStr += ",";
+                    optionalStr.append(",");
                 }
-                optionalStr += optional[i].toString(constants);
+                optionalStr.append(optional[i].toString(constants));
             }
         }
-        optionalStr += "]";
+        optionalStr.append("]");
 
-        String param_typesStr = "";
+        StringBuilder param_typesStr = new StringBuilder();
         for (int i = 0; i < param_types.length; i++) {
             if (i > 0) {
-                param_typesStr += ",";
+                param_typesStr.append(",");
             }
             if (param_types[i] == 0) {
-                param_typesStr += "*";
+                param_typesStr.append("*");
             } else {
-                param_typesStr += constants.getMultiname(param_types[i]).toString(constants, fullyQualifiedNames);
+                param_typesStr.append(constants.getMultiname(param_types[i]).toString(constants, fullyQualifiedNames));
             }
         }
 
-        String paramNamesStr = "";
+        StringBuilder paramNamesStr = new StringBuilder();
         for (int i = 0; i < paramNames.length; i++) {
             if (i > 0) {
-                paramNamesStr += ",";
+                paramNamesStr.append(",");
             }
-            paramNamesStr += constants.getString(paramNames[i]);
+            paramNamesStr.append(constants.getString(paramNames[i]));
         }
 
-        String ret_typeStr = "";
+        String ret_typeStr;
         if (ret_type == 0) {
-            ret_typeStr += "*";
+            ret_typeStr = "*";
         } else {
-            ret_typeStr += constants.getMultiname(ret_type).toString(constants, fullyQualifiedNames);
+            ret_typeStr = constants.getMultiname(ret_type).toString(constants, fullyQualifiedNames);
         }
 
         return "param_types=" + param_typesStr + " ret_type=" + ret_typeStr + " name=\"" + constants.getString(name_index) + "\" flags=" + flags + " optional=" + optionalStr + " paramNames=" + paramNamesStr;
@@ -325,7 +326,7 @@ public class MethodInfo {
                 writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(true, constants.getString(paramNames[i])), HighlightSpecialType.PARAM_NAME, i, pdata);
             } else {
                 pdata.localName = "param" + (i + 1);
-                writer.hilightSpecial("param" + (i + 1), HighlightSpecialType.PARAM_NAME, i, pdata);
+                writer.hilightSpecial(pdata.localName, HighlightSpecialType.PARAM_NAME, i, pdata);
             }
             writer.appendNoHilight(":");
             if (param_types[i] == 0) {
@@ -344,7 +345,7 @@ public class MethodInfo {
         if (flagNeed_rest()) {
             String restAdd = "";
             if ((param_types != null) && (param_types.length > 0)) {
-                restAdd += ", ";
+                restAdd = ", ";
             }
             restAdd += "... ";
             String restName;
