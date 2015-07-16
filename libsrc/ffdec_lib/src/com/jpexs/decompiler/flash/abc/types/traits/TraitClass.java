@@ -381,8 +381,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
             for (ScriptInfo si : tag.getABC().script_info) {
                 for (Trait t : si.traits.traits) {
                     ClassPath classPath = t.getPath(tag.getABC());
-                    DottedChain pkg = classPath.packageStr == null ? DottedChain.EMPTY : classPath.packageStr;
-                    if (pkg.equals(packageName)) {
+                    if (classPath.packageStr.equals(packageName)) {
                         namesInThisPackage.add(classPath.className);
                     }
                 }

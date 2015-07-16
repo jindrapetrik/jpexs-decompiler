@@ -21,12 +21,13 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Helper;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.regex.Pattern;
@@ -104,26 +105,27 @@ public class IdentifiersDeobfuscation {
         return false;
     }
 
-    private String fooString(boolean as3, HashMap<String, String> deobfuscated, String orig, boolean firstUppercase, int rndSize) {
+    private String fooString(boolean as3, HashMap<DottedChain, DottedChain> deobfuscated, String orig, boolean firstUppercase, int rndSize) {
         boolean exists;
         String ret;
         loopfoo:
         do {
             exists = false;
             int len = 3 + rnd.nextInt(rndSize - 3);
-            ret = "";
+            StringBuilder sb = new StringBuilder(len);
             for (int i = 0; i < len; i++) {
-                String c = "";
+                char c;
                 if ((i % 2) == 0) {
-                    c = "" + FOO_CHARACTERS.charAt(rnd.nextInt(FOO_CHARACTERS.length()));
+                    c = FOO_CHARACTERS.charAt(rnd.nextInt(FOO_CHARACTERS.length()));
                 } else {
-                    c = "" + FOO_JOIN_CHARACTERS.charAt(rnd.nextInt(FOO_JOIN_CHARACTERS.length()));
+                    c = FOO_JOIN_CHARACTERS.charAt(rnd.nextInt(FOO_JOIN_CHARACTERS.length()));
                 }
                 if (i == 0 && firstUppercase) {
-                    c = c.toUpperCase(Locale.ENGLISH);
+                    c = Character.toUpperCase(c);
                 }
-                ret += c;
+                sb.append(c);
             }
+            ret = sb.toString();
             if (allVariableNamesStr.contains(ret)) {
                 exists = true;
                 rndSize += 1;
@@ -134,7 +136,7 @@ public class IdentifiersDeobfuscation {
                 rndSize += 1;
                 continue;
             }
-            if (deobfuscated.containsValue(ret)) {
+            if (deobfuscated.containsValue(DottedChain.parse(ret))) {
                 exists = true;
                 rndSize += 1;
                 continue;
@@ -143,7 +145,7 @@ public class IdentifiersDeobfuscation {
         return ret;
     }
 
-    public void deobfuscateInstanceNames(boolean as3, HashMap<String, String> namesMap, RenameType renameType, List<Tag> tags, Map<String, String> selected) {
+    public void deobfuscateInstanceNames(boolean as3, HashMap<DottedChain, DottedChain> namesMap, RenameType renameType, List<Tag> tags, Map<DottedChain, DottedChain> selected) {
         for (Tag t : tags) {
             if (t instanceof DefineSpriteTag) {
                 deobfuscateInstanceNames(as3, namesMap, renameType, ((DefineSpriteTag) t).subTags, selected);
@@ -170,50 +172,38 @@ public class IdentifiersDeobfuscation {
         }
     }
 
-    public String deobfuscatePackage(boolean as3, String pkg, HashMap<String, String> namesMap, RenameType renameType, Map<String, String> selected) {
+    public DottedChain deobfuscatePackage(boolean as3, DottedChain pkg, HashMap<DottedChain, DottedChain> namesMap, RenameType renameType, Map<DottedChain, DottedChain> selected) {
         if (namesMap.containsKey(pkg)) {
             return namesMap.get(pkg);
         }
-        String[] parts = null;
-        if (pkg.contains(".")) {
-            parts = pkg.split("\\.");
-        } else {
-            parts = new String[]{pkg};
-        }
-        StringBuilder ret = new StringBuilder();
+        List<String> ret = new ArrayList<>(pkg.size());
         boolean isChanged = false;
-        for (int p = 0; p < parts.length; p++) {
-            if (p > 0) {
-                ret.append(".");
-            }
-            String partChanged = deobfuscateName(as3, parts[p], false, "package", namesMap, renameType, selected);
+        for (int p = 0; p < pkg.size(); p++) {
+            String part = pkg.get(p);
+            String partChanged = deobfuscateName(as3, part, false, "package", namesMap, renameType, selected);
             if (partChanged != null) {
-                ret.append(partChanged);
+                ret.add(partChanged);
                 isChanged = true;
             } else {
-                ret.append(parts[p]);
+                ret.add(part);
             }
         }
         if (isChanged) {
-            String retStr = ret.toString();
-            namesMap.put(pkg, retStr);
-            return retStr;
+            DottedChain chain = new DottedChain(ret);
+            namesMap.put(pkg, chain);
+            return chain;
         }
         return null;
     }
 
-    public String deobfuscateNameWithPackage(boolean as3, String n, HashMap<String, String> namesMap, RenameType renameType, Map<String, String> selected) {
-        String pkg = null;
-        String name = "";
-        if (n.contains(".")) {
-            pkg = n.substring(0, n.lastIndexOf('.'));
-            name = n.substring(n.lastIndexOf('.') + 1);
-        } else {
-            name = n;
-        }
+    public String deobfuscateNameWithPackage(boolean as3, String n, HashMap<DottedChain, DottedChain> namesMap, RenameType renameType, Map<DottedChain, DottedChain> selected) {
+        DottedChain nChain = DottedChain.parse(n);
+        DottedChain pkg = nChain.getWithoutLast();
+        String name = nChain.getLast();
+
         boolean changed = false;
         if ((pkg != null) && (!pkg.isEmpty())) {
-            String changedPkg = deobfuscatePackage(as3, pkg, namesMap, renameType, selected);
+            DottedChain changedPkg = deobfuscatePackage(as3, pkg, namesMap, renameType, selected);
             if (changedPkg != null) {
                 changed = true;
                 pkg = changedPkg;
@@ -258,22 +248,23 @@ public class IdentifiersDeobfuscation {
         return false;
     }
 
-    public String deobfuscateName(boolean as3, String s, boolean firstUppercase, String usageType, HashMap<String, String> namesMap, RenameType renameType, Map<String, String> selected) {
+    public String deobfuscateName(boolean as3, String s, boolean firstUppercase, String usageType, HashMap<DottedChain, DottedChain> namesMap, RenameType renameType, Map<DottedChain, DottedChain> selected) {
         boolean isValid = true;
         if (usageType == null) {
             usageType = "name";
         }
 
+        DottedChain sChain = DottedChain.parse(s);
         if (selected != null) {
-            if (selected.containsKey(s)) {
-                return selected.get(s);
+            if (selected.containsKey(sChain)) {
+                return selected.get(sChain).toRawString();
             }
         }
 
         isValid = isValidName(as3, s);
         if (!isValid) {
-            if (namesMap.containsKey(s)) {
-                return namesMap.get(s);
+            if (namesMap.containsKey(sChain)) {
+                return namesMap.get(sChain).toRawString();
             } else {
                 Integer cnt = typeCounts.get(usageType);
                 if (cnt == null) {
@@ -294,7 +285,7 @@ public class IdentifiersDeobfuscation {
                 } else if (renameType == RenameType.RANDOMWORD) {
                     ret = fooString(as3, namesMap, s, firstUppercase, DEFAULT_FOO_SIZE);
                 }
-                namesMap.put(s, ret);
+                namesMap.put(DottedChain.parse(s), DottedChain.parse(ret));
                 return ret;
             }
         }

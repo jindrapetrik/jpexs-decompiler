@@ -282,7 +282,7 @@ public class ABC {
         }
     }
 
-    public void deobfuscateIdentifiers(HashMap<String, String> namesMap, RenameType renameType, boolean classesOnly) {
+    public void deobfuscateIdentifiers(HashMap<DottedChain, DottedChain> namesMap, RenameType renameType, boolean classesOnly) {
         Set<Integer> stringUsages = getStringUsages();
         Set<Integer> namespaceUsages = getNsStringUsages();
         Map<Integer, String> stringUsageTypes = new HashMap<>();

@@ -125,6 +125,7 @@ import com.jpexs.decompiler.flash.types.filters.BlendComposite;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
 import com.jpexs.decompiler.flash.xfl.FLAVersion;
 import com.jpexs.decompiler.flash.xfl.XFLConverter;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
@@ -284,7 +285,7 @@ public final class SWF implements SWFContainerItem, Timelined {
     public DefineBinaryDataTag binaryData;
 
     @Internal
-    private final HashMap<String, String> deobfuscated = new HashMap<>();
+    private final HashMap<DottedChain, DottedChain> deobfuscated = new HashMap<>();
 
     @Internal
     private final IdentifiersDeobfuscation deobfuscation = new IdentifiersDeobfuscation();
@@ -1886,8 +1887,8 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     public void renameAS2Identifier(String identifier, String newname) throws InterruptedException {
-        Map<String, String> selected = new HashMap<>();
-        selected.put(identifier, newname);
+        Map<DottedChain, DottedChain> selected = new HashMap<>();
+        selected.put(DottedChain.parse(identifier), DottedChain.parse(newname));
         renameAS2Identifiers(null, selected);
     }
 
@@ -1895,7 +1896,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         return renameAS2Identifiers(renameType, null);
     }
 
-    private int renameAS2Identifiers(RenameType renameType, Map<String, String> selected) throws InterruptedException {
+    private int renameAS2Identifiers(RenameType renameType, Map<DottedChain, DottedChain> selected) throws InterruptedException {
         HashMap<ASMSource, ActionList> actionsMap = new HashMap<>();
         List<GraphSourceItem> allFunctions = new ArrayList<>();
         List<MyEntry<DirectValueActionItem, ConstantPool>> allVariableNames = new ArrayList<>();
@@ -1959,7 +1960,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                                     String fname = dvf.toStringNoH(null);
                                     String changed = deobfuscation.deobfuscateName(false, fname, false, "method", deobfuscated, renameType, selected);
                                     if (changed != null) {
-                                        deobfuscated.put(fname, changed);
+                                        deobfuscated.put(DottedChain.parse(fname), DottedChain.parse(changed));
                                     }
                                 }
                             }
@@ -1978,7 +1979,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                                 String vname = dvf.toStringNoH(null);
                                 String changed = deobfuscation.deobfuscateName(false, vname, false, "attribute", deobfuscated, renameType, selected);
                                 if (changed != null) {
-                                    deobfuscated.put(vname, changed);
+                                    deobfuscated.put(DottedChain.parse(vname), DottedChain.parse(changed));
                                 }
                             }
                         }
@@ -2014,7 +2015,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                                 changedNameStr = changedNameStr2;
                             }
                             ret++;
-                            deobfuscated.put(nameStr, changedNameStr);
+                            deobfuscated.put(DottedChain.parse(nameStr), DottedChain.parse(changedNameStr));
                             pos++;
                         }
                         name = mem.object;
@@ -2038,7 +2039,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                                 changedNameStr = changedNameStr2;
                             }
                             ret++;
-                            deobfuscated.put(nameStr, changedNameStr);
+                            deobfuscated.put(DottedChain.parse(nameStr), DottedChain.parse(changedNameStr));
                             pos++;
                         }
                     }

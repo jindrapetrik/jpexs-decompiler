@@ -421,12 +421,7 @@ public class AVM2ConstantPool {
         String str = getString(index);
         DottedChain chain = dottedChainCache.get(str);
         if (chain == null) {
-            if (str.isEmpty()) {
-                chain = DottedChain.EMPTY;
-            } else {
-                chain = new DottedChain(str.split("\\."));
-            }
-
+            chain = DottedChain.parse(str);
             dottedChainCache.put(str, chain);
         }
 

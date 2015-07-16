@@ -30,13 +30,13 @@ public class ClassPath {
     public final String className;
 
     public ClassPath(DottedChain packageStr, String className) {
-        this.packageStr = packageStr;
+        this.packageStr = packageStr == null ? DottedChain.EMPTY : packageStr;
         this.className = className;
     }
 
     @Override
     public String toString() {
-        return (packageStr == null || packageStr.isEmpty()) ? className : packageStr.toPrintableString(true) + "." + className;
+        return packageStr.isEmpty() ? className : packageStr.toPrintableString(true) + "." + className;
     }
 
     @Override

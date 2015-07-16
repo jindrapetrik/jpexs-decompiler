@@ -294,7 +294,7 @@ public class Multiname {
             return isAttribute() ? "@*" : "*";
         } else {
             String name = constants.getString(name_index);
-            if (fullyQualifiedNames != null && fullyQualifiedNames.contains(name)) {
+            if (fullyQualifiedNames != null && fullyQualifiedNames.contains(DottedChain.parse(name))) {
                 DottedChain dc = getNameWithNamespace(constants);
                 return raw ? dc.toRawString() : dc.toPrintableString(true);
             }

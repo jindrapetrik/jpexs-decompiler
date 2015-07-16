@@ -66,6 +66,14 @@ public class DottedChain implements Serializable {
 
     private final int hash;
 
+    public static final DottedChain parse(String name) {
+        if (name == null || name.isEmpty()) {
+            return DottedChain.EMPTY;
+        } else {
+            return new DottedChain(name.split("\\."));
+        }
+    }
+
     public DottedChain(List<String> parts) {
         length = parts.size();
         this.parts = parts.toArray(new String[length]);
