@@ -77,8 +77,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -136,7 +138,7 @@ public class AVM2Graph extends Graph {
         localData.refs = refs;
         localData.code = code;
         g.init(localData);
-        List<GraphPart> allParts = new ArrayList<>();
+        Set<GraphPart> allParts = new HashSet<>();
         for (GraphPart head : g.heads) {
             populateParts(head, allParts);
         }
@@ -166,7 +168,7 @@ public class AVM2Graph extends Graph {
     }
 
     @Override
-    protected List<GraphTargetItem> check(Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, GraphSource code, BaseLocalData localData, List<GraphPart> allParts, TranslateStack stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> output, Loop currentLoop, int staticOperation, String path) throws InterruptedException {
+    protected List<GraphTargetItem> check(Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, GraphSource code, BaseLocalData localData, Set<GraphPart> allParts, TranslateStack stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> output, Loop currentLoop, int staticOperation, String path) throws InterruptedException {
         List<GraphTargetItem> ret = null;
 
         AVM2LocalData aLocalData = (AVM2LocalData) localData;
@@ -649,7 +651,7 @@ public class AVM2Graph extends Graph {
     }
 
     @Override
-    protected GraphPart checkPart(TranslateStack stack, BaseLocalData localData, GraphPart next, List<GraphPart> allParts) {
+    protected GraphPart checkPart(TranslateStack stack, BaseLocalData localData, GraphPart next, Set<GraphPart> allParts) {
         AVM2LocalData aLocalData = (AVM2LocalData) localData;
         Map<Integer, List<Integer>> finallyJumps = aLocalData.finallyJumps;
         Map<Integer, Integer> ignoredSwitches = aLocalData.ignoredSwitches;
