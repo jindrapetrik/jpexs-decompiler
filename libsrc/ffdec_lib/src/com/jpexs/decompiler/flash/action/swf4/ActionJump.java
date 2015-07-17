@@ -26,7 +26,6 @@ import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.graph.GraphSource;
 import com.jpexs.helpers.Helper;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
@@ -67,16 +66,18 @@ public class ActionJump extends Action {
     }
 
     @Override
-    public byte[] getBytes(int version) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        SWFOutputStream sos = new SWFOutputStream(baos, version);
-        try {
-            sos.writeSI16(offset);
-            sos.close();
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return surroundWithAction(baos.toByteArray(), version);
+    protected void getContentBytes(SWFOutputStream sos) throws IOException {
+        sos.writeSI16(offset);
+    }
+
+    /**
+     * Gets the length of action converted to bytes
+     *
+     * @return Length
+     */
+    @Override
+    protected int getContentBytesLength() {
+        return 2;
     }
 
     @Override

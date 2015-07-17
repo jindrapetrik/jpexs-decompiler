@@ -16,13 +16,15 @@
  */
 package com.jpexs.helpers;
 
+import com.jpexs.decompiler.flash.SWFInputStream;
+
 /**
  *
  * @author JPEXS
  */
 public class ByteArrayRange {
 
-    public static final ByteArrayRange EMPTY = new ByteArrayRange(new byte[0]);
+    public static final ByteArrayRange EMPTY = new ByteArrayRange(SWFInputStream.BYTE_ARRAY_EMPTY);
 
     private final byte[] array;
 

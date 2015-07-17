@@ -58,7 +58,7 @@ public class BUTTONCONDACTION implements ASMSource, Serializable {
     public BUTTONCONDACTION() {
         swf = null;
         tag = null;
-        actionBytes = new ByteArrayRange(new byte[0]);
+        actionBytes = new ByteArrayRange(SWFInputStream.BYTE_ARRAY_EMPTY);
     }
 
     @Override

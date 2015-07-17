@@ -30,7 +30,7 @@ import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.helpers.Helper;
-import java.io.ByteArrayOutputStream;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,17 +63,19 @@ public class ActionGetURL extends Action {
     }
 
     @Override
-    public byte[] getBytes(int version) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        SWFOutputStream sos = new SWFOutputStream(baos, version);
-        try {
-            sos.writeString(urlString);
-            sos.writeString(targetString);
-            sos.close();
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return surroundWithAction(baos.toByteArray(), version);
+    protected void getContentBytes(SWFOutputStream sos) throws IOException {
+        sos.writeString(urlString);
+        sos.writeString(targetString);
+    }
+
+    /**
+     * Gets the length of action converted to bytes
+     *
+     * @return Length
+     */
+    @Override
+    protected int getContentBytesLength() {
+        return Utf8Helper.getBytesLength(urlString) + Utf8Helper.getBytesLength(targetString) + 2;
     }
 
     @Override

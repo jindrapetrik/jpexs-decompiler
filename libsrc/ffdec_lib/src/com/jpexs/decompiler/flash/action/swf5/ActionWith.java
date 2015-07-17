@@ -27,7 +27,6 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,18 +62,18 @@ public class ActionWith extends Action implements GraphSourceItemContainer {
     }
 
     @Override
-    public byte[] getBytes(int version) {
-        ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        SWFOutputStream sos = new SWFOutputStream(baos, version);
-        try {
-            sos.writeUI16(codeSize);
-            sos.close();
-            baos2.write(surroundWithAction(baos.toByteArray(), version));
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return baos2.toByteArray();
+    protected void getContentBytes(SWFOutputStream sos) throws IOException {
+        sos.writeUI16(codeSize);
+    }
+
+    /**
+     * Gets the length of action converted to bytes
+     *
+     * @return Length
+     */
+    @Override
+    protected int getContentBytesLength() {
+        return 2;
     }
 
     @Override
@@ -110,7 +109,7 @@ public class ActionWith extends Action implements GraphSourceItemContainer {
 
     @Override
     public long getHeaderSize() {
-        return surroundWithAction(new byte[]{0, 0}, version).length;
+        return super.getBytesLength(version) + 2;
     }
 
     @Override

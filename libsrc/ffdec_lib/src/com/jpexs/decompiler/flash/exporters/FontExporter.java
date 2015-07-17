@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.FontExportSettings;
@@ -122,7 +123,7 @@ public class FontExporter {
         } catch (IOException ex) {
             Logger.getLogger(FontExporter.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return new byte[0];
+        return SWFInputStream.BYTE_ARRAY_EMPTY;
     }
 
     public void exportFont(FontTag ft, FontExportMode mode, File file) throws IOException {

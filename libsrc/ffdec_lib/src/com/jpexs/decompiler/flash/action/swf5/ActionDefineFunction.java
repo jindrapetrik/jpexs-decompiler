@@ -29,7 +29,7 @@ import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.helpers.Helper;
-import java.io.ByteArrayOutputStream;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -84,28 +84,32 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
 
     @Override
     public long getHeaderSize() {
-        return getBytes(version).length;
+        return getBytesLength(version);
     }
 
     @Override
-    public byte[] getBytes(int version) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        SWFOutputStream sos = new SWFOutputStream(baos, version);
-        ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
-        try {
-            sos.writeString(functionName);
-            sos.writeUI16(paramNames.size());
-            for (String s : paramNames) {
-                sos.writeString(s);
-            }
-            sos.writeUI16(codeSize);
-            sos.close();
-
-            baos2.write(surroundWithAction(baos.toByteArray(), version));
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
+    protected void getContentBytes(SWFOutputStream sos) throws IOException {
+        sos.writeString(functionName);
+        sos.writeUI16(paramNames.size());
+        for (String s : paramNames) {
+            sos.writeString(s);
         }
-        return baos2.toByteArray();
+        sos.writeUI16(codeSize);
+    }
+
+    /**
+     * Gets the length of action converted to bytes
+     *
+     * @return Length
+     */
+    @Override
+    protected int getContentBytesLength() {
+        int res = Utf8Helper.getBytesLength(functionName) + 5;
+        for (String s : paramNames) {
+            res += Utf8Helper.getBytesLength(s) + 1;
+        }
+
+        return res;
     }
 
     @Override

@@ -78,7 +78,7 @@ public class ActionGraphSource extends GraphSource {
 
     @Override
     public List<GraphTargetItem> translatePart(GraphPart part, BaseLocalData localData, TranslateStack stack, int start, int end, int staticOperation, String path) throws InterruptedException {
-        return (Action.actionsPartToTree(registerNames, variables, functions, stack, actions, start, end, version, staticOperation, path));
+        return Action.actionsPartToTree(registerNames, variables, functions, stack, actions, start, end, version, staticOperation, path);
     }
 
     private List<Long> posCache = null;

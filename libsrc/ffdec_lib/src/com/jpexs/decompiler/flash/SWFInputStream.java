@@ -302,7 +302,7 @@ public class SWFInputStream implements AutoCloseable {
 
     private static final Logger logger = Logger.getLogger(SWFInputStream.class.getName());
 
-    private static final byte[] BYTE_ARRAY_EMPTY = new byte[0];
+    public static final byte[] BYTE_ARRAY_EMPTY = new byte[0];
 
     private final List<ProgressListener> listeners = new ArrayList<>();
 

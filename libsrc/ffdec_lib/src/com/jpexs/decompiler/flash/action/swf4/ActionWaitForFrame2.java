@@ -29,7 +29,6 @@ import com.jpexs.decompiler.flash.action.special.ActionStore;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -100,16 +99,18 @@ public class ActionWaitForFrame2 extends Action implements ActionStore {
     }
 
     @Override
-    public byte[] getBytes(int version) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        SWFOutputStream sos = new SWFOutputStream(baos, version);
-        try {
-            sos.writeUI8(skipCount);
-            sos.close();
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
-        }
-        return surroundWithAction(baos.toByteArray(), version);
+    protected void getContentBytes(SWFOutputStream sos) throws IOException {
+        sos.writeUI8(skipCount);
+    }
+
+    /**
+     * Gets the length of action converted to bytes
+     *
+     * @return Length
+     */
+    @Override
+    protected int getContentBytesLength() {
+        return 1;
     }
 
     @Override

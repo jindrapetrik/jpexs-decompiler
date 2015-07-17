@@ -40,7 +40,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.FalseItem;
 import com.jpexs.decompiler.graph.model.TrueItem;
 import com.jpexs.helpers.Helper;
-import java.io.ByteArrayOutputStream;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -135,57 +135,95 @@ public class ActionPush extends Action {
     }
 
     @Override
-    public byte[] getBytes(int version) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        SWFOutputStream sos = new SWFOutputStream(baos, version);
-        try {
-            for (Object o : values) {
-                if (o instanceof String) {
-                    sos.writeUI8(0);
-                    sos.writeString((String) o);
-                } else if (o instanceof Float) {
-                    sos.writeUI8(1);
-                    sos.writeFLOAT((Float) o);
-                } else if (o instanceof Null) {
-                    sos.writeUI8(2);
-                } else if (o instanceof Undefined) {
-                    sos.writeUI8(3);
-                } else if (o instanceof RegisterNumber) {
-                    sos.writeUI8(4);
-                    sos.writeUI8(((RegisterNumber) o).number);
-                } else if (o instanceof Boolean) {
-                    sos.writeUI8(5);
-                    sos.writeUI8((Boolean) o ? 1 : 0);
-                } else if (o instanceof Double || o instanceof Long) {
-                    if (o instanceof Long) {
-                        long l = (Long) o;
-                        if (l < -0x80000000 || l > 0x7fffffff) {
-                            o = (double) l;
-                        }
-                    }
-                    if (o instanceof Double) {
-                        sos.writeUI8(6);
-                        sos.writeDOUBLE((Double) o);
-                    } else if (o instanceof Long) {
-                        sos.writeUI8(7);
-                        sos.writeSI32((Long) o);
-                    }
-                } else if (o instanceof ConstantIndex) {
-                    int cIndex = ((ConstantIndex) o).index;
-                    if (cIndex < 256) {
-                        sos.writeUI8(8);
-                        sos.writeUI8(cIndex);
-                    } else {
-                        sos.writeUI8(9);
-                        sos.writeUI16(cIndex);
+    protected void getContentBytes(SWFOutputStream sos) throws IOException {
+        for (Object o : values) {
+            if (o instanceof String) {
+                sos.writeUI8(0);
+                sos.writeString((String) o);
+            } else if (o instanceof Float) {
+                sos.writeUI8(1);
+                sos.writeFLOAT((Float) o);
+            } else if (o instanceof Null) {
+                sos.writeUI8(2);
+            } else if (o instanceof Undefined) {
+                sos.writeUI8(3);
+            } else if (o instanceof RegisterNumber) {
+                sos.writeUI8(4);
+                sos.writeUI8(((RegisterNumber) o).number);
+            } else if (o instanceof Boolean) {
+                sos.writeUI8(5);
+                sos.writeUI8((Boolean) o ? 1 : 0);
+            } else if (o instanceof Double || o instanceof Long) {
+                if (o instanceof Long) {
+                    long l = (Long) o;
+                    if (l < -0x80000000 || l > 0x7fffffff) {
+                        o = (double) l;
                     }
                 }
+                if (o instanceof Double) {
+                    sos.writeUI8(6);
+                    sos.writeDOUBLE((Double) o);
+                } else if (o instanceof Long) {
+                    sos.writeUI8(7);
+                    sos.writeSI32((Long) o);
+                }
+            } else if (o instanceof ConstantIndex) {
+                int cIndex = ((ConstantIndex) o).index;
+                if (cIndex < 256) {
+                    sos.writeUI8(8);
+                    sos.writeUI8(cIndex);
+                } else {
+                    sos.writeUI8(9);
+                    sos.writeUI16(cIndex);
+                }
             }
-            sos.close();
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
         }
-        return surroundWithAction(baos.toByteArray(), version);
+    }
+
+    /**
+     * Gets the length of action converted to bytes
+     *
+     * @return Length
+     */
+    @Override
+    protected int getContentBytesLength() {
+        int res = 0;
+        for (Object o : values) {
+            if (o instanceof String) {
+                res += Utf8Helper.getBytesLength((String) o) + 2;
+            } else if (o instanceof Float) {
+                res += 5;
+            } else if (o instanceof Null) {
+                res++;
+            } else if (o instanceof Undefined) {
+                res++;
+            } else if (o instanceof RegisterNumber) {
+                res += 2;
+            } else if (o instanceof Boolean) {
+                res += 2;
+            } else if (o instanceof Double || o instanceof Long) {
+                if (o instanceof Long) {
+                    long l = (Long) o;
+                    if (l < -0x80000000 || l > 0x7fffffff) {
+                        o = (double) l;
+                    }
+                }
+                if (o instanceof Double) {
+                    res += 9;
+                } else if (o instanceof Long) {
+                    res += 5;
+                }
+            } else if (o instanceof ConstantIndex) {
+                int cIndex = ((ConstantIndex) o).index;
+                if (cIndex < 256) {
+                    res += 2;
+                } else {
+                    res += 3;
+                }
+            }
+        }
+
+        return res;
     }
 
     public static boolean isValidValue(Object value) {

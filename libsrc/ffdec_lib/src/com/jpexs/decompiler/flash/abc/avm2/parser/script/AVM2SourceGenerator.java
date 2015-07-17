@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
@@ -218,7 +219,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         } catch (IOException ex) {
             Logger.getLogger(AVM2SourceGenerator.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return new byte[0];
+        return SWFInputStream.BYTE_ARRAY_EMPTY;
     }
 
     @Override

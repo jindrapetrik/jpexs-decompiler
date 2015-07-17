@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.types;
 
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ABCInputStream;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
@@ -92,7 +93,7 @@ public final class MethodBody implements Cloneable {
 
     public MethodBody(ABC abc) {
         this.traits = new Traits();
-        this.codeBytes = new byte[0];
+        this.codeBytes = SWFInputStream.BYTE_ARRAY_EMPTY;
         this.exceptions = new ABCException[0];
         this.abc = abc;
     }

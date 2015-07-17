@@ -39,7 +39,7 @@ public class JPEGTablesTag extends Tag {
      */
     public JPEGTablesTag(SWF swf) {
         super(swf, ID, NAME, null);
-        jpegData = new byte[0];
+        jpegData = SWFInputStream.BYTE_ARRAY_EMPTY;
     }
 
     public JPEGTablesTag(SWFInputStream sis, ByteArrayRange data) throws IOException {

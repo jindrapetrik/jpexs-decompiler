@@ -62,7 +62,7 @@ public class DefineFont4Tag extends CharacterTag {
         super(swf, ID, NAME, null);
         fontID = swf.getNextCharacterId();
         fontName = "New font";
-        fontData = new byte[0];
+        fontData = SWFInputStream.BYTE_ARRAY_EMPTY;
     }
 
     public DefineFont4Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
