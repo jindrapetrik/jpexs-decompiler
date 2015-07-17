@@ -1042,6 +1042,8 @@ public class CommandLineArgumentParser {
         }
         String[] validExportItems = new String[]{
             "script",
+            "script_as2",
+            "script_as3",
             "image",
             "shape",
             "morphshape",
@@ -1285,7 +1287,10 @@ public class CommandLineArgumentParser {
                 }
 
                 ScriptExportSettings scriptExportSettings = new ScriptExportSettings(enumFromStr(formats.get("script"), ScriptExportMode.class), singleScriptFile);
-                if (exportAll || exportFormats.contains("script")) {
+                boolean exportAllScript = exportAll || exportFormats.contains("script");
+                boolean exportAs2Script = exportAllScript || exportFormats.contains("script_as2");
+                boolean exportAs3Script = exportAllScript || exportFormats.contains("script_as3");
+                if (exportAs2Script || exportAs3Script) {
                     System.out.println("Exporting scripts...");
                     if (as3classes.isEmpty()) {
                         as3classes = parseSelectClassOld(args);
@@ -1301,7 +1306,7 @@ public class CommandLineArgumentParser {
                                 exportOK = swf.exportAS3Class(as3class, scriptsFolder, scriptExportSettings, parallel, evl) && exportOK;
                             }
                         } else {
-                            exportOK = swf.exportActionScript(handler, scriptsFolder, scriptExportSettings, parallel, evl) != null && exportOK;
+                            exportOK = swf.exportActionScript(handler, scriptsFolder, scriptExportSettings, parallel, evl, exportAs2Script, exportAs3Script) != null && exportOK;
                         }
                     }
                 }

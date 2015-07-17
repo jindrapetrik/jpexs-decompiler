@@ -1348,6 +1348,10 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     public List<File> exportActionScript(AbortRetryIgnoreHandler handler, String outdir, ScriptExportSettings exportSettings, boolean parallel, EventListener evl) throws IOException {
+        return exportActionScript(handler, outdir, exportSettings, parallel, evl, true, true);
+    }
+
+    public List<File> exportActionScript(AbortRetryIgnoreHandler handler, String outdir, ScriptExportSettings exportSettings, boolean parallel, EventListener evl, boolean as2, boolean as3) throws IOException {
         List<File> ret = new ArrayList<>();
 
         if (isAS3()) {
