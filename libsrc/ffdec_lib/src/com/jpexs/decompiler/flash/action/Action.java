@@ -962,17 +962,7 @@ public abstract class Action implements GraphSourceItem {
                     }
                     List<GraphTargetItem> out;
                     try {
-                        try {
-                            out = ActionGraph.translateViaGraph(cnt.getRegNames(), variables2, functions, actions.subList(adr2ip(actions, endAddr), adr2ip(actions, endAddr + size)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName));
-                        } catch (InterruptedException ex) {
-                            throw ex;
-                        } catch (Exception ex) {
-                            boolean inter = Thread.currentThread().isInterrupted();
-                            ActionList a = new ActionList(actions);
-                            String b = a.toString();
-                            String c = b;
-                            throw ex;
-                        }
+                        out = ActionGraph.translateViaGraph(cnt.getRegNames(), variables2, functions, actions.subList(adr2ip(actions, endAddr), adr2ip(actions, endAddr + size)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName));
                     } catch (OutOfMemoryError | TranslateException | StackOverflowError ex2) {
                         logger.log(Level.SEVERE, "Decompilation error in: " + path, ex2);
                         if (ex2 instanceof OutOfMemoryError) {

@@ -52,7 +52,6 @@ import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
-import com.jpexs.helpers.Stopwatch;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -424,9 +423,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
                 }
                 DisassemblyListener listener = getDisassemblyListener();
                 asm.addDisassemblyListener(listener);
-                Stopwatch sw = Stopwatch.startNew();
                 ActionList actions = asm.getActions();
-                System.out.println("t:" + sw.getElapsedMilliseconds());
                 lastCode = actions;
                 asm.removeDisassemblyListener(listener);
                 srcWithHex = null;
