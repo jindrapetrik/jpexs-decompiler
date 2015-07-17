@@ -107,11 +107,14 @@ public class ScriptPack extends AS3ClassTreeItem {
         return scriptName;
     }
 
-    public File getExportFile(String directory, ScriptExportSettings exportSettings) throws IOException {
+    public File getExportFile(String directory, ScriptExportSettings exportSettings) {
+        if (exportSettings.singleFile) {
+            return null;
+        }
+
         String scriptName = getPathScriptName();
         DottedChain packageName = getPathPackage();
         File outDir = new File(directory + File.separatorChar + packageName.toFilePath());
-        Path.createDirectorySafe(outDir);
         String fileName = outDir.toString() + File.separator + Helper.makeFileName(scriptName) + exportSettings.getFileExtension();
         return new File(fileName);
     }
@@ -189,15 +192,14 @@ public class ScriptPack extends AS3ClassTreeItem {
         appendTo(writer, traits, exportMode, parallel);
     }
 
-    public File export(String directory, ScriptExportSettings exportSettings, boolean parallel) throws IOException, InterruptedException {
-        File file = null;
-
+    public File export(File file, ScriptExportSettings exportSettings, boolean parallel) throws IOException, InterruptedException {
         if (!exportSettings.singleFile) {
-            file = getExportFile(directory, exportSettings);
             if (file.exists() && !Configuration.overwriteExistingFiles.get()) {
                 return file;
             }
         }
+
+        Path.createDirectorySafe(file.getParentFile());
 
         try (FileTextWriter writer = exportSettings.singleFile ? null : new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(file))) {
             FileTextWriter writer2 = exportSettings.singleFile ? exportSettings.singleFileWriter : writer;

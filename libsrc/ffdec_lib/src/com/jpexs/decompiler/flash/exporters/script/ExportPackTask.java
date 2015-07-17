@@ -36,7 +36,7 @@ public class ExportPackTask implements Callable<File> {
 
     ScriptPack pack;
 
-    String directory;
+    File file;
 
     ScriptExportSettings exportSettings;
 
@@ -56,9 +56,9 @@ public class ExportPackTask implements Callable<File> {
 
     EventListener eventListener;
 
-    public ExportPackTask(AbortRetryIgnoreHandler handler, int index, int count, ClassPath path, ScriptPack pack, String directory, ScriptExportSettings exportSettings, boolean parallel, EventListener evl) {
+    public ExportPackTask(AbortRetryIgnoreHandler handler, int index, int count, ClassPath path, ScriptPack pack, File file, ScriptExportSettings exportSettings, boolean parallel, EventListener evl) {
         this.pack = pack;
-        this.directory = directory;
+        this.file = file;
         this.exportSettings = exportSettings;
         this.path = path;
         this.index = index;
@@ -74,7 +74,7 @@ public class ExportPackTask implements Callable<File> {
             @Override
             public void run() throws IOException, InterruptedException {
                 startTime = System.currentTimeMillis();
-                this.result = pack.export(directory, exportSettings, parallel);
+                this.result = pack.export(file, exportSettings, parallel);
                 stopTime = System.currentTimeMillis();
             }
         };

@@ -1244,7 +1244,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                                 }
 
                                 Main.startWork(translate("work.exporting") + " " + (i + 1) + "/" + as3scripts.size() + " " + tls.getPath() + " ...", null);
-                                ret.add(tls.export(scriptsFolder, scriptExportSettings, parallel));
+                                File file = tls.getExportFile(scriptsFolder, scriptExportSettings);
+                                ret.add(tls.export(file, scriptExportSettings, parallel));
                             }
                         }
                     } else {

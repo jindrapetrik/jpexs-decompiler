@@ -1274,7 +1274,8 @@ public final class SWF implements SWFContainerItem, Timelined {
                 }
                 String eventData = cnt + scr.getPath() + " ...";
                 evl.handleExportingEvent("tag", i + 1, abcList.size(), eventData);
-                scr.export(outdir, exportSettings, parallel);
+                File file = scr.getExportFile(outdir, exportSettings);
+                scr.export(file, exportSettings, parallel);
                 evl.handleExportedEvent("tag", i + 1, abcList.size(), eventData);
                 exported = true;
             }
