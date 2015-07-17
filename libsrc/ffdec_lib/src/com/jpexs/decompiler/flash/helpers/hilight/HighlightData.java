@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.helpers.hilight;
 
+import com.jpexs.decompiler.graph.DottedChain;
 import java.io.Serializable;
 
 /**
@@ -26,7 +27,7 @@ public class HighlightData implements Cloneable, Serializable {
 
     public boolean declaration;
 
-    public String declaredType;
+    public DottedChain declaredType;
 
     public String localName;
 

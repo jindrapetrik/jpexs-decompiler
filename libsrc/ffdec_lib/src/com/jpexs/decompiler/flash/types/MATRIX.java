@@ -175,12 +175,12 @@ public class MATRIX implements Serializable {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 37 * hash + this.getScaleX();
-        hash = 37 * hash + this.getScaleY();
-        hash = 37 * hash + this.getRotateSkew0();
-        hash = 37 * hash + this.getRotateSkew1();
-        hash = 37 * hash + this.translateX;
-        hash = 37 * hash + this.translateY;
+        hash = 37 * hash + getScaleX();
+        hash = 37 * hash + getScaleY();
+        hash = 37 * hash + getRotateSkew0();
+        hash = 37 * hash + getRotateSkew1();
+        hash = 37 * hash + translateX;
+        hash = 37 * hash + translateY;
         return hash;
     }
 
@@ -193,22 +193,22 @@ public class MATRIX implements Serializable {
             return false;
         }
         final MATRIX other = (MATRIX) obj;
-        if (this.getScaleX() != other.getScaleX()) {
+        if (getScaleX() != other.getScaleX()) {
             return false;
         }
-        if (this.getScaleY() != other.getScaleY()) {
+        if (getScaleY() != other.getScaleY()) {
             return false;
         }
-        if (this.getRotateSkew0() != other.getRotateSkew0()) {
+        if (getRotateSkew0() != other.getRotateSkew0()) {
             return false;
         }
-        if (this.getRotateSkew1() != other.getRotateSkew1()) {
+        if (getRotateSkew1() != other.getRotateSkew1()) {
             return false;
         }
-        if (this.translateX != other.translateX) {
+        if (translateX != other.translateX) {
             return false;
         }
-        if (this.translateY != other.translateY) {
+        if (translateY != other.translateY) {
             return false;
         }
         return true;

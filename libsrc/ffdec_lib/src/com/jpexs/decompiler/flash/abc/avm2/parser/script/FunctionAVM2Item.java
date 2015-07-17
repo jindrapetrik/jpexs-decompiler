@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -60,11 +61,12 @@ public class FunctionAVM2Item extends AVM2Item {
 
     public boolean isInterface;
 
-    public String pkg;
+    public DottedChain pkg;
 
     public List<Map.Entry<String, Map<String, String>>> metadata;
 
-    public FunctionAVM2Item(List<Map.Entry<String, Map<String, String>>> metadata, String pkg, boolean isInterface, boolean needsActivation, int namespace, boolean hasRest, int line, String functionName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<AssignableAVM2Item> subvariables, GraphTargetItem retType) {
+    public FunctionAVM2Item(List<Map.Entry<String, Map<String, String>>> metadata, DottedChain pkg, boolean isInterface, boolean needsActivation, int namespace, boolean hasRest, int line, String functionName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<AssignableAVM2Item> subvariables, GraphTargetItem retType) {
+
         super(null, NOPRECEDENCE);
         this.metadata = metadata;
         this.pkg = pkg;
@@ -89,7 +91,7 @@ public class FunctionAVM2Item extends AVM2Item {
 
     @Override
     public GraphTargetItem returnType() {
-        return new TypeItem("Function");
+        return new TypeItem(DottedChain.FUNCTION);
     }
 
     @Override

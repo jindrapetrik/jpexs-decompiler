@@ -75,13 +75,13 @@ public class Graph {
      * Identify loop exits
      *
      * @param localData
-     * @param N All nodes
+     * @param allParts All nodes
      * @return
      */
-    public Map<GraphPart, List<GraphPart>> identifyLoopBreaks(BaseLocalData localData, List<GraphPart> N) {
+    public Map<GraphPart, List<GraphPart>> identifyLoopBreaks(BaseLocalData localData, Set<GraphPart> allParts) {
         Map<GraphPart, List<GraphPart>> lb = new HashMap<>();
 
-        for (GraphPart b0 : N) {
+        for (GraphPart b0 : allParts) {
             List<GraphPart> np = new ArrayList<>(b0.nextParts);
             np.addAll(b0.throwParts);
             for (GraphPart b : np) {
@@ -107,10 +107,10 @@ public class Graph {
      * @param localData
      * @param loopContinues Result - list of loop headers
      * @param heads Entries
-     * @param N All Nodes
+     * @param appParts All Nodes
      */
-    public void identifyLoops(BaseLocalData localData, List<GraphPart> loopContinues, List<GraphPart> heads, List<GraphPart> N) {
-        for (GraphPart b : N) {
+    public void identifyLoops(BaseLocalData localData, List<GraphPart> loopContinues, List<GraphPart> heads, Set<GraphPart> appParts) {
+        for (GraphPart b : appParts) {
             b.traversed = false;
             b.DFSP_pos = 0;
             b.irreducible = false;
@@ -169,7 +169,7 @@ public class Graph {
         folParts.addAll(b0.throwParts);
 
         b0.traversed = true;
-        b0.DFSP_pos = DFSP_pos; //Mark b0’s position in DFSP 
+        b0.DFSP_pos = DFSP_pos; //Mark b0’s position in DFSP
         for (GraphPart b : folParts) {
             b = checkPart(null, localData, b, null);
             if (b == null) {
@@ -180,7 +180,7 @@ public class Graph {
                 GraphPart nh = trav_loops_DFS(localData, loopHeaders, b, DFSP_pos + 1);
                 tag_lhead(b0, nh);
             } else {
-                if (b.DFSP_pos > 0) {  // b in DFSP(b0) 
+                if (b.DFSP_pos > 0) {  // b in DFSP(b0)
                     //case (B)
                     if (b.type != GraphPart.TYPE_LOOP_HEADER) {
                         b.type = GraphPart.TYPE_LOOP_HEADER;
@@ -194,7 +194,7 @@ public class Graph {
                     if (h.DFSP_pos > 0) {  // h in DFSP(b0)
                         //case (D)
                         tag_lhead(b0, h);
-                    } else { // h not in DFSP(b0) 
+                    } else { // h not in DFSP(b0)
                         //case (E), reentry
                         b.type = GraphPart.TYPE_REENTRY; //TODO:and b0,b ?
                         h.irreducible = true;
@@ -233,7 +233,7 @@ public class Graph {
         }
     }
 
-    protected static void populateParts(GraphPart part, List<GraphPart> allParts) {
+    protected static void populateParts(GraphPart part, Set<GraphPart> allParts) {
         if (allParts.contains(part)) {
             return;
         }
@@ -243,40 +243,43 @@ public class Graph {
         }
     }
 
-    public GraphPart deepCopy(GraphPart part, List<GraphPart> visited, List<GraphPart> copies) {
-        if (visited == null) {
-            visited = new ArrayList<>();
+    public GraphPart deepCopy(GraphPart part) {
+        return deepCopy(part, new HashMap<>());
+    }
+
+    private GraphPart deepCopy(GraphPart part, Map<GraphPart, GraphPart> copies) {
+        GraphPart copy = copies.get(part);
+        if (copy != null) {
+            return copy;
         }
-        if (copies == null) {
-            copies = new ArrayList<>();
-        }
-        if (visited.contains(part)) {
-            return copies.get(visited.indexOf(part));
-        }
-        visited.add(part);
-        GraphPart copy = new GraphPart(part.start, part.end);
+
+        copy = new GraphPart(part.start, part.end);
         copy.path = part.path;
-        copies.add(copy);
+        copies.put(part, copy);
         copy.nextParts = new ArrayList<>();
         for (int i = 0; i < part.nextParts.size(); i++) {
-            copy.nextParts.add(deepCopy(part.nextParts.get(i), visited, copies));
+            copy.nextParts.add(deepCopy(part.nextParts.get(i), copies));
         }
+
         for (int i = 0; i < part.refs.size(); i++) {
-            copy.refs.add(deepCopy(part.refs.get(i), visited, copies));
+            copy.refs.add(deepCopy(part.refs.get(i), copies));
         }
+
         return copy;
     }
 
-    public void resetGraph(GraphPart part, List<GraphPart> visited) {
+    public void resetGraph(GraphPart part, Set<GraphPart> visited) {
         if (visited.contains(part)) {
             return;
         }
+
         visited.add(part);
         int pos = 0;
         for (GraphPart p : part.nextParts) {
             if (!visited.contains(p)) {
                 p.path = part.path.sub(pos, p.end);
             }
+
             resetGraph(p, visited);
             pos++;
         }
@@ -567,7 +570,7 @@ public class Graph {
     }
 
     public List<GraphTargetItem> translate(BaseLocalData localData, int staticOperation, String path) throws InterruptedException {
-        List<GraphPart> allParts = new ArrayList<>();
+        Set<GraphPart> allParts = new HashSet<>();
         for (GraphPart head : heads) {
             populateParts(head, allParts);
         }
@@ -919,11 +922,11 @@ public class Graph {
         return false;
     }
 
-    protected List<GraphTargetItem> check(Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, GraphSource code, BaseLocalData localData, List<GraphPart> allParts, TranslateStack stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> output, Loop currentLoop, int staticOperation, String path) throws InterruptedException {
+    protected List<GraphTargetItem> check(Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, GraphSource code, BaseLocalData localData, Set<GraphPart> allParts, TranslateStack stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> output, Loop currentLoop, int staticOperation, String path) throws InterruptedException {
         return null;
     }
 
-    protected GraphPart checkPart(TranslateStack stack, BaseLocalData localData, GraphPart part, List<GraphPart> allParts) {
+    protected GraphPart checkPart(TranslateStack stack, BaseLocalData localData, GraphPart part, Set<GraphPart> allParts) {
         return part;
     }
 
@@ -995,9 +998,8 @@ public class Graph {
         list.remove(list.size() - 1);
     }
 
-    protected List<GraphTargetItem> printGraph(Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, BaseLocalData localData, TranslateStack stack, List<GraphPart> allParts, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, int staticOperation, String path) throws InterruptedException {
-        List<GraphPart> visited = new ArrayList<>();
-        return printGraph(partCodes, partCodePos, visited, localData, stack, allParts, parent, part, stopPart, loops, null, staticOperation, path, 0);
+    protected List<GraphTargetItem> printGraph(Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, BaseLocalData localData, TranslateStack stack, Set<GraphPart> allParts, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, int staticOperation, String path) throws InterruptedException {
+        return printGraph(partCodes, partCodePos, new HashSet<>(), localData, stack, allParts, parent, part, stopPart, loops, null, staticOperation, path, 0);
     }
 
     protected GraphTargetItem checkLoop(LoopItem loopItem, BaseLocalData localData, List<Loop> loops) {
@@ -1005,7 +1007,7 @@ public class Graph {
     }
 
     //TODO: Make this faster!!!
-    private void getPrecontinues(String path, BaseLocalData localData, GraphPart parent, GraphPart part, List<GraphPart> allParts, List<Loop> loops, List<GraphPart> stopPart) throws InterruptedException {
+    private void getPrecontinues(String path, BaseLocalData localData, GraphPart parent, GraphPart part, Set<GraphPart> allParts, List<Loop> loops, List<GraphPart> stopPart) throws InterruptedException {
         try {
             markLevels(path, localData, part, allParts, loops);
         } catch (ThreadDeath | InterruptedException iex) {
@@ -1063,13 +1065,13 @@ public class Graph {
          clearLoops(loops);*/
     }
 
-    private void markLevels(String path, BaseLocalData localData, GraphPart part, List<GraphPart> allParts, List<Loop> loops) throws InterruptedException {
+    private void markLevels(String path, BaseLocalData localData, GraphPart part, Set<GraphPart> allParts, List<Loop> loops) throws InterruptedException {
         clearLoops(loops);
-        markLevels(path, localData, part, allParts, loops, new ArrayList<>(), 1, new ArrayList<>(), 0);
+        markLevels(path, localData, part, allParts, loops, new ArrayList<>(), 1, new HashSet<>(), 0);
         clearLoops(loops);
     }
 
-    private void markLevels(String path, BaseLocalData localData, GraphPart part, List<GraphPart> allParts, List<Loop> loops, List<GraphPart> stopPart, int level, List<GraphPart> visited, int recursionLevel) throws InterruptedException {
+    private void markLevels(String path, BaseLocalData localData, GraphPart part, Set<GraphPart> allParts, List<Loop> loops, List<GraphPart> stopPart, int level, Set<GraphPart> visited, int recursionLevel) throws InterruptedException {
         boolean debugMode = false;
         if (stopPart == null) {
             stopPart = new ArrayList<>();
@@ -1499,7 +1501,7 @@ public class Graph {
         }
     }
 
-    protected List<GraphTargetItem> printGraph(Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, List<GraphPart> visited, BaseLocalData localData, TranslateStack stack, List<GraphPart> allParts, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> ret, int staticOperation, String path, int recursionLevel) throws InterruptedException {
+    protected List<GraphTargetItem> printGraph(Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, BaseLocalData localData, TranslateStack stack, Set<GraphPart> allParts, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> ret, int staticOperation, String path, int recursionLevel) throws InterruptedException {
         if (Thread.currentThread().isInterrupted()) {
             throw new InterruptedException();
         }

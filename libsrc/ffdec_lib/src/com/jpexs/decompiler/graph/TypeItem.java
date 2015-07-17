@@ -32,15 +32,15 @@ import java.util.Objects;
  */
 public class TypeItem extends GraphTargetItem {
 
-    public static TypeItem BOOLEAN = new TypeItem("Boolean");
+    public static TypeItem BOOLEAN = new TypeItem(DottedChain.BOOLEAN);
 
-    public static TypeItem STRING = new TypeItem("String");
+    public static TypeItem STRING = new TypeItem(DottedChain.STRING);
 
-    public static TypeItem ARRAY = new TypeItem("Array");
+    public static TypeItem ARRAY = new TypeItem(DottedChain.ARRAY);
 
     public static UnboundedTypeItem UNBOUNDED = new UnboundedTypeItem();
 
-    public DottedChain fullTypeName;
+    public final DottedChain fullTypeName;
 
     public TypeItem(String s) {
         this(s == null ? new DottedChain() : new DottedChain(s.split("\\.")));
@@ -58,7 +58,7 @@ public class TypeItem extends GraphTargetItem {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 83 * hash + Objects.hashCode(this.fullTypeName);
+        hash = 83 * hash + Objects.hashCode(fullTypeName);
         return hash;
     }
 
@@ -71,7 +71,7 @@ public class TypeItem extends GraphTargetItem {
             return false;
         }
         final TypeItem other = (TypeItem) obj;
-        if (!Objects.equals(this.fullTypeName, other.fullTypeName)) {
+        if (!Objects.equals(fullTypeName, other.fullTypeName)) {
             return false;
         }
         return true;
@@ -79,10 +79,11 @@ public class TypeItem extends GraphTargetItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        boolean as3 = localData.constantsAvm2 != null;
         if (localData.fullyQualifiedNames.contains(fullTypeName)) {
-            writer.hilightSpecial(IdentifiersDeobfuscation.printNamespace(localData.constantsAvm2 != null, fullTypeName.toPrintableString()), HighlightSpecialType.TYPE_NAME, fullTypeName.toPrintableString());
+            writer.hilightSpecial(fullTypeName.toPrintableString(as3), HighlightSpecialType.TYPE_NAME, fullTypeName.toPrintableString(as3));
         } else {
-            writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(localData.constantsAvm2 != null, fullTypeName.getLast()), HighlightSpecialType.TYPE_NAME, fullTypeName.toPrintableString());
+            writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(as3, fullTypeName.getLast()), HighlightSpecialType.TYPE_NAME, fullTypeName.toPrintableString(as3));
         }
 
         return writer;
@@ -100,7 +101,7 @@ public class TypeItem extends GraphTargetItem {
 
     @Override
     public String toString() {
-        return fullTypeName.toString();
+        return fullTypeName.toRawString();
     }
 
     @Override

@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
@@ -57,7 +58,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public String toString(ABC abc, List<String> fullyQualifiedNames) {
+    public String toString(ABC abc, List<DottedChain> fullyQualifiedNames) {
         String typeStr = "*";
         if (type_index > 0) {
             typeStr = abc.constants.getMultiname(type_index).toString(abc.constants, fullyQualifiedNames);
@@ -65,7 +66,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         return "0x" + Helper.formatAddress(fileOffset) + " " + Helper.byteArrToString(bytes) + " SlotConst " + abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " slot=" + slot_id + " type=" + typeStr + " value=" + (new ValueKind(value_index, value_kind)).toString(abc.constants) + " metadata=" + Helper.intArrToString(metadata);
     }
 
-    public String getType(AVM2ConstantPool constants, List<String> fullyQualifiedNames) {
+    public String getType(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames) {
         String typeStr = "*";
         if (type_index > 0) {
             typeStr = constants.getMultiname(type_index).getName(constants, fullyQualifiedNames, false);
@@ -73,7 +74,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         return typeStr;
     }
 
-    public GraphTextWriter getNameStr(GraphTextWriter writer, ABC abc, List<String> fullyQualifiedNames) {
+    public GraphTextWriter getNameStr(GraphTextWriter writer, ABC abc, List<DottedChain> fullyQualifiedNames) {
         String typeStr = getType(abc.constants, fullyQualifiedNames);
         if (typeStr.equals("*")) {
             typeStr = "";
@@ -98,7 +99,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         return writer;
     }
 
-    public void getValueStr(Trait parent, GraphTextWriter writer, ABC abc, List<String> fullyQualifiedNames) throws InterruptedException {
+    public void getValueStr(Trait parent, GraphTextWriter writer, ABC abc, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
         if (assignedValue != null) {
             if (parent instanceof TraitClass) {
                 TraitClass tc = (TraitClass) parent;
@@ -136,7 +137,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public GraphTextWriter toString(Trait parent, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) throws InterruptedException {
+    public GraphTextWriter toString(Trait parent, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
         getMetaData(abc, writer);
         Multiname n = getName(abc);
         boolean showModifier = true;
@@ -162,7 +163,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public void convert(Trait parent, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<String> fullyQualifiedNames, boolean parallel) throws InterruptedException {
+    public void convert(Trait parent, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
         getNameStr(writer, abc, fullyQualifiedNames);
         if (assignedValue != null || value_kind != 0) {
             getValueStr(parent, writer, abc, fullyQualifiedNames);

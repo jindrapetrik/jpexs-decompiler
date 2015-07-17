@@ -19,6 +19,7 @@ package com.jpexs.decompiler.graph;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -30,7 +31,7 @@ public class GraphPath implements Serializable {
 
     private final List<Integer> vals = new ArrayList<>();
 
-    public String rootName = "";
+    public final String rootName;
 
     public GraphPath(String rootName, List<Integer> keys, List<Integer> vals) {
         this.rootName = rootName;
@@ -39,8 +40,13 @@ public class GraphPath implements Serializable {
     }
 
     public GraphPath(List<Integer> keys, List<Integer> vals) {
+        rootName = "";
         this.keys.addAll(keys);
         this.vals.addAll(vals);
+    }
+
+    public GraphPath() {
+        rootName = "";
     }
 
     public boolean startsWith(GraphPath p) {
@@ -52,10 +58,10 @@ public class GraphPath implements Serializable {
         List<Integer> otherVals = new ArrayList<>(p.vals);
 
         for (int i = 0; i < p.length(); i++) {
-            if (keys.get(i) != otherKeys.get(i)) {
+            if (!Objects.equals(keys.get(i), otherKeys.get(i))) {
                 return false;
             }
-            if (vals.get(i) != otherVals.get(i)) {
+            if (!Objects.equals(vals.get(i), otherVals.get(i))) {
                 return false;
             }
         }
@@ -82,9 +88,6 @@ public class GraphPath implements Serializable {
         this.rootName = rootName;
     }
 
-    public GraphPath() {
-    }
-
     public int length() {
         return vals.size();
     }
@@ -100,9 +103,9 @@ public class GraphPath implements Serializable {
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 23 * hash + (this.keys != null ? this.keys.hashCode() : 0);
-        hash = 23 * hash + (this.vals != null ? this.vals.hashCode() : 0);
-        hash = 23 * hash + (this.rootName != null ? this.rootName.hashCode() : 0);
+        hash = 23 * hash + arrHashCode(keys);
+        hash = 23 * hash + arrHashCode(vals);
+        hash = 23 * hash + Objects.hashCode(rootName);
         return hash;
     }
 
@@ -115,26 +118,36 @@ public class GraphPath implements Serializable {
             return false;
         }
         final GraphPath other = (GraphPath) obj;
-        if (this.rootName == null && other.rootName != null) {
-            return false;
-        }
-        if (this.rootName != null && other.rootName == null) {
+        if ((rootName == null) != (other.rootName == null)) {
             return false;
         }
 
-        if (this.rootName != null && other.rootName != null) {
-            if (!this.rootName.equals(other.rootName)) {
-                return false;
-            }
+        if (!Objects.equals(rootName, other.rootName)) {
+            return false;
         }
 
         if (!arrMatch(keys, other.keys)) {
             return false;
         }
+
         if (!arrMatch(vals, other.vals)) {
             return false;
         }
+
         return true;
+    }
+
+    private static int arrHashCode(List<Integer> arr) {
+        if (arr == null || arr.isEmpty()) {
+            return 0;
+        }
+
+        int hash = 5;
+        for (Integer i : arr) {
+            hash = 23 * hash + Objects.hashCode(i);
+        }
+
+        return hash;
     }
 
     private static boolean arrMatch(List<Integer> arr, List<Integer> arr2) {
@@ -142,7 +155,7 @@ public class GraphPath implements Serializable {
             return false;
         }
         for (int i = 0; i < arr.size(); i++) {
-            if (arr.get(i) != arr2.get(i)) {
+            if (!Objects.equals(arr.get(i), arr2.get(i))) {
                 return false;
             }
         }

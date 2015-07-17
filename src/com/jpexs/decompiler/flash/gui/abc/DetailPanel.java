@@ -28,7 +28,6 @@ import java.awt.CardLayout;
 import java.awt.FlowLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -188,7 +187,7 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
             traitNameLabel.setText("-");
         } else {
             if (abcPanel != null) {
-                traitNameLabel.setText(trait.getName(abcPanel.abc).getName(abcPanel.abc.constants, new ArrayList<>(), false));
+                traitNameLabel.setText(trait.getName(abcPanel.abc).getName(abcPanel.abc.constants, null, false));
             }
         }
     }

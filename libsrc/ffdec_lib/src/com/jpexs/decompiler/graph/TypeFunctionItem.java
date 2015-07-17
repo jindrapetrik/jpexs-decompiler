@@ -45,7 +45,7 @@ public class TypeFunctionItem extends GraphTargetItem {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 83 * hash + Objects.hashCode(this.fullTypeName);
+        hash = 83 * hash + Objects.hashCode(fullTypeName);
         return hash;
     }
 
@@ -58,7 +58,7 @@ public class TypeFunctionItem extends GraphTargetItem {
             return false;
         }
         final TypeFunctionItem other = (TypeFunctionItem) obj;
-        if (!Objects.equals(this.fullTypeName, other.fullTypeName)) {
+        if (!Objects.equals(fullTypeName, other.fullTypeName)) {
             return false;
         }
         return true;

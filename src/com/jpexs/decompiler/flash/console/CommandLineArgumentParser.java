@@ -83,6 +83,7 @@ import com.jpexs.decompiler.flash.importers.BinaryDataImporter;
 import com.jpexs.decompiler.flash.importers.ImageImporter;
 import com.jpexs.decompiler.flash.importers.ShapeImporter;
 import com.jpexs.decompiler.flash.importers.SwfXmlImporter;
+import com.jpexs.decompiler.flash.importers.TextImporter;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
@@ -95,8 +96,11 @@ import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
+import com.jpexs.decompiler.flash.tags.base.MissingCharacterHandler;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
+import com.jpexs.decompiler.flash.tags.base.TextImportErrorHandler;
+import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.RECT;
@@ -107,6 +111,7 @@ import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.streams.SeekableInputStream;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import com.sun.jna.Platform;
 import com.sun.jna.platform.win32.Kernel32;
 import gnu.jpdf.PDFJob;
@@ -159,7 +164,8 @@ public class CommandLineArgumentParser {
         Configuration.parallelSpeedUp,
         Configuration.internalFlashViewer,
         Configuration.autoDeobfuscate,
-        Configuration.cacheOnDisk
+        Configuration.cacheOnDisk,
+        Configuration.overwriteExistingFiles
     };
 
     public static boolean isCommandLineMode() {
@@ -316,7 +322,7 @@ public class CommandLineArgumentParser {
         out.println(" " + (cnt++) + ") -zoom <N>");
         out.println(" ...apply zoom during export (currently for FlashPaper conversion only)");
         out.println(" " + (cnt++) + ") -replace <infile> <outfile> (<characterId1>|<scriptName1>) <importDataFile1> [methodBodyIndex1] [(<characterId2>|<scriptName2>) <importDataFile2> [methodBodyIndex2]]...");
-        out.println(" ...replaces the data of the specified BinaryData, Image, DefineSound tag or Script");
+        out.println(" ...replaces the data of the specified BinaryData, Image, Text, DefineSound tag or Script");
         out.println(" ...methodBodyIndexN parameter should be specified if and only if the imported entity is an AS3 P-Code");
         out.println(" " + (cnt++) + ") -replaceAlpha <infile> <outfile> <imageId1> <importDataFile1> [<imageId2> <importDataFile2>]...");
         out.println(" ...replaces the alpha channel of the specified JPEG3 or JPEG4 tag");
@@ -579,9 +585,6 @@ public class CommandLineArgumentParser {
             }
             String key = cp[0];
             String value = cp[1];
-            if (key.toLowerCase().equals("paralelSpeedUp".toLowerCase())) {
-                key = "parallelSpeedUp";
-            }
             for (ConfigurationItem<Boolean> item : commandlineConfigBoolean) {
                 if (key.toLowerCase().equals(item.getName().toLowerCase())) {
                     Boolean bValue = parseBooleanConfigValue(value);
@@ -1039,6 +1042,8 @@ public class CommandLineArgumentParser {
         }
         String[] validExportItems = new String[]{
             "script",
+            "script_as2",
+            "script_as3",
             "image",
             "shape",
             "morphshape",
@@ -1282,7 +1287,10 @@ public class CommandLineArgumentParser {
                 }
 
                 ScriptExportSettings scriptExportSettings = new ScriptExportSettings(enumFromStr(formats.get("script"), ScriptExportMode.class), singleScriptFile);
-                if (exportAll || exportFormats.contains("script")) {
+                boolean exportAllScript = exportAll || exportFormats.contains("script");
+                boolean exportAs2Script = exportAllScript || exportFormats.contains("script_as2");
+                boolean exportAs3Script = exportAllScript || exportFormats.contains("script_as3");
+                if (exportAs2Script || exportAs3Script) {
                     System.out.println("Exporting scripts...");
                     if (as3classes.isEmpty()) {
                         as3classes = parseSelectClassOld(args);
@@ -1298,7 +1306,7 @@ public class CommandLineArgumentParser {
                                 exportOK = swf.exportAS3Class(as3class, scriptsFolder, scriptExportSettings, parallel, evl) && exportOK;
                             }
                         } else {
-                            exportOK = swf.exportActionScript(handler, scriptsFolder, scriptExportSettings, parallel, evl) != null && exportOK;
+                            exportOK = swf.exportActionScript(handler, scriptsFolder, scriptExportSettings, parallel, evl, exportAs2Script, exportAs3Script) != null && exportOK;
                         }
                     }
                 }
@@ -1398,7 +1406,7 @@ public class CommandLineArgumentParser {
                 inFile.delete();
                 tmpFile.renameTo(inFile);
                 tmpFile = null;
-                System.out.println("" + inFile + " overwritten.");
+                System.out.println(inFile + " overwritten.");
             }
             System.out.println("OK");
         } catch (FileNotFoundException ex) {
@@ -1788,6 +1796,24 @@ public class CommandLineArgumentParser {
                         } else if (characterTag instanceof ShapeTag) {
                             ShapeTag shapeTag = (ShapeTag) characterTag;
                             new ShapeImporter().importImage(shapeTag, data);
+                        } else if (characterTag instanceof TextTag) {
+                            TextTag textTag = (TextTag) characterTag;
+                            new TextImporter(new MissingCharacterHandler(), new TextImportErrorHandler() {
+
+                                @Override
+                                public boolean handle(TextTag textTag) {
+                                    String msg = "Error during text import.";
+                                    logger.log(Level.SEVERE, msg);
+                                    return false;
+                                }
+
+                                @Override
+                                public boolean handle(TextTag textTag, String message, long line) {
+                                    String msg = "Error during text import: %text% on line %line%".replace("%text%", message).replace("%line%", Long.toString(line));
+                                    logger.log(Level.SEVERE, msg);
+                                    return false;
+                                }
+                            }).importText(textTag, new String(data, Utf8Helper.charset));
                         } else if (characterTag instanceof SoundTag) {
                             SoundTag st = (SoundTag) characterTag;
                             int soundFormat = SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN;

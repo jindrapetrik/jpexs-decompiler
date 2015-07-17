@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.tags.DoABC2Tag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.ScopeStack;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
@@ -60,7 +61,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
             }
         }
         assertNotNull(tag);
-        clsIndex = tag.getABC().findClassByName("classes.Test");
+        clsIndex = tag.getABC().findClassByName(new DottedChain("classes", "Test"));
         assertTrue(clsIndex > -1);
         this.abc = tag.getABC();
         Configuration.autoDeobfuscate.set(false);

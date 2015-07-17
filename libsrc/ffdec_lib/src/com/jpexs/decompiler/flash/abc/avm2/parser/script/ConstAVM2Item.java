@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
@@ -43,7 +44,7 @@ public class ConstAVM2Item extends AVM2Item {
 
     public int line;
 
-    public String pkg;
+    public DottedChain pkg;
 
     public int getNamespace() {
         return namespace;
@@ -53,7 +54,8 @@ public class ConstAVM2Item extends AVM2Item {
         return isStatic;
     }
 
-    public ConstAVM2Item(List<Map.Entry<String, Map<String, String>>> metadata, String pkg, String customNamespace, boolean isStatic, int namespace, String var, GraphTargetItem type, GraphTargetItem value, int line) {
+    public ConstAVM2Item(List<Map.Entry<String, Map<String, String>>> metadata, DottedChain pkg, String customNamespace, boolean isStatic, int namespace, String var, GraphTargetItem type, GraphTargetItem value, int line) {
+
         super(null, NOPRECEDENCE, value);
         this.metadata = metadata;
         this.pkg = pkg;

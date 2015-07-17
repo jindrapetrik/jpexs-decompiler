@@ -282,7 +282,7 @@ public class ABC {
         }
     }
 
-    public void deobfuscateIdentifiers(HashMap<String, String> namesMap, RenameType renameType, boolean classesOnly) {
+    public void deobfuscateIdentifiers(HashMap<DottedChain, DottedChain> namesMap, RenameType renameType, boolean classesOnly) {
         Set<Integer> stringUsages = getStringUsages();
         Set<Integer> namespaceUsages = getNsStringUsages();
         Map<Integer, String> stringUsageTypes = new HashMap<>();
@@ -822,7 +822,7 @@ public class ABC {
                     if (t instanceof TraitSlotConst) {
                         TraitSlotConst s = ((TraitSlotConst) t);
                         if (s.isNamespace()) {
-                            String key = constants.getNamespace(s.value_index).getName(constants, true); // assume not null
+                            String key = constants.getNamespace(s.value_index).getName(constants).toRawString(); // assume not null
                             DottedChain val = constants.getMultiname(s.name_index).getNameWithNamespace(constants);
                             map.put(key, val);
                         }
@@ -857,13 +857,19 @@ public class ABC {
         return bodyIdxFromMethodIdx;
     }
 
-    public DottedChain nsValueToName(String value) {
-        if (getNamespaceMap().containsKey(value)) {
-            return getNamespaceMap().get(value);
+    public DottedChain nsValueToName(DottedChain value) {
+        if (value == null) {
+            return null;
+        }
+
+        String valueStr = value.toRawString();
+
+        if (getNamespaceMap().containsKey(valueStr)) {
+            return getNamespaceMap().get(valueStr);
         } else {
-            DottedChain ns = getDeobfuscation().builtInNs(value);
+            DottedChain ns = getDeobfuscation().builtInNs(valueStr);
             if (ns == null) {
-                return new DottedChain("");
+                return DottedChain.EMPTY;
             } else {
                 return ns;
             }
@@ -1037,10 +1043,15 @@ public class ABC {
         return findMethodBodyByName(classId, methodName);
     }
 
+    public int findClassByName(DottedChain name) {
+        String str = name == null ? null : name.toRawString();
+        return findClassByName(str);
+    }
+
     public int findClassByName(String name) {
         for (int c = 0; c < instance_info.size(); c++) {
             DottedChain s = constants.getMultiname(instance_info.get(c).name_index).getNameWithNamespace(constants);
-            if (name.equals(s.toString())) {
+            if (name.equals(s.toRawString())) {
                 return c;
             }
         }

@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
+import com.jpexs.decompiler.graph.DottedChain;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,7 +73,7 @@ public class ScriptInfo {
             Namespace ns = name.getNamespace(abc.constants);
             if ((ns.kind == Namespace.KIND_PACKAGE_INTERNAL)
                     || (ns.kind == Namespace.KIND_PACKAGE)) {
-                String packageName = ns.getName(abc.constants, false); // assume not null package
+                DottedChain packageName = ns.getName(abc.constants); // assume not null package
                 String objectName = name.getName(abc.constants, null, false);
                 List<Integer> traitIndices = new ArrayList<>();
 
@@ -82,7 +83,7 @@ public class ScriptInfo {
                     otherTraits.clear();
                 }
 
-                if (packagePrefix == null || packageName.startsWith(packagePrefix)) {
+                if (packagePrefix == null || packageName.toPrintableString(true).startsWith(packagePrefix)) {
                     ClassPath cp = new ClassPath(packageName, objectName);
                     ret.add(new ScriptPack(cp, abc, allAbcs, scriptIndex, traitIndices));
                 }
@@ -103,7 +104,7 @@ public class ScriptInfo {
         return "method_index=" + init_index + "\r\n" + traits.toString();
     }
 
-    public String toString(ABC abc, List<String> fullyQualifiedNames) {
+    public String toString(ABC abc, List<DottedChain> fullyQualifiedNames) {
         return "method_index=" + init_index + "\r\n" + traits.toString(abc, fullyQualifiedNames);
     }
 

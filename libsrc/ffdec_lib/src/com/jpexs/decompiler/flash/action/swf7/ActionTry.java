@@ -33,7 +33,7 @@ import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.helpers.Helper;
-import java.io.ByteArrayOutputStream;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -95,27 +95,34 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
     }
 
     @Override
-    public byte[] getBytes(int version) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        SWFOutputStream sos = new SWFOutputStream(baos, version);
-        try {
-            sos.writeUB(5, reserved);
-            sos.writeUB(1, catchInRegisterFlag ? 1 : 0);
-            sos.writeUB(1, finallyBlockFlag ? 1 : 0);
-            sos.writeUB(1, catchBlockFlag ? 1 : 0);
-            sos.writeUI16((int) trySize);
-            sos.writeUI16((int) catchSize);
-            sos.writeUI16((int) finallySize);
-            if (catchInRegisterFlag) {
-                sos.writeUI8(catchRegister);
-            } else {
-                sos.writeString(catchName == null ? "" : catchName);
-            }
-            sos.close();
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
+    protected void getContentBytes(SWFOutputStream sos) throws IOException {
+        sos.writeUB(5, reserved);
+        sos.writeUB(1, catchInRegisterFlag ? 1 : 0);
+        sos.writeUB(1, finallyBlockFlag ? 1 : 0);
+        sos.writeUB(1, catchBlockFlag ? 1 : 0);
+        sos.writeUI16((int) trySize);
+        sos.writeUI16((int) catchSize);
+        sos.writeUI16((int) finallySize);
+        if (catchInRegisterFlag) {
+            sos.writeUI8(catchRegister);
+        } else {
+            sos.writeString(catchName == null ? "" : catchName);
         }
-        return surroundWithAction(baos.toByteArray(), version);
+    }
+
+    /**
+     * Gets the length of action converted to bytes
+     *
+     * @return Length
+     */
+    @Override
+    protected int getContentBytesLength() {
+        int res = 8;
+        if (!catchInRegisterFlag) {
+            res += Utf8Helper.getBytesLength(catchName == null ? "" : catchName);
+        }
+
+        return res;
     }
 
     public ActionTry(FlasmLexer lexer, int version) throws IOException, ActionParseException {
@@ -173,7 +180,7 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
 
     @Override
     public long getHeaderSize() {
-        return getBytes(version).length;
+        return getBytesLength(version);
     }
 
     public long getTrySize() {

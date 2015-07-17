@@ -25,7 +25,6 @@ import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -59,21 +58,28 @@ public class ActionGotoFrame2 extends Action {
     }
 
     @Override
-    public byte[] getBytes(int version) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        SWFOutputStream sos = new SWFOutputStream(baos, version);
-        try {
-            sos.writeUB(6, reserved);
-            sos.writeUB(1, sceneBiasFlag ? 1 : 0);
-            sos.writeUB(1, playFlag ? 1 : 0);
-            if (sceneBiasFlag) {
-                sos.writeUI16(sceneBias);
-            }
-            sos.close();
-        } catch (IOException e) {
-            throw new Error("This should never happen.", e);
+    protected void getContentBytes(SWFOutputStream sos) throws IOException {
+        sos.writeUB(6, reserved);
+        sos.writeUB(1, sceneBiasFlag ? 1 : 0);
+        sos.writeUB(1, playFlag ? 1 : 0);
+        if (sceneBiasFlag) {
+            sos.writeUI16(sceneBias);
         }
-        return surroundWithAction(baos.toByteArray(), version);
+    }
+
+    /**
+     * Gets the length of action converted to bytes
+     *
+     * @return Length
+     */
+    @Override
+    protected int getContentBytesLength() {
+        int res = 1;
+        if (sceneBiasFlag) {
+            res += 2;
+        }
+
+        return res;
     }
 
     @Override

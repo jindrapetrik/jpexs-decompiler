@@ -1366,7 +1366,7 @@ public class XFLConverter {
                 boolean soundType = false;
                 boolean soundSize = false;
                 long soundSampleCount = 0;
-                byte[] soundData = new byte[0];
+                byte[] soundData = SWFInputStream.BYTE_ARRAY_EMPTY;
                 int[] rateMap = {5, 11, 22, 44};
                 String exportFormat = "flv";
                 if (symbol instanceof SoundStreamHeadTypeTag) {
@@ -1491,7 +1491,7 @@ public class XFLConverter {
                 }
                 SoundTag st = (SoundTag) symbol;
                 SoundFormat fmt = st.getSoundFormat();
-                byte[] data = new byte[0];
+                byte[] data = SWFInputStream.BYTE_ARRAY_EMPTY;
                 try {
                     data = new SoundExporter().exportSound(st, SoundExportMode.MP3_WAV);
                 } catch (IOException ex) {
@@ -1544,7 +1544,7 @@ public class XFLConverter {
                         break;
                 }
 
-                byte[] data = new byte[0];
+                byte[] data = SWFInputStream.BYTE_ARRAY_EMPTY;
                 try {
                     data = new MovieExporter().exportMovie(video, MovieExportMode.FLV);
                 } catch (IOException ex) {

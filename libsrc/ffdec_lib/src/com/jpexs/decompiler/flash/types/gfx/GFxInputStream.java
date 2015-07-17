@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types.gfx;
 
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.helpers.MemoryInputStream;
 import com.jpexs.helpers.utf8.Utf8Helper;
@@ -215,7 +216,7 @@ public class GFxInputStream {
      */
     public byte[] readBytes(long count, String name) throws IOException {
         if (count <= 0) {
-            return new byte[0];
+            return SWFInputStream.BYTE_ARRAY_EMPTY;
         }
         newDumpLevel(name, "bytes");
         byte[] ret = new byte[(int) count];

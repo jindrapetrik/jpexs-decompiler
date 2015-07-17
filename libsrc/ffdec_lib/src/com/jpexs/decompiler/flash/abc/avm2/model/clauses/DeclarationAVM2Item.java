@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetSlotAVM2Item;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -58,7 +59,7 @@ public class DeclarationAVM2Item extends AVM2Item {
             HighlightData srcData = getSrcData();
             srcData.localName = localName;
             srcData.declaration = true;
-            srcData.declaredType = "*";
+            srcData.declaredType = DottedChain.ALL;
             writer.append("var ");
             writer.append(localName);
             return writer;
@@ -69,7 +70,7 @@ public class DeclarationAVM2Item extends AVM2Item {
             HighlightData srcData = getSrcData();
             srcData.localName = sti.getNameAsStr(localData);
             srcData.declaration = true;
-            srcData.declaredType = "*";
+            srcData.declaredType = DottedChain.ALL;
             writer.append("var ");
             sti.getName(writer, localData);
             return writer;
@@ -89,7 +90,7 @@ public class DeclarationAVM2Item extends AVM2Item {
             if (lti.value instanceof ConvertAVM2Item) {
                 coerType = ((ConvertAVM2Item) lti.value).type;
             }
-            srcData.declaredType = (coerType instanceof TypeItem) ? ((TypeItem) coerType).fullTypeName.toPrintableString() : "*";
+            srcData.declaredType = (coerType instanceof TypeItem) ? ((TypeItem) coerType).fullTypeName : DottedChain.ALL;
             writer.append("var ");
             writer.append(localName);
             writer.append(":");
@@ -102,7 +103,7 @@ public class DeclarationAVM2Item extends AVM2Item {
             HighlightData srcData = getSrcData();
             srcData.localName = ssti.getNameAsStr(localData);
             srcData.declaration = true;
-            srcData.declaredType = (type instanceof TypeItem) ? ((TypeItem) type).fullTypeName.toPrintableString() : "*";
+            srcData.declaredType = (type instanceof TypeItem) ? ((TypeItem) type).fullTypeName : DottedChain.ALL;
             writer.append("var ");
             ssti.getName(writer, localData);
             writer.append(":");

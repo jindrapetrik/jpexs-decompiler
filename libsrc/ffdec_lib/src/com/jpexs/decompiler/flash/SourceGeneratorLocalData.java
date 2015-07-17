@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -57,7 +58,7 @@ public class SourceGeneratorLocalData implements Serializable {
 
     public Map<MethodBody, List<Integer>> traitUsages = new HashMap<>();
 
-    public String pkg = "";
+    public DottedChain pkg = DottedChain.EMPTY;
 
     public List<GraphTargetItem> scopeStack = new ArrayList<>();
 
@@ -68,7 +69,7 @@ public class SourceGeneratorLocalData implements Serializable {
     public boolean subMethod = false;
 
     public String getFullClass() {
-        return pkg == null || pkg.isEmpty() ? currentClass : pkg + "." + currentClass;
+        return pkg == null || pkg.isEmpty() ? currentClass : pkg.toRawString() + "." + currentClass;
     }
 
     public SourceGeneratorLocalData(HashMap<String, Integer> registerVars, Integer inFunction, Boolean inMethod, Integer forInLevel) {

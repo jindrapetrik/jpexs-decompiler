@@ -77,6 +77,6 @@ public class ExportRectangle {
             ExportRectangle r = (ExportRectangle) obj;
             return (xMin == r.xMin) && (yMin == r.yMin) && (xMax == r.xMax) && (yMax == r.yMax);
         }
-        return super.equals(obj);
+        return false;
     }
 }

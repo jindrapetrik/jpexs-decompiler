@@ -98,7 +98,7 @@ public class MovieExporter {
         HashMap<Integer, VideoFrameTag> frames = new HashMap<>();
         SWF.populateVideoFrames(videoStream.characterID, swf.tags, frames);
         if (frames.isEmpty()) {
-            return new byte[0];
+            return SWFInputStream.BYTE_ARRAY_EMPTY;
         }
 
         //double ms = 1000.0f / ((float) frameRate);

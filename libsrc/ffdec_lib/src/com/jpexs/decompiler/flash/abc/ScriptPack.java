@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
@@ -82,13 +83,13 @@ public class ScriptPack extends AS3ClassTreeItem {
         this.allABCs = allAbcs;
     }
 
-    public String getPathPackage() {
-        String packageName = "";
+    public DottedChain getPathPackage() {
+        DottedChain packageName = DottedChain.EMPTY;
         for (int t : traitIndices) {
             Multiname name = abc.script_info.get(scriptIndex).traits.traits.get(t).getName(abc);
             Namespace ns = name.getNamespace(abc.constants);
             if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
-                packageName = ns.getName(abc.constants, false); // assume not null
+                packageName = ns.getName(abc.constants); // assume not null
             }
         }
         return packageName;
@@ -106,11 +107,14 @@ public class ScriptPack extends AS3ClassTreeItem {
         return scriptName;
     }
 
-    public File getExportFile(String directory, ScriptExportSettings exportSettings) throws IOException {
+    public File getExportFile(String directory, ScriptExportSettings exportSettings) {
+        if (exportSettings.singleFile) {
+            return null;
+        }
+
         String scriptName = getPathScriptName();
-        String packageName = getPathPackage();
-        File outDir = new File(directory + File.separatorChar + makeDirPath(packageName));
-        Path.createDirectorySafe(outDir);
+        DottedChain packageName = getPathPackage();
+        File outDir = new File(directory + File.separatorChar + packageName.toFilePath());
         String fileName = outDir.toString() + File.separator + Helper.makeFileName(scriptName) + exportSettings.getFileExtension();
         return new File(fileName);
     }
@@ -128,22 +132,6 @@ public class ScriptPack extends AS3ClassTreeItem {
      }
      return packageName.equals("") ? scriptName : packageName + "." + scriptName;
      }*/
-    private static String makeDirPath(String packageName) {
-        if (packageName.isEmpty()) {
-            return "";
-        }
-        String[] pathParts;
-        if (packageName.contains(".")) {
-            pathParts = packageName.split("\\.");
-        } else {
-            pathParts = new String[]{packageName};
-        }
-        for (int i = 0; i < pathParts.length; i++) {
-            pathParts[i] = Helper.makeFileName(pathParts[i]);
-        }
-        return Helper.joinStrings(pathParts, File.separator);
-    }
-
     public void convert(final NulWriter writer, final List<Trait> traits, final ScriptExportMode exportMode, final boolean parallel) throws InterruptedException {
         for (int t : traitIndices) {
             Trait trait = traits.get(t);
@@ -204,12 +192,14 @@ public class ScriptPack extends AS3ClassTreeItem {
         appendTo(writer, traits, exportMode, parallel);
     }
 
-    public File export(String directory, ScriptExportSettings exportSettings, boolean parallel) throws IOException, InterruptedException {
-        File file = null;
-
+    public File export(File file, ScriptExportSettings exportSettings, boolean parallel) throws IOException, InterruptedException {
         if (!exportSettings.singleFile) {
-            file = getExportFile(directory, exportSettings);
+            if (file.exists() && !Configuration.overwriteExistingFiles.get()) {
+                return file;
+            }
         }
+
+        Path.createDirectorySafe(file.getParentFile());
 
         try (FileTextWriter writer = exportSettings.singleFile ? null : new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(file))) {
             FileTextWriter writer2 = exportSettings.singleFile ? exportSettings.singleFileWriter : writer;
@@ -224,9 +214,9 @@ public class ScriptPack extends AS3ClassTreeItem {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 79 * hash + Objects.hashCode(this.abc);
-        hash = 79 * hash + this.scriptIndex;
-        hash = 79 * hash + Objects.hashCode(this.path);
+        hash = 79 * hash + Objects.hashCode(abc);
+        hash = 79 * hash + scriptIndex;
+        hash = 79 * hash + Objects.hashCode(path);
         return hash;
     }
 
@@ -239,13 +229,13 @@ public class ScriptPack extends AS3ClassTreeItem {
             return false;
         }
         final ScriptPack other = (ScriptPack) obj;
-        if (!Objects.equals(this.abc, other.abc)) {
+        if (!Objects.equals(abc, other.abc)) {
             return false;
         }
-        if (this.scriptIndex != other.scriptIndex) {
+        if (scriptIndex != other.scriptIndex) {
             return false;
         }
-        if (!Objects.equals(this.path, other.path)) {
+        if (!Objects.equals(path, other.path)) {
             return false;
         }
         return true;

@@ -21,7 +21,6 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -53,17 +52,17 @@ public class Multiname {
 
     private static final String[] multinameKindNames = new String[]{"Qname", "QnameA", "Multiname", "MultinameA", "RTQname", "RTQnameA", "MultinameL", "RTQnameL", "RTQnameLA", "MultinameLA", "TypeName"};
 
-    public int kind = -1;
+    public final int kind;
 
-    public int name_index = 0;
+    public int name_index;
 
-    public int namespace_index = 0;
+    public int namespace_index;
 
-    public int namespace_set_index = 0;
+    public final int namespace_set_index;
 
-    public int qname_index = 0; //for TypeName
+    public final int qname_index; //for TypeName
 
-    public List<Integer> params; //for TypeName
+    public final List<Integer> params; //for TypeName
 
     @Internal
     public boolean deleted;
@@ -79,6 +78,11 @@ public class Multiname {
     }
 
     public Multiname() {
+        kind = -1;
+        namespace_index = 0;
+        namespace_set_index = 0;
+        qname_index = 0;
+        params = null;
     }
 
     public Multiname(int kind, int name_index, int namespace_index, int namespace_set_index, int qname_index, List<Integer> params) {
@@ -184,7 +188,7 @@ public class Multiname {
         }
         int type = constants.getNamespace(index).kind;
         int name_index = constants.getNamespace(index).name_index;
-        String name = name_index == 0 ? null : constants.getNamespace(index).getName(constants, true);
+        String name = name_index == 0 ? null : constants.getNamespace(index).getName(constants).toRawString();
         int sub = -1;
         for (int n = 1; n < constants.getNamespaceCount(); n++) {
             if (constants.getNamespace(n).kind == type && constants.getNamespace(n).name_index == name_index) {
@@ -214,14 +218,14 @@ public class Multiname {
         return ret.toString();
     }
 
-    private static String multinameToString(AVM2ConstantPool constants, int index, List<String> fullyQualifiedNames) {
+    private static String multinameToString(AVM2ConstantPool constants, int index, List<DottedChain> fullyQualifiedNames) {
         if (index == 0) {
             return "null";
         }
         return constants.getMultiname(index).toString(constants, fullyQualifiedNames);
     }
 
-    public String toString(AVM2ConstantPool constants, List<String> fullyQualifiedNames) {
+    public String toString(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames) {
 
         switch (kind) {
             case QNAME:
@@ -256,29 +260,30 @@ public class Multiname {
         return null;
     }
 
-    private String typeNameToStr(AVM2ConstantPool constants, List<String> fullyQualifiedNames, boolean raw) {
+    private String typeNameToStr(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames, boolean raw) {
         if (constants.getMultiname(qname_index).name_index == name_index) {
             return "ambiguousTypeName";
         }
-        String typeNameStr = constants.getMultiname(qname_index).getName(constants, fullyQualifiedNames, raw);
+        StringBuilder typeNameStr = new StringBuilder();
+        typeNameStr.append(constants.getMultiname(qname_index).getName(constants, fullyQualifiedNames, raw));
         if (!params.isEmpty()) {
-            typeNameStr += ".<";
+            typeNameStr.append(".<");
             for (int i = 0; i < params.size(); i++) {
                 if (i > 0) {
-                    typeNameStr += ",";
+                    typeNameStr.append(",");
                 }
                 if (params.get(i) == 0) {
-                    typeNameStr += "*";
+                    typeNameStr.append("*");
                 } else {
-                    typeNameStr += constants.getMultiname(params.get(i)).getName(constants, fullyQualifiedNames, raw);
+                    typeNameStr.append(constants.getMultiname(params.get(i)).getName(constants, fullyQualifiedNames, raw));
                 }
             }
-            typeNameStr += ">";
+            typeNameStr.append(">");
         }
-        return typeNameStr;
+        return typeNameStr.toString();
     }
 
-    public String getName(AVM2ConstantPool constants, List<String> fullyQualifiedNames, boolean raw) {
+    public String getName(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames, boolean raw) {
         if (kind == TYPENAME) {
             return typeNameToStr(constants, fullyQualifiedNames, raw);
         }
@@ -289,29 +294,21 @@ public class Multiname {
             return isAttribute() ? "@*" : "*";
         } else {
             String name = constants.getString(name_index);
-            if (fullyQualifiedNames != null && fullyQualifiedNames.contains(name)) {
+            if (fullyQualifiedNames != null && fullyQualifiedNames.contains(DottedChain.parse(name))) {
                 DottedChain dc = getNameWithNamespace(constants);
-                return raw ? dc.toString() : dc.toPrintableString();
+                return raw ? dc.toRawString() : dc.toPrintableString(true);
             }
             return (isAttribute() ? "@" : "") + (raw ? name : IdentifiersDeobfuscation.printIdentifier(true, name));
         }
     }
 
     public DottedChain getNameWithNamespace(AVM2ConstantPool constants) {
-        StringBuilder ret = new StringBuilder();
         Namespace ns = getNamespace(constants);
-        List<String> chain = new ArrayList<>();
+        String name = getName(constants, null, true);
         if (ns != null) {
-            String nsname = ns.getName(constants, true);
-            if (nsname != null && !nsname.isEmpty()) {
-                String parts[] = nsname.split("\\.");
-                for (String p : parts) {
-                    chain.add(p);
-                }
-            }
+            return ns.getName(constants).add(name);
         }
-        chain.add(getName(constants, null, true));
-        return new DottedChain(chain);
+        return new DottedChain(name);
     }
 
     public Namespace getNamespace(AVM2ConstantPool constants) {
@@ -335,12 +332,12 @@ public class Multiname {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 53 * hash + this.kind;
-        hash = 53 * hash + this.name_index;
-        hash = 53 * hash + this.namespace_index;
-        hash = 53 * hash + this.namespace_set_index;
-        hash = 53 * hash + this.qname_index;
-        hash = 53 * hash + Objects.hashCode(this.params);
+        hash = 53 * hash + kind;
+        hash = 53 * hash + name_index;
+        hash = 53 * hash + namespace_index;
+        hash = 53 * hash + namespace_set_index;
+        hash = 53 * hash + qname_index;
+        hash = 53 * hash + Objects.hashCode(params);
         return hash;
     }
 
@@ -368,7 +365,7 @@ public class Multiname {
         if (this.qname_index != other.qname_index) {
             return false;
         }
-        if (!Objects.equals(this.params, other.params)) {
+        if (!Objects.equals(params, other.params)) {
             return false;
         }
         return true;

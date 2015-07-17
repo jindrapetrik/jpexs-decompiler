@@ -23,6 +23,7 @@ import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
@@ -31,7 +32,7 @@ public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
 
     public GraphTargetItem rightSide;
 
-    protected String operator = "";
+    protected final String operator;
 
     @Override
     public GraphPart getFirstPart() {
@@ -107,9 +108,9 @@ public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 71 * hash + (this.leftSide != null ? this.leftSide.hashCode() : 0);
-        hash = 71 * hash + (this.rightSide != null ? this.rightSide.hashCode() : 0);
-        hash = 71 * hash + (this.operator != null ? this.operator.hashCode() : 0);
+        hash = 71 * hash + Objects.hashCode(leftSide);
+        hash = 71 * hash + Objects.hashCode(rightSide);
+        hash = 71 * hash + Objects.hashCode(operator);
         return hash;
     }
 
@@ -138,13 +139,13 @@ public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
             return false;
         }
         final BinaryOpItem other = (BinaryOpItem) obj;
-        if (this.leftSide != other.leftSide && (this.leftSide == null || !this.leftSide.equals(other.leftSide))) {
+        if (!Objects.equals(leftSide, other.leftSide)) {
             return false;
         }
-        if (this.rightSide != other.rightSide && (this.rightSide == null || !this.rightSide.equals(other.rightSide))) {
+        if (!Objects.equals(rightSide, other.rightSide)) {
             return false;
         }
-        if ((this.operator == null) ? (other.operator != null) : !this.operator.equals(other.operator)) {
+        if (!Objects.equals(operator, other.operator)) {
             return false;
         }
         return true;

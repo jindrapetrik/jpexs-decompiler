@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc;
 
 import com.jpexs.decompiler.flash.EndOfStreamException;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.abc.types.Decimal;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
@@ -63,7 +64,7 @@ public class ABCInputStream implements AutoCloseable {
 
     public byte[] stopBuffer() {
         if (bufferOs == null) {
-            return new byte[0];
+            return SWFInputStream.BYTE_ARRAY_EMPTY;
         }
         byte[] ret = bufferOs.toByteArray();
         bufferOs.reset();

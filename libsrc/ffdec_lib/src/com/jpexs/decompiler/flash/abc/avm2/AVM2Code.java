@@ -276,6 +276,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.graph.Block;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -298,6 +299,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -1456,7 +1458,7 @@ public class AVM2Code implements Cloneable {
         return pos2adr(fixIPAfterDebugLine(adr2pos(addr, true)));
     }
 
-    public ConvertOutput toSourceOutput(String path, GraphPart part, boolean processJumps, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, ABC abc, AVM2ConstantPool constants, List<MethodInfo> method_info, MethodBody body, int start, int end, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, boolean[] visited, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) throws ConvertException, InterruptedException {
+    public ConvertOutput toSourceOutput(String path, GraphPart part, boolean processJumps, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, ABC abc, AVM2ConstantPool constants, List<MethodInfo> method_info, MethodBody body, int start, int end, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, boolean[] visited, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) throws ConvertException, InterruptedException {
         calcKilledStats(body);
         boolean debugMode = DEBUG_MODE;
         if (debugMode) {
@@ -1748,7 +1750,7 @@ public class AVM2Code implements Cloneable {
         return maxRegister + 1;
     }
 
-    public HashMap<Integer, GraphTargetItem> getLocalRegTypes(AVM2ConstantPool constants, List<String> fullyQualifiedNames) {
+    public HashMap<Integer, GraphTargetItem> getLocalRegTypes(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames) {
         HashMap<Integer, GraphTargetItem> ret = new HashMap<>();
         AVM2Instruction prev = null;
         for (AVM2Instruction ins : code) {
@@ -1767,9 +1769,9 @@ public class AVM2Code implements Cloneable {
 
     private class Slot {
 
-        public GraphTargetItem scope;
+        public final GraphTargetItem scope;
 
-        public Multiname multiname;
+        public final Multiname multiname;
 
         public Slot(GraphTargetItem scope, Multiname multiname) {
             this.scope = scope;
@@ -1779,8 +1781,9 @@ public class AVM2Code implements Cloneable {
         @Override
         public boolean equals(Object obj) {
             if (obj instanceof Slot) {
-                return (((Slot) obj).scope.getThroughRegister() == scope.getThroughRegister())
-                        && (((Slot) obj).multiname == multiname);
+                Slot slot = (Slot) obj;
+                return (slot.scope.getThroughRegister() == scope.getThroughRegister())
+                        && (slot.multiname == multiname);
             }
             return false;
         }
@@ -1788,8 +1791,8 @@ public class AVM2Code implements Cloneable {
         @Override
         public int hashCode() {
             int hash = 7;
-            hash = 59 * hash + (this.scope != null ? this.scope.hashCode() : 0);
-            hash = 59 * hash + (this.multiname != null ? this.multiname.hashCode() : 0);
+            hash = 59 * hash + (scope != null ? Objects.hashCode(scope.getThroughRegister()) : 0);
+            hash = 59 * hash + Objects.hashCode(multiname);
             return hash;
         }
     }
@@ -1871,7 +1874,7 @@ public class AVM2Code implements Cloneable {
          }*/
     }
 
-    public List<GraphTargetItem> toGraphTargetItems(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, AVM2ConstantPool constants, List<MethodInfo> method_info, MethodBody body, HashMap<Integer, String> localRegNames, ScopeStack scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) throws InterruptedException {
+    public List<GraphTargetItem> toGraphTargetItems(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, AVM2ConstantPool constants, List<MethodInfo> method_info, MethodBody body, HashMap<Integer, String> localRegNames, ScopeStack scopeStack, boolean isStaticInitializer, List<DottedChain> fullyQualifiedNames, Traits initTraits, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) throws InterruptedException {
         initToSource();
         List<GraphTargetItem> list;
         HashMap<Integer, GraphTargetItem> localRegs = new HashMap<>();

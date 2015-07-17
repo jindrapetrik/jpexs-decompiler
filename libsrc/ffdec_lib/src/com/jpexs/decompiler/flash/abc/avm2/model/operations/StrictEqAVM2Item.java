@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfStrictEqIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfStrictNeIns;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.CompilationException;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.EqualsTypeItem;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -71,6 +72,6 @@ public class StrictEqAVM2Item extends BinaryOpItem implements LogicalOpItem, IfC
 
     @Override
     public GraphTargetItem returnType() {
-        return new TypeItem("Boolean");
+        return new TypeItem(DottedChain.BOOLEAN);
     }
 }

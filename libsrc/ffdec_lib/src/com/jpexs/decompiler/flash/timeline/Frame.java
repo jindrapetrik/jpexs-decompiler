@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.TreeMap;
 
 /**
@@ -41,7 +42,7 @@ public class Frame implements TreeItem, Exportable {
 
     public RGB backgroundColor = new RGBA(0, 0, 0, 0);
 
-    public Timeline timeline;
+    public final Timeline timeline;
 
     public List<Integer> sounds = new ArrayList<>();
 
@@ -92,7 +93,7 @@ public class Frame implements TreeItem, Exportable {
     public boolean equals(Object obj) {
         if (obj instanceof Frame) {
             Frame frameObj = (Frame) obj;
-            return timeline.equals(frameObj.timeline) && frame == frameObj.frame;
+            return Objects.equals(timeline, frameObj.timeline) && frame == frameObj.frame;
         }
 
         return false;

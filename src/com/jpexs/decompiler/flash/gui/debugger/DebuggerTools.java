@@ -54,7 +54,7 @@ public class DebuggerTools {
         for (ABCContainerTag ac : swf.getAbcList()) {
             ABC a = ac.getABC();
             for (ScriptPack m : a.getScriptPacks(DEBUGGER_PACKAGE, allAbcList)) {
-                if (isDebuggerClass(m.getClassPath().packageStr, null)) {
+                if (isDebuggerClass(m.getClassPath().packageStr.toRawString(), null)) {
                     return m;
                 }
             }
@@ -87,13 +87,13 @@ public class DebuggerTools {
 
     public static void replaceTraceCalls(SWF swf, String fname) {
         if (hasDebugger(swf)) {
-            String debuggerPkg = getDebuggerScriptPack(swf).getClassPath().packageStr;
+            String debuggerPkg = getDebuggerScriptPack(swf).getClassPath().packageStr.toRawString();
             //change trace to fname
             for (ABCContainerTag ct : swf.getAbcList()) {
                 ABC a = ct.getABC();
                 for (int i = 1; i < a.constants.constant_multiname.size(); i++) {
                     Multiname m = a.constants.constant_multiname.get(i);
-                    if ("trace".equals(m.getNameWithNamespace(a.constants).toString())) {
+                    if ("trace".equals(m.getNameWithNamespace(a.constants).toRawString())) {
                         m.namespace_index = a.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, a.constants.getStringId(debuggerPkg, true)), 0, true);
                         m.name_index = a.constants.getStringId(fname, true);
                         ((Tag) ct).setModified(true);

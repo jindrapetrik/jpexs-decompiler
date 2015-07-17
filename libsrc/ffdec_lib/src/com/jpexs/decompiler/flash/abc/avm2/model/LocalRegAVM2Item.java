@@ -36,7 +36,7 @@ import java.util.Set;
 
 public class LocalRegAVM2Item extends AVM2Item {
 
-    public int regIndex;
+    public final int regIndex;
 
     public GraphTargetItem computedValue;
 

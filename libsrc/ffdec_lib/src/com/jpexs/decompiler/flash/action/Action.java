@@ -195,7 +195,7 @@ public abstract class Action implements GraphSourceItem {
     }
 
     public int getTotalActionLength() {
-        return actionLength + 1 + ((actionCode >= 0x80) ? 2 : 0);
+        return actionLength + 1 + (actionCode >= 0x80 ? 2 : 0);
     }
 
     /**
@@ -301,8 +301,19 @@ public abstract class Action implements GraphSourceItem {
      * @param version SWF version
      * @return Array of bytes
      */
-    public byte[] getBytes(int version) {
-        return surroundWithAction(new byte[0], version);
+    public final byte[] getBytes(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        SWFOutputStream sos = new SWFOutputStream(baos, version);
+        try {
+            getContentBytes(sos);
+            sos.close();
+        } catch (IOException e) {
+            throw new Error("This should never happen.", e);
+        }
+        return surroundWithAction(baos.toByteArray(), version);
+    }
+
+    protected void getContentBytes(SWFOutputStream sos) throws IOException {
     }
 
     /**
@@ -311,18 +322,27 @@ public abstract class Action implements GraphSourceItem {
      * @param version SWF version
      * @return Length
      */
-    public int getBytesLength(int version) {
-        return getBytes(version).length;
+    public final int getBytesLength(int version) {
+        int contentLength = getContentBytesLength();
+        if (contentLength == -1) {
+            return getBytes(version).length;
+        }
+
+        return contentLength + 1 + (actionCode >= 0x80 ? 2 : 0);
+    }
+
+    protected int getContentBytesLength() {
+        return 0;
     }
 
     /**
-     * Uptates the action length to the length calculated from action bytes
+     * Updates the action length to the length calculated from action bytes
      *
      * @param version SWF version
      */
     public void updateLength(int version) {
-        int length = getBytes(version).length;
-        actionLength = length - 1 - ((actionCode >= 0x80) ? 2 : 0);
+        int length = getBytesLength(version);
+        actionLength = length - 1 - (actionCode >= 0x80 ? 2 : 0);
     }
 
     /**
@@ -332,7 +352,7 @@ public abstract class Action implements GraphSourceItem {
      * @param version SWF version
      * @return Byte array
      */
-    protected byte[] surroundWithAction(byte[] data, int version) {
+    private byte[] surroundWithAction(byte[] data, int version) {
         ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
         SWFOutputStream sos2 = new SWFOutputStream(baos2, version);
         try {

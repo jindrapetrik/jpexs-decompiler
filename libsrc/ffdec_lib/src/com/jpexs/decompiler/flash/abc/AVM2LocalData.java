@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.ScopeStack;
 import java.util.ArrayList;
@@ -53,7 +54,7 @@ public class AVM2LocalData extends BaseLocalData {
 
     public HashMap<Integer, String> localRegNames;
 
-    public List<String> fullyQualifiedNames;
+    public List<DottedChain> fullyQualifiedNames;
 
     public ArrayList<ABCException> parsedExceptions;
 

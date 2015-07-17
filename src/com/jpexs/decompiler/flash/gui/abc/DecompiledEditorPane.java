@@ -41,6 +41,7 @@ import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.graph.DottedChain;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
@@ -250,7 +251,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         return getMultinameAtPos(getCaretPosition());
     }
 
-    public int getLocalDeclarationOfPos(int pos, Reference<String> type) {
+    public int getLocalDeclarationOfPos(int pos, Reference<DottedChain> type) {
         Highlighting sh = Highlighting.searchPos(specialHighlights, pos);
         Highlighting h = Highlighting.searchPos(highlights, pos);
 
@@ -275,7 +276,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                 Highlighting ch = Highlighting.searchPos(classHighlights, pos);
                 int cindex = (int) ch.getProperties().index;
                 ABC abc = getABC();
-                type.setVal(abc.instance_info.get(cindex).getName(abc.constants).getNameWithNamespace(abc.constants).toString());
+                type.setVal(abc.instance_info.get(cindex).getName(abc.constants).getNameWithNamespace(abc.constants));
                 return ch.startPos;
             }
 
@@ -329,15 +330,15 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         if (t.type != TokenType.IDENTIFIER && t.type != TokenType.KEYWORD || t.type == TokenType.REGEX) {
             return false;
         }
-        Reference<String> locTypeRef = new Reference<>("");
+        Reference<DottedChain> locTypeRef = new Reference<>(DottedChain.EMPTY);
         getLocalDeclarationOfPos(t.start, locTypeRef);
-        String currentType = locTypeRef.getVal();
-        if (currentType.equals("*")) {
+        DottedChain currentType = locTypeRef.getVal();
+        if (currentType.equals(DottedChain.ALL)) {
             return false;
         }
         boolean found;
         t = sd.getNextToken(t);
-        while (t != lastToken && !currentType.equals("*")) {
+        while (t != lastToken && !currentType.equals(DottedChain.ALL)) {
             t = sd.getNextToken(t);
             String ident = t.getString(sd);
             found = false;
@@ -350,13 +351,13 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                     InstanceInfo ii = a.instance_info.get(cindex);
                     for (int j = 0; j < ii.instance_traits.traits.size(); j++) {
                         Trait tr = ii.instance_traits.traits.get(j);
-                        if (ident.equals(tr.getName(a).getName(a.constants, new ArrayList<>(), false /*NOT RAW!*/))) {
+                        if (ident.equals(tr.getName(a).getName(a.constants, null, false /*NOT RAW!*/))) {
                             classIndex.setVal(cindex);
                             abcIndex.setVal(i);
                             traitIndex.setVal(j);
                             classTrait.setVal(false);
                             multinameIndex.setVal(tr.name_index);
-                            currentType = ii.getName(a.constants).getNameWithNamespace(a.constants).toString();
+                            currentType = ii.getName(a.constants).getNameWithNamespace(a.constants);
                             found = true;
                             break loopi;
                         }
@@ -365,13 +366,13 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                     ClassInfo ci = a.class_info.get(cindex);
                     for (int j = 0; j < ci.static_traits.traits.size(); j++) {
                         Trait tr = ci.static_traits.traits.get(j);
-                        if (ident.equals(tr.getName(a).getName(a.constants, new ArrayList<>(), false /*NOT RAW!*/))) {
+                        if (ident.equals(tr.getName(a).getName(a.constants, null, false /*NOT RAW!*/))) {
                             classIndex.setVal(cindex);
                             abcIndex.setVal(i);
                             traitIndex.setVal(j);
                             classTrait.setVal(true);
                             multinameIndex.setVal(tr.name_index);
-                            currentType = ii.getName(a.constants).getNameWithNamespace(a.constants).toString();
+                            currentType = ii.getName(a.constants).getNameWithNamespace(a.constants);
                             found = true;
                             break loopi;
                         }
@@ -520,7 +521,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
             if (tm != null) {
                 String name = "";
                 if (classIndex > -1) {
-                    name = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants).toPrintableString();
+                    name = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants).toPrintableString(true);
                 }
 
                 Trait currentTrait = null;
@@ -531,7 +532,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                         currentTrait = getCurrentTrait();
                         isStatic = abc.isStaticTraitId(classIndex, lastTraitIndex);
                         if (currentTrait != null) {
-                            name += ":" + currentTrait.getName(abc).getName(abc.constants, new ArrayList<>(), false);
+                            name += ":" + currentTrait.getName(abc).getName(abc.constants, null, false);
                         }
                     }
                 }
@@ -571,11 +572,11 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                 }
                 currentMethodHighlight = null;
                 currentTrait = null;
-                String name = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants).toPrintableString();
+                String name = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants).toPrintableString(true);
                 currentTrait = getCurrentTrait();
                 isStatic = abc.isStaticTraitId(classIndex, lastTraitIndex);
                 if (currentTrait != null) {
-                    name += ":" + currentTrait.getName(abc).getName(abc.constants, new ArrayList<>(), false);
+                    name += ":" + currentTrait.getName(abc).getName(abc.constants, null, false);
                 }
 
                 displayMethod(pos, abc.findMethodIdByTraitId(classIndex, lastTraitIndex), name, currentTrait, isStatic);

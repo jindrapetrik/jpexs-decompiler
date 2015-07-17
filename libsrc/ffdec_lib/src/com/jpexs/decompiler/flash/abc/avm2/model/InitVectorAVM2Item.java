@@ -31,6 +31,7 @@ import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -44,6 +45,18 @@ import java.util.List;
  * @author JPEXS
  */
 public class InitVectorAVM2Item extends AVM2Item {
+
+    public static final DottedChain VECTOR_PACKAGE = new DottedChain("__AS3__", "vec");
+
+    public static final DottedChain VECTOR_FQN = new DottedChain("__AS3__", "vec", "Vector");
+
+    public static final DottedChain VECTOR_INT = new DottedChain("__AS3__", "vec", "Vector$int");
+
+    public static final DottedChain VECTOR_DOUBLE = new DottedChain("__AS3__", "vec", "Vector$double");
+
+    public static final DottedChain VECTOR_UINT = new DottedChain("__AS3__", "vec", "Vector$uint");
+
+    public static final DottedChain VECTOR_OBJECT = new DottedChain("__AS3__", "vec", "Vector$object");
 
     public GraphTargetItem subtype;
 
@@ -97,7 +110,7 @@ public class InitVectorAVM2Item extends AVM2Item {
     public GraphTargetItem returnType() {
         List<GraphTargetItem> pars = new ArrayList<>();
         pars.add(subtype);
-        return new ApplyTypeAVM2Item(null, new TypeItem("__AS3__.vec.Vector"), pars);
+        return new ApplyTypeAVM2Item(null, new TypeItem(VECTOR_FQN), pars);
     }
 
     @Override

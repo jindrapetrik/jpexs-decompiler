@@ -145,6 +145,10 @@ public class Configuration {
     @ConfigurationCategory("ui")
     public static final ConfigurationItem<Boolean> useRibbonInterface = null;
 
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("export")
+    public static final ConfigurationItem<Boolean> overwriteExistingFiles = null;
+
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("export")
     public static final ConfigurationItem<Boolean> openFolderAfterFlaExport = null;

@@ -27,13 +27,14 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 public class CallFunctionActionItem extends ActionItem {
 
-    public GraphTargetItem functionName;
+    public final GraphTargetItem functionName;
 
-    public List<GraphTargetItem> arguments;
+    public final List<GraphTargetItem> arguments;
 
     public GraphTargetItem calculatedFunction;
 
@@ -99,8 +100,8 @@ public class CallFunctionActionItem extends ActionItem {
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 37 * hash + (this.functionName != null ? this.functionName.hashCode() : 0);
-        hash = 37 * hash + (this.arguments != null ? this.arguments.hashCode() : 0);
+        hash = 37 * hash + Objects.hashCode(functionName);
+        hash = 37 * hash + Objects.hashCode(arguments);
         return hash;
     }
 
@@ -113,10 +114,10 @@ public class CallFunctionActionItem extends ActionItem {
             return false;
         }
         final CallFunctionActionItem other = (CallFunctionActionItem) obj;
-        if (this.functionName != other.functionName && (this.functionName == null || !this.functionName.equals(other.functionName))) {
+        if (!Objects.equals(functionName, other.functionName)) {
             return false;
         }
-        if (this.arguments != other.arguments && (this.arguments == null || !this.arguments.equals(other.arguments))) {
+        if (!Objects.equals(this.arguments, other.arguments)) {
             return false;
         }
         return true;

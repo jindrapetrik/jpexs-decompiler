@@ -1244,7 +1244,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                                 }
 
                                 Main.startWork(translate("work.exporting") + " " + (i + 1) + "/" + as3scripts.size() + " " + tls.getPath() + " ...", null);
-                                ret.add(tls.export(scriptsFolder, scriptExportSettings, parallel));
+                                File file = tls.getExportFile(scriptsFolder, scriptExportSettings);
+                                ret.add(tls.export(file, scriptExportSettings, parallel));
                             }
                         }
                     } else {
@@ -1981,12 +1982,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 private final ConfigurationItem<Boolean> showAgainInvalidText = new ConfigurationItem<>("showAgainInvalidText", true, true);
 
                 private String getTextTagInfo(TextTag textTag) {
-                    String ret = "";
+                    StringBuilder ret = new StringBuilder();
                     if (textTag != null) {
-                        ret += " TextId: " + textTag.getCharacterId() + " (" + String.join(", ", textTag.getTexts()) + ")";
+                        ret.append(" TextId: ").append(textTag.getCharacterId()).append(" (").append(String.join(", ", textTag.getTexts())).append(")");
                     }
 
-                    return ret;
+                    return ret.toString();
                 }
 
                 @Override

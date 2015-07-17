@@ -119,26 +119,33 @@ public class TextImporter {
         for (String fileName : files) {
             String texts = Helper.readTextFile(Path.combine(textsFolder.getPath(), fileName));
             int characterId = Integer.parseInt(fileName.split("\\.")[0]);
-            String recordSeparator = Helper.newLine + Configuration.textExportSingleFileRecordSeparator.get() + Helper.newLine;
-            boolean formatted = !texts.contains(recordSeparator) && texts.startsWith("[" + Helper.newLine);
-            if (!formatted) {
-                String[] records = texts.split(recordSeparator);
-                TextTag textTag = swf.getText(characterId);
-                if (textTag != null) {
-                    String text = textTag.getFormattedText().text;
-                    if (!saveText(textTag, text, records)) {
-                        return;
-                    }
+            TextTag textTag = swf.getText(characterId);
+            if (!importText(textTag, texts)) {
+                return;
+            }
+        }
+    }
+
+    public boolean importText(TextTag textTag, String newText) {
+        String recordSeparator = Helper.newLine + Configuration.textExportSingleFileRecordSeparator.get() + Helper.newLine;
+        boolean formatted = !newText.contains(recordSeparator) && newText.startsWith("[" + Helper.newLine);
+        if (!formatted) {
+            String[] records = newText.split(recordSeparator);
+            if (textTag != null) {
+                String text = textTag.getFormattedText().text;
+                if (!saveText(textTag, text, records)) {
+                    return false;
                 }
-            } else {
-                TextTag textTag = swf.getText(characterId);
-                if (textTag != null) {
-                    if (!saveText(textTag, texts, null)) {
-                        return;
-                    }
+            }
+        } else {
+            if (textTag != null) {
+                if (!saveText(textTag, newText, null)) {
+                    return false;
                 }
             }
         }
+
+        return true;
     }
 
     /**

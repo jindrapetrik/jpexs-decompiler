@@ -24,9 +24,12 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.Path;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -51,12 +54,29 @@ public class AS3ScriptExporter {
 
         int cnt = 1;
         List<ExportPackTask> tasks = new ArrayList<>();
+        Set<String> files = new HashSet<>();
         for (ScriptPack item : packs) {
             if (!item.isSimple && Configuration.ignoreCLikePackages.get()) {
                 continue;
             }
 
-            tasks.add(new ExportPackTask(handler, cnt++, packs.size(), item.getClassPath(), item, outdir, exportSettings, parallel, evl));
+            File file = item.getExportFile(outdir, exportSettings);
+            String filePath = file.getPath();
+            if (files.contains(filePath.toLowerCase())) {
+                String parentPath = file.getParent();
+                String fileName = file.getName();
+                String extension = Path.getExtension(fileName);
+                String fileNameWithoutExtension = Path.getFileNameWithoutExtension(file);
+                int i = 2;
+                do {
+                    filePath = Path.combine(parentPath, fileNameWithoutExtension + "_" + i++ + extension);
+                } while (files.contains(filePath.toUpperCase()));
+
+                file = new File(filePath);
+            }
+
+            files.add(filePath.toLowerCase());
+            tasks.add(new ExportPackTask(handler, cnt++, packs.size(), item.getClassPath(), item, file, exportSettings, parallel, evl));
         }
 
         if (!parallel || tasks.size() < 2) {

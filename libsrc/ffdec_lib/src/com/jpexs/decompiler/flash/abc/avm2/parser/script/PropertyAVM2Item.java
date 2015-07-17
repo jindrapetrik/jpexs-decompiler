@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertDIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.ApplyTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.InitVectorAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
@@ -44,6 +45,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
@@ -195,19 +197,19 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                     List<ABC> abcs = new ArrayList<>();
                     abcs.add(abc);
                     abcs.addAll(otherABCs);
-                    if (ttype.equals(new TypeItem("__AS3__.vec.Vector"))) {
+                    if (ttype.equals(new TypeItem(InitVectorAVM2Item.VECTOR_FQN))) {
                         switch ("" + objSubType) {
                             case "int":
-                                ttype = new TypeItem("__AS3__.vec.Vector$int");
+                                ttype = new TypeItem(InitVectorAVM2Item.VECTOR_INT);
                                 break;
                             case "Number":
-                                ttype = new TypeItem("__AS3__.vec.Vector$double");
+                                ttype = new TypeItem(InitVectorAVM2Item.VECTOR_DOUBLE);
                                 break;
                             case "uint":
-                                ttype = new TypeItem("__AS3__.vec.Vector$uint");
+                                ttype = new TypeItem(InitVectorAVM2Item.VECTOR_UINT);
                                 break;
                             default:
-                                ttype = new TypeItem("__AS3__.vec.Vector$object");
+                                ttype = new TypeItem(InitVectorAVM2Item.VECTOR_OBJECT);
                         }
                     }
                     loopa:
@@ -219,14 +221,14 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                             Multiname m = ii.getName(a.constants);
                             if (multinameToType(ii.name_index, a.constants).equals(ttype)) {
                                 Reference<String> outName = new Reference<>("");
-                                Reference<String> outNs = new Reference<>("");
-                                Reference<String> outPropNs = new Reference<>("");
+                                Reference<DottedChain> outNs = new Reference<>(DottedChain.EMPTY);
+                                Reference<DottedChain> outPropNs = new Reference<>(DottedChain.EMPTY);
                                 Reference<Integer> outPropNsKind = new Reference<>(1);
                                 Reference<Integer> outPropNsIndex = new Reference<>(0);
                                 Reference<GraphTargetItem> outPropType = new Reference<>(null);
                                 Reference<ValueKind> outPropValue = new Reference<>(null);
-                                if (AVM2SourceGenerator.searchPrototypeChain(false, abcs, m.getNamespace(a.constants).getName(a.constants, true), m.getName(a.constants, null, true), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue)) {
-                                    objType = new TypeItem("".equals(outNs.getVal()) ? outName.getVal() : outNs.getVal() + "." + outName.getVal());
+                                if (AVM2SourceGenerator.searchPrototypeChain(false, abcs, m.getNamespace(a.constants).getName(a.constants), m.getName(a.constants, null, true), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue)) {
+                                    objType = new TypeItem(outNs.getVal().isEmpty() ? outName.getVal() : outNs.getVal().toRawString() + "." + outName.getVal());
                                     propType = outPropType.getVal();
                                     propIndex = abc.constants.getMultinameId(new Multiname(Multiname.QNAME,
                                             abc.constants.getStringId(propertyName, true),
@@ -248,7 +250,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                             if (t.getName(abc).getName(abc.constants, null, true).equals(propertyName)) {
                                 if (t instanceof TraitSlotConst) {
                                     TraitSlotConst tsc = (TraitSlotConst) t;
-                                    objType = new TypeItem("Function");
+                                    objType = new TypeItem(DottedChain.FUNCTION);
                                     propType = multinameToType(tsc.type_index, abc.constants);
                                     propIndex = tsc.name_index;
                                     if (!localData.traitUsages.containsKey(b)) {
@@ -264,7 +266,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                         for (int i = 0; i < openedNamespaces.size(); i++) {
                             int nsindex = openedNamespaces.get(i);
                             int nsKind = abc.constants.constant_namespace.get(openedNamespaces.get(i)).kind;
-                            String nsname = abc.constants.constant_namespace.get(openedNamespaces.get(i)).getName(abc.constants, true);
+                            DottedChain nsname = abc.constants.constant_namespace.get(openedNamespaces.get(i)).getName(abc.constants);
                             int name_index = 0;
                             for (int m = 1; m < abc.constants.constant_multiname.size(); m++) {
                                 Multiname mname = abc.constants.constant_multiname.get(m);
@@ -310,7 +312,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                     }
                                     for (Trait t : si.traits.traits) {
                                         if (t.name_index == name_index) {
-                                            objType = new TypeItem("Object");
+                                            objType = new TypeItem(DottedChain.OBJECT);
                                             propType = AVM2SourceGenerator.getTraitReturnType(abc, t);
                                             propIndex = t.name_index;
                                             if (t instanceof TraitSlotConst) {
@@ -334,10 +336,10 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                             continue;
                                         }
                                         Multiname n = a.constants.constant_multiname.get(ii.name_index);
-                                        if (n.getNamespace(a.constants).kind == Namespace.KIND_PACKAGE && n.getNamespace(a.constants).getName(a.constants, true).equals(nsname)) {
+                                        if (n.getNamespace(a.constants).kind == Namespace.KIND_PACKAGE && n.getNamespace(a.constants).getName(a.constants).equals(nsname)) {
                                             Reference<String> outName = new Reference<>("");
-                                            Reference<String> outNs = new Reference<>("");
-                                            Reference<String> outPropNs = new Reference<>("");
+                                            Reference<DottedChain> outNs = new Reference<>(DottedChain.EMPTY);
+                                            Reference<DottedChain> outPropNs = new Reference<>(DottedChain.EMPTY);
                                             Reference<Integer> outPropNsKind = new Reference<>(1);
                                             Reference<Integer> outPropNsIndex = new Reference<>(0);
                                             Reference<GraphTargetItem> outPropType = new Reference<>(null);
@@ -622,13 +624,11 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
         Object obj = object;
 
         if (obj == null) {
-            String cname;
-            String pkgName = "";
-            cname = localData.currentClass;
-            pkgName = localData.pkg;
+            String cname = localData.currentClass;
+            DottedChain pkgName = localData.pkg;
             Reference<String> outName = new Reference<>("");
-            Reference<String> outNs = new Reference<>("");
-            Reference<String> outPropNs = new Reference<>("");
+            Reference<DottedChain> outNs = new Reference<>(DottedChain.EMPTY);
+            Reference<DottedChain> outPropNs = new Reference<>(DottedChain.EMPTY);
             Reference<Integer> outPropNsKind = new Reference<>(1);
             Reference<Integer> outPropNsIndex = new Reference<>(0);
             Reference<GraphTargetItem> outPropType = new Reference<>(null);

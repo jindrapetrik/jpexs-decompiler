@@ -480,7 +480,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
             }
         }
 
-        return decompiledTextArea.getLocalDeclarationOfPos(pos, new Reference<>("")) != -1;
+        return decompiledTextArea.getLocalDeclarationOfPos(pos, new Reference<>(null)) != -1;
     }
 
     private void gotoDeclaration(int pos) {
@@ -525,7 +525,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
             }
         }
 
-        int dpos = decompiledTextArea.getLocalDeclarationOfPos(pos, new Reference<>(""));
+        int dpos = decompiledTextArea.getLocalDeclarationOfPos(pos, new Reference<>(null));
         if (dpos > -1) {
             decompiledTextArea.setCaretPosition(dpos);
         }
@@ -626,7 +626,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
             ClassesListTreeModel clModel = (ClassesListTreeModel) scriptsNode;
             ScriptPack pack = null;
             for (ScriptPack item : clModel.getList()) {
-                if (!pack.isSimple && Configuration.ignoreCLikePackages.get()) {
+                if (!item.isSimple && Configuration.ignoreCLikePackages.get()) {
                     continue;
                 }
                 ClassPath classPath = item.getClassPath();

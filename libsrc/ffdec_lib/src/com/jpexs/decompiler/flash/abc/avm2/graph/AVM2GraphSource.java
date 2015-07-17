@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.ConvertOutput;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSource;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -56,7 +57,7 @@ public class AVM2GraphSource extends GraphSource {
 
     HashMap<Integer, String> localRegNames;
 
-    List<String> fullyQualifiedNames;
+    List<DottedChain> fullyQualifiedNames;
 
     HashMap<Integer, Integer> localRegAssigmentIps;
 
@@ -66,7 +67,7 @@ public class AVM2GraphSource extends GraphSource {
         return code;
     }
 
-    public AVM2GraphSource(AVM2Code code, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, ScopeStack scopeStack, ABC abc, MethodBody body, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, HashMap<Integer, Integer> localRegAssigmentIp, HashMap<Integer, List<Integer>> refs) {
+    public AVM2GraphSource(AVM2Code code, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, ScopeStack scopeStack, ABC abc, MethodBody body, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, HashMap<Integer, Integer> localRegAssigmentIp, HashMap<Integer, List<Integer>> refs) {
         this.code = code;
         this.isStatic = isStatic;
         this.classIndex = classIndex;

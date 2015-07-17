@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.exporters.script;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.EventListener;
+import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.RunnableIOExResult;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -81,11 +82,15 @@ public class ExportScriptTask implements Callable<File> {
             public void run() throws IOException, InterruptedException {
                 startTime = System.currentTimeMillis();
 
+                File file = new File(f);
                 if (!exportSettings.singleFile) {
                     Path.createDirectorySafe(new File(directory));
+                    if (file.exists() && !Configuration.overwriteExistingFiles.get()) {
+                        this.result = file;
+                        return;
+                    }
                 }
 
-                File file = new File(f);
                 try (FileTextWriter writer = exportSettings.singleFile ? null : new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(f))) {
                     FileTextWriter writer2 = exportSettings.singleFile ? exportSettings.singleFileWriter : writer;
                     ScriptExportMode exportMode = exportSettings.mode;
@@ -113,6 +118,8 @@ public class ExportScriptTask implements Callable<File> {
         if (eventListener != null) {
             eventListener.handleExportingEvent("script", index, count, f);
         }
+
+        new RetryTask(rio, handler).run();
 
         if (eventListener != null) {
             long time = stopTime - startTime;

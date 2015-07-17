@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.Exportable;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -66,7 +67,7 @@ public class TagScript implements TreeItem, Exportable {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof TagScript) {
-            return tag.equals(((TagScript) obj).getTag());
+            return Objects.equals(tag, ((TagScript) obj).tag);
         }
 
         return false;
