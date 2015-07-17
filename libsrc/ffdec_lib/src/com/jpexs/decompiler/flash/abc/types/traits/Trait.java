@@ -28,9 +28,17 @@ import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
 import java.io.Serializable;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public abstract class Trait implements Cloneable, Serializable {
+
+    public static final String METADATA_CTOR_DEFINITION = "__go_to_ctor_definition_help";
+    public static final String METADATA_DEFINITION = "__go_to_definition_help";
 
     private static final int[] EMPTY_METADATA_ARRAY = new int[0];
 
@@ -67,6 +75,54 @@ public abstract class Trait implements Cloneable, Serializable {
     public static final int TRAIT_CONST = 6;
 
     public abstract void delete(ABC abc, boolean d);
+
+    public List<Entry<String, Map<String, String>>> getMetaDataTable(ABC abc) {
+        List<Entry<String, Map<String, String>>> ret = new ArrayList<>();
+        for (int m : metadata) {
+            if (m >= 0 && m < abc.metadata_info.size()) {
+                String name = abc.constants.getString(abc.metadata_info.get(m).name_index);
+                Map<String, String> data = new HashMap<>();
+                for (int i = 0; i < abc.metadata_info.get(m).keys.length; i++) {
+                    data.put(abc.constants.getString(abc.metadata_info.get(m).keys[i]),
+                            abc.constants.getString(abc.metadata_info.get(m).values[i]));
+                }
+                ret.add(new SimpleEntry<>(name, data));
+            }
+        }
+        return ret;
+    }
+
+    public GraphTextWriter getMetaData(ABC abc, GraphTextWriter writer) {
+        List<Entry<String, Map<String, String>>> md = getMetaDataTable(abc);
+        for (Entry<String, Map<String, String>> en : md) {
+            String name = en.getKey();
+            if (METADATA_DEFINITION.equals(name) || METADATA_CTOR_DEFINITION.equals(name)) {
+                continue;
+            }
+            writer.append("[").append(name);
+            if (!en.getValue().isEmpty()) {
+                writer.append("(");
+                boolean first = true;
+                for (String key : en.getValue().keySet()) {
+                    if (!first) {
+                        writer.append(",");
+                    }
+                    first = false;
+                    if (!key.isEmpty()) {
+                        writer.append(IdentifiersDeobfuscation.printIdentifier(true, key)).append("=");
+                    }
+                    writer.append("\"");
+                    String val = en.getValue().get(key);
+                    writer.append(Helper.escapeString(val));
+                    writer.append("\"");
+                }
+                writer.append(")");
+            }
+            writer.append("]");
+            writer.newLine();
+        }
+        return writer;
+    }
 
     public GraphTextWriter getModifiers(ABC abc, boolean isStatic, GraphTextWriter writer) {
         if ((kindFlags & ATTR_Override) > 0) {

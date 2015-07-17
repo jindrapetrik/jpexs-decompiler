@@ -92,6 +92,7 @@ import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.ClassInfo;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
+import com.jpexs.decompiler.flash.abc.types.MetadataInfo;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
@@ -1982,6 +1983,25 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
     }
 
+    public int[] generateMetadata(List<Map.Entry<String, Map<String, String>>> metadata) {
+        int ret[] = new int[metadata.size()];
+        for (int i = 0; i < metadata.size(); i++) {
+            Map.Entry<String, Map<String, String>> en = metadata.get(i);
+            int keys[] = new int[en.getValue().size()];
+            int values[] = new int[en.getValue().size()];
+            int j = 0;
+            for (String key : en.getValue().keySet()) {
+                keys[j] = abc.constants.getStringId(key, true);
+                values[j] = abc.constants.getStringId(en.getValue().get(key), true);
+                j++;
+            }
+            MetadataInfo mi = new MetadataInfo(abc.constants.getStringId(en.getKey(), true), keys, values);
+            ret[i] = abc.metadata_info.size();
+            abc.metadata_info.add(mi);
+        }
+        return ret;
+    }
+
     public void generateTraitsPhase3(int methodInitScope, boolean isInterface, String className, String superName, boolean generateStatic, SourceGeneratorLocalData localData, List<GraphTargetItem> items, Traits ts, Trait[] traits, Map<Trait, Integer> initScopes, Reference<Integer> class_index) throws AVM2ParseException, CompilationException {
         //Note: Names must be generated first before accesed in inner subs
         for (int k = 0; k < items.size(); k++) {
@@ -2031,6 +2051,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 tc.slot_id = 0; //?
                 ts.traits.add(tc);
                 traits[k] = tc;
+                traits[k].metadata = generateMetadata(((InterfaceAVM2Item) item).metadata);
             }
 
             if (item instanceof ClassAVM2Item) {
@@ -2058,6 +2079,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 tc.slot_id = slot_id++;
                 ts.traits.add(tc);
                 traits[k] = tc;
+                traits[k].metadata = generateMetadata(((ClassAVM2Item) item).metadata);
 
             }
             if ((item instanceof SlotAVM2Item) || (item instanceof ConstAVM2Item)) {
@@ -2069,6 +2091,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 boolean isNamespace = false;
                 int namespace = 0;
                 boolean isStatic = false;
+                int metadata[] = new int[0];
                 if (item instanceof SlotAVM2Item) {
                     SlotAVM2Item sai = (SlotAVM2Item) item;
                     if (sai.isStatic() != generateStatic) {
@@ -2079,6 +2102,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     type = sai.type;
                     isStatic = sai.isStatic();
                     namespace = sai.getNamespace();
+                    metadata = generateMetadata(((SlotAVM2Item) item).metadata);
                 }
                 if (item instanceof ConstAVM2Item) {
                     ConstAVM2Item cai = (ConstAVM2Item) item;
@@ -2091,6 +2115,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     namespace = cai.getNamespace();
                     isNamespace = type.toString().equals("Namespace");
                     isStatic = cai.isStatic();
+                    metadata = generateMetadata(((ConstAVM2Item) item).metadata);
                 }
                 if (isNamespace) {
                     tsc.name_index = traitName(namespace, var);
@@ -2107,6 +2132,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 tsc.slot_id = isStatic ? slot_id++ : 0;
                 ts.traits.add(tsc);
                 traits[k] = tsc;
+                traits[k].metadata = metadata;
             }
             if ((item instanceof MethodAVM2Item) || (item instanceof GetterAVM2Item) || (item instanceof SetterAVM2Item)) {
                 MethodAVM2Item mai = (MethodAVM2Item) item;
@@ -2126,6 +2152,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 ts.traits.add(tmgs);
 
                 traits[k] = tmgs;
+                traits[k].metadata = generateMetadata(((MethodAVM2Item) item).metadata);
             } else if (item instanceof FunctionAVM2Item) {
                 TraitFunction tf = new TraitFunction();
                 tf.slot_id = slot_id++;
@@ -2133,6 +2160,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 //tf.name_index = traitName(((FunctionAVM2Item) item).namespace, ((FunctionAVM2Item) item).functionName);
                 ts.traits.add(tf);
                 traits[k] = tf;
+                traits[k].metadata = generateMetadata(((FunctionAVM2Item) item).metadata);
             }
         }
 

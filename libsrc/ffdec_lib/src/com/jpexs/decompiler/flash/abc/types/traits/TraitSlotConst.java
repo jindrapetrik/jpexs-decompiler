@@ -137,6 +137,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
 
     @Override
     public GraphTextWriter toString(Trait parent, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<String> fullyQualifiedNames, boolean parallel) throws InterruptedException {
+        getMetaData(abc, writer);
         Multiname n = getName(abc);
         boolean showModifier = true;
         if ((classIndex == -1) && (n != null)) {

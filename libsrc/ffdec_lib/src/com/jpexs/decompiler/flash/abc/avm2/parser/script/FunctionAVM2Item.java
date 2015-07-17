@@ -26,6 +26,7 @@ import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -61,8 +62,11 @@ public class FunctionAVM2Item extends AVM2Item {
 
     public String pkg;
 
-    public FunctionAVM2Item(String pkg, boolean isInterface, boolean needsActivation, int namespace, boolean hasRest, int line, String functionName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<AssignableAVM2Item> subvariables, GraphTargetItem retType) {
+    public List<Map.Entry<String, Map<String, String>>> metadata;
+
+    public FunctionAVM2Item(List<Map.Entry<String, Map<String, String>>> metadata, String pkg, boolean isInterface, boolean needsActivation, int namespace, boolean hasRest, int line, String functionName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<AssignableAVM2Item> subvariables, GraphTargetItem retType) {
         super(null, NOPRECEDENCE);
+        this.metadata = metadata;
         this.pkg = pkg;
         this.needsActivation = needsActivation;
         this.namespace = namespace;

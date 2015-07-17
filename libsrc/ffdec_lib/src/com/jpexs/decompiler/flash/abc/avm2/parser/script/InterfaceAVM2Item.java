@@ -23,6 +23,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -46,8 +47,11 @@ public class InterfaceAVM2Item extends AVM2Item {
 
     public List<DottedChain> importedClasses;
 
-    public InterfaceAVM2Item(List<DottedChain> importedClasses, String pkg, List<Integer> openedNamespaces, boolean isFinal, int namespace, String name, List<GraphTargetItem> superInterfaces, List<GraphTargetItem> traits) {
+    public List<Map.Entry<String, Map<String, String>>> metadata;
+
+    public InterfaceAVM2Item(List<Map.Entry<String, Map<String, String>>> metadata, List<DottedChain> importedClasses, String pkg, List<Integer> openedNamespaces, boolean isFinal, int namespace, String name, List<GraphTargetItem> superInterfaces, List<GraphTargetItem> traits) {
         super(null, NOPRECEDENCE);
+        this.metadata = metadata;
         this.importedClasses = importedClasses;
         this.pkg = pkg;
         this.name = name;

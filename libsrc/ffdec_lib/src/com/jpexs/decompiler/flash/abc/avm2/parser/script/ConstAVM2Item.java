@@ -20,6 +20,8 @@ import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -37,6 +39,8 @@ public class ConstAVM2Item extends AVM2Item {
 
     public String customNamespace;
 
+    public List<Map.Entry<String, Map<String, String>>> metadata;
+
     public int line;
 
     public String pkg;
@@ -49,8 +53,9 @@ public class ConstAVM2Item extends AVM2Item {
         return isStatic;
     }
 
-    public ConstAVM2Item(String pkg, String customNamespace, boolean isStatic, int namespace, String var, GraphTargetItem type, GraphTargetItem value, int line) {
+    public ConstAVM2Item(List<Map.Entry<String, Map<String, String>>> metadata, String pkg, String customNamespace, boolean isStatic, int namespace, String var, GraphTargetItem type, GraphTargetItem value, int line) {
         super(null, NOPRECEDENCE, value);
+        this.metadata = metadata;
         this.pkg = pkg;
         this.line = line;
         this.namespace = namespace;

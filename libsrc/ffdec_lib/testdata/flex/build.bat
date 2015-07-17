@@ -7,12 +7,12 @@ set ISDEBUG=true
 :block2
 set COMPILERPATH=mxmlc.exe
 if not exist %COMPILERPATH% goto notex
-%COMPILERPATH% -warnings=false -debug=%ISDEBUG% TestMovie.as>out.txt
-rem start notepad out.txt
+%COMPILERPATH% -warnings=false -debug=%ISDEBUG% TestFlex.as>out.txt
+start notepad out.txt
 if errorlevel==1 goto failed
 goto end
 :notex
-echo Flex SDK not found. Download and unpack Flex SDK into trunk\flex_sdk directory, then run build again
+echo Flex SDK not found. Download and unpack Flex SDK into some directory and add it to PATH variable
 goto end
 :failed
 pause
