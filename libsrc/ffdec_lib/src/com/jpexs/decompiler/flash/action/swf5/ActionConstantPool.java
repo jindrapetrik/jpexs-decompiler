@@ -80,6 +80,10 @@ public class ActionConstantPool extends Action {
         return calculateSize(constantPool);
     }
 
+    public static int calculateSize(String str) {
+        return Utf8Helper.getBytesLength(str) + 1;
+    }
+
     public static int calculateSize(List<String> strings) {
         int res = 2;
         for (String s : strings) {

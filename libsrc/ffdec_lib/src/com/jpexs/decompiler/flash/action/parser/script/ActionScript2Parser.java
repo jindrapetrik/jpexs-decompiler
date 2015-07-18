@@ -1810,9 +1810,17 @@ public class ActionScript2Parser {
     private DirectValueActionItem pushConst(String s) throws IOException, ActionParseException {
         int index = constantPool.indexOf(s);
         if (index == -1) {
-            constantPool.add(s);
-            index = constantPool.indexOf(s);
+            if (ActionConstantPool.calculateSize(constantPool) + ActionConstantPool.calculateSize(s) <= 0xffff) {
+                // constant pool is not full
+                constantPool.add(s);
+                index = constantPool.indexOf(s);
+            }
         }
+
+        if (index == -1) {
+            return new DirectValueActionItem(null, 0, s, constantPool);
+        }
+
         return new DirectValueActionItem(null, 0, new ConstantIndex(index), constantPool);
     }
 
