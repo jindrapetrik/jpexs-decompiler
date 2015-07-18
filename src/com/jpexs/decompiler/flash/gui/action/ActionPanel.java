@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraph;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.CachedScript;
+import com.jpexs.decompiler.flash.action.ConstantPoolTooBigException;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
@@ -30,7 +31,6 @@ import com.jpexs.decompiler.flash.action.parser.script.ParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.script.SymbolType;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
-import com.jpexs.decompiler.flash.action.swf5.ActionConstantPool;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.gui.AppStrings;
@@ -788,15 +788,11 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
                 src.setActionBytes(Helper.getBytesFromHexaText(text));
             } else if (trimmed.startsWith(Helper.constants)) {
                 List<List<String>> constantPools = Helper.getConstantPoolsFromText(text);
-                for (int i = 0; i < constantPools.size(); i++) {
-                    List<String> constantPool = constantPools.get(i);
-                    int size = ActionConstantPool.calculateSize(constantPool);
-                    if (size > 0xffff) {
-                        View.showMessageDialog(this, AppStrings.translate("error.constantPoolTooBig").replace("%index%", Integer.toString(i)).replace("%size%", Integer.toString(size)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-                    }
+                try {
+                    Action.setConstantPools(src, constantPools, true);
+                } catch (ConstantPoolTooBigException ex) {
+                    View.showMessageDialog(this, AppStrings.translate("error.constantPoolTooBig").replace("%index%", Integer.toString(ex.index)).replace("%size%", Integer.toString(ex.size)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                 }
-
-                src.setConstantPools(constantPools);
             } else {
                 src.setActions(ASMParser.parse(0, true, text, src.getSwf().version, false));
             }

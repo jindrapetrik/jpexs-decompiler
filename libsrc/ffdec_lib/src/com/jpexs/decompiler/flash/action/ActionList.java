@@ -21,6 +21,8 @@ import com.jpexs.decompiler.flash.action.special.ActionNop;
 import com.jpexs.decompiler.flash.action.special.ActionStore;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.action.swf4.ActionJump;
+import com.jpexs.decompiler.flash.action.swf4.ActionPush;
+import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.FileTextWriter;
@@ -141,6 +143,42 @@ public class ActionList extends ArrayList<Action> {
                 throw new UnsupportedOperationException();
             }
         };
+    }
+
+    public int getConstantPoolIndexReferenceCount(int index) {
+        int count = 0;
+        for (Action action : this) {
+            if (action instanceof ActionPush) {
+                ActionPush push = (ActionPush) action;
+                for (Object value : push.values) {
+                    if (value instanceof ConstantIndex) {
+                        ConstantIndex constantIndex = (ConstantIndex) value;
+                        if (constantIndex.index == index) {
+                            count++;
+                        }
+                    }
+                }
+            }
+        }
+
+        return count;
+    }
+
+    public void inlineConstantPoolString(int index, String str) {
+        for (Action action : this) {
+            if (action instanceof ActionPush) {
+                ActionPush push = (ActionPush) action;
+                for (int i = 0; i < push.values.size(); i++) {
+                    Object value = push.values.get(i);
+                    if (value instanceof ConstantIndex) {
+                        ConstantIndex constantIndex = (ConstantIndex) value;
+                        if (constantIndex.index == index) {
+                            push.values.set(i, str);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public void removeNops() {

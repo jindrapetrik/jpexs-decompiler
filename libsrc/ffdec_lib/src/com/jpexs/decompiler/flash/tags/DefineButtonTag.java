@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.ActionListReader;
+import com.jpexs.decompiler.flash.action.ConstantPoolTooBigException;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
@@ -212,8 +213,8 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
     }
 
     @Override
-    public void setConstantPools(List<List<String>> constantPools) {
-        Action.setConstantPools(this, constantPools);
+    public void setConstantPools(List<List<String>> constantPools) throws ConstantPoolTooBigException {
+        Action.setConstantPools(this, constantPools, false);
     }
 
     @Override

@@ -392,7 +392,7 @@ public abstract class Action implements GraphSourceItem {
         return new ByteArrayRange(bytes);
     }
 
-    public static void setConstantPools(ASMSource src, List<List<String>> constantPools) {
+    public static void setConstantPools(ASMSource src, List<List<String>> constantPools, boolean tryInline) throws ConstantPoolTooBigException {
         try {
             ActionList actions = src.getActions();
             int poolIdx = 0;
@@ -400,6 +400,24 @@ public abstract class Action implements GraphSourceItem {
                 if (action instanceof ActionConstantPool) {
                     ActionConstantPool cPool = (ActionConstantPool) action;
                     List<String> constantPool = constantPools.get(poolIdx);
+
+                    int size = ActionConstantPool.calculateSize(constantPool);
+                    if (size > 0xffff && tryInline) {
+                        for (int i = 0; i < constantPool.size(); i++) {
+                            int refCount = actions.getConstantPoolIndexReferenceCount(i);
+                            if (refCount == 1) {
+                                actions.inlineConstantPoolString(i, constantPool.get(i));
+                                constantPool.set(i, "");
+                            }
+                        }
+
+                        size = ActionConstantPool.calculateSize(constantPool);
+                    }
+
+                    if (size > 0xffff) {
+                        throw new ConstantPoolTooBigException(poolIdx, size);
+                    }
+
                     cPool.constantPool = constantPool;
 
                     poolIdx++;

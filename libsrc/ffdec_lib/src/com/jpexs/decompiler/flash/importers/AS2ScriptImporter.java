@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.importers;
 
+import com.jpexs.decompiler.flash.action.ConstantPoolTooBigException;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
@@ -116,7 +117,11 @@ public class AS2ScriptImporter {
             if (new File(fileName).exists()) {
                 String txt = Helper.readTextFile(fileName);
 
-                asm.setConstantPools(Helper.getConstantPoolsFromText(txt));
+                try {
+                    asm.setConstantPools(Helper.getConstantPoolsFromText(txt));
+                } catch (ConstantPoolTooBigException ex) {
+                    logger.log(Level.SEVERE, null, ex);
+                }
                 asm.setModified();
                 importCount++;
             }

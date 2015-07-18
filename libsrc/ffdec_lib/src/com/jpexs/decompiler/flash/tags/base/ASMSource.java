@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags.base;
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
+import com.jpexs.decompiler.flash.action.ConstantPoolTooBigException;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -70,7 +71,7 @@ public interface ASMSource extends Exportable {
 
     public void setActionBytes(byte[] actionBytes);
 
-    public void setConstantPools(List<List<String>> constantPools);
+    public void setConstantPools(List<List<String>> constantPools) throws ConstantPoolTooBigException;
 
     public GraphTextWriter getActionBytesAsHex(GraphTextWriter writer);
 
