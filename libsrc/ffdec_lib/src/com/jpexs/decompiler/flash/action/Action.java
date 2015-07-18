@@ -427,6 +427,7 @@ public abstract class Action implements GraphSourceItem {
                 }
             }
 
+            actions.removeNonReferencedConstantPoolItems();
             src.setActions(actions);
         } catch (InterruptedException ex) {
             logger.log(Level.SEVERE, null, ex);

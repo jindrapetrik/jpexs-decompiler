@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.action.swf4.ActionJump;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
+import com.jpexs.decompiler.flash.action.swf5.ActionConstantPool;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.FileTextWriter;
@@ -145,6 +146,80 @@ public class ActionList extends ArrayList<Action> {
         };
     }
 
+    public Iterable<ActionConstantPool> getConstantPools() {
+        return () -> new Iterator<ActionConstantPool>() {
+
+            private final Iterator<Action> iterator = ActionList.this.iterator();
+
+            private ActionConstantPool action = getNext();
+
+            @Override
+            public boolean hasNext() {
+                return action != null;
+            }
+
+            @Override
+            public ActionConstantPool next() {
+                ActionConstantPool a = action;
+                action = getNext();
+                return a;
+            }
+
+            private ActionConstantPool getNext() {
+                while (iterator.hasNext()) {
+                    Action a = iterator.next();
+                    if (a instanceof ActionConstantPool) {
+                        return (ActionConstantPool) a;
+                    }
+                }
+
+                return null;
+            }
+
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+        };
+    }
+
+    public Iterable<ActionPush> getPushes() {
+        return () -> new Iterator<ActionPush>() {
+
+            private final Iterator<Action> iterator = ActionList.this.iterator();
+
+            private ActionPush action = getNext();
+
+            @Override
+            public boolean hasNext() {
+                return action != null;
+            }
+
+            @Override
+            public ActionPush next() {
+                ActionPush a = action;
+                action = getNext();
+                return a;
+            }
+
+            private ActionPush getNext() {
+                while (iterator.hasNext()) {
+                    Action a = iterator.next();
+                    if (a instanceof ActionPush) {
+                        return (ActionPush) a;
+                    }
+                }
+
+                return null;
+            }
+
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+        };
+    }
+
     public int getConstantPoolIndexReferenceCount(int index) {
         int count = 0;
         for (Action action : this) {
@@ -165,16 +240,62 @@ public class ActionList extends ArrayList<Action> {
     }
 
     public void inlineConstantPoolString(int index, String str) {
-        for (Action action : this) {
-            if (action instanceof ActionPush) {
-                ActionPush push = (ActionPush) action;
-                for (int i = 0; i < push.values.size(); i++) {
-                    Object value = push.values.get(i);
-                    if (value instanceof ConstantIndex) {
-                        ConstantIndex constantIndex = (ConstantIndex) value;
-                        if (constantIndex.index == index) {
-                            push.values.set(i, str);
+        for (ActionPush push : getPushes()) {
+            for (int i = 0; i < push.values.size(); i++) {
+                Object value = push.values.get(i);
+                if (value instanceof ConstantIndex) {
+                    ConstantIndex constantIndex = (ConstantIndex) value;
+                    if (constantIndex.index == index) {
+                        push.values.set(i, str);
+                    }
+                }
+            }
+        }
+    }
+
+    public void removeNonReferencedConstantPoolItems() {
+        int maxSize = 0;
+        for (ActionConstantPool constantPool : getConstantPools()) {
+            maxSize = Math.max(maxSize, constantPool.constantPool.size());
+        }
+
+        boolean[] used = new boolean[maxSize];
+
+        for (ActionPush push : getPushes()) {
+            for (int i = 0; i < push.values.size(); i++) {
+                Object value = push.values.get(i);
+                if (value instanceof ConstantIndex) {
+                    ConstantIndex constantIndex = (ConstantIndex) value;
+                    int index = constantIndex.index;
+                    if (index >= 0 && index < maxSize) {
+                        used[index] = true;
+                    }
+                }
+            }
+        }
+
+        int newIdx = 0;
+        for (int i = 0; i < maxSize; i++) {
+            if (used[i]) {
+                if (i != newIdx) {
+                    for (ActionPush push : getPushes()) {
+                        for (int j = 0; j < push.values.size(); j++) {
+                            Object value = push.values.get(j);
+                            if (value instanceof ConstantIndex) {
+                                ConstantIndex constantIndex = (ConstantIndex) value;
+                                if (constantIndex.index == i) {
+                                    constantIndex.index = newIdx;
+                                }
+                            }
                         }
+                    }
+                }
+
+                newIdx++;
+            } else {
+                for (ActionConstantPool constantPool : getConstantPools()) {
+                    if (constantPool.constantPool.size() > newIdx) {
+                        constantPool.constantPool.remove(newIdx);
                     }
                 }
             }
