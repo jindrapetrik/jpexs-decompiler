@@ -90,7 +90,8 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
         removeObfuscationIfs(actions, fakeFunctions);
         removeUnreachableActions(actions);
         removeZeroJumps(actions);
-        rereadActionList(actions, swf); // this call will fix the contant pool assigments
+        ActionListReader.fixConstantPools(null, actions);
+        //rereadActionList(actions, swf); // this call will fix the contant pool assigments
     }
 
     private void combinePushs(ActionList actions) {

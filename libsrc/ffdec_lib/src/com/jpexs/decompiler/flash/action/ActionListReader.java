@@ -271,7 +271,7 @@ public class ActionListReader {
         for (int i = 0; i < endIp; i++) {
             retMap.add(null);
         }
-        List<Action> actionMap = new ArrayList<>(endIp);
+        List<Action> actionMap = new ArrayList<>(endIp + 1);
         for (int i = 0; i <= endIp; i++) {
             actionMap.add(null);
         }
@@ -764,6 +764,115 @@ public class ActionListReader {
             }
         }
         return entryAction;
+    }
+
+    public static void fixConstantPools(List<DisassemblyListener> listeners, ActionList actions) {
+        Action lastAction = actions.get(actions.size() - 1);
+        int endIp = (int) lastAction.getAddress();
+        List<Action> actionMap = new ArrayList<>(endIp);
+        for (int i = 0; i <= endIp; i++) {
+            actionMap.add(null);
+        }
+        for (Action a : actions) {
+            actionMap.set((int) a.getAddress(), a);
+        }
+
+        try {
+            fixConstantPools(listeners, new ConstantPool(), actionMap, new TreeMap<>(), 0, 0, endIp, null, true, new ArrayList<>());
+        } catch (IOException ex) {
+            // ignore
+        }
+    }
+
+    private static void fixConstantPools(List<DisassemblyListener> listeners, ConstantPool cpool,
+            List<Action> actions, Map<Integer, Action> actionMap,
+            int ip, int startIp, int endIp, String path, boolean indeterminate, List<Integer> visitedContainers) throws IOException {
+
+        if (visitedContainers.contains(ip)) {
+            return;
+        }
+        visitedContainers.add(ip);
+
+        Queue<Integer> jumpQueue = new LinkedList<>();
+        jumpQueue.add(ip);
+        while (!jumpQueue.isEmpty()) {
+            ip = jumpQueue.remove();
+            if (ip < startIp) {
+                continue;
+            }
+
+            while (endIp == -1 || endIp > ip) {
+                Action a;
+                if ((a = actions.get(ip)) == null) {
+                    break;
+                }
+
+                int actionLengthWithHeader = a.getTotalActionLength();
+
+                // unknown action, replace with jump
+                if (a instanceof ActionNop) {
+                    ActionJump aJump = new ActionDeobfuscateJump(0);
+                    int jumpLength = aJump.getTotalActionLength();
+                    aJump.setAddress(a.getAddress());
+                    //FIXME! This offset can be larger than SI16 value!
+                    aJump.setJumpOffset(actionLengthWithHeader - jumpLength);
+                    a = aJump;
+                    actionLengthWithHeader = a.getTotalActionLength();
+                }
+
+                Action existingAction = actionMap.get(ip);
+                if (existingAction != null) {
+                    break;
+                }
+
+                actionMap.put(ip, a);
+
+                if (listeners != null) {
+                    for (int i = 0; i < listeners.size(); i++) {
+                        listeners.get(i).progressReading(ip, actions.size());
+                    }
+                }
+
+                a.setAddress(ip);
+
+                if (a instanceof ActionPush && cpool != null) {
+                    ((ActionPush) a).constantPool = cpool.constants;
+                } else if (a instanceof ActionConstantPool) {
+                    cpool = new ConstantPool(((ActionConstantPool) a).constantPool);
+                } else if (a instanceof ActionIf) {
+                    ActionIf aIf = (ActionIf) a;
+                    int nIp = ip + actionLengthWithHeader + aIf.getJumpOffset();
+                    if (nIp >= 0) {
+                        jumpQueue.add(nIp);
+                    }
+                } else if (a instanceof ActionJump) {
+                    ActionJump aJump = (ActionJump) a;
+                    int nIp = ip + actionLengthWithHeader + aJump.getJumpOffset();
+                    if (nIp >= 0) {
+                        jumpQueue.add(nIp);
+                    }
+                    break;
+                } else if (a instanceof GraphSourceItemContainer) {
+                    GraphSourceItemContainer cnt = (GraphSourceItemContainer) a;
+                    String cntName = cnt.getName();
+                    String newPath = path + (cntName == null ? "" : "/" + cntName);
+                    for (long size : cnt.getContainerSizes()) {
+                        if (size != 0) {
+                            int ip2 = ip + actionLengthWithHeader;
+                            int endIp2 = ip + actionLengthWithHeader + (int) size;
+                            fixConstantPools(listeners, cpool, actions, actionMap, ip2, startIp, endIp2, newPath, indeterminate, visitedContainers);
+                            actionLengthWithHeader += size;
+                        }
+                    }
+                }
+
+                ip += actionLengthWithHeader;
+
+                if (a.isExit()) {
+                    break;
+                }
+            }
+        }
     }
 
     private static void deobfustaceActionListAtPosRecursive(List<DisassemblyListener> listeners, List<GraphTargetItem> output, HashMap<Long, List<GraphSourceItemContainer>> containers, ActionLocalData localData, TranslateStack stack, ConstantPool cpool, List<Action> actions, int ip, List<Action> ret, int startIp, int endip, String path, Map<Integer, Integer> visited, boolean indeterminate, Map<Integer, HashMap<String, GraphTargetItem>> decisionStates, int version, int recursionLevel, int maxRecursionLevel) throws IOException, InterruptedException {

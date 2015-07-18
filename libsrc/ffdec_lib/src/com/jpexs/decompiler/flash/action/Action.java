@@ -323,12 +323,7 @@ public abstract class Action implements GraphSourceItem {
      * @return Length
      */
     public final int getBytesLength(int version) {
-        int contentLength = getContentBytesLength();
-        if (contentLength == -1) {
-            return getBytes(version).length;
-        }
-
-        return contentLength + 1 + (actionCode >= 0x80 ? 2 : 0);
+        return getContentBytesLength() + (actionCode >= 0x80 ? 3 : 1);
     }
 
     protected int getContentBytesLength() {
