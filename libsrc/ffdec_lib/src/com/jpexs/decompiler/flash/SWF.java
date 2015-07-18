@@ -1251,8 +1251,8 @@ public final class SWF implements SWFContainerItem, Timelined {
         return true;
     }
 
-    public boolean exportAS3Class(String className, String outdir, ScriptExportSettings exportSettings, boolean parallel, EventListener evl) throws Exception {
-        boolean exported = false;
+    public List<ScriptPack> getScriptPacksByClassNames(List<String> classNames) throws Exception {
+        Set<ScriptPack> resultSet = new HashSet<>();
 
         List<ABCContainerTag> abcList = getAbcList();
         List<ABC> allAbcList = new ArrayList<>();
@@ -1260,27 +1260,18 @@ public final class SWF implements SWFContainerItem, Timelined {
             allAbcList.add(abcList.get(i).getABC());
         }
 
-        for (int i = 0; i < abcList.size(); i++) {
-            ABC abc = abcList.get(i).getABC();
-            List<ScriptPack> scrs = abc.findScriptPacksByPath(className, allAbcList);
-            for (int j = 0; j < scrs.size(); j++) {
-                ScriptPack scr = scrs.get(j);
-                if (!scr.isSimple && Configuration.ignoreCLikePackages.get()) {
-                    continue;
+        for (String className : classNames) {
+            for (int i = 0; i < abcList.size(); i++) {
+                ABC abc = abcList.get(i).getABC();
+                List<ScriptPack> scrs = abc.findScriptPacksByPath(className, allAbcList);
+                for (int j = 0; j < scrs.size(); j++) {
+                    ScriptPack scr = scrs.get(j);
+                    resultSet.add(scr);
                 }
-                String cnt = "";
-                if (scrs.size() > 1) {
-                    cnt = "script " + (j + 1) + "/" + scrs.size() + " ";
-                }
-                String eventData = cnt + scr.getPath() + " ...";
-                evl.handleExportingEvent("tag", i + 1, abcList.size(), eventData);
-                File file = scr.getExportFile(outdir, exportSettings);
-                scr.export(file, exportSettings, parallel);
-                evl.handleExportedEvent("tag", i + 1, abcList.size(), eventData);
-                exported = true;
             }
         }
-        return exported;
+
+        return new ArrayList<>(resultSet);
     }
 
     private List<ScriptPack> uniqueAS3Packs(List<ScriptPack> packs) {
@@ -1349,15 +1340,15 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     public List<File> exportActionScript(AbortRetryIgnoreHandler handler, String outdir, ScriptExportSettings exportSettings, boolean parallel, EventListener evl) throws IOException {
-        return exportActionScript(handler, outdir, exportSettings, parallel, evl, true, true);
+        return exportActionScript(handler, outdir, null, exportSettings, parallel, evl, true, true);
     }
 
-    public List<File> exportActionScript(AbortRetryIgnoreHandler handler, String outdir, ScriptExportSettings exportSettings, boolean parallel, EventListener evl, boolean as2, boolean as3) throws IOException {
+    public List<File> exportActionScript(AbortRetryIgnoreHandler handler, String outdir, List<ScriptPack> as3scripts, ScriptExportSettings exportSettings, boolean parallel, EventListener evl, boolean as2, boolean as3) throws IOException {
         List<File> ret = new ArrayList<>();
 
         if (isAS3()) {
             if (as3) {
-                ret.addAll(new AS3ScriptExporter().exportActionScript3(this, handler, outdir, exportSettings, parallel, evl));
+                ret.addAll(new AS3ScriptExporter().exportActionScript3(this, handler, outdir, as3scripts, exportSettings, parallel, evl));
             }
         } else {
             if (as2) {

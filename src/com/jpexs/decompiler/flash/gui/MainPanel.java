@@ -57,6 +57,7 @@ import com.jpexs.decompiler.flash.exporters.modes.SpriteExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.SymbolClassExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.TextExportMode;
 import com.jpexs.decompiler.flash.exporters.script.AS2ScriptExporter;
+import com.jpexs.decompiler.flash.exporters.script.AS3ScriptExporter;
 import com.jpexs.decompiler.flash.exporters.settings.BinaryDataExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.ButtonExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.FontExportSettings;
@@ -1233,25 +1234,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     Path.createDirectorySafe(new File(scriptsFolder));
                     ScriptExportSettings scriptExportSettings = new ScriptExportSettings(export.getValue(ScriptExportMode.class), !parallel && Configuration.scriptExportSingleFile.get());
                     String singleFileName = Path.combine(scriptsFolder, swf.getShortFileName() + scriptExportSettings.getFileExtension());
-                    if (swf.isAS3()) {
-                        try (FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
-                            scriptExportSettings.singleFileWriter = writer;
-                            for (int i = 0; i < as3scripts.size(); i++) {
-
-                                ScriptPack tls = as3scripts.get(i);
-                                if (!tls.isSimple && Configuration.ignoreCLikePackages.get()) {
-                                    continue;
-                                }
-
-                                Main.startWork(translate("work.exporting") + " " + (i + 1) + "/" + as3scripts.size() + " " + tls.getPath() + " ...", null);
-                                File file = tls.getExportFile(scriptsFolder, scriptExportSettings);
-                                ret.add(tls.export(file, scriptExportSettings, parallel));
-                            }
-                        }
-                    } else {
-                        Map<String, ASMSource> asmsToExport = swf.getASMs(true, as12scripts, false);
-                        try (FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
-                            scriptExportSettings.singleFileWriter = writer;
+                    try (FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
+                        scriptExportSettings.singleFileWriter = writer;
+                        if (swf.isAS3()) {
+                            ret.addAll(new AS3ScriptExporter().exportActionScript3(swf, handler, scriptsFolder, as3scripts, scriptExportSettings, parallel, evl));
+                        } else {
+                            Map<String, ASMSource> asmsToExport = swf.getASMs(true, as12scripts, false);
                             ret.addAll(new AS2ScriptExporter().exportAS2Scripts(handler, scriptsFolder, asmsToExport, scriptExportSettings, parallel, evl));
                         }
                     }

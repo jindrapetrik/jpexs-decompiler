@@ -48,9 +48,9 @@ public class AS3ScriptExporter {
 
     private static final Logger logger = Logger.getLogger(AS3ScriptExporter.class.getName());
 
-    public List<File> exportActionScript3(SWF swf, AbortRetryIgnoreHandler handler, String outdir, ScriptExportSettings exportSettings, boolean parallel, EventListener evl) {
+    public List<File> exportActionScript3(SWF swf, AbortRetryIgnoreHandler handler, String outdir, List<ScriptPack> as3scripts, ScriptExportSettings exportSettings, boolean parallel, EventListener evl) {
         final List<File> ret = new ArrayList<>();
-        final List<ScriptPack> packs = swf.getAS3Packs();
+        final List<ScriptPack> packs = as3scripts != null ? as3scripts : swf.getAS3Packs();
 
         int cnt = 1;
         List<ExportPackTask> tasks = new ArrayList<>();

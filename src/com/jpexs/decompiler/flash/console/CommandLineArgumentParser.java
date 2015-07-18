@@ -1301,13 +1301,8 @@ public class CommandLineArgumentParser {
                     String singleFileName = Path.combine(scriptsFolder, swf.getShortFileName() + scriptExportSettings.getFileExtension());
                     try (FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
                         scriptExportSettings.singleFileWriter = writer;
-                        if (!as3classes.isEmpty()) {
-                            for (String as3class : as3classes) {
-                                exportOK = swf.exportAS3Class(as3class, scriptsFolder, scriptExportSettings, parallel, evl) && exportOK;
-                            }
-                        } else {
-                            exportOK = swf.exportActionScript(handler, scriptsFolder, scriptExportSettings, parallel, evl, exportAs2Script, exportAs3Script) != null && exportOK;
-                        }
+                        List<ScriptPack> as3packs = as3classes.isEmpty() ? null : swf.getScriptPacksByClassNames(as3classes);
+                        exportOK = swf.exportActionScript(handler, scriptsFolder, as3classes.isEmpty() ? null : as3packs, scriptExportSettings, parallel, evl, exportAs2Script, exportAs3Script) != null && exportOK;
                     }
                 }
 
