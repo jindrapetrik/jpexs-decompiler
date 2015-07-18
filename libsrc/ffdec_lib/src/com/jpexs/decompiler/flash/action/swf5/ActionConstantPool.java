@@ -77,8 +77,12 @@ public class ActionConstantPool extends Action {
      */
     @Override
     protected int getContentBytesLength() {
+        return calculateSize(constantPool);
+    }
+
+    public static int calculateSize(List<String> strings) {
         int res = 2;
-        for (String s : constantPool) {
+        for (String s : strings) {
             res += Utf8Helper.getBytesLength(s) + 1;
         }
 

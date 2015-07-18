@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.action.parser.script.ParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.script.SymbolType;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
+import com.jpexs.decompiler.flash.action.swf5.ActionConstantPool;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.gui.AppStrings;
@@ -786,7 +787,16 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
             if (trimmed.startsWith(Helper.hexData)) {
                 src.setActionBytes(Helper.getBytesFromHexaText(text));
             } else if (trimmed.startsWith(Helper.constants)) {
-                src.setConstantPools(Helper.getConstantPoolsFromText(text));
+                List<List<String>> constantPools = Helper.getConstantPoolsFromText(text);
+                for (int i = 0; i < constantPools.size(); i++) {
+                    List<String> constantPool = constantPools.get(i);
+                    int size = ActionConstantPool.calculateSize(constantPool);
+                    if (size > 0xffff) {
+                        View.showMessageDialog(this, AppStrings.translate("error.constantPoolTooBig").replace("%index%", Integer.toString(i)).replace("%size%", Integer.toString(size)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+
+                src.setConstantPools(constantPools);
             } else {
                 src.setActions(ASMParser.parse(0, true, text, src.getSwf().version, false));
             }
@@ -806,6 +816,8 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
             editor.gotoLine((int) ex.line);
             editor.markError();
             View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+        } catch (Throwable ex) {
+            logger.log(Level.SEVERE, null, ex);
         }
     }
 
