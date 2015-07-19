@@ -1106,11 +1106,15 @@ public class CommandLineArgumentParser {
             for (File inFile : inFiles) {
                 String inFileName = Path.getFileNameWithoutExtension(inFile);
                 if (stdOut != null) {
-                    System.setOut(new PrintStream(new FileOutputStream(stdOut.replace("{swfFile}", inFileName), true)));
+                    String outFilePath = stdOut.replace("{swfFile}", inFileName);
+                    Path.createDirectorySafe(new File(outFilePath).getParentFile());
+                    System.setOut(new PrintStream(new FileOutputStream(outFilePath, true)));
                 }
 
                 if (stdErr != null) {
-                    System.setErr(new PrintStream(new FileOutputStream(stdErr.replace("{swfFile}", inFileName), true)));
+                    String errFilePath = stdErr.replace("{swfFile}", inFileName);
+                    Path.createDirectorySafe(new File(errFilePath).getParentFile());
+                    System.setErr(new PrintStream(new FileOutputStream(errFilePath, true)));
                     Main.initLogging(Configuration.debugMode.get());
                 }
 
