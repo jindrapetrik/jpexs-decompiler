@@ -57,7 +57,7 @@ public class ShapeImporter {
 
         int idx = swf.tags.indexOf(st);
         if (idx != -1) {
-            swf.tags.add(0, imageTag);
+            swf.tags.add(idx, imageTag);
         } else {
             swf.tags.add(imageTag);
         }
