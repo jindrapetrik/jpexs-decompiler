@@ -422,21 +422,59 @@ public class CommandLineArgumentParser {
     private static void printCmdLineUsageExamples(PrintStream out, String filter) {
         out.println();
         out.println("Examples:");
-        out.println("java -jar ffdec.jar myfile.swf");
-        out.println("java -jar ffdec.jar -proxy");
-        out.println("java -jar ffdec.jar -proxy -P1234");
-        out.println("java -jar ffdec.jar -export script \"C:\\decompiled\" myfile.swf");
-        out.println("java -jar ffdec.jar -selectclass com.example.MyClass,com.example.SecondClass -export script \"C:\\decompiled\" myfile.swf");
-        out.println("java -jar ffdec.jar -format script:pcode -export script \"C:\\decompiled\" myfile.swf");
-        out.println("java -jar ffdec.jar -format script:pcode,text:plain -export script,text,image \"C:\\decompiled\" myfile.swf");
-        out.println("java -jar ffdec.jar -format fla:cs5.5 -export fla \"C:\\sources\\myfile.fla\" myfile.swf");
-        out.println("java -jar ffdec.jar -dumpSWF myfile.swf");
-        out.println("java -jar ffdec.jar -compress myfile.swf myfilecomp.swf");
-        out.println("java -jar ffdec.jar -decompress myfile.swf myfiledec.swf");
-        out.println("java -jar ffdec.jar -onerror ignore -export script \"C:\\decompiled\" myfile.swf");
-        out.println("java -jar ffdec.jar -onerror retry 5 -export script \"C:\\decompiled\" myfile.swf");
-        out.println("java -jar ffdec.jar -config autoDeobfuscate=1,parallelSpeedUp=0 -export script \"C:\\decompiled\" myfile.swf");
-        out.println("java -jar ffdec.jar -deobfuscate max myas3file_secure.swf myas3file.swf");
+
+        boolean exampleFound = false;
+        if (filter == null) {
+            out.println("java -jar ffdec.jar myfile.swf");
+            exampleFound = true;
+        }
+
+        if (filter == null || filter.equals("proxy")) {
+            out.println("java -jar ffdec.jar -proxy");
+            out.println("java -jar ffdec.jar -proxy -P1234");
+            exampleFound = true;
+        }
+
+        if (filter == null || filter.equals("export") || filter.equals("format") || filter.equals("selectclass") || filter.equals("onerror")) {
+            out.println("java -jar ffdec.jar -export script \"C:\\decompiled\" myfile.swf");
+            out.println("java -jar ffdec.jar -selectclass com.example.MyClass,com.example.SecondClass -export script \"C:\\decompiled\" myfile.swf");
+            out.println("java -jar ffdec.jar -format script:pcode -export script \"C:\\decompiled\" myfile.swf");
+            out.println("java -jar ffdec.jar -format script:pcode,text:plain -export script,text,image \"C:\\decompiled\" myfile.swf");
+            out.println("java -jar ffdec.jar -format fla:cs5.5 -export fla \"C:\\sources\\myfile.fla\" myfile.swf");
+            out.println("java -jar ffdec.jar -onerror ignore -export script \"C:\\decompiled\" myfile.swf");
+            out.println("java -jar ffdec.jar -onerror retry 5 -export script \"C:\\decompiled\" myfile.swf");
+            exampleFound = true;
+        }
+
+        if (filter == null || filter.equals("dumpswf")) {
+            out.println("java -jar ffdec.jar -dumpSWF myfile.swf");
+            exampleFound = true;
+        }
+
+        if (filter == null || filter.equals("compress")) {
+            out.println("java -jar ffdec.jar -compress myfile.swf myfilecomp.swf");
+            exampleFound = true;
+        }
+
+        if (filter == null || filter.equals("decompress")) {
+            out.println("java -jar ffdec.jar -decompress myfile.swf myfiledec.swf");
+            exampleFound = true;
+        }
+
+        if (filter == null || filter.equals("config")) {
+            out.println("java -jar ffdec.jar -config autoDeobfuscate=1,parallelSpeedUp=0 -export script \"C:\\decompiled\" myfile.swf");
+            exampleFound = true;
+        }
+
+        if (filter == null || filter.equals("deobfuscate")) {
+            out.println("java -jar ffdec.jar -deobfuscate max myas3file_secure.swf myas3file.swf");
+            exampleFound = true;
+        }
+
+        if (!exampleFound) {
+            out.println("Sorry, no example found for command " + filter + ", Let us know in issue tracker when you need it.");
+        }
+
         out.println();
         out.println("Instead of \"java -jar ffdec.jar\" you can use ffdec.bat on Windows, ffdec.sh on Linux/MacOs");
     }
