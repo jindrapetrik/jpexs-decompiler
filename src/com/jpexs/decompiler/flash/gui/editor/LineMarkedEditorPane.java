@@ -274,7 +274,7 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
     public void setText(String t) {
         lastLine = -1;
         error = false;
-        if (Configuration.debugMode.get() && t.length() > truncateLimit) {
+        if (Configuration.debugMode.get() && t != null && t.length() > truncateLimit) {
             t = t.substring(0, truncateLimit) + "\r\n" + AppStrings.translate("editorTruncateWarning").replace("%chars%", Integer.toString(truncateLimit));
         }
         super.setText(t);
