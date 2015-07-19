@@ -39,9 +39,9 @@
 		private static var svgxml:Class;
 		
 		[Embed(source="text.txt",
-		   mimeType="application/octet-stream")]		
+		   mimeType="application/octet-stream")]
 		private static var txt:Class;*/
-	
-		
+
+
 	}
 }

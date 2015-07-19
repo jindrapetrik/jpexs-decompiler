@@ -885,7 +885,7 @@
 		public function testVector2()
 		{
 			var a:Vector.<Vector.<int>> = new Vector.<Vector.<int>>();
-         	var b:Vector.<int> = new <int>[10,20,30];
+         		var b:Vector.<int> = new <int>[10, 20, 30];
 		}
 		
 		public function testFinallyOnly(){
