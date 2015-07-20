@@ -87,8 +87,12 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
      * @param swf
      */
     public DefineBitsLossless2Tag(SWF swf) {
-        super(swf, ID, NAME, null);
-        characterID = swf.getNextCharacterId();
+        this(swf, null, swf.getNextCharacterId());
+    }
+
+    public DefineBitsLossless2Tag(SWF swf, ByteArrayRange data, int characterID) {
+        super(swf, ID, NAME, data);
+        this.characterID = characterID;
         bitmapFormat = DefineBitsLossless2Tag.FORMAT_32BIT_ARGB;
         bitmapWidth = 1;
         bitmapHeight = 1;
@@ -202,11 +206,11 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
 
     private void uncompressData() {
         try {
-            SWFInputStream sis = new SWFInputStream(swf, Helper.readStream(new InflaterInputStream(new ByteArrayInputStream(zlibBitmapData.getArray(), zlibBitmapData.getPos(), zlibBitmapData.getLength()))));
+            byte[] uncompressedData = Helper.readStream(new InflaterInputStream(new ByteArrayInputStream(zlibBitmapData.getArray(), zlibBitmapData.getPos(), zlibBitmapData.getLength())));
+            SWFInputStream sis = new SWFInputStream(swf, uncompressedData);
             if (bitmapFormat == FORMAT_8BIT_COLORMAPPED) {
                 colorMapData = sis.readALPHACOLORMAPDATA(bitmapColorTableSize, bitmapWidth, bitmapHeight, "colorMapData");
-            }
-            if (bitmapFormat == FORMAT_32BIT_ARGB) {
+            } else if (bitmapFormat == FORMAT_32BIT_ARGB) {
                 bitmapData = sis.readALPHABITMAPDATA(bitmapFormat, bitmapWidth, bitmapHeight, "bitmapData");
             }
         } catch (IOException ex) {

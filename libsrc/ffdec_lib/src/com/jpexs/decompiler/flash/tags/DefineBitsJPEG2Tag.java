@@ -67,13 +67,13 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
         this.imageData = new ByteArrayRange(imageData);
     }
 
-    private byte[] createEmptyImage() {
-        BufferedImage img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
-        ByteArrayOutputStream bitmapDataOS = new ByteArrayOutputStream();
-        ImageHelper.write(img, ImageFormat.JPEG, bitmapDataOS);
-        return bitmapDataOS.toByteArray();
-    }
-
+    /**
+     * Constructor
+     *
+     * @param sis
+     * @param data
+     * @throws IOException
+     */
     public DefineBitsJPEG2Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
@@ -95,6 +95,20 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
     public void getData(SWFOutputStream sos) throws IOException {
         sos.writeUI16(characterID);
         sos.write(imageData);
+    }
+
+    private byte[] createEmptyImage() {
+        BufferedImage img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+        ByteArrayOutputStream bitmapDataOS = new ByteArrayOutputStream();
+        ImageHelper.write(img, ImageFormat.JPEG, bitmapDataOS);
+        return bitmapDataOS.toByteArray();
+    }
+
+    @Override
+    public void setImage(byte[] data) {
+        imageData = new ByteArrayRange(data);
+        clearCache();
+        setModified(true);
     }
 
     @Override
@@ -120,22 +134,15 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
                 return null;
             }
 
-            SerializableImage ret = new SerializableImage(image);
+            SerializableImage img = new SerializableImage(image);
             if (Configuration.cacheImages.get()) {
-                cachedImage = ret;
+                cachedImage = img;
             }
 
-            return ret;
+            return img;
         } catch (IOException ex) {
             Logger.getLogger(DefineBitsJPEG2Tag.class.getName()).log(Level.SEVERE, "Failed to get image", ex);
         }
         return null;
-    }
-
-    @Override
-    public void setImage(byte[] data) {
-        imageData = new ByteArrayRange(data);
-        clearCache();
-        setModified(true);
     }
 }

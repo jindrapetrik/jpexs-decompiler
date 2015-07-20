@@ -88,6 +88,8 @@ import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG4Tag;
+import com.jpexs.decompiler.flash.tags.DefineBitsLossless2Tag;
+import com.jpexs.decompiler.flash.tags.DefineBitsLosslessTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -384,9 +386,11 @@ public class CommandLineArgumentParser {
         }
 
         if (filter == null || filter.equals("replace")) {
-            out.println(" " + (cnt++) + ") -replace <infile> <outfile> (<characterId1>|<scriptName1>) <importDataFile1> [methodBodyIndex1] [(<characterId2>|<scriptName2>) <importDataFile2> [methodBodyIndex2]]...");
-            out.println(" ...replaces the data of the specified BinaryData, Image, Text, DefineSound tag or Script");
-            out.println(" ...methodBodyIndexN parameter should be specified if and only if the imported entity is an AS3 P-Code");
+            out.println(" " + (cnt++) + ") -replace <infile> <outfile> (<characterId1>|<scriptName1>) <importDataFile1> ([<format1>][<methodBodyIndex1>]) [(<characterId2>|<scriptName2>) <importDataFile2> ([<format2>][<methodBodyIndex2>])]...");
+            out.println(" ...replaces the data of the specified BinaryData, Image, Shape, Text, DefineSound tag or Script");
+            out.println(" ...<format> parameter can be specified for Image and Shape tags");
+            out.println(" ...valid formats: lossless, lossless2, jpeg2, jpeg3, jpeg4");
+            out.println(" ...<methodBodyIndexN> parameter should be specified if and only if the imported entity is an AS3 P-Code");
         }
 
         if (filter == null || filter.equals("replacealpha")) {
@@ -1889,11 +1893,13 @@ public class CommandLineArgumentParser {
                             DefineBinaryDataTag defineBinaryData = (DefineBinaryDataTag) characterTag;
                             new BinaryDataImporter().importData(defineBinaryData, data);
                         } else if (characterTag instanceof ImageTag) {
+                            int format = parseImageFormat(args);
                             ImageTag imageTag = (ImageTag) characterTag;
-                            new ImageImporter().importImage(imageTag, data);
+                            new ImageImporter().importImage(imageTag, data, format);
                         } else if (characterTag instanceof ShapeTag) {
+                            int format = parseImageFormat(args);
                             ShapeTag shapeTag = (ShapeTag) characterTag;
-                            new ShapeImporter().importImage(shapeTag, data);
+                            new ShapeImporter().importImage(shapeTag, data, format);
                         } else if (characterTag instanceof TextTag) {
                             TextTag textTag = (TextTag) characterTag;
                             new TextImporter(new MissingCharacterHandler(), new TextImportErrorHandler() {
@@ -1991,6 +1997,38 @@ public class CommandLineArgumentParser {
             System.err.println("I/O error during reading");
             System.exit(2);
         }
+    }
+
+    private static int parseImageFormat(Stack<String> args) {
+        if (args.isEmpty()) {
+            return 0;
+        }
+
+        String format = args.peek();
+        int res = 0;
+        switch (format) {
+            case "lossless":
+                res = DefineBitsLosslessTag.ID;
+                break;
+            case "lossless2":
+                res = DefineBitsLossless2Tag.ID;
+                break;
+            case "jpeg2":
+                res = DefineBitsJPEG2Tag.ID;
+                break;
+            case "jpeg3":
+                res = DefineBitsJPEG3Tag.ID;
+                break;
+            case "jpeg4":
+                res = DefineBitsJPEG4Tag.ID;
+                break;
+        }
+
+        if (res != 0) {
+            args.pop();
+        }
+
+        return res;
     }
 
     private static void parseReplaceAlpha(Stack<String> args) {

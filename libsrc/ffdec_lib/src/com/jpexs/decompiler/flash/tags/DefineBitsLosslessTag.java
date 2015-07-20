@@ -89,8 +89,12 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
      * @param swf
      */
     public DefineBitsLosslessTag(SWF swf) {
-        super(swf, ID, NAME, null);
-        characterID = swf.getNextCharacterId();
+        this(swf, null, swf.getNextCharacterId());
+    }
+
+    public DefineBitsLosslessTag(SWF swf, ByteArrayRange data, int characterID) {
+        super(swf, ID, NAME, data);
+        this.characterID = characterID;
         bitmapFormat = DefineBitsLosslessTag.FORMAT_24BIT_RGB;
         bitmapWidth = 1;
         bitmapHeight = 1;
@@ -181,6 +185,39 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
         setModified(true);
     }
 
+    public COLORMAPDATA getColorMapData() {
+        if (!decompressed) {
+            uncompressData();
+        }
+        return colorMapData;
+    }
+
+    public BITMAPDATA getBitmapData() {
+        if (!decompressed) {
+            uncompressData();
+        }
+        return bitmapData;
+    }
+
+    private void uncompressData() {
+        try {
+            byte[] uncompressedData = Helper.readStream(new InflaterInputStream(new ByteArrayInputStream(zlibBitmapData.getArray(), zlibBitmapData.getPos(), zlibBitmapData.getLength())));
+            SWFInputStream sis = new SWFInputStream(swf, uncompressedData);
+            if (bitmapFormat == FORMAT_8BIT_COLORMAPPED) {
+                colorMapData = sis.readCOLORMAPDATA(bitmapColorTableSize, bitmapWidth, bitmapHeight, "colorMapData");
+            } else if ((bitmapFormat == FORMAT_15BIT_RGB) || (bitmapFormat == FORMAT_24BIT_RGB)) {
+                bitmapData = sis.readBITMAPDATA(bitmapFormat, bitmapWidth, bitmapHeight, "bitmapData");
+            }
+        } catch (IOException ex) {
+        }
+        decompressed = true;
+    }
+
+    @Override
+    public ImageFormat getImageFormat() {
+        return ImageFormat.PNG;
+    }
+
     @Override
     public InputStream getOriginalImageData() {
         return null;
@@ -237,38 +274,5 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
         }
 
         return bi;
-    }
-
-    public COLORMAPDATA getColorMapData() {
-        if (!decompressed) {
-            uncompressData();
-        }
-        return colorMapData;
-    }
-
-    public BITMAPDATA getBitmapData() {
-        if (!decompressed) {
-            uncompressData();
-        }
-        return bitmapData;
-    }
-
-    private void uncompressData() {
-        try {
-            byte[] uncompressedData = Helper.readStream(new InflaterInputStream(new ByteArrayInputStream(zlibBitmapData.getArray(), zlibBitmapData.getPos(), zlibBitmapData.getLength())));
-            SWFInputStream sis = new SWFInputStream(swf, uncompressedData);
-            if (bitmapFormat == FORMAT_8BIT_COLORMAPPED) {
-                colorMapData = sis.readCOLORMAPDATA(bitmapColorTableSize, bitmapWidth, bitmapHeight, "colorMapData");
-            } else if ((bitmapFormat == FORMAT_15BIT_RGB) || (bitmapFormat == FORMAT_24BIT_RGB)) {
-                bitmapData = sis.readBITMAPDATA(bitmapFormat, bitmapWidth, bitmapHeight, "bitmapData");
-            }
-        } catch (IOException ex) {
-        }
-        decompressed = true;
-    }
-
-    @Override
-    public ImageFormat getImageFormat() {
-        return ImageFormat.PNG;
     }
 }

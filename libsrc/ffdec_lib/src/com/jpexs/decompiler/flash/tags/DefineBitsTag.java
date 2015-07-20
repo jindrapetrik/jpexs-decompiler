@@ -60,6 +60,13 @@ public class DefineBitsTag extends ImageTag implements TagChangedListener {
         forceWriteAsLong = true;
     }
 
+    /**
+     * Constructor
+     *
+     * @param sis
+     * @param data
+     * @throws IOException
+     */
     public DefineBitsTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
@@ -84,14 +91,19 @@ public class DefineBitsTag extends ImageTag implements TagChangedListener {
     }
 
     @Override
+    public boolean importSupported() {
+        // importing a new image will replace the current DefineBitsTag with a new DefineBitsJPEG2Tag
+        return true;
+    }
+
+    @Override
     public void setImage(byte[] data) {
         throw new UnsupportedOperationException("Set image is not supported for DefineBits");
     }
 
     @Override
-    public boolean importSupported() {
-        // importing a new image will replace the current DefineBitsTag with a new DefineBitsJPEG2Tag
-        return true;
+    public ImageFormat getImageFormat() {
+        return ImageFormat.JPEG;
     }
 
     @Override
@@ -132,23 +144,18 @@ public class DefineBitsTag extends ImageTag implements TagChangedListener {
                     return null;
                 }
 
-                SerializableImage ret = new SerializableImage(image);
+                SerializableImage img = new SerializableImage(image);
                 if (Configuration.cacheImages.get()) {
-                    cachedImage = ret;
+                    cachedImage = img;
                 }
 
-                return ret;
+                return img;
             } catch (IOException ex) {
                 Logger.getLogger(DefineBitsTag.class.getName()).log(Level.SEVERE, "Failed to get image", ex);
             }
         }
 
         return null;
-    }
-
-    @Override
-    public ImageFormat getImageFormat() {
-        return ImageFormat.JPEG;
     }
 
     @Override

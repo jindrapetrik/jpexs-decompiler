@@ -66,6 +66,14 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
         forceWriteAsLong = true;
     }
 
+    public DefineBitsJPEG3Tag(SWF swf, ByteArrayRange data, int characterID, byte[] imageData) throws IOException {
+        super(swf, ID, NAME, data);
+        this.characterID = characterID;
+        this.imageData = new ByteArrayRange(imageData);
+        bitmapAlphaData = ByteArrayRange.EMPTY;
+        forceWriteAsLong = true;
+    }
+
     /**
      * Constructor
      *
@@ -153,7 +161,7 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
 
     @Override
     public InputStream getOriginalImageData() {
-        if (bitmapAlphaData.getLength() == 0) { //No alpha, then its JPEG
+        if (bitmapAlphaData.getLength() == 0) { // No alpha
             int errorLength = hasErrorHeader(imageData) ? 4 : 0;
             return new ByteArrayInputStream(imageData.getArray(), imageData.getPos() + errorLength, imageData.getLength() - errorLength);
         }

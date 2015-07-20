@@ -19,7 +19,10 @@ package com.jpexs.decompiler.flash.importers;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
+import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
+import com.jpexs.decompiler.flash.tags.DefineBitsJPEG4Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsLossless2Tag;
+import com.jpexs.decompiler.flash.tags.DefineBitsLosslessTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
@@ -36,6 +39,10 @@ import java.io.IOException;
 public class ShapeImporter {
 
     public Tag importImage(ShapeTag st, byte[] newData) throws IOException {
+        return importImage(st, newData, 0);
+    }
+
+    public Tag importImage(ShapeTag st, byte[] newData, int tagType) throws IOException {
         SWF swf = st.getSwf();
 
         if (newData[0] == 'B' && newData[1] == 'M') {
@@ -45,14 +52,42 @@ public class ShapeImporter {
             newData = baos.toByteArray();
         }
 
+        if (tagType == 0) {
+            if (ImageTag.getImageFormat(newData) == ImageFormat.JPEG) {
+                tagType = DefineBitsJPEG2Tag.ID;
+            } else {
+                tagType = DefineBitsLossless2Tag.ID;
+            }
+        }
+
         ImageTag imageTag;
-        if (ImageTag.getImageFormat(newData) == ImageFormat.JPEG) {
-            DefineBitsJPEG2Tag jpeg2Tag = new DefineBitsJPEG2Tag(swf, null, swf.getNextCharacterId(), newData);
-            imageTag = jpeg2Tag;
-        } else {
-            DefineBitsLossless2Tag lossless2Tag = new DefineBitsLossless2Tag(swf);
-            lossless2Tag.setImage(newData);
-            imageTag = lossless2Tag;
+        switch (tagType) {
+            case DefineBitsJPEG2Tag.ID: {
+                imageTag = new DefineBitsJPEG2Tag(swf, null, swf.getNextCharacterId(), newData);
+                break;
+            }
+            case DefineBitsJPEG3Tag.ID: {
+                imageTag = new DefineBitsJPEG3Tag(swf, null, swf.getNextCharacterId(), newData);
+                break;
+            }
+            case DefineBitsJPEG4Tag.ID: {
+                imageTag = new DefineBitsJPEG4Tag(swf, null, swf.getNextCharacterId(), newData);
+                break;
+            }
+            case DefineBitsLosslessTag.ID: {
+                DefineBitsLosslessTag losslessTag = new DefineBitsLosslessTag(swf);
+                losslessTag.setImage(newData);
+                imageTag = losslessTag;
+                break;
+            }
+            case DefineBitsLossless2Tag.ID: {
+                DefineBitsLossless2Tag lossless2Tag = new DefineBitsLossless2Tag(swf);
+                lossless2Tag.setImage(newData);
+                imageTag = lossless2Tag;
+                break;
+            }
+            default:
+                throw new Error("Unsupported image type tag.");
         }
 
         int idx = swf.tags.indexOf(st);
