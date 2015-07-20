@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.helpers;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.helpers.Helper;
+import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -26,10 +27,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import org.monte.media.jpeg.CMYKJPEGImageReader;
 import org.monte.media.jpeg.CMYKJPEGImageReaderSpi;
@@ -135,5 +138,24 @@ public class ImageHelper {
         }
 
         throw new Error("Unsuported image format: " + format);
+    }
+
+    public static Dimension getDimesion(InputStream input) throws IOException {
+        try (ImageInputStream in = ImageIO.createImageInputStream(input)) {
+            final Iterator<ImageReader> readers = ImageIO.getImageReaders(in);
+            if (readers.hasNext()) {
+                ImageReader reader = readers.next();
+                try {
+                    reader.setInput(in);
+                    return new Dimension(reader.getWidth(0), reader.getHeight(0));
+                } finally {
+                    reader.dispose();
+                }
+            }
+        } catch (IOException ex) {
+        }
+
+        BufferedImage image = read(input);
+        return new Dimension(image.getWidth(), image.getHeight());
     }
 }

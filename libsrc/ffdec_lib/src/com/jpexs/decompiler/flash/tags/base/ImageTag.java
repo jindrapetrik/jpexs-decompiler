@@ -41,6 +41,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
+import java.awt.Dimension;
 import java.awt.Shape;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -67,6 +68,8 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
     public abstract InputStream getOriginalImageData();
 
     public abstract SerializableImage getImage();
+
+    public abstract Dimension getImageDimension();
 
     public abstract void setImage(byte[] data) throws IOException;
 
@@ -231,9 +234,9 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
 
     @Override
     public RECT getRect(Set<BoundedTag> added) {
-        SerializableImage image = getImage();
-        int widthInTwips = (int) (image.getWidth() * SWF.unitDivisor);
-        int heightInTwips = (int) (image.getHeight() * SWF.unitDivisor);
+        Dimension dimension = getImageDimension();
+        int widthInTwips = (int) (dimension.getWidth() * SWF.unitDivisor);
+        int heightInTwips = (int) (dimension.getHeight() * SWF.unitDivisor);
         return new RECT(0, widthInTwips, 0, heightInTwips);
     }
 
@@ -282,9 +285,9 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
     @Override
     public void getTagInfo(TagInfo tagInfo) {
         super.getTagInfo(tagInfo);
-        SerializableImage image = getImage();
-        tagInfo.addInfo("general", "width", image.getWidth());
-        tagInfo.addInfo("general", "height", image.getHeight());
+        Dimension dimension = getImageDimension();
+        tagInfo.addInfo("general", "width", dimension.getWidth());
+        tagInfo.addInfo("general", "height", dimension.getHeight());
     }
 
     @Override

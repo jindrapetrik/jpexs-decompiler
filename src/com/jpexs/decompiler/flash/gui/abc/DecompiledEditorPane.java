@@ -408,17 +408,18 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
             int bi = abc.findBodyIndex(mi);
             Highlighting h = Highlighting.searchPos(highlights, pos);
             if (h != null) {
+                long highlightOffset = h.getProperties().offset;
                 List<AVM2Instruction> list = abc.bodies.get(bi).getCode().code;
                 AVM2Instruction lastIns = null;
                 long inspos = 0;
                 AVM2Instruction selIns = null;
                 for (AVM2Instruction ins : list) {
-                    if (h.getProperties().offset == ins.getOffset()) {
+                    if (highlightOffset == ins.getOffset()) {
                         selIns = ins;
                         break;
                     }
-                    if (ins.getOffset() > h.getProperties().offset) {
-                        inspos = h.getProperties().offset - lastIns.offset;
+                    if (ins.getOffset() > highlightOffset) {
+                        inspos = highlightOffset - lastIns.offset;
                         selIns = lastIns;
                         break;
                     }

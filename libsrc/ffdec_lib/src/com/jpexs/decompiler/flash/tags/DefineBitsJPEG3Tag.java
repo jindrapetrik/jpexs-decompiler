@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
+import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.io.ByteArrayInputStream;
@@ -140,8 +141,8 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
             throw new IOException("Only Jpeg can have alpha channel.");
         }
 
-        SerializableImage image = getImage();
-        if (data == null || data.length != image.getWidth() * image.getHeight()) {
+        Dimension dimension = getImageDimension();
+        if (data == null || data.length != dimension.getWidth() * dimension.getHeight()) {
             throw new IOException("Data length must match the size of the image.");
         }
 
@@ -208,6 +209,23 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
         } catch (IOException ex) {
             Logger.getLogger(DefineBitsJPEG3Tag.class.getName()).log(Level.SEVERE, "Failed to get image", ex);
         }
+        return null;
+    }
+
+    @Override
+    public Dimension getImageDimension() {
+        if (cachedImage != null) {
+            return new Dimension(cachedImage.getWidth(), cachedImage.getHeight());
+        }
+
+        try {
+            int errorLength = hasErrorHeader(imageData) ? 4 : 0;
+            ByteArrayInputStream bis = new ByteArrayInputStream(imageData.getArray(), imageData.getPos() + errorLength, imageData.getLength() - errorLength);
+            return ImageHelper.getDimesion(bis);
+        } catch (IOException ex) {
+            Logger.getLogger(DefineBitsJPEG3Tag.class.getName()).log(Level.SEVERE, "Failed to get image dimension", ex);
+        }
+
         return null;
     }
 }

@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
+import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -143,6 +144,21 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
         } catch (IOException ex) {
             Logger.getLogger(DefineBitsJPEG2Tag.class.getName()).log(Level.SEVERE, "Failed to get image", ex);
         }
+        return null;
+    }
+
+    @Override
+    public Dimension getImageDimension() {
+        if (cachedImage != null) {
+            return new Dimension(cachedImage.getWidth(), cachedImage.getHeight());
+        }
+
+        try {
+            return ImageHelper.getDimesion(getOriginalImageData());
+        } catch (IOException ex) {
+            Logger.getLogger(DefineBitsJPEG2Tag.class.getName()).log(Level.SEVERE, "Failed to get image dimension", ex);
+        }
+
         return null;
     }
 }

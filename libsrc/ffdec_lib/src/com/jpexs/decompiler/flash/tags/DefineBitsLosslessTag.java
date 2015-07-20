@@ -34,6 +34,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
+import java.awt.Dimension;
 import java.awt.image.DataBufferInt;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -274,5 +275,10 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
         }
 
         return bi;
+    }
+
+    @Override
+    public Dimension getImageDimension() {
+        return new Dimension(bitmapWidth, bitmapHeight);
     }
 }
