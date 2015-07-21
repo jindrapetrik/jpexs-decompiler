@@ -2888,12 +2888,19 @@ public final class SWF implements SWFContainerItem, Timelined {
     public boolean replaceCharacter(int oldCharacterId, int newCharacterId) {
         boolean modified = false;
         for (Tag tag : tags) {
-            modified |= tag.replaceCharacter(oldCharacterId, newCharacterId);
-        }
-        CharacterTag characterTag = getCharacter(oldCharacterId);
-        if (characterTag != null) {
-            characterTag.setCharacterId(newCharacterId);
-            characterTag.setModified(true);
+            boolean modified2 = false;
+            if (tag instanceof CharacterIdTag) {
+                CharacterIdTag characterIdTag = (CharacterIdTag) tag;
+                if (characterIdTag.getCharacterId() == oldCharacterId) {
+                    characterIdTag.setCharacterId(newCharacterId);
+                    modified2 = true;
+                }
+            }
+            modified2 |= tag.replaceCharacter(oldCharacterId, newCharacterId);
+            if (modified2) {
+                tag.setModified(true);
+            }
+            modified |= modified2;
         }
         return modified;
     }
