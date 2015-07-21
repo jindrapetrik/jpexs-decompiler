@@ -1337,9 +1337,7 @@ public class XFLConverter {
             } else if (symbol instanceof ImageTag) {
                 ImageTag imageTag = (ImageTag) symbol;
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                SerializableImage image = imageTag.getImage();
-                // do not store the image in cache during xfl conversion
-                imageTag.clearCache();
+                SerializableImage image = imageTag.getImage(false);
                 ImageFormat format = imageTag.getImageFormat();
                 ImageHelper.write(image.getBufferedImage(), format, baos);
                 String symbolFile = "bitmap" + symbol.getCharacterId() + "." + imageTag.getImageFormat();
