@@ -88,4 +88,30 @@ public class SymbolClassTag extends SymbolClassTypeTag {
             sos.writeString(names.get(i));
         }
     }
+
+    @Override
+    public boolean replaceCharacter(int oldCharacterId, int newCharacterId) {
+        boolean modified = false;
+        for (int i = 0; i < tags.size(); i++) {
+            if (tags.get(i) == oldCharacterId) {
+                tags.set(i, newCharacterId);
+                modified = true;
+            }
+        }
+        return modified;
+    }
+
+    @Override
+    public boolean removeCharacter(int characterId) {
+        boolean modified = false;
+        for (int i = 0; i < tags.size(); i++) {
+            if (tags.get(i) == characterId) {
+                tags.remove(i);
+                names.remove(i);
+                i--;
+                modified = true;
+            }
+        }
+        return modified;
+    }
 }
