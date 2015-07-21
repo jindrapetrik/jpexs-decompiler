@@ -837,7 +837,7 @@ public class ABC {
 
     private AVM2Deobfuscation getDeobfuscation() {
         if (deobfuscation == null) {
-            deobfuscation = new AVM2Deobfuscation(constants);
+            deobfuscation = new AVM2Deobfuscation(getSwf(), constants);
         }
 
         return deobfuscation;

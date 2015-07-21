@@ -1829,6 +1829,19 @@ public final class SWF implements SWFContainerItem, Timelined {
         getVariables(variables, actionsMap, functions, strings, usageTypes, asm, path);
     }
 
+    public boolean as3StringConstantExists(String str) {
+        for (ABCContainerTag abcTag : getAbcList()) {
+            ABC abc = abcTag.getABC();
+            for (int i = 1; i < abc.constants.getStringCount(); i++) {
+                if (abc.constants.getString(i).equals(str)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     public void fixAS3Code() {
         for (ABCContainerTag abcTag : getAbcList()) {
             ABC abc = abcTag.getABC();

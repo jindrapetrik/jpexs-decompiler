@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.graph.DottedChain;
 import java.util.ArrayList;
@@ -53,6 +54,8 @@ public class AVM2Deobfuscation {
 
     public static final String FOO_JOIN_CHARACTERS = "aeiouy";
 
+    private final SWF swf;
+
     private final AVM2ConstantPool constants;
 
     private final Map<String, Integer> usageTypesCount = new HashMap<>();
@@ -61,7 +64,8 @@ public class AVM2Deobfuscation {
 
     public static final DottedChain BUILTIN = new DottedChain("-");
 
-    public AVM2Deobfuscation(AVM2ConstantPool constants) {
+    public AVM2Deobfuscation(SWF swf, AVM2ConstantPool constants) {
+        this.swf = swf;
         this.constants = constants;
     }
 
@@ -148,12 +152,11 @@ public class AVM2Deobfuscation {
 
                 ret = sb.toString();
             }
-            for (int i = 1; i < constants.getStringCount(); i++) {
-                if (constants.getString(i).equals(ret)) {
-                    exists = true;
-                    rndSize += 1;
-                    continue loopfoo;
-                }
+            if (swf.as3StringConstantExists(ret)) {
+                exists = true;
+                rndSize += 1;
+                continue loopfoo;
+
             }
             if (isReserved(ret)) {
                 exists = true;
