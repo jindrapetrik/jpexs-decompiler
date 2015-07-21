@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
@@ -132,10 +131,6 @@ public class DefineBitsTag extends ImageTag implements TagChangedListener {
 
     @Override
     public SerializableImage getImage(boolean preMultiplyApha) {
-        if (cachedImage != null) {
-            return cachedImage;
-        }
-
         InputStream imageStream = getOriginalImageData();
         if (imageStream != null) {
             try {
@@ -146,10 +141,6 @@ public class DefineBitsTag extends ImageTag implements TagChangedListener {
                 }
 
                 SerializableImage img = new SerializableImage(image);
-                if (Configuration.cacheImages.get()) {
-                    cachedImage = img;
-                }
-
                 return img;
             } catch (IOException ex) {
                 Logger.getLogger(DefineBitsTag.class.getName()).log(Level.SEVERE, "Failed to get image", ex);

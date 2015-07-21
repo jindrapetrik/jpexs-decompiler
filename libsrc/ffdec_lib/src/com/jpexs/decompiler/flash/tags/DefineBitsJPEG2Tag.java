@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.base.AloneTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
@@ -125,9 +124,6 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
 
     @Override
     public SerializableImage getImage(boolean preMultiplyApha) {
-        if (cachedImage != null) {
-            return cachedImage;
-        }
         try {
             BufferedImage image = ImageHelper.read(getOriginalImageData());
             if (image == null) {
@@ -136,14 +132,11 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
             }
 
             SerializableImage img = new SerializableImage(image);
-            if (Configuration.cacheImages.get()) {
-                cachedImage = img;
-            }
-
             return img;
         } catch (IOException ex) {
             Logger.getLogger(DefineBitsJPEG2Tag.class.getName()).log(Level.SEVERE, "Failed to get image", ex);
         }
+
         return null;
     }
 

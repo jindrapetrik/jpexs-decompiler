@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.base.AloneTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
@@ -231,9 +230,6 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
 
     @Override
     public SerializableImage getImage(boolean preMultiplyApha) {
-        if (cachedImage != null) {
-            return cachedImage;
-        }
         SerializableImage bi = new SerializableImage(bitmapWidth, bitmapHeight, SerializableImage.TYPE_INT_ARGB);
         ALPHACOLORMAPDATA colorMapData = null;
         ALPHABITMAPDATA bitmapData = null;
@@ -269,10 +265,6 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
             while ((pos32aligned % 4 != 0)) {
                 pos32aligned++;
             }
-        }
-
-        if (Configuration.cacheImages.get()) {
-            cachedImage = bi;
         }
 
         return bi;

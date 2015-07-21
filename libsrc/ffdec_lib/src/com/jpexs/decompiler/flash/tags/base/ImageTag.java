@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.shape.BitmapExporter;
@@ -106,7 +107,16 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
     }
 
     public SerializableImage getImage() {
-        return getImage(true);
+        if (cachedImage != null) {
+            return cachedImage;
+        }
+
+        SerializableImage image = getImage(true);
+        if (Configuration.cacheImages.get()) {
+            cachedImage = image;
+        }
+
+        return image;
     }
 
     public InputStream getImageData() {
