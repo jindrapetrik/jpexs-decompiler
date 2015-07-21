@@ -2172,38 +2172,9 @@ public class CommandLineArgumentParser {
                 SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
                 String arg = args.pop().toLowerCase();
                 if (arg.equals("pack")) {
-                    int maxId = swf.getNextCharacterId();
-                    int id = 1;
-                    for (int i = 1; i < maxId; i += 2) {
-                        CharacterTag charactertag = swf.getCharacter(i);
-                        if (charactertag != null) {
-                            if (i != id) {
-                                swf.replaceCharacter(i, id);
-                            }
-                            id++;
-                        } else {
-                            // make sure that the id is not referenced in the tags
-                            swf.replaceCharacter(i, 0);
-                        }
-                    }
+                    swf.packCharacterIds();
                 } else if (arg.equals("sort")) {
-                    int maxId = Math.max(swf.tags.size(), swf.getNextCharacterId());
-                    int id = maxId;
-                    // first set the chatacter ids to surely not used ids
-                    for (Tag tag : swf.tags) {
-                        if (tag instanceof CharacterTag) {
-                            CharacterTag characterTag = (CharacterTag) tag;
-                            swf.replaceCharacter(characterTag.getCharacterId(), id++);
-                        }
-                    }
-                    // then set them to 1,2,3...
-                    id = 1;
-                    for (Tag tag : swf.tags) {
-                        if (tag instanceof CharacterTag) {
-                            CharacterTag characterTag = (CharacterTag) tag;
-                            swf.replaceCharacter(characterTag.getCharacterId(), id++);
-                        }
-                    }
+                    swf.sortCharacterIds();
                 } else {
                     String[] characterIdsStr = arg.split(",");
                     if (characterIdsStr.length % 2 != 0) {

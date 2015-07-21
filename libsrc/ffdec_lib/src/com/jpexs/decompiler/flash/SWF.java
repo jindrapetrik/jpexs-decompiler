@@ -2885,6 +2885,43 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
     }
 
+    public void packCharacterIds() {
+        int maxId = getNextCharacterId();
+        int id = 1;
+        for (int i = 1; i < maxId; i++) {
+            CharacterTag charactertag = getCharacter(i);
+            if (charactertag != null) {
+                if (i != id) {
+                    replaceCharacter(i, id);
+                }
+                id++;
+            } else {
+                // make sure that the id is not referenced in the tags
+                replaceCharacter(i, 0);
+            }
+        }
+    }
+
+    public void sortCharacterIds() {
+        int maxId = Math.max(tags.size(), getNextCharacterId());
+        int id = maxId;
+        // first set the chatacter ids to surely not used ids
+        for (Tag tag : tags) {
+            if (tag instanceof CharacterTag) {
+                CharacterTag characterTag = (CharacterTag) tag;
+                replaceCharacter(characterTag.getCharacterId(), id++);
+            }
+        }
+        // then set them to 1,2,3...
+        id = 1;
+        for (Tag tag : tags) {
+            if (tag instanceof CharacterTag) {
+                CharacterTag characterTag = (CharacterTag) tag;
+                replaceCharacter(characterTag.getCharacterId(), id++);
+            }
+        }
+    }
+
     public boolean replaceCharacter(int oldCharacterId, int newCharacterId) {
         boolean modified = false;
         for (Tag tag : tags) {
