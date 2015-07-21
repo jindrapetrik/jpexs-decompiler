@@ -230,7 +230,7 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
     }
 
     @Override
-    public SerializableImage getImage() {
+    public SerializableImage getImage(boolean preMultiplyApha) {
         if (cachedImage != null) {
             return cachedImage;
         }
@@ -251,12 +251,17 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
                 if ((bitmapFormat == DefineBitsLossless2Tag.FORMAT_8BIT_COLORMAPPED)) {
                     int colorTableIndex = colorMapData.colorMapPixelData[pos32aligned] & 0xff;
                     if (colorTableIndex < colorMapData.colorTableRGB.length) {
-                        c = multiplyAlpha(colorMapData.colorTableRGB[colorTableIndex]);
+                        c = colorMapData.colorTableRGB[colorTableIndex];
                     }
                 }
                 if ((bitmapFormat == DefineBitsLossless2Tag.FORMAT_32BIT_ARGB)) {
-                    c = multiplyAlpha(bitmapData.bitmapPixelData[pos]);
+                    c = bitmapData.bitmapPixelData[pos];
                 }
+
+                if (preMultiplyApha) {
+                    c = multiplyAlpha(c);
+                }
+
                 bi.setRGB(x, y, c);
                 pos32aligned++;
                 pos++;

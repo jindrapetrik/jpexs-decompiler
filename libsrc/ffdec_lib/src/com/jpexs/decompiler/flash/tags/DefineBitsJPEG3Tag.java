@@ -175,7 +175,7 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
     }
 
     @Override
-    public SerializableImage getImage() {
+    public SerializableImage getImage(boolean preMultiplyApha) {
         if (cachedImage != null) {
             return cachedImage;
         }
@@ -189,6 +189,7 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
                 return null;
             }
 
+            image = ensurePreMultipled(image, preMultiplyApha);
             SerializableImage img = new SerializableImage(image);
             if (bitmapAlphaData.getLength() == 0) {
                 if (Configuration.cacheImages.get()) {
@@ -202,7 +203,11 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
             int[] pixels = ((DataBufferInt) img.getRaster().getDataBuffer()).getData();
             for (int i = 0; i < pixels.length; i++) {
                 int a = alphaData[i] & 0xff;
-                pixels[i] = multiplyAlpha((pixels[i] & 0xffffff) | (a << 24));
+                if (preMultiplyApha) {
+                    pixels[i] = multiplyAlpha((pixels[i] & 0xffffff) | (a << 24));
+                } else {
+                    pixels[i] = (pixels[i] & 0xffffff) | (a << 24);
+                }
             }
 
             if (Configuration.cacheImages.get()) {

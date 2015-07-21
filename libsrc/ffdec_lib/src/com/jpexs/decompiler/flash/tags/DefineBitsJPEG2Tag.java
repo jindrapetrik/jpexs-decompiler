@@ -124,7 +124,7 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
     }
 
     @Override
-    public SerializableImage getImage() {
+    public SerializableImage getImage(boolean preMultiplyApha) {
         if (cachedImage != null) {
             return cachedImage;
         }

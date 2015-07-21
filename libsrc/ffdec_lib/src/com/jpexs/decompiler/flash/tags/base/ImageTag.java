@@ -43,6 +43,8 @@ import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Dimension;
 import java.awt.Shape;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -67,7 +69,7 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
 
     public abstract InputStream getOriginalImageData();
 
-    public abstract SerializableImage getImage();
+    public abstract SerializableImage getImage(boolean preMultiplyApha);
 
     public abstract Dimension getImageDimension();
 
@@ -103,6 +105,10 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
         return ImageFormat.UNKNOWN;
     }
 
+    public SerializableImage getImage() {
+        return getImage(true);
+    }
+
     public InputStream getImageData() {
         InputStream is = getOriginalImageData();
         if (is != null) {
@@ -110,7 +116,7 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
         }
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageHelper.write(getImage().getBufferedImage(), getImageFormat(), baos);
+        ImageHelper.write(getImage(false).getBufferedImage(), getImageFormat(), baos);
         return new ByteArrayInputStream(baos.toByteArray());
     }
 
@@ -163,6 +169,21 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
         g = max255(g * multiplier);
         b = max255(b * multiplier);
         return RGBA.toInt(r, g, b, a);
+    }
+
+    protected BufferedImage ensurePreMultipled(BufferedImage image, boolean preMultiplyApha) {
+        if (image.getColorModel().isAlphaPremultiplied() == preMultiplyApha) {
+            return image;
+        }
+
+        BufferedImage imgRes = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
+        int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+        int[] pixelsNew = ((DataBufferInt) imgRes.getRaster().getDataBuffer()).getData();
+        for (int i = 0; i < pixels.length; i++) {
+            pixelsNew[i] = pixels[i];
+        }
+
+        return imgRes;
     }
 
     private SHAPEWITHSTYLE getShape() {
