@@ -2611,7 +2611,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         SWF swf = it.getSwf();
                         swf.clearImageCache();
                     } catch (IOException ex) {
-                        logger.log(Level.SEVERE, "Invalid image", ex);
+                        logger.log(Level.SEVERE, "Invalid alpha channel data", ex);
                         View.showMessageDialog(null, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
                     }
 

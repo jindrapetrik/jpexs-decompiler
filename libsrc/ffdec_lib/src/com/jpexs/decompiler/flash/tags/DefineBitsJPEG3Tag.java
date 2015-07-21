@@ -135,6 +135,10 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
         setModified(true);
     }
 
+    public byte[] getImageAlpha() throws IOException {
+        return SWFInputStream.uncompressByteArray(bitmapAlphaData.getRangeData());
+    }
+
     public void setImageAlpha(byte[] data) throws IOException {
         ImageFormat fmt = ImageTag.getImageFormat(imageData);
         if (fmt != ImageFormat.JPEG) {
@@ -194,7 +198,7 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
                 return img;
             }
 
-            byte[] alphaData = SWFInputStream.uncompressByteArray(bitmapAlphaData.getRangeData());
+            byte[] alphaData = getImageAlpha();
             int[] pixels = ((DataBufferInt) img.getRaster().getDataBuffer()).getData();
             for (int i = 0; i < pixels.length; i++) {
                 int a = alphaData[i] & 0xff;
