@@ -404,8 +404,11 @@ public class CommandLineArgumentParser {
         }
 
         if (filter == null || filter.equals("replacecharacterid")) {
-            out.println(" " + (cnt++) + ") -replaceCharacterId <oldId1>,<newId1>,<oldId2>,<newId2>...");
+            out.println(" " + (cnt++) + ") -replaceCharacterId <oldId1>,<newId1>,<oldId2>,<newId2>... or");
+            out.println(" " + (cnt++) + ") -replaceCharacterId (pack|sort)");
             out.println(" ...replaces the <oldId1> character id with <newId1>");
+            out.println(" ...pack: removes the spaces between the character ids (1,4,3 => 1,3,2)");
+            out.println(" ...sort: assigns increasing IDs to the chatacter tags + pack (1,4,3 => 1,2,3)");
             out.println("    DO NOT PUT space between comma (,) and next value.");
         }
 
@@ -2167,27 +2170,64 @@ public class CommandLineArgumentParser {
         try {
             try (FileInputStream is = new FileInputStream(inFile)) {
                 SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
-                String[] characterIdsStr = args.pop().split(",");
-                if (characterIdsStr.length % 2 != 0) {
-                    System.err.println("CharacterId count should be an even number");
-                    badArguments("replacecharacterid");
-                }
-
-                List<Integer> characterIds = new ArrayList<>();
-                for (int i = 0; i < characterIdsStr.length; i++) {
-                    int characterId = 0;
-                    try {
-                        characterId = Integer.parseInt(characterIdsStr[i]);
-                    } catch (NumberFormatException nfe) {
-                        System.err.println("CharacterId should be integer");
+                String arg = args.pop().toLowerCase();
+                if (arg.equals("pack")) {
+                    int maxId = swf.getNextCharacterId();
+                    int id = 1;
+                    for (int i = 1; i < maxId; i += 2) {
+                        CharacterTag charactertag = swf.getCharacter(i);
+                        if (charactertag != null) {
+                            if (i != id) {
+                                swf.replaceCharacter(i, id);
+                            }
+                            id++;
+                        } else {
+                            // make sure that the id is not referenced in the tags
+                            swf.replaceCharacter(i, 0);
+                        }
+                    }
+                } else if (arg.equals("sort")) {
+                    int maxId = Math.max(swf.tags.size(), swf.getNextCharacterId());
+                    int id = maxId;
+                    // first set the chatacter ids to surely not used ids
+                    for (Tag tag : swf.tags) {
+                        if (tag instanceof CharacterTag) {
+                            CharacterTag characterTag = (CharacterTag) tag;
+                            swf.replaceCharacter(characterTag.getCharacterId(), id++);
+                        }
+                    }
+                    // then set them to 1,2,3...
+                    id = 1;
+                    for (Tag tag : swf.tags) {
+                        if (tag instanceof CharacterTag) {
+                            CharacterTag characterTag = (CharacterTag) tag;
+                            swf.replaceCharacter(characterTag.getCharacterId(), id++);
+                        }
+                    }
+                } else {
+                    String[] characterIdsStr = arg.split(",");
+                    if (characterIdsStr.length % 2 != 0) {
+                        System.err.println("CharacterId count should be an even number");
                         badArguments("replacecharacterid");
                     }
-                }
 
-                for (int i = 0; i < characterIds.size(); i += 2) {
-                    int oldCharacterId = characterIds.get(i);
-                    int newCharacterId = characterIds.get(i + 1);
-                    swf.replaceCharacter(oldCharacterId, newCharacterId);
+                    List<Integer> characterIds = new ArrayList<>();
+                    for (int i = 0; i < characterIdsStr.length; i++) {
+                        int characterId = 0;
+                        try {
+                            characterId = Integer.parseInt(characterIdsStr[i]);
+                            characterIds.add(characterId);
+                        } catch (NumberFormatException nfe) {
+                            System.err.println("CharacterId should be integer");
+                            badArguments("replacecharacterid");
+                        }
+                    }
+
+                    for (int i = 0; i < characterIds.size(); i += 2) {
+                        int oldCharacterId = characterIds.get(i);
+                        int newCharacterId = characterIds.get(i + 1);
+                        swf.replaceCharacter(oldCharacterId, newCharacterId);
+                    }
                 }
 
                 try {
