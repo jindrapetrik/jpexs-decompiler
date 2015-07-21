@@ -403,6 +403,12 @@ public class CommandLineArgumentParser {
             out.println(" ...replaces a character tag with another chatacter tag from the same SWF");
         }
 
+        if (filter == null || filter.equals("replacecharacterid")) {
+            out.println(" " + (cnt++) + ") -replaceCharacterId <oldId1>,<newId1>,<oldId2>,<newId2>...");
+            out.println(" ...replaces the <oldId1> character id with <newId1>");
+            out.println("    DO NOT PUT space between comma (,) and next value.");
+        }
+
         if (filter == null || filter.equals("remove")) {
             out.println(" " + (cnt++) + ") -remove <infile> <outfile> <tagNo1> [<tagNo2>]...");
             out.println(" ...removes a tag from the SWF");
@@ -627,6 +633,8 @@ public class CommandLineArgumentParser {
             parseReplaceAlpha(args);
         } else if (command.equals("replacecharacter")) {
             parseReplaceCharacter(args);
+        } else if (command.equals("replacecharacterid")) {
+            parseReplaceCharacterId(args);
         } else if (command.equals("remove")) {
             parseRemove(args);
         } else if (command.equals("removecharacter")) {
@@ -1479,7 +1487,7 @@ public class CommandLineArgumentParser {
                 lev = DeobfuscationLevel.LEVEL_REMOVE_DEAD_CODE;
                 break;
             default:
-                System.err.println("Invalid level, must be one of: controlflow,traps,deadcode or 1,2, 3/max");
+                System.err.println("Invalid level, must be one of: controlflow,traps,deadcode or 1,2,3/max");
                 System.exit(1);
                 break;
         }
@@ -1879,7 +1887,7 @@ public class CommandLineArgumentParser {
                             characterId = Integer.parseInt(objectToReplace);
                         } catch (NumberFormatException nfe) {
                             System.err.println("CharacterId should be integer");
-                            System.exit(1);
+                            badArguments("replace");
                         }
                         if (!swf.getCharacters().containsKey(characterId)) {
                             System.err.println("CharacterId does not exist");
@@ -2049,7 +2057,7 @@ public class CommandLineArgumentParser {
                         imageId = Integer.parseInt(objectToReplace);
                     } catch (NumberFormatException nfe) {
                         System.err.println("ImageId should be integer");
-                        System.exit(1);
+                        badArguments("replacealpha");
                     }
                     if (!swf.getCharacters().containsKey(imageId)) {
                         System.err.println("ImageId does not exist");
@@ -2064,7 +2072,7 @@ public class CommandLineArgumentParser {
                         new ImageImporter().importImageAlpha(imageTag, data);
                     } else {
                         System.err.println("The specified tag type is not supported for alpha channel import");
-                        System.exit(1);
+                        badArguments("replacealpha");
                     }
 
                     if (args.isEmpty() || args.peek().startsWith("-")) {
@@ -2105,7 +2113,7 @@ public class CommandLineArgumentParser {
                         characterId = Integer.parseInt(objectToReplace);
                     } catch (NumberFormatException nfe) {
                         System.err.println("CharacterId should be integer");
-                        System.exit(1);
+                        badArguments("replacecharacter");
                     }
                     if (!swf.getCharacters().containsKey(characterId)) {
                         System.err.println("CharacterId does not exist");
@@ -2120,7 +2128,7 @@ public class CommandLineArgumentParser {
                         newCharacterId = Integer.parseInt(newCharacterIdStr);
                     } catch (NumberFormatException nfe) {
                         System.err.println("NewCharacterId should be integer");
-                        System.exit(1);
+                        badArguments("replacecharacter");
                     }
                     if (!swf.getCharacters().containsKey(newCharacterId)) {
                         System.err.println("NewCharacterId does not exist");
@@ -2132,6 +2140,54 @@ public class CommandLineArgumentParser {
                     if (args.isEmpty() || args.peek().startsWith("-")) {
                         break;
                     }
+                }
+
+                try {
+                    try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(outFile))) {
+                        swf.saveTo(fos);
+                    }
+                } catch (IOException e) {
+                    System.err.println("I/O error during writing");
+                    System.exit(2);
+                }
+            }
+        } catch (IOException | InterruptedException e) {
+            System.err.println("I/O error during reading");
+            System.exit(2);
+        }
+    }
+
+    private static void parseReplaceCharacterId(Stack<String> args) {
+        if (args.size() < 3) {
+            badArguments("replacecharacterid");
+        }
+
+        File inFile = new File(args.pop());
+        File outFile = new File(args.pop());
+        try {
+            try (FileInputStream is = new FileInputStream(inFile)) {
+                SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
+                String[] characterIdsStr = args.pop().split(",");
+                if (characterIdsStr.length % 2 != 0) {
+                    System.err.println("CharacterId count should be an even number");
+                    badArguments("replacecharacterid");
+                }
+
+                List<Integer> characterIds = new ArrayList<>();
+                for (int i = 0; i < characterIdsStr.length; i++) {
+                    int characterId = 0;
+                    try {
+                        characterId = Integer.parseInt(characterIdsStr[i]);
+                    } catch (NumberFormatException nfe) {
+                        System.err.println("CharacterId should be integer");
+                        badArguments("replacecharacterid");
+                    }
+                }
+
+                for (int i = 0; i < characterIds.size(); i += 2) {
+                    int oldCharacterId = characterIds.get(i);
+                    int newCharacterId = characterIds.get(i + 1);
+                    swf.replaceCharacter(oldCharacterId, newCharacterId);
                 }
 
                 try {
@@ -2222,7 +2278,7 @@ public class CommandLineArgumentParser {
                         characterId = Integer.parseInt(objectToRemove);
                     } catch (NumberFormatException nfe) {
                         System.err.println("CharacterId should be integer");
-                        System.exit(1);
+                        badArguments("removecharacter");
                     }
                     if (!swf.getCharacters().containsKey(characterId)) {
                         System.err.println("CharacterId does not exist");
