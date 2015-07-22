@@ -27,7 +27,9 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
+import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
+import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -39,10 +41,10 @@ import java.io.IOException;
 public class ShapeImporter {
 
     public Tag importImage(ShapeTag st, byte[] newData) throws IOException {
-        return importImage(st, newData, 0);
+        return importImage(st, newData, 0, true);
     }
 
-    public Tag importImage(ShapeTag st, byte[] newData, int tagType) throws IOException {
+    public Tag importImage(ShapeTag st, byte[] newData, int tagType, boolean fill) throws IOException {
         SWF swf = st.getSwf();
 
         if (newData[0] == 'B' && newData[1] == 'M') {
@@ -99,8 +101,15 @@ public class ShapeImporter {
 
         swf.updateCharacters();
         st.setModified(true);
-        SHAPEWITHSTYLE shapes = imageTag.getShape(st.getRect(), true);
 
+        RECT rect = st.getRect();
+        if (!fill) {
+            Dimension dimension = imageTag.getImageDimension();
+            rect.Xmax = rect.Xmin + (int) (SWF.unitDivisor * dimension.getWidth());
+            rect.Ymax = rect.Ymin + (int) (SWF.unitDivisor * dimension.getHeight());
+        }
+
+        SHAPEWITHSTYLE shapes = imageTag.getShape(rect, fill);
         st.shapes = shapes;
         return (Tag) st;
     }
