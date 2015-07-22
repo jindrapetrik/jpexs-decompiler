@@ -465,6 +465,15 @@ public abstract class Action implements GraphSourceItem {
         return writer.toString();
     }
 
+    private static void informListeners(List<DisassemblyListener> listeners, int pos, int count) {
+        if (pos % INFORM_LISTENER_RESOLUTION == 0) {
+            DisassemblyListener[] listenersArray = listeners.toArray(new DisassemblyListener[listeners.size()]);
+            for (DisassemblyListener listener : listenersArray) {
+                listener.progressToString(pos + 1, count);
+            }
+        }
+    }
+
     /**
      * Converts list of actions to ASM source
      *
@@ -493,11 +502,7 @@ public abstract class Action implements GraphSourceItem {
         int pos = 0;
         boolean lastPush = false;
         for (Action a : list) {
-            if (pos % INFORM_LISTENER_RESOLUTION == 0) {
-                for (DisassemblyListener listener : listeners) {
-                    listener.progressToString(pos + 1, list.size());
-                }
-            }
+            informListeners(listeners, pos, list.size());
 
             if (exportMode == ScriptExportMode.PCODE_HEX) {
                 if (lastPush) {

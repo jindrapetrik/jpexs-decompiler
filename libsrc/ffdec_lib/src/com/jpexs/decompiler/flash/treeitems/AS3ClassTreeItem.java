@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.treeitems;
 
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.abc.ClassPath;
 
 /**
@@ -43,6 +44,6 @@ public abstract class AS3ClassTreeItem implements TreeItem {
 
     @Override
     public String toString() {
-        return name;
+        return IdentifiersDeobfuscation.printIdentifier(true, name);
     }
 }

@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.timeline;
 
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
@@ -145,7 +146,7 @@ public class AS3Package extends AS3ClassTreeItem {
 
     @Override
     public String toString() {
-        return packageName;
+        return IdentifiersDeobfuscation.printIdentifier(true, packageName);
     }
 
     @Override
