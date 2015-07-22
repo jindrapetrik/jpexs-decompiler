@@ -19,6 +19,9 @@ package com.jpexs.decompiler.flash.importers;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
+import com.jpexs.decompiler.flash.tags.DefineEditTextTag;
+import com.jpexs.decompiler.flash.tags.DefineText2Tag;
+import com.jpexs.decompiler.flash.tags.DefineTextTag;
 import com.jpexs.decompiler.flash.tags.base.MissingCharacterHandler;
 import com.jpexs.decompiler.flash.tags.base.TextImportErrorHandler;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
@@ -166,5 +169,22 @@ public class TextImporter {
         } catch (TextParseException ex) {
             return !errorHandler.handle(textTag, ex.text, ex.line);
         }
+    }
+
+    public static int getTextTagType(String format) {
+        int res = 0;
+        switch (format) {
+            case "text":
+                res = DefineTextTag.ID;
+                break;
+            case "text2":
+                res = DefineText2Tag.ID;
+                break;
+            case "edittext":
+                res = DefineEditTextTag.ID;
+                break;
+        }
+
+        return res;
     }
 }

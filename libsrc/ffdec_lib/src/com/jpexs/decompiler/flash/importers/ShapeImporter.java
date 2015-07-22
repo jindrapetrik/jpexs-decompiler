@@ -23,6 +23,10 @@ import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG4Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsLossless2Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsLosslessTag;
+import com.jpexs.decompiler.flash.tags.DefineShape2Tag;
+import com.jpexs.decompiler.flash.tags.DefineShape3Tag;
+import com.jpexs.decompiler.flash.tags.DefineShape4Tag;
+import com.jpexs.decompiler.flash.tags.DefineShapeTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
@@ -112,5 +116,25 @@ public class ShapeImporter {
         SHAPEWITHSTYLE shapes = imageTag.getShape(rect, fill);
         st.shapes = shapes;
         return (Tag) st;
+    }
+
+    public static int getShapeTagType(String format) {
+        int res = 0;
+        switch (format) {
+            case "shape":
+                res = DefineShapeTag.ID;
+                break;
+            case "shape2":
+                res = DefineShape2Tag.ID;
+                break;
+            case "shape3":
+                res = DefineShape3Tag.ID;
+                break;
+            case "shape4":
+                res = DefineShape4Tag.ID;
+                break;
+        }
+
+        return res;
     }
 }

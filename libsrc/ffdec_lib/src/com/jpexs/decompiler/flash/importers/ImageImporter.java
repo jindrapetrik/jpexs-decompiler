@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.helpers.ByteArrayRange;
+import com.jpexs.helpers.Helper;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -111,5 +112,32 @@ public class ImageImporter extends TagImporter {
             ((DefineBitsJPEG4Tag) it).setImageAlpha(newData);
         }
         return null;
+    }
+
+    public void convertImage(ImageTag it, int tagType) throws IOException {
+        importImage(it, Helper.readStream(it.getImageData()), tagType);
+    }
+
+    public static int getImageTagType(String format) {
+        int res = 0;
+        switch (format) {
+            case "lossless":
+                res = DefineBitsLosslessTag.ID;
+                break;
+            case "lossless2":
+                res = DefineBitsLossless2Tag.ID;
+                break;
+            case "jpeg2":
+                res = DefineBitsJPEG2Tag.ID;
+                break;
+            case "jpeg3":
+                res = DefineBitsJPEG3Tag.ID;
+                break;
+            case "jpeg4":
+                res = DefineBitsJPEG4Tag.ID;
+                break;
+        }
+
+        return res;
     }
 }

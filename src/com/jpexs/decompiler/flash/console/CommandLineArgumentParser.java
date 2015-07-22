@@ -80,7 +80,9 @@ import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.helpers.CheckResources;
 import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.importers.BinaryDataImporter;
+import com.jpexs.decompiler.flash.importers.FontImporter;
 import com.jpexs.decompiler.flash.importers.ImageImporter;
+import com.jpexs.decompiler.flash.importers.MorphShapeImporter;
 import com.jpexs.decompiler.flash.importers.ShapeImporter;
 import com.jpexs.decompiler.flash.importers.SwfXmlImporter;
 import com.jpexs.decompiler.flash.importers.TextImporter;
@@ -88,8 +90,6 @@ import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG4Tag;
-import com.jpexs.decompiler.flash.tags.DefineBitsLossless2Tag;
-import com.jpexs.decompiler.flash.tags.DefineBitsLosslessTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -97,8 +97,10 @@ import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.MissingCharacterHandler;
+import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.TextImportErrorHandler;
@@ -639,6 +641,8 @@ public class CommandLineArgumentParser {
             parseReplaceCharacter(args);
         } else if (command.equals("replacecharacterid")) {
             parseReplaceCharacterId(args);
+        } else if (command.equals("convert")) {
+            parseConvert(args);
         } else if (command.equals("remove")) {
             parseRemove(args);
         } else if (command.equals("removecharacter")) {
@@ -2024,26 +2028,7 @@ public class CommandLineArgumentParser {
             return 0;
         }
 
-        String format = args.peek();
-        int res = 0;
-        switch (format) {
-            case "lossless":
-                res = DefineBitsLosslessTag.ID;
-                break;
-            case "lossless2":
-                res = DefineBitsLossless2Tag.ID;
-                break;
-            case "jpeg2":
-                res = DefineBitsJPEG2Tag.ID;
-                break;
-            case "jpeg3":
-                res = DefineBitsJPEG3Tag.ID;
-                break;
-            case "jpeg4":
-                res = DefineBitsJPEG4Tag.ID;
-                break;
-        }
-
+        int res = ImageImporter.getImageTagType(args.peek().toLowerCase());
         if (res != 0) {
             args.pop();
         }
@@ -2208,6 +2193,73 @@ public class CommandLineArgumentParser {
                         int newCharacterId = characterIds.get(i + 1);
                         swf.replaceCharacter(oldCharacterId, newCharacterId);
                     }
+                }
+
+                try {
+                    try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(outFile))) {
+                        swf.saveTo(fos);
+                    }
+                } catch (IOException e) {
+                    System.err.println("I/O error during writing");
+                    System.exit(2);
+                }
+            }
+        } catch (IOException | InterruptedException e) {
+            System.err.println("I/O error during reading");
+            System.exit(2);
+        }
+    }
+
+    private static void parseConvert(Stack<String> args) {
+        if (args.size() < 4) {
+            badArguments("convert");
+        }
+
+        File inFile = new File(args.pop());
+        File outFile = new File(args.pop());
+        try {
+            try (FileInputStream is = new FileInputStream(inFile)) {
+                SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
+
+                String objectToConvert = args.pop();
+
+                int characterId = 0;
+                try {
+                    characterId = Integer.parseInt(objectToConvert);
+                } catch (NumberFormatException nfe) {
+                    System.err.println("CharacterId should be integer");
+                    badArguments("convert");
+                }
+                if (!swf.getCharacters().containsKey(characterId)) {
+                    System.err.println("CharacterId does not exist");
+                    System.exit(1);
+                }
+
+                CharacterTag characterTag = swf.getCharacter(characterId);
+                String targetType = args.pop().toLowerCase();
+                if (characterTag instanceof ImageTag) {
+                    int format = ImageImporter.getImageTagType(targetType);
+                    ImageTag imageTag = (ImageTag) characterTag;
+                    new ImageImporter().convertImage(imageTag, format);
+                } else if (characterTag instanceof ShapeTag) {
+                    int format = ShapeImporter.getShapeTagType(targetType);
+                    ShapeTag shapeTag = (ShapeTag) characterTag;
+                    System.err.println("Converting shape tag is currently not supported");
+                } else if (characterTag instanceof MorphShapeTag) {
+                    int format = MorphShapeImporter.getMorphShapeTagType(targetType);
+                    MorphShapeTag morphShapeTag = (MorphShapeTag) characterTag;
+                    System.err.println("Converting morph shape tag is currently not supported");
+                } else if (characterTag instanceof FontTag) {
+                    int format = FontImporter.getFontTagType(targetType);
+                    FontTag fontTag = (FontTag) characterTag;
+                    System.err.println("Converting font tag is currently not supported");
+                } else if (characterTag instanceof TextTag) {
+                    int format = TextImporter.getTextTagType(targetType);
+                    TextTag textTag = (TextTag) characterTag;
+                    System.err.println("Converting text tag is currently not supported");
+                } else {
+                    System.err.println("The specified tag type is not supported for import");
+                    System.exit(1);
                 }
 
                 try {
