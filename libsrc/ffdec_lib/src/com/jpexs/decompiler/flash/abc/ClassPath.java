@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc;
 
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.graph.DottedChain;
 import java.util.Objects;
 
@@ -36,7 +37,7 @@ public class ClassPath {
 
     @Override
     public String toString() {
-        return packageStr.isEmpty() ? className : packageStr.toPrintableString(true) + "." + className;
+        return packageStr.isEmpty() ? className : packageStr.toPrintableString(true) + "." + IdentifiersDeobfuscation.printIdentifier(true, className);
     }
 
     @Override
