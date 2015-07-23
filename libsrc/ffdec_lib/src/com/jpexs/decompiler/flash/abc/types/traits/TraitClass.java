@@ -546,6 +546,19 @@ public class TraitClass extends Trait implements TraitWithSlot {
         InstanceInfo instanceInfo = abc.instance_info.get(class_info);
         String instanceInfoName = instanceInfo.getName(abc.constants).getName(abc.constants, fullyQualifiedNames, false);
         ClassInfo classInfo = abc.class_info.get(class_info);
+
+        for (Trait trait : classInfo.static_traits.traits) {
+            if (trait instanceof TraitSlotConst) {
+                ((TraitSlotConst) trait).assignedValue = null;
+            }
+        }
+
+        for (Trait trait : instanceInfo.instance_traits.traits) {
+            if (trait instanceof TraitSlotConst) {
+                ((TraitSlotConst) trait).assignedValue = null;
+            }
+        }
+
         int bodyIndex = abc.findBodyIndex(classInfo.cinit_index);
         if (bodyIndex != -1) {
             writer.mark();
