@@ -21,9 +21,11 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.tags.base.StaticTextTag;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -48,6 +50,16 @@ public class DefineText2Tag extends StaticTextTag {
         textRecords = new ArrayList<>();
         glyphBits = 0;
         advanceBits = 0;
+    }
+
+    public DefineText2Tag(SWF swf, int characterID, RECT textBounds, MATRIX textMatrix, List<TEXTRECORD> textRecords) {
+        super(swf, ID, NAME, null);
+        this.characterID = characterID;
+        this.textBounds = textBounds;
+        this.textMatrix = textMatrix;
+        this.textRecords = textRecords;
+        this.glyphBits = 0;
+        this.advanceBits = 0;
     }
 
     /**

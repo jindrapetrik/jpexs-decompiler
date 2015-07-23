@@ -1787,7 +1787,7 @@ public class CommandLineArgumentParser {
         }
         Map<String, String> ret = new HashMap<>();
         for (String fmt : fmts) {
-            if (fmt.contains(":")) {
+            if (!fmt.contains(":")) {
                 badArguments("format");
             }
             String[] parts = fmt.split(":");

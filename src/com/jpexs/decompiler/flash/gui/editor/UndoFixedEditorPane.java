@@ -96,7 +96,9 @@ public class UndoFixedEditorPane extends JEditorPane {
     @Override
     public void setText(final String t) {
         View.execInEventDispatch(() -> {
+            removeDocumentListener();
             setText(t, getContentType());
+            addDocumentListener();
         });
     }
 
