@@ -1906,14 +1906,15 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             Configuration.lastOpenDir.set(Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
             File sf = Helper.fixDialogFile(fc.getSelectedFile());
 
-            final boolean compressed = flaFilters.contains(fc.getFileFilter());
-            if (!compressed) {
-                if (sf.getName().endsWith(".fla")) {
-                    sf = new File(sf.getAbsolutePath().substring(0, sf.getAbsolutePath().length() - 4) + ".xfl");
-                }
+            FileFilter selectedFilter = fc.getFileFilter();
+            final boolean compressed = flaFilters.contains(selectedFilter);
+            String path = sf.getAbsolutePath();
+            if (path.endsWith(".fla") || path.endsWith(".xfl")) {
+                path = path.substring(0, path.length() - 4);
             }
-            final FLAVersion selectedVersion = versions.get(compressed ? flaFilters.indexOf(fc.getFileFilter()) : xflFilters.indexOf(fc.getFileFilter()));
-            final File selfile = sf;
+            path += compressed ? ".fla" : ".xfl";
+            final FLAVersion selectedVersion = versions.get(compressed ? flaFilters.indexOf(selectedFilter) : xflFilters.indexOf(selectedFilter));
+            final File selfile = new File(path);
             new CancellableWorker() {
                 @Override
                 protected Void doInBackground() throws Exception {
