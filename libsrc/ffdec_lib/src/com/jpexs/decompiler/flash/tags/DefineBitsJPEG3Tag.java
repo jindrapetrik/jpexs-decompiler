@@ -192,6 +192,10 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
             }
 
             byte[] alphaData = getImageAlpha();
+            if (alphaData.length == 0) {
+                return img;
+            }
+
             int[] pixels = ((DataBufferInt) img.getRaster().getDataBuffer()).getData();
             for (int i = 0; i < pixels.length; i++) {
                 int a = alphaData[i] & 0xff;
