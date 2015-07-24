@@ -149,19 +149,19 @@ public class DirectValueActionItem extends ActionItem implements SimpleValue {
     public String toStringNoH(ConstantPool constants) {
         if (value instanceof Double) {
             if (Double.compare((double) (Double) value, 0) == 0) {
-                return ("0");
+                return "0";
             }
         }
         if (value instanceof Float) {
             if (Float.compare((float) (Float) value, 0) == 0) {
-                return ("0");
+                return "0";
             }
         }
         if (value instanceof String) {
             return (String) value;
         }
         if (value instanceof ConstantIndex) {
-            return (this.constants.get(((ConstantIndex) value).index));
+            return this.constants.get(((ConstantIndex) value).index);
         }
         return value.toString();
     }

@@ -487,6 +487,10 @@ public class Configuration {
     @ConfigurationCategory("script")
     public static final ConfigurationItem<Boolean> ignoreCLikePackages = null;
 
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("script")
+    public static final ConfigurationItem<Boolean> smartNumberFormatting = null;
+
     private enum OSId {
 
         WINDOWS, OSX, UNIX
