@@ -467,7 +467,7 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     public int getNextCharacterId() {
-        int max = -1;
+        int max = 0;
         for (int characterId : getCharacters().keySet()) {
             if (characterId > max) {
                 max = characterId;

@@ -278,7 +278,7 @@ public class TagTreeModel implements TreeModel {
         addFolderItem(nodeList, emptyFolders, addAllFolders, translate("node.fonts"), FOLDER_FONTS, swf, fonts);
         addFolderItem(nodeList, emptyFolders, addAllFolders, translate("node.binaryData"), FOLDER_BINARY_DATA, swf, binaryData);
         addFolderItem(nodeList, emptyFolders, addAllFolders, translate("node.frames"), FOLDER_FRAMES, swf, frames);
-        addFolderItem(nodeList, emptyFolders, addAllFolders, translate("node.others"), FOLDER_OTHERS, swf, others);
+        addFolderItem(nodeList, emptyFolders, true /*always add*/, translate("node.others"), FOLDER_OTHERS, swf, others);
 
         Map<Tag, TagScript> currentTagScriptCache = new HashMap<>();
         if (swf.isAS3()) {
