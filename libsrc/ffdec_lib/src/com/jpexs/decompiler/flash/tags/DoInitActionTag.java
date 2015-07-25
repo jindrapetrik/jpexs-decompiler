@@ -69,6 +69,7 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
      */
     public DoInitActionTag(SWF swf) {
         super(swf, ID, NAME, null);
+        actionBytes = ByteArrayRange.EMPTY;
     }
 
     /**

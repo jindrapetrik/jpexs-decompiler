@@ -38,6 +38,7 @@ import java.util.Map.Entry;
 public abstract class Trait implements Cloneable, Serializable {
 
     public static final String METADATA_CTOR_DEFINITION = "__go_to_ctor_definition_help";
+
     public static final String METADATA_DEFINITION = "__go_to_definition_help";
 
     private static final int[] EMPTY_METADATA_ARRAY = new int[0];

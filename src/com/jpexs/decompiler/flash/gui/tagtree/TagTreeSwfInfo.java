@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui.tagtree;
 
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.timeline.TagScript;
+import com.jpexs.decompiler.flash.treeitems.FolderItem;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,8 @@ import java.util.Map;
 public class TagTreeSwfInfo {
 
     public List<TreeItem> folders;
+
+    public List<FolderItem> emptyFolders;
 
     public Map<Integer, List<TreeItem>> mappedTags;
 

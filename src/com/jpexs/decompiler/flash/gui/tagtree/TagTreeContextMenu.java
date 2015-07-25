@@ -335,25 +335,31 @@ public class TagTreeContextMenu extends JPopupMenu {
                 replaceMenuItem.setVisible(true);
             }
 
-            List<Integer> allowedTagTypes = null;
+            addTagMenu.removeAll();
             if (firstItem instanceof FolderItem) {
-                allowedTagTypes = tagTree.getSwfFolderItemNestedTagIds(((FolderItem) firstItem).getName(), firstItem.getSwf().gfx);
+                List<Integer> allowedTagTypes;
+                FolderItem folderItem = (FolderItem) firstItem;
+                SWF swf = firstItem.getSwf();
+                if (folderItem.getName().equals(TagTreeModel.FOLDER_OTHERS)) {
+                    TagTreeModel ttm = tagTree.getModel();
+                    for (FolderItem emptyFolder : ttm.getEmptyFolders(swf)) {
+                        JMenu subMenu = new JMenu(emptyFolder.toString());
+                        allowedTagTypes = tagTree.getSwfFolderItemNestedTagIds(emptyFolder.getName(), swf.gfx);
+                        addAddTagMenuItems(allowedTagTypes, subMenu, firstItem);
+                        if (subMenu.getItemCount() > 0) {
+                            addTagMenu.add(subMenu);
+                        }
+                    }
+                }
+
+                allowedTagTypes = tagTree.getSwfFolderItemNestedTagIds(folderItem.getName(), swf.gfx);
+                addAddTagMenuItems(allowedTagTypes, addTagMenu, firstItem);
             } else if (firstItem instanceof Tag) {
-                allowedTagTypes = tagTree.getNestedTagIds((Tag) firstItem);
+                List<Integer> allowedTagTypes = tagTree.getNestedTagIds((Tag) firstItem);
+                addAddTagMenuItems(allowedTagTypes, addTagMenu, firstItem);
             }
 
-            addTagMenu.removeAll();
-            if (allowedTagTypes != null) {
-                for (Integer tagId : allowedTagTypes) {
-                    final Class<?> cl = TagIdClassMap.getClassByTagId(tagId);
-                    JMenuItem tagItem = new JMenuItem(cl.getSimpleName());
-                    tagItem.addActionListener((ActionEvent ae) -> {
-                        addTagActionPerformed(ae, firstItem, cl);
-                    });
-                    addTagMenu.add(tagItem);
-                }
-                addTagMenu.setVisible(true);
-            }
+            addTagMenu.setVisible(addTagMenu.getItemCount() > 0);
 
             if (tagTree.getModel().getChildCount(firstItem) > 0) {
                 expandRecursiveMenuItem.setVisible(true);
@@ -412,6 +418,21 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
 
             openSWFInsideTagMenuItem.setVisible(anyInnerSwf);
+        }
+    }
+
+    private void addAddTagMenuItems(List<Integer> allowedTagTypes, JMenu addTagMenu, TreeItem item) {
+        if (allowedTagTypes == null) {
+            return;
+        }
+
+        for (Integer tagId : allowedTagTypes) {
+            final Class<?> cl = TagIdClassMap.getClassByTagId(tagId);
+            JMenuItem tagItem = new JMenuItem(cl.getSimpleName());
+            tagItem.addActionListener((ActionEvent ae) -> {
+                addTagActionPerformed(ae, item, cl);
+            });
+            addTagMenu.add(tagItem);
         }
     }
 
