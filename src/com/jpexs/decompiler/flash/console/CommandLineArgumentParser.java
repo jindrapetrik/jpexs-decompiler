@@ -329,7 +329,7 @@ public class CommandLineArgumentParser {
             out.println("  ...Converts the <infile> XML to <outfile> SWF file");
         }
 
-        if (filter == null || filter.equals("proxy")) {
+        if (filter == null || filter.equals("extract")) {
             out.println(" " + (cnt++) + ") -extract <infile> [-o <outpath>|<outfile>] [nocheck] [(all|biggest|smallest|first|last)]");
             out.println("  ...Extracts SWF files from ZIP or other binary files");
             out.println("  ...-o parameter should contain a file path when \"biggest\" or \"first\" parameter is specified");
@@ -341,7 +341,7 @@ public class CommandLineArgumentParser {
             out.println("  ...Renames the invalid identifiers in <infile> and save it to <outfile>");
         }
 
-        if (filter == null || filter.equals("proxy")) {
+        if (filter == null || filter.equals("config")) {
             out.println(" " + (cnt++) + ") -config key=value[,key2=value2][,key3=value3...] [other parameters]");
             out.print("  ...Sets configuration values. ");
             if (!webHelp) {
@@ -407,8 +407,8 @@ public class CommandLineArgumentParser {
         }
 
         if (filter == null || filter.equals("replacecharacterid")) {
-            out.println(" " + (cnt++) + ") -replaceCharacterId <oldId1>,<newId1>,<oldId2>,<newId2>... or");
-            out.println(" " + (cnt++) + ") -replaceCharacterId (pack|sort)");
+            out.println(" " + (cnt++) + ") -replaceCharacterId <infile> <outfile> <oldId1>,<newId1>,<oldId2>,<newId2>... or");
+            out.println(" " + (cnt++) + ") -replaceCharacterId <infile> <outfile> (pack|sort)");
             out.println(" ...replaces the <oldId1> character id with <newId1>");
             out.println(" ...pack: removes the spaces between the character ids (1,4,3 => 1,3,2)");
             out.println(" ...sort: assigns increasing IDs to the chatacter tags + pack (1,4,3 => 1,2,3)");

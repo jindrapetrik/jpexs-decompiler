@@ -160,6 +160,7 @@ import java.util.Date;
 import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -261,6 +262,9 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     @Internal
     private Map<Integer, CharacterTag> characters;
+
+    @Internal
+    private Map<Integer, Set<Integer>> dependentCharacters;
 
     @Internal
     private List<ABCContainerTag> abcList;
@@ -386,6 +390,71 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
 
         return characters;
+    }
+
+    public Map<Integer, Set<Integer>> getDependentCharacters() {
+        if (dependentCharacters == null) {
+            synchronized (this) {
+                if (dependentCharacters == null) {
+                    Map<Integer, Set<Integer>> dep = new HashMap<>();
+                    for (Tag tag : tags) {
+                        if (tag instanceof CharacterTag) {
+                            int characterId = ((CharacterTag) tag).getCharacterId();
+                            Set<Integer> needed = new HashSet<>();
+                            tag.getNeededCharacters(needed);
+                            for (Integer needed1 : needed) {
+                                Set<Integer> s = dep.get(needed1);
+                                if (s == null) {
+                                    s = new HashSet<>();
+                                    dep.put(needed1, s);
+                                }
+
+                                s.add(characterId);
+                            }
+                        }
+                    }
+
+                    dependentCharacters = dep;
+                }
+            }
+        }
+
+        return dependentCharacters;
+    }
+
+    public Set<Integer> getDependentCharacters(int characterId) {
+        Set<Integer> visited = new HashSet<>();
+
+        Set<Integer> dependents2 = new LinkedHashSet<>();
+        Set<Integer> deps = getDependentCharacters().get(characterId);
+        if (deps != null) {
+            dependents2.addAll(deps);
+        }
+
+        while (visited.size() != dependents2.size()) {
+            for (int chId : dependents2) {
+                if (!visited.contains(chId)) {
+                    visited.add(chId);
+                    if (getCharacters().containsKey(chId)) {
+                        deps = getDependentCharacters().get(chId);
+                        if (deps != null) {
+                            dependents2.addAll(deps);
+                        }
+
+                        break;
+                    }
+                }
+            }
+        }
+
+        Set<Integer> dependents = new LinkedHashSet<>();
+        for (Integer chId : dependents2) {
+            if (getCharacters().containsKey(chId)) {
+                dependents.add(chId);
+            }
+        }
+
+        return dependents;
     }
 
     public CharacterTag getCharacter(int characterId) {

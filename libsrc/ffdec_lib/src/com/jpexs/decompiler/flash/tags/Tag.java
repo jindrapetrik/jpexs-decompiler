@@ -660,17 +660,14 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
             tagInfo.addInfo("general", "neededCharacters", Helper.joinStrings(needed, ", "));
         }
 
-        /* todo: add dependent characters, getDependentCharacters method is currently slow
-         if (this instanceof CharacterTag) {
-         Set<Integer> dependent = new LinkedHashSet<>();
-         int characterId = ((CharacterTag) this).getCharacterId();
-         dependent.add(characterId);
-         getDependentCharacters(dependent);
-         dependent.remove(characterId);
-
-         if (dependent.size() > 0) {
-         tagInfo.addInfo("general", "dependentCharacters", Helper.joinStrings(dependent, ", "));
-         }
-         }*/
+        if (this instanceof CharacterTag) {
+            int characterId = ((CharacterTag) this).getCharacterId();
+            Set<Integer> dependent = swf.getDependentCharacters(characterId);
+            if (dependent != null) {
+                if (dependent.size() > 0) {
+                    tagInfo.addInfo("general", "dependentCharacters", Helper.joinStrings(dependent, ", "));
+                }
+            }
+        }
     }
 }

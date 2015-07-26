@@ -2847,8 +2847,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 final SWF swf = getCurrentSwf();
                 if (swf != null) {
                     TreeItem item = tagTree.getCurrentTreeItem();
-                    if (item instanceof DefineSpriteTag) {
-                        timelineViewPanel.setTimelined((DefineSpriteTag) item);
+                    if (item instanceof TagScript) {
+                        item = ((TagScript) item).getTag();
+                    }
+                    if (item instanceof Timelined) {
+                        timelineViewPanel.setTimelined((Timelined) item);
                     } else {
                         timelineViewPanel.setTimelined(swf);
                     }

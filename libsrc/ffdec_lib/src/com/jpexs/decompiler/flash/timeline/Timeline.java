@@ -117,6 +117,7 @@ public class Timeline {
         ensureInitialized();
         frames.add(frame);
         maxDepth = getMaxDepthInternal();
+        calculateMaxDepthFrames();
     }
 
     public AS2Package getAS2RootPackage() {
@@ -343,14 +344,7 @@ public class Timeline {
 
         // todo: enable again after TweenDetector.detectRanges implemented
         //detectTweens();
-        for (int d = 1; d <= maxDepth; d++) {
-            for (int f = frames.size() - 1; f >= 0; f--) {
-                if (frames.get(f).layers.get(d) != null) {
-                    depthMaxFrame.put(d, f + 1);
-                    break;
-                }
-            }
-        }
+        calculateMaxDepthFrames();
 
         createASPackages();
         if (parentTag == null) {
@@ -393,6 +387,18 @@ public class Timeline {
                     len = 1;
                 }
                 characterId = ds == null ? -1 : ds.characterId;
+            }
+        }
+    }
+
+    private void calculateMaxDepthFrames() {
+        depthMaxFrame.clear();
+        for (int d = 1; d <= maxDepth; d++) {
+            for (int f = frames.size() - 1; f >= 0; f--) {
+                if (frames.get(f).layers.get(d) != null) {
+                    depthMaxFrame.put(d, f + 1);
+                    break;
+                }
             }
         }
     }
