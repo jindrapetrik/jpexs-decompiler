@@ -72,9 +72,7 @@ public class FontTextureInfo extends Tag {
     public void getData(SWFOutputStream sos) throws IOException {
         sos.writeUI32(textureID);
         sos.writeUI16(textureFormat);
-        byte[] fileNameBytes = fileName.getBytes();
-        sos.writeUI8(fileNameBytes.length);
-        sos.write(fileNameBytes);
+        sos.writeNetString(fileName);
         sos.writeUI16(textureWidth);
         sos.writeUI16(textureHeight);
         sos.writeUI8(padPixels);
@@ -105,8 +103,7 @@ public class FontTextureInfo extends Tag {
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         textureID = sis.readUI32("textureID");
         textureFormat = sis.readUI16("textureFormat");
-        int fileNameLen = sis.readUI8("fileNameLen");
-        fileName = new String(sis.readBytesEx(fileNameLen, "fileName"));
+        fileName = sis.readNetString("fileName");
         textureWidth = sis.readUI16("textureWidth");
         textureHeight = sis.readUI16("textureHeight");
         padPixels = sis.readUI8("padPixels");

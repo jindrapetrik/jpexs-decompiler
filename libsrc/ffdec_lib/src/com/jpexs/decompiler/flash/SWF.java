@@ -1028,7 +1028,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         SWFInputStream sis = new SWFInputStream(this, uncompressedData);
         dumpInfo = new DumpInfoSwfNode(this, "rootswf", "", null, 0, 0);
         sis.dumpInfo = dumpInfo;
-        sis.readBytesEx(3, "signature"); // skip siganture
+        sis.skipBytesEx(3, "signature"); // skip siganture
         version = sis.readUI8("version");
         fileSize = sis.readUI32("fileSize");
         dumpInfo.lengthBytes = fileSize;

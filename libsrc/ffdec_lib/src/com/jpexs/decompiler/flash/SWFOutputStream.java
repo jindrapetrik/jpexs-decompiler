@@ -80,6 +80,7 @@ import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -167,7 +168,7 @@ public class SWFOutputStream extends OutputStream {
     }
 
     /**
-     * Writes String value to the stream
+     * Writes null terminated string value to the stream
      *
      * @param value String value
      * @throws IOException
@@ -182,6 +183,31 @@ public class SWFOutputStream extends OutputStream {
 
         write(data);
         write(0);
+    }
+
+    /**
+     * Writes netstring (length + string) value to the stream
+     *
+     * @param value String value
+     * @throws IOException
+     */
+    public void writeNetString(String value) throws IOException {
+        byte[] data = value.getBytes();
+        writeUI8(data.length);
+        write(data);
+    }
+
+    /**
+     * Writes netstring (length + string) value to the stream
+     *
+     * @param value String value
+     * @param charset
+     * @throws IOException
+     */
+    public void writeNetString(String value, Charset charset) throws IOException {
+        byte[] data = value.getBytes(charset);
+        writeUI8(data.length);
+        write(data);
     }
 
     /**

@@ -93,7 +93,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
     private final HashSet<TagChangedListener> listeners = new HashSet<>();
 
     @Internal
-    public byte[] remainingData;
+    public ByteArrayRange remainingData;
 
     /**
      * Constructor

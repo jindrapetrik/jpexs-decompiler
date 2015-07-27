@@ -135,11 +135,10 @@ public class DefineFont2Tag extends FontTag {
         fontFlagsItalic = sis.readUB(1, "fontFlagsItalic") == 1;
         fontFlagsBold = sis.readUB(1, "fontFlagsBold") == 1;
         languageCode = sis.readLANGCODE("languageCode");
-        int fontNameLen = sis.readUI8("fontNameLen");
         if (swf.version >= 6) {
-            fontName = new String(sis.readBytesEx(fontNameLen, "fontName"), Utf8Helper.charset);
+            fontName = sis.readNetString("fontName", Utf8Helper.charset);
         } else {
-            fontName = new String(sis.readBytesEx(fontNameLen, "fontName"));
+            fontName = sis.readNetString("fontName");
         }
         int numGlyphs = sis.readUI16("numGlyphs");
         long[] offsetTable = new long[numGlyphs];
@@ -212,9 +211,7 @@ public class DefineFont2Tag extends FontTag {
         sos.writeUB(1, fontFlagsItalic ? 1 : 0);
         sos.writeUB(1, fontFlagsBold ? 1 : 0);
         sos.writeLANGCODE(languageCode);
-        byte[] fontNameBytes = Utf8Helper.getBytes(fontName);
-        sos.writeUI8(fontNameBytes.length);
-        sos.write(fontNameBytes);
+        sos.writeNetString(fontName, Utf8Helper.charset); // todo: check swf version and write non utf-8 for version < 6
         int numGlyphs = glyphShapeTable.size();
         sos.writeUI16(numGlyphs);
 

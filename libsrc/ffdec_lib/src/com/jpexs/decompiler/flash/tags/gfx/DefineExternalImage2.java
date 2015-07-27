@@ -65,12 +65,8 @@ public class DefineExternalImage2 extends Tag {
         sos.writeUI16(bitmapFormat);
         sos.writeUI16(targetWidth);
         sos.writeUI16(targetHeight);
-        byte[] exportNameBytes = exportName.getBytes();
-        sos.writeUI8(exportNameBytes.length);
-        sos.write(exportNameBytes);
-        byte[] fileNameBytes = fileName.getBytes();
-        sos.writeUI8(fileNameBytes.length);
-        sos.write(fileNameBytes);
+        sos.writeNetString(exportName);
+        sos.writeNetString(fileName);
         if (extraData != null) {
             sos.write(extraData);
         }
@@ -94,10 +90,8 @@ public class DefineExternalImage2 extends Tag {
         bitmapFormat = sis.readUI16("bitmapFormat");
         targetWidth = sis.readUI16("targetWidth");
         targetHeight = sis.readUI16("targetHeight");
-        int exportNameLen = sis.readUI8("exportNameLen");
-        exportName = new String(sis.readBytesEx(exportNameLen, "exportName"));
-        int fileNameLen = sis.readUI8("fileNameLen");
-        fileName = new String(sis.readBytesEx(fileNameLen, "fileName"));
+        exportName = sis.readNetString("exportName");
+        fileName = sis.readNetString("fileName");
         if (sis.available() > 0) { //there is usually one zero byte, bod knows why
             extraData = sis.readBytesEx(sis.available(), "extraData");
         }

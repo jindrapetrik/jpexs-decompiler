@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 
@@ -29,8 +28,7 @@ public class JPEGTablesTag extends Tag {
 
     public static final String NAME = "JPEGTables";
 
-    @HideInRawEdit
-    public byte[] jpegData;
+    public ByteArrayRange jpegData;
 
     /**
      * Constructor
@@ -39,7 +37,7 @@ public class JPEGTablesTag extends Tag {
      */
     public JPEGTablesTag(SWF swf) {
         super(swf, ID, NAME, null);
-        jpegData = SWFInputStream.BYTE_ARRAY_EMPTY;
+        jpegData = ByteArrayRange.EMPTY;
     }
 
     public JPEGTablesTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
@@ -49,7 +47,7 @@ public class JPEGTablesTag extends Tag {
 
     @Override
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
-        jpegData = sis.readBytesEx(sis.available(), "jpegData");
+        jpegData = sis.readByteRangeEx(sis.available(), "jpegData");
     }
 
     /**

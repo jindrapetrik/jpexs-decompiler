@@ -69,9 +69,7 @@ public class DefineExternalStreamSound extends Tag {
         sos.writeUI32(seekSample);
         sos.writeUI32(startFrame);
         sos.writeUI32(lastFrame);
-        byte[] fileNameBytes = fileName.getBytes();
-        sos.writeUI8(fileNameBytes.length);
-        sos.write(fileNameBytes);
+        sos.writeNetString(fileName);
     }
 
     /**
@@ -96,8 +94,6 @@ public class DefineExternalStreamSound extends Tag {
         seekSample = sis.readUI32("seekSample");
         startFrame = sis.readUI32("startFrame");
         lastFrame = sis.readUI32("lastFrame");
-        int fileNameLen = sis.readUI8("fileNameLen");
-        fileName = new String(sis.readBytesEx(fileNameLen, "fileName"));
-
+        fileName = sis.readNetString("fileName");
     }
 }

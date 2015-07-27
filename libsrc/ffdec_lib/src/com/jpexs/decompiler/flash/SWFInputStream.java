@@ -277,6 +277,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -467,7 +468,7 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one string value from the stream
+     * Reads one null terminated string value from the stream
      *
      * @param name
      * @return String value
@@ -485,6 +486,37 @@ public class SWFInputStream implements AutoCloseable {
             }
             baos.write(r);
         }
+    }
+
+    /**
+     * Reads one netstring (length + string) value from the stream
+     *
+     * @param name
+     * @return String value
+     * @throws IOException
+     */
+    public String readNetString(String name) throws IOException {
+        newDumpLevel(name, "string");
+        int length = readEx();
+        String ret = new String(readBytesInternalEx(length));
+        endDumpLevel();
+        return ret;
+    }
+
+    /**
+     * Reads one netstring (length + string) value from the stream
+     *
+     * @param name
+     * @param charset
+     * @return String value
+     * @throws IOException
+     */
+    public String readNetString(String name, Charset charset) throws IOException {
+        newDumpLevel(name, "string");
+        int length = readEx();
+        String ret = new String(readBytesInternalEx(length), charset);
+        endDumpLevel();
+        return ret;
     }
 
     /**
@@ -703,6 +735,7 @@ public class SWFInputStream implements AutoCloseable {
         if (count <= 0) {
             return BYTE_ARRAY_EMPTY;
         }
+
         newDumpLevel(name, "bytes");
         byte[] ret = readBytesInternalEx(count);
         endDumpLevel();
@@ -721,6 +754,7 @@ public class SWFInputStream implements AutoCloseable {
         if (count <= 0) {
             return ByteArrayRange.EMPTY;
         }
+
         newDumpLevel(name, "bytes");
         int startPos = (int) getPos();
         skipBytesEx(count);
@@ -768,6 +802,23 @@ public class SWFInputStream implements AutoCloseable {
         }
 
         informListeners();
+    }
+
+    /**
+     * Skip bytes from the stream
+     *
+     * @param count Number of bytes to skip
+     * @param name
+     * @throws IOException
+     */
+    public void skipBytesEx(long count, String name) throws IOException {
+        if (count <= 0) {
+            return;
+        }
+
+        newDumpLevel(name, "bytes");
+        skipBytesEx(count);
+        endDumpLevel();
     }
 
     /**
@@ -1489,7 +1540,7 @@ public class SWFInputStream implements AutoCloseable {
             }
 
             if (sis.available() > 0) {
-                ret.remainingData = sis.readBytesEx(sis.available(), "remaining");
+                ret.remainingData = sis.readByteRangeEx(sis.available(), "remaining");
             }
         } catch (IOException ex) {
             logger.log(Level.SEVERE, "Error during tag reading. SWF: " + swf.getShortFileName() + " ID: " + tag.getId() + " name: " + tag.getName() + " pos: " + data.getPos(), ex);
@@ -3344,6 +3395,7 @@ public class SWFInputStream implements AutoCloseable {
         for (int i = 0; i < colorTableSize + 1; i++) {
             ret.colorTableRGB[i] = readRGBInt("colorTableRGB");
         }
+
         int dataLen = 0;
         for (int y = 0; y < bitmapHeight; y++) {
             int x = 0;
@@ -3355,6 +3407,7 @@ public class SWFInputStream implements AutoCloseable {
                 x++;
             }
         }
+
         ret.colorMapPixelData = readBytesEx(dataLen, "colorMapPixelData");
         endDumpLevel();
         return ret;
@@ -3444,6 +3497,7 @@ public class SWFInputStream implements AutoCloseable {
         for (int i = 0; i < colorTableSize + 1; i++) {
             ret.colorTableRGB[i] = readRGBAInt("colorTableRGB");
         }
+
         int dataLen = 0;
         for (int y = 0; y < bitmapHeight; y++) {
             int x = 0;
@@ -3455,7 +3509,8 @@ public class SWFInputStream implements AutoCloseable {
                 x++;
             }
         }
-        ret.colorMapPixelData = readBytesEx(dataLen, "");
+
+        ret.colorMapPixelData = readBytesEx(dataLen, "colorMapPixelData");
         endDumpLevel();
         return ret;
     }

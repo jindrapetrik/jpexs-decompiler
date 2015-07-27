@@ -61,9 +61,7 @@ public class DefineExternalImage extends Tag {
         sos.writeUI16(bitmapFormat);
         sos.writeUI16(targetWidth);
         sos.writeUI16(targetHeight);
-        byte[] fileNameBytes = fileName.getBytes();
-        sos.writeUI8(fileNameBytes.length);
-        sos.write(fileNameBytes);
+        sos.writeNetString(fileName);
     }
 
     /**
@@ -84,8 +82,6 @@ public class DefineExternalImage extends Tag {
         bitmapFormat = sis.readUI16("bitmapFormat");
         targetWidth = sis.readUI16("targetWidth");
         targetHeight = sis.readUI16("targetHeight");
-        int fileNameLen = sis.readUI8("fileNameLen");
-        fileName = new String(sis.readBytesEx(fileNameLen, "fileName"));
-
+        fileName = sis.readNetString("fileName");
     }
 }

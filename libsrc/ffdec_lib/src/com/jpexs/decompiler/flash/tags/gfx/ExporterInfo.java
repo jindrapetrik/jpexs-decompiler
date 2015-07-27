@@ -74,9 +74,7 @@ public class ExporterInfo extends Tag {
         sos.writeUI16(bitmapFormat);
         sos.writeUI8(prefix.length);
         sos.write(prefix);
-        byte[] swfNameBytes = swfName.getBytes();
-        sos.writeUI8(swfNameBytes.length);
-        sos.write(swfNameBytes);
+        sos.writeNetString(swfName);
         if (codeOffsets != null) {
             sos.writeUI16(codeOffsets.size());
             for (long l : codeOffsets) {
@@ -106,8 +104,7 @@ public class ExporterInfo extends Tag {
         bitmapFormat = sis.readUI16("bitmapFormat");
         int prefixLen = sis.readUI8("prefixLen");
         prefix = sis.readBytesEx(prefixLen, "prefix");
-        int swfNameLen = sis.readUI8("swfNameLen");
-        swfName = new String(sis.readBytesEx(swfNameLen, "swfName"));
+        swfName = sis.readNetString("swfName");
         if (sis.available() > 0) // (version >= 0x401) //?
         {
             codeOffsets = new ArrayList<>();

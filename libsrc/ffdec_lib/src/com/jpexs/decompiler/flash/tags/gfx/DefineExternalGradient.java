@@ -58,9 +58,7 @@ public class DefineExternalGradient extends Tag {
         sos.writeUI16(gradientId);
         sos.writeUI16(bitmapsFormat);
         sos.writeUI16(gradientSize);
-        byte[] fileNameBytes = fileName.getBytes();
-        sos.writeUI8(fileNameBytes.length);
-        sos.write(fileNameBytes);
+        sos.writeNetString(fileName);
     }
 
     /**
@@ -80,7 +78,6 @@ public class DefineExternalGradient extends Tag {
         gradientId = sis.readUI16("gradientId");
         bitmapsFormat = sis.readUI16("bitmapsFormat");
         gradientSize = sis.readUI16("gradientSize");
-        int fileNameLen = sis.readUI8("fileNameLen");
-        fileName = new String(sis.readBytesEx(fileNameLen, "fileName"));
+        fileName = sis.readNetString("fileName");
     }
 }

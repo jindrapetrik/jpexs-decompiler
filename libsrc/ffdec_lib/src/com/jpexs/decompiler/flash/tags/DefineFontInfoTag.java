@@ -89,11 +89,10 @@ public class DefineFontInfoTag extends Tag implements CharacterIdTag {
     @Override
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         fontId = sis.readUI16("fontId");
-        int fontNameLen = sis.readUI8("fontNameLen");
         if (swf.version >= 6) {
-            fontName = new String(sis.readBytesEx(fontNameLen, "fontName"), Utf8Helper.charset);
+            fontName = sis.readNetString("fontName", Utf8Helper.charset);
         } else {
-            fontName = new String(sis.readBytesEx(fontNameLen, "fontName"));
+            fontName = sis.readNetString("fontName");
         }
         reserved = (int) sis.readUB(2, "reserved");
         fontFlagsSmallText = sis.readUB(1, "fontFlagsSmallText") == 1;
@@ -121,9 +120,7 @@ public class DefineFontInfoTag extends Tag implements CharacterIdTag {
     @Override
     public void getData(SWFOutputStream sos) throws IOException {
         sos.writeUI16(fontId);
-        byte[] fontNameBytes = Utf8Helper.getBytes(fontName);
-        sos.writeUI8(fontNameBytes.length);
-        sos.write(fontNameBytes);
+        sos.writeNetString(fontName, Utf8Helper.charset); // todo: check swf version and write non utf-8 for version < 6
         sos.writeUB(2, reserved);
         sos.writeUB(1, fontFlagsSmallText ? 1 : 0);
         sos.writeUB(1, fontFlagsShiftJIS ? 1 : 0);

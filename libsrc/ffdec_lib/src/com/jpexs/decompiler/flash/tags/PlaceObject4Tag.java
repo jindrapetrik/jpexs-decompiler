@@ -318,6 +318,7 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
         if (placeFlagHasClipActions) {
             clipActions = sis.readCLIPACTIONS(swf, this, "clipActions");
         }
+
         amfData = sis.readBytesEx(sis.available(), "amfData");
     }
 
