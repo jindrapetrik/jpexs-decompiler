@@ -736,6 +736,7 @@ public class SWFInputStream implements AutoCloseable {
             return BYTE_ARRAY_EMPTY;
         }
 
+        System.out.println("READ BYTE ARRAY: " + count + " " + name);
         newDumpLevel(name, "bytes");
         byte[] ret = readBytesInternalEx(count);
         endDumpLevel();

@@ -51,7 +51,7 @@ public class DefineFont4Tag extends CharacterTag {
 
     public String fontName;
 
-    public byte[] fontData;
+    public ByteArrayRange fontData;
 
     /**
      * Constructor
@@ -62,7 +62,7 @@ public class DefineFont4Tag extends CharacterTag {
         super(swf, ID, NAME, null);
         fontID = swf.getNextCharacterId();
         fontName = "New font";
-        fontData = SWFInputStream.BYTE_ARRAY_EMPTY;
+        fontData = ByteArrayRange.EMPTY;
     }
 
     public DefineFont4Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
@@ -78,7 +78,7 @@ public class DefineFont4Tag extends CharacterTag {
         fontFlagsItalic = sis.readUB(1, "fontFlagsItalic") == 1;
         fontFlagsBold = sis.readUB(1, "fontFlagsBold") == 1;
         fontName = sis.readString("fontName");
-        fontData = sis.readBytesEx(sis.available(), "fontData");
+        fontData = sis.readByteRangeEx(sis.available(), "fontData");
     }
 
     /**
