@@ -2270,7 +2270,6 @@ public class AVM2Code implements Cloneable {
             new AVM2DeobfuscatorSimple().deobfuscate(path, classIndex, isStatic, scriptIndex, abc, constants, trait, info, body);
             new AVM2DeobfuscatorRegisters().deobfuscate(path, classIndex, isStatic, scriptIndex, abc, constants, trait, info, body);
             new AVM2DeobfuscatorJumps().deobfuscate(path, classIndex, isStatic, scriptIndex, abc, constants, trait, info, body);
-            //body.getCode().checkValidOffsets(body); // todo: only for debugging. checkValidOffsets can be made private later
             return 1;
         }
     }

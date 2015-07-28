@@ -211,7 +211,11 @@ public class DefineFont2Tag extends FontTag {
         sos.writeUB(1, fontFlagsItalic ? 1 : 0);
         sos.writeUB(1, fontFlagsBold ? 1 : 0);
         sos.writeLANGCODE(languageCode);
-        sos.writeNetString(fontName, Utf8Helper.charset); // todo: check swf version and write non utf-8 for version < 6
+        if (swf.version >= 6) {
+            sos.writeNetString(fontName, Utf8Helper.charset);
+        } else {
+            sos.writeNetString(fontName);
+        }
         int numGlyphs = glyphShapeTable.size();
         sos.writeUI16(numGlyphs);
 
