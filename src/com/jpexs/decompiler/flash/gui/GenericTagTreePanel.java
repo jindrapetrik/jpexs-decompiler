@@ -37,6 +37,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.Table;
 import com.jpexs.decompiler.flash.types.annotations.parser.AnnotationParseException;
 import com.jpexs.decompiler.flash.types.annotations.parser.ConditionEvaluator;
+import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.ConcreteClasses;
 import com.jpexs.helpers.ReflectionTools;
 import java.awt.BorderLayout;
@@ -517,7 +518,11 @@ public class GenericTagTreePanel extends GenericTagPanel {
                     colorAdd = "<cite style=\"color:rgb(" + color.getRed() + "," + color.getGreen() + "," + color.getBlue() + ");\">\u25cf</cite> ";
                 }
 
-                valStr += " = " + colorAdd + val.toString();
+                if (val instanceof ByteArrayRange) {
+                    valStr += " = " + ((ByteArrayRange) val).getLength() + " byte";
+                } else {
+                    valStr += " = " + colorAdd + val.toString();
+                }
             }
             return getNameType(fieldIndex) + valStr;
         }
@@ -899,6 +904,8 @@ public class GenericTagTreePanel extends GenericTagPanel {
         } else if (type.equals(String.class)) {
             return true;
         } else if (type.equals(RGB.class) || type.equals(RGBA.class) || type.equals(ARGB.class)) {
+            return true;
+        } else if (type.equals(ByteArrayRange.class)) {
             return true;
         } else {
             return false;
