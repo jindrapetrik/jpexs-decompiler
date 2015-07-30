@@ -43,6 +43,7 @@ import com.jpexs.helpers.ReflectionTools;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import static java.awt.Component.TOP_ALIGNMENT;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
@@ -187,12 +188,18 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
                     };
                     pan.setBackground(Color.white);
-                    nameLabel.setSize(nameLabel.getWidth(), ((Component) editor).getHeight());
                     nameLabel.setAlignmentY(TOP_ALIGNMENT);
-                    ((JComponent) editor).setAlignmentY(TOP_ALIGNMENT);
                     pan.add(nameLabel);
-                    pan.add((Component) editor);
-                    pan.setPreferredSize(new Dimension((int) nameLabel.getPreferredSize().getWidth() + 5 + (int) ((Component) editor).getPreferredSize().getWidth(), (int) ((Component) editor).getPreferredSize().getHeight()));
+
+                    JComponent editorComponent = (JComponent) editor;
+                    if (editorComponent != null) {
+                        nameLabel.setSize(nameLabel.getWidth(), editorComponent.getHeight());
+                        editorComponent.setAlignmentY(TOP_ALIGNMENT);
+                        pan.add(editorComponent);
+                        pan.setPreferredSize(new Dimension((int) nameLabel.getPreferredSize().getWidth() + 5 + (int) editorComponent.getPreferredSize().getWidth(), (int) editorComponent.getPreferredSize().getHeight()));
+                    } else {
+                        pan.setPreferredSize(new Dimension((int) nameLabel.getPreferredSize().getWidth(), (int) nameLabel.getPreferredSize().getHeight()));
+                    }
                     panSum.add(pan);
                 }
                 return panSum;
@@ -204,8 +211,10 @@ public class GenericTagTreePanel extends GenericTagPanel {
         @Override
         public Object getCellEditorValue() {
             List<Object> ret = new ArrayList<>();
-            for (GenericTagEditor editor : editors) {
-                ret.add(editor.getChangedValue());
+            if (editors != null) {
+                for (GenericTagEditor editor : editors) {
+                    ret.add(editor.getChangedValue());
+                }
             }
             return ret;
         }
@@ -238,8 +247,10 @@ public class GenericTagTreePanel extends GenericTagPanel {
              if (!depends.isEmpty()) {
              dep = true;
              }     */
-            for (GenericTagEditor editor : editors) {
-                editor.save();
+            if (editors != null) {
+                for (GenericTagEditor editor : editors) {
+                    editor.save();
+                }
             }
             TreePath sp = tree.getSelectionPath();
             if (sp != null) {
@@ -269,19 +280,22 @@ public class GenericTagTreePanel extends GenericTagPanel {
                             Object selObject = selPath.getLastPathComponent();
                             if (selObject instanceof FieldNode) {
                                 final FieldNode fnode = (FieldNode) selObject;
-                                SWFArray swfArray = fnode.fieldSet.get(FIELD_INDEX).getAnnotation(SWFArray.class);
+                                Field field = fnode.fieldSet.get(FIELD_INDEX);
+                                if (field.getType().equals(ByteArrayRange.class)) {
+                                    // todo: load file (Issue #1007)
+                                } else if (ReflectionTools.needsIndex(field)) {
+                                    SWFArray swfArray = fnode.fieldSet.get(FIELD_INDEX).getAnnotation(SWFArray.class);
 
-                                String itemStr = "";
-                                if (swfArray != null) {
-                                    itemStr = swfArray.value();
-                                }
-                                if (fnode.fieldSet.itemName != null && !fnode.fieldSet.itemName.isEmpty()) {
-                                    itemStr = fnode.fieldSet.itemName;
-                                }
-                                if (itemStr.isEmpty()) {
-                                    itemStr = AppStrings.translate("generictag.array.item");
-                                }
-                                if (ReflectionTools.needsIndex(fnode.fieldSet.get(FIELD_INDEX))) {
+                                    String itemStr = "";
+                                    if (swfArray != null) {
+                                        itemStr = swfArray.value();
+                                    }
+                                    if (fnode.fieldSet.itemName != null && !fnode.fieldSet.itemName.isEmpty()) {
+                                        itemStr = fnode.fieldSet.itemName;
+                                    }
+                                    if (itemStr.isEmpty()) {
+                                        itemStr = AppStrings.translate("generictag.array.item");
+                                    }
 
                                     boolean canAdd = true;
                                     if (!ReflectionTools.canAddToField(fnode.obj, fnode.fieldSet.get(FIELD_INDEX))) {
