@@ -39,11 +39,11 @@ import com.jpexs.decompiler.flash.types.annotations.parser.AnnotationParseExcept
 import com.jpexs.decompiler.flash.types.annotations.parser.ConditionEvaluator;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.ConcreteClasses;
+import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ReflectionTools;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import static java.awt.Component.TOP_ALIGNMENT;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
@@ -51,6 +51,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -90,6 +91,8 @@ import javax.swing.tree.TreePath;
 public class GenericTagTreePanel extends GenericTagPanel {
 
     private static final Logger logger = Logger.getLogger(GenericTagTreePanel.class.getName());
+
+    private final MainPanel mainPanel;
 
     private JTree tree;
 
@@ -192,6 +195,10 @@ public class GenericTagTreePanel extends GenericTagPanel {
                     pan.add(nameLabel);
 
                     JComponent editorComponent = (JComponent) editor;
+                    if (editorComponent == null && type.equals(ByteArrayRange.class)) {
+                        //ByteArrayRange bar = (ByteArrayRange) field.get(obj);
+                        nameLabel.setText(nameLabel.getText() + " ...");
+                    }
                     if (editorComponent != null) {
                         nameLabel.setSize(nameLabel.getWidth(), editorComponent.getHeight());
                         editorComponent.setAlignmentY(TOP_ALIGNMENT);
@@ -261,8 +268,9 @@ public class GenericTagTreePanel extends GenericTagPanel {
         }
     }
 
-    public GenericTagTreePanel() {
+    public GenericTagTreePanel(MainPanel mainPanel) {
         setLayout(new BorderLayout());
+        this.mainPanel = mainPanel;
         tree = new MyTree();
 
         add(new JScrollPane(tree), BorderLayout.CENTER);
@@ -282,7 +290,16 @@ public class GenericTagTreePanel extends GenericTagPanel {
                                 final FieldNode fnode = (FieldNode) selObject;
                                 Field field = fnode.fieldSet.get(FIELD_INDEX);
                                 if (field.getType().equals(ByteArrayRange.class)) {
-                                    // todo: load file (Issue #1007)
+                                    File selectedFile = mainPanel.showImportFileChooser("");
+                                    if (selectedFile != null) {
+                                        File selfile = Helper.fixDialogFile(selectedFile);
+                                        byte[] data = Helper.readFile(selfile.getAbsolutePath());
+                                        try {
+                                            field.set(fnode.obj, new ByteArrayRange(data));
+                                        } catch (IllegalArgumentException | IllegalAccessException ex) {
+                                            Logger.getLogger(GenericTagTreePanel.class.getName()).log(Level.SEVERE, null, ex);
+                                        }
+                                    }
                                 } else if (ReflectionTools.needsIndex(field)) {
                                     SWFArray swfArray = fnode.fieldSet.get(FIELD_INDEX).getAnnotation(SWFArray.class);
 

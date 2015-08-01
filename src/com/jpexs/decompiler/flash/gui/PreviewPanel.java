@@ -410,7 +410,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     private JPanel createGenericTagCard() {
         JPanel genericTagCard = new JPanel(new BorderLayout());
-        genericTagPanel = new GenericTagTreePanel();
+        genericTagPanel = new GenericTagTreePanel(mainPanel);
         genericTagCard.add(genericTagPanel, BorderLayout.CENTER);
         genericTagCard.add(createGenericTagButtonsPanel(), BorderLayout.SOUTH);
         return genericTagCard;

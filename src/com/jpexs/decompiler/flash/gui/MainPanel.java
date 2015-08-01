@@ -2654,7 +2654,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         export(true);
     }
 
-    private File showImportFileChooser(String filter) {
+    public File showImportFileChooser(String filter) {
         String[] filterArray = filter.length() > 0 ? filter.split("\\|") : new String[0];
 
         JFileChooser fc = new JFileChooser();
