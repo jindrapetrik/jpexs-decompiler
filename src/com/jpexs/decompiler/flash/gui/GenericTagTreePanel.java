@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.gui.generictageditors.BinaryDataEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.BooleanEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.ColorEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.GenericTagEditor;
@@ -39,7 +40,6 @@ import com.jpexs.decompiler.flash.types.annotations.parser.AnnotationParseExcept
 import com.jpexs.decompiler.flash.types.annotations.parser.ConditionEvaluator;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.ConcreteClasses;
-import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ReflectionTools;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -51,7 +51,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -91,8 +90,6 @@ import javax.swing.tree.TreePath;
 public class GenericTagTreePanel extends GenericTagPanel {
 
     private static final Logger logger = Logger.getLogger(GenericTagTreePanel.class.getName());
-
-    private final MainPanel mainPanel;
 
     private JTree tree;
 
@@ -166,6 +163,8 @@ public class GenericTagTreePanel extends GenericTagPanel {
                         editor = new StringEditor(field.getName(), obj, field, index, type, multiline != null);
                     } else if (type.equals(RGB.class) || type.equals(RGBA.class) || type.equals(ARGB.class)) {
                         editor = new ColorEditor(field.getName(), obj, field, index, type);
+                    } else if (type.equals(ByteArrayRange.class)) {
+                        editor = new BinaryDataEditor(mainPanel, field.getName(), obj, field, index, type);
                     }
                     if (editor != null) {
                         if (editors == null) {
@@ -195,10 +194,6 @@ public class GenericTagTreePanel extends GenericTagPanel {
                     pan.add(nameLabel);
 
                     JComponent editorComponent = (JComponent) editor;
-                    if (editorComponent == null && type.equals(ByteArrayRange.class)) {
-                        //ByteArrayRange bar = (ByteArrayRange) field.get(obj);
-                        nameLabel.setText(nameLabel.getText() + " ...");
-                    }
                     if (editorComponent != null) {
                         nameLabel.setSize(nameLabel.getWidth(), editorComponent.getHeight());
                         editorComponent.setAlignmentY(TOP_ALIGNMENT);
@@ -269,8 +264,8 @@ public class GenericTagTreePanel extends GenericTagPanel {
     }
 
     public GenericTagTreePanel(MainPanel mainPanel) {
+        super(mainPanel);
         setLayout(new BorderLayout());
-        this.mainPanel = mainPanel;
         tree = new MyTree();
 
         add(new JScrollPane(tree), BorderLayout.CENTER);
@@ -289,18 +284,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                             if (selObject instanceof FieldNode) {
                                 final FieldNode fnode = (FieldNode) selObject;
                                 Field field = fnode.fieldSet.get(FIELD_INDEX);
-                                if (field.getType().equals(ByteArrayRange.class)) {
-                                    File selectedFile = mainPanel.showImportFileChooser("");
-                                    if (selectedFile != null) {
-                                        File selfile = Helper.fixDialogFile(selectedFile);
-                                        byte[] data = Helper.readFile(selfile.getAbsolutePath());
-                                        try {
-                                            field.set(fnode.obj, new ByteArrayRange(data));
-                                        } catch (IllegalArgumentException | IllegalAccessException ex) {
-                                            Logger.getLogger(GenericTagTreePanel.class.getName()).log(Level.SEVERE, null, ex);
-                                        }
-                                    }
-                                } else if (ReflectionTools.needsIndex(field)) {
+                                if (ReflectionTools.needsIndex(field)) {
                                     SWFArray swfArray = fnode.fieldSet.get(FIELD_INDEX).getAnnotation(SWFArray.class);
 
                                     String itemStr = "";

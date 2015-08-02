@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.gui.generictageditors.BinaryDataEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.BooleanEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.ChangeListener;
 import com.jpexs.decompiler.flash.gui.generictageditors.ColorEditor;
@@ -36,6 +37,7 @@ import com.jpexs.decompiler.flash.types.annotations.Optional;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.parser.AnnotationParseException;
 import com.jpexs.decompiler.flash.types.annotations.parser.ConditionEvaluator;
+import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ReflectionTools;
 import java.awt.BorderLayout;
@@ -70,6 +72,8 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
 
     private static final Logger logger = Logger.getLogger(GenericTagPanel.class.getName());
 
+    protected final MainPanel mainPanel;
+
     private final JEditorPane genericTagPropertiesEditorPane;
 
     private final JPanel genericTagPropertiesEditPanel;
@@ -102,9 +106,10 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
 
     private Map<String, Component> removeButtons = new HashMap<>();
 
-    public GenericTagPanel() {
+    public GenericTagPanel(MainPanel mainPanel) {
         super(new BorderLayout());
 
+        this.mainPanel = mainPanel;
         hdr = new HeaderLabel("");
         add(hdr, BorderLayout.NORTH);
         genericTagPropertiesEditorPane = new JEditorPane() {
@@ -402,6 +407,8 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
             editor = new StringEditor(name, obj, field, index, type, multiline != null);
         } else if (type.equals(RGB.class) || type.equals(RGBA.class) || type.equals(ARGB.class)) {
             editor = new ColorEditor(name, obj, field, index, type);
+        } else if (type.equals(ByteArrayRange.class)) {
+            editor = new BinaryDataEditor(mainPanel, name, obj, field, index, type);
         } else {
             if (value == null) {
                 if (readonly) {
