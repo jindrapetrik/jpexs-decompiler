@@ -60,9 +60,15 @@ public class BinaryDataEditor extends JButton implements GenericTagEditor {
         addActionListener(this::buttonActionPerformed);
 
         try {
-            ByteArrayRange bar = (ByteArrayRange) ReflectionTools.getValue(obj, field, index);
-            setToolTipText(bar.getLength() + " bytes");
-            value = bar;
+            Object val = ReflectionTools.getValue(obj, field, index);
+            if (val instanceof byte[]) {
+                byte[] ba = (byte[]) val;
+                setToolTipText(ba.length + " bytes");
+            } else if (val instanceof ByteArrayRange) {
+                ByteArrayRange bar = (ByteArrayRange) val;
+                setToolTipText(bar.getLength() + " bytes");
+            }
+            value = val;
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             // ignore
         }
@@ -74,7 +80,12 @@ public class BinaryDataEditor extends JButton implements GenericTagEditor {
             File selfile = Helper.fixDialogFile(selectedFile);
             byte[] data = Helper.readFile(selfile.getAbsolutePath());
             setToolTipText(data.length + " bytes");
-            value = new ByteArrayRange(data);
+            Class type = field.getType();
+            if (type.equals(byte[].class)) {
+                value = data;
+            } else if (type.equals(ByteArrayRange.class)) {
+                value = new ByteArrayRange(data);
+            }
         }
     }
 

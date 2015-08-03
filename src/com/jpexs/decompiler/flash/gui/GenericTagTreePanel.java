@@ -142,8 +142,9 @@ public class GenericTagTreePanel extends GenericTagPanel {
                     int index = fnode.index;
                     Object obj = fnode.obj;
                     Class<?> type;
+                    boolean isByteArray = field.getType().equals(byte[].class);
                     try {
-                        type = ReflectionTools.getValue(obj, field, index).getClass();
+                        type = isByteArray ? byte[].class : ReflectionTools.getValue(obj, field, index).getClass();
                     } catch (IllegalArgumentException | IllegalAccessException ex) {
                         logger.log(Level.SEVERE, "Fixing characters order failed, recursion detected.");
                         return null;
@@ -163,7 +164,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                         editor = new StringEditor(field.getName(), obj, field, index, type, multiline != null);
                     } else if (type.equals(RGB.class) || type.equals(RGBA.class) || type.equals(ARGB.class)) {
                         editor = new ColorEditor(field.getName(), obj, field, index, type);
-                    } else if (type.equals(ByteArrayRange.class)) {
+                    } else if (type.equals(byte[].class) || type.equals(ByteArrayRange.class)) {
                         editor = new BinaryDataEditor(mainPanel, field.getName(), obj, field, index, type);
                     }
                     if (editor != null) {
@@ -254,6 +255,9 @@ public class GenericTagTreePanel extends GenericTagPanel {
                     editor.save();
                 }
             }
+
+            editors = null;
+
             TreePath sp = tree.getSelectionPath();
             if (sp != null) {
                 ((MyTreeModel) tree.getModel()).vchanged(sp);
@@ -516,9 +520,10 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
         public String toString(int fieldIndex) {
             String valStr = "";
-            if (ReflectionTools.needsIndex(fieldSet.get(fieldIndex)) && (index == -1)) {
+            Field field = fieldSet.get(fieldIndex);
+            if (ReflectionTools.needsIndex(field) && (index == -1)) {
                 valStr += "";
-            } else if (hasEditor(obj, fieldSet.get(fieldIndex), index)) {
+            } else if (hasEditor(obj, field, index)) {
                 Object val = getValue(fieldIndex);
                 Color color = null;
                 String colorAdd = "";
@@ -533,7 +538,9 @@ public class GenericTagTreePanel extends GenericTagPanel {
                     colorAdd = "<cite style=\"color:rgb(" + color.getRed() + "," + color.getGreen() + "," + color.getBlue() + ");\">\u25cf</cite> ";
                 }
 
-                if (val instanceof ByteArrayRange) {
+                if (val instanceof byte[]) {
+                    valStr += " = " + ((byte[]) val).length + " byte";
+                } else if (val instanceof ByteArrayRange) {
                     valStr += " = " + ((ByteArrayRange) val).getLength() + " byte";
                 } else {
                     valStr += " = " + colorAdd + val.toString();
@@ -779,7 +786,8 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
             FieldNode fnode = (FieldNode) node;
             Field field = fnode.fieldSet.get(FIELD_INDEX);
-            if (ReflectionTools.needsIndex(field) && fnode.index == -1) {
+            boolean isByteArray = field.getType().equals(byte[].class);
+            if (!isByteArray && ReflectionTools.needsIndex(field) && fnode.index == -1) {
                 return false;
             }
             boolean r = hasEditor(fnode.obj, field, fnode.index);
@@ -892,7 +900,8 @@ public class GenericTagTreePanel extends GenericTagPanel {
     }
 
     private static boolean hasEditor(Object obj, Field field, int index) {
-        if (ReflectionTools.needsIndex(field) && index == -1) {
+        boolean isByteArray = field.getType().equals(byte[].class);
+        if (!isByteArray && ReflectionTools.needsIndex(field) && index == -1) {
             return false;
         }
         Class<?> type;
@@ -920,7 +929,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
             return true;
         } else if (type.equals(RGB.class) || type.equals(RGBA.class) || type.equals(ARGB.class)) {
             return true;
-        } else if (type.equals(ByteArrayRange.class)) {
+        } else if (isByteArray || type.equals(ByteArrayRange.class)) {
             return true;
         } else {
             return false;

@@ -41,6 +41,10 @@ public class ReflectionTools {
     }
 
     public static Object getValue(Object obj, Field field, int index) throws IllegalArgumentException, IllegalAccessException {
+        if (index == -1) {
+            return getValue(obj, field);
+        }
+
         if (getFieldSubSize(obj, field) <= index) {
             return null;
         }
@@ -87,6 +91,11 @@ public class ReflectionTools {
 
     @SuppressWarnings("unchecked")
     public static void setValue(Object obj, Field field, int index, Object newValue) throws IllegalArgumentException, IllegalAccessException {
+        if (index == -1) {
+            setValue(obj, field, newValue);
+            return;
+        }
+
         Object value = field.get(obj);
         if (needsIndex(field) && index >= getFieldSubSize(obj, field)) { //outofbounds, ignore
             return;

@@ -23,6 +23,8 @@ import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -72,6 +74,10 @@ public class DebugIDTag extends Tag {
      */
     @Override
     public void getData(SWFOutputStream sos) throws IOException {
+        if (debugId.length != 16) {
+            Logger.getLogger(DebugIDTag.class.getName()).log(Level.WARNING, "DebugID should be 16 bytes");
+        }
+
         sos.write(debugId);
     }
 }
