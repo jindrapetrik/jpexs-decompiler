@@ -450,7 +450,10 @@ public class XFLConverter {
      * @return
      */
     private static List<SHAPERECORD> smoothShape(List<SHAPERECORD> shapeRecords) {
-        List<SHAPERECORD> ret = new ArrayList<>(shapeRecords);
+        List<SHAPERECORD> ret = new ArrayList<>(shapeRecords.size());
+        for (SHAPERECORD rec : shapeRecords) {
+            ret.add(rec.clone());
+        }
 
         for (int i = 1; i < ret.size() - 1; i++) {
             if (ret.get(i) instanceof StraightEdgeRecord && (ret.get(i - 1) instanceof StyleChangeRecord) && (ret.get(i + 1) instanceof StyleChangeRecord)) {
@@ -472,24 +475,23 @@ public class XFLConverter {
                         } else {
                             //???
                         }
-                        if (i >= 2) {
-                            ret.remove(i - 1);
-                            ret.remove(i - 1);
-                            if (scr.stateFillStyle0 && !scr2.stateFillStyle0) {
-                                scr2.stateFillStyle0 = true;
-                                scr2.fillStyle0 = scr.fillStyle0;
-                            }
-                            if (scr.stateFillStyle1 && !scr2.stateFillStyle1) {
-                                scr2.stateFillStyle1 = true;
-                                scr2.fillStyle1 = scr.fillStyle1;
-                            }
-                            if (scr.stateLineStyle && !scr2.stateLineStyle) {
-                                scr2.stateLineStyle = true;
-                                scr2.lineStyle = scr.lineStyle;
-                            }
-                            i -= 2;
+
+                        ret.remove(i - 1);
+                        ret.remove(i - 1);
+                        if (scr.stateFillStyle0 && !scr2.stateFillStyle0) {
+                            scr2.stateFillStyle0 = true;
+                            scr2.fillStyle0 = scr.fillStyle0;
+                        }
+                        if (scr.stateFillStyle1 && !scr2.stateFillStyle1) {
+                            scr2.stateFillStyle1 = true;
+                            scr2.fillStyle1 = scr.fillStyle1;
+                        }
+                        if (scr.stateLineStyle && !scr2.stateLineStyle) {
+                            scr2.stateLineStyle = true;
+                            scr2.lineStyle = scr.lineStyle;
                         }
 
+                        i -= 2;
                     }
                 }
             }
