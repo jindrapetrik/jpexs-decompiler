@@ -79,7 +79,12 @@ public class FileAttributesTag extends Tag {
         reserved2 = sis.readUB(1, "reserved2") == 1; // reserved
         useNetwork = sis.readUB(1, "useNetwork") != 0;
         // UB[24] == 0 (reserved)
-        reserved3 = (int) sis.readUB(24, "reserved3"); //reserved
+        int bitCount = 24;
+        if (sis.available() * 8 < bitCount) {
+            bitCount = sis.available() * 8;
+        }
+
+        reserved3 = (int) sis.readUB(bitCount, "reserved3"); //reserved
     }
 
     /**
