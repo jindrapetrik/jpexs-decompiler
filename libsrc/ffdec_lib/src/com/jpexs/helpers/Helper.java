@@ -1365,4 +1365,24 @@ public class Helper {
         }
         return data;
     }
+
+    public static String getNextId(String str, Map<String, Integer> lastIds) {
+        return getNextId(str, lastIds, false);
+    }
+
+    public static String getNextId(String str, Map<String, Integer> lastIds, boolean addFirst) {
+        Integer a = lastIds.get(str);
+        if (a == null) {
+            lastIds.put(str, 1);
+            if (addFirst) {
+                str += "_1";
+            }
+
+            return str;
+        }
+
+        a++;
+        lastIds.put(str, a);
+        return str + "_" + a;
+    }
 }

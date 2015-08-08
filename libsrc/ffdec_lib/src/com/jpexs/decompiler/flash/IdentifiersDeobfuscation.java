@@ -38,7 +38,7 @@ import java.util.regex.Pattern;
  */
 public class IdentifiersDeobfuscation {
 
-    private final Random rnd = new Random();
+    private static final Random rnd = new Random();
 
     private final int DEFAULT_FOO_SIZE = 10;
 
@@ -88,6 +88,14 @@ public class IdentifiersDeobfuscation {
         "void", "while", "with"
     };
 
+    // TODO, why do we have 2 different list? Moved from AVM2Deobfuscation
+    public static final String[] reservedWordsAS3_2 = {
+        "as", "break", "case", "catch", "class", "const", "continue", "default", "delete", "do", "each", "else",
+        "extends", "false", "finally", "for", "function", "get", "if", "implements", "import", "in", "instanceof",
+        "interface", "internal", "is", "native", "new", "null", "override", "package", "private", "protected", "public",
+        "return", "set", "super", "switch", "this", "throw", "true", "try", "typeof", "use", "var", /*"void",*/ "while",
+        "with", "dynamic", "default", "final", "in", "static"};
+
     //syntactic keywords - can be used as identifiers, but that have special meaning in certain contexts
     public static final String[] syntacticKeywordsAS3 = {"each", "get", "set", "namespace", "include", "dynamic", "final", "native", "override", "static"};
 
@@ -105,44 +113,38 @@ public class IdentifiersDeobfuscation {
         return false;
     }
 
-    private String fooString(boolean as3, HashMap<DottedChain, DottedChain> deobfuscated, String orig, boolean firstUppercase, int rndSize) {
-        boolean exists;
-        String ret;
-        loopfoo:
-        do {
-            exists = false;
-            int len = 3 + rnd.nextInt(rndSize - 3);
-            StringBuilder sb = new StringBuilder(len);
-            for (int i = 0; i < len; i++) {
-                char c;
-                if ((i % 2) == 0) {
-                    c = FOO_CHARACTERS.charAt(rnd.nextInt(FOO_CHARACTERS.length()));
-                } else {
-                    c = FOO_JOIN_CHARACTERS.charAt(rnd.nextInt(FOO_JOIN_CHARACTERS.length()));
-                }
-                if (i == 0 && firstUppercase) {
-                    c = Character.toUpperCase(c);
-                }
-                sb.append(c);
+    // TODO: Why do we need this method???
+    public static boolean isReservedWord2(String s) {
+        if (s == null) {
+            return false;
+        }
+        String[] reservedWords = reservedWordsAS3_2;
+        s = s.trim();
+        for (String rw : reservedWords) {
+            if (rw.equals(s)) {
+                return true;
             }
-            ret = sb.toString();
-            if (allVariableNamesStr.contains(ret)) {
-                exists = true;
-                rndSize += 1;
-                continue loopfoo;
+        }
+        return false;
+    }
+
+    public static String fooString(boolean firstUppercase, int rndSize) {
+        int len = 3 + rnd.nextInt(rndSize - 3);
+        StringBuilder sb = new StringBuilder(len);
+        for (int i = 0; i < len; i++) {
+            char c;
+            if ((i % 2) == 0) {
+                c = FOO_CHARACTERS.charAt(rnd.nextInt(FOO_CHARACTERS.length()));
+            } else {
+                c = FOO_JOIN_CHARACTERS.charAt(rnd.nextInt(FOO_JOIN_CHARACTERS.length()));
             }
-            if (isReservedWord(ret, as3)) {
-                exists = true;
-                rndSize += 1;
-                continue;
+            if (i == 0 && firstUppercase) {
+                c = Character.toUpperCase(c);
             }
-            if (deobfuscated.containsValue(DottedChain.parse(ret))) {
-                exists = true;
-                rndSize += 1;
-                continue;
-            }
-        } while (exists);
-        return ret;
+            sb.append(c);
+        }
+
+        return sb.toString();
     }
 
     public void deobfuscateInstanceNames(boolean as3, HashMap<DottedChain, DottedChain> namesMap, RenameType renameType, List<Tag> tags, Map<DottedChain, DottedChain> selected) {
@@ -266,25 +268,27 @@ public class IdentifiersDeobfuscation {
             if (namesMap.containsKey(sChain)) {
                 return namesMap.get(sChain).toRawString();
             } else {
-                Integer cnt = typeCounts.get(usageType);
-                if (cnt == null) {
-                    cnt = 0;
-                }
-
                 String ret = null;
-                if (renameType == RenameType.TYPENUMBER) {
+                boolean found;
+                int rndSize = DEFAULT_FOO_SIZE;
+                do {
+                    found = false;
+                    if (renameType == RenameType.TYPENUMBER) {
+                        ret = Helper.getNextId(usageType, typeCounts, true);
+                        if (allVariableNamesStr.contains(ret)) {
+                            found = true;
+                        }
+                    } else if (renameType == RenameType.RANDOMWORD) {
+                        ret = fooString(firstUppercase, rndSize);
+                        if (allVariableNamesStr.contains(ret)
+                                || isReservedWord(ret, as3)
+                                || namesMap.containsValue(DottedChain.parse(ret))) {
+                            found = true;
+                            rndSize++;
+                        }
+                    }
+                } while (found);
 
-                    boolean found;
-                    do {
-                        found = false;
-                        cnt++;
-                        ret = usageType + "_" + cnt;
-                        found = allVariableNamesStr.contains(ret);
-                    } while (found);
-                    typeCounts.put(usageType, cnt);
-                } else if (renameType == RenameType.RANDOMWORD) {
-                    ret = fooString(as3, namesMap, s, firstUppercase, DEFAULT_FOO_SIZE);
-                }
                 namesMap.put(DottedChain.parse(s), DottedChain.parse(ret));
                 return ret;
             }

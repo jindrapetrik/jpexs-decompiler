@@ -16,14 +16,15 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2;
 
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.graph.DottedChain;
+import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -33,26 +34,13 @@ import java.util.regex.Pattern;
  */
 public class AVM2Deobfuscation {
 
-    private static final Random rnd = new Random();
-
     private static final int DEFAULT_FOO_SIZE = 10;
-
-    public static final String[] reservedWords = {
-        "as", "break", "case", "catch", "class", "const", "continue", "default", "delete", "do", "each", "else",
-        "extends", "false", "finally", "for", "function", "get", "if", "implements", "import", "in", "instanceof",
-        "interface", "internal", "is", "native", "new", "null", "override", "package", "private", "protected", "public",
-        "return", "set", "super", "switch", "this", "throw", "true", "try", "typeof", "use", "var", /*"void",*/ "while",
-        "with", "dynamic", "default", "final", "in", "static"};
 
     public static final String VALID_FIRST_CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
 
     public static final String VALID_NEXT_CHARACTERS = VALID_FIRST_CHARACTERS + "0123456789";
 
     public static final String VALID_NS_CHARACTERS = ".:$";
-
-    public static final String FOO_CHARACTERS = "bcdfghjklmnpqrstvwz";
-
-    public static final String FOO_JOIN_CHARACTERS = "aeiouy";
 
     private final SWF swf;
 
@@ -69,18 +57,9 @@ public class AVM2Deobfuscation {
         this.constants = constants;
     }
 
-    private static boolean isReserved(String s) {
-        for (String rw : reservedWords) {
-            if (rw.equals(s.trim())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     private boolean isValidNSPart(String s) {
         boolean isValid = true;
-        if (isReserved(s)) {
+        if (IdentifiersDeobfuscation.isReservedWord2(s)) {
             isValid = false;
         }
 
@@ -114,62 +93,29 @@ public class AVM2Deobfuscation {
         return null;
     }
 
-    private String fooString(HashMap<DottedChain, DottedChain> deobfuscated, String orig, boolean firstUppercase, int rndSize, String usageType, RenameType renameType) {
-        boolean exists;
-        String ret;
-        int pos = 0;
-
+    private String fooString(HashMap<DottedChain, DottedChain> deobfuscated, String orig, boolean firstUppercase, String usageType, RenameType renameType) {
         if (usageType == null) {
             usageType = "name";
         }
-        if (usageTypesCount.containsKey(usageType)) {
-            pos = usageTypesCount.get(usageType);
-        }
 
-        loopfoo:
+        String ret = null;
+        boolean found;
+        int rndSize = DEFAULT_FOO_SIZE;
+
         do {
-            exists = false;
-            ret = "";
+            found = false;
             if (renameType == RenameType.TYPENUMBER) {
-                pos++;
-                ret = usageType + "_" + pos;
+                ret = Helper.getNextId(usageType, usageTypesCount, true);
             } else if (renameType == RenameType.RANDOMWORD) {
-                int len = 3 + rnd.nextInt(rndSize - 3);
-
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < len; i++) {
-                    char c;
-                    if ((i % 2) == 0) {
-                        c = FOO_CHARACTERS.charAt(rnd.nextInt(FOO_CHARACTERS.length()));
-                    } else {
-                        c = FOO_JOIN_CHARACTERS.charAt(rnd.nextInt(FOO_JOIN_CHARACTERS.length()));
-                    }
-                    if (i == 0 && firstUppercase) {
-                        c = Character.toUpperCase(c);
-                    }
-                    sb.append(c);
-                }
-
-                ret = sb.toString();
+                ret = IdentifiersDeobfuscation.fooString(firstUppercase, rndSize);
             }
-            if (swf.as3StringConstantExists(ret)) {
-                exists = true;
-                rndSize += 1;
-                continue loopfoo;
-
+            if (swf.as3StringConstantExists(ret)
+                    || IdentifiersDeobfuscation.isReservedWord2(ret)
+                    || deobfuscated.containsValue(DottedChain.parse(ret))) {
+                found = true;
+                rndSize++;
             }
-            if (isReserved(ret)) {
-                exists = true;
-                rndSize += 1;
-                continue;
-            }
-            if (deobfuscated.containsValue(DottedChain.parse(ret))) {
-                exists = true;
-                rndSize += 1;
-                continue;
-            }
-        } while (exists);
-        usageTypesCount.put(usageType, pos);
+        } while (found);
         deobfuscated.put(DottedChain.parse(orig), DottedChain.parse(ret));
         return ret;
     }
@@ -194,7 +140,7 @@ public class AVM2Deobfuscation {
                 for (int p = 0; p < sChain.size(); p++) {
                     String part = sChain.get(p);
                     if (!isValidNSPart(part)) {
-                        ret.add(fooString(namesMap, part, false, DEFAULT_FOO_SIZE, "package", renameType));
+                        ret.add(fooString(namesMap, part, false, "package", renameType));
                     } else {
                         ret.add(part);
                     }
@@ -218,7 +164,7 @@ public class AVM2Deobfuscation {
         }
         String s = constants.getString(strIndex);
         boolean isValid = true;
-        if (isReserved(s)) {
+        if (IdentifiersDeobfuscation.isReservedWord2(s)) {
             isValid = false;
         }
 
@@ -244,7 +190,7 @@ public class AVM2Deobfuscation {
             if (namesMap.containsKey(sChain)) {
                 newname = namesMap.get(sChain);
             } else {
-                String str = fooString(namesMap, constants.getString(strIndex), firstUppercase, DEFAULT_FOO_SIZE, stringUsageTypes.get(strIndex), renameType);
+                String str = fooString(namesMap, constants.getString(strIndex), firstUppercase, stringUsageTypes.get(strIndex), renameType);
                 newname = DottedChain.parse(str);
             }
             if (stringUsages.contains(strIndex) || namespaceUsages.contains(strIndex)) { // this name is already referenced as String
