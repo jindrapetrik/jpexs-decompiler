@@ -682,7 +682,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
         });
 
-        //displayPanel.setBorder(BorderFactory.createLineBorder(Color.black));
+//displayPanel.setBorder(BorderFactory.createLineBorder(Color.black));
         splitPane2 = new JPersistentSplitPane(JSplitPane.VERTICAL_SPLIT, treePanel, detailPanel, Configuration.guiSplitPane2DividerLocationPercent);
         splitPane1 = new JPersistentSplitPane(JSplitPane.HORIZONTAL_SPLIT, splitPane2, displayPanel, Configuration.guiSplitPane1DividerLocationPercent);
 
@@ -1049,14 +1049,16 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         List<File> ret = new ArrayList<>();
         List<TreeItem> sel = folderPreviewPanel.selectedItems.isEmpty() ? tagTree.getAllSelected(tagTree) : new ArrayList<>(folderPreviewPanel.selectedItems.values());
 
-        List<SWF> allSwfs = new ArrayList<>();
-        for (SWFList swfList : swfs) {
-            for (SWF swf : swfList) {
-                allSwfs.add(swf);
+        Set<SWF> usedSwfs = new HashSet<>();
+        for (TreeItem d : sel) {
+            SWF selectedNodeSwf = d.getSwf();
+            if (!usedSwfs.contains(selectedNodeSwf)) {
+                usedSwfs.add(selectedNodeSwf);
             }
         }
 
-        for (int j = 0; j < allSwfs.size(); j++) {
+        Map<String, Integer> usedSwfsIds = new HashMap<>();
+        for (SWF swf : usedSwfs) {
             List<ScriptPack> as3scripts = new ArrayList<>();
             List<Tag> images = new ArrayList<>();
             List<Tag> shapes = new ArrayList<>();
@@ -1071,12 +1073,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             List<Tag> fonts = new ArrayList<>();
             List<Tag> symbolNames = new ArrayList<>();
 
-            SWF swf = allSwfs.get(j);
             for (TreeItem d : sel) {
                 SWF selectedNodeSwf = d.getSwf();
-                if (!allSwfs.contains(selectedNodeSwf)) {
-                    allSwfs.add(selectedNodeSwf);
-                }
 
                 if (selectedNodeSwf != swf) {
                     continue;
@@ -1146,50 +1144,57 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 }
             }
 
+            String selFile2;
+            if (usedSwfs.size() > 1) {
+                selFile2 = selFile + File.separator + Helper.getNextId(swf.getShortFileName(), usedSwfsIds);
+            } else {
+                selFile2 = selFile;
+            }
+
             EventListener evl = swf.getExportEventListener();
 
             if (export.isOptionEnabled(ImageExportMode.class)) {
-                ret.addAll(new ImageExporter().exportImages(handler, selFile + File.separator + ImageExportSettings.EXPORT_FOLDER_NAME, images,
+                ret.addAll(new ImageExporter().exportImages(handler, selFile2 + File.separator + ImageExportSettings.EXPORT_FOLDER_NAME, images,
                         new ImageExportSettings(export.getValue(ImageExportMode.class)), evl));
             }
 
             if (export.isOptionEnabled(ShapeExportMode.class)) {
-                ret.addAll(new ShapeExporter().exportShapes(handler, selFile + File.separator + ShapeExportSettings.EXPORT_FOLDER_NAME, shapes,
+                ret.addAll(new ShapeExporter().exportShapes(handler, selFile2 + File.separator + ShapeExportSettings.EXPORT_FOLDER_NAME, shapes,
                         new ShapeExportSettings(export.getValue(ShapeExportMode.class), export.getZoom()), evl));
             }
 
             if (export.isOptionEnabled(MorphShapeExportMode.class)) {
-                ret.addAll(new MorphShapeExporter().exportMorphShapes(handler, selFile + File.separator + MorphShapeExportSettings.EXPORT_FOLDER_NAME, morphshapes,
+                ret.addAll(new MorphShapeExporter().exportMorphShapes(handler, selFile2 + File.separator + MorphShapeExportSettings.EXPORT_FOLDER_NAME, morphshapes,
                         new MorphShapeExportSettings(export.getValue(MorphShapeExportMode.class), export.getZoom()), evl));
             }
 
             if (export.isOptionEnabled(TextExportMode.class)) {
-                ret.addAll(new TextExporter().exportTexts(handler, selFile + File.separator + TextExportSettings.EXPORT_FOLDER_NAME, texts,
+                ret.addAll(new TextExporter().exportTexts(handler, selFile2 + File.separator + TextExportSettings.EXPORT_FOLDER_NAME, texts,
                         new TextExportSettings(export.getValue(TextExportMode.class), Configuration.textExportSingleFile.get(), export.getZoom()), evl));
             }
 
             if (export.isOptionEnabled(MovieExportMode.class)) {
-                ret.addAll(new MovieExporter().exportMovies(handler, selFile + File.separator + MovieExportSettings.EXPORT_FOLDER_NAME, movies,
+                ret.addAll(new MovieExporter().exportMovies(handler, selFile2 + File.separator + MovieExportSettings.EXPORT_FOLDER_NAME, movies,
                         new MovieExportSettings(export.getValue(MovieExportMode.class)), evl));
             }
 
             if (export.isOptionEnabled(SoundExportMode.class)) {
-                ret.addAll(new SoundExporter().exportSounds(handler, selFile + File.separator + SoundExportSettings.EXPORT_FOLDER_NAME, sounds,
+                ret.addAll(new SoundExporter().exportSounds(handler, selFile2 + File.separator + SoundExportSettings.EXPORT_FOLDER_NAME, sounds,
                         new SoundExportSettings(export.getValue(SoundExportMode.class)), evl));
             }
 
             if (export.isOptionEnabled(BinaryDataExportMode.class)) {
-                ret.addAll(new BinaryDataExporter().exportBinaryData(handler, selFile + File.separator + BinaryDataExportSettings.EXPORT_FOLDER_NAME, binaryData,
+                ret.addAll(new BinaryDataExporter().exportBinaryData(handler, selFile2 + File.separator + BinaryDataExportSettings.EXPORT_FOLDER_NAME, binaryData,
                         new BinaryDataExportSettings(export.getValue(BinaryDataExportMode.class)), evl));
             }
 
             if (export.isOptionEnabled(FontExportMode.class)) {
-                ret.addAll(new FontExporter().exportFonts(handler, selFile + File.separator + FontExportSettings.EXPORT_FOLDER_NAME, fonts,
+                ret.addAll(new FontExporter().exportFonts(handler, selFile2 + File.separator + FontExportSettings.EXPORT_FOLDER_NAME, fonts,
                         new FontExportSettings(export.getValue(FontExportMode.class)), evl));
             }
 
             if (export.isOptionEnabled(SymbolClassExportMode.class)) {
-                ret.addAll(new SymbolClassExporter().exportNames(selFile, symbolNames, evl));
+                ret.addAll(new SymbolClassExporter().exportNames(selFile2, symbolNames, evl));
             }
 
             FrameExporter frameExporter = new FrameExporter();
@@ -1200,7 +1205,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     int containerId = entry.getKey();
                     if (containerId == 0) {
                         String subFolder = FrameExportSettings.EXPORT_FOLDER_NAME;
-                        ret.addAll(frameExporter.exportFrames(handler, selFile + File.separator + subFolder, swf, containerId, entry.getValue(), fes, evl));
+                        ret.addAll(frameExporter.exportFrames(handler, selFile2 + File.separator + subFolder, swf, containerId, entry.getValue(), fes, evl));
                     }
                 }
             }
@@ -1211,7 +1216,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     int containerId = entry.getKey();
                     if (containerId != 0) {
                         String subFolder = SpriteExportSettings.EXPORT_FOLDER_NAME;
-                        ret.addAll(frameExporter.exportFrames(handler, selFile + File.separator + subFolder, swf, containerId, entry.getValue(), ses, evl));
+                        ret.addAll(frameExporter.exportFrames(handler, selFile2 + File.separator + subFolder, swf, containerId, entry.getValue(), ses, evl));
                     }
                 }
             }
