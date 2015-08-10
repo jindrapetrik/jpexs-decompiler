@@ -682,7 +682,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
         });
 
-//displayPanel.setBorder(BorderFactory.createLineBorder(Color.black));
+        //displayPanel.setBorder(BorderFactory.createLineBorder(Color.black));
         splitPane2 = new JPersistentSplitPane(JSplitPane.VERTICAL_SPLIT, treePanel, detailPanel, Configuration.guiSplitPane2DividerLocationPercent);
         splitPane1 = new JPersistentSplitPane(JSplitPane.HORIZONTAL_SPLIT, splitPane2, displayPanel, Configuration.guiSplitPane1DividerLocationPercent);
 
@@ -1228,14 +1228,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     String subFolder = ButtonExportSettings.EXPORT_FOLDER_NAME;
                     List<Integer> frameNums = new ArrayList<>();
                     frameNums.add(0); // todo: export all frames
-                    ret.addAll(frameExporter.exportFrames(handler, selFile + File.separator + subFolder, swf, button.getCharacterId(), frameNums, bes, evl));
+                    ret.addAll(frameExporter.exportFrames(handler, selFile2 + File.separator + subFolder, swf, button.getCharacterId(), frameNums, bes, evl));
                 }
             }
 
             if (export.isOptionEnabled(ScriptExportMode.class)) {
                 if (as3scripts.size() > 0 || as12scripts.size() > 0) {
                     boolean parallel = Configuration.parallelSpeedUp.get();
-                    String scriptsFolder = Path.combine(selFile, ScriptExportSettings.EXPORT_FOLDER_NAME);
+                    String scriptsFolder = Path.combine(selFile2, ScriptExportSettings.EXPORT_FOLDER_NAME);
                     Path.createDirectorySafe(new File(scriptsFolder));
                     ScriptExportSettings scriptExportSettings = new ScriptExportSettings(export.getValue(ScriptExportMode.class), !parallel && Configuration.scriptExportSingleFile.get());
                     String singleFileName = Path.combine(scriptsFolder, swf.getShortFileName() + scriptExportSettings.getFileExtension());
