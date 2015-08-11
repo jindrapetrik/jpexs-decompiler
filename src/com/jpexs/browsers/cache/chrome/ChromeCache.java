@@ -35,7 +35,7 @@ import java.util.logging.Logger;
  */
 public class ChromeCache implements CacheImplementation {
 
-    private static ChromeCache instance;
+    private static volatile ChromeCache instance;
 
     private File tempDir;
 

@@ -44,7 +44,7 @@ public class DebuggerTools {
 
     public static final String DEBUGGER_PACKAGE = "com.jpexs.decompiler.flash.debugger";
 
-    private static Debugger debugger;
+    private static volatile Debugger debugger;
 
     private static ScriptPack getDebuggerScriptPack(SWF swf) {
         List<ABC> allAbcList = new ArrayList<>();

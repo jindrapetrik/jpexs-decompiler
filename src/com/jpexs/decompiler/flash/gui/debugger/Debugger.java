@@ -161,11 +161,9 @@ public class Debugger {
                 ss.setReuseAddress(true);
                 while (true) {
                     Socket s = ss.accept();
-                    if (s != null) {
-                        DebugHandler h = new DebugHandler(port, s);
-                        handlers.put(h.id, h);
-                        h.start();
-                    }
+                    DebugHandler h = new DebugHandler(port, s);
+                    handlers.put(h.id, h);
+                    h.start();
                 }
             } catch (IOException ex) {
                 //ignore

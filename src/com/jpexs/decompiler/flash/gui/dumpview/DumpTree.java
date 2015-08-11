@@ -184,9 +184,6 @@ public class DumpTree extends JTree {
         JFileChooser fc = new JFileChooser();
         String selDir = Configuration.lastOpenDir.get();
         fc.setCurrentDirectory(new File(selDir));
-        if (!selDir.endsWith(File.separator)) {
-            selDir += File.separator;
-        }
         JFrame f = new JFrame();
         View.setWindowIcon(f);
         if (fc.showSaveDialog(f) == JFileChooser.APPROVE_OPTION) {

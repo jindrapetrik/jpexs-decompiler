@@ -858,7 +858,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
     @Override
     public void updateSearchPos(ActionSearchResult item) {
         TagTreeModel ttm = (TagTreeModel) mainPanel.tagTree.getModel();
-        TreePath tp = ttm.getTreePath(item.src);
+        TreePath tp = ttm.getTreePath(item.getSrc());
         mainPanel.tagTree.setSelectionPath(tp);
         mainPanel.tagTree.scrollPathToVisible(tp);
         decompiledEditor.setCaretPosition(0);

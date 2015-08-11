@@ -186,8 +186,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
                     Main.startWork(workText + " \"" + txt + "\"" + decAdd + " - (" + pos + "/" + allpacks.size() + ") " + pack.getClassPath().toString() + "... ", worker);
                     try {
                         if (pat.matcher(SWF.getCached(pack).text).find()) {
-                            ABCPanelSearchResult searchResult = new ABCPanelSearchResult();
-                            searchResult.scriptPack = pack;
+                            ABCPanelSearchResult searchResult = new ABCPanelSearchResult(pack);
                             found.add(searchResult);
                         }
                     } catch (InterruptedException ex) {
@@ -655,7 +654,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
     @Override
     public void updateSearchPos(ABCPanelSearchResult item) {
-        ScriptPack pack = item.scriptPack;
+        ScriptPack pack = item.getScriptPack();
         setAbc(pack.abc);
         decompiledTextArea.setScript(pack);
         hilightScript(pack);

@@ -24,13 +24,17 @@ import com.jpexs.decompiler.flash.tags.base.ASMSource;
  */
 public class ActionSearchResult {
 
-    public ASMSource src;
+    private ASMSource src;
 
-    public String path;
+    private String path;
 
     public ActionSearchResult(ASMSource src, String path) {
         this.src = src;
         this.path = path;
+    }
+
+    public ASMSource getSrc() {
+        return src;
     }
 
     @Override

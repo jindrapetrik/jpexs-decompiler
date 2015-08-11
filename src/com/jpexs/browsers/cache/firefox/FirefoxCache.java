@@ -33,7 +33,7 @@ import java.util.logging.Logger;
  */
 public class FirefoxCache implements CacheImplementation {
 
-    private static FirefoxCache instance;
+    private static volatile FirefoxCache instance;
 
     private FirefoxCache() {
     }

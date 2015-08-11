@@ -237,7 +237,7 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
         @Override
         public void mouseMoved(MouseEvent e) {
 
-            ctrlDown = (e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) > 0;
+            ctrlDown = (e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) != 0;
             lastPos = e.getPoint();
             update();
 

@@ -24,7 +24,15 @@ import com.jpexs.decompiler.flash.abc.ScriptPack;
  */
 public class ABCPanelSearchResult {
 
-    public ScriptPack scriptPack;
+    private ScriptPack scriptPack;
+
+    public ABCPanelSearchResult(ScriptPack scriptPack) {
+        this.scriptPack = scriptPack;
+    }
+
+    public ScriptPack getScriptPack() {
+        return scriptPack;
+    }
 
     @Override
     public String toString() {

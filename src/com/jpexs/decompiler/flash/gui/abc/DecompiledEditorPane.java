@@ -411,7 +411,6 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                 long highlightOffset = h.getProperties().offset;
                 List<AVM2Instruction> list = abc.bodies.get(bi).getCode().code;
                 AVM2Instruction lastIns = null;
-                long inspos = 0;
                 AVM2Instruction selIns = null;
                 for (AVM2Instruction ins : list) {
                     if (highlightOffset == ins.getOffset()) {
@@ -419,13 +418,13 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                         break;
                     }
                     if (ins.getOffset() > highlightOffset) {
-                        inspos = highlightOffset - lastIns.offset;
                         selIns = lastIns;
                         break;
                     }
                     lastIns = ins;
                 }
                 if (selIns != null) {
+                    //long inspos = highlightOffset - selIns.offset;
                     if (!codeOnly && ((selIns.definition instanceof ConstructSuperIns) || (selIns.definition instanceof CallSuperIns) || (selIns.definition instanceof CallSuperVoidIns))) {
                         Highlighting tc = Highlighting.searchPos(classHighlights, pos);
                         if (tc != null) {
