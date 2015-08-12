@@ -54,7 +54,7 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
 
     private boolean stopped = true;
 
-    private int frameRate;
+    private float frameRate;
 
     @Override
     public boolean loopAvailable() {
@@ -237,7 +237,7 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
         }
     }
 
-    public synchronized void displaySWF(String flashName, Color bgColor, int frameRate) {
+    public synchronized void displaySWF(String flashName, Color bgColor, float frameRate) {
 
         zoom = 1.0;
         this.frameRate = frameRate;
@@ -316,7 +316,7 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
     }
 
     @Override
-    public int getFrameRate() {
+    public float getFrameRate() {
         return frameRate;
     }
 
