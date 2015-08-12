@@ -3293,7 +3293,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             private void initTimeline(Timeline timeline) {
                 if (tag instanceof MorphShapeTag) {
                     tim.frameRate = MORPH_SHAPE_ANIMATION_FRAME_RATE;
-                    int framesCnt = tim.frameRate * MORPH_SHAPE_ANIMATION_LENGTH;
+                    int framesCnt = (int) (tim.frameRate * MORPH_SHAPE_ANIMATION_LENGTH);
                     for (int i = 0; i < framesCnt; i++) {
                         Frame f = new Frame(tim, i);
                         DepthState ds = new DepthState(tag.getSwf(), f);

@@ -180,7 +180,7 @@ public class MovieExporter {
             }
 
             baos.write(tag.videoData.getRangeData());
-            flv.writeTag(new FLVTAG((int) Math.floor(i * 1000.0f / ((float) swf.frameRate)), new VIDEODATA(frameType, videoStream.codecID, baos.toByteArray())));
+            flv.writeTag(new FLVTAG((int) Math.floor(i * 1000.0 / swf.frameRate), new VIDEODATA(frameType, videoStream.codecID, baos.toByteArray())));
         }
         return fos.toByteArray();
     }

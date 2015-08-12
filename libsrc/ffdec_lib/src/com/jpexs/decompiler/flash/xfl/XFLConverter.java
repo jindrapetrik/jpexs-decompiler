@@ -1577,10 +1577,10 @@ public class XFLConverter {
                     mediaLinkStr = "<DOMVideoItem name=\"" + symbolFile + "\" sourceLastImported=\"" + getTimestamp(swf) + "\" externalFileSize=\"" + data.length + "\"";
                     mediaLinkStr += " href=\"" + symbolFile + "\"";
                     mediaLinkStr += " videoType=\"" + videoType + "\"";
-                    mediaLinkStr += " fps=\"" + swf.frameRate + "\"";
+                    mediaLinkStr += " fps=\"" + (int) swf.frameRate + "\""; // todo: is the cast to in needed?
                     mediaLinkStr += " width=\"" + video.width + "\"";
                     mediaLinkStr += " height=\"" + video.height + "\"";
-                    double len = ((double) video.numFrames) / ((double) swf.frameRate);
+                    double len = (double) video.numFrames / swf.frameRate;
                     mediaLinkStr += " length=\"" + len + "\"";
                     boolean linkageExportForAS = false;
                     if (characterClasses.containsKey(symbol.getCharacterId())) {
@@ -2694,7 +2694,7 @@ public class XFLConverter {
         }
         domDocument.append("<DOMDocument xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://ns.adobe.com/xfl/2008/\" currentTimeline=\"1\" xflVersion=\"").append(flaVersion.xflVersion()).append("\" creatorInfo=\"").append(generator).append("\" platform=\"Windows\" versionInfo=\"Saved by ").append(generatorVerName).append("\" majorVersion=\"").append(generatorVersion).append("\" buildNumber=\"\" nextSceneIdentifier=\"2\" playOptionsPlayLoop=\"false\" playOptionsPlayPages=\"false\" playOptionsPlayFrameActions=\"false\" autoSaveHasPrompted=\"true\"");
         domDocument.append(" backgroundColor=\"").append(backgroundColor).append("\"");
-        domDocument.append(" frameRate=\"").append(swf.frameRate).append("\"");
+        domDocument.append(" frameRate=\"").append((int) swf.frameRate).append("\"");
 
         double width = twipToPixel(swf.displayRect.getWidth());
         double height = twipToPixel(swf.displayRect.getHeight());

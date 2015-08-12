@@ -348,7 +348,7 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
             if (currentFrame >= totalFrames) {
                 currentFrame = totalFrames - 1;
             }
-            int frameRate = display.getFrameRate();
+            float frameRate = display.getFrameRate();
             if (totalFrames == 0) {
                 progress.setIndeterminate(true);
             } else {
@@ -360,8 +360,8 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
             frameLabel.setText(("" + (currentFrame + 1)));
             totalFrameLabel.setText("" + totalFrames);
             if (frameRate != 0) {
-                timeLabel.setText("(" + formatMs((currentFrame * 1000) / frameRate) + ")");
-                totalTimeLabel.setText("(" + formatMs((totalFrames * 1000) / frameRate) + ")");
+                timeLabel.setText("(" + formatMs((int) (currentFrame * 1000.0 / frameRate)) + ")");
+                totalTimeLabel.setText("(" + formatMs((int) (totalFrames * 1000.0 / frameRate)) + ")");
             }
             if (totalFrames <= 1 && playbackControls.isVisible()) {
                 playbackControls.setVisible(false);

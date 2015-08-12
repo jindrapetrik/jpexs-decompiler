@@ -299,7 +299,7 @@ public class SoundTagPlayer implements MediaDisplay {
     }
 
     @Override
-    public int getFrameRate() {
+    public float getFrameRate() {
         return (int) (1000000L / FRAME_DIVISOR);
     }
 

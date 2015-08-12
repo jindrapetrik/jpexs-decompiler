@@ -225,7 +225,7 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
         swf.compression = getCompression();
         swf.version = getVersionNumber();
         swf.gfx = gfxCheckBox.isSelected();
-        swf.frameRate = (int) frameRateEditor.getModel().getValue();
+        swf.frameRate = ((Number) (frameRateEditor.getModel().getValue())).floatValue();
         swf.displayRect.Xmin = (int) xMinEditor.getModel().getValue();
         swf.displayRect.Xmax = (int) xMaxEditor.getModel().getValue();
         swf.displayRect.Ymin = (int) yMinEditor.getModel().getValue();
@@ -266,7 +266,7 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
 
         fileSizeLabel.setText(Long.toString(swf.fileSize));
 
-        frameRateLabel.setText(Integer.toString(swf.frameRate));
+        frameRateLabel.setText(Float.toString(swf.frameRate));
         frameRateEditor.setModel(new SpinnerNumberModel(swf.frameRate, -0x80000000, 0x7fffffff, 1));
 
         frameCountLabel.setText("" + swf.frameCount);

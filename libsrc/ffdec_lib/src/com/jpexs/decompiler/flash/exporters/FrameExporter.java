@@ -438,14 +438,14 @@ public class FrameExporter {
         return "[" + rgb.red + "," + rgb.green + "," + rgb.blue + "," + ((rgb instanceof RGBA) ? ((RGBA) rgb).getAlphaFloat() : 1) + "]";
     }
 
-    public static void makeAVI(Iterator<BufferedImage> images, int frameRate, File file, EventListener evl) throws IOException {
+    public static void makeAVI(Iterator<BufferedImage> images, float frameRate, File file, EventListener evl) throws IOException {
         if (!images.hasNext()) {
             return;
         }
 
         AVIWriter out = new AVIWriter(file);
         BufferedImage img0 = images.next();
-        out.addVideoTrack(VideoFormatKeys.ENCODING_AVI_PNG, 1, frameRate, img0.getWidth(), img0.getHeight(), 0, 0);
+        out.addVideoTrack(VideoFormatKeys.ENCODING_AVI_PNG, 1, (int) frameRate, img0.getWidth(), img0.getHeight(), 0, 0);
         try {
             out.write(0, img0, 1);
             while (images.hasNext()) {
@@ -456,7 +456,7 @@ public class FrameExporter {
         }
     }
 
-    public static void makeGIF(Iterator<BufferedImage> images, int frameRate, File file, EventListener evl) throws IOException {
+    public static void makeGIF(Iterator<BufferedImage> images, float frameRate, File file, EventListener evl) throws IOException {
         if (!images.hasNext()) {
             return;
         }
@@ -464,7 +464,7 @@ public class FrameExporter {
         AnimatedGifEncoder encoder = new AnimatedGifEncoder();
         encoder.setRepeat(0); // repeat forever
         encoder.start(file.getAbsolutePath());
-        encoder.setDelay(1000 / frameRate);
+        encoder.setDelay((int) (1000.0 / frameRate));
         while (images.hasNext()) {
             encoder.addFrame(images.next());
         }
@@ -472,14 +472,14 @@ public class FrameExporter {
         encoder.finish();
     }
 
-    public static void makeGIFOld(Iterator<BufferedImage> images, int frameRate, File file, EventListener evl) throws IOException {
+    public static void makeGIFOld(Iterator<BufferedImage> images, float frameRate, File file, EventListener evl) throws IOException {
         if (!images.hasNext()) {
             return;
         }
 
         try (ImageOutputStream output = new FileImageOutputStream(file)) {
             BufferedImage img0 = images.next();
-            GifSequenceWriter writer = new GifSequenceWriter(output, img0.getType(), 1000 / frameRate, true);
+            GifSequenceWriter writer = new GifSequenceWriter(output, img0.getType(), (int) (1000.0 / frameRate), true);
             writer.writeToSequence(img0);
 
             while (images.hasNext()) {

@@ -618,7 +618,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             }
 
             int frameCount = 1;
-            int frameRate = swf.frameRate;
+            float frameRate = swf.frameRate;
             HashMap<Integer, VideoFrameTag> videoFrames = new HashMap<>();
             if (tagObj instanceof DefineVideoStreamTag) {
                 DefineVideoStreamTag vs = (DefineVideoStreamTag) tagObj;
@@ -634,7 +634,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
             if ((tagObj instanceof DefineMorphShapeTag) || (tagObj instanceof DefineMorphShape2Tag)) {
                 frameRate = MainPanel.MORPH_SHAPE_ANIMATION_FRAME_RATE;
-                frameCount = MainPanel.MORPH_SHAPE_ANIMATION_LENGTH * frameRate;
+                frameCount = (int) (MainPanel.MORPH_SHAPE_ANIMATION_LENGTH * frameRate);
             }
 
             if (tagObj instanceof DefineSoundTag) {
@@ -660,8 +660,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 int height = outrect.getHeight();
 
                 sos2.writeRECT(outrect);
-                sos2.writeUI8(0);
-                sos2.writeUI8(frameRate);
+                sos2.writeFIXED8(frameRate);
                 sos2.writeUI16(frameCount); //framecnt
 
                 /*FileAttributesTag fa = new FileAttributesTag();

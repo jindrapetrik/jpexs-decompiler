@@ -206,7 +206,7 @@ public final class SWF implements SWFContainerItem, Timelined {
     /**
      * Movie frame rate
      */
-    public int frameRate;
+    public float frameRate;
 
     /**
      * Number of frames in movie
@@ -767,8 +767,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             sos.writeUI8(version);
             sos.writeUI32(0); // placeholder for file length
             sos.writeRECT(displayRect);
-            sos.writeUI8(0);
-            sos.writeUI8(frameRate);
+            sos.writeFIXED8(frameRate);
             sos.writeUI16(frameCount);
 
             sos.writeTags(tags);
@@ -1037,9 +1036,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
         sis.setPercentMax(fileSize);
         displayRect = sis.readRECT("displayRect");
-        // FIXED8 (16 bit fixed point) frameRate
-        sis.readUI8("tmpFirstByetOfFrameRate"); // tmpFirstByetOfFrameRate
-        frameRate = sis.readUI8("frameRate");
+        frameRate = sis.readFIXED8("frameRate");
         frameCount = sis.readUI16("frameCount");
         List<Tag> tags = sis.readTagList(this, 0, parallelRead, true, !checkOnly, lazy);
         if (tags.size() > 0 && tags.get(tags.size() - 1).getId() == EndTag.ID) {

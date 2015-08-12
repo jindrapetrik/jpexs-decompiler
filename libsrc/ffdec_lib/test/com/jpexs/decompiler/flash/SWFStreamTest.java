@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 //import com.jpexs.decompiler.flash.gui.Main;
@@ -136,23 +137,47 @@ public class SWFStreamTest {
         assertTrue(Double.compare(7.5, sis.readFIXED("test")) == 0);
         sis.close();
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION);
-        double dd = 5.25;
-        sos.writeFIXED(dd);
-        sos.close();
-        sis = new SWFInputStream(null, baos.toByteArray());
-        assertTrue(Double.compare(dd, sis.readFIXED("test")) == 0);
-        sis.close();
+        double[] dds = new double[]{5.25, 65535.25};
+        for (double dd : dds) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION);
+            sos.writeFIXED(dd);
+            sos.close();
+            sis = new SWFInputStream(null, baos.toByteArray());
+            double dd2 = sis.readFIXED("test");
+            assertTrue(Double.compare(dd, dd2) == 0, "Written and read value not equals. Written: " + dd + " read: " + dd2);
+            sis.close();
+        }
 
-        baos = new ByteArrayOutputStream();
-        sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION);
-        float ff = 5.25f;
-        sos.writeFIXED8(ff);
-        sos.close();
-        sis = new SWFInputStream(null, baos.toByteArray());
-        assertEquals(ff, sis.readFIXED8("test"));
-        sis.close();
+        float[] ffs = new float[]{5.25f, -5.25f, 127.75f, -128f};
+        for (float ff : ffs) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION);
+            sos.writeFIXED8(ff);
+            sos.close();
+            sis = new SWFInputStream(null, baos.toByteArray());
+            float ff2 = sis.readFIXED8("test");
+            assertEquals(ff, ff2, "Written and read value not equals. Written: " + ff + " read: " + ff2);
+            sis.close();
+        }
+    }
+
+    //@Test
+    public void testAllFIXED8() throws IOException {
+        for (int i = 0; i < 65536; i++) {
+            byte[] data = new byte[]{(byte) (i % 256), (byte) (i / 256)};
+            SWFInputStream sis = new SWFInputStream(null, data);
+            float d = sis.readFIXED8("test");
+            sis.close();
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION);
+            sos.writeFIXED8(d);
+            sos.close();
+            byte[] data2 = baos.toByteArray();
+
+            assertTrue(data[0] == data2[0] && data[1] == data2[1]);
+        }
     }
 
     @Test

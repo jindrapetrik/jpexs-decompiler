@@ -66,7 +66,7 @@ public class Timeline {
 
     public RECT displayRect;
 
-    public int frameRate;
+    public float frameRate;
 
     public Timelined timelined;
 

@@ -958,8 +958,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private void startTimer(Timeline timeline, boolean playing) {
 
-        int frameRate = timeline.frameRate;
-        int msPerFrame = frameRate == 0 ? 1000 : 1000 / frameRate;
+        float frameRate = timeline.frameRate;
+        int msPerFrame = frameRate == 0 ? 1000 : (int) (1000.0 / frameRate);
         final boolean singleFrame = !playing || (timeline.getRealFrameCount() <= 1 && timeline.isSingleFrame());
 
         timer = new Timer();
@@ -1043,7 +1043,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     @Override
-    public synchronized int getFrameRate() {
+    public synchronized float getFrameRate() {
         if (timelined == null) {
             return 1;
         }

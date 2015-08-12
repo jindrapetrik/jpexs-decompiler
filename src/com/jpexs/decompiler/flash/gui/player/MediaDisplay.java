@@ -48,7 +48,7 @@ public interface MediaDisplay extends Closeable {
 
     public void setBackground(Color color);
 
-    public int getFrameRate();
+    public float getFrameRate();
 
     public boolean isLoaded();
 

@@ -617,11 +617,22 @@ public class SWFInputStream implements AutoCloseable {
      */
     public int readSI8(String name) throws IOException {
         newDumpLevel(name, "SI8");
+        int ret = readSI8Internal();
+        endDumpLevel(ret);
+        return ret;
+    }
+
+    /**
+     * Reads one SI8 (Signed 8bit integer) value from the stream
+     *
+     * @return SI8 value
+     * @throws IOException
+     */
+    public int readSI8Internal() throws IOException {
         int uval = readEx();
         if (uval >= 0x80) {
             uval = -(((~uval) & 0xff) + 1);
         }
-        endDumpLevel(uval);
         return uval;
     }
 
@@ -636,13 +647,13 @@ public class SWFInputStream implements AutoCloseable {
         newDumpLevel(name, "FIXED");
         int afterPoint = readUI16Internal();
         int beforePoint = readUI16Internal();
-        double ret = ((double) ((beforePoint << 16) + afterPoint)) / 65536;
+        double ret = beforePoint + ((double) (afterPoint)) / 65536;
         endDumpLevel(ret);
         return ret;
     }
 
     /**
-     * Reads one FIXED8 (Fixed point 8.8) value from the stream
+     * Reads one FIXED8 (Fixed point 8.8) signed value from the stream
      *
      * @param name
      * @return FIXED8 value
@@ -651,8 +662,13 @@ public class SWFInputStream implements AutoCloseable {
     public float readFIXED8(String name) throws IOException {
         newDumpLevel(name, "FIXED8");
         int afterPoint = readEx();
-        int beforePoint = readEx();
-        float ret = beforePoint + (((float) afterPoint) / 256);
+        int beforePoint = readSI8Internal();
+        float ret;
+        if (beforePoint < 0) {
+            ret = beforePoint - ((float) afterPoint) / 256;
+        } else {
+            ret = beforePoint + ((float) afterPoint) / 256;
+        }
         endDumpLevel(ret);
         return ret;
     }

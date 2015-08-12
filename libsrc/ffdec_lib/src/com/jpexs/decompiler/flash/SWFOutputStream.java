@@ -295,7 +295,6 @@ public class SWFOutputStream extends OutputStream {
     public void writeFIXED(double value) throws IOException {
         long valueLong = (long) (value * (1 << 16));
         int beforePoint = (int) valueLong >> 16;
-
         int afterPoint = (int) valueLong % (1 << 16);
         writeUI16(afterPoint);
         writeUI16(beforePoint);
@@ -308,10 +307,11 @@ public class SWFOutputStream extends OutputStream {
      * @throws IOException
      */
     public void writeFIXED8(float value) throws IOException {
-        int beforePoint = (int) getIntPart(value);
-        int afterPoint = (int) getIntPart((value + (value < 0 ? beforePoint : -beforePoint)) * 256);
+        final int divisor = 1 << 8;
+        int beforePoint = (int) value;
+        int afterPoint = Math.abs((int) (value * divisor)) % divisor;
         writeUI8(afterPoint);
-        writeUI8(beforePoint);
+        writeSI8(beforePoint);
     }
 
     private void writeLong(long value) throws IOException {
@@ -576,13 +576,6 @@ public class SWFOutputStream extends OutputStream {
             nBits = enlargeBitCountU(nBits, params[i]);
         }
         return nBits;
-    }
-
-    private static long getIntPart(double value) {
-        if (value < 0) {
-            return (long) Math.ceil(value);
-        }
-        return (long) Math.floor(value);
     }
 
     public static int unsignedSize(final int value) {
