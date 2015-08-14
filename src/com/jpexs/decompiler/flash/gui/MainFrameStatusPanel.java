@@ -121,11 +121,6 @@ public class MainFrameStatusPanel extends JPanel {
     }
 
     public void setErrorState(ErrorState errorState) {
-        if (errorNotificationButton == null) {
-            // todo: honfika
-            // why null?
-            return;
-        }
         switch (errorState) {
             case NO_ERROR:
                 currentIcon = View.getIcon("okay16");

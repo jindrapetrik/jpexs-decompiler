@@ -497,7 +497,6 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         hexOnlyButton.setToolTipText(AppStrings.translate("button.viewhex"));
         hexOnlyButton.setMargin(new Insets(3, 3, 3, 3));
 
-        // todo: change icon
         constantsViewButton = new JToggleButton(View.getIcon("constantpool16"));
         constantsViewButton.addActionListener(this::constantsViewButtonActionPerformed);
         constantsViewButton.setToolTipText(AppStrings.translate("button.viewConstants"));

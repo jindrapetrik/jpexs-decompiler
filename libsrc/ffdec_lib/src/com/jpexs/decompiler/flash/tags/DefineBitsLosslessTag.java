@@ -66,7 +66,7 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
     @Conditional(value = "bitmapFormat", options = {FORMAT_8BIT_COLORMAPPED})
     public int bitmapColorTableSize;
 
-    public ByteArrayRange zlibBitmapData; //TODO: Parse COLORMAPDATA,BITMAPDATA
+    public ByteArrayRange zlibBitmapData;
 
     public static final int FORMAT_8BIT_COLORMAPPED = 3;
 
