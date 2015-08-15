@@ -650,9 +650,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         closeSearchButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                filterField.setText("");
-                doFilter();
-                searchPanel.setVisible(false);
+                closeTagTreeSearch();
             }
         });
         searchPanel.add(closeSearchButton, BorderLayout.EAST);
@@ -750,6 +748,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         enableDrop(true);
     }
 
+    private void closeTagTreeSearch() {
+        filterField.setText("");
+        doFilter();
+        searchPanel.setVisible(false);
+    }
+
     public void load(SWFList newSwfs, boolean first) {
 
         previewPanel.clear();
@@ -778,6 +782,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             updateUi(swf);
         }
 
+        doFilter();
         reload(false);
     }
 
@@ -826,6 +831,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             CardLayout cl = (CardLayout) (contentPanel.getLayout());
             cl.show(contentPanel, WELCOME_PANEL);
             isWelcomeScreen = true;
+            closeTagTreeSearch();
         }
 
         mainFrame.setTitle(ApplicationInfo.applicationVerName);
