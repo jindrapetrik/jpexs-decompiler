@@ -3345,20 +3345,24 @@ public class AVM2Code implements Cloneable {
      }*/
 
     @Override
-    public AVM2Code clone() throws CloneNotSupportedException {
-        AVM2Code ret = (AVM2Code) super.clone();
-        if (code != null) {
-            List<AVM2Instruction> codeCopy = new ArrayList<>(code.size());
-            for (AVM2Instruction ins : code) {
-                codeCopy.add(ins.clone());
+    public AVM2Code clone() {
+        try {
+            AVM2Code ret = (AVM2Code) super.clone();
+            if (code != null) {
+                List<AVM2Instruction> codeCopy = new ArrayList<>(code.size());
+                for (AVM2Instruction ins : code) {
+                    codeCopy.add(ins.clone());
+                }
+                ret.code = codeCopy;
             }
-            ret.code = codeCopy;
-        }
 
-        cacheActual = false;
-        ignoredIns = new ArrayList<>();
-        killedRegs = new HashMap<>();
-        unknownJumps = new ArrayList<>();
-        return ret;
+            ret.cacheActual = false;
+            ret.ignoredIns = new ArrayList<>();
+            ret.killedRegs = new HashMap<>();
+            ret.unknownJumps = new ArrayList<>();
+            return ret;
+        } catch (CloneNotSupportedException ex) {
+            throw new RuntimeException();
+        }
     }
 }

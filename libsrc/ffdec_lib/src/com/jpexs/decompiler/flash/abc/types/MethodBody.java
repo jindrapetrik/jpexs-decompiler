@@ -394,8 +394,8 @@ public final class MethodBody implements Cloneable {
             /*if (traits != null) {
              ret.traits = traits.clone();
              }*/
-            convertedItems = null;
-            convertException = null;
+            ret.convertedItems = null;
+            ret.convertException = null;
 
             return ret;
         } catch (CloneNotSupportedException ex) {
