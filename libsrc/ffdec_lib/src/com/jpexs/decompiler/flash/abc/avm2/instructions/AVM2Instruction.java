@@ -416,12 +416,16 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
     }
 
     @Override
-    public AVM2Instruction clone() throws CloneNotSupportedException {
-        AVM2Instruction ret = (AVM2Instruction) super.clone();
-        if (operands != null) {
-            ret.operands = Arrays.copyOf(operands, operands.length);
+    public AVM2Instruction clone() {
+        try {
+            AVM2Instruction ret = (AVM2Instruction) super.clone();
+            if (operands != null) {
+                ret.operands = Arrays.copyOf(operands, operands.length);
+            }
+            return ret;
+        } catch (CloneNotSupportedException ex) {
+            throw new RuntimeException();
         }
-        return ret;
     }
 
     @Override

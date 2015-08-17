@@ -72,8 +72,12 @@ public class ABCException implements Serializable, Cloneable {
     }
 
     @Override
-    public ABCException clone() throws CloneNotSupportedException {
-        ABCException ret = (ABCException) super.clone();
-        return ret;
+    public ABCException clone() {
+        try {
+            ABCException ret = (ABCException) super.clone();
+            return ret;
+        } catch (CloneNotSupportedException ex) {
+            throw new RuntimeException();
+        }
     }
 }

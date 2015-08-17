@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWC;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.model.ApplyTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.BooleanAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
@@ -2430,7 +2431,17 @@ public class ActionScript3Parser {
         parABCs.addAll(playerABCs);
         parABCs.addAll(otherABCs);
         ActionScript3Parser parser = new ActionScript3Parser(abc, parABCs);
-        parser.addScript(src, documentClass, fileName, classPos);
+        boolean success = false;
+        AVM2ConstantPool originalConstantPool = abc.constants.clone();
+        try {
+            parser.addScript(src, documentClass, fileName, classPos);
+            success = true;
+        } finally {
+            if (!success) {
+                // restore original constant pool
+                abc.constants = originalConstantPool;
+            }
+        }
     }
 
     public static void compile(SWF swf, String src, String dst, int classPos) {
