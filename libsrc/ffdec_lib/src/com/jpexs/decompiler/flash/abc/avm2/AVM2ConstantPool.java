@@ -479,14 +479,14 @@ public class AVM2ConstantPool implements Cloneable {
     public AVM2ConstantPool clone() {
         try {
             AVM2ConstantPool ret = (AVM2ConstantPool) super.clone();
-            ret.constant_int = new ArrayList(constant_int);
-            ret.constant_uint = new ArrayList(constant_uint);
-            ret.constant_double = new ArrayList(constant_double);
-            ret.constant_decimal = new ArrayList(constant_decimal);
-            ret.constant_string = new ArrayList(constant_string);
-            ret.constant_namespace = new ArrayList(constant_namespace);
-            ret.constant_namespace_set = new ArrayList(constant_namespace_set);
-            ret.constant_multiname = new ArrayList(constant_multiname);
+            ret.constant_int = new ArrayList<>(constant_int);
+            ret.constant_uint = new ArrayList<>(constant_uint);
+            ret.constant_double = new ArrayList<>(constant_double);
+            ret.constant_decimal = new ArrayList<>(constant_decimal);
+            ret.constant_string = new ArrayList<>(constant_string);
+            ret.constant_namespace = new ArrayList<>(constant_namespace);
+            ret.constant_namespace_set = new ArrayList<>(constant_namespace_set);
+            ret.constant_multiname = new ArrayList<>(constant_multiname);
             ret.dottedChainCache = new HashMap<>();
             return ret;
         } catch (CloneNotSupportedException ex) {
