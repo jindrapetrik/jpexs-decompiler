@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.SWC;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.model.ApplyTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.BooleanAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
@@ -2432,14 +2431,20 @@ public class ActionScript3Parser {
         parABCs.addAll(otherABCs);
         ActionScript3Parser parser = new ActionScript3Parser(abc, parABCs);
         boolean success = false;
-        AVM2ConstantPool originalConstantPool = abc.constants.clone();
+        ABC originalAbc = ((ABCContainerTag) ((Tag) abc.parentTag).cloneTag()).getABC();
         try {
             parser.addScript(src, documentClass, fileName, classPos);
             success = true;
         } finally {
             if (!success) {
-                // restore original constant pool
-                abc.constants = originalConstantPool;
+                // restore original constant pool and other lists
+                abc.constants = originalAbc.constants;
+                abc.method_info = originalAbc.method_info;
+                abc.metadata_info = originalAbc.metadata_info;
+                abc.instance_info = originalAbc.instance_info;
+                abc.class_info = originalAbc.class_info;
+                abc.script_info = originalAbc.script_info;
+                abc.bodies = originalAbc.bodies;
             }
         }
     }
