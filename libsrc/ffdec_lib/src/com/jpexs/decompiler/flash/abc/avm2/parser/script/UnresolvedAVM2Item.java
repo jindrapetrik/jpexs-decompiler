@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.NanAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.UndefinedAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
+import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -381,35 +382,38 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                     if (a.instance_info.get(c).deleted) {
                         continue;
                     }
-                    if ((a.instance_info.get(c).getName(a.constants) != null && a == abc && a.instance_info.get(c).getName(a.constants).namespace_index == ni)
-                            || (ons.kind != Namespace.KIND_PRIVATE && a.instance_info.get(c).getName(a.constants) != null && a.instance_info.get(c).getName(a.constants).getNamespace(a.constants) != null && a.instance_info.get(c).getName(a.constants).getNamespace(a.constants).hasName(ons.getName(abc.constants).toRawString(), a.constants))) {
-                        String cname = a.instance_info.get(c).getName(a.constants).getName(a.constants, null, true);
-                        if (name.get(0).equals(cname)) {
-                            if (!subtypes.isEmpty() && name.size() > 1) {
-                                continue;
-                            }
-                            TypeItem ret = new TypeItem(a.instance_info.get(c).getName(a.constants).getNameWithNamespace(a.constants));
-                            /*for (String s : subtypes) {
-                             UnresolvedAVM2Item su = new UnresolvedAVM2Item(new ArrayList<>(), importedClasses, true, null, line, s, null, openedNamespaces);
-                             su.resolve(thisType, paramTypes, paramNames, abc, otherAbcs, callStack, variables);
-                             if (!(su.resolved instanceof TypeItem)) {
-                             throw new CompilationException("Not a type", line);
-                             }
-                             TypeItem st = (TypeItem) su.resolved;
-                             ret.subtypes.add(st.fullTypeName);
-                             }*/
-                            resolved = ret;
-                            for (int i = 1; i < name.size(); i++) {
-                                resolved = new PropertyAVM2Item(resolved, name.get(i), abc, otherAbcs, openedNamespaces, new ArrayList<>());
-                                if (i == name.size() - 1) {
-                                    ((PropertyAVM2Item) resolved).assignedValue = assignedValue;
+                    Multiname mname = a.instance_info.get(c).getName(a.constants);
+                    if (mname != null) {
+                        if ((a == abc && mname.namespace_index == ni)
+                                || (ons.kind != Namespace.KIND_PRIVATE && mname.getNamespace(a.constants) != null && mname.getNamespace(a.constants).hasName(ons.getName(abc.constants).toRawString(), a.constants))) {
+                            String cname = mname.getName(a.constants, null, true);
+                            if (name.get(0).equals(cname)) {
+                                if (!subtypes.isEmpty() && name.size() > 1) {
+                                    continue;
                                 }
-                            }
-                            if (name.size() == 1 && assignedValue != null) {
-                                throw new CompilationException("Cannot assign type", line);
-                            }
+                                TypeItem ret = new TypeItem(mname.getNameWithNamespace(a.constants));
+                                /*for (String s : subtypes) {
+                                 UnresolvedAVM2Item su = new UnresolvedAVM2Item(new ArrayList<>(), importedClasses, true, null, line, s, null, openedNamespaces);
+                                 su.resolve(thisType, paramTypes, paramNames, abc, otherAbcs, callStack, variables);
+                                 if (!(su.resolved instanceof TypeItem)) {
+                                 throw new CompilationException("Not a type", line);
+                                 }
+                                 TypeItem st = (TypeItem) su.resolved;
+                                 ret.subtypes.add(st.fullTypeName);
+                                 }*/
+                                resolved = ret;
+                                for (int i = 1; i < name.size(); i++) {
+                                    resolved = new PropertyAVM2Item(resolved, name.get(i), abc, otherAbcs, openedNamespaces, new ArrayList<>());
+                                    if (i == name.size() - 1) {
+                                        ((PropertyAVM2Item) resolved).assignedValue = assignedValue;
+                                    }
+                                }
+                                if (name.size() == 1 && assignedValue != null) {
+                                    throw new CompilationException("Cannot assign type", line);
+                                }
 
-                            return resolvedRoot = ret;
+                                return resolvedRoot = ret;
+                            }
                         }
                     }
                 }
