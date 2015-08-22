@@ -125,6 +125,11 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
     }
 
     @Override
+    public int getRequiredStackSize(AVM2Instruction ins) {
+        return 1;
+    }
+
+    @Override
     public String getObject(Stack<AVM2Item> stack, ABC abc, AVM2Instruction ins, List<AVM2Item> output, MethodBody body, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames) {
         return AVM2Item.localRegName(localRegNames, getRegisterId(ins));
     }

@@ -73,6 +73,12 @@ public class CallPropVoidIns extends InstructionDefinition {
     }
 
     @Override
+    public int getRequiredStackSize(AVM2Instruction ins) {
+        return ins.operands[1] + 1;
+        // todo: honfika: add resolveMultiname stack size
+    }
+
+    @Override
     public int getStackDelta(AVM2Instruction ins, ABC abc) {
         int ret = -ins.operands[1] - 1;
         int multinameIndex = ins.operands[0];

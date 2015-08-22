@@ -257,6 +257,12 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
                         }
                     }
                 } else {
+                    // do not throw EmptyStackException, much faster
+                    int requiredStackSize = ins.getRequiredStackSize();
+                    if (stack.size() < requiredStackSize) {
+                        return;
+                    }
+
                     ins.translate(localData, stack, output, Graph.SOP_USE_STATIC, "");
                 }
 

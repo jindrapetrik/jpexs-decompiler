@@ -91,6 +91,10 @@ public class InstructionDefinition implements Serializable {
     public void translate(boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, AVM2ConstantPool constants, AVM2Instruction ins, List<MethodInfo> method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) throws InterruptedException {
     }
 
+    public int getRequiredStackSize(AVM2Instruction ins) {
+        return 0;
+    }
+
     protected FullMultinameAVM2Item resolveMultiname(TranslateStack stack, AVM2ConstantPool constants, int multinameIndex, AVM2Instruction ins) {
         GraphTargetItem ns = null;
         GraphTargetItem name = null;

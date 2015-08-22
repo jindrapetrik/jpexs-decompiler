@@ -43,4 +43,9 @@ public class DeobfuscatePopIns extends PopIns {
     public void translate(boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, AVM2ConstantPool constants, AVM2Instruction ins, List<MethodInfo> method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) {
         stack.pop(); //Just ignore the value
     }
+
+    @Override
+    public int getRequiredStackSize(AVM2Instruction ins) {
+        return 1;
+    }
 }

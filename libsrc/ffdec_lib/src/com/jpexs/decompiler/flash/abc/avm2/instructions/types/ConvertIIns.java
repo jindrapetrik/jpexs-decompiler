@@ -67,6 +67,11 @@ public class ConvertIIns extends InstructionDefinition implements CoerceOrConver
     }
 
     @Override
+    public int getRequiredStackSize(AVM2Instruction ins) {
+        return 1;
+    }
+
+    @Override
     public int getStackDelta(AVM2Instruction ins, ABC abc) {
         return -1 + 1;
     }

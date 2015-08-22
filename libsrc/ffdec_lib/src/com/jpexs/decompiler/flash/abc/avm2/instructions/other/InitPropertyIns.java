@@ -49,6 +49,12 @@ public class InitPropertyIns extends InstructionDefinition {
     }
 
     @Override
+    public int getRequiredStackSize(AVM2Instruction ins) {
+        return 2;
+        // todo: honfika: add resolveMultiname stack size
+    }
+
+    @Override
     public int getStackDelta(AVM2Instruction ins, ABC abc) {
         int ret = -2;
         int multinameIndex = ins.operands[0];

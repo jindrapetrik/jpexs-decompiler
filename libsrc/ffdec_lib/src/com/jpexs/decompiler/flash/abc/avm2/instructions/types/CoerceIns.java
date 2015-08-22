@@ -52,6 +52,11 @@ public class CoerceIns extends InstructionDefinition implements CoerceOrConvertT
     }
 
     @Override
+    public int getRequiredStackSize(AVM2Instruction ins) {
+        return 1;
+    }
+
+    @Override
     public GraphTargetItem getTargetType(AVM2ConstantPool constants, AVM2Instruction ins, List<DottedChain> fullyQualifiedNames) {
         int multinameIndex = ins.operands[0];
         return PropertyAVM2Item.multinameToType(multinameIndex, constants);

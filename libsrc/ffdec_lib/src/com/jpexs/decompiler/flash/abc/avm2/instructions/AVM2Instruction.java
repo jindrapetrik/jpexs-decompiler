@@ -340,6 +340,10 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
                 aLocalData.constants, this, aLocalData.methodInfo, output, aLocalData.methodBody, aLocalData.abc, aLocalData.localRegNames, aLocalData.fullyQualifiedNames, null, aLocalData.localRegAssignmentIps, aLocalData.ip, aLocalData.refs, aLocalData.code);
     }
 
+    public int getRequiredStackSize() {
+        return definition.getRequiredStackSize(this);
+    }
+
     @Override
     public boolean isJump() {
         return (definition instanceof JumpIns) || (fixedBranch > -1);

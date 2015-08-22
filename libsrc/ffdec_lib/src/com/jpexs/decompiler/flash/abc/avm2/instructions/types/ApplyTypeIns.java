@@ -62,6 +62,11 @@ public class ApplyTypeIns extends InstructionDefinition {
     }
 
     @Override
+    public int getRequiredStackSize(AVM2Instruction ins) {
+        return ins.operands[0];
+    }
+
+    @Override
     public int getStackDelta(AVM2Instruction ins, ABC abc) {
         return -ins.operands[0] - 1 + 1;
     }
