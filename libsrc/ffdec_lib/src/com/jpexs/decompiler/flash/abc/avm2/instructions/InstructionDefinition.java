@@ -91,7 +91,11 @@ public class InstructionDefinition implements Serializable {
     public void translate(boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, AVM2ConstantPool constants, AVM2Instruction ins, List<MethodInfo> method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) throws InterruptedException {
     }
 
-    public int getRequiredStackSize(AVM2Instruction ins) {
+    public int getStackPopCount(AVM2Instruction ins, ABC abc) {
+        return 0;
+    }
+
+    public int getStackPushCount(AVM2Instruction ins, ABC abc) {
         return 0;
     }
 
@@ -108,6 +112,25 @@ public class InstructionDefinition implements Serializable {
 
         }
         return new FullMultinameAVM2Item(ins, multinameIndex, name, ns);
+    }
+
+    protected int getMultinameRequiredStackSize(AVM2ConstantPool constants, int multinameIndex) {
+        int res = 0;
+        if (multinameIndex > 0 && multinameIndex < constants.constant_multiname.size()) {
+            //Note: In official compiler, the stack can be wrong(greater) for some MULTINAMEL/A, e.g. increments
+            /*
+             var arr=[1,2,3];
+             return arr[2]++;
+             */
+            if (constants.getMultiname(multinameIndex).needsName()) {
+                res++;
+            }
+            if (constants.getMultiname(multinameIndex).needsNs()) {
+                res++;
+            }
+        }
+
+        return res;
     }
 
     protected int resolvedCount(AVM2ConstantPool constants, int multinameIndex) {
@@ -137,8 +160,8 @@ public class InstructionDefinition implements Serializable {
         return name + ns;
     }
 
-    public int getStackDelta(AVM2Instruction ins, ABC abc) {
-        return 0;
+    public int getStackDelta2(AVM2Instruction ins, ABC abc) {
+        return getStackPushCount(ins, abc) - getStackPopCount(ins, abc);
     }
 
     public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {

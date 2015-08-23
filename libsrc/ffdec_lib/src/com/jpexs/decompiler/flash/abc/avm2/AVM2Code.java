@@ -1267,7 +1267,7 @@ public class AVM2Code implements Cloneable {
                         int fixBranch = ins.getFixBranch();
                         if (fixBranch > -1) {
                             if (ins.definition instanceof IfTypeIns) {
-                                for (int i = 0; i < -ins.definition.getStackDelta(ins, null/*IfTypeIns do not require ABCs*/); i++) {
+                                for (int i = 0; i < -ins.definition.getStackDelta2(ins, null/*IfTypeIns do not require ABCs*/); i++) {
                                     writer.appendNoHilight(new DeobfuscatePopIns().instructionName).newLine();
                                 }
                                 if (fixBranch == 0) { // jump
@@ -2297,7 +2297,7 @@ public class AVM2Code implements Cloneable {
             stats.instructionStats[pos].stackpos = stack;
             stats.instructionStats[pos].scopepos = scope;
 
-            int stackDelta = ins.definition.getStackDelta(ins, abc);
+            int stackDelta = ins.definition.getStackDelta2(ins, abc);
             int scopeDelta = ins.definition.getScopeStackDelta(ins, abc);
             int oldStack = stack;
 

@@ -72,6 +72,5 @@ public class DecLocalIIns extends InstructionDefinition {
             regAssignCount.put(regId, 0);
         }
         regAssignCount.put(regId, regAssignCount.get(regId) + 1);
-
     }
 }

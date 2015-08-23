@@ -58,7 +58,7 @@ public class GetGlobalScopeIns extends InstructionDefinition {
     }
 
     @Override
-    public int getStackDelta(AVM2Instruction ins, ABC abc) {
+    public int getStackPushCount(AVM2Instruction ins, ABC abc) {
         return 1;
     }
 }

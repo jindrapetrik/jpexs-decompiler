@@ -54,7 +54,7 @@ public class IfGtIns extends InstructionDefinition implements IfTypeIns {
     }
 
     @Override
-    public int getStackDelta(AVM2Instruction ins, ABC abc) {
-        return -2;
+    public int getStackPopCount(AVM2Instruction ins, ABC abc) {
+        return 2;
     }
 }

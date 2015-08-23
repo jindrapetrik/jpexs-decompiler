@@ -42,11 +42,6 @@ public class Sxi1Ins extends InstructionDefinition implements AlchemyTypeIns {
     }
 
     @Override
-    public int getStackDelta(AVM2Instruction ins, ABC abc) {
-        return 1 - 1;
-    }
-
-    @Override
     public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
         return 0;
     }
@@ -55,5 +50,15 @@ public class Sxi1Ins extends InstructionDefinition implements AlchemyTypeIns {
     public void translate(boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, AVM2ConstantPool constants, AVM2Instruction ins, List<MethodInfo> method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) {
         GraphTargetItem value = stack.pop();
         stack.push(new AlchemySignExtendAVM2Item(ins, value, 1));
+    }
+
+    @Override
+    public int getStackPopCount(AVM2Instruction ins, ABC abc) {
+        return 1;
+    }
+
+    @Override
+    public int getStackPushCount(AVM2Instruction ins, ABC abc) {
+        return 1;
     }
 }

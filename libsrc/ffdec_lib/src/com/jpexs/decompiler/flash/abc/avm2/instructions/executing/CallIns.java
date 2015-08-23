@@ -65,7 +65,12 @@ public class CallIns extends InstructionDefinition {
     }
 
     @Override
-    public int getStackDelta(AVM2Instruction ins, ABC abc) {
-        return -2 + 1 - ins.operands[0];
+    public int getStackPopCount(AVM2Instruction ins, ABC abc) {
+        return ins.operands[0] + 2;
+    }
+
+    @Override
+    public int getStackPushCount(AVM2Instruction ins, ABC abc) {
+        return 1;
     }
 }

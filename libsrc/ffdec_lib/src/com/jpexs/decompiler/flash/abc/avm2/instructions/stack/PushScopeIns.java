@@ -48,13 +48,8 @@ public class PushScopeIns extends InstructionDefinition {
     }
 
     @Override
-    public int getRequiredStackSize(AVM2Instruction ins) {
+    public int getStackPopCount(AVM2Instruction ins, ABC abc) {
         return 1;
-    }
-
-    @Override
-    public int getStackDelta(AVM2Instruction ins, ABC abc) {
-        return -1;
     }
 
     @Override

@@ -162,6 +162,11 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
     }
 
     @Override
+    public int getStackPopCount(AVM2Instruction ins, ABC abc) {
+        return 2;
+    }
+
+    @Override
     public String getObject(Stack<AVM2Item> stack, ABC abc, AVM2Instruction ins, List<AVM2Item> output, MethodBody body, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames) {
         int slotIndex = ins.operands[0];
         ////String obj = stack.get(1);
@@ -175,10 +180,5 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
 
         }
         return slotname;
-    }
-
-    @Override
-    public int getStackDelta(AVM2Instruction ins, ABC abc) {
-        return -2;
     }
 }

@@ -46,12 +46,12 @@ public class SetGlobalSlotIns extends InstructionDefinition implements SetTypeIn
     }
 
     @Override
-    public String getObject(Stack<AVM2Item> stack, ABC abc, AVM2Instruction ins, List<AVM2Item> output, MethodBody body, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames) {
-        return "globalslot" + ins.operands[0];
+    public int getStackPopCount(AVM2Instruction ins, ABC abc) {
+        return 1;
     }
 
     @Override
-    public int getStackDelta(AVM2Instruction ins, ABC abc) {
-        return -1;
+    public String getObject(Stack<AVM2Item> stack, ABC abc, AVM2Instruction ins, List<AVM2Item> output, MethodBody body, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames) {
+        return "globalslot" + ins.operands[0];
     }
 }

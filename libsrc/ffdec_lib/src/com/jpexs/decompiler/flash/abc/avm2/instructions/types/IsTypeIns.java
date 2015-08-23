@@ -46,7 +46,12 @@ public class IsTypeIns extends InstructionDefinition {
     }
 
     @Override
-    public int getStackDelta(AVM2Instruction ins, ABC abc) {
-        return -1 + 1; //may not be runtime multiname
+    public int getStackPopCount(AVM2Instruction ins, ABC abc) {
+        return 1; //may not be runtime multiname
+    }
+
+    @Override
+    public int getStackPushCount(AVM2Instruction ins, ABC abc) {
+        return 1;
     }
 }

@@ -55,6 +55,12 @@ public class SetSuperIns extends InstructionDefinition implements SetTypeIns {
     }
 
     @Override
+    public int getStackPopCount(AVM2Instruction ins, ABC abc) {
+        int multinameIndex = ins.operands[0];
+        return 2 + getMultinameRequiredStackSize(abc.constants, multinameIndex);
+    }
+
+    @Override
     public String getObject(Stack<AVM2Item> stack, ABC abc, AVM2Instruction ins, List<AVM2Item> output, MethodBody body, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
         int multinameIndex = ins.operands[0];
         String multiname = resolveMultinameNoPop(1, stack, abc.constants, multinameIndex, ins, fullyQualifiedNames);
@@ -62,18 +68,5 @@ public class SetSuperIns extends InstructionDefinition implements SetTypeIns {
         stack.get(1 + resolvedCount(abc.constants, multinameIndex)).toString(writer, LocalData.create(abc.constants, localRegNames, fullyQualifiedNames));
         String obj = writer.toString();
         return obj + ".super." + multiname;
-    }
-
-    @Override
-    public int getStackDelta(AVM2Instruction ins, ABC abc) {
-        int ret = -2;
-        int multinameIndex = ins.operands[0];
-        if (abc.constants.getMultiname(multinameIndex).needsName()) {
-            ret--;
-        }
-        if (abc.constants.getMultiname(multinameIndex).needsNs()) {
-            ret--;
-        }
-        return ret;
     }
 }

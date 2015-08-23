@@ -27,7 +27,12 @@ public class ConcatIns extends InstructionDefinition {
     }
 
     @Override
-    public int getStackDelta(AVM2Instruction ins, ABC abc) {
-        return -2 + 1; // ?
+    public int getStackPopCount(AVM2Instruction ins, ABC abc) {
+        return 2; // ?
+    }
+
+    @Override
+    public int getStackPushCount(AVM2Instruction ins, ABC abc) {
+        return 1; // ?
     }
 }

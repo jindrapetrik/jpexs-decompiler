@@ -56,15 +56,13 @@ public class FindPropertyIns extends InstructionDefinition {
     }
 
     @Override
-    public int getStackDelta(AVM2Instruction ins, ABC abc) {
-        int ret = 1;
+    public int getStackPopCount(AVM2Instruction ins, ABC abc) {
         int multinameIndex = ins.operands[0];
-        if (abc.constants.getMultiname(multinameIndex).needsName()) {
-            ret--;
-        }
-        if (abc.constants.getMultiname(multinameIndex).needsNs()) {
-            ret--;
-        }
-        return ret;
+        return getMultinameRequiredStackSize(abc.constants, multinameIndex);
+    }
+
+    @Override
+    public int getStackPushCount(AVM2Instruction ins, ABC abc) {
+        return 1;
     }
 }

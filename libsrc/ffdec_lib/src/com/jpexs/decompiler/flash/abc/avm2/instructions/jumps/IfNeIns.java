@@ -54,12 +54,7 @@ public class IfNeIns extends InstructionDefinition implements IfTypeIns {
     }
 
     @Override
-    public int getRequiredStackSize(AVM2Instruction ins) {
+    public int getStackPopCount(AVM2Instruction ins, ABC abc) {
         return 2;
-    }
-
-    @Override
-    public int getStackDelta(AVM2Instruction ins, ABC abc) {
-        return -2;
     }
 }

@@ -49,21 +49,8 @@ public class InitPropertyIns extends InstructionDefinition {
     }
 
     @Override
-    public int getRequiredStackSize(AVM2Instruction ins) {
-        return 2;
-        // todo: honfika: add resolveMultiname stack size
-    }
-
-    @Override
-    public int getStackDelta(AVM2Instruction ins, ABC abc) {
-        int ret = -2;
+    public int getStackPopCount(AVM2Instruction ins, ABC abc) {
         int multinameIndex = ins.operands[0];
-        if (abc.constants.getMultiname(multinameIndex).needsName()) {
-            ret--;
-        }
-        if (abc.constants.getMultiname(multinameIndex).needsNs()) {
-            ret--;
-        }
-        return ret;
+        return 2 + getMultinameRequiredStackSize(abc.constants, multinameIndex);
     }
 }

@@ -42,11 +42,6 @@ public class Si16Ins extends InstructionDefinition implements AlchemyTypeIns {
     }
 
     @Override
-    public int getStackDelta(AVM2Instruction ins, ABC abc) {
-        return -2;
-    }
-
-    @Override
     public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
         return 0;
     }
@@ -56,5 +51,10 @@ public class Si16Ins extends InstructionDefinition implements AlchemyTypeIns {
         GraphTargetItem ofs = stack.pop();
         GraphTargetItem value = stack.pop();
         output.add(new AlchemyStoreAVM2Item(ins, value, ofs, 'i', 16));
+    }
+
+    @Override
+    public int getStackPopCount(AVM2Instruction ins, ABC abc) {
+        return 2;
     }
 }

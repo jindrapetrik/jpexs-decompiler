@@ -49,7 +49,7 @@ public class PushShortIns extends InstructionDefinition implements PushIntegerTy
     }
 
     @Override
-    public int getStackDelta(AVM2Instruction ins, ABC abc) {
+    public int getStackPushCount(AVM2Instruction ins, ABC abc) {
         return 1;
     }
 }

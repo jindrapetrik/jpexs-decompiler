@@ -16,11 +16,23 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.other2;
 
+import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
 public class ConvertF4Ins extends InstructionDefinition {
 
     public ConvertF4Ins() {
         super(0x7B, "convert_f4", new int[]{}, true);
+    }
+
+    @Override
+    public int getStackPopCount(AVM2Instruction ins, ABC abc) {
+        return 1;
+    }
+
+    @Override
+    public int getStackPushCount(AVM2Instruction ins, ABC abc) {
+        return 1;
     }
 }

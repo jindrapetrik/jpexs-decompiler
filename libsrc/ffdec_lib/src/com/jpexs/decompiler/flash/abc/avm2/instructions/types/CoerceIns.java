@@ -52,7 +52,12 @@ public class CoerceIns extends InstructionDefinition implements CoerceOrConvertT
     }
 
     @Override
-    public int getRequiredStackSize(AVM2Instruction ins) {
+    public int getStackPopCount(AVM2Instruction ins, ABC abc) {
+        return 1;
+    }
+
+    @Override
+    public int getStackPushCount(AVM2Instruction ins, ABC abc) {
         return 1;
     }
 
@@ -60,10 +65,5 @@ public class CoerceIns extends InstructionDefinition implements CoerceOrConvertT
     public GraphTargetItem getTargetType(AVM2ConstantPool constants, AVM2Instruction ins, List<DottedChain> fullyQualifiedNames) {
         int multinameIndex = ins.operands[0];
         return PropertyAVM2Item.multinameToType(multinameIndex, constants);
-    }
-
-    @Override
-    public int getStackDelta(AVM2Instruction ins, ABC abc) {
-        return -1 + 1;
     }
 }

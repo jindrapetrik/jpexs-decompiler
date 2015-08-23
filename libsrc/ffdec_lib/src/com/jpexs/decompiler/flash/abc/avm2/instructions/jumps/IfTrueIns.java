@@ -50,7 +50,7 @@ public class IfTrueIns extends InstructionDefinition implements IfTypeIns {
     }
 
     @Override
-    public int getStackDelta(AVM2Instruction ins, ABC abc) {
-        return -1;
+    public int getStackPopCount(AVM2Instruction ins, ABC abc) {
+        return 1;
     }
 }

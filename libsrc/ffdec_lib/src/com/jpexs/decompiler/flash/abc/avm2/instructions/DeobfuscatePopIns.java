@@ -45,7 +45,7 @@ public class DeobfuscatePopIns extends PopIns {
     }
 
     @Override
-    public int getRequiredStackSize(AVM2Instruction ins) {
+    public int getStackPopCount(AVM2Instruction ins, ABC abc) {
         return 1;
     }
 }

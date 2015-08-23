@@ -340,8 +340,8 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
                 aLocalData.constants, this, aLocalData.methodInfo, output, aLocalData.methodBody, aLocalData.abc, aLocalData.localRegNames, aLocalData.fullyQualifiedNames, null, aLocalData.localRegAssignmentIps, aLocalData.ip, aLocalData.refs, aLocalData.code);
     }
 
-    public int getRequiredStackSize() {
-        return definition.getRequiredStackSize(this);
+    public int getStackPopCount(AVM2LocalData aLocalData) {
+        return definition.getStackPopCount(this, aLocalData.abc);
     }
 
     @Override

@@ -258,7 +258,7 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
                     }
                 } else {
                     // do not throw EmptyStackException, much faster
-                    int requiredStackSize = ins.getRequiredStackSize();
+                    int requiredStackSize = ins.getStackPopCount(localData);
                     if (stack.size() < requiredStackSize) {
                         return;
                     }
@@ -364,7 +364,7 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
                     AVM2Instruction tarIns = code.code.get(nidx);
 
                     //Some IfType instructions need more than 1 operand, we must pop out all of them
-                    int stackCount = -ins.definition.getStackDelta(ins, abc);
+                    int stackCount = -def.getStackDelta2(ins, abc);
 
                     if (EcmaScript.toBoolean(res)) {
                         //System.err.println("replacing " + ins + " on " + idx + " with jump");

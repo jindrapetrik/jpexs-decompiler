@@ -47,39 +47,13 @@ public class GetPropertyIns extends InstructionDefinition {
     }
 
     @Override
-    public int getRequiredStackSize(AVM2Instruction ins) {
-        int ret = 1;
+    public int getStackPopCount(AVM2Instruction ins, ABC abc) {
         int multinameIndex = ins.operands[0];
-        //Note: In official compiler, the stack can be wrong(greater) for some MULTINAMEL/A, e.g. increments
-        /*
-         var arr=[1,2,3];
-         return arr[2]++;
-         */
-        /* todo: honfika
-         if (abc.constants.getMultiname(multinameIndex).needsName()) {
-         ret--;
-         }
-         if (abc.constants.getMultiname(multinameIndex).needsNs()) {
-         ret--;
-         }*/
-        return ret;
+        return 1 + getMultinameRequiredStackSize(abc.constants, multinameIndex);
     }
 
     @Override
-    public int getStackDelta(AVM2Instruction ins, ABC abc) {
-        int ret = -1 + 1;
-        int multinameIndex = ins.operands[0];
-        //Note: In official compiler, the stack can be wrong(greater) for some MULTINAMEL/A, e.g. increments
-        /*
-         var arr=[1,2,3];
-         return arr[2]++;
-         */
-        if (abc.constants.getMultiname(multinameIndex).needsName()) {
-            ret--;
-        }
-        if (abc.constants.getMultiname(multinameIndex).needsNs()) {
-            ret--;
-        }
-        return ret;
+    public int getStackPushCount(AVM2Instruction ins, ABC abc) {
+        return 1;
     }
 }
