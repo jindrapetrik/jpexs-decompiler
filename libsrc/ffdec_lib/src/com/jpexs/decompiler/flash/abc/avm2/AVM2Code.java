@@ -790,7 +790,7 @@ public class AVM2Code implements Cloneable {
         List<Long> switchAddresses = new ArrayList<>();
         int availableBytes = ais.available();
         for (int i = 0; i < availableBytes; i++) {
-            codeMap.put((long) i, new AVM2Instruction(i, new NopIns(), new int[]{}));
+            codeMap.put((long) i, new AVM2Instruction(i, new NopIns(), null));
         }
 
         long startPos = ais.getPosition();
@@ -1267,7 +1267,7 @@ public class AVM2Code implements Cloneable {
                         int fixBranch = ins.getFixBranch();
                         if (fixBranch > -1) {
                             if (ins.definition instanceof IfTypeIns) {
-                                for (int i = 0; i < -ins.definition.getStackDelta2(ins, null/*IfTypeIns do not require ABCs*/); i++) {
+                                for (int i = 0; i < -ins.definition.getStackDelta(ins, null/*IfTypeIns do not require ABCs*/); i++) {
                                     writer.appendNoHilight(new DeobfuscatePopIns().instructionName).newLine();
                                 }
                                 if (fixBranch == 0) { // jump
@@ -2297,7 +2297,7 @@ public class AVM2Code implements Cloneable {
             stats.instructionStats[pos].stackpos = stack;
             stats.instructionStats[pos].scopepos = scope;
 
-            int stackDelta = ins.definition.getStackDelta2(ins, abc);
+            int stackDelta = ins.definition.getStackDelta(ins, abc);
             int scopeDelta = ins.definition.getScopeStackDelta(ins, abc);
             int oldStack = stack;
 
@@ -2875,11 +2875,11 @@ public class AVM2Code implements Cloneable {
                         if (ins2.isExit()) {
                             code.set(i, new AVM2Instruction(ofs, ins2.definition, ins2.operands));
                             AVM2Instruction nopIns;
-                            nopIns = new AVM2Instruction(ofs + 1, new NopIns(), new int[]{});
+                            nopIns = new AVM2Instruction(ofs + 1, new NopIns(), null);
                             code.add(i + 1, nopIns);
-                            nopIns = new AVM2Instruction(ofs + 2, new NopIns(), new int[]{});
+                            nopIns = new AVM2Instruction(ofs + 2, new NopIns(), null);
                             code.add(i + 2, nopIns);
-                            nopIns = new AVM2Instruction(ofs + 3, new NopIns(), new int[]{});
+                            nopIns = new AVM2Instruction(ofs + 3, new NopIns(), null);
                             code.add(i + 3, nopIns);
                             i += 3;
                             csize = code.size();

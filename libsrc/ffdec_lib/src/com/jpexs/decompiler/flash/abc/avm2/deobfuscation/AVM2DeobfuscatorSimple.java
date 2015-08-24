@@ -120,15 +120,15 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
         }
         if (ovalue instanceof Boolean) {
             if ((Boolean) ovalue) {
-                return new AVM2Instruction(0, new PushTrueIns(), new int[]{});
+                return new AVM2Instruction(0, new PushTrueIns(), null);
             }
-            return new AVM2Instruction(0, new PushFalseIns(), new int[]{});
+            return new AVM2Instruction(0, new PushFalseIns(), null);
         }
         if (ovalue instanceof Null) {
-            return new AVM2Instruction(0, new PushNullIns(), new int[]{});
+            return new AVM2Instruction(0, new PushNullIns(), null);
         }
         if (ovalue instanceof Undefined) {
-            return new AVM2Instruction(0, new PushUndefinedIns(), new int[]{});
+            return new AVM2Instruction(0, new PushUndefinedIns(), null);
         }
         return null;
     }
@@ -272,7 +272,7 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
                     if (def instanceof SetLocalTypeIns) {
                         int regId = ((SetLocalTypeIns) def).getRegisterId(ins);
                         staticRegs.put(regId, localData.localRegs.get(regId).getNotCoerced());
-                        code.replaceInstruction(idx, new AVM2Instruction(0, new DeobfuscatePopIns(), new int[]{}), body);
+                        code.replaceInstruction(idx, new AVM2Instruction(0, new DeobfuscatePopIns(), null), body);
                     }
                 }
                 if (def instanceof GetLocalTypeIns) {
@@ -364,7 +364,7 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
                     AVM2Instruction tarIns = code.code.get(nidx);
 
                     //Some IfType instructions need more than 1 operand, we must pop out all of them
-                    int stackCount = -def.getStackDelta2(ins, abc);
+                    int stackCount = -def.getStackDelta(ins, abc);
 
                     if (EcmaScript.toBoolean(res)) {
                         //System.err.println("replacing " + ins + " on " + idx + " with jump");
@@ -373,15 +373,15 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
                         code.replaceInstruction(idx, jumpIns, body);
                         jumpIns.operands[0] = (int) (tarIns.offset - jumpIns.offset - jumpIns.getBytesLength());
                         for (int s = 0; s < stackCount; s++) {
-                            code.insertInstruction(idx, new AVM2Instruction(ins.offset, new DeobfuscatePopIns(), new int[]{}), true, body);
+                            code.insertInstruction(idx, new AVM2Instruction(ins.offset, new DeobfuscatePopIns(), null), true, body);
                         }
 
                         idx = code.adr2pos(jumpIns.offset + jumpIns.getBytesLength() + jumpIns.operands[0]);
                     } else {
                         //System.err.println("replacing " + ins + " on " + idx + " with pop");
-                        code.replaceInstruction(idx, new AVM2Instruction(ins.offset, new DeobfuscatePopIns(), new int[]{}), body);
+                        code.replaceInstruction(idx, new AVM2Instruction(ins.offset, new DeobfuscatePopIns(), null), body);
                         for (int s = 1 /*first is replaced*/; s < stackCount; s++) {
-                            code.insertInstruction(idx, new AVM2Instruction(ins.offset, new DeobfuscatePopIns(), new int[]{}), true, body);
+                            code.insertInstruction(idx, new AVM2Instruction(ins.offset, new DeobfuscatePopIns(), null), true, body);
                         }
                         //ins.definition = new DeobfuscatePopIns();
                         idx++;

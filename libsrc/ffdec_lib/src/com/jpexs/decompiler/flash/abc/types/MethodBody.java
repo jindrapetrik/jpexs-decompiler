@@ -142,19 +142,21 @@ public final class MethodBody implements Cloneable {
 
     public List<Integer> getExceptionEntries() {
         List<Integer> ret = new ArrayList<>();
+        AVM2Code code = getCode();
         for (ABCException e : exceptions) {
-            ret.add(getCode().adr2pos(e.start, true));
-            ret.add(getCode().adr2pos(e.end, true));
-            ret.add(getCode().adr2pos(e.target));
+            ret.add(code.adr2pos(e.start, true));
+            ret.add(code.adr2pos(e.end, true));
+            ret.add(code.adr2pos(e.target));
         }
         return ret;
     }
 
     public void markOffsets() {
         long offset = 0;
-        for (int i = 0; i < getCode().code.size(); i++) {
-            getCode().code.get(i).offset = offset;
-            offset += getCode().code.get(i).getBytesLength();
+        AVM2Code code = getCode();
+        for (int i = 0; i < code.code.size(); i++) {
+            code.code.get(i).offset = offset;
+            offset += code.code.get(i).getBytesLength();
         }
     }
 

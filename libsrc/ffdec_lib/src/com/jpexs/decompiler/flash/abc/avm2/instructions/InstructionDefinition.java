@@ -160,7 +160,7 @@ public class InstructionDefinition implements Serializable {
         return name + ns;
     }
 
-    public int getStackDelta2(AVM2Instruction ins, ABC abc) {
+    public int getStackDelta(AVM2Instruction ins, ABC abc) {
         return getStackPushCount(ins, abc) - getStackPopCount(ins, abc);
     }
 

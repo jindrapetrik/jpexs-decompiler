@@ -47,7 +47,7 @@ public class CodeStats {
         int i = 0;
         int ms = 0;
         for (InstructionStats stats : instructionStats) {
-            int deltastack = stats.ins.definition.getStackDelta2(stats.ins, abc);
+            int deltastack = stats.ins.definition.getStackDelta(stats.ins, abc);
             if (stats.stackpos > ms) {
                 ms = stats.stackpos;
             }
