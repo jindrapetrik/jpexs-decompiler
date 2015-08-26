@@ -25,6 +25,10 @@ public interface GraphSourceItem extends Serializable, Cloneable {
 
     public void translate(BaseLocalData localData, TranslateStack stack, List<GraphTargetItem> output, int staticOperation, String path) throws InterruptedException;
 
+    public int getStackPopCount(BaseLocalData localData, TranslateStack stack);
+
+    public int getStackPushCount(BaseLocalData localData, TranslateStack stack);
+
     public boolean isJump();
 
     public boolean isBranch();

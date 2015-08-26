@@ -492,30 +492,31 @@ public class GenericTagTreePanel extends GenericTagPanel {
          */
         @Override
         public String toString() {
-            String ret = "";
+            StringBuilder ret = new StringBuilder();
             if (index > -1) {
                 for (int i = 0; i < fieldSet.size(); i++) {
                     if (i > 0) {
-                        ret += ", ";
+                        ret.append(", ");
                     }
-                    ret += toString(i);
+                    ret.append(toString(i));
                 }
-                return ret;
+                return ret.toString();
             }
 
             if (fieldSet.size() == 1) {
-                ret = toString(0);
+                ret.append(toString(0));
             } else {
-                ret = fieldSet.name;
+                ret.append(fieldSet.name);
                 SWFArray t = fieldSet.get(0).getAnnotation(SWFArray.class);
                 if (t != null) {
-                    ret += " [" + t.countField() + "]";
+                    ret.append(" [").append(t.countField()).append("]");
                 } else {
-                    ret += " []";
+                    ret.append(" []");
                 }
             }
 
-            return "<html>" + ret + "</html>";
+            ret.insert(0, "<html>").append("</html>");
+            return ret.toString();
         }
 
         public String toString(int fieldIndex) {
@@ -820,7 +821,6 @@ public class GenericTagTreePanel extends GenericTagPanel {
             tag = this.tag;
         }
         this.tag = tag;
-        SWF swf = tag.getSwf();
         try {
             editedTag = tag.cloneTag();
         } catch (InterruptedException ex) {

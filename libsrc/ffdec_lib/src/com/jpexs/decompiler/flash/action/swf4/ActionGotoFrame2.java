@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.swf4;
 
+import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
@@ -100,5 +101,10 @@ public class ActionGotoFrame2 extends Action {
     public void translate(TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem frame = stack.pop();
         output.add(new GotoFrame2ActionItem(this, frame, sceneBiasFlag, playFlag, sceneBias));
+    }
+
+    @Override
+    public int getStackPopCount(BaseLocalData localData, TranslateStack stack) {
+        return 1;
     }
 }

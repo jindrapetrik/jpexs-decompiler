@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.swf4;
 
+import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
@@ -37,5 +38,15 @@ public class ActionNot extends Action {
     public void translate(TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem a = stack.pop();
         stack.push(a.invert(this));
+    }
+
+    @Override
+    public int getStackPopCount(BaseLocalData localData, TranslateStack stack) {
+        return 1;
+    }
+
+    @Override
+    public int getStackPushCount(BaseLocalData localData, TranslateStack stack) {
+        return 1;
     }
 }

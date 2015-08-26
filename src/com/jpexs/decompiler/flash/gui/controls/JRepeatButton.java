@@ -40,8 +40,6 @@ public class JRepeatButton extends JButton {
     public JRepeatButton(String text, ImageIcon icon) {
         super(text, icon);
         addMouseListener(new MouseAdapter() {
-            int counter = 0;
-
             ScheduledFuture<?> future;
 
             @Override

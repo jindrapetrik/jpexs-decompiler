@@ -331,6 +331,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
     @Override
     public void translate(BaseLocalData localData, TranslateStack stack, List<GraphTargetItem> output, int staticOperation, String path) throws InterruptedException {
         AVM2LocalData aLocalData = (AVM2LocalData) localData;
+        //int expectedSize = stack.size() - getStackPopCount(localData, stack) + getStackPushCount(localData, stack);
         definition.translate(aLocalData.isStatic,
                 aLocalData.scriptIndex,
                 aLocalData.classIndex,
@@ -338,10 +339,29 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
                 stack,
                 aLocalData.scopeStack,
                 aLocalData.constants, this, aLocalData.methodInfo, output, aLocalData.methodBody, aLocalData.abc, aLocalData.localRegNames, aLocalData.fullyQualifiedNames, null, aLocalData.localRegAssignmentIps, aLocalData.ip, aLocalData.refs, aLocalData.code);
+        /*if (stack.size() != expectedSize) {
+         throw new Error("HONFIKA stack size mismatch");
+         }*/
+    }
+
+    @Override
+    public int getStackPopCount(BaseLocalData localData, TranslateStack stack) {
+        AVM2LocalData aLocalData = (AVM2LocalData) localData;
+        return getStackPopCount(aLocalData);
+    }
+
+    @Override
+    public int getStackPushCount(BaseLocalData localData, TranslateStack stack) {
+        AVM2LocalData aLocalData = (AVM2LocalData) localData;
+        return getStackPushCount(aLocalData);
     }
 
     public int getStackPopCount(AVM2LocalData aLocalData) {
         return definition.getStackPopCount(this, aLocalData.abc);
+    }
+
+    public int getStackPushCount(AVM2LocalData aLocalData) {
+        return definition.getStackPushCount(this, aLocalData.abc);
     }
 
     @Override

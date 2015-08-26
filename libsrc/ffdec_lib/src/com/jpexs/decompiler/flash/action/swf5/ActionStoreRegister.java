@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.swf5;
 
+import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
@@ -112,27 +113,33 @@ public class ActionStoreRegister extends Action implements StoreTypeAction {
 
         if (value instanceof IncrementActionItem) {
             GraphTargetItem obj = ((IncrementActionItem) value).object;
-            if (!stack.isEmpty()) {
-                if (stack.peek().valueEquals(obj)) {
-                    stack.pop();
-                    stack.push(new PostIncrementActionItem(this, obj));
-                    stack.push(obj);
-                    return;
-                }
+            if (!stack.isEmpty() && stack.peek().valueEquals(obj)) {
+                stack.pop();
+                stack.push(new PostIncrementActionItem(this, obj));
+                stack.push(obj);
+                return;
             }
         }
         if (value instanceof DecrementActionItem) {
             GraphTargetItem obj = ((DecrementActionItem) value).object;
-            if (!stack.isEmpty()) {
-                if (stack.peek().valueEquals(obj)) {
-                    stack.pop();
-                    stack.push(new PostDecrementActionItem(this, obj));
-                    stack.push(obj);
-                    return;
-                }
+            if (!stack.isEmpty() && stack.peek().valueEquals(obj)) {
+                stack.pop();
+                stack.push(new PostDecrementActionItem(this, obj));
+                stack.push(obj);
+                return;
             }
         }
         stack.push(new StoreRegisterActionItem(this, rn, value, define));
+    }
+
+    @Override
+    public int getStackPopCount(BaseLocalData localData, TranslateStack stack) {
+        return 1;
+    }
+
+    @Override
+    public int getStackPushCount(BaseLocalData localData, TranslateStack stack) {
+        return 1;
     }
 
     @Override

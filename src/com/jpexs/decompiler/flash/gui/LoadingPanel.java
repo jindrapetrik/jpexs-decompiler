@@ -96,11 +96,10 @@ public class LoadingPanel extends JPanel {
         lastImage = bi;
         lastSize = size;
         drawTimer = new Timer();
-        int timeSpin = 1000;
-        double delay = timeSpin / o;
-        while (delay < 10) {
+        double timeSpin = 1000;
+        double delay;
+        while ((delay = timeSpin / o) < 10) {
             o--;
-            delay = timeSpin / o;
         }
         final int segments = o;
         int idelay = (int) Math.round(delay);

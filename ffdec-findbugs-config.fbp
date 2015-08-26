@@ -1,0 +1,9 @@
+<Project projectName="JPEXS">
+  <Jar>.\dist\ffdec.jar</Jar>
+  <AuxClasspathEntry>.\dist\lib</AuxClasspathEntry>
+  <SrcDir>.\src</SrcDir>
+  <SrcDir>.\libsrc</SrcDir>
+  <SuppressionFilter>
+    <LastVersion value="-1" relOp="NEQ"/>
+  </SuppressionFilter>
+</Project>

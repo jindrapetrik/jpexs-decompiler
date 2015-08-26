@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.swf5;
 
+import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.EnumerateActionItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -39,5 +40,10 @@ public class ActionEnumerate extends Action {
         GraphTargetItem object = stack.pop();
         //stack.push(new DirectValueActionItem(null, 0, new Null(), new ArrayList<String>()));
         output.add(new EnumerateActionItem(this, object));
+    }
+
+    @Override
+    public int getStackPopCount(BaseLocalData localData, TranslateStack stack) {
+        return 1;
     }
 }

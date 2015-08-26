@@ -711,6 +711,16 @@ public abstract class Action implements GraphSourceItem {
     public void translate(TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) throws InterruptedException {
     }
 
+    @Override
+    public int getStackPopCount(BaseLocalData localData, TranslateStack stack) {
+        return 0;
+    }
+
+    @Override
+    public int getStackPushCount(BaseLocalData localData, TranslateStack stack) {
+        return 0;
+    }
+
     /**
      * Pops long value off the stack
      *
@@ -870,7 +880,16 @@ public abstract class Action implements GraphSourceItem {
     @Override
     public void translate(BaseLocalData localData, TranslateStack stack, List<GraphTargetItem> output, int staticOperation, String path) throws InterruptedException {
         ActionLocalData aLocalData = (ActionLocalData) localData;
+        /*int expectedSize = stack.size() - getStackPopCount(localData, stack);
+         if (expectedSize < 0) {
+         expectedSize = 0;
+         }
+         expectedSize += getStackPushCount(localData, stack);*/
+
         translate(stack, output, aLocalData.regNames, aLocalData.variables, aLocalData.functions, staticOperation, path);
+        /*if (stack.size() != expectedSize && !(this instanceof ActionPushDuplicate)) {
+         throw new Error("HONFIKA stack size mismatch");
+         }*/
     }
 
     @Override

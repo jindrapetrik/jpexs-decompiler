@@ -169,17 +169,17 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
     private void setTagText(Tag tag) {
         clear();
         generateEditControls(tag, true);
-        String val = "";
+        StringBuilder val = new StringBuilder();
         for (String key : keys) {
             GenericTagEditor ed = editors.get(key);
             if (((Component) ed).isVisible()) {
-                val += key + " : " + ed.getReadOnlyValue() + "<br>";
+                val.append(key).append(" : ").append(ed.getReadOnlyValue()).append("<br>");
             }
         }
         //HTML for colors:
-        val = "<html>" + val + "</html>";
+        val.insert(0, "<html>").append("</html>");
         genericTagPropertiesEditorPane.setContentType("text/html");
-        genericTagPropertiesEditorPane.setText(val);
+        genericTagPropertiesEditorPane.setText(val.toString());
         genericTagPropertiesEditorPane.setCaretPosition(0);
         hdr.setText(tag.toString());
     }

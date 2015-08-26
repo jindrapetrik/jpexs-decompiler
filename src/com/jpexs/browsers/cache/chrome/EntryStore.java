@@ -135,7 +135,7 @@ public class EntryStore extends CacheEntry {
         if (key_len < 0) {
             return null;
         }
-        return new String(key, 0, key_len > key.length || key_len < 0 ? key.length : key_len);
+        return new String(key, 0, key_len > key.length ? key.length : key_len);
     }
 
     @Override

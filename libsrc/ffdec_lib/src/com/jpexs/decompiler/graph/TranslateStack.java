@@ -69,6 +69,16 @@ public class TranslateStack extends Stack<GraphTargetItem> {
         return super.peek();
     }
 
+    public synchronized GraphTargetItem peek(int index) {
+        if (path != null) {
+            if (index > this.size()) {
+                Logger.getLogger(TranslateStack.class.getName()).log(Level.FINE, "{0}: Attemp to Peek item from stack", path);
+                return getPop();
+            }
+        }
+        return super.get(size() - index);
+    }
+
     @Override
     public synchronized GraphTargetItem pop() {
         if (path != null) {

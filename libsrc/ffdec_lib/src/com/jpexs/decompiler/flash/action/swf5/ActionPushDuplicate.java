@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.swf5;
 
+import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -40,5 +41,15 @@ public class ActionPushDuplicate extends Action {
         GraphTargetItem value = stack.peek();
         stack.push(new DuplicateItem(this, value));
         value.getMoreSrc().add(new GraphSourceItemPos(this, 0));
+    }
+
+    @Override
+    public int getStackPopCount(BaseLocalData localData, TranslateStack stack) {
+        return 1;
+    }
+
+    @Override
+    public int getStackPushCount(BaseLocalData localData, TranslateStack stack) {
+        return 2;
     }
 }

@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.swf4;
 
+import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.EndOfStreamException;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
@@ -441,5 +442,10 @@ public class ActionPush extends Action {
             }
             pos++;
         }
+    }
+
+    @Override
+    public int getStackPushCount(BaseLocalData localData, TranslateStack stack) {
+        return values.size();
     }
 }

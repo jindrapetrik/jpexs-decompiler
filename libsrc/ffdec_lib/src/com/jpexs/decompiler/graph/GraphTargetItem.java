@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
@@ -374,5 +375,16 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
         }
         writer.endBlock();
         return writer;
+    }
+
+    public long getAsLong() {
+        if (this instanceof DirectValueActionItem) {
+            DirectValueActionItem dvai = (DirectValueActionItem) this;
+            if (dvai.value instanceof Long) {
+                return (long) (Long) dvai.value;
+            }
+        }
+
+        return 0;
     }
 }

@@ -370,7 +370,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
 
             if (firstItem instanceof Tag) {
-                rawEditMenuItem.setVisible(firstItem instanceof Tag);
+                rawEditMenuItem.setVisible(true);
             }
         }
 
@@ -565,17 +565,14 @@ public class TagTreeContextMenu extends JPopupMenu {
                 // first add dependencies in reverse order
                 for (int i = neededList.size() - 1; i >= 0; i--) {
                     int characterId = neededList.get(i);
-                    Tag neededTag = (Tag) sourceSwf.getCharacter(characterId);
+                    CharacterTag neededTag = sourceSwf.getCharacter(characterId);
                     if (!copiedTags.contains(neededTag)) {
                         copyTag = neededTag.cloneTag();
                         copyTag.setSwf(targetSwf, true);
                         targetSwf.tags.add(copyTag);
-                        if (neededTag instanceof CharacterTag) {
-                            CharacterTag characterTag = (CharacterTag) copyTag;
-                            int oldCharacterId = characterTag.getCharacterId();
-                            int newCharacterId = chechUniqueCharacterId(copyTag);
-                            changedCharacterIds.put(oldCharacterId, newCharacterId);
-                        }
+                        int oldCharacterId = neededTag.getCharacterId();
+                        int newCharacterId = chechUniqueCharacterId(copyTag);
+                        changedCharacterIds.put(oldCharacterId, newCharacterId);
 
                         targetSwf.updateCharacters();
                         targetSwf.getCharacters(); // force rebuild character id cache

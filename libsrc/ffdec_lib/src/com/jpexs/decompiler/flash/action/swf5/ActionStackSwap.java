@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.swf5;
 
+import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -42,5 +43,15 @@ public class ActionStackSwap extends Action {
         stack.push(b);
         a.getMoreSrc().add(new GraphSourceItemPos(this, 0));
         b.getMoreSrc().add(new GraphSourceItemPos(this, 0));
+    }
+
+    @Override
+    public int getStackPopCount(BaseLocalData localData, TranslateStack stack) {
+        return 2;
+    }
+
+    @Override
+    public int getStackPushCount(BaseLocalData localData, TranslateStack stack) {
+        return 2;
     }
 }

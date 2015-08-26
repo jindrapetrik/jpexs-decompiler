@@ -291,6 +291,12 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
                  System.out.print(" '" + stack.get(j).getResult() + "'");
                  }
                  System.out.println();*/
+                // do not throw EmptyStackException, much faster
+                int requiredStackSize = action.getStackPopCount(localData, stack);
+                if (stack.size() < requiredStackSize) {
+                    return;
+                }
+
                 action.translate(localData, stack, output, Graph.SOP_USE_STATIC, "");
 
                 if (!(action instanceof ActionPush
@@ -341,6 +347,10 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
 
                 if (action instanceof ActionIf) {
                     ActionIf aif = (ActionIf) action;
+                    if (stack.isEmpty()) {
+                        return;
+                    }
+
                     if (EcmaScript.toBoolean(stack.pop().getResult())) {
                         long address = aif.getAddress() + aif.getTotalActionLength() + aif.getJumpOffset();
                         idx = actions.indexOf(actions.getByAddress(address));

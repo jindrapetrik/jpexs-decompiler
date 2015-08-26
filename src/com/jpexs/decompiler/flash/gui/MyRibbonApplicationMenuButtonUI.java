@@ -85,7 +85,7 @@ public class MyRibbonApplicationMenuButtonUI extends BasicRibbonApplicationMenuB
                     g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
                     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                     SubstanceSkin skin = SubstanceLookAndFeel.getCurrentSkin();
-                    g2.setPaint(new RadialGradientPaint(getIconWidth() / 2, getIconHeight() / 2, getIconWidth() / 2, new float[]{0.32f, 0.84f, 1f}, new Color[]{
+                    g2.setPaint(new RadialGradientPaint(getIconWidth() / 2.0f, getIconHeight() / 2.0f, getIconWidth() / 2.0f, new float[]{0.32f, 0.84f, 1f}, new Color[]{
                         skin.getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.HIGHLIGHT, ComponentState.ENABLED).shiftBackground(Color.white, 0.5).getUltraLightColor(),
                         skin.getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.FILL, ComponentState.ENABLED).getMidColor(),
                         skin.getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.BORDER, ComponentState.ENABLED).getUltraDarkColor()

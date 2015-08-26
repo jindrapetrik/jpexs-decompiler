@@ -812,7 +812,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
          addToggleMenuItem("/settings/deobfuscation/new", translate("menu.file.deobfuscation.new"), "deobfuscation", "deobfuscatenew16", (ActionEvent e) -> {
          deobfuscationMode(e, 1);
          }, 0);
-         
+
          finishMenu("/settings/deobfuscation");*/
         addMenuItem("/settings/advancedSettings", translate("menu.advancedsettings.advancedsettings"), null, null, 0, null, false);
         addMenuItem("/settings/advancedSettings/advancedSettings", translate("menu.advancedsettings.advancedsettings"), "settings32", this::advancedSettingsActionPerformed, PRIORITY_TOP, null, true);
@@ -951,9 +951,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
             switchDebugger();
             mainFrame.getPanel().refreshDecompiled();
         } else {
-            if (debuggerOn) {
-                setMenuChecked("/tools/debugger/debuggerSwitch", false);
-            }
+            setMenuChecked("/tools/debugger/debuggerSwitch", false);
         }
         setMenuEnabled("/tools/debugger/debuggerReplaceTrace", isMenuChecked("/tools/debugger/debuggerSwitch"));
     }

@@ -586,7 +586,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     }
 
     public void createAndShowTempSwf(TreeItem tagObj) {
-        SWF swf;
+        SWF swf = null;
         try {
             if (tempFile != null) {
                 tempFile.delete();
@@ -597,11 +597,13 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
             Color backgroundColor = View.getSwfBackgroundColor();
 
-            if (tagObj instanceof FontTag) { //Fonts are always black on white
-                backgroundColor = View.getDefaultBackgroundColor();
-            }
-
-            if (tagObj instanceof Frame) {
+            if (tagObj instanceof Tag) {
+                Tag tag = (Tag) tagObj;
+                swf = tag.getSwf();
+                if (tag instanceof FontTag) { //Fonts are always black on white
+                    backgroundColor = View.getDefaultBackgroundColor();
+                }
+            } else if (tagObj instanceof Frame) {
                 Frame fn = (Frame) tagObj;
                 swf = fn.getSwf();
                 if (fn.timeline.timelined == swf) {
@@ -612,9 +614,6 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                         }
                     }
                 }
-            } else {
-                Tag tag = (Tag) tagObj;
-                swf = tag.getSwf();
             }
 
             int frameCount = 1;
@@ -714,14 +713,9 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                                     mat = new MATRIX();
                                 }
                                 mat = Helper.deepCopy(mat);
-                                if (parent instanceof BoundedTag) {
-                                    RECT r = ((BoundedTag) parent).getRect();
-                                    mat.translateX = mat.translateX + width / 2 - r.getWidth() / 2;
-                                    mat.translateY = mat.translateY + height / 2 - r.getHeight() / 2;
-                                } else {
-                                    mat.translateX += width / 2;
-                                    mat.translateY += height / 2;
-                                }
+                                RECT r = parent.getRect();
+                                mat.translateX += width / 2 - r.getWidth() / 2;
+                                mat.translateY += height / 2 - r.getHeight() / 2;
                                 new PlaceObject2Tag(swf, false, false, false, false, false, true, false, true, depth, chid, mat, null, 0, null, 0, null).writeTag(sos2);
 
                             }

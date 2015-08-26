@@ -322,17 +322,17 @@ public class FontEmbedDialog extends AppDialog {
             rangeNames[i] = CharacterRanges.rangeName(i);
             int codes[] = CharacterRanges.rangeCodes(i);
             int avail = 0;
-            String sample = "";
+            StringBuilder sample = new StringBuilder();
             for (int c = 0; c < codes.length; c++) {
                 if (f.canDisplay(codes[c])) {
                     allChars.add(codes[c]);
                     if (avail < SAMPLE_MAX_LENGTH) {
-                        sample += "" + (char) codes[c];
+                        sample.append((char) codes[c]);
                     }
                     avail++;
                 }
             }
-            rangeSamples[i].setText(sample);
+            rangeSamples[i].setText(sample.toString());
             rangeSamples[i].setFont(f);
             rangeCheckboxes[i].setText(translate("range.description").replace("%available%", Integer.toString(avail)).replace("%name%", rangeNames[i]).replace("%total%", Integer.toString(codes.length)));
         }

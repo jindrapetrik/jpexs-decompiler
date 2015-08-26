@@ -499,18 +499,18 @@ public class ProxyFrame extends AppFrame implements CatchedListener, MouseListen
 
     private void copyUrlButtonActionPerformed(ActionEvent evt) {
         int[] sel = getSelectedRows();
-        String copyText = "";
+        StringBuilder copyText = new StringBuilder();
         for (int sc : sel) {
             Replacement r = replacements.get(sc);
-            if (!copyText.isEmpty()) {
-                copyText += System.lineSeparator();
+            if (copyText.length() > 0) {
+                copyText.append(System.lineSeparator());
             }
-            copyText += r.urlPattern;
+            copyText.append(r.urlPattern);
         }
 
-        if (!copyText.isEmpty()) {
+        if (copyText.length() > 0) {
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-            StringSelection stringSelection = new StringSelection(copyText);
+            StringSelection stringSelection = new StringSelection(copyText.toString());
             clipboard.setContents(stringSelection, null);
         }
     }

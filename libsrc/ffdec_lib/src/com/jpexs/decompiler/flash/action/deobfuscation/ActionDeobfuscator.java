@@ -257,13 +257,19 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
                 }
 
                 if (action instanceof ActionDefineLocal) {
-                    GraphTargetItem top = stack.pop();
-                    String variableName = stack.peek().getResult().toString();
+                    if (stack.size() < 2) {
+                        return;
+                    }
+
+                    String variableName = stack.peek(2).getResult().toString();
                     result.defines.add(variableName);
-                    stack.push(top);
                 }
 
                 if (action instanceof ActionGetVariable) {
+                    if (stack.isEmpty()) {
+                        return;
+                    }
+
                     String variableName = stack.peek().getResult().toString();
                     if (!localData.variables.containsKey(variableName)) {
                         break;
@@ -271,6 +277,10 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
                 }
 
                 if (action instanceof ActionCallFunction) {
+                    if (stack.isEmpty()) {
+                        return;
+                    }
+
                     String functionName = stack.pop().getResult().toString();
                     long numArgs = EcmaScript.toUint32(stack.pop().getResult());
                     if (numArgs == 0) {
@@ -283,6 +293,12 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
                         break;
                     }
                 } else {
+                    // do not throw EmptyStackException, much faster
+                    int requiredStackSize = action.getStackPopCount(localData, stack);
+                    if (stack.size() < requiredStackSize) {
+                        return;
+                    }
+
                     action.translate(localData, stack, output, Graph.SOP_USE_STATIC, "");
                 }
 
@@ -348,6 +364,10 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
 
                 if (action instanceof ActionIf) {
                     ActionIf aif = (ActionIf) action;
+                    if (stack.isEmpty()) {
+                        return;
+                    }
+
                     if (EcmaScript.toBoolean(stack.pop().getResult())) {
                         long address = aif.getAddress() + aif.getTotalActionLength() + aif.getJumpOffset();
                         idx = actions.indexOf(actions.getByAddress(address));

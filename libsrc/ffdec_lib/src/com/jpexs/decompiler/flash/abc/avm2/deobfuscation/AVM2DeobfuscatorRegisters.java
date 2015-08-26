@@ -175,6 +175,7 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
         toVisit.add(idx);
         List<TranslateStack> toVisitStacks = new ArrayList<>();
         toVisitStacks.add(stack);
+        outer:
         while (!toVisit.isEmpty()) {
             idx = toVisit.remove(0);
             stack = toVisitStacks.remove(0);
@@ -191,6 +192,12 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
                     AVM2Instruction ins = code.code.get(idx);
                     InstructionDefinition def = ins.definition;
                     //System.err.println("" + idx + ": " + ins + " stack:" + stack.size());
+
+                    // do not throw EmptyStackException, much faster
+                    int requiredStackSize = ins.getStackPopCount(localData);
+                    if (stack.size() < requiredStackSize) {
+                        continue outer;
+                    }
 
                     ins.translate(localData, stack, output, Graph.SOP_USE_STATIC, "");
 

@@ -1,20 +1,22 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.swf5;
 
+import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.DecrementActionItem;
 import com.jpexs.decompiler.flash.action.model.GetMemberActionItem;
@@ -49,22 +51,18 @@ public class ActionSetMember extends Action {
         GraphTargetItem object = stack.pop();
         if (value instanceof IncrementActionItem) {
             GraphTargetItem obj = ((IncrementActionItem) value).object;
-            if (!stack.isEmpty()) {
-                if (stack.peek().valueEquals(obj)) {
-                    stack.pop();
-                    stack.push(new PostIncrementActionItem(this, obj));
-                    return;
-                }
+            if (!stack.isEmpty() && stack.peek().valueEquals(obj)) {
+                stack.pop();
+                stack.push(new PostIncrementActionItem(this, obj));
+                return;
             }
         }
         if (value instanceof DecrementActionItem) {
             GraphTargetItem obj = ((DecrementActionItem) value).object;
-            if (!stack.isEmpty()) {
-                if (stack.peek().valueEquals(obj)) {
-                    stack.pop();
-                    stack.push(new PostDecrementActionItem(this, obj));
-                    return;
-                }
+            if (!stack.isEmpty() && stack.peek().valueEquals(obj)) {
+                stack.pop();
+                stack.push(new PostDecrementActionItem(this, obj));
+                return;
             }
         }
 
@@ -115,5 +113,10 @@ public class ActionSetMember extends Action {
             }
         }
         output.add(ret);
+    }
+
+    @Override
+    public int getStackPopCount(BaseLocalData localData, TranslateStack stack) {
+        return 3;
     }
 }

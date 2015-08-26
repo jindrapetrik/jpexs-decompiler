@@ -3141,7 +3141,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
 
             showCard(CARDPREVIEWPANEL);
-        } else if ((treeItem instanceof Frame) || ((treeItem instanceof CharacterTag) || (treeItem instanceof FontTag)) && (treeItem instanceof Tag) || (treeItem instanceof SoundStreamHeadTypeTag)) {
+        } else if ((treeItem instanceof Frame) || (treeItem instanceof CharacterTag) || (treeItem instanceof FontTag) || (treeItem instanceof SoundStreamHeadTypeTag)) {
             previewPanel.createAndShowTempSwf(treeItem);
 
             if (treeItem instanceof TextTag) {
@@ -3280,11 +3280,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
             @Override
             public Timeline getTimeline() {
-                if (tim != null) {
-                    return tim;
+                if (tim == null) {
+                    Timeline timeline = new Timeline(tag.getSwf(), null, new ArrayList<>(), ((CharacterTag) tag).getCharacterId(), getRect());
+                    initTimeline(timeline);
+                    tim = timeline;
                 }
-                tim = new Timeline(tag.getSwf(), null, new ArrayList<>(), ((CharacterTag) tag).getCharacterId(), getRect());
-                initTimeline(tim);
+
                 return tim;
             }
 
@@ -3298,17 +3299,17 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
             private void initTimeline(Timeline timeline) {
                 if (tag instanceof MorphShapeTag) {
-                    tim.frameRate = MORPH_SHAPE_ANIMATION_FRAME_RATE;
-                    int framesCnt = (int) (tim.frameRate * MORPH_SHAPE_ANIMATION_LENGTH);
+                    timeline.frameRate = MORPH_SHAPE_ANIMATION_FRAME_RATE;
+                    int framesCnt = (int) (timeline.frameRate * MORPH_SHAPE_ANIMATION_LENGTH);
                     for (int i = 0; i < framesCnt; i++) {
-                        Frame f = new Frame(tim, i);
+                        Frame f = new Frame(timeline, i);
                         DepthState ds = new DepthState(tag.getSwf(), f);
                         ds.characterId = ((CharacterTag) tag).getCharacterId();
                         ds.matrix = new MATRIX();
                         ds.ratio = i * 65535 / framesCnt;
                         f.layers.put(1, ds);
                         f.layersChanged = true;
-                        tim.addFrame(f);
+                        timeline.addFrame(f);
                     }
                 } else if (tag instanceof FontTag) {
                     int pageCount = PreviewPanel.getFontPageCount((FontTag) tag);
@@ -3317,23 +3318,23 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         frame = 0;
                     }
 
-                    Frame f = new Frame(tim, 0);
+                    Frame f = new Frame(timeline, 0);
                     DepthState ds = new DepthState(tag.getSwf(), f);
                     ds.characterId = ((CharacterTag) tag).getCharacterId();
                     ds.matrix = new MATRIX();
                     f.layers.put(1, ds);
                     f.layersChanged = true;
-                    tim.addFrame(f);
-                    tim.fontFrameNum = frame;
+                    timeline.addFrame(f);
+                    timeline.fontFrameNum = frame;
                 } else {
-                    Frame f = new Frame(tim, 0);
+                    Frame f = new Frame(timeline, 0);
                     DepthState ds = new DepthState(tag.getSwf(), f);
                     ds.characterId = ((CharacterTag) tag).getCharacterId();
                     ds.matrix = new MATRIX();
                     f.layers.put(1, ds);
-                    tim.addFrame(f);
+                    timeline.addFrame(f);
                 }
-                tim.displayRect = getRect();
+                timeline.displayRect = getRect();
             }
 
             @Override
