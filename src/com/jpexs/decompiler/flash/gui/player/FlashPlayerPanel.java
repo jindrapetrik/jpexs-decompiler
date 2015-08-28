@@ -161,7 +161,12 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
         }
 
         flash.setAllowScriptAccess("always");
-        flash.setAllowNetworking("all");
+        try {
+            flash.setAllowNetworking("all");
+        } catch (ActiveXException ex) {
+            // ignore
+        }
+
         flash.addOnReadyStateChangeListener((ActiveXEvent axe) -> {
             fireMediaDisplayStateChanged();
         });
