@@ -73,7 +73,7 @@ public class EnableTelemetryTag extends Tag {
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         reserved = (int) sis.readUB(16, "reserved");
         if (sis.available() > 0) {
-            if (passwordHash.length != 32) {
+            if (sis.available() != 32) {
                 Logger.getLogger(EnableTelemetryTag.class.getName()).log(Level.WARNING, "PasswordHash should be 32 bytes");
             }
 
