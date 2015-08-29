@@ -394,6 +394,7 @@
                     <runtimeBits>64/32</runtimeBits>
                     <maxHeapPercent>${max.heap.size.percent}</maxHeapPercent>
                     <opt>-Djava.net.preferIPv4Stack=true</opt>
+                    <opt>-Djna.nosys=true</opt>
                 </jre>
                 <splash>
                     <file>graphics/splash.bmp</file>
