@@ -254,169 +254,165 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
         FixItemCounterTranslateStack stack = new FixItemCounterTranslateStack("");
         int instructionsProcessed = 0;
 
-        try {
-            while (true) {
-                if (idx > endIdx) {
-                    break;
-                }
+        while (true) {
+            if (idx > endIdx) {
+                break;
+            }
 
-                if (instructionsProcessed > executionLimit) {
-                    break;
-                }
+            if (instructionsProcessed > executionLimit) {
+                break;
+            }
 
-                AVM2Instruction ins = code.code.get(idx);
-                if (ins.definition instanceof NewFunctionIns) {
-                    if (idx + 1 < code.code.size()) {
-                        if (code.code.get(idx + 1).definition instanceof PopIns) {
-                            code.removeInstruction(idx + 1, body);
-                            code.removeInstruction(idx, body);
-                            continue;
-                        }
+            AVM2Instruction ins = code.code.get(idx);
+            if (ins.definition instanceof NewFunctionIns) {
+                if (idx + 1 < code.code.size()) {
+                    if (code.code.get(idx + 1).definition instanceof PopIns) {
+                        code.removeInstruction(idx + 1, body);
+                        code.removeInstruction(idx, body);
+                        continue;
                     }
+                }
+            } else {
+                // do not throw EmptyStackException, much faster
+                int requiredStackSize = ins.getStackPopCount(localData);
+                if (stack.size() < requiredStackSize) {
+                    return;
+                }
+
+                ins.translate(localData, stack, output, Graph.SOP_USE_STATIC, "");
+            }
+
+            InstructionDefinition def = ins.definition;
+
+            if (inlineIns.contains(ins)) {
+                if (def instanceof SetLocalTypeIns) {
+                    int regId = ((SetLocalTypeIns) def).getRegisterId(ins);
+                    staticRegs.put(regId, localData.localRegs.get(regId).getNotCoerced());
+                    code.replaceInstruction(idx, new AVM2Instruction(0, new DeobfuscatePopIns(), null), body);
+                }
+            }
+            if (def instanceof GetLocalTypeIns) {
+                int regId = ((GetLocalTypeIns) def).getRegisterId(ins);
+                if (staticRegs.containsKey(regId)) {
+                    stack.pop();
+                    AVM2Instruction pushins = makePush(abc.constants, staticRegs.get(regId));
+                    code.replaceInstruction(idx, pushins, body);
+                    stack.push(staticRegs.get(regId));
+                    ins = pushins;
+                    def = ins.definition;
+                }
+            }
+
+            boolean ok = false;
+            if (def instanceof PushByteIns
+                    || def instanceof PushShortIns
+                    || def instanceof PushIntIns
+                    || def instanceof PushDoubleIns
+                    || def instanceof PushStringIns
+                    || def instanceof PushNullIns
+                    || def instanceof PushUndefinedIns
+                    || def instanceof PushFalseIns
+                    || def instanceof PushTrueIns
+                    || def instanceof DupIns
+                    || def instanceof SwapIns
+                    || def instanceof AddIns
+                    || def instanceof AddIIns
+                    || def instanceof SubtractIns
+                    || def instanceof SubtractIIns
+                    || def instanceof ModuloIns
+                    || def instanceof MultiplyIns
+                    || def instanceof BitAndIns
+                    || def instanceof BitXorIns
+                    || def instanceof BitOrIns
+                    || def instanceof LShiftIns
+                    || def instanceof RShiftIns
+                    || def instanceof URShiftIns
+                    || def instanceof EqualsIns
+                    || def instanceof NotIns
+                    || def instanceof IfTypeIns
+                    || def instanceof JumpIns
+                    || def instanceof EqualsIns
+                    || def instanceof LessEqualsIns
+                    || def instanceof GreaterEqualsIns
+                    || def instanceof GreaterThanIns
+                    || def instanceof LessThanIns
+                    || def instanceof StrictEqualsIns
+                    || def instanceof PopIns
+                    || def instanceof GetLocalTypeIns
+                    || def instanceof NewFunctionIns
+                    || def instanceof CoerceOrConvertTypeIns) {
+                ok = true;
+            }
+
+            if (!ok) {
+                break;
+            }
+
+            if (def instanceof GetLocalTypeIns) {
+                int regId = ((GetLocalTypeIns) def).getRegisterId(ins);
+                if (staticRegs.containsKey(regId)) {
+                    stack.pop();
+                    stack.push(staticRegs.get(regId));
                 } else {
-                    // do not throw EmptyStackException, much faster
-                    int requiredStackSize = ins.getStackPopCount(localData);
-                    if (stack.size() < requiredStackSize) {
-                        return;
-                    }
-
-                    ins.translate(localData, stack, output, Graph.SOP_USE_STATIC, "");
-                }
-
-                InstructionDefinition def = ins.definition;
-
-                if (inlineIns.contains(ins)) {
-                    if (def instanceof SetLocalTypeIns) {
-                        int regId = ((SetLocalTypeIns) def).getRegisterId(ins);
-                        staticRegs.put(regId, localData.localRegs.get(regId).getNotCoerced());
-                        code.replaceInstruction(idx, new AVM2Instruction(0, new DeobfuscatePopIns(), null), body);
-                    }
-                }
-                if (def instanceof GetLocalTypeIns) {
-                    int regId = ((GetLocalTypeIns) def).getRegisterId(ins);
-                    if (staticRegs.containsKey(regId)) {
-                        stack.pop();
-                        AVM2Instruction pushins = makePush(abc.constants, staticRegs.get(regId));
-                        code.replaceInstruction(idx, pushins, body);
-                        stack.push(staticRegs.get(regId));
-                        ins = pushins;
-                        def = ins.definition;
-                    }
-                }
-
-                boolean ok = false;
-                if (def instanceof PushByteIns
-                        || def instanceof PushShortIns
-                        || def instanceof PushIntIns
-                        || def instanceof PushDoubleIns
-                        || def instanceof PushStringIns
-                        || def instanceof PushNullIns
-                        || def instanceof PushUndefinedIns
-                        || def instanceof PushFalseIns
-                        || def instanceof PushTrueIns
-                        || def instanceof DupIns
-                        || def instanceof SwapIns
-                        || def instanceof AddIns
-                        || def instanceof AddIIns
-                        || def instanceof SubtractIns
-                        || def instanceof SubtractIIns
-                        || def instanceof ModuloIns
-                        || def instanceof MultiplyIns
-                        || def instanceof BitAndIns
-                        || def instanceof BitXorIns
-                        || def instanceof BitOrIns
-                        || def instanceof LShiftIns
-                        || def instanceof RShiftIns
-                        || def instanceof URShiftIns
-                        || def instanceof EqualsIns
-                        || def instanceof NotIns
-                        || def instanceof IfTypeIns
-                        || def instanceof JumpIns
-                        || def instanceof EqualsIns
-                        || def instanceof LessEqualsIns
-                        || def instanceof GreaterEqualsIns
-                        || def instanceof GreaterThanIns
-                        || def instanceof LessThanIns
-                        || def instanceof StrictEqualsIns
-                        || def instanceof PopIns
-                        || def instanceof GetLocalTypeIns
-                        || def instanceof NewFunctionIns
-                        || def instanceof CoerceOrConvertTypeIns) {
-                    ok = true;
-                }
-
-                if (!ok) {
-                    break;
-                }
-
-                if (def instanceof GetLocalTypeIns) {
-                    int regId = ((GetLocalTypeIns) def).getRegisterId(ins);
-                    if (staticRegs.containsKey(regId)) {
-                        stack.pop();
-                        stack.push(staticRegs.get(regId));
-                    } else {
-                        break;
-                    }
-                }
-
-                boolean ifed = false;
-                if (def instanceof JumpIns) {
-                    long address = ins.offset + ins.getBytesLength() + ins.operands[0];
-                    idx = code.adr2pos(address);
-
-                    if (idx == -1) {
-                        throw new TranslateException("Jump target not found: " + address);
-                    }
-                } else if (def instanceof IfTypeIns) {
-                    GraphTargetItem top = stack.pop();
-                    Object res = top.getResult();
-                    long address = ins.offset + ins.getBytesLength() + ins.operands[0];
-                    int nidx = code.adr2pos(address);//code.indexOf(code.getByAddress(address));
-                    AVM2Instruction tarIns = code.code.get(nidx);
-
-                    //Some IfType instructions need more than 1 operand, we must pop out all of them
-                    int stackCount = -def.getStackDelta(ins, abc);
-
-                    if (EcmaScript.toBoolean(res)) {
-                        //System.err.println("replacing " + ins + " on " + idx + " with jump");
-                        AVM2Instruction jumpIns = new AVM2Instruction(0, new JumpIns(), new int[]{0});
-                        //jumpIns.operands[0] = ins.operands[0] /*- ins.getBytes().length*/ + jumpIns.getBytes().length;
-                        code.replaceInstruction(idx, jumpIns, body);
-                        jumpIns.operands[0] = (int) (tarIns.offset - jumpIns.offset - jumpIns.getBytesLength());
-                        for (int s = 0; s < stackCount; s++) {
-                            code.insertInstruction(idx, new AVM2Instruction(ins.offset, new DeobfuscatePopIns(), null), true, body);
-                        }
-
-                        idx = code.adr2pos(jumpIns.offset + jumpIns.getBytesLength() + jumpIns.operands[0]);
-                    } else {
-                        //System.err.println("replacing " + ins + " on " + idx + " with pop");
-                        code.replaceInstruction(idx, new AVM2Instruction(ins.offset, new DeobfuscatePopIns(), null), body);
-                        for (int s = 1 /*first is replaced*/; s < stackCount; s++) {
-                            code.insertInstruction(idx, new AVM2Instruction(ins.offset, new DeobfuscatePopIns(), null), true, body);
-                        }
-                        //ins.definition = new DeobfuscatePopIns();
-                        idx++;
-                    }
-                    ifed = true;
-                    //break;
-                } else {
-                    idx++;
-                }
-
-                instructionsProcessed++;
-
-                if (stack.allItemsFixed()) {
-                    result.idx = idx == code.code.size() ? idx - 1 : idx;
-                    result.instructionsProcessed = instructionsProcessed;
-                    result.stack.clear();
-                    result.stack.addAll(stack);
-                }
-                if (ifed) {
                     break;
                 }
             }
-        } catch (InterruptedException ex) {
-            throw ex;
+
+            boolean ifed = false;
+            if (def instanceof JumpIns) {
+                long address = ins.offset + ins.getBytesLength() + ins.operands[0];
+                idx = code.adr2pos(address);
+
+                if (idx == -1) {
+                    throw new TranslateException("Jump target not found: " + address);
+                }
+            } else if (def instanceof IfTypeIns) {
+                GraphTargetItem top = stack.pop();
+                Object res = top.getResult();
+                long address = ins.offset + ins.getBytesLength() + ins.operands[0];
+                int nidx = code.adr2pos(address);//code.indexOf(code.getByAddress(address));
+                AVM2Instruction tarIns = code.code.get(nidx);
+
+                //Some IfType instructions need more than 1 operand, we must pop out all of them
+                int stackCount = -def.getStackDelta(ins, abc);
+
+                if (EcmaScript.toBoolean(res)) {
+                    //System.err.println("replacing " + ins + " on " + idx + " with jump");
+                    AVM2Instruction jumpIns = new AVM2Instruction(0, new JumpIns(), new int[]{0});
+                    //jumpIns.operands[0] = ins.operands[0] /*- ins.getBytes().length*/ + jumpIns.getBytes().length;
+                    code.replaceInstruction(idx, jumpIns, body);
+                    jumpIns.operands[0] = (int) (tarIns.offset - jumpIns.offset - jumpIns.getBytesLength());
+                    for (int s = 0; s < stackCount; s++) {
+                        code.insertInstruction(idx, new AVM2Instruction(ins.offset, new DeobfuscatePopIns(), null), true, body);
+                    }
+
+                    idx = code.adr2pos(jumpIns.offset + jumpIns.getBytesLength() + jumpIns.operands[0]);
+                } else {
+                    //System.err.println("replacing " + ins + " on " + idx + " with pop");
+                    code.replaceInstruction(idx, new AVM2Instruction(ins.offset, new DeobfuscatePopIns(), null), body);
+                    for (int s = 1 /*first is replaced*/; s < stackCount; s++) {
+                        code.insertInstruction(idx, new AVM2Instruction(ins.offset, new DeobfuscatePopIns(), null), true, body);
+                    }
+                    //ins.definition = new DeobfuscatePopIns();
+                    idx++;
+                }
+                ifed = true;
+                //break;
+            } else {
+                idx++;
+            }
+
+            instructionsProcessed++;
+
+            if (stack.allItemsFixed()) {
+                result.idx = idx == code.code.size() ? idx - 1 : idx;
+                result.instructionsProcessed = instructionsProcessed;
+                result.stack.clear();
+                result.stack.addAll(stack);
+            }
+            if (ifed) {
+                break;
+            }
         }
     }
 

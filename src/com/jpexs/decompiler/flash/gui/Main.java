@@ -119,7 +119,7 @@ public class Main {
 
     private static MenuItem stopMenuItem;
 
-    private static MainFrame mainFrame;
+    private static volatile MainFrame mainFrame;
 
     public static final int UPDATE_SYSTEM_MAJOR = 1;
 
@@ -724,9 +724,6 @@ public class Main {
             String filterDescription = null;
             switch (exeExportMode) {
                 case WRAPPER:
-                    ext = ".exe";
-                    filterDescription = "filter.exe";
-                    break;
                 case PROJECTOR_WIN:
                     ext = ".exe";
                     filterDescription = "filter.exe";

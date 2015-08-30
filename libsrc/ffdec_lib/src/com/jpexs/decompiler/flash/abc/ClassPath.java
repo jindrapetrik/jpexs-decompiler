@@ -37,7 +37,8 @@ public class ClassPath {
 
     @Override
     public String toString() {
-        return packageStr.isEmpty() ? className : packageStr.toPrintableString(true) + "." + IdentifiersDeobfuscation.printIdentifier(true, className);
+        return packageStr.isEmpty() ? IdentifiersDeobfuscation.printIdentifier(true, className)
+                : packageStr.toPrintableString(true) + "." + IdentifiersDeobfuscation.printIdentifier(true, className);
     }
 
     @Override

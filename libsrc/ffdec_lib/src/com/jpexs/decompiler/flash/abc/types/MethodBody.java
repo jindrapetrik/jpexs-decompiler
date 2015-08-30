@@ -235,11 +235,12 @@ public final class MethodBody implements Cloneable {
     }
 
     public int getLocalReservedCount() {
-        int pos = abc.method_info.get(this.method_info).param_types.length + 1;
-        if (abc.method_info.get(this.method_info).flagNeed_arguments()) {
+        MethodInfo methodInfo = abc.method_info.get(this.method_info);
+        int pos = methodInfo.param_types.length + 1;
+        if (methodInfo.flagNeed_arguments()) {
             pos++;
         }
-        if (abc.method_info.get(this.method_info).flagNeed_rest()) {
+        if (methodInfo.flagNeed_rest()) {
             pos++;
         }
         return pos;

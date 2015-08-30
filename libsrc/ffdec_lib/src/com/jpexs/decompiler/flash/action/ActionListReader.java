@@ -171,7 +171,7 @@ public class ActionListReader {
 
         if (deobfuscationMode == 0) {
             try {
-                actions = deobfuscateActionList(listeners, actions, version, 0, path);
+                actions = deobfuscateActionListOld(listeners, actions, version, 0, path);
                 updateActionLengths(actions, version);
             } catch (OutOfMemoryError | StackOverflowError | TranslateException ex) {
                 // keep orignal (not deobfuscated) actions
@@ -259,7 +259,7 @@ public class ActionListReader {
      * @throws IOException
      * @throws java.lang.InterruptedException
      */
-    private static ActionList deobfuscateActionList(List<DisassemblyListener> listeners, ActionList actions, int version, int ip, String path) throws IOException, InterruptedException {
+    private static ActionList deobfuscateActionListOld(List<DisassemblyListener> listeners, ActionList actions, int version, int ip, String path) throws IOException, InterruptedException {
         if (actions.isEmpty()) {
             return actions;
         }
@@ -292,7 +292,7 @@ public class ActionListReader {
             }
         }
 
-        deobfustaceActionListAtPosRecursive(listeners,
+        deobfustaceActionListAtPosRecursiveOld(listeners,
                 new ArrayList<>(),
                 new HashMap<>(),
                 new ActionLocalData(),
@@ -875,7 +875,7 @@ public class ActionListReader {
         }
     }
 
-    private static void deobfustaceActionListAtPosRecursive(List<DisassemblyListener> listeners, List<GraphTargetItem> output, HashMap<Long, List<GraphSourceItemContainer>> containers, ActionLocalData localData, TranslateStack stack, ConstantPool cpool, List<Action> actions, int ip, List<Action> ret, int startIp, int endip, String path, Map<Integer, Integer> visited, boolean indeterminate, Map<Integer, HashMap<String, GraphTargetItem>> decisionStates, int version, int recursionLevel, int maxRecursionLevel) throws IOException, InterruptedException {
+    private static void deobfustaceActionListAtPosRecursiveOld(List<DisassemblyListener> listeners, List<GraphTargetItem> output, HashMap<Long, List<GraphSourceItemContainer>> containers, ActionLocalData localData, TranslateStack stack, ConstantPool cpool, List<Action> actions, int ip, List<Action> ret, int startIp, int endip, String path, Map<Integer, Integer> visited, boolean indeterminate, Map<Integer, HashMap<String, GraphTargetItem>> decisionStates, int version, int recursionLevel, int maxRecursionLevel) throws IOException, InterruptedException {
         boolean debugMode = false;
         boolean decideBranch = false;
 
@@ -1040,7 +1040,7 @@ public class ActionListReader {
                         } else {
                             localData2 = localData;
                         }
-                        deobfustaceActionListAtPosRecursive(listeners, output2, containers, localData2, new TranslateStack(path), cpool, actions, (int) endAddr, ret, startIp, (int) (endAddr + size), path + (cntName == null ? "" : "/" + cntName), visited, indeterminate, decisionStates, version, recursionLevel + 1, maxRecursionLevel);
+                        deobfustaceActionListAtPosRecursiveOld(listeners, output2, containers, localData2, new TranslateStack(path), cpool, actions, (int) endAddr, ret, startIp, (int) (endAddr + size), path + (cntName == null ? "" : "/" + cntName), visited, indeterminate, decisionStates, version, recursionLevel + 1, maxRecursionLevel);
                         output2s.add(output2);
                         endAddr += size;
                     }
@@ -1101,7 +1101,7 @@ public class ActionListReader {
                 TranslateStack subStack = (TranslateStack) stack.clone();
                 ActionLocalData subLocalData = new ActionLocalData(new HashMap<>(localData.regNames),
                         new HashMap<>(localData.variables), new HashMap<>(localData.functions));
-                deobfustaceActionListAtPosRecursive(listeners, output, containers, subLocalData, subStack, cpool, actions, ip + actionLen + aif.getJumpOffset(), ret, startIp, endip, path, visited, indeterminate, decisionStates, version, recursionLevel + 1, maxRecursionLevel);
+                deobfustaceActionListAtPosRecursiveOld(listeners, output, containers, subLocalData, subStack, cpool, actions, ip + actionLen + aif.getJumpOffset(), ret, startIp, endip, path, visited, indeterminate, decisionStates, version, recursionLevel + 1, maxRecursionLevel);
             }
 
             if (newip > -1) {

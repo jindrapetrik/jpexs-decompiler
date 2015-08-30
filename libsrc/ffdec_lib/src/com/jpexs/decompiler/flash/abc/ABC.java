@@ -578,6 +578,8 @@ public class ABC {
             SWFDecompilerPlugin.fireMethodBodyParsed(mb, swf);
         }
 
+        createBodyIdxFromMethodIdxMap();
+
         /*for(int i=0;i<script_count;i++){
          MethodBody bod=bodies.get(bodyIdxFromMethodIdx.get(script_info.get(i).init_index));
          GraphTextWriter t=new HighlightedTextWriter(Configuration.getCodeFormatting(),false);
@@ -843,17 +845,20 @@ public class ABC {
         return deobfuscation;
     }
 
-    private Map<Integer, Integer> getBodyIdxFromMethodIdx() {
-        if (bodyIdxFromMethodIdx == null) {
-            Map<Integer, Integer> map = new HashMap<>(bodies.size());
-            for (int i = 0; i < bodies.size(); i++) {
-                MethodBody mb = bodies.get(i);
-                map.put(mb.method_info, i);
-            }
-
-            bodyIdxFromMethodIdx = map;
+    public final void createBodyIdxFromMethodIdxMap() {
+        Map<Integer, Integer> map = new HashMap<>(bodies.size());
+        for (int i = 0; i < bodies.size(); i++) {
+            MethodBody mb = bodies.get(i);
+            map.put(mb.method_info, i);
         }
 
+        bodyIdxFromMethodIdx = map;
+    }
+
+    private Map<Integer, Integer> getBodyIdxFromMethodIdx() {
+        if (bodyIdxFromMethodIdx == null) {
+            createBodyIdxFromMethodIdxMap();
+        }
         return bodyIdxFromMethodIdx;
     }
 
@@ -1305,5 +1310,7 @@ public class ABC {
                 m--;
             }
         }
+
+        createBodyIdxFromMethodIdxMap();
     }
 }

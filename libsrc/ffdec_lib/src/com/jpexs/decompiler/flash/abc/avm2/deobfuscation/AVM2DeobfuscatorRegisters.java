@@ -180,132 +180,129 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
         while (!toVisit.isEmpty()) {
             idx = toVisit.remove(0);
             stack = toVisitStacks.remove(0);
-            try {
-                while (true) {
-                    if (idx > endIdx) {
-                        break;
-                    }
-                    if (visited.contains(idx)) {
-                        break;
-                    }
-                    visited.add(idx);
 
-                    AVM2Instruction ins = code.code.get(idx);
-                    InstructionDefinition def = ins.definition;
+            while (true) {
+                if (idx > endIdx) {
+                    break;
+                }
+                if (visited.contains(idx)) {
+                    break;
+                }
+                visited.add(idx);
+
+                AVM2Instruction ins = code.code.get(idx);
+                InstructionDefinition def = ins.definition;
                     //System.err.println("" + idx + ": " + ins + " stack:" + stack.size());
 
-                    // do not throw EmptyStackException, much faster
-                    int requiredStackSize = ins.getStackPopCount(localData);
-                    if (stack.size() < requiredStackSize) {
-                        continue outer;
+                // do not throw EmptyStackException, much faster
+                int requiredStackSize = ins.getStackPopCount(localData);
+                if (stack.size() < requiredStackSize) {
+                    continue outer;
+                }
+
+                ins.translate(localData, stack, output, Graph.SOP_USE_STATIC, "");
+
+                //if (!(def instanceof KillIns))
+                if (def instanceof SetLocalTypeIns) {
+                    int regId = ((SetLocalTypeIns) def).getRegisterId(ins);
+                    if (!ignored.contains(regId)) {
+                        assignment.setVal(ins);
+                        return regId;
                     }
-
-                    ins.translate(localData, stack, output, Graph.SOP_USE_STATIC, "");
-
-                    //if (!(def instanceof KillIns))
-                    if (def instanceof SetLocalTypeIns) {
-                        int regId = ((SetLocalTypeIns) def).getRegisterId(ins);
-                        if (!ignored.contains(regId)) {
-                            assignment.setVal(ins);
-                            return regId;
+                } else if (def instanceof GetLocalTypeIns) {
+                    int regId = ((GetLocalTypeIns) def).getRegisterId(ins);
+                    if (!ignored.contains(regId) && !ignoredGets.contains(regId)) {
+                        assignment.setVal(ins);
+                        return regId;
+                    }
+                } else {
+                    for (int p = 0; p < ins.definition.operands.length; p++) {
+                        int op = ins.definition.operands[p];
+                        if (op == AVM2Code.DAT_REGISTER_INDEX) {
+                            int regId = ins.operands[p];
+                            if (!ignored.contains(regId)) {
+                                assignment.setVal(ins);
+                                return regId;
+                            }
                         }
-                    } else if (def instanceof GetLocalTypeIns) {
-                        int regId = ((GetLocalTypeIns) def).getRegisterId(ins);
-                        if (!ignored.contains(regId) && !ignoredGets.contains(regId)) {
-                            assignment.setVal(ins);
-                            return regId;
-                        }
-                    } else {
-                        for (int p = 0; p < ins.definition.operands.length; p++) {
-                            int op = ins.definition.operands[p];
-                            if (op == AVM2Code.DAT_REGISTER_INDEX) {
-                                int regId = ins.operands[p];
-                                if (!ignored.contains(regId)) {
-                                    assignment.setVal(ins);
-                                    return regId;
-                                }
-                            }
-                        }
-                    }
-
-                    idx++;
-
-                    if (ins.definition instanceof JumpIns) {
-
-                        long address = ins.offset + ins.getBytesLength() + ins.operands[0];
-                        idx = code.adr2pos(address);//code.indexOf(code.getByAddress(address));
-                        if (idx == -1) {
-                            throw new TranslateException("Jump target not found: " + address);
-                        }
-                    }
-
-                    if (ins.isBranch()) {
-                        List<Integer> branches = ins.getBranches(new GraphSource() {
-
-                            @Override
-                            public int size() {
-                                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                            }
-
-                            @Override
-                            public GraphSourceItem get(int pos) {
-                                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                            }
-
-                            @Override
-                            public boolean isEmpty() {
-                                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                            }
-
-                            @Override
-                            public List<GraphTargetItem> translatePart(GraphPart part, BaseLocalData localData, TranslateStack stack, int start, int end, int staticOperation, String path) throws InterruptedException {
-                                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                            }
-
-                            @Override
-                            public int adr2pos(long adr) {
-                                return code.adr2pos(adr);
-                            }
-
-                            @Override
-                            public long pos2adr(int pos) {
-                                return code.pos2adr(pos);
-                            }
-                        });
-                        idx = branches.get(0);
-                        for (int n = 1; n < branches.size(); n++) {
-                            //visitCode(visited, (TranslateStack) stack.clone(), classIndex, isStatic, body, scriptIndex, abc, code, branches.get(n), endIdx, result);
-                            int nidx = branches.get(n);
-                            if (visited.contains(nidx)) {
-                                continue;
-                            }
-                            toVisit.add(nidx);
-                            toVisitStacks.add((TranslateStack) stack.clone());
-                        }
-                    }
-                    /*if (ins.definition instanceof IfTypeIns) {
-                     long address = ins.offset + ins.getBytes().length + ins.operands[0];
-                     int newIdx = code.adr2pos(address);
-                     if (newIdx == -1) {
-                     throw new TranslateException("If target not found: " + address);
-                     }
-                     visitCode(visited, (TranslateStack) stack.clone(), classIndex, isStatic, body, scriptIndex, abc, code, newIdx, endIdx, result);
-                     }*/
-
-                    if (ins.definition instanceof ReturnValueIns) {
-                        break;
-                    }
-
-                    if (ins.definition instanceof ThrowIns) {
-                        break;
-                    }
-
-                    if (ins.definition instanceof ReturnVoidIns) {
-                        break;
                     }
                 }
-            } catch (ThreadDeath | InterruptedException ex) {
-                throw ex;
+
+                idx++;
+
+                if (ins.definition instanceof JumpIns) {
+
+                    long address = ins.offset + ins.getBytesLength() + ins.operands[0];
+                    idx = code.adr2pos(address);//code.indexOf(code.getByAddress(address));
+                    if (idx == -1) {
+                        throw new TranslateException("Jump target not found: " + address);
+                    }
+                }
+
+                if (ins.isBranch()) {
+                    List<Integer> branches = ins.getBranches(new GraphSource() {
+
+                        @Override
+                        public int size() {
+                            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                        }
+
+                        @Override
+                        public GraphSourceItem get(int pos) {
+                            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                        }
+
+                        @Override
+                        public boolean isEmpty() {
+                            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                        }
+
+                        @Override
+                        public List<GraphTargetItem> translatePart(GraphPart part, BaseLocalData localData, TranslateStack stack, int start, int end, int staticOperation, String path) throws InterruptedException {
+                            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                        }
+
+                        @Override
+                        public int adr2pos(long adr) {
+                            return code.adr2pos(adr);
+                        }
+
+                        @Override
+                        public long pos2adr(int pos) {
+                            return code.pos2adr(pos);
+                        }
+                    });
+                    idx = branches.get(0);
+                    for (int n = 1; n < branches.size(); n++) {
+                        //visitCode(visited, (TranslateStack) stack.clone(), classIndex, isStatic, body, scriptIndex, abc, code, branches.get(n), endIdx, result);
+                        int nidx = branches.get(n);
+                        if (visited.contains(nidx)) {
+                            continue;
+                        }
+                        toVisit.add(nidx);
+                        toVisitStacks.add((TranslateStack) stack.clone());
+                    }
+                }
+                /*if (ins.definition instanceof IfTypeIns) {
+                 long address = ins.offset + ins.getBytes().length + ins.operands[0];
+                 int newIdx = code.adr2pos(address);
+                 if (newIdx == -1) {
+                 throw new TranslateException("If target not found: " + address);
+                 }
+                 visitCode(visited, (TranslateStack) stack.clone(), classIndex, isStatic, body, scriptIndex, abc, code, newIdx, endIdx, result);
+                 }*/
+
+                if (ins.definition instanceof ReturnValueIns) {
+                    break;
+                }
+
+                if (ins.definition instanceof ThrowIns) {
+                    break;
+                }
+
+                if (ins.definition instanceof ReturnVoidIns) {
+                    break;
+                }
             }
         }
         return -1;
