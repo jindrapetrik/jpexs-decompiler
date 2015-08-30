@@ -36,7 +36,6 @@ import com.jpexs.decompiler.flash.action.model.SetPropertyActionItem;
 import com.jpexs.decompiler.flash.action.model.SetVariableActionItem;
 import com.jpexs.decompiler.flash.action.model.StoreRegisterActionItem;
 import com.jpexs.decompiler.flash.action.model.TemporaryRegister;
-import com.jpexs.decompiler.flash.action.model.UnsupportedActionItem;
 import com.jpexs.decompiler.flash.action.model.clauses.ClassActionItem;
 import com.jpexs.decompiler.flash.action.model.clauses.InterfaceActionItem;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
@@ -83,7 +82,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -1132,13 +1130,7 @@ public abstract class Action implements GraphSourceItem {
                     ip = ip + 1 + store.getStoreSize() - 1/*ip++ will be next*/;
                 }
 
-                try {
-                    action.translate(localData, stack, output, staticOperation, path);
-                } catch (EmptyStackException ese) {
-                    logger.log(Level.SEVERE, "Decompilation error in: " + path, ese);
-                    output.add(new UnsupportedActionItem(action, "Empty stack"));
-                }
-
+                action.translate(localData, stack, output, staticOperation, path);
             }
 
             ip++;

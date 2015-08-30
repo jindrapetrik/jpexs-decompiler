@@ -94,6 +94,10 @@ import java.util.Map;
  */
 public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
 
+    private static final UndefinedAVM2Item UNDEFINED_ITEM = new UndefinedAVM2Item(null);
+
+    private static final NotCompileTimeItem NOT_COMPILE_TIME_UNDEFINED_ITEM = new NotCompileTimeItem(null, UNDEFINED_ITEM);
+
     private final int executionLimit = 30000;
 
     @Override
@@ -169,13 +173,22 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
                 staticRegs.put(((GetLocalTypeIns) ins.definition).getRegisterId(ins), new UndefinedAVM2Item(ins));
             }
         }
+
+        AVM2LocalData localData = newLocalData(scriptIndex, abc, abc.constants, body, isStatic, classIndex);
+        int localReservedCount = body.getLocalReservedCount();
         for (int i = 0; i < code.code.size(); i++) {
             if (Thread.currentThread().isInterrupted()) {
                 throw new InterruptedException();
             }
 
+            if (i > 0) {
+                localData.scopeStack.clear();
+                localData.localRegs.clear();
+                initLocalRegs(localData, localReservedCount, body.max_regs);
+            }
+
             ExecutionResult result = new ExecutionResult();
-            executeInstructions(staticRegs, classIndex, isStatic, body, scriptIndex, abc, code, i, code.code.size() - 1, result, inlineIns);
+            executeInstructions(staticRegs, classIndex, isStatic, body, scriptIndex, abc, code, localData, i, code.code.size() - 1, result, inlineIns);
         }
 
         return false;
@@ -204,13 +217,9 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
         AVM2LocalData localData = new AVM2LocalData();
         localData.isStatic = isStatic;
         localData.classIndex = classIndex;
-        localData.localRegs = new HashMap<>();
-        for (int i = 0; i < body.getLocalReservedCount(); i++) {
-            localData.localRegs.put(i, new NotCompileTimeItem(null, new UndefinedAVM2Item(null)));
-        }
-        for (int i = body.getLocalReservedCount(); i < body.max_regs; i++) {
-            localData.localRegs.put(i, new UndefinedAVM2Item(null));
-        }
+        localData.localRegs = new HashMap<>(body.max_regs);
+        int localReservedCount = body.getLocalReservedCount();
+        initLocalRegs(localData, localReservedCount, body.max_regs);
         localData.scopeStack = new ScopeStack(true);
         localData.constants = cpool;
         localData.methodInfo = abc.method_info;
@@ -230,9 +239,17 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
         return localData;
     }
 
-    private void executeInstructions(Map<Integer, GraphTargetItem> staticRegs, int classIndex, boolean isStatic, MethodBody body, int scriptIndex, ABC abc, AVM2Code code, int idx, int endIdx, ExecutionResult result, List<AVM2Instruction> inlineIns) throws InterruptedException {
+    protected void initLocalRegs(AVM2LocalData localData, int localReservedCount, int maxRegs) {
+        for (int i = 0; i < localReservedCount; i++) {
+            localData.localRegs.put(i, NOT_COMPILE_TIME_UNDEFINED_ITEM);
+        }
+        for (int i = localReservedCount; i < maxRegs; i++) {
+            localData.localRegs.put(i, UNDEFINED_ITEM);
+        }
+    }
+
+    private void executeInstructions(Map<Integer, GraphTargetItem> staticRegs, int classIndex, boolean isStatic, MethodBody body, int scriptIndex, ABC abc, AVM2Code code, AVM2LocalData localData, int idx, int endIdx, ExecutionResult result, List<AVM2Instruction> inlineIns) throws InterruptedException {
         List<GraphTargetItem> output = new ArrayList<>();
-        AVM2LocalData localData = newLocalData(scriptIndex, abc, abc.constants, body, isStatic, classIndex);
 
         FixItemCounterTranslateStack stack = new FixItemCounterTranslateStack("");
         int instructionsProcessed = 0;
@@ -287,53 +304,47 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
                     }
                 }
 
-                Class allowedDefs[] = new Class[]{
-                    PushByteIns.class,
-                    PushShortIns.class,
-                    PushIntIns.class,
-                    PushDoubleIns.class,
-                    PushStringIns.class,
-                    PushNullIns.class,
-                    PushUndefinedIns.class,
-                    PushFalseIns.class,
-                    PushTrueIns.class,
-                    DupIns.class,
-                    SwapIns.class,
-                    AddIns.class,
-                    AddIIns.class,
-                    SubtractIns.class,
-                    SubtractIIns.class,
-                    ModuloIns.class,
-                    MultiplyIns.class,
-                    BitAndIns.class,
-                    BitXorIns.class,
-                    BitOrIns.class,
-                    LShiftIns.class,
-                    RShiftIns.class,
-                    URShiftIns.class,
-                    EqualsIns.class,
-                    NotIns.class,
-                    IfTypeIns.class,
-                    JumpIns.class,
-                    EqualsIns.class,
-                    LessEqualsIns.class,
-                    GreaterEqualsIns.class,
-                    GreaterThanIns.class,
-                    LessThanIns.class,
-                    StrictEqualsIns.class,
-                    PopIns.class,
-                    GetLocalTypeIns.class,
-                    NewFunctionIns.class,
-                    CoerceOrConvertTypeIns.class
-                };
-
                 boolean ok = false;
-                for (Class<?> s : allowedDefs) {
-                    if (s.isAssignableFrom(def.getClass())) {
-                        ok = true;
-                        break;
-                    }
+                if (def instanceof PushByteIns
+                        || def instanceof PushShortIns
+                        || def instanceof PushIntIns
+                        || def instanceof PushDoubleIns
+                        || def instanceof PushStringIns
+                        || def instanceof PushNullIns
+                        || def instanceof PushUndefinedIns
+                        || def instanceof PushFalseIns
+                        || def instanceof PushTrueIns
+                        || def instanceof DupIns
+                        || def instanceof SwapIns
+                        || def instanceof AddIns
+                        || def instanceof AddIIns
+                        || def instanceof SubtractIns
+                        || def instanceof SubtractIIns
+                        || def instanceof ModuloIns
+                        || def instanceof MultiplyIns
+                        || def instanceof BitAndIns
+                        || def instanceof BitXorIns
+                        || def instanceof BitOrIns
+                        || def instanceof LShiftIns
+                        || def instanceof RShiftIns
+                        || def instanceof URShiftIns
+                        || def instanceof EqualsIns
+                        || def instanceof NotIns
+                        || def instanceof IfTypeIns
+                        || def instanceof JumpIns
+                        || def instanceof EqualsIns
+                        || def instanceof LessEqualsIns
+                        || def instanceof GreaterEqualsIns
+                        || def instanceof GreaterThanIns
+                        || def instanceof LessThanIns
+                        || def instanceof StrictEqualsIns
+                        || def instanceof PopIns
+                        || def instanceof GetLocalTypeIns
+                        || def instanceof NewFunctionIns
+                        || def instanceof CoerceOrConvertTypeIns) {
+                    ok = true;
                 }
+
                 if (!ok) {
                     break;
                 }
@@ -406,8 +417,6 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
             }
         } catch (InterruptedException ex) {
             throw ex;
-        } catch (Exception ex) {
-            //ignore
         }
     }
 

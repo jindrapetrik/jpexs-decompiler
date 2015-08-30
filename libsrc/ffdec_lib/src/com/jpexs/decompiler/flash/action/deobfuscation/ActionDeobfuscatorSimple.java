@@ -52,7 +52,6 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateException;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.ArrayList;
-import java.util.EmptyStackException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -274,102 +273,99 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
         FixItemCounterTranslateStack stack = new FixItemCounterTranslateStack("");
         int instructionsProcessed = 0;
 
-        try {
-            while (true) {
-                if (idx > endIdx) {
-                    break;
-                }
+        while (true) {
+            if (idx > endIdx) {
+                break;
+            }
 
-                if (instructionsProcessed > executionLimit) {
-                    break;
-                }
+            if (instructionsProcessed > executionLimit) {
+                break;
+            }
 
-                Action action = actions.get(idx);
+            Action action = actions.get(idx);
 
-                /*System.out.print(action.getASMSource(actions, new ArrayList<Long>(), ScriptExportMode.PCODE));
-                 for (int j = 0; j < stack.size(); j++) {
-                 System.out.print(" '" + stack.get(j).getResult() + "'");
-                 }
-                 System.out.println();*/
-                // do not throw EmptyStackException, much faster
-                int requiredStackSize = action.getStackPopCount(localData, stack);
-                if (stack.size() < requiredStackSize) {
-                    return;
-                }
+            /*System.out.print(action.getASMSource(actions, new ArrayList<Long>(), ScriptExportMode.PCODE));
+             for (int j = 0; j < stack.size(); j++) {
+             System.out.print(" '" + stack.get(j).getResult() + "'");
+             }
+             System.out.println();*/
+            // do not throw EmptyStackException, much faster
+            int requiredStackSize = action.getStackPopCount(localData, stack);
+            if (stack.size() < requiredStackSize) {
+                return;
+            }
 
-                action.translate(localData, stack, output, Graph.SOP_USE_STATIC, "");
+            action.translate(localData, stack, output, Graph.SOP_USE_STATIC, "");
 
-                if (!(action instanceof ActionPush
-                        || action instanceof ActionPushDuplicate
-                        || action instanceof ActionCharToAscii
-                        || action instanceof ActionAdd
-                        || action instanceof ActionAdd2
-                        || action instanceof ActionSubtract
-                        || action instanceof ActionModulo
-                        || action instanceof ActionMultiply
-                        || action instanceof ActionBitXor
-                        || action instanceof ActionBitAnd
-                        || action instanceof ActionBitOr
-                        || action instanceof ActionBitLShift
-                        || action instanceof ActionBitRShift
-                        || action instanceof ActionEquals
-                        || action instanceof ActionNot
-                        || action instanceof ActionIf
-                        || action instanceof ActionJump)) {
-                    break;
-                }
+            if (!(action instanceof ActionPush
+                    || action instanceof ActionPushDuplicate
+                    || action instanceof ActionCharToAscii
+                    || action instanceof ActionAdd
+                    || action instanceof ActionAdd2
+                    || action instanceof ActionSubtract
+                    || action instanceof ActionModulo
+                    || action instanceof ActionMultiply
+                    || action instanceof ActionBitXor
+                    || action instanceof ActionBitAnd
+                    || action instanceof ActionBitOr
+                    || action instanceof ActionBitLShift
+                    || action instanceof ActionBitRShift
+                    || action instanceof ActionEquals
+                    || action instanceof ActionNot
+                    || action instanceof ActionIf
+                    || action instanceof ActionJump)) {
+                break;
+            }
 
-                if (action instanceof ActionPush) {
-                    ActionPush push = (ActionPush) action;
-                    boolean ok = true;
-                    instructionsProcessed += push.values.size() - 1;
-                    for (Object value : push.values) {
-                        if (value instanceof ConstantIndex || value instanceof RegisterNumber) {
-                            ok = false;
-                            break;
-                        }
-                    }
-                    if (!ok) {
+            if (action instanceof ActionPush) {
+                ActionPush push = (ActionPush) action;
+                boolean ok = true;
+                instructionsProcessed += push.values.size() - 1;
+                for (Object value : push.values) {
+                    if (value instanceof ConstantIndex || value instanceof RegisterNumber) {
+                        ok = false;
                         break;
                     }
                 }
-
-                idx++;
-
-                if (action instanceof ActionJump) {
-                    ActionJump jump = (ActionJump) action;
-                    long address = jump.getAddress() + jump.getTotalActionLength() + jump.getJumpOffset();
-                    idx = actions.indexOf(actions.getByAddress(address));
-                    if (idx == -1) {
-                        throw new TranslateException("Jump target not found: " + address);
-                    }
-                }
-
-                if (action instanceof ActionIf) {
-                    ActionIf aif = (ActionIf) action;
-                    if (stack.isEmpty()) {
-                        return;
-                    }
-
-                    if (EcmaScript.toBoolean(stack.pop().getResult())) {
-                        long address = aif.getAddress() + aif.getTotalActionLength() + aif.getJumpOffset();
-                        idx = actions.indexOf(actions.getByAddress(address));
-                        if (idx == -1) {
-                            throw new TranslateException("If target not found: " + address);
-                        }
-                    }
-                }
-
-                instructionsProcessed++;
-
-                if (stack.allItemsFixed()) {
-                    result.idx = idx == actions.size() ? idx - 1 : idx;
-                    result.instructionsProcessed = instructionsProcessed;
-                    result.stack.clear();
-                    result.stack.addAll(stack);
+                if (!ok) {
+                    break;
                 }
             }
-        } catch (EmptyStackException | TranslateException ex) {
+
+            idx++;
+
+            if (action instanceof ActionJump) {
+                ActionJump jump = (ActionJump) action;
+                long address = jump.getAddress() + jump.getTotalActionLength() + jump.getJumpOffset();
+                idx = actions.indexOf(actions.getByAddress(address));
+                if (idx == -1) {
+                    throw new TranslateException("Jump target not found: " + address);
+                }
+            }
+
+            if (action instanceof ActionIf) {
+                ActionIf aif = (ActionIf) action;
+                if (stack.isEmpty()) {
+                    return;
+                }
+
+                if (EcmaScript.toBoolean(stack.pop().getResult())) {
+                    long address = aif.getAddress() + aif.getTotalActionLength() + aif.getJumpOffset();
+                    idx = actions.indexOf(actions.getByAddress(address));
+                    if (idx == -1) {
+                        throw new TranslateException("If target not found: " + address);
+                    }
+                }
+            }
+
+            instructionsProcessed++;
+
+            if (stack.allItemsFixed()) {
+                result.idx = idx == actions.size() ? idx - 1 : idx;
+                result.instructionsProcessed = instructionsProcessed;
+                result.stack.clear();
+                result.stack.addAll(stack);
+            }
         }
     }
 

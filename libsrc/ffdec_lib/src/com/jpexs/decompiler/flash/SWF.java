@@ -261,16 +261,16 @@ public final class SWF implements SWFContainerItem, Timelined {
     private String fileTitle;
 
     @Internal
-    private Map<Integer, CharacterTag> characters;
+    private volatile Map<Integer, CharacterTag> characters;
 
     @Internal
-    private Map<Integer, Set<Integer>> dependentCharacters;
+    private volatile Map<Integer, Set<Integer>> dependentCharacters;
 
     @Internal
-    private List<ABCContainerTag> abcList;
+    private volatile List<ABCContainerTag> abcList;
 
     @Internal
-    private JPEGTablesTag jtt;
+    private volatile JPEGTablesTag jtt;
 
     @Internal
     public Map<Integer, String> sourceFontNamesMap = new HashMap<>();
@@ -1762,11 +1762,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 r.add(new ArrayList<>());
                 r.add(new ArrayList<>());
                 r.add(new ArrayList<>());
-                try {
-                    ((GraphSourceItemContainer) ins).translateContainer(r, stack, output, new HashMap<>(), new HashMap<>(), new HashMap<>());
-                } catch (EmptyStackException ex) {
-                }
-
+                ((GraphSourceItemContainer) ins).translateContainer(r, stack, output, new HashMap<>(), new HashMap<>(), new HashMap<>());
                 continue;
             }
 
@@ -1800,12 +1796,13 @@ public final class SWF implements SWFContainerItem, Timelined {
             }
             int staticOperation = Graph.SOP_USE_STATIC; //(Boolean) Configuration.getConfig("autoDeobfuscate", true) ? Graph.SOP_SKIP_STATIC : Graph.SOP_USE_STATIC;
 
-            try {
-                ins.translate(localData, stack, output, staticOperation, path);
-            } catch (EmptyStackException ex) {
+            int requiredStackSize = ins.getStackPopCount(localData, stack);
+            if (stack.size() < requiredStackSize) {
                 // probably obfucated code, never executed branch
                 break;
             }
+
+            ins.translate(localData, stack, output, staticOperation, path);
             if (ins.isExit()) {
                 break;
             }
@@ -1848,7 +1845,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 break;
             }
             ip++;
-        };
+        }
     }
 
     private static void getVariables(List<MyEntry<DirectValueActionItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, HashMap<DirectValueActionItem, String> usageTypes, ActionGraphSource code, int addr, String path) throws InterruptedException {

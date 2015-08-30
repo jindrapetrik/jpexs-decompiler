@@ -65,7 +65,6 @@ import com.jpexs.decompiler.graph.TranslateException;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -234,177 +233,174 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
         int instructionsProcessed = 0;
         ActionConstantPool lastConstantPool = null;
 
-        try {
-            while (true) {
-                if (idx > endIdx) {
+        while (true) {
+            if (idx > endIdx) {
+                break;
+            }
+
+            Action action = actions.get(idx);
+            instructionsProcessed++;
+
+            if (instructionsProcessed > executionLimit) {
+                break;
+            }
+
+            /*System.out.print(action.getASMSource(actions, new ArrayList<Long>(), ScriptExportMode.PCODE));
+             for (int j = 0; j < stack.size(); j++) {
+             System.out.print(" '" + stack.get(j).getResult() + "'");
+             }
+             System.out.println();*/
+            if (action instanceof ActionConstantPool) {
+                lastConstantPool = (ActionConstantPool) action;
+            }
+
+            if (action instanceof ActionDefineLocal) {
+                if (stack.size() < 2) {
+                    return;
+                }
+
+                String variableName = stack.peek(2).getResult().toString();
+                result.defines.add(variableName);
+            }
+
+            if (action instanceof ActionGetVariable) {
+                if (stack.isEmpty()) {
+                    return;
+                }
+
+                String variableName = stack.peek().getResult().toString();
+                if (!localData.variables.containsKey(variableName)) {
                     break;
                 }
+            }
 
-                Action action = actions.get(idx);
-                instructionsProcessed++;
-
-                if (instructionsProcessed > executionLimit) {
-                    break;
+            if (action instanceof ActionCallFunction) {
+                if (stack.isEmpty()) {
+                    return;
                 }
 
-                /*System.out.print(action.getASMSource(actions, new ArrayList<Long>(), ScriptExportMode.PCODE));
-                 for (int j = 0; j < stack.size(); j++) {
-                 System.out.print(" '" + stack.get(j).getResult() + "'");
-                 }
-                 System.out.println();*/
-                if (action instanceof ActionConstantPool) {
-                    lastConstantPool = (ActionConstantPool) action;
-                }
-
-                if (action instanceof ActionDefineLocal) {
-                    if (stack.size() < 2) {
-                        return;
-                    }
-
-                    String variableName = stack.peek(2).getResult().toString();
-                    result.defines.add(variableName);
-                }
-
-                if (action instanceof ActionGetVariable) {
-                    if (stack.isEmpty()) {
-                        return;
-                    }
-
-                    String variableName = stack.peek().getResult().toString();
-                    if (!localData.variables.containsKey(variableName)) {
-                        break;
-                    }
-                }
-
-                if (action instanceof ActionCallFunction) {
-                    if (stack.isEmpty()) {
-                        return;
-                    }
-
-                    String functionName = stack.pop().getResult().toString();
-                    long numArgs = EcmaScript.toUint32(stack.pop().getResult());
-                    if (numArgs == 0) {
-                        if (fakeFunctions != null && fakeFunctions.containsKey(functionName)) {
-                            stack.push(new DirectValueActionItem(fakeFunctions.get(functionName)));
-                        } else {
-                            break;
-                        }
+                String functionName = stack.pop().getResult().toString();
+                long numArgs = EcmaScript.toUint32(stack.pop().getResult());
+                if (numArgs == 0) {
+                    if (fakeFunctions != null && fakeFunctions.containsKey(functionName)) {
+                        stack.push(new DirectValueActionItem(fakeFunctions.get(functionName)));
                     } else {
                         break;
                     }
                 } else {
-                    // do not throw EmptyStackException, much faster
-                    int requiredStackSize = action.getStackPopCount(localData, stack);
-                    if (stack.size() < requiredStackSize) {
-                        return;
-                    }
-
-                    action.translate(localData, stack, output, Graph.SOP_USE_STATIC, "");
-                }
-
-                if (!(action instanceof ActionPush
-                        || action instanceof ActionPushDuplicate
-                        || action instanceof ActionAdd
-                        || action instanceof ActionAdd2
-                        || action instanceof ActionIncrement
-                        || action instanceof ActionDecrement
-                        || action instanceof ActionSubtract
-                        || action instanceof ActionModulo
-                        || action instanceof ActionMultiply
-                        || action instanceof ActionBitXor
-                        || action instanceof ActionBitAnd
-                        || action instanceof ActionBitOr
-                        || action instanceof ActionBitLShift
-                        || action instanceof ActionBitRShift
-                        || action instanceof ActionDefineLocal
-                        || action instanceof ActionJump
-                        || action instanceof ActionGetVariable
-                        || action instanceof ActionSetVariable
-                        || action instanceof ActionEquals
-                        || action instanceof ActionEquals2
-                        || action instanceof ActionLess
-                        || action instanceof ActionLess2
-                        || action instanceof ActionGreater
-                        || action instanceof ActionNot
-                        || action instanceof ActionIf
-                        || action instanceof ActionConstantPool
-                        || action instanceof ActionCallFunction
-                        || action instanceof ActionReturn
-                        || action instanceof ActionEnd)) {
                     break;
                 }
+            } else {
+                // do not throw EmptyStackException, much faster
+                int requiredStackSize = action.getStackPopCount(localData, stack);
+                if (stack.size() < requiredStackSize) {
+                    return;
+                }
 
-                if (action instanceof ActionPush) {
-                    ActionPush push = (ActionPush) action;
-                    boolean ok = true;
-                    for (Object value : push.values) {
-                        if ((constantPool == null && value instanceof ConstantIndex) || value instanceof RegisterNumber) {
-                            ok = false;
-                            break;
-                        }
-                    }
-                    if (!ok) {
+                action.translate(localData, stack, output, Graph.SOP_USE_STATIC, "");
+            }
+
+            if (!(action instanceof ActionPush
+                    || action instanceof ActionPushDuplicate
+                    || action instanceof ActionAdd
+                    || action instanceof ActionAdd2
+                    || action instanceof ActionIncrement
+                    || action instanceof ActionDecrement
+                    || action instanceof ActionSubtract
+                    || action instanceof ActionModulo
+                    || action instanceof ActionMultiply
+                    || action instanceof ActionBitXor
+                    || action instanceof ActionBitAnd
+                    || action instanceof ActionBitOr
+                    || action instanceof ActionBitLShift
+                    || action instanceof ActionBitRShift
+                    || action instanceof ActionDefineLocal
+                    || action instanceof ActionJump
+                    || action instanceof ActionGetVariable
+                    || action instanceof ActionSetVariable
+                    || action instanceof ActionEquals
+                    || action instanceof ActionEquals2
+                    || action instanceof ActionLess
+                    || action instanceof ActionLess2
+                    || action instanceof ActionGreater
+                    || action instanceof ActionNot
+                    || action instanceof ActionIf
+                    || action instanceof ActionConstantPool
+                    || action instanceof ActionCallFunction
+                    || action instanceof ActionReturn
+                    || action instanceof ActionEnd)) {
+                break;
+            }
+
+            if (action instanceof ActionPush) {
+                ActionPush push = (ActionPush) action;
+                boolean ok = true;
+                for (Object value : push.values) {
+                    if ((constantPool == null && value instanceof ConstantIndex) || value instanceof RegisterNumber) {
+                        ok = false;
                         break;
                     }
                 }
-
-                /*for (String variable : localData.variables.keySet()) {
-                 System.out.println(Helper.byteArrToString(variable.getBytes()));
-                 }*/
-                idx++;
-
-                if (action instanceof ActionJump) {
-                    ActionJump jump = (ActionJump) action;
-                    long address = jump.getAddress() + jump.getTotalActionLength() + jump.getJumpOffset();
-                    idx = actions.indexOf(actions.getByAddress(address));
-                    if (idx == -1) {
-                        throw new TranslateException("Jump target not found: " + address);
-                    }
-                }
-
-                if (action instanceof ActionIf) {
-                    ActionIf aif = (ActionIf) action;
-                    if (stack.isEmpty()) {
-                        return;
-                    }
-
-                    if (EcmaScript.toBoolean(stack.pop().getResult())) {
-                        long address = aif.getAddress() + aif.getTotalActionLength() + aif.getJumpOffset();
-                        idx = actions.indexOf(actions.getByAddress(address));
-                        if (idx == -1) {
-                            throw new TranslateException("If target not found: " + address);
-                        }
-                    }
-                }
-
-                if (action instanceof ActionDefineFunction) {
-                    List<Action> lastActions = actions.getContainerLastActions(action);
-                    int lastActionIdx = actions.indexOf(lastActions.get(0));
-                    idx = lastActionIdx != -1 ? lastActionIdx + 1 : -1;
-                }
-
-                if (/*localData.variables.size() == 1 && */stack.allItemsFixed() || action instanceof ActionEnd) {
-                    result.idx = idx == actions.size() ? idx - 1 : idx;
-                    result.instructionsProcessed = instructionsProcessed;
-                    result.constantPool = lastConstantPool;
-                    result.variables.clear();
-                    for (String variableName : localData.variables.keySet()) {
-                        Object value = localData.variables.get(variableName).getResult();
-                        result.variables.put(variableName, value);
-                    }
-                    result.stack.clear();
-                    result.stack.addAll(stack);
-                }
-
-                if (action instanceof ActionReturn) {
-                    if (output.size() > 0) {
-                        ReturnActionItem ret = (ReturnActionItem) output.get(output.size() - 1);
-                        result.resultValue = ret.value.getResult();
-                    }
+                if (!ok) {
                     break;
                 }
             }
-        } catch (EmptyStackException | TranslateException ex) {
+
+            /*for (String variable : localData.variables.keySet()) {
+             System.out.println(Helper.byteArrToString(variable.getBytes()));
+             }*/
+            idx++;
+
+            if (action instanceof ActionJump) {
+                ActionJump jump = (ActionJump) action;
+                long address = jump.getAddress() + jump.getTotalActionLength() + jump.getJumpOffset();
+                idx = actions.indexOf(actions.getByAddress(address));
+                if (idx == -1) {
+                    throw new TranslateException("Jump target not found: " + address);
+                }
+            }
+
+            if (action instanceof ActionIf) {
+                ActionIf aif = (ActionIf) action;
+                if (stack.isEmpty()) {
+                    return;
+                }
+
+                if (EcmaScript.toBoolean(stack.pop().getResult())) {
+                    long address = aif.getAddress() + aif.getTotalActionLength() + aif.getJumpOffset();
+                    idx = actions.indexOf(actions.getByAddress(address));
+                    if (idx == -1) {
+                        throw new TranslateException("If target not found: " + address);
+                    }
+                }
+            }
+
+            if (action instanceof ActionDefineFunction) {
+                List<Action> lastActions = actions.getContainerLastActions(action);
+                int lastActionIdx = actions.indexOf(lastActions.get(0));
+                idx = lastActionIdx != -1 ? lastActionIdx + 1 : -1;
+            }
+
+            if (/*localData.variables.size() == 1 && */stack.allItemsFixed() || action instanceof ActionEnd) {
+                result.idx = idx == actions.size() ? idx - 1 : idx;
+                result.instructionsProcessed = instructionsProcessed;
+                result.constantPool = lastConstantPool;
+                result.variables.clear();
+                for (String variableName : localData.variables.keySet()) {
+                    Object value = localData.variables.get(variableName).getResult();
+                    result.variables.put(variableName, value);
+                }
+                result.stack.clear();
+                result.stack.addAll(stack);
+            }
+
+            if (action instanceof ActionReturn) {
+                if (output.size() > 0) {
+                    ReturnActionItem ret = (ReturnActionItem) output.get(output.size() - 1);
+                    result.resultValue = ret.value.getResult();
+                }
+                break;
+            }
         }
     }
 

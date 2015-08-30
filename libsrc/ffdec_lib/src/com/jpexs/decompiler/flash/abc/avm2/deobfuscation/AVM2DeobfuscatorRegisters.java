@@ -77,7 +77,8 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
         MethodBody body = abody.clone();
         Reference<AVM2Instruction> assignment = new Reference<>(null);
         ignoredRegs.clear();
-        for (int i = 0; i < body.getLocalReservedCount(); i++) {
+        int localReservedCount = body.getLocalReservedCount();
+        for (int i = 0; i < localReservedCount; i++) {
             ignoredRegs.add(i);
         }
 
@@ -124,7 +125,7 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
 
         abody.exceptions = body.exceptions;
         abody.setCode(body.getCode());
-        removeUnreachableInstructions(body.getCode(), cpool, trait, minfo, body);
+        removeUnreachableInstructions(abody.getCode(), cpool, trait, minfo, abody);
         //System.err.println("/deo");
     }
 
@@ -305,8 +306,6 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
                 }
             } catch (ThreadDeath | InterruptedException ex) {
                 throw ex;
-            } catch (Throwable ex) {
-                //ignore
             }
         }
         return -1;

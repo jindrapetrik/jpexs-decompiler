@@ -1,3 +1,4 @@
+
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
@@ -24,7 +25,7 @@ public class DeobfuscatorSample implements SWFDecompilerListener {
     @Override
     public void swfParsed(SWF swf) {
         System.out.println("swfParsed");
-        Map<String, ASMSource> asms = swf.getASMs();
+        Map<String, ASMSource> asms = swf.getASMs(true);
         for (ASMSource asm : asms.values()) {
             try {
                 asm.getActions();
