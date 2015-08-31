@@ -115,10 +115,10 @@ public class ActionScript3AssemblerTest extends ActionScriptTestBase {
     }
 
     @Test
-    public void replaceIstruction() throws Exception {
+    public void replaceInstruction() throws Exception {
         MethodBody b = compilePCode("pushbyte 1\r\n"
                 + "setlocal_1\r\n"
-                + "jump label1\r\n" //remove this                
+                + "jump label1\r\n" //remove this
                 + "jump label1\r\n"
                 + "pushtrue\r\n"
                 + "pop\r\n"
@@ -127,12 +127,12 @@ public class ActionScript3AssemblerTest extends ActionScriptTestBase {
     }
 
     @Test
-    public void replaceIstruction2() throws Exception {
+    public void replaceInstruction2() throws Exception {
         MethodBody b = compilePCode("pushbyte 1\r\n"
                 + "setlocal_1\r\n"
                 + "jump label1\r\n"
                 + "pushtrue\r\n"
-                + "jump label1\r\n" //remove this               
+                + "jump label1\r\n" //remove this
                 + "pop\r\n"
                 + "label1:pushfalse\r\n");
         b.getCode().replaceInstruction(getBaseAddr() + 4, new AVM2Instruction(0, new DeobfuscatePopIns(), new int[]{}), b);
