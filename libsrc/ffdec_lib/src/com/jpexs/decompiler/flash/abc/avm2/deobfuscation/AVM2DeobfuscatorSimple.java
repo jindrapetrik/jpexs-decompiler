@@ -188,7 +188,7 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
             }
 
             ExecutionResult result = new ExecutionResult();
-            executeInstructions(staticRegs, classIndex, isStatic, body, scriptIndex, abc, code, localData, i, code.code.size() - 1, result, inlineIns);
+            executeInstructions(staticRegs, body, abc, code, localData, i, code.code.size() - 1, result, inlineIns);
         }
 
         return false;
@@ -248,7 +248,7 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
         }
     }
 
-    private void executeInstructions(Map<Integer, GraphTargetItem> staticRegs, int classIndex, boolean isStatic, MethodBody body, int scriptIndex, ABC abc, AVM2Code code, AVM2LocalData localData, int idx, int endIdx, ExecutionResult result, List<AVM2Instruction> inlineIns) throws InterruptedException {
+    private void executeInstructions(Map<Integer, GraphTargetItem> staticRegs, MethodBody body, ABC abc, AVM2Code code, AVM2LocalData localData, int idx, int endIdx, ExecutionResult result, List<AVM2Instruction> inlineIns) throws InterruptedException {
         List<GraphTargetItem> output = new ArrayList<>();
 
         FixItemCounterTranslateStack stack = new FixItemCounterTranslateStack("");
