@@ -128,12 +128,7 @@ public class AVM2Graph extends Graph {
         localData.abc = abc;
         localData.localRegNames = localRegNames;
         localData.fullyQualifiedNames = fullyQualifiedNames;
-        localData.parsedExceptions = new ArrayList<>();
-        localData.finallyJumps = new HashMap<>();
-        localData.ignoredSwitches = new HashMap<>();
-        localData.ignoredSwitches2 = new ArrayList<>();
         localData.scriptIndex = scriptIndex;
-        localData.localRegAssignmentIps = new HashMap<>();
         localData.ip = 0;
         localData.refs = refs;
         localData.code = code;
@@ -172,9 +167,21 @@ public class AVM2Graph extends Graph {
         List<GraphTargetItem> ret = null;
 
         AVM2LocalData aLocalData = (AVM2LocalData) localData;
+        if (aLocalData.parsedExceptions == null) {
+            aLocalData.parsedExceptions = new ArrayList<>();
+        }
         List<ABCException> parsedExceptions = aLocalData.parsedExceptions;
+        if (aLocalData.finallyJumps == null) {
+            aLocalData.finallyJumps = new HashMap<>();
+        }
         Map<Integer, List<Integer>> finallyJumps = aLocalData.finallyJumps;
+        if (aLocalData.ignoredSwitches == null) {
+            aLocalData.ignoredSwitches = new HashMap<>();
+        }
         Map<Integer, Integer> ignoredSwitches = aLocalData.ignoredSwitches;
+        if (aLocalData.ignoredSwitches2 == null) {
+            aLocalData.ignoredSwitches2 = new ArrayList<>();
+        }
         List<Integer> ignoredSwitches2 = aLocalData.ignoredSwitches2;
         int ip = part.start;
         int addr = this.avm2code.fixAddrAfterDebugLine(this.avm2code.pos2adr(part.start));
@@ -384,7 +391,6 @@ public class AVM2Graph extends Graph {
                 output.clear();
                 stack.clear();
                 output.add(new TryAVM2Item(tryCommands, catchedExceptions, catchedCommands, finallyCommands, finCatchName));
-                finallyJumps = ((AVM2LocalData) localData).finallyJumps;
                 for (int fin_e : catchedFinallys) {
                     if (finallyJumps.containsKey(fin_e)) {
                         finallyJumps.get(fin_e).clear();
@@ -653,7 +659,13 @@ public class AVM2Graph extends Graph {
     @Override
     protected GraphPart checkPart(TranslateStack stack, BaseLocalData localData, GraphPart next, Set<GraphPart> allParts) {
         AVM2LocalData aLocalData = (AVM2LocalData) localData;
+        if (aLocalData.finallyJumps == null) {
+            aLocalData.finallyJumps = new HashMap<>();
+        }
         Map<Integer, List<Integer>> finallyJumps = aLocalData.finallyJumps;
+        if (aLocalData.ignoredSwitches == null) {
+            aLocalData.ignoredSwitches = new HashMap<>();
+        }
         Map<Integer, Integer> ignoredSwitches = aLocalData.ignoredSwitches;
         GraphPart ret = next;
         for (int f : finallyJumps.keySet()) {//int f = 0; f < finallyJumps.size(); f++) {

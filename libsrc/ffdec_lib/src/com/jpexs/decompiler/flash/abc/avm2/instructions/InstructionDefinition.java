@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2.instructions;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
@@ -88,7 +89,27 @@ public class InstructionDefinition implements Serializable {
         throw new UnsupportedOperationException("Instruction " + instructionName + " not implemented");
     }
 
+    public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) throws InterruptedException {
+    }
+
     public void translate(boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, AVM2ConstantPool constants, AVM2Instruction ins, List<MethodInfo> method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) throws InterruptedException {
+        AVM2LocalData localData = new AVM2LocalData();
+        localData.isStatic = isStatic;
+        localData.scriptIndex = scriptIndex;
+        localData.classIndex = classIndex;
+        localData.localRegs = localRegs;
+        localData.scopeStack = scopeStack;
+        localData.constants = constants;
+        localData.methodInfo = method_info;
+        localData.methodBody = body;
+        localData.abc = abc;
+        localData.localRegNames = localRegNames;
+        localData.fullyQualifiedNames = fullyQualifiedNames;
+        localData.localRegAssignmentIps = localRegsAssignmentIps;
+        localData.ip = ip;
+        localData.refs = refs;
+        localData.code = code;
+        translate(localData, stack, ins, output, path);
     }
 
     public int getStackPopCount(AVM2Instruction ins, ABC abc) {

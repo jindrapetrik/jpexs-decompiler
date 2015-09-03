@@ -18,9 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions.types;
 
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
-import java.util.List;
 
 /**
  *
@@ -28,5 +26,5 @@ import java.util.List;
  */
 public interface CoerceOrConvertTypeIns {
 
-    public GraphTargetItem getTargetType(AVM2ConstantPool constants, AVM2Instruction ins, List<DottedChain> fullyQualifiedNames);
+    public GraphTargetItem getTargetType(AVM2ConstantPool constants, AVM2Instruction ins);
 }

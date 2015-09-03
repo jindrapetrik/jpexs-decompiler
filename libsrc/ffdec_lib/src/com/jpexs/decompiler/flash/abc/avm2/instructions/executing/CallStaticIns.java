@@ -17,20 +17,16 @@
 package com.jpexs.decompiler.flash.abc.avm2.instructions.executing;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.CallStaticAVM2Item;
-import com.jpexs.decompiler.flash.abc.types.MethodBody;
-import com.jpexs.decompiler.flash.abc.types.MethodInfo;
-import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class CallStaticIns extends InstructionDefinition {
@@ -53,7 +49,7 @@ public class CallStaticIns extends InstructionDefinition {
     }
 
     @Override
-    public void translate(boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, AVM2ConstantPool constants, AVM2Instruction ins, List<MethodInfo> method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) {
+    public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         int methodIndex = ins.operands[0];
         int argCount = ins.operands[1];
         List<GraphTargetItem> args = new ArrayList<>();
@@ -61,7 +57,7 @@ public class CallStaticIns extends InstructionDefinition {
             args.add(0, stack.pop());
         }
         GraphTargetItem receiver = stack.pop();
-        String methodName = method_info.get(methodIndex).getName(constants);
+        String methodName = localData.methodInfo.get(methodIndex).getName(localData.constants);
         stack.push(new CallStaticAVM2Item(ins, receiver, methodName, args));
     }
 

@@ -1757,7 +1757,7 @@ public class AVM2Code implements Cloneable {
             if (ins.definition instanceof SetLocalTypeIns) {
                 if (prev != null) {
                     if (prev.definition instanceof CoerceOrConvertTypeIns) {
-                        ret.put(((SetLocalTypeIns) ins.definition).getRegisterId(ins), ((CoerceOrConvertTypeIns) prev.definition).getTargetType(constants, prev, fullyQualifiedNames));
+                        ret.put(((SetLocalTypeIns) ins.definition).getRegisterId(ins), ((CoerceOrConvertTypeIns) prev.definition).getTargetType(constants, prev));
                     }
                 }
             }
@@ -2244,13 +2244,7 @@ public class AVM2Code implements Cloneable {
         localData.methodBody = body;
         localData.abc = abc;
         localData.localRegNames = body.getLocalRegNames(abc);
-        localData.fullyQualifiedNames = new ArrayList<>();
-        localData.parsedExceptions = new ArrayList<>();
-        localData.finallyJumps = new HashMap<>();
-        localData.ignoredSwitches = new HashMap<>();
-        localData.ignoredSwitches2 = new ArrayList<>();
         localData.scriptIndex = scriptIndex;
-        localData.localRegAssignmentIps = new HashMap<>();
         localData.ip = 0;
         HashMap<Integer, List<Integer>> refs = visitCode(body);
         localData.refs = refs;

@@ -17,8 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2.instructions.localregs;
 
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
-import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.SetTypeIns;
@@ -34,10 +33,8 @@ import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreDecrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreIncrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
-import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.PopItem;
 import java.util.HashMap;
@@ -51,7 +48,7 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
     }
 
     @Override
-    public void translate(boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, AVM2ConstantPool constants, AVM2Instruction ins, List<MethodInfo> method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, String path, HashMap<Integer, Integer> regAssignCount, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) {
+    public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         int regId = getRegisterId(ins);
         GraphTargetItem value = stack.pop();
         /*if (localRegs.containsKey(regId)) {
@@ -60,12 +57,12 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
          localRegs.put(regId, value);
          }*/
         if (!(value instanceof PopItem)) {
-            localRegs.put(regId, value);
+            localData.localRegs.put(regId, value);
         }
-        if (!regAssignCount.containsKey(regId)) {
-            regAssignCount.put(regId, 0);
+        if (!localData.localRegAssignmentIps.containsKey(regId)) {
+            localData.localRegAssignmentIps.put(regId, 0);
         }
-        regAssignCount.put(regId, regAssignCount.get(regId) + 1);
+        localData.localRegAssignmentIps.put(regId, localData.localRegAssignmentIps.get(regId) + 1);
         //localRegsAssignmentIps.put(regId, ip);
         if (value.getThroughDuplicate() instanceof NewActivationAVM2Item) {
             return;

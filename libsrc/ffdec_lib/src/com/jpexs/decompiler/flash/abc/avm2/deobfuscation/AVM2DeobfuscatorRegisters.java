@@ -170,6 +170,7 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
     private int visitCode(Reference<AVM2Instruction> assignment, Set<Integer> visited, TranslateStack stack, int classIndex, boolean isStatic, MethodBody body, int scriptIndex, ABC abc, AVM2Code code, int idx, int endIdx, ExecutionResult result, Set<Integer> ignored, Set<Integer> ignoredGets) throws InterruptedException {
         List<GraphTargetItem> output = new ArrayList<>();
         AVM2LocalData localData = newLocalData(scriptIndex, abc, abc.constants, body, isStatic, classIndex);
+        initLocalRegs(localData, body.getLocalReservedCount(), body.max_regs);
         localData.localRegs.put(0, new NullAVM2Item(null));//this
 
         List<Integer> toVisit = new ArrayList<>();

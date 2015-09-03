@@ -17,8 +17,8 @@
 package com.jpexs.decompiler.flash.abc.avm2.instructions.other;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
-import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.ClassAVM2Item;
@@ -28,15 +28,11 @@ import com.jpexs.decompiler.flash.abc.avm2.model.ScriptAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ThisAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ExceptionAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
-import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitWithSlot;
-import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TranslateStack;
-import java.util.HashMap;
 import java.util.List;
 
 public class GetSlotIns extends InstructionDefinition {
@@ -46,32 +42,35 @@ public class GetSlotIns extends InstructionDefinition {
     }
 
     @Override
-    public void translate(boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, AVM2ConstantPool constants, AVM2Instruction ins, List<MethodInfo> method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) {
+    public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         int slotIndex = ins.operands[0];
         GraphTargetItem obj = stack.pop(); //scope
         obj = obj.getThroughRegister();
         Multiname slotname = null;
         if (obj instanceof ExceptionAVM2Item) {
-            slotname = constants.getMultiname(((ExceptionAVM2Item) obj).exception.name_index);
+            slotname = localData.constants.getMultiname(((ExceptionAVM2Item) obj).exception.name_index);
         } else if (obj instanceof ClassAVM2Item) {
             slotname = ((ClassAVM2Item) obj).className;
         } else if (obj instanceof ThisAVM2Item) {
             slotname = ((ThisAVM2Item) obj).className;
         } else if (obj instanceof ScriptAVM2Item) {
-            for (int t = 0; t < abc.script_info.get(((ScriptAVM2Item) obj).scriptIndex).traits.traits.size(); t++) {
-                Trait tr = abc.script_info.get(((ScriptAVM2Item) obj).scriptIndex).traits.traits.get(t);
+            List<Trait> traits = localData.abc.script_info.get(((ScriptAVM2Item) obj).scriptIndex).traits.traits;
+            for (int t = 0; t < traits.size(); t++) {
+                Trait tr = traits.get(t);
                 if (tr instanceof TraitWithSlot) {
                     if (((TraitWithSlot) tr).getSlotIndex() == slotIndex) {
-                        slotname = tr.getName(abc);
+                        slotname = tr.getName(localData.abc);
                     }
                 }
             }
         } else if (obj instanceof NewActivationAVM2Item) {
-
-            for (int t = 0; t < body.traits.traits.size(); t++) {
-                if (body.traits.traits.get(t) instanceof TraitWithSlot) {
-                    if (((TraitWithSlot) body.traits.traits.get(t)).getSlotIndex() == slotIndex) {
-                        slotname = body.traits.traits.get(t).getName(abc);
+            MethodBody body = localData.methodBody;
+            List<Trait> traits = body.traits.traits;
+            for (int t = 0; t < traits.size(); t++) {
+                Trait trait = traits.get(t);
+                if (trait instanceof TraitWithSlot) {
+                    if (((TraitWithSlot) trait).getSlotIndex() == slotIndex) {
+                        slotname = trait.getName(localData.abc);
                     }
                 }
 

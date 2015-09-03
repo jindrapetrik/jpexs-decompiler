@@ -174,6 +174,10 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
             }
         }
 
+        if (code.code.isEmpty()) {
+            return false;
+        }
+
         AVM2LocalData localData = newLocalData(scriptIndex, abc, abc.constants, body, isStatic, classIndex);
         int localReservedCount = body.getLocalReservedCount();
         for (int i = 0; i < code.code.size(); i++) {
@@ -181,11 +185,11 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
                 throw new InterruptedException();
             }
 
-            if (i > 0) {
-                localData.scopeStack.clear();
-                localData.localRegs.clear();
-                initLocalRegs(localData, localReservedCount, body.max_regs);
-            }
+            localData.scopeStack.clear();
+            localData.localRegs.clear();
+            localData.localRegAssignmentIps.clear();
+            localData.localRegs.clear();
+            initLocalRegs(localData, localReservedCount, body.max_regs);
 
             ExecutionResult result = new ExecutionResult();
             executeInstructions(staticRegs, body, abc, code, localData, i, code.code.size() - 1, result, inlineIns);
@@ -218,23 +222,15 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
         localData.isStatic = isStatic;
         localData.classIndex = classIndex;
         localData.localRegs = new HashMap<>(body.max_regs);
-        int localReservedCount = body.getLocalReservedCount();
-        initLocalRegs(localData, localReservedCount, body.max_regs);
+        localData.localRegAssignmentIps = new HashMap<>();
         localData.scopeStack = new ScopeStack(true);
         localData.constants = cpool;
         localData.methodInfo = abc.method_info;
         localData.methodBody = body;
         localData.abc = abc;
         localData.localRegNames = new HashMap<>();
-        localData.fullyQualifiedNames = new ArrayList<>();
-        localData.parsedExceptions = new ArrayList<>();
-        localData.finallyJumps = new HashMap<>();
-        localData.ignoredSwitches = new HashMap<>();
-        localData.ignoredSwitches2 = new ArrayList<>();
         localData.scriptIndex = scriptIndex;
-        localData.localRegAssignmentIps = new HashMap<>();
         localData.ip = 0;
-        localData.refs = new HashMap<>();
         localData.code = body.getCode();
         return localData;
     }
@@ -294,6 +290,10 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
             if (def instanceof GetLocalTypeIns) {
                 int regId = ((GetLocalTypeIns) def).getRegisterId(ins);
                 if (staticRegs.containsKey(regId)) {
+                    if (stack.isEmpty()) {
+                        return;
+                    }
+
                     stack.pop();
                     AVM2Instruction pushins = makePush(abc.constants, staticRegs.get(regId));
                     code.replaceInstruction(idx, pushins, body);
@@ -351,6 +351,10 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
             if (def instanceof GetLocalTypeIns) {
                 int regId = ((GetLocalTypeIns) def).getRegisterId(ins);
                 if (staticRegs.containsKey(regId)) {
+                    if (stack.isEmpty()) {
+                        return;
+                    }
+
                     stack.pop();
                     stack.push(staticRegs.get(regId));
                 } else {
@@ -367,6 +371,10 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
                     throw new TranslateException("Jump target not found: " + address);
                 }
             } else if (def instanceof IfTypeIns) {
+                if (stack.isEmpty()) {
+                    return;
+                }
+
                 GraphTargetItem top = stack.pop();
                 Object res = top.getResult();
                 long address = ins.offset + ins.getBytesLength() + ins.operands[0];

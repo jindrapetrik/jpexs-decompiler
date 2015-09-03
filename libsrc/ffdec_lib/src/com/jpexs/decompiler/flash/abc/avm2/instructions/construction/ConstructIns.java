@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2.instructions.construction;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
@@ -32,14 +33,9 @@ import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.StringAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.XMLAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.AddAVM2Item;
-import com.jpexs.decompiler.flash.abc.types.MethodBody;
-import com.jpexs.decompiler.flash.abc.types.MethodInfo;
-import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class ConstructIns extends InstructionDefinition {
@@ -77,7 +73,7 @@ public class ConstructIns extends InstructionDefinition {
     }
 
     @Override
-    public void translate(boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, AVM2ConstantPool constants, AVM2Instruction ins, List<MethodInfo> method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) throws InterruptedException {
+    public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) throws InterruptedException {
         int argCount = ins.operands[0];
         List<GraphTargetItem> args = new ArrayList<>();
         for (int a = 0; a < argCount; a++) {
@@ -92,12 +88,14 @@ public class ConstructIns extends InstructionDefinition {
             if (gpt.object instanceof FindPropertyAVM2Item) {
                 FindPropertyAVM2Item fpt = (FindPropertyAVM2Item) gpt.object;
                 xmlMult = (FullMultinameAVM2Item) fpt.propertyName;
-                isXML = xmlMult.isXML(constants, localRegNames, fullyQualifiedNames) && xmlMult.isXML(constants, localRegNames, fullyQualifiedNames);
+                // todo: honfika: Why call isXML 2 times with the same parameters?
+                isXML = xmlMult.isXML(localData.constants, localData.localRegNames, localData.fullyQualifiedNames)
+                        && xmlMult.isXML(localData.constants, localData.localRegNames, localData.fullyQualifiedNames);
             }
         }
         if (obj instanceof GetLexAVM2Item) {
             GetLexAVM2Item glt = (GetLexAVM2Item) obj;
-            isXML = glt.propertyName.getName(constants, fullyQualifiedNames, true).equals("XML");
+            isXML = glt.propertyName.getName(localData.constants, localData.fullyQualifiedNames, true).equals("XML");
         }
 
         if (isXML) {

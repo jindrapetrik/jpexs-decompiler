@@ -17,22 +17,16 @@
 package com.jpexs.decompiler.flash.abc.avm2.instructions.localregs;
 
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
-import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.ClassAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ScriptAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ThisAVM2Item;
-import com.jpexs.decompiler.flash.abc.types.MethodBody;
-import com.jpexs.decompiler.flash.abc.types.MethodInfo;
-import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.NotCompileTimeItem;
-import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TranslateStack;
-import java.util.HashMap;
 import java.util.List;
 
 public abstract class GetLocalTypeIns extends InstructionDefinition {
@@ -42,27 +36,27 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
     }
 
     @Override
-    public void translate(boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, AVM2ConstantPool constants, AVM2Instruction ins, List<MethodInfo> method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, String path, HashMap<Integer, Integer> regAssignCount, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) {
+    public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
 
         int regId = getRegisterId(ins);
 
         if (regId == 0) {
-            if ((classIndex >= abc.instance_info.size()) || classIndex < 0) {
-                stack.push(new ScriptAVM2Item(scriptIndex));
+            if ((localData.classIndex >= localData.abc.instance_info.size()) || localData.classIndex < 0) {
+                stack.push(new ScriptAVM2Item(localData.scriptIndex));
                 return;
             }
-            if (isStatic) {
-                stack.push(new ClassAVM2Item(abc.instance_info.get(classIndex).getName(constants)));
+            if (localData.isStatic) {
+                stack.push(new ClassAVM2Item(localData.abc.instance_info.get(localData.classIndex).getName(localData.constants)));
             } else {
-                stack.push(new ThisAVM2Item(ins, abc.instance_info.get(classIndex).getName(constants)));
+                stack.push(new ThisAVM2Item(ins, localData.abc.instance_info.get(localData.classIndex).getName(localData.constants)));
             }
             return;
         }
 
-        GraphTargetItem computedValue = localRegs.get(regId);
+        GraphTargetItem computedValue = localData.localRegs.get(regId);
         int assignCount = 0;
-        if (regAssignCount.containsKey(regId)) {
-            assignCount = regAssignCount.get(regId);
+        if (localData.localRegAssignmentIps.containsKey(regId)) {
+            assignCount = localData.localRegAssignmentIps.get(regId);
         }
         if (assignCount > 5) { //Do not allow change register more than 5 - for deobfuscation
             computedValue = new NotCompileTimeItem(ins, computedValue);

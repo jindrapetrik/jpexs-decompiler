@@ -17,21 +17,16 @@
 package com.jpexs.decompiler.flash.abc.avm2.instructions.construction;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
-import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.UnparsedAVM2Item;
-import com.jpexs.decompiler.flash.abc.types.MethodBody;
-import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
-import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.LocalData;
-import java.util.HashMap;
 import java.util.List;
 
 public class NewClassIns extends InstructionDefinition {
@@ -41,12 +36,13 @@ public class NewClassIns extends InstructionDefinition {
     }
 
     @Override
-    public void translate(boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, AVM2ConstantPool constants, AVM2Instruction ins, List<MethodInfo> method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) throws InterruptedException {
+    public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) throws InterruptedException {
         int clsIndex = ins.operands[0];
         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
-        stack.pop().toString(writer, LocalData.create(constants, localRegNames, fullyQualifiedNames));
+        stack.pop().toString(writer, LocalData.create(localData.constants, localData.localRegNames, localData.fullyQualifiedNames));
         String baseType = writer.toString();
-        stack.push(new UnparsedAVM2Item(ins, "new " + abc.constants.getMultiname(abc.instance_info.get(clsIndex).name_index).getName(constants, fullyQualifiedNames, false) + ".class extends " + baseType));
+        ABC abc = localData.abc;
+        stack.push(new UnparsedAVM2Item(ins, "new " + abc.constants.getMultiname(abc.instance_info.get(clsIndex).name_index).getName(localData.constants, localData.fullyQualifiedNames, false) + ".class extends " + baseType));
     }
 
     @Override

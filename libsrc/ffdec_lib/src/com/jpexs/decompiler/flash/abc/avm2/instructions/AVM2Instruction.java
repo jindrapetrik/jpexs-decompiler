@@ -332,13 +332,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
     public void translate(BaseLocalData localData, TranslateStack stack, List<GraphTargetItem> output, int staticOperation, String path) throws InterruptedException {
         AVM2LocalData aLocalData = (AVM2LocalData) localData;
         //int expectedSize = stack.size() - getStackPopCount(localData, stack) + getStackPushCount(localData, stack);
-        definition.translate(aLocalData.isStatic,
-                aLocalData.scriptIndex,
-                aLocalData.classIndex,
-                aLocalData.localRegs,
-                stack,
-                aLocalData.scopeStack,
-                aLocalData.constants, this, aLocalData.methodInfo, output, aLocalData.methodBody, aLocalData.abc, aLocalData.localRegNames, aLocalData.fullyQualifiedNames, null, aLocalData.localRegAssignmentIps, aLocalData.ip, aLocalData.refs, aLocalData.code);
+        definition.translate(aLocalData, stack, this, output, null);
         /*if (stack.size() != expectedSize) {
          throw new Error("HONFIKA stack size mismatch");
          }*/

@@ -17,21 +17,18 @@
 package com.jpexs.decompiler.flash.abc.avm2.instructions.other;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
-import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetSlotAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ExceptionAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
-import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
+import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
-import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TranslateStack;
-import java.util.HashMap;
 import java.util.List;
 
 public class GetGlobalSlotIns extends InstructionDefinition {
@@ -41,18 +38,20 @@ public class GetGlobalSlotIns extends InstructionDefinition {
     }
 
     @Override
-    public void translate(boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, AVM2ConstantPool constants, AVM2Instruction ins, List<MethodInfo> method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) {
+    public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         int slotIndex = ins.operands[0];
-        GraphTargetItem obj = scopeStack.get(0); //scope
+        GraphTargetItem obj = localData.scopeStack.get(0); //scope
         Multiname slotname = null;
         if (obj instanceof ExceptionAVM2Item) {
-            slotname = constants.getMultiname(((ExceptionAVM2Item) obj).exception.name_index);
+            slotname = localData.constants.getMultiname(((ExceptionAVM2Item) obj).exception.name_index);
         } else {
-
-            for (int t = 0; t < body.traits.traits.size(); t++) {
-                if (body.traits.traits.get(t) instanceof TraitSlotConst) {
-                    if (((TraitSlotConst) body.traits.traits.get(t)).slot_id == slotIndex) {
-                        slotname = body.traits.traits.get(t).getName(abc);
+            MethodBody body = localData.methodBody;
+            List<Trait> traits = body.traits.traits;
+            for (int t = 0; t < traits.size(); t++) {
+                Trait trait = traits.get(t);
+                if (trait instanceof TraitSlotConst) {
+                    if (((TraitSlotConst) trait).slot_id == slotIndex) {
+                        slotname = trait.getName(localData.abc);
                     }
                 }
 
