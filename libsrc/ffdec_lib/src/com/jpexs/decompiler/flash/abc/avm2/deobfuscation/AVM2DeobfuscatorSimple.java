@@ -296,6 +296,10 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
 
                     stack.pop();
                     AVM2Instruction pushins = makePush(abc.constants, staticRegs.get(regId));
+                    if (pushins == null) {
+                        return;
+                    }
+
                     code.replaceInstruction(idx, pushins, body);
                     stack.push(staticRegs.get(regId));
                     ins = pushins;
