@@ -70,7 +70,7 @@ public class AS3ScriptExporter {
                 int i = 2;
                 do {
                     filePath = Path.combine(parentPath, fileNameWithoutExtension + "_" + i++ + extension);
-                } while (files.contains(filePath.toUpperCase()));
+                } while (files.contains(filePath.toLowerCase()));
 
                 file = new File(filePath);
             }
