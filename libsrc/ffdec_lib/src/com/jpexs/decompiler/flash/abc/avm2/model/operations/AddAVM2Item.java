@@ -63,10 +63,12 @@ public class AddAVM2Item extends BinaryOpItem {
 
     @Override
     public Object getResult() {
-        if (EcmaScript.type(leftSide.getResult()) == EcmaType.STRING || EcmaScript.type(rightSide.getResult()) == EcmaType.STRING) {
-            return "" + leftSide.getResult() + rightSide.getResult();
+        Object leftResult = leftSide.getResult();
+        Object rightResult = rightSide.getResult();
+        if (EcmaScript.type(leftResult) == EcmaType.STRING || EcmaScript.type(rightResult) == EcmaType.STRING) {
+            return "" + leftResult + rightResult;
         }
-        return EcmaScript.toNumber(leftSide.getResult()) + EcmaScript.toNumber(rightSide.getResult());
+        return EcmaScript.toNumber(leftResult) + EcmaScript.toNumber(rightResult);
     }
 
     @Override

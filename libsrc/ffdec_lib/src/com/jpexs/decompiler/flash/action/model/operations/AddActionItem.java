@@ -1,18 +1,19 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -63,10 +64,12 @@ public class AddActionItem extends BinaryOpItem {
     @Override
     public Object getResult() {
         if (version2) {
-            if (EcmaScript.type(leftSide.getResult()) == EcmaType.STRING || EcmaScript.type(rightSide.getResult()) == EcmaType.STRING) {
-                return "" + leftSide.getResult() + rightSide.getResult();
+            Object leftResult = leftSide.getResult();
+            Object rightResult = rightSide.getResult();
+            if (EcmaScript.type(leftResult) == EcmaType.STRING || EcmaScript.type(rightResult) == EcmaType.STRING) {
+                return "" + leftResult + rightResult;
             }
-            return EcmaScript.toNumber(leftSide.getResult()) + EcmaScript.toNumber(rightSide.getResult());
+            return EcmaScript.toNumber(leftResult) + EcmaScript.toNumber(rightResult);
         } else {
             return Action.toFloatPoint(leftSide.getResult()) + Action.toFloatPoint(rightSide.getResult());
         }
