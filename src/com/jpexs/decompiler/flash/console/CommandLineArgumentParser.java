@@ -723,10 +723,14 @@ public class CommandLineArgumentParser {
             String value = cp[1];
             for (ConfigurationItem<Boolean> item : commandlineConfigBoolean) {
                 if (key.toLowerCase().equals(item.getName().toLowerCase())) {
-                    Boolean bValue = parseBooleanConfigValue(value);
-                    if (bValue != null) {
-                        System.out.println("Config " + item.getName() + " set to " + bValue);
-                        item.set(bValue);
+                    if (value != null) {
+                        Boolean bValue = parseBooleanConfigValue(value);
+                        if (bValue != null) {
+                            System.out.println("Config " + item.getName() + " set to " + bValue);
+                            item.set(bValue);
+                        } else {
+                            System.out.println("Invalid config value for " + item.getName() + ": " + value);
+                        }
                     }
                 }
             }
@@ -1461,6 +1465,8 @@ public class CommandLineArgumentParser {
             logger.log(Level.SEVERE, null, ex);
             System.exit(1);
         }
+
+        Statistics.print(stat);
 
         long stopTime = System.currentTimeMillis();
         long time = stopTime - startTime;
