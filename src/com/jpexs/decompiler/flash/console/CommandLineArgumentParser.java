@@ -1466,8 +1466,6 @@ public class CommandLineArgumentParser {
             System.exit(1);
         }
 
-        Statistics.print(stat);
-
         long stopTime = System.currentTimeMillis();
         long time = stopTime - startTime;
         System.out.println("Export finished. Total export time: " + Helper.formatTimeSec(time));
