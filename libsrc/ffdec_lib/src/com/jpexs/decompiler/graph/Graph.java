@@ -583,7 +583,6 @@ public class Graph {
         if (!newLoopDetection) {
             getLoops(localData, heads.get(0), loops, null);
         } else {
-
             List<GraphPart> loopHeads = new ArrayList<>();
             identifyLoops(localData, loopHeads, heads, allParts);
             Map<GraphPart, List<GraphPart>> loopBreaks = identifyLoopBreaks(localData, allParts);
@@ -594,7 +593,6 @@ public class Graph {
             }
             for (int i = 0; i < loopHeads.size(); i++) {
                 if (loopBreaks.containsKey(loopHeads.get(i))) {
-
                     loops2.get(i).loopBreak = loopBreaks.get(loopHeads.get(i)).get(0);//getMostCommonPart(localData, loopBreaks.get(loopHeads.get(i)), loops2);
                 } else {
                     loops2.get(i).loopBreak = null;
@@ -1224,9 +1222,6 @@ public class Graph {
     private void getLoops(BaseLocalData localData, GraphPart part, List<Loop> loops, List<GraphPart> stopPart, boolean first, int level, List<GraphPart> visited) throws InterruptedException {
         boolean debugMode = false;
 
-        if (stopPart == null) {
-            stopPart = new ArrayList<>();
-        }
         if (part == null) {
             return;
         }
@@ -1285,7 +1280,7 @@ public class Graph {
             }
         }
 
-        if (stopPart.contains(part)) {
+        if (stopPart != null && stopPart.contains(part)) {
             return;
         }
         part.level = level;
@@ -1301,16 +1296,17 @@ public class Graph {
 
         if (part.nextParts.size() == 2) {
 
-            List<GraphPart> nps = new ArrayList<>(part.nextParts);
-            /*for(int i=0;i<nps.size();i++){
+            List<GraphPart> nps;/* = new ArrayList<>(part.nextParts);
+             for(int i=0;i<nps.size();i++){
              nps.set(i,getNextNoJump(nps.get(i),localData));
              }
              if(nps.get(0) == nps.get(1)){
              nps = part.nextParts;
              }*/
+
             nps = part.nextParts;
             GraphPart next = getCommonPart(localData, nps, loops);//part.getNextPartPath(loopContinues);
-            List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
+            List<GraphPart> stopPart2 = stopPart == null ? new ArrayList<>() : new ArrayList<>(stopPart);
             if (next != null) {
                 stopPart2.add(next);
             }
@@ -1328,7 +1324,7 @@ public class Graph {
             GraphPart next = getNextCommonPart(localData, part, loops);
 
             for (GraphPart p : part.nextParts) {
-                List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
+                List<GraphPart> stopPart2 = stopPart == null ? new ArrayList<>() : new ArrayList<>(stopPart);
                 if (next != null) {
                     stopPart2.add(next);
                 }

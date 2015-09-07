@@ -18,10 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.StrictEqualsIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfStrictEqIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfStrictNeIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.DottedChain;
@@ -41,13 +38,13 @@ public class StrictEqAVM2Item extends BinaryOpItem implements LogicalOpItem, IfC
     }
 
     @Override
-    public InstructionDefinition getIfDefinition() {
-        return new IfStrictEqIns();
+    public int getIfDefinition() {
+        return AVM2Instructions.IfStrictEq;
     }
 
     @Override
-    public InstructionDefinition getIfNotDefinition() {
-        return new IfStrictNeIns();
+    public int getIfNotDefinition() {
+        return AVM2Instructions.IfStrictNe;
     }
 
     @Override
@@ -66,7 +63,7 @@ public class StrictEqAVM2Item extends BinaryOpItem implements LogicalOpItem, IfC
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSourceMerge(localData, generator, leftSide, rightSide,
-                new AVM2Instruction(0, new StrictEqualsIns(), null)
+                new AVM2Instruction(0, AVM2Instructions.StrictEquals, null)
         );
     }
 

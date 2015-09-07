@@ -18,7 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.SetPropertyIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.AssignmentAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -76,7 +76,7 @@ public class SetPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, As
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSourceMerge(localData, generator, object, value,
-                new AVM2Instruction(0, new SetPropertyIns(), new int[]{((AVM2SourceGenerator) generator).propertyName(propertyName)})
+                new AVM2Instruction(0, AVM2Instructions.SetProperty, new int[]{((AVM2SourceGenerator) generator).propertyName(propertyName)})
         );
     }
 

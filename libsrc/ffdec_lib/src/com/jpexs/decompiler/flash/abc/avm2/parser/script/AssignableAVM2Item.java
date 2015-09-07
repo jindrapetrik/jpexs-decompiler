@@ -1,37 +1,24 @@
 /*
  *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal0Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal1Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal2Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal3Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocalIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.KillIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal0Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal1Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal2Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal3Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetScopeObjectIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetSlotIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.SetSlotIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.DupIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -72,7 +59,7 @@ public abstract class AssignableAVM2Item extends AVM2Item {
     public static List<GraphSourceItem> dupSetTemp(SourceGeneratorLocalData localData, SourceGenerator generator, Reference<Integer> register) {
         register.setVal(getFreeRegister(localData, generator));
         List<GraphSourceItem> ret = new ArrayList<>();
-        ret.add(ins(new DupIns()));
+        ret.add(ins(AVM2Instructions.Dup));
         ret.add(generateSetLoc(register.getVal()));
         return ret;
     }
@@ -97,7 +84,7 @@ public abstract class AssignableAVM2Item extends AVM2Item {
      killRegister(localData, generator, register.getVal());
      List<GraphSourceItem> ret = new ArrayList<>();
      ret.add(generateGetLoc(register.getVal()));
-     ret.add(ins(new KillIns(), register.getVal()));
+     ret.add(ins(AVM2Instructions.Kill, register.getVal()));
      return ret;
      }*/
     public static List<GraphSourceItem> killTemp(SourceGeneratorLocalData localData, SourceGenerator generator, List<Reference<Integer>> registers) {
@@ -108,7 +95,7 @@ public abstract class AssignableAVM2Item extends AVM2Item {
             }
             killRegister(localData, generator, register.getVal());
 
-            ret.add(ins(new KillIns(), register.getVal()));
+            ret.add(ins(AVM2Instructions.Kill, register.getVal()));
         }
         return ret;
     }
@@ -118,15 +105,15 @@ public abstract class AssignableAVM2Item extends AVM2Item {
             case -1:
                 return null;
             case 0:
-                return ins(new SetLocal0Ins());
+                return ins(AVM2Instructions.SetLocal0);
             case 1:
-                return ins(new SetLocal1Ins());
+                return ins(AVM2Instructions.SetLocal1);
             case 2:
-                return ins(new SetLocal2Ins());
+                return ins(AVM2Instructions.SetLocal2);
             case 3:
-                return ins(new SetLocal3Ins());
+                return ins(AVM2Instructions.SetLocal3);
             default:
-                return ins(new SetLocalIns(), regNumber);
+                return ins(AVM2Instructions.SetLocal, regNumber);
         }
     }
 
@@ -135,15 +122,15 @@ public abstract class AssignableAVM2Item extends AVM2Item {
             case -1:
                 return null;
             case 0:
-                return ins(new GetLocal0Ins());
+                return ins(AVM2Instructions.GetLocal0);
             case 1:
-                return ins(new GetLocal1Ins());
+                return ins(AVM2Instructions.GetLocal1);
             case 2:
-                return ins(new GetLocal2Ins());
+                return ins(AVM2Instructions.GetLocal2);
             case 3:
-                return ins(new GetLocal3Ins());
+                return ins(AVM2Instructions.GetLocal3);
             default:
-                return ins(new GetLocalIns(), regNumber);
+                return ins(AVM2Instructions.GetLocal, regNumber);
         }
     }
 
@@ -152,8 +139,8 @@ public abstract class AssignableAVM2Item extends AVM2Item {
             return null;
         }
         List<GraphSourceItem> ret = new ArrayList<>();
-        ret.add(ins(new GetScopeObjectIns(), slotScope));
-        ret.add(ins(new GetSlotIns(), slotNumber));
+        ret.add(ins(AVM2Instructions.GetScopeObject, slotScope));
+        ret.add(ins(AVM2Instructions.GetSlot, slotNumber));
         return ret;
     }
 
@@ -162,9 +149,9 @@ public abstract class AssignableAVM2Item extends AVM2Item {
             return null;
         }
         List<GraphSourceItem> ret = new ArrayList<>();
-        ret.add(ins(new GetScopeObjectIns(), slotScope));
+        ret.add(ins(AVM2Instructions.GetScopeObject, slotScope));
         ret.addAll(val.toSource(localData, generator));
-        ret.add(ins(new SetSlotIns(), slotNumber));
+        ret.add(ins(AVM2Instructions.SetSlot, slotNumber));
         return ret;
     }
 }

@@ -20,17 +20,8 @@ import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.DecrementIIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.DecrementIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.IncrementIIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.IncrementIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrictIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetLexIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetPropertyIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.SetPropertyIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.DupIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertDIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.ApplyTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.InitVectorAVM2Item;
@@ -585,17 +576,17 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
             }
             return toSourceMerge(localData, generator, obj, coerced,
                     needsReturn ? dupSetTemp(localData, generator, ret_temp) : null,
-                    ins(new SetPropertyIns(), propertyId),
+                    ins(AVM2Instructions.SetProperty, propertyId),
                     needsReturn ? getTemp(localData, generator, ret_temp) : null,
                     killTemp(localData, generator, Arrays.asList(ret_temp)));
         } else {
             if (obj instanceof AVM2Instruction && (((AVM2Instruction) obj).definition instanceof FindPropertyStrictIns)) {
-                return toSourceMerge(localData, generator, ins(new GetLexIns(), propertyId),
-                        needsReturn ? null : ins(new PopIns())
+                return toSourceMerge(localData, generator, ins(AVM2Instructions.GetLex, propertyId),
+                        needsReturn ? null : ins(AVM2Instructions.Pop)
                 );
             }
-            return toSourceMerge(localData, generator, obj, ins(new GetPropertyIns(), propertyId),
-                    needsReturn ? null : ins(new PopIns())
+            return toSourceMerge(localData, generator, obj, ins(AVM2Instructions.GetProperty, propertyId),
+                    needsReturn ? null : ins(AVM2Instructions.Pop)
             );
         }
     }
@@ -646,7 +637,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                 Reference<Integer> propIndex = new Reference<>(0);
                 Reference<ValueKind> propValue = new Reference<>(null);
                 resolve(localData, objType, propType, propIndex, outPropValue);
-                obj = ins(new FindPropertyStrictIns(), propIndex.getVal());
+                obj = ins(AVM2Instructions.FindPropertyStrict, propIndex.getVal());
             }
         }
         return obj;
@@ -673,16 +664,16 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                 //Start get original
                 //getTemp(localData, generator, obj_temp),
                 //index!=null?getTemp(localData, generator, index_temp):null,
-                ins(new GetPropertyIns(), propertyId),
-                (!isInteger && post) ? ins(new ConvertDIns()) : null,
+                ins(AVM2Instructions.GetProperty, propertyId),
+                (!isInteger && post) ? ins(AVM2Instructions.ConvertD) : null,
                 //End get original
-                (!post) ? (decrement ? ins(isInteger ? new DecrementIIns() : new DecrementIns()) : ins(isInteger ? new IncrementIIns() : new IncrementIns())) : null,
-                needsReturn ? ins(new DupIns()) : null,
-                (post) ? (decrement ? ins(isInteger ? new DecrementIIns() : new DecrementIns()) : ins(isInteger ? new IncrementIIns() : new IncrementIns())) : null,
+                (!post) ? (decrement ? ins(isInteger ? AVM2Instructions.DecrementI : AVM2Instructions.Decrement) : ins(isInteger ? AVM2Instructions.IncrementI : AVM2Instructions.Increment)) : null,
+                needsReturn ? ins(AVM2Instructions.Dup) : null,
+                (post) ? (decrement ? ins(isInteger ? AVM2Instructions.DecrementI : AVM2Instructions.Decrement) : ins(isInteger ? AVM2Instructions.IncrementI : AVM2Instructions.Increment)) : null,
                 setTemp(localData, generator, ret_temp),
                 getTemp(localData, generator, obj_temp),
                 getTemp(localData, generator, ret_temp),
-                ins(new SetPropertyIns(), propertyId),
+                ins(AVM2Instructions.SetProperty, propertyId),
                 //needsReturn?getTemp(localData, generator, ret_temp):null,
                 killTemp(localData, generator, Arrays.asList(ret_temp, obj_temp)));
         return ret;

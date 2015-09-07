@@ -234,6 +234,10 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
         ActionConstantPool lastConstantPool = null;
 
         while (true) {
+            if (Thread.currentThread().isInterrupted()) {
+                throw new InterruptedException();
+            }
+
             if (idx > endIdx) {
                 break;
             }

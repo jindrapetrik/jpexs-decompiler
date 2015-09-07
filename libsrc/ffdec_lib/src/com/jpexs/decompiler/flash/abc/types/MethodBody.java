@@ -367,6 +367,7 @@ public final class MethodBody implements Cloneable {
                 throw ex;
             } catch (Throwable ex) {
                 //ignore
+                logger.log(Level.SEVERE, "Deobfuscation failed in: " + path, ex);
                 body = clone();
                 code = body.getCode();
                 code.markMappedOffsets();

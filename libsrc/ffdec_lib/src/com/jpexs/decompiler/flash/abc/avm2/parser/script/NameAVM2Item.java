@@ -19,24 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.DecrementIIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.DecrementIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.IncrementIIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.IncrementIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.DecLocalIIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.DecLocalIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.IncLocalIIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.IncLocalIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetScopeObjectIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.SetSlotIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.DupIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceAIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceSIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertBIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertIIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertUIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NanAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
@@ -196,27 +179,27 @@ public class NameAVM2Item extends AssignableAVM2Item {
         }
         AVM2Instruction ins;
         if (ttype instanceof UnboundedTypeItem) {
-            ins = ins(new CoerceAIns());
+            ins = ins(AVM2Instructions.CoerceA);
         } else {
             switch (ttype.toString()) {
                 case "int":
-                    ins = ins(new ConvertIIns());
+                    ins = ins(AVM2Instructions.ConvertI);
                     break;
                 case "*":
-                    ins = ins(new CoerceAIns());
+                    ins = ins(AVM2Instructions.CoerceA);
                     break;
                 case "String":
-                    ins = ins(new CoerceSIns());
+                    ins = ins(AVM2Instructions.CoerceS);
                     break;
                 case "Boolean":
-                    ins = ins(new ConvertBIns());
+                    ins = ins(AVM2Instructions.ConvertB);
                     break;
                 case "uint":
-                    ins = ins(new ConvertUIns());
+                    ins = ins(AVM2Instructions.ConvertU);
                     break;
                 default:
                     int type_index = AVM2SourceGenerator.resolveType(localData, ttype, ((AVM2SourceGenerator) generator).abc, ((AVM2SourceGenerator) generator).allABCs);
-                    ins = ins(new CoerceIns(), type_index);
+                    ins = ins(AVM2Instructions.Coerce, type_index);
                     break;
             }
         }
@@ -245,21 +228,21 @@ public class NameAVM2Item extends AssignableAVM2Item {
             List<String> basicTypes = Arrays.asList("int", "Number");
             if (slotNumber > -1) {
                 return toSourceMerge(localData, generator,
-                        ins(new GetScopeObjectIns(), slotScope),
+                        ins(AVM2Instructions.GetScopeObject, slotScope),
                         assignedValue, !(("" + assignedValue.returnType()).equals("" + type) && (basicTypes.contains("" + type))) ? generateCoerce(localData, generator, type) : null, needsReturn
                                 ? dupSetTemp(localData, generator, ret_temp) : null, generateSetLoc(regNumber), slotNumber > -1
-                                ? ins(new SetSlotIns(), slotNumber)
+                                ? ins(AVM2Instructions.SetSlot, slotNumber)
                                 : null,
                         needsReturn ? getTemp(localData, generator, ret_temp) : null,
                         killTemp(localData, generator, Arrays.asList(ret_temp)));
             } else {
 
                 return toSourceMerge(localData, generator, assignedValue, !(("" + assignedValue.returnType()).equals("" + type) && (basicTypes.contains("" + type))) ? generateCoerce(localData, generator, type) : null, needsReturn
-                        ? ins(new DupIns()) : null, generateSetLoc(regNumber));
+                        ? ins(AVM2Instructions.Dup) : null, generateSetLoc(regNumber));
             }
         } else {
             return toSourceMerge(localData, generator, generateGetLoc(regNumber), generateGetSlot(slotScope, slotNumber),
-                    needsReturn ? null : ins(new PopIns()));
+                    needsReturn ? null : ins(AVM2Instructions.Pop));
         }
     }
 
@@ -327,29 +310,29 @@ public class NameAVM2Item extends AssignableAVM2Item {
         if (!needsReturn) {
             if (slotNumber > -1) {
                 return toSourceMerge(localData, generator,
-                        ins(new GetScopeObjectIns(), slotScope),
+                        ins(AVM2Instructions.GetScopeObject, slotScope),
                         generateGetSlot(slotScope, slotNumber),
-                        (decrement ? ins(isInteger ? new DecrementIIns() : new DecrementIns()) : ins(isInteger ? new IncrementIIns() : new IncrementIns())),
-                        ins(new SetSlotIns(), slotNumber)
+                        (decrement ? ins(isInteger ? AVM2Instructions.DecrementI : AVM2Instructions.Decrement) : ins(isInteger ? AVM2Instructions.IncrementI : AVM2Instructions.Increment)),
+                        ins(AVM2Instructions.SetSlot, slotNumber)
                 );
             } else {
                 return toSourceMerge(localData, generator,
-                        (decrement ? ins(isInteger ? new DecLocalIIns() : new DecLocalIns(), regNumber) : ins(isInteger ? new IncLocalIIns() : new IncLocalIns(), regNumber)));
+                        (decrement ? ins(isInteger ? AVM2Instructions.DecLocalI : AVM2Instructions.DecLocal, regNumber) : ins(isInteger ? AVM2Instructions.IncLocalI : AVM2Instructions.IncLocal, regNumber)));
             }
         }
         return toSourceMerge(localData, generator,
-                slotNumber > -1 ? ins(new GetScopeObjectIns(), slotScope) : null,
+                slotNumber > -1 ? ins(AVM2Instructions.GetScopeObject, slotScope) : null,
                 //Start get original
                 generateGetLoc(regNumber), generateGetSlot(slotScope, slotNumber),
                 //End get original
-                //!isInteger ? ins(new ConvertDIns()) : null,
+                //!isInteger ? ins(AVM2Instructions.ConvertD) : null,
                 //End get original
-                (!post) ? (decrement ? ins(isInteger ? new DecrementIIns() : new DecrementIns()) : ins(isInteger ? new IncrementIIns() : new IncrementIns())) : null,
-                needsReturn ? ins(new DupIns()) : null,
-                (post) ? (decrement ? ins(isInteger ? new DecrementIIns() : new DecrementIns()) : ins(isInteger ? new IncrementIIns() : new IncrementIns())) : null,
+                (!post) ? (decrement ? ins(isInteger ? AVM2Instructions.DecrementI : AVM2Instructions.Decrement) : ins(isInteger ? AVM2Instructions.IncrementI : AVM2Instructions.Increment)) : null,
+                needsReturn ? ins(AVM2Instructions.Dup) : null,
+                (post) ? (decrement ? ins(isInteger ? AVM2Instructions.DecrementI : AVM2Instructions.Decrement) : ins(isInteger ? AVM2Instructions.IncrementI : AVM2Instructions.Increment)) : null,
                 generateCoerce(localData, generator, returnType()),
                 generateSetLoc(regNumber),
-                slotNumber > -1 ? ins(new SetSlotIns(), slotNumber) : null
+                slotNumber > -1 ? ins(AVM2Instructions.SetSlot, slotNumber) : null
         );
     }
 }

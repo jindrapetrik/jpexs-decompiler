@@ -242,19 +242,36 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
             }
         }
 
-        boolean result = false;
+        /*boolean result = false;
+         for (int i = 0; i < actions.size(); i++) {
+         if (!reachableActions.contains(actions.get(i))) {
+         actions.removeAction(i);
+         i--;
+         result = true;
+         }
+         }
+
+         return result;*/
+        List<Action> actionsToRemove = null;
         for (int i = 0; i < actions.size(); i++) {
-            if (!reachableActions.contains(actions.get(i))) {
-                actions.removeAction(i);
-                i--;
-                result = true;
+            Action action = actions.get(i);
+            if (!reachableActions.contains(action)) {
+                if (actionsToRemove == null) {
+                    actionsToRemove = new ArrayList<>();
+                }
+
+                actionsToRemove.add(action);
             }
         }
 
-        return result;
+        if (actionsToRemove != null) {
+            actions.removeActions(actionsToRemove);
+        }
+
+        return actionsToRemove != null;
     }
 
-    protected boolean removeZeroJumps(ActionList actions) {
+    protected boolean removeZeroJumpsOld(ActionList actions) {
         boolean result = false;
         for (int i = 0; i < actions.size(); i++) {
             Action action = actions.get(i);
@@ -267,6 +284,26 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
         return result;
     }
 
+    protected boolean removeZeroJumps(ActionList actions) {
+        List<Action> actionsToRemove = null;
+        for (int i = 0; i < actions.size(); i++) {
+            Action action = actions.get(i);
+            if (action instanceof ActionJump && ((ActionJump) action).getJumpOffset() == 0) {
+                if (actionsToRemove == null) {
+                    actionsToRemove = new ArrayList<>();
+                }
+
+                actionsToRemove.add(action);
+            }
+        }
+
+        if (actionsToRemove != null) {
+            actions.removeActions(actionsToRemove);
+        }
+
+        return actionsToRemove != null;
+    }
+
     private void executeActions(ActionList actions, int idx, int endIdx, ExecutionResult result) throws InterruptedException {
         List<GraphTargetItem> output = new ArrayList<>();
         ActionLocalData localData = new ActionLocalData();
@@ -274,6 +311,10 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
         int instructionsProcessed = 0;
 
         while (true) {
+            if (Thread.currentThread().isInterrupted()) {
+                throw new InterruptedException();
+            }
+
             if (idx > endIdx) {
                 break;
             }

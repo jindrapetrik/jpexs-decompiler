@@ -18,7 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallPropertyIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -64,7 +64,7 @@ public class CallPropertyAVM2Item extends AVM2Item {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSourceMerge(localData, generator, receiver, arguments,
-                new AVM2Instruction(0, new CallPropertyIns(), new int[]{((AVM2SourceGenerator) generator).propertyName(propertyName), arguments.size()})
+                new AVM2Instruction(0, AVM2Instructions.CallProperty, new int[]{((AVM2SourceGenerator) generator).propertyName(propertyName), arguments.size()})
         );
     }
 

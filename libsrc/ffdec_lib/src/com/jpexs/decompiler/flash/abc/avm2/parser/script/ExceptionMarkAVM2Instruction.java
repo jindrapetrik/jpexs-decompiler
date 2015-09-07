@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
 /**
  *
@@ -34,7 +33,7 @@ public class ExceptionMarkAVM2Instruction extends AVM2Instruction {
         super(0, null, null);
         this.markType = markType;
         this.exceptionId = exceptionId;
-        this.definition = new InstructionDefinition(0, "--mark", new int[0], false /*?*/);
+        this.definition = ExceptionMarkIns.getInstance();
     }
 
     @Override

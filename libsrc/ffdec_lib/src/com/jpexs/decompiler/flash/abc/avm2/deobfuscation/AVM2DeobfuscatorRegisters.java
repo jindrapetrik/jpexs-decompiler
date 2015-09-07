@@ -67,16 +67,38 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
 
     }
 
+    private Set<Integer> getRegisters(AVM2Code code) {
+        Set<Integer> regs = new HashSet<>();
+        for (AVM2Instruction ins : code.code) {
+            InstructionDefinition def = ins.definition;
+            if (def instanceof SetLocalTypeIns) {
+                int regId = ((SetLocalTypeIns) def).getRegisterId(ins);
+                regs.add(regId);
+            } else if (def instanceof GetLocalTypeIns) {
+                int regId = ((GetLocalTypeIns) def).getRegisterId(ins);
+                regs.add(regId);
+            } else {
+                for (int p = 0; p < ins.definition.operands.length; p++) {
+                    int op = ins.definition.operands[p];
+                    if (op == AVM2Code.DAT_REGISTER_INDEX || op == AVM2Code.DAT_LOCAL_REG_INDEX) {
+                        int regId = ins.operands[p];
+                        regs.add(regId);
+                    }
+                }
+            }
+        }
+
+        return regs;
+    }
+
     @Override
-    public void deobfuscate(String path, int classIndex, boolean isStatic, int scriptIndex, ABC abc, AVM2ConstantPool cpool, Trait trait, MethodInfo minfo, MethodBody abody) throws InterruptedException {
+    public void deobfuscate(String path, int classIndex, boolean isStatic, int scriptIndex, ABC abc, AVM2ConstantPool cpool, Trait trait, MethodInfo minfo, MethodBody body) throws InterruptedException {
         //System.err.println("regdeo:" + path);
 
-        removeUnreachableInstructions(abody.getCode(), cpool, trait, minfo, abody);
+        MethodBody originalBody = body;
+        removeUnreachableInstructions(body.getCode(), cpool, trait, minfo, body);
         Set<Integer> ignoredRegs = new HashSet<>();
 
-        MethodBody body = abody.clone();
-        Reference<AVM2Instruction> assignment = new Reference<>(null);
-        ignoredRegs.clear();
         int localReservedCount = body.getLocalReservedCount();
         for (int i = 0; i < localReservedCount; i++) {
             ignoredRegs.add(i);
@@ -86,22 +108,27 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
         List<Integer> listedRegs = new ArrayList<>();
         List<MethodBody> listedLastBodies = new ArrayList<>();
         Set<Integer> ignoredRegGets = new HashSet<>();
+        Reference<AVM2Instruction> assignmentRef = new Reference<>(null);
 
         while (setReg > -1) {
+            if (Thread.currentThread().isInterrupted()) {
+                throw new InterruptedException();
+            }
+
             MethodBody bodybefore = body;
             body = bodybefore.clone();
-            setReg = getFirstRegisterSetter(assignment, classIndex, isStatic, scriptIndex, abc, cpool, trait, minfo, body, ignoredRegs, ignoredRegGets);
-            //System.err.println("setreg " + setReg + " ass:" + assignment.getVal());
+            setReg = getFirstRegisterSetter(assignmentRef, classIndex, isStatic, scriptIndex, abc, body, ignoredRegs, ignoredRegGets);
+            //System.err.println("setreg " + setReg + " ass:" + assignment);
             if (setReg < 0) {
                 break;
             }
 
-            //if there is second assignment
+            // if there is second assignment
             if (listedRegs.contains(setReg)) {
                 //System.err.println("second assignment of loc" + setReg + ", ignoring");
                 int lindex = listedRegs.indexOf(setReg);
-                body = listedLastBodies.get(lindex); //switch to body before
-                ignoredRegs.add(setReg); //this is not obfuscated
+                body = listedLastBodies.get(lindex); // switch to body before
+                ignoredRegs.add(setReg); // this is not obfuscated
                 for (int i = listedRegs.size() - 1; i >= lindex; i--) {
                     int r = listedRegs.get(i);
                     listedRegs.remove(i);
@@ -111,11 +138,13 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
                 continue;
             }
 
-            if ((assignment.getVal().definition instanceof SetLocalTypeIns) || (assignment.getVal().definition instanceof GetLocalTypeIns /*First usage -> value undefined*/)) {
-                super.removeObfuscationIfs(classIndex, isStatic, scriptIndex, abc, cpool, trait, minfo, body, Arrays.asList(assignment.getVal()));
+            AVM2Instruction assignment = assignmentRef.getVal();
+            InstructionDefinition def = assignment.definition;
+            if ((def instanceof SetLocalTypeIns) || (def instanceof GetLocalTypeIns /*First usage -> value undefined*/)) {
+                super.removeObfuscationIfs(classIndex, isStatic, scriptIndex, abc, cpool, trait, minfo, body, Arrays.asList(assignment));
             }
 
-            if (assignment.getVal().definition instanceof GetLocalTypeIns) {
+            if (def instanceof GetLocalTypeIns) {
                 ignoredRegGets.add(setReg);
             }
 
@@ -123,9 +152,9 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
             listedLastBodies.add(bodybefore);
         }
 
-        abody.exceptions = body.exceptions;
-        abody.setCode(body.getCode());
-        removeUnreachableInstructions(abody.getCode(), cpool, trait, minfo, abody);
+        originalBody.exceptions = body.exceptions;
+        originalBody.setCode(body.getCode());
+        removeUnreachableInstructions(body.getCode(), cpool, trait, minfo, body);
         //System.err.println("/deo");
     }
 
@@ -142,7 +171,7 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
                 SetLocalTypeIns slt = (SetLocalTypeIns) ins.definition;
                 int regId = slt.getRegisterId(ins);
                 if (singleRegisters.containsKey(regId)) {
-                    code.replaceInstruction(i, new AVM2Instruction(ins.offset, new DeobfuscatePopIns(), null), body);
+                    code.replaceInstruction(i, new AVM2Instruction(ins.offset, DeobfuscatePopIns.getInstance(), null), body);
                 }
             }
 
@@ -156,22 +185,21 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
         }
     }
 
-    private int getFirstRegisterSetter(Reference<AVM2Instruction> assignment, int classIndex, boolean isStatic, int scriptIndex, ABC abc, AVM2ConstantPool cpool, Trait trait, MethodInfo minfo, MethodBody body, Set<Integer> ignoredRegisters, Set<Integer> ignoredGets) throws InterruptedException {
+    private int getFirstRegisterSetter(Reference<AVM2Instruction> assignment, int classIndex, boolean isStatic, int scriptIndex, ABC abc, MethodBody body, Set<Integer> ignoredRegisters, Set<Integer> ignoredGets) throws InterruptedException {
         AVM2Code code = body.getCode();
 
         if (code.code.isEmpty()) {
             return -1;
         }
 
-        ExecutionResult res = new ExecutionResult();
-        return visitCode(assignment, new HashSet<>(), new TranslateStack("deo"), classIndex, isStatic, body, scriptIndex, abc, code, 0, code.code.size() - 1, res, ignoredRegisters, ignoredGets);
+        return visitCode(assignment, new HashSet<>(), new TranslateStack("deo"), classIndex, isStatic, body, scriptIndex, abc, code, 0, code.code.size() - 1, ignoredRegisters, ignoredGets);
     }
 
-    private int visitCode(Reference<AVM2Instruction> assignment, Set<Integer> visited, TranslateStack stack, int classIndex, boolean isStatic, MethodBody body, int scriptIndex, ABC abc, AVM2Code code, int idx, int endIdx, ExecutionResult result, Set<Integer> ignored, Set<Integer> ignoredGets) throws InterruptedException {
+    private int visitCode(Reference<AVM2Instruction> assignment, Set<Integer> visited, TranslateStack stack, int classIndex, boolean isStatic, MethodBody body, int scriptIndex, ABC abc, AVM2Code code, int idx, int endIdx, Set<Integer> ignored, Set<Integer> ignoredGets) throws InterruptedException {
         List<GraphTargetItem> output = new ArrayList<>();
         AVM2LocalData localData = newLocalData(scriptIndex, abc, abc.constants, body, isStatic, classIndex);
         initLocalRegs(localData, body.getLocalReservedCount(), body.max_regs);
-        localData.localRegs.put(0, new NullAVM2Item(null));//this
+        localData.localRegs.put(0, new NullAVM2Item(null)); // this
 
         List<Integer> toVisit = new ArrayList<>();
         toVisit.add(idx);
@@ -179,6 +207,10 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
         toVisitStacks.add(stack);
         outer:
         while (!toVisit.isEmpty()) {
+            if (Thread.currentThread().isInterrupted()) {
+                throw new InterruptedException();
+            }
+
             idx = toVisit.remove(0);
             stack = toVisitStacks.remove(0);
 
@@ -219,7 +251,7 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
                 } else {
                     for (int p = 0; p < ins.definition.operands.length; p++) {
                         int op = ins.definition.operands[p];
-                        if (op == AVM2Code.DAT_REGISTER_INDEX) {
+                        if (op == AVM2Code.DAT_REGISTER_INDEX/* || op == AVM2Code.DAT_LOCAL_REG_INDEX ???*/) {
                             int regId = ins.operands[p];
                             if (!ignored.contains(regId)) {
                                 assignment.setVal(ins);

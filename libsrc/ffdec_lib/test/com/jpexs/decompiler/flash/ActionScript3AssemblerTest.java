@@ -123,7 +123,7 @@ public class ActionScript3AssemblerTest extends ActionScriptTestBase {
                 + "pushtrue\r\n"
                 + "pop\r\n"
                 + "label1:pushfalse\r\n");
-        b.getCode().replaceInstruction(getBaseAddr() + 2, new AVM2Instruction(0, new DeobfuscatePopIns(), new int[]{}), b);
+        b.getCode().replaceInstruction(getBaseAddr() + 2, new AVM2Instruction(0, DeobfuscatePopIns.getInstance(), new int[]{}), b);
     }
 
     @Test
@@ -135,6 +135,6 @@ public class ActionScript3AssemblerTest extends ActionScriptTestBase {
                 + "jump label1\r\n" //remove this
                 + "pop\r\n"
                 + "label1:pushfalse\r\n");
-        b.getCode().replaceInstruction(getBaseAddr() + 4, new AVM2Instruction(0, new DeobfuscatePopIns(), new int[]{}), b);
+        b.getCode().replaceInstruction(getBaseAddr() + 4, new AVM2Instruction(0, DeobfuscatePopIns.getInstance(), new int[]{}), b);
     }
 }

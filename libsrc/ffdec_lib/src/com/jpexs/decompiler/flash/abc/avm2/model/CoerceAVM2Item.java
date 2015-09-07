@@ -18,13 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceAIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceSIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertBIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertDIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertIIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertUIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
@@ -112,26 +106,26 @@ public class CoerceAVM2Item extends AVM2Item {
         AVM2Instruction ins;
         switch (typeObj.toString()) {
             case "*":
-                ins = new AVM2Instruction(0, new CoerceAIns(), null);
+                ins = new AVM2Instruction(0, AVM2Instructions.CoerceA, null);
                 break;
             case "String":
-                ins = new AVM2Instruction(0, new CoerceSIns(), null);
+                ins = new AVM2Instruction(0, AVM2Instructions.CoerceS, null);
                 break;
             case "Boolean":
-                ins = new AVM2Instruction(0, new ConvertBIns(), null);
+                ins = new AVM2Instruction(0, AVM2Instructions.ConvertB, null);
                 break;
             case "int":
-                ins = new AVM2Instruction(0, new ConvertIIns(), null);
+                ins = new AVM2Instruction(0, AVM2Instructions.ConvertI, null);
                 break;
             case "uint":
-                ins = new AVM2Instruction(0, new ConvertUIns(), null);
+                ins = new AVM2Instruction(0, AVM2Instructions.ConvertU, null);
                 break;
             case "Number":
-                ins = new AVM2Instruction(0, new ConvertDIns(), null);
+                ins = new AVM2Instruction(0, AVM2Instructions.ConvertD, null);
                 break;
             default:
                 int type_index = AVM2SourceGenerator.resolveType(localData, typeObj, ((AVM2SourceGenerator) generator).abc, (((AVM2SourceGenerator) generator).allABCs));
-                ins = new AVM2Instruction(0, new CoerceIns(), new int[]{type_index});
+                ins = new AVM2Instruction(0, AVM2Instructions.Coerce, new int[]{type_index});
                 break;
         }
         return toSourceMerge(localData, generator, value, ins);

@@ -19,14 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallPropVoidIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallPropertyIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallSuperIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallSuperVoidIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrictIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetGlobalScopeIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.types.ValueKind;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -133,16 +126,16 @@ public class CallAVM2Item extends AVM2Item {
 
         if (propIndex != -1) {
             if (obj == null) {
-                obj = new AVM2Instruction(0, new FindPropertyStrictIns(), new int[]{propIndex});
+                obj = new AVM2Instruction(0, AVM2Instructions.FindPropertyStrict, new int[]{propIndex});
             }
 
             boolean isSuper = (obj instanceof NameAVM2Item) && "super".equals(((NameAVM2Item) obj).getVariableName());
 
-            InstructionDefinition insDef = isSuper
-                    ? (needsReturn ? new CallSuperIns() : new CallSuperVoidIns())
-                    : (needsReturn ? new CallPropertyIns() : new CallPropVoidIns());
+            int insCode = isSuper
+                    ? (needsReturn ? AVM2Instructions.CallSuper : AVM2Instructions.CallSuperVoid)
+                    : (needsReturn ? AVM2Instructions.CallProperty : AVM2Instructions.CallPropVoid);
             return toSourceMerge(localData, generator, obj, arguments,
-                    ins(insDef, propIndex, arguments.size())
+                    ins(insCode, propIndex, arguments.size())
             );
         }
 
@@ -153,7 +146,7 @@ public class CallAVM2Item extends AVM2Item {
             return ((NamespacedAVM2Item) callable).toSource(localData, generator, needsReturn, true, arguments, false, false);
         }
 
-        return toSourceMerge(localData, generator, callable, ins(new GetGlobalScopeIns()), arguments, ins(new CallIns(), arguments.size()));
+        return toSourceMerge(localData, generator, callable, ins(AVM2Instructions.GetGlobalScope), arguments, ins(AVM2Instructions.Call, arguments.size()));
     }
 
     @Override

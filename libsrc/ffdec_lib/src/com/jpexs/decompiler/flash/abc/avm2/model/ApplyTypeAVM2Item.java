@@ -18,7 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ApplyTypeIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -74,15 +74,15 @@ public class ApplyTypeAVM2Item extends AVM2Item {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
-        //int qname = AVM2SourceGenerator.resolveType(localData,object,((AVM2SourceGenerator)generator).abc,((AVM2SourceGenerator)generator).allABCs);
+        //int qname = AVM2SourceGenerator.resolveType(localData, object, ((AVM2SourceGenerator)generator).abc, ((AVM2SourceGenerator)generator).allABCs);
         List<GraphSourceItem> nparams = new ArrayList<>();
         for (GraphTargetItem i : params) {
-            nparams.addAll(i.toSource(localData, generator));//ins(new GetLexIns(),AVM2SourceGenerator.resolveType(localData,i,((AVM2SourceGenerator)generator).abc,((AVM2SourceGenerator)generator).allABCs)));
+            nparams.addAll(i.toSource(localData, generator));//ins(AVM2Instructions.GetLex, AVM2SourceGenerator.resolveType(localData, i, ((AVM2SourceGenerator)generator).abc,((AVM2SourceGenerator)generator).allABCs)));
         }
         return toSourceMerge(localData, generator,
                 object,
                 nparams,
-                ins(new ApplyTypeIns(), params.size())
+                ins(AVM2Instructions.ApplyType, params.size())
         );
     }
 }

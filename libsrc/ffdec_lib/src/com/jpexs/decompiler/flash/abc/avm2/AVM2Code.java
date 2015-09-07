@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorSimple;
 import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2Graph;
 import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2GraphSource;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.DeobfuscatePopIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.IfTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
@@ -790,7 +791,7 @@ public class AVM2Code implements Cloneable {
         List<Long> switchAddresses = new ArrayList<>();
         int availableBytes = ais.available();
         for (int i = 0; i < availableBytes; i++) {
-            codeMap.put((long) i, new AVM2Instruction(i, new NopIns(), null));
+            codeMap.put((long) i, new AVM2Instruction(i, AVM2Instructions.Nop, null));
         }
 
         long startPos = ais.getPosition();
@@ -833,7 +834,7 @@ public class AVM2Code implements Cloneable {
 
                     int instructionCode = ais.read("instructionCode");
                     InstructionDefinition instr = instructionSet[instructionCode];
-                    if (instr instanceof LookupSwitchIns) {
+                    if (instructionCode == AVM2Instructions.LookupSwitch) {
                         if (!isSwitch) {
                             switchAddresses.add(startOffset);
                             continue loopaddr;
@@ -1268,10 +1269,10 @@ public class AVM2Code implements Cloneable {
                         if (fixBranch > -1) {
                             if (ins.definition instanceof IfTypeIns) {
                                 for (int i = 0; i < -ins.definition.getStackDelta(ins, null/*IfTypeIns do not require ABCs*/); i++) {
-                                    writer.appendNoHilight(new DeobfuscatePopIns().instructionName).newLine();
+                                    writer.appendNoHilight(DeobfuscatePopIns.NAME).newLine();
                                 }
                                 if (fixBranch == 0) { // jump
-                                    writer.appendNoHilight(new JumpIns().instructionName + " ofs" + Helper.formatAddress(ofs + ins.getBytesLength() + ins.operands[0]));
+                                    writer.appendNoHilight(JumpIns.NAME + " ofs" + Helper.formatAddress(ofs + ins.getBytesLength() + ins.operands[0]));
                                 } else {
                                     // nojump, ignore
                                 }
@@ -1301,16 +1302,24 @@ public class AVM2Code implements Cloneable {
 
     private List<Long> posCache;
 
+    private Map<Long, Integer> posCacheReverse;
+
     private void buildCache() {
-        posCache = new ArrayList<>();
+        List<Long> posCache = new ArrayList<>(code.size() + 1);
+        Map<Long, Integer> posCacheReverse = new HashMap<>(code.size() + 1);
         long a = 0;
-        for (int i = 0; i < code.size(); i++) {
+        int i = 0;
+        for (; i < code.size(); i++) {
             AVM2Instruction ins = code.get(i);
             posCache.add(ins.offset);
+            posCacheReverse.put(ins.offset, i);
             a = ins.offset + ins.getBytesLength();
         }
 
         posCache.add(a);
+        posCacheReverse.put(a, i);
+        this.posCache = posCache;
+        this.posCacheReverse = posCacheReverse;
         cacheActual = true;
     }
 
@@ -1322,8 +1331,8 @@ public class AVM2Code implements Cloneable {
         if (!cacheActual) {
             buildCache();
         }
-        int ret = posCache.indexOf(address);
-        if (ret == -1) {
+        Integer ret = posCacheReverse.get(address);
+        if (ret == null) {
             if (nearest) {
                 for (long a : posCache) {
                     if (a > address) {
@@ -2023,8 +2032,8 @@ public class AVM2Code implements Cloneable {
 
         boolean someIgnored = false;
         for (Long insAddr : insAddrToRemove) {
-            int pos = posCache.indexOf(insAddr);
-            if (pos > -1) {
+            Integer pos = posCacheReverse.get(insAddr);
+            if (pos != null) {
                 code.get(pos).ignored = true;
                 someIgnored = true;
             }
@@ -2322,7 +2331,8 @@ public class AVM2Code implements Cloneable {
                 handleRegister(stats, ((GetLocalTypeIns) ins.definition).getRegisterId(ins));
             } else {
                 for (int i = 0; i < ins.definition.operands.length; i++) {
-                    if (ins.definition.operands[i] == DAT_REGISTER_INDEX) {
+                    int op = ins.definition.operands[i];
+                    if (op == DAT_REGISTER_INDEX/* || op == DAT_LOCAL_REG_INDEX ???*/) {
                         handleRegister(stats, ins.operands[i]);
                     }
                 }
@@ -2559,7 +2569,7 @@ public class AVM2Code implements Cloneable {
                             prev.ignored = true;
                             prev2.ignored = true;
                             if (prev.operands[0] == prev2.operands[0]) {
-                                ins.definition = new JumpIns();
+                                ins.definition = AVM2Code.instructionSet[AVM2Instructions.Jump];
                                 visited[ip]--;
                             } else {
                                 ins.ignored = true;
@@ -2572,7 +2582,7 @@ public class AVM2Code implements Cloneable {
                             prev.ignored = true;
                             prev2.ignored = true;
                             if (prev.operands[0] != prev2.operands[0]) {
-                                ins.definition = new JumpIns();
+                                ins.definition = AVM2Code.instructionSet[AVM2Instructions.Jump];
                                 visited[ip]--;
                             } else {
                                 ins.ignored = true;
@@ -2586,7 +2596,7 @@ public class AVM2Code implements Cloneable {
                 if ((prev != null) && ins.definition instanceof IfTrueIns) {
                     if (prev.definition instanceof PushTrueIns) {
                         prev.ignored = true;
-                        ins.definition = new JumpIns();
+                        ins.definition = AVM2Code.instructionSet[AVM2Instructions.Jump];
                         visited[ip]--;
                         ret++;
                         continue;
@@ -2601,7 +2611,7 @@ public class AVM2Code implements Cloneable {
                 if ((prev != null) && ins.definition instanceof IfFalseIns) {
                     if (prev.definition instanceof PushFalseIns) {
                         prev.ignored = true;
-                        ins.definition = new JumpIns();
+                        ins.definition = AVM2Code.instructionSet[AVM2Instructions.Jump];
                         visited[ip]--;
                         ret++;
                         continue;
@@ -2869,11 +2879,11 @@ public class AVM2Code implements Cloneable {
                         if (ins2.isExit()) {
                             code.set(i, new AVM2Instruction(ofs, ins2.definition, ins2.operands));
                             AVM2Instruction nopIns;
-                            nopIns = new AVM2Instruction(ofs + 1, new NopIns(), null);
+                            nopIns = new AVM2Instruction(ofs + 1, AVM2Instructions.Nop, null);
                             code.add(i + 1, nopIns);
-                            nopIns = new AVM2Instruction(ofs + 2, new NopIns(), null);
+                            nopIns = new AVM2Instruction(ofs + 2, AVM2Instructions.Nop, null);
                             code.add(i + 2, nopIns);
-                            nopIns = new AVM2Instruction(ofs + 3, new NopIns(), null);
+                            nopIns = new AVM2Instruction(ofs + 3, AVM2Instructions.Nop, null);
                             code.add(i + 3, nopIns);
                             i += 3;
                             csize = code.size();
@@ -3206,7 +3216,7 @@ public class AVM2Code implements Cloneable {
                         if (secondPass) {
                             if (condition && (dec.jumpUsed) && (!dec.skipUsed)) {
                                 ins.setFixBranch(0);
-                                //((AVM2Instruction) ins).definition = new JumpIns();
+                                //ins.definition = AVM2Code.instructionSet[AVM2Instructions.Jump];
                             }
                             if ((!condition) && (!dec.jumpUsed) && (dec.skipUsed)) {
                                 ins.setFixBranch(1);

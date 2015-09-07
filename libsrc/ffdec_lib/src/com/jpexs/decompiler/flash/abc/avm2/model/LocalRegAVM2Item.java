@@ -18,11 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal0Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal1Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal2Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal3Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocalIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.FilterAVM2Item;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -94,19 +90,19 @@ public class LocalRegAVM2Item extends AVM2Item {
         AVM2Instruction ins;
         switch (regIndex) {
             case 0:
-                ins = new AVM2Instruction(0, new GetLocal0Ins(), null);
+                ins = new AVM2Instruction(0, AVM2Instructions.GetLocal0, null);
                 break;
             case 1:
-                ins = new AVM2Instruction(0, new GetLocal1Ins(), null);
+                ins = new AVM2Instruction(0, AVM2Instructions.GetLocal1, null);
                 break;
             case 2:
-                ins = new AVM2Instruction(0, new GetLocal2Ins(), null);
+                ins = new AVM2Instruction(0, AVM2Instructions.GetLocal2, null);
                 break;
             case 3:
-                ins = new AVM2Instruction(0, new GetLocal3Ins(), null);
+                ins = new AVM2Instruction(0, AVM2Instructions.GetLocal3, null);
                 break;
             default:
-                ins = new AVM2Instruction(0, new GetLocalIns(), new int[]{regIndex});
+                ins = new AVM2Instruction(0, AVM2Instructions.GetLocal, new int[]{regIndex});
                 break;
         }
         return toSourceMerge(localData, generator, ins);

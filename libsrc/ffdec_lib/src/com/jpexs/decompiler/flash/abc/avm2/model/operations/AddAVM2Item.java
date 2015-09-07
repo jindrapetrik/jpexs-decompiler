@@ -18,8 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.AddIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.IncrementIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.ecma.EcmaType;
@@ -77,12 +76,12 @@ public class AddAVM2Item extends BinaryOpItem {
             IntegerValueAVM2Item iv = (IntegerValueAVM2Item) rightSide;
             if (iv.value == 1) {
                 return toSourceMerge(localData, generator, leftSide,
-                        new AVM2Instruction(0, new IncrementIns(), null)
+                        new AVM2Instruction(0, AVM2Instructions.Increment, null)
                 );
             }
         }
         return toSourceMerge(localData, generator, leftSide, rightSide,
-                new AVM2Instruction(0, new AddIns(), null)
+                new AVM2Instruction(0, AVM2Instructions.Add, null)
         );
     }
 

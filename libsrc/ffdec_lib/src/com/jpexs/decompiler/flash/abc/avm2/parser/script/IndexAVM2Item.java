@@ -18,16 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.DecrementIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.IncrementIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.ConstructPropIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.DeletePropertyIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetPropertyIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.SetPropertyIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.DupIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertDIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -102,16 +93,16 @@ public class IndexAVM2Item extends AssignableAVM2Item {
         return toSourceMerge(localData, generator,
                 object, dupSetTemp(localData, generator, obj_temp),
                 index, dupSetTemp(localData, generator, index_temp),
-                ins(new GetPropertyIns(), indexPropIndex),
-                post ? ins(new ConvertDIns()) : null,
-                (!post) ? (decrement ? ins(new DecrementIns()) : ins(new IncrementIns())) : null,
-                needsReturn ? ins(new DupIns()) : null,
-                post ? (decrement ? ins(new DecrementIns()) : ins(new IncrementIns())) : null,
+                ins(AVM2Instructions.GetProperty, indexPropIndex),
+                post ? ins(AVM2Instructions.ConvertD) : null,
+                (!post) ? (decrement ? ins(AVM2Instructions.Decrement) : ins(AVM2Instructions.Increment)) : null,
+                needsReturn ? ins(AVM2Instructions.Dup) : null,
+                post ? (decrement ? ins(AVM2Instructions.Decrement) : ins(AVM2Instructions.Increment)) : null,
                 setTemp(localData, generator, val_temp),
                 getTemp(localData, generator, obj_temp),
                 getTemp(localData, generator, index_temp),
                 getTemp(localData, generator, val_temp),
-                ins(new SetPropertyIns(), indexPropIndex),
+                ins(AVM2Instructions.SetProperty, indexPropIndex),
                 killTemp(localData, generator, Arrays.asList(val_temp, obj_temp, index_temp))
         );
 
@@ -128,19 +119,19 @@ public class IndexAVM2Item extends AssignableAVM2Item {
                     index,
                     assignedValue,
                     needsReturn ? dupSetTemp(localData, generator, ret_temp) : null,
-                    ins(new SetPropertyIns(), indexPropIndex),
+                    ins(AVM2Instructions.SetProperty, indexPropIndex),
                     needsReturn ? getTemp(localData, generator, ret_temp) : null,
                     killTemp(localData, generator, Arrays.asList(ret_temp)));
         } else {
             return toSourceMerge(localData, generator,
                     object,
-                    call ? ins(new DupIns()) : null,
+                    call ? ins(AVM2Instructions.Dup) : null,
                     index,
                     construct ? callargs : null,
-                    ins(construct ? new ConstructPropIns() : delete ? new DeletePropertyIns() : new GetPropertyIns(), indexPropIndex, construct ? callargs.size() : null),
+                    ins(construct ? AVM2Instructions.ConstructProp : delete ? AVM2Instructions.DeleteProperty : AVM2Instructions.GetProperty, indexPropIndex, construct ? callargs.size() : null),
                     call ? callargs : null,
-                    call ? ins(new CallIns(), callargs.size()) : null,
-                    needsReturn ? null : ins(new PopIns()));
+                    call ? ins(AVM2Instructions.Call, callargs.size()) : null,
+                    needsReturn ? null : ins(AVM2Instructions.Pop));
         }
 
     }

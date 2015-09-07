@@ -18,10 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.LessThanIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfLtIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfNLtIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.DottedChain;
@@ -40,13 +37,13 @@ public class LtAVM2Item extends BinaryOpItem implements LogicalOpItem, IfConditi
     }
 
     @Override
-    public InstructionDefinition getIfDefinition() {
-        return new IfLtIns();
+    public int getIfDefinition() {
+        return AVM2Instructions.IfLt;
     }
 
     @Override
-    public InstructionDefinition getIfNotDefinition() {
-        return new IfNLtIns();
+    public int getIfNotDefinition() {
+        return AVM2Instructions.IfNLt;
     }
 
     @Override
@@ -62,7 +59,7 @@ public class LtAVM2Item extends BinaryOpItem implements LogicalOpItem, IfConditi
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSourceMerge(localData, generator, leftSide, rightSide,
-                new AVM2Instruction(0, new LessThanIns(), null)
+                new AVM2Instruction(0, AVM2Instructions.LessThan, null)
         );
     }
 

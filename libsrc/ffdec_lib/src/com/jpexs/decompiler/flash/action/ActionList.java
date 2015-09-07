@@ -60,6 +60,10 @@ public class ActionList extends ArrayList<Action> {
         ActionListReader.removeAction(this, index, SWF.DEFAULT_VERSION, true);
     }
 
+    public void removeActions(List<Action> actionsToRemove) {
+        ActionListReader.removeActions(this, actionsToRemove, SWF.DEFAULT_VERSION, true);
+    }
+
     public void removeAction(int index, int count) {
         if (size() <= index + count - 1) {
             // Can't remove count elements, only size - index is available

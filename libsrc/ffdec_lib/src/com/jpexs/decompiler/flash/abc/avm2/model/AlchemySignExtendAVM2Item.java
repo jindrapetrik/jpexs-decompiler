@@ -17,10 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Sxi16Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Sxi1Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Sxi8Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.DottedChain;
@@ -63,18 +60,18 @@ public class AlchemySignExtendAVM2Item extends AVM2Item {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
-        InstructionDefinition def = null;
+        int code = 0;
         switch (size) {
             case 1:
-                def = new Sxi1Ins();
+                code = AVM2Instructions.Sxi1;
                 break;
             case 8:
-                def = new Sxi8Ins();
+                code = AVM2Instructions.Sxi8;
                 break;
             case 16:
-                def = new Sxi16Ins();
+                code = AVM2Instructions.Sxi16;
                 break;
         }
-        return toSourceMerge(localData, generator, value, ins(def));
+        return toSourceMerge(localData, generator, value, ins(code));
     }
 }

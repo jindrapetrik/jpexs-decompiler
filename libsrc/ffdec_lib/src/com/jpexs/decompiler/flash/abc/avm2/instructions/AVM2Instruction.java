@@ -66,6 +66,10 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
         this.line = line;
     }
 
+    public AVM2Instruction(long offset, int insructionCode, int[] operands) {
+        this(offset, AVM2Code.instructionSet[insructionCode], operands);
+    }
+
     public AVM2Instruction(long offset, InstructionDefinition definition, int[] operands) {
         this.definition = definition;
         this.operands = operands != null && operands.length > 0 ? operands : null;

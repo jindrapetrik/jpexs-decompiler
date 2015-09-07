@@ -42,4 +42,9 @@ public class AddIIns extends AddIns {
     public int getStackPopCount(AVM2Instruction ins, ABC abc) {
         return 2;
     }
+
+    @Override
+    public int getStackPushCount(AVM2Instruction ins, ABC abc) {
+        return 1;
+    }
 }

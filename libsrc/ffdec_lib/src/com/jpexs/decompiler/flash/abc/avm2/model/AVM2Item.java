@@ -18,9 +18,10 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -130,11 +131,12 @@ public abstract class AVM2Item extends GraphTargetItem {
             return toSource(localData, generator);
         }
         List<GraphSourceItem> ret = toSource(localData, generator);
-        ret.add(new AVM2Instruction(0, new PopIns(), null));
+        ret.add(new AVM2Instruction(0, AVM2Instructions.Pop, null));
         return ret;
     }
 
-    public static AVM2Instruction ins(InstructionDefinition def, Integer... operands) {
+    public static AVM2Instruction ins(int instructionCode, Integer... operands) {
+        InstructionDefinition def = AVM2Code.instructionSet[instructionCode];
         List<Integer> ops = new ArrayList<>();
         for (Integer o : operands) {
             if (o != null) {

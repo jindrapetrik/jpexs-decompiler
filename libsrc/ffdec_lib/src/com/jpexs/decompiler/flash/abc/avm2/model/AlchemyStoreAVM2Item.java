@@ -17,12 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Sf32Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Sf64Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Si16Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Si32Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Si8Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -73,24 +68,24 @@ public class AlchemyStoreAVM2Item extends AVM2Item {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         String ts = "" + type + size;
-        InstructionDefinition def = null;
+        int code = 0;
         switch (ts) {
             case "i8":
-                def = new Si8Ins();
+                code = AVM2Instructions.Si8;
                 break;
             case "i16":
-                def = new Si16Ins();
+                code = AVM2Instructions.Si16;
                 break;
             case "i32":
-                def = new Si32Ins();
+                code = AVM2Instructions.Si32;
                 break;
             case "f32":
-                def = new Sf32Ins();
+                code = AVM2Instructions.Sf32;
                 break;
             case "f64":
-                def = new Sf64Ins();
+                code = AVM2Instructions.Sf64;
                 break;
         }
-        return toSourceMerge(localData, generator, ofs, ins(def));
+        return toSourceMerge(localData, generator, ofs, ins(code));
     }
 }

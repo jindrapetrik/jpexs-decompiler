@@ -19,10 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceAIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceSIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertIIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.model.InitVectorAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NanAVM2Item;
@@ -212,17 +209,17 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         AVM2Instruction ins;
         switch (type.toString()) {
             case "int":
-                ins = ins(new ConvertIIns());
+                ins = ins(AVM2Instructions.ConvertI);
                 break;
             case "*":
-                ins = ins(new CoerceAIns());
+                ins = ins(AVM2Instructions.CoerceA);
                 break;
             case "String":
-                ins = ins(new CoerceSIns());
+                ins = ins(AVM2Instructions.CoerceS);
                 break;
             default:
                 int type_index = AVM2SourceGenerator.resolveType(localData, type, ((AVM2SourceGenerator) generator).abc, ((AVM2SourceGenerator) generator).allABCs);
-                ins = ins(new CoerceIns(), type_index);
+                ins = ins(AVM2Instructions.Coerce, type_index);
                 break;
         }
         return ins;

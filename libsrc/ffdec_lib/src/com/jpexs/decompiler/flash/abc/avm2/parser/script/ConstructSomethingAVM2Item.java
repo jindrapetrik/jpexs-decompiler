@@ -19,9 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.ConstructIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.ConstructPropIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrictIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -71,20 +69,20 @@ public class ConstructSomethingAVM2Item extends CallAVM2Item {
             TypeItem prop = (TypeItem) resname;
             int type_index = AVM2SourceGenerator.resolveType(localData, resname, ((AVM2SourceGenerator) generator).abc, ((AVM2SourceGenerator) generator).allABCs);
             return toSourceMerge(localData, generator,
-                    new AVM2Instruction(0, new FindPropertyStrictIns(), new int[]{type_index, arguments.size()}), arguments,
-                    new AVM2Instruction(0, new ConstructPropIns(), new int[]{type_index, arguments.size()})
+                    new AVM2Instruction(0, AVM2Instructions.FindPropertyStrict, new int[]{type_index, arguments.size()}), arguments,
+                    new AVM2Instruction(0, AVM2Instructions.ConstructProp, new int[]{type_index, arguments.size()})
             );
         }
 
         if (resname instanceof PropertyAVM2Item) {
             PropertyAVM2Item prop = (PropertyAVM2Item) resname;
             return toSourceMerge(localData, generator, prop.resolveObject(localData, generator), arguments,
-                    ins(new ConstructPropIns(), prop.resolveProperty(localData), arguments.size())
+                    ins(AVM2Instructions.ConstructProp, prop.resolveProperty(localData), arguments.size())
             );
         }
 
         if (resname instanceof NameAVM2Item) {
-            return toSourceMerge(localData, generator, resname, arguments, ins(new ConstructIns(), arguments.size()));
+            return toSourceMerge(localData, generator, resname, arguments, ins(AVM2Instructions.Construct, arguments.size()));
         }
 
         if (resname instanceof IndexAVM2Item) {
@@ -94,6 +92,6 @@ public class ConstructSomethingAVM2Item extends CallAVM2Item {
         if (resname instanceof NamespacedAVM2Item) {
             return ((NamespacedAVM2Item) resname).toSource(localData, generator, true, false, arguments, false, true);
         }
-        return toSourceMerge(localData, generator, resname, arguments, ins(new ConstructIns(), arguments.size()));
+        return toSourceMerge(localData, generator, resname, arguments, ins(AVM2Instructions.Construct, arguments.size()));
     }
 }

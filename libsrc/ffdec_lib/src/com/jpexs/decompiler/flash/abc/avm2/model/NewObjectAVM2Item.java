@@ -18,7 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewObjectIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.DottedChain;
@@ -80,7 +80,7 @@ public class NewObjectAVM2Item extends AVM2Item {
             args.add(p.value);
         }
         return toSourceMerge(localData, generator, args,
-                new AVM2Instruction(0, new NewObjectIns(), new int[]{pairs.size()})
+                new AVM2Instruction(0, AVM2Instructions.NewObject, new int[]{pairs.size()})
         );
     }
 }

@@ -29,8 +29,16 @@ import java.util.List;
  */
 public class DeobfuscatePopIns extends PopIns {
 
-    public DeobfuscatePopIns() {
-        instructionName = "ffdec_deobfuscatepop";
+    public static final String NAME = "ffdec_deobfuscatepop";
+
+    private static final DeobfuscatePopIns instance = new DeobfuscatePopIns();
+
+    public static final DeobfuscatePopIns getInstance() {
+        return instance;
+    }
+
+    private DeobfuscatePopIns() {
+        instructionName = NAME;
     }
 
     @Override

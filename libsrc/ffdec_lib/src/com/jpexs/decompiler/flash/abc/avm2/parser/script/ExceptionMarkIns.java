@@ -14,17 +14,23 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.abc.avm2.model.operations;
+package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
-import com.jpexs.decompiler.graph.model.BinaryOp;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
 /**
  *
  * @author JPEXS
  */
-public interface IfCondition extends BinaryOp {
+public class ExceptionMarkIns extends InstructionDefinition {
 
-    public int getIfDefinition();
+    private static final ExceptionMarkIns instance = new ExceptionMarkIns();
 
-    public int getIfNotDefinition();
+    public static final ExceptionMarkIns getInstance() {
+        return instance;
+    }
+
+    private ExceptionMarkIns() {
+        super(0, "--mark", new int[0], false /*?*/);
+    }
 }

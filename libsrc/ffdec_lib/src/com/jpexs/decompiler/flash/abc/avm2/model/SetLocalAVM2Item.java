@@ -18,12 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal0Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal1Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal2Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal3Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.DupIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.AssignmentAVM2Item;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -72,23 +67,23 @@ public class SetLocalAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assig
         AVM2Instruction ins;
         switch (regIndex) {
             case 0:
-                ins = new AVM2Instruction(0, new SetLocal0Ins(), null);
+                ins = new AVM2Instruction(0, AVM2Instructions.SetLocal0, null);
                 break;
             case 1:
-                ins = new AVM2Instruction(0, new SetLocal1Ins(), null);
+                ins = new AVM2Instruction(0, AVM2Instructions.SetLocal1, null);
                 break;
             case 2:
-                ins = new AVM2Instruction(0, new SetLocal2Ins(), null);
+                ins = new AVM2Instruction(0, AVM2Instructions.SetLocal2, null);
                 break;
             case 3:
-                ins = new AVM2Instruction(0, new SetLocal3Ins(), null);
+                ins = new AVM2Instruction(0, AVM2Instructions.SetLocal3, null);
                 break;
             default:
-                ins = new AVM2Instruction(0, new SetLocalIns(), new int[]{regIndex});
+                ins = new AVM2Instruction(0, AVM2Instructions.SetLocal, new int[]{regIndex});
                 break;
         }
         return toSourceMerge(localData, generator, value,
-                new AVM2Instruction(0, new DupIns(), null), ins);
+                new AVM2Instruction(0, AVM2Instructions.Dup, null), ins);
     }
 
     @Override
@@ -96,19 +91,19 @@ public class SetLocalAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assig
         AVM2Instruction ins;
         switch (regIndex) {
             case 0:
-                ins = new AVM2Instruction(0, new SetLocal0Ins(), null);
+                ins = new AVM2Instruction(0, AVM2Instructions.SetLocal0, null);
                 break;
             case 1:
-                ins = new AVM2Instruction(0, new SetLocal1Ins(), null);
+                ins = new AVM2Instruction(0, AVM2Instructions.SetLocal1, null);
                 break;
             case 2:
-                ins = new AVM2Instruction(0, new SetLocal2Ins(), null);
+                ins = new AVM2Instruction(0, AVM2Instructions.SetLocal2, null);
                 break;
             case 3:
-                ins = new AVM2Instruction(0, new SetLocal3Ins(), null);
+                ins = new AVM2Instruction(0, AVM2Instructions.SetLocal3, null);
                 break;
             default:
-                ins = new AVM2Instruction(0, new SetLocalIns(), new int[]{regIndex});
+                ins = new AVM2Instruction(0, AVM2Instructions.SetLocal, new int[]{regIndex});
                 break;
         }
         return toSourceMerge(localData, generator, value, ins);

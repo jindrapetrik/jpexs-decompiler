@@ -18,9 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushByteIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushIntIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushShortIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -132,11 +130,11 @@ public class IntegerValueAVM2Item extends NumberValueAVM2Item implements Integer
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         AVM2Instruction ins = null;
         if (value >= -128 && value <= 127) {
-            ins = new AVM2Instruction(0, new PushByteIns(), new int[]{(int) (long) value});
+            ins = new AVM2Instruction(0, AVM2Instructions.PushByte, new int[]{(int) (long) value});
         } else if (value >= -32768 && value <= 32767) {
-            ins = new AVM2Instruction(0, new PushShortIns(), new int[]{((int) (long) value) & 0xffff});
+            ins = new AVM2Instruction(0, AVM2Instructions.PushShort, new int[]{((int) (long) value) & 0xffff});
         } else {
-            ins = new AVM2Instruction(0, new PushIntIns(), new int[]{((AVM2SourceGenerator) generator).abc.constants.getIntId(value, true)});
+            ins = new AVM2Instruction(0, AVM2Instructions.PushInt, new int[]{((AVM2SourceGenerator) generator).abc.constants.getIntId(value, true)});
         }
 
         return toSourceMerge(localData, generator, ins);

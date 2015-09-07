@@ -181,9 +181,11 @@ public class ActionListReader {
             try {
                 new ActionDeobfuscatorSimple().actionListParsed(actions, sis.getSwf());
                 new ActionDeobfuscator().actionListParsed(actions, sis.getSwf());
-            } catch (OutOfMemoryError | StackOverflowError | TranslateException ex) {
+            } catch (ThreadDeath | InterruptedException ex) {
+                throw ex;
+            } catch (Throwable ex) {
                 // keep orignal (not deobfuscated) actions
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, "Deobfuscation failed in: " + path, ex);
             }
         }
 
@@ -583,6 +585,71 @@ public class ActionListReader {
         }
 
         actions.remove(index);
+
+        updateActionLengths(actions, version);
+        updateAddresses(actions, startIp);
+        updateJumps(actions, jumps, containerLastActions, endAddress);
+        updateActionStores(actions, jumps);
+        updateContainerSizes(actions, containerLastActions);
+
+        return true;
+    }
+
+    /**
+     * Removes multiple actions from the action list, and updates all references
+     * This
+     * method will keep the inner actions of the container when you remove the
+     * container
+     *
+     * @param actions
+     * @param actionsToRemove
+     * @param version
+     * @param removeWhenLast
+     * @return
+     */
+    public static boolean removeActions(ActionList actions, List<Action> actionsToRemove, int version, boolean removeWhenLast) {
+
+        long startIp = actions.get(0).getAddress();
+        Action lastAction = actions.get(actions.size() - 1);
+        long endAddress = lastAction.getAddress() + lastAction.getTotalActionLength();
+
+        Map<Action, List<Action>> containerLastActions = new HashMap<>();
+        getContainerLastActions(actions, containerLastActions);
+
+        Map<Action, Action> jumps = new HashMap<>();
+        getJumps(actions, jumps);
+
+        for (Action actionToRemove : actionsToRemove) {
+            int index = actions.indexOf(actionToRemove);
+            Action prevAction = index > 0 ? actions.get(index - 1) : null;
+            Action nextAction = index + 1 < actions.size() ? actions.get(index + 1) : null;
+            for (Action a : containerLastActions.keySet()) {
+                List<Action> lastActions = containerLastActions.get(a);
+                for (int i = 0; i < lastActions.size(); i++) {
+                    if (lastActions.get(i) == actionToRemove) {
+                        if (!removeWhenLast) {
+                            return false;
+                        }
+                        lastActions.set(i, prevAction);
+                    }
+                }
+            }
+
+            for (Action a : jumps.keySet()) {
+                Action targetAction = jumps.get(a);
+                if (targetAction == actionToRemove) {
+                    jumps.put(a, nextAction);
+                }
+            }
+            if (containerLastActions.containsKey(actionToRemove)) {
+                containerLastActions.remove(actionToRemove);
+            }
+            if (jumps.containsKey(actionToRemove)) {
+                jumps.remove(actionToRemove);
+            }
+
+            actions.remove(index);
+        }
 
         updateActionLengths(actions, version);
         updateAddresses(actions, startIp);

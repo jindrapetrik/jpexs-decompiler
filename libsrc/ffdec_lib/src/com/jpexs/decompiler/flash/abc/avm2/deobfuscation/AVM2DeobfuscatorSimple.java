@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.FixItemCounterTranslateStack;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.DeobfuscatePopIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.IfTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
@@ -109,30 +110,30 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
         if (ovalue instanceof Long) {
             long value = (Long) ovalue;
             if (value >= -128 && value <= 127) {
-                return new AVM2Instruction(0, new PushByteIns(), new int[]{(int) (long) value});
+                return new AVM2Instruction(0, AVM2Instructions.PushByte, new int[]{(int) (long) value});
             } else if (value >= -32768 && value <= 32767) {
-                return new AVM2Instruction(0, new PushShortIns(), new int[]{((int) (long) value) & 0xffff});
+                return new AVM2Instruction(0, AVM2Instructions.PushShort, new int[]{((int) (long) value) & 0xffff});
             } else {
-                return new AVM2Instruction(0, new PushIntIns(), new int[]{cpool.getIntId(value, true)});
+                return new AVM2Instruction(0, AVM2Instructions.PushInt, new int[]{cpool.getIntId(value, true)});
             }
         }
         if (ovalue instanceof Double) {
-            return new AVM2Instruction(0, new PushDoubleIns(), new int[]{cpool.getDoubleId((Double) ovalue, true)});
+            return new AVM2Instruction(0, AVM2Instructions.PushDouble, new int[]{cpool.getDoubleId((Double) ovalue, true)});
         }
         if (ovalue instanceof String) {
-            return new AVM2Instruction(0, new PushStringIns(), new int[]{cpool.getStringId((String) ovalue, true)});
+            return new AVM2Instruction(0, AVM2Instructions.PushString, new int[]{cpool.getStringId((String) ovalue, true)});
         }
         if (ovalue instanceof Boolean) {
             if ((Boolean) ovalue) {
-                return new AVM2Instruction(0, new PushTrueIns(), null);
+                return new AVM2Instruction(0, AVM2Instructions.PushTrue, null);
             }
-            return new AVM2Instruction(0, new PushFalseIns(), null);
+            return new AVM2Instruction(0, AVM2Instructions.PushFalse, null);
         }
         if (ovalue instanceof Null) {
-            return new AVM2Instruction(0, new PushNullIns(), null);
+            return new AVM2Instruction(0, AVM2Instructions.PushNull, null);
         }
         if (ovalue instanceof Undefined) {
-            return new AVM2Instruction(0, new PushUndefinedIns(), null);
+            return new AVM2Instruction(0, AVM2Instructions.PushUndefined, null);
         }
         return null;
     }
@@ -191,8 +192,7 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
             localData.localRegs.clear();
             initLocalRegs(localData, localReservedCount, body.max_regs);
 
-            ExecutionResult result = new ExecutionResult();
-            executeInstructions(staticRegs, body, abc, code, localData, i, code.code.size() - 1, result, inlineIns);
+            executeInstructions(staticRegs, body, abc, code, localData, i, code.code.size() - 1, null, inlineIns);
         }
 
         return false;
@@ -202,12 +202,16 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
         code.removeDeadCode(body);
     }
 
-    protected boolean removeZeroJumps(AVM2Code code, MethodBody body) {
+    protected boolean removeZeroJumps(AVM2Code code, MethodBody body) throws InterruptedException {
         boolean result = false;
         for (int i = 0; i < code.code.size(); i++) {
             AVM2Instruction ins = code.code.get(i);
             if (ins.definition instanceof JumpIns) {
                 if (ins.operands[0] == 0) {
+                    if (Thread.currentThread().isInterrupted()) {
+                        throw new InterruptedException();
+                    }
+
                     code.removeInstruction(i, body);
                     i--;
                     result = true;
@@ -284,7 +288,7 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
                 if (def instanceof SetLocalTypeIns) {
                     int regId = ((SetLocalTypeIns) def).getRegisterId(ins);
                     staticRegs.put(regId, localData.localRegs.get(regId).getNotCoerced());
-                    code.replaceInstruction(idx, new AVM2Instruction(0, new DeobfuscatePopIns(), null), body);
+                    code.replaceInstruction(idx, new AVM2Instruction(0, DeobfuscatePopIns.getInstance(), null), body);
                 }
             }
             if (def instanceof GetLocalTypeIns) {
@@ -308,6 +312,7 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
             }
 
             boolean ok = false;
+            // todo: honfika: order by statistics
             if (def instanceof PushByteIns
                     || def instanceof PushShortIns
                     || def instanceof PushIntIns
@@ -390,22 +395,22 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
 
                 if (EcmaScript.toBoolean(res)) {
                     //System.err.println("replacing " + ins + " on " + idx + " with jump");
-                    AVM2Instruction jumpIns = new AVM2Instruction(0, new JumpIns(), new int[]{0});
+                    AVM2Instruction jumpIns = new AVM2Instruction(0, AVM2Instructions.Jump, new int[]{0});
                     //jumpIns.operands[0] = ins.operands[0] /*- ins.getBytes().length*/ + jumpIns.getBytes().length;
                     code.replaceInstruction(idx, jumpIns, body);
                     jumpIns.operands[0] = (int) (tarIns.offset - jumpIns.offset - jumpIns.getBytesLength());
                     for (int s = 0; s < stackCount; s++) {
-                        code.insertInstruction(idx, new AVM2Instruction(ins.offset, new DeobfuscatePopIns(), null), true, body);
+                        code.insertInstruction(idx, new AVM2Instruction(ins.offset, DeobfuscatePopIns.getInstance(), null), true, body);
                     }
 
                     idx = code.adr2pos(jumpIns.offset + jumpIns.getBytesLength() + jumpIns.operands[0]);
                 } else {
                     //System.err.println("replacing " + ins + " on " + idx + " with pop");
-                    code.replaceInstruction(idx, new AVM2Instruction(ins.offset, new DeobfuscatePopIns(), null), body);
+                    code.replaceInstruction(idx, new AVM2Instruction(ins.offset, DeobfuscatePopIns.getInstance(), null), body);
                     for (int s = 1 /*first is replaced*/; s < stackCount; s++) {
-                        code.insertInstruction(idx, new AVM2Instruction(ins.offset, new DeobfuscatePopIns(), null), true, body);
+                        code.insertInstruction(idx, new AVM2Instruction(ins.offset, DeobfuscatePopIns.getInstance(), null), true, body);
                     }
-                    //ins.definition = new DeobfuscatePopIns();
+                    //ins.definition = DeobfuscatePopIns.getInstance();
                     idx++;
                 }
                 ifed = true;
@@ -416,12 +421,13 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
 
             instructionsProcessed++;
 
-            if (stack.allItemsFixed()) {
+            if (result != null && stack.allItemsFixed()) {
                 result.idx = idx == code.code.size() ? idx - 1 : idx;
                 result.instructionsProcessed = instructionsProcessed;
                 result.stack.clear();
                 result.stack.addAll(stack);
             }
+
             if (ifed) {
                 break;
             }

@@ -42,7 +42,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
-public class InstructionDefinition implements Serializable {
+public abstract class InstructionDefinition implements Serializable {
 
     public static final long serialVersionUID = 1L;
 

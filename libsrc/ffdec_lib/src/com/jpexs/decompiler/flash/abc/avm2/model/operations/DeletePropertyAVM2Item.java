@@ -18,7 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.DeletePropertyIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.IndexAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.NamespacedAVM2Item;
@@ -71,7 +71,7 @@ public class DeletePropertyAVM2Item extends AVM2Item {
         if (p instanceof PropertyAVM2Item) {
             PropertyAVM2Item prop = (PropertyAVM2Item) p;
             return toSourceMerge(localData, generator, prop.resolveObject(localData, generator),
-                    ins(new DeletePropertyIns(), prop.resolveProperty(localData))
+                    ins(AVM2Instructions.DeleteProperty, prop.resolveProperty(localData))
             );
         }
         if (p instanceof IndexAVM2Item) {
