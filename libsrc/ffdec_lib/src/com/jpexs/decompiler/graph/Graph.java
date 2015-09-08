@@ -49,9 +49,11 @@ import com.jpexs.decompiler.graph.model.WhileItem;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 
 /**
  *
@@ -285,19 +287,109 @@ public class Graph {
         }
     }
 
-    private void getReachableParts(GraphPart part, List<GraphPart> ret, List<Loop> loops) {
+    private void getReachableParts(GraphPart part, LinkedHashSet<GraphPart> ret, List<Loop> loops) {
+        // use LinkedHashSet to preserve order
         getReachableParts(part, ret, loops, true);
     }
 
-    private void getReachableParts(GraphPart part, List<GraphPart> ret, List<Loop> loops, boolean first) {
+    /**
+     * Non recursive version of getReachablePartsOld
+     */
+    private void getReachableParts(GraphPart part, LinkedHashSet<GraphPart> ret, List<Loop> loops, boolean first) {
 
+        Stack<GraphPartQueue> stack = new Stack<>();
+        GraphPartQueue queue = new GraphPartQueue();
+        queue.add(part);
+        stack.add(queue);
+        stacknext:
+        while (!stack.isEmpty()) {
+
+            queue = stack.peek();
+            if (!queue.isEmpty()) {
+                part = queue.remove();
+            } else if (queue.currentLoop != null) {
+                Loop cLoop = queue.currentLoop;
+                part = cLoop.loopBreak;
+                queue.currentLoop = null;
+                if (ret.contains(part)) {
+                    continue;
+                }
+
+                ret.add(part);
+                cLoop.reachableMark = 2;
+            } else {
+                stack.pop();
+                continue;
+            }
+
+            for (Loop l : loops) {
+                l.reachableMark = 0;
+            }
+
+            Loop currentLoop = null;
+            for (Loop l : loops) {
+                if ((l.phase == 1) || (l.reachableMark == 1)) {
+                    if (l.loopContinue == part) {
+                        continue stacknext;
+                    }
+                    if (l.loopBreak == part) {
+                        continue stacknext;
+                    }
+                    if (l.loopPreContinue == part) {
+                        continue stacknext;
+                    }
+                }
+                if (l.reachableMark == 0) {
+                    if (l.loopContinue == part) {
+                        l.reachableMark = 1;
+                        currentLoop = l;
+                    }
+                }
+            }
+
+            GraphPartQueue newParts = new GraphPartQueue();
+            loopnext:
+            for (GraphPart next : part.nextParts) {
+                for (Loop l : loops) {
+                    if ((l.phase == 1) || (l.reachableMark == 1)) {
+                        if (l.loopContinue == next) {
+                            continue loopnext;
+                        }
+                        if (l.loopBreak == next) {
+                            continue loopnext;
+                        }
+                        if (l.loopPreContinue == next) {
+                            continue loopnext;
+                        }
+                    }
+
+                }
+                if (!ret.contains(next)) {
+                    newParts.add(next);
+                }
+            }
+
+            ret.addAll(newParts);
+            if (currentLoop != null && currentLoop.loopBreak != null) {
+                newParts.currentLoop = currentLoop;
+            }
+
+            if (!newParts.isEmpty() || newParts.currentLoop != null) {
+                stack.add(newParts);
+            }
+        }
+    }
+
+    private void getReachablePartsOld(GraphPart part, LinkedHashSet<GraphPart> ret, List<Loop> loops, boolean first) {
+
+        // todo: honfika: why call with first = true parameter always?
         if (first) {
             for (Loop l : loops) {
                 l.reachableMark = 0;
             }
         }
-        Loop currentLoop = null;
 
+        Loop currentLoop = null;
         for (Loop l : loops) {
             if ((l.phase == 1) || (l.reachableMark == 1)) {
                 if (l.loopContinue == part) {
@@ -342,7 +434,7 @@ public class Graph {
 
         ret.addAll(newparts);
         for (GraphPart next : newparts) {
-            getReachableParts(next, ret, loops);
+            getReachableParts(next, ret, loops, true);
         }
 
         if (currentLoop != null) {
@@ -350,7 +442,7 @@ public class Graph {
                 if (!ret.contains(currentLoop.loopBreak)) {
                     ret.add(currentLoop.loopBreak);
                     currentLoop.reachableMark = 2;
-                    getReachableParts(currentLoop.loopBreak, ret, loops);
+                    getReachableParts(currentLoop.loopBreak, ret, loops, true);
                 }
             }
         }
@@ -394,14 +486,14 @@ public class Graph {
                 return p;
             }
         }
-        List<List<GraphPart>> reachable = new ArrayList<>();
+        List<Set<GraphPart>> reachable = new ArrayList<>();
         for (GraphPart p : parts) {
-            List<GraphPart> r1 = new ArrayList<>();
+            LinkedHashSet<GraphPart> r1 = new LinkedHashSet<>();
             getReachableParts(p, r1, loops);
             r1.add(p);
             reachable.add(r1);
         }
-        List<GraphPart> first = reachable.get(0);
+        Set<GraphPart> first = reachable.get(0);
         for (GraphPart p : first) {
             /*if (ignored.contains(p)) {
              continue;
@@ -411,7 +503,7 @@ public class Graph {
                 continue;
             }
             boolean common = true;
-            for (List<GraphPart> r : reachable) {
+            for (Set<GraphPart> r : reachable) {
                 if (!r.contains(p)) {
                     common = false;
                     break;
@@ -472,17 +564,19 @@ public class Graph {
                 }
             }
         }
-        List<List<GraphPart>> reachable = new ArrayList<>();
+        List<Set<GraphPart>> reachable = new ArrayList<>();
         for (GraphPart p : parts) {
-            List<GraphPart> r1 = new ArrayList<>();
+            LinkedHashSet<GraphPart> r1 = new LinkedHashSet<>();
             getReachableParts(p, r1, loops);
-            r1.add(0, p);
-            reachable.add(r1);
+            Set<GraphPart> r2 = new LinkedHashSet<>();
+            r2.add(p);
+            r2.addAll(r1);
+            reachable.add(r2);
         }
         ///List<GraphPart> first = reachable.get(0);
         int commonLevel;
         Map<GraphPart, Integer> levelMap = new HashMap<>();
-        for (List<GraphPart> first : reachable) {
+        for (Set<GraphPart> first : reachable) {
             int maxclevel = 0;
             Set<GraphPart> visited = new HashSet<>();
             for (GraphPart p : first) {
@@ -495,7 +589,7 @@ public class Graph {
                 visited.add(p);
                 boolean common = true;
                 commonLevel = 1;
-                for (List<GraphPart> r : reachable) {
+                for (Set<GraphPart> r : reachable) {
                     if (r == first) {
                         continue;
                     }
@@ -622,7 +716,6 @@ public class Graph {
         finalProcessStack(stack, ret);
         finalProcessAll(ret, 0, new FinalProcessLocalData());
         return ret;
-
     }
 
     public void finalProcessStack(TranslateStack stack, List<GraphTargetItem> output) {
@@ -1237,7 +1330,7 @@ public class Graph {
         if (debugMode) {
             System.err.println("getloops: " + part);
         }
-        List<GraphPart> loopContinues = getLoopsContinues(loops);
+        //List<GraphPart> loopContinues = getLoopsContinues(loops);
         Loop lastP1 = null;
         for (Loop el : loops) {
             if ((el.phase == 1) && el.loopBreak == null) { //break not found yet
@@ -1256,8 +1349,8 @@ public class Graph {
                 lastP1.breakCandidatesLevels.add(level);
                 return;
             } else {
-                List<GraphPart> loopContinues2 = new ArrayList<>(loopContinues);
-                loopContinues2.remove(lastP1.loopContinue);
+                //List<GraphPart> loopContinues2 = new ArrayList<>(loopContinues);
+                //loopContinues2.remove(lastP1.loopContinue);
                 List<Loop> loops2 = new ArrayList<>(loops);
                 loops2.remove(lastP1);
                 if (!part.leadsTo(localData, this, code, lastP1.loopContinue, loops2)) {
@@ -1291,7 +1384,7 @@ public class Graph {
             currentLoop = new Loop(loops.size(), part, null);
             currentLoop.phase = 1;
             loops.add(currentLoop);
-            loopContinues.add(part);
+            //loopContinues.add(part);
         }
 
         if (part.nextParts.size() == 2) {
@@ -1319,8 +1412,7 @@ public class Graph {
             if (next != null) {
                 getLoops(localData, next, loops, stopPart, false, level, visited);
             }
-        }
-        if (part.nextParts.size() > 2) {
+        } else if (part.nextParts.size() > 2) {
             GraphPart next = getNextCommonPart(localData, part, loops);
 
             for (GraphPart p : part.nextParts) {
@@ -1343,8 +1435,7 @@ public class Graph {
             if (next != null) {
                 getLoops(localData, next, loops, stopPart, false, level, visited);
             }
-        }
-        if (part.nextParts.size() == 1) {
+        } else if (part.nextParts.size() == 1) {
             getLoops(localData, part.nextParts.get(0), loops, stopPart, false, level, visited);
         }
 
@@ -1542,7 +1633,7 @@ public class Graph {
             return ret;
         }
 
-        List<GraphPart> loopContinues = getLoopsContinues(loops);
+        //List<GraphPart> loopContinues = getLoopsContinues(loops);
         boolean isLoop = false;
         Loop currentLoop = null;
         for (Loop el : loops) {
