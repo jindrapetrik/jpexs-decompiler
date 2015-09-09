@@ -290,6 +290,7 @@ import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.ExitItem;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.stat.Statistics;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -1035,7 +1036,6 @@ public class AVM2Code implements Cloneable {
     }
 
     public GraphTextWriter toASMSource(AVM2ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, List<Integer> outputMap, ScriptExportMode exportMode, GraphTextWriter writer) {
-        invalidateCache();
         if (trait != null) {
             if (trait instanceof TraitFunction) {
                 TraitFunction tf = (TraitFunction) trait;
@@ -1298,62 +1298,58 @@ public class AVM2Code implements Cloneable {
         return writer;
     }
 
-    private boolean cacheActual = false;
-
-    private List<Long> posCache;
-
-    private Map<Long, Integer> posCacheReverse;
-
-    private void buildCache() {
-        List<Long> posCache = new ArrayList<>(code.size() + 1);
-        Map<Long, Integer> posCacheReverse = new HashMap<>(code.size() + 1);
-        long a = 0;
-        int i = 0;
-        for (; i < code.size(); i++) {
-            AVM2Instruction ins = code.get(i);
-            posCache.add(ins.offset);
-            posCacheReverse.put(ins.offset, i);
-            a = ins.offset + ins.getBytesLength();
-        }
-
-        posCache.add(a);
-        posCacheReverse.put(a, i);
-        this.posCache = posCache;
-        this.posCacheReverse = posCacheReverse;
-        cacheActual = true;
-    }
-
     public int adr2pos(long address) throws ConvertException {
         return adr2pos(address, false);
     }
 
     public int adr2pos(long address, boolean nearest) throws ConvertException {
-        if (!cacheActual) {
-            buildCache();
-        }
-        Integer ret = posCacheReverse.get(address);
-        if (ret == null) {
-            if (nearest) {
-                for (long a : posCache) {
-                    if (a > address) {
-                        return posCache.indexOf(a);
-                    }
-                }
+        int ret = adr2posNoEx(address);
+        if (ret < 0) {
+            if (nearest && address < getEndOffset()) {
+                return -ret - 1;
             }
             throw new ConvertException("Invalid jump to ofs" + Helper.formatAddress(address), -1);
         }
         return ret;
     }
 
-    public int pos2adr(int pos) {
-        if (!cacheActual) {
-            buildCache();
+    private int adr2posNoEx(long address) {
+        int min = 0;
+        int max = code.size() - 1;
+
+        while (max >= min) {
+            int mid = (min + max) / 2;
+            long midValue = code.get(mid).offset;
+            if (midValue == address) {
+                return mid;
+            } else if (midValue < address) {
+                min = mid + 1;
+            } else {
+                max = mid - 1;
+            }
         }
-        return posCache.get(pos).intValue();
+
+        if (address == getEndOffset()) {
+            return code.size();
+        }
+
+        return -min - 1;
     }
 
-    public void invalidateCache() {
-        cacheActual = false;
+    public long pos2adr(int pos) {
+        if (pos == code.size()) {
+            return getEndOffset();
+        }
+        return (int) code.get(pos).offset;
+    }
+
+    public long getEndOffset() {
+        if (code.isEmpty()) {
+            return 0;
+        }
+
+        AVM2Instruction ins = code.get(code.size() - 1);
+        return (int) (ins.offset + ins.getBytesLength());
     }
 
     private List<Integer> unknownJumps;
@@ -1463,7 +1459,7 @@ public class AVM2Code implements Cloneable {
         return ip;
     }
 
-    public int fixAddrAfterDebugLine(int addr) throws ConvertException {
+    public long fixAddrAfterDebugLine(long addr) throws ConvertException {
         return pos2adr(fixIPAfterDebugLine(adr2pos(addr, true)));
     }
 
@@ -2006,13 +2002,11 @@ public class AVM2Code implements Cloneable {
     }
 
     public void fixJumps(final String path, MethodBody body) throws InterruptedException {
-        buildCache();
         if (code.isEmpty()) {
             return;
         }
-        AVM2Instruction lastInstuction = code.get(code.size() - 1);
         final List<Long> insAddrToRemove = new ArrayList<>();
-        final long endOffset = lastInstuction.offset + lastInstuction.getBytesLength();
+        final long endOffset = getEndOffset();
         updateOffsets(new OffsetUpdater() {
 
             @Override
@@ -2022,7 +2016,7 @@ public class AVM2Code implements Cloneable {
 
             @Override
             public int updateOperandOffset(long insAddr, long targetAddress, int offset) {
-                if (targetAddress > endOffset || targetAddress < 0 || posCache.indexOf(targetAddress) == -1) {
+                if (targetAddress > endOffset || targetAddress < 0 || adr2posNoEx(targetAddress) < 0) {
                     insAddrToRemove.add(insAddr);
                 }
                 return offset;
@@ -2032,8 +2026,8 @@ public class AVM2Code implements Cloneable {
 
         boolean someIgnored = false;
         for (Long insAddr : insAddrToRemove) {
-            Integer pos = posCacheReverse.get(insAddr);
-            if (pos != null) {
+            int pos = adr2posNoEx(insAddr);
+            if (pos > -1) {
                 code.get(pos).ignored = true;
                 someIgnored = true;
             }
@@ -2045,7 +2039,6 @@ public class AVM2Code implements Cloneable {
     }
 
     public void checkValidOffsets(MethodBody body) {
-        invalidateCache();
         updateOffsets(new OffsetUpdater() {
 
             @Override
@@ -2097,7 +2090,6 @@ public class AVM2Code implements Cloneable {
             }
         }, body);
         code.remove(pos);
-        invalidateCache();
         //checkValidOffsets(body);
     }
 
@@ -2159,7 +2151,6 @@ public class AVM2Code implements Cloneable {
             }, body);
         }
         code.set(pos, instruction);
-        invalidateCache();
         //checkValidOffsets(body);
     }
 
@@ -2212,7 +2203,6 @@ public class AVM2Code implements Cloneable {
             }
         }, body);
         code.add(pos, instruction);
-        invalidateCache();
         //checkValidOffsets(body);
     }
 
@@ -2270,9 +2260,15 @@ public class AVM2Code implements Cloneable {
         if (Configuration.deobfuscationOldMode.get()) {
             return removeTrapsOld(constants, trait, info, body, abc, scriptIndex, classIndex, isStatic, path);
         } else {
-            new AVM2DeobfuscatorSimple().deobfuscate(path, classIndex, isStatic, scriptIndex, abc, constants, trait, info, body);
-            new AVM2DeobfuscatorRegisters().deobfuscate(path, classIndex, isStatic, scriptIndex, abc, constants, trait, info, body);
-            new AVM2DeobfuscatorJumps().deobfuscate(path, classIndex, isStatic, scriptIndex, abc, constants, trait, info, body);
+            try (Statistics s = new Statistics("AVM2DeobfuscatorSimple")) {
+                new AVM2DeobfuscatorSimple().deobfuscate(path, classIndex, isStatic, scriptIndex, abc, constants, trait, info, body);
+            }
+            try (Statistics s = new Statistics("AVM2DeobfuscatorRegisters")) {
+                new AVM2DeobfuscatorRegisters().deobfuscate(path, classIndex, isStatic, scriptIndex, abc, constants, trait, info, body);
+            }
+            try (Statistics s = new Statistics("AVM2DeobfuscatorJumps")) {
+                new AVM2DeobfuscatorJumps().deobfuscate(path, classIndex, isStatic, scriptIndex, abc, constants, trait, info, body);
+            }
             return 1;
         }
     }
@@ -2765,7 +2761,6 @@ public class AVM2Code implements Cloneable {
         } catch (ConvertException cex) {
             logger.log(Level.SEVERE, "Error during restore control flow", cex);
         }
-        invalidateCache();
         try {
             List<Integer> outputMap = new ArrayList<>();
             HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
@@ -2791,7 +2786,6 @@ public class AVM2Code implements Cloneable {
         } catch (AVM2ParseException ex) {
             logger.log(Level.FINE, null, ex);
         }
-        invalidateCache();
         removeDeadCode(body);
     }
 
@@ -2836,7 +2830,6 @@ public class AVM2Code implements Cloneable {
     }
 
     public int removeDeadCode(MethodBody body) throws InterruptedException {
-        invalidateCache();
         HashMap<Integer, List<Integer>> refs = visitCode(body);
         int cnt = 0;
         for (int i = code.size() - 1; i >= 0; i--) {
@@ -2869,9 +2862,9 @@ public class AVM2Code implements Cloneable {
         for (int i = 0; i < csize; i++) {
             AVM2Instruction ins = code.get(i);
             int insLen = code.get(i).getBytesLength();
-            int ofs = pos2adr(i);
+            long ofs = pos2adr(i);
             if (ins.definition instanceof JumpIns) {
-                int targetOfs = ofs + insLen + ins.operands[0];
+                long targetOfs = ofs + insLen + ins.operands[0];
                 try {
                     int ni = adr2pos(targetOfs);
                     if (ni < code.size() && ni > -1) {
@@ -2887,7 +2880,6 @@ public class AVM2Code implements Cloneable {
                             code.add(i + 3, nopIns);
                             i += 3;
                             csize = code.size();
-                            buildCache();
                         }
                     }
                 } catch (ConvertException ex) {
@@ -3360,7 +3352,6 @@ public class AVM2Code implements Cloneable {
                 ret.code = codeCopy;
             }
 
-            ret.cacheActual = false;
             ret.ignoredIns = new ArrayList<>();
             ret.killedRegs = new HashMap<>();
             ret.unknownJumps = new ArrayList<>();
