@@ -3,6 +3,7 @@
 	import flash.display.*;
 	import flash.text.TextField;
 	import flash.events.MouseEvent;
+	import flash.external.ExternalInterface;
 	
 	public class RunMain extends MovieClip {
 		
@@ -10,7 +11,8 @@
 		
 		public function RunMain() {
 			myTextBox = new TextField();    
-			myTextBox.text = "";    
+			myTextBox.text = "";
+			myTextBox.width = 400;
 			addChild(myTextBox);  
 
 			var rectangleShape:Shape = new Shape();
@@ -35,10 +37,21 @@
 			simpleButton.y = 100;
 			simpleButton.addEventListener(MouseEvent.CLICK, this.clickListener);
 			addChild(simpleButton);
+			
+			ExternalInterface.addCallback("testFunc", testFunction);
 		}
 		
-		function clickListener(e:MouseEvent){
-			myTextBox.text = "Result:" + Run.run();
+		function testFunction() {
+			try {
+				var result = Run.run();
+				return "Result:" + result + " Type:" + typeof(result);
+			} catch (ex:Error) {
+				return "Error:" + ex;
+			}
+		}
+
+		function clickListener(e:MouseEvent) {
+			myTextBox.text = testFunction();
 		}
 	}
 }
