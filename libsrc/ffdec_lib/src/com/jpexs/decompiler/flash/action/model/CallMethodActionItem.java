@@ -65,20 +65,26 @@ public class CallMethodActionItem extends ActionItem {
                     blankMethod = true;
                 }
             }
-        }
-        if (!blankMethod) {
-            if (scriptObject.getPrecedence() > this.precedence) {
-                writer.append("(");
-                scriptObject.toString(writer, localData);
-                writer.append(")");
+
+            if (!blankMethod) {
+                if (scriptObject.getPrecedence() > this.precedence) {
+                    writer.append("(");
+                    scriptObject.toString(writer, localData);
+                    writer.append(")");
+                } else {
+                    scriptObject.toString(writer, localData);
+                }
+                writer.append(".");
+                writer.append(IdentifiersDeobfuscation.printIdentifier(false, methodName.toStringNoQuotes(localData)));
             } else {
                 scriptObject.toString(writer, localData);
             }
-            writer.append(".");
-            writer.append(IdentifiersDeobfuscation.printIdentifier(false, methodName.toStringNoQuotes(localData)));
         } else {
-            scriptObject.toString(writer, localData);
+            writer.append("this[");
+            methodName.appendTo(writer, localData);
+            writer.append("].call");
         }
+
         writer.spaceBeforeCallParenthesies(arguments.size());
         writer.append("(");
 
