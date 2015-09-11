@@ -239,7 +239,7 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
         }
 
         if (cache != null) {
-            cache.put(this, ret);
+            cache.put(this, rect);
         }
 
         return rect;
