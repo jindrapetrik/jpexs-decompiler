@@ -27,6 +27,7 @@ import com.jpexs.helpers.Helper;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +62,9 @@ public class AS2ScriptExporter {
         Map<String, List<String>> existingNamesMap = new HashMap<>();
         int cnt = 1;
         List<ExportScriptTask> tasks = new ArrayList<>();
-        for (String key : asms.keySet()) {
+        String[] keys = asms.keySet().toArray(new String[asms.size()]);
+        Arrays.sort(keys);
+        for (String key : keys) {
             ASMSource asm = asms.get(key);
             String currentOutDir = outdir + key + File.separator;
             currentOutDir = new File(currentOutDir).getParentFile().toString() + File.separator;
