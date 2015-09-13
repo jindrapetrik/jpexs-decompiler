@@ -961,11 +961,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         List<TreeItem> nodes = getASTreeNodes(tagTree);
         for (TreeItem n : nodes) {
             if (n instanceof ClassesListTreeModel) {
-                ((ClassesListTreeModel) n).setFilter(filterField.getText());
+                String filterText = filterField.getText();
+                ((ClassesListTreeModel) n).setFilter(filterText);
                 TagTreeModel tm = tagTree.getModel();
                 TreePath path = tm.getTreePath(n);
                 tm.updateNode(path);
-                View.expandTreeNodes(tagTree, path, true);
+                if (!filterText.isEmpty()) {
+                    View.expandTreeNodes(tagTree, path, true);
+                }
             }
         }
     }

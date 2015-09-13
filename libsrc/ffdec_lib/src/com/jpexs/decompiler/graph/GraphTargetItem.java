@@ -181,7 +181,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     @Override
     public String toString() {
-        return this.getClass().getName();
+        return getClass().getName();
     }
 
     public GraphTextWriter toString(GraphTextWriter writer, LocalData localData) throws InterruptedException {
@@ -230,6 +230,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     }
 
     public String toStringNoQuotes(LocalData localData) {
+        // todo: honfika: this method should not be called, maybe we should throw an exception
         return toString();
     }
 
