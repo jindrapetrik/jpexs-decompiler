@@ -31,17 +31,14 @@ import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
-import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Dimension;
 import java.awt.image.DataBufferInt;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.zip.InflaterInputStream;
 
 /**
  *
@@ -201,7 +198,7 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
 
     private void uncompressData() {
         try {
-            byte[] uncompressedData = Helper.readStream(new InflaterInputStream(new ByteArrayInputStream(zlibBitmapData.getArray(), zlibBitmapData.getPos(), zlibBitmapData.getLength())));
+            byte[] uncompressedData = SWFInputStream.uncompressByteArray(zlibBitmapData.getArray(), zlibBitmapData.getPos(), zlibBitmapData.getLength());
             SWFInputStream sis = new SWFInputStream(swf, uncompressedData);
             if (bitmapFormat == FORMAT_8BIT_COLORMAPPED) {
                 colorMapData = sis.readCOLORMAPDATA(bitmapColorTableSize, bitmapWidth, bitmapHeight, "colorMapData");

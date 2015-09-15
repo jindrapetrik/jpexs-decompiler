@@ -98,6 +98,10 @@ public class DumpTree extends JTree {
         saveToFileMenuItem.addActionListener(this::saveToFileButtonActionPerformed);
         contextPopupMenu.add(saveToFileMenuItem);
 
+        final JMenuItem saveUncompressedToFileMenuItem = new JMenuItem(mainPanel.translate("contextmenu.saveUncompressedToFile"));
+        saveUncompressedToFileMenuItem.addActionListener(this::saveUncompressedToFileButtonActionPerformed);
+        contextPopupMenu.add(saveUncompressedToFileMenuItem);
+
         final JMenuItem closeSelectionMenuItem = new JMenuItem(mainPanel.translate("contextmenu.closeSwf"));
         closeSelectionMenuItem.addActionListener(this::closeSwfButtonActionPerformed);
         contextPopupMenu.add(closeSelectionMenuItem);
@@ -129,9 +133,11 @@ public class DumpTree extends JTree {
                     if (paths == null || paths.length == 0) {
                         return;
                     }
+
                     closeSelectionMenuItem.setVisible(false);
                     expandRecursiveMenuItem.setVisible(false);
                     saveToFileMenuItem.setVisible(false);
+                    saveUncompressedToFileMenuItem.setVisible(false);
                     parseActionsMenuItem.setVisible(false);
                     parseAbcMenuItem.setVisible(false);
                     parseInstructionsMenuItem.setVisible(false);
@@ -145,6 +151,9 @@ public class DumpTree extends JTree {
 
                         if (treeNode.getEndByte() - treeNode.startByte > 3) {
                             saveToFileMenuItem.setVisible(true);
+                            if (treeNode.name.equals("bitmapAlphaData") || treeNode.name.equals("zlibBitmapData")) {
+                                saveUncompressedToFileMenuItem.setVisible(true);
+                            }
                         }
 
                         // todo honfika: do not use string names, because it has conflicts e.g with DefineFont.code
@@ -179,6 +188,14 @@ public class DumpTree extends JTree {
     }
 
     private void saveToFileButtonActionPerformed(ActionEvent evt) {
+        saveToFileButtonActionPerformed(false);
+    }
+
+    private void saveUncompressedToFileButtonActionPerformed(ActionEvent evt) {
+        saveToFileButtonActionPerformed(true);
+    }
+
+    private void saveToFileButtonActionPerformed(boolean decompress) {
         TreePath[] paths = getSelectionPaths();
         DumpInfo dumpInfo = (DumpInfo) paths[0].getLastPathComponent();
         JFileChooser fc = new JFileChooser();
@@ -189,8 +206,13 @@ public class DumpTree extends JTree {
         if (fc.showSaveDialog(f) == JFileChooser.APPROVE_OPTION) {
             File sf = Helper.fixDialogFile(fc.getSelectedFile());
             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(sf))) {
-                byte[] data = DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf().originalUncompressedData;
-                fos.write(data, (int) dumpInfo.startByte, (int) (dumpInfo.getEndByte() - dumpInfo.startByte + 1));
+                if (decompress) {
+                    byte[] data = DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf().originalUncompressedData;
+                    fos.write(SWFInputStream.uncompressByteArray(data, (int) dumpInfo.startByte, (int) (dumpInfo.getEndByte() - dumpInfo.startByte + 1)));
+                } else {
+                    byte[] data = DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf().originalUncompressedData;
+                    fos.write(data, (int) dumpInfo.startByte, (int) (dumpInfo.getEndByte() - dumpInfo.startByte + 1));
+                }
             } catch (IOException ex) {
                 logger.log(Level.SEVERE, null, ex);
             }

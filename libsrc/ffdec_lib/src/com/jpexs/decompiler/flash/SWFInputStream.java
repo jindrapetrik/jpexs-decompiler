@@ -890,7 +890,11 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     public static byte[] uncompressByteArray(byte[] data) throws IOException {
-        InflaterInputStream dis = new InflaterInputStream(new ByteArrayInputStream(data));
+        return uncompressByteArray(data, 0, data.length);
+    }
+
+    public static byte[] uncompressByteArray(byte[] data, int offset, int length) throws IOException {
+        InflaterInputStream dis = new InflaterInputStream(new ByteArrayInputStream(data, offset, length));
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         byte[] buf = new byte[4096];
         int c = 0;
