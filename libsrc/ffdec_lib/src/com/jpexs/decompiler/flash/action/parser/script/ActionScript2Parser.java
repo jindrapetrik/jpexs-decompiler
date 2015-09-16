@@ -947,7 +947,7 @@ public class ActionScript2Parser {
                     List<GraphTargetItem> args = call(inFunction, inMethod, variables);
                     VariableActionItem supItem = new VariableActionItem(s.value.toString(), null, false);
                     variables.add(supItem);
-                    ret = new CallMethodActionItem(null, supItem, new DirectValueActionItem(null, 0, new Undefined(), constantPool), args);
+                    ret = new CallMethodActionItem(null, supItem, new DirectValueActionItem(null, 0, Undefined.INSTANCE, constantPool), args);
                 } else {//no costructor call, but it could be calling parent methods... => handle in expression
                     lexer.pushback(ss2);
                     lexer.pushback(s);
@@ -1142,7 +1142,7 @@ public class ActionScript2Parser {
             case RETURN:
                 GraphTargetItem retexpr = expression(inFunction, inMethod, true, variables);
                 if (retexpr == null) {
-                    retexpr = new DirectValueActionItem(null, 0, new Undefined(), new ArrayList<>());
+                    retexpr = new DirectValueActionItem(null, 0, Undefined.INSTANCE, new ArrayList<>());
                 }
                 ret = new ReturnActionItem(null, retexpr);
                 break;
@@ -1621,11 +1621,11 @@ public class ActionScript2Parser {
 
                 break;
             case NULL:
-                ret = new DirectValueActionItem(null, 0, new Null(), new ArrayList<>());
+                ret = new DirectValueActionItem(null, 0, Null.INSTANCE, new ArrayList<>());
 
                 break;
             case UNDEFINED:
-                ret = new DirectValueActionItem(null, 0, new Undefined(), new ArrayList<>());
+                ret = new DirectValueActionItem(null, 0, Undefined.INSTANCE, new ArrayList<>());
                 break;
             case FALSE:
                 ret = new DirectValueActionItem(null, 0, Boolean.FALSE, new ArrayList<>());

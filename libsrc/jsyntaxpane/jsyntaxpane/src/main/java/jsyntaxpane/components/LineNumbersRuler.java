@@ -21,6 +21,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -221,9 +222,18 @@ public class LineNumbersRuler extends JPanel
 		int maxLines = ActionUtils.getLineCount(editor);
 		SyntaxView.setRenderingHits((Graphics2D) g);
 
+		Rectangle bounds = g.getClipBounds();
+		int minY = bounds.y;
+		int maxY = minY + bounds.height;
 		for (int line = 1; line <= maxLines; line++) {
-			String lineNumber = String.format(numbersFormat, line);
 			int y = line * lh;
+			if (y < minY) {
+				continue;
+			}
+			if (y - lh > maxY) {
+				break;
+			}
+			String lineNumber = String.format(numbersFormat, line);
 			if (line == currentLine) {
 				g.setColor(currentLineColor);
 				g.fillRect(0, y - lh + fontMetrics.getDescent() - 1, getWidth(), lh);

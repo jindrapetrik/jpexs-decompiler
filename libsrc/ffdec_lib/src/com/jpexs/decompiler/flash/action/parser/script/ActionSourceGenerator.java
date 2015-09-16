@@ -723,7 +723,7 @@ public class ActionSourceGenerator implements SourceGenerator {
 
         if (!isInterface) {
             ifbody.add(new ActionPush((Long) 1L));
-            ifbody.add(new ActionPush(new Null()));
+            ifbody.add(new ActionPush(Null.INSTANCE));
             ifbody.addAll(typeToActions(globalClassTypeStr, null));
             ifbody.add(pushConst("prototype"));
             ifbody.add(new ActionGetMember());

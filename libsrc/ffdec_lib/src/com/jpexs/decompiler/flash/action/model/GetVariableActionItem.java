@@ -97,7 +97,7 @@ public class GetVariableActionItem extends ActionItem {
     @Override
     public Object getResult() {
         if (computedValue == null) {
-            return new Undefined();
+            return Undefined.INSTANCE;
         }
         return computedResult;
     }

@@ -39,14 +39,12 @@ public class NotItem extends UnaryOpItem implements LogicalOpItem, Inverted {
 
     @Override
     public Object getResult() {
-        Object ret = EcmaScript.toBoolean(value.getResult());
-        if (ret == Boolean.TRUE) {
+        boolean ret = EcmaScript.toBoolean(value.getResult());
+        if (ret) {
             return Boolean.FALSE;
-        }
-        if (ret == Boolean.FALSE) {
+        } else {
             return Boolean.TRUE;
         }
-        return ret;
     }
 
     @Override

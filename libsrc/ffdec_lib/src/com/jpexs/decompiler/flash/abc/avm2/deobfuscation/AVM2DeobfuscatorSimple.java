@@ -154,9 +154,9 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
         } else if (graphTargetItem instanceof FalseItem) {
             return makePush(Boolean.FALSE, cpool);
         } else if (graphTargetItem instanceof NullAVM2Item) {
-            return makePush(new Null(), cpool);
+            return makePush(Null.INSTANCE, cpool);
         } else if (graphTargetItem instanceof UndefinedAVM2Item) {
-            return makePush(new Undefined(), cpool);
+            return makePush(Undefined.INSTANCE, cpool);
         } else {
             return null;
         }

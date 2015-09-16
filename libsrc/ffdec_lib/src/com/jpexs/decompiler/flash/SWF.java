@@ -1788,7 +1788,7 @@ public final class SWF implements SWFContainerItem, Timelined {
 
             // for..in return
             if (((ins instanceof ActionEquals) || (ins instanceof ActionEquals2)) && (stack.size() == 1) && (stack.peek() instanceof DirectValueActionItem)) {
-                stack.push(new DirectValueActionItem(null, 0, new Null(), new ArrayList<>()));
+                stack.push(new DirectValueActionItem(null, 0, Null.INSTANCE, new ArrayList<>()));
             }
 
             if (ins instanceof ActionConstantPool) {

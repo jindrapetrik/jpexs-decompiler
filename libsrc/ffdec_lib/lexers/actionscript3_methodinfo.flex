@@ -31,7 +31,7 @@ package com.jpexs.decompiler.flash.abc.methodinfo_parser;
 
 %{
 
-    StringBuffer string = new StringBuffer();
+    StringBuilder string = new StringBuilder();
     boolean isMultiname = false;
     long multinameId = 0;
 

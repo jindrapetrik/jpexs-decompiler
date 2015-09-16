@@ -99,10 +99,10 @@ public class ActionPush extends Action {
                         values.add(sis.readFLOAT("float"));
                         break;
                     case 2:
-                        values.add(new Null());
+                        values.add(Null.INSTANCE);
                         break;
                     case 3:
-                        values.add(new Undefined());
+                        values.add(Undefined.INSTANCE);
                         break;
                     case 4:
                         values.add(new RegisterNumber(sis.readUI8("registerNumber")));

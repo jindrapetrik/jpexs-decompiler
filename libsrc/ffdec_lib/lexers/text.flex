@@ -31,7 +31,7 @@ package com.jpexs.decompiler.flash.tags.text;
 
 %{
 
-    StringBuffer string = null;
+    StringBuilder string = null;
     boolean finish = false;
     boolean parameter = false;
     String parameterName = null;
@@ -74,22 +74,22 @@ HexDigit          = [0-9a-fA-F]
                                     }
                                  }
   /* escape sequences */
-  "\\["                          { if (string == null) string = new StringBuffer(); string.append('['); }
-  "\\]"                          { if (string == null) string = new StringBuffer(); string.append(']'); }
-  "\\b"                          { if (string == null) string = new StringBuffer(); string.append('\b'); }
-  "\\t"                          { if (string == null) string = new StringBuffer(); string.append('\t'); }
-  "\\n"                          { if (string == null) string = new StringBuffer(); string.append('\n'); }
-  "\\f"                          { if (string == null) string = new StringBuffer(); string.append('\f'); }
-  "\\r"                          { if (string == null) string = new StringBuffer(); string.append('\r'); }
-  "\\\""                         { if (string == null) string = new StringBuffer(); string.append('\"'); }
-  "\\'"                          { if (string == null) string = new StringBuffer(); string.append('\''); }
-  "\\\\"                         { if (string == null) string = new StringBuffer(); string.append('\\'); }
+  "\\["                          { if (string == null) string = new StringBuilder(); string.append('['); }
+  "\\]"                          { if (string == null) string = new StringBuilder(); string.append(']'); }
+  "\\b"                          { if (string == null) string = new StringBuilder(); string.append('\b'); }
+  "\\t"                          { if (string == null) string = new StringBuilder(); string.append('\t'); }
+  "\\n"                          { if (string == null) string = new StringBuilder(); string.append('\n'); }
+  "\\f"                          { if (string == null) string = new StringBuilder(); string.append('\f'); }
+  "\\r"                          { if (string == null) string = new StringBuilder(); string.append('\r'); }
+  "\\\""                         { if (string == null) string = new StringBuilder(); string.append('\"'); }
+  "\\'"                          { if (string == null) string = new StringBuilder(); string.append('\''); }
+  "\\\\"                         { if (string == null) string = new StringBuilder(); string.append('\\'); }
   \\x{HexDigit}{HexDigit}        { char val = (char) Integer.parseInt(yytext().substring(2), 16);
                         				   string.append(val); }
 
   /* error cases */
   \\.                            { throw new TextParseException("Illegal escape sequence \"" + yytext() + "\"", yyline + 1); }   
-  .                              { if (string == null) string = new StringBuffer(); string.append(yytext()); }
+  .                              { if (string == null) string = new StringBuilder(); string.append(yytext()); }
  <<EOF>>                         { if (finish) {return null;} else {finish=true; return new ParsedSymbol(SymbolType.TEXT, string == null ? null : string.toString());}}
 }
 
@@ -118,5 +118,5 @@ HexDigit          = [0-9a-fA-F]
 }
 
 /* error fallback */
-[^]                              { if (!parameter) { if (string == null) string = new StringBuffer(); string.append(yytext()); } }
+[^]                              { if (!parameter) { if (string == null) string = new StringBuilder(); string.append(yytext()); } }
 <<EOF>>                          { return null; }

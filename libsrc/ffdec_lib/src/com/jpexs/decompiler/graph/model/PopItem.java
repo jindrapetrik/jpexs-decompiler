@@ -51,6 +51,6 @@ public class PopItem extends GraphTargetItem {
 
     @Override
     public Object getResult() {
-        return new Null();
+        return Null.INSTANCE;
     }
 }

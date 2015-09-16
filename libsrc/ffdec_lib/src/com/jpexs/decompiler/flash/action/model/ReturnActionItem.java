@@ -71,7 +71,7 @@ public class ReturnActionItem extends ActionItem implements ExitItem {
         int forinlevel = asGenerator.getForInLevel(localData);
         for (int i = 0; i < forinlevel; i++) { //Must POP all remaining values from enumerations (for..in)
             List<Action> forinret = new ArrayList<>();
-            forinret.add(new ActionPush(new Null()));
+            forinret.add(new ActionPush(Null.INSTANCE));
             forinret.add(new ActionEquals2());
             forinret.add(new ActionNot());
             ActionIf aforinif = new ActionIf(0);
@@ -80,7 +80,7 @@ public class ReturnActionItem extends ActionItem implements ExitItem {
             ret.addAll(forinret);
         }
         if (value == null) {
-            ret.add(new ActionPush(new Undefined()));
+            ret.add(new ActionPush(Undefined.INSTANCE));
         } else {
             ret.addAll(value.toSource(localData, generator));
         }

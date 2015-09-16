@@ -77,7 +77,7 @@ public class CoerceAVM2Item extends AVM2Item {
                     return ret;
                 }
                 if (ret instanceof Undefined) {
-                    return new Null();
+                    return Null.INSTANCE;
                 }
                 return ret.toString();
             case "*":

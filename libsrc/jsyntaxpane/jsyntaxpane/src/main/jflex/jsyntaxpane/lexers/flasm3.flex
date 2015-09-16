@@ -19,7 +19,7 @@ import jsyntaxpane.TokenType;
 
 %{
 
-  StringBuffer string = new StringBuffer();
+  StringBuilder string = new StringBuilder();
   boolean isMultiname=false;
 
 
@@ -249,5 +249,5 @@ ExceptionTarget = "exceptiontarget "{PositiveNumberLiteral}":"
 }
 
 /* error fallback */
-.|\n                             { }
+[^]                              { }
 <<EOF>>                          { return null; }

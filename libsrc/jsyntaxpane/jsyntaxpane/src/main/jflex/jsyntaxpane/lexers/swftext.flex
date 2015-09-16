@@ -18,7 +18,7 @@ import jsyntaxpane.TokenType;
 
 %{
 
-  StringBuffer string = new StringBuffer();
+  StringBuilder string = new StringBuilder();
   private int tokenStart = -1;
 
   private static final byte BRACKET   = 1;
@@ -89,5 +89,5 @@ Divider = [ \r\n]+
 }
 
 /* error fallback */
-.|\n                             { }
+[^]                              { }
 <<EOF>>                          { return null; }

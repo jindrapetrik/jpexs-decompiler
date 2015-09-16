@@ -32,7 +32,7 @@ import java.util.Stack;
 
 %{
 
-    StringBuffer string = new StringBuffer();
+    StringBuilder string = new StringBuilder();
 
     private static String xmlTagName = "";
 

@@ -123,12 +123,19 @@ public class UndoFixedEditorPane extends JEditorPane {
 
                 Stopwatch sw = Stopwatch.startNew();
                 try {
-                    Document doc = getDocument();
-                    setDocument(new SyntaxDocument(null));
-                    doc.remove(0, doc.getLength());
                     Reader r = new StringReader(t);
                     EditorKit kit = createEditorKitForContentType(contentType);
+                    Document doc = kit.createDefaultDocument();
+                    if (doc instanceof SyntaxDocument) {
+                        ((SyntaxDocument) doc).setIgnoreUpdate(true);
+                    }
+
                     kit.read(r, doc, 0);
+
+                    if (doc instanceof SyntaxDocument) {
+                        ((SyntaxDocument) doc).setIgnoreUpdate(false);
+                    }
+
                     setDocument(doc);
                 } catch (BadLocationException | IOException ex) {
                     Logger.getLogger(UndoFixedEditorPane.class.getName()).log(Level.SEVERE, null, ex);

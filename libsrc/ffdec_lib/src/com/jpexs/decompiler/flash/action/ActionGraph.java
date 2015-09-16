@@ -268,7 +268,7 @@ public class ActionGraph extends Graph {
                 }
             }
             if (switchedObject == null) {
-                switchedObject = new DirectValueActionItem(null, -1, new Null(), null);
+                switchedObject = new DirectValueActionItem(null, -1, Null.INSTANCE, null);
             }
             HashMap<Integer, GraphTargetItem> caseValuesMap = new HashMap<>();
 

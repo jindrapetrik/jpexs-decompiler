@@ -49,7 +49,7 @@ public class UndefinedAVM2Item extends AVM2Item {
 
     @Override
     public Object getResult() {
-        return new Undefined();
+        return Undefined.INSTANCE;
     }
 
     @Override

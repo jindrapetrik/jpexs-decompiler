@@ -52,7 +52,7 @@ import java.util.Stack;
         yypushbackstr(s, YYINITIAL);
     }
 
-    StringBuffer string = new StringBuffer();
+    StringBuilder string = new StringBuilder();
 
     private static String xmlTagName = "";
 

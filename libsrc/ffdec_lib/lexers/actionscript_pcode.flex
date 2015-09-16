@@ -37,7 +37,7 @@ import com.jpexs.decompiler.flash.ecma.Undefined;
 
 %{
 
-    StringBuffer string = new StringBuffer();
+    StringBuilder string = new StringBuilder();
 
     /**
      * Create an empty lexer, yyrset will be called later to reset and assign
@@ -146,8 +146,8 @@ Constant= constant{PositiveNumberLiteral}
   {StartOfBlock}                        {  yybegin(YYINITIAL); return new ASMParsedSymbol(ASMParsedSymbol.TYPE_BLOCK_START); }
   {True}                {return new ASMParsedSymbol(ASMParsedSymbol.TYPE_BOOLEAN,Boolean.TRUE);}
   {False}                {return new ASMParsedSymbol(ASMParsedSymbol.TYPE_BOOLEAN,Boolean.FALSE);}
-  {Null}                {return new ASMParsedSymbol(ASMParsedSymbol.TYPE_NULL, new Null());}
-  {Undefined}                {return new ASMParsedSymbol(ASMParsedSymbol.TYPE_UNDEFINED, new Undefined());}
+  {Null}                {return new ASMParsedSymbol(ASMParsedSymbol.TYPE_NULL, Null.INSTANCE);}
+  {Undefined}                {return new ASMParsedSymbol(ASMParsedSymbol.TYPE_UNDEFINED, Undefined.INSTANCE);}
 
   {Register}              { return new ASMParsedSymbol(ASMParsedSymbol.TYPE_REGISTER, new RegisterNumber(Integer.parseInt(yytext().substring(8))));  }
   {Constant}              { return new ASMParsedSymbol(ASMParsedSymbol.TYPE_CONSTANT, new ConstantIndex(Integer.parseInt(yytext().substring(8))));  }

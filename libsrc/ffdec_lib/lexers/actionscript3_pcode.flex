@@ -34,7 +34,7 @@ import java.util.Stack;
 
 %{
 
-    StringBuffer string = new StringBuffer();
+    StringBuilder string = new StringBuilder();
     boolean isMultiname = false;
     long multinameId = 0;
 

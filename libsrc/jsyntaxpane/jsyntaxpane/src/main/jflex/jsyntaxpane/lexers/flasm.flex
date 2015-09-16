@@ -18,7 +18,7 @@ import jsyntaxpane.TokenType;
 
 %{
 
-  StringBuffer string = new StringBuffer();
+  StringBuilder string = new StringBuilder();
 
 
     /**
@@ -150,5 +150,5 @@ Constant= constant{NumberLiteral}
 }
 
 /* error fallback */
-.|\n                             { }
+[^]                              { }
 <<EOF>>                          { return null; }

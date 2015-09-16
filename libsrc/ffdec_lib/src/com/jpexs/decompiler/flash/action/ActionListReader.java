@@ -1065,10 +1065,10 @@ public class ActionListReader {
                     } else if (!(a instanceof GraphSourceItemContainer)) {
                         //return in for..in,   TODO:Handle this better way
                         if (((a instanceof ActionEquals) || (a instanceof ActionEquals2)) && (stack.size() == 1) && (stack.peek() instanceof DirectValueActionItem)) {
-                            stack.push(new DirectValueActionItem(null, 0, new Null(), new ArrayList<>()));
+                            stack.push(new DirectValueActionItem(null, 0, Null.INSTANCE, new ArrayList<>()));
                         }
                         if ((a instanceof ActionStoreRegister) && stack.isEmpty()) {
-                            stack.push(new DirectValueActionItem(null, 0, new Null(), new ArrayList<>()));
+                            stack.push(new DirectValueActionItem(null, 0, Null.INSTANCE, new ArrayList<>()));
                         }
                         a.translate(localData, stack, output, Graph.SOP_USE_STATIC/*Graph.SOP_SKIP_STATIC*/, path);
                     }

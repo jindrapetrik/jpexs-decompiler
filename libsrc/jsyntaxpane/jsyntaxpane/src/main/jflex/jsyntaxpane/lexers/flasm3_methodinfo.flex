@@ -18,7 +18,7 @@ import jsyntaxpane.TokenType;
 
 %{
 
-  StringBuffer string = new StringBuffer();
+  StringBuilder string = new StringBuilder();
   boolean isMultiname=false;
 
 
@@ -146,5 +146,5 @@ StringCharacter = [^\r\n\"\\]
 }
 
 /* error fallback */
-.|\n                             { }
+[^]                              { }
 <<EOF>>                          { return null; }

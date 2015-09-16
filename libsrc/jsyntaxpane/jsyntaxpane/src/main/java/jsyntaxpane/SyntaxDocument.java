@@ -41,6 +41,7 @@ public class SyntaxDocument extends PlainDocument {
 	Lexer lexer;
 	List<Token> tokens;
 	CompoundUndoMan undo;
+	boolean ignoreUpdate;
 
 	public SyntaxDocument(Lexer lexer) {
 		super();
@@ -62,12 +63,12 @@ public class SyntaxDocument extends PlainDocument {
 			tokens = null;
 			return;
 		}
-		List<Token> toks = new ArrayList<Token>(getLength() / 10);
-		long ts = System.nanoTime();
 		int len = getLength();
+		List<Token> toks = new ArrayList<Token>(len / 10);
+		long ts = System.nanoTime();
 		try {
 			Segment seg = new Segment();
-			getText(0, getLength(), seg);
+			getText(0, len, seg);
 			lexer.parse(seg, 0, toks);
 		} catch (BadLocationException ex) {
 			log.log(Level.SEVERE, null, ex);
@@ -88,6 +89,9 @@ public class SyntaxDocument extends PlainDocument {
 
 	@Override
 	protected void fireInsertUpdate(DocumentEvent e) {
+		if (ignoreUpdate) {
+			return;
+		}	
 		parse();
 		super.fireInsertUpdate(e);
 	}
@@ -96,6 +100,13 @@ public class SyntaxDocument extends PlainDocument {
 	protected void fireRemoveUpdate(DocumentEvent e) {
 		parse();
 		super.fireRemoveUpdate(e);
+	}
+
+	public void setIgnoreUpdate(boolean value) {
+		ignoreUpdate = value;
+		if (!ignoreUpdate) {
+			parse();
+		}
 	}
 
 	/**

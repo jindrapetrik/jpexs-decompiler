@@ -355,6 +355,6 @@ Preprocessor = \u00A7\u00A7 {Identifier}
 }
 
 /* error fallback */
-.|\n                             {  }
+[^]                              {  }
 <<EOF>>                          { return null; }
 

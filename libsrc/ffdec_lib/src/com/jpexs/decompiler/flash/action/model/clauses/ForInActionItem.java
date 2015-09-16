@@ -132,7 +132,7 @@ public class ForInActionItem extends LoopActionItem implements Block {
         int exprReg = asGenerator.getTempRegister(localData);
 
         loopExpr.add(new ActionStoreRegister(exprReg));
-        loopExpr.add(new ActionPush(new Null()));
+        loopExpr.add(new ActionPush(Null.INSTANCE));
         loopExpr.add(new ActionEquals2());
         ActionIf forInEndIf = new ActionIf(0);
         loopExpr.add(forInEndIf);

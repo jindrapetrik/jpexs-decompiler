@@ -94,7 +94,7 @@ public class DirectValueActionItem extends ActionItem implements SimpleValue {
             return (this.constants.get(((ConstantIndex) value).index));
         }
         if (value instanceof RegisterNumber) {
-            return new Undefined(); //has not computed value
+            return Undefined.INSTANCE; //has not computed value
         }
         return value;
     }
