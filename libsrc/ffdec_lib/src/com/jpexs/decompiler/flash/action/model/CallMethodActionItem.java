@@ -56,7 +56,8 @@ public class CallMethodActionItem extends ActionItem {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         boolean blankMethod = false;
-        if (methodName instanceof DirectValueActionItem) {
+        boolean dvai = methodName instanceof DirectValueActionItem;
+        if (dvai) {
             if (((DirectValueActionItem) methodName).value instanceof Undefined) {
                 blankMethod = true;
             }
@@ -87,9 +88,12 @@ public class CallMethodActionItem extends ActionItem {
 
         writer.spaceBeforeCallParenthesies(arguments.size());
         writer.append("(");
+        if (!dvai) {
+            writer.append("this");
+        }
 
         for (int t = 0; t < arguments.size(); t++) {
-            if (t > 0) {
+            if (t > 0 || !dvai) {
                 writer.append(",");
             }
             arguments.get(t).toStringNL(writer, localData);
