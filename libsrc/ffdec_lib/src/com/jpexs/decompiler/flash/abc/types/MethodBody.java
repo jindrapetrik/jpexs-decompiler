@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFField;
 import com.jpexs.decompiler.graph.DottedChain;
@@ -274,7 +275,7 @@ public final class MethodBody implements Cloneable {
         return ret;
     }
 
-    public void convert(final String path, ScriptExportMode exportMode, final boolean isStatic, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final AVM2ConstantPool constants, final List<MethodInfo> method_info, final ScopeStack scopeStack, final boolean isStaticInitializer, final GraphTextWriter writer, final List<DottedChain> fullyQualifiedNames, final Traits initTraits, boolean firstLevel) throws InterruptedException {
+    public void convert(final String path, ScriptExportMode exportMode, final boolean isStatic, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final AVM2ConstantPool constants, final List<MethodInfo> method_info, final ScopeStack scopeStack, final boolean isStaticInitializer, final NulWriter writer, final List<DottedChain> fullyQualifiedNames, final Traits initTraits, boolean firstLevel) throws InterruptedException {
         if (debugMode) {
             System.err.println("Decompiling " + path);
         }
