@@ -79,6 +79,8 @@ import com.jpexs.decompiler.flash.exporters.swf.SwfXmlExporter;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.helpers.CheckResources;
 import com.jpexs.decompiler.flash.helpers.FileTextWriter;
+import com.jpexs.decompiler.flash.importers.AS2ScriptImporter;
+import com.jpexs.decompiler.flash.importers.AS3ScriptImporter;
 import com.jpexs.decompiler.flash.importers.BinaryDataImporter;
 import com.jpexs.decompiler.flash.importers.FontImporter;
 import com.jpexs.decompiler.flash.importers.ImageImporter;
@@ -425,6 +427,11 @@ public class CommandLineArgumentParser {
             out.println(" ...removes a character tag from the SWF");
         }
 
+        if (filter == null || filter.equals("importscript")) {
+            out.println(" " + (cnt++) + ") -importScript <infile> <outfile> <scriptsfolder>");
+            out.println(" ...imports scripts to <infile> and saves the result to <outfile>");
+        }
+
         if (filter == null || filter.equals("deobfuscate")) {
             out.println(" " + (cnt++) + ") -deobfuscate <level> <infile> <outfile>");
             out.println("  ...Deobfuscates AS3 P-code in <infile> and saves result to <outfile>");
@@ -649,6 +656,8 @@ public class CommandLineArgumentParser {
             parseRemoveCharacter(args, false);
         } else if (command.equals("removecharacterwithdependencies")) {
             parseRemoveCharacter(args, true);
+        } else if (command.equals("importscript")) {
+            parseImportScript(args);
         } else if (command.equals("as3compiler")) {
             ActionScript3Parser.compile(null /*?*/, args.pop(), args.pop(), 0);
         } else if (nextParam.equals("--debugtool")) {
@@ -2368,6 +2377,35 @@ public class CommandLineArgumentParser {
                         break;
                     }
                 }
+
+                try {
+                    try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(outFile))) {
+                        swf.saveTo(fos);
+                    }
+                } catch (IOException e) {
+                    System.err.println("I/O error during writing");
+                    System.exit(2);
+                }
+            }
+        } catch (IOException | InterruptedException e) {
+            System.err.println("I/O error during reading");
+            System.exit(2);
+        }
+    }
+
+    private static void parseImportScript(Stack<String> args) {
+        if (args.size() < 3) {
+            badArguments("importscript");
+        }
+
+        File inFile = new File(args.pop());
+        File outFile = new File(args.pop());
+        try {
+            try (FileInputStream is = new FileInputStream(inFile)) {
+                SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
+                String scriptsFolder = Path.combine(args.pop(), ScriptExportSettings.EXPORT_FOLDER_NAME);
+                new AS2ScriptImporter().importScripts(scriptsFolder, swf.getASMs(true));
+                new AS3ScriptImporter().importScripts(scriptsFolder, swf.getAS3Packs());
 
                 try {
                     try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(outFile))) {
