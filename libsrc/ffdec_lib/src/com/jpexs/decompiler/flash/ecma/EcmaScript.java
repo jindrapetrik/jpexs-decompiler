@@ -71,7 +71,9 @@ public class EcmaScript {
         if (o.getClass() == Long.class) {
             return EcmaType.NUMBER;
         }
-
+        if (o.getClass() == Boolean.class) {
+            return EcmaType.BOOLEAN;
+        }
         if (o.getClass() == Null.class) {
             return EcmaType.NULL;
         }
@@ -288,5 +290,19 @@ public class EcmaScript {
         Long posInt = (long) (double) (Math.signum(n) * Math.floor(Math.abs(n)));
         posInt %= (1 << 32);
         return posInt;
+    }
+
+    public static String toString(Object o) {
+        if (o == null) {
+            return "null";
+        }
+
+        if (o instanceof Number) {
+            // http://www.ecma-international.org/ecma-262/5.1/#sec-9.8.1
+            Number n = (Number) o;
+            return new EcmaFloatingDecimal(n.doubleValue()).toJavaFormatString();
+        }
+
+        return o.toString();
     }
 }
