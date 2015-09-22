@@ -87,7 +87,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import org.testng.Assert;
-import org.testng.annotations.Test;
 
 /**
  *
@@ -136,7 +135,7 @@ public class FlashPlayerTest {
         }
     }
 
-    @Test
+    //@Test
     public void testAs2() throws IOException, InterruptedException {
         final Reference<String> resultRef = new Reference<>(null);
 
