@@ -139,7 +139,7 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
             ExecutionResult result = new ExecutionResult();
             executeActions(actions, i, actions.size() - 1, cPool, result, fakeFunctions);
 
-            if (result.idx != -1) {
+            if (result.idx != -1 && result.resultValue == null) {
                 int newIstructionCount = 1; // jump
                 if (result.constantPool != null) {
                     newIstructionCount++;
@@ -429,9 +429,10 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
                     executeActions(actions, i + 1, lastActionIdx, null, result, null);
                     if (result.resultValue != null) {
                         results.put(def.functionName, result.resultValue);
-                        for (int j = i; j <= lastActionIdx; j++) {
-                            actions.removeAction(i);
-                        }
+                        // todo: remove fake function
+                        /*for (int j = i; j <= lastActionIdx; j++) {
+                         actions.removeAction(i);
+                         }*/
                     }
                 }
             }
