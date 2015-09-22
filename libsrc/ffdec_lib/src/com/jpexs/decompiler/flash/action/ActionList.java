@@ -79,6 +79,10 @@ public class ActionList extends ArrayList<Action> {
         ActionListReader.addAction(this, index, action, SWF.DEFAULT_VERSION, false, false);
     }
 
+    public void addActions(int index, List<Action> actions) {
+        ActionListReader.addActions(this, index, actions, SWF.DEFAULT_VERSION);
+    }
+
     public void fixActionList() {
         ActionListReader.fixActionList(this, null, SWF.DEFAULT_VERSION);
     }

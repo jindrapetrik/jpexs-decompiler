@@ -19,15 +19,75 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
+import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.ActionList;
+import com.jpexs.decompiler.flash.action.ActionLocalData;
+import com.jpexs.decompiler.flash.action.deobfuscation.FixItemCounterTranslateStack;
+import com.jpexs.decompiler.flash.action.swf4.ActionAdd;
+import com.jpexs.decompiler.flash.action.swf4.ActionAnd;
+import com.jpexs.decompiler.flash.action.swf4.ActionAsciiToChar;
+import com.jpexs.decompiler.flash.action.swf4.ActionCharToAscii;
+import com.jpexs.decompiler.flash.action.swf4.ActionDivide;
+import com.jpexs.decompiler.flash.action.swf4.ActionEquals;
+import com.jpexs.decompiler.flash.action.swf4.ActionLess;
+import com.jpexs.decompiler.flash.action.swf4.ActionMBAsciiToChar;
+import com.jpexs.decompiler.flash.action.swf4.ActionMBStringExtract;
+import com.jpexs.decompiler.flash.action.swf4.ActionMBStringLength;
+import com.jpexs.decompiler.flash.action.swf4.ActionMultiply;
+import com.jpexs.decompiler.flash.action.swf4.ActionNot;
+import com.jpexs.decompiler.flash.action.swf4.ActionOr;
+import com.jpexs.decompiler.flash.action.swf4.ActionPush;
+import com.jpexs.decompiler.flash.action.swf4.ActionStringAdd;
+import com.jpexs.decompiler.flash.action.swf4.ActionStringExtract;
+import com.jpexs.decompiler.flash.action.swf4.ActionStringLength;
+import com.jpexs.decompiler.flash.action.swf4.ActionStringLess;
+import com.jpexs.decompiler.flash.action.swf4.ActionToInteger;
+import com.jpexs.decompiler.flash.action.swf5.ActionAdd2;
+import com.jpexs.decompiler.flash.action.swf5.ActionBitAnd;
+import com.jpexs.decompiler.flash.action.swf5.ActionBitLShift;
+import com.jpexs.decompiler.flash.action.swf5.ActionBitOr;
+import com.jpexs.decompiler.flash.action.swf5.ActionBitRShift;
+import com.jpexs.decompiler.flash.action.swf5.ActionBitURShift;
+import com.jpexs.decompiler.flash.action.swf5.ActionBitXor;
+import com.jpexs.decompiler.flash.action.swf5.ActionDecrement;
+import com.jpexs.decompiler.flash.action.swf5.ActionEquals2;
+import com.jpexs.decompiler.flash.action.swf5.ActionIncrement;
+import com.jpexs.decompiler.flash.action.swf5.ActionLess2;
+import com.jpexs.decompiler.flash.action.swf5.ActionModulo;
+import com.jpexs.decompiler.flash.action.swf5.ActionPushDuplicate;
+import com.jpexs.decompiler.flash.action.swf5.ActionToNumber;
+import com.jpexs.decompiler.flash.action.swf5.ActionToString;
+import com.jpexs.decompiler.flash.action.swf5.ActionTypeOf;
+import com.jpexs.decompiler.flash.action.swf6.ActionGreater;
+import com.jpexs.decompiler.flash.action.swf6.ActionStrictEquals;
+import com.jpexs.decompiler.flash.action.swf6.ActionStringGreater;
+import com.jpexs.decompiler.flash.ecma.Null;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.tags.DoABC2Tag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.base.ASMSource;
+import com.jpexs.decompiler.graph.Graph;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.javactivex.ActiveX;
+import com.jpexs.javactivex.ActiveXEvent;
+import com.jpexs.javactivex.ActiveXEventListener;
+import com.jpexs.javactivex.Reference;
 import com.jpexs.javactivex.example.controls.flash.ShockwaveFlash;
 import java.awt.Panel;
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import org.testng.Assert;
+import org.testng.annotations.Test;
 
 /**
  *
@@ -35,10 +95,15 @@ import org.testng.Assert;
  */
 public class FlashPlayerTest {
 
+    private Object lockObj = new Object();
+
+    private Random random = new Random();
+
     //@Test
     public void test1() throws IOException, InterruptedException {
         ShockwaveFlash flash = ActiveX.createObject(ShockwaveFlash.class, new Panel());
-        SWF swf = new SWF(new BufferedInputStream(new FileInputStream("libsrc/ffdec_lib/testdata/run_as3/run.swf")), false);
+        File f = new File("libsrc/ffdec_lib/testdata/run_as3/run.swf");
+        SWF swf = new SWF(new BufferedInputStream(new FileInputStream(f)), false);
         DoABC2Tag abcTag = null;
         for (Tag t : swf.tags) {
             if (t instanceof DoABC2Tag) {
@@ -49,7 +114,7 @@ public class FlashPlayerTest {
 
         ABC abc = abcTag.getABC();
         MethodBody body = abc.findBodyByClassAndName("Run", "run");
-        flash.setMovie("libsrc/ffdec_lib/testdata/run_as3/run2.swf");
+        flash.setMovie(f.getAbsolutePath());
 
         int cnt = 0;
         while (flash.getReadyState() != 4) {
@@ -63,10 +128,230 @@ public class FlashPlayerTest {
 
         flash.setAllowScriptAccess("always");
         try {
-            String res = flash.CallFunction("testFunc");
+            String res = flash.CallFunction("<invoke name=\"testFunc\" returntype=\"xml\"><arguments><string>something</string></arguments></invoke>");
+            //String str = flash.GetVariable("_root.myText.text");
             throw new Error(res + " " + body.getCode().toString() + "");
         } catch (Exception ex) {
             int a = 1;
         }
+    }
+
+    @Test
+    public void testAs2() throws IOException, InterruptedException {
+        final Reference<String> resultRef = new Reference<>(null);
+
+        ShockwaveFlash flash = ActiveX.createObject(ShockwaveFlash.class, new Panel());
+        flash.setAllowScriptAccess("always");
+        flash.setAllowNetworking("all");
+        flash.addFSCommandListener(new ActiveXEventListener() {
+
+            @Override
+            public void onEvent(ActiveXEvent axe) {
+                resultRef.setVal((String) axe.args.get("args"));
+                System.out.println("Flash event");
+                synchronized (lockObj) {
+                    lockObj.notify();
+                }
+            }
+        });
+
+        for (int i = 0; i < 15; i++) {
+            for (int j = 0; j < 12 + 22; j++) {
+
+                File f = new File("libsrc/ffdec_lib/testdata/run_as2/run_as2.swf");
+                File f2 = new File("run_test_" + new Date().getTime() + "_" + i + ".swf");
+                f2.deleteOnExit();
+
+                SWF swf = new SWF(new BufferedInputStream(new FileInputStream(f)), false);
+                Map<String, ASMSource> asms = swf.getASMs(true);
+                ASMSource asm = asms.get("\\frame_1\\DoAction");
+                ActionList actions = asm.getActions();
+                actions.removeAction(2, 4);
+
+                List<Action> newActions = new ArrayList<>();
+                int r1 = random.nextInt(500) - 255;
+                int r2 = random.nextInt(100);
+
+                /*i = 9;
+                 j = 21;
+                 r1 = 212;
+                 r2 = 3;*/
+                Action opAction = getOpAction(j);
+
+                if (j >= 12) {
+                    newActions.add(new ActionPush(r1));
+                }
+
+                if (i == 0) {
+                    newActions.add(new ActionPush(Undefined.INSTANCE));
+                } else if (i == 1) {
+                    newActions.add(new ActionPush(Null.INSTANCE));
+                } else if (i == 2) {
+                    newActions.add(new ActionPush(false));
+                } else if (i == 3) {
+                    newActions.add(new ActionPush(true));
+                } else if (i == 4) {
+                    newActions.add(new ActionPush("test"));
+                } else if (i == 5) {
+                    newActions.add(new ActionPush("0"));
+                } else if (i == 6) {
+                    newActions.add(new ActionPush("0.0"));
+                } else if (i == 7) {
+                    newActions.add(new ActionPush("1.0"));
+                } else if (i == 8) {
+                    newActions.add(new ActionPush("-1.0"));
+                } else if (i == 9) {
+                    newActions.add(new ActionPush(0));
+                } else if (i == 10) {
+                    newActions.add(new ActionPush(-100));
+                } else if (i == 11) {
+                    newActions.add(new ActionPush(100));
+                } else {
+                    newActions.add(new ActionPush(r2));
+                }
+
+                System.out.println(i + " " + j + " " + opAction.toString() + " r1:" + r1 + " r2:" + r2);
+                newActions.add(opAction);
+                newActions.add(new ActionPushDuplicate());
+                newActions.add(new ActionTypeOf());
+                newActions.add(new ActionStringAdd());
+                actions.addActions(2, newActions);
+
+                List<GraphTargetItem> output = new ArrayList<>();
+                ActionLocalData localData = new ActionLocalData();
+                FixItemCounterTranslateStack stack = new FixItemCounterTranslateStack("");
+                for (Action a : newActions) {
+                    a.translate(localData, stack, output, Graph.SOP_USE_STATIC, "");
+                }
+
+                Object ffdecResult = stack.pop().getResult();
+                System.out.println("FFDec result: " + ffdecResult);
+
+                asm.setActions(actions);
+                asm.setModified();
+                try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(f2))) {
+                    swf.saveTo(fos);
+                }
+                flash.setMovie(f2.getAbsolutePath());
+
+                synchronized (lockObj) {
+                    lockObj.wait();
+                }
+
+                String str = flash.GetVariable("myText.text");
+                String flashResult = resultRef.getVal();
+                Assert.assertEquals(ffdecResult, flashResult);
+
+                f2.delete();
+            }
+        }
+    }
+
+    private Action getOpAction(int idx) {
+        Action result;
+        if (idx < 12) {
+            result = getUnaryOpAction(idx);
+            Assert.assertEquals(1, result.getStackPopCount(null, null));
+            Assert.assertEquals(1, result.getStackPushCount(null, null));
+        } else {
+            result = getBinaryOpAction(idx - 12);
+            Assert.assertEquals(2, result.getStackPopCount(null, null));
+            Assert.assertEquals(1, result.getStackPushCount(null, null));
+        }
+
+        return result;
+    }
+
+    private Action getUnaryOpAction(int idx) {
+        switch (idx) {
+            case 0:
+                return new ActionAsciiToChar();
+            case 1:
+                return new ActionCharToAscii();
+            case 2:
+                return new ActionDecrement();
+            case 3:
+                return new ActionIncrement();
+            case 4:
+                return new ActionNot();
+            case 5:
+                return new ActionToInteger();
+            case 6:
+                return new ActionToNumber();
+            case 7:
+                return new ActionToString();
+            case 8:
+                return new ActionTypeOf();
+            case 9:
+                return new ActionStringLength();
+            case 10:
+                return new ActionMBAsciiToChar();
+            case 11:
+                return new ActionMBStringLength();
+        }
+
+        throw new Error("Invalid index");
+    }
+
+    private Action getBinaryOpAction(int idx) {
+        switch (idx) {
+            case 0:
+                return new ActionAnd();
+            case 1:
+                return new ActionAdd();
+            case 2:
+                return new ActionAdd2();
+            case 3:
+                return new ActionBitAnd();
+            case 4:
+                return new ActionBitLShift();
+            case 5:
+                return new ActionBitOr();
+            case 6:
+                return new ActionBitRShift();
+            case 7:
+                return new ActionBitURShift();
+            case 8:
+                return new ActionBitXor();
+            case 9:
+                return new ActionDivide();
+            case 10:
+                return new ActionEquals();
+            case 11:
+                return new ActionEquals2();
+            case 12:
+                return new ActionGreater();
+            case 13:
+                return new ActionLess();
+            case 14:
+                return new ActionLess2();
+            case 15:
+                return new ActionModulo();
+            case 16:
+                return new ActionMultiply();
+            case 17:
+                return new ActionOr();
+            case 18:
+                return new ActionStringAdd();
+            case 19:
+                return new ActionStrictEquals();
+            case 20:
+                return new ActionStringGreater();
+            case 21:
+                return new ActionStringLess();
+        }
+
+        throw new Error("Invalid index");
+    }
+
+    private Action getTernaryOpAction(int idx) {
+        switch (idx) {
+            case 0:
+                return new ActionStringExtract();
+            case 1:
+                return new ActionMBStringExtract();
+        }
+
+        throw new Error("Invalid index");
     }
 }

@@ -730,6 +730,52 @@ public class ActionListReader {
         return true;
     }
 
+    /**
+     * Adds an action to the action list to the specified location, and updates
+     * all references
+     *
+     * @param actions
+     * @param index
+     * @param newActions
+     * @param version
+     * @return
+     */
+    public static boolean addActions(ActionList actions, int index, List<Action> newActions, int version) {
+
+        if (index < 0 || actions.size() < index) {
+            return false;
+        }
+
+        long startIp = actions.get(0).getAddress();
+        Action lastAction = actions.get(actions.size() - 1);
+        if (!(lastAction instanceof ActionEnd)) {
+            Action aEnd = new ActionEnd();
+            aEnd.setAddress(lastAction.getAddress() + lastAction.getTotalActionLength());
+            actions.add(aEnd);
+            lastAction = aEnd;
+        }
+
+        long endAddress = lastAction.getAddress();
+
+        Map<Action, List<Action>> containerLastActions = new HashMap<>();
+        getContainerLastActions(actions, containerLastActions);
+
+        Map<Action, Action> jumps = new HashMap<>();
+        List<Action> tempActions = new ArrayList<>(actions);
+        tempActions.addAll(newActions);
+        getJumps(tempActions, jumps);
+
+        actions.addAll(index, newActions);
+
+        updateActionLengths(actions, version);
+        updateAddresses(actions, startIp);
+        updateJumps(actions, jumps, containerLastActions, endAddress);
+        updateActionStores(actions, jumps);
+        updateContainerSizes(actions, containerLastActions);
+
+        return true;
+    }
+
     private static Action readActionListAtPos(List<DisassemblyListener> listeners, ConstantPool cpool,
             SWFInputStream sis, Map<Long, Action> actions, Map<Long, Long> nextOffsets,
             long ip, long startIp, long endIp, String path, boolean indeterminate, List<Long> visitedContainers) throws IOException {

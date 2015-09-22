@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.swf4.ActionMBAsciiToChar;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -47,6 +48,16 @@ public class MBAsciiToCharActionItem extends ActionItem {
         List<GraphSourceItemPos> ret = super.getNeededSources();
         ret.addAll(value.getNeededSources());
         return ret;
+    }
+
+    @Override
+    public Object getResult() {
+        Double res = EcmaScript.toNumber(value.getResult());
+        if (Double.isNaN(res) || Double.compare(res, 0) == 0) {
+            return "";
+        }
+
+        return ((Character) (char) res.intValue()).toString();
     }
 
     @Override

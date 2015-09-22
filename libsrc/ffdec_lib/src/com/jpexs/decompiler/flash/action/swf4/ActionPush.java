@@ -154,19 +154,19 @@ public class ActionPush extends Action {
             } else if (o instanceof Boolean) {
                 sos.writeUI8(5);
                 sos.writeUI8((Boolean) o ? 1 : 0);
-            } else if (o instanceof Double || o instanceof Long) {
+            } else if (o instanceof Number) {
                 if (o instanceof Long) {
                     long l = (Long) o;
                     if (l < -0x80000000 || l > 0x7fffffff) {
                         o = (double) l;
                     }
                 }
-                if (o instanceof Double) {
+                if (o instanceof Double || o instanceof Float) {
                     sos.writeUI8(6);
-                    sos.writeDOUBLE((Double) o);
-                } else if (o instanceof Long) {
+                    sos.writeDOUBLE(((Number) o).doubleValue());
+                } else if (o instanceof Long || o instanceof Integer || o instanceof Short || o instanceof Byte) {
                     sos.writeUI8(7);
-                    sos.writeSI32((Long) o);
+                    sos.writeSI32(((Number) o).longValue());
                 }
             } else if (o instanceof ConstantIndex) {
                 int cIndex = ((ConstantIndex) o).index;
@@ -202,16 +202,16 @@ public class ActionPush extends Action {
                 res += 2;
             } else if (o instanceof Boolean) {
                 res += 2;
-            } else if (o instanceof Double || o instanceof Long) {
+            } else if (o instanceof Number) {
                 if (o instanceof Long) {
                     long l = (Long) o;
                     if (l < -0x80000000 || l > 0x7fffffff) {
                         o = (double) l;
                     }
                 }
-                if (o instanceof Double) {
+                if (o instanceof Double || o instanceof Float) {
                     res += 9;
-                } else if (o instanceof Long) {
+                } else if (o instanceof Long || o instanceof Integer || o instanceof Short || o instanceof Byte) {
                     res += 5;
                 }
             } else if (o instanceof ConstantIndex) {

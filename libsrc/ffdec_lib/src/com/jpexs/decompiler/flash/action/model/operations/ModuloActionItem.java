@@ -35,11 +35,11 @@ public class ModuloActionItem extends BinaryOpItem {
 
     @Override
     public Object getResult() {
-        Object rightResult = rightSide.getResult();
-        if (Double.compare(EcmaScript.toNumber(rightResult), 0) == 0) {
+        Double rightResult = EcmaScript.toNumber(rightSide.getResult());
+        if (Double.isNaN(rightResult) || Double.compare(rightResult, 0) == 0) {
             return Double.NaN;
         }
-        return ((long) (double) EcmaScript.toNumber(leftSide.getResult())) % ((long) (double) EcmaScript.toNumber(rightResult));
+        return ((long) (double) EcmaScript.toNumber(leftSide.getResult())) % ((long) (double) rightResult);
     }
 
     @Override

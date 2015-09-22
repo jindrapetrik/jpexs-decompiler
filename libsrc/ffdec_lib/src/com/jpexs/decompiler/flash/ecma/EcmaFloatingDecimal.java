@@ -13,8 +13,9 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
- */
-/*
+ *
+ * ----------------- Original copyright --------------------------
+ *
  * Copyright 1996-2004 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
@@ -134,8 +135,7 @@ public class EcmaFloatingDecimal {
      * count number of bits from high-order 1 bit to low-order 1 bit,
      * inclusive.
      */
-    private static int
-            countBits(long v) {
+    private static int countBits(long v) {
         //
         // the strategy is to shift until we get a non-zero sign bit
         // then shift until we have no bits left, counting the difference.
@@ -213,8 +213,7 @@ public class EcmaFloatingDecimal {
     //
     // a common operation
     //
-    private static FDBigInt
-            multPow52(FDBigInt v, int p5, int p2) {
+    private static FDBigInt multPow52(FDBigInt v, int p5, int p2) {
         if (p5 != 0) {
             if (p5 < small5pow.length) {
                 v = v.mult(small5pow[p5]);
@@ -249,8 +248,7 @@ public class EcmaFloatingDecimal {
      * bigIntExp and bigIntNBits
      *
      */
-    private FDBigInt
-            doubleToBigInt(double dval) {
+    private FDBigInt doubleToBigInt(double dval) {
         long lbits = Double.doubleToLongBits(dval) & ~signMask;
         int binexp = (int) (lbits >>> expShift);
         lbits &= fractMask;
@@ -926,6 +924,17 @@ public class EcmaFloatingDecimal {
                 roundup();
             }
         }
+
+        if (nDigits > 15) {
+            nDigits = 15;
+            if (digits[15] >= '5') {
+                roundup();
+            }
+
+            while (nDigits > 0 && digits[nDigits - 1] == '0') {
+                nDigits--;
+            }
+        }
     }
 
     public String toString() {
@@ -954,7 +963,7 @@ public class EcmaFloatingDecimal {
     private int getChars(char[] result) {
         assert nDigits <= 19 : nDigits; // generous bound on size of nDigits
         int i = 0;
-        if (isNegative) {
+        if (isNegative && (decExponent != 0 || digits != zero)) {
             result[0] = '-';
             i = 1;
         }
@@ -1253,8 +1262,7 @@ class FDBigInt {
      * Left shift by c bits.
      * Shifts this in place.
      */
-    public void
-            lshiftMe(int c) throws IllegalArgumentException {
+    public void lshiftMe(int c) throws IllegalArgumentException {
         if (c <= 0) {
             if (c == 0) {
                 return; // silly.
@@ -1307,8 +1315,7 @@ class FDBigInt {
      * the dividend not span up into another word of precision.
      * (This needs to be explained more clearly!)
      */
-    public int
-            normalizeMe() throws IllegalArgumentException {
+    public int normalizeMe() throws IllegalArgumentException {
         int src;
         int wordcount = 0;
         int bitcount = 0;
@@ -1359,8 +1366,7 @@ class FDBigInt {
      * Multiply a FDBigInt by an int.
      * Result is a new FDBigInt.
      */
-    public FDBigInt
-            mult(int iv) {
+    public FDBigInt mult(int iv) {
         long v = iv;
         int r[];
         long p;
@@ -1386,8 +1392,7 @@ class FDBigInt {
      * Result is computed in place.
      * Hope it fits!
      */
-    public void
-            multaddMe(int iv, int addend) {
+    public void multaddMe(int iv, int addend) {
         long v = iv;
         long p;
 
@@ -1410,8 +1415,7 @@ class FDBigInt {
      * Multiply a FDBigInt by another FDBigInt.
      * Result is a new FDBigInt.
      */
-    public FDBigInt
-            mult(FDBigInt other) {
+    public FDBigInt mult(FDBigInt other) {
         // crudely guess adequate size for r
         int r[] = new int[nWords + other.nWords];
         int i;
@@ -1440,8 +1444,7 @@ class FDBigInt {
     /*
      * Add one FDBigInt to another. Return a FDBigInt
      */
-    public FDBigInt
-            add(FDBigInt other) {
+    public FDBigInt add(FDBigInt other) {
         int i;
         int a[], b[];
         int n, m;
@@ -1482,8 +1485,7 @@ class FDBigInt {
      * Subtract one FDBigInt from another. Return a FDBigInt
      * Assert that the result is positive.
      */
-    public FDBigInt
-            sub(FDBigInt other) {
+    public FDBigInt sub(FDBigInt other) {
         int r[] = new int[this.nWords];
         int i;
         int n = this.nWords;
@@ -1522,8 +1524,7 @@ class FDBigInt {
      *  0: this == other
      * <0: this < other
      */
-    public int
-            cmp(FDBigInt other) {
+    public int cmp(FDBigInt other) {
         int i;
         if (this.nWords > other.nWords) {
             // if any of my high-order words is non-zero,
@@ -1584,8 +1585,7 @@ class FDBigInt {
      * Also assume, of course, that the result, q, can be expressed
      * as an integer, 0 <= q < 10.
      */
-    public int
-            quoRemIteration(FDBigInt S) throws IllegalArgumentException {
+    public int quoRemIteration(FDBigInt S) throws IllegalArgumentException {
         // ensure that this and S have the same number of
         // digits. If S is properly normalized and q < 10 then
         // this must be so.
@@ -1641,8 +1641,7 @@ class FDBigInt {
         return (int) q;
     }
 
-    public long
-            longValue() {
+    public long longValue() {
         // if this can be represented as a long, return the value
         assert this.nWords > 0 : this.nWords; // longValue confused
 
@@ -1655,8 +1654,7 @@ class FDBigInt {
         return ((long) (data[1]) << 32) | ((long) data[0] & 0xffffffffL);
     }
 
-    public String
-            toString() {
+    public String toString() {
         StringBuffer r = new StringBuffer(30);
         r.append('[');
         int i = Math.min(nWords - 1, data.length - 1);

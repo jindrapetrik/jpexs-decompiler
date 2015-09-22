@@ -80,13 +80,12 @@ public class DirectValueActionItem extends ActionItem implements SimpleValue {
         if (value instanceof Float) {
             return (double) (Float) value;
         }
-        if (value instanceof Long) {
-            return (double) (Long) value;
+        if (value instanceof Long || value instanceof Integer || value instanceof Short || value instanceof Byte) {
+            return ((Number) value).doubleValue();
         }
         if (value instanceof Boolean) {
             return value;
         }
-
         if (value instanceof String) {
             return value;
         }

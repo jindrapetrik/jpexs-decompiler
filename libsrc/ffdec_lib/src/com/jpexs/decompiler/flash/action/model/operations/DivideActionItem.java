@@ -35,11 +35,13 @@ public class DivideActionItem extends BinaryOpItem {
 
     @Override
     public Object getResult() {
-        Object rightResult = rightSide.getResult();
-        if (Double.compare(EcmaScript.toNumber(rightResult), 0) == 0) {
-            return Double.NaN;
+        Double leftResult = EcmaScript.toNumber(leftSide.getResult());
+        Double rightResult = EcmaScript.toNumber(rightSide.getResult());
+        if (Double.compare(rightResult, 0) == 0) {
+            return leftResult < 0 ? Double.NEGATIVE_INFINITY
+                    : leftResult > 0 ? Double.POSITIVE_INFINITY : Double.NaN;
         }
-        return (EcmaScript.toNumber(leftSide.getResult())) / (EcmaScript.toNumber(rightResult));
+        return leftResult / rightResult;
     }
 
     @Override

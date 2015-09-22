@@ -30,7 +30,7 @@ public class EcmaScript {
             return Double.NaN;
         }
         if (o instanceof Null) {
-            return 0.0;
+            return Double.NaN;
         }
         if (o instanceof Boolean) {
             return (Boolean) o ? 1.0 : 0.0;

@@ -55,6 +55,7 @@ import com.jpexs.decompiler.flash.action.swf5.ActionEquals2;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.ecma.Null;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -925,34 +926,9 @@ public abstract class Action implements GraphSourceItem {
         this.ignored = ignored;
     }
 
-    private static class Loop {
-
-        public long loopContinue;
-
-        public long loopBreak;
-
-        public int continueCount = 0;
-
-        public int breakCount = 0;
-
-        public Loop(long loopContinue, long loopBreak) {
-            this.loopContinue = loopContinue;
-            this.loopBreak = loopBreak;
-        }
-
-        @Override
-        public String toString() {
-            return "[Loop continue:" + loopContinue + ", break:" + loopBreak + "]";
-        }
-    }
-
-    private static void log(String s) {
-        logger.fine(s);
-    }
-
     public static List<GraphTargetItem> actionsPartToTree(HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, TranslateStack stack, List<Action> actions, int start, int end, int version, int staticOperation, String path) throws InterruptedException {
         if (start < actions.size() && (end > 0) && (start > 0)) {
-            log("Entering " + start + "-" + end + (actions.size() > 0 ? (" (" + actions.get(start).toString() + " - " + actions.get(end == actions.size() ? end - 1 : end) + ")") : ""));
+            logger.log(Level.FINE, "Entering {0}-{1}{2}", new Object[]{start, end, actions.size() > 0 ? (" (" + actions.get(start).toString() + " - " + actions.get(end == actions.size() ? end - 1 : end) + ")") : ""});
         }
         ActionLocalData localData = new ActionLocalData(registerNames, variables, functions);
         List<GraphTargetItem> output = new ArrayList<>();
@@ -1136,7 +1112,7 @@ public abstract class Action implements GraphSourceItem {
             ip++;
         }
         //output = checkClass(output);
-        log("Leaving " + start + "-" + end);
+        logger.log(Level.FINE, "Leaving {0}-{1}", new Object[]{start, end});
         return output;
     }
 
@@ -1357,11 +1333,20 @@ public abstract class Action implements GraphSourceItem {
         if (o instanceof Long) {
             return (Long) o;
         }
+        if (o instanceof Null) {
+            return Double.NaN;
+        }
+        if (o instanceof Undefined) {
+            return Double.NaN;
+        }
+        if (o instanceof Boolean) {
+            return (Boolean) o ? 1.0 : 0.0;
+        }
         if (o instanceof String) {
             try {
                 return Double.parseDouble((String) o);
             } catch (NumberFormatException nfe) {
-                return 0;
+                return Double.NaN;
             }
         }
         return 0;

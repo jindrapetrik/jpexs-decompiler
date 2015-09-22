@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.swf4.ActionStringEquals;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -36,6 +37,11 @@ public class StringEqActionItem extends BinaryOpItem implements Inverted {
     @Override
     public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
         return false;
+    }
+
+    @Override
+    public Object getResult() {
+        return EcmaScript.toString(leftSide.getResult()).equals(EcmaScript.toString(rightSide.getResult()));
     }
 
     @Override
