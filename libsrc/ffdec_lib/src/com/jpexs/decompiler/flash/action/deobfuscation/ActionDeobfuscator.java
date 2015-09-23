@@ -28,16 +28,28 @@ import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.ReturnActionItem;
 import com.jpexs.decompiler.flash.action.special.ActionEnd;
 import com.jpexs.decompiler.flash.action.swf4.ActionAdd;
+import com.jpexs.decompiler.flash.action.swf4.ActionAnd;
+import com.jpexs.decompiler.flash.action.swf4.ActionAsciiToChar;
+import com.jpexs.decompiler.flash.action.swf4.ActionCharToAscii;
+import com.jpexs.decompiler.flash.action.swf4.ActionDivide;
 import com.jpexs.decompiler.flash.action.swf4.ActionEquals;
 import com.jpexs.decompiler.flash.action.swf4.ActionGetVariable;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.action.swf4.ActionJump;
 import com.jpexs.decompiler.flash.action.swf4.ActionLess;
+import com.jpexs.decompiler.flash.action.swf4.ActionMBAsciiToChar;
+import com.jpexs.decompiler.flash.action.swf4.ActionMBStringLength;
 import com.jpexs.decompiler.flash.action.swf4.ActionMultiply;
 import com.jpexs.decompiler.flash.action.swf4.ActionNot;
+import com.jpexs.decompiler.flash.action.swf4.ActionOr;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ActionSetVariable;
+import com.jpexs.decompiler.flash.action.swf4.ActionStringAdd;
+import com.jpexs.decompiler.flash.action.swf4.ActionStringEquals;
+import com.jpexs.decompiler.flash.action.swf4.ActionStringLength;
+import com.jpexs.decompiler.flash.action.swf4.ActionStringLess;
 import com.jpexs.decompiler.flash.action.swf4.ActionSubtract;
+import com.jpexs.decompiler.flash.action.swf4.ActionToInteger;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionAdd2;
@@ -45,6 +57,7 @@ import com.jpexs.decompiler.flash.action.swf5.ActionBitAnd;
 import com.jpexs.decompiler.flash.action.swf5.ActionBitLShift;
 import com.jpexs.decompiler.flash.action.swf5.ActionBitOr;
 import com.jpexs.decompiler.flash.action.swf5.ActionBitRShift;
+import com.jpexs.decompiler.flash.action.swf5.ActionBitURShift;
 import com.jpexs.decompiler.flash.action.swf5.ActionBitXor;
 import com.jpexs.decompiler.flash.action.swf5.ActionCallFunction;
 import com.jpexs.decompiler.flash.action.swf5.ActionConstantPool;
@@ -53,11 +66,14 @@ import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineLocal;
 import com.jpexs.decompiler.flash.action.swf5.ActionEquals2;
 import com.jpexs.decompiler.flash.action.swf5.ActionIncrement;
-import com.jpexs.decompiler.flash.action.swf5.ActionLess2;
 import com.jpexs.decompiler.flash.action.swf5.ActionModulo;
 import com.jpexs.decompiler.flash.action.swf5.ActionPushDuplicate;
 import com.jpexs.decompiler.flash.action.swf5.ActionReturn;
+import com.jpexs.decompiler.flash.action.swf5.ActionToNumber;
+import com.jpexs.decompiler.flash.action.swf5.ActionToString;
+import com.jpexs.decompiler.flash.action.swf5.ActionTypeOf;
 import com.jpexs.decompiler.flash.action.swf6.ActionGreater;
+import com.jpexs.decompiler.flash.action.swf6.ActionStringGreater;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -306,28 +322,45 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
 
             if (!(action instanceof ActionPush
                     || action instanceof ActionPushDuplicate
+                    || action instanceof ActionAsciiToChar
+                    || action instanceof ActionCharToAscii
+                    || action instanceof ActionDecrement
+                    || action instanceof ActionIncrement
+                    || action instanceof ActionNot
+                    || action instanceof ActionToInteger
+                    || action instanceof ActionToNumber
+                    || action instanceof ActionToString
+                    || action instanceof ActionTypeOf
+                    || action instanceof ActionStringLength
+                    || action instanceof ActionMBAsciiToChar
+                    || action instanceof ActionMBStringLength
+                    || action instanceof ActionAnd
                     || action instanceof ActionAdd
                     || action instanceof ActionAdd2
-                    || action instanceof ActionIncrement
-                    || action instanceof ActionDecrement
-                    || action instanceof ActionSubtract
+                    || action instanceof ActionBitAnd
+                    || action instanceof ActionBitLShift
+                    || action instanceof ActionBitOr
+                    || action instanceof ActionBitRShift
+                    || action instanceof ActionBitURShift
+                    || action instanceof ActionBitXor
+                    || action instanceof ActionDivide
+                    || action instanceof ActionEquals
+                    || action instanceof ActionEquals2
+                    || action instanceof ActionGreater
+                    || action instanceof ActionLess
+                    //|| action instanceof ActionLess2: todo: fix (tz.swf/frame_6/DoAction: _loc3_.icon.gotoAndStop((Number(item.cost) || 0) >= 0?1:2)
                     || action instanceof ActionModulo
                     || action instanceof ActionMultiply
-                    || action instanceof ActionBitXor
-                    || action instanceof ActionBitAnd
-                    || action instanceof ActionBitOr
-                    || action instanceof ActionBitLShift
-                    || action instanceof ActionBitRShift
+                    || action instanceof ActionOr
+                    || action instanceof ActionStringAdd
+                    || action instanceof ActionStringEquals
+                    || action instanceof ActionStringGreater
+                    || action instanceof ActionStringLess
+                    || action instanceof ActionSubtract
                     || action instanceof ActionDefineLocal
                     || action instanceof ActionJump
                     || action instanceof ActionGetVariable
                     || action instanceof ActionSetVariable
-                    || action instanceof ActionEquals
-                    || action instanceof ActionEquals2
-                    || action instanceof ActionLess
-                    || action instanceof ActionLess2
-                    || action instanceof ActionGreater
-                    || action instanceof ActionNot
                     || action instanceof ActionIf
                     || action instanceof ActionConstantPool
                     || action instanceof ActionCallFunction
@@ -385,7 +418,7 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
                 idx = lastActionIdx != -1 ? lastActionIdx + 1 : -1;
             }
 
-            if (/*localData.variables.size() == 1 && */stack.allItemsFixed() || action instanceof ActionEnd) {
+            if (/*localData.variables.size() == 1 && */(stack.allItemsFixed() || action instanceof ActionEnd) && !(action instanceof ActionPush)) {
                 result.idx = idx == actions.size() ? idx - 1 : idx;
                 result.instructionsProcessed = instructionsProcessed;
                 result.constantPool = lastConstantPool;

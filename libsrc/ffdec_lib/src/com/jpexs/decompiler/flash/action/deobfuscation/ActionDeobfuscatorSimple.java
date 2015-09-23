@@ -444,7 +444,7 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
 
             instructionsProcessed++;
 
-            if (stack.allItemsFixed()) {
+            if (stack.allItemsFixed() && !(action instanceof ActionPush)) {
                 result.idx = idx == actions.size() ? idx - 1 : idx;
                 result.instructionsProcessed = instructionsProcessed;
                 result.stack.clear();
