@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.EvalActionItem;
 import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
 import com.jpexs.decompiler.flash.action.model.GetVersionActionItem;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -42,7 +43,13 @@ public class ActionGetVariable extends Action {
     @Override
     public void translate(TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem name = stack.pop();
-        GraphTargetItem computedVal = variables.get(name.toStringNoQuotes(LocalData.empty));
+        String nameStr;
+        if (name instanceof DirectValueActionItem) {
+            nameStr = name.toStringNoQuotes(LocalData.empty);
+        } else {
+            nameStr = EcmaScript.toString(name.getResult());
+        }
+        GraphTargetItem computedVal = variables.get(nameStr);
         if (name instanceof DirectValueActionItem && ((DirectValueActionItem) name).value.equals("/:$version")) {
             stack.push(new GetVersionActionItem(this));
         } else if (!(name instanceof DirectValueActionItem) && !(name instanceof GetVariableActionItem)) {

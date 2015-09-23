@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.StoreTypeAction;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.model.DecrementActionItem;
+import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
 import com.jpexs.decompiler.flash.action.model.IncrementActionItem;
 import com.jpexs.decompiler.flash.action.model.PostDecrementActionItem;
@@ -30,6 +31,7 @@ import com.jpexs.decompiler.flash.action.model.StoreRegisterActionItem;
 import com.jpexs.decompiler.flash.action.model.TemporaryRegister;
 import com.jpexs.decompiler.flash.action.model.operations.PreDecrementActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.PreIncrementActionItem;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -51,7 +53,13 @@ public class ActionSetVariable extends Action implements StoreTypeAction {
     public void translate(TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem value = stack.pop().getThroughDuplicate();
         GraphTargetItem name = stack.pop();
-        variables.put(name.toStringNoQuotes(LocalData.empty), value);
+        String nameStr;
+        if (name instanceof DirectValueActionItem) {
+            nameStr = name.toStringNoQuotes(LocalData.empty);
+        } else {
+            nameStr = EcmaScript.toString(name.getResult());
+        }
+        variables.put(nameStr, value);
         if (value instanceof IncrementActionItem) {
             GraphTargetItem obj = ((IncrementActionItem) value).object;
             if (!stack.isEmpty() && stack.peek().valueEquals(obj)) {

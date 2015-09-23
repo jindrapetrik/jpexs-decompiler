@@ -370,6 +370,28 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
                 break;
             }
 
+            if (action instanceof ActionGetVariable) {
+                if (stack.isEmpty()) {
+                    return;
+                }
+
+                if (stack.peek() instanceof DirectValueActionItem) {
+                    // avoid dynamic variable names, for example: eval("item" add i);
+                    break;
+                }
+            }
+
+            if (action instanceof ActionSetVariable) {
+                if (stack.size() < 2) {
+                    return;
+                }
+
+                if (stack.peek(2) instanceof DirectValueActionItem) {
+                    // avoid dynamic variable names, for example: set("item" add i, 1);
+                    break;
+                }
+            }
+
             if (action instanceof ActionPush) {
                 ActionPush push = (ActionPush) action;
                 boolean ok = true;
