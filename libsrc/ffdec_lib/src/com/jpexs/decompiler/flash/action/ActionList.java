@@ -342,6 +342,19 @@ public class ActionList extends ArrayList<Action> {
         return -1;
     }
 
+    public Action getContainer(int idx) {
+        int i = idx - 1;
+        while (i >= 0) {
+            if (get(i) instanceof GraphSourceItemContainer) {
+                return get(i);
+            }
+
+            i--;
+        }
+
+        return null;
+    }
+
     public void saveToFile(String fileName) {
         File file = new File(fileName);
         try (FileTextWriter writer = new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(file))) {

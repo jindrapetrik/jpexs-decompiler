@@ -153,8 +153,17 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
 
         ActionConstantPool cPool = getConstantPool(actions);
         for (int i = 0; i < actions.size(); i++) {
+            int idx = actions.size() - 1;
+            Action container = actions.getContainer(i);
+            if (container != null) {
+                List<Action> lastActions = actions.getContainerLastActions(container);
+                Action lastAction = lastActions.get(lastActions.size() - 1);
+                int idx2 = actions.getIndexByAddress(lastAction.getAddress()) - 1;
+                idx = Math.min(idx, idx2);
+            }
+
             ExecutionResult result = new ExecutionResult();
-            executeActions(actions, i, actions.size() - 1, cPool, result, fakeFunctions);
+            executeActions(actions, i, idx, cPool, result, fakeFunctions);
 
             if (result.idx != -1 && result.resultValue == null) {
                 int newIstructionCount = 1; // jump
