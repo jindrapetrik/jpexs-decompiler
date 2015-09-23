@@ -289,8 +289,25 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
                     return;
                 }
 
-                String variableName = stack.peek().getResult().toString();
+                GraphTargetItem variableNameObj = stack.peek();
+                if (!(variableNameObj instanceof DirectValueActionItem)) {
+                    // avoid dynamic variable names, for example: eval("item" add i);
+                    break;
+                }
+
+                String variableName = variableNameObj.getResult().toString();
                 if (!localData.variables.containsKey(variableName)) {
+                    break;
+                }
+            }
+
+            if (action instanceof ActionSetVariable) {
+                if (stack.size() < 2) {
+                    return;
+                }
+
+                if (!(stack.peek(2) instanceof DirectValueActionItem)) {
+                    // avoid dynamic variable names, for example: set("item" add i, 1);
                     break;
                 }
             }
@@ -368,28 +385,6 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
                     || action instanceof ActionReturn
                     || action instanceof ActionEnd)) {
                 break;
-            }
-
-            if (action instanceof ActionGetVariable) {
-                if (stack.isEmpty()) {
-                    return;
-                }
-
-                if (stack.peek() instanceof DirectValueActionItem) {
-                    // avoid dynamic variable names, for example: eval("item" add i);
-                    break;
-                }
-            }
-
-            if (action instanceof ActionSetVariable) {
-                if (stack.size() < 2) {
-                    return;
-                }
-
-                if (stack.peek(2) instanceof DirectValueActionItem) {
-                    // avoid dynamic variable names, for example: set("item" add i, 1);
-                    break;
-                }
             }
 
             if (action instanceof ActionPush) {
