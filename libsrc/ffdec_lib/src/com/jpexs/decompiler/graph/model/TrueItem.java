@@ -25,6 +25,7 @@ import com.jpexs.decompiler.graph.SimpleValue;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -67,7 +68,7 @@ public class TrueItem extends GraphTargetItem implements LogicalOpItem, SimpleVa
     }
 
     @Override
-    public boolean isCompileTime() {
+    public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
         return true;
     }
 
