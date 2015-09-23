@@ -423,16 +423,28 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
             if (action instanceof ActionDefineFunction) {
                 ActionDefineFunction def = (ActionDefineFunction) action;
                 if (def.paramNames.isEmpty()) {
+                    boolean isFakeName = true;
+                    for (char ch : def.functionName.toCharArray()) {
+                        if (ch > 31) {
+                            isFakeName = false;
+                            break;
+                        }
+                    }
+
+                    // remove funcion only when the function name contains only non printable characters
+                    if (!isFakeName) {
+                        continue;
+                    }
+
                     ExecutionResult result = new ExecutionResult();
                     List<Action> lastActions = actions.getContainerLastActions(action);
                     int lastActionIdx = actions.indexOf(lastActions.get(0));
                     executeActions(actions, i + 1, lastActionIdx, null, result, null);
                     if (result.resultValue != null) {
                         results.put(def.functionName, result.resultValue);
-                        // todo: remove fake function
-                        /*for (int j = i; j <= lastActionIdx; j++) {
-                         actions.removeAction(i);
-                         }*/
+                        for (int j = i; j <= lastActionIdx; j++) {
+                            actions.removeAction(i);
+                        }
                     }
                 }
             }
