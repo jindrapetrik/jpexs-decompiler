@@ -66,6 +66,7 @@ import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineLocal;
 import com.jpexs.decompiler.flash.action.swf5.ActionEquals2;
 import com.jpexs.decompiler.flash.action.swf5.ActionIncrement;
+import com.jpexs.decompiler.flash.action.swf5.ActionLess2;
 import com.jpexs.decompiler.flash.action.swf5.ActionModulo;
 import com.jpexs.decompiler.flash.action.swf5.ActionPushDuplicate;
 import com.jpexs.decompiler.flash.action.swf5.ActionReturn;
@@ -348,7 +349,7 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
                     || action instanceof ActionEquals2
                     || action instanceof ActionGreater
                     || action instanceof ActionLess
-                    //|| action instanceof ActionLess2: todo: fix (tz.swf/frame_6/DoAction: _loc3_.icon.gotoAndStop((Number(item.cost) || 0) >= 0?1:2)
+                    || action instanceof ActionLess2
                     || action instanceof ActionModulo
                     || action instanceof ActionMultiply
                     || action instanceof ActionOr
