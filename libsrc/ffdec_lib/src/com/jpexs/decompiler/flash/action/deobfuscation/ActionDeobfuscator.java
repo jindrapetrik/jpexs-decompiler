@@ -180,7 +180,7 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
                     }
                 }
 
-                if (allValueValid && newIstructionCount * 5 < result.instructionsProcessed) {
+                if (allValueValid && newIstructionCount * 2 < result.instructionsProcessed) {
                     Action target = actions.get(result.idx);
                     Action prevAction = actions.get(i);
 

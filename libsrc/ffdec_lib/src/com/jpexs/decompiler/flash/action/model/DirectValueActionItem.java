@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -146,39 +147,17 @@ public class DirectValueActionItem extends ActionItem implements SimpleValue {
     }
 
     public String toStringNoH(ConstantPool constants) {
-        if (value instanceof Double) {
-            if (Double.compare((double) (Double) value, 0) == 0) {
-                return "0";
-            }
-        }
-        if (value instanceof Float) {
-            if (Float.compare((float) (Float) value, 0) == 0) {
-                return "0";
-            }
-        }
-        if (value instanceof String) {
-            return (String) value;
-        }
         if (value instanceof ConstantIndex) {
             return this.constants.get(((ConstantIndex) value).index);
         }
-        return value.toString();
+
+        return EcmaScript.toString(value);
     }
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
-        if (value instanceof Double) {
-            if (Double.compare((double) (Double) value, 0) == 0) {
-                return writer.append("0");
-            }
-        }
-        if (value instanceof Float) {
-            if (Float.compare((float) (Float) value, 0) == 0) {
-                return writer.append("0");
-            }
-        }
         if (value instanceof String) {
-            return writer.append("\"").append(Helper.escapeActionScriptString((String) value)).append("\"");
+            return writer.append("\"").append(Helper.escapeActionScriptString(EcmaScript.toString(value))).append("\"");
         }
         if (value instanceof ConstantIndex) {
             return writer.append("\"").append(Helper.escapeActionScriptString(this.constants.get(((ConstantIndex) value).index))).append("\"");
@@ -186,7 +165,7 @@ public class DirectValueActionItem extends ActionItem implements SimpleValue {
         if (value instanceof RegisterNumber) {
             return writer.append(((RegisterNumber) value).translate());
         }
-        return writer.append(value.toString());
+        return writer.append(EcmaScript.toString(value));
     }
 
     @Override
