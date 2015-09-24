@@ -445,7 +445,7 @@ public class EcmaFloatingDecimal {
     /*
      * FIRST IMPORTANT CONSTRUCTOR: DOUBLE
      */
-    public EcmaFloatingDecimal(double d) {
+    public EcmaFloatingDecimal(double d, boolean maxPrecision) {
         long dBits = Double.doubleToLongBits(d);
         long fractBits;
         int binExp;
@@ -499,6 +499,19 @@ public class EcmaFloatingDecimal {
         binExp -= expBias;
         // call the routine that actually does all the hard work.
         dtoa(binExp, fractBits, nSignificantBits);
+
+        if (!maxPrecision) {
+            if (nDigits > 15) {
+                nDigits = 15;
+                if (digits[15] >= '5') {
+                    roundup();
+                }
+
+                while (nDigits > 0 && digits[nDigits - 1] == '0') {
+                    nDigits--;
+                }
+            }
+        }
     }
 
     /*
@@ -769,7 +782,7 @@ public class EcmaFloatingDecimal {
                  * Thus we will need more than one digit if we're using
                  * E-form
                  */
-                if (decExp <= -3 || decExp >= 8) {
+                if (decExp <= -6 || decExp >= 8) {
                     high = low = false;
                 }
                 while (!low && !high) {
@@ -822,7 +835,7 @@ public class EcmaFloatingDecimal {
                  * Thus we will need more than one digit if we're using
                  * E-form
                  */
-                if (decExp <= -3 || decExp >= 8) {
+                if (decExp <= -6 || decExp >= 8) {
                     high = low = false;
                 }
                 while (!low && !high) {
@@ -885,7 +898,7 @@ public class EcmaFloatingDecimal {
              * Thus we will need more than one digit if we're using
              * E-form
              */
-            if (decExp <= -3 || decExp >= 8) {
+            if (decExp <= -6 || decExp >= 8) {
                 high = low = false;
             }
             while (!low && !high) {
@@ -922,17 +935,6 @@ public class EcmaFloatingDecimal {
                 }
             } else {
                 roundup();
-            }
-        }
-
-        if (nDigits > 15) {
-            nDigits = 15;
-            if (digits[15] >= '5') {
-                roundup();
-            }
-
-            while (nDigits > 0 && digits[nDigits - 1] == '0') {
-                nDigits--;
             }
         }
     }

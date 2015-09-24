@@ -293,6 +293,10 @@ public class EcmaScript {
     }
 
     public static String toString(Object o) {
+        return toString(o, false);
+    }
+
+    public static String toString(Object o, boolean maxPrecision) {
         if (o == null) {
             return "null";
         }
@@ -300,7 +304,7 @@ public class EcmaScript {
         if (o instanceof Number) {
             // http://www.ecma-international.org/ecma-262/5.1/#sec-9.8.1
             Number n = (Number) o;
-            return new EcmaFloatingDecimal(n.doubleValue()).toJavaFormatString();
+            return new EcmaFloatingDecimal(n.doubleValue(), maxPrecision).toJavaFormatString();
         }
 
         return o.toString();

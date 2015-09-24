@@ -157,7 +157,7 @@ public class DirectValueActionItem extends ActionItem implements SimpleValue {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         if (value instanceof String) {
-            return writer.append("\"").append(Helper.escapeActionScriptString(EcmaScript.toString(value))).append("\"");
+            return writer.append("\"").append(Helper.escapeActionScriptString((String) value)).append("\"");
         }
         if (value instanceof ConstantIndex) {
             return writer.append("\"").append(Helper.escapeActionScriptString(this.constants.get(((ConstantIndex) value).index))).append("\"");
@@ -165,7 +165,7 @@ public class DirectValueActionItem extends ActionItem implements SimpleValue {
         if (value instanceof RegisterNumber) {
             return writer.append(((RegisterNumber) value).translate());
         }
-        return writer.append(EcmaScript.toString(value));
+        return writer.append(EcmaScript.toString(value, true));
     }
 
     @Override

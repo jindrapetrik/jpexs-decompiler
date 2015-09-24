@@ -19,6 +19,8 @@ package com.jpexs.decompiler.flash.action.swf5;
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.DefineLocalActionItem;
+import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -40,7 +42,13 @@ public class ActionDefineLocal extends Action {
     public void translate(TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem value = stack.pop();
         GraphTargetItem name = stack.pop();
-        variables.put(name.toStringNoQuotes(LocalData.empty), value);
+        String nameStr;
+        if (name instanceof DirectValueActionItem) {
+            nameStr = name.toStringNoQuotes(LocalData.empty);
+        } else {
+            nameStr = EcmaScript.toString(name.getResult());
+        }
+        variables.put(nameStr, value);
         output.add(new DefineLocalActionItem(this, name, value));
     }
 

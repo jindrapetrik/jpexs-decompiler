@@ -52,12 +52,12 @@ public class AsciiToCharActionItem extends ActionItem {
 
     @Override
     public Object getResult() {
-        Double res = EcmaScript.toNumber(value.getResult());
-        if (Double.isNaN(res) || Double.compare(res, 0) == 0) {
+        int res = (int) (double) (EcmaScript.toNumber(value.getResult()));
+        if (res == 0) {
             return "";
         }
 
-        return ((Character) (char) res.intValue()).toString();
+        return ((Character) (char) res).toString();
     }
 
     @Override

@@ -52,7 +52,9 @@ import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionConstantPool;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
 import com.jpexs.decompiler.flash.action.swf5.ActionEquals2;
+import com.jpexs.decompiler.flash.action.swf5.ActionWith;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
+import com.jpexs.decompiler.flash.action.swf7.ActionTry;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
@@ -976,9 +978,11 @@ public abstract class Action implements GraphSourceItem {
                     List<GraphTargetItem> out;
                     try {
                         HashMap<Integer, String> regNames = cnt.getRegNames();
-                        for (Map.Entry<Integer, String> e : registerNames.entrySet()) {
-                            if (!regNames.containsKey(e.getKey())) {
-                                regNames.put(e.getKey(), e.getValue());
+                        if (action instanceof ActionWith || action instanceof ActionTry) {
+                            for (Map.Entry<Integer, String> e : registerNames.entrySet()) {
+                                if (!regNames.containsKey(e.getKey())) {
+                                    regNames.put(e.getKey(), e.getValue());
+                                }
                             }
                         }
                         out = ActionGraph.translateViaGraph(regNames, variables2, functions, actions.subList(adr2ip(actions, endAddr), adr2ip(actions, endAddr + size)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName));
