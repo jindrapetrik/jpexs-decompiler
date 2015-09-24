@@ -342,17 +342,23 @@ public class ActionList extends ArrayList<Action> {
         return -1;
     }
 
-    public Action getContainer(int idx) {
+    public int getContainerIndex(int idx) {
+        Action action = get(idx);
         int i = idx - 1;
         while (i >= 0) {
-            if (get(i) instanceof GraphSourceItemContainer) {
-                return get(i);
+            Action a = get(i);
+            if (a instanceof GraphSourceItemContainer) {
+                List<Action> lastActions = getContainerLastActions(a);
+                Action lastAction = lastActions.get(lastActions.size() - 1);
+                if (lastAction.getAddress() >= action.getAddress()) {
+                    return i;
+                }
             }
 
             i--;
         }
 
-        return null;
+        return -1;
     }
 
     public void saveToFile(String fileName) {
