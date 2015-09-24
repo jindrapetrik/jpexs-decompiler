@@ -86,6 +86,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -974,7 +975,13 @@ public abstract class Action implements GraphSourceItem {
                     }
                     List<GraphTargetItem> out;
                     try {
-                        out = ActionGraph.translateViaGraph(cnt.getRegNames(), variables2, functions, actions.subList(adr2ip(actions, endAddr), adr2ip(actions, endAddr + size)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName));
+                        HashMap<Integer, String> regNames = cnt.getRegNames();
+                        for (Map.Entry<Integer, String> e : registerNames.entrySet()) {
+                            if (!regNames.containsKey(e.getKey())) {
+                                regNames.put(e.getKey(), e.getValue());
+                            }
+                        }
+                        out = ActionGraph.translateViaGraph(regNames, variables2, functions, actions.subList(adr2ip(actions, endAddr), adr2ip(actions, endAddr + size)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName));
                     } catch (OutOfMemoryError | TranslateException | StackOverflowError ex2) {
                         logger.log(Level.SEVERE, "Decompilation error in: " + path, ex2);
                         if (ex2 instanceof OutOfMemoryError) {
