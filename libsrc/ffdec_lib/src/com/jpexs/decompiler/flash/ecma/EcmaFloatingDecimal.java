@@ -1161,7 +1161,7 @@ public class EcmaFloatingDecimal {
 
     private static final char notANumber[] = {'N', 'a', 'N'};
 
-    private static final char zero[] = {'0', '0', '0', '0', '0', '0', '0', '0'};
+    private static final char zero[] = {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'};
 
 
     /*
