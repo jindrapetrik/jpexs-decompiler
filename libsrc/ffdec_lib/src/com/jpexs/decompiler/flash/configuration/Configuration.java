@@ -308,7 +308,6 @@ public class Configuration {
     @ConfigurationCategory("export")
     public static final ConfigurationItem<Integer> saveAsExeScaleMode = null;
 
-    @ConfigurationDefaultInt(3)
     @ConfigurationCategory("export")
     public static final ConfigurationItem<ExeExportMode> exeExportMode = null;
 

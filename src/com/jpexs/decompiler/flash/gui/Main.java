@@ -721,6 +721,9 @@ public class Main {
         ExeExportMode exeExportMode = null;
         if (mode == SaveFileMode.EXE) {
             exeExportMode = Configuration.exeExportMode.get();
+            if (exeExportMode == null) {
+                exeExportMode = ExeExportMode.WRAPPER;
+            }
             String filterDescription = null;
             switch (exeExportMode) {
                 case WRAPPER:
@@ -732,12 +735,12 @@ public class Main {
                     ext = ".dmg";
                     filterDescription = "filter.dmg";
                     break;
-                /*case PROJECTOR_LINUX:
-                 // linux projector is compressed with tar.gz
-                 // todo: decompress
-                 ext = "";
-                 filterDescription = "filter.linuxExe";
-                 break;*/
+                case PROJECTOR_LINUX:
+                    // linux projector is compressed with tar.gz
+                    // todo: decompress
+                    ext = "";
+                    filterDescription = "filter.linuxExe";
+                    break;
             }
 
             String fext = ext;
