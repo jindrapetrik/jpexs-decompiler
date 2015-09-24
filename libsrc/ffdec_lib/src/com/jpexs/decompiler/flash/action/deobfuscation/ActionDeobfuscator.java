@@ -154,7 +154,7 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
         ActionConstantPool cPool = getConstantPool(actions);
         for (int i = 0; i < actions.size(); i++) {
             int idx = actions.size() - 1;
-            int containerIndex = actions.getContainerIndex(i);
+            int containerIndex = actions.getContainerEndIndex(i);
             if (containerIndex != -1) {
                 idx = Math.min(idx, containerIndex - 1);
             }
@@ -180,7 +180,7 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
                     }
                 }
 
-                if (allValueValid && newIstructionCount * 2 < result.instructionsProcessed) {
+                if (allValueValid && newIstructionCount * 5 < result.instructionsProcessed) {
                     Action target = actions.get(result.idx);
                     Action prevAction = actions.get(i);
 

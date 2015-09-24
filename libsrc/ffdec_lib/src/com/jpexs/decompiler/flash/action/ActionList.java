@@ -342,7 +342,7 @@ public class ActionList extends ArrayList<Action> {
         return -1;
     }
 
-    public int getContainerIndex(int idx) {
+    public int getContainerEndIndex(int idx) {
         Action action = get(idx);
         int i = idx - 1;
         while (i >= 0) {
@@ -351,7 +351,7 @@ public class ActionList extends ArrayList<Action> {
                 List<Action> lastActions = getContainerLastActions(a);
                 Action lastAction = lastActions.get(lastActions.size() - 1);
                 if (lastAction.getAddress() >= action.getAddress()) {
-                    return i;
+                    return getIndexByAddress(lastAction.getAddress());
                 }
             }
 
