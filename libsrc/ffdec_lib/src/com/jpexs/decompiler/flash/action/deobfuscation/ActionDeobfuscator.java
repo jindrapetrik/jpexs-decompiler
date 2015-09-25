@@ -170,6 +170,7 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
                 if (!result.stack.isEmpty()) {
                     newIstructionCount++;
                 }
+
                 newIstructionCount += 2 * result.variables.size();
 
                 boolean allValueValid = true;
@@ -180,7 +181,9 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
                     }
                 }
 
-                if (allValueValid && newIstructionCount * 2 < result.instructionsProcessed) {
+                int unreachableCount = actions.getUnreachableActions(i, result.idx).size();
+
+                if (allValueValid && newIstructionCount + 2 < unreachableCount) {
                     Action target = actions.get(result.idx);
                     Action prevAction = actions.get(i);
 
@@ -415,7 +418,7 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
             if (action instanceof ActionJump) {
                 ActionJump jump = (ActionJump) action;
                 long address = jump.getAddress() + jump.getTotalActionLength() + jump.getJumpOffset();
-                idx = actions.indexOf(actions.getByAddress(address));
+                idx = actions.getIndexByAddress(address);
                 if (idx == -1) {
                     throw new TranslateException("Jump target not found: " + address);
                 }
@@ -429,7 +432,7 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
 
                 if (EcmaScript.toBoolean(stack.pop().getResult())) {
                     long address = aif.getAddress() + aif.getTotalActionLength() + aif.getJumpOffset();
-                    idx = actions.indexOf(actions.getByAddress(address));
+                    idx = actions.getIndexByAddress(address);
                     if (idx == -1) {
                         throw new TranslateException("If target not found: " + address);
                     }
@@ -438,7 +441,7 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
 
             if (action instanceof ActionDefineFunction) {
                 List<Action> lastActions = actions.getContainerLastActions(action);
-                int lastActionIdx = actions.indexOf(lastActions.get(0));
+                int lastActionIdx = actions.getIndexByAction(lastActions.get(0));
                 idx = lastActionIdx != -1 ? lastActionIdx + 1 : -1;
             }
 
@@ -495,7 +498,7 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
 
                     ExecutionResult result = new ExecutionResult();
                     List<Action> lastActions = actions.getContainerLastActions(action);
-                    int lastActionIdx = actions.indexOf(lastActions.get(0));
+                    int lastActionIdx = actions.getIndexByAction(lastActions.get(0));
                     executeActions(actions, i + 1, lastActionIdx, null, result, null);
                     if (result.resultValue != null) {
                         results.put(def.functionName, result.resultValue);

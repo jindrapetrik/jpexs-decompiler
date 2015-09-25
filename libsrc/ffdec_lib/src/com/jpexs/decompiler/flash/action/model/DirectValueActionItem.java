@@ -165,7 +165,8 @@ public class DirectValueActionItem extends ActionItem implements SimpleValue {
         if (value instanceof RegisterNumber) {
             return writer.append(((RegisterNumber) value).translate());
         }
-        return writer.append(EcmaScript.toString(value, true));
+        return writer.append(value.toString());
+        //return writer.append(EcmaScript.toString(value, true)); // todo, use this line
     }
 
     @Override

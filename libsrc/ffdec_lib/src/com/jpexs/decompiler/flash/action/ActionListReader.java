@@ -620,7 +620,7 @@ public class ActionListReader {
         getJumps(actions, jumps);
 
         for (Action actionToRemove : actionsToRemove) {
-            int index = actions.indexOf(actionToRemove);
+            int index = actions.getIndexByAction(actionToRemove);
             Action prevAction = index > 0 ? actions.get(index - 1) : null;
             Action nextAction = index + 1 < actions.size() ? actions.get(index + 1) : null;
             for (Action a : containerLastActions.keySet()) {

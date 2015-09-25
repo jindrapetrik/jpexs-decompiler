@@ -323,6 +323,10 @@ public class ActionList extends ArrayList<Action> {
         return idx == -1 ? null : get(idx);
     }
 
+    public int getIndexByAction(Action action) {
+        return getIndexByAddress(action.getAddress());
+    }
+
     public int getIndexByAddress(long address) {
         int min = 0;
         int max = size() - 1;
@@ -359,6 +363,108 @@ public class ActionList extends ArrayList<Action> {
         }
 
         return -1;
+    }
+
+    public List<Action> getUnreachableActions() {
+        int[] isReachable = getUnreachableActionsMap(-1, 0);
+        List<Action> unreachableActions = new ArrayList<>();
+        for (int i = 0; i < size(); i++) {
+            if (isReachable[i] == 0) {
+                unreachableActions.add(get(i));
+            }
+        }
+
+        if (unreachableActions.isEmpty()) {
+            unreachableActions = null;
+        }
+
+        return unreachableActions;
+    }
+
+    public List<Action> getUnreachableActions(int jumpIndex, int jumpTargetIndex) {
+        int[] isReachable = getUnreachableActionsMap(jumpIndex, jumpTargetIndex);
+        List<Action> unreachableActions = new ArrayList<>();
+        for (int i = 0; i < size(); i++) {
+            if (isReachable[i] == 0) {
+                unreachableActions.add(get(i));
+            }
+        }
+
+        if (unreachableActions.isEmpty()) {
+            unreachableActions = null;
+        }
+
+        return unreachableActions;
+    }
+
+    private int[] getUnreachableActionsMap(int jumpIndex, int jumpTargetIndex) {
+        int size = size();
+
+        // one item for each action. 1 means reachable, 2 means reachable and processed
+        int[] isReachable = new int[size];
+        isReachable[0] = 1;
+        boolean modified = true;
+        while (modified) {
+            modified = false;
+            for (int i = 0; i < size; i++) {
+                Action action = get(i);
+                if (isReachable[i] == 1) {
+                    isReachable[i] = 2;
+                    modified = true;
+
+                    if (i == jumpIndex) {
+                        if (isReachable[jumpTargetIndex] == 0) {
+                            isReachable[jumpTargetIndex] = 1;
+                        }
+
+                        continue;
+                    }
+
+                    if (!action.isExit() && !(action instanceof ActionJump) && i != size - 1) {
+                        if (isReachable[i + 1] == 0) {
+                            isReachable[i + 1] = 1;
+                        }
+                    }
+
+                    if (action instanceof ActionJump) {
+                        ActionJump aJump = (ActionJump) action;
+                        long ref = aJump.getAddress() + aJump.getTotalActionLength() + aJump.getJumpOffset();
+                        int targetIndex = getIndexByAddress(ref);
+                        if (targetIndex != -1 && isReachable[targetIndex] == 0) {
+                            isReachable[targetIndex] = 1;
+                        }
+                    } else if (action instanceof ActionIf) {
+                        ActionIf aIf = (ActionIf) action;
+                        long ref = aIf.getAddress() + aIf.getTotalActionLength() + aIf.getJumpOffset();
+                        int targetIndex = getIndexByAddress(ref);
+                        if (targetIndex != -1 && isReachable[targetIndex] == 0) {
+                            isReachable[targetIndex] = 1;
+                        }
+                    } else if (action instanceof ActionStore) {
+                        ActionStore aStore = (ActionStore) action;
+                        int storeSize = aStore.getStoreSize();
+                        if (size > i + storeSize) {
+                            int targetIndex = i + storeSize;
+                            if (isReachable[targetIndex] == 0) {
+                                isReachable[targetIndex] = 1;
+                            }
+                        }
+                    } else if (action instanceof GraphSourceItemContainer) {
+                        GraphSourceItemContainer container = (GraphSourceItemContainer) action;
+                        long ref = action.getAddress() + action.getTotalActionLength();
+                        for (Long containerSize : container.getContainerSizes()) {
+                            ref += containerSize;
+                            int targetIndex = getIndexByAddress(ref);
+                            if (targetIndex != -1 && isReachable[targetIndex] == 0) {
+                                isReachable[targetIndex] = 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return isReachable;
     }
 
     public void saveToFile(String fileName) {
