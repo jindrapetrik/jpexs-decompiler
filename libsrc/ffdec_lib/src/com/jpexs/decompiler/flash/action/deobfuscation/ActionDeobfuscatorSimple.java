@@ -155,7 +155,7 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
             if (result.idx != -1) {
                 int newIstructionCount = 1 /*jump */ + result.stack.size();
                 List<Action> unreachable = actions.getUnreachableActions(i, result.idx);
-                int unreachableCount = unreachable == null ? 0 : unreachable.size();
+                int unreachableCount = getActionCount(unreachable);
 
                 if (newIstructionCount < unreachableCount) {
                     Action target = actions.get(result.idx);
@@ -240,6 +240,23 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
         }
 
         return actionsToRemove != null;
+    }
+
+    protected int getActionCount(List<Action> actions) {
+        if (actions == null) {
+            return 0;
+        }
+
+        int result = 0;
+        for (Action action : actions) {
+            if (action instanceof ActionPush) {
+                result += ((ActionPush) action).values.size();
+            } else {
+                result++;
+            }
+        }
+
+        return result;
     }
 
     private void executeActions(ActionList actions, int idx, int endIdx, ExecutionResult result) throws InterruptedException {

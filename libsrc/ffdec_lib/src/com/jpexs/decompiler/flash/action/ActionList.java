@@ -383,6 +383,7 @@ public class ActionList extends ArrayList<Action> {
 
     public List<Action> getUnreachableActions(int jumpIndex, int jumpTargetIndex) {
         int[] isReachable = getUnreachableActionsMap(jumpIndex, jumpTargetIndex);
+        isReachable[jumpIndex] = 0;
         List<Action> unreachableActions = new ArrayList<>();
         for (int i = 0; i < size(); i++) {
             if (isReachable[i] == 0) {

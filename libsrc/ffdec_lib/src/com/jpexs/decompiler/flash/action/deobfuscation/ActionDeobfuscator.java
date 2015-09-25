@@ -184,7 +184,7 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
                 }
 
                 List<Action> unreachable = actions.getUnreachableActions(i, result.idx);
-                int unreachableCount = unreachable == null ? 0 : unreachable.size();
+                int unreachableCount = getActionCount(unreachable);
 
                 if (allValueValid && newIstructionCount + 2 < unreachableCount) {
                     Action target = actions.get(result.idx);
