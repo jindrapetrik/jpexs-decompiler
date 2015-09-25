@@ -160,7 +160,9 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
             }
 
             ExecutionResult result = new ExecutionResult();
-            executeActions(actions, i, idx, cPool, result, fakeFunctions);
+
+            // allow uninitialized variables only when the code is execuded from the first line
+            executeActions(actions, i, idx, cPool, result, fakeFunctions, i == 0);
 
             if (result.idx != -1 && result.resultValue == null) {
                 int newIstructionCount = 1; // jump
@@ -253,7 +255,7 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
         return cPool;
     }
 
-    private void executeActions(ActionList actions, int idx, int endIdx, ActionConstantPool constantPool, ExecutionResult result, Map<String, Object> fakeFunctions) throws InterruptedException {
+    private void executeActions(ActionList actions, int idx, int endIdx, ActionConstantPool constantPool, ExecutionResult result, Map<String, Object> fakeFunctions, boolean allowGetUninitializedVariables) throws InterruptedException {
         List<GraphTargetItem> output = new ArrayList<>();
         ActionLocalData localData = new ActionLocalData();
         FixItemCounterTranslateStack stack = new FixItemCounterTranslateStack("");
@@ -306,7 +308,7 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
                 }
 
                 String variableName = variableNameObj.getResult().toString();
-                if (!localData.variables.containsKey(variableName)) {
+                if (!localData.variables.containsKey(variableName) && !allowGetUninitializedVariables) {
                     break;
                 }
             }
@@ -500,7 +502,7 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
                     ExecutionResult result = new ExecutionResult();
                     List<Action> lastActions = actions.getContainerLastActions(action);
                     int lastActionIdx = actions.getIndexByAction(lastActions.get(0));
-                    executeActions(actions, i + 1, lastActionIdx, null, result, null);
+                    executeActions(actions, i + 1, lastActionIdx, null, result, null, false);
                     if (result.resultValue != null) {
                         results.put(def.functionName, result.resultValue);
                         for (int j = i; j <= lastActionIdx; j++) {
