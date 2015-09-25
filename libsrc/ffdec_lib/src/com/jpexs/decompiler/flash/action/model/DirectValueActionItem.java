@@ -156,6 +156,17 @@ public class DirectValueActionItem extends ActionItem implements SimpleValue {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+        if (value instanceof Double) {
+            if (Double.compare((double) (Double) value, 0) == 0) {
+                return writer.append("0");
+            }
+        }
+        if (value instanceof Float) {
+            if (Float.compare((float) (Float) value, 0) == 0) {
+                return writer.append("0");
+            }
+        }
+
         if (value instanceof String) {
             return writer.append("\"").append(Helper.escapeActionScriptString((String) value)).append("\"");
         }

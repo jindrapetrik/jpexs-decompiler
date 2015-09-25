@@ -154,7 +154,8 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
 
             if (result.idx != -1) {
                 int newIstructionCount = 1 /*jump */ + result.stack.size();
-                int unreachableCount = actions.getUnreachableActions(i, result.idx).size();
+                List<Action> unreachable = actions.getUnreachableActions(i, result.idx);
+                int unreachableCount = unreachable == null ? 0 : unreachable.size();
 
                 if (newIstructionCount < unreachableCount) {
                     Action target = actions.get(result.idx);
