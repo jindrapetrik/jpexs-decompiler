@@ -169,11 +169,10 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
                 if (result.constantPool != null) {
                     newIstructionCount++;
                 }
-                if (!result.stack.isEmpty()) {
-                    newIstructionCount++;
-                }
 
-                newIstructionCount += 2 * result.variables.size();
+                newIstructionCount += result.stack.size();
+
+                newIstructionCount += 3 * result.variables.size(); /* 2x Push + Set or Define */
 
                 boolean allValueValid = true;
                 for (Object value : result.variables.values()) {
@@ -308,7 +307,8 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
                 }
 
                 String variableName = variableNameObj.getResult().toString();
-                if (!localData.variables.containsKey(variableName) && !allowGetUninitializedVariables) {
+                if (!localData.variables.containsKey(variableName)
+                        && (!allowGetUninitializedVariables || !isFakeName(variableName))) {
                     break;
                 }
             }
@@ -486,16 +486,8 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
             if (action instanceof ActionDefineFunction) {
                 ActionDefineFunction def = (ActionDefineFunction) action;
                 if (def.paramNames.isEmpty()) {
-                    boolean isFakeName = true;
-                    for (char ch : def.functionName.toCharArray()) {
-                        if (ch > 31) {
-                            isFakeName = false;
-                            break;
-                        }
-                    }
-
                     // remove funcion only when the function name contains only non printable characters
-                    if (!isFakeName) {
+                    if (!isFakeName(def.functionName)) {
                         continue;
                     }
 

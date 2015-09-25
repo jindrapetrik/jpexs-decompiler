@@ -259,6 +259,17 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
         return result;
     }
 
+    protected boolean isFakeName(String name) {
+        boolean isFakeName = true;
+        for (char ch : name.toCharArray()) {
+            if (ch > 31) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     private void executeActions(ActionList actions, int idx, int endIdx, ExecutionResult result) throws InterruptedException {
         List<GraphTargetItem> output = new ArrayList<>();
         ActionLocalData localData = new ActionLocalData();
