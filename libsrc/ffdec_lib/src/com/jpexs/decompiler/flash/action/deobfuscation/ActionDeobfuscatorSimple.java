@@ -88,7 +88,6 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
         fastActions.expandPushes();
         actions.setActions(fastActions.toActionList());
 
-        actions.expandPushes();
         removeGetTimes(actions);
         removeObfuscationIfs(actions);
     }

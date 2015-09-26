@@ -55,15 +55,18 @@ public class FastActionList {
         }
     }
 
-    private void updateActionLengths() {
+    private void updateActionAddressesAndLengths() {
+        long address = actions.get(0).getAddress();
         for (Action action : actions) {
+            action.setAddress(address);
             action.updateLength();
+            address += action.getTotalActionLength();
         }
     }
 
     public ActionList toActionList() {
         ActionList result = new ActionList(actions);
-        updateActionLengths();
+        updateActionAddressesAndLengths();
         return result;
     }
 }
