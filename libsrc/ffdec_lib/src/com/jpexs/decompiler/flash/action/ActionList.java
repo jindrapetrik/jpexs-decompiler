@@ -468,6 +468,51 @@ public class ActionList extends ArrayList<Action> {
         return isReachable;
     }
 
+    public void combinePushes() {
+        for (int i = 0; i < size() - 1; i++) {
+            Action action = get(i);
+            Action action2 = get(i + 1);
+            if (action instanceof ActionPush && action2 instanceof ActionPush) {
+                if (!getReferencesFor(action2).hasNext()) {
+                    ActionPush push = (ActionPush) action;
+                    ActionPush push2 = (ActionPush) action2;
+                    if (!(push.constantPool != null && push2.constantPool != null && push.constantPool != push2.constantPool)) {
+                        ActionPush newPush = new ActionPush(0);
+                        newPush.constantPool = push.constantPool == null ? push2.constantPool : push.constantPool;
+                        newPush.values.clear();
+                        newPush.values.addAll(push.values);
+                        newPush.values.addAll(push2.values);
+                        addAction(i + 1, newPush);
+                        removeAction(i + 2);
+                        removeAction(i);
+                        i--;
+                    }
+                }
+            }
+        }
+    }
+
+    public void expandPushes() {
+        for (int i = 0; i < size(); i++) {
+            Action action = get(i);
+            if (action instanceof ActionPush) {
+                ActionPush push = (ActionPush) action;
+                if (push.values.size() > 1) {
+                    int j = 0;
+                    for (Object value : push.values) {
+                        j++;
+                        ActionPush newPush = new ActionPush(value);
+                        newPush.constantPool = push.constantPool;
+                        addAction(i + j, newPush);
+                    }
+
+                    removeAction(i);
+                    i += j - 1;
+                }
+            }
+        }
+    }
+
     public void saveToFile(String fileName) {
         File file = new File(fileName);
         try (FileTextWriter writer = new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(file))) {

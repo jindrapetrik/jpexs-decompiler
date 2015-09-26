@@ -100,7 +100,6 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
 
     @Override
     public void actionListParsed(ActionList actions, SWF swf) throws InterruptedException {
-        combinePushs(actions);
         Map<String, Object> fakeFunctions = getFakeFunctionResults(actions);
         removeUnreachableActions(actions);
         removeObfuscationIfs(actions, fakeFunctions);
@@ -108,30 +107,6 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
         removeZeroJumps(actions);
         ActionListReader.fixConstantPools(null, actions);
         //rereadActionList(actions, swf); // this call will fix the contant pool assigments
-    }
-
-    private void combinePushs(ActionList actions) {
-        for (int i = 0; i < actions.size() - 1; i++) {
-            Action action = actions.get(i);
-            Action action2 = actions.get(i + 1);
-            if (action instanceof ActionPush && action2 instanceof ActionPush) {
-                if (!actions.getReferencesFor(action2).hasNext()) {
-                    ActionPush push = (ActionPush) action;
-                    ActionPush push2 = (ActionPush) action2;
-                    if (!(push.constantPool != null && push2.constantPool != null && push.constantPool != push.constantPool)) {
-                        ActionPush newPush = new ActionPush(0);
-                        newPush.constantPool = push.constantPool == null ? push2.constantPool : push.constantPool;
-                        newPush.values.clear();
-                        newPush.values.addAll(push.values);
-                        newPush.values.addAll(push2.values);
-                        actions.addAction(i + 1, newPush);
-                        actions.removeAction(i + 2);
-                        actions.removeAction(i);
-                        i--;
-                    }
-                }
-            }
-        }
     }
 
     private boolean rereadActionList(ActionList actions, SWF swf) throws InterruptedException {
@@ -325,7 +300,7 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
             }
 
             if (action instanceof ActionCallFunction) {
-                if (stack.isEmpty()) {
+                if (stack.size() < 2) {
                     return;
                 }
 

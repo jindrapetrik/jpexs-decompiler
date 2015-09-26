@@ -83,6 +83,7 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
 
     @Override
     public void actionListParsed(ActionList actions, SWF swf) throws InterruptedException {
+        actions.expandPushes();
         removeGetTimes(actions);
         removeObfuscationIfs(actions);
     }
@@ -260,7 +261,6 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
     }
 
     protected boolean isFakeName(String name) {
-        boolean isFakeName = true;
         for (char ch : name.toCharArray()) {
             if (ch > 31) {
                 return false;
