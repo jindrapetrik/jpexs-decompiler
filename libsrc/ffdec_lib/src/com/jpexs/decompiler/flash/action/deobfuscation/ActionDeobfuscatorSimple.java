@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.ActionLocalData;
+import com.jpexs.decompiler.flash.action.FastActionList;
 import com.jpexs.decompiler.flash.action.swf4.ActionAdd;
 import com.jpexs.decompiler.flash.action.swf4.ActionAnd;
 import com.jpexs.decompiler.flash.action.swf4.ActionAsciiToChar;
@@ -83,6 +84,10 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
 
     @Override
     public void actionListParsed(ActionList actions, SWF swf) throws InterruptedException {
+        FastActionList fastActions = new FastActionList(actions);
+        fastActions.expandPushes();
+        actions.setActions(fastActions.toActionList());
+
         actions.expandPushes();
         removeGetTimes(actions);
         removeObfuscationIfs(actions);

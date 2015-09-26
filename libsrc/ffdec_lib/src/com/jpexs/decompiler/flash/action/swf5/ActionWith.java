@@ -109,7 +109,7 @@ public class ActionWith extends Action implements GraphSourceItemContainer {
 
     @Override
     public long getHeaderSize() {
-        return getBytesLength(version);
+        return getBytesLength();
     }
 
     @Override

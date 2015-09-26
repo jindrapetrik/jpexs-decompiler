@@ -143,7 +143,7 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
 
     @Override
     public long getHeaderSize() {
-        return getBytesLength(version);
+        return getBytesLength();
     }
 
     @Override

@@ -57,11 +57,11 @@ public class ActionList extends ArrayList<Action> {
     }
 
     public void removeAction(int index) {
-        ActionListReader.removeAction(this, index, SWF.DEFAULT_VERSION, true);
+        ActionListReader.removeAction(this, index, true);
     }
 
     public void removeActions(List<Action> actionsToRemove) {
-        ActionListReader.removeActions(this, actionsToRemove, SWF.DEFAULT_VERSION, true);
+        ActionListReader.removeActions(this, actionsToRemove, true);
     }
 
     public void removeAction(int index, int count) {
@@ -71,20 +71,20 @@ public class ActionList extends ArrayList<Action> {
         }
 
         for (int i = 0; i < count; i++) {
-            ActionListReader.removeAction(this, index, SWF.DEFAULT_VERSION, true);
+            ActionListReader.removeAction(this, index, true);
         }
     }
 
     public void addAction(int index, Action action) {
-        ActionListReader.addAction(this, index, action, SWF.DEFAULT_VERSION, false, false);
+        ActionListReader.addAction(this, index, action, false, false);
     }
 
     public void addActions(int index, List<Action> actions) {
-        ActionListReader.addActions(this, index, actions, SWF.DEFAULT_VERSION);
+        ActionListReader.addActions(this, index, actions);
     }
 
     public void fixActionList() {
-        ActionListReader.fixActionList(this, null, SWF.DEFAULT_VERSION);
+        ActionListReader.fixActionList(this, null);
     }
 
     public List<Action> getContainerLastActions(Action action) {

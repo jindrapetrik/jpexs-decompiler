@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.EndOfStreamException;
-import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
@@ -248,7 +247,7 @@ public class ActionPush extends Action {
         super(0x96, 0);
         this.values = new ArrayList<>();
         this.values.add(value);
-        updateLength(SWF.DEFAULT_VERSION);
+        updateLength();
     }
 
     public ActionPush(FlasmLexer lexer, List<String> constantPool) throws IOException, ActionParseException {

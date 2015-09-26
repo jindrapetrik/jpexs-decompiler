@@ -156,7 +156,7 @@ public class ActionListReader {
             nextOffsets.put(endAddress, endAddress + 1);
         }
 
-        ActionList actions = fixActionList(new ActionList(actionMap.values()), nextOffsets, version);
+        ActionList actions = fixActionList(new ActionList(actionMap.values()), nextOffsets);
 
         // jump to the entry action when it is diffrent from the first action in the map
         if (entryAction != actions.get(0)) {
@@ -166,13 +166,13 @@ public class ActionListReader {
         }
 
         if (SWFDecompilerPlugin.fireActionListParsed(actions, sis.getSwf())) {
-            actions = fixActionList(actions, null, version);
+            actions = fixActionList(actions, null);
         }
 
         if (deobfuscationMode == 0) {
             try {
                 actions = deobfuscateActionListOld(listeners, actions, version, 0, path);
-                updateActionLengths(actions, version);
+                updateActionLengths(actions);
             } catch (OutOfMemoryError | StackOverflowError | TranslateException ex) {
                 // keep orignal (not deobfuscated) actions
                 logger.log(Level.SEVERE, null, ex);
@@ -192,7 +192,7 @@ public class ActionListReader {
         return actions;
     }
 
-    public static ActionList fixActionList(ActionList actions, Map<Long, Long> nextOffsets, int version) {
+    public static ActionList fixActionList(ActionList actions, Map<Long, Long> nextOffsets) {
         Map<Action, List<Action>> containerLastActions = new HashMap<>();
         getContainerLastActions(actions, containerLastActions);
 
@@ -226,7 +226,7 @@ public class ActionListReader {
         Map<Action, Action> jumps = new HashMap<>();
         getJumps(ret, jumps);
 
-        updateActionLengths(ret, version);
+        updateActionLengths(ret);
         updateAddresses(ret, 0);
         long endAddress = ret.get(ret.size() - 1).getAddress();
 
@@ -427,9 +427,9 @@ public class ActionListReader {
         return address;
     }
 
-    private static void updateActionLengths(List<Action> actions, int version) {
+    private static void updateActionLengths(List<Action> actions) {
         for (int i = 0; i < actions.size(); i++) {
-            actions.get(i).updateLength(version);
+            actions.get(i).updateLength();
         }
     }
 
@@ -537,11 +537,10 @@ public class ActionListReader {
      *
      * @param actions
      * @param index
-     * @param version
      * @param removeWhenLast
      * @return
      */
-    public static boolean removeAction(ActionList actions, int index, int version, boolean removeWhenLast) {
+    public static boolean removeAction(ActionList actions, int index, boolean removeWhenLast) {
 
         if (index < 0 || actions.size() <= index) {
             return false;
@@ -586,7 +585,7 @@ public class ActionListReader {
 
         actions.remove(index);
 
-        updateActionLengths(actions, version);
+        updateActionLengths(actions);
         updateAddresses(actions, startIp);
         updateJumps(actions, jumps, containerLastActions, endAddress);
         updateActionStores(actions, jumps);
@@ -603,11 +602,10 @@ public class ActionListReader {
      *
      * @param actions
      * @param actionsToRemove
-     * @param version
      * @param removeWhenLast
      * @return
      */
-    public static boolean removeActions(ActionList actions, List<Action> actionsToRemove, int version, boolean removeWhenLast) {
+    public static boolean removeActions(ActionList actions, List<Action> actionsToRemove, boolean removeWhenLast) {
 
         long startIp = actions.get(0).getAddress();
         Action lastAction = actions.get(actions.size() - 1);
@@ -651,7 +649,7 @@ public class ActionListReader {
             actions.remove(index);
         }
 
-        updateActionLengths(actions, version);
+        updateActionLengths(actions);
         updateAddresses(actions, startIp);
         updateJumps(actions, jumps, containerLastActions, endAddress);
         updateActionStores(actions, jumps);
@@ -667,13 +665,12 @@ public class ActionListReader {
      * @param actions
      * @param index
      * @param action
-     * @param version
      * @param addToContainer
      * @param replaceJump
      * @return
      */
     public static boolean addAction(ActionList actions, int index, Action action,
-            int version, boolean addToContainer, boolean replaceJump) {
+            boolean addToContainer, boolean replaceJump) {
 
         if (index < 0 || actions.size() < index) {
             return false;
@@ -721,7 +718,7 @@ public class ActionListReader {
 
         actions.add(index, action);
 
-        updateActionLengths(actions, version);
+        updateActionLengths(actions);
         updateAddresses(actions, startIp);
         updateJumps(actions, jumps, containerLastActions, endAddress);
         updateActionStores(actions, jumps);
@@ -737,10 +734,9 @@ public class ActionListReader {
      * @param actions
      * @param index
      * @param newActions
-     * @param version
      * @return
      */
-    public static boolean addActions(ActionList actions, int index, List<Action> newActions, int version) {
+    public static boolean addActions(ActionList actions, int index, List<Action> newActions) {
 
         if (index < 0 || actions.size() < index) {
             return false;
@@ -767,7 +763,7 @@ public class ActionListReader {
 
         actions.addAll(index, newActions);
 
-        updateActionLengths(actions, version);
+        updateActionLengths(actions);
         updateAddresses(actions, startIp);
         updateJumps(actions, jumps, containerLastActions, endAddress);
         updateActionStores(actions, jumps);

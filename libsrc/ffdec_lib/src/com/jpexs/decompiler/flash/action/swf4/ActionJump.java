@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.action.swf4;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.ActionGraphSource;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
@@ -105,8 +104,7 @@ public class ActionJump extends Action {
     @Override
     public List<Integer> getBranches(GraphSource code) {
         List<Integer> ret = super.getBranches(code);
-        int version = ((ActionGraphSource) code).version;
-        int length = getBytesLength(version);
+        int length = getBytesLength();
         int ofs = code.adr2pos(getAddress() + length + offset);
         if (ofs == -1) {
             ofs = code.adr2pos(getAddress() + length);

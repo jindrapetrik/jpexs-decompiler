@@ -321,10 +321,9 @@ public abstract class Action implements GraphSourceItem {
     /**
      * Gets the length of action converted to bytes
      *
-     * @param version SWF version
      * @return Length
      */
-    public final int getBytesLength(int version) {
+    public final int getBytesLength() {
         return getContentBytesLength() + (actionCode >= 0x80 ? 3 : 1);
     }
 
@@ -334,11 +333,9 @@ public abstract class Action implements GraphSourceItem {
 
     /**
      * Updates the action length to the length calculated from action bytes
-     *
-     * @param version SWF version
      */
-    public void updateLength(int version) {
-        int length = getBytesLength(version);
+    public void updateLength() {
+        int length = getBytesLength();
         actionLength = length - 1 - (actionCode >= 0x80 ? 2 : 0);
     }
 
