@@ -61,7 +61,11 @@ public class ActionIf extends Action {
 
     @Override
     public void getRef(Set<Long> refs) {
-        refs.add(getAddress() + getTotalActionLength() + offset);
+        refs.add(getTargetAddress());
+    }
+
+    public long getTargetAddress() {
+        return getAddress() + 5 /*getTotalActionLength()*/ + offset;
     }
 
     @Override
