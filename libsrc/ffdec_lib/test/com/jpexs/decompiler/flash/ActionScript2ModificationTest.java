@@ -137,8 +137,8 @@ public class ActionScript2ModificationTest extends ActionStript2TestBase {
         String actionsString
                 = "ConstantPool\n"
                 + "DefineFunction \"test\" 1 \"p1\" {\n"
-                + "Push 1\n" + // remove this action
-                "Return\n"
+                + "Push 1\n" // remove this action
+                + "Return\n"
                 + "}\n"
                 + "Push 2\n"
                 + "Jump label_1\n"
@@ -160,8 +160,8 @@ public class ActionScript2ModificationTest extends ActionStript2TestBase {
                 = "ConstantPool\n"
                 + "DefineFunction \"test\" 1 \"p1\" {\n"
                 + "Push 1\n"
-                + "GetVariable\n" + // remove this action
-                "}\n"
+                + "GetVariable\n" // remove this action
+                + "}\n"
                 + "Push 2\n"
                 + "Jump label_1\n"
                 + "label_1:Push 3";
@@ -187,8 +187,8 @@ public class ActionScript2ModificationTest extends ActionStript2TestBase {
                 + "Push 2\n"
                 + "If label_1\n"
                 + "Push 3\n"
-                + "label_1:Push 4\n" + // remove this action
-                "Push 5"; // after removing the previous action the if action should jump here
+                + "label_1:Push 4\n" // remove this action
+                + "Push 5"; // after removing the previous action the if action should jump here
         String expectedResult
                 = "ConstantPool\n"
                 + "DefineFunction \"test\" 1 \"p1\" {\n"
@@ -311,8 +311,8 @@ public class ActionScript2ModificationTest extends ActionStript2TestBase {
                 = "ConstantPool\n"
                 + "If label_1\n"
                 + "GetMember\n"
-                + "label_1:Jump label_2\n" + // address 9
-                "label_2:Jump label_3\n"
+                + "label_1:Jump label_2\n" // address 9
+                + "label_2:Jump label_3\n"
                 + "label_3:Jump labelend\n"
                 + "labelend:End"; // address 24
         String expectedResult
