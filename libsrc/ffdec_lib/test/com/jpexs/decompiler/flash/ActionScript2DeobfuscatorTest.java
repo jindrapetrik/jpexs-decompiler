@@ -287,4 +287,31 @@ public class ActionScript2DeobfuscatorTest extends ActionStript2TestBase {
             fail();
         }
     }
+
+    @Test
+    public void testRemoveGetTimeAndIncrement() {
+        String actionsString = "ConstantPool \"a\"\n"
+                + "GetTime\n"
+                + "Increment\n"
+                + "If loc1\n"
+                + "Push \"FAIL\"\n"
+                + "Trace\n"
+                + "loc1:Push \"OK\"\n"
+                + "Trace\n"
+                + "loc2:";
+        try {
+            List<Action> actions = ASMParser.parse(0, true, actionsString, swf.version, false);
+
+            DoActionTag doa = getFirstActionTag();
+            doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
+            HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
+            Action.actionsToSource(doa, doa.getActions(), "", writer);
+            String actualResult = writer.toString();
+
+            assertTrue(!actualResult.contains("FAIL"));
+            assertTrue(actualResult.contains("OK"));
+        } catch (IOException | ActionParseException | InterruptedException ex) {
+            fail();
+        }
+    }
 }
