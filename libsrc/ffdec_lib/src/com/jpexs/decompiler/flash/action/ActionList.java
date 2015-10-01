@@ -115,13 +115,13 @@ public class ActionList extends ArrayList<Action> {
                     Action a = iterator.next();
                     if (a instanceof ActionJump) {
                         ActionJump aJump = (ActionJump) a;
-                        long ref = aJump.getAddress() + aJump.getTotalActionLength() + aJump.getJumpOffset();
+                        long ref = aJump.getTargetAddress();
                         if (target.getAddress() == ref) {
                             return aJump;
                         }
                     } else if (a instanceof ActionIf) {
                         ActionIf aIf = (ActionIf) a;
-                        long ref = aIf.getAddress() + aIf.getTotalActionLength() + aIf.getJumpOffset();
+                        long ref = aIf.getTargetAddress();
                         if (target.getAddress() == ref) {
                             return aIf;
                         }
@@ -429,14 +429,14 @@ public class ActionList extends ArrayList<Action> {
 
                     if (action instanceof ActionJump) {
                         ActionJump aJump = (ActionJump) action;
-                        long ref = aJump.getAddress() + aJump.getTotalActionLength() + aJump.getJumpOffset();
+                        long ref = aJump.getTargetAddress();
                         int targetIndex = getIndexByAddress(ref);
                         if (targetIndex != -1 && isReachable[targetIndex] == 0) {
                             isReachable[targetIndex] = 1;
                         }
                     } else if (action instanceof ActionIf) {
                         ActionIf aIf = (ActionIf) action;
-                        long ref = aIf.getAddress() + aIf.getTotalActionLength() + aIf.getJumpOffset();
+                        long ref = aIf.getTargetAddress();
                         int targetIndex = getIndexByAddress(ref);
                         if (targetIndex != -1 && isReachable[targetIndex] == 0) {
                             isReachable[targetIndex] = 1;

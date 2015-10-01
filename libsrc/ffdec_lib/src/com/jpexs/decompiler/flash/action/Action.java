@@ -607,7 +607,7 @@ public abstract class Action implements GraphSourceItem {
                         if (fixBranch == 0) { //jump
                             writer.newLine();
                             writer.appendNoHilight("Jump loc");
-                            writer.appendNoHilight(Helper.formatAddress(a.getAddress() + a.getTotalActionLength() + ((ActionIf) a).getJumpOffset()));
+                            writer.appendNoHilight(Helper.formatAddress(((ActionIf) a).getTargetAddress()));
                         } else {
                             //nojump, ignore
                         }
