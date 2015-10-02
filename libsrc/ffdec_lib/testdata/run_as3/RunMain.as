@@ -4,6 +4,7 @@
 	import flash.text.TextField;
 	import flash.events.MouseEvent;
 	import flash.external.ExternalInterface;
+	import flash.system.fscommand;
 	
 	public class RunMain extends MovieClip {
 		
@@ -39,6 +40,15 @@
 			addChild(simpleButton);
 			
 			ExternalInterface.addCallback("testFunc", testFunction);
+			
+			var result;
+			try {
+				result = Run.run();
+			} catch (e) {
+				result = e.toString();
+			}
+			
+			fscommand("run", result);
 		}
 		
 		function testFunction() {
