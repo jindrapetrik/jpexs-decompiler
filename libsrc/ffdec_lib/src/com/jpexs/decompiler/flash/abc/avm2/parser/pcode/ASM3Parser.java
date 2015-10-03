@@ -531,7 +531,8 @@ public class ASM3Parser {
                     case ParsedSymbol.TYPE_KEYWORD_GETTER:
                     case ParsedSymbol.TYPE_KEYWORD_SETTER:
                         if (!(trait instanceof TraitMethodGetterSetter)) {
-                            throw new AVM2ParseException("Unxpected trait type", lexer.yyline());
+                            continue; // Instead of glitching it all the way down, ignore the error.
+                            //throw new AVM2ParseException("Unxpected trait type", lexer.yyline());
                         }
                         TraitMethodGetterSetter tm = (TraitMethodGetterSetter) trait;
                         switch (symb.type) {
