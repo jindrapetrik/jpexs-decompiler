@@ -362,11 +362,9 @@ public class ActionListReader {
         for (Action a : actions) {
             long target = -1;
             if (a instanceof ActionIf) {
-                ActionIf aIf = (ActionIf) a;
-                target = aIf.getAddress() + a.getTotalActionLength() + aIf.getJumpOffset();
+                target = ((ActionIf) a).getTargetAddress();
             } else if (a instanceof ActionJump) {
-                ActionJump aJump = (ActionJump) a;
-                target = aJump.getAddress() + a.getTotalActionLength() + aJump.getJumpOffset();
+                target = ((ActionJump) a).getTargetAddress();
             } else if (a instanceof ActionStore) {
                 ActionStore aStore = (ActionStore) a;
                 int storeSize = aStore.getStoreSize();
