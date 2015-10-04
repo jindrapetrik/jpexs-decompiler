@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
+import com.jpexs.helpers.stat.Statistics;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -103,9 +104,15 @@ public class ExportScriptTask implements Callable<File> {
                         asm.getASMSource(exportMode, writer2, null);
                         asm.getActionSourceSuffix(writer2);
                     } else {
-                        List<Action> as = asm.getActions();
+                        List<Action> as;
+                        try (Statistics s = new Statistics("ASMSource.getActions")) {
+                            as = asm.getActions();
+                        }
                         Action.setActionsAddresses(as, 0);
-                        Action.actionsToSource(asm, as, asm.toString()/*FIXME?*/, writer2);
+
+                        try (Statistics s = new Statistics("Action.actionsToSource")) {
+                            Action.actionsToSource(asm, as, asm.toString()/*FIXME?*/, writer2);
+                        }
                     }
                 }
 

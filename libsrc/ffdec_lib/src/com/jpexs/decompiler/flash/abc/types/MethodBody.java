@@ -41,6 +41,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
+import com.jpexs.helpers.stat.Statistics;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -292,11 +293,18 @@ public final class MethodBody implements Cloneable {
                 Callable<Void> callable = new Callable<Void>() {
                     @Override
                     public Void call() throws InterruptedException {
-                        MethodBody converted = convertMethodBody(path, isStatic, scriptIndex, classIndex, abc, trait, constants, method_info, scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits);
-                        HashMap<Integer, String> localRegNames = getLocalRegNames(abc);
-                        List<GraphTargetItem> convertedItems1 = converted.getCode().toGraphTargetItems(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, converted, localRegNames, scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits, Graph.SOP_USE_STATIC, new HashMap<>(), converted.getCode().visitCode(converted));
-                        Graph.graphToString(convertedItems1, writer, LocalData.create(constants, localRegNames, fullyQualifiedNames));
-                        convertedItems = convertedItems1;
+                        try (Statistics s1 = new Statistics("MethodBody.convert")) {
+                            MethodBody converted = convertMethodBody(path, isStatic, scriptIndex, classIndex, abc, trait, constants, method_info, scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits);
+                            HashMap<Integer, String> localRegNames = getLocalRegNames(abc);
+                            List<GraphTargetItem> convertedItems1;
+                            try (Statistics s = new Statistics("AVM2Code.toGraphTargetItems")) {
+                                convertedItems1 = converted.getCode().toGraphTargetItems(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, converted, localRegNames, scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits, Graph.SOP_USE_STATIC, new HashMap<>(), converted.getCode().visitCode(converted));
+                            }
+                            try (Statistics s = new Statistics("Graph.graphToString")) {
+                                Graph.graphToString(convertedItems1, writer, LocalData.create(constants, localRegNames, fullyQualifiedNames));
+                            }
+                            convertedItems = convertedItems1;
+                        }
                         return null;
                     }
                 };
@@ -334,22 +342,24 @@ public final class MethodBody implements Cloneable {
             }
             int timeout = Configuration.decompilationTimeoutSingleMethod.get();
 
-            if (convertException == null) {
-                HashMap<Integer, String> localRegNames = getLocalRegNames(abc);
-                //writer.startMethod(this.method_info);
-                if (Configuration.showMethodBodyId.get()) {
-                    writer.appendNoHilight("// method body id: ");
-                    writer.appendNoHilight(abc.findBodyIndex(this.method_info));
-                    writer.newLine();
+            try (Statistics s = new Statistics("MethodBody.toString")) {
+                if (convertException == null) {
+                    HashMap<Integer, String> localRegNames = getLocalRegNames(abc);
+                    //writer.startMethod(this.method_info);
+                    if (Configuration.showMethodBodyId.get()) {
+                        writer.appendNoHilight("// method body id: ");
+                        writer.appendNoHilight(abc.findBodyIndex(this.method_info));
+                        writer.newLine();
+                    }
+                    Graph.graphToString(convertedItems, writer, LocalData.create(constants, localRegNames, fullyQualifiedNames));
+                    //writer.endMethod();
+                } else if (convertException instanceof TimeoutException) {
+                    // exception was logged in convert method
+                    Helper.appendTimeoutCommentAs3(writer, timeout, getCode().code.size());
+                } else {
+                    // exception was logged in convert method
+                    Helper.appendErrorComment(writer, convertException);
                 }
-                Graph.graphToString(convertedItems, writer, LocalData.create(constants, localRegNames, fullyQualifiedNames));
-                //writer.endMethod();
-            } else if (convertException instanceof TimeoutException) {
-                // exception was logged in convert method
-                Helper.appendTimeoutCommentAs3(writer, timeout, getCode().code.size());
-            } else {
-                // exception was logged in convert method
-                Helper.appendErrorComment(writer, convertException);
             }
         }
         return writer;

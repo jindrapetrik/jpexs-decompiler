@@ -290,6 +290,7 @@ import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.ExitItem;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.stat.Statistics;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -2259,9 +2260,15 @@ public class AVM2Code implements Cloneable {
         if (Configuration.deobfuscationOldMode.get()) {
             return removeTrapsOld(constants, trait, info, body, abc, scriptIndex, classIndex, isStatic, path);
         } else {
-            new AVM2DeobfuscatorSimple().deobfuscate(path, classIndex, isStatic, scriptIndex, abc, constants, trait, info, body);
-            new AVM2DeobfuscatorRegisters().deobfuscate(path, classIndex, isStatic, scriptIndex, abc, constants, trait, info, body);
-            new AVM2DeobfuscatorJumps().deobfuscate(path, classIndex, isStatic, scriptIndex, abc, constants, trait, info, body);
+            try (Statistics s = new Statistics("AVM2DeobfuscatorSimple")) {
+                new AVM2DeobfuscatorSimple().deobfuscate(path, classIndex, isStatic, scriptIndex, abc, constants, trait, info, body);
+            }
+            try (Statistics s = new Statistics("AVM2DeobfuscatorRegisters")) {
+                new AVM2DeobfuscatorRegisters().deobfuscate(path, classIndex, isStatic, scriptIndex, abc, constants, trait, info, body);
+            }
+            try (Statistics s = new Statistics("AVM2DeobfuscatorJumps")) {
+                new AVM2DeobfuscatorJumps().deobfuscate(path, classIndex, isStatic, scriptIndex, abc, constants, trait, info, body);
+            }
             return 1;
         }
     }

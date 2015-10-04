@@ -49,6 +49,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.stat.Statistics;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -179,8 +180,12 @@ public class ActionListReader {
             }
         } else if (deobfuscationMode == 1) {
             try {
-                new ActionDeobfuscatorSimple().actionListParsed(actions, sis.getSwf());
-                new ActionDeobfuscator().actionListParsed(actions, sis.getSwf());
+                try (Statistics s = new Statistics("ActionDeobfuscatorSimple")) {
+                    new ActionDeobfuscatorSimple().actionListParsed(actions, sis.getSwf());
+                }
+                try (Statistics s = new Statistics("ActionDeobfuscator")) {
+                    new ActionDeobfuscator().actionListParsed(actions, sis.getSwf());
+                }
             } catch (ThreadDeath | InterruptedException ex) {
                 throw ex;
             } catch (Throwable ex) {
