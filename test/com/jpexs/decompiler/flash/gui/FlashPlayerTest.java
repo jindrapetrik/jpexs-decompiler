@@ -18,6 +18,9 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
@@ -41,6 +44,7 @@ import com.jpexs.decompiler.flash.action.swf4.ActionStringAdd;
 import com.jpexs.decompiler.flash.action.swf4.ActionStringExtract;
 import com.jpexs.decompiler.flash.action.swf4.ActionStringLength;
 import com.jpexs.decompiler.flash.action.swf4.ActionStringLess;
+import com.jpexs.decompiler.flash.action.swf4.ActionSubtract;
 import com.jpexs.decompiler.flash.action.swf4.ActionToInteger;
 import com.jpexs.decompiler.flash.action.swf5.ActionAdd2;
 import com.jpexs.decompiler.flash.action.swf5.ActionBitAnd;
@@ -55,6 +59,7 @@ import com.jpexs.decompiler.flash.action.swf5.ActionIncrement;
 import com.jpexs.decompiler.flash.action.swf5.ActionLess2;
 import com.jpexs.decompiler.flash.action.swf5.ActionModulo;
 import com.jpexs.decompiler.flash.action.swf5.ActionPushDuplicate;
+import com.jpexs.decompiler.flash.action.swf5.ActionStackSwap;
 import com.jpexs.decompiler.flash.action.swf5.ActionToNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionToString;
 import com.jpexs.decompiler.flash.action.swf5.ActionTypeOf;
@@ -100,8 +105,29 @@ public class FlashPlayerTest {
 
     //@Test
     public void test1() throws IOException, InterruptedException {
+        final Reference<String> resultRef = new Reference<>(null);
+
         ShockwaveFlash flash = ActiveX.createObject(ShockwaveFlash.class, new Panel());
+        flash.setAllowScriptAccess("always");
+        flash.setAllowNetworking("all");
+        flash.addFSCommandListener(new ActiveXEventListener() {
+
+            @Override
+            public void onEvent(ActiveXEvent axe) {
+                resultRef.setVal((String) axe.args.get("args"));
+                synchronized (lockObj) {
+                    lockObj.notify();
+                }
+            }
+        });
+
         File f = new File("libsrc/ffdec_lib/testdata/run_as3/run.swf");
+
+        int i = 1;
+        int j = 1;
+        File f2 = new File("run_test_" + new Date().getTime() + "_" + i + "_" + j + ".swf");
+        f2.deleteOnExit();
+
         SWF swf = new SWF(new BufferedInputStream(new FileInputStream(f)), false);
         DoABC2Tag abcTag = null;
         for (Tag t : swf.tags) {
@@ -113,26 +139,52 @@ public class FlashPlayerTest {
 
         ABC abc = abcTag.getABC();
         MethodBody body = abc.findBodyByClassAndName("Run", "run");
-        flash.setMovie(f.getAbsolutePath());
+        body.max_stack = 10;
+        AVM2Code ccode = new AVM2Code();
+        ccode.code = new ArrayList<>();
+        List<AVM2Instruction> code = ccode.code;
+        code.add(new AVM2Instruction(0, AVM2Instructions.GetLocal0, null));
+        code.add(new AVM2Instruction(0, AVM2Instructions.PushScope, null));
+        code.add(new AVM2Instruction(0, AVM2Instructions.PushByte, new int[]{1}));
+        code.add(new AVM2Instruction(0, AVM2Instructions.PushByte, new int[]{2}));
+        code.add(new AVM2Instruction(0, AVM2Instructions.Add, null));
+        code.add(new AVM2Instruction(0, AVM2Instructions.Dup, null));
+        code.add(new AVM2Instruction(0, AVM2Instructions.TypeOf, null));
+        code.add(new AVM2Instruction(0, AVM2Instructions.Add, null));
+        code.add(new AVM2Instruction(0, AVM2Instructions.ReturnValue, null));
 
-        int cnt = 0;
-        while (flash.getReadyState() != 4) {
-            Thread.sleep(50);
-            if (cnt > 100) {
-                Assert.fail("Flash init timeout");
-            }
-
-            cnt++;
+        body.setCode(ccode);
+        abcTag.setModified(true);
+        try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(f2))) {
+            swf.saveTo(fos);
         }
 
-        flash.setAllowScriptAccess("always");
-        try {
-            String res = flash.CallFunction("<invoke name=\"testFunc\" returntype=\"xml\"><arguments><string>something</string></arguments></invoke>");
-            //String str = flash.GetVariable("_root.myText.text");
-            throw new Error(res + " " + body.getCode().toString() + "");
-        } catch (Exception ex) {
-            int a = 1;
+        flash.setMovie(f2.getAbsolutePath());
+
+        synchronized (lockObj) {
+            lockObj.wait();
         }
+
+        String flashResult = resultRef.getVal();
+
+        f2.delete();
+
+        /*int cnt = 0;
+         while (flash.getReadyState() != 4) {
+         Thread.sleep(50);
+         if (cnt > 100) {
+         Assert.fail("Flash init timeout");
+         }
+
+         cnt++;
+         }*/
+        /*try {
+         String res = flash.CallFunction("<invoke name=\"testFunc\" returntype=\"xml\"><arguments><string>something</string></arguments></invoke>");
+         //String str = flash.GetVariable("_root.myText.text");
+         throw new Error(res + " " + body.getCode().toString() + "");
+         } catch (Exception ex) {
+         int a = 1;
+         }*/
     }
 
     //@Test
@@ -147,18 +199,17 @@ public class FlashPlayerTest {
             @Override
             public void onEvent(ActiveXEvent axe) {
                 resultRef.setVal((String) axe.args.get("args"));
-                System.out.println("Flash event");
                 synchronized (lockObj) {
                     lockObj.notify();
                 }
             }
         });
 
+        File f = new File("libsrc/ffdec_lib/testdata/run_as2/run_as2.swf");
         for (int i = 0; i < 15; i++) {
-            for (int j = 0; j < 12 + 22; j++) {
+            for (int j = 0; j < 12 + 23; j++) {
 
-                File f = new File("libsrc/ffdec_lib/testdata/run_as2/run_as2.swf");
-                File f2 = new File("run_test_" + new Date().getTime() + "_" + i + ".swf");
+                File f2 = new File("run_test_" + new Date().getTime() + "_" + i + "_" + j + ".swf");
                 f2.deleteOnExit();
 
                 SWF swf = new SWF(new BufferedInputStream(new FileInputStream(f)), false);
@@ -171,10 +222,6 @@ public class FlashPlayerTest {
                 int r1 = random.nextInt(500) - 255;
                 int r2 = random.nextInt(100);
 
-                /*i = 9;
-                 j = 21;
-                 r1 = 212;
-                 r2 = 3;*/
                 Action opAction = getOpAction(j);
 
                 if (j >= 12) {
@@ -213,6 +260,7 @@ public class FlashPlayerTest {
                 newActions.add(opAction);
                 newActions.add(new ActionPushDuplicate());
                 newActions.add(new ActionTypeOf());
+                newActions.add(new ActionStackSwap());
                 newActions.add(new ActionStringAdd());
                 actions.addActions(2, newActions);
 
@@ -231,6 +279,7 @@ public class FlashPlayerTest {
                 try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(f2))) {
                     swf.saveTo(fos);
                 }
+
                 flash.setMovie(f2.getAbsolutePath());
 
                 synchronized (lockObj) {
@@ -239,7 +288,28 @@ public class FlashPlayerTest {
 
                 String str = flash.GetVariable("myText.text");
                 String flashResult = resultRef.getVal();
-                Assert.assertEquals(ffdecResult, flashResult);
+                boolean checkOnlyStart = false;
+                /*if (flashResult.length() > 10) {
+                 boolean onlyNumber = true;
+                 for (int k = 0; k < 10; k++) {
+                 char ch = flashResult.charAt(flashResult.length() - k - 1);
+                 if (ch < '0' || ch > '9') {
+                 onlyNumber = false;
+                 break;
+                 }
+                 }
+
+                 if (onlyNumber) {
+                 flashResult = flashResult.substring(0, flashResult.length() - 1);
+                 checkOnlyStart = true;
+                 }
+                 }*/
+
+                if (checkOnlyStart) {
+                    Assert.assertTrue(((String) ffdecResult).startsWith(flashResult));
+                } else {
+                    Assert.assertEquals(ffdecResult, flashResult);
+                }
 
                 f2.delete();
             }
@@ -338,6 +408,8 @@ public class FlashPlayerTest {
                 return new ActionStringGreater();
             case 21:
                 return new ActionStringLess();
+            case 22:
+                return new ActionSubtract();
         }
 
         throw new Error("Invalid index");
