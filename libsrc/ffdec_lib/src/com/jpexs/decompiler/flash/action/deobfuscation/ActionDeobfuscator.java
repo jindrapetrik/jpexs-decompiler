@@ -395,7 +395,7 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
 
             if (action instanceof ActionJump) {
                 ActionJump jump = (ActionJump) action;
-                long address = jump.getAddress() + jump.getTotalActionLength() + jump.getJumpOffset();
+                long address = jump.getTargetAddress();
                 idx = actions.getIndexByAddress(address);
                 if (idx == -1) {
                     throw new TranslateException("Jump target not found: " + address);
@@ -409,7 +409,7 @@ public class ActionDeobfuscator extends ActionDeobfuscatorSimple {
                 }
 
                 if (EcmaScript.toBoolean(stack.pop().getResult())) {
-                    long address = aif.getAddress() + aif.getTotalActionLength() + aif.getJumpOffset();
+                    long address = aif.getTargetAddress();
                     idx = actions.getIndexByAddress(address);
                     if (idx == -1) {
                         throw new TranslateException("If target not found: " + address);
