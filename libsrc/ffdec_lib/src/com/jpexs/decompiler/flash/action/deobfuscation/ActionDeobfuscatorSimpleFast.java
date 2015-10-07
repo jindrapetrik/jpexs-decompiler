@@ -22,6 +22,9 @@ import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.ActionLocalData;
+import com.jpexs.decompiler.flash.action.fastactionlist.ActionItem;
+import com.jpexs.decompiler.flash.action.fastactionlist.FastActionList;
+import com.jpexs.decompiler.flash.action.fastactionlist.FastActionListIterator;
 import com.jpexs.decompiler.flash.action.swf4.ActionAdd;
 import com.jpexs.decompiler.flash.action.swf4.ActionAnd;
 import com.jpexs.decompiler.flash.action.swf4.ActionAsciiToChar;
@@ -77,59 +80,75 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
+public class ActionDeobfuscatorSimpleFast implements SWFDecompilerListener {
 
     private final int executionLimit = 30000;
 
     @Override
     public void actionListParsed(ActionList actions, SWF swf) throws InterruptedException {
-        //removeGetTimes(actions);
-        removeObfuscationIfs(actions);
+        FastActionList fastActions = new FastActionList(actions);
+        fastActions.expandPushes();
+        removeGetTimes(fastActions);
+        //removeObfuscationIfs(fastActions);
+        actions.setActions(fastActions.toActionList());
     }
 
-    private boolean removeGetTimes(ActionList actions) {
-        if (actions.size() == 0) {
+    private boolean removeGetTimes(FastActionList actions) {
+        if (actions.isEmpty()) {
             return false;
         }
 
         boolean changed = true;
-        while (changed) {
+        int getTimeCount = 1;
+        while (changed && getTimeCount > 0) {
             changed = false;
-            removeUnreachableActions(actions);
-            removeZeroJumps(actions);
+            actions.removeUnreachableActions();
+            actions.removeZeroJumps();
+            getTimeCount = 0;
 
             // GetTime, If => Jump, assume GetTime > 0
-            for (int i = 0; i < actions.size() - 1; i++) {
-                Action a = actions.get(i);
-                Action a2 = actions.get(i + 1);
-                if (a instanceof ActionGetTime && a2 instanceof ActionIf) {
-                    ActionIf aIf = (ActionIf) a2;
+            FastActionListIterator iterator = actions.iterator();
+            while (iterator.hasNext()) {
+                Action a = iterator.next().action;
+                ActionItem a2Item = iterator.peek(0);
+                Action a2 = a2Item.action;
+                boolean isGetTime = a instanceof ActionGetTime;
+                if (isGetTime) {
+                    getTimeCount++;
+                }
+
+                if (isGetTime && a2 instanceof ActionIf) {
                     ActionJump jump = new ActionJump(0);
-                    jump.setAddress(aIf.getAddress());
-                    jump.setJumpOffset(aIf.getJumpOffset());
-                    actions.remove(i); // GetTime
-                    actions.remove(i); // If
-                    actions.addAction(i, jump); // replace If with Jump
+                    ActionItem jumpItem = new ActionItem(jump);
+                    jumpItem.jumpTarget = a2Item.jumpTarget;
+                    iterator.remove(); // GetTime
+                    iterator.next();
+                    iterator.remove(); // If
+                    iterator.add(jumpItem); // replace If with Jump
                     changed = true;
+                    getTimeCount--;
                     break;
                 }
             }
 
-            if (!changed) {
+            if (!changed && getTimeCount > 0) {
                 // GetTime, Increment If => Jump
-                for (int i = 0; i < actions.size() - 2; i++) {
-                    Action a = actions.get(i);
-                    Action a1 = actions.get(i + 1);
-                    Action a2 = actions.get(i + 2);
+                iterator = actions.iterator();
+                while (iterator.hasNext()) {
+                    Action a = iterator.next().action;
+                    Action a1 = iterator.peek(0).action;
+                    ActionItem a2Item = iterator.peek(1);
+                    Action a2 = a2Item.action;
                     if (a instanceof ActionGetTime && a1 instanceof ActionIncrement && a2 instanceof ActionIf) {
-                        ActionIf aIf = (ActionIf) a2;
                         ActionJump jump = new ActionJump(0);
-                        jump.setAddress(aIf.getAddress());
-                        jump.setJumpOffset(aIf.getJumpOffset());
-                        actions.remove(i); // GetTime
-                        actions.remove(i); // Increment
-                        actions.remove(i); // If
-                        actions.addAction(i, jump); // replace If with Jump
+                        ActionItem jumpItem = new ActionItem(jump);
+                        jumpItem.jumpTarget = a2Item.jumpTarget;
+                        iterator.remove(); // GetTime
+                        iterator.next();
+                        iterator.remove(); // Increment
+                        iterator.next();
+                        iterator.remove(); // If
+                        iterator.add(jumpItem); // replace If with Jump
                         changed = true;
                         break;
                     }
@@ -140,125 +159,67 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
         return false;
     }
 
-    private boolean removeObfuscationIfs(ActionList actions) throws InterruptedException {
-        if (actions.size() == 0) {
-            return false;
-        }
-
-        removeUnreachableActions(actions);
-        removeZeroJumps(actions);
-
-        for (int i = 0; i < actions.size(); i++) {
-            ExecutionResult result = new ExecutionResult();
-            executeActions(actions, i, actions.size() - 1, result);
-
-            if (result.idx != -1) {
-                int newIstructionCount = 1 /*jump */ + result.stack.size();
-                List<Action> unreachable = actions.getUnreachableActions(i, result.idx);
-                int unreachableCount = getActionCount(unreachable);
-
-                if (newIstructionCount < unreachableCount) {
-                    Action target = actions.get(result.idx);
-                    Action prevAction = actions.get(i);
-
-                    if (result.stack.isEmpty() && prevAction instanceof ActionJump) {
-                        ActionJump jump = (ActionJump) prevAction;
-                        jump.setJumpOffset((int) (target.getAddress() - jump.getAddress() - jump.getTotalActionLength()));
-                    } else {
-                        if (!result.stack.isEmpty()) {
-                            ActionPush push = new ActionPush(0);
-                            push.values.clear();
-                            for (GraphTargetItem graphTargetItem : result.stack) {
-                                push.values.add(graphTargetItem.getResult());
-                            }
-                            push.setAddress(prevAction.getAddress());
-                            actions.addAction(i++, push);
-                            prevAction = push;
-                        }
-
-                        ActionJump jump = new ActionJump(0);
-                        jump.setAddress(prevAction.getAddress());
-                        jump.setJumpOffset((int) (target.getAddress() - jump.getAddress() - jump.getTotalActionLength()));
-                        actions.addAction(i++, jump);
-                    }
-
-                    Action nextAction = actions.size() > i ? actions.get(i) : null;
-
-                    removeUnreachableActions(actions);
-                    removeZeroJumps(actions);
-
-                    if (nextAction != null) {
-                        int nextIdx = actions.indexOf(nextAction);
-                        if (nextIdx < i) {
-                            i = nextIdx;
-                        }
-                    }
-                }
-            }
-        }
-
-        return false;
-    }
-
-    protected boolean removeUnreachableActions(ActionList actions) {
-        List<Action> unreachableActions = actions.getUnreachableActions();
-        if (unreachableActions != null) {
-            actions.removeActions(unreachableActions);
-        }
-
-        return unreachableActions != null;
-    }
-
-    protected boolean removeZeroJumpsOld(ActionList actions) {
-        boolean result = false;
-        for (int i = 0; i < actions.size(); i++) {
-            Action action = actions.get(i);
-            if (action instanceof ActionJump && ((ActionJump) action).getJumpOffset() == 0) {
-                actions.removeAction(i);
-                i--;
-                result = true;
-            }
-        }
-        return result;
-    }
-
-    protected boolean removeZeroJumps(ActionList actions) {
-        List<Action> actionsToRemove = null;
-        for (int i = 0; i < actions.size(); i++) {
-            Action action = actions.get(i);
-            if (action instanceof ActionJump && ((ActionJump) action).getJumpOffset() == 0) {
-                if (actionsToRemove == null) {
-                    actionsToRemove = new ArrayList<>();
-                }
-
-                actionsToRemove.add(action);
-            }
-        }
-
-        if (actionsToRemove != null) {
-            actions.removeActions(actionsToRemove);
-        }
-
-        return actionsToRemove != null;
-    }
-
-    protected int getActionCount(List<Action> actions) {
-        if (actions == null) {
-            return 0;
-        }
-
-        int result = 0;
-        for (Action action : actions) {
-            if (action instanceof ActionPush) {
-                result += ((ActionPush) action).values.size();
-            } else {
-                result++;
-            }
-        }
-
-        return result;
-    }
-
+//    private boolean removeObfuscationIfs(FastActionList actions) throws InterruptedException {
+//        if (actions.isEmpty()) {
+//            return false;
+//        }
+//
+//        actions.removeUnreachableActions();
+//        actions.removeZeroJumps();
+//
+//        FastActionListIterator iterator = actions.iterator();
+//        while (iterator.hasNext()) {
+//            ActionItem actionItem = iterator.next();
+//            ExecutionResult result = new ExecutionResult();
+//            executeActions(actions, i, actions.size() - 1, result);
+//
+//            if (result.idx != -1) {
+//                int newIstructionCount = 1 /*jump */ + result.stack.size();
+//                List<Action> unreachable = actions.getUnreachableActions(i, result.idx);
+//                int unreachableCount = unreachable.size();
+//
+//                if (newIstructionCount < unreachableCount) {
+//                    Action target = actions.get(result.idx);
+//                    Action prevAction = actions.get(i);
+//
+//                    if (result.stack.isEmpty() && prevAction instanceof ActionJump) {
+//                        ActionJump jump = (ActionJump) prevAction;
+//                        jump.setJumpOffset((int) (target.getAddress() - jump.getAddress() - jump.getTotalActionLength()));
+//                    } else {
+//                        if (!result.stack.isEmpty()) {
+//                            ActionPush push = new ActionPush(0);
+//                            push.values.clear();
+//                            for (GraphTargetItem graphTargetItem : result.stack) {
+//                                push.values.add(graphTargetItem.getResult());
+//                            }
+//                            push.setAddress(prevAction.getAddress());
+//                            actions.addAction(i++, push);
+//                            prevAction = push;
+//                        }
+//
+//                        ActionJump jump = new ActionJump(0);
+//                        jump.setAddress(prevAction.getAddress());
+//                        jump.setJumpOffset((int) (target.getAddress() - jump.getAddress() - jump.getTotalActionLength()));
+//                        actions.addAction(i++, jump);
+//                    }
+//
+//                    Action nextAction = actions.size() > i ? actions.get(i) : null;
+//
+//                    actions.removeUnreachableActions();
+//                    actions.removeZeroJumps();
+//
+//                    if (nextAction != null) {
+//                        int nextIdx = actions.indexOf(nextAction);
+//                        if (nextIdx < i) {
+//                            i = nextIdx;
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//
+//        return false;
+//    }
     protected boolean isFakeName(String name) {
         for (char ch : name.toCharArray()) {
             if (ch > 31) {
