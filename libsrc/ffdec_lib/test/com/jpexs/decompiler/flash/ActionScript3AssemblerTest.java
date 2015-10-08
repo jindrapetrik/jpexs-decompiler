@@ -18,18 +18,24 @@ package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.abc.avm2.ConvertException;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.DeobfuscatePopIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.ASM3Parser;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
+import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -136,5 +142,113 @@ public class ActionScript3AssemblerTest extends ActionScriptTestBase {
                 + "pop\r\n"
                 + "label1:pushfalse\r\n");
         b.getCode().replaceInstruction(getBaseAddr() + 4, new AVM2Instruction(0, DeobfuscatePopIns.getInstance(), new int[]{}), b);
+    }
+
+    @Test
+    public void testAddressToPos() throws Exception {
+        String str = "pushbyte 1\r\n"
+                + "pushbyte 1\r\n"
+                + "pushbyte 1\r\n";
+
+        MethodBody b = new MethodBody(getABC());
+        AVM2Code code = ASM3Parser.parse(new StringReader(str), getABC().constants, null, b, new MethodInfo());
+
+        long to = code.getEndOffset();
+        Map<Long, Integer> expected = new HashMap<>();
+        Map<Long, Integer> expectedNearest = new HashMap<>();
+        expected.put(-2L, -1);
+        expectedNearest.put(-2L, 0);
+        expected.put(-1L, -1);
+        expectedNearest.put(-1L, 0);
+        for (int i = 0; i < code.code.size(); i++) {
+            AVM2Instruction ins = code.code.get(i);
+            int length = ins.getBytesLength();
+            expected.put(ins.offset, i);
+            expectedNearest.put(ins.offset, i);
+            Assert.assertEquals(code.pos2adr(i), ins.offset);
+            for (int j = 1; j < length; j++) {
+                expected.put(ins.offset + j, -1);
+                expectedNearest.put(ins.offset + j, i + 1);
+            }
+        }
+
+        Assert.assertEquals(code.pos2adr(code.code.size()), code.getEndOffset());
+        expected.put(to, code.code.size());
+        expectedNearest.put(to, code.code.size());
+        expected.put(to + 1, -1);
+        expectedNearest.put(to + 1, -1);
+        expected.put(to + 2, -1);
+        expectedNearest.put(to + 2, -1);
+
+        for (Map.Entry<Long, Integer> e : expected.entrySet()) {
+            int pos;
+            try {
+                pos = code.adr2pos(e.getKey());
+            } catch (ConvertException ex) {
+                pos = -1;
+            }
+
+            Assert.assertEquals((long) pos, (int) e.getValue());
+        }
+
+        for (Map.Entry<Long, Integer> e : expectedNearest.entrySet()) {
+            int pos;
+            try {
+                pos = code.adr2pos(e.getKey(), true);
+            } catch (ConvertException ex) {
+                pos = -1;
+            }
+
+            Assert.assertEquals((long) pos, (int) e.getValue());
+        }
+    }
+
+    @Test
+    public void testInstructionStackSizes() throws Exception {
+        ABC abc = new ABC(null);
+        Multiname multiname = new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, null);
+        abc.constants.constant_multiname.add(multiname);
+        AVM2Instruction ins = new AVM2Instruction(0, null, new int[]{1, 20});
+        for (InstructionDefinition def : AVM2Code.instructionSet) {
+            if (def == null) {
+                continue;
+            }
+
+            int popCount = 0;
+            int pushCount = 0;
+            int delta = 0;
+            boolean popException = false;
+            boolean pushException = false;
+            boolean deltaException = false;
+            try {
+                popCount = def.getStackPopCount(ins, abc);
+            } catch (UnsupportedOperationException ex) {
+                popException = true;
+            }
+
+            try {
+                pushCount = def.getStackPushCount(ins, abc);
+            } catch (UnsupportedOperationException ex) {
+                pushException = true;
+            }
+
+            try {
+                delta = def.getStackDelta(ins, abc);
+            } catch (UnsupportedOperationException ex) {
+                deltaException = true;
+            }
+
+            if (popException && pushException && deltaException) {
+                continue;
+            }
+
+            if (popException || pushException || deltaException) {
+                Assert.fail(def.instructionName + " exception mismatch.");
+            }
+
+            if (pushCount - popCount != delta) {
+                Assert.fail(def.instructionName + " stack mismatch.");
+            }
+        }
     }
 }
