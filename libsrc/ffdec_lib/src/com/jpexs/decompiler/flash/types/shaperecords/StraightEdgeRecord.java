@@ -49,7 +49,7 @@ public class StraightEdgeRecord extends SHAPERECORD {
 
     public boolean generalLineFlag;
 
-    @Conditional(value = "generalLineFlag", revert = true)
+    @Conditional("!generalLineFlag")
     public boolean vertLineFlag;
 
     @SWFType(value = BasicType.SB, countField = "numBits", countAdd = 2)

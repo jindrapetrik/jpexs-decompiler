@@ -72,10 +72,10 @@ public class MORPHLINESTYLE2 implements Serializable {
     @Conditional(value = "joinStyle", options = {MITER_JOIN})
     public int miterLimitFactor;
 
-    @Conditional(value = "hasFillFlag", revert = true)
+    @Conditional("!hasFillFlag")
     public RGBA startColor;
 
-    @Conditional(value = "hasFillFlag", revert = true)
+    @Conditional("!hasFillFlag")
     public RGBA endColor;
 
     @Conditional(value = "hasFillFlag")
