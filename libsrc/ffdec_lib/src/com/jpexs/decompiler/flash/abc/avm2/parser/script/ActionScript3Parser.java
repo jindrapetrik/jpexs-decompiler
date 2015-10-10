@@ -2308,7 +2308,7 @@ public class ActionScript3Parser {
             expected(s, lexer.yyline(), SymbolType.DOT);
             s = lex();
             expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
-            name.add(s.value.toString());
+            name = name.add(s.value.toString());
             s = lex();
         }
 
