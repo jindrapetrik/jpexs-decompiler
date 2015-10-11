@@ -116,6 +116,8 @@ import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
+import com.jpexs.helpers.stat.StatisticData;
+import com.jpexs.helpers.stat.Statistics;
 import com.jpexs.helpers.streams.SeekableInputStream;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import com.sun.jna.Platform;
@@ -159,6 +161,8 @@ public class CommandLineArgumentParser {
     private static final Logger logger = Logger.getLogger(CommandLineArgumentParser.class.getName());
 
     private static boolean commandLineMode = false;
+
+    private static boolean showStat = false;
 
     private static String stdOut = null;
 
@@ -379,6 +383,11 @@ public class CommandLineArgumentParser {
             out.println("  ...export timeout for a single AS3 class in seconds");
         }
 
+        if (filter == null || filter.equals("stat")) {
+            out.println(" " + (cnt++) + ") -stat");
+            out.println("  ...show export performance statistics");
+        }
+
         if (filter == null || filter.equals("flashpaper2pdf")) {
             out.println(" " + (cnt++) + ") -flashpaper2pdf <infile> <outfile>");
             out.println("  ...converts FlashPaper SWF file <infile> to PDF <outfile>. Use -zoom parameter to specify image quality.");
@@ -567,6 +576,9 @@ public class CommandLineArgumentParser {
                     break;
                 case "-exportfiletimeout":
                     parseExportFileTimeout(args);
+                    break;
+                case "-stat":
+                    parseStat(args);
                     break;
                 case "-stdout":
                     parseStdOut(args);
@@ -946,6 +958,10 @@ public class CommandLineArgumentParser {
         }
     }
 
+    private static void parseStat(Stack<String> args) {
+        showStat = true;
+    }
+
     private static void parseStdOut(Stack<String> args) {
         if (args.isEmpty()) {
             System.err.println("stdOut parameter expected");
@@ -1228,6 +1244,8 @@ public class CommandLineArgumentParser {
             as3classes.addAll(selectionClasses);
         }
 
+        Map<String, StatisticData> stat = new HashMap<>();
+
         try {
             File[] inFiles;
             boolean singleFile = true;
@@ -1440,6 +1458,12 @@ public class CommandLineArgumentParser {
                         List<ScriptPack> as3packs = as3classes.isEmpty() ? null : swf.getScriptPacksByClassNames(as3classes);
                         exportOK = swf.exportActionScript(handler, scriptsFolder, as3classes.isEmpty() ? null : as3packs, scriptExportSettings, parallel, evl, exportAs2Script, exportAs3Script) != null && exportOK;
                     }
+
+                    if (showStat) {
+                        Statistics.print();
+                        Statistics.addToMap(stat);
+                        Statistics.clear();
+                    }
                 }
 
                 if (exportFormats.contains("fla")) {
@@ -1473,6 +1497,10 @@ public class CommandLineArgumentParser {
             System.err.print("FAIL: Exporting Failed on Exception - ");
             logger.log(Level.SEVERE, null, ex);
             System.exit(1);
+        }
+
+        if (showStat) {
+            Statistics.print(stat);
         }
 
         long stopTime = System.currentTimeMillis();
