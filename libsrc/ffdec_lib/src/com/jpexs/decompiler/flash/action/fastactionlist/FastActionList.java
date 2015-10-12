@@ -107,7 +107,25 @@ public class FastActionList implements Collection<ActionItem> {
         size--;
         actionItemMap.remove(item.action);
         actionItemSet.remove(item);
+
+        replaceJumpTargets(item, next);
+
         return next;
+    }
+
+    private void replaceJumpTargets(ActionItem target, ActionItem newTarget) {
+        ActionItem item = firstAction;
+        if (item == null) {
+            return;
+        }
+
+        do {
+            if (item.jumpTarget == target) {
+                item.jumpTarget = newTarget;
+            }
+
+            item = item.next;
+        } while (item != firstAction);
     }
 
     private void getContainerLastActions(ActionList actions, Map<Action, ActionItem> actionItemMap) {
