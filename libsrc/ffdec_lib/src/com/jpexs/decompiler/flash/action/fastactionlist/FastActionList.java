@@ -108,7 +108,20 @@ public class FastActionList implements Collection<ActionItem> {
         actionItemMap.remove(item.action);
         actionItemSet.remove(item);
 
-        replaceJumpTargets(item, next);
+        item.removeJumpTarget();
+        item.removeContainerLastActions();
+
+        if (item.jumpsHere != null) {
+            for (ActionItem item1 : item.jumpsHere) {
+                item1.setJumpTarget(item.next);
+            }
+        }
+
+        if (item.lastActionOf != null) {
+            for (ActionItem item1 : item.lastActionOf) {
+                item1.replaceContainerLastAction(item, item.prev);
+            }
+        }
 
         return next;
     }
@@ -120,8 +133,8 @@ public class FastActionList implements Collection<ActionItem> {
         }
 
         do {
-            if (item.jumpTarget == target) {
-                item.jumpTarget = newTarget;
+            if (item.getJumpTarget() == target) {
+                item.setJumpTarget(newTarget);
             }
 
             item = item.next;
@@ -137,7 +150,7 @@ public class FastActionList implements Collection<ActionItem> {
         do {
             Action action = item.action;
             if (action instanceof GraphSourceItemContainer) {
-                item.containerLastActions = getContainerLastActions(actions, action, actionItemMap);
+                item.setContainerLastActions(getContainerLastActions(actions, action, actionItemMap));
             }
 
             item = item.next;
@@ -213,11 +226,11 @@ public class FastActionList implements Collection<ActionItem> {
                     }
                 }
 
-                item.jumpTarget = actionItemMap.get(targetAction);
+                item.setJumpTarget(actionItemMap.get(targetAction));
             }
             if (target >= 0) {
                 Action targetAction = actions.getByAddress(target);
-                item.jumpTarget = actionItemMap.get(targetAction);
+                item.setJumpTarget(actionItemMap.get(targetAction));
             }
 
             item = item.next;
@@ -251,7 +264,7 @@ public class FastActionList implements Collection<ActionItem> {
             Action action = item.action;
             if (action instanceof ActionIf) {
                 ActionIf aIf = (ActionIf) action;
-                Action target = item.jumpTarget == null ? null : item.jumpTarget.action;
+                Action target = item.getJumpTargetAction();
                 long offset;
                 if (target != null) {
                     offset = target.getAddress() - action.getAddress() - action.getTotalActionLength();
@@ -261,7 +274,7 @@ public class FastActionList implements Collection<ActionItem> {
                 aIf.setJumpOffset((int) offset);
             } else if (action instanceof ActionJump) {
                 ActionJump aJump = (ActionJump) action;
-                Action target = item.jumpTarget == null ? null : item.jumpTarget.action;
+                Action target = item.getJumpTargetAction();
                 long offset;
                 if (target != null) {
                     offset = target.getAddress() - action.getAddress() - action.getTotalActionLength();
@@ -275,7 +288,7 @@ public class FastActionList implements Collection<ActionItem> {
         } while (item != firstAction);
     }
 
-    private void updateActionStores(ActionList actionList) {
+    private void updateActionStores() {
         ActionItem item = firstAction;
         if (item == null) {
             return;
@@ -285,17 +298,18 @@ public class FastActionList implements Collection<ActionItem> {
             Action action = item.action;
             if (action instanceof ActionStore) {
                 ActionStore aStore = (ActionStore) action;
-                Action nextActionAfterStore = item.jumpTarget == null ? null : item.jumpTarget.action;
-                Action a1 = action;
+                Action nextActionAfterStore = item.getJumpTargetAction();
+                ActionItem item1 = item;
                 List<Action> store = new ArrayList<>();
                 while (true) {
-                    long address = a1.getAddress() + a1.getTotalActionLength();
-                    a1 = actionList.getByAddress(address);
-                    if (a1 == null || a1 == nextActionAfterStore) {
+                    item1 = item1.next;
+                    if (item1 == firstAction || item1.action == nextActionAfterStore) {
                         break;
                     }
-                    store.add(a1);
+
+                    store.add(item1.action);
                 }
+
                 aStore.setStore(store);
             }
 
@@ -313,7 +327,7 @@ public class FastActionList implements Collection<ActionItem> {
             Action action = item.action;
             if (action instanceof GraphSourceItemContainer) {
                 GraphSourceItemContainer container = (GraphSourceItemContainer) action;
-                List<ActionItem> lastActions = item.containerLastActions;
+                List<ActionItem> lastActions = item.getContainerLastActions();
                 long startAddress = action.getAddress() + container.getHeaderSize();
                 for (int j = 0; j < lastActions.size(); j++) {
                     Action lastAction = lastActions.get(j).action;
@@ -365,7 +379,7 @@ public class FastActionList implements Collection<ActionItem> {
         do {
             Action action = item.action;
             if (action instanceof ActionJump) {
-                if (item.jumpTarget == item.next && item.jumpTarget != firstAction) {
+                if (item.getJumpTarget() == item.next && item.getJumpTarget() != firstAction) {
                     item = removeItem(item);
                     continue;
                 }
@@ -439,7 +453,7 @@ public class FastActionList implements Collection<ActionItem> {
                         }
                     }
 
-                    ActionItem target = item.jumpTarget;
+                    ActionItem target = item.getJumpTarget();
                     if (target != null) {
                         if (target.reachable == 0) {
                             target.reachable = 1;
@@ -447,7 +461,7 @@ public class FastActionList implements Collection<ActionItem> {
                     }
 
                     if (action instanceof GraphSourceItemContainer) {
-                        for (ActionItem lastActionItem : item.containerLastActions) {
+                        for (ActionItem lastActionItem : item.getContainerLastActions()) {
                             if (lastActionItem != null && lastActionItem.next != null && lastActionItem.next.reachable == 0) {
                                 lastActionItem.next.reachable = 1;
                             }
@@ -473,7 +487,7 @@ public class FastActionList implements Collection<ActionItem> {
         ActionList result = new ActionList(resultList);
         updateActionAddressesAndLengths();
         updateJumps();
-        updateActionStores(result);
+        updateActionStores();
         updateContainerSizes();
         return result;
     }

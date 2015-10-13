@@ -120,7 +120,7 @@ public class ActionDeobfuscatorSimpleFast implements SWFDecompilerListener {
                 if (isGetTime && a2 instanceof ActionIf) {
                     ActionJump jump = new ActionJump(0);
                     ActionItem jumpItem = new ActionItem(jump);
-                    jumpItem.jumpTarget = a2Item.jumpTarget;
+                    jumpItem.setJumpTarget(a2Item.getJumpTarget());
                     iterator.remove(); // GetTime
                     iterator.next();
                     iterator.remove(); // If
@@ -142,7 +142,7 @@ public class ActionDeobfuscatorSimpleFast implements SWFDecompilerListener {
                     if (a instanceof ActionGetTime && a1 instanceof ActionIncrement && a2 instanceof ActionIf) {
                         ActionJump jump = new ActionJump(0);
                         ActionItem jumpItem = new ActionItem(jump);
-                        jumpItem.jumpTarget = a2Item.jumpTarget;
+                        jumpItem.setJumpTarget(a2Item.getJumpTarget());
                         iterator.remove(); // GetTime
                         iterator.next();
                         iterator.remove(); // Increment
@@ -159,14 +159,14 @@ public class ActionDeobfuscatorSimpleFast implements SWFDecompilerListener {
         return false;
     }
 
-//    private boolean removeObfuscationIfs(FastActionList actions) throws InterruptedException {
-//        if (actions.isEmpty()) {
-//            return false;
-//        }
-//
-//        actions.removeUnreachableActions();
-//        actions.removeZeroJumps();
-//
+    private boolean removeObfuscationIfs(FastActionList actions) throws InterruptedException {
+        if (actions.isEmpty()) {
+            return false;
+        }
+
+        actions.removeUnreachableActions();
+        actions.removeZeroJumps();
+
 //        FastActionListIterator iterator = actions.iterator();
 //        while (iterator.hasNext()) {
 //            ActionItem actionItem = iterator.next();
@@ -217,9 +217,9 @@ public class ActionDeobfuscatorSimpleFast implements SWFDecompilerListener {
 //                }
 //            }
 //        }
-//
-//        return false;
-//    }
+        return false;
+    }
+
     protected boolean isFakeName(String name) {
         for (char ch : name.toCharArray()) {
             if (ch > 31) {
