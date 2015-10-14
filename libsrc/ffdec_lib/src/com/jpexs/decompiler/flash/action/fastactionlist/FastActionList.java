@@ -112,13 +112,13 @@ public class FastActionList implements Collection<ActionItem> {
         item.removeContainerLastActions();
 
         if (item.jumpsHere != null) {
-            for (ActionItem item1 : item.jumpsHere) {
+            for (ActionItem item1 : new ArrayList<>(item.jumpsHere)) {
                 item1.setJumpTarget(item.next);
             }
         }
 
         if (item.lastActionOf != null) {
-            for (ActionItem item1 : item.lastActionOf) {
+            for (ActionItem item1 : new ArrayList<>(item.lastActionOf)) {
                 item1.replaceContainerLastAction(item, item.prev);
             }
         }
