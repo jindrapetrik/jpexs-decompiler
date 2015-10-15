@@ -127,7 +127,6 @@ public class ActionDeobfuscatorSimpleFast implements SWFDecompilerListener {
                     iterator.add(jumpItem); // replace If with Jump
                     changed = true;
                     getTimeCount--;
-                    break;
                 }
             }
 
@@ -150,7 +149,6 @@ public class ActionDeobfuscatorSimpleFast implements SWFDecompilerListener {
                         iterator.remove(); // If
                         iterator.add(jumpItem); // replace If with Jump
                         changed = true;
-                        break;
                     }
                 }
             }
