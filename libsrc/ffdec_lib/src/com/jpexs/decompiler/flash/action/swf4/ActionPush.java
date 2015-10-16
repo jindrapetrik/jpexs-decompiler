@@ -332,15 +332,16 @@ public class ActionPush extends Action {
 
     public String toString(int i) {
         String ret;
-        if (values.get(i) instanceof ConstantIndex) {
-            ((ConstantIndex) values.get(i)).constantPool = constantPool;
-            ret = ((ConstantIndex) values.get(i)).toString();
-        } else if (values.get(i) instanceof String) {
-            ret = "\"" + Helper.escapeActionScriptString((String) values.get(i)) + "\"";
-        } else if (values.get(i) instanceof RegisterNumber) {
-            ret = ((RegisterNumber) values.get(i)).toStringNoName();
+        Object value = values.get(i);
+        if (value instanceof ConstantIndex) {
+            ((ConstantIndex) value).constantPool = constantPool;
+            ret = ((ConstantIndex) value).toString();
+        } else if (value instanceof String) {
+            ret = "\"" + Helper.escapeActionScriptString((String) value) + "\"";
+        } else if (value instanceof RegisterNumber) {
+            ret = ((RegisterNumber) value).toStringNoName();
         } else {
-            ret = values.get(i).toString();
+            ret = value.toString();
         }
         return ret;
     }

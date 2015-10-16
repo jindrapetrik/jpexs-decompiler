@@ -56,6 +56,7 @@ import com.jpexs.decompiler.flash.action.swf5.ActionWith;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.action.swf7.ActionTry;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
@@ -729,10 +730,9 @@ public abstract class Action implements GraphSourceItem {
     protected long popLong(TranslateStack stack) {
         GraphTargetItem item = stack.pop();
         if (item instanceof DirectValueActionItem) {
-            if (((DirectValueActionItem) item).value instanceof Long) {
-                return (long) (Long) ((DirectValueActionItem) item).value;
-            }
+            return (long) (double) EcmaScript.toNumber(((DirectValueActionItem) item).value);
         }
+
         return 0;
     }
 
