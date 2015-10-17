@@ -71,7 +71,6 @@ import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerListener;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.decompiler.graph.TranslateException;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.ArrayList;
 import java.util.List;
@@ -88,8 +87,12 @@ public class ActionDeobfuscatorSimpleFast implements SWFDecompilerListener {
     public void actionListParsed(ActionList actions, SWF swf) throws InterruptedException {
         FastActionList fastActions = new FastActionList(actions);
         fastActions.expandPushes();
-        removeGetTimes(fastActions);
-        //removeObfuscationIfs(fastActions);
+        boolean changed = true;
+        while (changed) {
+            changed = removeGetTimes(fastActions);
+            changed |= removeObfuscationIfs(fastActions);
+        }
+
         actions.setActions(fastActions.toActionList());
     }
 
@@ -98,6 +101,7 @@ public class ActionDeobfuscatorSimpleFast implements SWFDecompilerListener {
             return false;
         }
 
+        boolean ret = false;
         boolean changed = true;
         int getTimeCount = 1;
         while (changed && getTimeCount > 0) {
@@ -126,6 +130,7 @@ public class ActionDeobfuscatorSimpleFast implements SWFDecompilerListener {
                     iterator.remove(); // If
                     iterator.add(jumpItem); // replace If with Jump
                     changed = true;
+                    ret = true;
                     getTimeCount--;
                 }
             }
@@ -149,12 +154,13 @@ public class ActionDeobfuscatorSimpleFast implements SWFDecompilerListener {
                         iterator.remove(); // If
                         iterator.add(jumpItem); // replace If with Jump
                         changed = true;
+                        ret = true;
                     }
                 }
             }
         }
 
-        return false;
+        return ret;
     }
 
     private boolean removeObfuscationIfs(FastActionList actions) throws InterruptedException {
@@ -162,60 +168,52 @@ public class ActionDeobfuscatorSimpleFast implements SWFDecompilerListener {
             return false;
         }
 
+        boolean ret = false;
         actions.removeUnreachableActions();
         actions.removeZeroJumps();
 
-//        FastActionListIterator iterator = actions.iterator();
-//        while (iterator.hasNext()) {
-//            ActionItem actionItem = iterator.next();
-//            ExecutionResult result = new ExecutionResult();
-//            executeActions(actions, i, actions.size() - 1, result);
-//
-//            if (result.idx != -1) {
-//                int newIstructionCount = 1 /*jump */ + result.stack.size();
-//                List<Action> unreachable = actions.getUnreachableActions(i, result.idx);
-//                int unreachableCount = unreachable.size();
-//
-//                if (newIstructionCount < unreachableCount) {
-//                    Action target = actions.get(result.idx);
-//                    Action prevAction = actions.get(i);
-//
-//                    if (result.stack.isEmpty() && prevAction instanceof ActionJump) {
-//                        ActionJump jump = (ActionJump) prevAction;
-//                        jump.setJumpOffset((int) (target.getAddress() - jump.getAddress() - jump.getTotalActionLength()));
-//                    } else {
-//                        if (!result.stack.isEmpty()) {
-//                            ActionPush push = new ActionPush(0);
-//                            push.values.clear();
-//                            for (GraphTargetItem graphTargetItem : result.stack) {
-//                                push.values.add(graphTargetItem.getResult());
-//                            }
-//                            push.setAddress(prevAction.getAddress());
-//                            actions.addAction(i++, push);
-//                            prevAction = push;
-//                        }
-//
-//                        ActionJump jump = new ActionJump(0);
-//                        jump.setAddress(prevAction.getAddress());
-//                        jump.setJumpOffset((int) (target.getAddress() - jump.getAddress() - jump.getTotalActionLength()));
-//                        actions.addAction(i++, jump);
-//                    }
-//
-//                    Action nextAction = actions.size() > i ? actions.get(i) : null;
-//
-//                    actions.removeUnreachableActions();
-//                    actions.removeZeroJumps();
-//
-//                    if (nextAction != null) {
-//                        int nextIdx = actions.indexOf(nextAction);
-//                        if (nextIdx < i) {
-//                            i = nextIdx;
-//                        }
-//                    }
-//                }
-//            }
-//        }
-        return false;
+        FastActionListIterator iterator = actions.iterator();
+        while (iterator.hasNext()) {
+            ActionItem actionItem = iterator.next();
+            ExecutionResult result = new ExecutionResult();
+            executeActions(actionItem, actions.last(), result);
+
+            if (result.item != null) {
+                int newIstructionCount = 1 /*jump */ + result.stack.size();
+                int unreachableCount = actions.getUnreachableActionCount(actionItem, result.item);
+
+                if (newIstructionCount < unreachableCount) {
+                    if (result.stack.isEmpty() && actionItem.action instanceof ActionJump) {
+                        actionItem.setJumpTarget(result.item);
+                    } else {
+                        ActionItem prevActionItem = actionItem.prev;
+                        if (!result.stack.isEmpty()) {
+                            for (GraphTargetItem graphTargetItem : result.stack) {
+                                ActionPush push = new ActionPush(graphTargetItem.getResult());
+                                ActionItem pushItem = new ActionItem(push);
+                                iterator.addBefore(pushItem);
+                            }
+                        }
+
+                        ActionJump jump = new ActionJump(0);
+                        ActionItem jumpItem = new ActionItem(jump);
+                        jumpItem.setJumpTarget(result.item);
+                        iterator.addBefore(jumpItem);
+
+                        actions.replaceJumpTargets(actionItem, prevActionItem.next);
+                    }
+
+                    ActionItem prevItem = actionItem.prev;
+
+                    actions.removeUnreachableActions();
+                    actions.removeZeroJumps();
+
+                    iterator.setCurrent(prevItem.next.next);
+                    ret = true;
+                }
+            }
+        }
+        return ret;
     }
 
     protected boolean isFakeName(String name) {
@@ -228,7 +226,7 @@ public class ActionDeobfuscatorSimpleFast implements SWFDecompilerListener {
         return true;
     }
 
-    private void executeActions(ActionList actions, int idx, int endIdx, ExecutionResult result) throws InterruptedException {
+    private void executeActions(ActionItem item, ActionItem endItem, ExecutionResult result) throws InterruptedException {
         List<GraphTargetItem> output = new ArrayList<>();
         ActionLocalData localData = new ActionLocalData();
         FixItemCounterTranslateStack stack = new FixItemCounterTranslateStack("");
@@ -239,15 +237,11 @@ public class ActionDeobfuscatorSimpleFast implements SWFDecompilerListener {
                 throw new InterruptedException();
             }
 
-            if (idx > endIdx) {
-                break;
-            }
-
             if (instructionsProcessed > executionLimit) {
                 break;
             }
 
-            Action action = actions.get(idx);
+            Action action = item.action;
 
             /*System.out.print(action.getASMSource(actions, new ArrayList<Long>(), ScriptExportMode.PCODE));
              for (int j = 0; j < stack.size(); j++) {
@@ -320,36 +314,26 @@ public class ActionDeobfuscatorSimpleFast implements SWFDecompilerListener {
                 }
             }
 
-            idx++;
-
             if (action instanceof ActionJump) {
-                ActionJump jump = (ActionJump) action;
-                long address = jump.getTargetAddress();
-                idx = actions.getIndexByAddress(address);
-                if (idx == -1) {
-                    throw new TranslateException("Jump target not found: " + address);
-                }
-            }
-
-            if (action instanceof ActionIf) {
-                ActionIf aif = (ActionIf) action;
+                item = item.getJumpTarget();
+            } else if (action instanceof ActionIf) {
                 if (stack.isEmpty()) {
                     return;
                 }
 
                 if (EcmaScript.toBoolean(stack.pop().getResult())) {
-                    long address = aif.getTargetAddress();
-                    idx = actions.getIndexByAddress(address);
-                    if (idx == -1) {
-                        throw new TranslateException("If target not found: " + address);
-                    }
+                    item = item.getJumpTarget();
+                } else {
+                    item = item.next;
                 }
+            } else {
+                item = item.next;
             }
 
             instructionsProcessed++;
 
             if (stack.allItemsFixed() && !(action instanceof ActionPush)) {
-                result.idx = idx == actions.size() ? idx - 1 : idx;
+                result.item = item;
                 result.instructionsProcessed = instructionsProcessed;
                 result.stack.clear();
                 result.stack.addAll(stack);
@@ -376,7 +360,7 @@ public class ActionDeobfuscatorSimpleFast implements SWFDecompilerListener {
 
     class ExecutionResult {
 
-        public int idx = -1;
+        public ActionItem item = null;
 
         public int instructionsProcessed = -1;
 

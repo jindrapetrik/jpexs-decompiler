@@ -19,6 +19,7 @@ package com.jpexs.decompiler.graph;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
@@ -381,9 +382,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     public long getAsLong() {
         if (this instanceof DirectValueActionItem) {
             DirectValueActionItem dvai = (DirectValueActionItem) this;
-            if (dvai.value instanceof Long) {
-                return (long) (Long) dvai.value;
-            }
+            return (long) (double) EcmaScript.toNumber(dvai.value);
         }
 
         return 0;

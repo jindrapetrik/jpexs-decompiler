@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.action;
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.action.deobfuscation.ActionDeobfuscator;
-import com.jpexs.decompiler.flash.action.deobfuscation.ActionDeobfuscatorSimple;
 import com.jpexs.decompiler.flash.action.deobfuscation.ActionDeobfuscatorSimpleFast;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
@@ -184,9 +183,9 @@ public class ActionListReader {
                 try (Statistics s = new Statistics("ActionDeobfuscatorSimpleFast")) {
                     new ActionDeobfuscatorSimpleFast().actionListParsed(actions, sis.getSwf());
                 }
-                try (Statistics s = new Statistics("ActionDeobfuscatorSimple")) {
-                    new ActionDeobfuscatorSimple().actionListParsed(actions, sis.getSwf());
-                }
+                /*try (Statistics s = new Statistics("ActionDeobfuscatorSimple")) {
+                 new ActionDeobfuscatorSimple().actionListParsed(actions, sis.getSwf());
+                 }*/
                 try (Statistics s = new Statistics("ActionDeobfuscator")) {
                     new ActionDeobfuscator().actionListParsed(actions, sis.getSwf());
                 }
@@ -894,7 +893,8 @@ public class ActionListReader {
         }
 
         try {
-            fixConstantPools(listeners, new ConstantPool(), actionMap, new TreeMap<>(), 0, 0, endIp, null, true, new ArrayList<>());
+            int startIp = (int) actions.get(0).getAddress();
+            fixConstantPools(listeners, new ConstantPool(), actionMap, new TreeMap<>(), startIp, startIp, endIp, null, true, new ArrayList<>());
         } catch (IOException ex) {
             // ignore
         }

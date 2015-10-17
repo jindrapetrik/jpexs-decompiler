@@ -19,6 +19,7 @@ package com.jpexs.decompiler.graph;
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.FinalProcessLocalData;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.model.AndItem;
 import com.jpexs.decompiler.graph.model.BreakItem;
@@ -2489,7 +2490,6 @@ public class Graph {
 
     protected static void makeAllCommands(List<GraphTargetItem> commands, TranslateStack stack) {
         int clen = commands.size();
-        BreakItem br = null;
         if (!commands.isEmpty()) {
             if (commands.get(commands.size() - 1) instanceof BreakItem) {
                 clen--;
@@ -2498,7 +2498,11 @@ public class Graph {
         while (stack.size() > 0) {
             GraphTargetItem p = stack.pop();
             if (!(p instanceof PopItem)) {
-                commands.add(clen, new PushItem(p));
+                if (p instanceof FunctionActionItem) {
+                    commands.add(clen, p);
+                } else {
+                    commands.add(clen, new PushItem(p));
+                }
             }
         }
     }

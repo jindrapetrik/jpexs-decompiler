@@ -39,7 +39,7 @@ public class FastActionList implements Collection<ActionItem> {
 
     private int size;
 
-    private ActionItem firstAction;
+    private ActionItem firstItem;
 
     private final Map<Action, ActionItem> actionItemMap;
 
@@ -62,15 +62,24 @@ public class FastActionList implements Collection<ActionItem> {
         return insertItemAfter(item, newItem);
     }
 
+    final ActionItem insertItemBefore(ActionItem item, ActionItem newItem) {
+        insertItemAfter(item.prev, newItem);
+        if (item == firstItem) {
+            firstItem = newItem;
+        }
+
+        return newItem;
+    }
+
     final ActionItem insertItemAfter(ActionItem item, ActionItem newItem) {
-        if (item == null && firstAction == null) {
-            firstAction = newItem;
+        if (item == null && firstItem == null) {
+            firstItem = newItem;
             newItem.next = newItem;
             newItem.prev = newItem;
         } else {
             if (item == null) {
                 // insert to the end
-                item = firstAction.prev;
+                item = firstItem.prev;
             }
 
             ActionItem oldNext = item.next;
@@ -88,13 +97,13 @@ public class FastActionList implements Collection<ActionItem> {
 
     ActionItem removeItem(ActionItem item) {
         ActionItem next = null;
-        if (item == firstAction) {
+        if (item == firstItem) {
             if (item.next == item) {
                 // there is only 1 item
-                firstAction = null;
+                firstItem = null;
             } else {
                 next = item.next;
-                firstAction = next;
+                firstItem = next;
                 next.prev = item.prev;
                 item.prev.next = next;
             }
@@ -126,23 +135,16 @@ public class FastActionList implements Collection<ActionItem> {
         return next;
     }
 
-    private void replaceJumpTargets(ActionItem target, ActionItem newTarget) {
-        ActionItem item = firstAction;
-        if (item == null) {
-            return;
-        }
-
-        do {
-            if (item.getJumpTarget() == target) {
+    public void replaceJumpTargets(ActionItem target, ActionItem newTarget) {
+        if (target.jumpsHere != null) {
+            for (ActionItem item : new ArrayList<>(target.jumpsHere)) {
                 item.setJumpTarget(newTarget);
             }
-
-            item = item.next;
-        } while (item != firstAction);
+        }
     }
 
     private void getContainerLastActions(ActionList actions, Map<Action, ActionItem> actionItemMap) {
-        ActionItem item = firstAction;
+        ActionItem item = firstItem;
         if (item == null) {
             return;
         }
@@ -154,7 +156,7 @@ public class FastActionList implements Collection<ActionItem> {
             }
 
             item = item.next;
-        } while (item != firstAction);
+        } while (item != firstItem);
     }
 
     private List<ActionItem> getContainerLastActions(ActionList actions, Action action, Map<Action, ActionItem> actionItemMap) {
@@ -201,7 +203,7 @@ public class FastActionList implements Collection<ActionItem> {
     }
 
     private void getJumps(ActionList actions, Map<Action, ActionItem> actionItemMap) {
-        ActionItem item = firstAction;
+        ActionItem item = firstItem;
         if (item == null) {
             return;
         }
@@ -234,11 +236,11 @@ public class FastActionList implements Collection<ActionItem> {
             }
 
             item = item.next;
-        } while (item != firstAction);
+        } while (item != firstItem);
     }
 
     private void updateActionAddressesAndLengths() {
-        ActionItem item = firstAction;
+        ActionItem item = firstItem;
         if (item == null) {
             return;
         }
@@ -250,11 +252,11 @@ public class FastActionList implements Collection<ActionItem> {
             action.updateLength();
             address += action.getTotalActionLength();
             item = item.next;
-        } while (item != firstAction);
+        } while (item != firstItem);
     }
 
     private void updateJumps() {
-        ActionItem item = firstAction;
+        ActionItem item = firstItem;
         if (item == null) {
             return;
         }
@@ -285,11 +287,11 @@ public class FastActionList implements Collection<ActionItem> {
             }
 
             item = item.next;
-        } while (item != firstAction);
+        } while (item != firstItem);
     }
 
     private void updateActionStores() {
-        ActionItem item = firstAction;
+        ActionItem item = firstItem;
         if (item == null) {
             return;
         }
@@ -303,7 +305,7 @@ public class FastActionList implements Collection<ActionItem> {
                 List<Action> store = new ArrayList<>();
                 while (true) {
                     item1 = item1.next;
-                    if (item1 == firstAction || item1.action == nextActionAfterStore) {
+                    if (item1 == firstItem || item1.action == nextActionAfterStore) {
                         break;
                     }
 
@@ -314,11 +316,11 @@ public class FastActionList implements Collection<ActionItem> {
             }
 
             item = item.next;
-        } while (item != firstAction);
+        } while (item != firstItem);
     }
 
     private void updateContainerSizes() {
-        ActionItem item = firstAction;
+        ActionItem item = firstItem;
         if (item == null) {
             return;
         }
@@ -338,11 +340,11 @@ public class FastActionList implements Collection<ActionItem> {
             }
 
             item = item.next;
-        } while (item != firstAction);
+        } while (item != firstItem);
     }
 
     public void expandPushes() {
-        ActionItem item = firstAction;
+        ActionItem item = firstItem;
         if (item == null) {
             return;
         }
@@ -367,11 +369,11 @@ public class FastActionList implements Collection<ActionItem> {
             }
 
             item = item.next;
-        } while (item != firstAction);
+        } while (item != firstItem);
     }
 
     public void removeZeroJumps() {
-        ActionItem item = firstAction;
+        ActionItem item = firstItem;
         if (item == null) {
             return;
         }
@@ -379,18 +381,18 @@ public class FastActionList implements Collection<ActionItem> {
         do {
             Action action = item.action;
             if (action instanceof ActionJump) {
-                if (item.getJumpTarget() == item.next && item.getJumpTarget() != firstAction) {
+                if (item.getJumpTarget() == item.next && item.getJumpTarget() != firstItem) {
                     item = removeItem(item);
                     continue;
                 }
             }
 
             item = item.next;
-        } while (item != firstAction);
+        } while (item != firstItem);
     }
 
     public void removeUnreachableActions() {
-        ActionItem item = firstAction;
+        ActionItem item = firstItem;
         if (item == null) {
             return;
         }
@@ -404,11 +406,32 @@ public class FastActionList implements Collection<ActionItem> {
             }
 
             item = item.next;
-        } while (item != firstAction);
+        } while (item != firstItem);
+    }
+
+    public int getUnreachableActionCount(ActionItem jump, ActionItem jumpTarget) {
+        ActionItem item = firstItem;
+        if (item == null) {
+            return 0;
+        }
+
+        updateReachableFlags(jump, jumpTarget);
+        jump.reachable = 0;
+
+        int count = 0;
+        do {
+            if (item.reachable == 0) {
+                count++;
+            }
+
+            item = item.next;
+        } while (item != firstItem);
+
+        return count;
     }
 
     private void clearReachableFlags() {
-        ActionItem item = firstAction;
+        ActionItem item = firstItem;
         if (item == null) {
             return;
         }
@@ -416,21 +439,20 @@ public class FastActionList implements Collection<ActionItem> {
         do {
             item.reachable = 0;
             item = item.next;
-        } while (item != firstAction);
+        } while (item != firstItem);
     }
 
     private void updateReachableFlags(ActionItem jump, ActionItem jumpTarget) {
-        if (firstAction == null) {
+        if (firstItem == null) {
             return;
         }
 
         clearReachableFlags();
 
-        firstAction.reachable = 1;
+        firstItem.reachable = 1;
         boolean modified = true;
         while (modified) {
             modified = false;
-            int i = 0;
             FastActionListIterator iterator = iterator();
             while (iterator.hasNext()) {
                 ActionItem item = iterator.next();
@@ -474,7 +496,7 @@ public class FastActionList implements Collection<ActionItem> {
 
     public ActionList updateActions() {
         List<Action> resultList = new ArrayList<>(size);
-        ActionItem item = firstAction;
+        ActionItem item = firstItem;
         if (item == null) {
             return new ActionList(resultList);
         }
@@ -482,7 +504,7 @@ public class FastActionList implements Collection<ActionItem> {
         do {
             resultList.add(item.action);
             item = item.next;
-        } while (item != firstAction);
+        } while (item != firstItem);
 
         ActionList result = new ActionList(resultList);
         updateActionAddressesAndLengths();
@@ -490,6 +512,14 @@ public class FastActionList implements Collection<ActionItem> {
         updateActionStores();
         updateContainerSizes();
         return result;
+    }
+
+    public ActionItem first() {
+        return firstItem;
+    }
+
+    public ActionItem last() {
+        return firstItem == null ? null : firstItem.prev;
     }
 
     public ActionList toActionList() {
@@ -519,14 +549,14 @@ public class FastActionList implements Collection<ActionItem> {
 
     @Override
     public FastActionListIterator iterator() {
-        return new FastActionListIterator(firstAction, this);
+        return new FastActionListIterator(this);
     }
 
     @Override
     public Object[] toArray() {
         Object[] result = new Object[size];
 
-        ActionItem item = firstAction;
+        ActionItem item = firstItem;
         if (item == null) {
             return result;
         }
@@ -536,7 +566,7 @@ public class FastActionList implements Collection<ActionItem> {
             result[i] = item.action;
             item = item.next;
             i++;
-        } while (item != firstAction);
+        } while (item != firstItem);
         return null;
     }
 
@@ -547,7 +577,7 @@ public class FastActionList implements Collection<ActionItem> {
             a = (T[]) new ActionItem[size];
         }
 
-        ActionItem item = firstAction;
+        ActionItem item = firstItem;
         if (item == null) {
             return a;
         }
@@ -557,7 +587,7 @@ public class FastActionList implements Collection<ActionItem> {
             a[i] = (T) item;
             item = item.next;
             i++;
-        } while (item != firstAction);
+        } while (item != firstItem);
         return null;
     }
 
@@ -616,7 +646,7 @@ public class FastActionList implements Collection<ActionItem> {
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        ActionItem item = firstAction;
+        ActionItem item = firstItem;
         if (item == null) {
             return false;
         }
@@ -630,13 +660,13 @@ public class FastActionList implements Collection<ActionItem> {
             }
 
             item = item.next;
-        } while (item != firstAction);
+        } while (item != firstItem);
         return modified;
     }
 
     @Override
     public void clear() {
-        firstAction = null;
+        firstItem = null;
         size = 0;
     }
 }
