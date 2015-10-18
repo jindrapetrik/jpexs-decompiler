@@ -245,14 +245,13 @@ public class DocumentSearchData {
 			java.util.ResourceBundle.getBundle("jsyntaxpane/Bundle").getString("DocumentSearchData.Find"), JOptionPane.INFORMATION_MESSAGE);
 	}
 
-        public void showQuickFindDialogEx(JTextComponent target,boolean ignoreCase,boolean regularExpresion) {
+        public void showQuickFindDialogEx(JTextComponent target, boolean ignoreCase, boolean regularExpresion) {
 		if (quickFindDlg == null) {
 			quickFindDlg = new QuickFindDialog(target, this);
 		}
-		quickFindDlg.showFor(target);
                 quickFindDlg.setIgnoreCase(ignoreCase);
                 quickFindDlg.setRegularExpression(regularExpresion);
-                
+		quickFindDlg.showFor(target);
 	}
         
 	/**
