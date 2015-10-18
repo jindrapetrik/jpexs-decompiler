@@ -27,7 +27,7 @@ import java.util.logging.Logger;
  */
 public class TranslateStack extends Stack<GraphTargetItem> {
 
-    private static PopItem pop;
+    private PopItem pop;
 
     private final String path;
 
