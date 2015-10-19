@@ -57,6 +57,7 @@ import com.jpexs.decompiler.flash.action.swf5.ActionBitRShift;
 import com.jpexs.decompiler.flash.action.swf5.ActionBitURShift;
 import com.jpexs.decompiler.flash.action.swf5.ActionBitXor;
 import com.jpexs.decompiler.flash.action.swf5.ActionDecrement;
+import com.jpexs.decompiler.flash.action.swf5.ActionDefineLocal;
 import com.jpexs.decompiler.flash.action.swf5.ActionEquals2;
 import com.jpexs.decompiler.flash.action.swf5.ActionIncrement;
 import com.jpexs.decompiler.flash.action.swf5.ActionLess2;
@@ -73,7 +74,9 @@ import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -91,6 +94,7 @@ public class ActionDeobfuscatorSimpleFast implements SWFDecompilerListener {
         while (changed) {
             changed = removeGetTimes(fastActions);
             changed |= removeObfuscationIfs(fastActions);
+            changed |= removeObfuscatedUnusedVariables(fastActions);
         }
 
         actions.setActions(fastActions.toActionList());
@@ -213,6 +217,59 @@ public class ActionDeobfuscatorSimpleFast implements SWFDecompilerListener {
                 }
             }
         }
+        return ret;
+    }
+
+    private boolean removeObfuscatedUnusedVariables(FastActionList actions) throws InterruptedException {
+        if (actions.isEmpty()) {
+            return false;
+        }
+
+        Map<String, Integer> pushValues = getPushValues(actions);
+
+        boolean ret = false;
+
+        // Push, Push DefineLocal => remove when first pushed value is obfuscated and never used
+        FastActionListIterator iterator = actions.iterator();
+        while (iterator.hasNext()) {
+            Action a = iterator.next().action;
+            Action a1 = iterator.peek(0).action;
+            Action a2 = iterator.peek(1).action;
+            if (a instanceof ActionPush && a1 instanceof ActionPush && a2 instanceof ActionDefineLocal) {
+                ActionPush pushName = (ActionPush) a;
+                ActionPush pushValue = (ActionPush) a1;
+                if (pushName.values.size() == 1 && pushValue.values.size() == 1) {
+                    String strName = EcmaScript.toString(pushName.values.get(0), pushName.constantPool);
+                    if (isFakeName(strName) && pushValues.get(strName) == 1) {
+                        iterator.remove(); // Push name
+                        iterator.next();
+                        iterator.remove(); // Push value
+                        iterator.next();
+                        iterator.remove(); // DefineLocal
+                        ret = true;
+                    }
+                }
+            }
+        }
+
+        return ret;
+    }
+
+    private Map<String, Integer> getPushValues(FastActionList actions) {
+        Map<String, Integer> ret = new HashMap<>();
+        for (ActionItem actionItem : actions) {
+            Action action = actionItem.action;
+            if (action instanceof ActionPush) {
+                ActionPush push = (ActionPush) action;
+                for (int i = 0; i < push.values.size(); i++) {
+                    String str = EcmaScript.toString(push.values.get(i), push.constantPool);
+                    Integer cnt = ret.get(str);
+                    cnt = cnt == null ? 1 : cnt + 1;
+                    ret.put(str, cnt);
+                }
+            }
+        }
+
         return ret;
     }
 
