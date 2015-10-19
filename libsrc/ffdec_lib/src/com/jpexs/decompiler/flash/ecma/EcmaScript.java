@@ -16,6 +16,9 @@
  */
 package com.jpexs.decompiler.flash.ecma;
 
+import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
+import java.util.List;
+
 /**
  *
  * @author JPEXS
@@ -293,6 +296,16 @@ public class EcmaScript {
     }
 
     public static String toString(Object o) {
+        return toString(o, false);
+    }
+
+    public static String toString(Object o, List<String> constantPool) {
+        if (o instanceof ConstantIndex) {
+            int index = ((ConstantIndex) o).index;
+            if (constantPool != null && index < constantPool.size()) {
+                return constantPool.get(index);
+            }
+        }
         return toString(o, false);
     }
 
