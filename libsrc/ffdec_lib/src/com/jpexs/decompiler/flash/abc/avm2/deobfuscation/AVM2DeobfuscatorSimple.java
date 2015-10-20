@@ -29,8 +29,16 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.IfTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.AddIIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.AddIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.DecrementIIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.DecrementIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.DivideIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.IncrementIIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.IncrementIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.ModuloIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.MultiplyIIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.MultiplyIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.NegateIIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.NegateIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.NotIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.SubtractIIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.SubtractIns;
@@ -330,6 +338,8 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
                     || def instanceof SubtractIIns
                     || def instanceof ModuloIns
                     || def instanceof MultiplyIns
+                    || def instanceof MultiplyIIns
+                    || def instanceof DivideIns
                     || def instanceof BitAndIns
                     || def instanceof BitXorIns
                     || def instanceof BitOrIns
@@ -338,6 +348,12 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
                     || def instanceof URShiftIns
                     || def instanceof EqualsIns
                     || def instanceof NotIns
+                    || def instanceof NegateIns
+                    || def instanceof NegateIIns
+                    || def instanceof IncrementIns
+                    || def instanceof IncrementIIns
+                    || def instanceof DecrementIns
+                    || def instanceof DecrementIIns
                     || def instanceof IfTypeIns
                     || def instanceof JumpIns
                     || def instanceof EqualsIns
@@ -432,6 +448,10 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
                 break;
             }
         }
+    }
+
+    @Override
+    public void actionTreeCreated(List<GraphTargetItem> tree, SWF swf) {
     }
 
     @Override
