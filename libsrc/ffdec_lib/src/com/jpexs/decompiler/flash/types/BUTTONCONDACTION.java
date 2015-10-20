@@ -214,6 +214,7 @@ public class BUTTONCONDACTION implements ASMSource, Serializable {
     @Override
     public void setActionBytes(byte[] actionBytes) {
         this.actionBytes = new ByteArrayRange(actionBytes);
+        SWF.uncache(this);
     }
 
     @Override

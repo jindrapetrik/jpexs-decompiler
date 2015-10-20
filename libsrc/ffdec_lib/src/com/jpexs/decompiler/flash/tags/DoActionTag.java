@@ -147,6 +147,7 @@ public class DoActionTag extends Tag implements ASMSource {
     @Override
     public void setActionBytes(byte[] actionBytes) {
         this.actionBytes = new ByteArrayRange(actionBytes);
+        SWF.uncache(this);
     }
 
     @Override

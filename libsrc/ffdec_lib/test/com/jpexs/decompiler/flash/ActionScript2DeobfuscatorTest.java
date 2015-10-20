@@ -58,7 +58,7 @@ public class ActionScript2DeobfuscatorTest extends ActionStript2TestBase {
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
         List<Action> actions = par.actionsFromString(str);
         byte[] hex = Action.actionsToBytes(actions, true, SWF.DEFAULT_VERSION);
-        ActionList list = ActionListReader.readActionListTimeout(new ArrayList<>(), new SWFInputStream(swf, hex), SWF.DEFAULT_VERSION, 0, hex.length, "");
+        ActionList list = ActionListReader.readActionListTimeout(new ArrayList<>(), new SWFInputStream(swf, hex), SWF.DEFAULT_VERSION, 0, hex.length, "", 1);
         Action.actionsToSource(null, list, "", writer);
         return writer.toString();
     }
