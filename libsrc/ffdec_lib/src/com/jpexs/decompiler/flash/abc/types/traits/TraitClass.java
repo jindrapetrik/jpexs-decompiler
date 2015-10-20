@@ -474,8 +474,6 @@ public class TraitClass extends Trait implements TraitWithSlot {
                 writer.startBlock();
                 abc.bodies.get(bodyIndex).toString(path +/*packageName +*/ "/" + instanceInfoName + ".staticinitializer", exportMode, abc, this, abc.constants, abc.method_info, writer, fullyQualifiedNames);
                 writer.endBlock();
-            } else {
-                writer.append(" ");
             }
             writer.endMethod();
             writer.endTrait();
