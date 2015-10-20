@@ -1920,7 +1920,7 @@ public class AVM2Code implements Cloneable {
                                             ((TraitSlotConst) t).assignmentMethod = methodIndex;
                                             list.remove(i);
                                             i--;
-                                            continue loopi;
+                                            continue;
                                         }
                                     }
                                     break;
