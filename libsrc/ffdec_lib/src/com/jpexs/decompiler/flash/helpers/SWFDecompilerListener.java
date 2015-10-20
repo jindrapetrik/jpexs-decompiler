@@ -20,6 +20,8 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.action.ActionList;
+import com.jpexs.decompiler.graph.GraphTargetItem;
+import java.util.List;
 
 /**
  *
@@ -32,6 +34,8 @@ public interface SWFDecompilerListener {
     void swfParsed(SWF swf);
 
     void actionListParsed(ActionList actions, SWF swf) throws InterruptedException;
+
+    void actionTreeCreated(List<GraphTargetItem> tree, SWF swf) throws InterruptedException;
 
     void abcParsed(ABC abc, SWF swf);
 

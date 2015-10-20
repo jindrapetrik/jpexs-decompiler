@@ -83,7 +83,7 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
 
     @Override
     public void actionListParsed(ActionList actions, SWF swf) throws InterruptedException {
-        //removeGetTimes(actions);
+        removeGetTimes(actions);
         removeObfuscationIfs(actions);
     }
 
@@ -396,6 +396,10 @@ public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
                 result.stack.addAll(stack);
             }
         }
+    }
+
+    @Override
+    public void actionTreeCreated(List<GraphTargetItem> tree, SWF swf) {
     }
 
     @Override

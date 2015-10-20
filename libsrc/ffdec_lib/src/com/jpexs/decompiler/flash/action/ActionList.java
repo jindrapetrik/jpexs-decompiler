@@ -44,6 +44,8 @@ import java.util.logging.Logger;
  */
 public class ActionList extends ArrayList<Action> {
 
+    public int deobfuscationMode;
+
     public ActionList() {
     }
 

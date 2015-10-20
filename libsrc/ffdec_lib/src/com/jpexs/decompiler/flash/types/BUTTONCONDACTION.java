@@ -21,7 +21,6 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
-import com.jpexs.decompiler.flash.action.ActionListReader;
 import com.jpexs.decompiler.flash.action.ConstantPoolTooBigException;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -36,8 +35,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Actions to execute at particular button events
@@ -50,22 +47,11 @@ public class BUTTONCONDACTION implements ASMSource, Serializable {
 
     private Tag tag;
 
-    @Override
-    public SWF getSwf() {
-        return swf;
-    }
-
     // Constructor for Generic tag editor.
     public BUTTONCONDACTION() {
         swf = null;
         tag = null;
         actionBytes = new ByteArrayRange(SWFInputStream.BYTE_ARRAY_EMPTY);
-    }
-
-    @Override
-    public void setSourceTag(Tag t) {
-        this.tag = t;
-        this.swf = t.getSwf();
     }
 
     public BUTTONCONDACTION(SWF swf, SWFInputStream sis, Tag tag) throws IOException {
@@ -84,6 +70,11 @@ public class BUTTONCONDACTION implements ASMSource, Serializable {
         condKeyPress = (int) sis.readUB(7, "condKeyPress");
         condOverDownToIdle = sis.readUB(1, "condOverDownToIdle") == 1;
         actionBytes = sis.readByteRangeEx(condActionSize <= 0 ? sis.available() : condActionSize - 4, "actionBytes");
+    }
+
+    @Override
+    public SWF getSwf() {
+        return swf;
     }
 
     /**
@@ -207,22 +198,7 @@ public class BUTTONCONDACTION implements ASMSource, Serializable {
      */
     @Override
     public ActionList getActions() throws InterruptedException {
-        try {
-            int prevLength = actionBytes.getPos();
-            SWFInputStream rri = new SWFInputStream(swf, actionBytes.getArray());
-            if (prevLength != 0) {
-                rri.seek(prevLength);
-            }
-
-            ActionList list = ActionListReader.readActionListTimeout(listeners, rri, swf.version, prevLength, prevLength + actionBytes.getLength(), toString()/*FIXME?*/);
-            return list;
-
-        } catch (InterruptedException ex) {
-            throw ex;
-        } catch (Exception ex) {
-            Logger.getLogger(BUTTONCONDACTION.class.getName()).log(Level.SEVERE, null, ex);
-            return new ActionList();
-        }
+        return SWF.getCachedActionList(this, listeners);
     }
 
     @Override
@@ -231,8 +207,8 @@ public class BUTTONCONDACTION implements ASMSource, Serializable {
     }
 
     @Override
-    public byte[] getActionBytes() {
-        return actionBytes.getRangeData();
+    public ByteArrayRange getActionBytes() {
+        return actionBytes;
     }
 
     @Override
@@ -348,5 +324,11 @@ public class BUTTONCONDACTION implements ASMSource, Serializable {
     @Override
     public Tag getSourceTag() {
         return tag;
+    }
+
+    @Override
+    public void setSourceTag(Tag t) {
+        this.tag = t;
+        this.swf = t.getSwf();
     }
 }

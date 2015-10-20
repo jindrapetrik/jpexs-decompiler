@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.action;
 
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWFInputStream;
-import com.jpexs.decompiler.flash.action.deobfuscation.ActionDeobfuscator;
 import com.jpexs.decompiler.flash.action.deobfuscation.ActionDeobfuscatorSimpleFast;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
@@ -91,9 +90,8 @@ public class ActionListReader {
      * @throws java.lang.InterruptedException
      * @throws java.util.concurrent.TimeoutException
      */
-    public static ActionList readActionListTimeout(final List<DisassemblyListener> listeners, final SWFInputStream sis, final int version, final int ip, final int endIp, final String path) throws IOException, InterruptedException, TimeoutException {
+    public static ActionList readActionListTimeout(final List<DisassemblyListener> listeners, final SWFInputStream sis, final int version, final int ip, final int endIp, final String path, final int deobfuscationMode) throws IOException, InterruptedException, TimeoutException {
         try {
-            final int deobfuscationMode = Configuration.autoDeobfuscate.get() ? (Configuration.deobfuscationOldMode.get() ? 0 : 1) : -1;
             ActionList actions = CancellableWorker.call(new Callable<ActionList>() {
 
                 @Override
@@ -182,12 +180,6 @@ public class ActionListReader {
             try {
                 try (Statistics s = new Statistics("ActionDeobfuscatorSimpleFast")) {
                     new ActionDeobfuscatorSimpleFast().actionListParsed(actions, sis.getSwf());
-                }
-                /*try (Statistics s = new Statistics("ActionDeobfuscatorSimple")) {
-                 new ActionDeobfuscatorSimple().actionListParsed(actions, sis.getSwf());
-                 }*/
-                try (Statistics s = new Statistics("ActionDeobfuscator")) {
-                    new ActionDeobfuscator().actionListParsed(actions, sis.getSwf());
                 }
             } catch (ThreadDeath | InterruptedException ex) {
                 throw ex;
@@ -881,7 +873,7 @@ public class ActionListReader {
         return entryAction;
     }
 
-    public static void fixConstantPools(List<DisassemblyListener> listeners, ActionList actions) {
+    public static boolean fixConstantPools(List<DisassemblyListener> listeners, ActionList actions) {
         Action lastAction = actions.get(actions.size() - 1);
         int endIp = (int) lastAction.getAddress();
         List<Action> actionMap = new ArrayList<>(endIp);
@@ -894,23 +886,26 @@ public class ActionListReader {
 
         try {
             int startIp = (int) actions.get(0).getAddress();
-            fixConstantPools(listeners, new ConstantPool(), actionMap, new TreeMap<>(), startIp, startIp, endIp, null, true, new ArrayList<>());
+            return fixConstantPools(listeners, new ConstantPool(), actionMap, new TreeMap<>(), startIp, startIp, endIp, null, true, new ArrayList<>());
         } catch (IOException ex) {
             // ignore
         }
+
+        return false;
     }
 
-    private static void fixConstantPools(List<DisassemblyListener> listeners, ConstantPool cpool,
+    private static boolean fixConstantPools(List<DisassemblyListener> listeners, ConstantPool cpool,
             List<Action> actions, Map<Integer, Action> actionMap,
             int ip, int startIp, int endIp, String path, boolean indeterminate, List<Integer> visitedContainers) throws IOException {
 
         if (visitedContainers.contains(ip)) {
-            return;
+            return false;
         }
         visitedContainers.add(ip);
 
         Queue<Integer> jumpQueue = new LinkedList<>();
         jumpQueue.add(ip);
+        boolean ret = false;
         while (!jumpQueue.isEmpty()) {
             ip = jumpQueue.remove();
             if (ip < startIp) {
@@ -949,10 +944,19 @@ public class ActionListReader {
                     }
                 }
 
-                a.setAddress(ip);
+                if (a.getAddress() != ip) {
+                    a.setAddress(ip);
+                    ret = true;
+                }
 
                 if (a instanceof ActionPush && cpool != null) {
-                    ((ActionPush) a).constantPool = cpool.constants;
+                    ActionPush push = (ActionPush) a;
+                    if (push.constantPool != cpool.constants) {
+                        push.constantPool = cpool.constants.isEmpty() ? null : cpool.constants;
+                        if (push.constantPool != null) {
+                            ret = true;
+                        }
+                    }
                 } else if (a instanceof ActionConstantPool) {
                     cpool = new ConstantPool(((ActionConstantPool) a).constantPool);
                 } else if (a instanceof ActionIf) {
@@ -976,7 +980,7 @@ public class ActionListReader {
                         if (size != 0) {
                             int ip2 = ip + actionLengthWithHeader;
                             int endIp2 = ip + actionLengthWithHeader + (int) size;
-                            fixConstantPools(listeners, cpool, actions, actionMap, ip2, startIp, endIp2, newPath, indeterminate, visitedContainers);
+                            ret |= fixConstantPools(listeners, cpool, actions, actionMap, ip2, startIp, endIp2, newPath, indeterminate, visitedContainers);
                             actionLengthWithHeader += size;
                         }
                     }
@@ -989,6 +993,8 @@ public class ActionListReader {
                 }
             }
         }
+
+        return ret;
     }
 
     private static void deobfustaceActionListAtPosRecursiveOld(List<DisassemblyListener> listeners, List<GraphTargetItem> output, HashMap<Long, List<GraphSourceItemContainer>> containers, ActionLocalData localData, TranslateStack stack, ConstantPool cpool, List<Action> actions, int ip, List<Action> ret, int startIp, int endip, String path, Map<Integer, Integer> visited, boolean indeterminate, Map<Integer, HashMap<String, GraphTargetItem>> decisionStates, int version, int recursionLevel, int maxRecursionLevel) throws IOException, InterruptedException {

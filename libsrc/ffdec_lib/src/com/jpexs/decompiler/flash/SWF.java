@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraphSource;
 import com.jpexs.decompiler.flash.action.ActionList;
+import com.jpexs.decompiler.flash.action.ActionListReader;
 import com.jpexs.decompiler.flash.action.ActionLocalData;
 import com.jpexs.decompiler.flash.action.CachedScript;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
@@ -132,6 +133,7 @@ import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.LocalData;
+import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.NulStream;
@@ -307,6 +309,9 @@ public final class SWF implements SWFContainerItem, Timelined {
     private final Cache<SoundTag, byte[]> soundCache = Cache.getInstance(false, false, "sound");
 
     @Internal
+    private final Cache<ASMSource, ActionList> as2PcodeCache = Cache.getInstance(true, true, "as2pcode");
+
+    @Internal
     private final Cache<ASMSource, CachedScript> as2Cache = Cache.getInstance(true, false, "as2");
 
     @Internal
@@ -358,6 +363,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             swfList.swfs.clear();
         }
 
+        as2PcodeCache.clear();
         as2Cache.clear();
         as3Cache.clear();
         frameCache.clear();
@@ -2265,6 +2271,7 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     public void clearScriptCache() {
+        as2PcodeCache.clear();
         as2Cache.clear();
         as3Cache.clear();
         IdentifiersDeobfuscation.clearCache();
@@ -2283,7 +2290,9 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     public static void uncache(ASMSource src) {
         if (src != null) {
-            src.getSwf().as2Cache.remove(src);
+            SWF swf = src.getSwf();
+            swf.as2Cache.remove(src);
+            swf.as2PcodeCache.remove(src);
         }
     }
 
@@ -2299,6 +2308,42 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     public static boolean isCached(ScriptPack pack) {
         return pack.getSwf().as3Cache.contains(pack);
+    }
+
+    public static ActionList getCachedActionList(ASMSource src, final List<DisassemblyListener> listeners) throws InterruptedException {
+        synchronized (src) {
+            SWF swf = src.getSwf();
+            int deobfuscationMode = Configuration.autoDeobfuscate.get() ? (Configuration.deobfuscationOldMode.get() ? 0 : 1) : -1;
+            if (swf != null && swf.as2PcodeCache.contains(src)) {
+                ActionList result = swf.as2PcodeCache.get(src);
+                if (result.deobfuscationMode == deobfuscationMode) {
+                    return result;
+                }
+            }
+
+            try {
+                ByteArrayRange actionBytes = src.getActionBytes();
+                int prevLength = actionBytes.getPos();
+                SWFInputStream rri = new SWFInputStream(swf, actionBytes.getArray());
+                if (prevLength != 0) {
+                    rri.seek(prevLength);
+                }
+
+                int version = swf == null ? SWF.DEFAULT_VERSION : swf.version;
+                ActionList list = ActionListReader.readActionListTimeout(listeners, rri, version, prevLength, prevLength + actionBytes.getLength(), src.toString()/*FIXME?*/, deobfuscationMode);
+                list.deobfuscationMode = deobfuscationMode;
+                if (swf != null) {
+                    swf.as2PcodeCache.put(src, list);
+                }
+
+                return list;
+            } catch (InterruptedException ex) {
+                throw ex;
+            } catch (Exception ex) {
+                Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, null, ex);
+                return new ActionList();
+            }
+        }
     }
 
     public static CachedScript getCached(ASMSource src, ActionList actions) throws InterruptedException {

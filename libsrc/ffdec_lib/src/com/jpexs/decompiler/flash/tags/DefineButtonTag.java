@@ -22,7 +22,6 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
-import com.jpexs.decompiler.flash.action.ActionListReader;
 import com.jpexs.decompiler.flash.action.ConstantPoolTooBigException;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -47,8 +46,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Defines a button character
@@ -180,21 +177,7 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
      */
     @Override
     public ActionList getActions() throws InterruptedException {
-        try {
-            int prevLength = actionBytes.getPos();
-            SWFInputStream rri = new SWFInputStream(swf, actionBytes.getArray());
-            if (prevLength != 0) {
-                rri.seek(prevLength);
-            }
-
-            ActionList list = ActionListReader.readActionListTimeout(listeners, rri, getVersion(), prevLength, prevLength + actionBytes.getLength(), toString()/*FIXME?*/);
-            return list;
-        } catch (InterruptedException ex) {
-            throw ex;
-        } catch (Exception ex) {
-            Logger.getLogger(DefineButtonTag.class.getName()).log(Level.SEVERE, null, ex);
-            return new ActionList();
-        }
+        return SWF.getCachedActionList(this, listeners);
     }
 
     @Override
@@ -203,8 +186,8 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
     }
 
     @Override
-    public byte[] getActionBytes() {
-        return actionBytes.getRangeData();
+    public ByteArrayRange getActionBytes() {
+        return actionBytes;
     }
 
     @Override

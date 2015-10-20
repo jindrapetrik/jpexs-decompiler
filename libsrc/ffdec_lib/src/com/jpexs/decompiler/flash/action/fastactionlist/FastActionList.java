@@ -409,6 +409,22 @@ public class FastActionList implements Collection<ActionItem> {
         } while (item != firstItem);
     }
 
+    public void removeIncludedActions() {
+        ActionItem item = firstItem;
+        if (item == null) {
+            return;
+        }
+
+        do {
+            if (!item.excluded) {
+                item = removeItem(item);
+                continue;
+            }
+
+            item = item.next;
+        } while (item != firstItem);
+    }
+
     public int getUnreachableActionCount(ActionItem jump, ActionItem jumpTarget) {
         ActionItem item = firstItem;
         if (item == null) {
@@ -442,6 +458,18 @@ public class FastActionList implements Collection<ActionItem> {
         } while (item != firstItem);
     }
 
+    public void setExcludedFlags(boolean value) {
+        ActionItem item = firstItem;
+        if (item == null) {
+            return;
+        }
+
+        do {
+            item.excluded = value;
+            item = item.next;
+        } while (item != firstItem);
+    }
+
     private void updateReachableFlags(ActionItem jump, ActionItem jumpTarget) {
         if (firstItem == null) {
             return;
@@ -453,9 +481,7 @@ public class FastActionList implements Collection<ActionItem> {
         boolean modified = true;
         while (modified) {
             modified = false;
-            FastActionListIterator iterator = iterator();
-            while (iterator.hasNext()) {
-                ActionItem item = iterator.next();
+            for (ActionItem item : this) {
                 Action action = item.action;
                 if (item.reachable == 1) {
                     item.reachable = 2;

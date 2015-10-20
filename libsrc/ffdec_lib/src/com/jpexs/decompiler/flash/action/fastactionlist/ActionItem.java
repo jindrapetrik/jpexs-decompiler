@@ -44,6 +44,8 @@ public class ActionItem {
     // 1 means reachable, 2 means reachable and processed
     int reachable;
 
+    public boolean excluded;
+
     public ActionItem(Action action) {
         this.action = action;
     }
@@ -142,5 +144,9 @@ public class ActionItem {
         }
 
         return lastActionOf;
+    }
+
+    public boolean isExcluded() {
+        return excluded;
     }
 }

@@ -2194,8 +2194,8 @@ public class Graph {
                             exprList.add(expr);
                             checkContinueAtTheEnd(commands, currentLoop);
                             ret.add(index, li = new DoWhileItem(null, currentLoop, commands, exprList));
-
                         }
+
                         loopTypeFound = true;
                     }
                 }
@@ -2263,7 +2263,6 @@ public class Graph {
         }
 
         return ret;
-
     }
 
     protected void checkGraph(List<GraphPart> allBlocks) {

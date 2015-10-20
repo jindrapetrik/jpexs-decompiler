@@ -347,7 +347,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
             case HEX:
                 if (srcHexOnly == null) {
                     HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
-                    Helper.byteArrayToHexWithHeader(writer, src.getActionBytes());
+                    Helper.byteArrayToHexWithHeader(writer, src.getActionBytes().getRangeData());
                     srcHexOnly = new HighlightedText(writer);
                 }
 

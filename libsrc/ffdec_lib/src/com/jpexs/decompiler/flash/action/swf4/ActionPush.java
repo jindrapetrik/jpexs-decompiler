@@ -262,7 +262,7 @@ public class ActionPush extends Action {
                 case ASMParsedSymbol.TYPE_STRING:
                     count++;
                     if (constantPool.contains((String) symb.value)) {
-                        values.add(new ConstantIndex(constantPool.indexOf(symb.value), constantPool));
+                        values.add(new ConstantIndex(constantPool.indexOf(symb.value)));
                     } else {
                         values.add(symb.value);
                     }
@@ -317,15 +317,15 @@ public class ActionPush extends Action {
 
     public String toStringNoQ(int i) {
         String ret;
-        if (values.get(i) instanceof ConstantIndex) {
-            ((ConstantIndex) values.get(i)).constantPool = constantPool;
-            ret = ((ConstantIndex) values.get(i)).toStringNoQ();
-        } else if (values.get(i) instanceof String) {
-            ret = (String) values.get(i);
-        } else if (values.get(i) instanceof RegisterNumber) {
-            ret = ((RegisterNumber) values.get(i)).toStringNoName();
+        Object value = values.get(i);
+        if (value instanceof ConstantIndex) {
+            ret = ((ConstantIndex) value).toStringNoQ(constantPool);
+        } else if (value instanceof String) {
+            ret = (String) value;
+        } else if (value instanceof RegisterNumber) {
+            ret = ((RegisterNumber) value).toStringNoName();
         } else {
-            ret = values.get(i).toString();
+            ret = value.toString();
         }
         return ret;
     }
@@ -334,8 +334,7 @@ public class ActionPush extends Action {
         String ret;
         Object value = values.get(i);
         if (value instanceof ConstantIndex) {
-            ((ConstantIndex) value).constantPool = constantPool;
-            ret = ((ConstantIndex) value).toString();
+            ret = ((ConstantIndex) value).toString(constantPool);
         } else if (value instanceof String) {
             ret = "\"" + Helper.escapeActionScriptString((String) value) + "\"";
         } else if (value instanceof RegisterNumber) {
