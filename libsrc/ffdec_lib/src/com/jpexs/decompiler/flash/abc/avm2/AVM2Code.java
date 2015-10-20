@@ -1879,7 +1879,7 @@ public class AVM2Code implements Cloneable {
          }*/
     }
 
-    public List<GraphTargetItem> toGraphTargetItems(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, AVM2ConstantPool constants, List<MethodInfo> method_info, MethodBody body, HashMap<Integer, String> localRegNames, ScopeStack scopeStack, boolean isStaticInitializer, List<DottedChain> fullyQualifiedNames, Traits initTraits, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) throws InterruptedException {
+    public List<GraphTargetItem> toGraphTargetItems(String path, int methodIndex, boolean isStatic, int scriptIndex, int classIndex, ABC abc, AVM2ConstantPool constants, List<MethodInfo> method_info, MethodBody body, HashMap<Integer, String> localRegNames, ScopeStack scopeStack, int initializerType, List<DottedChain> fullyQualifiedNames, List<Traits> initTraits, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) throws InterruptedException {
         initToSource();
         List<GraphTargetItem> list;
         HashMap<Integer, GraphTargetItem> localRegs = new HashMap<>();
@@ -1893,6 +1893,7 @@ public class AVM2Code implements Cloneable {
         list = AVM2Graph.translateViaGraph(path, this, abc, body, isStatic, scriptIndex, classIndex, localRegs, scopeStack, localRegNames, fullyQualifiedNames, staticOperation, localRegAssigmentIps, refs);
 
         if (initTraits != null) {
+            loopi:
             for (int i = 0; i < list.size(); i++) {
                 GraphTargetItem ti = list.get(i);
                 if ((ti instanceof InitPropertyAVM2Item) || (ti instanceof SetPropertyAVM2Item)) {
@@ -1907,20 +1908,23 @@ public class AVM2Code implements Cloneable {
                         value = ((SetPropertyAVM2Item) ti).value;
                     }
                     Multiname m = abc.constants.getMultiname(multinameIndex);
-                    for (Trait t : initTraits.traits) {
-                        Multiname tm = abc.constants.getMultiname(t.name_index);
-
-                        if (tm != null && tm.equals(m)) {
-                            if ((t instanceof TraitSlotConst)) {
-                                if (((TraitSlotConst) t).isConst() || isStaticInitializer) {
-                                    if ((((TraitSlotConst) t).assignedValue) == null) {
-                                        ((TraitSlotConst) t).assignedValue = value;
-                                        list.remove(i);
-                                        i--;
-                                        continue;
+                    for (Traits ts : initTraits) {
+                        for (Trait t : ts.traits) {
+                            Multiname tm = abc.constants.getMultiname(t.name_index);
+                            if (tm != null && tm.equals(m)) {
+                                if ((t instanceof TraitSlotConst)) {
+                                    if (((TraitSlotConst) t).isConst() || initializerType == GraphTextWriter.TRAIT_CLASS_INITIALIZER || initializerType == GraphTextWriter.TRAIT_SCRIPT_INITIALIZER) {
+                                        if ((((TraitSlotConst) t).assignedValue) == null) {
+                                            ((TraitSlotConst) t).assignedValue = value;
+                                            ((TraitSlotConst) t).assignmentInitializer = initializerType;
+                                            ((TraitSlotConst) t).assignmentMethod = methodIndex;
+                                            list.remove(i);
+                                            i--;
+                                            continue loopi;
+                                        }
                                     }
+                                    break;
                                 }
-                                break;
                             }
                         }
                     }
@@ -1930,7 +1934,7 @@ public class AVM2Code implements Cloneable {
                 }
             }
         }
-        if (isStaticInitializer) {
+        if (initializerType == GraphTextWriter.TRAIT_CLASS_INITIALIZER || initializerType == GraphTextWriter.TRAIT_SCRIPT_INITIALIZER) {
             List<GraphTargetItem> newList = new ArrayList<>();
             for (GraphTargetItem ti : list) {
                 if (!(ti instanceof ReturnVoidAVM2Item)) {

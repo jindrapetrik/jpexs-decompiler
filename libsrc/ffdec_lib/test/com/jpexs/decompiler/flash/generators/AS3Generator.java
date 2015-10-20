@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
+import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
@@ -33,6 +34,7 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -66,7 +68,9 @@ public class AS3Generator {
                     s.append("\", ");
                     HighlightedTextWriter src = new HighlightedTextWriter(new CodeFormatting(), false);
                     MethodBody b = abc.findBody(((TraitMethodGetterSetter) t).method_info);
-                    b.convert("", ScriptExportMode.AS, false, -1/*FIX?*/, classId, abc, null, abc.constants, abc.method_info, new ScopeStack(), false, new NulWriter(), new ArrayList<>(), abc.instance_info.get(classId).instance_traits, true);
+                    List<Traits> ts = new ArrayList<>();
+                    ts.add(abc.instance_info.get(classId).instance_traits);
+                    b.convert("", ScriptExportMode.AS, false, -1/*FIX?*/, -1/*FIX?*/, classId, abc, null, abc.constants, abc.method_info, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), ts, true);
                     b.toString("", ScriptExportMode.AS, abc, null, abc.constants, abc.method_info, src, new ArrayList<>());
                     String[] srcs = src.toString().split("[\r\n]+");
                     for (int i = 0; i < srcs.length; i++) {

@@ -490,6 +490,10 @@ public class Configuration {
     @ConfigurationCategory("script")
     public static final ConfigurationItem<Boolean> smartNumberFormatting = null;
 
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("script")
+    public static final ConfigurationItem<Boolean> enableScriptInitializerDisplay = null;
+
     private enum OSId {
 
         WINDOWS, OSX, UNIX

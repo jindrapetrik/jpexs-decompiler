@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
@@ -30,6 +31,7 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
@@ -75,7 +77,9 @@ public class ActionScript3Test extends ActionScriptTestBase {
         assertTrue(bodyIndex > -1);
         HighlightedTextWriter writer = null;
         try {
-            abc.bodies.get(bodyIndex).convert(methodName, ScriptExportMode.AS, isStatic, -1/*FIX?*/, clsIndex, abc, null, abc.constants, abc.method_info, new ScopeStack(), false, new NulWriter(), new ArrayList<>(), abc.instance_info.get(clsIndex).instance_traits, true);
+            List<Traits> ts = new ArrayList<>();
+            ts.add(abc.instance_info.get(clsIndex).instance_traits);
+            abc.bodies.get(bodyIndex).convert(methodName, ScriptExportMode.AS, isStatic, -1/*FIX?*/, -1/*FIX?*/, clsIndex, abc, null, abc.constants, abc.method_info, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), ts, true);
             writer = new HighlightedTextWriter(new CodeFormatting(), false);
             abc.bodies.get(bodyIndex).toString(methodName, ScriptExportMode.AS, abc, null, abc.constants, abc.method_info, writer, new ArrayList<>());
         } catch (InterruptedException ex) {

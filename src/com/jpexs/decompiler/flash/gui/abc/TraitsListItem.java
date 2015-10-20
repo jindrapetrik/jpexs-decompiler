@@ -51,6 +51,8 @@ public class TraitsListItem {
 
     public String STR_CLASS_INITIALIZER = AppStrings.translate("abc.traitslist.classinitializer");
 
+    public String STR_SCRIPT_INITIALIZER = AppStrings.translate("abc.traitslist.scriptinitializer");
+
     public TraitsListItem(Type type, int index, boolean isStatic, ABC abc, int classIndex, int scriptIndex) {
         this.type = type;
         this.index = index;
@@ -63,10 +65,16 @@ public class TraitsListItem {
     public int getGlobalTraitId() {
         if (type == Type.INITIALIZER) {
             if (!isStatic) {
-                return abc.class_info.get(classIndex).static_traits.traits.size() + abc.instance_info.get(classIndex).instance_traits.traits.size();
+                return -1;
+                //return abc.class_info.get(classIndex).static_traits.traits.size() + abc.instance_info.get(classIndex).instance_traits.traits.size();
             } else {
-                return abc.class_info.get(classIndex).static_traits.traits.size() + abc.instance_info.get(classIndex).instance_traits.traits.size() + 1;
+                return -2;
+                //return abc.class_info.get(classIndex).static_traits.traits.size() + abc.instance_info.get(classIndex).instance_traits.traits.size() + 1;
             }
+        }
+        if (type == Type.SCRIPT_INITIALIZER) {
+            //return abc.class_info.get(classIndex).static_traits.traits.size() + abc.instance_info.get(classIndex).instance_traits.traits.size() + 2;
+            return -3;
         }
         if (isStatic) {
             return index;
@@ -76,14 +84,21 @@ public class TraitsListItem {
     }
 
     public String toStringName() {
-        if ((type != Type.INITIALIZER) && isStatic) {
+
+        if (type == Type.INITIALIZER) {
+            if (!isStatic) {
+                return "__" + STR_INSTANCE_INITIALIZER;
+            } else {
+                return "__" + STR_CLASS_INITIALIZER;
+            }
+        }
+        if (type == Type.SCRIPT_INITIALIZER) {
+            return "__" + STR_SCRIPT_INITIALIZER;
+        }
+        if (isStatic) {
             return abc.class_info.get(classIndex).static_traits.traits.get(index).getName(abc).getName(abc.constants, null, false);
-        } else if ((type != Type.INITIALIZER) && (!isStatic)) {
-            return abc.instance_info.get(classIndex).instance_traits.traits.get(index).getName(abc).getName(abc.constants, null, false);
-        } else if (!isStatic) {
-            return "__" + STR_INSTANCE_INITIALIZER;
         } else {
-            return "__" + STR_CLASS_INITIALIZER;
+            return abc.instance_info.get(classIndex).instance_traits.traits.get(index).getName(abc).getName(abc.constants, null, false);
         }
     }
 
@@ -91,20 +106,24 @@ public class TraitsListItem {
     public String toString() {
         String s = "";
         try {
-            if ((type != Type.INITIALIZER) && isStatic) {
+            if (type == Type.SCRIPT_INITIALIZER) {
+                s = STR_SCRIPT_INITIALIZER;
+            } else if (type == Type.INITIALIZER) {
+                if (!isStatic) {
+                    s = STR_INSTANCE_INITIALIZER;
+                } else {
+                    s = STR_CLASS_INITIALIZER;
+                }
+            } else if (isStatic) {
                 abc.class_info.get(classIndex).static_traits.traits.get(index).convertHeader(null, "", abc, true, ScriptExportMode.AS, scriptIndex, classIndex, new NulWriter(), new ArrayList<>(), false);
                 HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
                 abc.class_info.get(classIndex).static_traits.traits.get(index).toStringHeader(null, "", abc, true, ScriptExportMode.AS, scriptIndex, classIndex, writer, new ArrayList<>(), false);
                 s = writer.toString();
-            } else if ((type != Type.INITIALIZER) && (!isStatic)) {
+            } else {
                 abc.instance_info.get(classIndex).instance_traits.traits.get(index).convertHeader(null, "", abc, false, ScriptExportMode.AS, scriptIndex, classIndex, new NulWriter(), new ArrayList<>(), false);
                 HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
                 abc.instance_info.get(classIndex).instance_traits.traits.get(index).toStringHeader(null, "", abc, false, ScriptExportMode.AS, scriptIndex, classIndex, writer, new ArrayList<>(), false);
                 s = writer.toString();
-            } else if (!isStatic) {
-                s = STR_INSTANCE_INITIALIZER;
-            } else {
-                s = STR_CLASS_INITIALIZER;
             }
         } catch (InterruptedException ex) {
             Logger.getLogger(TraitsListItem.class.getName()).log(Level.SEVERE, null, ex);
@@ -126,7 +145,8 @@ public class TraitsListItem {
         METHOD,
         VAR,
         CONST,
-        INITIALIZER;
+        INITIALIZER,
+        SCRIPT_INITIALIZER;
 
         public static Type getTypeForTrait(Trait t) {
             if (t instanceof TraitMethodGetterSetter) {

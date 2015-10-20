@@ -47,6 +47,9 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
     @Internal
     public GraphTargetItem assignedValue;
 
+    public int assignmentInitializer = 0;
+    public int assignmentMethod = 0;
+
     @Override
     public void delete(ABC abc, boolean d) {
         abc.constants.constant_multiname.get(name_index).deleted = d;
@@ -101,19 +104,15 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
 
     public void getValueStr(Trait parent, GraphTextWriter writer, ABC abc, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
         if (assignedValue != null) {
-            if (parent instanceof TraitClass) {
-                TraitClass tc = (TraitClass) parent;
-                int traitInitId = abc.class_info.get(tc.class_info).static_traits.traits.size()
-                        + abc.instance_info.get(tc.class_info).instance_traits.traits.size() + 1;
-                int initMethod = abc.class_info.get(tc.class_info).cinit_index;
-                writer.startTrait(traitInitId);
-                writer.startMethod(initMethod);
-                if (Configuration.showMethodBodyId.get()) {
-                    writer.appendNoHilight("// method body id: ");
-                    writer.appendNoHilight(abc.findBodyIndex(initMethod));
-                    writer.newLine();
-                }
+
+            writer.startTrait(assignmentInitializer);
+            writer.startMethod(assignmentMethod);
+            if (Configuration.showMethodBodyId.get()) {
+                writer.appendNoHilight("// method body id: ");
+                writer.appendNoHilight(abc.findBodyIndex(assignmentMethod));
+                writer.newLine();
             }
+
             assignedValue.toString(writer, LocalData.create(abc.constants, new HashMap<>(), fullyQualifiedNames));
             if (parent instanceof TraitClass) {
                 writer.endMethod();

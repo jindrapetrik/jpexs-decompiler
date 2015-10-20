@@ -49,14 +49,17 @@ public final class TraitsListModel implements ListModel<Object> {
 
     private void reset() {
         items = new ArrayList<>();
-        for (int t = 0; t < abc.class_info.get(classIndex).static_traits.traits.size(); t++) {
-            items.add(new TraitsListItem(TraitsListItem.Type.getTypeForTrait(abc.class_info.get(classIndex).static_traits.traits.get(t)), t, true, abc, classIndex, scriptIndex));
+        if (classIndex > -1) {
+            for (int t = 0; t < abc.class_info.get(classIndex).static_traits.traits.size(); t++) {
+                items.add(new TraitsListItem(TraitsListItem.Type.getTypeForTrait(abc.class_info.get(classIndex).static_traits.traits.get(t)), t, true, abc, classIndex, scriptIndex));
+            }
+            for (int t = 0; t < abc.instance_info.get(classIndex).instance_traits.traits.size(); t++) {
+                items.add(new TraitsListItem(TraitsListItem.Type.getTypeForTrait(abc.instance_info.get(classIndex).instance_traits.traits.get(t)), t, false, abc, classIndex, scriptIndex));
+            }
+            items.add(new TraitsListItem(TraitsListItem.Type.INITIALIZER, 0, false, abc, classIndex, scriptIndex));
+            items.add(new TraitsListItem(TraitsListItem.Type.INITIALIZER, 0, true, abc, classIndex, scriptIndex));
         }
-        for (int t = 0; t < abc.instance_info.get(classIndex).instance_traits.traits.size(); t++) {
-            items.add(new TraitsListItem(TraitsListItem.Type.getTypeForTrait(abc.instance_info.get(classIndex).instance_traits.traits.get(t)), t, false, abc, classIndex, scriptIndex));
-        }
-        items.add(new TraitsListItem(TraitsListItem.Type.INITIALIZER, 0, false, abc, classIndex, scriptIndex));
-        items.add(new TraitsListItem(TraitsListItem.Type.INITIALIZER, 0, true, abc, classIndex, scriptIndex));
+        items.add(new TraitsListItem(TraitsListItem.Type.SCRIPT_INITIALIZER, 0, true, abc, classIndex, scriptIndex));
     }
 
     public TraitsListModel(ABC abc, int classIndex, int scriptIndex, boolean sorted) {

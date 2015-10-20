@@ -770,11 +770,11 @@ public class ABC {
             return null;
         }
         List<Trait> staticTraits = class_info.get(classIndex).static_traits.traits;
-        if (traitId < staticTraits.size()) {
+        if (traitId >= 0 && traitId < staticTraits.size()) {
             return staticTraits.get(traitId);
         } else {
             List<Trait> instanceTraits = instance_info.get(classIndex).instance_traits.traits;
-            if (traitId < staticTraits.size() + instanceTraits.size()) {
+            if (traitId >= 0 && traitId < staticTraits.size() + instanceTraits.size()) {
                 traitId -= staticTraits.size();
                 return instanceTraits.get(traitId);
             } else {

@@ -37,6 +37,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.editor.LineMarkedEditorPane;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
@@ -516,8 +517,8 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
             Highlighting cm = Highlighting.searchPos(classHighlights, pos);
             if (cm != null) {
                 classIndex = (int) cm.getProperties().index;
-                displayClass(classIndex, script.scriptIndex);
             }
+            displayClass(classIndex, script.scriptIndex);
             Highlighting tm = Highlighting.searchPos(methodHighlights, pos);
             if (tm != null) {
                 String name = "";
@@ -594,13 +595,11 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     }
 
     public void gotoTrait(int traitId) {
-        if (traitId == -1) {
-            return;
-        }
+        boolean isScriptInit = traitId == GraphTextWriter.TRAIT_SCRIPT_INITIALIZER;
 
         Highlighting tc = Highlighting.searchIndex(classHighlights, classIndex);
-        if (tc != null) {
-            Highlighting th = Highlighting.searchIndex(traitHighlights, traitId, tc.startPos, tc.startPos + tc.len);
+        if (tc != null || isScriptInit) {
+            Highlighting th = Highlighting.searchIndex(traitHighlights, traitId, isScriptInit ? 0 : tc.startPos, isScriptInit ? -1 : tc.startPos + tc.len);
             int pos;
             if (th != null) {
                 if (th.len > 1) {

@@ -468,7 +468,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         if (bodyIndex != -1) {
             //Note: There must be trait/method highlight even if the initializer is empty to TraitList in GUI to work correctly
             //TODO: handle this better in GUI(?)
-            writer.startTrait(classInfo.static_traits.traits.size() + instanceInfo.instance_traits.traits.size() + 1);
+            writer.startTrait(GraphTextWriter.TRAIT_CLASS_INITIALIZER);
             writer.startMethod(classInfo.cinit_index);
             if (!classInitializerIsEmpty) {
                 writer.startBlock();
@@ -507,7 +507,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
             }
 
             writer.newLine();
-            writer.startTrait(classInfo.static_traits.traits.size() + instanceInfo.instance_traits.traits.size());
+            writer.startTrait(GraphTextWriter.TRAIT_INSTANCE_INITIALIZER);
             writer.startMethod(instanceInfo.iinit_index);
             writer.appendNoHilight(modifier);
             writer.appendNoHilight("function ");
@@ -547,30 +547,23 @@ public class TraitClass extends Trait implements TraitWithSlot {
         String instanceInfoName = instanceInfo.getName(abc.constants).getName(abc.constants, fullyQualifiedNames, false);
         ClassInfo classInfo = abc.class_info.get(class_info);
 
-        for (Trait trait : classInfo.static_traits.traits) {
-            if (trait instanceof TraitSlotConst) {
-                ((TraitSlotConst) trait).assignedValue = null;
-            }
-        }
-
-        for (Trait trait : instanceInfo.instance_traits.traits) {
-            if (trait instanceof TraitSlotConst) {
-                ((TraitSlotConst) trait).assignedValue = null;
-            }
-        }
-
+        //class initializer
         int bodyIndex = abc.findBodyIndex(classInfo.cinit_index);
         if (bodyIndex != -1) {
             writer.mark();
-            abc.bodies.get(bodyIndex).convert(path +/*packageName +*/ "/" + instanceInfoName + ".staticinitializer", exportMode, true, scriptIndex, class_info, abc, this, abc.constants, abc.method_info, new ScopeStack(), true, writer, fullyQualifiedNames, classInfo.static_traits, true);
+            List<Traits> ts = new ArrayList<>();
+            ts.add(classInfo.static_traits);
+            abc.bodies.get(bodyIndex).convert(path +/*packageName +*/ "/" + instanceInfoName + ".staticinitializer", exportMode, true, classInfo.cinit_index, scriptIndex, class_info, abc, this, abc.constants, abc.method_info, new ScopeStack(), GraphTextWriter.TRAIT_CLASS_INITIALIZER, writer, fullyQualifiedNames, ts, true);
             classInitializerIsEmpty = !writer.getMark();
         }
 
-        //constructor
+        //constructor - instance initializer
         if (!instanceInfo.isInterface()) {
             bodyIndex = abc.findBodyIndex(instanceInfo.iinit_index);
             if (bodyIndex != -1) {
-                abc.bodies.get(bodyIndex).convert(path +/*packageName +*/ "/" + instanceInfoName + ".initializer", exportMode, false, scriptIndex, class_info, abc, this, abc.constants, abc.method_info, new ScopeStack(), false, writer, fullyQualifiedNames, instanceInfo.instance_traits, true);
+                List<Traits> ts = new ArrayList<>();
+                ts.add(instanceInfo.instance_traits);
+                abc.bodies.get(bodyIndex).convert(path +/*packageName +*/ "/" + instanceInfoName + ".initializer", exportMode, false, instanceInfo.iinit_index, scriptIndex, class_info, abc, this, abc.constants, abc.method_info, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, writer, fullyQualifiedNames, ts, true);
             }
         }
 

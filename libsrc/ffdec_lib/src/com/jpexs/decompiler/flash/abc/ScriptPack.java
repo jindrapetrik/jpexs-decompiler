@@ -20,6 +20,9 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
+import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
@@ -28,6 +31,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
 import com.jpexs.decompiler.graph.DottedChain;
+import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
@@ -64,6 +68,7 @@ public class ScriptPack extends AS3ClassTreeItem {
     private final ClassPath path;
 
     public boolean isSimple = false;
+    public boolean scriptInitializerIsEmpty = false;
 
     @Override
     public SWF getSwf() {
@@ -133,6 +138,34 @@ public class ScriptPack extends AS3ClassTreeItem {
      return packageName.equals("") ? scriptName : packageName + "." + scriptName;
      }*/
     public void convert(final NulWriter writer, final List<Trait> traits, final ScriptExportMode exportMode, final boolean parallel) throws InterruptedException {
+
+        int script_init = abc.script_info.get(scriptIndex).init_index;
+        int bodyIndex = abc.findBodyIndex(script_init);
+        if (bodyIndex != -1) {
+            List<Traits> ts = new ArrayList<>();
+            //initialize all classes traits
+            for (Trait t : traits) {
+                if (t instanceof TraitClass) {
+                    ts.add(abc.class_info.get(((TraitClass) t).class_info).static_traits);
+
+                    for (Trait trait : abc.class_info.get(((TraitClass) t).class_info).static_traits.traits) {
+                        if (trait instanceof TraitSlotConst) {
+                            ((TraitSlotConst) trait).assignedValue = null;
+                        }
+                    }
+                    for (Trait trait : abc.instance_info.get(((TraitClass) t).class_info).instance_traits.traits) {
+                        if (trait instanceof TraitSlotConst) {
+                            ((TraitSlotConst) trait).assignedValue = null;
+                        }
+                    }
+                }
+            }
+
+            writer.mark();
+            abc.bodies.get(bodyIndex).convert(path +/*packageName +*/ "/.scriptinitializer", exportMode, true, script_init, scriptIndex, -1, abc, null, abc.constants, abc.method_info, new ScopeStack(), GraphTextWriter.TRAIT_SCRIPT_INITIALIZER, writer, new ArrayList<DottedChain>(), ts, true);
+            scriptInitializerIsEmpty = !writer.getMark();
+
+        }
         for (int t : traitIndices) {
             Trait trait = traits.get(t);
             Multiname name = trait.getName(abc);
@@ -147,6 +180,31 @@ public class ScriptPack extends AS3ClassTreeItem {
 
     private void appendTo(GraphTextWriter writer, List<Trait> traits, ScriptExportMode exportMode, boolean parallel) throws InterruptedException {
         boolean first = true;
+        //script initializer
+        int script_init = abc.script_info.get(scriptIndex).init_index;
+        int bodyIndex = abc.findBodyIndex(script_init);
+        if (bodyIndex != -1 && Configuration.enableScriptInitializerDisplay.get()) {
+            //Note: There must be trait/method highlight even if the initializer is empty to TraitList in GUI to work correctly
+            //TODO: handle this better in GUI(?)
+            writer.startTrait(GraphTextWriter.TRAIT_SCRIPT_INITIALIZER);
+            writer.startMethod(script_init);
+            if (!scriptInitializerIsEmpty) {
+                writer.startBlock();
+                abc.bodies.get(bodyIndex).toString(path +/*packageName +*/ "/.scriptinitializer", exportMode, abc, null, abc.constants, abc.method_info, writer, new ArrayList<DottedChain>());
+                writer.endBlock();
+            } else {
+                writer.append(" ");
+            }
+            writer.endMethod();
+            writer.endTrait();
+            if (!scriptInitializerIsEmpty) {
+                writer.newLine();
+            }
+            first = false;
+        } else {
+            //"/*classInitializer*/";
+        }
+
         for (int t : traitIndices) {
             if (!first) {
                 writer.newLine();

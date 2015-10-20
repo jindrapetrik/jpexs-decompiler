@@ -86,7 +86,7 @@ public class NewFunctionAVM2Item extends AVM2Item {
         writer.startBlock();
         if (body != null) {
             if (writer instanceof NulWriter) {
-                body.convert(path + "/inner", ScriptExportMode.AS, isStatic, scriptIndex, classIndex, abc, null, constants, methodInfo, new ScopeStack(), false, (NulWriter) writer, fullyQualifiedNames, null, false);
+                body.convert(path + "/inner", ScriptExportMode.AS, isStatic, methodIndex, scriptIndex, classIndex, abc, null, constants, methodInfo, new ScopeStack(), 0, (NulWriter) writer, fullyQualifiedNames, null, false);
             } else {
                 body.toString(path + "/inner", ScriptExportMode.AS, abc, null, constants, methodInfo, writer, fullyQualifiedNames);
             }

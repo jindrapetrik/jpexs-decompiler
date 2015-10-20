@@ -276,7 +276,7 @@ public final class MethodBody implements Cloneable {
         return ret;
     }
 
-    public void convert(final String path, ScriptExportMode exportMode, final boolean isStatic, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final AVM2ConstantPool constants, final List<MethodInfo> method_info, final ScopeStack scopeStack, final boolean isStaticInitializer, final NulWriter writer, final List<DottedChain> fullyQualifiedNames, final Traits initTraits, boolean firstLevel) throws InterruptedException {
+    public void convert(final String path, ScriptExportMode exportMode, final boolean isStatic, final int methodIndex, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final AVM2ConstantPool constants, final List<MethodInfo> method_info, final ScopeStack scopeStack, final int initializerType, final NulWriter writer, final List<DottedChain> fullyQualifiedNames, final List<Traits> initTraits, boolean firstLevel) throws InterruptedException {
         if (debugMode) {
             System.err.println("Decompiling " + path);
         }
@@ -294,11 +294,11 @@ public final class MethodBody implements Cloneable {
                     @Override
                     public Void call() throws InterruptedException {
                         try (Statistics s1 = new Statistics("MethodBody.convert")) {
-                            MethodBody converted = convertMethodBody(path, isStatic, scriptIndex, classIndex, abc, trait, constants, method_info, scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits);
+                            MethodBody converted = convertMethodBody(path, isStatic, scriptIndex, classIndex, abc, trait, constants, method_info, scopeStack, initializerType != GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, fullyQualifiedNames, initTraits);
                             HashMap<Integer, String> localRegNames = getLocalRegNames(abc);
                             List<GraphTargetItem> convertedItems1;
                             try (Statistics s = new Statistics("AVM2Code.toGraphTargetItems")) {
-                                convertedItems1 = converted.getCode().toGraphTargetItems(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, converted, localRegNames, scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits, Graph.SOP_USE_STATIC, new HashMap<>(), converted.getCode().visitCode(converted));
+                                convertedItems1 = converted.getCode().toGraphTargetItems(path, methodIndex, isStatic, scriptIndex, classIndex, abc, constants, method_info, converted, localRegNames, scopeStack, initializerType, fullyQualifiedNames, initTraits, Graph.SOP_USE_STATIC, new HashMap<>(), converted.getCode().visitCode(converted));
                             }
                             try (Statistics s = new Statistics("Graph.graphToString")) {
                                 Graph.graphToString(convertedItems1, writer, LocalData.create(constants, localRegNames, fullyQualifiedNames));
@@ -365,7 +365,7 @@ public final class MethodBody implements Cloneable {
         return writer;
     }
 
-    public MethodBody convertMethodBody(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, Trait trait, AVM2ConstantPool constants, List<MethodInfo> method_info, ScopeStack scopeStack, boolean isStaticInitializer, List<DottedChain> fullyQualifiedNames, Traits initTraits) throws InterruptedException {
+    public MethodBody convertMethodBody(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, Trait trait, AVM2ConstantPool constants, List<MethodInfo> method_info, ScopeStack scopeStack, boolean isStaticInitializer, List<DottedChain> fullyQualifiedNames, List<Traits> initTraits) throws InterruptedException {
         MethodBody body = clone();
         AVM2Code code = body.getCode();
         code.markMappedOffsets();

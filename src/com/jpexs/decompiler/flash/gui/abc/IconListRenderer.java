@@ -70,6 +70,10 @@ public class IconListRenderer extends DefaultListCellRenderer {
         if (tli.getType() == TraitsListItem.Type.INITIALIZER) {
             label.setIcon(functionIcon);
         }
+
+        if (tli.getType() == TraitsListItem.Type.SCRIPT_INITIALIZER) {
+            label.setIcon(functionIcon);
+        }
         return label;
     }
 }
