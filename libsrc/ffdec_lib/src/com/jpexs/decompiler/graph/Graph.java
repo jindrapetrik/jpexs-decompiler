@@ -2014,10 +2014,10 @@ public class Graph {
                                     stack.push(new AndItem(null, prevExpr, rightSide));
                                 } else if (prevExpr instanceof FalseItem) {
                                     isIf = false;
-                                    stack.push(new OrItem(null, leftSide, rightSide));
+                                    stack.push(new AndItem(null, leftSide, rightSide));
                                 } else if (prevExpr instanceof TrueItem) {
                                     isIf = false;
-                                    stack.push(new AndItem(null, leftSide, rightSide));
+                                    stack.push(new OrItem(null, leftSide, rightSide));
                                 } else {
                                     //:-(
                                 }
