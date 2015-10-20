@@ -2014,6 +2014,7 @@ public class Graph {
                                     stack.push(new AndItem(null, prevExpr, rightSide));
                                 } else if (prevExpr instanceof FalseItem) {
                                     isIf = false;
+                                    leftSide = leftSide.invert(null);
                                     stack.push(new AndItem(null, leftSide, rightSide));
                                 } else if (prevExpr instanceof TrueItem) {
                                     isIf = false;
