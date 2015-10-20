@@ -114,10 +114,8 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
             }
 
             assignedValue.toString(writer, LocalData.create(abc.constants, new HashMap<>(), fullyQualifiedNames));
-            if (parent instanceof TraitClass) {
-                writer.endMethod();
-                writer.endTrait();
-            }
+            writer.endMethod();
+            writer.endTrait();
             return;
         }
 
