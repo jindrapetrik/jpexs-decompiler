@@ -17,12 +17,14 @@
 package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import javax.swing.ListModel;
 import javax.swing.event.ListDataListener;
+import jdk.nashorn.internal.runtime.regexp.joni.Config;
 
 public final class TraitsListModel implements ListModel<Object> {
 
@@ -59,7 +61,9 @@ public final class TraitsListModel implements ListModel<Object> {
             items.add(new TraitsListItem(TraitsListItem.Type.INITIALIZER, 0, false, abc, classIndex, scriptIndex));
             items.add(new TraitsListItem(TraitsListItem.Type.INITIALIZER, 0, true, abc, classIndex, scriptIndex));
         }
-        items.add(new TraitsListItem(TraitsListItem.Type.SCRIPT_INITIALIZER, 0, true, abc, classIndex, scriptIndex));
+        if (Configuration.enableScriptInitializerDisplay.get()) {
+            items.add(new TraitsListItem(TraitsListItem.Type.SCRIPT_INITIALIZER, 0, true, abc, classIndex, scriptIndex));
+        }
     }
 
     public TraitsListModel(ABC abc, int classIndex, int scriptIndex, boolean sorted) {
