@@ -466,14 +466,16 @@ public class TraitClass extends Trait implements TraitWithSlot {
         //static initializer
         int bodyIndex = abc.findBodyIndex(classInfo.cinit_index);
         if (bodyIndex != -1) {
-            //Note: There must be trait/method highlight even if the initializer is empty to TraitList in GUI to work correctly
-            //TODO: handle this better in GUI(?)
             writer.startTrait(GraphTextWriter.TRAIT_CLASS_INITIALIZER);
             writer.startMethod(classInfo.cinit_index);
             if (!classInitializerIsEmpty) {
                 writer.startBlock();
                 abc.bodies.get(bodyIndex).toString(path +/*packageName +*/ "/" + instanceInfoName + ".staticinitializer", exportMode, abc, this, abc.constants, abc.method_info, writer, fullyQualifiedNames);
                 writer.endBlock();
+            } else {
+                //Note: There must be trait/method highlight even if the initializer is empty to TraitList in GUI to work correctly
+                //TODO: handle this better in GUI(?)
+                writer.append(" ");
             }
             writer.endMethod();
             writer.endTrait();
