@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorJumps;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.ASM3Parser;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScript3Parser;
+import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -114,7 +115,7 @@ public class ActionScript3DeobfuscatorTest extends ActionStript2TestBase {
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
         par.addScript(str, true, "Test.as", 0);
 
-        abc.script_info.get(0).getPacks(abc, 0, "", new ArrayList<>()).get(0).toSource(writer, abc.script_info.get(0).traits.traits, ScriptExportMode.AS, false);
+        abc.script_info.get(0).getPacks(abc, 0, "", new ArrayList<>()).get(0).toSource(writer, abc.script_info.get(0).traits.traits, new ConvertData(), ScriptExportMode.AS, false);
         return writer.toString();
     }
 

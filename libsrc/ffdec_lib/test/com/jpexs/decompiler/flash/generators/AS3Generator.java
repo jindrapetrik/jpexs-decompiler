@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.generators;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
@@ -70,7 +71,7 @@ public class AS3Generator {
                     MethodBody b = abc.findBody(((TraitMethodGetterSetter) t).method_info);
                     List<Traits> ts = new ArrayList<>();
                     ts.add(abc.instance_info.get(classId).instance_traits);
-                    b.convert("", ScriptExportMode.AS, false, -1/*FIX?*/, -1/*FIX?*/, classId, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), ts, true);
+                    b.convert(new ConvertData(), "", ScriptExportMode.AS, false, -1/*FIX?*/, -1/*FIX?*/, classId, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), ts, true);
                     b.toString("", ScriptExportMode.AS, abc, null, src, new ArrayList<>());
                     String[] srcs = src.toString().split("[\r\n]+");
                     for (int i = 0; i < srcs.length; i++) {

@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScript3Parser;
+import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
@@ -85,7 +86,7 @@ public class DirectEditingTest extends FileTestBase {
                         }
 
                         System.out.println("Recompiling:" + classPathString + "...");
-                        en.toSource(htw, abc.script_info.get(s).traits.traits, ScriptExportMode.AS, false);
+                        en.toSource(htw, abc.script_info.get(s).traits.traits, new ConvertData(), ScriptExportMode.AS, false);
                         String original = htw.toString();
                         ActionScript3Parser.compile(original, abc, allAbcs, false, en.getClassPath().className + ".as", abc.instance_info.size());
 
