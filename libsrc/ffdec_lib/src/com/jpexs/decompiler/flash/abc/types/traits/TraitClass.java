@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.InitVectorAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.ClassInfo;
+import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
@@ -360,17 +361,17 @@ public class TraitClass extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public GraphTextWriter toStringHeader(Trait parent, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) {
+    public GraphTextWriter toStringHeader(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) {
         abc.instance_info.get(class_info).getClassHeaderStr(writer, abc, fullyQualifiedNames, false);
         return writer;
     }
 
     @Override
-    public void convertHeader(Trait parent, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) {
+    public void convertHeader(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) {
     }
 
     @Override
-    public GraphTextWriter toString(Trait parent, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
+    public GraphTextWriter toString(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
 
         InstanceInfo instanceInfo = abc.instance_info.get(class_info);
         Multiname instanceInfoMultiname = instanceInfo.getName(abc.constants);
@@ -461,7 +462,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
         //static variables & constants
         ClassInfo classInfo = abc.class_info.get(class_info);
-        classInfo.static_traits.toString(new Class[]{TraitSlotConst.class}, this, path +/*packageName +*/ "/" + instanceInfoName, abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
+        classInfo.static_traits.toString(new Class[]{TraitSlotConst.class}, this, convertData, path +/*packageName +*/ "/" + instanceInfoName, abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
 
         //static initializer
         int bodyIndex = abc.findBodyIndex(classInfo.cinit_index);
@@ -487,7 +488,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         }
 
         //instance variables
-        instanceInfo.instance_traits.toString(new Class[]{TraitSlotConst.class}, this, path +/*packageName +*/ "/" + instanceInfoName, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
+        instanceInfo.instance_traits.toString(new Class[]{TraitSlotConst.class}, this, convertData, path +/*packageName +*/ "/" + instanceInfoName, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
 
         //instance initializer - constructor
         if (!instanceInfo.isInterface()) {
@@ -527,10 +528,10 @@ public class TraitClass extends Trait implements TraitWithSlot {
         }
 
         //static methods
-        classInfo.static_traits.toString(new Class[]{TraitClass.class, TraitFunction.class, TraitMethodGetterSetter.class}, this, path +/*packageName +*/ "/" + instanceInfoName, abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
+        classInfo.static_traits.toString(new Class[]{TraitClass.class, TraitFunction.class, TraitMethodGetterSetter.class}, this, convertData, path +/*packageName +*/ "/" + instanceInfoName, abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
 
         //instance methods
-        instanceInfo.instance_traits.toString(new Class[]{TraitClass.class, TraitFunction.class, TraitMethodGetterSetter.class}, this, path +/*packageName +*/ "/" + instanceInfoName, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
+        instanceInfo.instance_traits.toString(new Class[]{TraitClass.class, TraitFunction.class, TraitMethodGetterSetter.class}, this, convertData, path +/*packageName +*/ "/" + instanceInfoName, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
 
         writer.endBlock(); // class
         writer.endClass();
@@ -539,7 +540,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public void convert(Trait parent, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
+    public void convert(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
 
         fullyQualifiedNames = new ArrayList<>();
 
@@ -553,7 +554,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
             writer.mark();
             List<Traits> ts = new ArrayList<>();
             ts.add(classInfo.static_traits);
-            abc.bodies.get(bodyIndex).convert(path +/*packageName +*/ "/" + instanceInfoName + ".staticinitializer", exportMode, true, classInfo.cinit_index, scriptIndex, class_info, abc, this, new ScopeStack(), GraphTextWriter.TRAIT_CLASS_INITIALIZER, writer, fullyQualifiedNames, ts, true);
+            abc.bodies.get(bodyIndex).convert(convertData, path +/*packageName +*/ "/" + instanceInfoName + ".staticinitializer", exportMode, true, classInfo.cinit_index, scriptIndex, class_info, abc, this, new ScopeStack(), GraphTextWriter.TRAIT_CLASS_INITIALIZER, writer, fullyQualifiedNames, ts, true);
             classInitializerIsEmpty = !writer.getMark();
         }
 
@@ -563,14 +564,14 @@ public class TraitClass extends Trait implements TraitWithSlot {
             if (bodyIndex != -1) {
                 List<Traits> ts = new ArrayList<>();
                 ts.add(instanceInfo.instance_traits);
-                abc.bodies.get(bodyIndex).convert(path +/*packageName +*/ "/" + instanceInfoName + ".initializer", exportMode, false, instanceInfo.iinit_index, scriptIndex, class_info, abc, this, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, writer, fullyQualifiedNames, ts, true);
+                abc.bodies.get(bodyIndex).convert(convertData, path +/*packageName +*/ "/" + instanceInfoName + ".initializer", exportMode, false, instanceInfo.iinit_index, scriptIndex, class_info, abc, this, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, writer, fullyQualifiedNames, ts, true);
             }
         }
 
         //static variables,constants & methods
-        classInfo.static_traits.convert(this, path +/*packageName +*/ "/" + instanceInfoName, abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
+        classInfo.static_traits.convert(this, convertData, path +/*packageName +*/ "/" + instanceInfoName, abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
 
-        instanceInfo.instance_traits.convert(this, path +/*packageName +*/ "/" + instanceInfoName, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
+        instanceInfo.instance_traits.convert(this, convertData, path +/*packageName +*/ "/" + instanceInfoName, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
     }
 
     @Override

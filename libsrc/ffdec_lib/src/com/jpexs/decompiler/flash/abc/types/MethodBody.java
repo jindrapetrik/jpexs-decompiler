@@ -276,7 +276,7 @@ public final class MethodBody implements Cloneable {
         return ret;
     }
 
-    public void convert(final String path, ScriptExportMode exportMode, final boolean isStatic, final int methodIndex, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final ScopeStack scopeStack, final int initializerType, final NulWriter writer, final List<DottedChain> fullyQualifiedNames, final List<Traits> initTraits, boolean firstLevel) throws InterruptedException {
+    public void convert(final ConvertData convertData, final String path, ScriptExportMode exportMode, final boolean isStatic, final int methodIndex, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final ScopeStack scopeStack, final int initializerType, final NulWriter writer, final List<DottedChain> fullyQualifiedNames, final List<Traits> initTraits, boolean firstLevel) throws InterruptedException {
         if (debugMode) {
             System.err.println("Decompiling " + path);
         }
@@ -298,7 +298,7 @@ public final class MethodBody implements Cloneable {
                             HashMap<Integer, String> localRegNames = getLocalRegNames(abc);
                             List<GraphTargetItem> convertedItems1;
                             try (Statistics s = new Statistics("AVM2Code.toGraphTargetItems")) {
-                                convertedItems1 = converted.getCode().toGraphTargetItems(path, methodIndex, isStatic, scriptIndex, classIndex, abc, converted, localRegNames, scopeStack, initializerType, fullyQualifiedNames, initTraits, Graph.SOP_USE_STATIC, new HashMap<>(), converted.getCode().visitCode(converted));
+                                convertedItems1 = converted.getCode().toGraphTargetItems(convertData, path, methodIndex, isStatic, scriptIndex, classIndex, abc, converted, localRegNames, scopeStack, initializerType, fullyQualifiedNames, initTraits, Graph.SOP_USE_STATIC, new HashMap<>(), converted.getCode().visitCode(converted));
                             }
                             try (Statistics s = new Statistics("Graph.graphToString")) {
                                 Graph.graphToString(convertedItems1, writer, LocalData.create(abc.constants, localRegNames, fullyQualifiedNames));

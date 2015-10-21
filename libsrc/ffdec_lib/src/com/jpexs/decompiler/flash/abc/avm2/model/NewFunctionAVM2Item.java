@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
@@ -78,7 +79,7 @@ public class NewFunctionAVM2Item extends AVM2Item {
         writer.startBlock();
         if (body != null) {
             if (writer instanceof NulWriter) {
-                body.convert(path + "/inner", ScriptExportMode.AS, isStatic, methodIndex, scriptIndex, classIndex, abc, null, new ScopeStack(), 0, (NulWriter) writer, fullyQualifiedNames, null, false);
+                body.convert(new ConvertData(), path + "/inner", ScriptExportMode.AS, isStatic, methodIndex, scriptIndex, classIndex, abc, null, new ScopeStack(), 0, (NulWriter) writer, fullyQualifiedNames, null, false);
             } else {
                 body.toString(path + "/inner", ScriptExportMode.AS, abc, null, writer, fullyQualifiedNames);
             }

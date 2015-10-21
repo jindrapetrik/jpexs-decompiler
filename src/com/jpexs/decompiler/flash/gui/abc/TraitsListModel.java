@@ -24,7 +24,6 @@ import java.util.Comparator;
 import java.util.List;
 import javax.swing.ListModel;
 import javax.swing.event.ListDataListener;
-import jdk.nashorn.internal.runtime.regexp.joni.Config;
 
 public final class TraitsListModel implements ListModel<Object> {
 

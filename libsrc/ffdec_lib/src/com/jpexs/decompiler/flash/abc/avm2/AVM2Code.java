@@ -260,6 +260,8 @@ import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.ASM3Parser;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.PropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
+import com.jpexs.decompiler.flash.abc.types.AssignedValue;
+import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
@@ -1880,7 +1882,7 @@ public class AVM2Code implements Cloneable {
          }*/
     }
 
-    public List<GraphTargetItem> toGraphTargetItems(String path, int methodIndex, boolean isStatic, int scriptIndex, int classIndex, ABC abc, MethodBody body, HashMap<Integer, String> localRegNames, ScopeStack scopeStack, int initializerType, List<DottedChain> fullyQualifiedNames, List<Traits> initTraits, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) throws InterruptedException {
+    public List<GraphTargetItem> toGraphTargetItems(ConvertData convertData, String path, int methodIndex, boolean isStatic, int scriptIndex, int classIndex, ABC abc, MethodBody body, HashMap<Integer, String> localRegNames, ScopeStack scopeStack, int initializerType, List<DottedChain> fullyQualifiedNames, List<Traits> initTraits, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) throws InterruptedException {
         initToSource();
         List<GraphTargetItem> list;
         HashMap<Integer, GraphTargetItem> localRegs = new HashMap<>();
@@ -1915,10 +1917,10 @@ public class AVM2Code implements Cloneable {
                             if (tm != null && tm.equals(m)) {
                                 if ((t instanceof TraitSlotConst)) {
                                     if (((TraitSlotConst) t).isConst() || initializerType == GraphTextWriter.TRAIT_CLASS_INITIALIZER || initializerType == GraphTextWriter.TRAIT_SCRIPT_INITIALIZER) {
-                                        if ((((TraitSlotConst) t).assignedValue) == null) {
-                                            ((TraitSlotConst) t).assignedValue = value;
-                                            ((TraitSlotConst) t).assignmentInitializer = initializerType;
-                                            ((TraitSlotConst) t).assignmentMethod = methodIndex;
+                                        TraitSlotConst tsc = (TraitSlotConst) t;
+                                        if (value != null && !convertData.assignedValues.containsKey(tsc)) {
+                                            AssignedValue av = new AssignedValue(value, initializerType, methodIndex);
+                                            convertData.assignedValues.put(tsc, av);
                                             list.remove(i);
                                             i--;
                                             continue;

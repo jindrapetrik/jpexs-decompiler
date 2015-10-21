@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.types.traits;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -50,7 +51,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public GraphTextWriter toStringHeader(Trait parent, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) {
+    public GraphTextWriter toStringHeader(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) {
         MethodBody body = abc.findBody(method_info);
         if (body == null) {
             writer.appendNoHilight("native ");
@@ -66,14 +67,14 @@ public class TraitFunction extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public void convertHeader(Trait parent, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) {
+    public void convertHeader(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) {
     }
 
     @Override
-    public GraphTextWriter toString(Trait parent, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
+    public GraphTextWriter toString(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
         getMetaData(abc, writer);
         writer.startMethod(method_info);
-        toStringHeader(parent, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
+        toStringHeader(parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
         if (abc.instance_info.get(classIndex).isInterface()) {
             writer.appendNoHilight(";");
         } else {
@@ -91,13 +92,13 @@ public class TraitFunction extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public void convert(Trait parent, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
+    public void convert(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
         writer.startMethod(method_info);
-        convertHeader(parent, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
+        convertHeader(parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
         if (!abc.instance_info.get(classIndex).isInterface()) {
             int bodyIndex = abc.findBodyIndex(method_info);
             if (bodyIndex != -1) {
-                abc.bodies.get(bodyIndex).convert(path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false), exportMode, isStatic, method_info, scriptIndex, classIndex, abc, this, new ScopeStack(), 0, writer, fullyQualifiedNames, null, true);
+                abc.bodies.get(bodyIndex).convert(convertData, path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false), exportMode, isStatic, method_info, scriptIndex, classIndex, abc, this, new ScopeStack(), 0, writer, fullyQualifiedNames, null, true);
             }
         }
         writer.endMethod();

@@ -17,11 +17,11 @@
 package com.jpexs.decompiler.flash.abc;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
-import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
@@ -138,7 +138,7 @@ public class ScriptPack extends AS3ClassTreeItem {
      }
      return packageName.equals("") ? scriptName : packageName + "." + scriptName;
      }*/
-    public void convert(final NulWriter writer, final List<Trait> traits, final ScriptExportMode exportMode, final boolean parallel) throws InterruptedException {
+    public void convert(final NulWriter writer, final List<Trait> traits, final ConvertData convertData, final ScriptExportMode exportMode, final boolean parallel) throws InterruptedException {
 
         int script_init = abc.script_info.get(scriptIndex).init_index;
         int bodyIndex = abc.findBodyIndex(script_init);
@@ -148,22 +148,11 @@ public class ScriptPack extends AS3ClassTreeItem {
             for (Trait t : traits) {
                 if (t instanceof TraitClass) {
                     ts.add(abc.class_info.get(((TraitClass) t).class_info).static_traits);
-
-                    for (Trait trait : abc.class_info.get(((TraitClass) t).class_info).static_traits.traits) {
-                        if (trait instanceof TraitSlotConst) {
-                            ((TraitSlotConst) trait).assignedValue = null;
-                        }
-                    }
-                    for (Trait trait : abc.instance_info.get(((TraitClass) t).class_info).instance_traits.traits) {
-                        if (trait instanceof TraitSlotConst) {
-                            ((TraitSlotConst) trait).assignedValue = null;
-                        }
-                    }
                 }
             }
 
             writer.mark();
-            abc.bodies.get(bodyIndex).convert(path +/*packageName +*/ "/.scriptinitializer", exportMode, true, script_init, scriptIndex, -1, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_SCRIPT_INITIALIZER, writer, new ArrayList<DottedChain>(), ts, true);
+            abc.bodies.get(bodyIndex).convert(convertData, path +/*packageName +*/ "/.scriptinitializer", exportMode, true, script_init, scriptIndex, -1, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_SCRIPT_INITIALIZER, writer, new ArrayList<>(), ts, true);
             scriptInitializerIsEmpty = !writer.getMark();
 
         }
@@ -172,14 +161,14 @@ public class ScriptPack extends AS3ClassTreeItem {
             Multiname name = trait.getName(abc);
             Namespace ns = name.getNamespace(abc.constants);
             if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
-                trait.convertPackaged(null, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel);
+                trait.convertPackaged(null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel);
             } else {
-                trait.convert(null, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel);
+                trait.convert(null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel);
             }
         }
     }
 
-    private void appendTo(GraphTextWriter writer, List<Trait> traits, ScriptExportMode exportMode, boolean parallel) throws InterruptedException {
+    private void appendTo(GraphTextWriter writer, List<Trait> traits, ConvertData convertData, ScriptExportMode exportMode, boolean parallel) throws InterruptedException {
         boolean first = true;
         //script initializer
         int script_init = abc.script_info.get(scriptIndex).init_index;
@@ -215,23 +204,23 @@ public class ScriptPack extends AS3ClassTreeItem {
             Multiname name = trait.getName(abc);
             Namespace ns = name.getNamespace(abc.constants);
             if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
-                trait.toStringPackaged(null, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel);
+                trait.toStringPackaged(null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel);
             } else {
-                trait.toString(null, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel);
+                trait.toString(null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel);
             }
 
             first = false;
         }
     }
 
-    public void toSource(GraphTextWriter writer, final List<Trait> traits, final ScriptExportMode exportMode, final boolean parallel) throws InterruptedException {
+    public void toSource(GraphTextWriter writer, final List<Trait> traits, final ConvertData convertData, final ScriptExportMode exportMode, final boolean parallel) throws InterruptedException {
         writer.suspendMeasure();
         int timeout = Configuration.decompilationTimeoutFile.get();
         try {
             CancellableWorker.call(new Callable<Void>() {
                 @Override
                 public Void call() throws Exception {
-                    convert(new NulWriter(), traits, exportMode, parallel);
+                    convert(new NulWriter(), traits, convertData, exportMode, parallel);
                     return null;
                 }
             }, timeout, TimeUnit.SECONDS);
@@ -248,7 +237,7 @@ public class ScriptPack extends AS3ClassTreeItem {
         }
         writer.continueMeasure();
 
-        appendTo(writer, traits, exportMode, parallel);
+        appendTo(writer, traits, convertData, exportMode, parallel);
     }
 
     public File export(File file, ScriptExportSettings exportSettings, boolean parallel) throws IOException, InterruptedException {
@@ -262,7 +251,7 @@ public class ScriptPack extends AS3ClassTreeItem {
 
         try (FileTextWriter writer = exportSettings.singleFile ? null : new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(file))) {
             FileTextWriter writer2 = exportSettings.singleFile ? exportSettings.singleFileWriter : writer;
-            toSource(writer2, abc.script_info.get(scriptIndex).traits.traits, exportSettings.mode, parallel);
+            toSource(writer2, abc.script_info.get(scriptIndex).traits.traits, new ConvertData(), exportSettings.mode, parallel);
         } catch (FileNotFoundException ex) {
             logger.log(Level.SEVERE, "The file path is probably too long", ex);
         }
