@@ -81,16 +81,16 @@ public class ConstructIns extends InstructionDefinition {
         }
         GraphTargetItem obj = stack.pop();
 
-        FullMultinameAVM2Item xmlMult = null;
         boolean isXML = false;
         if (obj instanceof GetPropertyAVM2Item) {
             GetPropertyAVM2Item gpt = (GetPropertyAVM2Item) obj;
             if (gpt.object instanceof FindPropertyAVM2Item) {
                 FindPropertyAVM2Item fpt = (FindPropertyAVM2Item) gpt.object;
-                xmlMult = (FullMultinameAVM2Item) fpt.propertyName;
-                // todo: honfika: Why call isXML 2 times with the same parameters?
-                isXML = xmlMult.isXML(localData.constants, localData.localRegNames, localData.fullyQualifiedNames)
-                        && xmlMult.isXML(localData.constants, localData.localRegNames, localData.fullyQualifiedNames);
+                FullMultinameAVM2Item fptXmlMult = (FullMultinameAVM2Item) fpt.propertyName;
+                FullMultinameAVM2Item gptXmlMult = (FullMultinameAVM2Item) gpt.propertyName;
+
+                isXML = fptXmlMult.isXML(localData.constants, localData.localRegNames, localData.fullyQualifiedNames)
+                        && gptXmlMult.isXML(localData.constants, localData.localRegNames, localData.fullyQualifiedNames);
             }
         }
         if (obj instanceof GetLexAVM2Item) {
