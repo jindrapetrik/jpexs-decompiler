@@ -84,7 +84,7 @@ public class ActionScript3DeobfuscatorTest extends ActionStript2TestBase {
         MethodBody b = new MethodBody(abc);
         AVM2Code code = ASM3Parser.parse(new StringReader(str), abc.constants, null, b, new MethodInfo());
         b.setCode(code);
-        new AVM2DeobfuscatorJumps().deobfuscate("test", 0, true, 0, abc, abc.constants, null, new MethodInfo(), b);
+        new AVM2DeobfuscatorJumps().avm2CodeRemoveTraps("test", 0, true, 0, abc, null, 0, b);
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
         code.toASMSource(abc.constants, null, new MethodInfo(), new MethodBody(abc), ScriptExportMode.PCODE, writer);
         String ret = writer.toString();

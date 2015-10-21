@@ -178,18 +178,18 @@ public final class MethodBody implements Cloneable {
         getCode().restoreControlFlow(constants, trait, info, this);
     }
 
-    public int removeTraps(AVM2ConstantPool constants, ABC abc, Trait trait, int scriptIndex, int classIndex, boolean isStatic, String path) throws InterruptedException {
+    public int removeTraps(ABC abc, Trait trait, int scriptIndex, int classIndex, boolean isStatic, String path) throws InterruptedException {
 
-        return getCode().removeTraps(constants, trait, abc.method_info.get(method_info), this, abc, scriptIndex, classIndex, isStatic, path);
+        return getCode().removeTraps(trait, method_info, this, abc, scriptIndex, classIndex, isStatic, path);
     }
 
     public void deobfuscate(DeobfuscationLevel level, Trait trait, int scriptIndex, int classIndex, boolean isStatic, String path) throws InterruptedException {
         if (level == DeobfuscationLevel.LEVEL_REMOVE_DEAD_CODE) {
             removeDeadCode(abc.constants, trait, abc.method_info.get(method_info));
         } else if (level == DeobfuscationLevel.LEVEL_REMOVE_TRAPS) {
-            removeTraps(abc.constants, abc, trait, scriptIndex, classIndex, isStatic, path);
+            removeTraps(abc, trait, scriptIndex, classIndex, isStatic, path);
         } else if (level == DeobfuscationLevel.LEVEL_RESTORE_CONTROL_FLOW) {
-            removeTraps(abc.constants, abc, trait, scriptIndex, classIndex, isStatic, path);
+            removeTraps(abc, trait, scriptIndex, classIndex, isStatic, path);
             restoreControlFlow(abc.constants, trait, abc.method_info.get(method_info));
         }
     }
@@ -276,12 +276,12 @@ public final class MethodBody implements Cloneable {
         return ret;
     }
 
-    public void convert(final String path, ScriptExportMode exportMode, final boolean isStatic, final int methodIndex, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final AVM2ConstantPool constants, final List<MethodInfo> method_info, final ScopeStack scopeStack, final int initializerType, final NulWriter writer, final List<DottedChain> fullyQualifiedNames, final List<Traits> initTraits, boolean firstLevel) throws InterruptedException {
+    public void convert(final String path, ScriptExportMode exportMode, final boolean isStatic, final int methodIndex, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final ScopeStack scopeStack, final int initializerType, final NulWriter writer, final List<DottedChain> fullyQualifiedNames, final List<Traits> initTraits, boolean firstLevel) throws InterruptedException {
         if (debugMode) {
             System.err.println("Decompiling " + path);
         }
         if (exportMode != ScriptExportMode.AS) {
-            getCode().toASMSource(constants, trait, method_info.get(this.method_info), this, exportMode, writer);
+            getCode().toASMSource(abc.constants, trait, abc.method_info.get(this.method_info), this, exportMode, writer);
         } else {
             if ((DEBUG_FIXED != null && !path.endsWith(DEBUG_FIXED)) || (!Configuration.decompile.get())) {
                 writer.appendNoHilight(Helper.getDecompilationSkippedComment()).newLine();
@@ -294,14 +294,14 @@ public final class MethodBody implements Cloneable {
                     @Override
                     public Void call() throws InterruptedException {
                         try (Statistics s1 = new Statistics("MethodBody.convert")) {
-                            MethodBody converted = convertMethodBody(path, isStatic, scriptIndex, classIndex, abc, trait, constants, method_info, scopeStack, initializerType != GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, fullyQualifiedNames, initTraits);
+                            MethodBody converted = convertMethodBody(path, isStatic, scriptIndex, classIndex, abc, trait, scopeStack, initializerType != GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, fullyQualifiedNames, initTraits);
                             HashMap<Integer, String> localRegNames = getLocalRegNames(abc);
                             List<GraphTargetItem> convertedItems1;
                             try (Statistics s = new Statistics("AVM2Code.toGraphTargetItems")) {
-                                convertedItems1 = converted.getCode().toGraphTargetItems(path, methodIndex, isStatic, scriptIndex, classIndex, abc, constants, method_info, converted, localRegNames, scopeStack, initializerType, fullyQualifiedNames, initTraits, Graph.SOP_USE_STATIC, new HashMap<>(), converted.getCode().visitCode(converted));
+                                convertedItems1 = converted.getCode().toGraphTargetItems(path, methodIndex, isStatic, scriptIndex, classIndex, abc, converted, localRegNames, scopeStack, initializerType, fullyQualifiedNames, initTraits, Graph.SOP_USE_STATIC, new HashMap<>(), converted.getCode().visitCode(converted));
                             }
                             try (Statistics s = new Statistics("Graph.graphToString")) {
-                                Graph.graphToString(convertedItems1, writer, LocalData.create(constants, localRegNames, fullyQualifiedNames));
+                                Graph.graphToString(convertedItems1, writer, LocalData.create(abc.constants, localRegNames, fullyQualifiedNames));
                             }
                             convertedItems = convertedItems1;
                         }
@@ -330,9 +330,9 @@ public final class MethodBody implements Cloneable {
         }
     }
 
-    public GraphTextWriter toString(final String path, ScriptExportMode exportMode, final ABC abc, final Trait trait, final AVM2ConstantPool constants, final List<MethodInfo> method_info, final GraphTextWriter writer, final List<DottedChain> fullyQualifiedNames) throws InterruptedException {
+    public GraphTextWriter toString(final String path, ScriptExportMode exportMode, final ABC abc, final Trait trait, final GraphTextWriter writer, final List<DottedChain> fullyQualifiedNames) throws InterruptedException {
         if (exportMode != ScriptExportMode.AS) {
-            getCode().toASMSource(constants, trait, method_info.get(this.method_info), this, exportMode, writer);
+            getCode().toASMSource(abc.constants, trait, abc.method_info.get(this.method_info), this, exportMode, writer);
         } else {
             if ((DEBUG_FIXED != null && !path.endsWith(DEBUG_FIXED)) || (!Configuration.decompile.get())) {
                 //writer.startMethod(this.method_info);
@@ -351,7 +351,7 @@ public final class MethodBody implements Cloneable {
                         writer.appendNoHilight(abc.findBodyIndex(this.method_info));
                         writer.newLine();
                     }
-                    Graph.graphToString(convertedItems, writer, LocalData.create(constants, localRegNames, fullyQualifiedNames));
+                    Graph.graphToString(convertedItems, writer, LocalData.create(abc.constants, localRegNames, fullyQualifiedNames));
                     //writer.endMethod();
                 } else if (convertException instanceof TimeoutException) {
                     // exception was logged in convert method
@@ -365,7 +365,7 @@ public final class MethodBody implements Cloneable {
         return writer;
     }
 
-    public MethodBody convertMethodBody(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, Trait trait, AVM2ConstantPool constants, List<MethodInfo> method_info, ScopeStack scopeStack, boolean isStaticInitializer, List<DottedChain> fullyQualifiedNames, List<Traits> initTraits) throws InterruptedException {
+    public MethodBody convertMethodBody(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, Trait trait, ScopeStack scopeStack, boolean isStaticInitializer, List<DottedChain> fullyQualifiedNames, List<Traits> initTraits) throws InterruptedException {
         MethodBody body = clone();
         AVM2Code code = body.getCode();
         code.markMappedOffsets();
@@ -373,7 +373,7 @@ public final class MethodBody implements Cloneable {
 
         if (Configuration.autoDeobfuscate.get()) {
             try {
-                code.removeTraps(constants, trait, method_info.get(this.method_info), body, abc, scriptIndex, classIndex, isStatic, path);
+                code.removeTraps(trait, method_info, body, abc, scriptIndex, classIndex, isStatic, path);
             } catch (ThreadDeath | InterruptedException ex) {
                 throw ex;
             } catch (Throwable ex) {

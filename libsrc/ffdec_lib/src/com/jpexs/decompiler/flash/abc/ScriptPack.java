@@ -68,6 +68,7 @@ public class ScriptPack extends AS3ClassTreeItem {
     private final ClassPath path;
 
     public boolean isSimple = false;
+
     public boolean scriptInitializerIsEmpty = false;
 
     @Override
@@ -162,7 +163,7 @@ public class ScriptPack extends AS3ClassTreeItem {
             }
 
             writer.mark();
-            abc.bodies.get(bodyIndex).convert(path +/*packageName +*/ "/.scriptinitializer", exportMode, true, script_init, scriptIndex, -1, abc, null, abc.constants, abc.method_info, new ScopeStack(), GraphTextWriter.TRAIT_SCRIPT_INITIALIZER, writer, new ArrayList<DottedChain>(), ts, true);
+            abc.bodies.get(bodyIndex).convert(path +/*packageName +*/ "/.scriptinitializer", exportMode, true, script_init, scriptIndex, -1, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_SCRIPT_INITIALIZER, writer, new ArrayList<DottedChain>(), ts, true);
             scriptInitializerIsEmpty = !writer.getMark();
 
         }
@@ -190,7 +191,7 @@ public class ScriptPack extends AS3ClassTreeItem {
             writer.startMethod(script_init);
             if (!scriptInitializerIsEmpty) {
                 writer.startBlock();
-                abc.bodies.get(bodyIndex).toString(path +/*packageName +*/ "/.scriptinitializer", exportMode, abc, null, abc.constants, abc.method_info, writer, new ArrayList<DottedChain>());
+                abc.bodies.get(bodyIndex).toString(path +/*packageName +*/ "/.scriptinitializer", exportMode, abc, null, writer, new ArrayList<>());
                 writer.endBlock();
             } else {
                 writer.append(" ");

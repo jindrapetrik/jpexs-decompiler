@@ -41,7 +41,7 @@ public class PushUIntIns extends InstructionDefinition implements PushIntegerTyp
 
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
-        stack.push(new IntegerValueAVM2Item(ins, localData.constants.getUInt(ins.operands[0])));
+        stack.push(new IntegerValueAVM2Item(ins, localData.getConstants().getUInt(ins.operands[0])));
     }
 
     @Override

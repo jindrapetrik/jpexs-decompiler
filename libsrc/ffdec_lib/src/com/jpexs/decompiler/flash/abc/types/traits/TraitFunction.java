@@ -80,7 +80,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
             writer.appendNoHilight(" {").newLine();
             int bodyIndex = abc.findBodyIndex(method_info);
             if (bodyIndex != -1) {
-                abc.bodies.get(bodyIndex).toString(path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false), exportMode, abc, this, abc.constants, abc.method_info, writer, fullyQualifiedNames);
+                abc.bodies.get(bodyIndex).toString(path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false), exportMode, abc, this, writer, fullyQualifiedNames);
             }
             writer.newLine();
             writer.appendNoHilight("}");
@@ -97,7 +97,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
         if (!abc.instance_info.get(classIndex).isInterface()) {
             int bodyIndex = abc.findBodyIndex(method_info);
             if (bodyIndex != -1) {
-                abc.bodies.get(bodyIndex).convert(path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false), exportMode, isStatic, method_info, scriptIndex, classIndex, abc, this, abc.constants, abc.method_info, new ScopeStack(), 0, writer, fullyQualifiedNames, null, true);
+                abc.bodies.get(bodyIndex).convert(path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false), exportMode, isStatic, method_info, scriptIndex, classIndex, abc, this, new ScopeStack(), 0, writer, fullyQualifiedNames, null, true);
             }
         }
         writer.endMethod();
@@ -107,7 +107,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
     public int removeTraps(int scriptIndex, int classIndex, boolean isStatic, ABC abc, String path) throws InterruptedException {
         int bodyIndex = abc.findBodyIndex(method_info);
         if (bodyIndex != -1) {
-            return abc.bodies.get(bodyIndex).removeTraps(abc.constants, abc, this, scriptIndex, classIndex, isStatic, path);
+            return abc.bodies.get(bodyIndex).removeTraps(abc, this, scriptIndex, classIndex, isStatic, path);
         }
         return 0;
     }

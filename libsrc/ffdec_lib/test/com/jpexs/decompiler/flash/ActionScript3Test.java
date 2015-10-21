@@ -79,9 +79,9 @@ public class ActionScript3Test extends ActionScriptTestBase {
         try {
             List<Traits> ts = new ArrayList<>();
             ts.add(abc.instance_info.get(clsIndex).instance_traits);
-            abc.bodies.get(bodyIndex).convert(methodName, ScriptExportMode.AS, isStatic, -1/*FIX?*/, -1/*FIX?*/, clsIndex, abc, null, abc.constants, abc.method_info, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), ts, true);
+            abc.bodies.get(bodyIndex).convert(methodName, ScriptExportMode.AS, isStatic, -1/*FIX?*/, -1/*FIX?*/, clsIndex, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), ts, true);
             writer = new HighlightedTextWriter(new CodeFormatting(), false);
-            abc.bodies.get(bodyIndex).toString(methodName, ScriptExportMode.AS, abc, null, abc.constants, abc.method_info, writer, new ArrayList<>());
+            abc.bodies.get(bodyIndex).toString(methodName, ScriptExportMode.AS, abc, null, writer, new ArrayList<>());
         } catch (InterruptedException ex) {
             fail();
         }

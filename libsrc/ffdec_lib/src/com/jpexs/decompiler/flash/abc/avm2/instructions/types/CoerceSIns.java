@@ -43,7 +43,7 @@ public class CoerceSIns extends InstructionDefinition implements CoerceOrConvert
 
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
-        stack.push(new CoerceAVM2Item(ins, stack.pop(), getTargetType(localData.constants, ins)));
+        stack.push(new CoerceAVM2Item(ins, stack.pop(), getTargetType(localData.getConstants(), ins)));
     }
 
     @Override

@@ -45,6 +45,6 @@ public class DXNSIns extends InstructionDefinition {
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         //FIXME!!! -  search namespace
-        output.add(new DefaultXMLNamespace(ins, new StringAVM2Item(ins, localData.constants.getString(ins.operands[0]))));
+        output.add(new DefaultXMLNamespace(ins, new StringAVM2Item(ins, localData.getConstants().getString(ins.operands[0]))));
     }
 }

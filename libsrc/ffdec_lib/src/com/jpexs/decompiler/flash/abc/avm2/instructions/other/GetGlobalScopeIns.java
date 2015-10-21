@@ -45,7 +45,7 @@ public class GetGlobalScopeIns extends InstructionDefinition {
             if (localData.classIndex == -1) {
                 stack.push(new ScriptAVM2Item(localData.scriptIndex));
             } else {
-                stack.push(new ClassAVM2Item(localData.abc.instance_info.get(localData.classIndex).getName(localData.constants)));
+                stack.push(new ClassAVM2Item(localData.getInstanceInfo().get(localData.classIndex).getName(localData.getConstants())));
             }
             return;
         }

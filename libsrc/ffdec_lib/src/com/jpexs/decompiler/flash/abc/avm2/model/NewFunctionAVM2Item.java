@@ -17,10 +17,8 @@
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
-import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -48,13 +46,9 @@ public class NewFunctionAVM2Item extends AVM2Item {
 
     public List<DottedChain> fullyQualifiedNames;
 
-    public AVM2ConstantPool constants;
-
-    public List<MethodInfo> methodInfo;
-
     public int methodIndex;
 
-    public NewFunctionAVM2Item(AVM2Instruction instruction, String functionName, String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, List<DottedChain> fullyQualifiedNames, AVM2ConstantPool constants, List<MethodInfo> methodInfo, int methodIndex) {
+    public NewFunctionAVM2Item(AVM2Instruction instruction, String functionName, String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, List<DottedChain> fullyQualifiedNames, int methodIndex) {
         super(instruction, PRECEDENCE_PRIMARY);
         this.functionName = functionName;
         this.path = path;
@@ -63,8 +57,6 @@ public class NewFunctionAVM2Item extends AVM2Item {
         this.classIndex = classIndex;
         this.abc = abc;
         this.fullyQualifiedNames = fullyQualifiedNames;
-        this.constants = constants;
-        this.methodInfo = methodInfo;
         this.methodIndex = methodIndex;
     }
 
@@ -75,20 +67,20 @@ public class NewFunctionAVM2Item extends AVM2Item {
         writer.startMethod(methodIndex);
         writer.append((!functionName.isEmpty() ? " " + functionName : ""));
         writer.appendNoHilight("(");
-        methodInfo.get(methodIndex).getParamStr(writer, constants, body, abc, fullyQualifiedNames);
+        abc.method_info.get(methodIndex).getParamStr(writer, abc.constants, body, abc, fullyQualifiedNames);
         writer.appendNoHilight("):");
         if (Configuration.showMethodBodyId.get()) {
             writer.appendNoHilight("// method body id: ");
             writer.appendNoHilight(abc.findBodyIndex(methodIndex));
             writer.newLine();
         }
-        methodInfo.get(methodIndex).getReturnTypeStr(writer, constants, fullyQualifiedNames);
+        abc.method_info.get(methodIndex).getReturnTypeStr(writer, abc.constants, fullyQualifiedNames);
         writer.startBlock();
         if (body != null) {
             if (writer instanceof NulWriter) {
-                body.convert(path + "/inner", ScriptExportMode.AS, isStatic, methodIndex, scriptIndex, classIndex, abc, null, constants, methodInfo, new ScopeStack(), 0, (NulWriter) writer, fullyQualifiedNames, null, false);
+                body.convert(path + "/inner", ScriptExportMode.AS, isStatic, methodIndex, scriptIndex, classIndex, abc, null, new ScopeStack(), 0, (NulWriter) writer, fullyQualifiedNames, null, false);
             } else {
-                body.toString(path + "/inner", ScriptExportMode.AS, abc, null, constants, methodInfo, writer, fullyQualifiedNames);
+                body.toString(path + "/inner", ScriptExportMode.AS, abc, null, writer, fullyQualifiedNames);
             }
         }
         writer.endBlock();

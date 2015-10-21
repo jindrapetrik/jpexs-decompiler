@@ -61,7 +61,7 @@ public class ConvertDIns extends InstructionDefinition implements CoerceOrConver
 
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
-        stack.push(new ConvertAVM2Item(ins, stack.pop(), getTargetType(localData.constants, ins)));
+        stack.push(new ConvertAVM2Item(ins, stack.pop(), getTargetType(localData.getConstants(), ins)));
     }
 
     @Override

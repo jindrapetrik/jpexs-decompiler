@@ -41,14 +41,14 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
         int regId = getRegisterId(ins);
 
         if (regId == 0) {
-            if ((localData.classIndex >= localData.abc.instance_info.size()) || localData.classIndex < 0) {
+            if ((localData.classIndex >= localData.getInstanceInfo().size()) || localData.classIndex < 0) {
                 stack.push(new ScriptAVM2Item(localData.scriptIndex));
                 return;
             }
             if (localData.isStatic) {
-                stack.push(new ClassAVM2Item(localData.abc.instance_info.get(localData.classIndex).getName(localData.constants)));
+                stack.push(new ClassAVM2Item(localData.getInstanceInfo().get(localData.classIndex).getName(localData.getConstants())));
             } else {
-                stack.push(new ThisAVM2Item(ins, localData.abc.instance_info.get(localData.classIndex).getName(localData.constants)));
+                stack.push(new ThisAVM2Item(ins, localData.getInstanceInfo().get(localData.classIndex).getName(localData.getConstants())));
             }
             return;
         }

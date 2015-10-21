@@ -122,8 +122,6 @@ public class AVM2Graph extends Graph {
         localData.classIndex = classIndex;
         localData.localRegs = localRegs;
         localData.scopeStack = scopeStack;
-        localData.constants = abc.constants;
-        localData.methodInfo = abc.method_info;
         localData.methodBody = body;
         localData.abc = abc;
         localData.localRegNames = localRegNames;

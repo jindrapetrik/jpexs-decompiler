@@ -444,7 +444,10 @@ public class TagTreeContextMenu extends JPopupMenu {
             Timelined timelined = isDefineSprite ? (DefineSpriteTag) firstItem : swf;
             t.setTimelined(timelined);
             if (isDefineSprite) {
-                ((DefineSpriteTag) firstItem).subTags.add(t);
+                DefineSpriteTag sprite = (DefineSpriteTag) firstItem;
+                timelined.resetTimeline();
+                sprite.subTags.add(t);
+                sprite.frameCount = timelined.getTimeline().getFrameCount();
             } else {
                 int index;
                 if (firstItem instanceof Tag) {
@@ -470,8 +473,10 @@ public class TagTreeContextMenu extends JPopupMenu {
                 } else {
                     swf.tags.add(t);
                 }
+
+                timelined.resetTimeline();
             }
-            timelined.resetTimeline();
+
             swf.updateCharacters();
             mainPanel.refreshTree(swf);
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException ex) {

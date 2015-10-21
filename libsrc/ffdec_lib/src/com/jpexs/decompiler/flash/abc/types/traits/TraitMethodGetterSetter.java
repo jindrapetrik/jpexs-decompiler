@@ -81,7 +81,7 @@ public class TraitMethodGetterSetter extends Trait {
         int bodyIndex = abc.findBodyIndex(method_info);
         if (!(classIndex != -1 && abc.instance_info.get(classIndex).isInterface() || bodyIndex == -1)) {
             if (bodyIndex != -1) {
-                abc.bodies.get(bodyIndex).convert(path, exportMode, isStatic, method_info, scriptIndex, classIndex, abc, this, abc.constants, abc.method_info, new ScopeStack(), 0, writer, fullyQualifiedNames, null, true);
+                abc.bodies.get(bodyIndex).convert(path, exportMode, isStatic, method_info, scriptIndex, classIndex, abc, this, new ScopeStack(), 0, writer, fullyQualifiedNames, null, true);
             }
         }
         writer.endMethod();
@@ -99,7 +99,7 @@ public class TraitMethodGetterSetter extends Trait {
         } else {
             writer.startBlock();
             if (bodyIndex != -1) {
-                abc.bodies.get(bodyIndex).toString(path, exportMode, abc, this, abc.constants, abc.method_info, writer, fullyQualifiedNames);
+                abc.bodies.get(bodyIndex).toString(path, exportMode, abc, this, writer, fullyQualifiedNames);
             }
             writer.endBlock();
         }
@@ -112,7 +112,7 @@ public class TraitMethodGetterSetter extends Trait {
     public int removeTraps(int scriptIndex, int classIndex, boolean isStatic, ABC abc, String path) throws InterruptedException {
         int bodyIndex = abc.findBodyIndex(method_info);
         if (bodyIndex != -1) {
-            return abc.bodies.get(bodyIndex).removeTraps(abc.constants, abc, this, scriptIndex, classIndex, isStatic, path);
+            return abc.bodies.get(bodyIndex).removeTraps(abc, this, scriptIndex, classIndex, isStatic, path);
         }
         return 0;
     }

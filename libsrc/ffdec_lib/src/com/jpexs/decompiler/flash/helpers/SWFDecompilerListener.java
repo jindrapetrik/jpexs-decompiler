@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.helpers;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
+import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.List;
@@ -40,4 +41,7 @@ public interface SWFDecompilerListener {
     void abcParsed(ABC abc, SWF swf);
 
     void methodBodyParsed(MethodBody body, SWF swf);
+
+    // this method is only called when deobfuscation is enabled and new deobfuscation mode is selected
+    void avm2CodeRemoveTraps(String path, int classIndex, boolean isStatic, int scriptIndex, ABC abc, Trait trait, int methodInfo, MethodBody body) throws InterruptedException;
 }

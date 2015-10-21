@@ -58,6 +58,10 @@ public class IdentifiersDeobfuscation {
 
     private static final Pattern IDENTIFIER_PATTERN = Pattern.compile("^[" + VALID_FIRST_CHARACTERS + "][" + VALID_NEXT_CHARACTERS + "]*$");
 
+    private static final Pattern VALID_NAME_PATTERN_DOT = Pattern.compile("^[a-zA-Z_\\$][a-zA-Z0-9_.\\$]*$");
+
+    private static final Pattern IDENTIFIER_PATTERN_DOT = Pattern.compile("^[" + VALID_FIRST_CHARACTERS + "][" + VALID_NEXT_CHARACTERS + ".]*$");
+
     public static final String FOO_CHARACTERS = "bcdfghjklmnpqrstvwz";
 
     public static final String FOO_JOIN_CHARACTERS = "aeiouy";
@@ -226,6 +230,28 @@ public class IdentifiersDeobfuscation {
             return newClassName;
         }
         return null;
+    }
+
+    public static boolean isValidNameWithDot(boolean as3, String s, String... exceptions) {
+        for (String e : exceptions) {
+            if (e.equals(s)) {
+                return true;
+            }
+        }
+
+        if (isReservedWord(s, as3)) {
+            return false;
+        }
+
+        // simple fast test
+        if (VALID_NAME_PATTERN_DOT.matcher(s).matches()) {
+            return true;
+        }
+        // unicode test
+        if (IDENTIFIER_PATTERN_DOT.matcher(s).matches()) {
+            return true;
+        }
+        return false;
     }
 
     public static boolean isValidName(boolean as3, String s, String... exceptions) {

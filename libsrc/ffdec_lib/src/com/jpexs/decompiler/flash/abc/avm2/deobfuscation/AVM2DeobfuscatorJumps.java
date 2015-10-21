@@ -19,12 +19,10 @@ package com.jpexs.decompiler.flash.abc.avm2.deobfuscation;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
-import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.IfTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
-import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.action.ActionList;
 import java.util.List;
@@ -47,7 +45,7 @@ public class AVM2DeobfuscatorJumps extends AVM2DeobfuscatorSimple {
     }
 
     @Override
-    public void deobfuscate(String path, int classIndex, boolean isStatic, int scriptIndex, ABC abc, AVM2ConstantPool cpool, Trait trait, MethodInfo minfo, MethodBody body) throws InterruptedException {
+    public void avm2CodeRemoveTraps(String path, int classIndex, boolean isStatic, int scriptIndex, ABC abc, Trait trait, int methodInfo, MethodBody body) throws InterruptedException {
 
         //body.getCode().markMappedOffsets();
         //removeUnreachableInstructions(body.getCode(), cpool, trait, minfo, body);
@@ -81,7 +79,7 @@ public class AVM2DeobfuscatorJumps extends AVM2DeobfuscatorSimple {
                     }
                 }
             }
-            removeUnreachableInstructions(body.getCode(), cpool, trait, minfo, body);
+            removeUnreachableInstructions(body.getCode(), body);
         } while (found);
     }
 }

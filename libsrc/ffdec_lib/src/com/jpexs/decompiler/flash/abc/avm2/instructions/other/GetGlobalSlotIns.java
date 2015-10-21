@@ -43,7 +43,7 @@ public class GetGlobalSlotIns extends InstructionDefinition {
         GraphTargetItem obj = localData.scopeStack.get(0); //scope
         Multiname slotname = null;
         if (obj instanceof ExceptionAVM2Item) {
-            slotname = localData.constants.getMultiname(((ExceptionAVM2Item) obj).exception.name_index);
+            slotname = localData.getConstants().getMultiname(((ExceptionAVM2Item) obj).exception.name_index);
         } else {
             MethodBody body = localData.methodBody;
             List<Trait> traits = body.traits.traits;

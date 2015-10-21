@@ -89,13 +89,13 @@ public class ConstructIns extends InstructionDefinition {
                 FullMultinameAVM2Item fptXmlMult = (FullMultinameAVM2Item) fpt.propertyName;
                 FullMultinameAVM2Item gptXmlMult = (FullMultinameAVM2Item) gpt.propertyName;
 
-                isXML = fptXmlMult.isXML(localData.constants, localData.localRegNames, localData.fullyQualifiedNames)
-                        && gptXmlMult.isXML(localData.constants, localData.localRegNames, localData.fullyQualifiedNames);
+                isXML = fptXmlMult.isXML(localData.getConstants(), localData.localRegNames, localData.fullyQualifiedNames)
+                        && gptXmlMult.isXML(localData.getConstants(), localData.localRegNames, localData.fullyQualifiedNames);
             }
         }
         if (obj instanceof GetLexAVM2Item) {
             GetLexAVM2Item glt = (GetLexAVM2Item) obj;
-            isXML = glt.propertyName.getName(localData.constants, localData.fullyQualifiedNames, true).equals("XML");
+            isXML = glt.propertyName.getName(localData.getConstants(), localData.fullyQualifiedNames, true).equals("XML");
         }
 
         if (isXML) {

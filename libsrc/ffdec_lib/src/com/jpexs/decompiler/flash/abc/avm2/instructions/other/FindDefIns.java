@@ -36,7 +36,7 @@ public class FindDefIns extends InstructionDefinition {
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         int multinameIndex = ins.operands[0];
-        Multiname multiname = localData.constants.getMultiname(multinameIndex);
+        Multiname multiname = localData.getConstants().getMultiname(multinameIndex);
         stack.push(new FindDefAVM2Item(ins, multiname));
     }
 

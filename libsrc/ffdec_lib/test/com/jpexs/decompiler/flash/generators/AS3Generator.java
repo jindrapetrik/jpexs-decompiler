@@ -70,8 +70,8 @@ public class AS3Generator {
                     MethodBody b = abc.findBody(((TraitMethodGetterSetter) t).method_info);
                     List<Traits> ts = new ArrayList<>();
                     ts.add(abc.instance_info.get(classId).instance_traits);
-                    b.convert("", ScriptExportMode.AS, false, -1/*FIX?*/, -1/*FIX?*/, classId, abc, null, abc.constants, abc.method_info, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), ts, true);
-                    b.toString("", ScriptExportMode.AS, abc, null, abc.constants, abc.method_info, src, new ArrayList<>());
+                    b.convert("", ScriptExportMode.AS, false, -1/*FIX?*/, -1/*FIX?*/, classId, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), ts, true);
+                    b.toString("", ScriptExportMode.AS, abc, null, src, new ArrayList<>());
                     String[] srcs = src.toString().split("[\r\n]+");
                     for (int i = 0; i < srcs.length; i++) {
                         String ss = srcs[i];

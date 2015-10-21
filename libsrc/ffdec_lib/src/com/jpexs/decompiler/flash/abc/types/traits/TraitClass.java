@@ -470,7 +470,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
             writer.startMethod(classInfo.cinit_index);
             if (!classInitializerIsEmpty) {
                 writer.startBlock();
-                abc.bodies.get(bodyIndex).toString(path +/*packageName +*/ "/" + instanceInfoName + ".staticinitializer", exportMode, abc, this, abc.constants, abc.method_info, writer, fullyQualifiedNames);
+                abc.bodies.get(bodyIndex).toString(path +/*packageName +*/ "/" + instanceInfoName + ".staticinitializer", exportMode, abc, this, writer, fullyQualifiedNames);
                 writer.endBlock();
             } else {
                 //Note: There must be trait/method highlight even if the initializer is empty to TraitList in GUI to work correctly
@@ -518,7 +518,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
             abc.method_info.get(instanceInfo.iinit_index).getParamStr(writer, abc.constants, body, abc, fullyQualifiedNames);
             writer.appendNoHilight(")").startBlock();
             if (body != null) {
-                body.toString(path +/*packageName +*/ "/" + instanceInfoName + ".initializer", exportMode, abc, this, abc.constants, abc.method_info, writer, fullyQualifiedNames);
+                body.toString(path +/*packageName +*/ "/" + instanceInfoName + ".initializer", exportMode, abc, this, writer, fullyQualifiedNames);
             }
 
             writer.endBlock().newLine();
@@ -553,7 +553,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
             writer.mark();
             List<Traits> ts = new ArrayList<>();
             ts.add(classInfo.static_traits);
-            abc.bodies.get(bodyIndex).convert(path +/*packageName +*/ "/" + instanceInfoName + ".staticinitializer", exportMode, true, classInfo.cinit_index, scriptIndex, class_info, abc, this, abc.constants, abc.method_info, new ScopeStack(), GraphTextWriter.TRAIT_CLASS_INITIALIZER, writer, fullyQualifiedNames, ts, true);
+            abc.bodies.get(bodyIndex).convert(path +/*packageName +*/ "/" + instanceInfoName + ".staticinitializer", exportMode, true, classInfo.cinit_index, scriptIndex, class_info, abc, this, new ScopeStack(), GraphTextWriter.TRAIT_CLASS_INITIALIZER, writer, fullyQualifiedNames, ts, true);
             classInitializerIsEmpty = !writer.getMark();
         }
 
@@ -563,7 +563,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
             if (bodyIndex != -1) {
                 List<Traits> ts = new ArrayList<>();
                 ts.add(instanceInfo.instance_traits);
-                abc.bodies.get(bodyIndex).convert(path +/*packageName +*/ "/" + instanceInfoName + ".initializer", exportMode, false, instanceInfo.iinit_index, scriptIndex, class_info, abc, this, abc.constants, abc.method_info, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, writer, fullyQualifiedNames, ts, true);
+                abc.bodies.get(bodyIndex).convert(path +/*packageName +*/ "/" + instanceInfoName + ".initializer", exportMode, false, instanceInfo.iinit_index, scriptIndex, class_info, abc, this, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, writer, fullyQualifiedNames, ts, true);
             }
         }
 
@@ -585,11 +585,11 @@ public class TraitClass extends Trait implements TraitWithSlot {
         int iInitializer = abc.findBodyIndex(instanceInfo.iinit_index);
         int ret = 0;
         if (iInitializer != -1) {
-            ret += abc.bodies.get(iInitializer).removeTraps(abc.constants, abc, this, scriptIndex, class_info, false, path);
+            ret += abc.bodies.get(iInitializer).removeTraps(abc, this, scriptIndex, class_info, false, path);
         }
         int sInitializer = abc.findBodyIndex(classInfo.cinit_index);
         if (sInitializer != -1) {
-            ret += abc.bodies.get(sInitializer).removeTraps(abc.constants, abc, this, scriptIndex, class_info, true, path);
+            ret += abc.bodies.get(sInitializer).removeTraps(abc, this, scriptIndex, class_info, true, path);
         }
         ret += instanceInfo.instance_traits.removeTraps(scriptIndex, class_info, false, abc, path);
         ret += classInfo.static_traits.removeTraps(scriptIndex, class_info, true, abc, path);

@@ -57,7 +57,7 @@ public class CallStaticIns extends InstructionDefinition {
             args.add(0, stack.pop());
         }
         GraphTargetItem receiver = stack.pop();
-        String methodName = localData.methodInfo.get(methodIndex).getName(localData.constants);
+        String methodName = localData.getMethodInfo().get(methodIndex).getName(localData.getConstants());
         stack.push(new CallStaticAVM2Item(ins, receiver, methodName, args));
     }
 

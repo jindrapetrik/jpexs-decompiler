@@ -77,7 +77,6 @@ import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.StringAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.UndefinedAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
-import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
@@ -170,7 +169,7 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
         }
     }
 
-    protected boolean removeObfuscationIfs(int classIndex, boolean isStatic, int scriptIndex, ABC abc, AVM2ConstantPool cpool, Trait trait, MethodInfo minfo, MethodBody body, List<AVM2Instruction> inlineIns) throws InterruptedException {
+    protected boolean removeObfuscationIfs(int classIndex, boolean isStatic, int scriptIndex, ABC abc, MethodBody body, List<AVM2Instruction> inlineIns) throws InterruptedException {
         AVM2Code code = body.getCode();
         if (code.code.isEmpty()) {
             return false;
@@ -206,7 +205,7 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
         return false;
     }
 
-    protected void removeUnreachableInstructions(AVM2Code code, AVM2ConstantPool cpool, Trait trait, MethodInfo minfo, MethodBody body) throws InterruptedException {
+    protected void removeUnreachableInstructions(AVM2Code code, MethodBody body) throws InterruptedException {
         code.removeDeadCode(body);
     }
 
@@ -236,8 +235,6 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
         localData.localRegs = new HashMap<>(body.max_regs);
         localData.localRegAssignmentIps = new HashMap<>();
         localData.scopeStack = new ScopeStack(true);
-        localData.constants = cpool;
-        localData.methodInfo = abc.method_info;
         localData.methodBody = body;
         localData.abc = abc;
         localData.localRegNames = new HashMap<>();
@@ -472,10 +469,11 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
 
     }
 
-    public void deobfuscate(String path, int classIndex, boolean isStatic, int scriptIndex, ABC abc, AVM2ConstantPool cpool, Trait trait, MethodInfo minfo, MethodBody body) throws InterruptedException {
+    @Override
+    public void avm2CodeRemoveTraps(String path, int classIndex, boolean isStatic, int scriptIndex, ABC abc, Trait trait, int methodInfo, MethodBody body) throws InterruptedException {
         AVM2Code code = body.getCode();
-        removeUnreachableInstructions(code, cpool, trait, minfo, body);
-        removeObfuscationIfs(classIndex, isStatic, scriptIndex, abc, cpool, trait, minfo, body, new ArrayList<>());
+        removeUnreachableInstructions(code, body);
+        removeObfuscationIfs(classIndex, isStatic, scriptIndex, abc, body, new ArrayList<>());
         removeZeroJumps(code, body);
     }
 

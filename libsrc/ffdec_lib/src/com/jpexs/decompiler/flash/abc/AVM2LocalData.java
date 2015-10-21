@@ -20,8 +20,10 @@ import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
+import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
+import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.ScopeStack;
@@ -43,10 +45,6 @@ public class AVM2LocalData extends BaseLocalData {
     public HashMap<Integer, GraphTargetItem> localRegs;
 
     public ScopeStack scopeStack;
-
-    public AVM2ConstantPool constants;
-
-    public List<MethodInfo> methodInfo;
 
     public MethodBody methodBody;
 
@@ -83,8 +81,6 @@ public class AVM2LocalData extends BaseLocalData {
         classIndex = localData.classIndex;
         localRegs = localData.localRegs;
         scopeStack = localData.scopeStack;
-        constants = localData.constants;
-        methodInfo = localData.methodInfo;
         methodBody = localData.methodBody;
         abc = localData.abc;
         localRegNames = localData.localRegNames;
@@ -98,5 +94,21 @@ public class AVM2LocalData extends BaseLocalData {
         ip = localData.ip;
         refs = localData.refs;
         code = localData.code;
+    }
+
+    public AVM2ConstantPool getConstants() {
+        return abc.constants;
+    }
+
+    public List<MethodInfo> getMethodInfo() {
+        return abc.method_info;
+    }
+
+    public List<InstanceInfo> getInstanceInfo() {
+        return abc.instance_info;
+    }
+
+    public List<ScriptInfo> getScriptInfo() {
+        return abc.script_info;
     }
 }

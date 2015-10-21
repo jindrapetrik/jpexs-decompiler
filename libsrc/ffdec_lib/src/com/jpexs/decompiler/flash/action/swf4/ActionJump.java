@@ -85,7 +85,7 @@ public class ActionJump extends Action {
 
     @Override
     public String getASMSource(ActionList container, Set<Long> knownAddreses, ScriptExportMode exportMode) {
-        long address = getAddress() + getTotalActionLength() + offset;
+        long address = getTargetAddress();
         String ofsStr = Helper.formatAddress(address);
         return "Jump loc" + ofsStr;
     }

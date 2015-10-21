@@ -35,7 +35,7 @@ public class NewFunctionIns extends InstructionDefinition {
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         int methodIndex = ins.operands[0];
-        NewFunctionAVM2Item function = new NewFunctionAVM2Item(ins, "", path, localData.isStatic, localData.scriptIndex, localData.classIndex, localData.abc, localData.fullyQualifiedNames, localData.constants, localData.methodInfo, methodIndex);
+        NewFunctionAVM2Item function = new NewFunctionAVM2Item(ins, "", path, localData.isStatic, localData.scriptIndex, localData.classIndex, localData.abc, localData.fullyQualifiedNames, methodIndex);
         stack.push(function);
     }
 

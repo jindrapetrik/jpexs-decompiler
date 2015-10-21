@@ -60,10 +60,10 @@ public class ConstructPropIns extends InstructionDefinition {
         for (int a = 0; a < argCount; a++) {
             args.add(0, stack.pop());
         }
-        FullMultinameAVM2Item multiname = resolveMultiname(stack, localData.constants, multinameIndex, ins);
+        FullMultinameAVM2Item multiname = resolveMultiname(stack, localData.getConstants(), multinameIndex, ins);
         GraphTargetItem obj = stack.pop();
 
-        if (multiname.isXML(localData.constants, localData.localRegNames, localData.fullyQualifiedNames)) {
+        if (multiname.isXML(localData.getConstants(), localData.localRegNames, localData.fullyQualifiedNames)) {
             if (args.size() == 1) {
                 GraphTargetItem arg = args.get(0);
                 List<GraphTargetItem> xmlLines = new ArrayList<>();

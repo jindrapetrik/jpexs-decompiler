@@ -39,10 +39,10 @@ public class NewClassIns extends InstructionDefinition {
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) throws InterruptedException {
         int clsIndex = ins.operands[0];
         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
-        stack.pop().toString(writer, LocalData.create(localData.constants, localData.localRegNames, localData.fullyQualifiedNames));
+        stack.pop().toString(writer, LocalData.create(localData.getConstants(), localData.localRegNames, localData.fullyQualifiedNames));
         String baseType = writer.toString();
         ABC abc = localData.abc;
-        stack.push(new UnparsedAVM2Item(ins, "new " + abc.constants.getMultiname(abc.instance_info.get(clsIndex).name_index).getName(localData.constants, localData.fullyQualifiedNames, false) + ".class extends " + baseType));
+        stack.push(new UnparsedAVM2Item(ins, "new " + abc.constants.getMultiname(abc.instance_info.get(clsIndex).name_index).getName(localData.getConstants(), localData.fullyQualifiedNames, false) + ".class extends " + baseType));
     }
 
     @Override

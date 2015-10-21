@@ -19,8 +19,11 @@ package com.jpexs.decompiler.flash.helpers;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
+import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.action.ActionList;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.Path;
 import com.jpexs.helpers.plugin.CharSequenceJavaFileObject;
 import com.jpexs.helpers.plugin.ClassFileManager;
 import java.util.ArrayList;
@@ -43,6 +46,18 @@ public class SWFDecompilerPlugin {
     private static final List<SWFDecompilerListener> listeners = new ArrayList<>();
 
     public static void loadPlugin(String path) {
+        if (".class".equals(Path.getExtension(path))) {
+            loadPluginCompiled(path);
+        } else {
+            loadPluginSource(path);
+        }
+    }
+
+    private static void loadPluginCompiled(String path) {
+
+    }
+
+    private static void loadPluginSource(String path) {
 
         // Here we specify the source code of the class to be compiled
         String src = Helper.readTextFile(path);
@@ -90,6 +105,8 @@ public class SWFDecompilerPlugin {
                     result = newResult;
                     data = newResult;
                 }
+            } catch (ThreadDeath ex) {
+                throw ex;
             } catch (Throwable e) {
                 logger.log(Level.SEVERE, "Failed to call plugin method proxyFileCatched.", e);
             }
@@ -101,6 +118,8 @@ public class SWFDecompilerPlugin {
         for (SWFDecompilerListener listener : listeners) {
             try {
                 listener.swfParsed(swf);
+            } catch (ThreadDeath ex) {
+                throw ex;
             } catch (Throwable e) {
                 logger.log(Level.SEVERE, "Failed to call plugin method swfParsed.", e);
             }
@@ -108,12 +127,27 @@ public class SWFDecompilerPlugin {
         return !listeners.isEmpty();
     }
 
-    public static boolean fireActionListParsed(ActionList actions, SWF swf) {
+    public static boolean fireActionListParsed(ActionList actions, SWF swf) throws InterruptedException {
         for (SWFDecompilerListener listener : listeners) {
             try {
                 listener.actionListParsed(actions, swf);
+            } catch (ThreadDeath | InterruptedException ex) {
+                throw ex;
             } catch (Throwable e) {
                 logger.log(Level.SEVERE, "Failed to call plugin method actionListParsed.", e);
+            }
+        }
+        return !listeners.isEmpty();
+    }
+
+    public static boolean fireActionTreeCreated(List<GraphTargetItem> tree, SWF swf) throws InterruptedException {
+        for (SWFDecompilerListener listener : listeners) {
+            try {
+                listener.actionTreeCreated(tree, swf);
+            } catch (ThreadDeath | InterruptedException ex) {
+                throw ex;
+            } catch (Throwable e) {
+                logger.log(Level.SEVERE, "Failed to call plugin method actionTreeCreated.", e);
             }
         }
         return !listeners.isEmpty();
@@ -123,6 +157,8 @@ public class SWFDecompilerPlugin {
         for (SWFDecompilerListener listener : listeners) {
             try {
                 listener.abcParsed(abc, swf);
+            } catch (ThreadDeath ex) {
+                throw ex;
             } catch (Throwable e) {
                 logger.log(Level.SEVERE, "Failed to call plugin method abcParsed.", e);
             }
@@ -134,8 +170,23 @@ public class SWFDecompilerPlugin {
         for (SWFDecompilerListener listener : listeners) {
             try {
                 listener.methodBodyParsed(body, swf);
+            } catch (ThreadDeath ex) {
+                throw ex;
             } catch (Throwable e) {
                 logger.log(Level.SEVERE, "Failed to call plugin method methodBodyParsed.", e);
+            }
+        }
+        return !listeners.isEmpty();
+    }
+
+    public static boolean fireAvm2CodeRemoveTraps(String path, int classIndex, boolean isStatic, int scriptIndex, ABC abc, Trait trait, int methodInfo, MethodBody body) throws InterruptedException {
+        for (SWFDecompilerListener listener : listeners) {
+            try {
+                listener.avm2CodeRemoveTraps(path, classIndex, isStatic, scriptIndex, abc, trait, methodInfo, body);
+            } catch (ThreadDeath | InterruptedException ex) {
+                throw ex;
+            } catch (Throwable e) {
+                logger.log(Level.SEVERE, "Failed to call plugin method abcParsed.", e);
             }
         }
         return !listeners.isEmpty();

@@ -92,11 +92,11 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
     }
 
     @Override
-    public void deobfuscate(String path, int classIndex, boolean isStatic, int scriptIndex, ABC abc, AVM2ConstantPool cpool, Trait trait, MethodInfo minfo, MethodBody body) throws InterruptedException {
+    public void avm2CodeRemoveTraps(String path, int classIndex, boolean isStatic, int scriptIndex, ABC abc, Trait trait, int methodInfo, MethodBody body) throws InterruptedException {
         //System.err.println("regdeo:" + path);
 
         MethodBody originalBody = body;
-        removeUnreachableInstructions(body.getCode(), cpool, trait, minfo, body);
+        removeUnreachableInstructions(body.getCode(), body);
         Set<Integer> ignoredRegs = new HashSet<>();
 
         int localReservedCount = body.getLocalReservedCount();
@@ -141,7 +141,7 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
             AVM2Instruction assignment = assignmentRef.getVal();
             InstructionDefinition def = assignment.definition;
             if ((def instanceof SetLocalTypeIns) || (def instanceof GetLocalTypeIns /*First usage -> value undefined*/)) {
-                super.removeObfuscationIfs(classIndex, isStatic, scriptIndex, abc, cpool, trait, minfo, body, Arrays.asList(assignment));
+                super.removeObfuscationIfs(classIndex, isStatic, scriptIndex, abc, body, Arrays.asList(assignment));
             }
 
             if (def instanceof GetLocalTypeIns) {
@@ -154,7 +154,7 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
 
         originalBody.exceptions = body.exceptions;
         originalBody.setCode(body.getCode());
-        removeUnreachableInstructions(body.getCode(), cpool, trait, minfo, body);
+        removeUnreachableInstructions(body.getCode(), body);
         //System.err.println("/deo");
     }
 

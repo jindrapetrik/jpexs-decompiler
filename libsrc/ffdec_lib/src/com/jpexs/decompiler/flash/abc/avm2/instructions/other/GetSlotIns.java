@@ -48,13 +48,13 @@ public class GetSlotIns extends InstructionDefinition {
         obj = obj.getThroughRegister();
         Multiname slotname = null;
         if (obj instanceof ExceptionAVM2Item) {
-            slotname = localData.constants.getMultiname(((ExceptionAVM2Item) obj).exception.name_index);
+            slotname = localData.getConstants().getMultiname(((ExceptionAVM2Item) obj).exception.name_index);
         } else if (obj instanceof ClassAVM2Item) {
             slotname = ((ClassAVM2Item) obj).className;
         } else if (obj instanceof ThisAVM2Item) {
             slotname = ((ThisAVM2Item) obj).className;
         } else if (obj instanceof ScriptAVM2Item) {
-            List<Trait> traits = localData.abc.script_info.get(((ScriptAVM2Item) obj).scriptIndex).traits.traits;
+            List<Trait> traits = localData.getScriptInfo().get(((ScriptAVM2Item) obj).scriptIndex).traits.traits;
             for (int t = 0; t < traits.size(); t++) {
                 Trait tr = traits.get(t);
                 if (tr instanceof TraitWithSlot) {

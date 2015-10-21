@@ -60,7 +60,7 @@ public class CallPropertyIns extends InstructionDefinition {
             args.add(0, stack.pop());
         }
 
-        FullMultinameAVM2Item multiname = resolveMultiname(stack, localData.constants, multinameIndex, ins);
+        FullMultinameAVM2Item multiname = resolveMultiname(stack, localData.getConstants(), multinameIndex, ins);
         GraphTargetItem receiver = stack.pop();
 
         stack.push(new CallPropertyAVM2Item(ins, false, receiver, multiname, args));

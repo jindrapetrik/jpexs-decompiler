@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.action.deobfuscation.ActionDeobfuscatorSimpleFast;
 import com.jpexs.decompiler.flash.action.model.ActionItem;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
@@ -64,6 +65,7 @@ import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
+import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.Graph;
@@ -817,13 +819,20 @@ public abstract class Action implements GraphSourceItem {
         List<GraphTargetItem> tree = null;
         Throwable convertException = null;
         int timeout = Configuration.decompilationTimeoutSingleMethod.get();
-        final int version = asm == null ? SWF.DEFAULT_VERSION : asm.getSwf().version;
+        final SWF swf = asm == null ? null : asm.getSwf();
+        final int version = swf == null ? SWF.DEFAULT_VERSION : swf.version;
         try {
             tree = CancellableWorker.call(new Callable<List<GraphTargetItem>>() {
                 @Override
                 public List<GraphTargetItem> call() throws Exception {
                     int staticOperation = Graph.SOP_USE_STATIC; //(Boolean) Configuration.getConfig("autoDeobfuscate", true) ? Graph.SOP_SKIP_STATIC : Graph.SOP_USE_STATIC;
                     List<GraphTargetItem> tree = actionsToTree(new HashMap<>(), new HashMap<>(), new HashMap<>(), actions, version, staticOperation, path);
+                    SWFDecompilerPlugin.fireActionTreeCreated(tree, swf);
+                    int deobfuscationMode = Configuration.autoDeobfuscate.get() ? (Configuration.deobfuscationOldMode.get() ? 0 : 1) : -1;
+                    if (deobfuscationMode == 1) {
+                        new ActionDeobfuscatorSimpleFast().actionTreeCreated(tree, swf);
+                    }
+
                     Graph.graphToString(tree, new NulWriter(), new LocalData());
                     return tree;
                 }
