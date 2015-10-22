@@ -93,7 +93,10 @@ import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG4Tag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
+import com.jpexs.decompiler.flash.tags.FileAttributesTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
+import com.jpexs.decompiler.flash.tags.ScriptLimitsTag;
+import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
@@ -116,6 +119,7 @@ import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
+import com.jpexs.helpers.ProgressListener;
 import com.jpexs.helpers.stat.StatisticData;
 import com.jpexs.helpers.stat.Statistics;
 import com.jpexs.helpers.streams.SeekableInputStream;
@@ -136,11 +140,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -148,7 +154,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Stack;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -579,6 +588,9 @@ public class CommandLineArgumentParser {
                     break;
                 case "-stat":
                     parseStat(args);
+                    break;
+                case "-info":
+                    parseInfo(args);
                     break;
                 case "-stdout":
                     parseStdOut(args);
@@ -2545,6 +2557,170 @@ public class CommandLineArgumentParser {
         }
     }
 
+    private static void parseInfo(Stack<String> args) throws FileNotFoundException {
+        File out = null;
+        PrintWriter pw = new PrintWriter(System.out);
+        boolean found = false;
+        while (!args.isEmpty()) {
+            String a = args.pop();
+            switch (a) {
+                case "-out":
+                    if (args.isEmpty()) {
+                        badArguments("info");
+                    }
+                    out = new File(args.pop());
+                    if (out.isDirectory()) {
+                        Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, "File is a directory");
+                        System.exit(1);
+                    } else if (out.exists()) {
+                        pw = new PrintWriter(out);
+                    }
+                    break;
+                default:
+                    SWFBundle bundle = null;
+                    String sfile = a;
+                    File file = new File(sfile);
+                    try {
+
+                        SWFSourceInfo sourceInfo = new SWFSourceInfo(null, sfile, sfile);
+                        bundle = sourceInfo.getBundle(false, SearchMode.ALL);
+                        logger.log(Level.INFO, "Load file: {0}", sourceInfo.getFile());
+
+                        if (bundle != null) {
+                            int subcnt = 0;
+                            for (Entry<String, SeekableInputStream> streamEntry : bundle.getAll().entrySet()) {
+                                InputStream stream = streamEntry.getValue();
+                                stream.reset();
+                                CancellableWorker<SWF> worker = new CancellableWorker<SWF>() {
+                                    @Override
+                                    public SWF doInBackground() throws Exception {
+                                        final CancellableWorker worker = this;
+                                        SWF swf = new SWF(stream, null, streamEntry.getKey(), new ProgressListener() {
+                                            @Override
+                                            public void progress(int p) {
+                                                //...
+                                            }
+                                        }, Configuration.parallelSpeedUp.get());
+                                        return swf;
+                                    }
+                                };
+                                //loadingDialog.setWroker(worker);
+                                worker.execute();
+
+                                subcnt++;
+                                try {
+                                    proccessInfoSWF(file, worker.get(), pw);
+                                } catch (CancellationException | ExecutionException | InterruptedException ex) {
+                                    logger.log(Level.WARNING, "Loading SWF {0} was cancelled.", streamEntry.getKey());
+                                }
+                            }
+                            if (subcnt > 0) {
+                                found = true;
+                            } else {
+                                System.err.println("No SWFs found in \"" + file + "\"");
+                            }
+                        } else {
+                            FileInputStream fis = new FileInputStream(file);
+                            BufferedInputStream inputStream = new BufferedInputStream(fis);
+
+                            InputStream fInputStream = inputStream;
+                            CancellableWorker<SWF> worker = new CancellableWorker<SWF>() {
+                                @Override
+                                public SWF doInBackground() throws Exception {
+                                    final CancellableWorker worker = this;
+                                    SWF swf = new SWF(fInputStream, sourceInfo.getFile(), sourceInfo.getFileTitle(), new ProgressListener() {
+                                        @Override
+                                        public void progress(int p) {
+                                            //startWork(AppStrings.translate("work.reading.swf"), p, worker);
+                                        }
+                                    }, Configuration.parallelSpeedUp.get());
+                                    return swf;
+                                }
+                            };
+
+                            worker.execute();
+
+                            try {
+                                proccessInfoSWF(null, worker.get(), pw);
+                            } catch (CancellationException | ExecutionException | InterruptedException ex) {
+                                logger.log(Level.WARNING, "Loading SWF was cancelled.");
+                            }
+                            found = true;
+                        }
+                    } catch (IOException ex) {
+                        logger.log(Level.SEVERE, "Cannot read.");
+                        System.exit(1);
+                    }
+            }
+        }
+        if (!found) {
+            System.exit(1);
+        }
+        System.exit(0);
+    }
+
+    private static String doubleToString(double d) {
+        String ds = "" + d;
+        if (ds.endsWith(".0")) {
+            ds = ds.substring(0, ds.length() - 2);
+        }
+        return ds;
+    }
+
+    private static void proccessInfoSWF(File bundle, SWF swf, PrintWriter pw) throws IOException {
+        pw.println("[swf]");
+        pw.println("file=" + (bundle == null ? swf.getFile() : bundle + ":" + swf.getFileTitle()));
+        pw.println("fileSize=" + swf.fileSize);
+        pw.println("version=" + swf.version);
+        pw.println("compression=" + swf.compression);
+        pw.println("gfx=" + swf.gfx);
+        pw.println("width=" + doubleToString(swf.displayRect.getWidth() / SWF.unitDivisor));
+        pw.println("height=" + doubleToString(swf.displayRect.getHeight() / SWF.unitDivisor));
+        pw.println("frameCount=" + swf.frameCount);
+        pw.println("frameRate=" + doubleToString(swf.frameRate));
+        for (Tag t : swf.tags) {
+            if (t instanceof SetBackgroundColorTag) {
+                pw.println("backgroundColor=" + ((SetBackgroundColorTag) t).backgroundColor.toHexRGB());
+            }
+            if (t instanceof ScriptLimitsTag) {
+                pw.println("maxRecursionDepth=" + ((ScriptLimitsTag) t).maxRecursionDepth);
+                pw.println("scriptTimeoutSeconds=" + ((ScriptLimitsTag) t).scriptTimeoutSeconds);
+            }
+        }
+        pw.println();
+
+        pw.println("[tags]");
+        pw.println("tagCount=" + swf.tags.size());
+        pw.println("hasEndTag=" + swf.hasEndTag);
+        pw.println("characterCount=" + (swf.getCharacters().size()));
+        pw.println("maxCharacterId=" + (swf.getNextCharacterId() - 1));
+        pw.println();
+
+        FileAttributesTag fa = swf.getFileAttributes();
+        if (fa != null) {
+            pw.println("[attributes]");
+            pw.println("actionScript3=" + fa.actionScript3);
+            pw.println("hasMetadata=" + fa.hasMetadata);
+            pw.println("noCrossDomainCache=" + fa.noCrossDomainCache);
+            pw.println("useDirectBlit=" + fa.useDirectBlit);
+            pw.println("useGPU=" + fa.useGPU);
+            pw.println("useNetwork=" + fa.useNetwork);
+            pw.println();
+        }
+
+        pw.println("[as2]");
+        pw.println("scriptsCount=" + swf.getASMs(true).size());
+        pw.println();
+
+        pw.println("[as3]");
+        pw.println("ABCtagCount=" + swf.getAbcList().size());
+        pw.println("packsCount=" + swf.getAS3Packs().size());
+        String dc = swf.getDocumentClass();
+        pw.println("documentClass=" + (dc == null ? "" : dc));
+        pw.println();
+        pw.flush();
+    }
+
     private static void parseDumpSwf(Stack<String> args) {
         if (args.isEmpty()) {
             badArguments("dumpswf");
@@ -2615,4 +2791,5 @@ public class CommandLineArgumentParser {
         }
         return vals[0];
     }
+
 }
