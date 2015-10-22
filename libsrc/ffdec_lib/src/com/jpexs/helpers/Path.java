@@ -64,18 +64,19 @@ public class Path {
         if (i > 0 && i < s.length() - 1) {
             ext = s.substring(i).toLowerCase();
         }
+
         return ext;
     }
 
     public static String getFileNameWithoutExtension(File f) {
-        String ext = null;
-        String s = f.getName();
-        int i = s.lastIndexOf('.');
+        String fileName = f.getName();
+        int i = fileName.lastIndexOf('.');
 
-        if (i > 0 && i < s.length() - 1) {
-            ext = s.substring(0, i);
+        if (i > 0 && i < fileName.length() - 1) {
+            fileName = fileName.substring(0, i);
         }
-        return ext;
+
+        return fileName;
     }
 
     public static void createDirectorySafe(File directory) throws IOException {

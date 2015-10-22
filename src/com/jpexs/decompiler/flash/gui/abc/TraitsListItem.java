@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
@@ -115,14 +116,16 @@ public class TraitsListItem {
                     s = STR_CLASS_INITIALIZER;
                 }
             } else if (isStatic) {
-                abc.class_info.get(classIndex).static_traits.traits.get(index).convertHeader(null, "", abc, true, ScriptExportMode.AS, scriptIndex, classIndex, new NulWriter(), new ArrayList<>(), false);
+                ConvertData convertData = new ConvertData();
+                abc.class_info.get(classIndex).static_traits.traits.get(index).convertHeader(null, convertData, "", abc, true, ScriptExportMode.AS, scriptIndex, classIndex, new NulWriter(), new ArrayList<>(), false);
                 HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
-                abc.class_info.get(classIndex).static_traits.traits.get(index).toStringHeader(null, "", abc, true, ScriptExportMode.AS, scriptIndex, classIndex, writer, new ArrayList<>(), false);
+                abc.class_info.get(classIndex).static_traits.traits.get(index).toStringHeader(null, convertData, "", abc, true, ScriptExportMode.AS, scriptIndex, classIndex, writer, new ArrayList<>(), false);
                 s = writer.toString();
             } else {
-                abc.instance_info.get(classIndex).instance_traits.traits.get(index).convertHeader(null, "", abc, false, ScriptExportMode.AS, scriptIndex, classIndex, new NulWriter(), new ArrayList<>(), false);
+                ConvertData convertData = new ConvertData();
+                abc.instance_info.get(classIndex).instance_traits.traits.get(index).convertHeader(null, convertData, "", abc, false, ScriptExportMode.AS, scriptIndex, classIndex, new NulWriter(), new ArrayList<>(), false);
                 HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
-                abc.instance_info.get(classIndex).instance_traits.traits.get(index).toStringHeader(null, "", abc, false, ScriptExportMode.AS, scriptIndex, classIndex, writer, new ArrayList<>(), false);
+                abc.instance_info.get(classIndex).instance_traits.traits.get(index).toStringHeader(null, convertData, "", abc, false, ScriptExportMode.AS, scriptIndex, classIndex, writer, new ArrayList<>(), false);
                 s = writer.toString();
             }
         } catch (InterruptedException ex) {

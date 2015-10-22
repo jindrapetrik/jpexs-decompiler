@@ -26,6 +26,12 @@ import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.plugin.CharSequenceJavaFileObject;
 import com.jpexs.helpers.plugin.ClassFileManager;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -45,6 +51,26 @@ public class SWFDecompilerPlugin {
 
     private static final List<SWFDecompilerListener> listeners = new ArrayList<>();
 
+    public static void loadPlugins() {
+        try {
+            File f = new File(SWFDecompilerPlugin.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+            File dir = f.getAbsoluteFile().getParentFile().getParentFile();
+            File pluginPath = new File(Path.combine(dir.getPath(), "plugins")).getCanonicalFile();
+            if (pluginPath.exists()) {
+                System.out.println("Loading plugins from " + pluginPath.getPath());
+                File[] files = pluginPath.listFiles();
+                if (files != null) {
+                    for (File file : files) {
+                        System.out.println("Loading plugin: " + file.getPath());
+                        loadPlugin(file.getPath());
+                    }
+                }
+            }
+        } catch (IOException | URISyntaxException ex) {
+            Logger.getLogger(SWFDecompilerPlugin.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     public static void loadPlugin(String path) {
         if (".class".equals(Path.getExtension(path))) {
             loadPluginCompiled(path);
@@ -54,7 +80,28 @@ public class SWFDecompilerPlugin {
     }
 
     private static void loadPluginCompiled(String path) {
+        File pluginFile = new File(path);
+        File file = pluginFile.getParentFile();
 
+        try {
+            // Convert File to a URL
+            URL url = file.toURI().toURL();
+            URL[] urls = new URL[]{url};
+
+            // Create a new class loader with the directory
+            ClassLoader cl = new URLClassLoader(urls);
+
+            String pluginName = Path.getFileNameWithoutExtension(pluginFile);
+            Class<?> cls = cl.loadClass(pluginName);
+            if (SWFDecompilerListener.class.isAssignableFrom(cls)) {
+                SWFDecompilerListener listener = (SWFDecompilerListener) cls.newInstance();
+                listeners.add(listener);
+            }
+
+            System.out.println("Plugin loaded: " + pluginName);
+        } catch (MalformedURLException | ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
+            Logger.getLogger(SWFDecompilerPlugin.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     private static void loadPluginSource(String path) {
@@ -74,6 +121,11 @@ public class SWFDecompilerPlugin {
         // we create a file manager
         // (our custom implementation of it)
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        if (compiler == null) {
+            logger.log(Level.SEVERE, "Compiler is null");
+            return;
+        }
+
         JavaFileManager fileManager = new ClassFileManager(compiler.getStandardFileManager(null, null, null));
 
         // Dynamic compiling requires specifying
@@ -91,6 +143,7 @@ public class SWFDecompilerPlugin {
         // Creating an instance of our compiled class and
         try {
             listeners.add((SWFDecompilerListener) fileManager.getClassLoader(null).loadClass(fullName).newInstance());
+            System.out.println("Plugin loaded: " + fullName);
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
             logger.log(Level.SEVERE, null, ex);
         }

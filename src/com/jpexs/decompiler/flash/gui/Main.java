@@ -1146,13 +1146,14 @@ public class Main {
     public static void main(String[] args) throws IOException {
 
         clearTemp();
-        String pluginPath = Configuration.pluginPath.get();
-        if (pluginPath != null && !pluginPath.isEmpty()) {
-            try {
-                SWFDecompilerPlugin.loadPlugin(pluginPath);
-            } catch (Throwable e) {
-                View.showMessageDialog(null, "Failed to load plugin: " + pluginPath);
-            }
+        //String pluginPath = Configuration.pluginPath.get();
+        //if (pluginPath != null && !pluginPath.isEmpty()) {
+        //}
+
+        try {
+            SWFDecompilerPlugin.loadPlugins();
+        } catch (Throwable ex) {
+            logger.log(Level.SEVERE, "Failed to load plugins", ex);
         }
 
         AppStrings.setResourceClass(MainFrame.class);

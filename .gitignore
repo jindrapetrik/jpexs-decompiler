@@ -60,3 +60,6 @@ hs_err_pid*.log
 /nbproject/private/
 /libsrc/cmykjpeg/build/
 /libsrc/cmykjpeg/nbproject/private/
+/libsrc/Plugins/nbproject/private/
+/libsrc/Plugins/build/
+/libsrc/Plugins/dist/

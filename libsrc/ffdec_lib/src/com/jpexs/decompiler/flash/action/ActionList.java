@@ -348,6 +348,25 @@ public class ActionList extends ArrayList<Action> {
         return -1;
     }
 
+    public GraphSourceItemContainer getContainer(int idx) {
+        Action action = get(idx);
+        int i = idx - 1;
+        while (i >= 0) {
+            Action a = get(i);
+            if (a instanceof GraphSourceItemContainer) {
+                List<Action> lastActions = getContainerLastActions(a);
+                Action lastAction = lastActions.get(lastActions.size() - 1);
+                if (lastAction.getAddress() >= action.getAddress()) {
+                    return (GraphSourceItemContainer) a;
+                }
+            }
+
+            i--;
+        }
+
+        return null;
+    }
+
     public int getContainerEndIndex(int idx) {
         Action action = get(idx);
         int i = idx - 1;
