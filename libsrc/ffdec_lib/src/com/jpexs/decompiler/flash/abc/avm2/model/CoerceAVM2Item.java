@@ -60,6 +60,11 @@ public class CoerceAVM2Item extends AVM2Item {
     }
 
     @Override
+    public GraphTargetItem getNotCoercedNoDup() {
+        return value.getNotCoercedNoDup();
+    }
+
+    @Override
     public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
         if (dependencies.contains(value)) {
             return false;

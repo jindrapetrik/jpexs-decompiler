@@ -44,6 +44,11 @@ public class ConvertAVM2Item extends AVM2Item {
     }
 
     @Override
+    public GraphTargetItem getNotCoercedNoDup() {
+        return value.getNotCoercedNoDup();
+    }
+
+    @Override
     public Object getResult() {
         switch (type.toString()) {
             case "Boolean":

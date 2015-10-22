@@ -62,4 +62,9 @@ public class PushItem extends GraphTargetItem {
     public GraphTargetItem getThroughRegister() {
         return value.getThroughRegister();
     }
+
+    @Override
+    public GraphTargetItem getNotCoercedNoDup() {
+        return value.getNotCoercedNoDup();
+    }
 }

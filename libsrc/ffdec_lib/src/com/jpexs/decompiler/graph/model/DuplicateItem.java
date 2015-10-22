@@ -58,6 +58,11 @@ public class DuplicateItem extends GraphTargetItem implements SimpleValue {
     }
 
     @Override
+    public GraphTargetItem getNotCoercedNoDup() {
+        return this;
+    }
+
+    @Override
     public GraphTargetItem getThroughRegister() {
         return value.getThroughRegister();
     }

@@ -73,4 +73,9 @@ public class TemporaryRegister extends ActionItem {
     public GraphTargetItem getNotCoerced() {
         return value.getNotCoerced();
     }
+
+    @Override
+    public GraphTargetItem getNotCoercedNoDup() {
+        return value.getNotCoercedNoDup();
+    }
 }

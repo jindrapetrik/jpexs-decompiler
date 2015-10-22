@@ -250,6 +250,10 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
         return this;
     }
 
+    public GraphTargetItem getNotCoercedNoDup() {
+        return getNotCoerced();
+    }
+
     public GraphTargetItem getThroughRegister() {
         return this;
     }

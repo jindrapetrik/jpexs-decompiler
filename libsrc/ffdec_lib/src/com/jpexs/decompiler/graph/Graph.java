@@ -2004,12 +2004,12 @@ public class Graph {
                             if (onTrue.size() == 2) {
                                 GraphTargetItem rightSide = ((PushItem) onTrue.get(1)).value;
                                 GraphTargetItem prevExpr = stack.pop();
-                                GraphTargetItem leftSide = expr;
+                                GraphTargetItem leftSide = expr.getNotCoercedNoDup();
 
                                 if (leftSide instanceof DuplicateItem) {
                                     isIf = false;
                                     stack.push(new OrItem(null, prevExpr, rightSide));
-                                } else if (leftSide.invert(null) instanceof DuplicateItem) {
+                                } else if (leftSide.invert(null).getNotCoercedNoDup() instanceof DuplicateItem) {
                                     isIf = false;
                                     stack.push(new AndItem(null, prevExpr, rightSide));
                                 } else if (prevExpr instanceof FalseItem) {
