@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ABCInputStream;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
+import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorGetSet;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorJumps;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorRegisters;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorSimple;
@@ -2262,6 +2263,9 @@ public class AVM2Code implements Cloneable {
             return removeTrapsOld(trait, methodInfo, body, abc, scriptIndex, classIndex, isStatic, path);
         } else {
             SWFDecompilerPlugin.fireAvm2CodeRemoveTraps(path, classIndex, isStatic, scriptIndex, abc, trait, methodInfo, body);
+            try (Statistics s = new Statistics("AVM2DeobfuscatorGetSet")) {
+                new AVM2DeobfuscatorGetSet().avm2CodeRemoveTraps(path, classIndex, isStatic, scriptIndex, abc, trait, methodInfo, body);
+            }
             try (Statistics s = new Statistics("AVM2DeobfuscatorSimple")) {
                 new AVM2DeobfuscatorSimple().avm2CodeRemoveTraps(path, classIndex, isStatic, scriptIndex, abc, trait, methodInfo, body);
             }
