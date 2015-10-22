@@ -2572,7 +2572,7 @@ public class CommandLineArgumentParser {
                     if (out.isDirectory()) {
                         Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, "File is a directory");
                         System.exit(1);
-                    } else if (out.exists()) {
+                    } else {
                         pw = new PrintWriter(out);
                     }
                     break;
