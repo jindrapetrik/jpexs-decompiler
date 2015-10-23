@@ -2716,8 +2716,8 @@ public class CommandLineArgumentParser {
         pw.println("[as3]");
         pw.println("ABCtagCount=" + swf.getAbcList().size());
         pw.println("packsCount=" + swf.getAS3Packs().size());
-        String dc = IdentifiersDeobfuscation.printIdentifier(true, swf.getDocumentClass());
-        pw.println("documentClass=" + (dc == null ? "" : dc));
+        String dc = swf.getDocumentClass();
+        pw.println("documentClass=" + (dc == null ? "" : IdentifiersDeobfuscation.printIdentifier(true, dc)));
         pw.println();
         pw.flush();
     }
