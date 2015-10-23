@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.console;
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.EventListener;
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFBundle;
 import com.jpexs.decompiler.flash.SWFCompression;
@@ -2715,7 +2716,7 @@ public class CommandLineArgumentParser {
         pw.println("[as3]");
         pw.println("ABCtagCount=" + swf.getAbcList().size());
         pw.println("packsCount=" + swf.getAS3Packs().size());
-        String dc = swf.getDocumentClass();
+        String dc = IdentifiersDeobfuscation.printIdentifier(true, swf.getDocumentClass());
         pw.println("documentClass=" + (dc == null ? "" : dc));
         pw.println();
         pw.flush();
