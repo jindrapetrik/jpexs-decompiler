@@ -648,13 +648,13 @@ public class AVM2Code implements Cloneable {
             while (true) {
                 AVM2Instruction ins = code.get(pos);
                 if (ins.definition instanceof JumpIns) {
-                    pos = adr2pos((Long) ins.getParamsAsList(constants).get(0));
+                    pos = adr2pos(ins.getParamAsLong(constants, 0));
                     continue;
                 }
                 if (ins.definition instanceof IfFalseIns) {
                     Boolean b = (Boolean) lda.operandStack.pop();
                     if (b == false) {
-                        pos = adr2pos((Long) ins.getParamsAsList(constants).get(0));
+                        pos = adr2pos(ins.getParamAsLong(constants, 0));
                     } else {
                         pos++;
                     }
@@ -663,7 +663,7 @@ public class AVM2Code implements Cloneable {
                 if (ins.definition instanceof IfTrueIns) {
                     Boolean b = (Boolean) lda.operandStack.pop();
                     if (b == true) {
-                        pos = adr2pos((Long) ins.getParamsAsList(constants).get(0));
+                        pos = adr2pos(ins.getParamAsLong(constants, 0));
                     } else {
                         pos++;
                     }
@@ -675,7 +675,7 @@ public class AVM2Code implements Cloneable {
                 if (ins.definition instanceof ReturnVoidIns) {
                     return null;
                 }
-                ins.definition.execute(lda, constants, ins.getParamsAsList(constants));
+                ins.definition.execute(lda, constants, ins);
                 pos++;
             }
         } catch (ConvertException e) {
@@ -853,7 +853,7 @@ public class AVM2Code implements Cloneable {
                     if (instr != null) {
                         int[] actualOperands = null;
 
-                        if (instructionCode == 0x1b) { // switch
+                        if (instructionCode == AVM2Instructions.LookupSwitch) { // switch
                             int firstOperand = ais.readS24("default_offset");
                             int case_count = ais.readU30("case_count");
                             long afterCasePos = ais.getPosition() + 3 * (case_count + 1);

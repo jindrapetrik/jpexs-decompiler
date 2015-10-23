@@ -34,7 +34,9 @@ import java.util.Set;
 
 public class StringAVM2Item extends AVM2Item implements SimpleValue {
 
-    public String value;
+    private String value;
+
+    private Double numberValue;
 
     public StringAVM2Item(AVM2Instruction instruction, String value) {
         super(instruction, PRECEDENCE_PRIMARY);
@@ -57,6 +59,15 @@ public class StringAVM2Item extends AVM2Item implements SimpleValue {
     }
 
     @Override
+    public Double getResultAsNumber() {
+        if (numberValue == null) {
+            numberValue = super.getResultAsNumber();
+        }
+
+        return numberValue;
+    }
+
+    @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSourceMerge(localData, generator,
                 new AVM2Instruction(0, AVM2Instructions.PushString, new int[]{((AVM2SourceGenerator) generator).str(value)})
@@ -76,5 +87,14 @@ public class StringAVM2Item extends AVM2Item implements SimpleValue {
     @Override
     public boolean isSimpleValue() {
         return true;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+        numberValue = null;
     }
 }

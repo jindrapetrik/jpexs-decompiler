@@ -55,7 +55,6 @@ import com.jpexs.decompiler.flash.abc.avm2.model.operations.StrictEqAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.StrictNeqAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
-import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphPart;
@@ -673,7 +672,7 @@ public class AVM2Graph extends Graph {
                     if (stack != null && swip != -1) {
                         AVM2Instruction swIns = avm2code.code.get(swip);
                         GraphTargetItem t = stack.pop();
-                        Double dval = EcmaScript.toNumber(t.getResult());
+                        Double dval = t.getResultAsNumber();
                         int val = (int) (double) dval;
                         if (swIns.definition instanceof LookupSwitchIns) {
                             List<Integer> branches = swIns.getBranches(code);

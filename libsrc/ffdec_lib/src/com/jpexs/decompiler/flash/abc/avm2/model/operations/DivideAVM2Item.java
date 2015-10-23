@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.abc.avm2.model.operations;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
-import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -38,11 +37,13 @@ public class DivideAVM2Item extends BinaryOpItem {
 
     @Override
     public Object getResult() {
-        Object rightResult = rightSide.getResult();
-        if (Double.compare(EcmaScript.toNumber(rightResult), 0) == 0) {
-            return Double.NaN;
+        Double leftResult = leftSide.getResultAsNumber();
+        Double rightResult = rightSide.getResultAsNumber();
+        if (Double.compare(rightResult, 0) == 0) {
+            return leftResult < 0 ? Double.NEGATIVE_INFINITY
+                    : leftResult > 0 ? Double.POSITIVE_INFINITY : Double.NaN;
         }
-        return (EcmaScript.toNumber(leftSide.getResult())) / (EcmaScript.toNumber(rightResult));
+        return leftResult / rightResult;
     }
 
     @Override

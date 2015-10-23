@@ -36,8 +36,8 @@ public class DeletePropertyIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, List<Object> arguments) {
-        /*int multiIndex = (int) ((Long) arguments.get(0)).longValue();
+    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+        /*int multiIndex = ins.getParamAsLong(constants, 0).intValue();
          //if multiname[multinameIndex] is runtime
          //pop(name) pop(ns)
          Object obj = lda.operandStack.pop();

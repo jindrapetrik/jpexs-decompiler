@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.abc.avm2.model.operations;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
-import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -38,7 +37,7 @@ public class MultiplyAVM2Item extends BinaryOpItem {
 
     @Override
     public Object getResult() {
-        return (EcmaScript.toNumber(leftSide.getResult())) * (EcmaScript.toNumber(rightSide.getResult()));
+        return leftSide.getResultAsNumber() * rightSide.getResultAsNumber();
     }
 
     @Override

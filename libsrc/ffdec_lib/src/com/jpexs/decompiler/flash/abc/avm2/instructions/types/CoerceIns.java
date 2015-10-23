@@ -36,8 +36,8 @@ public class CoerceIns extends InstructionDefinition implements CoerceOrConvertT
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, List<Object> arguments) {
-        //int multinameIndex = (int) ((Long) arguments.get(0)).longValue();
+    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+        //int multinameIndex = ins.getParamAsLong(constants, 0).intValue();
         //push and pop coerced value to specified type
     }
 

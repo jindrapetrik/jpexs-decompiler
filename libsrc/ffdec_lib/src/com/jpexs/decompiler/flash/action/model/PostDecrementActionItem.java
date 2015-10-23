@@ -27,7 +27,6 @@ import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionDecrement;
 import com.jpexs.decompiler.flash.action.swf5.ActionSetMember;
 import com.jpexs.decompiler.flash.action.swf5.ActionStoreRegister;
-import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -63,7 +62,7 @@ public class PostDecrementActionItem extends ActionItem implements SetTypeAction
 
     @Override
     public Object getResult() {
-        return EcmaScript.toNumber(object.getResult());
+        return object.getResultAsNumber();
     }
 
     @Override

@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.swf4.ActionStartDrag;
-import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -59,7 +58,7 @@ public class StartDragActionItem extends ActionItem {
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         boolean hasConstrains = true;
         if (constrain instanceof DirectValueActionItem) {
-            if (Double.compare(EcmaScript.toNumber(constrain.getResult()), 0) == 0) {
+            if (Double.compare(constrain.getResultAsNumber(), 0) == 0) {
                 hasConstrains = false;
             }
         }
@@ -98,7 +97,7 @@ public class StartDragActionItem extends ActionItem {
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         boolean hasConstrains = true;
         if (constrain instanceof DirectValueActionItem) {
-            if (Double.compare(EcmaScript.toNumber(constrain.getResult()), 0) == 0) {
+            if (Double.compare(constrain.getResultAsNumber(), 0) == 0) {
                 hasConstrains = false;
             }
         }

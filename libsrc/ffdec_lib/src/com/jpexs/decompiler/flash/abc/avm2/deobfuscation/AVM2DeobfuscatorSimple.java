@@ -155,7 +155,7 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
             return makePush(fv.value, cpool);
         } else if (graphTargetItem instanceof StringAVM2Item) {
             StringAVM2Item fv = (StringAVM2Item) graphTargetItem;
-            return makePush(fv.value, cpool);
+            return makePush(fv.getValue(), cpool);
         } else if (graphTargetItem instanceof TrueItem) {
             return makePush(Boolean.TRUE, cpool);
         } else if (graphTargetItem instanceof FalseItem) {
@@ -335,8 +335,8 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
                     || def instanceof SubtractIIns
                     || def instanceof ModuloIns
                     || def instanceof MultiplyIns
-                    || def instanceof MultiplyIIns
-                    || def instanceof DivideIns
+                    || def instanceof MultiplyIIns//
+                    || def instanceof DivideIns//
                     || def instanceof BitAndIns
                     || def instanceof BitXorIns
                     || def instanceof BitOrIns
@@ -345,12 +345,12 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
                     || def instanceof URShiftIns
                     || def instanceof EqualsIns
                     || def instanceof NotIns
-                    || def instanceof NegateIns
-                    || def instanceof NegateIIns
-                    || def instanceof IncrementIns
-                    || def instanceof IncrementIIns
-                    || def instanceof DecrementIns
-                    || def instanceof DecrementIIns
+                    || def instanceof NegateIns//
+                    || def instanceof NegateIIns//
+                    || def instanceof IncrementIns//
+                    || def instanceof IncrementIIns//
+                    || def instanceof DecrementIns//
+                    || def instanceof DecrementIIns //
                     || def instanceof IfTypeIns
                     || def instanceof JumpIns
                     || def instanceof EqualsIns

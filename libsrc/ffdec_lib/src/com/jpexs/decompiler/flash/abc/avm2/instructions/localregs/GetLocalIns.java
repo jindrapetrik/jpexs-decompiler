@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import java.util.List;
 
 public class GetLocalIns extends GetLocalTypeIns {
 
@@ -29,8 +28,8 @@ public class GetLocalIns extends GetLocalTypeIns {
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, List<Object> arguments) {
-        lda.operandStack.push(lda.localRegisters.get((int) (long) (Long) arguments.get(0)));
+    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+        lda.operandStack.push(lda.localRegisters.get(ins.getParamAsLong(constants, 0).intValue()));
     }
 
     @Override

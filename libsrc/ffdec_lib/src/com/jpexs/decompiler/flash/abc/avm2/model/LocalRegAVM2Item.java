@@ -81,6 +81,11 @@ public class LocalRegAVM2Item extends AVM2Item {
     }
 
     @Override
+    public Double getResultAsNumber() {
+        return computedValue.getResultAsNumber();
+    }
+
+    @Override
     public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
         return computedValue instanceof UndefinedAVM2Item;
     }

@@ -35,8 +35,8 @@ public class PushStringIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, List<Object> arguments) {
-        lda.operandStack.push(arguments.get(0));
+    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+        lda.operandStack.push(ins.getParam(constants, 0));
     }
 
     @Override

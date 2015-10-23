@@ -171,48 +171,40 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
                     }
                     break;
             }
-
         }
+
         return ret;
     }
 
-    public List<Object> getParamsAsList(AVM2ConstantPool constants) {
-        List<Object> s = new ArrayList<>();
-        for (int i = 0; i < definition.operands.length; i++) {
-            switch (definition.operands[i]) {
-                case AVM2Code.DAT_MULTINAME_INDEX:
-                    s.add(constants.getMultiname(operands[i]));
-                    break;
-                case AVM2Code.DAT_STRING_INDEX:
-                    s.add(constants.getString(operands[i]));
-                    break;
-                case AVM2Code.DAT_INT_INDEX:
-                    s.add(constants.getInt(operands[i]));
-                    break;
-                case AVM2Code.DAT_UINT_INDEX:
-                    s.add(constants.getUInt(operands[i]));
-                    break;
-                case AVM2Code.DAT_DOUBLE_INDEX:
-                    s.add(constants.getDouble(operands[i]));
-                    break;
-                case AVM2Code.DAT_OFFSET:
-                    s.add(offset + operands[i] + getBytesLength());
-                    break;
-                case AVM2Code.DAT_CASE_BASEOFFSET:
-                    s.add(offset + operands[i]);
-                    break;
-                case AVM2Code.OPT_CASE_OFFSETS:
-                    s.add((long) operands[i]);
-                    for (int j = i + 1; j < operands.length; j++) {
-                        s.add(offset + operands[j]);
-                    }
-                    break;
-                default:
-                    s.add((long) operands[i]);
-            }
+    public Object getParam(AVM2ConstantPool constants, int idx) {
+        //if (idx < 0 || idx >= definition.operands.length) {
+        //    return null;
+        //}
 
+        switch (definition.operands[idx]) {
+            case AVM2Code.DAT_MULTINAME_INDEX:
+                return constants.getMultiname(operands[idx]);
+            case AVM2Code.DAT_STRING_INDEX:
+                return constants.getString(operands[idx]);
+            case AVM2Code.DAT_INT_INDEX:
+                return constants.getInt(operands[idx]);
+            case AVM2Code.DAT_UINT_INDEX:
+                return constants.getUInt(operands[idx]);
+            case AVM2Code.DAT_DOUBLE_INDEX:
+                return constants.getDouble(operands[idx]);
+            case AVM2Code.DAT_OFFSET:
+                return offset + operands[idx] + getBytesLength();
+            case AVM2Code.DAT_CASE_BASEOFFSET:
+                return offset + operands[idx];
+            case AVM2Code.OPT_CASE_OFFSETS:
+                return (long) operands[idx]; // offsets: offset + operands[i];
+            default:
+                return (long) operands[idx];
         }
-        return s;
+    }
+
+    public Long getParamAsLong(AVM2ConstantPool constants, int idx) {
+        return (Long) getParam(constants, idx);
     }
 
     public String getParams(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames) {

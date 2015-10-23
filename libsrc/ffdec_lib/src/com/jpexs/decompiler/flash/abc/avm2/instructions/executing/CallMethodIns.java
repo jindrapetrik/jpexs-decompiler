@@ -36,9 +36,9 @@ public class CallMethodIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, List<Object> arguments) {
-        /*int methodIndex = (int) ((Long) arguments.get(0)).longValue(); //index of object's method
-         int argCount = (int) ((Long) arguments.get(1)).longValue();
+    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+        /*int methodIndex = ins.getParamAsLong(constants, 0).intValue(); //index of object's method
+         int argCount = ins.getParamAsLong(constants, 1).intValue();
          List<Object> passArguments = new ArrayList<Object>();
          for (int i = argCount - 1; i >= 0; i--) {
          passArguments.set(i, lda.operandStack.pop());

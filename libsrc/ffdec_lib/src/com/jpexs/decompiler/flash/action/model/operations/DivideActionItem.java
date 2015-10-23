@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.action.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.swf4.ActionDivide;
-import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -35,8 +34,8 @@ public class DivideActionItem extends BinaryOpItem {
 
     @Override
     public Object getResult() {
-        Double leftResult = EcmaScript.toNumber(leftSide.getResult());
-        Double rightResult = EcmaScript.toNumber(rightSide.getResult());
+        Double leftResult = leftSide.getResultAsNumber();
+        Double rightResult = rightSide.getResultAsNumber();
         if (Double.compare(rightResult, 0) == 0) {
             return leftResult < 0 ? Double.NEGATIVE_INFINITY
                     : leftResult > 0 ? Double.POSITIVE_INFINITY : Double.NaN;

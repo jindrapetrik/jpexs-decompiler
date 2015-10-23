@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.StartDragActionItem;
-import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.HashMap;
@@ -45,7 +44,7 @@ public class ActionStartDrag extends Action {
 
         boolean hasConstrains = true;
         if (constrain instanceof DirectValueActionItem) {
-            if (Double.compare(EcmaScript.toNumber(constrain.getResult()), 0) == 0) {
+            if (Double.compare(constrain.getResultAsNumber(), 0) == 0) {
                 hasConstrains = false;
             }
         }
@@ -70,7 +69,7 @@ public class ActionStartDrag extends Action {
             GraphTargetItem constrain = stack.peek(3);
             boolean hasConstrains = true;
             if (constrain instanceof DirectValueActionItem) {
-                if (Double.compare(EcmaScript.toNumber(constrain.getResult()), 0) == 0) {
+                if (Double.compare(constrain.getResultAsNumber(), 0) == 0) {
                     hasConstrains = false;
                 }
             }

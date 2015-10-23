@@ -1074,7 +1074,8 @@ public class ActionScript3Parser {
     private void addS(List<GraphTargetItem> rets, StringBuilder sb) {
         if (sb.length() > 0) {
             if (!rets.isEmpty() && (rets.get(rets.size() - 1) instanceof StringAVM2Item)) {
-                ((StringAVM2Item) rets.get(rets.size() - 1)).value += sb.toString();
+                StringAVM2Item stringItem = ((StringAVM2Item) rets.get(rets.size() - 1));
+                stringItem.setValue(stringItem.getValue() + sb.toString());
             } else {
                 rets.add(new StringAVM2Item(null, sb.toString()));
             }

@@ -41,7 +41,7 @@ public class XMLAVM2Item extends AVM2Item {
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         for (GraphTargetItem part : parts) {
             if (part instanceof StringAVM2Item) {
-                writer.append(((StringAVM2Item) part).value);
+                writer.append(((StringAVM2Item) part).getValue());
             } else {
                 part.toString(writer, localData);
             }

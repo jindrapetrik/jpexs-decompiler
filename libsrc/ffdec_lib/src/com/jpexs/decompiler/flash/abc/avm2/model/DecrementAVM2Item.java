@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TypeItem;
@@ -47,7 +46,7 @@ public class DecrementAVM2Item extends AVM2Item {
 
     @Override
     public Object getResult() {
-        return EcmaScript.toNumber(value.getResult()) - 1;
+        return value.getResultAsNumber() - 1;
     }
 
     @Override
