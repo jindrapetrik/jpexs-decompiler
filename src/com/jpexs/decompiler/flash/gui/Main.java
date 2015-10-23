@@ -1146,9 +1146,6 @@ public class Main {
     public static void main(String[] args) throws IOException {
 
         clearTemp();
-        //String pluginPath = Configuration.pluginPath.get();
-        //if (pluginPath != null && !pluginPath.isEmpty()) {
-        //}
 
         try {
             SWFDecompilerPlugin.loadPlugins();

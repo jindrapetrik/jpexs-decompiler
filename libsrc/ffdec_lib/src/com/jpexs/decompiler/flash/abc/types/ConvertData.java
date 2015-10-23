@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.types;
 
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,5 +27,11 @@ import java.util.Map;
  */
 public class ConvertData {
 
+    public int deobfuscationMode;
+
     public Map<TraitSlotConst, AssignedValue> assignedValues = new HashMap<>();
+
+    public ConvertData() {
+        deobfuscationMode = Configuration.autoDeobfuscate.get() ? (Configuration.deobfuscationOldMode.get() ? 0 : 1) : -1;
+    }
 }
