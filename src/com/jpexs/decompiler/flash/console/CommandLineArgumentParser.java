@@ -117,6 +117,7 @@ import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.decompiler.flash.xfl.FLAVersion;
 import com.jpexs.decompiler.graph.CompilationException;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
@@ -2716,8 +2717,18 @@ public class CommandLineArgumentParser {
         pw.println("[as3]");
         pw.println("ABCtagCount=" + swf.getAbcList().size());
         pw.println("packsCount=" + swf.getAS3Packs().size());
-        String dc = swf.getDocumentClass();
-        pw.println("documentClass=" + (dc == null ? "" : IdentifiersDeobfuscation.printIdentifier(true, dc)));
+        String dcs = swf.getDocumentClass();
+        if (dcs != null) {
+            if (dcs.contains(".")) {
+                DottedChain dc = new DottedChain(dcs.split("\\."));
+                pw.println("documentClass=" + dc.toPrintableString(true));
+            } else {
+                pw.println("documentClass=" + IdentifiersDeobfuscation.printIdentifier(true, dcs));
+            }
+        } else {
+            pw.println("documentClass=");
+        }
+
         pw.println();
         pw.flush();
     }
