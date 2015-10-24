@@ -37,9 +37,9 @@ public class CallSuperVoidIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, List<Object> arguments) {
-        /*int multinameIndex = (int) ((Long) arguments.get(0)).longValue();
-         int argCount = (int) ((Long) arguments.get(1)).longValue();
+    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+        /*int multinameIndex = ins.getParamAsLong(constants, 0).intValue();
+         int argCount = ins.getParamAsLong(constants, 1).intValue();
          List<Object> passArguments = new ArrayList<Object>();
          for (int i = argCount - 1; i >= 0; i--) {
          passArguments.set(i, lda.operandStack.pop());

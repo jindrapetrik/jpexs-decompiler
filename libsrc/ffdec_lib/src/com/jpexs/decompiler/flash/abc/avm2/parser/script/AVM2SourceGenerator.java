@@ -1809,9 +1809,9 @@ public class AVM2SourceGenerator implements SourceGenerator {
         if (val instanceof StringAVM2Item) {
             StringAVM2Item sval = (StringAVM2Item) val;
             if (isNs) {
-                return new ValueKind(namespace(Namespace.KIND_NAMESPACE, sval.value), ValueKind.CONSTANT_Namespace);
+                return new ValueKind(namespace(Namespace.KIND_NAMESPACE, sval.getValue()), ValueKind.CONSTANT_Namespace);
             } else {
-                return new ValueKind(str(sval.value), ValueKind.CONSTANT_Utf8);
+                return new ValueKind(str(sval.getValue()), ValueKind.CONSTANT_Utf8);
             }
         }
         if (val instanceof IntegerValueAVM2Item) {

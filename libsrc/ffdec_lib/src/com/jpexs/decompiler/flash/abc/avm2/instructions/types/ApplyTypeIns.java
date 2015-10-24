@@ -37,8 +37,8 @@ public class ApplyTypeIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, List<Object> arguments) {
-        int argCount = (int) ((Long) arguments.get(0)).longValue();
+    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+        int argCount = ins.getParamAsLong(constants, 0).intValue();
         List<Object> params = new ArrayList<>();
         for (int i = 0; i < argCount; i++) {
             params.add(lda.operandStack.pop());

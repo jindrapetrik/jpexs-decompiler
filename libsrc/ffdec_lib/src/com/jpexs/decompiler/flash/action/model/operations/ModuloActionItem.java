@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.action.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.swf5.ActionModulo;
-import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -35,11 +34,11 @@ public class ModuloActionItem extends BinaryOpItem {
 
     @Override
     public Object getResult() {
-        Double rightResult = EcmaScript.toNumber(rightSide.getResult());
+        Double rightResult = rightSide.getResultAsNumber();
         if (Double.isNaN(rightResult) || Double.compare(rightResult, 0) == 0) {
             return Double.NaN;
         }
-        return ((long) (double) EcmaScript.toNumber(leftSide.getResult())) % ((long) (double) rightResult);
+        return ((long) (double) leftSide.getResultAsNumber()) % ((long) (double) rightResult);
     }
 
     @Override

@@ -34,7 +34,7 @@ public class LShiftIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, List<Object> arguments) {
+    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         int value2 = (int) ((Long) lda.operandStack.pop() & 0x1F);
         int value1 = ((Long) lda.operandStack.pop()).intValue();
         Long value3 = (long) (value1 << value2);

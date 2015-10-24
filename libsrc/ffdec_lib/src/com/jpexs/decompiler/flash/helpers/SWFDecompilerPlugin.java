@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.action.ActionList;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
@@ -53,9 +54,18 @@ public class SWFDecompilerPlugin {
 
     public static void loadPlugins() {
         try {
-            File f = new File(SWFDecompilerPlugin.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
-            File dir = f.getAbsoluteFile().getParentFile().getParentFile();
-            File pluginPath = new File(Path.combine(dir.getPath(), "plugins")).getCanonicalFile();
+            File pluginPath = null;
+            String pluginPathConfig = Configuration.pluginPath.get();
+            if (pluginPathConfig != null && !pluginPathConfig.isEmpty()) {
+                pluginPath = new File(pluginPathConfig);
+            }
+
+            if (pluginPath == null || !pluginPath.exists()) {
+                File f = new File(SWFDecompilerPlugin.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+                File dir = f.getAbsoluteFile().getParentFile().getParentFile();
+                pluginPath = new File(Path.combine(dir.getPath(), "plugins")).getCanonicalFile();
+            }
+
             if (pluginPath.exists()) {
                 System.out.println("Loading plugins from " + pluginPath.getPath());
                 File[] files = pluginPath.listFiles();

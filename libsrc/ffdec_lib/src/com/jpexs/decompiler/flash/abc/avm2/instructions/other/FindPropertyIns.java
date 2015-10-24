@@ -36,8 +36,8 @@ public class FindPropertyIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, List<Object> arguments) {
-        //int multiIndex = (int) ((Long) arguments.get(0)).longValue();
+    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+        //int multiIndex = ins.getParamAsLong(constants, 0).intValue();
         //if is runtime
         //pop(name), pop(ns)
         throw new RuntimeException("Cannot find property");

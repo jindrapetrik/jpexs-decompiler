@@ -36,8 +36,8 @@ public class DecLocalIIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, List<Object> arguments) {
-        int locRegIndex = (int) ((Long) arguments.get(0)).longValue();
+    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+        int locRegIndex = ins.getParamAsLong(constants, 0).intValue();
         Object obj = lda.localRegisters.get(locRegIndex);
         if (obj instanceof Long) {
             Long obj2 = ((Long) obj) - 1;

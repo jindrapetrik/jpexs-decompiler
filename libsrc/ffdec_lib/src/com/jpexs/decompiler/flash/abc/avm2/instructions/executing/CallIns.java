@@ -36,8 +36,8 @@ public class CallIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, List<Object> arguments) {
-        /*int argCount = (int) ((Long) arguments.get(0)).longValue();
+    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+        /*int argCount = ins.getParamAsLong(constants, 0).intValue();
          List<Object> passArguments = new ArrayList<Object>();
          for (int i = argCount - 1; i >= 0; i--) {
          passArguments.set(i, lda.operandStack.pop());

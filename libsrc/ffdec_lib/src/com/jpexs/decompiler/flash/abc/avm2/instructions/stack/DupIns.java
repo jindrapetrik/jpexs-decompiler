@@ -34,7 +34,7 @@ public class DupIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, List<Object> arguments) {
+    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         Object obj = lda.operandStack.pop();
         lda.operandStack.push(obj);
         lda.operandStack.push(obj);

@@ -36,7 +36,7 @@ public class ConvertIIns extends InstructionDefinition implements CoerceOrConver
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, List<Object> arguments) {
+    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         Object value = lda.operandStack.pop();
         long ret;
         if (value == null) {

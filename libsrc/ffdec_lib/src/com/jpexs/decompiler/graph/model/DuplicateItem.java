@@ -43,6 +43,11 @@ public class DuplicateItem extends GraphTargetItem implements SimpleValue {
     }
 
     @Override
+    public Double getResultAsNumber() {
+        return value.getResultAsNumber();
+    }
+
+    @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         if ((value instanceof SimpleValue) && (((SimpleValue) value).isSimpleValue())) {
             return value.appendTo(writer, localData);

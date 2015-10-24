@@ -33,7 +33,7 @@ public class PushScopeIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, List<Object> arguments) {
+    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         lda.scopeStack.push(lda.operandStack.pop());
     }
 

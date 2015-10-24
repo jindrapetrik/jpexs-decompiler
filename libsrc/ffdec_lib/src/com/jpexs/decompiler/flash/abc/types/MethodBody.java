@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFField;
@@ -294,7 +295,7 @@ public final class MethodBody implements Cloneable {
                     @Override
                     public Void call() throws InterruptedException {
                         try (Statistics s1 = new Statistics("MethodBody.convert")) {
-                            MethodBody converted = convertMethodBody(path, isStatic, scriptIndex, classIndex, abc, trait, scopeStack, initializerType != GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, fullyQualifiedNames, initTraits);
+                            MethodBody converted = convertMethodBody(convertData, path, isStatic, scriptIndex, classIndex, abc, trait, scopeStack, initializerType != GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, fullyQualifiedNames, initTraits);
                             HashMap<Integer, String> localRegNames = getLocalRegNames(abc);
                             List<GraphTargetItem> convertedItems1;
                             try (Statistics s = new Statistics("AVM2Code.toGraphTargetItems")) {
@@ -365,13 +366,13 @@ public final class MethodBody implements Cloneable {
         return writer;
     }
 
-    public MethodBody convertMethodBody(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, Trait trait, ScopeStack scopeStack, boolean isStaticInitializer, List<DottedChain> fullyQualifiedNames, List<Traits> initTraits) throws InterruptedException {
+    public MethodBody convertMethodBody(ConvertData convertData, String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, Trait trait, ScopeStack scopeStack, boolean isStaticInitializer, List<DottedChain> fullyQualifiedNames, List<Traits> initTraits) throws InterruptedException {
         MethodBody body = clone();
         AVM2Code code = body.getCode();
         code.markMappedOffsets();
         code.fixJumps(path, body);
 
-        if (Configuration.autoDeobfuscate.get()) {
+        if (convertData.deobfuscationMode != -1) {
             try {
                 code.removeTraps(trait, method_info, body, abc, scriptIndex, classIndex, isStatic, path);
             } catch (ThreadDeath | InterruptedException ex) {
@@ -388,6 +389,23 @@ public final class MethodBody implements Cloneable {
         }
 
         return body;
+    }
+
+    public String toSource() {
+        ConvertData convertData = new ConvertData();
+        convertData.deobfuscationMode = -1;
+        try {
+            convert(convertData, "", ScriptExportMode.AS, false, method_info, 0, 0, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true);
+            HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
+            writer.indent().indent().indent();
+            toString("", ScriptExportMode.AS, abc, null, writer, new ArrayList<>());
+            writer.unindent().unindent().unindent();
+            return writer.toString();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return null;
     }
 
     @Override

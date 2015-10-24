@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.abc.avm2.model.operations;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
-import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -38,11 +37,11 @@ public class ModuloAVM2Item extends BinaryOpItem {
 
     @Override
     public Object getResult() {
-        Object rightResult = rightSide.getResult();
-        if (Double.compare(EcmaScript.toNumber(rightResult), 0) == 0) {
+        Double rightResult = rightSide.getResultAsNumber();
+        if (Double.isNaN(rightResult) || Double.compare(rightResult, 0) == 0) {
             return Double.NaN;
         }
-        return ((long) (double) EcmaScript.toNumber(leftSide.getResult())) % ((long) (double) EcmaScript.toNumber(rightResult));
+        return ((long) (double) leftSide.getResultAsNumber()) % ((long) (double) rightResult);
     }
 
     @Override

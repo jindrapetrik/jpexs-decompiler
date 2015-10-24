@@ -34,7 +34,7 @@ public class BitOrIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, List<Object> arguments) {
+    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         Long value2 = (Long) lda.operandStack.pop();
         Long value1 = (Long) lda.operandStack.pop();
         Long value3 = value1 | value2;

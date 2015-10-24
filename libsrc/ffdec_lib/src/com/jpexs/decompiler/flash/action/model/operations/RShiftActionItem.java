@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.action.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.swf5.ActionBitRShift;
-import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -35,8 +34,8 @@ public class RShiftActionItem extends BinaryOpItem {
 
     @Override
     public Object getResult() {
-        long rightResult = ((long) (double) EcmaScript.toNumber(rightSide.getResult())) & 0x1f;
-        return ((long) (double) EcmaScript.toNumber(leftSide.getResult())) >> rightResult;
+        long rightResult = ((long) (double) rightSide.getResultAsNumber()) & 0x1f;
+        return ((long) (double) leftSide.getResultAsNumber()) >> rightResult;
     }
 
     @Override

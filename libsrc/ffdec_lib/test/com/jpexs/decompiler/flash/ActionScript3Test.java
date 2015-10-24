@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -32,6 +33,7 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
@@ -83,6 +85,23 @@ public class ActionScript3Test extends ActionScriptTestBase {
             abc.bodies.get(bodyIndex).convert(new ConvertData(), methodName, ScriptExportMode.AS, isStatic, -1/*FIX?*/, -1/*FIX?*/, clsIndex, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), ts, true);
             writer = new HighlightedTextWriter(new CodeFormatting(), false);
             abc.bodies.get(bodyIndex).toString(methodName, ScriptExportMode.AS, abc, null, writer, new ArrayList<>());
+        } catch (InterruptedException ex) {
+            fail();
+        }
+        String actualResult = cleanPCode(writer.toString());
+        expectedResult = cleanPCode(expectedResult);
+        assertEquals(actualResult, expectedResult);
+    }
+
+    private void decompileScriptPack(String path, String expectedResult) {
+        ScriptPack scriptPack = abc.findScriptPackByPath(path, Arrays.asList(abc));
+        assertTrue(scriptPack != null);
+        HighlightedTextWriter writer = null;
+        try {
+            List<Traits> ts = new ArrayList<>();
+            ts.add(abc.instance_info.get(clsIndex).instance_traits);
+            writer = new HighlightedTextWriter(new CodeFormatting(), false);
+            scriptPack.toSource(writer, abc.script_info.get(scriptPack.scriptIndex).traits.traits, new ConvertData(), ScriptExportMode.AS, false);
         } catch (InterruptedException ex) {
             fail();
         }
@@ -932,6 +951,172 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "{\r\n"
                 + "trace(\"infinally\");\r\n"
                 + "}\r\n", false);
+    }
+
+    //@Test
+    public void testMyPackage1TestClass() {
+        decompileScriptPack("classes.mypackage1.TestClass", "package classes.mypackage1\n"
+                + "{\n"
+                + "   import classes.mypackage2.TestInterface;\n"
+                + "   import classes.mypackage2.TestClass;\n"
+                + "   \n"
+                + "   public class TestClass extends Object implements TestInterface\n"
+                + "   {\n"
+                + "       \n"
+                + "      public function TestClass()\n"
+                + "      {\n"
+                + "         super();\n"
+                + "      }\n"
+                + "      \n"
+                + "      public function testCall() : String\n"
+                + "      {\n"
+                + "         trace(\"pkg1hello\");\n"
+                + "         return \"pkg1hello\";\n"
+                + "      }\n"
+                + "      \n"
+                + "      public function testMethod1() : void\n"
+                + "      {\n"
+                + "         var a:classes.mypackage1.TestInterface = this;\n"
+                + "         a.testMethod1();\n"
+                + "         var b:classes.mypackage2.TestInterface = this;\n"
+                + "         b = new classes.mypackage2.TestClass();\n"
+                + "      }\n"
+                + "      \n"
+                + "      public function testMethod2() : void\n"
+                + "      {\n"
+                + "         var a:classes.mypackage1.TestInterface = this;\n"
+                + "         a.testMethod1();\n"
+                + "         var b:classes.mypackage2.TestInterface = this;\n"
+                + "         b = new classes.mypackage2.TestClass();\n"
+                + "      }\n"
+                + "   }\n"
+                + "}");
+    }
+
+    //@Test
+    public void testMyPackage1TestClass2() {
+        decompileScriptPack("classes.mypackage1.TestClass2", "package classes.mypackage1\n"
+                + "{\n"
+                + "   import classes.mypackage2.TestClass;\n"
+                + "   import classes.mypackage3.TestClass;\n"
+                + "   \n"
+                + "   public class TestClass2 extends Object\n"
+                + "   {\n"
+                + "       \n"
+                + "      public function TestClass2()\n"
+                + "      {\n"
+                + "         super();\n"
+                + "      }\n"
+                + "      \n"
+                + "      public function testCall() : *\n"
+                + "      {\n"
+                + "         var a:classes.mypackage1.TestClass = null;\n"
+                + "         var b:classes.mypackage2.TestClass = null;\n"
+                + "         var c:classes.mypackage3.TestClass = null;\n"
+                + "         a = new classes.mypackage1.TestClass();\n"
+                + "         b = new classes.mypackage2.TestClass();\n"
+                + "         c = new classes.mypackage3.TestClass();\n"
+                + "         var res:String = a.testCall() + b.testCall() + c.testCall() + this.testCall2() + myNamespace::testCall3();\n"
+                + "         trace(res);\n"
+                + "         return res;\n"
+                + "      }\n"
+                + "      \n"
+                + "      myNamespace function testCall2() : String\n"
+                + "      {\n"
+                + "         return \"1\";\n"
+                + "      }\n"
+                + "      \n"
+                + "      myNamespace function testCall3() : String\n"
+                + "      {\n"
+                + "         return myNamespace::testCall2();\n"
+                + "      }\n"
+                + "      \n"
+                + "      public function testCall2() : String\n"
+                + "      {\n"
+                + "         return \"2\";\n"
+                + "      }\n"
+                + "   }\n"
+                + "}");
+    }
+
+    //@Test
+    public void testMyPackage1TestInterface() {
+        decompileScriptPack("classes.mypackage1.TestInterface", "package classes.mypackage1\n"
+                + "{\n"
+                + "   import classes.mypackage2.TestInterface;\n"
+                + "   \n"
+                + "   public interface TestInterface extends classes.mypackage2.TestInterface\n"
+                + "   {\n"
+                + "       \n"
+                + "      function testMethod1() : void;\n"
+                + "   }\n"
+                + "}");
+    }
+
+    @Test
+    public void testMyPackage1MyNamespace() {
+        decompileScriptPack("classes.mypackage1.myNamespace", "package classes.mypackage1\n"
+                + "{\n"
+                + "   public namespace myNamespace = \"https://www.free-decompiler.com/flash/test/namespace\";\n"
+                + "}");
+    }
+
+    @Test
+    public void testMyPackage2TestClass() {
+        decompileScriptPack("classes.mypackage2.TestClass", "package classes.mypackage2\n"
+                + "{\n"
+                + "   public class TestClass extends Object implements TestInterface\n"
+                + "   {\n"
+                + "       \n"
+                + "      public function TestClass()\n"
+                + "      {\n"
+                + "         super();\n"
+                + "      }\n"
+                + "      \n"
+                + "      public function testCall() : String\n"
+                + "      {\n"
+                + "         trace(\"pkg2hello\");\n"
+                + "         return \"pkg2hello\";\n"
+                + "      }\n"
+                + "      \n"
+                + "      public function testMethod2() : void\n"
+                + "      {\n"
+                + "      }\n"
+                + "   }\n"
+                + "}");
+    }
+
+    @Test
+    public void testMyPackage2TestInterface() {
+        decompileScriptPack("classes.mypackage2.TestInterface", "package classes.mypackage2\n"
+                + "{\n"
+                + "   public interface TestInterface\n"
+                + "   {\n"
+                + "       \n"
+                + "      function testMethod2() : void;\n"
+                + "   }\n"
+                + "}");
+    }
+
+    @Test
+    public void testMyPackage3TestClass() {
+        decompileScriptPack("classes.mypackage3.TestClass", "package classes.mypackage3\n"
+                + "{\n"
+                + "   public class TestClass extends Object\n"
+                + "   {\n"
+                + "       \n"
+                + "      public function TestClass()\n"
+                + "      {\n"
+                + "         super();\n"
+                + "      }\n"
+                + "      \n"
+                + "      public function testCall() : String\n"
+                + "      {\n"
+                + "         trace(\"pkg3hello\");\n"
+                + "         return \"pkg3hello\";\n"
+                + "      }\n"
+                + "   }\n"
+                + "}");
     }
 
     @Test

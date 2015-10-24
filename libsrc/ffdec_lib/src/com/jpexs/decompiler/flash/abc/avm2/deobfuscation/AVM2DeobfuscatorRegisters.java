@@ -61,7 +61,6 @@ import java.util.Set;
  */
 public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
 
-    //private final int executionLimit = 30000;
     @Override
     public void actionListParsed(ActionList actions, SWF swf) {
 
@@ -118,7 +117,7 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
             MethodBody bodybefore = body;
             body = bodybefore.clone();
             setReg = getFirstRegisterSetter(assignmentRef, classIndex, isStatic, scriptIndex, abc, body, ignoredRegs, ignoredRegGets);
-            //System.err.println("setreg " + setReg + " ass:" + assignment);
+            //System.err.println("setreg " + setReg + " ass:" + assignmentRef.getVal());
             if (setReg < 0) {
                 break;
             }
