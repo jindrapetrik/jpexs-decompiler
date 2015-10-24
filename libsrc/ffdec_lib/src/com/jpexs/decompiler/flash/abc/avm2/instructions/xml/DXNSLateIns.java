@@ -34,9 +34,10 @@ public class DXNSLateIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         String s = lda.operandStack.pop().toString();
         System.out.println("Set default XML space " + s);
+        return true;
     }
 
     @Override

@@ -84,8 +84,9 @@ public abstract class InstructionDefinition implements Serializable {
         return s.toString();
     }
 
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
-        throw new UnsupportedOperationException("Instruction " + instructionName + " not implemented");
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+        //throw new UnsupportedOperationException("Instruction " + instructionName + " not implemented");
+        return false;
     }
 
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) throws InterruptedException {

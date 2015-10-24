@@ -35,8 +35,9 @@ public class PopScopeIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         lda.scopeStack.pop();
+        return true;
     }
 
     @Override

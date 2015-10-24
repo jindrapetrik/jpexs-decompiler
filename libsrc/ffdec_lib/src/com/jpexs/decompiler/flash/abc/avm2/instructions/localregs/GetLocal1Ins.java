@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions.localregs;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import java.util.List;
 
 public class GetLocal1Ins extends GetLocalTypeIns {
 
@@ -28,8 +27,9 @@ public class GetLocal1Ins extends GetLocalTypeIns {
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         lda.operandStack.push(lda.localRegisters.get(1));
+        return true;
     }
 
     @Override

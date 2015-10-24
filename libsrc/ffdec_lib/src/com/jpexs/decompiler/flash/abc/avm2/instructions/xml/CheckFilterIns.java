@@ -34,8 +34,9 @@ public class CheckFilterIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         //if pop() is not XML|XMLList throw
+        return false;
     }
 
     @Override

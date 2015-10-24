@@ -37,7 +37,7 @@ public class ApplyTypeIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         int argCount = ins.getParamAsLong(constants, 0).intValue();
         List<Object> params = new ArrayList<>();
         for (int i = 0; i < argCount; i++) {
@@ -45,6 +45,7 @@ public class ApplyTypeIns extends InstructionDefinition {
         }
         Collections.reverse(params);
         //TODO: pop type and push type<params>
+        return false;
     }
 
     @Override

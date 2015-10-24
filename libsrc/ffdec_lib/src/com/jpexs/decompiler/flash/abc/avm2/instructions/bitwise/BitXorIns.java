@@ -34,11 +34,12 @@ public class BitXorIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         Long value2 = (Long) lda.operandStack.pop();
         Long value1 = (Long) lda.operandStack.pop();
         Long value3 = value1 ^ value2;
         lda.operandStack.push(value3);
+        return true;
     }
 
     @Override

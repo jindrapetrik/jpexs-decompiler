@@ -36,8 +36,9 @@ public class ConvertOIns extends InstructionDefinition implements CoerceOrConver
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         //throw if pop is not object
+        return true;
     }
 
     @Override

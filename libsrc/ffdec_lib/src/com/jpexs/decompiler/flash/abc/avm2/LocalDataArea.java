@@ -26,4 +26,19 @@ public class LocalDataArea {
     public Stack<Object> scopeStack = new Stack<>();
 
     public HashMap<Integer, Object> localRegisters = new HashMap<>();
+
+    public Long jump;
+
+    public Object returnValue;
+
+    public String executionException;
+
+    public void clear() {
+        operandStack.clear();
+        scopeStack.clear();
+        localRegisters.clear();
+        jump = null;
+        returnValue = null;
+        executionException = null;
+    }
 }

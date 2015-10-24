@@ -36,13 +36,14 @@ public class DeletePropertyIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         /*int multiIndex = ins.getParamAsLong(constants, 0).intValue();
          //if multiname[multinameIndex] is runtime
          //pop(name) pop(ns)
          Object obj = lda.operandStack.pop();
          //push true if removed*/
-        throw new RuntimeException("Cannot remove property");
+        lda.executionException = "Cannot remove property";
+        return false;
     }
 
     @Override

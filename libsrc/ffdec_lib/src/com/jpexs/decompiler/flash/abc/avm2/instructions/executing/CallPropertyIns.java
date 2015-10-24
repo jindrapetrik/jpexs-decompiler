@@ -37,7 +37,7 @@ public class CallPropertyIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         /*int multinameIndex = ins.getParamAsLong(constants, 0).intValue();
          int argCount = ins.getParamAsLong(constants, 1).intValue();
          List<Object> passArguments = new ArrayList<Object>();
@@ -47,7 +47,8 @@ public class CallPropertyIns extends InstructionDefinition {
          //if multiname[multinameIndex] is runtime
          //pop(name) pop(ns)
          Object obj = lda.operandStack.pop();*/
-        throw new RuntimeException("Call to unknown property");
+        lda.executionException = "Call to unknown property";
+        return false;
         //push(result)
     }
 

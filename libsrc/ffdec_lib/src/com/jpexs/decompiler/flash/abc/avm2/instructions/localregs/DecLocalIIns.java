@@ -36,7 +36,7 @@ public class DecLocalIIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         int locRegIndex = ins.getParamAsLong(constants, 0).intValue();
         Object obj = lda.localRegisters.get(locRegIndex);
         if (obj instanceof Long) {
@@ -50,8 +50,10 @@ public class DecLocalIIns extends InstructionDefinition {
             Double obj2 = Double.parseDouble((String) obj) - 1;
             lda.localRegisters.put(locRegIndex, obj2);
         } else {
-            throw new RuntimeException("Cannot decrement local register");
+            lda.executionException = "Cannot decrement local register";
+            return false;
         }
+        return true;
     }
 
     @Override

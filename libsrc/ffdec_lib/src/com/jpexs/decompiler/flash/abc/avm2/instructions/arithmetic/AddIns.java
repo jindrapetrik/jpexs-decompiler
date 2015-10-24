@@ -34,7 +34,7 @@ public class AddIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         Object o1 = lda.operandStack.pop();
         Object o2 = lda.operandStack.pop();
         if ((o1 instanceof Long) && ((o2 instanceof Long))) {
@@ -53,6 +53,7 @@ public class AddIns extends InstructionDefinition {
             String s = o1.toString() + o2.toString();
             lda.operandStack.push(s);
         }
+        return true;
     }
 
     @Override

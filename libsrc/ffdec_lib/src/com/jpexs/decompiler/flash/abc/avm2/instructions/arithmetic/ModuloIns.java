@@ -34,7 +34,7 @@ public class ModuloIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         Object o1 = lda.operandStack.pop();
         Object o2 = lda.operandStack.pop();
 
@@ -42,8 +42,10 @@ public class ModuloIns extends InstructionDefinition {
             Long ret = ((Long) o2) % ((Long) o1);
             lda.operandStack.push(ret);
         } else {
-            throw new RuntimeException("Cannot modulo");
+            lda.executionException = "Cannot modulo";
+            return false;
         }
+        return true;
     }
 
     @Override

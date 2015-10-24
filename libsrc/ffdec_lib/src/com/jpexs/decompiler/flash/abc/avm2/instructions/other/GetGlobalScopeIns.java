@@ -35,8 +35,9 @@ public class GetGlobalScopeIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
-        throw new RuntimeException("getglobalscope not working");
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+        lda.executionException = "getglobalscope not working";
+        return false;
     }
 
     @Override

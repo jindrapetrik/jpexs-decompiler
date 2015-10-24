@@ -645,41 +645,25 @@ public class AVM2Code implements Cloneable {
         LocalDataArea lda = new LocalDataArea();
         lda.localRegisters = arguments;
         try {
-            while (true) {
+            while (pos < code.size()) {
                 AVM2Instruction ins = code.get(pos);
-                if (ins.definition instanceof JumpIns) {
-                    pos = adr2pos(ins.getParamAsLong(constants, 0));
-                    continue;
-                }
-                if (ins.definition instanceof IfFalseIns) {
-                    Boolean b = (Boolean) lda.operandStack.pop();
-                    if (b == false) {
-                        pos = adr2pos(ins.getParamAsLong(constants, 0));
-                    } else {
-                        pos++;
-                    }
-                    continue;
-                }
-                if (ins.definition instanceof IfTrueIns) {
-                    Boolean b = (Boolean) lda.operandStack.pop();
-                    if (b == true) {
-                        pos = adr2pos(ins.getParamAsLong(constants, 0));
-                    } else {
-                        pos++;
-                    }
-                    continue;
-                }
-                if (ins.definition instanceof ReturnValueIns) {
-                    return lda.operandStack.pop();
-                }
-                if (ins.definition instanceof ReturnVoidIns) {
-                    return null;
-                }
                 ins.definition.execute(lda, constants, ins);
+
+                if (lda.jump != null) {
+                    pos = adr2pos(lda.jump);
+                } else {
+                    pos++;
+                }
+
+                if (lda.returnValue != null) {
+                    return lda.returnValue;
+                }
+
                 pos++;
             }
         } catch (ConvertException e) {
         }
+
         return null;
     }
 
@@ -1478,10 +1462,8 @@ public class AVM2Code implements Cloneable {
         }
         //if(true) return "";
         toSourceCount++;
-        if (toSourceLimit > 0) {
-            if (toSourceCount >= toSourceLimit) {
-                throw new ConvertException("Limit of subs(" + toSourceLimit + ") was reached", start);
-            }
+        if (toSourceLimit > 0 && toSourceCount >= toSourceLimit) {
+            throw new ConvertException("Limit of subs(" + toSourceLimit + ") was reached", start);
         }
         List<GraphTargetItem> output = new ArrayList<>();
         int ip = start;

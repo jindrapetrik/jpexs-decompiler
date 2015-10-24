@@ -36,12 +36,13 @@ public class GetDescendantsIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         /*int multiIndex = ins.getParamAsLong(constants, 0).intValue();
          //if is runtime
          //pop(name), pop(ns)
          Object obj = lda.operandStack.pop();*/
-        throw new RuntimeException("getdescendants not working");
+        lda.executionException = "getdescendants not working";
+        return false;
     }
 
     @Override

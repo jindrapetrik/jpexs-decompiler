@@ -36,9 +36,10 @@ public class ConvertSIns extends InstructionDefinition implements CoerceOrConver
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         Object obj = lda.operandStack.pop();
         lda.operandStack.push(obj.toString());
+        return true;
     }
 
     @Override
