@@ -34,10 +34,11 @@ public class EscXAttrIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         String s = lda.operandStack.pop().toString();
         //escape
         lda.operandStack.push(s);
+        return true;
     }
 
     @Override

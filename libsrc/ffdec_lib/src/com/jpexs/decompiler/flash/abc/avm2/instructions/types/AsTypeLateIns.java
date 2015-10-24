@@ -34,12 +34,13 @@ public class AsTypeLateIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         //Object objClass = lda.operandStack.pop();
         Object obj = lda.operandStack.pop();
         //if obj.class=objClass
         lda.operandStack.push(obj);
         //else push null
+        return true;
     }
 
     @Override

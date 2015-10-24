@@ -36,8 +36,9 @@ public class ConvertUIns extends InstructionDefinition implements CoerceOrConver
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
-        throw new UnsupportedOperationException("Cannot convert to uint ");
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+        //throw new UnsupportedOperationException("Cannot convert to uint ");
+        return false;
     }
 
     @Override

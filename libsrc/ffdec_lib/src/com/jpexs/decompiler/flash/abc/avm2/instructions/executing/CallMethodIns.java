@@ -36,7 +36,7 @@ public class CallMethodIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         /*int methodIndex = ins.getParamAsLong(constants, 0).intValue(); //index of object's method
          int argCount = ins.getParamAsLong(constants, 1).intValue();
          List<Object> passArguments = new ArrayList<Object>();
@@ -44,7 +44,8 @@ public class CallMethodIns extends InstructionDefinition {
          passArguments.set(i, lda.operandStack.pop());
          }
          Object receiver = lda.operandStack.pop();*/
-        throw new RuntimeException("Call to unknown method");
+        lda.executionException = "Call to unknown method";
+        return false;
         //push(result)
     }
 

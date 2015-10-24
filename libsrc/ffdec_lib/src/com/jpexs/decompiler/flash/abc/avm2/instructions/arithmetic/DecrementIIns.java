@@ -34,7 +34,7 @@ public class DecrementIIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         Object obj = lda.operandStack.pop();
         if (obj instanceof Long) {
             Long obj2 = ((Long) obj) - 1;
@@ -47,8 +47,10 @@ public class DecrementIIns extends InstructionDefinition {
             Double obj2 = Double.parseDouble((String) obj) - 1;
             lda.operandStack.push(obj2);
         } else {
-            throw new RuntimeException("Cannot decrement local register");
+            lda.executionException = "Cannot decrement local register";
+            return false;
         }
+        return true;
     }
 
     @Override

@@ -36,11 +36,12 @@ public class FindPropertyStrictIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         //int multiIndex = ins.getParamAsLong(constants, 0).intValue();
         //if is runtime
         //pop(name), pop(ns)
-        throw new RuntimeException("Cannot find property");
+        lda.executionException = "Cannot find property";
+        return false;
     }
 
     @Override

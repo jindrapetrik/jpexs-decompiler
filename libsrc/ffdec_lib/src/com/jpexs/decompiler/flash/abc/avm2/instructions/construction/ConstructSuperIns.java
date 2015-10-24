@@ -36,14 +36,15 @@ public class ConstructSuperIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         /*int argCount = ins.getParamAsLong(constants, 0).intValue();
          List<Object> passArguments = new ArrayList<Object>();
          for (int i = argCount - 1; i >= 0; i--) {
          passArguments.set(i, lda.operandStack.pop());
          }
          Object obj = lda.operandStack.pop();*/
-        throw new RuntimeException("Cannot call super constructor");
+        lda.executionException = "Cannot call super constructor";
+        return false;
         //call construct property of obj
         //do not push anything
     }

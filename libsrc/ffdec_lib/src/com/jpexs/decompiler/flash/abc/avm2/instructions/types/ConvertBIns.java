@@ -36,7 +36,7 @@ public class ConvertBIns extends InstructionDefinition implements CoerceOrConver
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         Object value = lda.operandStack.pop();
         boolean bval;
         if (value instanceof Boolean) {
@@ -49,6 +49,7 @@ public class ConvertBIns extends InstructionDefinition implements CoerceOrConver
             bval = true;
         }
         lda.operandStack.push((Boolean) bval);
+        return true;
     }
 
     @Override

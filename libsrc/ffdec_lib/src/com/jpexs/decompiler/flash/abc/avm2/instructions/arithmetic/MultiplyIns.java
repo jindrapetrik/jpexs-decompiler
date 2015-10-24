@@ -34,7 +34,7 @@ public class MultiplyIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         Object o1 = lda.operandStack.pop();
         Object o2 = lda.operandStack.pop();
         if ((o1 instanceof Long) && ((o2 instanceof Long))) {
@@ -50,8 +50,10 @@ public class MultiplyIns extends InstructionDefinition {
             Double ret = ((Double) o1) * ((Long) o2);
             lda.operandStack.push(ret);
         } else {
-            throw new RuntimeException("Cannot multiply");
+            lda.executionException = "Cannot multiply";
+            return false;
         }
+        return true;
     }
 
     @Override

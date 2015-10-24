@@ -38,7 +38,7 @@ public class ConstructPropIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         /*int multinameIndex = ins.getParamAsLong(constants, 0).intValue();
          int argCount = ins.getParamAsLong(constants, 1).intValue();
          List<Object> passArguments = new ArrayList<Object>();
@@ -47,7 +47,8 @@ public class ConstructPropIns extends InstructionDefinition {
          }*/
         //if multiname[multinameIndex] is runtime
         //pop(name) pop(ns)
-        throw new RuntimeException("Cannot construct property");
+        lda.executionException = "Cannot construct property";
+        return false;
         //create property
         //push new instance
     }

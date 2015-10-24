@@ -36,7 +36,7 @@ public class CallIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         /*int argCount = ins.getParamAsLong(constants, 0).intValue();
          List<Object> passArguments = new ArrayList<Object>();
          for (int i = argCount - 1; i >= 0; i--) {
@@ -44,7 +44,8 @@ public class CallIns extends InstructionDefinition {
          }
          Object receiver = lda.operandStack.pop();
          Object function = lda.operandStack.pop();*/
-        throw new RuntimeException("Call to unknown function");
+        lda.executionException = "Call to unknown function";
+        return false;
         //push(result)
     }
 

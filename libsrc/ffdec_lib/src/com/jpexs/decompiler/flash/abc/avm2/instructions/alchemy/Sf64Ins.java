@@ -36,11 +36,6 @@ public class Sf64Ins extends InstructionDefinition implements AlchemyTypeIns {
     }
 
     @Override
-    public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
-        return 0;
-    }
-
-    @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         GraphTargetItem ofs = stack.pop();
         GraphTargetItem value = stack.pop();

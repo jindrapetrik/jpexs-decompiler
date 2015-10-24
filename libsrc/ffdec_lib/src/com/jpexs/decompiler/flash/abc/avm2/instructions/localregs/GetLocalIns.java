@@ -28,8 +28,9 @@ public class GetLocalIns extends GetLocalTypeIns {
     }
 
     @Override
-    public void execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         lda.operandStack.push(lda.localRegisters.get(ins.getParamAsLong(constants, 0).intValue()));
+        return true;
     }
 
     @Override

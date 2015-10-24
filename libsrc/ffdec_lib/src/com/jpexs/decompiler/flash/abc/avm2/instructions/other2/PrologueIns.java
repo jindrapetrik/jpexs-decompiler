@@ -35,9 +35,4 @@ public class PrologueIns extends InstructionDefinition {
     public int getStackPushCount(AVM2Instruction ins, ABC abc) {
         throw new UnsupportedOperationException();
     }
-
-    @Override
-    public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
-        throw new UnsupportedOperationException();
-    }
 }

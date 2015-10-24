@@ -18,6 +18,8 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions.other;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.ReturnValueAVM2Item;
@@ -29,6 +31,12 @@ public class ReturnValueIns extends InstructionDefinition {
 
     public ReturnValueIns() {
         super(0x48, "returnvalue", new int[]{}, true);
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+        lda.returnValue = lda.operandStack.pop();
+        return true;
     }
 
     @Override
