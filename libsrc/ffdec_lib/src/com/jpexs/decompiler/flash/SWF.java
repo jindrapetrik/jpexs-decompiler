@@ -84,6 +84,7 @@ import com.jpexs.decompiler.flash.tags.EndTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
+import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.SymbolClassTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -121,6 +122,7 @@ import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.filters.BlendComposite;
@@ -3083,5 +3085,30 @@ public final class SWF implements SWFContainerItem, Timelined {
                 tag.getABC().restoreControlFlow();
             }
         }
+    }
+
+    public static byte[] createEmptySWF(int width, int height) {
+        SWF s = new SWF();
+        s.displayRect = new RECT(0, 0, width * 20, height * 20);
+        s.compression = SWFCompression.NONE;
+        s.version = 10;
+
+        s.frameCount = 1;
+        s.frameRate = 1;
+
+        s.tags.add(new SetBackgroundColorTag(s, new RGB(Color.white)));
+        s.tags.add(new ShowFrameTag(s));
+        s.tags.add(new EndTag(s));
+
+        s.hasEndTag = true;
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        try {
+            s.saveTo(baos);
+        } catch (IOException ex) {
+            Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return baos.toByteArray();
     }
 }

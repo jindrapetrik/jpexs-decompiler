@@ -472,6 +472,8 @@ public class Configuration {
 
     public static final ConfigurationItem<String> lastSessionFiles = null;
 
+    public static final ConfigurationItem<String> lastSessionFileTitles = null;
+
     public static final ConfigurationItem<String> lastSessionSelection = null;
 
     @ConfigurationDefaultBoolean(true)

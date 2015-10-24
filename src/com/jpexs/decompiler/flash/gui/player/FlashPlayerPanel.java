@@ -37,6 +37,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -200,15 +202,19 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
 
                     boolean changed = false;
 
-                    boolean isPlaying = flash1.IsPlaying();
-                    if (this.isPlaying != isPlaying) {
-                        this.isPlaying = isPlaying;
-                    }
+                    if (flash1.getReadyState() >= 3) {
+                        boolean isPlaying = flash1.IsPlaying();
+                        if (this.isPlaying != isPlaying) {
+                            this.isPlaying = isPlaying;
+                        }
 
-                    int currentFrame = flash1.CurrentFrame();
-                    if (this.currentFrame != currentFrame) {
-                        this.currentFrame = currentFrame;
-                        changed = true;
+                        int currentFrame = flash1.CurrentFrame();
+                        if (this.currentFrame != currentFrame) {
+                            this.currentFrame = currentFrame;
+                            changed = true;
+                        }
+                    } else {
+                        this.isPlaying = false;
                     }
 
                     if (changed) {
@@ -249,10 +255,16 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
         if (bgColor != null) {
             setBackground(bgColor);
         }
+        int state = flash.getReadyState();
         flash.setMovie(flashName);
         //play
         stopped = false;
         fireMediaDisplayStateChanged();
+        try {
+            Thread.sleep(1000); //Safety delay to avoid access violation. TODO: handle this better. How?
+        } catch (InterruptedException ex) {
+            //ignore
+        }
     }
 
     @Override
@@ -263,7 +275,9 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
     @Override
     public void pause() {
         try {
-            flash.Stop();
+            if (flash.getReadyState() >= 3) {
+                flash.Stop();
+            }
         } catch (ActiveXException | NullPointerException ex) { // Can be "Data not available yet exception"
         }
     }
@@ -271,8 +285,10 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
     @Override
     public void stop() {
         try {
-            flash.Stop();
-            flash.Rewind();
+            if (flash.getReadyState() >= 3) {
+                flash.Stop();
+                flash.Rewind();
+            }
         } catch (ActiveXException | NullPointerException ex) { // Can be "Data not available yet exception"
         }
     }
@@ -280,7 +296,9 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
     @Override
     public void rewind() {
         try {
-            flash.Rewind();
+            if (flash.getReadyState() >= 3) {
+                flash.Rewind();
+            }
         } catch (ActiveXException | NullPointerException ex) { // Can be "Data not available yet exception"
         }
     }
@@ -288,7 +306,9 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
     @Override
     public void play() {
         try {
-            flash.Play();
+            if (flash.getReadyState() >= 3) {
+                flash.Play();
+            }
         } catch (ActiveXException | NullPointerException ex) { // Can be "Data not available yet exception"
         }
     }
@@ -296,7 +316,11 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
     @Override
     public boolean isPlaying() {
         try {
-            return flash.IsPlaying();
+            if (flash.getReadyState() >= 3) {
+                return flash.IsPlaying();
+            } else {
+                return false;
+            }
         } catch (ActiveXException | NullPointerException ex) { // Can be "Data not available yet exception"
             return false;
         }
@@ -315,7 +339,9 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
             return;
         }
         try {
-            flash.GotoFrame(frame);
+            if (flash.getReadyState() >= 3) {
+                flash.GotoFrame(frame);
+            }
         } catch (ActiveXException | NullPointerException ex) { // Can be "Data not available yet exception"
         }
     }

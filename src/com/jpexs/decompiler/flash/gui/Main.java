@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFBundle;
+import com.jpexs.decompiler.flash.SWFCompression;
 import com.jpexs.decompiler.flash.SWFSourceInfo;
 import com.jpexs.decompiler.flash.SearchMode;
 import com.jpexs.decompiler.flash.SwfOpenException;
@@ -35,8 +36,13 @@ import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.decompiler.flash.gui.pipes.FirstInstance;
 import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
+import com.jpexs.decompiler.flash.tags.EndTag;
+import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
+import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
+import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
@@ -49,6 +55,7 @@ import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.WinReg;
 import java.awt.AWTException;
+import java.awt.Color;
 import java.awt.Frame;
 import java.awt.GraphicsEnvironment;
 import java.awt.MenuItem;
@@ -989,7 +996,15 @@ public class Main {
                 SWF swf = Main.getMainFrame().getPanel().getCurrentSwf();
 
                 String title = swf == null ? "?" : swf.getFileTitle();
-                openFile(new SWFSourceInfo(new ByteArrayInputStream(data), null, title + ":" + hash));
+                title = title + ":" + hash;
+                String tfile;
+                try {
+                    tfile = tempFile(title);
+                    Helper.writeFile(tfile, data);
+                    openFile(new SWFSourceInfo(null, tfile, title));
+                } catch (IOException ex) {
+                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, "Cannot create tempfile");
+                }
             }
 
             @Override
@@ -1251,14 +1266,25 @@ public class Main {
             if (lastSession != null && lastSession.length() > 0) {
                 String[] filesToOpen = lastSession.split(File.pathSeparator, -1);
                 List<String> exfiles = new ArrayList<>();
+                List<String> extitles = new ArrayList<>();
+                String lastSessionTitles = Configuration.lastSessionFileTitles.get();
+                String fileTitles[] = new String[0];
+                if (lastSessionTitles != null && !lastSessionTitles.isEmpty()) {
+                    fileTitles = lastSessionTitles.split(File.pathSeparator, -1);
+                }
                 for (int i = 0; i < filesToOpen.length; i++) {
                     if (new File(filesToOpen[i]).exists()) {
                         exfiles.add(filesToOpen[i]);
+                        if (fileTitles.length > i) {
+                            extitles.add(fileTitles[i]);
+                        } else {
+                            extitles.add(null);
+                        }
                     }
                 }
                 SWFSourceInfo[] sourceInfos = new SWFSourceInfo[exfiles.size()];
                 for (int i = 0; i < exfiles.size(); i++) {
-                    sourceInfos[i] = new SWFSourceInfo(null, exfiles.get(i), null);
+                    sourceInfos[i] = new SWFSourceInfo(null, exfiles.get(i), extitles.get(i).isEmpty() ? null : extitles.get(i));
                 }
                 if (sourceInfos.length > 0) {
                     openFile(sourceInfos, () -> {

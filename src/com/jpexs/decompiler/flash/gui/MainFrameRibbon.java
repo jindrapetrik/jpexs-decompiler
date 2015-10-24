@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
@@ -32,7 +33,10 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
 import org.pushingpixels.flamingo.api.ribbon.JRibbon;
 import org.pushingpixels.flamingo.internal.ui.ribbon.appmenu.JRibbonApplicationMenuButton;
@@ -120,19 +124,25 @@ public final class MainFrameRibbon extends AppRibbonFrame {
             public void windowClosing(WindowEvent e) {
                 if (Configuration.saveSessionOnExit.get()) {
                     StringBuilder sb = new StringBuilder();
+                    StringBuilder sbt = new StringBuilder();
+
                     boolean first = true;
                     for (SWFList swf : panel.getSwfs()) {
                         if (!first) {
                             sb.append(File.pathSeparator);
+                            sbt.append(File.pathSeparator);
                         }
                         first = false;
                         String file = swf.sourceInfo.getFile();
                         if (file != null) {
                             sb.append(file);
+                            String t = swf.sourceInfo.getFileTitle();
+                            sbt.append(t == null ? "" : t);
                         }
                     }
 
                     Configuration.lastSessionFiles.set(sb.toString());
+                    Configuration.lastSessionFileTitles.set(sbt.toString());
 
                     String path = panel.tagTree.getSelectionPathString();
                     if (path != null) {
