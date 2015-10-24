@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui.player;
 
 import com.jpexs.decompiler.flash.gui.FlashUnsupportedException;
 import com.jpexs.decompiler.flash.gui.Main;
+import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.javactivex.ActiveX;
 import com.jpexs.javactivex.ActiveXEvent;
 import com.jpexs.javactivex.ActiveXException;
@@ -35,6 +36,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
@@ -248,23 +250,61 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
         }
     }
 
-    public synchronized void displaySWF(String flashName, Color bgColor, float frameRate) {
+    private String movieToPlay = null;
 
+    private Thread playQueue;
+    private Object queueLock = new Object();
+
+    public synchronized void displaySWF(final String flashName, final Color bgColor, final float frameRate) {
+
+        //Minimum of 1000 ms delay before calling flash.setMovie to avoid illegalAccess errors
+        if (playQueue == null) {
+            playQueue = new Thread() {
+                long lastTime;
+
+                @Override
+                public void run() {
+                    while (true) {
+                        boolean empty;
+                        synchronized (queueLock) {
+                            empty = movieToPlay == null;
+                            if (empty) {
+                                try {
+                                    queueLock.wait();
+                                } catch (InterruptedException ex) {
+                                    break;
+                                }
+                            }
+                        }
+                        if (!empty) {
+                            flash.setMovie(movieToPlay);
+                            synchronized (queueLock) {
+                                movieToPlay = null;
+                            }
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException ex) {
+                                break;
+                            }
+                        }
+                    }
+                }
+            };
+            playQueue.start();
+        }
         zoom = 1.0;
         this.frameRate = frameRate;
         if (bgColor != null) {
             setBackground(bgColor);
         }
-        int state = flash.getReadyState();
-        flash.setMovie(flashName);
+        synchronized (queueLock) {
+            movieToPlay = flashName;
+            queueLock.notify();
+        }
+
         //play
         stopped = false;
         fireMediaDisplayStateChanged();
-        try {
-            Thread.sleep(1000); //Safety delay to avoid access violation. TODO: handle this better. How?
-        } catch (InterruptedException ex) {
-            //ignore
-        }
     }
 
     @Override
@@ -327,11 +367,13 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
     }
 
     @Override
-    public void setLoop(boolean loop) {
+    public void setLoop(boolean loop
+    ) {
     }
 
     @Override
-    public void gotoFrame(int frame) {
+    public void gotoFrame(int frame
+    ) {
         if (frame < 0) {
             return;
         }
