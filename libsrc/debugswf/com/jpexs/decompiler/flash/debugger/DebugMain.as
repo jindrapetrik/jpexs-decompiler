@@ -11,6 +11,7 @@
 			debugConsole("test console");			
 			debugSocket("test proxy");
 			debugTrace("test trace");
+			var loader:DebugLoader = new DebugLoader();
 		}
 	}		
 	

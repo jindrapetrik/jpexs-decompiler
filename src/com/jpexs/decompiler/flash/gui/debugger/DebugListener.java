@@ -24,5 +24,9 @@ public interface DebugListener {
 
     public void onMessage(String clientId, String msg);
 
+    public void onLoaderURL(String clientId, String url);
+
+    public void onLoaderBytes(String clientId, byte data[]);
+
     public void onFinish(String clientId);
 }

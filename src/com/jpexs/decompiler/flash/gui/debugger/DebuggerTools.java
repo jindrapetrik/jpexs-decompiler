@@ -85,6 +85,27 @@ public class DebuggerTools {
         return tested.matches(Pattern.quote(DEBUGGER_PACKAGE) + "(\\.pkg[a-f0-9]+)?" + cls);
     }
 
+    public static void injectDebugLoader(SWF swf) {
+        if (hasDebugger(swf)) {
+            ScriptPack dsp = getDebuggerScriptPack(swf);
+            String debuggerPkg = dsp.getClassPath().packageStr.toRawString();
+            for (ABCContainerTag ct : swf.getAbcList()) {
+                ABC a = ct.getABC();
+                if (dsp.abc == a) { //do not replace Loader in debugger itself
+                    continue;
+                }
+                for (int i = 1; i < a.constants.constant_multiname.size(); i++) {
+                    Multiname m = a.constants.constant_multiname.get(i);
+                    if ("flash.display.Loader".equals(m.getNameWithNamespace(a.constants).toRawString())) {
+                        m.namespace_index = a.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, a.constants.getStringId(debuggerPkg, true)), 0, true);
+                        m.name_index = a.constants.getStringId("DebugLoader", true);
+                        ((Tag) ct).setModified(true);
+                    }
+                }
+            }
+        }
+    }
+
     public static void replaceTraceCalls(SWF swf, String fname) {
         if (hasDebugger(swf)) {
             String debuggerPkg = getDebuggerScriptPack(swf).getClassPath().packageStr.toRawString();
@@ -111,7 +132,7 @@ public class DebuggerTools {
             swf.tags.remove((Tag) tag);
             swf.getAbcList().remove(tag);
 
-            //Change all debugger calls to normal trace
+            //Change all debugger calls to normal trace / Loader
             for (ABCContainerTag ct : swf.getAbcList()) {
                 ABC a = ct.getABC();
                 for (int i = 1; i < a.constants.constant_multiname.size(); i++) {
@@ -124,6 +145,9 @@ public class DebuggerTools {
                         m.name_index = a.constants.getStringId("trace", true);
                         m.namespace_index = a.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, a.constants.getStringId("", true)), 0, true);
                         ((Tag) ct).setModified(true);
+                    } else if (isDebuggerClass(packageStr, "DebugLoader")) {
+                        m.name_index = a.constants.getStringId("Loader", true);
+                        m.namespace_index = a.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, a.constants.getStringId("flash.display", true)), 0, true);
                     }
                 }
             }
@@ -136,7 +160,11 @@ public class DebuggerTools {
                 //load debug swf
                 SWF debugSWF = new SWF(Main.class.getClassLoader().getResourceAsStream("com/jpexs/decompiler/flash/gui/debugger/debug.swf"), false);
 
-                ABCContainerTag firstAbc = swf.getAbcList().get(0);
+                List<ABCContainerTag> al = swf.getAbcList();
+                ABCContainerTag firstAbc = al.isEmpty() ? null : al.get(0);
+                if (firstAbc == null) { //nothing to instrument?
+                    return;
+                }
                 String newdebuggerpkg = DEBUGGER_PACKAGE;
 
                 if (Configuration.randomDebuggerPackage.get()) {
@@ -174,7 +202,7 @@ public class DebuggerTools {
         initDebugger();
     }
 
-    private static void initDebugger() {
+    public static Debugger initDebugger() {
         if (debugger == null) {
             synchronized (Main.class) {
                 if (debugger == null) {
@@ -184,6 +212,7 @@ public class DebuggerTools {
                 }
             }
         }
+        return debugger;
     }
 
     public static void debuggerShowLog() {

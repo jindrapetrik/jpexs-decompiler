@@ -2,10 +2,11 @@
 	
 	import flash.external.ExternalInterface;
 	
-	public function debugAlert(msg):*{
-		if(ExternalInterface.available)
-		  ExternalInterface.call("alert",""+msg);
-		return msg;		
+	public function debugAlert(...msg):void{
+		for each(var n in msg){
+			if(ExternalInterface.available)
+		  	ExternalInterface.call("alert",""+n);
+		}
 	}
 	
 }

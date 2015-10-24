@@ -25,10 +25,12 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -57,6 +59,30 @@ public class Debugger {
         private final int id;
 
         public boolean finished = false;
+        private final Map<String, String> parameters = new HashMap<>();
+
+        public static final int MSG_STRING = 0;
+        public static final int MSG_LOADER_URL = 1;
+        public static final int MSG_LOADER_BYTES = 2;
+
+        public String getParameter(String name, String defValue) {
+            if (parameters.containsKey(name)) {
+                return parameters.get(name);
+            }
+            return defValue;
+        }
+
+        public int getVersionMajor() {
+            return Integer.parseInt(getParameter("debug.version.major", "1"));
+        }
+
+        public int getVersionMinor() {
+            return Integer.parseInt(getParameter("debug.version.major", "0"));
+        }
+
+        public boolean hasMsgType() {
+            return getVersionMajor() > 1 || getVersionMinor() > 0;
+        }
 
         public DebugHandler(int serverPort, Socket s) {
             this.s = s;
@@ -70,6 +96,42 @@ public class Debugger {
             } catch (IOException ex) {
                 //ignore
             }
+        }
+
+        private int readType(InputStream is) throws IOException {
+            int type = is.read();
+            if (type == -1) {
+                throw new EOFException();
+            }
+            return type;
+        }
+
+        private byte[] readBytes(InputStream is) throws IOException {
+            int len = is.read();
+            if (len == -1) {
+                throw new EOFException();
+            }
+            int len2 = is.read();
+            if (len2 == -1) {
+                throw new EOFException();
+            }
+            int len3 = is.read();
+            if (len3 == -1) {
+                throw new EOFException();
+            }
+            int len4 = is.read();
+            if (len4 == -1) {
+                throw new EOFException();
+            }
+            len = (len << 24) + (len2 << 16) + (len3 << 8) + len4;
+            byte data[] = new byte[len];
+            int cnt;
+            int off = 0;
+            while (len > 0 && (cnt = is.read(data, off, len)) > 0) {
+                len -= cnt;
+                off += cnt;
+            }
+            return data;
         }
 
         private String readString(InputStream is) throws IOException {
@@ -115,14 +177,47 @@ public class Debugger {
                         os.write(("<cross-domain-policy><allow-access-from domain=\"*\" to-ports=\"" + serverPort + "\" /></cross-domain-policy>").getBytes("UTF-8"));
                     }
                 } else {
+                    if (!ret.isEmpty()) {
+                        String param[] = (ret.contains(";") ? ret.split(";") : new String[]{ret});
+                        for (String p : param) {
+                            if (p.contains("=")) {
+                                String key = p.substring(0, p.indexOf("="));
+                                String val = p.substring(p.indexOf("=") + 1);
+                                parameters.put(key, val);
+                            } else {
+                                parameters.put(p, "true");
+                            }
+                        }
+                    }
+                    boolean hasType = hasMsgType();
                     String name = readString(is);
                     if (!name.isEmpty()) {
                         clientName = name;
                     }
                     while (true) {
-                        ret = readString(is);
-                        for (DebugListener l : listeners) {
-                            l.onMessage(clientName, ret);
+                        int type = 0;
+                        if (hasType) {
+                            type = readType(is);
+                        }
+                        switch (type) {
+                            case MSG_STRING:
+                                ret = readString(is);
+                                for (DebugListener l : listeners) {
+                                    l.onMessage(clientName, ret);
+                                }
+                                break;
+                            case MSG_LOADER_URL:
+                                ret = readString(is);
+                                for (DebugListener l : listeners) {
+                                    l.onLoaderURL(clientName, ret);
+                                }
+                                break;
+                            case MSG_LOADER_BYTES:
+                                byte retB[] = readBytes(is);
+                                for (DebugListener l : listeners) {
+                                    l.onLoaderBytes(clientName, retB);
+                                }
+                                break;
                         }
                     }
                 }

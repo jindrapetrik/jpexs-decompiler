@@ -374,6 +374,11 @@ public abstract class MainFrameMenu implements MenuBuilder {
         DebuggerTools.debuggerShowLog();
     }
 
+    protected void debuggerInjectLoader(ActionEvent evt) {
+        DebuggerTools.injectDebugLoader(swf);
+        refreshDecompiled();
+    }
+
     protected void debuggerReplaceTraceCallsActionPerformed(ActionEvent evt) {
         ReplaceTraceDialog rtd = new ReplaceTraceDialog(Configuration.lastDebuggerReplaceFunction.get());
         rtd.setVisible(true);
@@ -516,6 +521,13 @@ public abstract class MainFrameMenu implements MenuBuilder {
         boolean selected = button.isSelected();
 
         Configuration.gotoMainClassOnStartup.set(selected);
+    }
+
+    protected void autoOpenLoadedSWFsActionPerformed(ActionEvent evt) {
+        AbstractButton button = (AbstractButton) evt.getSource();
+        boolean selected = button.isSelected();
+
+        Configuration.autoOpenLoadedSWFs.set(selected);
     }
 
     protected void autoRenameIdentifiersActionPerformed(ActionEvent evt) {
@@ -672,6 +684,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         setMenuEnabled("/tools/debugger/debuggerSwitch", hasAbc);
         setMenuChecked("/tools/debugger/debuggerSwitch", hasDebugger);
         setMenuEnabled("/tools/debugger/debuggerReplaceTrace", hasAbc && hasDebugger);
+        //setMenuEnabled("/tools/debugger/debuggerInjectLoader", hasAbc && hasDebugger);
 
         setMenuEnabled("_/checkUpdates", !isWorking);
         setMenuEnabled("/help/checkUpdates", !isWorking);
@@ -780,6 +793,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addMenuItem("/tools/debugger", translate("menu.debugger"), null, null, 0, null, false);
         addToggleMenuItem("/tools/debugger/debuggerSwitch", translate("menu.debugger.switch"), null, "debugger32", this::debuggerSwitchActionPerformed, PRIORITY_TOP);
         addMenuItem("/tools/debugger/debuggerReplaceTrace", translate("menu.debugger.replacetrace"), "debuggerreplace16", this::debuggerReplaceTraceCallsActionPerformed, PRIORITY_MEDIUM, null, true);
+        //addMenuItem("/tools/debugger/debuggerInjectLoader", "Inject Loader", "debuggerreplace16", this::debuggerInjectLoader, PRIORITY_MEDIUM, null, true);
         addMenuItem("/tools/debugger/debuggerShowLog", translate("menu.debugger.showlog"), "debuggerlog16", this::debuggerShowLogActionPerformed, PRIORITY_MEDIUM, null, true);
         finishMenu("/tools/debugger");
 
@@ -796,7 +810,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addToggleMenuItem("/settings/cacheOnDisk", translate("menu.settings.cacheOnDisk"), null, null, this::cacheOnDiskActionPerformed, 0);
         addToggleMenuItem("/settings/gotoMainClassOnStartup", translate("menu.settings.gotoMainClassOnStartup"), null, null, this::gotoDucumentClassOnStartupActionPerformed, 0);
         addToggleMenuItem("/settings/autoRenameIdentifiers", translate("menu.settings.autoRenameIdentifiers"), null, null, this::autoRenameIdentifiersActionPerformed, 0);
-
+        addToggleMenuItem("/settings/autoOpenLoadedSWFs", translate("menu.settings.autoOpenLoadedSWFs"), null, null, this::autoOpenLoadedSWFsActionPerformed, 0);
         if (Platform.isWindows()) {
             addToggleMenuItem("/settings/associate", translate("menu.settings.addtocontextmenu"), null, null, this::associateActionPerformed, 0);
         }
@@ -858,6 +872,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         if (externalFlashPlayerUnavailable) {
             setMenuEnabled("/settings/internalViewer", false);
+            setMenuEnabled("/settings/autoOpenLoadedSWFs", false);
         }
 
         /*int deobfuscationMode = Configuration.deobfuscationMode.get();
@@ -954,6 +969,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
             setMenuChecked("/tools/debugger/debuggerSwitch", false);
         }
         setMenuEnabled("/tools/debugger/debuggerReplaceTrace", isMenuChecked("/tools/debugger/debuggerSwitch"));
+        //setMenuEnabled("/tools/debugger/debuggerInjectLoader", isMenuChecked("/tools/debugger/debuggerSwitch"));
     }
 
     private void timelineActionPerformed(ActionEvent evt) {

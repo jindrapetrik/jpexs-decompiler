@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.SWFSourceInfo;
 import com.jpexs.decompiler.flash.gui.debugger.DebugListener;
 import com.jpexs.decompiler.flash.gui.debugger.Debugger;
 import java.awt.BorderLayout;
@@ -24,6 +25,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
+import java.io.ByteArrayInputStream;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -60,6 +62,16 @@ public class DebugLogDialog extends AppDialog {
             @Override
             public void onFinish(String clientId) {
 
+            }
+
+            @Override
+            public void onLoaderURL(String clientId, String url) {
+                log(translate("msg.header").replace("%clientid%", clientId) + " LOADURL:" + url);
+            }
+
+            @Override
+            public void onLoaderBytes(String clientId, byte[] data) {
+                log(translate("msg.header").replace("%clientid%", clientId) + " LOADBYTES: " + data.length + "B");
             }
         });
         Container cnt = getContentPane();

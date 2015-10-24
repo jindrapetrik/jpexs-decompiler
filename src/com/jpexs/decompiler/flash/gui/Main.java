@@ -30,6 +30,8 @@ import com.jpexs.decompiler.flash.configuration.SwfSpecificConfiguration;
 import com.jpexs.decompiler.flash.console.CommandLineArgumentParser;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
 import com.jpexs.decompiler.flash.exporters.modes.ExeExportMode;
+import com.jpexs.decompiler.flash.gui.debugger.DebugListener;
+import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.decompiler.flash.gui.pipes.FirstInstance;
 import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
@@ -60,6 +62,7 @@ import java.awt.event.MouseEvent;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -77,9 +80,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.ConsoleHandler;
@@ -910,6 +915,20 @@ public class Main {
         ErrorLogFrame.getInstance().setVisible(true);
     }
 
+    private static String md5(byte data[]) {
+        try {
+            java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
+            byte[] array = md.digest(data);
+            StringBuffer sb = new StringBuffer();
+            for (int i = 0; i < array.length; ++i) {
+                sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1, 3));
+            }
+            return sb.toString();
+        } catch (java.security.NoSuchAlgorithmException e) {
+        }
+        return null;
+    }
+
     private static void initGui() {
         if (GraphicsEnvironment.isHeadless()) {
             System.err.println("Error: Your system does not support Graphic User Interface");
@@ -942,6 +961,41 @@ public class Main {
         autoCheckForUpdates();
         offerAssociation();
         loadingDialog = new LoadingDialog();
+
+        DebuggerTools.initDebugger().addMessageListener(new DebugListener() {
+
+            @Override
+            public void onMessage(String clientId, String msg) {
+            }
+
+            @Override
+            public void onLoaderURL(String clientId, String url) {
+            }
+
+            @Override
+            public void onLoaderBytes(String clientId, byte[] data) {
+                String hash = md5(data);
+                for (SWFList sl : Main.getMainFrame().getPanel().getSwfs()) {
+                    for (int s = 0; s < sl.size(); s++) {
+                        String t = sl.get(s).getFileTitle();
+                        if (t == null) {
+                            t = "";
+                        }
+                        if (t.endsWith(":" + hash)) { //this one is already opened
+                            return;
+                        }
+                    }
+                }
+                SWF swf = Main.getMainFrame().getPanel().getCurrentSwf();
+
+                String title = swf == null ? "?" : swf.getFileTitle();
+                openFile(new SWFSourceInfo(new ByteArrayInputStream(data), null, title + ":" + hash));
+            }
+
+            @Override
+            public void onFinish(String clientId) {
+            }
+        });
     }
 
     public static void showModeFrame() {

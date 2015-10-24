@@ -494,6 +494,10 @@ public class Configuration {
     @ConfigurationCategory("script")
     public static final ConfigurationItem<Boolean> enableScriptInitializerDisplay = null;
 
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("ui")
+    public static final ConfigurationItem<Boolean> autoOpenLoadedSWFs = null;
+
     private enum OSId {
 
         WINDOWS, OSX, UNIX

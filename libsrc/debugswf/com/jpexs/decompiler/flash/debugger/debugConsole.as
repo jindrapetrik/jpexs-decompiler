@@ -2,10 +2,11 @@
 	
 	import flash.external.ExternalInterface;
 	
-	public function debugConsole(msg):*{
-		if(ExternalInterface.available)
-		  ExternalInterface.call("console.log",""+msg);
-		return msg;
+	public function debugConsole(...msg):*{
+		for each(var n in msg){
+			if(ExternalInterface.available)
+		  		ExternalInterface.call("console.log",""+n);
+		}
 	}
 	
 }

@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
+import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.decompiler.flash.gui.editor.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.player.MediaDisplay;
@@ -79,6 +80,7 @@ import java.awt.event.ActionEvent;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -1072,9 +1074,25 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
                 swf.saveTo(fos);
             }
+            //Inject Loader
+            if (swf.isAS3() && Configuration.autoOpenLoadedSWFs.get() && !Configuration.internalFlashViewer.get() && !DebuggerTools.hasDebugger(swf)) {
+                SWF instrSWF = null;
+                try (FileInputStream fis = new FileInputStream(tempFile)) {
+                    instrSWF = new SWF(fis, false, false);
+                }
+                if (instrSWF != null) {
+                    DebuggerTools.switchDebugger(instrSWF);
+                    DebuggerTools.injectDebugLoader(instrSWF);
+                    try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
+                        instrSWF.saveTo(fos);
+                    }
+                }
+            }
             flashPanel.displaySWF(tempFile.getAbsolutePath(), backgroundColor, swf.frameRate);
         } catch (IOException iex) {
             Logger.getLogger(PreviewPanel.class.getName()).log(Level.SEVERE, "Cannot create tempfile", iex);
+        } catch (InterruptedException ex) {
+
         }
     }
 
