@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.swf5;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
@@ -33,6 +34,19 @@ public class ActionStackSwap extends Action {
     @Override
     public String toString() {
         return "StackSwap";
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda) {
+        if (lda.stack.size() < 2) {
+            return false;
+        }
+
+        Object obj1 = lda.stack.pop();
+        Object obj2 = lda.stack.pop();
+        lda.stack.push(obj1);
+        lda.stack.push(obj2);
+        return true;
     }
 
     @Override

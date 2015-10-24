@@ -18,7 +18,9 @@ package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.operations.StringAddActionItem;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.HashMap;
@@ -33,6 +35,20 @@ public class ActionStringAdd extends Action {
     @Override
     public String toString() {
         return "StringAdd";
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda) {
+        if (lda.stack.size() < 2) {
+            return false;
+        }
+
+        lda.stack.push(getResult(lda.pop(), lda.pop()));
+        return true;
+    }
+
+    public static String getResult(Object obj1, Object obj2) {
+        return EcmaScript.toString(obj1) + EcmaScript.toString(obj2);
     }
 
     @Override

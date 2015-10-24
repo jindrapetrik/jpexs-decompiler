@@ -698,6 +698,11 @@ public abstract class Action implements GraphSourceItem {
         return toString();
     }
 
+    public boolean execute(LocalDataArea lda) {
+        //throw new UnsupportedOperationException("Action " + toString() + " not implemented");
+        return false;
+    }
+
     /**
      * Translates this function to stack and output.
      *

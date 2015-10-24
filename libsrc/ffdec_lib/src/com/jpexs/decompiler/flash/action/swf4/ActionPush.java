@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
+import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.TemporaryRegister;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
@@ -371,6 +372,15 @@ public class ActionPush extends Action {
         writer.appendNoHilight("Push ");
         paramsToString(writer);
         return writer;
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda) {
+        for (Object value : values) {
+            lda.stack.push(value);
+        }
+
+        return true;
     }
 
     @Override
