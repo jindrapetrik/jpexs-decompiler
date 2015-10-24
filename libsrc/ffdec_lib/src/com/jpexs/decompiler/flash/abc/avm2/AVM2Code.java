@@ -2069,14 +2069,27 @@ public class AVM2Code implements Cloneable {
             }
 
             @Override
-            public int updateOperandOffset(long insAddr, long targetAddress, int offset) {
-                if (targetAddress > remOffset && insAddr < remOffset) {
-                    return offset - byteCount;
+            public int updateOperandOffset(long jumpInsAddr, long jumpTargetAddr, int jumpOffset) {
+                /*
+                 a:jump d:
+                 b:
+                 c:X
+                 d:
+                 */
+                if (jumpTargetAddr > remOffset && jumpInsAddr < remOffset) {
+                    return jumpOffset - byteCount;
                 }
-                if (targetAddress <= remOffset && insAddr > remOffset) {
-                    return offset + byteCount;
+                /*
+                 a:X1
+                 b:X2
+                 c:
+                 d:jump a:
+                 */
+                if (jumpTargetAddr <= remOffset && jumpInsAddr > remOffset) {
+                    return jumpOffset + byteCount;
                 }
-                return offset;
+
+                return jumpOffset;
             }
         }, body);
         code.remove(pos);
@@ -2169,29 +2182,55 @@ public class AVM2Code implements Cloneable {
         } else {
             instruction.offset = code.get(pos).offset;
         }
+        final long x = instruction.offset;
         updateOffsets(new OffsetUpdater() {
 
             @Override
             public long updateInstructionOffset(long offset) {
-                if (offset >= instruction.offset) {
+                if (offset >= x) {
                     return offset + byteCount;
                 }
                 return offset;
             }
 
             @Override
-            public int updateOperandOffset(long insAddr, long targetAddress, int offset) {
-                if (((targetAddress > instruction.offset) || (mapOffsetsAfterIns && (targetAddress == instruction.offset)))
-                        && (insAddr < instruction.offset)) {
-                    return offset + byteCount;
+            public int updateOperandOffset(long j, long t, int offset_jt) {
+
+                /*
+                 j:jump t:
+                 n:
+                 n:
+                 x:#
+                 t:
+                 */
+                if (((t > x) || (mapOffsetsAfterIns && (t == x))) && (j < x)) {
+                    return offset_jt + byteCount;
                 }
-                if (((targetAddress < instruction.offset) || (mapOffsetsAfterIns && (targetAddress == instruction.offset)))
-                        && (insAddr > instruction.offset)) {
-                    return offset - byteCount;
+                /*
+                 t:
+                 x:#
+                 n:
+                 n:
+                 j:jump t:                
+                 */
+                if (((t < x) || (mapOffsetsAfterIns && (t == x))) && (j > x)) {
+                    return offset_jt - byteCount;
                 }
-                return offset;
+
+                /*
+                 t:
+                 n:
+                 n:
+                 j:x: # jump t:
+                 */
+                if ((j == x) && (t < x)) {
+                    return offset_jt - byteCount;
+                }
+
+                return offset_jt;
             }
         }, body);
+        instruction.offset = x;
         code.add(pos, instruction);
         //checkValidOffsets(body);
     }
