@@ -18,8 +18,6 @@ package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.swf5.ActionTypeOf;
-import com.jpexs.decompiler.flash.ecma.EcmaScript;
-import com.jpexs.decompiler.flash.ecma.EcmaType;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -53,24 +51,7 @@ public class TypeOfActionItem extends ActionItem {
 
     @Override
     public Object getResult() {
-        Object res = value.getResult();
-        EcmaType type = EcmaScript.type(res);
-        switch (type) {
-            case STRING:
-                return "string";
-            case BOOLEAN:
-                return "boolean";
-            case NUMBER:
-                return "number";
-            case OBJECT:
-                return "object";
-            case UNDEFINED:
-                return "undefined";
-            case NULL:
-                return "null";
-        }
-        //TODO: function,movieclip
-        return "object";
+        return ActionTypeOf.getResult(value.getResult());
     }
 
     @Override

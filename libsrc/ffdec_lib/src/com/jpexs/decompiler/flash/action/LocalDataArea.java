@@ -1,0 +1,50 @@
+/*
+ *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3.0 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library.
+ */
+package com.jpexs.decompiler.flash.action;
+
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import java.util.HashMap;
+import java.util.Stack;
+
+public class LocalDataArea {
+
+    public Stack<Object> stack = new Stack<>();
+
+    public HashMap<String, Object> localVariables = new HashMap<>();
+
+    public Long jump;
+
+    public Object returnValue;
+
+    public String executionException;
+
+    public void clear() {
+        stack.clear();
+        localVariables.clear();
+        jump = null;
+        returnValue = null;
+        executionException = null;
+    }
+
+    public Object pop() {
+        return stack.pop();
+    }
+
+    public Double popAsNumber() {
+        return EcmaScript.toNumber(stack.pop());
+    }
+}

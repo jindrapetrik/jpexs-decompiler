@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.AsciiToCharActionItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
@@ -33,6 +34,25 @@ public class ActionAsciiToChar extends Action {
     @Override
     public String toString() {
         return "AsciiToChar";
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda) {
+        if (lda.stack.size() == 0) {
+            return false;
+        }
+
+        lda.stack.push(getResult(lda.popAsNumber()));
+        return true;
+    }
+
+    public static String getResult(Double ascii) {
+        int res = (int) (double) ascii;
+        if (res == 0) {
+            return "";
+        }
+
+        return ((Character) (char) res).toString();
     }
 
     @Override

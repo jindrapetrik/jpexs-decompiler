@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.ActionLocalData;
+import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.deobfuscation.FixItemCounterTranslateStack;
 import com.jpexs.decompiler.flash.action.swf4.ActionAdd;
 import com.jpexs.decompiler.flash.action.swf4.ActionAnd;
@@ -92,6 +93,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import org.testng.Assert;
+import static org.testng.Assert.fail;
 
 /**
  *
@@ -274,6 +276,16 @@ public class FlashPlayerTest {
                 Object ffdecResult = stack.pop().getResult();
                 System.out.println("FFDec result: " + ffdecResult);
 
+                LocalDataArea lda = new LocalDataArea();
+                for (Action a : newActions) {
+                    if (!a.execute(lda)) {
+                        fail();
+                    }
+                }
+
+                Object ffdecExecuteResult = lda.stack.pop();
+                System.out.println("FFDec execte result: " + ffdecExecuteResult);
+
                 asm.setActions(actions);
                 asm.setModified();
                 try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(f2))) {
@@ -307,8 +319,10 @@ public class FlashPlayerTest {
 
                 if (checkOnlyStart) {
                     Assert.assertTrue(((String) ffdecResult).startsWith(flashResult));
+                    Assert.assertTrue(((String) ffdecExecuteResult).startsWith(flashResult));
                 } else {
                     Assert.assertEquals(ffdecResult, flashResult);
+                    Assert.assertEquals(ffdecExecuteResult, flashResult);
                 }
 
                 f2.delete();
