@@ -17,11 +17,18 @@
 package com.jpexs.decompiler.flash.abc;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.abc.avm2.ConvertException;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
+import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
@@ -29,6 +36,8 @@ import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
 import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
+import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
+import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.ScopeStack;
@@ -40,8 +49,14 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -292,5 +307,87 @@ public class ScriptPack extends AS3ClassTreeItem {
     @Override
     public boolean isModified() {
         return abc.script_info.get(scriptIndex).isModified();
+    }
+
+    /**
+     * Injects debugfile, debugline instructions into the code
+     *
+     * Based on idea of Jacob Thompson
+     * http://securityevaluators.com/knowledge/flash/
+     */
+    public void injectDebugInfo() {
+        Map<Integer, Map<Integer, Integer>> bodyToPosToLine = new HashMap<>();
+        try {
+            CachedDecompilation decompiled = SWF.getCached(this);
+            int line = 1;
+            String txt = decompiled.text;
+            txt = txt.replace("\r", "");
+            for (int i = 0; i < txt.length(); i++) {
+                if (txt.charAt(i) == '\n') {
+                    line++;
+                }
+                Highlighting cls = Highlighting.searchPos(decompiled.classHilights, i);
+                if (cls == null) {
+                    continue;
+                }
+                Highlighting trt = Highlighting.searchPos(decompiled.traitHilights, i);
+                if (trt == null) {
+                    continue;
+                }
+                Highlighting method = Highlighting.searchPos(decompiled.methodHilights, i);
+                if (method == null) {
+                    continue;
+                }
+                Highlighting instr = Highlighting.searchPos(decompiled.instructionHilights, i);
+                if (instr == null) {
+                    continue;
+                }
+                int classIndex = (int) cls.getProperties().index;
+                int methodIndex = (int) method.getProperties().index;
+                int bodyIndex = abc.findBodyIndex(methodIndex);
+                if (bodyIndex == -1) {
+                    continue;
+                }
+                long instrOffset = instr.getProperties().offset;
+                int traitIndex = (int) trt.getProperties().index;
+
+                Trait trait = abc.findTraitByTraitId(classIndex, traitIndex);
+                if (((trait instanceof TraitMethodGetterSetter) && (((TraitMethodGetterSetter) trait).method_info != methodIndex))
+                        || ((trait instanceof TraitFunction) && (((TraitFunction) trait).method_info != methodIndex))) {
+                    continue; //inner anonymous function - ignore. TODO: make work
+                }
+                int pos = -1;
+                try {
+                    abc.bodies.get(bodyIndex).getCode().adr2pos(instrOffset);
+                } catch (ConvertException cex) {
+                    //ignore
+                }
+                if (pos == -1) {
+                    continue;
+                }
+                if (!bodyToPosToLine.containsKey(bodyIndex)) {
+                    bodyToPosToLine.put(bodyIndex, new HashMap<>());
+                }
+                bodyToPosToLine.get(bodyIndex).put(pos, line);
+
+            }
+        } catch (InterruptedException ex) {
+            Logger.getLogger(ScriptPack.class.getName()).log(Level.SEVERE, "Cannot decompile", ex);
+        }
+
+        String filename = path.toString().replace('.', '/') + ".as";
+
+        for (int bodyIndex : bodyToPosToLine.keySet()) {
+            MethodBody b = abc.bodies.get(bodyIndex);
+            b.insertInstruction(0, new AVM2Instruction(0, AVM2Instructions.DebugFile, new int[]{abc.constants.getStringId(filename, true)}), true);
+            List<Integer> pos = new ArrayList<>(bodyToPosToLine.get(bodyIndex).keySet());
+            Collections.sort(pos);
+            Collections.reverse(pos);
+            for (int i : pos) {
+                int line = bodyToPosToLine.get(bodyIndex).get(i);
+                b.insertInstruction(i, new AVM2Instruction(0, AVM2Instructions.DebugLine, new int[]{line}));
+            }
+        }
+        ((Tag) abc.parentTag).setModified(true);
     }
 }

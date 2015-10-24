@@ -459,6 +459,13 @@ public class CommandLineArgumentParser {
             out.println("  ...WARNING: The deobfuscation result is still probably far enough to be openable by other decompilers.");
         }
 
+        if (filter == null || filter.equals("enabledebugging")) {
+            out.println(" " + (cnt++) + ") -enabledebugging [-injectas3] <infile> <outfile>");
+            out.println("  ...Enables debugging for <infile> and saves result to <outfile>");
+            out.println("  ...When optional -injectas3 parameter specified, debugfile and debugline instructions are injected into the code to match decompiled source.");
+            out.println("  ...WARNING: not everything works yet");
+        }
+
         printCmdLineUsageExamples(out, filter);
     }
 
@@ -511,6 +518,11 @@ public class CommandLineArgumentParser {
 
         if (filter == null || filter.equals("deobfuscate")) {
             out.println("java -jar ffdec.jar -deobfuscate max myas3file_secure.swf myas3file.swf");
+            exampleFound = true;
+        }
+
+        if (filter == null || filter.equals("enabledebugging")) {
+            out.println("java -jar ffdec.jar -enabledebugging -injectas3 myas3file.swf myas3file_debug.swf");
             exampleFound = true;
         }
 
@@ -664,6 +676,8 @@ public class CommandLineArgumentParser {
             parseDumpAS2(args);
         } else if (command.equals("dumpas3")) {
             parseDumpAS3(args);
+        } else if (command.equals("enabledebugging")) {
+            parseEnableDebugging(args);
         } else if (command.equals("flashpaper2pdf")) {
             parseFlashPaperToPdf(selection, zoom, args);
         } else if (command.equals("replace")) {
@@ -2766,6 +2780,46 @@ public class CommandLineArgumentParser {
             System.err.println("I/O error during reading");
             System.exit(2);
         }
+    }
+
+    private static void parseEnableDebugging(Stack<String> args) {
+        if (args.size() < 2) {
+            badArguments("enabledebugging");
+        }
+
+        boolean injectas3 = false;
+        String file = args.pop();
+        if (file.equals("-injectas3")) {
+            if (args.size() < 2) {
+                badArguments("enabledebugging");
+            }
+            file = args.pop();
+            injectas3 = true;
+        }
+        String outfile = args.pop();
+        try {
+            System.out.print("Working...");
+            FileInputStream fis = new FileInputStream(file);
+            SWF swf = new SWF(fis, Configuration.parallelSpeedUp.get());
+            fis.close();
+            swf.enableDebugging(injectas3);
+            FileOutputStream fos = new FileOutputStream(outfile);
+            swf.saveTo(fos);
+            fos.close();
+            System.out.println("OK");
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, "Cannot read " + file);
+            System.exit(1);
+        } catch (IOException ex) {
+            Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, "Reading error " + file);
+            System.exit(2);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, "Cancelled " + file);
+            System.exit(3);
+        }
+
+        System.out.println("Finished");
+        System.exit(0);
     }
 
     private static void parseDumpAS3(Stack<String> args) {

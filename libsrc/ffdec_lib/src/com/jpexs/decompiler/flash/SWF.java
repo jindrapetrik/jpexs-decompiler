@@ -80,10 +80,14 @@ import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
+import com.jpexs.decompiler.flash.tags.EnableDebugger2Tag;
+import com.jpexs.decompiler.flash.tags.EnableDebuggerTag;
 import com.jpexs.decompiler.flash.tags.EndTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
+import com.jpexs.decompiler.flash.tags.MetadataTag;
+import com.jpexs.decompiler.flash.tags.ProtectTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.SymbolClassTag;
@@ -3084,6 +3088,53 @@ public final class SWF implements SWFContainerItem, Timelined {
                 tag.getABC().removeTraps();
                 tag.getABC().restoreControlFlow();
             }
+        }
+    }
+
+    /**
+     * Enables debugging. Adds tags to enable debugging and injects debugline
+     * and debugfile instructions to AS3 code
+     *
+     * @param injectCode Modify AS3 code with debugfile / debugline ?
+     */
+    public void enableDebugging(boolean injectCode) {
+
+        if (injectCode) {
+            List<ScriptPack> packs = getAS3Packs();
+            for (ScriptPack s : packs) {
+                if (s.isSimple) {
+                    s.injectDebugInfo();
+                }
+            }
+        }
+
+        int pos = 0;
+
+        for (int i = 0; i < tags.size(); i++) {
+            Tag t = tags.get(i);
+            if (t instanceof MetadataTag) {
+                pos = i + 1;
+            }
+            if (t instanceof FileAttributesTag) {
+                pos = i + 1;
+            }
+            if (version >= 6 && (t instanceof EnableDebugger2Tag)) {
+                return;
+            }
+            if (version == 5 && (t instanceof EnableDebuggerTag)) {
+                return;
+            }
+            if (version < 5 && (t instanceof ProtectTag)) {
+                return;
+            }
+        }
+
+        if (version >= 6) {
+            tags.add(pos, new EnableDebugger2Tag(this));
+        } else if (version == 5) {
+            tags.add(pos, new EnableDebuggerTag(this));
+        } else {
+            tags.add(pos, new ProtectTag(this));
         }
     }
 }
