@@ -3086,29 +3086,4 @@ public final class SWF implements SWFContainerItem, Timelined {
             }
         }
     }
-
-    public static byte[] createEmptySWF(int width, int height) {
-        SWF s = new SWF();
-        s.displayRect = new RECT(0, 0, width * 20, height * 20);
-        s.compression = SWFCompression.NONE;
-        s.version = 10;
-
-        s.frameCount = 1;
-        s.frameRate = 1;
-
-        s.tags.add(new SetBackgroundColorTag(s, new RGB(Color.white)));
-        s.tags.add(new ShowFrameTag(s));
-        s.tags.add(new EndTag(s));
-
-        s.hasEndTag = true;
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-        try {
-            s.saveTo(baos);
-        } catch (IOException ex) {
-            Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return baos.toByteArray();
-    }
 }
