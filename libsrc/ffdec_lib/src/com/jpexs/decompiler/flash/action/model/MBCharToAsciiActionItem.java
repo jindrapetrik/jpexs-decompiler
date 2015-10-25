@@ -50,6 +50,21 @@ public class MBCharToAsciiActionItem extends ActionItem {
     }
 
     @Override
+    public Object getResult() {
+        return getResult(value.getResult());
+    }
+
+    public static int getResult(Object ch) {
+        String s = ch.toString();
+        if (s.length() > 0) {
+            char c = s.charAt(0);
+            return (int) c;
+        }
+
+        return 0;
+    }
+
+    @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSourceMerge(localData, generator, value, new ActionMBCharToAscii());
     }

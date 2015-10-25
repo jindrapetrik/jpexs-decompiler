@@ -35,6 +35,7 @@ import com.jpexs.decompiler.flash.action.swf4.ActionDivide;
 import com.jpexs.decompiler.flash.action.swf4.ActionEquals;
 import com.jpexs.decompiler.flash.action.swf4.ActionLess;
 import com.jpexs.decompiler.flash.action.swf4.ActionMBAsciiToChar;
+import com.jpexs.decompiler.flash.action.swf4.ActionMBCharToAscii;
 import com.jpexs.decompiler.flash.action.swf4.ActionMBStringExtract;
 import com.jpexs.decompiler.flash.action.swf4.ActionMBStringLength;
 import com.jpexs.decompiler.flash.action.swf4.ActionMultiply;
@@ -209,7 +210,7 @@ public class FlashPlayerTest {
 
         File f = new File("libsrc/ffdec_lib/testdata/run_as2/run_as2.swf");
         for (int i = 0; i < 15; i++) {
-            for (int j = 0; j < 12 + 23; j++) {
+            for (int j = 0; j < 13 + 23; j++) {
 
                 File f2 = new File("run_test_" + new Date().getTime() + "_" + i + "_" + j + ".swf");
                 f2.deleteOnExit();
@@ -226,7 +227,7 @@ public class FlashPlayerTest {
 
                 Action opAction = getOpAction(j);
 
-                if (j >= 12) {
+                if (j >= 13) {
                     newActions.add(new ActionPush(r1));
                 }
 
@@ -332,12 +333,12 @@ public class FlashPlayerTest {
 
     private Action getOpAction(int idx) {
         Action result;
-        if (idx < 12) {
+        if (idx < 13) {
             result = getUnaryOpAction(idx);
             Assert.assertEquals(1, result.getStackPopCount(null, null));
             Assert.assertEquals(1, result.getStackPushCount(null, null));
         } else {
-            result = getBinaryOpAction(idx - 12);
+            result = getBinaryOpAction(idx - 13);
             Assert.assertEquals(2, result.getStackPopCount(null, null));
             Assert.assertEquals(1, result.getStackPushCount(null, null));
         }
@@ -370,6 +371,8 @@ public class FlashPlayerTest {
             case 10:
                 return new ActionMBAsciiToChar();
             case 11:
+                return new ActionMBCharToAscii();
+            case 12:
                 return new ActionMBStringLength();
         }
 

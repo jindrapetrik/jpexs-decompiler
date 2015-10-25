@@ -34,9 +34,13 @@ public class URShiftActionItem extends BinaryOpItem {
 
     @Override
     public Object getResult() {
-        long leftResult = ((long) (double) leftSide.getResultAsNumber()) & 0xffffffffL;
-        long rightResult = ((long) (double) rightSide.getResultAsNumber()) & 0x1f;
-        return leftResult >>> rightResult;
+        return getResult(rightSide.getResultAsNumber(), leftSide.getResultAsNumber());
+    }
+
+    public static long getResult(Double rightResult, Double leftResult) {
+        long leftResult2 = ((long) (double) leftResult) & 0xffffffffL;
+        long rightResult2 = ((long) (double) rightResult) & 0x1f;
+        return leftResult2 >>> rightResult2;
     }
 
     @Override

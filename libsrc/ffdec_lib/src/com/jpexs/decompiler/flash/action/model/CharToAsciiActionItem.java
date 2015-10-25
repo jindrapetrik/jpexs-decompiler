@@ -66,12 +66,16 @@ public class CharToAsciiActionItem extends ActionItem {
 
     @Override
     public Object getResult() {
-        Object res = value.getResult();
-        String s = res.toString();
+        return getResult(value.getResult());
+    }
+
+    public static int getResult(Object ch) {
+        String s = ch.toString();
         if (s.length() > 0) {
             char c = s.charAt(0);
             return (int) c;
         }
+
         return 0;
     }
 

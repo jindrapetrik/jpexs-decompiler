@@ -34,8 +34,12 @@ public class RShiftActionItem extends BinaryOpItem {
 
     @Override
     public Object getResult() {
-        long rightResult = ((long) (double) rightSide.getResultAsNumber()) & 0x1f;
-        return ((long) (double) leftSide.getResultAsNumber()) >> rightResult;
+        return getResult(rightSide.getResultAsNumber(), leftSide.getResultAsNumber());
+    }
+
+    public static long getResult(Double rightResult, Double leftResult) {
+        long rightResult2 = ((long) (double) rightResult) & 0x1f;
+        return ((long) (double) leftResult) >> rightResult2;
     }
 
     @Override

@@ -37,7 +37,11 @@ public class SubtractActionItem extends BinaryOpItem {
 
     @Override
     public Object getResult() {
-        return leftSide.getResultAsNumber() - rightSide.getResultAsNumber();
+        return getResult(rightSide.getResultAsNumber(), leftSide.getResultAsNumber());
+    }
+
+    public static Double getResult(Double rightResult, Double leftResult) {
+        return leftResult - rightResult;
     }
 
     @Override

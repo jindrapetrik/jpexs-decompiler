@@ -39,7 +39,11 @@ public class GtActionItem extends BinaryOpItem implements LogicalOpItem {
 
     @Override
     public Object getResult() {
-        return EcmaScript.compare(rightSide.getResult(), leftSide.getResult());
+        return getResult(rightSide.getResult(), leftSide.getResult());
+    }
+
+    public static Object getResult(Object rightResult, Object leftResult) {
+        return EcmaScript.compare(rightResult, leftResult);
     }
 
     @Override

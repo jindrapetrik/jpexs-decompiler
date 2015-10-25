@@ -34,7 +34,11 @@ public class LShiftActionItem extends BinaryOpItem {
 
     @Override
     public Object getResult() {
-        return ((int) (double) leftSide.getResultAsNumber()) << ((int) (double) rightSide.getResultAsNumber());
+        return getResult(rightSide.getResultAsNumber(), leftSide.getResultAsNumber());
+    }
+
+    public static int getResult(Double rightResult, Double leftResult) {
+        return ((int) (double) leftResult) << ((int) (double) rightResult);
     }
 
     @Override

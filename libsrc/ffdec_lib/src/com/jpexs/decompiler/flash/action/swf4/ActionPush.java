@@ -320,7 +320,7 @@ public class ActionPush extends Action {
         String ret;
         Object value = values.get(i);
         if (value instanceof ConstantIndex) {
-            ret = ((ConstantIndex) value).toStringNoQ(constantPool);
+            ret = ((ConstantIndex) value).toStringNoQ(constantPool, Configuration.resolveConstants.get());
         } else if (value instanceof String) {
             ret = (String) value;
         } else if (value instanceof RegisterNumber) {
@@ -335,7 +335,7 @@ public class ActionPush extends Action {
         String ret;
         Object value = values.get(i);
         if (value instanceof ConstantIndex) {
-            ret = ((ConstantIndex) value).toString(constantPool);
+            ret = ((ConstantIndex) value).toString(constantPool, Configuration.resolveConstants.get());
         } else if (value instanceof String) {
             ret = "\"" + Helper.escapeActionScriptString((String) value) + "\"";
         } else if (value instanceof RegisterNumber) {
@@ -377,7 +377,13 @@ public class ActionPush extends Action {
     @Override
     public boolean execute(LocalDataArea lda) {
         for (Object value : values) {
-            lda.stack.push(value);
+            if (value instanceof ConstantIndex) {
+                ConstantIndex constantIndex = (ConstantIndex) value;
+                List<String> cPool = lda.constantPool != null ? lda.constantPool : constantPool;
+                lda.stack.push(constantIndex.toStringNoQ(cPool, true));
+            } else {
+                lda.stack.push(value);
+            }
         }
 
         return true;

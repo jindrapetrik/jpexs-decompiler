@@ -52,7 +52,11 @@ public class ToStringActionItem extends ActionItem {
 
     @Override
     public Object getResult() {
-        return EcmaScript.toString(value.getResult());
+        return getResult(value.getResult());
+    }
+
+    public static String getResult(Object obj) {
+        return EcmaScript.toString(obj);
     }
 
     @Override

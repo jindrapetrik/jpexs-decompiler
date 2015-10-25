@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.action.swf5;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
@@ -101,6 +102,11 @@ public class ActionConstantPool extends Action {
             ret.append(" \"").append(Helper.escapeActionScriptString(constantPool.get(i))).append("\"");
         }
         return ret.toString();
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda) {
+        return true;
     }
 
     @Override

@@ -51,7 +51,16 @@ public class AsciiToCharActionItem extends ActionItem {
 
     @Override
     public Object getResult() {
-        return ActionAsciiToChar.getResult(value.getResultAsNumber());
+        return getResult(value.getResultAsNumber());
+    }
+
+    public static String getResult(Double ascii) {
+        int res = (int) (double) ascii;
+        if (res == 0) {
+            return "";
+        }
+
+        return ((Character) (char) res).toString();
     }
 
     @Override

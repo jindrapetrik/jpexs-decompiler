@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFBundle;
-import com.jpexs.decompiler.flash.SWFCompression;
 import com.jpexs.decompiler.flash.SWFSourceInfo;
 import com.jpexs.decompiler.flash.SearchMode;
 import com.jpexs.decompiler.flash.SwfOpenException;
@@ -36,13 +35,8 @@ import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.decompiler.flash.gui.pipes.FirstInstance;
 import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
-import com.jpexs.decompiler.flash.tags.EndTag;
-import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
-import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
-import com.jpexs.decompiler.flash.types.RECT;
-import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
@@ -55,7 +49,6 @@ import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.WinReg;
 import java.awt.AWTException;
-import java.awt.Color;
 import java.awt.Frame;
 import java.awt.GraphicsEnvironment;
 import java.awt.MenuItem;
@@ -69,7 +62,6 @@ import java.awt.event.MouseEvent;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -87,11 +79,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.ConsoleHandler;
@@ -1284,7 +1274,8 @@ public class Main {
                 }
                 SWFSourceInfo[] sourceInfos = new SWFSourceInfo[exfiles.size()];
                 for (int i = 0; i < exfiles.size(); i++) {
-                    sourceInfos[i] = new SWFSourceInfo(null, exfiles.get(i), extitles.get(i).isEmpty() ? null : extitles.get(i));
+                    String extitle = extitles.get(i);
+                    sourceInfos[i] = new SWFSourceInfo(null, exfiles.get(i), extitle == null || extitle.isEmpty() ? null : extitle);
                 }
                 if (sourceInfos.length > 0) {
                     openFile(sourceInfos, () -> {

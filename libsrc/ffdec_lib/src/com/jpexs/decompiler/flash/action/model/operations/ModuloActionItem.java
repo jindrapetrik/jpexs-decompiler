@@ -34,11 +34,14 @@ public class ModuloActionItem extends BinaryOpItem {
 
     @Override
     public Object getResult() {
-        Double rightResult = rightSide.getResultAsNumber();
+        return getResult(rightSide.getResultAsNumber(), leftSide.getResultAsNumber());
+    }
+
+    public static Number getResult(Double rightResult, Double leftResult) {
         if (Double.isNaN(rightResult) || Double.compare(rightResult, 0) == 0) {
             return Double.NaN;
         }
-        return ((long) (double) leftSide.getResultAsNumber()) % ((long) (double) rightResult);
+        return ((long) (double) leftResult) % ((long) (double) rightResult);
     }
 
     @Override

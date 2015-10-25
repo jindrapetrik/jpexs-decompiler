@@ -18,8 +18,10 @@ package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.model.NotItem;
 import java.util.HashMap;
 import java.util.List;
 
@@ -32,6 +34,16 @@ public class ActionNot extends Action {
     @Override
     public String toString() {
         return "Not";
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda) {
+        if (lda.stack.size() == 0) {
+            return false;
+        }
+
+        lda.stack.push(NotItem.getResult(lda.pop()));
+        return true;
     }
 
     @Override

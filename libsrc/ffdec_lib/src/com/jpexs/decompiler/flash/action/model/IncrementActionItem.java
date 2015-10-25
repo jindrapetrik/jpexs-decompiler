@@ -62,7 +62,11 @@ public class IncrementActionItem extends ActionItem {
 
     @Override
     public Object getResult() {
-        return object.getResultAsNumber() + 1;
+        return getResult(object.getResultAsNumber());
+    }
+
+    public static Double getResult(Double num) {
+        return num + 1;
     }
 
     @Override

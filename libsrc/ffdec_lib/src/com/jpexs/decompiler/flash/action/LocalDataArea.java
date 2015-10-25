@@ -18,9 +18,12 @@ package com.jpexs.decompiler.flash.action;
 
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Stack;
 
 public class LocalDataArea {
+
+    public List<String> constantPool;
 
     public Stack<Object> stack = new Stack<>();
 
@@ -33,6 +36,7 @@ public class LocalDataArea {
     public String executionException;
 
     public void clear() {
+        constantPool = null;
         stack.clear();
         localVariables.clear();
         jump = null;

@@ -34,7 +34,11 @@ public class BitAndActionItem extends BinaryOpItem {
 
     @Override
     public Object getResult() {
-        return ((long) (double) leftSide.getResultAsNumber()) & ((long) (double) rightSide.getResultAsNumber());
+        return getResult(rightSide.getResultAsNumber(), leftSide.getResultAsNumber());
+    }
+
+    public static long getResult(Double rightResult, Double leftResult) {
+        return ((long) (double) leftResult) & ((long) (double) rightResult);
     }
 
     @Override

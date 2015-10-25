@@ -51,7 +51,11 @@ public class ToNumberActionItem extends ActionItem {
 
     @Override
     public Object getResult() {
-        return value.getResultAsNumber();
+        return getResult(value.getResultAsNumber());
+    }
+
+    public static Double getResult(Double num) {
+        return num;
     }
 
     @Override

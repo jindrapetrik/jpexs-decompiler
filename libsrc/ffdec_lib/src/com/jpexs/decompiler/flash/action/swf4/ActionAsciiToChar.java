@@ -42,17 +42,8 @@ public class ActionAsciiToChar extends Action {
             return false;
         }
 
-        lda.stack.push(getResult(lda.popAsNumber()));
+        lda.stack.push(AsciiToCharActionItem.getResult(lda.popAsNumber()));
         return true;
-    }
-
-    public static String getResult(Double ascii) {
-        int res = (int) (double) ascii;
-        if (res == 0) {
-            return "";
-        }
-
-        return ((Character) (char) res).toString();
     }
 
     @Override

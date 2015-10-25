@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.swf5;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.operations.ModuloActionItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
@@ -33,6 +34,16 @@ public class ActionModulo extends Action {
     @Override
     public String toString() {
         return "Modulo";
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda) {
+        if (lda.stack.size() < 2) {
+            return false;
+        }
+
+        lda.stack.push(ModuloActionItem.getResult(lda.popAsNumber(), lda.popAsNumber()));
+        return true;
     }
 
     @Override

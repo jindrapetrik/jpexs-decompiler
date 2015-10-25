@@ -34,12 +34,15 @@ public class DivideActionItem extends BinaryOpItem {
 
     @Override
     public Object getResult() {
-        Double leftResult = leftSide.getResultAsNumber();
-        Double rightResult = rightSide.getResultAsNumber();
+        return getResult(rightSide.getResultAsNumber(), leftSide.getResultAsNumber());
+    }
+
+    public static Double getResult(Double rightResult, Double leftResult) {
         if (Double.compare(rightResult, 0) == 0) {
             return leftResult < 0 ? Double.NEGATIVE_INFINITY
                     : leftResult > 0 ? Double.POSITIVE_INFINITY : Double.NaN;
         }
+
         return leftResult / rightResult;
     }
 

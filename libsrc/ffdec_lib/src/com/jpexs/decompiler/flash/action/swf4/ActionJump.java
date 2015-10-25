@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
+import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
@@ -98,6 +99,11 @@ public class ActionJump extends Action {
     @Override
     public String toString() {
         return "Jump " + offset;
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda) {
+        return true;
     }
 
     @Override

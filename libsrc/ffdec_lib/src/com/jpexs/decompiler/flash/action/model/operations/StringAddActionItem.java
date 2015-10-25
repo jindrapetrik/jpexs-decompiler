@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.swf4.ActionStringAdd;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -40,7 +41,11 @@ public class StringAddActionItem extends BinaryOpItem {
 
     @Override
     public Object getResult() {
-        return ActionStringAdd.getResult(leftSide.getResult(), rightSide.getResult());
+        return getResult(rightSide.getResult(), leftSide.getResult());
+    }
+
+    public static String getResult(Object rightResult, Object leftResult) {
+        return EcmaScript.toString(leftResult) + EcmaScript.toString(rightResult);
     }
 
     @Override

@@ -78,7 +78,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class ActionDeobfuscatorSimple implements SWFDecompilerListener {
+public class ActionDeobfuscatorSimpleOld implements SWFDecompilerListener {
 
     private final int executionLimit = 30000;
 

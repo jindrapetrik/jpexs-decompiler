@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.operations.StringAddActionItem;
-import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.HashMap;
@@ -43,12 +42,8 @@ public class ActionStringAdd extends Action {
             return false;
         }
 
-        lda.stack.push(getResult(lda.pop(), lda.pop()));
+        lda.stack.push(StringAddActionItem.getResult(lda.pop(), lda.pop()));
         return true;
-    }
-
-    public static String getResult(Object obj1, Object obj2) {
-        return EcmaScript.toString(obj1) + EcmaScript.toString(obj2);
     }
 
     @Override

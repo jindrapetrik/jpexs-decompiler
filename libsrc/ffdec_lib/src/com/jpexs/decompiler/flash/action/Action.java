@@ -21,7 +21,7 @@ import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.action.deobfuscation.ActionDeobfuscatorSimpleFast;
+import com.jpexs.decompiler.flash.action.deobfuscation.ActionDeobfuscator;
 import com.jpexs.decompiler.flash.action.model.ActionItem;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
@@ -835,7 +835,7 @@ public abstract class Action implements GraphSourceItem {
                     SWFDecompilerPlugin.fireActionTreeCreated(tree, swf);
                     int deobfuscationMode = Configuration.autoDeobfuscate.get() ? (Configuration.deobfuscationOldMode.get() ? 0 : 1) : -1;
                     if (deobfuscationMode == 1) {
-                        new ActionDeobfuscatorSimpleFast().actionTreeCreated(tree, swf);
+                        new ActionDeobfuscator().actionTreeCreated(tree, swf);
                     }
 
                     Graph.graphToString(tree, new NulWriter(), new LocalData());

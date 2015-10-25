@@ -37,8 +37,12 @@ public class StrictEqActionItem extends BinaryOpItem implements LogicalOpItem, I
 
     @Override
     public Object getResult() {
-        Object x = leftSide.getResult();
-        Object y = rightSide.getResult();
+        return getResult(rightSide.getResult(), leftSide.getResult());
+    }
+
+    public static boolean getResult(Object rightResult, Object leftResult) {
+        Object x = leftResult;
+        Object y = rightResult;
         return EcmaScript.type(x) == EcmaScript.type(y)
                 && EcmaScript.equals(x, y);
     }

@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.swf5;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.ReturnActionItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
@@ -33,6 +34,18 @@ public class ActionReturn extends Action {
     @Override
     public String toString() {
         return "Return";
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda) {
+        if (lda.stack.size() == 0) {
+            //lda.returnValue = Undefined.INSTANCE;
+            return false;
+        } else {
+            lda.returnValue = lda.stack.pop();
+        }
+
+        return true;
     }
 
     @Override

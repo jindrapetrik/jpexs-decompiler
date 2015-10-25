@@ -59,7 +59,11 @@ public class MBStringLengthActionItem extends ActionItem {
 
     @Override
     public Object getResult() {
-        return EcmaScript.toNumber(EcmaScript.toString(value.getResult()).length());
+        return getResult(value.getResult());
+    }
+
+    public static Double getResult(Object obj) {
+        return EcmaScript.toNumber(EcmaScript.toString(obj).length());
     }
 
     @Override

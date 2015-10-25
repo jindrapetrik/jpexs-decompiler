@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.action.swf4;
 
-import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.helpers.Helper;
 import java.io.Serializable;
 import java.util.List;
@@ -29,8 +28,8 @@ public class ConstantIndex implements Serializable {
         this.index = index;
     }
 
-    public String toStringNoQ(List<String> constantPool) {
-        if (Configuration.resolveConstants.get()) {
+    public String toStringNoQ(List<String> constantPool, boolean resolve) {
+        if (resolve) {
             if (constantPool != null && index < constantPool.size()) {
                 return constantPool.get(index);
             }
@@ -39,8 +38,8 @@ public class ConstantIndex implements Serializable {
         return "constant" + index;
     }
 
-    public String toString(List<String> constantPool) {
-        if (Configuration.resolveConstants.get()) {
+    public String toString(List<String> constantPool, boolean resolve) {
+        if (resolve) {
             if (constantPool != null && index < constantPool.size()) {
                 return "\"" + Helper.escapeActionScriptString(constantPool.get(index)) + "\"";
             }

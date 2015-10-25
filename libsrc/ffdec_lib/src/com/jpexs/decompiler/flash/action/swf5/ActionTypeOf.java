@@ -20,8 +20,6 @@ import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.TypeOfActionItem;
-import com.jpexs.decompiler.flash.ecma.EcmaScript;
-import com.jpexs.decompiler.flash.ecma.EcmaType;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.HashMap;
@@ -44,29 +42,8 @@ public class ActionTypeOf extends Action {
             return false;
         }
 
-        lda.stack.push(getResult(lda.pop()));
+        lda.stack.push(TypeOfActionItem.getResult(lda.pop()));
         return true;
-    }
-
-    public static String getResult(Object obj) {
-        Object res = obj;
-        EcmaType type = EcmaScript.type(res);
-        switch (type) {
-            case STRING:
-                return "string";
-            case BOOLEAN:
-                return "boolean";
-            case NUMBER:
-                return "number";
-            case OBJECT:
-                return "object";
-            case UNDEFINED:
-                return "undefined";
-            case NULL:
-                return "null";
-        }
-        //TODO: function,movieclip
-        return "object";
     }
 
     @Override

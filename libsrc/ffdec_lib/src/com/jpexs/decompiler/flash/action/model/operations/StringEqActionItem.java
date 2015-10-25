@@ -41,7 +41,11 @@ public class StringEqActionItem extends BinaryOpItem implements Inverted {
 
     @Override
     public Object getResult() {
-        return EcmaScript.toString(leftSide.getResult()).equals(EcmaScript.toString(rightSide.getResult()));
+        return getResult(rightSide.getResult(), leftSide.getResult());
+    }
+
+    public static Boolean getResult(Object rightResult, Object leftResult) {
+        return EcmaScript.toString(leftResult).equals(EcmaScript.toString(rightResult));
     }
 
     @Override

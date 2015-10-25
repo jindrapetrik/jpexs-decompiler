@@ -51,7 +51,11 @@ public class ToIntegerActionItem extends ActionItem {
 
     @Override
     public Object getResult() {
-        return Math.round(value.getResultAsNumber());
+        return getResult(value.getResultAsNumber());
+    }
+
+    public static long getResult(Double num) {
+        return Math.round(num);
     }
 
     @Override

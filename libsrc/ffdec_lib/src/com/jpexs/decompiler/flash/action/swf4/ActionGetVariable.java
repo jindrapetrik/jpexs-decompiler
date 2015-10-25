@@ -18,11 +18,13 @@ package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.EvalActionItem;
 import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
 import com.jpexs.decompiler.flash.action.model.GetVersionActionItem;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -38,6 +40,21 @@ public class ActionGetVariable extends Action {
     @Override
     public String toString() {
         return "GetVariable";
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda) {
+        if (lda.stack.size() == 0) {
+            return false;
+        }
+
+        Object value = lda.localVariables.get(EcmaScript.toString(lda.pop()));
+        if (value == null) {
+            value = Undefined.INSTANCE;
+        }
+
+        lda.stack.push(value);
+        return true;
     }
 
     @Override

@@ -42,11 +42,15 @@ public class LtActionItem extends BinaryOpItem implements LogicalOpItem {
 
     @Override
     public Object getResult() {
+        return getResult(rightSide.getResult(), leftSide.getResult(), version2);
+    }
+
+    public static Object getResult(Object rightResult, Object leftResult, boolean version2) {
         if (version2) {
-            return EcmaScript.compare(leftSide.getResult(), rightSide.getResult());
+            return EcmaScript.compare(leftResult, rightResult);
         } else {
             //For SWF 4 and older, it should return 1 or 0
-            return Action.toFloatPoint(leftSide.getResult()) < Action.toFloatPoint(rightSide.getResult());
+            return Action.toFloatPoint(leftResult) < Action.toFloatPoint(rightResult);
         }
     }
 

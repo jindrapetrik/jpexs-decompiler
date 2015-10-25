@@ -51,7 +51,11 @@ public class MBAsciiToCharActionItem extends ActionItem {
 
     @Override
     public Object getResult() {
-        int res = (int) (double) (value.getResultAsNumber());
+        return getResult(value.getResultAsNumber());
+    }
+
+    public static String getResult(Double ascii) {
+        int res = (int) (double) ascii;
         if (res == 0) {
             return "";
         }
