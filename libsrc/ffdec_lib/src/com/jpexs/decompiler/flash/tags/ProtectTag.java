@@ -19,7 +19,10 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.tags.base.PasswordTag;
+import com.jpexs.decompiler.flash.types.annotations.Password;
 import com.jpexs.helpers.ByteArrayRange;
+import com.jpexs.helpers.MD5Crypt;
 import java.io.IOException;
 
 /**
@@ -27,7 +30,7 @@ import java.io.IOException;
  *
  * @author JPEXS
  */
-public class ProtectTag extends Tag {
+public class ProtectTag extends Tag implements PasswordTag {
 
     public static final int ID = 24;
 
@@ -36,6 +39,7 @@ public class ProtectTag extends Tag {
     /**
      * MD5 hash of password
      */
+    @Password
     public String passwordHash;
 
     /**
@@ -81,4 +85,16 @@ public class ProtectTag extends Tag {
             sos.writeString(passwordHash);
         }
     }
+
+    @Override
+    public void setPassword(String password) {
+        //Assuming Protect tag has same hash type as EnableDebugger2
+        this.passwordHash = MD5Crypt.crypt(password, 2);
+    }
+
+    @Override
+    public boolean hasPassword(String password) {
+        return this.passwordHash.equals(MD5Crypt.crypt(password, 2));
+    }
+
 }
