@@ -446,6 +446,27 @@ public class FastActionList implements Collection<ActionItem> {
         return count;
     }
 
+    public int getUnreachableActionCountOld(ActionItem jump, ActionItem jumpTarget) {
+        ActionItem item = firstItem;
+        if (item == null) {
+            return 0;
+        }
+
+        updateReachableFlagsOld(jump, jumpTarget);
+        jump.reachable = 0;
+
+        int count = 0;
+        do {
+            if (item.reachable == 0) {
+                count++;
+            }
+
+            item = item.next;
+        } while (item != firstItem);
+
+        return count;
+    }
+
     private void clearReachableFlags() {
         ActionItem item = firstItem;
         if (item == null) {
@@ -471,6 +492,69 @@ public class FastActionList implements Collection<ActionItem> {
     }
 
     private void updateReachableFlags(ActionItem jump, ActionItem jumpTarget) {
+        if (firstItem == null) {
+            return;
+        }
+
+        clearReachableFlags();
+
+        firstItem.reachable = 1;
+        ActionItem firstItem2 = firstItem;
+        boolean modified = true;
+        while (modified) {
+            modified = false;
+            ActionItem item = firstItem2;
+            do {
+                ActionItem next = item.next;
+                //ActionItem alternativeNext = null;
+                Action action = item.action;
+                if (item.reachable == 1) {
+                    item.reachable = 2;
+                    modified = true;
+
+                    if (item == firstItem2) {
+                        firstItem2 = next;
+                    }
+
+                    if (item == jump) {
+                        if (jumpTarget.reachable == 0) {
+                            jumpTarget.reachable = 1;
+                            //alternativeNext = jumpTarget;
+                        }
+                    } else {
+
+                        if (!action.isExit() && !(action instanceof ActionJump)) {
+                            if (next.reachable == 0) {
+                                next.reachable = 1;
+                            }
+                        }
+
+                        if (action instanceof GraphSourceItemContainer) {
+                            for (ActionItem lastActionItem : item.getContainerLastActions()) {
+                                if (lastActionItem != null && lastActionItem.next != null && lastActionItem.next.reachable == 0) {
+                                    lastActionItem.next.reachable = 1;
+                                    //alternativeNext = lastActionItem.next;
+                                }
+                            }
+                        }
+
+                        ActionItem target = item.getJumpTarget();
+                        if (target != null) {
+                            if (target.reachable == 0) {
+                                target.reachable = 1;
+                                //alternativeNext = target;
+                            }
+                        }
+                    }
+                }
+
+                //item = alternativeNext == null || next.reachable == 1 ? next : alternativeNext;
+                item = next;
+            } while (item != firstItem);
+        }
+    }
+
+    private void updateReachableFlagsOld(ActionItem jump, ActionItem jumpTarget) {
         if (firstItem == null) {
             return;
         }
