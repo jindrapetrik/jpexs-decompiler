@@ -19,10 +19,13 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.tags.base.PasswordTag;
 import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.annotations.Password;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
+import com.jpexs.helpers.MD5Crypt;
 import java.io.IOException;
 
 /**
@@ -30,7 +33,7 @@ import java.io.IOException;
  *
  * @author JPEXS
  */
-public class EnableDebugger2Tag extends Tag {
+public class EnableDebugger2Tag extends Tag implements PasswordTag {
 
     public static final int ID = 64;
 
@@ -43,6 +46,7 @@ public class EnableDebugger2Tag extends Tag {
     /**
      * MD5 hash of password
      */
+    @Password
     public String passwordHash;
 
     /**
@@ -52,7 +56,7 @@ public class EnableDebugger2Tag extends Tag {
      */
     public EnableDebugger2Tag(SWF swf) {
         super(swf, ID, NAME, null);
-        passwordHash = "PasswordHash";
+        setPassword("");
     }
 
     /**
@@ -83,5 +87,15 @@ public class EnableDebugger2Tag extends Tag {
     public void getData(SWFOutputStream sos) throws IOException {
         sos.writeUI16(reserved);
         sos.writeString(passwordHash);
+    }
+
+    @Override
+    public void setPassword(String password) {
+        this.passwordHash = MD5Crypt.crypt(password, 2);
+    }
+
+    @Override
+    public boolean hasPassword(String password) {
+        return this.passwordHash.equals(MD5Crypt.crypt(password, 2));
     }
 }
