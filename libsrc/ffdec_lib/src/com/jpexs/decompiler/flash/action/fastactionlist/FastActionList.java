@@ -446,27 +446,6 @@ public class FastActionList implements Collection<ActionItem> {
         return count;
     }
 
-    public int getUnreachableActionCountOld(ActionItem jump, ActionItem jumpTarget) {
-        ActionItem item = firstItem;
-        if (item == null) {
-            return 0;
-        }
-
-        updateReachableFlagsOld(jump, jumpTarget);
-        jump.reachable = 0;
-
-        int count = 0;
-        do {
-            if (item.reachable == 0) {
-                count++;
-            }
-
-            item = item.next;
-        } while (item != firstItem);
-
-        return count;
-    }
-
     private void clearReachableFlags() {
         ActionItem item = firstItem;
         if (item == null) {
@@ -551,56 +530,6 @@ public class FastActionList implements Collection<ActionItem> {
                 //item = alternativeNext == null || next.reachable == 1 ? next : alternativeNext;
                 item = next;
             } while (item != firstItem);
-        }
-    }
-
-    private void updateReachableFlagsOld(ActionItem jump, ActionItem jumpTarget) {
-        if (firstItem == null) {
-            return;
-        }
-
-        clearReachableFlags();
-
-        firstItem.reachable = 1;
-        boolean modified = true;
-        while (modified) {
-            modified = false;
-            for (ActionItem item : this) {
-                Action action = item.action;
-                if (item.reachable == 1) {
-                    item.reachable = 2;
-                    modified = true;
-
-                    if (item == jump) {
-                        if (jumpTarget.reachable == 0) {
-                            jumpTarget.reachable = 1;
-                        }
-
-                        continue;
-                    }
-
-                    if (!action.isExit() && !(action instanceof ActionJump) && item.next != null) {
-                        if (item.next.reachable == 0) {
-                            item.next.reachable = 1;
-                        }
-                    }
-
-                    ActionItem target = item.getJumpTarget();
-                    if (target != null) {
-                        if (target.reachable == 0) {
-                            target.reachable = 1;
-                        }
-                    }
-
-                    if (action instanceof GraphSourceItemContainer) {
-                        for (ActionItem lastActionItem : item.getContainerLastActions()) {
-                            if (lastActionItem != null && lastActionItem.next != null && lastActionItem.next.reachable == 0) {
-                                lastActionItem.next.reachable = 1;
-                            }
-                        }
-                    }
-                }
-            }
         }
     }
 
