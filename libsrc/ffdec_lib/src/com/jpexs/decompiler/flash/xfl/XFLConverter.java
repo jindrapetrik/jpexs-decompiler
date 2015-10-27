@@ -103,6 +103,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.decompiler.flash.types.sound.MP3FRAME;
 import com.jpexs.decompiler.flash.types.sound.MP3SOUNDDATA;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
+import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.utf8.Utf8Helper;
@@ -303,7 +304,7 @@ public class XFLConverter {
                     ImageTag it = (ImageTag) bitmapCh;
                     ret.append("<BitmapFill");
                     ret.append(" bitmapPath=\"");
-                    ret.append("bitmap").append(bitmapCh.getCharacterId()).append(".").append(it.getImageFormat());
+                    ret.append("bitmap").append(bitmapCh.getCharacterId()).append(it.getImageFormat().getExtension());
                 } else {
                     if (bitmapCh != null) {
                         logger.log(Level.SEVERE, "Suspicious bitmapfill:{0}", bitmapCh.getClass().getSimpleName());
@@ -609,15 +610,16 @@ public class XFLConverter {
                             }
                         }
 
+                    }
+                    if (currentLayer.length() > 0) {
                         currentLayer.append("</edges>");
                         currentLayer.append("</DOMShape>");
-                        String currentLayerString = currentLayer.toString();
-                        if (!currentLayerString.contains("<edges></edges>")) { //no empty layers,  TODO:handle this better
-                            layers.add(currentLayerString);
-                        }
-                        currentLayer.setLength(0);
                     }
-
+                    String currentLayerString = currentLayer.toString();
+                    if (!currentLayerString.contains("<edges></edges>")) { //no empty layers,  TODO:handle this better
+                        layers.add(currentLayerString);
+                    }
+                    currentLayer.setLength(0);
                     currentLayer.append("<DOMShape isFloating=\"true\">");
                     //ret += convertShape(characters, null, shape);
                     for (int f = 0; f < scr.fillStyles.fillStyles.length; f++) {
@@ -1342,7 +1344,7 @@ public class XFLConverter {
                 SerializableImage image = imageTag.getImage(false);
                 ImageFormat format = imageTag.getImageFormat();
                 ImageHelper.write(image.getBufferedImage(), format, baos);
-                String symbolFile = "bitmap" + symbol.getCharacterId() + "." + imageTag.getImageFormat();
+                String symbolFile = "bitmap" + symbol.getCharacterId() + imageTag.getImageFormat().getExtension();
                 files.put(symbolFile, baos.toByteArray());
                 String mediaLinkStr = "<DOMBitmapItem name=\"" + symbolFile + "\" sourceLastImported=\"" + getTimestamp(swf) + "\" externalFileSize=\"" + baos.toByteArray().length + "\"";
                 switch (format) {

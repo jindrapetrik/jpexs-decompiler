@@ -61,6 +61,8 @@ public class MORPHGRADIENT implements Serializable {
 
     public GRADIENT getGradientAt(int ratio) {
         GRADIENT ret = new GRADIENT();
+        ret.spreadMode = spreadMode;
+        ret.interpolationMode = interPolationMode;
         ret.gradientRecords = new GRADRECORD[gradientRecords.length];
         for (int m = 0; m < gradientRecords.length; m++) {
 
@@ -74,6 +76,8 @@ public class MORPHGRADIENT implements Serializable {
 
     public GRADIENT getStartGradient() {
         GRADIENT ret = new GRADIENT();
+        ret.spreadMode = spreadMode;
+        ret.interpolationMode = interPolationMode;
         ret.gradientRecords = new GRADRECORD[gradientRecords.length];
         for (int m = 0; m < gradientRecords.length; m++) {
             ret.gradientRecords[m] = gradientRecords[m].getStartRecord();
@@ -83,6 +87,8 @@ public class MORPHGRADIENT implements Serializable {
 
     public GRADIENT getEndGradient() {
         GRADIENT ret = new GRADIENT();
+        ret.spreadMode = spreadMode;
+        ret.interpolationMode = interPolationMode;
         ret.gradientRecords = new GRADRECORD[gradientRecords.length];
         for (int m = 0; m < gradientRecords.length; m++) {
             ret.gradientRecords[m] = gradientRecords[m].getEndRecord();
