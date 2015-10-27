@@ -478,45 +478,58 @@ public class FastActionList implements Collection<ActionItem> {
         clearReachableFlags();
 
         firstItem.reachable = 1;
+        ActionItem firstItem2 = firstItem;
         boolean modified = true;
         while (modified) {
             modified = false;
-            for (ActionItem item : this) {
+            ActionItem item = firstItem2;
+            do {
+                ActionItem next = item.next;
+                //ActionItem alternativeNext = null;
                 Action action = item.action;
                 if (item.reachable == 1) {
                     item.reachable = 2;
                     modified = true;
 
+                    if (item == firstItem2) {
+                        firstItem2 = next;
+                    }
+
                     if (item == jump) {
                         if (jumpTarget.reachable == 0) {
                             jumpTarget.reachable = 1;
+                            //alternativeNext = jumpTarget;
+                        }
+                    } else {
+
+                        if (!action.isExit() && !(action instanceof ActionJump)) {
+                            if (next.reachable == 0) {
+                                next.reachable = 1;
+                            }
                         }
 
-                        continue;
-                    }
-
-                    if (!action.isExit() && !(action instanceof ActionJump) && item.next != null) {
-                        if (item.next.reachable == 0) {
-                            item.next.reachable = 1;
+                        if (action instanceof GraphSourceItemContainer) {
+                            for (ActionItem lastActionItem : item.getContainerLastActions()) {
+                                if (lastActionItem != null && lastActionItem.next != null && lastActionItem.next.reachable == 0) {
+                                    lastActionItem.next.reachable = 1;
+                                    //alternativeNext = lastActionItem.next;
+                                }
+                            }
                         }
-                    }
 
-                    ActionItem target = item.getJumpTarget();
-                    if (target != null) {
-                        if (target.reachable == 0) {
-                            target.reachable = 1;
-                        }
-                    }
-
-                    if (action instanceof GraphSourceItemContainer) {
-                        for (ActionItem lastActionItem : item.getContainerLastActions()) {
-                            if (lastActionItem != null && lastActionItem.next != null && lastActionItem.next.reachable == 0) {
-                                lastActionItem.next.reachable = 1;
+                        ActionItem target = item.getJumpTarget();
+                        if (target != null) {
+                            if (target.reachable == 0) {
+                                target.reachable = 1;
+                                //alternativeNext = target;
                             }
                         }
                     }
                 }
-            }
+
+                //item = alternativeNext == null || next.reachable == 1 ? next : alternativeNext;
+                item = next;
+            } while (item != firstItem);
         }
     }
 
