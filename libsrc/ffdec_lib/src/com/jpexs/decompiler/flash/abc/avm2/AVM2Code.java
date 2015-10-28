@@ -651,6 +651,7 @@ public class AVM2Code implements Cloneable {
 
                 if (lda.jump != null) {
                     pos = adr2pos(lda.jump);
+                    lda.jump = null;
                 } else {
                     pos++;
                 }
@@ -2211,7 +2212,7 @@ public class AVM2Code implements Cloneable {
                  x:#
                  n:
                  n:
-                 j:jump t:                
+                 j:jump t:
                  */
                 if (((t < x) || (mapOffsetsAfterIns && (t == x))) && (j > x)) {
                     return offset_jt - byteCount;
