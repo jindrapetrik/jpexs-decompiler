@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.types.Decimal;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
+import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.utf8.Utf8PrintWriter;
 import java.util.ArrayList;
@@ -50,6 +51,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     public List<Multiname> constant_multiname = new ArrayList<>();
 
+    @Internal
     public Map<String, DottedChain> dottedChainCache = new HashMap<>();
 
     public synchronized int addInt(long value) {

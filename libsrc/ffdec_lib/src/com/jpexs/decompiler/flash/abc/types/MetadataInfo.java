@@ -27,6 +27,12 @@ public class MetadataInfo {
 
     public int[] values;
 
+    public MetadataInfo() {
+        this.name_index = 0;
+        this.keys = new int[0];
+        this.values = new int[0];
+    }
+
     public MetadataInfo(int name_index, int[] keys, int[] values) {
         this.name_index = name_index;
         this.keys = keys;

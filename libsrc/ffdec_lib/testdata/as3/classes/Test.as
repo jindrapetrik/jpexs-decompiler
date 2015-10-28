@@ -5,7 +5,7 @@
 	import classes.myInternal;
 	import flash.errors.EOFError;
 	import flash.events.Event;
-	public class Test
+	public class Test implements MyInterface2
 	{
 		private var testPriv:int=5;
 		protected var testProt:int=9;
@@ -16,6 +16,14 @@
 		public function testHello()
 		{
 			trace("hello");
+		}
+		
+		public function interfaceMethod(a:int):int {
+			return a+1;
+		}
+		
+		public function interface2Method(a:int,b:int):int {
+			return a + b;
 		}
 
 		public function testIncDec()

@@ -94,10 +94,14 @@ public final class MethodBody implements Cloneable {
     @Internal
     private ABC abc;
 
-    public MethodBody(ABC abc) {
+    public MethodBody() {
         this.traits = new Traits();
         this.codeBytes = SWFInputStream.BYTE_ARRAY_EMPTY;
         this.exceptions = new ABCException[0];
+        this.abc = null;
+    }
+
+    public void setAbc(ABC abc) {
         this.abc = abc;
     }
 

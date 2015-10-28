@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.ClassInfo;
 import com.jpexs.decompiler.flash.abc.types.Decimal;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
+import com.jpexs.decompiler.flash.abc.types.MetadataInfo;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
@@ -102,6 +103,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -156,6 +158,28 @@ public class SwfXmlImporter {
         return field;
     }
 
+    private static void setFieldValue(Field field, Object obj, Object value) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException {
+        Field modifiersField = Field.class.getDeclaredField("modifiers");
+        modifiersField.setAccessible(true);
+
+        //Remove final attribute temporary (For example Multiname.namespace_set_index
+        int originalModifiers = field.getModifiers();
+        if ((originalModifiers & Modifier.FINAL) > 0) {
+            modifiersField.setInt(field, originalModifiers & ~Modifier.FINAL);
+        }
+
+        field.setAccessible(true);
+
+        int newModifiers = field.getModifiers();
+
+        field.set(obj, value);
+
+        //Put final back in
+        if (originalModifiers != newModifiers) {
+            modifiersField.setInt(field, originalModifiers);
+        }
+    }
+
     private void processElement(Element element, Object obj, SWF swf, Tag tag) {
         Class cls = obj.getClass();
         for (int i = 0; i < element.getAttributes().getLength(); i++) {
@@ -165,7 +189,7 @@ public class SwfXmlImporter {
                 try {
                     Field field = getField(cls, name);
                     String attrValue = attr.getValue();
-                    field.set(obj, getAs(field.getType(), attrValue));
+                    setFieldValue(field, obj, getAs(field.getType(), attrValue));
                 } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
                     logger.log(Level.SEVERE, null, ex);
                 }
@@ -191,7 +215,7 @@ public class SwfXmlImporter {
                             }
                         }
 
-                        field.set(obj, list);
+                        setFieldValue(field, obj, list);
                     } else if (childCls.isArray()) {
                         List list = new ArrayList();
                         for (int j = 0; j < child.getChildNodes().getLength(); j++) {
@@ -208,10 +232,10 @@ public class SwfXmlImporter {
                             Array.set(array, j, list.get(j));
                         }
 
-                        field.set(obj, array);
+                        setFieldValue(field, obj, array);
                     } else {
                         Object childObj = processObject(child, null, swf, tag);
-                        field.set(obj, childObj);
+                        setFieldValue(field, obj, childObj);
                     }
                 } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException | NoSuchMethodException | InstantiationException | InvocationTargetException ex) {
                     logger.log(Level.SEVERE, null, ex);
@@ -274,7 +298,7 @@ public class SwfXmlImporter {
                 CurvedEdgeRecord.class, EndShapeRecord.class, StraightEdgeRecord.class, StyleChangeRecord.class,
                 BEVELFILTER.class, BLURFILTER.class, COLORMATRIXFILTER.class, CONVOLUTIONFILTER.class,
                 DROPSHADOWFILTER.class, GLOWFILTER.class, GRADIENTBEVELFILTER.class, GRADIENTGLOWFILTER.class,
-                AVM2ConstantPool.class, Decimal.class, Namespace.class, NamespaceSet.class, Multiname.class, MethodInfo.class,
+                AVM2ConstantPool.class, Decimal.class, Namespace.class, NamespaceSet.class, Multiname.class, MethodInfo.class, MetadataInfo.class,
                 ValueKind.class, InstanceInfo.class, Traits.class, TraitClass.class, TraitFunction.class,
                 TraitMethodGetterSetter.class, TraitSlotConst.class, ClassInfo.class, ScriptInfo.class, MethodBody.class,
                 ABCException.class};

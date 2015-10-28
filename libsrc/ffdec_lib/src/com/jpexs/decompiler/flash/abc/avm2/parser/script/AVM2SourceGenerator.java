@@ -692,7 +692,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
             scope = localData.scopeStack.size();
             localData.scopeStack.add(new PropertyAVM2Item(null, item.functionName, abc, allABCs, new ArrayList<>(), localData.callStack));
         }
-        ret.add(ins(AVM2Instructions.NewFunction, method(true, false, localData.callStack, localData.pkg, item.needsActivation, item.subvariables, 0 /*Set later*/, item.hasRest, item.line, localData.currentClass, null, false, localData, item.paramTypes, item.paramNames, item.paramValues, item.body, item.retType)));
+        ret.add(ins(AVM2Instructions.NewFunction, method(abc.constants.getStringId(item.functionName, true), true, false, localData.callStack, localData.pkg, item.needsActivation, item.subvariables, 0 /*Set later*/, item.hasRest, item.line, localData.currentClass, null, false, localData, item.paramTypes, item.paramNames, item.paramValues, item.body, item.retType)));
         if (!item.functionName.isEmpty()) {
             ret.add(ins(AVM2Instructions.Dup));
             ret.add(ins(AVM2Instructions.GetScopeObject, scope));
@@ -1178,14 +1178,14 @@ public class AVM2SourceGenerator implements SourceGenerator {
         generateTraitsPhase3(initScope, isInterface, name, superName, true, localData, traitItems, classInfo.static_traits, st, new HashMap<>(), class_index);
         int init = 0;
         if (constructor == null || isInterface) {
-            instanceInfo.iinit_index = init = method(false, isInterface, new ArrayList<>(), pkg, false, new ArrayList<>(), initScope + 1, false, 0, isInterface ? null : name, extendsVal != null ? extendsVal.toString() : null, true, localData, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), TypeItem.UNBOUNDED/*?? FIXME*/);
+            instanceInfo.iinit_index = init = method(0, false, isInterface, new ArrayList<>(), pkg, false, new ArrayList<>(), initScope + 1, false, 0, isInterface ? null : name, extendsVal != null ? extendsVal.toString() : null, true, localData, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), TypeItem.UNBOUNDED/*?? FIXME*/);
         } else {
             MethodAVM2Item m = (MethodAVM2Item) constructor;
-            instanceInfo.iinit_index = init = method(false, false, new ArrayList<>(), pkg, m.needsActivation, m.subvariables, initScope + 1, m.hasRest, m.line, name, extendsVal != null ? extendsVal.toString() : null, true, localData, m.paramTypes, m.paramNames, m.paramValues, m.body, TypeItem.UNBOUNDED/*?? FIXME*/);
+            instanceInfo.iinit_index = init = method(0, false, false, new ArrayList<>(), pkg, m.needsActivation, m.subvariables, initScope + 1, m.hasRest, m.line, name, extendsVal != null ? extendsVal.toString() : null, true, localData, m.paramTypes, m.paramNames, m.paramValues, m.body, TypeItem.UNBOUNDED/*?? FIXME*/);
         }
 
         //Class initializer
-        int staticMi = method(false, false, new ArrayList<>(), pkg, staticNeedsActivation, sinitVariables, initScope + (implementsStr.isEmpty() ? 0 : 1), false, 0, isInterface ? null : name, superName, false, localData, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), staticInit, TypeItem.UNBOUNDED);
+        int staticMi = method(0, false, false, new ArrayList<>(), pkg, staticNeedsActivation, sinitVariables, initScope + (implementsStr.isEmpty() ? 0 : 1), false, 0, isInterface ? null : name, superName, false, localData, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), staticInit, TypeItem.UNBOUNDED);
         MethodBody sinitBody = abc.findBody(staticMi);
 
         List<AVM2Instruction> sinitcode = new ArrayList<>();
@@ -1369,7 +1369,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return false;
     }
 
-    public int method(boolean subMethod, boolean isInterface, List<MethodBody> callStack, DottedChain pkg, boolean needsActivation, List<AssignableAVM2Item> subvariables, int initScope, boolean hasRest, int line, String className, String superType, boolean constructor, SourceGeneratorLocalData localData, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, GraphTargetItem retType) throws CompilationException {
+    public int method(int name_index, boolean subMethod, boolean isInterface, List<MethodBody> callStack, DottedChain pkg, boolean needsActivation, List<AssignableAVM2Item> subvariables, int initScope, boolean hasRest, int line, String className, String superType, boolean constructor, SourceGeneratorLocalData localData, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, GraphTargetItem retType) throws CompilationException {
         //Reference<Boolean> hasArgs = new Reference<>(Boolean.FALSE);
         //calcRegisters(localData,needsActivation,paramNames,subvariables,body, hasArgs);
         SourceGeneratorLocalData newlocalData = new SourceGeneratorLocalData(new HashMap<>(), 1, true, 0);
@@ -1611,7 +1611,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
             }
         }
 
-        MethodInfo mi = new MethodInfo(param_types, constructor ? 0 : typeName(localData, retType), 0/*name_index*/, 0, optional, new int[0]/*no param_names*/);
+        MethodInfo mi = new MethodInfo(param_types, constructor ? 0 : typeName(localData, retType), name_index, 0, optional, new int[0]/*no param_names*/);
         if (hasArguments) {
             mi.setFlagNeed_Arguments();
         }
@@ -1629,7 +1629,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
         int mindex;
         if (!isInterface) {
-            MethodBody mbody = new MethodBody(abc);
+            MethodBody mbody = new MethodBody(abc, new Traits(), new byte[0], new ABCException[0]);
 
             if (needsActivation) {
                 int slotId = 1;
@@ -1984,10 +1984,10 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 if (mai.isStatic() != generateStatic) {
                     continue;
                 }
-                ((TraitMethodGetterSetter) traits[k]).method_info = method(false, isInterface, new ArrayList<>(), mai.pkg, mai.needsActivation, mai.subvariables, methodInitScope + (mai.isStatic() ? 0 : 1), mai.hasRest, mai.line, className, superName, false, localData, mai.paramTypes, mai.paramNames, mai.paramValues, mai.body, mai.retType);
+                ((TraitMethodGetterSetter) traits[k]).method_info = method(abc.constants.getStringId(mai.functionName, true), false, isInterface, new ArrayList<>(), mai.pkg, mai.needsActivation, mai.subvariables, methodInitScope + (mai.isStatic() ? 0 : 1), mai.hasRest, mai.line, className, superName, false, localData, mai.paramTypes, mai.paramNames, mai.paramValues, mai.body, mai.retType);
             } else if (item instanceof FunctionAVM2Item) {
                 FunctionAVM2Item fai = (FunctionAVM2Item) item;
-                ((TraitFunction) traits[k]).method_info = method(false, isInterface, new ArrayList<>(), fai.pkg, fai.needsActivation, fai.subvariables, methodInitScope, fai.hasRest, fai.line, className, superName, false, localData, fai.paramTypes, fai.paramNames, fai.paramValues, fai.body, fai.retType);
+                ((TraitFunction) traits[k]).method_info = method(abc.constants.getStringId(fai.functionName, true), false, isInterface, new ArrayList<>(), fai.pkg, fai.needsActivation, fai.subvariables, methodInitScope, fai.hasRest, fai.line, className, superName, false, localData, fai.paramTypes, fai.paramNames, fai.paramValues, fai.body, fai.retType);
             }
         }
     }
@@ -2137,7 +2137,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         Trait[] traitArr = generateTraitsPhase1(null, null, true, localData, commands, si.traits, class_index);
         generateTraitsPhase2(new ArrayList<>(), null/*FIXME*/, commands, traitArr, new ArrayList<>(), localData);
         MethodInfo mi = new MethodInfo(new int[0], 0, 0, 0, new ValueKind[0], new int[0]);
-        MethodBody mb = new MethodBody(abc);
+        MethodBody mb = new MethodBody(abc, new Traits(), new byte[0], new ABCException[0]);
         mb.method_info = abc.addMethodInfo(mi);
         mb.setCode(new AVM2Code());
         List<AVM2Instruction> mbCode = mb.getCode().code;
@@ -2162,21 +2162,23 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 if (abc.instance_info.get(tc.class_info).isInterface()) {
                     mbCode.add(ins(AVM2Instructions.PushNull));
                 } else {
-
                     parentNamesAddNames(abc, allABCs, abc.instance_info.get(tc.class_info).name_index, parents, new ArrayList<>(), new ArrayList<>());
+                    parents.remove(0); //remove this class
+
+                    //add all parent objects to scopestack
                     for (int i = parents.size() - 1; i >= 0; i--) {
                         mbCode.add(ins(AVM2Instructions.GetLex, parents.get(i)));
                         mbCode.add(ins(AVM2Instructions.PushScope));
                         traitScope++;
                     }
+                    //direct parent class to new_class instruction
                     mbCode.add(ins(AVM2Instructions.GetLex, parents.get(0)));
                 }
                 mbCode.add(ins(AVM2Instructions.NewClass, tc.class_info));
-                if (!abc.instance_info.get(tc.class_info).isInterface()) {
-                    for (int i = parents.size() - 1; i >= 1; i--) {
-                        mbCode.add(ins(AVM2Instructions.PopScope));
-                    }
+                for (int i = 0; i < parents.size(); i++) {
+                    mbCode.add(ins(AVM2Instructions.PopScope));
                 }
+
                 mbCode.add(ins(AVM2Instructions.InitProperty, tc.name_index));
                 initScopes.put(t, traitScope);
                 traitScope = 1;
