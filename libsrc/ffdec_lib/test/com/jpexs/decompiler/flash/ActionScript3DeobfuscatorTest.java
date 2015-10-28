@@ -22,9 +22,11 @@ import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorJumps;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.ASM3Parser;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScript3Parser;
+import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
+import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
@@ -82,12 +84,12 @@ public class ActionScript3DeobfuscatorTest extends ActionStript2TestBase {
                 return 0;
             }
         });
-        MethodBody b = new MethodBody(abc);
+        MethodBody b = new MethodBody(abc, new Traits(), new byte[0], new ABCException[0]);
         AVM2Code code = ASM3Parser.parse(new StringReader(str), abc.constants, null, b, new MethodInfo());
         b.setCode(code);
         new AVM2DeobfuscatorJumps().avm2CodeRemoveTraps("test", 0, true, 0, abc, null, 0, b);
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
-        code.toASMSource(abc.constants, null, new MethodInfo(), new MethodBody(abc), ScriptExportMode.PCODE, writer);
+        code.toASMSource(abc.constants, null, new MethodInfo(), new MethodBody(abc, new Traits(), new byte[0], new ABCException[0]), ScriptExportMode.PCODE, writer);
         String ret = writer.toString();
         return ret.substring(ret.lastIndexOf("code\r\n") + 6);
     }

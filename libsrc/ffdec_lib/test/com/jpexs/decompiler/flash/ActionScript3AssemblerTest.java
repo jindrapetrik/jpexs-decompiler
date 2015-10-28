@@ -24,9 +24,11 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.DeobfuscatePopIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.ASM3Parser;
+import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
+import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.io.BufferedInputStream;
@@ -86,7 +88,7 @@ public class ActionScript3AssemblerTest extends ActionScriptTestBase {
                 + str
                 + "returnvoid\r\n";
 
-        MethodBody b = new MethodBody(getABC());
+        MethodBody b = new MethodBody(getABC(), new Traits(), new byte[0], new ABCException[0]);
         AVM2Code code = ASM3Parser.parse(new StringReader(str), getABC().constants, null, b, new MethodInfo());
         b.setCode(code);
         return b;
@@ -150,7 +152,7 @@ public class ActionScript3AssemblerTest extends ActionScriptTestBase {
                 + "pushbyte 1\r\n"
                 + "pushbyte 1\r\n";
 
-        MethodBody b = new MethodBody(getABC());
+        MethodBody b = new MethodBody(getABC(), new Traits(), new byte[0], new ABCException[0]);
         AVM2Code code = ASM3Parser.parse(new StringReader(str), getABC().constants, null, b, new MethodInfo());
 
         long to = code.getEndOffset();

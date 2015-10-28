@@ -129,6 +129,9 @@ public class Namespace {
         if (name == null) {
             return false;
         }
+        if (name.equals("") && name_index == 0) {
+            return true;
+        }
         if (name_index == 0) {
             return false;
         }
