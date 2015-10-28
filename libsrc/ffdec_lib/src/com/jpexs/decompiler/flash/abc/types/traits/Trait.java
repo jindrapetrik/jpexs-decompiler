@@ -126,27 +126,34 @@ public abstract class Trait implements Cloneable, Serializable {
         return writer;
     }
 
+    protected DottedChain findCustomNs(int link_ns_index, ABC abc) {
+        String nsname = "";
+        if (link_ns_index <= 0) {
+            return null;
+        }
+        DottedChain name = abc.constants.getNamespace(link_ns_index).getName(abc.constants);
+        for (ABCContainerTag abcTag : abc.getAbcTags()) {
+            DottedChain dc = abcTag.getABC().nsValueToName(name);
+            nsname = dc.getLast();
+
+            if (nsname == null) {
+                break;
+            }
+            if (!nsname.isEmpty()) {
+                return dc;
+            }
+        }
+        return null;
+    }
+
     public GraphTextWriter getModifiers(ABC abc, boolean isStatic, GraphTextWriter writer) {
         if ((kindFlags & ATTR_Override) > 0) {
             writer.appendNoHilight("override ");
         }
         Multiname m = getName(abc);
         if (m != null) {
-            String nsname = "";
-            for (ABCContainerTag abcTag : abc.getAbcTags()) {
-                if (m.namespace_index == -1) {
-                    break;
-                }
-                DottedChain dc = abcTag.getABC().nsValueToName(abc.constants.getNamespace(m.namespace_index).getName(abc.constants));
-                nsname = dc.getLast();
-
-                if (nsname == null) {
-                    break;
-                }
-                if (!nsname.isEmpty()) {
-                    break;
-                }
-            }
+            DottedChain dc = findCustomNs(m.namespace_index, abc);
+            String nsname = dc != null ? dc.getLast() : null;
 
             Namespace ns = m.getNamespace(abc.constants);
 

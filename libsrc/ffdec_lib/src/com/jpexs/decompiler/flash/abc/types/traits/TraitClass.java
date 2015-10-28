@@ -127,7 +127,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
                 newimport = oldimport.add(name);
             }
 
-            if (newimport.isEmpty()) {
+            if (!newimport.isEmpty()) {
                 /*                if(ns.kind==Namespace.KIND_PACKAGE){
                  newimport+=".*";
                  }*/
@@ -169,16 +169,13 @@ public class TraitClass extends Trait implements TraitWithSlot {
             name = "*";
         }
         DottedChain newimport = ns.getName(abc.constants);
+
         if (parseUsagesFromNS(abc, imports, uses, namespace_index, ignorePackage, name)) {
             return;
         } else if ((ns.kind != Namespace.KIND_PACKAGE) && (ns.kind != Namespace.KIND_PACKAGE_INTERNAL)) {
             return;
         }
         newimport = newimport.add(name);
-        //WUT?
-        /*if (newimport.contains(":")) {
-         return;
-         }*/
         if (!imports.contains(newimport)) {
             DottedChain pkg = newimport.getWithoutLast(); //.substring(0, newimport.lastIndexOf('.'));
             if (pkg.equals(InitVectorAVM2Item.VECTOR_PACKAGE)) { //special case - is imported always
