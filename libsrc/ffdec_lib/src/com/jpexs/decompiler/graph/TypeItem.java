@@ -80,7 +80,8 @@ public class TypeItem extends GraphTargetItem {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         boolean as3 = localData.constantsAvm2 != null;
-        if (localData.fullyQualifiedNames.contains(fullTypeName)) {
+
+        if (localData.fullyQualifiedNames.contains(new DottedChain(fullTypeName.getLast()))) {
             writer.hilightSpecial(fullTypeName.toPrintableString(as3), HighlightSpecialType.TYPE_NAME, fullTypeName.toPrintableString(as3));
         } else {
             writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(as3, fullTypeName.getLast()), HighlightSpecialType.TYPE_NAME, fullTypeName.toPrintableString(as3));

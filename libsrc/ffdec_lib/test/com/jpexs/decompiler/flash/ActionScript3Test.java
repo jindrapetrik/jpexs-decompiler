@@ -953,14 +953,11 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "}\r\n", false);
     }
 
-    //@Test
+    @Test
     public void testMyPackage1TestClass() {
         decompileScriptPack("classes.mypackage1.TestClass", "package classes.mypackage1\n"
                 + "{\n"
-                + "   import classes.mypackage2.TestInterface;\n"
-                + "   import classes.mypackage2.TestClass;\n"
-                + "   \n"
-                + "   public class TestClass extends Object implements TestInterface\n"
+                + "   public class TestClass extends Object implements classes.mypackage1.TestInterface\n"
                 + "   {\n"
                 + "       \n"
                 + "      public function TestClass()\n"
@@ -993,13 +990,10 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "}");
     }
 
-    //@Test
+    @Test
     public void testMyPackage1TestClass2() {
         decompileScriptPack("classes.mypackage1.TestClass2", "package classes.mypackage1\n"
                 + "{\n"
-                + "   import classes.mypackage2.TestClass;\n"
-                + "   import classes.mypackage3.TestClass;\n"
-                + "   \n"
                 + "   public class TestClass2 extends Object\n"
                 + "   {\n"
                 + "       \n"
@@ -1039,12 +1033,10 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "}");
     }
 
-    //@Test
+    @Test
     public void testMyPackage1TestInterface() {
         decompileScriptPack("classes.mypackage1.TestInterface", "package classes.mypackage1\n"
                 + "{\n"
-                + "   import classes.mypackage2.TestInterface;\n"
-                + "   \n"
                 + "   public interface TestInterface extends classes.mypackage2.TestInterface\n"
                 + "   {\n"
                 + "       \n"

@@ -304,6 +304,14 @@ public class Multiname {
 
     public DottedChain getNameWithNamespace(AVM2ConstantPool constants) {
         Namespace ns = getNamespace(constants);
+        if (ns == null) {
+            NamespaceSet nss = getNamespaceSet(constants);
+            if (nss != null) {
+                if (nss.namespaces.length == 1) {
+                    ns = constants.getNamespace(nss.namespaces[0]);
+                }
+            }
+        }
         String name = getName(constants, null, true);
         if (ns != null) {
             return ns.getName(constants).add(name);

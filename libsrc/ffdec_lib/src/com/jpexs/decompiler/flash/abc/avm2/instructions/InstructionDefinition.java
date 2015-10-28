@@ -118,7 +118,7 @@ public abstract class InstructionDefinition implements Serializable {
         return 0;
     }
 
-    protected FullMultinameAVM2Item resolveMultiname(TranslateStack stack, AVM2ConstantPool constants, int multinameIndex, AVM2Instruction ins) {
+    protected FullMultinameAVM2Item resolveMultiname(boolean property, TranslateStack stack, AVM2ConstantPool constants, int multinameIndex, AVM2Instruction ins) {
         GraphTargetItem ns = null;
         GraphTargetItem name = null;
         if (multinameIndex > 0 && multinameIndex < constants.constant_multiname.size()) {
@@ -130,7 +130,7 @@ public abstract class InstructionDefinition implements Serializable {
             }
 
         }
-        return new FullMultinameAVM2Item(ins, multinameIndex, name, ns);
+        return new FullMultinameAVM2Item(property, ins, multinameIndex, name, ns);
     }
 
     protected int getMultinameRequiredStackSize(AVM2ConstantPool constants, int multinameIndex) {

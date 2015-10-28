@@ -123,9 +123,9 @@ public class TraitClass extends Trait implements TraitWithSlot {
                     break;
                 }
             }
-            if (newimport.isEmpty()) {
-                newimport = oldimport.add(name);
-            }
+            /*            if (newimport.isEmpty()) {
+             newimport = oldimport.add(name);
+             }*/
 
             if (!newimport.isEmpty()) {
                 /*                if(ns.kind==Namespace.KIND_PACKAGE){
@@ -292,7 +292,6 @@ public class TraitClass extends Trait implements TraitWithSlot {
                     }
                 } else {
                     for (int k = 0; k < ins.definition.operands.length; k++) {
-
                         if (ins.definition.operands[k] == AVM2Code.DAT_MULTINAME_INDEX) {
                             int multinameIndex = ins.operands[k];
                             if (multinameIndex < abc.constants.constant_multiname.size()) {
@@ -395,29 +394,17 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
         List<String> importnames = new ArrayList<>();
         importnames.addAll(namesInThisPackage);
-        for (DottedChain ipath : imports) {
+        for (int i = 0; i < imports.size(); i++) {
+            DottedChain ipath = imports.get(i);
             String name = ipath.getLast();
-            DottedChain pkg = ipath.getWithoutLast();
             if (importnames.contains(name) || isBuiltInClass(name)) {
+                imports.remove(i);
+                i--;
                 fullyQualifiedNames.add(new DottedChain(name));
             } else {
                 importnames.add(name);
             }
         }
-        /*List<DottedChain> imports2 = new ArrayList<String>();
-         for (String path : imports) {
-         String name = path;
-         String pkg = "";
-         if (name.contains(".")) {
-         pkg = name.substring(0, name.lastIndexOf("."));
-         name = name.substring(name.lastIndexOf(".") + 1);
-         }
-
-         if ((!packageName.equals(pkg)) && (!fullyQualifiedNames.contains(name))) {
-         imports2.add(path);
-         }
-         }
-         imports = imports2;*/
 
         for (int i = 0; i < imports.size(); i++) {
             DottedChain imp = imports.get(i);

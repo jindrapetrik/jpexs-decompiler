@@ -60,7 +60,7 @@ public class CallSuperVoidIns extends InstructionDefinition {
         for (int a = 0; a < argCount; a++) {
             args.add(0, stack.pop());
         }
-        FullMultinameAVM2Item multiname = resolveMultiname(stack, localData.getConstants(), multinameIndex, ins);
+        FullMultinameAVM2Item multiname = resolveMultiname(true, stack, localData.getConstants(), multinameIndex, ins);
         GraphTargetItem receiver = stack.pop();
 
         output.add(new CallSuperAVM2Item(ins, true, receiver, multiname, args));

@@ -1,7 +1,5 @@
 ﻿package classes.mypackage1
 {
-	import classes.mypackage1.TestInterface;
-	import classes.mypackage2.TestInterface;
 	import classes.mypackage2.TestClass;
 
 	public class TestClass implements classes.mypackage1.TestInterface

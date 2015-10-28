@@ -24,6 +24,7 @@ import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -35,25 +36,30 @@ public class FullMultinameAVM2Item extends AVM2Item {
 
     public GraphTargetItem namespace;
 
-    public FullMultinameAVM2Item(AVM2Instruction instruction, int multinameIndex, GraphTargetItem name) {
+    public boolean property;
+
+    public FullMultinameAVM2Item(boolean property, AVM2Instruction instruction, int multinameIndex, GraphTargetItem name) {
         super(instruction, PRECEDENCE_PRIMARY);
         this.multinameIndex = multinameIndex;
         this.name = name;
         this.namespace = null;
+        this.property = property;
     }
 
-    public FullMultinameAVM2Item(AVM2Instruction instruction, int multinameIndex) {
+    public FullMultinameAVM2Item(boolean property, AVM2Instruction instruction, int multinameIndex) {
         super(instruction, PRECEDENCE_PRIMARY);
         this.multinameIndex = multinameIndex;
         this.name = null;
         this.namespace = null;
+        this.property = property;
     }
 
-    public FullMultinameAVM2Item(AVM2Instruction instruction, int multinameIndex, GraphTargetItem name, GraphTargetItem namespace) {
+    public FullMultinameAVM2Item(boolean property, AVM2Instruction instruction, int multinameIndex, GraphTargetItem name, GraphTargetItem namespace) {
         super(instruction, PRECEDENCE_PRIMARY);
         this.multinameIndex = multinameIndex;
         this.name = name;
         this.namespace = namespace;
+        this.property = property;
     }
 
     public boolean isRuntime() {
@@ -96,7 +102,7 @@ public class FullMultinameAVM2Item extends AVM2Item {
             writer.append("]");
         } else {
             AVM2ConstantPool constants = localData.constantsAvm2;
-            List<DottedChain> fullyQualifiedNames = localData.fullyQualifiedNames;
+            List<DottedChain> fullyQualifiedNames = property ? new ArrayList<>() : localData.fullyQualifiedNames;
             if (multinameIndex > 0 && multinameIndex < constants.constant_multiname.size()) {
                 writer.append(constants.getMultiname(multinameIndex).getName(constants, fullyQualifiedNames, false));
             } else {
