@@ -45,8 +45,6 @@ public enum SymbolType {
     FINALLY,
     WITH,
     DYNAMIC,
-    INTERNAL,
-    OVERRIDE,
     PRIVATE,
     PROTECTED,
     PUBLIC,
