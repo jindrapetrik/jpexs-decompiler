@@ -2138,7 +2138,7 @@ public class ActionScript3Parser {
                         lexer.pushback(s);
                     }
                     s = lex();
-                    expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER, SymbolType.STRING);
+                    expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER, SymbolType.STRING, SymbolType.INTEGER, SymbolType.DOUBLE);
 
                     GraphTargetItem n = new StringAVM2Item(null, s.value.toString());
 //expression(thisType,pkg,needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, allowRemainder, variables);
