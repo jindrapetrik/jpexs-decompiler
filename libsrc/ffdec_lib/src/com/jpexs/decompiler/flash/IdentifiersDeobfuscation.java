@@ -76,7 +76,13 @@ public class IdentifiersDeobfuscation {
         // is "it" really a keyword? documentation says yes, but I can create "it" variable in CS6...
         // "it",
         "ne", "new", "not", "null", "on", "onClipEvent",
-        "or", "private", "public", "return", "set", "static", "super", "switch", "tellTarget", "this", "throw", "try",
+        "or", "private", "public", "return", "set", "static",
+        //allow as variable:
+        //"super",
+        "switch", "tellTarget",
+        //allow as variable:
+        //"this",
+        "throw", "try",
         "typeof", "undefined", "var", "void", "while", "with"
     };
 
