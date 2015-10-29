@@ -306,6 +306,32 @@ public class ActionScript2ModificationTest extends ActionStript2TestBase {
     }
 
     @Test
+    public void testAddActionAfterContainer() {
+        String actionsString
+                = "ConstantPool\n"
+                + "DefineFunction \"test\" 1 \"p1\" {\n"
+                + "Push 1\n"
+                + "GetVariable\n"
+                + "}\n"
+                + "Push 2\n"
+                + "If label_1\n"
+                + "Push 3\n"
+                + "label_1:Push 4";
+        String expectedResult
+                = "ConstantPool\n"
+                + "DefineFunction \"test\" 1 \"p1\" {\n"
+                + "Push 1\n"
+                + "GetVariable\n"
+                + "}\n"
+                + "GetMember\n"
+                + "Push 2\n"
+                + "If label_1\n"
+                + "Push 3\n"
+                + "label_1:Push 4";
+        testAddAction(actionsString, expectedResult, new ActionGetMember(), 4);
+    }
+
+    @Test
     public void testAddToJumpTarget() {
         String actionsString
                 = "ConstantPool\n"
