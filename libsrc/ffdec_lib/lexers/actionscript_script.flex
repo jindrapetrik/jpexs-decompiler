@@ -167,8 +167,6 @@ Preprocessor = \u00A7\u00A7 {Identifier}
   "while"                        { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.WHILE, yytext()); }
   "with"                         { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.WITH, yytext()); }
   "dynamic"                      { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.DYNAMIC, yytext()); }
-  "internal"                     { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.INTERNAL, yytext()); }
-  "override"                     { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.OVERRIDE, yytext()); }
   "private"                      { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.PRIVATE, yytext()); }
   "protected"                    { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.PROTECTED, yytext()); }
   "public"                       { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.PUBLIC, yytext()); }
@@ -185,7 +183,6 @@ Preprocessor = \u00A7\u00A7 {Identifier}
   "set"                          { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.SET, yytext()); }
   "var"                          { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.VAR, yytext()); }
   "import"                       { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.IMPORT, yytext()); }
-  "use"                          { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.USE, yytext()); }
   "false"                        { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.FALSE, yytext()); }
   "null"                         { return new ParsedSymbol(SymbolGroup.GLOBALCONST, SymbolType.NULL, yytext()); }
   "this"                         { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.THIS, yytext()); }

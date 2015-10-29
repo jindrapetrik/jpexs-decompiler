@@ -1168,8 +1168,6 @@ public class AVM2SourceGenerator implements SourceGenerator {
         }
         ParsedSymbol s = null;
 
-        instanceInfo.name_index = traitName(namespace, name);
-
         Trait[] it = generateTraitsPhase1(name, superName, false, localData, traitItems, instanceInfo.instance_traits, class_index);
         Trait[] st = generateTraitsPhase1(name, superName, true, localData, traitItems, classInfo.static_traits, class_index);
         generateTraitsPhase2(importedClasses, pkg, traitItems, it, openedNamespaces, localData);
@@ -2008,6 +2006,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 abc.addClass(ci, ii, classIndex.getVal());
                 classIndex.setVal(classIndex.getVal() + 1);
                 ii.flags |= InstanceInfo.CLASS_INTERFACE;
+                ii.name_index = traitName(((InterfaceAVM2Item) item).namespace, ((InterfaceAVM2Item) item).name);
                 //tc.class_info = abc.instance_info.size() - 1;
                 tc.kindType = Trait.TRAIT_CLASS;
                 //tc.name_index = traitName(((InterfaceAVM2Item) item).namespace, ((InterfaceAVM2Item) item).name);
@@ -2021,6 +2020,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 TraitClass tc = new TraitClass();
                 ClassInfo ci = new ClassInfo();
                 InstanceInfo ii = new InstanceInfo();
+                ii.name_index = traitName(((ClassAVM2Item) item).namespace, ((ClassAVM2Item) item).className);
                 /*abc.class_info.add(ci);
                  abc.instance_info.add(instanceInfo);*/
                 tc.class_info = classIndex.getVal();
