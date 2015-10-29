@@ -31,7 +31,7 @@ import java.util.List;
 public class PushShortIns extends InstructionDefinition implements PushIntegerTypeIns {
 
     public PushShortIns() {
-        super(0x25, "pushshort", new int[]{AVM2Code.OPT_U30}, false);
+        super(0x25, "pushshort", new int[]{AVM2Code.OPT_U30_SHORT}, false);
     }
 
     @Override

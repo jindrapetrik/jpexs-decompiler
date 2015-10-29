@@ -68,6 +68,9 @@ public abstract class InstructionDefinition implements Serializable {
             if ((operands[i] & 0xff00) == AVM2Code.OPT_U30) {
                 s.append(" U30");
             }
+            if ((operands[i] & 0xff00) == AVM2Code.OPT_U30_SHORT) {
+                s.append(" U30");
+            }
             if ((operands[i] & 0xff00) == AVM2Code.OPT_U8) {
                 s.append(" U8");
             }

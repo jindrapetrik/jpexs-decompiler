@@ -332,6 +332,8 @@ public class AVM2Code implements Cloneable {
 
     public static final int OPT_BYTE = 0x500;
 
+    public static final int OPT_U30_SHORT = 0x600;
+
     public static final int DAT_MULTINAME_INDEX = OPT_U30 + 0x01;
 
     public static final int DAT_ARG_COUNT = OPT_U30 + 0x02;
@@ -875,6 +877,9 @@ public class AVM2Code implements Cloneable {
                                     switch (instr.operands[op] & 0xff00) {
                                         case OPT_U30:
                                             actualOperands[op] = ais.readU30("operand");
+                                            break;
+                                        case OPT_U30_SHORT:
+                                            actualOperands[op] = (short) ais.readU30("operand");
                                             break;
                                         case OPT_U8:
                                             actualOperands[op] = ais.read("operand");
