@@ -101,7 +101,7 @@ public abstract class Trait implements Cloneable, Serializable {
             if (METADATA_DEFINITION.equals(name) || METADATA_CTOR_DEFINITION.equals(name)) {
                 continue;
             }
-            writer.append("[").append(name);
+            writer.append("[").append(IdentifiersDeobfuscation.printIdentifier(true, name));
             if (!en.getValue().isEmpty()) {
                 writer.append("(");
                 boolean first = true;
@@ -115,7 +115,7 @@ public abstract class Trait implements Cloneable, Serializable {
                     }
                     writer.append("\"");
                     String val = en.getValue().get(key);
-                    writer.append(Helper.escapeString(val));
+                    writer.append(Helper.escapeActionScriptString(val));
                     writer.append("\"");
                 }
                 writer.append(")");
