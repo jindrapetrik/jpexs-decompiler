@@ -2218,6 +2218,9 @@ public class ActionScript3Parser {
             case PARENT_OPEN:
                 ret = new ParenthesisItem(null, expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables));
                 expectedType(SymbolType.PARENT_CLOSE);
+                if (ret.value == null) {
+                    throw new AVM2ParseException("Expression in parenthesis expected", lexer.yyline());
+                }
                 allowMemberOrCall = true;
                 break;
             case NEW:
