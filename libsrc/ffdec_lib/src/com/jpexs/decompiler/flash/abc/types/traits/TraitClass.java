@@ -559,11 +559,6 @@ public class TraitClass extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public Multiname getName(ABC abc) {
-        return abc.constants.getMultiname(abc.instance_info.get(class_info).name_index);
-    }
-
-    @Override
     public int removeTraps(int scriptIndex, int classIndex, boolean isStatic, ABC abc, String path) throws InterruptedException {
         ClassInfo classInfo = abc.class_info.get(class_info);
         InstanceInfo instanceInfo = abc.instance_info.get(class_info);

@@ -674,7 +674,11 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
             setText(hilightedCode);
 
             if (classHighlights.size() > 0) {
-                setCaretPosition(classHighlights.get(0).startPos);
+                try {
+                    setCaretPosition(classHighlights.get(0).startPos);
+                } catch (Exception ex) { //sometimes happens
+                    //ignore
+                }
             }
         }
         fireScript();

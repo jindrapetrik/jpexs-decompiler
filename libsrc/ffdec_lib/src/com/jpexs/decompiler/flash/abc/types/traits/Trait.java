@@ -78,7 +78,7 @@ public abstract class Trait implements Cloneable, Serializable {
 
     public abstract void delete(ABC abc, boolean d);
 
-    public List<Entry<String, Map<String, String>>> getMetaDataTable(ABC abc) {
+    public final List<Entry<String, Map<String, String>>> getMetaDataTable(ABC abc) {
         List<Entry<String, Map<String, String>>> ret = new ArrayList<>();
         for (int m : metadata) {
             if (m >= 0 && m < abc.metadata_info.size()) {
@@ -94,7 +94,7 @@ public abstract class Trait implements Cloneable, Serializable {
         return ret;
     }
 
-    public GraphTextWriter getMetaData(ABC abc, GraphTextWriter writer) {
+    public final GraphTextWriter getMetaData(ABC abc, GraphTextWriter writer) {
         List<Entry<String, Map<String, String>>> md = getMetaDataTable(abc);
         for (Entry<String, Map<String, String>> en : md) {
             String name = en.getKey();
@@ -126,7 +126,7 @@ public abstract class Trait implements Cloneable, Serializable {
         return writer;
     }
 
-    protected DottedChain findCustomNs(int link_ns_index, ABC abc) {
+    protected final DottedChain findCustomNs(int link_ns_index, ABC abc) {
         String nsname = "";
         if (link_ns_index <= 0) {
             return null;
@@ -146,7 +146,7 @@ public abstract class Trait implements Cloneable, Serializable {
         return null;
     }
 
-    public GraphTextWriter getModifiers(ABC abc, boolean isStatic, GraphTextWriter writer) {
+    public final GraphTextWriter getModifiers(ABC abc, boolean isStatic, GraphTextWriter writer) {
         if ((kindFlags & ATTR_Override) > 0) {
             writer.appendNoHilight("override ");
         }
@@ -235,7 +235,7 @@ public abstract class Trait implements Cloneable, Serializable {
         convert(parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
     }
 
-    public Multiname getName(ABC abc) {
+    public final Multiname getName(ABC abc) {
         if (name_index == 0) {
             return null;
         } else {
@@ -245,7 +245,7 @@ public abstract class Trait implements Cloneable, Serializable {
 
     public abstract int removeTraps(int scriptIndex, int classIndex, boolean isStatic, ABC abc, String path) throws InterruptedException;
 
-    public ClassPath getPath(ABC abc) {
+    public final ClassPath getPath(ABC abc) {
         Multiname name = getName(abc);
         Namespace ns = name.getNamespace(abc.constants);
         DottedChain packageName = ns.getName(abc.constants);
