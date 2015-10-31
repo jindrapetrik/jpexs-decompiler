@@ -103,6 +103,7 @@ public class ActionJump extends Action {
 
     @Override
     public boolean execute(LocalDataArea lda) {
+        lda.jump = getTargetAddress();
         return true;
     }
 

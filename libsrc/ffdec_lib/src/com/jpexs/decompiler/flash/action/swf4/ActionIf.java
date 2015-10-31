@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.graph.GraphSource;
 import com.jpexs.helpers.Helper;
@@ -103,6 +104,14 @@ public class ActionIf extends Action {
 
     @Override
     public boolean execute(LocalDataArea lda) {
+        if (lda.stack.size() == 0) {
+            return false;
+        }
+
+        if (EcmaScript.toBoolean(lda.pop())) {
+            lda.jump = getTargetAddress();
+        }
+
         return true;
     }
 

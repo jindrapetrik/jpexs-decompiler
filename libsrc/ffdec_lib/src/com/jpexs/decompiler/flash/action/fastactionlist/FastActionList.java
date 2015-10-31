@@ -343,6 +343,18 @@ public class FastActionList implements Collection<ActionItem> {
         } while (item != firstItem);
     }
 
+    public ActionItem getContainer(ActionItem item) {
+        while (!(item.action instanceof GraphSourceItemContainer) && item != firstItem) {
+            item = item.prev;
+        }
+
+        if (item.action instanceof GraphSourceItemContainer) {
+            return item;
+        }
+
+        return null;
+    }
+
     public void expandPushes() {
         ActionItem item = firstItem;
         if (item == null) {
