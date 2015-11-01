@@ -16,6 +16,7 @@
  */
 package com.jpexs.helpers.stat;
 
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.helpers.Stopwatch;
 import java.util.HashMap;
 import java.util.Map;
@@ -94,12 +95,14 @@ public class Statistics implements AutoCloseable {
 
     public Statistics(String name) {
         this.name = name;
-        sw = Stopwatch.startNew();
+        sw = Configuration.showStat ? Stopwatch.startNew() : null;
     }
 
     @Override
     public void close() {
-        sw.stop();
-        addTime(name, sw.getElapsedNanoseconds());
+        if (sw != null) {
+            sw.stop();
+            addTime(name, sw.getElapsedNanoseconds());
+        }
     }
 }

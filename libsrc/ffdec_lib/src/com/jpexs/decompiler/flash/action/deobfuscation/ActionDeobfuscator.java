@@ -234,66 +234,67 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
                     }
                 }
 
-                int unreachableCount = actions.getUnreachableActionCount(actionItem, result.item);
-                /*int unreachableCount = result.minSkippedInstructions;
-                 if (unreachableCount <= newIstructionCount && newIstructionCount < result.maxSkippedInstructions) {
-                 unreachableCount = actions.getUnreachableActionCount(actionItem, result.item);
-                 }*/
-
-                if (allValueValid && newIstructionCount < unreachableCount) {
-                    if (result.stack.isEmpty() && result.variables.isEmpty() && result.constantPool == null && actionItem.action instanceof ActionJump) {
-                        actionItem.setJumpTarget(result.item);
-                    } else {
-                        ActionItem prevActionItem = actionItem.prev;
-                        if (result.constantPool != null) {
-                            ActionConstantPool constantPool2 = new ActionConstantPool(new ArrayList<>(result.constantPool.constantPool));
-                            ActionItem constantPoolItem = new ActionItem(constantPool2);
-                            iterator.addBefore(constantPoolItem);
-                        }
-
-                        for (String variableName : result.variables.keySet()) {
-                            Object value = result.variables.get(variableName);
-                            ActionPush push = new ActionPush(variableName);
-                            ActionItem pushItem = new ActionItem(push);
-                            iterator.addBefore(pushItem);
-                            push = new ActionPush(value);
-                            pushItem = new ActionItem(push);
-                            iterator.addBefore(pushItem);
-
-                            if (result.defines.contains(variableName)) {
-                                ActionDefineLocal defineLocal = new ActionDefineLocal();
-                                ActionItem defineLocalItem = new ActionItem(defineLocal);
-                                iterator.addBefore(defineLocalItem);
-                            } else {
-                                ActionSetVariable setVariable = new ActionSetVariable();
-                                ActionItem setVariableItem = new ActionItem(setVariable);
-                                iterator.addBefore(setVariableItem);
-                            }
-                        }
-
-                        if (!result.stack.isEmpty()) {
-                            for (Object obj : result.stack) {
-                                ActionPush push = new ActionPush(obj);
-                                ActionItem pushItem = new ActionItem(push);
-                                iterator.addBefore(pushItem);
-                            }
-                        }
-
-                        ActionJump jump = new ActionJump(0);
-                        ActionItem jumpItem = new ActionItem(jump);
-                        jumpItem.setJumpTarget(result.item);
-                        iterator.addBefore(jumpItem);
-
-                        actions.replaceJumpTargets(actionItem, prevActionItem.next);
+                if (allValueValid && newIstructionCount < result.maxSkippedInstructions) {
+                    int unreachableCount = result.minSkippedInstructions;
+                    if (newIstructionCount >= result.minSkippedInstructions) {
+                        unreachableCount = actions.getUnreachableActionCount(actionItem, result.item);
                     }
 
-                    ActionItem prevItem = actionItem.prev;
+                    if (newIstructionCount < unreachableCount) {
+                        if (result.stack.isEmpty() && result.variables.isEmpty() && result.constantPool == null && actionItem.action instanceof ActionJump) {
+                            actionItem.setJumpTarget(result.item);
+                        } else {
+                            ActionItem prevActionItem = actionItem.prev;
+                            if (result.constantPool != null) {
+                                ActionConstantPool constantPool2 = new ActionConstantPool(new ArrayList<>(result.constantPool.constantPool));
+                                ActionItem constantPoolItem = new ActionItem(constantPool2);
+                                iterator.addBefore(constantPoolItem);
+                            }
 
-                    actions.removeUnreachableActions();
-                    actions.removeZeroJumps();
+                            for (String variableName : result.variables.keySet()) {
+                                Object value = result.variables.get(variableName);
+                                ActionPush push = new ActionPush(variableName);
+                                ActionItem pushItem = new ActionItem(push);
+                                iterator.addBefore(pushItem);
+                                push = new ActionPush(value);
+                                pushItem = new ActionItem(push);
+                                iterator.addBefore(pushItem);
 
-                    iterator.setCurrent(prevItem.next.next);
-                    ret = true;
+                                if (result.defines.contains(variableName)) {
+                                    ActionDefineLocal defineLocal = new ActionDefineLocal();
+                                    ActionItem defineLocalItem = new ActionItem(defineLocal);
+                                    iterator.addBefore(defineLocalItem);
+                                } else {
+                                    ActionSetVariable setVariable = new ActionSetVariable();
+                                    ActionItem setVariableItem = new ActionItem(setVariable);
+                                    iterator.addBefore(setVariableItem);
+                                }
+                            }
+
+                            if (!result.stack.isEmpty()) {
+                                for (Object obj : result.stack) {
+                                    ActionPush push = new ActionPush(obj);
+                                    ActionItem pushItem = new ActionItem(push);
+                                    iterator.addBefore(pushItem);
+                                }
+                            }
+
+                            ActionJump jump = new ActionJump(0);
+                            ActionItem jumpItem = new ActionItem(jump);
+                            jumpItem.setJumpTarget(result.item);
+                            iterator.addBefore(jumpItem);
+
+                            actions.replaceJumpTargets(actionItem, prevActionItem.next);
+                        }
+
+                        ActionItem prevItem = actionItem.prev;
+
+                        actions.removeUnreachableActions();
+                        actions.removeZeroJumps();
+
+                        iterator.setCurrent(prevItem.next.next);
+                        ret = true;
+                    }
                 }
             }
 
@@ -601,9 +602,9 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
 
                 instructionsProcessed++;
                 if (!jumpFound) {
-                    boolean isJumpTarget = prevItem.isJumpTarget();
+                    boolean isJumpTarget = prevItem.isJumpTarget() || prevItem.prev.isContainerLastAction();
                     if (isJumpTarget) {
-                        if (prevJumpedHere && prevItem.jumpsHere.size() == 1) {
+                        if (prevJumpedHere && prevItem.jumpsHereSize() == 1) {
                             isJumpTarget = false;
                         }
                     }
@@ -612,12 +613,14 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
                         jumpFound = true;
                     } else {
                         skippedInstructions++;
+                        if (action instanceof ActionIf) {
+                            jumpFound = true;
+                        }
                     }
 
                     if (jumpedHere) {
                         jumpFound = true;
                     }
-
                 }
             }
 
@@ -642,212 +645,6 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
 
             if (action instanceof ActionReturn) {
                 result.resultValue = localData.returnValue;
-                break;
-            }
-        }
-    }
-
-    private void executeActionsOld(ActionItem item, LocalDataArea localData, ActionConstantPool constantPool, ExecutionResult result, Map<String, Object> fakeFunctions, boolean useVariables, boolean allowGetUninitializedVariables) throws InterruptedException {
-        FixItemCounterStack stack = (FixItemCounterStack) localData.stack;
-        int instructionsProcessed = 0;
-        ActionConstantPool lastConstantPool = null;
-
-        while (true) {
-            if (item.isExcluded()) {
-                break;
-            }
-
-            if (Thread.currentThread().isInterrupted()) {
-                throw new InterruptedException();
-            }
-
-            if (instructionsProcessed > executionLimit) {
-                break;
-            }
-
-            Action action = item.action;
-
-            /*System.out.print(action.getASMSource(actions, new ArrayList<Long>(), ScriptExportMode.PCODE));
-             for (int j = 0; j < stack.size(); j++) {
-             System.out.print(" '" + stack.get(j).getResult() + "'");
-             }
-             System.out.println();*/
-            if (action instanceof ActionConstantPool) {
-                lastConstantPool = (ActionConstantPool) action;
-            }
-
-            if (action instanceof ActionDefineLocal) {
-                if (stack.size() < 2) {
-                    break;
-                }
-
-                String variableName = EcmaScript.toString(stack.peek(2));
-                result.defines.add(variableName);
-            }
-
-            if (action instanceof ActionGetVariable) {
-                if (stack.isEmpty()) {
-                    break;
-                }
-
-                String variableName = stack.peek().toString();
-                if (!localData.localVariables.containsKey(variableName)
-                        && (!allowGetUninitializedVariables || !isFakeName(variableName))) {
-                    break;
-                }
-            }
-
-            if (action instanceof ActionSetVariable) {
-                if (stack.size() < 2) {
-                    break;
-                }
-            }
-
-            if (action instanceof ActionCallFunction) {
-                if (stack.size() < 2) {
-                    break;
-                }
-
-                String functionName = stack.pop().toString();
-                long numArgs = EcmaScript.toUint32(stack.pop());
-                if (numArgs == 0) {
-                    if (fakeFunctions != null && fakeFunctions.containsKey(functionName)) {
-                        stack.push(fakeFunctions.get(functionName));
-                    } else {
-                        break;
-                    }
-                } else {
-                    break;
-                }
-            } else {
-                Object o = null;
-                if (action instanceof ActionIf) {
-                    if (!stack.isEmpty()) {
-                        o = stack.peek();
-                    }
-                }
-
-                if (!action.execute(localData)) {
-                    break;
-                }
-
-                if (o != null) {
-                    stack.push(o);
-                }
-            }
-
-            if (!useVariables && (action instanceof ActionDefineLocal
-                    || action instanceof ActionGetVariable
-                    || action instanceof ActionSetVariable
-                    || action instanceof ActionConstantPool
-                    || action instanceof ActionCallFunction
-                    || action instanceof ActionReturn
-                    || action instanceof ActionEnd)) {
-                break;
-            }
-
-            if (!(action instanceof ActionPush
-                    || action instanceof ActionPushDuplicate
-                    //|| action instanceof ActionPop
-                    || action instanceof ActionAsciiToChar
-                    || action instanceof ActionCharToAscii
-                    || action instanceof ActionDecrement
-                    || action instanceof ActionIncrement
-                    || action instanceof ActionNot
-                    || action instanceof ActionToInteger
-                    || action instanceof ActionToNumber
-                    || action instanceof ActionToString
-                    || action instanceof ActionTypeOf
-                    || action instanceof ActionStringLength
-                    || action instanceof ActionMBAsciiToChar
-                    || action instanceof ActionMBStringLength
-                    || action instanceof ActionAnd
-                    || action instanceof ActionAdd
-                    || action instanceof ActionAdd2
-                    || action instanceof ActionBitAnd
-                    || action instanceof ActionBitLShift
-                    || action instanceof ActionBitOr
-                    || action instanceof ActionBitRShift
-                    || action instanceof ActionBitURShift
-                    || action instanceof ActionBitXor
-                    || action instanceof ActionDivide
-                    || action instanceof ActionEquals
-                    || action instanceof ActionEquals2
-                    || action instanceof ActionGreater
-                    || action instanceof ActionLess
-                    || action instanceof ActionLess2 // todo: fix (tz.swf/frame_6/DoAction: _loc3_.icon.gotoAndStop((Number(item.cost) || 0) >= 0?1:2)
-                    || action instanceof ActionModulo
-                    || action instanceof ActionMultiply
-                    || action instanceof ActionOr
-                    || action instanceof ActionStringAdd
-                    || action instanceof ActionStringEquals
-                    || action instanceof ActionStringGreater
-                    || action instanceof ActionStringLess
-                    || action instanceof ActionSubtract
-                    || action instanceof ActionIf
-                    || action instanceof ActionJump
-                    || action instanceof ActionDefineLocal
-                    || action instanceof ActionGetVariable
-                    || action instanceof ActionSetVariable
-                    || action instanceof ActionConstantPool
-                    || action instanceof ActionCallFunction
-                    || action instanceof ActionReturn
-                    || action instanceof ActionEnd)) {
-                break;
-            }
-
-            if (action instanceof ActionPush) {
-                ActionPush push = (ActionPush) action;
-                boolean ok = true;
-                instructionsProcessed += push.values.size() - 1;
-                for (Object value : push.values) {
-                    if ((constantPool == null && value instanceof ConstantIndex) || value instanceof RegisterNumber) {
-                        ok = false;
-                        break;
-                    }
-                }
-                if (!ok) {
-                    break;
-                }
-            }
-
-            ActionItem prevItem = item;
-            if (action instanceof ActionJump) {
-                item = item.getJumpTarget();
-            } else if (action instanceof ActionIf) {
-                if (stack.isEmpty()) {
-                    break;
-                }
-
-                if (EcmaScript.toBoolean(stack.pop())) {
-                    item = item.getJumpTarget();
-                } else {
-                    item = item.next;
-                }
-            } else {
-                item = item.next;
-            }
-
-            instructionsProcessed++;
-
-            if ((stack.allItemsFixed() || action instanceof ActionEnd) && !(action instanceof ActionPush)) {
-                result.item = item;
-                result.instructionsProcessed = instructionsProcessed;
-                result.constantPool = lastConstantPool;
-                result.variables.clear();
-                for (String variableName : localData.localVariables.keySet()) {
-                    Object value = localData.localVariables.get(variableName);
-                    result.variables.put(variableName, value);
-                }
-                result.stack.clear();
-                result.stack.addAll(stack);
-            }
-
-            if (action instanceof ActionReturn) {
-                result.resultValue = localData.returnValue;
-                break;
-            } else if (action instanceof ActionEnd) {
-                result.item = prevItem;
                 break;
             }
         }

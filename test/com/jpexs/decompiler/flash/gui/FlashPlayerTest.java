@@ -26,7 +26,6 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.ActionLocalData;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
-import com.jpexs.decompiler.flash.action.deobfuscation.FixItemCounterTranslateStack;
 import com.jpexs.decompiler.flash.action.swf4.ActionAdd;
 import com.jpexs.decompiler.flash.action.swf4.ActionAnd;
 import com.jpexs.decompiler.flash.action.swf4.ActionAsciiToChar;
@@ -75,6 +74,7 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.javactivex.ActiveX;
 import com.jpexs.javactivex.ActiveXEvent;
 import com.jpexs.javactivex.ActiveXEventListener;
@@ -269,7 +269,7 @@ public class FlashPlayerTest {
 
                 List<GraphTargetItem> output = new ArrayList<>();
                 ActionLocalData localData = new ActionLocalData();
-                FixItemCounterTranslateStack stack = new FixItemCounterTranslateStack("");
+                TranslateStack stack = new TranslateStack("");
                 for (Action a : newActions) {
                     a.translate(localData, stack, output, Graph.SOP_USE_STATIC, "");
                 }

@@ -54,6 +54,10 @@ public class ActionItem {
         return jumpsHere != null && !jumpsHere.isEmpty();
     }
 
+    public int jumpsHereSize() {
+        return jumpsHere == null ? 0 : jumpsHere.size();
+    }
+
     public boolean isContainerLastAction() {
         return lastActionOf != null && !lastActionOf.isEmpty();
     }

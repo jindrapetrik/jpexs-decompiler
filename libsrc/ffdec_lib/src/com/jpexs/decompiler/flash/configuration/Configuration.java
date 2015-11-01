@@ -70,6 +70,8 @@ public class Configuration {
 
     public static final Level logLevel;
 
+    public static boolean showStat;
+
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("ui")
     public static final ConfigurationItem<Boolean> openMultipleFiles = null;

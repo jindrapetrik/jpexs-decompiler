@@ -142,7 +142,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -988,6 +987,7 @@ public class CommandLineArgumentParser {
 
     private static void parseStat(Stack<String> args) {
         showStat = true;
+        Configuration.showStat = showStat;
     }
 
     private static void parseStdOut(Stack<String> args) {
@@ -2857,5 +2857,4 @@ public class CommandLineArgumentParser {
         }
         return vals[0];
     }
-
 }
