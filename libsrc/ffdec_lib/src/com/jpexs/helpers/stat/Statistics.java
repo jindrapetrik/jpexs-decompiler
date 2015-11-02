@@ -33,7 +33,7 @@ public class Statistics implements AutoCloseable {
 
     private final Stopwatch sw;
 
-    public static synchronized void addTime(String name, long duration) {
+    private static synchronized void addTime(String name, long duration) {
         StatisticData s = map.get(name);
         if (s == null) {
             s = new StatisticData();

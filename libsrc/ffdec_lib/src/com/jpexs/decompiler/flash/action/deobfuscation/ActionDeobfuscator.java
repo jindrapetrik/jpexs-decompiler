@@ -197,7 +197,7 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
         actions.removeZeroJumps();
 
         ActionConstantPool cPool = getConstantPool(actions);
-        LocalDataArea localData = new LocalDataArea();
+        LocalDataArea localData = new LocalDataArea(true);
         localData.stack = new FixItemCounterStack();
         ExecutionResult result = new ExecutionResult();
         FastActionListIterator iterator = actions.iterator();
@@ -451,8 +451,9 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
         int skippedInstructions = 0;
         ActionConstantPool lastConstantPool = null;
 
-        boolean jumpFound = false;
+        boolean skippedInstructionsUnknown = false;
         boolean jumpedHere = true;
+        boolean jumpFound = false;
         while (true) {
             if (item.isExcluded()) {
                 break;
@@ -601,7 +602,7 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
                 }
 
                 instructionsProcessed++;
-                if (!jumpFound) {
+                if (!skippedInstructionsUnknown) {
                     boolean isJumpTarget = prevItem.isJumpTarget() || prevItem.prev.isContainerLastAction();
                     if (isJumpTarget) {
                         if (prevJumpedHere && prevItem.jumpsHereSize() == 1) {
@@ -610,25 +611,25 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
                     }
 
                     if (isJumpTarget) {
-                        jumpFound = true;
+                        skippedInstructionsUnknown = true;
                     } else {
                         skippedInstructions++;
                         if (action instanceof ActionIf) {
-                            jumpFound = true;
+                            skippedInstructionsUnknown = true;
                         }
                     }
 
                     if (jumpedHere) {
-                        jumpFound = true;
+                        skippedInstructionsUnknown = true;
                     }
                 }
             }
 
-            if (isEnd || (stack.allItemsFixed() && !(action instanceof ActionPush))) {
+            if (isEnd || (stack.allItemsFixed() && (action instanceof ActionIf || (jumpFound && action instanceof ActionJump) || action instanceof ActionSetVariable))) {
                 result.item = item;
                 result.instructionsProcessed = instructionsProcessed;
                 result.minSkippedInstructions = skippedInstructions;
-                result.maxSkippedInstructions = jumpFound ? Integer.MAX_VALUE : skippedInstructions;
+                result.maxSkippedInstructions = skippedInstructionsUnknown ? Integer.MAX_VALUE : skippedInstructions;
                 result.constantPool = lastConstantPool;
                 result.variables.clear();
                 for (String variableName : localData.localVariables.keySet()) {
@@ -646,6 +647,10 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
             if (action instanceof ActionReturn) {
                 result.resultValue = localData.returnValue;
                 break;
+            }
+
+            if (action instanceof ActionJump) {
+                jumpFound = true;
             }
         }
     }

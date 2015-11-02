@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action;
 
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Stack;
 
@@ -34,6 +35,15 @@ public class LocalDataArea {
     public Object returnValue;
 
     public String executionException;
+
+    public LocalDataArea() {
+    }
+
+    public LocalDataArea(boolean preserveVariableOrder) {
+        if (preserveVariableOrder) {
+            localVariables = new LinkedHashMap<>();
+        }
+    }
 
     public void clear() {
         constantPool = null;
