@@ -21,6 +21,8 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.IfTypeIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
@@ -90,6 +92,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -102,9 +105,9 @@ import static org.testng.Assert.fail;
  */
 public class FlashPlayerTest {
 
-    private Object lockObj = new Object();
+    private final Object lockObj = new Object();
 
-    private Random random = new Random();
+    private final Random random = new Random();
 
     //@Test
     public void test1() throws IOException, InterruptedException {
@@ -126,12 +129,8 @@ public class FlashPlayerTest {
 
         File f = new File("libsrc/ffdec_lib/testdata/run_as3/run.swf");
 
-        int i = 1;
-        int j = 1;
-        File f2 = new File("run_test_" + new Date().getTime() + "_" + i + "_" + j + ".swf");
-        f2.deleteOnExit();
-
         SWF swf = new SWF(new BufferedInputStream(new FileInputStream(f)), false);
+        swf.version = SWF.MAX_VERSION;
         DoABC2Tag abcTag = null;
         for (Tag t : swf.tags) {
             if (t instanceof DoABC2Tag) {
@@ -141,36 +140,110 @@ public class FlashPlayerTest {
         }
 
         ABC abc = abcTag.getABC();
+        abc.constants.addUInt(0);
+        abc.constants.addUInt(100);
+        abc.constants.addDouble(0.0);
+        abc.constants.addDouble(111.11);
         MethodBody body = abc.findBodyByClassAndName("Run", "run");
-        body.max_stack = 10;
-        AVM2Code ccode = new AVM2Code();
-        ccode.code = new ArrayList<>();
-        List<AVM2Instruction> code = ccode.code;
-        code.add(new AVM2Instruction(0, AVM2Instructions.GetLocal0, null));
-        code.add(new AVM2Instruction(0, AVM2Instructions.PushScope, null));
-        code.add(new AVM2Instruction(0, AVM2Instructions.PushByte, new int[]{1}));
-        code.add(new AVM2Instruction(0, AVM2Instructions.PushByte, new int[]{2}));
-        code.add(new AVM2Instruction(0, AVM2Instructions.Add, null));
-        code.add(new AVM2Instruction(0, AVM2Instructions.Dup, null));
-        code.add(new AVM2Instruction(0, AVM2Instructions.TypeOf, null));
-        code.add(new AVM2Instruction(0, AVM2Instructions.Add, null));
-        code.add(new AVM2Instruction(0, AVM2Instructions.ReturnValue, null));
+        body.max_stack = 20;
 
-        body.setCode(ccode);
-        abcTag.setModified(true);
-        try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(f2))) {
-            swf.saveTo(fos);
+        for (int i = 0; i < 255; i++) {
+            if (i == AVM2Instructions.GetSuper
+                    || i == AVM2Instructions.SetSuper
+                    || i == AVM2Instructions.DXNS
+                    || i == AVM2Instructions.DXNSLate
+                    || i == AVM2Instructions.Kill
+                    || i == AVM2Instructions.Lf32x4
+                    || i == AVM2Instructions.Sf32x4
+                    || i == AVM2Instructions.LookupSwitch
+                    || i == AVM2Instructions.PushWith
+                    || i == AVM2Instructions.NextName
+                    || i == AVM2Instructions.HasNext
+                    || i == AVM2Instructions.PushConstant
+                    || i == AVM2Instructions.NextValue
+                    || i == AVM2Instructions.PushScope
+                    || i == AVM2Instructions.PushNamespace
+                    || i == AVM2Instructions.HasNext2
+                    || i == AVM2Instructions.PushDecimal
+                    || i == AVM2Instructions.PushDNan
+                    || i == AVM2Instructions.DXNS
+                    || i == AVM2Instructions.DXNS
+                    || i == AVM2Instructions.DXNS
+                    || i == AVM2Instructions.DXNS
+                    || i == AVM2Instructions.DXNS
+                    || i == AVM2Instructions.DXNS) {
+                continue;
+            }
+
+            System.out.println("Instruction code: " + Integer.toHexString(i) + " (" + i + ")");
+            int j = 1;
+            File f2 = new File("run_test_" + new Date().getTime() + "_" + i + "_" + j + ".swf");
+            f2.deleteOnExit();
+
+            AVM2Code ccode = new AVM2Code();
+            ccode.code = new ArrayList<>();
+            List<AVM2Instruction> code = ccode.code;
+            code.add(new AVM2Instruction(0, AVM2Instructions.GetLocal0, null));
+            code.add(new AVM2Instruction(0, AVM2Instructions.PushScope, null));
+            code.add(new AVM2Instruction(0, AVM2Instructions.PushByte, new int[]{0}));
+            code.add(new AVM2Instruction(0, AVM2Instructions.PushByte, new int[]{1}));
+            code.add(new AVM2Instruction(0, AVM2Instructions.PushByte, new int[]{2}));
+
+            InstructionDefinition ins = AVM2Code.instructionSet[i];
+            int[] params = null;
+            boolean ifType = false;
+            if (ins.operands.length > 0) {
+                params = new int[ins.operands.length];
+                if (!(ins instanceof IfTypeIns)) {
+                    for (int k = 0; k < params.length; k++) {
+                        params[k] = 1;
+                    }
+                }
+
+                ifType = false; // todo: ins instanceof IfTypeIns;
+                if (ifType) {
+                    params[0] = 8;
+                }
+            }
+
+            code.add(new AVM2Instruction(0, /*getOpIns(i)*/ ins, params));
+            if (ifType) {
+                code.add(new AVM2Instruction(0, AVM2Instructions.PushByte, new int[]{3}));
+                code.add(new AVM2Instruction(0, AVM2Instructions.Jump, new int[]{2}));
+                code.add(new AVM2Instruction(0, AVM2Instructions.PushByte, new int[]{4}));
+            }
+
+            code.add(new AVM2Instruction(0, AVM2Instructions.Dup, null));
+            code.add(new AVM2Instruction(0, AVM2Instructions.TypeOf, null));
+            code.add(new AVM2Instruction(0, AVM2Instructions.Add, null));
+            code.add(new AVM2Instruction(0, AVM2Instructions.ReturnValue, null));
+
+            body.setCode(ccode);
+            body.markOffsets();
+            /*String pcode = ccode.toASMSource();
+             String as = body.toSource();*/
+
+            abcTag.setModified(true);
+            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(f2))) {
+                swf.saveTo(fos);
+            }
+
+            flash.setMovie(f2.getAbsolutePath());
+
+            synchronized (lockObj) {
+                lockObj.wait();
+            }
+
+            f2.delete();
+
+            String flashResult = resultRef.getVal();
+            System.out.println("Flash result: " + flashResult);
+
+            String ffdecExecuteResult = (String) ccode.execute(new HashMap<>(), abc.constants);
+            System.out.println("FFDec execte result: " + ffdecExecuteResult);
+
+            Assert.assertEquals(ffdecExecuteResult, flashResult);
         }
-
-        flash.setMovie(f2.getAbsolutePath());
-
-        synchronized (lockObj) {
-            lockObj.wait();
-        }
-
-        String flashResult = resultRef.getVal();
-
-        f2.delete();
 
         /*int cnt = 0;
          while (flash.getReadyState() != 4) {
@@ -210,7 +283,7 @@ public class FlashPlayerTest {
 
         File f = new File("libsrc/ffdec_lib/testdata/run_as2/run_as2.swf");
         for (int i = 0; i < 15; i++) {
-            for (int j = 0; j < 13 + 23; j++) {
+            for (int j = 0; j < 13 + 23 + 2; j++) {
 
                 File f2 = new File("run_test_" + new Date().getTime() + "_" + i + "_" + j + ".swf");
                 f2.deleteOnExit();
@@ -227,39 +300,46 @@ public class FlashPlayerTest {
 
                 Action opAction = getOpAction(j);
 
+                if (j >= 13 + 23) {
+                    newActions.add(new ActionPush("mystring"));
+                }
+
                 if (j >= 13) {
                     newActions.add(new ActionPush(r1));
                 }
 
+                Object r2Obj;
                 if (i == 0) {
-                    newActions.add(new ActionPush(Undefined.INSTANCE));
+                    r2Obj = Undefined.INSTANCE;
                 } else if (i == 1) {
-                    newActions.add(new ActionPush(Null.INSTANCE));
+                    r2Obj = Null.INSTANCE;
                 } else if (i == 2) {
-                    newActions.add(new ActionPush(false));
+                    r2Obj = false;
                 } else if (i == 3) {
-                    newActions.add(new ActionPush(true));
+                    r2Obj = true;
                 } else if (i == 4) {
-                    newActions.add(new ActionPush("test"));
+                    r2Obj = "test";
                 } else if (i == 5) {
-                    newActions.add(new ActionPush("0"));
+                    r2Obj = "0";
                 } else if (i == 6) {
-                    newActions.add(new ActionPush("0.0"));
+                    r2Obj = "0.0";
                 } else if (i == 7) {
-                    newActions.add(new ActionPush("1.0"));
+                    r2Obj = "1.0";
                 } else if (i == 8) {
-                    newActions.add(new ActionPush("-1.0"));
+                    r2Obj = "-1.0";
                 } else if (i == 9) {
-                    newActions.add(new ActionPush(0));
+                    r2Obj = 0;
                 } else if (i == 10) {
-                    newActions.add(new ActionPush(-100));
+                    r2Obj = -100;
                 } else if (i == 11) {
-                    newActions.add(new ActionPush(100));
+                    r2Obj = 100;
                 } else {
-                    newActions.add(new ActionPush(r2));
+                    r2Obj = r2;
                 }
 
-                System.out.println(i + " " + j + " " + opAction.toString() + " r1:" + r1 + " r2:" + r2);
+                newActions.add(new ActionPush(r2Obj));
+
+                System.out.println(i + " " + j + " " + opAction.toString() + " r1:" + r1 + " r2:" + r2Obj + " r3:" + "mystring");
                 newActions.add(opAction);
                 newActions.add(new ActionPushDuplicate());
                 newActions.add(new ActionTypeOf());
@@ -331,15 +411,50 @@ public class FlashPlayerTest {
         }
     }
 
+    private int getOpIns(int idx) {
+        switch (idx) {
+            case 0:
+                return AVM2Instructions.BitAnd;
+            case 1:
+                return AVM2Instructions.Add;
+            case 2:
+                return AVM2Instructions.LShift;
+            case 3:
+                return AVM2Instructions.BitOr;
+            case 4:
+                return AVM2Instructions.RShift;
+            case 5:
+                return AVM2Instructions.URShift;
+            case 6:
+                return AVM2Instructions.BitXor;
+            case 7:
+                return AVM2Instructions.Divide;
+            case 8:
+                return AVM2Instructions.Equals;
+            case 9:
+                return AVM2Instructions.Modulo;
+            case 10:
+                return AVM2Instructions.Multiply;
+            case 11:
+                return AVM2Instructions.Subtract;
+        }
+
+        throw new Error("Invalid index");
+    }
+
     private Action getOpAction(int idx) {
         Action result;
         if (idx < 13) {
             result = getUnaryOpAction(idx);
             Assert.assertEquals(1, result.getStackPopCount(null, null));
             Assert.assertEquals(1, result.getStackPushCount(null, null));
-        } else {
+        } else if (idx < 13 + 23) {
             result = getBinaryOpAction(idx - 13);
             Assert.assertEquals(2, result.getStackPopCount(null, null));
+            Assert.assertEquals(1, result.getStackPushCount(null, null));
+        } else {
+            result = getTernaryOpAction(idx - 13 - 23);
+            Assert.assertEquals(3, result.getStackPopCount(null, null));
             Assert.assertEquals(1, result.getStackPushCount(null, null));
         }
 
