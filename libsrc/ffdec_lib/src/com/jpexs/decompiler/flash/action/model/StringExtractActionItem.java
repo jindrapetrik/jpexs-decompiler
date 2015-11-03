@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.swf4.ActionStringExtract;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -59,6 +60,35 @@ public class StringExtractActionItem extends ActionItem {
         ret.addAll(index.getNeededSources());
         ret.addAll(count.getNeededSources());
         return ret;
+    }
+
+    @Override
+    public Object getResult() {
+        return getResult(count.getResult(), index.getResult(), value.getResult());
+    }
+
+    public static String getResult(Object count, Object index, Object value) {
+        String str = EcmaScript.toString(value);
+        int idx = (int) (double) EcmaScript.toNumber(index);
+        idx--; // index seems to be 1 based
+
+        int cnt = (int) (double) EcmaScript.toNumber(count);
+
+        /*if (idx < 0) {
+         idx = str.length() + idx;
+         }*/
+        if (idx < 0) {
+            idx = 0;
+        } else if (idx > str.length()) {
+            return "";
+        }
+
+        if (cnt < 0) {
+            cnt = str.length();
+        }
+
+        int endIdx = Math.min(str.length(), idx + cnt);
+        return str.substring(idx, endIdx);
     }
 
     @Override
