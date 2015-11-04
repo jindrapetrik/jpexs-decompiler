@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.DecLocalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.SubtractAVM2Item;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
@@ -39,20 +40,7 @@ public class DecLocalIIns extends InstructionDefinition {
     public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         int locRegIndex = ins.getParamAsLong(constants, 0).intValue();
         Object obj = lda.localRegisters.get(locRegIndex);
-        if (obj instanceof Long) {
-            Long obj2 = ((Long) obj) - 1;
-            lda.localRegisters.put(locRegIndex, obj2);
-        } else if (obj instanceof Double) {
-            Double obj2 = ((Double) obj) - 1;
-            lda.localRegisters.put(locRegIndex, obj2);
-        }
-        if (obj instanceof String) {
-            Double obj2 = Double.parseDouble((String) obj) - 1;
-            lda.localRegisters.put(locRegIndex, obj2);
-        } else {
-            lda.executionException = "Cannot decrement local register";
-            return false;
-        }
+        lda.localRegisters.put(locRegIndex, EcmaScript.toInt32(obj) - 1);
         return true;
     }
 

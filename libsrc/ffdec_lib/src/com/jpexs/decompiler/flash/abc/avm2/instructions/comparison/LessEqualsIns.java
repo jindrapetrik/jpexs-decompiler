@@ -18,9 +18,12 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions.comparison;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.LeAVM2Item;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
@@ -29,6 +32,14 @@ public class LessEqualsIns extends InstructionDefinition {
 
     public LessEqualsIns() {
         super(0xae, "lessequals", new int[]{}, true);
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+        Double right = EcmaScript.toNumber(lda.operandStack.pop());
+        Double left = EcmaScript.toNumber(lda.operandStack.pop());
+        lda.operandStack.push(left <= right);
+        return true;
     }
 
     @Override

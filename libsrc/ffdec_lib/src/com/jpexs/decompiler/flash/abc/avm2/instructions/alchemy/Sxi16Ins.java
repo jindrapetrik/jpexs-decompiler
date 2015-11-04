@@ -18,9 +18,12 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.AlchemySignExtendAVM2Item;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
@@ -33,6 +36,14 @@ public class Sxi16Ins extends InstructionDefinition implements AlchemyTypeIns {
 
     public Sxi16Ins() {
         super(0x52, "sxi16", new int[]{}, false);
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+        Double value = (double) (((int) (double) EcmaScript.toNumber(lda.operandStack.pop())) & 0xffff);
+        // todo: extend value to 32 bits
+        lda.operandStack.push(value);
+        return true;
     }
 
     @Override

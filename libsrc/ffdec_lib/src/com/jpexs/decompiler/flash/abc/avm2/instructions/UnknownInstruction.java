@@ -14,23 +14,25 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.abc.avm2.instructions.other2;
+package com.jpexs.decompiler.flash.abc.avm2.instructions;
 
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ExecutionException;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
-public class BkptIns extends InstructionDefinition {
+/**
+ *
+ * @author JPEXS
+ */
+public class UnknownInstruction extends InstructionDefinition {
 
-    public BkptIns() {
-        super(0x01, "bkpt", new int[]{}, false);
+    public UnknownInstruction(int instructionCode) {
+        super(instructionCode, "instruction_" + Integer.toString(instructionCode), new int[0], false);
     }
 
     @Override
     public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) throws AVM2ExecutionException {
-        // do nothing
-        return true;
+        illegalOpCode(lda, ins);
+        return false;
     }
 }

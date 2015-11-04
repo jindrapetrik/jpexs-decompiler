@@ -16,11 +16,25 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.other2;
 
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ExecutionException;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2Runtime;
+import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
 public class Lf32x4Ins extends InstructionDefinition {
 
     public Lf32x4Ins() {
         super(0x0A, "lf32x4", new int[]{}, true);
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) throws AVM2ExecutionException {
+        if (lda.runtime == AVM2Runtime.ADOBE_FLASH) {
+            illegalOpCode(lda, ins);
+        }
+
+        return super.execute(lda, constants, ins);
     }
 }

@@ -19,11 +19,14 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions.jumps;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.IfTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.StrictEqAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.StrictNeqAVM2Item;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.HashMap;
@@ -33,6 +36,18 @@ public class IfStrictNeIns extends InstructionDefinition implements IfTypeIns {
 
     public IfStrictNeIns() {
         super(0x1A, "ifstrictne", new int[]{AVM2Code.DAT_OFFSET}, false);
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+        Object rightObj = lda.operandStack.pop();
+        Object leftObj = lda.operandStack.pop();
+
+        if (!EcmaScript.strictEquals(leftObj, rightObj)) {
+            lda.jump = ins.getParamAsLong(constants, 0);
+        }
+
+        return true;
     }
 
     @Override

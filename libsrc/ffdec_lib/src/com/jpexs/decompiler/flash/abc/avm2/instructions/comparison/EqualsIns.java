@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.EqAVM2Item;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
@@ -37,7 +38,7 @@ public class EqualsIns extends InstructionDefinition {
     public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         Object obj1 = lda.operandStack.pop();
         Object obj2 = lda.operandStack.pop();
-        Boolean res = obj1.equals(obj2);
+        boolean res = EcmaScript.equals(obj1, obj2);
         lda.operandStack.push(res);
         return true;
     }

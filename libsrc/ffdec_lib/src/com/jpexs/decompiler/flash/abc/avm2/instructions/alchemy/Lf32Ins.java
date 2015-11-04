@@ -18,9 +18,12 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.AlchemyLoadAVM2Item;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
@@ -33,6 +36,14 @@ public class Lf32Ins extends InstructionDefinition implements AlchemyTypeIns {
 
     public Lf32Ins() {
         super(0x38, "lf32", new int[]{}, true);
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+        int addr = (int) (double) EcmaScript.toNumber(lda.operandStack.pop());
+        // todo: get 32 bits float
+        lda.operandStack.push((Double) (double) (lda.getDomainMemory()[addr]));
+        return true;
     }
 
     @Override

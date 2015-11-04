@@ -20,11 +20,16 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ExecutionException;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2TypeErrorException;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.PropertyAVM2Item;
+import com.jpexs.decompiler.flash.abc.types.Multiname;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.flash.ecma.EcmaType;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
@@ -36,9 +41,20 @@ public class CoerceIns extends InstructionDefinition implements CoerceOrConvertT
     }
 
     @Override
-    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
-        //int multinameIndex = ins.getParamAsLong(constants, 0).intValue();
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) throws AVM2ExecutionException {
+        Multiname multiname = (Multiname) ins.getParam(constants, 0);
+        if (multiname == null) {
+            throw new AVM2TypeErrorException(1034);
+        }
+
+        Object value = lda.operandStack.pop();
+        EcmaType type = EcmaScript.type(value);
+        if (type != EcmaType.NULL && type != EcmaType.OBJECT) {
+            throw new AVM2TypeErrorException(1034);
+        }
+
         //push and pop coerced value to specified type
+        lda.operandStack.push(value);
         return true;
     }
 

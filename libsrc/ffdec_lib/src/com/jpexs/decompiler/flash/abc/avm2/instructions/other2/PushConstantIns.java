@@ -18,6 +18,10 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions.other2;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ExecutionException;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2Runtime;
+import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
@@ -25,6 +29,15 @@ public class PushConstantIns extends InstructionDefinition {
 
     public PushConstantIns() {
         super(0x22, "pushconstant", new int[]{AVM2Code.DAT_STRING_INDEX}, false /*?*/);
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) throws AVM2ExecutionException {
+        if (lda.runtime == AVM2Runtime.ADOBE_FLASH) {
+            illegalOpCode(lda, ins);
+        }
+
+        return super.execute(lda, constants, ins);
     }
 
     @Override

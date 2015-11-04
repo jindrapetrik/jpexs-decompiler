@@ -18,8 +18,11 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
@@ -28,6 +31,13 @@ public class NotIns extends InstructionDefinition {
 
     public NotIns() {
         super(0x96, "not", new int[]{}, false);
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+        boolean value = EcmaScript.toBoolean(lda.operandStack.pop());
+        lda.operandStack.push(!value);
+        return true;
     }
 
     @Override

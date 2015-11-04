@@ -18,9 +18,12 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions.comparison;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.StrictEqAVM2Item;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
@@ -29,6 +32,15 @@ public class StrictEqualsIns extends InstructionDefinition {
 
     public StrictEqualsIns() {
         super(0xac, "strictequals", new int[]{}, true);
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+        Object obj1 = lda.operandStack.pop();
+        Object obj2 = lda.operandStack.pop();
+        boolean res = EcmaScript.strictEquals(obj1, obj2);
+        lda.operandStack.push(res);
+        return true;
     }
 
     @Override

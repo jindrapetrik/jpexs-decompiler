@@ -18,9 +18,12 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions.other2;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceOrConvertTypeIns;
+import com.jpexs.decompiler.flash.ecma.Null;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TypeItem;
@@ -29,6 +32,18 @@ public class CoerceOIns extends InstructionDefinition implements CoerceOrConvert
 
     public CoerceOIns() {
         super(0x89, "coerce_o", new int[]{}, true); // stack: -1+1
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+        Object value = lda.operandStack.pop();
+        // The only action appears to be to convert undefined to null.
+        if (value instanceof Undefined) {
+            value = Null.INSTANCE;
+        }
+
+        lda.operandStack.push(value);
+        return true;
     }
 
     @Override

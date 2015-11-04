@@ -19,11 +19,14 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions.jumps;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.IfTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.GtAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.LeAVM2Item;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.HashMap;
@@ -33,6 +36,18 @@ public class IfNGtIns extends InstructionDefinition implements IfTypeIns {
 
     public IfNGtIns() {
         super(0x0e, "ifngt", new int[]{AVM2Code.DAT_OFFSET}, true);
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+        Double right = EcmaScript.toNumber(lda.operandStack.pop());
+        Double left = EcmaScript.toNumber(lda.operandStack.pop());
+
+        if (!(left > right)) {
+            lda.jump = ins.getParamAsLong(constants, 0);
+        }
+
+        return true;
     }
 
     @Override

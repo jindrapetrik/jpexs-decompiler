@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
@@ -38,17 +39,7 @@ public class ConvertBIns extends InstructionDefinition implements CoerceOrConver
     @Override
     public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         Object value = lda.operandStack.pop();
-        boolean bval;
-        if (value instanceof Boolean) {
-            bval = (Boolean) value;
-        } else if (value instanceof Long) {
-            bval = (Long) value != 0;
-        } else if (value instanceof String) {
-            bval = !((String) value).isEmpty();
-        } else {
-            bval = true;
-        }
-        lda.operandStack.push((Boolean) bval);
+        lda.operandStack.push(EcmaScript.toBoolean(value));
         return true;
     }
 

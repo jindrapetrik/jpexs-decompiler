@@ -32,6 +32,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.DeobfuscatePopIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.IfTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.UnknownInstruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Lf32Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Lf64Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Li16Ins;
@@ -275,6 +276,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
@@ -372,7 +374,7 @@ public class AVM2Code implements Cloneable {
 
     public static final int DAT_DECIMAL_PARAMS = OPT_U30 + 0x13;
 
-    public static InstructionDefinition[] instructionSet = new InstructionDefinition[]{
+    public static final InstructionDefinition[] instructionSet = new InstructionDefinition[]{
         /*0x00*/null,
         /*0x01*/ new BkptIns(),
         /*0x02*/ new NopIns(),
@@ -633,6 +635,14 @@ public class AVM2Code implements Cloneable {
         /*0xFF*/ new DecodeIns(),};
     // endoflist
 
+    static {
+        for (int i = 0; i < instructionSet.length; i++) {
+            if (instructionSet[i] == null) {
+                instructionSet[i] = new UnknownInstruction(i);
+            }
+        }
+    }
+
     public boolean hideTemporaryRegisters = true;
 
     public static final String IDENTOPEN = "/*IDENTOPEN*/";
@@ -642,32 +652,40 @@ public class AVM2Code implements Cloneable {
     public AVM2Code() {
     }
 
-    public Object execute(HashMap<Integer, Object> arguments, AVM2ConstantPool constants) {
+    public Object execute(HashMap<Integer, Object> arguments, AVM2ConstantPool constants) throws AVM2ExecutionException {
+        return execute(arguments, constants, AVM2Runtime.UNKNOWN, 0);
+    }
+
+    public Object execute(HashMap<Integer, Object> arguments, AVM2ConstantPool constants, AVM2Runtime runtime, int runtimeVersoin) throws AVM2ExecutionException {
         int pos = 0;
         LocalDataArea lda = new LocalDataArea();
+        lda.methodName = "methodName"; // todo: needed for VerifyError exception message
         lda.localRegisters = arguments;
-        try {
-            while (pos < code.size()) {
-                AVM2Instruction ins = code.get(pos);
-                ins.definition.execute(lda, constants, ins);
+        lda.runtime = runtime;
+        lda.runtimeVersion = runtimeVersoin;
+        while (pos < code.size()) {
+            AVM2Instruction ins = code.get(pos);
+            if (!ins.definition.execute(lda, constants, ins)) {
+                return null;
+            }
 
-                if (lda.jump != null) {
+            if (lda.jump != null) {
+                try {
                     pos = adr2pos(lda.jump);
-                    lda.jump = null;
-                } else {
-                    pos++;
+                } catch (ConvertException ex) {
+                    throw new AVM2VerifyErrorException(AVM2VerifyErrorException.BRANCH_TARGET_INVALID_INSTRUCTION);
                 }
-
-                if (lda.returnValue != null) {
-                    return lda.returnValue;
-                }
-
+                lda.jump = null;
+            } else {
                 pos++;
             }
-        } catch (ConvertException e) {
+
+            if (lda.returnValue != null) {
+                return lda.returnValue;
+            }
         }
 
-        return null;
+        return Undefined.INSTANCE;
     }
 
     public void calculateDebugFileLine(ABC abc) {

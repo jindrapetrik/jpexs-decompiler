@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.DeobfuscatePopIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.UnknownInstruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushShortIns;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
@@ -735,7 +736,7 @@ public class ASM3Parser {
                 }
                 boolean insFound = false;
                 for (InstructionDefinition def : AVM2Code.instructionSet) {
-                    if (def != null && def.instructionName.equals((String) symb.value)) {
+                    if (def != null && !(def instanceof UnknownInstruction) && def.instructionName.equals((String) symb.value)) {
                         insFound = true;
                         List<Integer> operandsList = new ArrayList<>();
 

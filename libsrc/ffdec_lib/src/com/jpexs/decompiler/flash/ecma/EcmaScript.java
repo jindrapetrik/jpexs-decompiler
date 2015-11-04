@@ -54,7 +54,8 @@ public class EcmaScript {
                 return Double.NaN;
             }
         }
-        //TODO:ToPrimitive
+
+        // todo: ToPrimitive
         return 0.0;
     }
 
@@ -157,6 +158,14 @@ public class EcmaScript {
             }
             return false;
         }
+    }
+
+    public static boolean strictEquals(Object x, Object y) {
+        if (type(x) != type(y)) {
+            return false;
+        }
+
+        return equals(x, y);
     }
 
     public static boolean equals(Object x, Object y) {
@@ -276,7 +285,11 @@ public class EcmaScript {
         return true; //other Object
     }
 
-    public static Long toUint32(Object o) {
+    public static int toInt32(Object o) {
+        return (int) toUint32(o);
+    }
+
+    public static long toUint32(Object o) {
         Double n = toNumber(o);
         if (n.isNaN()) {
             return 0L;
@@ -290,8 +303,8 @@ public class EcmaScript {
         if (Double.isInfinite(n)) {
             return 0L;
         }
-        Long posInt = (long) (double) (Math.signum(n) * Math.floor(Math.abs(n)));
-        posInt %= (1 << 32);
+        long posInt = (long) (double) (Math.signum(n) * Math.floor(Math.abs(n)));
+        posInt %= (1L << 32);
         return posInt;
     }
 

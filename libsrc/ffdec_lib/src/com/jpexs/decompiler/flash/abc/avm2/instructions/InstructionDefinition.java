@@ -20,6 +20,8 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ExecutionException;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2VerifyErrorException;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.DecLocalIIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.DecLocalIns;
@@ -87,9 +89,13 @@ public abstract class InstructionDefinition implements Serializable {
         return s.toString();
     }
 
-    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) throws AVM2ExecutionException {
         //throw new UnsupportedOperationException("Instruction " + instructionName + " not implemented");
         return false;
+    }
+
+    protected void illegalOpCode(LocalDataArea lda, AVM2Instruction ins) throws AVM2VerifyErrorException {
+        throw new AVM2VerifyErrorException(AVM2VerifyErrorException.ILLEGAL_OPCODE, new Object[]{lda.methodName, instructionCode, ins.getOffset()});
     }
 
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) throws InterruptedException {

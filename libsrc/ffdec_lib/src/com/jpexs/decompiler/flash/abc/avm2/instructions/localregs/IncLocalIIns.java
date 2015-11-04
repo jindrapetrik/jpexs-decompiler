@@ -18,11 +18,14 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions.localregs;
 
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.IncLocalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.AddAVM2Item;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
@@ -31,6 +34,14 @@ public class IncLocalIIns extends InstructionDefinition {
 
     public IncLocalIIns() {
         super(0xc2, "inclocal_i", new int[]{AVM2Code.DAT_LOCAL_REG_INDEX}, true);
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+        int locRegIndex = ins.getParamAsLong(constants, 0).intValue();
+        Object obj = lda.localRegisters.get(locRegIndex);
+        lda.localRegisters.put(locRegIndex, EcmaScript.toInt32(obj) + 1);
+        return true;
     }
 
     @Override

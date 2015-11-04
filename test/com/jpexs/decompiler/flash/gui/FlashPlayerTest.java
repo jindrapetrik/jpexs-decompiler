@@ -19,6 +19,8 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ExecutionException;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2Runtime;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.IfTypeIns;
@@ -69,6 +71,7 @@ import com.jpexs.decompiler.flash.action.swf5.ActionTypeOf;
 import com.jpexs.decompiler.flash.action.swf6.ActionGreater;
 import com.jpexs.decompiler.flash.action.swf6.ActionStrictEquals;
 import com.jpexs.decompiler.flash.action.swf6.ActionStringGreater;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.tags.DoABC2Tag;
@@ -146,36 +149,79 @@ public class FlashPlayerTest {
         abc.constants.addDouble(111.11);
         MethodBody body = abc.findBodyByClassAndName("Run", "run");
         body.max_stack = 20;
+        body.max_regs = 10;
 
-        for (int i = 0; i < 255; i++) {
+        for (int i = 0; i < 256; i++) {
+            if (i == AVM2Instructions.ReturnVoid) {
+                // todo: fails for some reason
+                continue;
+            }
+
+            // todo: the following instructions are not implemented
             if (i == AVM2Instructions.GetSuper
                     || i == AVM2Instructions.SetSuper
                     || i == AVM2Instructions.DXNS
                     || i == AVM2Instructions.DXNSLate
                     || i == AVM2Instructions.Kill
-                    || i == AVM2Instructions.Lf32x4
-                    || i == AVM2Instructions.Sf32x4
                     || i == AVM2Instructions.LookupSwitch
                     || i == AVM2Instructions.PushWith
                     || i == AVM2Instructions.NextName
                     || i == AVM2Instructions.HasNext
-                    || i == AVM2Instructions.PushConstant
                     || i == AVM2Instructions.NextValue
                     || i == AVM2Instructions.PushScope
                     || i == AVM2Instructions.PushNamespace
                     || i == AVM2Instructions.HasNext2
-                    || i == AVM2Instructions.PushDecimal
-                    || i == AVM2Instructions.PushDNan
-                    || i == AVM2Instructions.DXNS
-                    || i == AVM2Instructions.DXNS
-                    || i == AVM2Instructions.DXNS
-                    || i == AVM2Instructions.DXNS
-                    || i == AVM2Instructions.DXNS
-                    || i == AVM2Instructions.DXNS) {
+                    || i == AVM2Instructions.NewFunction
+                    || i == AVM2Instructions.Call
+                    || i == AVM2Instructions.Construct
+                    || i == AVM2Instructions.CallMethod
+                    || i == AVM2Instructions.CallStatic
+                    || i == AVM2Instructions.CallSuper
+                    || i == AVM2Instructions.CallProperty
+                    || i == AVM2Instructions.ReturnVoid
+                    || i == AVM2Instructions.ConstructSuper
+                    || i == AVM2Instructions.ConstructProp
+                    || i == AVM2Instructions.CallPropLex
+                    || i == AVM2Instructions.CallSuperVoid
+                    || i == AVM2Instructions.CallPropVoid
+                    || i == AVM2Instructions.ApplyType
+                    || i == AVM2Instructions.NewObject
+                    || i == AVM2Instructions.NewArray
+                    || i == AVM2Instructions.NewActivation
+                    || i == AVM2Instructions.NewClass
+                    || i == AVM2Instructions.GetDescendants
+                    || i == AVM2Instructions.NewCatch
+                    || i == AVM2Instructions.FindPropGlobal
+                    || i == AVM2Instructions.FindPropertyStrict
+                    || i == AVM2Instructions.FindProperty
+                    || i == AVM2Instructions.FindDef
+                    || i == AVM2Instructions.GetLex
+                    || i == AVM2Instructions.SetProperty
+                    || i == AVM2Instructions.GetGlobalScope
+                    || i == AVM2Instructions.GetScopeObject
+                    || i == AVM2Instructions.GetProperty
+                    || i == AVM2Instructions.GetOuterScope
+                    || i == AVM2Instructions.InitProperty
+                    || i == AVM2Instructions.DeleteProperty
+                    || i == AVM2Instructions.GetSlot
+                    || i == AVM2Instructions.SetSlot
+                    || i == AVM2Instructions.GetGlobalSlot
+                    || i == AVM2Instructions.SetGlobalSlot
+                    || i == AVM2Instructions.CheckFilter
+                    || i == AVM2Instructions.AsType // todo: fix
+                    || i == AVM2Instructions.AsTypeLate
+                    || i == AVM2Instructions.InstanceOf
+                    || i == AVM2Instructions.IsType
+                    || i == AVM2Instructions.IsTypeLate
+                    || i == AVM2Instructions.In
+                    || i == AVM2Instructions.SubtractI // todo: implement
+                    || i == AVM2Instructions.MultiplyI // todo: implement
+                    || i == AVM2Instructions.BkptLine // todo: implement
+                    ) {
                 continue;
             }
 
-            System.out.println("Instruction code: " + Integer.toHexString(i) + " (" + i + ")");
+            System.out.println("Instruction code: " + Integer.toHexString(i) + " (" + i + ") " + AVM2Code.instructionSet[i].instructionName);
             int j = 1;
             File f2 = new File("run_test_" + new Date().getTime() + "_" + i + "_" + j + ".swf");
             f2.deleteOnExit();
@@ -185,6 +231,10 @@ public class FlashPlayerTest {
             List<AVM2Instruction> code = ccode.code;
             code.add(new AVM2Instruction(0, AVM2Instructions.GetLocal0, null));
             code.add(new AVM2Instruction(0, AVM2Instructions.PushScope, null));
+            code.add(new AVM2Instruction(0, AVM2Instructions.PushByte, new int[]{10}));
+            code.add(new AVM2Instruction(0, AVM2Instructions.SetLocal0, null));
+            code.add(new AVM2Instruction(0, AVM2Instructions.PushByte, new int[]{11}));
+            code.add(new AVM2Instruction(0, AVM2Instructions.SetLocal1, null));
             code.add(new AVM2Instruction(0, AVM2Instructions.PushByte, new int[]{0}));
             code.add(new AVM2Instruction(0, AVM2Instructions.PushByte, new int[]{1}));
             code.add(new AVM2Instruction(0, AVM2Instructions.PushByte, new int[]{2}));
@@ -200,17 +250,16 @@ public class FlashPlayerTest {
                     }
                 }
 
-                ifType = false; // todo: ins instanceof IfTypeIns;
+                ifType = ins instanceof IfTypeIns;
                 if (ifType) {
-                    params[0] = 8;
+                    params[0] = 3;
                 }
             }
 
-            code.add(new AVM2Instruction(0, /*getOpIns(i)*/ ins, params));
+            code.add(new AVM2Instruction(0, ins, params));
             if (ifType) {
-                code.add(new AVM2Instruction(0, AVM2Instructions.PushByte, new int[]{3}));
-                code.add(new AVM2Instruction(0, AVM2Instructions.Jump, new int[]{2}));
-                code.add(new AVM2Instruction(0, AVM2Instructions.PushByte, new int[]{4}));
+                code.add(new AVM2Instruction(0, AVM2Instructions.PushString, new int[]{1}));
+                code.add(new AVM2Instruction(0, AVM2Instructions.ReturnValue, null));
             }
 
             code.add(new AVM2Instruction(0, AVM2Instructions.Dup, null));
@@ -239,7 +288,13 @@ public class FlashPlayerTest {
             String flashResult = resultRef.getVal();
             System.out.println("Flash result: " + flashResult);
 
-            String ffdecExecuteResult = (String) ccode.execute(new HashMap<>(), abc.constants);
+            String ffdecExecuteResult;
+            try {
+                ffdecExecuteResult = EcmaScript.toString(ccode.execute(new HashMap<>(), abc.constants, AVM2Runtime.ADOBE_FLASH, 19));
+            } catch (AVM2ExecutionException ex) {
+                ffdecExecuteResult = ex.getMessage();
+            }
+
             System.out.println("FFDec execte result: " + ffdecExecuteResult);
 
             Assert.assertEquals(ffdecExecuteResult, flashResult);
@@ -301,7 +356,7 @@ public class FlashPlayerTest {
                 Action opAction = getOpAction(j);
 
                 if (j >= 13 + 23) {
-                    newActions.add(new ActionPush("mystring"));
+                    newActions.add(new ActionPush("mystring_árvíztűrő_tükörfúrógép"));
                 }
 
                 if (j >= 13) {
@@ -409,37 +464,6 @@ public class FlashPlayerTest {
                 f2.delete();
             }
         }
-    }
-
-    private int getOpIns(int idx) {
-        switch (idx) {
-            case 0:
-                return AVM2Instructions.BitAnd;
-            case 1:
-                return AVM2Instructions.Add;
-            case 2:
-                return AVM2Instructions.LShift;
-            case 3:
-                return AVM2Instructions.BitOr;
-            case 4:
-                return AVM2Instructions.RShift;
-            case 5:
-                return AVM2Instructions.URShift;
-            case 6:
-                return AVM2Instructions.BitXor;
-            case 7:
-                return AVM2Instructions.Divide;
-            case 8:
-                return AVM2Instructions.Equals;
-            case 9:
-                return AVM2Instructions.Modulo;
-            case 10:
-                return AVM2Instructions.Multiply;
-            case 11:
-                return AVM2Instructions.Subtract;
-        }
-
-        throw new Error("Invalid index");
     }
 
     private Action getOpAction(int idx) {

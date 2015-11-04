@@ -12,19 +12,16 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-package com.jpexs.decompiler.flash.abc.avm2.instructions;
+ * License along with this library. */
+package com.jpexs.decompiler.flash.abc.avm2;
 
 /**
  *
  * @author JPEXS
  */
-public class TagInstruction extends InstructionDefinition {
+public class AVM2ExecutionException extends Exception {
 
-    public static final long serialVersionUID = 1L;
-
-    public TagInstruction(String tagName) {
-        super(-1, tagName, new int[0], false /*?*/);
+    public AVM2ExecutionException(String message) {
+        super(message);
     }
 }

@@ -12,20 +12,14 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
+ * License along with this library. */
+package com.jpexs.decompiler.flash.abc.avm2;
+
+/**
+ *
+ * @author JPEXS
  */
-package com.jpexs.decompiler.flash.abc.avm2.instructions.localregs;
+public enum AVM2Runtime {
 
-import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-
-public class GetLocal0Ins extends GetLocalTypeIns {
-
-    public GetLocal0Ins() {
-        super(0xd0, "getlocal_0", new int[]{}, false);
-    }
-
-    @Override
-    public int getRegisterId(AVM2Instruction par0) {
-        return 0;
-    }
+    UNKNOWN, ADOBE_FLASH
 }

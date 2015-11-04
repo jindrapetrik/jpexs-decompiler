@@ -18,9 +18,12 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.AlchemyStoreAVM2Item;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
@@ -33,6 +36,15 @@ public class Si16Ins extends InstructionDefinition implements AlchemyTypeIns {
 
     public Si16Ins() {
         super(0x3B, "si16", new int[]{}, true);
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+        Double value = (double) EcmaScript.toNumber(lda.operandStack.pop());
+        int addr = (int) (double) EcmaScript.toNumber(lda.operandStack.pop());
+        // todo: set domainMemory
+        //lda.getDomainMemory()[addr] = ...
+        return true;
     }
 
     @Override

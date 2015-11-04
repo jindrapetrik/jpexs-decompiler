@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions.localregs;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.SetTypeIns;
@@ -45,6 +46,12 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
 
     public SetLocalTypeIns(int instructionCode, String instructionName, int[] operands, boolean canThrow) {
         super(instructionCode, instructionName, operands, canThrow);
+    }
+
+    @Override
+    public boolean execute(com.jpexs.decompiler.flash.abc.avm2.LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+        lda.localRegisters.put(getRegisterId(ins), lda.operandStack.pop());
+        return true;
     }
 
     @Override

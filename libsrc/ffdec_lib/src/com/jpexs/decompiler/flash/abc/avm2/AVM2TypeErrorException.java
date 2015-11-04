@@ -12,20 +12,33 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
+ * License along with this library. */
+package com.jpexs.decompiler.flash.abc.avm2;
+
+/**
+ *
+ * @author JPEXS
  */
-package com.jpexs.decompiler.flash.abc.avm2.instructions.localregs;
+public class AVM2TypeErrorException extends AVM2ExecutionException {
 
-import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-
-public class GetLocal0Ins extends GetLocalTypeIns {
-
-    public GetLocal0Ins() {
-        super(0xd0, "getlocal_0", new int[]{}, false);
+    public AVM2TypeErrorException(int code) {
+        super(codeToMessage(code, null));
     }
 
-    @Override
-    public int getRegisterId(AVM2Instruction par0) {
-        return 0;
+    public AVM2TypeErrorException(int code, Object[] params) {
+        super(codeToMessage(code, params));
+    }
+
+    private static String codeToMessage(int code, Object[] params) {
+        String msg = null;
+        switch (code) {
+        }
+
+        String result = "TypeError: Error #" + code;
+        /*if (msg != null) {
+         result += ": " + msg;
+         }*/
+
+        return result;
     }
 }

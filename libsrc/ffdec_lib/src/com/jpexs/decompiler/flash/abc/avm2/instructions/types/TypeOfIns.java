@@ -18,9 +18,13 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions.types;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.TypeOfAVM2Item;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.flash.ecma.EcmaType;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
@@ -29,6 +33,41 @@ public class TypeOfIns extends InstructionDefinition {
 
     public TypeOfIns() {
         super(0x95, "typeof", new int[]{}, false);
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+        Object res = lda.operandStack.pop();
+        EcmaType type = EcmaScript.type(res);
+        String typeStr;
+        switch (type) {
+            case STRING:
+                typeStr = "string";
+                break;
+            case BOOLEAN:
+                typeStr = "boolean";
+                break;
+            case NUMBER:
+                typeStr = "number";
+                break;
+            case OBJECT:
+                typeStr = "object";
+                break;
+            case UNDEFINED:
+                typeStr = "undefined";
+                break;
+            case NULL:
+                // note: null is object in AS3
+                typeStr = "object";
+                break;
+            default:
+                //TODO: function,movieclip
+                typeStr = "object";
+                break;
+        }
+
+        lda.operandStack.push(typeStr);
+        return true;
     }
 
     @Override

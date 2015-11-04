@@ -21,6 +21,8 @@ import java.util.Stack;
 
 public class LocalDataArea {
 
+    public String methodName;
+
     public Stack<Object> operandStack = new Stack<>();
 
     public Stack<Object> scopeStack = new Stack<>();
@@ -32,6 +34,23 @@ public class LocalDataArea {
     public Object returnValue;
 
     public String executionException;
+
+    public AVM2Runtime runtime;
+
+    public int runtimeVersion;
+
+    private byte[] domainMemory;
+
+    public LocalDataArea() {
+    }
+
+    public byte[] getDomainMemory() {
+        if (domainMemory == null) {
+            domainMemory = new byte[1024 * 1024];
+        }
+
+        return domainMemory;
+    }
 
     public void clear() {
         operandStack.clear();

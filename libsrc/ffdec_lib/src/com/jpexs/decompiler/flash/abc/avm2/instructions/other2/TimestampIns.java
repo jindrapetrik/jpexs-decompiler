@@ -16,11 +16,20 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.other2;
 
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
 public class TimestampIns extends InstructionDefinition {
 
     public TimestampIns() {
         super(0xF3, "timestamp", new int[]{}, false /*?*/);
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+        // Appears to be a no-op.
+        return true;
     }
 }

@@ -41,7 +41,6 @@ public class GetDescendantsIns extends InstructionDefinition {
          //if is runtime
          //pop(name), pop(ns)
          Object obj = lda.operandStack.pop();*/
-        lda.executionException = "getdescendants not working";
         return false;
     }
 

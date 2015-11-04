@@ -16,20 +16,12 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.localregs;
 
-import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
-import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 
 public class GetLocal3Ins extends GetLocalTypeIns {
 
     public GetLocal3Ins() {
         super(0xd3, "getlocal_3", new int[]{}, false);
-    }
-
-    @Override
-    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
-        lda.operandStack.push(lda.localRegisters.get(3));
-        return true;
     }
 
     @Override
