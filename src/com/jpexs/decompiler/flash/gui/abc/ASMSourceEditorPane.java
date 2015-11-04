@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ExecutionException;
 import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2Graph;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.ASM3Parser;
@@ -199,8 +200,12 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
         HashMap<Integer, Object> args = new HashMap<>();
         args.put(0, new Object()); //object "this"
         args.put(1, 466561L); //param1
-        Object o = abc.bodies.get(bodyIndex).getCode().execute(args, abc.constants);
-        View.showMessageDialog(this, "Returned object:" + o.toString());
+        try {
+            Object o = abc.bodies.get(bodyIndex).getCode().execute(args, abc.constants);
+            View.showMessageDialog(this, "Returned object:" + o.toString());
+        } catch (AVM2ExecutionException ex) {
+            Logger.getLogger(ASMSourceEditorPane.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public boolean save() {
