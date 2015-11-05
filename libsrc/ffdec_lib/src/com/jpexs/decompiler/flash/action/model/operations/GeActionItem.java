@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.action.swf4.ActionLess;
 import com.jpexs.decompiler.flash.action.swf4.ActionNot;
 import com.jpexs.decompiler.flash.action.swf5.ActionLess2;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -44,14 +45,13 @@ public class GeActionItem extends BinaryOpItem implements LogicalOpItem, Inverte
     @Override
     public Object getResult() {
         if (version2) {
-            Object ret = EcmaScript.compare(leftSide.getResult(), rightSide.getResult());
-            if (ret == Boolean.TRUE) {
-                return Boolean.FALSE;
+            Object ret = EcmaScript.compare(leftSide.getResult(), rightSide.getResult(), true);
+            if (ret == Undefined.INSTANCE) {
+                return ret;
             }
-            if (ret == Boolean.FALSE) {
-                return Boolean.TRUE;
-            }
-            return ret;//undefined
+
+            int reti = (int) ret;
+            return reti != -1;
         } else {
             //For SWF 4 and older, it should return 1 or 0
             return Action.toFloatPoint(leftSide.getResult()) >= Action.toFloatPoint(rightSide.getResult());

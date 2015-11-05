@@ -40,7 +40,6 @@ public class SubtractIns extends InstructionDefinition {
         Object left = lda.operandStack.pop();
         Double ret = EcmaScript.toNumber(left) - EcmaScript.toNumber(right);
         lda.operandStack.push(ret);
-
         return true;
     }
 

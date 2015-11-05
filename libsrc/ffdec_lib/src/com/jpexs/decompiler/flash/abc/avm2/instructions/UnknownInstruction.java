@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2.instructions;
 
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
-import com.jpexs.decompiler.flash.abc.avm2.AVM2ExecutionException;
+import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2ExecutionException;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 
 /**

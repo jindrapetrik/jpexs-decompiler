@@ -69,10 +69,10 @@ public class StringExtractActionItem extends ActionItem {
 
     public static String getResult(Object count, Object index, Object value) {
         String str = EcmaScript.toString(value);
-        int idx = (int) (double) EcmaScript.toNumber(index);
+        int idx = (int) (double) EcmaScript.toNumberAs2(index);
         idx--; // index seems to be 1 based
 
-        int cnt = (int) (double) EcmaScript.toNumber(count);
+        int cnt = (int) (double) EcmaScript.toNumberAs2(count);
 
         /*if (idx < 0) {
          idx = str.length() + idx;

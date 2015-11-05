@@ -38,7 +38,7 @@ public class CoerceOIns extends InstructionDefinition implements CoerceOrConvert
     public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         Object value = lda.operandStack.pop();
         // The only action appears to be to convert undefined to null.
-        if (value instanceof Undefined) {
+        if (value == Undefined.INSTANCE) {
             value = Null.INSTANCE;
         }
 

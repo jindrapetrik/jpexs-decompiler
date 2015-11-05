@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
 import com.jpexs.decompiler.flash.action.swf4.ActionLess;
 import com.jpexs.decompiler.flash.action.swf5.ActionLess2;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -47,7 +48,13 @@ public class LtActionItem extends BinaryOpItem implements LogicalOpItem {
 
     public static Object getResult(Object rightResult, Object leftResult, boolean version2) {
         if (version2) {
-            return EcmaScript.compare(leftResult, rightResult);
+            Object ret = EcmaScript.compare(leftResult, rightResult, true);
+            if (ret == Undefined.INSTANCE) {
+                return ret;
+            }
+
+            int reti = (int) ret;
+            return reti == -1;
         } else {
             //For SWF 4 and older, it should return 1 or 0
             return Action.toFloatPoint(leftResult) < Action.toFloatPoint(rightResult);

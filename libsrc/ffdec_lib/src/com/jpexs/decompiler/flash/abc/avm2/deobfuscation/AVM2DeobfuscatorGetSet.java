@@ -95,10 +95,10 @@ public class AVM2DeobfuscatorGetSet implements SWFDecompilerListener {
             }
             return new AVM2Instruction(0, AVM2Instructions.PushFalse, null);
         }
-        if (ovalue instanceof Null) {
+        if (ovalue == Null.INSTANCE) {
             return new AVM2Instruction(0, AVM2Instructions.PushNull, null);
         }
-        if (ovalue instanceof Undefined) {
+        if (ovalue == Undefined.INSTANCE) {
             return new AVM2Instruction(0, AVM2Instructions.PushUndefined, null);
         }
         return null;
@@ -281,5 +281,4 @@ public class AVM2DeobfuscatorGetSet implements SWFDecompilerListener {
         removeUnreachableInstructions(code, body);
         removeObfuscationGetSets(classIndex, isStatic, scriptIndex, abc, body, new ArrayList<>());
     }
-
 }

@@ -18,17 +18,36 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.AddAVM2Item;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.flash.ecma.EcmaType;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
-public class AddIIns extends AddIns {
+public class AddIIns extends InstructionDefinition {
 
     public AddIIns() {
-        instructionName = "add_i";
-        instructionCode = 0xc5;
+        super(0xc5, "add_i", new int[]{}, true);
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+        Object right = lda.operandStack.pop();
+        Object left = lda.operandStack.pop();
+        if (EcmaScript.type(left) == EcmaType.STRING || EcmaScript.type(right) == EcmaType.STRING) {
+            String ret = EcmaScript.toString(left) + EcmaScript.toString(right);
+            lda.operandStack.push(ret);
+        } else {
+            int ret = EcmaScript.toInt32(left) + EcmaScript.toInt32(right);
+            lda.operandStack.push(ret);
+        }
+
+        return true;
     }
 
     @Override

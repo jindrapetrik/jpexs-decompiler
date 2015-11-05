@@ -737,7 +737,7 @@ public abstract class Action implements GraphSourceItem {
     protected long popLong(TranslateStack stack) {
         GraphTargetItem item = stack.pop();
         if (item instanceof DirectValueActionItem) {
-            return (long) (double) EcmaScript.toNumber(((DirectValueActionItem) item).value);
+            return (long) (double) EcmaScript.toNumberAs2(((DirectValueActionItem) item).value);
         }
 
         return 0;
@@ -1021,7 +1021,7 @@ public abstract class Action implements GraphSourceItem {
             }
 
             //return in for..in
-            if ((action instanceof ActionPush) && (((ActionPush) action).values.size() == 1) && (((ActionPush) action).values.get(0) instanceof Null)) {
+            if ((action instanceof ActionPush) && (((ActionPush) action).values.size() == 1) && (((ActionPush) action).values.get(0) == Null.INSTANCE)) {
                 if (ip + 3 <= end) {
                     if ((actions.get(ip + 1) instanceof ActionEquals) || (actions.get(ip + 1) instanceof ActionEquals2)) {
                         if (actions.get(ip + 2) instanceof ActionNot) {
@@ -1355,10 +1355,10 @@ public abstract class Action implements GraphSourceItem {
         if (o instanceof Long) {
             return (Long) o;
         }
-        if (o instanceof Null) {
+        if (o == Null.INSTANCE) {
             return Double.NaN;
         }
-        if (o instanceof Undefined) {
+        if (o == Undefined.INSTANCE) {
             return Double.NaN;
         }
         if (o instanceof Boolean) {

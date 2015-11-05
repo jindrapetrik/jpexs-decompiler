@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -54,13 +55,12 @@ public class GeAVM2Item extends BinaryOpItem implements LogicalOpItem, IfConditi
     @Override
     public Object getResult() {
         Object ret = EcmaScript.compare(leftSide.getResult(), rightSide.getResult());
-        if (ret == Boolean.TRUE) {
-            return Boolean.FALSE;
+        if (ret == Undefined.INSTANCE) {
+            return ret;
         }
-        if (ret == Boolean.FALSE) {
-            return Boolean.TRUE;
-        }
-        return ret;//undefined
+
+        int reti = (int) ret;
+        return reti != -1;
     }
 
     @Override

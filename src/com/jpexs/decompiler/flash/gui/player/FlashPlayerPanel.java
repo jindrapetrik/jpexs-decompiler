@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.gui.player;
 
 import com.jpexs.decompiler.flash.gui.FlashUnsupportedException;
 import com.jpexs.decompiler.flash.gui.Main;
-import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.javactivex.ActiveX;
 import com.jpexs.javactivex.ActiveXEvent;
 import com.jpexs.javactivex.ActiveXException;
@@ -36,11 +35,8 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -253,6 +249,7 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
     private String movieToPlay = null;
 
     private Thread playQueue;
+
     private Object queueLock = new Object();
 
     public synchronized void displaySWF(final String flashName, final Color bgColor, final float frameRate) {

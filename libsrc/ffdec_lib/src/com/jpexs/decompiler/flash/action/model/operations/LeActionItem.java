@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.action.swf4.ActionNot;
 import com.jpexs.decompiler.flash.action.swf5.ActionLess2;
 import com.jpexs.decompiler.flash.action.swf6.ActionGreater;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -40,14 +41,13 @@ public class LeActionItem extends BinaryOpItem implements LogicalOpItem, Inverte
 
     @Override
     public Object getResult() {
-        Object ret = EcmaScript.compare(rightSide.getResult(), leftSide.getResult());
-        if (ret == Boolean.TRUE) {
-            return Boolean.FALSE;
+        Object ret = EcmaScript.compare(rightSide.getResult(), leftSide.getResult(), true);
+        if (ret == Undefined.INSTANCE) {
+            return ret;
         }
-        if (ret == Boolean.FALSE) {
-            return Boolean.TRUE;
-        }
-        return ret;//undefined
+
+        int reti = (int) ret;
+        return reti != -1;
     }
 
     @Override

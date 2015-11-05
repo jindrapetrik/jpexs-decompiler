@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.ModuloAVM2Item;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
@@ -35,16 +36,10 @@ public class ModuloIns extends InstructionDefinition {
 
     @Override
     public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
-        Object o1 = lda.operandStack.pop();
-        Object o2 = lda.operandStack.pop();
-
-        if ((o1 instanceof Long) && ((o2 instanceof Long))) {
-            Long ret = ((Long) o2) % ((Long) o1);
-            lda.operandStack.push(ret);
-        } else {
-            lda.executionException = "Cannot modulo";
-            return false;
-        }
+        Object right = lda.operandStack.pop();
+        Object left = lda.operandStack.pop();
+        Double ret = EcmaScript.toNumber(left) % EcmaScript.toNumber(right);
+        lda.operandStack.push(ret);
         return true;
     }
 

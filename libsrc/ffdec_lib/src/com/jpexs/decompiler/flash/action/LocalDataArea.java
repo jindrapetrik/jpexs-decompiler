@@ -59,6 +59,6 @@ public class LocalDataArea {
     }
 
     public Double popAsNumber() {
-        return EcmaScript.toNumber(stack.pop());
+        return EcmaScript.toNumberAs2(stack.pop());
     }
 }

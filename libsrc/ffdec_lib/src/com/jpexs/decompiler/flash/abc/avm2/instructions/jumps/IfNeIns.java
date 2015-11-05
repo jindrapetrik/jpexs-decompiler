@@ -40,10 +40,10 @@ public class IfNeIns extends InstructionDefinition implements IfTypeIns {
 
     @Override
     public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
-        Double right = EcmaScript.toNumber(lda.operandStack.pop());
-        Double left = EcmaScript.toNumber(lda.operandStack.pop());
+        Object rightObj = lda.operandStack.pop();
+        Object leftObj = lda.operandStack.pop();
 
-        if (left != right) {
+        if (!EcmaScript.equals(leftObj, rightObj)) {
             lda.jump = ins.getParamAsLong(constants, 0);
         }
 
