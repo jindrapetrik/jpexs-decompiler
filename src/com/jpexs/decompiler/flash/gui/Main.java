@@ -16,6 +16,16 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.debugger.flash.DebugConnectionListener;
+import com.jpexs.debugger.flash.DebugMessageListener;
+import com.jpexs.debugger.flash.Debugger;
+import com.jpexs.debugger.flash.DebuggerCommands;
+import com.jpexs.debugger.flash.DebuggerConnection;
+import com.jpexs.debugger.flash.messages.in.InAskBreakpoints;
+import com.jpexs.debugger.flash.messages.in.InBreakAt;
+import com.jpexs.debugger.flash.messages.in.InNumScript;
+import com.jpexs.debugger.flash.messages.in.InScript;
+import com.jpexs.debugger.flash.messages.in.InSwfInfo;
 import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.SWF;
@@ -79,8 +89,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -136,6 +148,8 @@ public class Main {
     public static DebugLogDialog debugDialog;
 
     public static boolean shouldCloseWhenClosingLoadingDialog;
+
+    private static Debugger flashDebugger;
 
     public static void ensureMainFrame() {
         if (mainFrame == null) {
@@ -1001,6 +1015,22 @@ public class Main {
             public void onFinish(String clientId) {
             }
         });
+
+        try {
+
+            /*Level level = Level.FINE;
+
+             Logger rootLog = Logger.getLogger("");
+             rootLog.setLevel(level);
+             rootLog.getHandlers()[0].setLevel(level);
+             */
+            flashDebugger = new Debugger();
+            flashDebugger.addConnectionListener(new DebuggerHandler());
+            flashDebugger.start();
+        } catch (IOException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 
     public static void showModeFrame() {
@@ -1203,7 +1233,6 @@ public class Main {
      * @throws IOException On error
      */
     public static void main(String[] args) throws IOException {
-
         clearTemp();
 
         try {

@@ -32,6 +32,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.plaf.TextUI;
@@ -64,6 +66,15 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
     private static final HighlightPainter underLinePainter = new UnderLinePainter(new Color(0, 0, 255));
 
     private LinkHandler linkHandler = this;
+
+    private Map<Integer, Color> lineColors = new HashMap<>();
+
+    public void setLineColor(int line, Color color) {
+        lineColors.remove(line);
+        if (color != null) {
+            lineColors.put(line, color);
+        }
+    }
 
     public int getLine() {
         return lastLine;
@@ -358,16 +369,21 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
     public void paint(Graphics g) {
         g.setColor(Color.white);
         g.fillRect(0, 0, getWidth(), getHeight());
+        FontMetrics fontMetrics = g.getFontMetrics();
+        int lh = fontMetrics.getHeight();
+        int d = fontMetrics.getDescent();
+
         if (lastLine > 0) {
-            FontMetrics fontMetrics = g.getFontMetrics();
-            int lh = fontMetrics.getHeight();
-            int d = fontMetrics.getDescent();
             if (error) {
                 g.setColor(new Color(255, 200, 200));
             } else {
                 g.setColor(new Color(0xee, 0xee, 0xee));
             }
             g.fillRect(0, d + lh * lastLine - 1, getWidth(), lh);
+        }
+        for (int line : lineColors.keySet()) {
+            g.setColor(lineColors.get(line));
+            g.fillRect(0, d + lh * line - 1, getWidth(), lh);
         }
         super.paint(g);
     }

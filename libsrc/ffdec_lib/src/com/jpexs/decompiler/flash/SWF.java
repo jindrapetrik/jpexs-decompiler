@@ -3095,13 +3095,13 @@ public final class SWF implements SWFContainerItem, Timelined {
      *
      * @param injectCode Modify AS3 code with debugfile / debugline ?
      */
-    public void enableDebugging(boolean injectCode) {
+    public void enableDebugging(boolean injectCode, File decompileDir) {
 
         if (injectCode) {
             List<ScriptPack> packs = getAS3Packs();
             for (ScriptPack s : packs) {
                 if (s.isSimple) {
-                    s.injectDebugInfo();
+                    s.injectDebugInfo(decompileDir);
                 }
             }
         }

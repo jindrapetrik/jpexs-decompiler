@@ -117,6 +117,10 @@ public final class MethodBody implements Cloneable {
         this.code = null;
     }
 
+    public void setModified() {
+        this.codeBytes = null;
+    }
+
     public synchronized byte[] getCodeBytes() {
         if (codeBytes != null) {
             return codeBytes;

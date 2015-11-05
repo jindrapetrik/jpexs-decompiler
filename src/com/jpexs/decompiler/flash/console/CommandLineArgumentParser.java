@@ -2802,7 +2802,7 @@ public class CommandLineArgumentParser {
             FileInputStream fis = new FileInputStream(file);
             SWF swf = new SWF(fis, Configuration.parallelSpeedUp.get());
             fis.close();
-            swf.enableDebugging(injectas3);
+            swf.enableDebugging(injectas3, new File(outfile).getParentFile());
             FileOutputStream fos = new FileOutputStream(outfile);
             swf.saveTo(fos);
             fos.close();

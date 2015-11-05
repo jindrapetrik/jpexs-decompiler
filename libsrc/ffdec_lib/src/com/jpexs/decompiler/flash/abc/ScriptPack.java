@@ -52,6 +52,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -315,7 +316,7 @@ public class ScriptPack extends AS3ClassTreeItem {
      * Based on idea of Jacob Thompson
      * http://securityevaluators.com/knowledge/flash/
      */
-    public void injectDebugInfo() {
+    public void injectDebugInfo(File directoryPath) {
         Map<Integer, Map<Integer, Integer>> bodyToPosToLine = new HashMap<>();
         try {
             CachedDecompilation decompiled = SWF.getCached(this);
@@ -358,7 +359,7 @@ public class ScriptPack extends AS3ClassTreeItem {
                 }
                 int pos = -1;
                 try {
-                    abc.bodies.get(bodyIndex).getCode().adr2pos(instrOffset);
+                    pos = abc.bodies.get(bodyIndex).getCode().adr2pos(instrOffset);
                 } catch (ConvertException cex) {
                     //ignore
                 }
@@ -375,7 +376,10 @@ public class ScriptPack extends AS3ClassTreeItem {
             Logger.getLogger(ScriptPack.class.getName()).log(Level.SEVERE, "Cannot decompile", ex);
         }
 
-        String filename = path.toString().replace('.', '/') + ".as";
+        //String filepath = path.toString().replace('.', '/') + ".as";
+        String pkg = path.packageStr.toString();
+        String cls = path.className;
+        String filename = new File(directoryPath, path.packageStr.toFilePath()) + ";" + pkg + ";" + cls + ".as";
 
         for (int bodyIndex : bodyToPosToLine.keySet()) {
             MethodBody b = abc.bodies.get(bodyIndex);
@@ -383,11 +387,19 @@ public class ScriptPack extends AS3ClassTreeItem {
             List<Integer> pos = new ArrayList<>(bodyToPosToLine.get(bodyIndex).keySet());
             Collections.sort(pos);
             Collections.reverse(pos);
+            Set<Integer> addedLines = new HashSet<>();
             for (int i : pos) {
                 int line = bodyToPosToLine.get(bodyIndex).get(i);
+                if (addedLines.contains(line)) {
+                    continue;
+                }
+                addedLines.add(line);
+                Logger.getLogger(ScriptPack.class.getName()).log(Level.WARNING, "Script " + path + ": Insert debugline(" + line + ") at pos " + i + " to body " + bodyIndex);
                 b.insertInstruction(i, new AVM2Instruction(0, AVM2Instructions.DebugLine, new int[]{line}));
             }
+            b.setModified();
         }
+
         ((Tag) abc.parentTag).setModified(true);
     }
 }

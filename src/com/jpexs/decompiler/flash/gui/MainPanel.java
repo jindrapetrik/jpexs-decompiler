@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFBundle;
 import com.jpexs.decompiler.flash.SWFSourceInfo;
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
@@ -1523,6 +1524,32 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             if (f != null) {
                 setTagTreeSelectedNode(f);
             }
+        }
+    }
+
+    public void gotoClassLine(SWF swf, String cls, int line) {
+        gotoClass(swf, cls);
+        if (abcPanel != null) {
+            abcPanel.decompiledTextArea.selectLine(line);
+        }
+    }
+
+    public void debuggerBreakAt(SWF swf, String cls, int line) {
+        gotoClassLine(swf, cls, line);
+        if (abcPanel != null) {
+            abcPanel.decompiledTextArea.setLineColor(line, Color.green);
+        }
+    }
+
+    public void gotoClass(SWF swf, String cls) {
+        if (swf == null) {
+            return;
+        }
+        List<ABCContainerTag> abcList = swf.getAbcList();
+        if (!abcList.isEmpty()) {
+            ABCPanel abcPanel = getABCPanel();
+            abcPanel.setAbc(abcList.get(0).getABC());
+            abcPanel.hilightScript(swf, cls);
         }
     }
 
