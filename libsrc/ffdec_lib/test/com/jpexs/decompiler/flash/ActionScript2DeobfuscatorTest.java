@@ -43,7 +43,7 @@ import org.testng.annotations.Test;
  *
  * @author JPEXS
  */
-public class ActionScript2DeobfuscatorTest extends ActionStript2TestBase {
+public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
 
     @BeforeClass
     public void init() throws IOException, InterruptedException {

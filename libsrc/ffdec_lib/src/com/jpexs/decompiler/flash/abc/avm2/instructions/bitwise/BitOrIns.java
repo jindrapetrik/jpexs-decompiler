@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.BitOrAVM2Item;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
@@ -35,9 +36,9 @@ public class BitOrIns extends InstructionDefinition {
 
     @Override
     public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
-        Long value2 = (Long) lda.operandStack.pop();
-        Long value1 = (Long) lda.operandStack.pop();
-        Long value3 = value1 | value2;
+        long value2 = EcmaScript.toInt32(lda.operandStack.pop());
+        long value1 = EcmaScript.toInt32(lda.operandStack.pop());
+        long value3 = value1 | value2;
         lda.operandStack.push(value3);
         return true;
     }

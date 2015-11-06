@@ -351,7 +351,7 @@ public class EcmaScript {
             return 0L;
         }
         long posInt = (long) (double) (Math.signum(n) * Math.floor(Math.abs(n)));
-        posInt %= (1L << 32);
+        posInt &= 0xffffffffL;
         return posInt;
     }
 

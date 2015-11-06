@@ -28,7 +28,7 @@ import org.testng.annotations.Test;
  *
  * @author JPEXS
  */
-public class ActionScript2ParserTest extends ActionStript2TestBase {
+public class ActionScript2ParserTest extends ActionScript2TestBase {
 
     @BeforeClass
     public void init() throws IOException, InterruptedException {

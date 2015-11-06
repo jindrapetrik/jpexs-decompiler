@@ -24,7 +24,6 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.AddAVM2Item;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
-import com.jpexs.decompiler.flash.ecma.EcmaType;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
@@ -39,14 +38,8 @@ public class AddIIns extends InstructionDefinition {
     public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         Object right = lda.operandStack.pop();
         Object left = lda.operandStack.pop();
-        if (EcmaScript.type(left) == EcmaType.STRING || EcmaScript.type(right) == EcmaType.STRING) {
-            String ret = EcmaScript.toString(left) + EcmaScript.toString(right);
-            lda.operandStack.push(ret);
-        } else {
-            int ret = EcmaScript.toInt32(left) + EcmaScript.toInt32(right);
-            lda.operandStack.push(ret);
-        }
-
+        int ret = EcmaScript.toInt32(left) + EcmaScript.toInt32(right);
+        lda.operandStack.push(ret);
         return true;
     }
 

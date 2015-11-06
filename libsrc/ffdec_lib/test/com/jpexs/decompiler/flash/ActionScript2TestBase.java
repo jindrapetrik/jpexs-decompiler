@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.tags.DoActionTag;
@@ -22,7 +23,7 @@ import com.jpexs.decompiler.flash.tags.Tag;
  *
  * @author JPEXS
  */
-public class ActionStript2TestBase extends ActionScriptTestBase {
+public class ActionScript2TestBase extends ActionScriptTestBase {
 
     protected SWF swf;
 

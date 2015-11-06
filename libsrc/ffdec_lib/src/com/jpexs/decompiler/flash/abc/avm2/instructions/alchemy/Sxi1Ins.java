@@ -40,8 +40,7 @@ public class Sxi1Ins extends InstructionDefinition implements AlchemyTypeIns {
 
     @Override
     public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
-        Double value = (double) (((int) (double) EcmaScript.toNumber(lda.operandStack.pop())) & 1);
-        // todo: extend value to 32 bits
+        int value = -(EcmaScript.toInt32(lda.operandStack.pop()) & 0x1);
         lda.operandStack.push(value);
         return true;
     }

@@ -37,8 +37,8 @@ public class LShiftIns extends InstructionDefinition {
     @Override
     public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         int value2 = EcmaScript.toInt32(lda.operandStack.pop()) & 0x1F;
-        long value1 = EcmaScript.toInt32(lda.operandStack.pop());
-        long value3 = value1 << value2;
+        int value1 = EcmaScript.toInt32(lda.operandStack.pop());
+        int value3 = value1 << value2;
         lda.operandStack.push(value3);
         return true;
     }

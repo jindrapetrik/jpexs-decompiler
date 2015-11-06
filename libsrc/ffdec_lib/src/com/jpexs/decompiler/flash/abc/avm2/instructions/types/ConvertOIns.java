@@ -19,8 +19,8 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions.types;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
-import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2TypeErrorException;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
+import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2TypeErrorException;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
@@ -41,6 +41,10 @@ public class ConvertOIns extends InstructionDefinition implements CoerceOrConver
     @Override
     public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) throws AVM2TypeErrorException {
         Object obj = lda.operandStack.peek();
+        if (EcmaScript.type(obj) == EcmaType.NULL) {
+            throw new AVM2TypeErrorException(1009);
+        }
+
         if (EcmaScript.type(obj) == EcmaType.UNDEFINED) {
             throw new AVM2TypeErrorException(1010);
         }

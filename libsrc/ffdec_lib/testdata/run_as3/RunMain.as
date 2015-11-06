@@ -43,7 +43,7 @@
 			
 			var result;
 			try {
-				result = Run.run();
+				result = testFunction();
 			} catch (e) {
 				result = e.toString();
 			}
@@ -55,7 +55,7 @@
 			try {
 				var result = Run.run();
 				return "Result:" + result + " Type:" + typeof(result);
-			} catch (ex:Error) {
+			} catch (ex) {
 				return "Error:" + ex;
 			}
 		}
