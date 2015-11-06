@@ -18,9 +18,12 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.SubtractAVM2Item;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
@@ -29,6 +32,15 @@ public class SubtractIIns extends InstructionDefinition {
 
     public SubtractIIns() {
         super(0xc6, "subtract_i", new int[]{}, true);
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+        Object right = lda.operandStack.pop();
+        Object left = lda.operandStack.pop();
+        int ret = EcmaScript.toInt32(left) - EcmaScript.toInt32(right);
+        lda.operandStack.push(ret);
+        return true;
     }
 
     @Override

@@ -168,7 +168,7 @@ public class ActionGraph extends Graph {
                         NeqActionItem ne = (NeqActionItem) wi.expression.get(wi.expression.size() - 1);
                         if (ne.rightSide instanceof DirectValueActionItem) {
                             DirectValueActionItem dv = (DirectValueActionItem) ne.rightSide;
-                            if (dv.value instanceof Null) {
+                            if (dv.value == Null.INSTANCE) {
                                 GraphTargetItem en = list.get(t - 1);
                                 if (en instanceof EnumerateActionItem) {
                                     EnumerateActionItem eti = (EnumerateActionItem) en;
@@ -467,7 +467,7 @@ public class ActionGraph extends Graph {
         int oldIp = ip;
         //return in for..in
         GraphSourceItem action = code.get(ip);
-        if ((action instanceof ActionPush) && (((ActionPush) action).values.size() == 1) && (((ActionPush) action).values.get(0) instanceof Null)) {
+        if ((action instanceof ActionPush) && (((ActionPush) action).values.size() == 1) && (((ActionPush) action).values.get(0) == Null.INSTANCE)) {
             if (ip + 4 < code.size()) {
                 if ((code.get(ip + 1) instanceof ActionEquals) || (code.get(ip + 1) instanceof ActionEquals2)) {
                     if (code.get(ip + 2) instanceof ActionNot) {

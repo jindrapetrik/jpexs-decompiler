@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.DivideAVM2Item;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
@@ -35,31 +36,10 @@ public class DivideIns extends InstructionDefinition {
 
     @Override
     public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
-        Object o2 = lda.operandStack.pop();
-        Object o1 = lda.operandStack.pop();
-        if ((o1 instanceof Long) && ((o2 instanceof Long))) {
-            Long l1 = (Long) o1;
-            Long l2 = (Long) o2;
-            if (l1 % l2 == 0) {
-                Long ret = l1 / l2;
-                lda.operandStack.push(ret);
-            } else {
-                Double ret = l1.doubleValue() / l2.doubleValue();
-                lda.operandStack.push(ret);
-            }
-        } else if ((o1 instanceof Double) && ((o2 instanceof Double))) {
-            Double ret = ((Double) o1) / ((Double) o2);
-            lda.operandStack.push(ret);
-        } else if ((o1 instanceof Long) && ((o2 instanceof Double))) {
-            Double ret = ((Long) o1) / ((Double) o2);
-            lda.operandStack.push(ret);
-        } else if ((o1 instanceof Double) && ((o2 instanceof Long))) {
-            Double ret = ((Double) o1) / ((Long) o2);
-            lda.operandStack.push(ret);
-        } else {
-            lda.executionException = "Cannot divide";
-            return false;
-        }
+        Object right = lda.operandStack.pop();
+        Object left = lda.operandStack.pop();
+        Double ret = EcmaScript.toNumber(left) / EcmaScript.toNumber(right);
+        lda.operandStack.push(ret);
         return true;
     }
 

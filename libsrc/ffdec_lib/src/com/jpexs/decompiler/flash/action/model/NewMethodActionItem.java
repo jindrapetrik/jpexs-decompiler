@@ -56,7 +56,7 @@ public class NewMethodActionItem extends ActionItem {
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         boolean blankMethod = false;
         if (methodName instanceof DirectValueActionItem) {
-            if (((DirectValueActionItem) methodName).value instanceof Undefined) {
+            if (((DirectValueActionItem) methodName).value == Undefined.INSTANCE) {
                 blankMethod = true;
             } else if (((DirectValueActionItem) methodName).value instanceof String) {
                 if (((DirectValueActionItem) methodName).value.equals("")) {
@@ -71,7 +71,7 @@ public class NewMethodActionItem extends ActionItem {
         if (!blankMethod) {
             writer.append(".");
             if (methodName instanceof DirectValueActionItem) {
-                if (((DirectValueActionItem) methodName).value instanceof Undefined) {
+                if (((DirectValueActionItem) methodName).value == Undefined.INSTANCE) {
                 } else if (((DirectValueActionItem) methodName).value instanceof String) {
                     ((DirectValueActionItem) methodName).toStringNoQuotes(writer, localData);
                 } else {

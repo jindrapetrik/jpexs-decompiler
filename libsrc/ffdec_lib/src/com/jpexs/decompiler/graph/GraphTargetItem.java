@@ -231,7 +231,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     }
 
     public Double getResultAsNumber() {
-        return EcmaScript.toNumber(getResult());
+        return EcmaScript.toNumberAs2(getResult());
     }
 
     public String toStringNoQuotes(LocalData localData) {
@@ -390,7 +390,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     public long getAsLong() {
         if (this instanceof DirectValueActionItem) {
             DirectValueActionItem dvai = (DirectValueActionItem) this;
-            return (long) (double) EcmaScript.toNumber(dvai.value);
+            return (long) (double) EcmaScript.toNumberAs2(dvai.value);
         }
 
         return 0;

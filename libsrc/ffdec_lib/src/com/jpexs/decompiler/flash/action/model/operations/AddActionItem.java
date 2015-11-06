@@ -71,7 +71,7 @@ public class AddActionItem extends BinaryOpItem {
             if (EcmaScript.type(leftResult) == EcmaType.STRING || EcmaScript.type(rightResult) == EcmaType.STRING) {
                 return EcmaScript.toString(leftResult) + EcmaScript.toString(rightResult);
             }
-            return EcmaScript.toNumber(leftResult) + EcmaScript.toNumber(rightResult);
+            return EcmaScript.toNumberAs2(leftResult) + EcmaScript.toNumberAs2(rightResult);
         } else {
             return Action.toFloatPoint(leftResult) + Action.toFloatPoint(rightResult);
         }

@@ -29,11 +29,11 @@ public class EcmaScript {
         if (o == null) {
             return 0.0;
         }
-        if (o instanceof Undefined) {
+        if (o == Undefined.INSTANCE) {
             return Double.NaN;
         }
-        if (o instanceof Null) {
-            return Double.NaN;
+        if (o == Null.INSTANCE) {
+            return 0.0;
         }
         if (o instanceof Boolean) {
             return (Boolean) o ? 1.0 : 0.0;
@@ -57,6 +57,14 @@ public class EcmaScript {
 
         // todo: ToPrimitive
         return 0.0;
+    }
+
+    public static Double toNumberAs2(Object o) {
+        if (o == Null.INSTANCE) {
+            return Double.NaN;
+        }
+
+        return toNumber(o);
     }
 
     public static EcmaType type(Object o) {
@@ -87,7 +95,43 @@ public class EcmaScript {
         return EcmaType.OBJECT;
     }
 
+    public static String typeString(Object o) {
+        EcmaType type = EcmaScript.type(o);
+        String typeStr;
+        switch (type) {
+            case STRING:
+                typeStr = "string";
+                break;
+            case BOOLEAN:
+                typeStr = "boolean";
+                break;
+            case NUMBER:
+                typeStr = "number";
+                break;
+            case OBJECT:
+                typeStr = "object";
+                break;
+            case UNDEFINED:
+                typeStr = "undefined";
+                break;
+            case NULL:
+                // note: null is object in AS3
+                typeStr = "object";
+                break;
+            default:
+                // todo: function,movieclip
+                typeStr = "object";
+                break;
+        }
+
+        return typeStr;
+    }
+
     public static Object compare(Object x, Object y) {
+        return compare(x, y, false);
+    }
+
+    public static Object compare(Object x, Object y, boolean as2) {
         Object px = x;
         Object py = y;
         /*if (leftFirst) {
@@ -98,45 +142,48 @@ public class EcmaScript {
          px = x;  //toPrimitive
          }*/
         if (type(px) != EcmaType.STRING || type(py) != EcmaType.STRING) {
-            Double nx = toNumber(px);
-            Double ny = toNumber(py);
+            Double nx = as2 ? toNumberAs2(px) : toNumber(px);
+            Double ny = as2 ? toNumberAs2(py) : toNumber(py);
             if (nx.isNaN() || ny.isNaN()) {
                 return Undefined.INSTANCE;
             }
-            if ((nx).compareTo(ny) == 0) {
-                return false;
+            if (nx.compareTo(ny) == 0) {
+                return 0;
             }
-            if ((Double.compare(nx, -0.0) == 0) && (Double.compare(ny, 0.0) == 0)) {
-                return false;
+            if (Double.compare(nx, -0.0) == 0 && Double.compare(ny, 0.0) == 0) {
+                return 0;
             }
-            if ((Double.compare(nx, 0.0) == 0) && (Double.compare(ny, -0.0) == 0)) {
-                return false;
+            if (Double.compare(nx, 0.0) == 0 && Double.compare(ny, -0.0) == 0) {
+                return 0;
             }
             if (nx.isInfinite() && nx > 0) {
-                return false;
+                return 1;
             }
             if (ny.isInfinite() && ny > 0) {
-                return true;
+                return -1;
             }
             if (nx.isInfinite() && nx < 0) {
-                return false;
+                return 1;
             }
             if (ny.isInfinite() && ny < 0) {
-                return true;
+                return -1;
             }
             if (nx.compareTo(ny) < 0) {
-                return true;
+                return -1;
             }
-            return false;
+            return 1;
         } else {//Both are STRING
             String sx = (String) px;
             String sy = (String) py;
 
+            if (sx.equals(sy)) {
+                return 0;
+            }
             if (sx.startsWith(sy)) {
-                return false;
+                return 1;
             }
             if (sy.startsWith(sx)) {
-                return true;
+                return -1;
             }
             int len = sx.length() > sy.length() ? sx.length() : sy.length();
             for (int k = 0; k < len; k++) {
@@ -150,13 +197,13 @@ public class EcmaScript {
                 }
                 if (m != n) {
                     if (m < n) {
-                        return true;
+                        return -1;
                     } else {
-                        return false;
+                        return 1;
                     }
                 }
             }
-            return false;
+            return 0;
         }
     }
 
@@ -253,10 +300,10 @@ public class EcmaScript {
         if (o == null) {
             return false;
         }
-        if (o instanceof Undefined) {
+        if (o == Undefined.INSTANCE) {
             return false;
         }
-        if (o instanceof Null) {
+        if (o == Null.INSTANCE) {
             return false;
         }
         if (o instanceof Boolean) {
@@ -304,7 +351,7 @@ public class EcmaScript {
             return 0L;
         }
         long posInt = (long) (double) (Math.signum(n) * Math.floor(Math.abs(n)));
-        posInt %= (1L << 32);
+        posInt &= 0xffffffffL;
         return posInt;
     }
 

@@ -78,10 +78,10 @@ public class CoerceAVM2Item extends AVM2Item {
         Object ret = value.getResult();
         switch (typeObj.toString()) {
             case "String":
-                if (ret instanceof Null) {
+                if (ret == Null.INSTANCE) {
                     return ret;
                 }
-                if (ret instanceof Undefined) {
+                if (ret == Undefined.INSTANCE) {
                     return Null.INSTANCE;
                 }
                 return ret.toString();

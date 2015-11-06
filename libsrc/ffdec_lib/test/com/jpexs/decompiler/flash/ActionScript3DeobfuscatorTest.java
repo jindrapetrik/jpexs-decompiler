@@ -49,7 +49,7 @@ import org.testng.annotations.Test;
  *
  * @author JPEXS
  */
-public class ActionScript3DeobfuscatorTest extends ActionStript2TestBase {
+public class ActionScript3DeobfuscatorTest extends ActionScript2TestBase {
 
     @BeforeClass
     public void init() throws IOException, InterruptedException {

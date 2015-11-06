@@ -144,9 +144,9 @@ public class ActionPush extends Action {
             } else if (o instanceof Float) {
                 sos.writeUI8(1);
                 sos.writeFLOAT((Float) o);
-            } else if (o instanceof Null) {
+            } else if (o == Null.INSTANCE) {
                 sos.writeUI8(2);
-            } else if (o instanceof Undefined) {
+            } else if (o == Undefined.INSTANCE) {
                 sos.writeUI8(3);
             } else if (o instanceof RegisterNumber) {
                 sos.writeUI8(4);
@@ -194,9 +194,9 @@ public class ActionPush extends Action {
                 res += Utf8Helper.getBytesLength((String) o) + 2;
             } else if (o instanceof Float) {
                 res += 5;
-            } else if (o instanceof Null) {
+            } else if (o == Null.INSTANCE) {
                 res++;
-            } else if (o instanceof Undefined) {
+            } else if (o == Undefined.INSTANCE) {
                 res++;
             } else if (o instanceof RegisterNumber) {
                 res += 2;

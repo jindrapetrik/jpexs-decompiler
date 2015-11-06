@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
+import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2RangeErrorException;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.AlchemyStoreAVM2Item;
@@ -39,11 +40,16 @@ public class Si8Ins extends InstructionDefinition implements AlchemyTypeIns {
     }
 
     @Override
-    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
-        Double value = (double) EcmaScript.toNumber(lda.operandStack.pop());
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) throws AVM2RangeErrorException {
         int addr = (int) (double) EcmaScript.toNumber(lda.operandStack.pop());
+        byte[] domainMemory = lda.getDomainMemory();
+        if (addr < 0 || addr >= domainMemory.length) {
+            throw new AVM2RangeErrorException(1506);
+        }
+
+        int value = EcmaScript.toInt32(lda.operandStack.pop());
         // todo: set domainMemory
-        //lda.getDomainMemory()[addr] = ...
+        //domainMemory[addr] = ...
         return true;
     }
 

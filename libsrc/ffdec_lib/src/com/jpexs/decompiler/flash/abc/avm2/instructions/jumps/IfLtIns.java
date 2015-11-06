@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.GeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.LtAVM2Item;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.HashMap;
@@ -40,10 +41,11 @@ public class IfLtIns extends InstructionDefinition implements IfTypeIns {
 
     @Override
     public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
-        Double right = EcmaScript.toNumber(lda.operandStack.pop());
-        Double left = EcmaScript.toNumber(lda.operandStack.pop());
+        Object rightObj = lda.operandStack.pop();
+        Object leftObj = lda.operandStack.pop();
 
-        if (left < right) {
+        Object cmp = EcmaScript.compare(leftObj, rightObj);
+        if (cmp != Undefined.INSTANCE && ((int) cmp) == -1) {
             lda.jump = ins.getParamAsLong(constants, 0);
         }
 

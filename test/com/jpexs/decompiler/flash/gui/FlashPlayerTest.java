@@ -19,8 +19,8 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
-import com.jpexs.decompiler.flash.abc.avm2.AVM2ExecutionException;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Runtime;
+import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2ExecutionException;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.IfTypeIns;
@@ -151,153 +151,166 @@ public class FlashPlayerTest {
         body.max_stack = 20;
         body.max_regs = 10;
 
-        for (int i = 0; i < 256; i++) {
-            if (i == AVM2Instructions.ReturnVoid) {
-                // todo: fails for some reason
-                continue;
-            }
+        AVM2Instruction[] pushes = new AVM2Instruction[]{
+            new AVM2Instruction(0, AVM2Instructions.PushUndefined, null),
+            new AVM2Instruction(0, AVM2Instructions.PushNull, null),
+            new AVM2Instruction(0, AVM2Instructions.PushTrue, null),
+            new AVM2Instruction(0, AVM2Instructions.PushFalse, null),
+            new AVM2Instruction(0, AVM2Instructions.PushNan, null),
+            new AVM2Instruction(0, AVM2Instructions.PushString, new int[]{1}),
+            new AVM2Instruction(0, AVM2Instructions.PushDouble, new int[]{1}),
+            new AVM2Instruction(0, AVM2Instructions.PushShort, new int[]{1}),
+            new AVM2Instruction(0, AVM2Instructions.PushInt, new int[]{1}),
+            new AVM2Instruction(0, AVM2Instructions.PushUInt, new int[]{1}),
+            new AVM2Instruction(0, AVM2Instructions.PushByte, new int[]{-2}),
+            new AVM2Instruction(0, AVM2Instructions.PushByte, new int[]{-1}),
+            new AVM2Instruction(0, AVM2Instructions.PushByte, new int[]{0}),
+            new AVM2Instruction(0, AVM2Instructions.PushByte, new int[]{1}),
+            new AVM2Instruction(0, AVM2Instructions.PushByte, new int[]{2}),};
 
-            // todo: the following instructions are not implemented
-            if (i == AVM2Instructions.GetSuper
-                    || i == AVM2Instructions.SetSuper
-                    || i == AVM2Instructions.DXNS
-                    || i == AVM2Instructions.DXNSLate
-                    || i == AVM2Instructions.Kill
-                    || i == AVM2Instructions.LookupSwitch
-                    || i == AVM2Instructions.PushWith
-                    || i == AVM2Instructions.NextName
-                    || i == AVM2Instructions.HasNext
-                    || i == AVM2Instructions.NextValue
-                    || i == AVM2Instructions.PushScope
-                    || i == AVM2Instructions.PushNamespace
-                    || i == AVM2Instructions.HasNext2
-                    || i == AVM2Instructions.NewFunction
-                    || i == AVM2Instructions.Call
-                    || i == AVM2Instructions.Construct
-                    || i == AVM2Instructions.CallMethod
-                    || i == AVM2Instructions.CallStatic
-                    || i == AVM2Instructions.CallSuper
-                    || i == AVM2Instructions.CallProperty
-                    || i == AVM2Instructions.ReturnVoid
-                    || i == AVM2Instructions.ConstructSuper
-                    || i == AVM2Instructions.ConstructProp
-                    || i == AVM2Instructions.CallPropLex
-                    || i == AVM2Instructions.CallSuperVoid
-                    || i == AVM2Instructions.CallPropVoid
-                    || i == AVM2Instructions.ApplyType
-                    || i == AVM2Instructions.NewObject
-                    || i == AVM2Instructions.NewArray
-                    || i == AVM2Instructions.NewActivation
-                    || i == AVM2Instructions.NewClass
-                    || i == AVM2Instructions.GetDescendants
-                    || i == AVM2Instructions.NewCatch
-                    || i == AVM2Instructions.FindPropGlobal
-                    || i == AVM2Instructions.FindPropertyStrict
-                    || i == AVM2Instructions.FindProperty
-                    || i == AVM2Instructions.FindDef
-                    || i == AVM2Instructions.GetLex
-                    || i == AVM2Instructions.SetProperty
-                    || i == AVM2Instructions.GetGlobalScope
-                    || i == AVM2Instructions.GetScopeObject
-                    || i == AVM2Instructions.GetProperty
-                    || i == AVM2Instructions.GetOuterScope
-                    || i == AVM2Instructions.InitProperty
-                    || i == AVM2Instructions.DeleteProperty
-                    || i == AVM2Instructions.GetSlot
-                    || i == AVM2Instructions.SetSlot
-                    || i == AVM2Instructions.GetGlobalSlot
-                    || i == AVM2Instructions.SetGlobalSlot
-                    || i == AVM2Instructions.CheckFilter
-                    || i == AVM2Instructions.AsType // todo: fix
-                    || i == AVM2Instructions.AsTypeLate
-                    || i == AVM2Instructions.InstanceOf
-                    || i == AVM2Instructions.IsType
-                    || i == AVM2Instructions.IsTypeLate
-                    || i == AVM2Instructions.In
-                    || i == AVM2Instructions.SubtractI // todo: implement
-                    || i == AVM2Instructions.MultiplyI // todo: implement
-                    || i == AVM2Instructions.BkptLine // todo: implement
-                    ) {
-                continue;
-            }
-
-            System.out.println("Instruction code: " + Integer.toHexString(i) + " (" + i + ") " + AVM2Code.instructionSet[i].instructionName);
-            int j = 1;
-            File f2 = new File("run_test_" + new Date().getTime() + "_" + i + "_" + j + ".swf");
-            f2.deleteOnExit();
-
-            AVM2Code ccode = new AVM2Code();
-            ccode.code = new ArrayList<>();
-            List<AVM2Instruction> code = ccode.code;
-            code.add(new AVM2Instruction(0, AVM2Instructions.GetLocal0, null));
-            code.add(new AVM2Instruction(0, AVM2Instructions.PushScope, null));
-            code.add(new AVM2Instruction(0, AVM2Instructions.PushByte, new int[]{10}));
-            code.add(new AVM2Instruction(0, AVM2Instructions.SetLocal0, null));
-            code.add(new AVM2Instruction(0, AVM2Instructions.PushByte, new int[]{11}));
-            code.add(new AVM2Instruction(0, AVM2Instructions.SetLocal1, null));
-            code.add(new AVM2Instruction(0, AVM2Instructions.PushByte, new int[]{0}));
-            code.add(new AVM2Instruction(0, AVM2Instructions.PushByte, new int[]{1}));
-            code.add(new AVM2Instruction(0, AVM2Instructions.PushByte, new int[]{2}));
-
-            InstructionDefinition ins = AVM2Code.instructionSet[i];
-            int[] params = null;
-            boolean ifType = false;
-            if (ins.operands.length > 0) {
-                params = new int[ins.operands.length];
-                if (!(ins instanceof IfTypeIns)) {
-                    for (int k = 0; k < params.length; k++) {
-                        params[k] = 1;
+        for (int i = 58; i < 256; i++) {
+            for (int p1 = 0; p1 < pushes.length; p1++) {
+                for (int p2 = 0; p2 < pushes.length; p2++) {
+                    System.out.println("p1: " + p1 + " p2: " + p2);
+                    // todo: the following instructions are not implemented
+                    if (i == AVM2Instructions.GetSuper
+                            || i == AVM2Instructions.SetSuper
+                            || i == AVM2Instructions.DXNS
+                            || i == AVM2Instructions.DXNSLate
+                            || i == AVM2Instructions.Kill
+                            || i == AVM2Instructions.LookupSwitch
+                            || i == AVM2Instructions.PushWith
+                            || i == AVM2Instructions.NextName
+                            || i == AVM2Instructions.HasNext
+                            || i == AVM2Instructions.NextValue
+                            || i == AVM2Instructions.PushScope
+                            || i == AVM2Instructions.PushNamespace
+                            || i == AVM2Instructions.HasNext2
+                            || i == AVM2Instructions.NewFunction
+                            || i == AVM2Instructions.Call
+                            || i == AVM2Instructions.Construct
+                            || i == AVM2Instructions.CallMethod
+                            || i == AVM2Instructions.CallStatic
+                            || i == AVM2Instructions.CallSuper
+                            || i == AVM2Instructions.CallProperty
+                            || i == AVM2Instructions.ConstructSuper
+                            || i == AVM2Instructions.ConstructProp
+                            || i == AVM2Instructions.CallPropLex
+                            || i == AVM2Instructions.CallSuperVoid
+                            || i == AVM2Instructions.CallPropVoid
+                            || i == AVM2Instructions.ApplyType
+                            || i == AVM2Instructions.NewObject
+                            || i == AVM2Instructions.NewArray
+                            || i == AVM2Instructions.NewActivation
+                            || i == AVM2Instructions.NewClass
+                            || i == AVM2Instructions.GetDescendants
+                            || i == AVM2Instructions.NewCatch
+                            || i == AVM2Instructions.FindPropGlobal
+                            || i == AVM2Instructions.FindPropertyStrict
+                            || i == AVM2Instructions.FindProperty
+                            || i == AVM2Instructions.FindDef
+                            || i == AVM2Instructions.GetLex
+                            || i == AVM2Instructions.SetProperty
+                            || i == AVM2Instructions.GetGlobalScope
+                            || i == AVM2Instructions.GetScopeObject
+                            || i == AVM2Instructions.GetProperty
+                            || i == AVM2Instructions.GetOuterScope
+                            || i == AVM2Instructions.InitProperty
+                            || i == AVM2Instructions.DeleteProperty
+                            || i == AVM2Instructions.GetSlot
+                            || i == AVM2Instructions.SetSlot
+                            || i == AVM2Instructions.GetGlobalSlot
+                            || i == AVM2Instructions.SetGlobalSlot
+                            || i == AVM2Instructions.CheckFilter
+                            || i == AVM2Instructions.AsType // todo: fix
+                            || i == AVM2Instructions.AsTypeLate
+                            || i == AVM2Instructions.InstanceOf
+                            || i == AVM2Instructions.IsType
+                            || i == AVM2Instructions.IsTypeLate
+                            || i == AVM2Instructions.In) {
+                        continue;
                     }
+
+                    System.out.println("Instruction code: " + Integer.toHexString(i) + " (" + i + ") " + AVM2Code.instructionSet[i].instructionName);
+                    int j = 1;
+                    File f2 = new File("run_test_" + new Date().getTime() + "_" + i + "_" + j + ".swf");
+                    f2.deleteOnExit();
+
+                    AVM2Code ccode = new AVM2Code();
+                    ccode.code = new ArrayList<>();
+                    List<AVM2Instruction> code = ccode.code;
+                    code.add(new AVM2Instruction(0, AVM2Instructions.GetLocal0, null));
+                    code.add(new AVM2Instruction(0, AVM2Instructions.PushScope, null));
+                    code.add(new AVM2Instruction(0, AVM2Instructions.PushByte, new int[]{10}));
+                    code.add(new AVM2Instruction(0, AVM2Instructions.SetLocal0, null));
+                    code.add(new AVM2Instruction(0, AVM2Instructions.PushByte, new int[]{11}));
+                    code.add(new AVM2Instruction(0, AVM2Instructions.SetLocal1, null));
+                    code.add(new AVM2Instruction(0, AVM2Instructions.PushByte, new int[]{0}));
+                    code.add(pushes[p1].clone());
+                    code.add(pushes[p2].clone());
+
+                    InstructionDefinition ins = AVM2Code.instructionSet[i];
+                    int[] params = null;
+                    boolean ifType = false;
+                    if (ins.operands.length > 0) {
+                        params = new int[ins.operands.length];
+                        if (!(ins instanceof IfTypeIns)) {
+                            for (int param = 0; param < params.length; param++) {
+                                params[param] = 1;
+                            }
+                        }
+
+                        ifType = ins instanceof IfTypeIns;
+                        if (ifType) {
+                            params[0] = 3;
+                        }
+                    }
+
+                    code.add(new AVM2Instruction(0, ins, params));
+                    if (ifType) {
+                        code.add(new AVM2Instruction(0, AVM2Instructions.PushString, new int[]{1}));
+                        code.add(new AVM2Instruction(0, AVM2Instructions.ReturnValue, null));
+                    }
+
+                    code.add(new AVM2Instruction(0, AVM2Instructions.Dup, null));
+                    code.add(new AVM2Instruction(0, AVM2Instructions.TypeOf, null));
+                    code.add(new AVM2Instruction(0, AVM2Instructions.Add, null));
+                    code.add(new AVM2Instruction(0, AVM2Instructions.ReturnValue, null));
+
+                    body.setCode(ccode);
+                    body.markOffsets();
+                    //String pcode = ccode.toASMSource();
+                    //String as = body.toSource();
+
+                    abcTag.setModified(true);
+                    try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(f2))) {
+                        swf.saveTo(fos);
+                    }
+
+                    flash.setMovie(f2.getAbsolutePath());
+
+                    synchronized (lockObj) {
+                        lockObj.wait();
+                    }
+
+                    f2.delete();
+
+                    String flashResult = resultRef.getVal();
+                    System.out.println("Flash result: " + flashResult);
+
+                    String ffdecExecuteResult;
+                    try {
+                        Object res = ccode.execute(new HashMap<>(), abc.constants, AVM2Runtime.ADOBE_FLASH, 19);
+                        ffdecExecuteResult = "Result:" + EcmaScript.toString(res) + " Type:" + EcmaScript.typeString(res);
+                    } catch (AVM2ExecutionException ex) {
+                        ffdecExecuteResult = "Error:" + ex.getMessage();
+                    }
+
+                    System.out.println("FFDec execte result: " + ffdecExecuteResult);
+
+                    Assert.assertEquals(ffdecExecuteResult, flashResult);
                 }
-
-                ifType = ins instanceof IfTypeIns;
-                if (ifType) {
-                    params[0] = 3;
-                }
             }
-
-            code.add(new AVM2Instruction(0, ins, params));
-            if (ifType) {
-                code.add(new AVM2Instruction(0, AVM2Instructions.PushString, new int[]{1}));
-                code.add(new AVM2Instruction(0, AVM2Instructions.ReturnValue, null));
-            }
-
-            code.add(new AVM2Instruction(0, AVM2Instructions.Dup, null));
-            code.add(new AVM2Instruction(0, AVM2Instructions.TypeOf, null));
-            code.add(new AVM2Instruction(0, AVM2Instructions.Add, null));
-            code.add(new AVM2Instruction(0, AVM2Instructions.ReturnValue, null));
-
-            body.setCode(ccode);
-            body.markOffsets();
-            /*String pcode = ccode.toASMSource();
-             String as = body.toSource();*/
-
-            abcTag.setModified(true);
-            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(f2))) {
-                swf.saveTo(fos);
-            }
-
-            flash.setMovie(f2.getAbsolutePath());
-
-            synchronized (lockObj) {
-                lockObj.wait();
-            }
-
-            f2.delete();
-
-            String flashResult = resultRef.getVal();
-            System.out.println("Flash result: " + flashResult);
-
-            String ffdecExecuteResult;
-            try {
-                ffdecExecuteResult = EcmaScript.toString(ccode.execute(new HashMap<>(), abc.constants, AVM2Runtime.ADOBE_FLASH, 19));
-            } catch (AVM2ExecutionException ex) {
-                ffdecExecuteResult = ex.getMessage();
-            }
-
-            System.out.println("FFDec execte result: " + ffdecExecuteResult);
-
-            Assert.assertEquals(ffdecExecuteResult, flashResult);
         }
 
         /*int cnt = 0;
@@ -373,20 +386,22 @@ public class FlashPlayerTest {
                 } else if (i == 3) {
                     r2Obj = true;
                 } else if (i == 4) {
-                    r2Obj = "test";
+                    r2Obj = "";
                 } else if (i == 5) {
-                    r2Obj = "0";
+                    r2Obj = "test";
                 } else if (i == 6) {
-                    r2Obj = "0.0";
+                    r2Obj = "0";
                 } else if (i == 7) {
-                    r2Obj = "1.0";
+                    r2Obj = "0.0";
                 } else if (i == 8) {
-                    r2Obj = "-1.0";
+                    r2Obj = "1.0";
                 } else if (i == 9) {
-                    r2Obj = 0;
+                    r2Obj = "-1.0";
                 } else if (i == 10) {
-                    r2Obj = -100;
+                    r2Obj = 0;
                 } else if (i == 11) {
+                    r2Obj = -100;
+                } else if (i == 12) {
                     r2Obj = 100;
                 } else {
                     r2Obj = r2;

@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.LShiftAVM2Item;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
@@ -35,9 +36,9 @@ public class LShiftIns extends InstructionDefinition {
 
     @Override
     public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
-        int value2 = (int) ((Long) lda.operandStack.pop() & 0x1F);
-        int value1 = ((Long) lda.operandStack.pop()).intValue();
-        Long value3 = (long) (value1 << value2);
+        int value2 = EcmaScript.toInt32(lda.operandStack.pop()) & 0x1F;
+        int value1 = EcmaScript.toInt32(lda.operandStack.pop());
+        int value3 = value1 << value2;
         lda.operandStack.push(value3);
         return true;
     }

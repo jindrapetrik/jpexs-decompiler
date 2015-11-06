@@ -55,7 +55,7 @@ public class StringLengthActionItem extends ActionItem {
     }
 
     public static Double getResult(Object obj) {
-        return EcmaScript.toNumber(EcmaScript.toString(obj).length());
+        return EcmaScript.toNumberAs2(EcmaScript.toString(obj).length());
     }
 
     @Override

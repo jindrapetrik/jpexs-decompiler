@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.GeAVM2Item;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
@@ -36,9 +37,11 @@ public class GreaterEqualsIns extends InstructionDefinition {
 
     @Override
     public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
-        Double right = EcmaScript.toNumber(lda.operandStack.pop());
-        Double left = EcmaScript.toNumber(lda.operandStack.pop());
-        lda.operandStack.push(left >= right);
+        Object rightObj = lda.operandStack.pop();
+        Object leftObj = lda.operandStack.pop();
+
+        Object cmp = EcmaScript.compare(leftObj, rightObj);
+        lda.operandStack.push(cmp != Undefined.INSTANCE && ((int) cmp) != -1);
         return true;
     }
 

@@ -17,11 +17,21 @@
 package com.jpexs.decompiler.flash.abc.avm2.instructions.other2;
 
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2ExecutionException;
+import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
 public class BkptLineIns extends InstructionDefinition {
 
     public BkptLineIns() {
         super(0xF2, "bkptline", new int[]{AVM2Code.OPT_U30}, false /*?*/);
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) throws AVM2ExecutionException {
+        // do nothing
+        return true;
     }
 }

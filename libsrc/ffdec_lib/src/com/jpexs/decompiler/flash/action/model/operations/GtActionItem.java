@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.action.swf4.ActionLess;
 import com.jpexs.decompiler.flash.action.swf5.ActionLess2;
 import com.jpexs.decompiler.flash.action.swf6.ActionGreater;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -43,7 +44,13 @@ public class GtActionItem extends BinaryOpItem implements LogicalOpItem {
     }
 
     public static Object getResult(Object rightResult, Object leftResult) {
-        return EcmaScript.compare(rightResult, leftResult);
+        Object ret = EcmaScript.compare(rightResult, leftResult, true);
+        if (ret == Undefined.INSTANCE) {
+            return ret;
+        }
+
+        int reti = (int) ret;
+        return reti == -1;
     }
 
     @Override

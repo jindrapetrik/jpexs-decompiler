@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
+import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2RangeErrorException;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.AlchemyLoadAVM2Item;
@@ -39,10 +40,15 @@ public class Lf64Ins extends InstructionDefinition implements AlchemyTypeIns {
     }
 
     @Override
-    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) throws AVM2RangeErrorException {
         int addr = (int) (double) EcmaScript.toNumber(lda.operandStack.pop());
+        byte[] domainMemory = lda.getDomainMemory();
+        if (addr < 0 || addr >= domainMemory.length) {
+            throw new AVM2RangeErrorException(1506);
+        }
+
         // todo: get 64 bits float
-        lda.operandStack.push((Double) (double) (lda.getDomainMemory()[addr]));
+        lda.operandStack.push((Double) (double) (domainMemory[addr]));
         return true;
     }
 

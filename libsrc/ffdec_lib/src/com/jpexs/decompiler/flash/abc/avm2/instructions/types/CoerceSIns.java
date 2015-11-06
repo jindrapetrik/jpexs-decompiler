@@ -23,6 +23,8 @@ import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
+import com.jpexs.decompiler.flash.ecma.Null;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
@@ -37,8 +39,17 @@ public class CoerceSIns extends InstructionDefinition implements CoerceOrConvert
 
     @Override
     public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
-        Object obj = lda.operandStack.pop();
-        lda.operandStack.push(obj.toString());
+        Object value = lda.operandStack.pop();
+        if (value == Undefined.INSTANCE) {
+            value = Null.INSTANCE;
+        }
+
+        if (value == Null.INSTANCE) {
+            lda.operandStack.push(value);
+        } else {
+            lda.operandStack.push(value.toString());
+        }
+
         return true;
     }
 

@@ -58,7 +58,7 @@ public class CallMethodActionItem extends ActionItem {
         boolean blankMethod = false;
         boolean dvai = methodName instanceof DirectValueActionItem;
         if (dvai) {
-            if (((DirectValueActionItem) methodName).value instanceof Undefined) {
+            if (((DirectValueActionItem) methodName).value == Undefined.INSTANCE) {
                 blankMethod = true;
             }
             if (((DirectValueActionItem) methodName).value instanceof String) {

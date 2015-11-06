@@ -20,8 +20,8 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
-import com.jpexs.decompiler.flash.abc.avm2.AVM2ExecutionException;
-import com.jpexs.decompiler.flash.abc.avm2.AVM2TypeErrorException;
+import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2ExecutionException;
+import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2TypeErrorException;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
@@ -30,6 +30,8 @@ import com.jpexs.decompiler.flash.abc.avm2.parser.script.PropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.ecma.EcmaType;
+import com.jpexs.decompiler.flash.ecma.Null;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
@@ -48,6 +50,10 @@ public class CoerceIns extends InstructionDefinition implements CoerceOrConvertT
         }
 
         Object value = lda.operandStack.pop();
+        if (value == Undefined.INSTANCE) {
+            value = Null.INSTANCE;
+        }
+
         EcmaType type = EcmaScript.type(value);
         if (type != EcmaType.NULL && type != EcmaType.OBJECT) {
             throw new AVM2TypeErrorException(1034);

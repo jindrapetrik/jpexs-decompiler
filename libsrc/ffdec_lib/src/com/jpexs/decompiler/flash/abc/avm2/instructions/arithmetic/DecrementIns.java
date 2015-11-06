@@ -37,7 +37,7 @@ public class DecrementIns extends InstructionDefinition {
     @Override
     public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         Object obj = lda.operandStack.pop();
-        lda.operandStack.push(EcmaScript.toInt32(obj) - 1);
+        lda.operandStack.push(EcmaScript.toNumber(obj) - 1);
         return true;
     }
 
