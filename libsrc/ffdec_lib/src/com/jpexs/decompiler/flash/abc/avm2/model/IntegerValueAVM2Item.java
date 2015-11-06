@@ -134,7 +134,7 @@ public class IntegerValueAVM2Item extends NumberValueAVM2Item implements Integer
         } else if (value >= -32768 && value <= 32767) {
             ins = new AVM2Instruction(0, AVM2Instructions.PushShort, new int[]{((int) (long) value) & 0xffff});
         } else {
-            ins = new AVM2Instruction(0, AVM2Instructions.PushInt, new int[]{((AVM2SourceGenerator) generator).abc.constants.getIntId(value, true)});
+            ins = new AVM2Instruction(0, AVM2Instructions.PushInt, new int[]{((AVM2SourceGenerator) generator).abcIndex.getSelectedAbc().constants.getIntId(value, true)});
         }
 
         return toSourceMerge(localData, generator, ins);

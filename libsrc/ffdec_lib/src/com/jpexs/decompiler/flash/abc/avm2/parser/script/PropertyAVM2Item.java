@@ -57,9 +57,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
 
     public GraphTargetItem object;
 
-    public ABC abc;
-
-    public List<ABC> otherABCs;
+    public AbcIndexing abc;
 
     private final List<Integer> openedNamespaces;
 
@@ -69,14 +67,13 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
 
     @Override
     public AssignableAVM2Item copy() {
-        PropertyAVM2Item p = new PropertyAVM2Item(object, propertyName, abc, otherABCs, openedNamespaces, callStack);
+        PropertyAVM2Item p = new PropertyAVM2Item(object, propertyName, abc, openedNamespaces, callStack);
         return p;
     }
 
-    public PropertyAVM2Item(GraphTargetItem object, String propertyName, ABC abc, List<ABC> otherABCs, List<Integer> openedNamespaces, List<MethodBody> callStack) {
+    public PropertyAVM2Item(GraphTargetItem object, String propertyName, AbcIndexing abc, List<Integer> openedNamespaces, List<MethodBody> callStack) {
         this.propertyName = propertyName;
         this.object = object;
-        this.otherABCs = otherABCs;
         this.abc = abc;
         this.openedNamespaces = openedNamespaces;
         this.callStack = callStack;
@@ -92,7 +89,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
         for (int i = 0; i < openedNamespaces.size(); i++) {
             nssa[i] = openedNamespaces.get(i);
         }
-        return abc.constants.getNamespaceSetId(new NamespaceSet(nssa), true);
+        return abc.getSelectedAbc().constants.getNamespaceSetId(new NamespaceSet(nssa), true);
     }
 
     public static GraphTargetItem multinameToType(int m_index, AVM2ConstantPool constants) {
@@ -185,9 +182,6 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                 }
 
                 {
-                    List<ABC> abcs = new ArrayList<>();
-                    abcs.add(abc);
-                    abcs.addAll(otherABCs);
                     if (ttype.equals(new TypeItem(InitVectorAVM2Item.VECTOR_FQN))) {
                         switch ("" + objSubType) {
                             case "int":
@@ -203,151 +197,144 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                 ttype = new TypeItem(InitVectorAVM2Item.VECTOR_OBJECT);
                         }
                     }
-                    loopa:
-                    for (ABC a : abcs) {
-                        for (InstanceInfo ii : a.instance_info) {
-                            if (ii.deleted) {
-                                continue;
-                            }
-                            Multiname m = ii.getName(a.constants);
-                            if (multinameToType(ii.name_index, a.constants).equals(ttype)) {
-                                Reference<String> outName = new Reference<>("");
-                                Reference<DottedChain> outNs = new Reference<>(DottedChain.EMPTY);
-                                Reference<DottedChain> outPropNs = new Reference<>(DottedChain.EMPTY);
-                                Reference<Integer> outPropNsKind = new Reference<>(1);
-                                Reference<Integer> outPropNsIndex = new Reference<>(0);
-                                Reference<GraphTargetItem> outPropType = new Reference<>(null);
-                                Reference<ValueKind> outPropValue = new Reference<>(null);
-                                if (AVM2SourceGenerator.searchPrototypeChain(false, abcs, m.getNamespace(a.constants).getName(a.constants), m.getName(a.constants, null, true), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue)) {
-                                    objType = new TypeItem(outNs.getVal().isEmpty() ? outName.getVal() : outNs.getVal().toRawString() + "." + outName.getVal());
-                                    propType = outPropType.getVal();
-                                    propIndex = abc.constants.getMultinameId(new Multiname(Multiname.QNAME,
-                                            abc.constants.getStringId(propertyName, true),
-                                            abc.constants.getNamespaceId(new Namespace(outPropNsKind.getVal(), abc.constants.getStringId(outPropNs.getVal(), true)), outPropNsIndex.getVal(), true), 0, 0, new ArrayList<>()), true
-                                    );
-                                    propValue = outPropValue.getVal();
-
-                                    break loopa;
-                                }
-                            }
+                    /*                    AbcIndexing.TraitIndex p = abc.findProperty(new AbcIndexing.PropertyDef(propertyName, ttype), false, true);
+                     if(p!=null){
+                     objType = new TypeItem(outNs.getVal().isEmpty() ? outName.getVal() : outNs.getVal().toRawString() + "." + outName.getVal());
+                     propType = p.type;
+                     propIndex = abc.getLastAbc().constants.getMultinameId(new Multiname(Multiname.QNAME,
+                     abc.getLastAbc().getStringId(propertyName, true),
+                     abc.getLastAbc().getNamespaceId(new Namespace(outPropNsKind.getVal(), abc.constants.getStringId(outPropNs.getVal(), true)), outPropNsIndex.getVal(), true), 0, 0, new ArrayList<>()), true
+                     );
+                     propValue = outPropValue.getVal();
+                     }*/
+                    if (ttype instanceof TypeItem) {
+                        DottedChain ftn = ((TypeItem) ttype).fullTypeName;
+                        Reference<String> outName = new Reference<>("");
+                        Reference<DottedChain> outNs = new Reference<>(DottedChain.EMPTY);
+                        Reference<DottedChain> outPropNs = new Reference<>(DottedChain.EMPTY);
+                        Reference<Integer> outPropNsKind = new Reference<>(1);
+                        Reference<Integer> outPropNsIndex = new Reference<>(0);
+                        Reference<GraphTargetItem> outPropType = new Reference<>(null);
+                        Reference<ValueKind> outPropValue = new Reference<>(null);
+                        if (AVM2SourceGenerator.searchPrototypeChain(localData.privateNs, localData.protectedNs, false, abc, ftn.getWithoutLast(), ftn.getLast(), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue)) {
+                            objType = new TypeItem(outNs.getVal().add(outName.getVal()));
+                            propType = outPropType.getVal();
+                            propIndex = abc.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.QNAME,
+                                    abc.getSelectedAbc().constants.getStringId(propertyName, true),
+                                    abc.getSelectedAbc().constants.getNamespaceId(new Namespace(outPropNsKind.getVal(), outPropNs.getVal() == null || outPropNs.getVal().isEmpty() ? 0 : abc.getSelectedAbc().constants.getStringId(outPropNs.getVal(), true)), outPropNsIndex.getVal(), true), 0, 0, new ArrayList<>()), true
+                            );
+                            propValue = outPropValue.getVal();
                         }
                     }
-                }
 
-                if (objType == null) {
-                    for (MethodBody b : callStack) {
-                        for (int i = 0; i < b.traits.traits.size(); i++) {
-                            Trait t = b.traits.traits.get(i);
-                            if (t.getName(abc).getName(abc.constants, null, true).equals(propertyName)) {
-                                if (t instanceof TraitSlotConst) {
-                                    TraitSlotConst tsc = (TraitSlotConst) t;
-                                    objType = new TypeItem(DottedChain.FUNCTION);
-                                    propType = multinameToType(tsc.type_index, abc.constants);
-                                    propIndex = tsc.name_index;
-                                    if (!localData.traitUsages.containsKey(b)) {
-                                        localData.traitUsages.put(b, new ArrayList<>());
-                                    }
-                                    localData.traitUsages.get(b).add(i);
-                                }
-                            }
-                        }
-                    }
                     if (objType == null) {
-                        loopobjType:
-                        for (int i = 0; i < openedNamespaces.size(); i++) {
-                            int nsindex = openedNamespaces.get(i);
-                            int nsKind = abc.constants.constant_namespace.get(openedNamespaces.get(i)).kind;
-                            DottedChain nsname = abc.constants.constant_namespace.get(openedNamespaces.get(i)).getName(abc.constants);
-                            int name_index = 0;
-                            for (int m = 1; m < abc.constants.constant_multiname.size(); m++) {
-                                Multiname mname = abc.constants.constant_multiname.get(m);
-                                if (mname.kind == Multiname.QNAME && mname.getName(abc.constants, null, true).equals(propertyName) && mname.namespace_index == nsindex) {
-                                    name_index = m;
-                                    break;
+                        for (MethodBody b : callStack) {
+                            for (int i = 0; i < b.traits.traits.size(); i++) {
+                                Trait t = b.traits.traits.get(i);
+                                if (t.getName(abc.getSelectedAbc()).getName(abc.getSelectedAbc().constants, null, true).equals(propertyName)) {
+                                    if (t instanceof TraitSlotConst) {
+                                        TraitSlotConst tsc = (TraitSlotConst) t;
+                                        objType = new TypeItem(DottedChain.FUNCTION);
+                                        propType = multinameToType(tsc.type_index, abc.getSelectedAbc().constants);
+                                        propIndex = tsc.name_index;
+                                        if (!localData.traitUsages.containsKey(b)) {
+                                            localData.traitUsages.put(b, new ArrayList<>());
+                                        }
+                                        localData.traitUsages.get(b).add(i);
+                                    }
                                 }
                             }
-                            if (name_index > 0) {
-                                for (int c = 0; c < abc.instance_info.size(); c++) {
-                                    if (abc.instance_info.get(c).deleted) {
-                                        continue;
-                                    }
-                                    for (Trait t : abc.instance_info.get(c).instance_traits.traits) {
-                                        if (t.name_index == name_index) {
-                                            objType = multinameToType(abc.instance_info.get(c).name_index, abc.constants);
-                                            propType = AVM2SourceGenerator.getTraitReturnType(abc, t);
-                                            propIndex = t.name_index;
-                                            if (t instanceof TraitSlotConst) {
-                                                TraitSlotConst tsc = (TraitSlotConst) t;
-                                                propValue = new ValueKind(tsc.value_index, tsc.value_kind);
-                                            }
-                                            break loopobjType;
-                                        }
-                                    }
-                                    for (Trait t : abc.class_info.get(c).static_traits.traits) {
-                                        if (t.name_index == name_index) {
-                                            objType = multinameToType(abc.instance_info.get(c).name_index, abc.constants);
-                                            propType = AVM2SourceGenerator.getTraitReturnType(abc, t);
-                                            propIndex = t.name_index;
-                                            if (t instanceof TraitSlotConst) {
-                                                TraitSlotConst tsc = (TraitSlotConst) t;
-                                                propValue = new ValueKind(tsc.value_index, tsc.value_kind);
-                                            }
-                                            break loopobjType;
-                                        }
-                                    }
-                                }
+                        }
+                        if (objType == null) {
+                            loopobjType:
+                            for (int i = 0; i < openedNamespaces.size(); i++) {
+                                int nsindex = openedNamespaces.get(i);
 
-                                for (ScriptInfo si : abc.script_info) {
-                                    if (si.deleted) {
-                                        continue;
-                                    }
-                                    for (Trait t : si.traits.traits) {
-                                        if (t.name_index == name_index) {
-                                            objType = new TypeItem(DottedChain.OBJECT);
-                                            propType = AVM2SourceGenerator.getTraitReturnType(abc, t);
-                                            propIndex = t.name_index;
-                                            if (t instanceof TraitSlotConst) {
-                                                TraitSlotConst tsc = (TraitSlotConst) t;
-                                                propValue = new ValueKind(tsc.value_index, tsc.value_kind);
-                                            }
-                                            break loopobjType;
-                                        }
+                                int nsKind = abc.getSelectedAbc().constants.constant_namespace.get(openedNamespaces.get(i)).kind;
+                                DottedChain nsname = abc.getSelectedAbc().constants.constant_namespace.get(openedNamespaces.get(i)).getName(abc.getSelectedAbc().constants);
+                                int name_index = 0;
+                                for (int m = 1; m < abc.getSelectedAbc().constants.constant_multiname.size(); m++) {
+                                    Multiname mname = abc.getSelectedAbc().constants.constant_multiname.get(m);
+                                    if (mname.kind == Multiname.QNAME && mname.getName(abc.getSelectedAbc().constants, null, true).equals(propertyName) && mname.namespace_index == nsindex) {
+                                        name_index = m;
+                                        break;
                                     }
                                 }
-                            }
-                            if (nsKind == Namespace.KIND_PACKAGE) {
-                                List<ABC> abcs = new ArrayList<>();
-                                abcs.add(abc);
-                                abcs.addAll(otherABCs);
-                                loopabc:
-                                for (ABC a : otherABCs) {
-                                    for (int h = 0; h < a.instance_info.size(); h++) {
-                                        InstanceInfo ii = a.instance_info.get(h);
-                                        if (ii.deleted) {
+                                if (name_index > 0) {
+                                    for (int c = 0; c < abc.getSelectedAbc().instance_info.size(); c++) {
+                                        if (abc.getSelectedAbc().instance_info.get(c).deleted) {
                                             continue;
                                         }
-                                        Multiname n = a.constants.constant_multiname.get(ii.name_index);
-                                        if (n.getNamespace(a.constants).kind == Namespace.KIND_PACKAGE && n.getNamespace(a.constants).getName(a.constants).equals(nsname)) {
-                                            Reference<String> outName = new Reference<>("");
-                                            Reference<DottedChain> outNs = new Reference<>(DottedChain.EMPTY);
-                                            Reference<DottedChain> outPropNs = new Reference<>(DottedChain.EMPTY);
-                                            Reference<Integer> outPropNsKind = new Reference<>(1);
-                                            Reference<Integer> outPropNsIndex = new Reference<>(0);
-                                            Reference<GraphTargetItem> outPropType = new Reference<>(null);
-                                            Reference<ValueKind> outPropValue = new Reference<>(null);
-
-                                            if (propertyName != null && AVM2SourceGenerator.searchPrototypeChain(false, abcs, nsname, n.getName(a.constants, null, true), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue)) {
-                                                objType = new TypeItem("".equals(outNs.getVal()) ? outName.getVal() : outNs.getVal() + "." + outName.getVal());
-                                                propType = outPropType.getVal();
-                                                propIndex = abc.constants.getMultinameId(new Multiname(Multiname.QNAME,
-                                                        abc.constants.getStringId(propertyName, true),
-                                                        abc.constants.getNamespaceId(new Namespace(outPropNsKind.getVal(), abc.constants.getStringId(outPropNs.getVal(), true)), outPropNsIndex.getVal(), true), 0, 0, new ArrayList<>()), true
-                                                );
-                                                propValue = outPropValue.getVal();
+                                        for (Trait t : abc.getSelectedAbc().instance_info.get(c).instance_traits.traits) {
+                                            if (t.name_index == name_index) {
+                                                objType = multinameToType(abc.getSelectedAbc().instance_info.get(c).name_index, abc.getSelectedAbc().constants);
+                                                propType = AVM2SourceGenerator.getTraitReturnType(abc, t);
+                                                propIndex = t.name_index;
+                                                if (t instanceof TraitSlotConst) {
+                                                    TraitSlotConst tsc = (TraitSlotConst) t;
+                                                    propValue = new ValueKind(tsc.value_index, tsc.value_kind);
+                                                }
+                                                break loopobjType;
+                                            }
+                                        }
+                                        for (Trait t : abc.getSelectedAbc().class_info.get(c).static_traits.traits) {
+                                            if (t.name_index == name_index) {
+                                                objType = multinameToType(abc.getSelectedAbc().instance_info.get(c).name_index, abc.getSelectedAbc().constants);
+                                                propType = AVM2SourceGenerator.getTraitReturnType(abc, t);
+                                                propIndex = t.name_index;
+                                                if (t instanceof TraitSlotConst) {
+                                                    TraitSlotConst tsc = (TraitSlotConst) t;
+                                                    propValue = new ValueKind(tsc.value_index, tsc.value_kind);
+                                                }
                                                 break loopobjType;
                                             }
                                         }
                                     }
+
+                                    for (ScriptInfo si : abc.getSelectedAbc().script_info) {
+                                        if (si.deleted) {
+                                            continue;
+                                        }
+                                        for (Trait t : si.traits.traits) {
+                                            if (t.name_index == name_index) {
+                                                objType = new TypeItem(DottedChain.OBJECT);
+                                                propType = AVM2SourceGenerator.getTraitReturnType(abc, t);
+                                                propIndex = t.name_index;
+                                                if (t instanceof TraitSlotConst) {
+                                                    TraitSlotConst tsc = (TraitSlotConst) t;
+                                                    propValue = new ValueKind(tsc.value_index, tsc.value_kind);
+                                                }
+                                                break loopobjType;
+                                            }
+                                        }
+                                    }
+                                }
+                                if (nsKind == Namespace.KIND_PACKAGE && propertyName != null) {
+                                    AbcIndexing.TraitIndex p = abc.findNsProperty(new AbcIndexing.PropertyNsDef(propertyName, nsname, abc.getSelectedAbc(), openedNamespaces.get(i)), true, true);
+
+                                    Reference<String> outName = new Reference<>("");
+                                    Reference<DottedChain> outNs = new Reference<>(DottedChain.EMPTY);
+                                    Reference<DottedChain> outPropNs = new Reference<>(DottedChain.EMPTY);
+                                    Reference<Integer> outPropNsKind = new Reference<>(1);
+                                    Reference<Integer> outPropNsIndex = new Reference<>(0);
+                                    Reference<GraphTargetItem> outPropType = new Reference<>(null);
+                                    Reference<ValueKind> outPropValue = new Reference<>(null);
+                                    if (p != null && (p.objType instanceof TypeItem)) {
+                                        if (AVM2SourceGenerator.searchPrototypeChain(localData.privateNs, localData.protectedNs, false, abc, nsname, (((TypeItem) p.objType).fullTypeName.getLast()), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue)) {
+                                            objType = new TypeItem("".equals(outNs.getVal()) ? outName.getVal() : outNs.getVal() + "." + outName.getVal());
+                                            propType = p.returnType;
+                                            propIndex = abc.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.QNAME,
+                                                    abc.getSelectedAbc().constants.getStringId(propertyName, true),
+                                                    abc.getSelectedAbc().constants.getNamespaceId(new Namespace(outPropNsKind.getVal(), outPropNs.getVal() == null || outPropNs.getVal().isEmpty() ? 0 : abc.getSelectedAbc().constants.getStringId(outPropNs.getVal(), true)), outPropNsIndex.getVal(), true), 0, 0, new ArrayList<>()), true
+                                            );
+                                            propValue = p.value;
+                                            break loopobjType;
+                                        }
+                                    }
+
+                                    //if (propertyName != null && AVM2SourceGenerator.searchPrototypeChain(false, abcs, nsname, n.getName(a.constants, null, true), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue)) {
+                                    //  
+                                    //}
                                 }
                             }
                         }
@@ -363,9 +350,9 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
             if (attr) {
                 pname = pname.substring(1);
             }
-            propIndex = abc.constants.getMultinameId(new Multiname(attr ? (pname.isEmpty() ? Multiname.MULTINAMELA : Multiname.MULTINAMEA) : Multiname.MULTINAME,
-                    abc.constants.getStringId("*".equals(pname) ? null : pname, true), 0, //Note: name = * is for .@* attribute
-                    attr && pname.isEmpty() ? abc.constants.getNamespaceSetId(new NamespaceSet(new int[]{abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE_INTERNAL, abc.constants.getStringId(localData.pkg, true)), 0, true)}), true) : allNsSet(), 0, new ArrayList<>()), true);
+            propIndex = abc.getSelectedAbc().constants.getMultinameId(new Multiname(attr ? (pname.isEmpty() ? Multiname.MULTINAMELA : Multiname.MULTINAMEA) : Multiname.MULTINAME,
+                    abc.getSelectedAbc().constants.getStringId("*".equals(pname) ? null : pname, true), 0, //Note: name = * is for .@* attribute
+                    attr && pname.isEmpty() ? abc.getSelectedAbc().constants.getNamespaceSetId(new NamespaceSet(new int[]{abc.getSelectedAbc().constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE_INTERNAL, localData.pkg == null || localData.pkg.isEmpty() ? 0 : abc.getSelectedAbc().constants.getStringId(localData.pkg, true)), 0, true)}), true) : allNsSet(), 0, new ArrayList<>()), true);
             propType = TypeItem.UNBOUNDED;
             objType = TypeItem.UNBOUNDED;
             propValue = null;
@@ -624,10 +611,10 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
             Reference<Integer> outPropNsIndex = new Reference<>(0);
             Reference<GraphTargetItem> outPropType = new Reference<>(null);
             Reference<ValueKind> outPropValue = new Reference<>(null);
-            List<ABC> abcs = new ArrayList<>();
-            abcs.add(abc);
-            abcs.addAll(otherABCs);
-            if (!localData.subMethod && cname != null && AVM2SourceGenerator.searchPrototypeChain(true, abcs, pkgName, cname, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue) && (localData.currentClass.equals("".equals(outNs.getVal()) ? outName.getVal() : outNs.getVal() + "." + outName.getVal()))) {
+            /*List<ABC> abcs = new ArrayList<>();
+             abcs.add(abc);
+             abcs.addAll(otherABCs);*/
+            if (!localData.subMethod && cname != null && AVM2SourceGenerator.searchPrototypeChain(localData.privateNs, localData.protectedNs, true, abc, pkgName, cname, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue) && (localData.currentClass.equals(DottedChain.EMPTY.equals(outNs.getVal()) ? outName.getVal() : outNs.getVal().add(outName.getVal())))) {
                 NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.getFullClass()), 0, "this", null, false, openedNamespaces);
                 nobj.setRegNumber(0);
                 obj = nobj;

@@ -68,9 +68,9 @@ public class CallAVM2Item extends AVM2Item {
         }
         if (callable instanceof NameAVM2Item) {
             NameAVM2Item n = (NameAVM2Item) callable;
-            List<ABC> allAbcs = new ArrayList<>();
-            allAbcs.add(g.abc);
-            allAbcs.addAll(g.allABCs);
+            /*List<ABC> allAbcs = new ArrayList<>();
+             allAbcs.add(g.abc);
+             allAbcs.addAll(g.allABCs);*/
             String cname = localData.currentClass;
             DottedChain pkgName = localData.pkg;
             GraphTargetItem obj = null;
@@ -81,12 +81,12 @@ public class CallAVM2Item extends AVM2Item {
             Reference<Integer> outPropNsIndex = new Reference<>(0);
             Reference<GraphTargetItem> outPropType = new Reference<>(null);
             Reference<ValueKind> outPropValue = new Reference<>(null);
-            if (cname != null && AVM2SourceGenerator.searchPrototypeChain(true, allAbcs, pkgName, cname, n.getVariableName(), outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue)) {
+            if (cname != null && AVM2SourceGenerator.searchPrototypeChain(localData.privateNs, localData.protectedNs, true, g.abcIndex, pkgName, cname, n.getVariableName(), outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue)) {
                 NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.getFullClass()), n.line, "this", null, false, n.openedNamespaces);
                 nobj.setRegNumber(0);
                 obj = nobj;
             }
-            PropertyAVM2Item p = new PropertyAVM2Item(obj, n.getVariableName(), g.abc, g.allABCs, n.openedNamespaces, new ArrayList<>());
+            PropertyAVM2Item p = new PropertyAVM2Item(obj, n.getVariableName(), g.abcIndex, n.openedNamespaces, new ArrayList<>());
             p.setAssignedValue(n.getAssignedValue());
             callable = p;
         }
@@ -94,7 +94,7 @@ public class CallAVM2Item extends AVM2Item {
         int propIndex = -1;
         if (callable instanceof TypeItem) {
             TypeItem t = (TypeItem) callable;
-            propIndex = AVM2SourceGenerator.resolveType(localData, t, ((AVM2SourceGenerator) generator).abc, ((AVM2SourceGenerator) generator).allABCs);
+            propIndex = AVM2SourceGenerator.resolveType(localData, t, ((AVM2SourceGenerator) generator).abcIndex);
         }
         Object obj = null;
 
@@ -103,10 +103,10 @@ public class CallAVM2Item extends AVM2Item {
             obj = prop.object;
             if (obj == null) {
 
-                List<ABC> allAbcs = new ArrayList<>();
-                allAbcs.add(g.abc);
-                allAbcs.addAll(g.allABCs);
-                String cname = localData.currentClass;
+                /*List<ABC> allAbcs = new ArrayList<>();
+                 allAbcs.add(g.abc);
+                 allAbcs.addAll(g.allABCs);
+                 */ String cname = localData.currentClass;
                 DottedChain pkgName = localData.pkg;
                 Reference<String> outName = new Reference<>("");
                 Reference<DottedChain> outNs = new Reference<>(DottedChain.EMPTY);
@@ -115,7 +115,7 @@ public class CallAVM2Item extends AVM2Item {
                 Reference<Integer> outPropNsIndex = new Reference<>(0);
                 Reference<GraphTargetItem> outPropType = new Reference<>(null);
                 Reference<ValueKind> outPropValue = new Reference<>(null);
-                if (cname != null && AVM2SourceGenerator.searchPrototypeChain(true, allAbcs, pkgName, cname, prop.propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue) && (localData.currentClass.equals("".equals(outNs.getVal()) ? outName.getVal() : outNs.getVal() + "." + outName.getVal()))) {
+                if (cname != null && AVM2SourceGenerator.searchPrototypeChain(localData.privateNs, localData.protectedNs, true, g.abcIndex, pkgName, cname, prop.propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue) && (localData.currentClass.equals("".equals(outNs.getVal()) ? outName.getVal() : outNs.getVal() + "." + outName.getVal()))) {
                     NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.getFullClass()), 0, "this", null, false, new ArrayList<>());
                     nobj.setRegNumber(0);
                     obj = nobj;

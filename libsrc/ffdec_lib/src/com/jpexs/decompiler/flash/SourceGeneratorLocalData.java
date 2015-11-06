@@ -58,7 +58,7 @@ public class SourceGeneratorLocalData implements Serializable {
 
     public Map<MethodBody, List<Integer>> traitUsages = new HashMap<>();
 
-    public DottedChain pkg = DottedChain.EMPTY;
+    public DottedChain pkg = DottedChain.TOPLEVEL;
 
     public List<GraphTargetItem> scopeStack = new ArrayList<>();
 
@@ -68,8 +68,11 @@ public class SourceGeneratorLocalData implements Serializable {
 
     public boolean subMethod = false;
 
+    public int privateNs = 0;
+    public int protectedNs = 0;
+
     public String getFullClass() {
-        return pkg == null || pkg.isEmpty() ? currentClass : pkg.toRawString() + "." + currentClass;
+        return pkg.add(currentClass).toRawString();
     }
 
     public SourceGeneratorLocalData(HashMap<String, Integer> registerVars, Integer inFunction, Boolean inMethod, Integer forInLevel) {

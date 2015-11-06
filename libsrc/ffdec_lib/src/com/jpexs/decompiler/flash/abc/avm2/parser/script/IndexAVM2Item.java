@@ -88,7 +88,7 @@ public class IndexAVM2Item extends AssignableAVM2Item {
         Reference<Integer> index_temp = new Reference<>(-1);
         Reference<Integer> val_temp = new Reference<>(-1);
         AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
-        int indexPropIndex = g.abc.constants.getMultinameId(new Multiname(attr ? Multiname.MULTINAMELA : Multiname.MULTINAMEL, 0, 0, allNsSet(g.abc), 0, new ArrayList<>()), true);
+        int indexPropIndex = g.abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(attr ? Multiname.MULTINAMELA : Multiname.MULTINAMEL, 0, 0, allNsSet(g.abcIndex.getSelectedAbc()), 0, new ArrayList<>()), true);
 
         return toSourceMerge(localData, generator,
                 object, dupSetTemp(localData, generator, obj_temp),
@@ -110,7 +110,7 @@ public class IndexAVM2Item extends AssignableAVM2Item {
 
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator, boolean needsReturn, boolean call, List<GraphTargetItem> callargs, boolean delete, boolean construct) throws CompilationException {
         AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
-        int indexPropIndex = g.abc.constants.getMultinameId(new Multiname(attr ? Multiname.MULTINAMELA : Multiname.MULTINAMEL, 0, 0, allNsSet(g.abc), 0, new ArrayList<>()), true);
+        int indexPropIndex = g.abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(attr ? Multiname.MULTINAMELA : Multiname.MULTINAMEL, 0, 0, allNsSet(g.abcIndex.getSelectedAbc()), 0, new ArrayList<>()), true);
         Reference<Integer> ret_temp = new Reference<>(-1);
 
         if (assignedValue != null) {

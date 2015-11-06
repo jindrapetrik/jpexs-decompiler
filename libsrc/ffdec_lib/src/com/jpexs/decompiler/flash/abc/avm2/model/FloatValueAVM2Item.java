@@ -57,7 +57,7 @@ public class FloatValueAVM2Item extends NumberValueAVM2Item {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSourceMerge(localData, generator,
-                new AVM2Instruction(0, AVM2Instructions.PushDouble, new int[]{((AVM2SourceGenerator) generator).abc.constants.getDoubleId(value, true)})
+                new AVM2Instruction(0, AVM2Instructions.PushDouble, new int[]{((AVM2SourceGenerator) generator).abcIndex.getSelectedAbc().constants.getDoubleId(value, true)})
         );
     }
 

@@ -67,7 +67,7 @@ public class ConstructSomethingAVM2Item extends CallAVM2Item {
 
         if (resname instanceof TypeItem) {
             TypeItem prop = (TypeItem) resname;
-            int type_index = AVM2SourceGenerator.resolveType(localData, resname, ((AVM2SourceGenerator) generator).abc, ((AVM2SourceGenerator) generator).allABCs);
+            int type_index = AVM2SourceGenerator.resolveType(localData, resname, ((AVM2SourceGenerator) generator).abcIndex);
             return toSourceMerge(localData, generator,
                     new AVM2Instruction(0, AVM2Instructions.FindPropertyStrict, new int[]{type_index, arguments.size()}), arguments,
                     new AVM2Instruction(0, AVM2Instructions.ConstructProp, new int[]{type_index, arguments.size()})

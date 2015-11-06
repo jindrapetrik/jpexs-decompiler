@@ -118,7 +118,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
                     return true;
                 }
 
-                if (!newname.isEmpty()) {
+                if (!newname.isEmpty() && !newname.isTopLevel()) {
                     newimport = newname;
                     break;
                 }
@@ -127,7 +127,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
              newimport = oldimport.add(name);
              }*/
 
-            if (!newimport.isEmpty()) {
+            if (!newimport.isEmpty() && !newimport.isTopLevel()) {
                 /*                if(ns.kind==Namespace.KIND_PACKAGE){
                  newimport+=".*";
                  }*/

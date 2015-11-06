@@ -30,7 +30,9 @@ import java.util.List;
  */
 public class DottedChain implements Serializable {
 
-    public static final DottedChain EMPTY = new DottedChain();
+    public static final DottedChain EMPTY = new DottedChain(true);
+
+    public static final DottedChain TOPLEVEL = new DottedChain("");
 
     public static final DottedChain BOOLEAN = new DottedChain("Boolean");
 
@@ -65,6 +67,7 @@ public class DottedChain implements Serializable {
     private final int length;
 
     private final int hash;
+    private boolean isNull = false;
 
     public static final DottedChain parse(String name) {
         if (name == null || name.isEmpty()) {
@@ -72,6 +75,17 @@ public class DottedChain implements Serializable {
         } else {
             return new DottedChain(name.split("\\."));
         }
+    }
+
+    private DottedChain(boolean isNull) {
+        this.isNull = isNull;
+        this.parts = new String[0];
+        this.length = 0;
+        this.hash = 0;
+    }
+
+    public DottedChain(DottedChain src) {
+        this(src.parts);
     }
 
     public DottedChain(List<String> parts) {
@@ -92,8 +106,12 @@ public class DottedChain implements Serializable {
         hash = calcHash();
     }
 
+    public boolean isTopLevel() {
+        return !isNull && length == 0;
+    }
+
     public boolean isEmpty() {
-        return length == 0;
+        return isNull;
     }
 
     public int size() {
@@ -117,6 +135,9 @@ public class DottedChain implements Serializable {
     }
 
     public String getLast() {
+        if (isNull) {
+            return null;
+        }
         if (length == 0) {
             return "";
         } else {
@@ -125,6 +146,9 @@ public class DottedChain implements Serializable {
     }
 
     public DottedChain getWithoutLast() {
+        if (isNull) {
+            return null;
+        }
         if (length < 2) {
             return EMPTY;
         }
@@ -133,6 +157,9 @@ public class DottedChain implements Serializable {
     }
 
     public DottedChain add(String name) {
+        if (name == null) {
+            return new DottedChain(this);
+        }
         String[] nparts = new String[length + 1];
         if (length > 0) {
             System.arraycopy(parts, 0, nparts, 0, length);
@@ -142,7 +169,10 @@ public class DottedChain implements Serializable {
         return new DottedChain(nparts);
     }
 
-    private String toString(boolean as3, boolean raw) {
+    protected String toString(boolean as3, boolean raw) {
+        if (isNull) {
+            return "";
+        }
         if (length == 0) {
             return "";
         }
@@ -161,6 +191,9 @@ public class DottedChain implements Serializable {
     }
 
     public String toFilePath() {
+        if (isNull) {
+            return "";
+        }
         if (length == 0) {
             return "";
         }
@@ -199,6 +232,9 @@ public class DottedChain implements Serializable {
     }
 
     private int calcHash() {
+        if (isNull) {
+            return 0;
+        }
         int result = 1;
         for (int i = 0; i < length; i++) {
             result = 31 * result + parts[i].hashCode();
@@ -216,6 +252,9 @@ public class DottedChain implements Serializable {
             return false;
         }
         final DottedChain other = (DottedChain) obj;
+        if (isNull && other.isNull) {
+            return true;
+        }
         if (length != other.length) {
             return false;
         }

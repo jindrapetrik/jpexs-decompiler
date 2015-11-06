@@ -1274,7 +1274,6 @@ public class ABC {
 
         }
         List<ABC> otherAbcs = new ArrayList<>(pack.allABCs);
-
         otherAbcs.remove(this);
         ActionScript3Parser.compile(as, this, otherAbcs, isDocumentClass, scriptName, newClassIndex);
 

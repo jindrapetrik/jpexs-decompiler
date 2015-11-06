@@ -101,8 +101,11 @@ public class InstanceInfo {
 
         if (super_index > 0) {
             String typeName = abc.constants.getMultiname(super_index).getNameWithNamespace(abc.constants).toPrintableString(true);
-            writer.appendNoHilight(" extends ");
-            writer.hilightSpecial(abc.constants.getMultiname(super_index).getName(abc.constants, fullyQualifiedNames, false), HighlightSpecialType.TYPE_NAME, typeName);
+            String parentName = abc.constants.getMultiname(super_index).getName(abc.constants, fullyQualifiedNames, false);
+            if (!parentName.equals("Object")) {
+                writer.appendNoHilight(" extends ");
+                writer.hilightSpecial(parentName, HighlightSpecialType.TYPE_NAME, typeName);
+            }
         }
         if (interfaces.length > 0) {
             if (isInterface()) {

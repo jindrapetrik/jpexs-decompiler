@@ -198,7 +198,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
                     ins = ins(AVM2Instructions.ConvertU);
                     break;
                 default:
-                    int type_index = AVM2SourceGenerator.resolveType(localData, ttype, ((AVM2SourceGenerator) generator).abc, ((AVM2SourceGenerator) generator).allABCs);
+                    int type_index = AVM2SourceGenerator.resolveType(localData, ttype, ((AVM2SourceGenerator) generator).abcIndex);
                     ins = ins(AVM2Instructions.Coerce, type_index);
                     break;
             }

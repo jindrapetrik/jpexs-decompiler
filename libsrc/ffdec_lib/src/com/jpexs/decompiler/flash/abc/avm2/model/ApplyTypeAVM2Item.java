@@ -28,6 +28,7 @@ import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ApplyTypeAVM2Item extends AVM2Item {
 
@@ -39,6 +40,32 @@ public class ApplyTypeAVM2Item extends AVM2Item {
         super(instruction, PRECEDENCE_PRIMARY);
         this.params = params;
         this.object = object;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 79 * hash + Objects.hashCode(this.object);
+        hash = 79 * hash + Objects.hashCode(this.params);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final ApplyTypeAVM2Item other = (ApplyTypeAVM2Item) obj;
+        if (!Objects.equals(this.object, other.object)) {
+            return false;
+        }
+        if (!Objects.equals(this.params, other.params)) {
+            return false;
+        }
+        return true;
     }
 
     @Override

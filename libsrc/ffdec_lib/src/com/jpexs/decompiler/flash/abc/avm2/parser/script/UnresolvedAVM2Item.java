@@ -218,7 +218,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                 ins = ins(AVM2Instructions.CoerceS);
                 break;
             default:
-                int type_index = AVM2SourceGenerator.resolveType(localData, type, ((AVM2SourceGenerator) generator).abc, ((AVM2SourceGenerator) generator).allABCs);
+                int type_index = AVM2SourceGenerator.resolveType(localData, type, ((AVM2SourceGenerator) generator).abcIndex);
                 ins = ins(AVM2Instructions.Coerce, type_index);
                 break;
         }
@@ -287,7 +287,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         throw new RuntimeException("Cannot assign");
     }
 
-    public GraphTargetItem resolve(GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, ABC abc, List<ABC> otherAbcs, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {
+    public GraphTargetItem resolve(GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {
         if (scopeStack.isEmpty()) { //Everything is multiname property in with command
 
             //search for variable
@@ -301,7 +301,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                         ret.setRegNumber(n.getRegNumber());
                         resolved = ret;
                         for (int i = 1; i < name.size(); i++) {
-                            resolved = new PropertyAVM2Item(resolved, name.get(i), abc, otherAbcs, openedNamespaces, new ArrayList<>());
+                            resolved = new PropertyAVM2Item(resolved, name.get(i), abc, openedNamespaces, new ArrayList<>());
                             if (i == name.size() - 1) {
                                 ((PropertyAVM2Item) resolved).assignedValue = assignedValue;
                             }
@@ -323,7 +323,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                 TypeItem ret = new TypeItem(imp);
                 resolved = ret;
                 for (int i = 1; i < name.size(); i++) {
-                    resolved = new PropertyAVM2Item(resolved, name.get(i), abc, otherAbcs, openedNamespaces, new ArrayList<>());
+                    resolved = new PropertyAVM2Item(resolved, name.get(i), abc, openedNamespaces, new ArrayList<>());
                     if (i == name.size() - 1) {
                         ((PropertyAVM2Item) resolved).assignedValue = assignedValue;
                     }
@@ -336,95 +336,66 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         }
 
         //Search all fully qualitfied types
-        List<ABC> allAbcs = new ArrayList<>();
-        allAbcs.add(abc);
-        allAbcs.addAll(otherAbcs);
+        /*List<ABC> allAbcs = new ArrayList<>();
+         allAbcs.add(abc);
+         allAbcs.addAll(otherAbcs);*/
         for (int i = 0; i < name.size(); i++) {
             DottedChain fname = name.subChain(i + 1);
-            for (ABC a : allAbcs) {
-                for (int c = 0; c < a.instance_info.size(); c++) {
-                    if (a.instance_info.get(c).deleted) {
-                        continue;
-                    }
-                    if (a.instance_info.get(c).name_index > 0 && fname.equals(a.instance_info.get(c).getName(a.constants).getNameWithNamespace(a.constants))) {
-                        if (!subtypes.isEmpty() && name.size() > i + 1) {
-                            continue;
-                        }
-                        TypeItem ret = new TypeItem(fname);
-                        resolved = ret;
-                        for (int j = i + 1; j < name.size(); j++) {
-                            resolved = new PropertyAVM2Item(resolved, name.get(j), abc, otherAbcs, openedNamespaces, new ArrayList<>());
-                            if (j == name.size() - 1) {
-                                ((PropertyAVM2Item) resolved).assignedValue = assignedValue;
-                            }
-                        }
-                        if (name.size() == i + 1 && assignedValue != null) {
-                            throw new CompilationException("Cannot assign type", line);
-                        }
-
-                        return resolvedRoot = ret;
+            AbcIndexing.ClassIndex ci = abc.findClass(new TypeItem(fname));
+            if (ci != null) {
+                if (!subtypes.isEmpty() && name.size() > i + 1) {
+                    continue;
+                }
+                TypeItem ret = new TypeItem(fname);
+                resolved = ret;
+                for (int j = i + 1; j < name.size(); j++) {
+                    resolved = new PropertyAVM2Item(resolved, name.get(j), abc, openedNamespaces, new ArrayList<>());
+                    if (j == name.size() - 1) {
+                        ((PropertyAVM2Item) resolved).assignedValue = assignedValue;
                     }
                 }
+                if (name.size() == i + 1 && assignedValue != null) {
+                    throw new CompilationException("Cannot assign type", line);
+                }
+
+                return resolvedRoot = ret;
             }
         }
 
         //Search for types in opened namespaces
         for (int ni : openedNamespaces) {
-            Namespace ons = abc.constants.getNamespace(ni);
-            if (ons == null) {
-                continue;
-            }
-            for (ABC a : allAbcs) {
-                for (int c = 0; c < a.instance_info.size(); c++) {
-                    if (a.instance_info.get(c).deleted) {
-                        continue;
-                    }
-                    Multiname mname = a.instance_info.get(c).getName(a.constants);
-                    if (mname != null) {
-                        if ((a == abc && mname.namespace_index == ni)
-                                || (ons.kind != Namespace.KIND_PRIVATE && mname.getNamespace(a.constants) != null && mname.getNamespace(a.constants).hasName(ons.getName(abc.constants).toRawString(), a.constants))) {
-                            String cname = mname.getName(a.constants, null, true);
-                            if (name.get(0).equals(cname)) {
-                                if (!subtypes.isEmpty() && name.size() > 1) {
-                                    continue;
-                                }
-                                TypeItem ret = new TypeItem(mname.getNameWithNamespace(a.constants));
-                                /*for (String s : subtypes) {
-                                 UnresolvedAVM2Item su = new UnresolvedAVM2Item(new ArrayList<>(), importedClasses, true, null, line, s, null, openedNamespaces);
-                                 su.resolve(thisType, paramTypes, paramNames, abc, otherAbcs, callStack, variables);
-                                 if (!(su.resolved instanceof TypeItem)) {
-                                 throw new CompilationException("Not a type", line);
-                                 }
-                                 TypeItem st = (TypeItem) su.resolved;
-                                 ret.subtypes.add(st.fullTypeName);
-                                 }*/
-                                resolved = ret;
-                                for (int i = 1; i < name.size(); i++) {
-                                    resolved = new PropertyAVM2Item(resolved, name.get(i), abc, otherAbcs, openedNamespaces, new ArrayList<>());
-                                    if (i == name.size() - 1) {
-                                        ((PropertyAVM2Item) resolved).assignedValue = assignedValue;
-                                    }
-                                }
-                                if (name.size() == 1 && assignedValue != null) {
-                                    throw new CompilationException("Cannot assign type", line);
-                                }
-
-                                return resolvedRoot = ret;
-                            }
-                        }
+            Namespace ons = abc.getSelectedAbc().constants.getNamespace(ni);
+            TypeItem ti = new TypeItem(ons.getName(abc.getSelectedAbc().constants).add(name.get(0)));
+            AbcIndexing.ClassIndex ci = abc.findClass(ti);
+            if (ci != null) {
+                if (!subtypes.isEmpty() && name.size() > 1) {
+                    continue;
+                }
+                TypeItem ret = ti;
+                resolved = ret;
+                for (int i = 1; i < name.size(); i++) {
+                    resolved = new PropertyAVM2Item(resolved, name.get(i), abc, openedNamespaces, new ArrayList<>());
+                    if (i == name.size() - 1) {
+                        ((PropertyAVM2Item) resolved).assignedValue = assignedValue;
                     }
                 }
+                if (name.size() == 1 && assignedValue != null) {
+                    throw new CompilationException("Cannot assign type", line);
+                }
+
+                return resolvedRoot = ret;
             }
         }
 
-        if (name.get(0).equals("this") || name.get(0).equals("super")) {
+        if (name.get(
+                0).equals("this") || name.get(0).equals("super")) {
             if (thisType == null) {
                 throw new CompilationException("Cannot use this in that context", line);
             }
             NameAVM2Item ret = new NameAVM2Item(thisType, line, name.get(0), null, false, openedNamespaces);
             resolved = ret;
             for (int i = 1; i < name.size(); i++) {
-                resolved = new PropertyAVM2Item(resolved, name.get(i), abc, otherAbcs, openedNamespaces, new ArrayList<>());
+                resolved = new PropertyAVM2Item(resolved, name.get(i), abc, openedNamespaces, new ArrayList<>());
                 if (i == name.size() - 1) {
                     ((PropertyAVM2Item) resolved).assignedValue = assignedValue;
                 }
@@ -447,7 +418,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
             GraphTargetItem ret = new NameAVM2Item(t, line, name.get(0), null, false, openedNamespaces);
             resolved = ret;
             for (int i = 1; i < name.size(); i++) {
-                resolved = new PropertyAVM2Item(resolved, name.get(i), abc, otherAbcs, openedNamespaces, new ArrayList<>());
+                resolved = new PropertyAVM2Item(resolved, name.get(i), abc, openedNamespaces, new ArrayList<>());
                 if (i == name.size() - 1) {
                     ((PropertyAVM2Item) resolved).assignedValue = assignedValue;
                 }
@@ -458,7 +429,8 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
             return resolvedRoot = ret;
         }
 
-        if (/*!subtypes.isEmpty() && */name.size() == 1 && name.get(0).equals("Vector")) {
+        if (/*!subtypes.isEmpty() && */name.size()
+                == 1 && name.get(0).equals("Vector")) {
             TypeItem ret = new TypeItem(InitVectorAVM2Item.VECTOR_FQN);
             /*for (String s : subtypes) {
              UnresolvedAVM2Item su = new UnresolvedAVM2Item(new ArrayList<>(), importedClasses, true, null, line, s, null, openedNamespaces);
@@ -478,8 +450,10 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         }
         resolved = null;
         GraphTargetItem ret = null;
-        for (int i = 0; i < name.size(); i++) {
-            resolved = new PropertyAVM2Item(resolved, name.get(i), abc, otherAbcs, openedNamespaces, callStack);
+        for (int i = 0;
+                i < name.size();
+                i++) {
+            resolved = new PropertyAVM2Item(resolved, name.get(i), abc, openedNamespaces, callStack);
             if (ret == null) {
                 ((PropertyAVM2Item) resolved).scopeStack = scopeStack;
                 ret = resolved;

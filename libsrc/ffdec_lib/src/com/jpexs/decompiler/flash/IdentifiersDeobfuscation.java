@@ -214,7 +214,7 @@ public class IdentifiersDeobfuscation {
         String name = nChain.getLast();
 
         boolean changed = false;
-        if ((pkg != null) && (!pkg.isEmpty())) {
+        if ((pkg != null) && (!pkg.isEmpty()) && (!pkg.isTopLevel())) {
             DottedChain changedPkg = deobfuscatePackage(as3, pkg, namesMap, renameType, selected);
             if (changedPkg != null) {
                 changed = true;
@@ -344,7 +344,7 @@ public class IdentifiersDeobfuscation {
      * @return
      */
     public static String printIdentifier(boolean as3, String s, String... validExceptions) {
-        if (s.isEmpty()) {
+        if (s == null || s.isEmpty()) {
             return "";
         }
 

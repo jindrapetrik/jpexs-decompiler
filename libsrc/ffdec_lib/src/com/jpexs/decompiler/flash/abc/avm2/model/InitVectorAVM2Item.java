@@ -112,8 +112,8 @@ public class InitVectorAVM2Item extends AVM2Item {
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
         List<GraphSourceItem> ret = toSourceMerge(localData, generator,
-                ins(AVM2Instructions.FindPropertyStrict, g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAME, g.abc.constants.getStringId("Vector", true), 0, g.abc.constants.getNamespaceSetId(new NamespaceSet(new int[]{g.abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, g.abc.constants.getStringId("__AS3__.vec", true)), 0, true)}), true), 0, new ArrayList<>()), true)),
-                ins(AVM2Instructions.GetProperty, g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAME, g.abc.constants.getStringId("Vector", true), 0, allNsSet(g.abc), 0, new ArrayList<>()), true)),
+                ins(AVM2Instructions.FindPropertyStrict, g.abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.MULTINAME, g.abcIndex.getSelectedAbc().constants.getStringId("Vector", true), 0, g.abcIndex.getSelectedAbc().constants.getNamespaceSetId(new NamespaceSet(new int[]{g.abcIndex.getSelectedAbc().constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, g.abcIndex.getSelectedAbc().constants.getStringId("__AS3__.vec", true)), 0, true)}), true), 0, new ArrayList<>()), true)),
+                ins(AVM2Instructions.GetProperty, g.abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.MULTINAME, g.abcIndex.getSelectedAbc().constants.getStringId("Vector", true), 0, allNsSet(g.abcIndex.getSelectedAbc()), 0, new ArrayList<>()), true)),
                 subtype,
                 ins(AVM2Instructions.ApplyType, 1),
                 new IntegerValueAVM2Item(null, (long) arguments.size()),
@@ -124,7 +124,7 @@ public class InitVectorAVM2Item extends AVM2Item {
                     ins(AVM2Instructions.Dup),
                     new IntegerValueAVM2Item(null, (long) i),
                     arguments.get(i),
-                    ins(AVM2Instructions.SetProperty, g.abc.constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, g.abc.constants.getNamespaceSetId(new NamespaceSet(new int[]{g.abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, g.abc.constants.getStringId("", true)), 0, true)}), true), precedence, openedNamespaces), true))
+                    ins(AVM2Instructions.SetProperty, g.abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, g.abcIndex.getSelectedAbc().constants.getNamespaceSetId(new NamespaceSet(new int[]{g.abcIndex.getSelectedAbc().constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, g.abcIndex.getSelectedAbc().constants.getStringId("", true)), 0, true)}), true), precedence, openedNamespaces), true))
             ));
         }
         return ret;

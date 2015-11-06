@@ -957,7 +957,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
     public void testMyPackage1TestClass() {
         decompileScriptPack("classes.mypackage1.TestClass", "package classes.mypackage1\n"
                 + "{\n"
-                + "   public class TestClass extends Object implements classes.mypackage1.TestInterface\n"
+                + "   public class TestClass implements classes.mypackage1.TestInterface\n"
                 + "   {\n"
                 + "       \n"
                 + "      public function TestClass()\n"
@@ -994,7 +994,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
     public void testMyPackage1TestClass2() {
         decompileScriptPack("classes.mypackage1.TestClass2", "package classes.mypackage1\n"
                 + "{\n"
-                + "   public class TestClass2 extends Object\n"
+                + "   public class TestClass2\n"
                 + "   {\n"
                 + "       \n"
                 + "      public function TestClass2()\n"
@@ -1057,7 +1057,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
     public void testMyPackage2TestClass() {
         decompileScriptPack("classes.mypackage2.TestClass", "package classes.mypackage2\n"
                 + "{\n"
-                + "   public class TestClass extends Object implements TestInterface\n"
+                + "   public class TestClass implements TestInterface\n"
                 + "   {\n"
                 + "       \n"
                 + "      public function TestClass()\n"
@@ -1094,7 +1094,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
     public void testMyPackage3TestClass() {
         decompileScriptPack("classes.mypackage3.TestClass", "package classes.mypackage3\n"
                 + "{\n"
-                + "   public class TestClass extends Object\n"
+                + "   public class TestClass\n"
                 + "   {\n"
                 + "       \n"
                 + "      public function TestClass()\n"

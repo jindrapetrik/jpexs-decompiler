@@ -129,7 +129,7 @@ public class CoerceAVM2Item extends AVM2Item {
                 ins = new AVM2Instruction(0, AVM2Instructions.ConvertD, null);
                 break;
             default:
-                int type_index = AVM2SourceGenerator.resolveType(localData, typeObj, ((AVM2SourceGenerator) generator).abc, (((AVM2SourceGenerator) generator).allABCs));
+                int type_index = AVM2SourceGenerator.resolveType(localData, typeObj, ((AVM2SourceGenerator) generator).abcIndex);
                 ins = new AVM2Instruction(0, AVM2Instructions.Coerce, new int[]{type_index});
                 break;
         }
