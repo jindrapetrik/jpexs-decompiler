@@ -36,7 +36,7 @@ public abstract class FileTestBase {
             files = dir.listFiles(new FilenameFilter() {
                 @Override
                 public boolean accept(File dir, String name) {
-                    return name.toLowerCase().endsWith(".swf");
+                    return name.toLowerCase().endsWith(".swf") && !name.toLowerCase().endsWith(".recompiled.swf");
                 }
             });
         }
