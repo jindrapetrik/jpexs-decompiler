@@ -25,6 +25,8 @@ public class AVM2VerifyErrorException extends AVM2ExecutionException {
 
     public static final int BRANCH_TARGET_INVALID_INSTRUCTION = 1021;
 
+    public static final int CPOOL_INDEX_OUT_OF_RANGE = 1032;
+
     public AVM2VerifyErrorException(int code) {
         super(codeToMessage(code, null));
     }
@@ -42,11 +44,14 @@ public class AVM2VerifyErrorException extends AVM2ExecutionException {
             case 1014:
                 msg = "class could not be found";
                 break;
-            case 1021:
+            case BRANCH_TARGET_INVALID_INSTRUCTION:
                 msg = "At least one branch target was not on a valid instruction in the method.";
                 break;
             case 1030:
                 msg = "Stack depth is unbalanced";
+                break;
+            case CPOOL_INDEX_OUT_OF_RANGE:
+                msg = "Cpool index " + params[0] + " is out of range " + params[1] + ".";
                 break;
         }
 

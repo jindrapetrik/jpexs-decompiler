@@ -25,7 +25,6 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrict
 import com.jpexs.decompiler.flash.abc.avm2.model.ApplyTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.InitVectorAVM2Item;
-import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
@@ -223,7 +222,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                             propType = outPropType.getVal();
                             propIndex = abc.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.QNAME,
                                     abc.getSelectedAbc().constants.getStringId(propertyName, true),
-                                    abc.getSelectedAbc().constants.getNamespaceId(new Namespace(outPropNsKind.getVal(), outPropNs.getVal() == null || outPropNs.getVal().isEmpty() ? 0 : abc.getSelectedAbc().constants.getStringId(outPropNs.getVal(), true)), outPropNsIndex.getVal(), true), 0, 0, new ArrayList<>()), true
+                                    abc.getSelectedAbc().constants.getNamespaceId(outPropNsKind.getVal(), outPropNs.getVal(), outPropNsIndex.getVal(), true), 0, 0, new ArrayList<>()), true
                             );
                             propValue = outPropValue.getVal();
                             propValueAbc = outPropValueAbc.getVal();
@@ -332,7 +331,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                             propType = p.returnType;
                                             propIndex = abc.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.QNAME,
                                                     abc.getSelectedAbc().constants.getStringId(propertyName, true),
-                                                    abc.getSelectedAbc().constants.getNamespaceId(new Namespace(outPropNsKind.getVal(), outPropNs.getVal() == null || outPropNs.getVal().isEmpty() ? 0 : abc.getSelectedAbc().constants.getStringId(outPropNs.getVal(), true)), outPropNsIndex.getVal(), true), 0, 0, new ArrayList<>()), true
+                                                    abc.getSelectedAbc().constants.getNamespaceId(outPropNsKind.getVal(), outPropNs.getVal(), outPropNsIndex.getVal(), true), 0, 0, new ArrayList<>()), true
                                             );
                                             propValue = p.value;
                                             propValueAbc = outPropValueAbc.getVal();
@@ -341,7 +340,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                     }
 
                                     //if (propertyName != null && AVM2SourceGenerator.searchPrototypeChain(false, abcs, nsname, n.getName(a.constants, null, true), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue)) {
-                                    //  
+                                    //
                                     //}
                                 }
                             }
@@ -360,7 +359,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
             }
             propIndex = abc.getSelectedAbc().constants.getMultinameId(new Multiname(attr ? (pname.isEmpty() ? Multiname.MULTINAMELA : Multiname.MULTINAMEA) : Multiname.MULTINAME,
                     abc.getSelectedAbc().constants.getStringId("*".equals(pname) ? null : pname, true), 0, //Note: name = * is for .@* attribute
-                    attr && pname.isEmpty() ? abc.getSelectedAbc().constants.getNamespaceSetId(new NamespaceSet(new int[]{abc.getSelectedAbc().constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE_INTERNAL, localData.pkg == null || localData.pkg.isEmpty() ? 0 : abc.getSelectedAbc().constants.getStringId(localData.pkg, true)), 0, true)}), true) : allNsSet(), 0, new ArrayList<>()), true);
+                    attr && pname.isEmpty() ? abc.getSelectedAbc().constants.getNamespaceSetId(new NamespaceSet(new int[]{abc.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE_INTERNAL, localData.pkg, 0, true)}), true) : allNsSet(), 0, new ArrayList<>()), true);
             propType = TypeItem.UNBOUNDED;
             objType = TypeItem.UNBOUNDED;
             propValue = null;

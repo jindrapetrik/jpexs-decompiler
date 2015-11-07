@@ -52,7 +52,7 @@ public class ConstructSomethingAVM2Item extends CallAVM2Item {
         for (int i = 0; i < openedNamespaces.size(); i++) {
             nssa[i] = openedNamespaces.get(i);
         }
-        nssa[nssa.length - 1] = abc.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, abc.constants.getStringId("__AS3__.vec", true)), 0, true);
+        nssa[nssa.length - 1] = abc.constants.getNamespaceId(Namespace.KIND_PACKAGE, "__AS3__.vec", 0, true);
         return abc.constants.getNamespaceSetId(new NamespaceSet(nssa), true);
 
     }

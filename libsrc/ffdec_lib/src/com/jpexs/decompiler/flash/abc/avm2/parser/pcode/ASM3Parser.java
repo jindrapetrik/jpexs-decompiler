@@ -253,7 +253,7 @@ public class ASM3Parser {
         }
         expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
 
-        return constants.getNamespaceId(new Namespace(kind, name.type == ParsedSymbol.TYPE_KEYWORD_NULL ? 0 : constants.getStringId((String) name.value, true)), index, true);
+        return constants.getNamespaceId(kind, name.type == ParsedSymbol.TYPE_KEYWORD_NULL ? null : (String) name.value, index, true);
     }
 
     private static int parseMultiName(AVM2ConstantPool constants, Flasm3Lexer lexer) throws AVM2ParseException, IOException {
@@ -758,7 +758,7 @@ public class ASM3Parser {
                                     } else {
                                         if (parsedOperand.type == ParsedSymbol.TYPE_STRING) {
                                             int sid = constants.getStringId((String) parsedOperand.value);
-                                            if (sid == 0) {
+                                            if (sid == -1) {
                                                 if ((missingHandler != null) && (missingHandler.missingString((String) parsedOperand.value))) {
                                                     sid = constants.addString((String) parsedOperand.value);
                                                 } else {
@@ -779,7 +779,7 @@ public class ASM3Parser {
                                         if (parsedOperand.type == ParsedSymbol.TYPE_INTEGER) {
                                             long intVal = (Long) parsedOperand.value;
                                             int iid = constants.getIntId(intVal);
-                                            if (iid == 0) {
+                                            if (iid == -1) {
                                                 if ((missingHandler != null) && (missingHandler.missingInt(intVal))) {
                                                     iid = constants.addInt(intVal);
                                                 } else {
@@ -799,7 +799,7 @@ public class ASM3Parser {
                                         if (parsedOperand.type == ParsedSymbol.TYPE_INTEGER) {
                                             long intVal = (Long) parsedOperand.value;
                                             int iid = constants.getUIntId(intVal);
-                                            if (iid == 0) {
+                                            if (iid == -1) {
                                                 if ((missingHandler != null) && (missingHandler.missingUInt(intVal))) {
                                                     iid = constants.addUInt(intVal);
                                                 } else {
@@ -826,7 +826,7 @@ public class ASM3Parser {
                                                 doubleVal = (Double) parsedOperand.value;
                                             }
                                             int did = constants.getDoubleId(doubleVal);
-                                            if (did == 0) {
+                                            if (did == -1) {
                                                 if ((missingHandler != null) && (missingHandler.missingDouble(doubleVal))) {
                                                     did = constants.addDouble(doubleVal);
                                                 } else {

@@ -98,7 +98,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -290,7 +289,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 ins(AVM2Instructions.CheckFilter),
                 NameAVM2Item.generateCoerce(localData, this, TypeItem.UNBOUNDED),
                 AssignableAVM2Item.setTemp(localData, this, collectionReg),
-                ins(AVM2Instructions.GetLex, abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.QNAME, abcIndex.getSelectedAbc().constants.getStringId("XMLList", true), abcIndex.getSelectedAbc().constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, abcIndex.getSelectedAbc().constants.getStringId("", true)), 0, true), 0, 0, new ArrayList<>()), true)),
+                ins(AVM2Instructions.GetLex, abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.QNAME, abcIndex.getSelectedAbc().constants.getStringId("XMLList", true), abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE, "", 0, true), 0, 0, new ArrayList<>()), true)),
                 ins(AVM2Instructions.PushString, abcIndex.getSelectedAbc().constants.getStringId("", true)),
                 ins(AVM2Instructions.Construct, 1),
                 xmlListSetTemp
@@ -695,7 +694,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
             ret.add(ins(AVM2Instructions.Dup));
             ret.add(ins(AVM2Instructions.GetScopeObject, scope));
             ret.add(ins(AVM2Instructions.Swap));
-            ret.add(ins(AVM2Instructions.SetProperty, abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.QNAME, abcIndex.getSelectedAbc().constants.getStringId(item.functionName, true), abcIndex.getSelectedAbc().constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, abcIndex.getSelectedAbc().constants.getStringId(localData.pkg, true)), 0, true), 0, 0, new ArrayList<>()), true)));
+            ret.add(ins(AVM2Instructions.SetProperty, abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.QNAME, abcIndex.getSelectedAbc().constants.getStringId(item.functionName, true), abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE, localData.pkg, 0, true), 0, 0, new ArrayList<>()), true)));
             ret.add(ins(AVM2Instructions.PopScope));
             localData.scopeStack.remove(localData.scopeStack.size() - 1);
         }
@@ -717,7 +716,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         int finallyEx = -1;
         for (NameAVM2Item e : item.catchExceptions2) {
             ABCException aex = new ABCException();
-            aex.name_index = abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.QNAME, abcIndex.getSelectedAbc().constants.getStringId(e.getVariableName(), true), abcIndex.getSelectedAbc().constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, abcIndex.getSelectedAbc().constants.getStringId("", true)), 0, true), 0, 0, new ArrayList<>()), true);
+            aex.name_index = abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.QNAME, abcIndex.getSelectedAbc().constants.getStringId(e.getVariableName(), true), abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE, "", 0, true), 0, 0, new ArrayList<>()), true);
             aex.type_index = typeName(localData, e.type);
             newex.add(aex);
         }
@@ -1329,7 +1328,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
     }
 
     public int namespace(int nsKind, String name) {
-        return abcIndex.getSelectedAbc().constants.getNamespaceId(new Namespace(nsKind, str(name)), 0, true);
+        return abcIndex.getSelectedAbc().constants.getNamespaceId(nsKind, str(name), 0, true);
     }
 
     public int str(String name) {
@@ -1638,7 +1637,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 for (int i = 1; i < slotNames.size(); i++) {
                     TraitSlotConst tsc = new TraitSlotConst();
                     tsc.slot_id = slotId++;
-                    tsc.name_index = abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.QNAME, abcIndex.getSelectedAbc().constants.getStringId(slotNames.get(i), true), abcIndex.getSelectedAbc().constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE_INTERNAL, abcIndex.getSelectedAbc().constants.getStringId(pkg, true)), 0, true), 0, 0, new ArrayList<>()), true);
+                    tsc.name_index = abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.QNAME, abcIndex.getSelectedAbc().constants.getStringId(slotNames.get(i), true), abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE_INTERNAL, pkg, 0, true), 0, 0, new ArrayList<>()), true);
                     tsc.type_index = typeName(localData, new TypeItem(slotTypes.get(i)));
                     mbody.traits.traits.add(tsc);
                 }
@@ -1862,16 +1861,15 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     if (ti.trait instanceof TraitSlotConst) {
                         if (((TraitSlotConst) ti.trait).isNamespace()) {
                             Namespace ns = ti.abc.constants.getNamespace(((TraitSlotConst) ti.trait).value_index);
-                            return abcIndex.getSelectedAbc().constants.getNamespaceId(new Namespace(ns.kind, abcIndex.getSelectedAbc().constants.getStringId(ns.getName(ti.abc.constants), true)), 0, true);
+                            return abcIndex.getSelectedAbc().constants.getNamespaceId(ns.kind, ns.getName(ti.abc.constants), 0, true);
                         }
                     }
                 }
 
                 throw new CompilationException("Namespace not defined", line);
             }
-            namespace = abcIndex.getSelectedAbc().constants.getNamespaceId(new Namespace(Namespace.KIND_NAMESPACE,
-                    abcIndex.getSelectedAbc().constants.getStringId(outAbc.getVal().constants.getNamespace(value.getVal().value_index).getName(outAbc.getVal().constants), true)
-            ), 0, true);
+            namespace = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_NAMESPACE,
+                    outAbc.getVal().constants.getNamespace(value.getVal().value_index).getName(outAbc.getVal().constants), 0, true);
         }
         return namespace;
     }
@@ -1908,7 +1906,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                         new Multiname(
                                 Multiname.QNAME,
                                 abcIndex.getSelectedAbc().constants.getStringId(((ClassAVM2Item) item).className, true),
-                                abcIndex.getSelectedAbc().constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, abcIndex.getSelectedAbc().constants.getStringId(((ClassAVM2Item) item).pkg, true)), 0, true), 0, 0, new ArrayList<>()), true);
+                                abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE, ((ClassAVM2Item) item).pkg, 0, true), 0, 0, new ArrayList<>()), true);
 
                 if (((ClassAVM2Item) item).extendsOp != null) {
                     instanceInfo.super_index = typeName(localData, ((ClassAVM2Item) item).extendsOp);
@@ -1923,7 +1921,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
             if (item instanceof InterfaceAVM2Item) {
                 InstanceInfo instanceInfo = abcIndex.getSelectedAbc().instance_info.get(((TraitClass) traits[k]).class_info);
                 instanceInfo.name_index = abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.QNAME, abcIndex.getSelectedAbc().constants.getStringId(((InterfaceAVM2Item) item).name, true),
-                        abcIndex.getSelectedAbc().constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, abcIndex.getSelectedAbc().constants.getStringId(((InterfaceAVM2Item) item).pkg, true)), 0, true), 0, 0, new ArrayList<>()), true);
+                        abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE, ((InterfaceAVM2Item) item).pkg, 0, true), 0, 0, new ArrayList<>()), true);
 
                 instanceInfo.interfaces = new int[((InterfaceAVM2Item) item).superInterfaces.size()];
                 for (int i = 0; i < ((InterfaceAVM2Item) item).superInterfaces.size(); i++) {
@@ -2179,9 +2177,8 @@ public class AVM2SourceGenerator implements SourceGenerator {
                         parents.add(abcIndex.getSelectedAbc().constants.getMultinameId(
                                 new Multiname(origM.kind,
                                         abcIndex.getSelectedAbc().constants.getStringId(ci.abc.constants.getString(origM.name_index), true),
-                                        abcIndex.getSelectedAbc().constants.getNamespaceId(new Namespace(origNs.kind, abcIndex.getSelectedAbc().constants.getStringId(
-                                                                ci.abc.constants.getString(origNs.name_index)
-                                                        )), 0, true), 0, 0, new ArrayList<Integer>())
+                                        abcIndex.getSelectedAbc().constants.getNamespaceId(origNs.kind,
+                                                ci.abc.constants.getString(origNs.name_index), 0, true), 0, 0, new ArrayList<>())
                         ));
                     }
 
@@ -2231,7 +2228,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     abc.getSelectedAbc().constants.getMultinameId(
                             new Multiname(Multiname.QNAME,
                                     abc.getSelectedAbc().constants.getStringId(superName.getName(a.constants, null, true), true),
-                                    abc.getSelectedAbc().constants.getNamespaceId(new Namespace(superName.getNamespace(a.constants).kind, abc.getSelectedAbc().constants.getStringId(superName.getNamespace(a.constants).getName(a.constants), true)), 0, true), 0, 0, new ArrayList<>()), true)
+                                    abc.getSelectedAbc().constants.getNamespaceId(superName.getNamespace(a.constants).kind, superName.getNamespace(a.constants).getName(a.constants), 0, true), 0, 0, new ArrayList<>()), true)
             );
         }
     }
@@ -2412,7 +2409,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 }
             }
             if (name_index == 0) {
-                name_index = abc.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.QNAME, abc.getSelectedAbc().constants.getStringId(name, true), abc.getSelectedAbc().constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, abc.getSelectedAbc().constants.getStringId(pkg, true)), 0, true), 0, 0, new ArrayList<>()), true);
+                name_index = abc.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.QNAME, abc.getSelectedAbc().constants.getStringId(name, true), abc.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE, pkg, 0, true), 0, 0, new ArrayList<>()), true);
             }
         }
 
