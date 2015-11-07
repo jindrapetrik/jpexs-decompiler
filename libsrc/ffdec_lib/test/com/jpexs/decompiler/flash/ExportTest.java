@@ -113,7 +113,7 @@ public class ExportTest extends FileTestBase {
     }
 
     @Override
-    public String getTestDataDir() {
-        return TESTDATADIR;
+    public String[] getTestDataDirs() {
+        return new String[]{TESTDATADIR, FREE_ACTIONSCRIPT_AS2, FREE_ACTIONSCRIPT_AS3};
     }
 }

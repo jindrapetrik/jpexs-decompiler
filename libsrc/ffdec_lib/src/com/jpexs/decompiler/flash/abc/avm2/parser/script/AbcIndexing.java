@@ -368,8 +368,14 @@ public class AbcIndexing {
         AbcIndexing.ClassIndex ci = findClass(prop.parent);
         if (ci != null && ci.parent != null) {
             ci = ci.parent;
+            //parent protected
             DottedChain parentClass = ci.abc.instance_info.get(ci.index).getName(ci.abc.constants).getNameWithNamespace(ci.abc.constants);
-            return findProperty(new PropertyDef(prop.propName, new TypeItem(parentClass), ci.abc, ci.abc.instance_info.get(ci.index).getName(ci.abc.constants).namespace_index), findStatic, findInstance);
+            TraitIndex pti = findProperty(new PropertyDef(prop.propName, new TypeItem(parentClass), ci.abc, ci.abc.instance_info.get(ci.index).protectedNS), findStatic, findInstance);
+            if (pti != null) {
+                return pti;
+            }
+            //parent public
+            return findProperty(new PropertyDef(prop.propName, new TypeItem(parentClass), null, 0), findStatic, findInstance);
         }
 
         return null;
@@ -512,7 +518,8 @@ public class AbcIndexing {
             ClassInfo ci = abc.class_info.get(i);
             ClassIndex cindex = new ClassIndex(i, abc, null);
             addedClasses.add(cindex);
-            classes.put(multinameToType(ii.name_index, abc.constants), cindex);
+            GraphTargetItem cname = multinameToType(ii.name_index, abc.constants);
+            classes.put(cname, cindex);
 
             indexTraits(abc, ii.name_index, ii.instance_traits, instanceProperties, instanceNsProperties);
             indexTraits(abc, ii.name_index, ci.static_traits, classProperties, classNsProperties);
@@ -520,13 +527,15 @@ public class AbcIndexing {
         for (int i = 0; i < abc.script_info.size(); i++) {
             indexTraits(abc, 0, abc.script_info.get(i).traits, null, scriptProperties);
         }
+
         for (ClassIndex cindex : addedClasses) {
             int parentClassName = abc.instance_info.get(cindex.index).super_index;
             if (parentClassName > 0) {
                 TypeItem parentClass = new TypeItem(abc.constants.getMultiname(parentClassName).getNameWithNamespace(abc.constants));
                 ClassIndex parentClassIndex = findClass(parentClass);
                 if (parentClassIndex == null) {
-                    throw new RuntimeException("Parent class " + parentClass + " definition not found!");
+                    //Parent class can be deleted, do not check. TODO: handle this better
+                    //throw new RuntimeException("Parent class " + parentClass + " definition not found!");
                 }
                 cindex.parent = parentClassIndex;
             }

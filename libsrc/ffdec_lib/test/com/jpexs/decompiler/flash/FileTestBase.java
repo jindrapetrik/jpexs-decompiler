@@ -18,6 +18,8 @@ package com.jpexs.decompiler.flash;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.ArrayList;
+import java.util.List;
 import org.testng.annotations.DataProvider;
 
 /**
@@ -26,25 +28,34 @@ import org.testng.annotations.DataProvider;
  */
 public abstract class FileTestBase {
 
-    protected abstract String getTestDataDir();
+    protected abstract String[] getTestDataDirs();
+
+    protected static final String FREE_ACTIONSCRIPT_AS2 = "testdata/freeactionscript.com/as2";
+    protected static final String FREE_ACTIONSCRIPT_AS3 = "testdata/freeactionscript.com/as3";
 
     @DataProvider(name = "provideFiles")
     public Object[][] provideFiles() {
-        File dir = new File(getTestDataDir());
-        File[] files = new File[0];
-        if (dir.exists()) {
-            files = dir.listFiles(new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, String name) {
-                    return name.toLowerCase().endsWith(".swf") && !name.toLowerCase().endsWith(".recompiled.swf");
+        String[] dirs = getTestDataDirs();
+        List<String> files = new ArrayList<>();
+        for (String d : dirs) {
+            File dir = new File(d);
+            if (dir.exists()) {
+                File[] fs = dir.listFiles(new FilenameFilter() {
+                    @Override
+                    public boolean accept(File dir, String name) {
+                        return name.toLowerCase().endsWith(".swf") && !name.toLowerCase().endsWith(".recompiled.swf");
+                    }
+                });
+                for (File f : fs) {
+                    files.add(dir.getAbsolutePath() + File.separator + f.getName());
                 }
-            });
+            }
         }
-        Object[][] ret = new Object[files.length + 2][1];
+        Object[][] ret = new Object[files.size() + 2][1];
         ret[0][0] = "testdata/as2/as2.swf";
         ret[1][0] = "testdata/as3/as3.swf";
-        for (int f = 0; f < files.length; f++) {
-            ret[f + 2][0] = dir.getAbsolutePath() + File.separator + files[f].getName();
+        for (int f = 0; f < files.size(); f++) {
+            ret[f + 2][0] = files.get(f);
         }
         return ret;
     }

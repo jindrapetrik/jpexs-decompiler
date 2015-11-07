@@ -91,14 +91,7 @@ public class DirectEditingTest extends FileTestBase {
                         System.out.println("Recompiling:" + classPathString + "...");
                         en.toSource(htw, abc.script_info.get(s).traits.traits, new ConvertData(), ScriptExportMode.AS, false);
                         String original = htw.toString();
-                        List<ABC> otherAbcs = new ArrayList<>(allAbcs);
-                        otherAbcs.remove(abc);
-                        ActionScript3Parser.compile(original, abc, otherAbcs, false, en.getClassPath().className + ".as", abc.instance_info.size());
-
-                        //remove last compiled script:
-                        ScriptInfo n = abc.script_info.remove(abc.script_info.size() - 1);
-                        abc.script_info.set(s, n);
-                        ((Tag) abc.parentTag).setModified(true);
+                        abc.replaceScriptPack(en, original);
                     }
                 }
             } else {
@@ -150,7 +143,7 @@ public class DirectEditingTest extends FileTestBase {
     }
 
     @Override
-    public String getTestDataDir() {
-        return TESTDATADIR;
+    public String[] getTestDataDirs() {
+        return new String[]{TESTDATADIR, FREE_ACTIONSCRIPT_AS2, FREE_ACTIONSCRIPT_AS3};
     }
 }
