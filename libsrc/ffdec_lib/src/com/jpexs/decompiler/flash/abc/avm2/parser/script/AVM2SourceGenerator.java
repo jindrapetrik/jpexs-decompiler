@@ -690,7 +690,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
             scope = localData.scopeStack.size();
             localData.scopeStack.add(new PropertyAVM2Item(null, item.functionName, abcIndex, new ArrayList<>(), localData.callStack));
         }
-        ret.add(ins(AVM2Instructions.NewFunction, method(abcIndex.getSelectedAbc().constants.getStringId(item.functionName, true), true, false, localData.callStack, localData.pkg, item.needsActivation, item.subvariables, 0 /*Set later*/, item.hasRest, item.line, localData.currentClass, null, false, localData, item.paramTypes, item.paramNames, item.paramValues, item.body, item.retType)));
+        ret.add(ins(AVM2Instructions.NewFunction, method(false, abcIndex.getSelectedAbc().constants.getStringId(item.functionName, true), true, false, localData.callStack, localData.pkg, item.needsActivation, item.subvariables, 0 /*Set later*/, item.hasRest, item.line, localData.currentClass, null, false, localData, item.paramTypes, item.paramNames, item.paramValues, item.body, item.retType)));
         if (!item.functionName.isEmpty()) {
             ret.add(ins(AVM2Instructions.Dup));
             ret.add(ins(AVM2Instructions.GetScopeObject, scope));
@@ -1175,14 +1175,14 @@ public class AVM2SourceGenerator implements SourceGenerator {
         generateTraitsPhase3(initScope, isInterface, name, superName, true, localData, traitItems, classInfo.static_traits, st, new HashMap<>(), class_index);
         int init = 0;
         if (constructor == null || isInterface) {
-            instanceInfo.iinit_index = init = method(0, false, isInterface, new ArrayList<>(), pkg, false, new ArrayList<>(), initScope + 1, false, 0, isInterface ? null : name, extendsVal != null ? extendsVal.toString() : null, true, localData, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), TypeItem.UNBOUNDED/*?? FIXME*/);
+            instanceInfo.iinit_index = init = method(false, 0, false, isInterface, new ArrayList<>(), pkg, false, new ArrayList<>(), initScope + 1, false, 0, isInterface ? null : name, extendsVal != null ? extendsVal.toString() : null, true, localData, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), TypeItem.UNBOUNDED/*?? FIXME*/);
         } else {
             MethodAVM2Item m = (MethodAVM2Item) constructor;
-            instanceInfo.iinit_index = init = method(0, false, false, new ArrayList<>(), pkg, m.needsActivation, m.subvariables, initScope + 1, m.hasRest, m.line, name, extendsVal != null ? extendsVal.toString() : null, true, localData, m.paramTypes, m.paramNames, m.paramValues, m.body, TypeItem.UNBOUNDED/*?? FIXME*/);
+            instanceInfo.iinit_index = init = method(false, 0, false, false, new ArrayList<>(), pkg, m.needsActivation, m.subvariables, initScope + 1, m.hasRest, m.line, name, extendsVal != null ? extendsVal.toString() : null, true, localData, m.paramTypes, m.paramNames, m.paramValues, m.body, TypeItem.UNBOUNDED/*?? FIXME*/);
         }
 
         //Class initializer
-        int staticMi = method(0, false, false, new ArrayList<>(), pkg, staticNeedsActivation, sinitVariables, initScope + (implementsStr.isEmpty() ? 0 : 1), false, 0, isInterface ? null : name, superName, false, localData, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), staticInit, TypeItem.UNBOUNDED);
+        int staticMi = method(true, 0, false, false, new ArrayList<>(), pkg, staticNeedsActivation, sinitVariables, initScope + (implementsStr.isEmpty() ? 0 : 1), false, 0, isInterface ? null : name, superName, false, localData, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), staticInit, TypeItem.UNBOUNDED);
         MethodBody sinitBody = abcIndex.getSelectedAbc().findBody(staticMi);
 
         List<AVM2Instruction> sinitcode = new ArrayList<>();
@@ -1209,6 +1209,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 }
                 if (isStatic && val != null) {
                     sinitcode.add(ins(AVM2Instructions.FindProperty, traitName(ns, tname)));
+                    localData.isStatic = true;
                     sinitcode.addAll(toInsList(val.toSource(localData, this)));
                     sinitcode.add(ins(isConst ? AVM2Instructions.InitProperty : AVM2Instructions.SetProperty, traitName(ns, tname)));
                 }
@@ -1216,6 +1217,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     //do not init basic values, that can be stored in trait
                     if (!(val instanceof IntegerValueAVM2Item) && !(val instanceof StringAVM2Item) && !(val instanceof BooleanAVM2Item) && !(val instanceof NullAVM2Item) && !(val instanceof UndefinedAVM2Item)) {
                         initcode.add(ins(AVM2Instructions.GetLocal0));
+                        localData.isStatic = false;
                         initcode.addAll(toInsList(val.toSource(localData, this)));
                         initcode.add(ins(isConst ? AVM2Instructions.InitProperty : AVM2Instructions.SetProperty, traitName(ns, tname)));
                     }
@@ -1366,7 +1368,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return false;
     }
 
-    public int method(int name_index, boolean subMethod, boolean isInterface, List<MethodBody> callStack, DottedChain pkg, boolean needsActivation, List<AssignableAVM2Item> subvariables, int initScope, boolean hasRest, int line, String className, String superType, boolean constructor, SourceGeneratorLocalData localData, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, GraphTargetItem retType) throws CompilationException {
+    public int method(boolean isStatic, int name_index, boolean subMethod, boolean isInterface, List<MethodBody> callStack, DottedChain pkg, boolean needsActivation, List<AssignableAVM2Item> subvariables, int initScope, boolean hasRest, int line, String className, String superType, boolean constructor, SourceGeneratorLocalData localData, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, GraphTargetItem retType) throws CompilationException {
         //Reference<Boolean> hasArgs = new Reference<>(Boolean.FALSE);
         //calcRegisters(localData,needsActivation,paramNames,subvariables,body, hasArgs);
         SourceGeneratorLocalData newlocalData = new SourceGeneratorLocalData(new HashMap<>(), 1, true, 0);
@@ -1378,6 +1380,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         newlocalData.documentClass = localData.documentClass;
         newlocalData.privateNs = localData.privateNs;
         newlocalData.protectedNs = localData.protectedNs;
+        newlocalData.isStatic = isStatic;
         newlocalData.subMethod = subMethod;
         localData = newlocalData;
 
@@ -1799,7 +1802,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
             }
         }
 
-        if ((type instanceof TypeItem) && (((TypeItem) type).fullTypeName.equals("Namespace"))) {
+        if ((type instanceof TypeItem) && (((TypeItem) type).fullTypeName.equals(DottedChain.NAMESPACE))) {
             isNs = true;
         }
 
@@ -1833,7 +1836,9 @@ public class AVM2SourceGenerator implements SourceGenerator {
         if (custom != null) {
             PropertyAVM2Item prop = new PropertyAVM2Item(null, custom, abcIndex, openedNamespaces, new ArrayList<>());
             Reference<ValueKind> value = new Reference<>(null);
-            prop.resolve(localData, new Reference<>(null), new Reference<>(null), new Reference<>(0), value);
+            Reference<ABC> outAbc = new Reference<>(null);
+
+            prop.resolve(localData, new Reference<>(null), new Reference<>(null), new Reference<>(0), value, outAbc);
             boolean resolved = true;
             if (value.getVal() == null) {
                 resolved = false;
@@ -1864,7 +1869,9 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
                 throw new CompilationException("Namespace not defined", line);
             }
-            namespace = value.getVal().value_index;
+            namespace = abcIndex.getSelectedAbc().constants.getNamespaceId(new Namespace(Namespace.KIND_NAMESPACE,
+                    abcIndex.getSelectedAbc().constants.getStringId(outAbc.getVal().constants.getNamespace(value.getVal().value_index).getName(outAbc.getVal().constants), true)
+            ), 0, true);
         }
         return namespace;
     }
@@ -1980,10 +1987,10 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 if (mai.isStatic() != generateStatic) {
                     continue;
                 }
-                ((TraitMethodGetterSetter) traits[k]).method_info = method(abcIndex.getSelectedAbc().constants.getStringId(mai.functionName, true), false, isInterface, new ArrayList<>(), mai.pkg, mai.needsActivation, mai.subvariables, methodInitScope + (mai.isStatic() ? 0 : 1), mai.hasRest, mai.line, className, superName, false, localData, mai.paramTypes, mai.paramNames, mai.paramValues, mai.body, mai.retType);
+                ((TraitMethodGetterSetter) traits[k]).method_info = method(mai.isStatic(), abcIndex.getSelectedAbc().constants.getStringId(mai.functionName, true), false, isInterface, new ArrayList<>(), mai.pkg, mai.needsActivation, mai.subvariables, methodInitScope + (mai.isStatic() ? 0 : 1), mai.hasRest, mai.line, className, superName, false, localData, mai.paramTypes, mai.paramNames, mai.paramValues, mai.body, mai.retType);
             } else if (item instanceof FunctionAVM2Item) {
                 FunctionAVM2Item fai = (FunctionAVM2Item) item;
-                ((TraitFunction) traits[k]).method_info = method(abcIndex.getSelectedAbc().constants.getStringId(fai.functionName, true), false, isInterface, new ArrayList<>(), fai.pkg, fai.needsActivation, fai.subvariables, methodInitScope, fai.hasRest, fai.line, className, superName, false, localData, fai.paramTypes, fai.paramNames, fai.paramValues, fai.body, fai.retType);
+                ((TraitFunction) traits[k]).method_info = method(false, abcIndex.getSelectedAbc().constants.getStringId(fai.functionName, true), false, isInterface, new ArrayList<>(), fai.pkg, fai.needsActivation, fai.subvariables, methodInitScope, fai.hasRest, fai.line, className, superName, false, localData, fai.paramTypes, fai.paramNames, fai.paramValues, fai.body, fai.retType);
             }
         }
     }
@@ -2256,20 +2263,20 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return TypeItem.UNBOUNDED;
     }
 
-    public static boolean searchPrototypeChain(int privateNs, int protectedNs, boolean instanceOnly, AbcIndexing abc, DottedChain pkg, String obj, String propertyName, Reference<String> outName, Reference<DottedChain> outNs, Reference<DottedChain> outPropNs, Reference<Integer> outPropNsKind, Reference<Integer> outPropNsIndex, Reference<GraphTargetItem> outPropType, Reference<ValueKind> outPropValue) {
-        if (searchPrototypeChain(privateNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue)) {
+    public static boolean searchPrototypeChain(int privateNs, int protectedNs, boolean instanceOnly, AbcIndexing abc, DottedChain pkg, String obj, String propertyName, Reference<String> outName, Reference<DottedChain> outNs, Reference<DottedChain> outPropNs, Reference<Integer> outPropNsKind, Reference<Integer> outPropNsIndex, Reference<GraphTargetItem> outPropType, Reference<ValueKind> outPropValue, Reference<ABC> outPropValueAbc) {
+        if (searchPrototypeChain(privateNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc)) {
             return true;
         }
-        if (searchPrototypeChain(protectedNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue)) {
+        if (searchPrototypeChain(protectedNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc)) {
             return true;
         }
-        if (searchPrototypeChain(0, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue)) {
+        if (searchPrototypeChain(0, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc)) {
             return true;
         }
         return false;
     }
 
-    private static boolean searchPrototypeChain(int selectedNs, boolean instanceOnly, AbcIndexing abc, DottedChain pkg, String obj, String propertyName, Reference<String> outName, Reference<DottedChain> outNs, Reference<DottedChain> outPropNs, Reference<Integer> outPropNsKind, Reference<Integer> outPropNsIndex, Reference<GraphTargetItem> outPropType, Reference<ValueKind> outPropValue) {
+    private static boolean searchPrototypeChain(int selectedNs, boolean instanceOnly, AbcIndexing abc, DottedChain pkg, String obj, String propertyName, Reference<String> outName, Reference<DottedChain> outNs, Reference<DottedChain> outPropNs, Reference<Integer> outPropNsKind, Reference<Integer> outPropNsIndex, Reference<GraphTargetItem> outPropType, Reference<ValueKind> outPropValue, Reference<ABC> outPropValueAbc) {
 
         AbcIndexing.TraitIndex sp = abc.findScriptProperty(pkg.add(propertyName));
         if (sp == null) {
@@ -2287,6 +2294,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
             outPropNsIndex.setVal(selectedNs == 0 ? 0 : sp.abc.constants.getNamespaceSubIndex(selectedNs));
             outPropType.setVal(sp.returnType);
             outPropValue.setVal(sp.value);
+            outPropValueAbc.setVal(sp.abc);
             return true;
         }
         return false;

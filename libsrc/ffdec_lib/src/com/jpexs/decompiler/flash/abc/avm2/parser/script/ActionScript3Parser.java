@@ -2273,7 +2273,7 @@ public class ActionScript3Parser {
     private PackageAVM2Item parsePackage(List<Integer> openedNamespaces) throws IOException, AVM2ParseException, CompilationException {
         List<GraphTargetItem> items = new ArrayList<>();
         expectedType(SymbolType.PACKAGE);
-        DottedChain name = DottedChain.EMPTY;
+        DottedChain name = DottedChain.TOPLEVEL;
         ParsedSymbol s = lex();
         if (s.type != SymbolType.CURLY_OPEN) {
             expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);

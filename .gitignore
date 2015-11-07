@@ -6,6 +6,7 @@
 *.rej
 *.conflict~
 *.identcache
+*.recompiled.swf
 Thumbs.db
 /build/
 /reports/

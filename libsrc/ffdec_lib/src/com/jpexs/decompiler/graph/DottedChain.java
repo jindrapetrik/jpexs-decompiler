@@ -32,7 +32,7 @@ public class DottedChain implements Serializable {
 
     public static final DottedChain EMPTY = new DottedChain(true);
 
-    public static final DottedChain TOPLEVEL = new DottedChain("");
+    public static final DottedChain TOPLEVEL = new DottedChain();
 
     public static final DottedChain BOOLEAN = new DottedChain("Boolean");
 
@@ -70,8 +70,10 @@ public class DottedChain implements Serializable {
     private boolean isNull = false;
 
     public static final DottedChain parse(String name) {
-        if (name == null || name.isEmpty()) {
+        if (name == null) {
             return DottedChain.EMPTY;
+        } else if (name.isEmpty()) {
+            return DottedChain.TOPLEVEL;
         } else {
             return new DottedChain(name.split("\\."));
         }
@@ -86,6 +88,7 @@ public class DottedChain implements Serializable {
 
     public DottedChain(DottedChain src) {
         this(src.parts);
+        this.isNull = src.isNull;
     }
 
     public DottedChain(List<String> parts) {
@@ -95,8 +98,13 @@ public class DottedChain implements Serializable {
     }
 
     public DottedChain(String... parts) {
-        length = parts.length;
-        this.parts = parts;
+        if (parts.length == 1 && parts[0].isEmpty()) {
+            length = 0;
+            this.parts = new String[0];
+        } else {
+            length = parts.length;
+            this.parts = parts;
+        }
         hash = calcHash();
     }
 

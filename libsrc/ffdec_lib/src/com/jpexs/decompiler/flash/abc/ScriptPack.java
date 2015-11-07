@@ -105,7 +105,7 @@ public class ScriptPack extends AS3ClassTreeItem {
     }
 
     public DottedChain getPathPackage() {
-        DottedChain packageName = DottedChain.EMPTY;
+        DottedChain packageName = DottedChain.TOPLEVEL;
         for (int t : traitIndices) {
             Multiname name = abc.script_info.get(scriptIndex).traits.traits.get(t).getName(abc);
             Namespace ns = name.getNamespace(abc.constants);

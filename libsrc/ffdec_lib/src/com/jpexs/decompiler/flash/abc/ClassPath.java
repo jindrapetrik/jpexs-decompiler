@@ -31,14 +31,13 @@ public class ClassPath {
     public final String className;
 
     public ClassPath(DottedChain packageStr, String className) {
-        this.packageStr = packageStr == null ? DottedChain.EMPTY : packageStr;
+        this.packageStr = packageStr == null ? DottedChain.TOPLEVEL : packageStr;
         this.className = className;
     }
 
     @Override
     public String toString() {
-        return packageStr.isEmpty() || packageStr.isTopLevel() ? IdentifiersDeobfuscation.printIdentifier(true, className)
-                : packageStr.toPrintableString(true) + "." + IdentifiersDeobfuscation.printIdentifier(true, className);
+        return packageStr.add(className).toPrintableString(true);
     }
 
     @Override

@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScript3Parser;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
+import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
@@ -29,12 +30,14 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.TranslateException;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -88,10 +91,14 @@ public class DirectEditingTest extends FileTestBase {
                         System.out.println("Recompiling:" + classPathString + "...");
                         en.toSource(htw, abc.script_info.get(s).traits.traits, new ConvertData(), ScriptExportMode.AS, false);
                         String original = htw.toString();
-                        ActionScript3Parser.compile(original, abc, allAbcs, false, en.getClassPath().className + ".as", abc.instance_info.size());
+                        List<ABC> otherAbcs = new ArrayList<>(allAbcs);
+                        otherAbcs.remove(abc);
+                        ActionScript3Parser.compile(original, abc, otherAbcs, false, en.getClassPath().className + ".as", abc.instance_info.size());
 
                         //remove last compiled script:
-                        abc.script_info.remove(abc.script_info.size() - 1);
+                        ScriptInfo n = abc.script_info.remove(abc.script_info.size() - 1);
+                        abc.script_info.set(s, n);
+                        ((Tag) abc.parentTag).setModified(true);
                     }
                 }
             } else {
@@ -125,10 +132,18 @@ public class DirectEditingTest extends FileTestBase {
                         if (!as3.equals(as2)) {
                             fail("ActionScript is different: " + asm.getSwf().getShortFileName() + "/" + asm.toString());
                         }
+                        asm.setModified();
                     } catch (InterruptedException | IOException | OutOfMemoryError | TranslateException | StackOverflowError ex) {
                     }
                 }
             }
+            String nFilePath = filePath.substring(0, filePath.length() - 4); //remove .swf
+            nFilePath += ".recompiled.swf";
+
+            try (FileOutputStream fos = new FileOutputStream(nFilePath)) {
+                swf.saveTo(fos);
+            }
+            //TODO: try tu run it in debug flashplayer (?)
         } catch (Exception ex) {
             fail("Exception during decompilation: " + filePath, ex);
         }

@@ -71,6 +71,8 @@ public class SourceGeneratorLocalData implements Serializable {
     public int privateNs = 0;
     public int protectedNs = 0;
 
+    public boolean isStatic = false;
+
     public String getFullClass() {
         return pkg.add(currentClass).toRawString();
     }
