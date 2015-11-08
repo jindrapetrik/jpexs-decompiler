@@ -698,7 +698,7 @@ public class ActionScript3Parser {
                     namespace = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_NAMESPACE, pkg == null || pkg.isEmpty() ? classNameStr : pkg + ":" + classNameStr, 0, true);
                 } else {
                     if (packageInternalNs == 0) {
-                        packageInternalNs = abcIndex.getSelectedAbc().constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE_INTERNAL, abcIndex.getSelectedAbc().constants.getStringId(pkg.toRawString(), true)), 0, true);
+                        packageInternalNs = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE_INTERNAL, abcIndex.getSelectedAbc().constants.getStringId(pkg.toRawString(), true), 0, true);
                     }
                     namespace = packageInternalNs;
                 }
@@ -974,9 +974,9 @@ public class ActionScript3Parser {
         int privateNs = 0;
         int packageInternalNs = 0;
         if (pkg != null && !pkg.isEmpty()) {
-            openedNamespaces.add(packageInternalNs = abcIndex.getSelectedAbc().constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE_INTERNAL, abcIndex.getSelectedAbc().constants.getStringId(pkg, true)), 0, true));
+            openedNamespaces.add(packageInternalNs = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE_INTERNAL, abcIndex.getSelectedAbc().constants.getStringId(pkg, true), 0, true));
         } else {
-            openedNamespaces.add(packageInternalNs = abcIndex.getSelectedAbc().constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE_INTERNAL, abcIndex.getSelectedAbc().constants.getStringId("", true)), 0, true));
+            openedNamespaces.add(packageInternalNs = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE_INTERNAL, abcIndex.getSelectedAbc().constants.getStringId("", true), 0, true));
         }
         if (pkg != null && !pkg.isEmpty()) {
             openedNamespaces.add(publicNs = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE, "", 0, true));
