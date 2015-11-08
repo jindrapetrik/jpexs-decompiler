@@ -253,7 +253,7 @@ public class AVM2ConstantPool implements Cloneable {
         return index;
     }
 
-    public int getNamespaceId(int kind, int nameIndex, int index) {
+    private int getNamespaceId(int kind, int nameIndex, int index) {
         for (int n = 1; n < constant_namespace.size(); n++) {
             Namespace ns = constant_namespace.get(n);
             if (ns.name_index == nameIndex && (ns.kind == kind)) {
@@ -292,7 +292,7 @@ public class AVM2ConstantPool implements Cloneable {
         return getNamespaceId(kind, nameIndex, index, add);
     }
 
-    public int getIntId(long value) {
+    private int getIntId(long value) {
         for (int i = 1; i < constant_int.size(); i++) {
             if (constant_int.get(i) == value) {
                 return i;
@@ -301,7 +301,7 @@ public class AVM2ConstantPool implements Cloneable {
         return -1;
     }
 
-    public int getUIntId(long value) {
+    private int getUIntId(long value) {
         for (int i = 1; i < constant_uint.size(); i++) {
             if (constant_uint.get(i) == value) {
                 return i;
@@ -310,7 +310,7 @@ public class AVM2ConstantPool implements Cloneable {
         return -1;
     }
 
-    public int getDoubleId(double value) {
+    private int getDoubleId(double value) {
         for (int i = 1; i < constant_double.size(); i++) {
             if (Double.isNaN(value) && Double.isNaN(constant_double.get(i))) {
                 return i;
@@ -322,7 +322,7 @@ public class AVM2ConstantPool implements Cloneable {
         return -1;
     }
 
-    public int getStringId(String val) {
+    private int getStringId(String val) {
         if (val == null) {
             return 0;
         }
@@ -334,7 +334,7 @@ public class AVM2ConstantPool implements Cloneable {
         return -1;
     }
 
-    public int getMultinameId(Multiname val) {
+    private int getMultinameId(Multiname val) {
         loopm:
         for (int m = 1; m < constant_multiname.size(); m++) {
             Multiname mul = constant_multiname.get(m);
@@ -393,7 +393,7 @@ public class AVM2ConstantPool implements Cloneable {
         return id;
     }
 
-    public int getNamespaceSetId(NamespaceSet val) {
+    private int getNamespaceSetId(NamespaceSet val) {
         loopi:
         for (int i = 1; i < constant_namespace_set.size(); i++) {
             NamespaceSet ts = constant_namespace_set.get(i);

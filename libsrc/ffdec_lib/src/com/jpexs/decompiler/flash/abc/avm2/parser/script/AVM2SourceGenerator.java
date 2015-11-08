@@ -2179,8 +2179,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                                 new Multiname(origM.kind,
                                         abcIndex.getSelectedAbc().constants.getStringId(ci.abc.constants.getString(origM.name_index), true),
                                         abcIndex.getSelectedAbc().constants.getNamespaceId(origNs.kind,
-                                                ci.abc.constants.getString(origNs.name_index), 0, true), 0, 0, new ArrayList<>())
-                        ));
+                                                ci.abc.constants.getString(origNs.name_index), 0, true), 0, 0, new ArrayList<>()), true));
                     }
 
                     //add all parent objects to scopestack

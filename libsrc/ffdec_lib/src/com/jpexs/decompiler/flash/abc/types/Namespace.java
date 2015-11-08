@@ -115,7 +115,7 @@ public class Namespace {
     }
 
     public DottedChain getName(AVM2ConstantPool constants) {
-        if (name_index == 0) {
+        if (name_index == 0 || name_index == -1) {
             return DottedChain.EMPTY;
         }
 

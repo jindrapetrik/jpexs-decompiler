@@ -984,7 +984,7 @@ public class ActionScript3Parser {
             publicNs = gpublicNs;
         }
 
-        openedNamespaces.add(privateNs = abcIndex.getSelectedAbc().constants.addNamespace(new Namespace(Namespace.KIND_PRIVATE, abcIndex.getSelectedAbc().constants.getStringId(pkg.toRawString() + ":" + nameStr))));
+        openedNamespaces.add(privateNs = abcIndex.getSelectedAbc().constants.addNamespace(new Namespace(Namespace.KIND_PRIVATE, abcIndex.getSelectedAbc().constants.getStringId(pkg.toRawString() + ":" + nameStr, true))));
 
         openedNamespaces.add(abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_NAMESPACE, AS3_NAMESPACE, 0, true));
 
