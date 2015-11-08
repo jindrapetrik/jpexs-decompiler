@@ -157,6 +157,10 @@ public class Graph {
         cur1.iloop_header = cur2;
     }
 
+    protected List<GraphTargetItem> filter(List<GraphTargetItem> list) {
+        return new ArrayList<>(list);
+    }
+
     /**
      * Traverse loops deep first search
      *
@@ -1989,20 +1993,26 @@ public class Graph {
                     makeAllCommands(onTrue, trueStack);
                     makeAllCommands(onFalse, falseStack);
 
-                    if (!isEmpty(onTrue) && !isEmpty(onFalse) && onTrue.size() == 1 && onFalse.size() == 1 && (onTrue.get(0) instanceof PushItem) && (onFalse.get(0) instanceof PushItem)) {
-                        stack.push(new TernarOpItem(null, expr.invert(null), ((PushItem) onTrue.get(0)).value, ((PushItem) onFalse.get(0)).value));
+                    List<GraphTargetItem> filteredOnTrue = filter(onTrue);
+                    List<GraphTargetItem> filteredOnFalse = filter(onFalse);
+
+                    if (!isEmpty(filteredOnTrue) && !isEmpty(filteredOnFalse) && filteredOnTrue.size() == 1 && filteredOnFalse.size() == 1 && (filteredOnTrue.get(0) instanceof PushItem) && (filteredOnFalse.get(0) instanceof PushItem)) {
+                        stack.push(new TernarOpItem(null, expr.invert(null), ((PushItem) filteredOnTrue.get(0)).value, ((PushItem) filteredOnFalse.get(0)).value));
                     } else {
                         boolean isIf = true;
                         //If the ontrue is empty, switch ontrue and onfalse
-                        if (onTrue.isEmpty() && !onFalse.isEmpty()) {
+                        if (filteredOnTrue.isEmpty() && !filteredOnFalse.isEmpty()) {
                             expr = expr.invert(null);
                             List<GraphTargetItem> tmp = onTrue;
                             onTrue = onFalse;
                             onFalse = tmp;
+                            tmp = filteredOnTrue;
+                            filteredOnTrue = filteredOnFalse;
+                            filteredOnFalse = tmp;
                         }
-                        if (!stack.isEmpty() && onFalse.isEmpty() && ((onTrue.size() == 1 && (onTrue.get(0) instanceof PopItem)) || ((onTrue.size() == 2) && (onTrue.get(0) instanceof PopItem) && (onTrue.get(1) instanceof PushItem)))) {
-                            if (onTrue.size() == 2) {
-                                GraphTargetItem rightSide = ((PushItem) onTrue.get(1)).value;
+                        if (!stack.isEmpty() && ((filteredOnTrue.size() == 1 && (filteredOnTrue.get(0) instanceof PopItem)) || ((filteredOnTrue.size() >= 2) && (filteredOnTrue.get(0) instanceof PopItem) && (filteredOnTrue.get(filteredOnTrue.size() - 1) instanceof PushItem)))) {
+                            if (filteredOnTrue.size() > 1) {
+                                GraphTargetItem rightSide = ((PushItem) filteredOnTrue.get(filteredOnTrue.size() - 1)).value;
                                 GraphTargetItem prevExpr = stack.pop();
                                 GraphTargetItem leftSide = expr.getNotCoercedNoDup();
 

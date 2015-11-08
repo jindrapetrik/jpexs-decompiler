@@ -12,6 +12,7 @@
 		public var t3:TestClass3;
 		public static const p:int=8;
 		private namespace n="nazdar";
+		private var mc:MoreClass;
 
 		public function testHello()
 		{

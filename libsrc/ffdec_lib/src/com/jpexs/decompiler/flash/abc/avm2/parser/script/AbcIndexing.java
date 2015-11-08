@@ -195,6 +195,11 @@ public class AbcIndexing {
             return propName;
         }
 
+        @Override
+        public String toString() {
+            return ns.toString() + ":" + propName + (propNsIndex > 0 ? "[ns:" + propNsIndex + "]" : "");
+        }
+
         public PropertyNsDef(String propName, DottedChain ns, ABC abc, int nsIndex) {
             this.propName = propName;
             this.ns = ns;
@@ -302,7 +307,14 @@ public class AbcIndexing {
     }
 
     public TraitIndex findScriptProperty(String propName, DottedChain ns) {
-        return scriptProperties.get(new PropertyNsDef(propName, ns, null, 0));
+        PropertyNsDef nsd = new PropertyNsDef(propName, ns, null, 0);
+        if (!scriptProperties.containsKey(nsd)) {
+            if (parent != null) {
+                return parent.findScriptProperty(propName, ns);
+            }
+            return null;
+        }
+        return scriptProperties.get(nsd);
     }
 
     public TraitIndex findNsProperty(PropertyNsDef prop, boolean findStatic, boolean findInstance) {
@@ -366,7 +378,7 @@ public class AbcIndexing {
 
         //now search parent class
         AbcIndexing.ClassIndex ci = findClass(prop.parent);
-        if (ci != null && ci.parent != null) {
+        if (ci != null && ci.parent != null && (prop.abc == null || prop.propNsIndex == 0)) {
             ci = ci.parent;
             //parent protected
             DottedChain parentClass = ci.abc.instance_info.get(ci.index).getName(ci.abc.constants).getNameWithNamespace(ci.abc.constants);
@@ -437,7 +449,8 @@ public class AbcIndexing {
                 map.put(dp, new TraitIndex(t, abc, getTraitReturnType(abc, t), propValue, multinameToType(name_index, abc.constants)));
             }
             if (mapNs != null) {
-                PropertyNsDef ndp = new PropertyNsDef(t.getName(abc).getName(abc.constants, new ArrayList<>() /*?*/, true), abc.constants.getMultiname(t.name_index).getNameWithNamespace(abc.constants), abc, abc.constants.getMultiname(t.name_index).namespace_index);
+                Multiname m = abc.constants.getMultiname(t.name_index);
+                PropertyNsDef ndp = new PropertyNsDef(t.getName(abc).getName(abc.constants, new ArrayList<>() /*?*/, true), m == null || m.namespace_index == 0 ? DottedChain.EMPTY : m.getNamespace(abc.constants).getName(abc.constants), abc, m.namespace_index);
                 TraitIndex ti = new TraitIndex(t, abc, getTraitReturnType(abc, t), propValue, multinameToType(name_index, abc.constants));
                 if (!mapNs.containsKey(ndp)) {
                     mapNs.put(ndp, ti);

@@ -35,14 +35,21 @@ public class MethodAVM2Item extends FunctionAVM2Item {
 
     private final boolean override;
 
+    private final boolean isPrivate;
+
+    public boolean isPrivate() {
+        return isPrivate;
+    }
+
     public String customNamespace;
 
     //public boolean isInterface;
-    public MethodAVM2Item(List<Map.Entry<String, Map<String, String>>> metadata, DottedChain pkg, boolean isInterface, String customNamespace, boolean needsActivation, boolean hasRest, int line, boolean override, boolean isFinal, boolean isStatic, int namespace, String methodName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<AssignableAVM2Item> subvariables, GraphTargetItem retType) {
+    public MethodAVM2Item(boolean isPrivate, List<Map.Entry<String, Map<String, String>>> metadata, DottedChain pkg, boolean isInterface, String customNamespace, boolean needsActivation, boolean hasRest, int line, boolean override, boolean isFinal, boolean isStatic, int namespace, String methodName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<AssignableAVM2Item> subvariables, GraphTargetItem retType) {
         super(metadata, pkg, isInterface, needsActivation, namespace, hasRest, line, methodName, paramTypes, paramNames, paramValues, body, subvariables, retType);
         this.isStatic = isStatic;
         this.override = override;
         this.isFinal = isFinal;
+        this.isPrivate = isPrivate;
         this.customNamespace = customNamespace;
         //this.isInterface = this.isInterface;
     }

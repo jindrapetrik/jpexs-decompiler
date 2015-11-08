@@ -939,4 +939,10 @@ public class AVM2Graph extends Graph {
         ret.scopeStack = copyScopeStack;
         return ret;
     }
+
+    @Override
+    protected List<GraphTargetItem> filter(List<GraphTargetItem> list) {
+        return avm2code.clearTemporaryRegisters(list);
+    }
+
 }

@@ -74,7 +74,7 @@ public class SourceGeneratorLocalData implements Serializable {
     public boolean isStatic = false;
 
     public String getFullClass() {
-        return pkg.add(currentClass).toRawString();
+        return pkg == null ? currentClass : pkg.add(currentClass).toRawString();
     }
 
     public SourceGeneratorLocalData(HashMap<String, Integer> registerVars, Integer inFunction, Boolean inMethod, Integer forInLevel) {

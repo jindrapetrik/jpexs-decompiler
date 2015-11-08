@@ -400,9 +400,9 @@ public class ABC {
         // constant double
         int constant_double_pool_count = ais.readU30("double_count");
         constants.constant_double = new ArrayList<>(constant_double_pool_count);
-        if (constant_double_pool_count > 0) {
-            constants.addDouble(0);
-        }
+        //if (constant_double_pool_count > 0) {
+        constants.addDouble(0);
+        //}
         if (constant_double_pool_count > 1) {
             ais.newDumpLevel("doubles", "double[]");
             for (int i = 1; i < constant_double_pool_count; i++) { // index 0 not used. Values 1..n-1
@@ -433,9 +433,9 @@ public class ABC {
         int constant_string_pool_count = ais.readU30("string_count");
         constants.constant_string = new ArrayList<>(constant_string_pool_count);
         stringOffsets = new long[constant_string_pool_count];
-        if (constant_string_pool_count > 0) {
-            constants.addString("");
-        }
+        //if (constant_string_pool_count > 0) {
+        constants.addString(null);
+        //}
         if (constant_string_pool_count > 1) {
             ais.newDumpLevel("strings", "string[]");
             for (int i = 1; i < constant_string_pool_count; i++) { // index 0 not used. Values 1..n-1
@@ -449,9 +449,9 @@ public class ABC {
         // constant namespace
         int constant_namespace_pool_count = ais.readU30("namespace_count");
         constants.constant_namespace = new ArrayList<>(constant_namespace_pool_count);
-        if (constant_namespace_pool_count > 0) {
-            constants.addNamespace(null);
-        }
+        //if (constant_namespace_pool_count > 0) {
+        constants.addNamespace(null);
+        //}
         if (constant_namespace_pool_count > 1) {
             ais.newDumpLevel("namespaces", "namespace[]");
             for (int i = 1; i < constant_namespace_pool_count; i++) { // index 0 not used. Values 1..n-1
@@ -463,9 +463,9 @@ public class ABC {
         // constant namespace set
         int constant_namespace_set_pool_count = ais.readU30("ns_set_count");
         constants.constant_namespace_set = new ArrayList<>(constant_namespace_set_pool_count);
-        if (constant_namespace_set_pool_count > 0) {
-            constants.addNamespaceSet(null);
-        }
+        //if (constant_namespace_set_pool_count > 0) {
+        constants.addNamespaceSet(null);
+        //}
         if (constant_namespace_set_pool_count > 1) {
             ais.newDumpLevel("ns_sets", "ns_set[]");
             for (int i = 1; i < constant_namespace_set_pool_count; i++) { // index 0 not used. Values 1..n-1
@@ -484,9 +484,9 @@ public class ABC {
         // constant multiname
         int constant_multiname_pool_count = ais.readU30("multiname_count");
         constants.constant_multiname = new ArrayList<>(constant_multiname_pool_count);
-        if (constant_multiname_pool_count > 0) {
-            constants.addMultiname(null);
-        }
+        //if (constant_multiname_pool_count > 0) {
+        constants.addMultiname(null);
+        //}
         if (constant_multiname_pool_count > 1) {
             ais.newDumpLevel("multiname", "multinames[]");
             for (int i = 1; i < constant_multiname_pool_count; i++) { // index 0 not used. Values 1..n-1

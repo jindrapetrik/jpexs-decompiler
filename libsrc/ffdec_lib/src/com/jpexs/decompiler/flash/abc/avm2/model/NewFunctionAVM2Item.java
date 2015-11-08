@@ -78,11 +78,8 @@ public class NewFunctionAVM2Item extends AVM2Item {
         abc.method_info.get(methodIndex).getReturnTypeStr(writer, abc.constants, fullyQualifiedNames);
         writer.startBlock();
         if (body != null) {
-            if (writer instanceof NulWriter) {
-                body.convert(new ConvertData(), path + "/inner", ScriptExportMode.AS, isStatic, methodIndex, scriptIndex, classIndex, abc, null, new ScopeStack(), 0, (NulWriter) writer, fullyQualifiedNames, null, false);
-            } else {
-                body.toString(path + "/inner", ScriptExportMode.AS, abc, null, writer, fullyQualifiedNames);
-            }
+            body.convert(new ConvertData(), path + "/inner", ScriptExportMode.AS, isStatic, methodIndex, scriptIndex, classIndex, abc, null, new ScopeStack(), 0, new NulWriter(), fullyQualifiedNames, null, false);
+            body.toString(path + "/inner", ScriptExportMode.AS, abc, null, writer, fullyQualifiedNames);
         }
         writer.endBlock();
         writer.endMethod();

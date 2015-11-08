@@ -29,7 +29,7 @@ public class ConvertAVM2Item extends AVM2Item {
     public GraphTargetItem type;
 
     public ConvertAVM2Item(AVM2Instruction instruction, GraphTargetItem value, GraphTargetItem type) {
-        super(instruction, NOPRECEDENCE, value);
+        super(instruction, value.getPrecedence(), value);
         this.type = type;
     }
 

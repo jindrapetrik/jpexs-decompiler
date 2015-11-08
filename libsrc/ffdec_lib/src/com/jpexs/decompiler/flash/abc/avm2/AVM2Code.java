@@ -1434,7 +1434,8 @@ public class AVM2Code implements Cloneable {
         }
     }
 
-    public List<GraphTargetItem> clearTemporaryRegisters(List<GraphTargetItem> output) {
+    public List<GraphTargetItem> clearTemporaryRegisters(List<GraphTargetItem> input) {
+        List<GraphTargetItem> output = new ArrayList<>(input);
         for (int i = 0; i < output.size(); i++) {
             if (output.get(i) instanceof SetLocalAVM2Item) {
                 if (isKilled(((SetLocalAVM2Item) output.get(i)).regIndex, 0, code.size() - 1)) {

@@ -110,7 +110,7 @@ public abstract class Trait implements Cloneable, Serializable {
                         writer.append(",");
                     }
                     first = false;
-                    if (!key.isEmpty()) {
+                    if (key != null && !key.isEmpty()) {
                         writer.append(IdentifiersDeobfuscation.printIdentifier(true, key)).append("=");
                     }
                     writer.append("\"");
@@ -248,7 +248,7 @@ public abstract class Trait implements Cloneable, Serializable {
     public final ClassPath getPath(ABC abc) {
         Multiname name = getName(abc);
         Namespace ns = name.getNamespace(abc.constants);
-        DottedChain packageName = ns.getName(abc.constants);
+        DottedChain packageName = ns == null ? DottedChain.EMPTY : ns.getName(abc.constants);
         String objectName = name.getName(abc.constants, null, true);
         return new ClassPath(packageName, objectName); //assume not null name
     }
