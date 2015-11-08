@@ -665,6 +665,10 @@ public class AVM2Code implements Cloneable {
         lda.localRegisters = arguments;
         lda.runtime = runtime;
         lda.runtimeVersion = runtimeVersoin;
+        for (AVM2Instruction ins : code) {
+            ins.definition.verify(lda, constants, ins);
+        }
+
         while (pos < code.size()) {
             AVM2Instruction ins = code.get(pos);
             if (!ins.definition.execute(lda, constants, ins)) {
