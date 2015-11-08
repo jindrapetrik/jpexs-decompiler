@@ -97,7 +97,7 @@ public class DebuggerTools {
                 for (int i = 1; i < a.constants.constant_multiname.size(); i++) {
                     Multiname m = a.constants.constant_multiname.get(i);
                     if ("flash.display.Loader".equals(m.getNameWithNamespace(a.constants).toRawString())) {
-                        m.namespace_index = a.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, a.constants.getStringId(debuggerPkg, true)), 0, true);
+                        m.namespace_index = a.constants.getNamespaceId(Namespace.KIND_PACKAGE, debuggerPkg, 0, true);
                         m.name_index = a.constants.getStringId("DebugLoader", true);
                         ((Tag) ct).setModified(true);
                     }
@@ -115,7 +115,7 @@ public class DebuggerTools {
                 for (int i = 1; i < a.constants.constant_multiname.size(); i++) {
                     Multiname m = a.constants.constant_multiname.get(i);
                     if ("trace".equals(m.getNameWithNamespace(a.constants).toRawString())) {
-                        m.namespace_index = a.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, a.constants.getStringId(debuggerPkg, true)), 0, true);
+                        m.namespace_index = a.constants.getNamespaceId(Namespace.KIND_PACKAGE, debuggerPkg, 0, true);
                         m.name_index = a.constants.getStringId(fname, true);
                         ((Tag) ct).setModified(true);
                     }
@@ -143,11 +143,11 @@ public class DebuggerTools {
                             || isDebuggerClass(packageStr, "debugSocket")
                             || isDebuggerClass(packageStr, "debugConsole")) {
                         m.name_index = a.constants.getStringId("trace", true);
-                        m.namespace_index = a.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, a.constants.getStringId("", true)), 0, true);
+                        m.namespace_index = a.constants.getNamespaceId(Namespace.KIND_PACKAGE, "", 0, true);
                         ((Tag) ct).setModified(true);
                     } else if (isDebuggerClass(packageStr, "DebugLoader")) {
                         m.name_index = a.constants.getStringId("Loader", true);
-                        m.namespace_index = a.constants.getNamespaceId(new Namespace(Namespace.KIND_PACKAGE, a.constants.getStringId("flash.display", true)), 0, true);
+                        m.namespace_index = a.constants.getNamespaceId(Namespace.KIND_PACKAGE, "flash.display", 0, true);
                     }
                 }
             }

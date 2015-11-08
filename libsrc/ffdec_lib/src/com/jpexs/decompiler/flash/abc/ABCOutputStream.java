@@ -70,7 +70,7 @@ public class ABCOutputStream extends OutputStream {
 
     public void writeU32(long value) throws IOException {
         boolean loop = true;
-        value &= 0xFFFFFFFF;
+        value &= 0xFFFFFFFFL;
         do {
             int ret = (int) (value & 0x7F);
             if (value < 0x80) {

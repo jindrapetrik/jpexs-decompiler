@@ -20,9 +20,9 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2ExecutionException;
 import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2VerifyErrorException;
-import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.DecLocalIIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.DecLocalIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.IncLocalIIns;
@@ -67,26 +67,59 @@ public abstract class InstructionDefinition implements Serializable {
         StringBuilder s = new StringBuilder();
         s.append(instructionName);
         for (int i = 0; i < operands.length; i++) {
-            if ((operands[i] & 0xff00) == AVM2Code.OPT_U30) {
+            int operand = operands[i];
+            if ((operand & 0xff00) == AVM2Code.OPT_U30) {
                 s.append(" U30");
             }
-            if ((operands[i] & 0xff00) == AVM2Code.OPT_U30_SHORT) {
+            if ((operand & 0xff00) == AVM2Code.OPT_U30_SHORT) {
                 s.append(" U30");
             }
-            if ((operands[i] & 0xff00) == AVM2Code.OPT_U8) {
+            if ((operand & 0xff00) == AVM2Code.OPT_U8) {
                 s.append(" U8");
             }
-            if ((operands[i] & 0xff00) == AVM2Code.OPT_BYTE) {
+            if ((operand & 0xff00) == AVM2Code.OPT_BYTE) {
                 s.append(" BYTE");
             }
-            if ((operands[i] & 0xff00) == AVM2Code.OPT_S24) {
+            if ((operand & 0xff00) == AVM2Code.OPT_S24) {
                 s.append(" S24");
             }
-            if ((operands[i] & 0xff00) == AVM2Code.OPT_CASE_OFFSETS) {
+            if ((operand & 0xff00) == AVM2Code.OPT_CASE_OFFSETS) {
                 s.append(" U30 S24,[S24]...");
             }
         }
         return s.toString();
+    }
+
+    public void verify(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) throws AVM2VerifyErrorException {
+        for (int i = 0; i < operands.length; i++) {
+            int operand = operands[i];
+            if (operand == AVM2Code.DAT_MULTINAME_INDEX) {
+                int idx = ins.operands[i];
+                if (idx <= 0 || idx >= constants.getMultinameCount()) {
+                    throw new AVM2VerifyErrorException(AVM2VerifyErrorException.CPOOL_INDEX_OUT_OF_RANGE, new Object[]{idx, constants.getMultinameCount()});
+                }
+            } else if (operand == AVM2Code.DAT_DOUBLE_INDEX) {
+                int idx = ins.operands[i];
+                if (idx <= 0 || idx >= constants.getDoubleCount()) {
+                    throw new AVM2VerifyErrorException(AVM2VerifyErrorException.CPOOL_INDEX_OUT_OF_RANGE, new Object[]{idx, constants.getDoubleCount()});
+                }
+            } else if (operand == AVM2Code.DAT_INT_INDEX) {
+                int idx = ins.operands[i];
+                if (idx <= 0 || idx >= constants.getIntCount()) {
+                    throw new AVM2VerifyErrorException(AVM2VerifyErrorException.CPOOL_INDEX_OUT_OF_RANGE, new Object[]{idx, constants.getIntCount()});
+                }
+            } else if (operand == AVM2Code.DAT_UINT_INDEX) {
+                int idx = ins.operands[i];
+                if (idx <= 0 || idx >= constants.getUIntCount()) {
+                    throw new AVM2VerifyErrorException(AVM2VerifyErrorException.CPOOL_INDEX_OUT_OF_RANGE, new Object[]{idx, constants.getUIntCount()});
+                }
+            } else if (operand == AVM2Code.DAT_STRING_INDEX) {
+                int idx = ins.operands[i];
+                if (idx <= 0 || idx >= constants.getStringCount()) {
+                    throw new AVM2VerifyErrorException(AVM2VerifyErrorException.CPOOL_INDEX_OUT_OF_RANGE, new Object[]{idx, constants.getStringCount()});
+                }
+            }
+        }
     }
 
     public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) throws AVM2ExecutionException {
