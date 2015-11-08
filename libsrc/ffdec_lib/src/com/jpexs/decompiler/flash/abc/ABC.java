@@ -862,12 +862,10 @@ public class ABC {
         return bodyIdxFromMethodIdx;
     }
 
-    public DottedChain nsValueToName(DottedChain value) {
-        if (value == null) {
-            return null;
+    public DottedChain nsValueToName(String valueStr) {
+        if (valueStr == null) {
+            return DottedChain.EMPTY;
         }
-
-        String valueStr = value.toRawString();
 
         if (getNamespaceMap().containsKey(valueStr)) {
             return getNamespaceMap().get(valueStr);

@@ -1226,10 +1226,10 @@ public class AVM2SourceGenerator implements SourceGenerator {
         MethodBody initBody = null;
         if (!isInterface) {
             initBody = abcIndex.getSelectedAbc().findBody(init);
-            initBody.getCode().code.addAll(constructor == null ? 0 : 2, initcode);//after getlocal0,pushscope
+            initBody.insertAll(constructor == null ? 0 : 2, initcode);//after getlocal0,pushscope
 
             if (sinitBody.getCode().code.get(sinitBody.getCode().code.size() - 1).definition instanceof ReturnVoidIns) {
-                sinitBody.getCode().code.addAll(2, sinitcode); //after getlocal0,pushscope
+                sinitBody.insertAll(2, sinitcode); //after getlocal0,pushscope
             }
         }
         sinitBody.markOffsets();

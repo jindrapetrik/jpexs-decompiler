@@ -104,6 +104,8 @@ public class TraitClass extends Trait implements TraitWithSlot {
         }
         boolean raw = ns.kind == Namespace.KIND_NAMESPACE;
         DottedChain newimport = ns.getName(abc.constants);
+
+        //Note: Following is weird and probably wrong - FIXIT!
         /*if ((ns.kind != Namespace.KIND_PACKAGE)
          && (ns.kind != Namespace.KIND_NAMESPACE)
          && (ns.kind != Namespace.KIND_STATIC_PROTECTED)) {
@@ -113,7 +115,8 @@ public class TraitClass extends Trait implements TraitWithSlot {
             DottedChain oldimport = newimport;
             newimport = new DottedChain();
             for (ABCContainerTag abcTag : abc.getAbcTags()) {
-                DottedChain newname = abcTag.getABC().nsValueToName(oldimport);
+                DottedChain newname = abcTag.getABC().nsValueToName(oldimport.toRawString()); /* why this? */
+
                 if (newname.size() == 1 && newname.get(0).equals("-")) {
                     return true;
                 }

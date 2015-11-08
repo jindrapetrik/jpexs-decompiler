@@ -227,6 +227,12 @@ public final class MethodBody implements Cloneable {
         getCode().insertInstruction(pos, instruction, this);
     }
 
+    public void insertAll(int pos, List<AVM2Instruction> list) {
+        for (AVM2Instruction ins : list) {
+            insertInstruction(pos++, ins);
+        }
+    }
+
     /**
      * Inserts instruction at specified point. Handles offsets properly. Note:
      * If newinstruction is jump, the offset operand must be handled properly by

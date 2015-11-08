@@ -131,13 +131,17 @@ public abstract class Trait implements Cloneable, Serializable {
         if (link_ns_index <= 0) {
             return null;
         }
-        DottedChain name = abc.constants.getNamespace(link_ns_index).getName(abc.constants);
+        Namespace ns = abc.constants.getNamespace(link_ns_index);
+        if (ns.kind != Namespace.KIND_NAMESPACE) {
+            return null;
+        }
+        String name = abc.constants.getString(ns.name_index);
         for (ABCContainerTag abcTag : abc.getAbcTags()) {
             DottedChain dc = abcTag.getABC().nsValueToName(name);
             nsname = dc.getLast();
 
             if (nsname == null) {
-                break;
+                continue;
             }
             if (!nsname.isEmpty()) {
                 return dc;
