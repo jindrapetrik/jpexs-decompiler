@@ -789,7 +789,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
             isStatic = newTraitDialog.getStatic();
             m = new Multiname(Multiname.QNAME, abc.constants.getStringId(name, true), abc.constants.getNamespaceId(nskind, "", 0, true), 0, 0, new ArrayList<>());
             int mid = abc.constants.getMultinameId(m, false);
-            if (mid == 0) {
+            if (mid <= 0) {
                 break;
             }
             for (Trait tr : abc.class_info.get(class_index).static_traits.traits) {
