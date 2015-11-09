@@ -95,7 +95,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
         if (m_index == 0) {
             return TypeItem.UNBOUNDED;
         }
-        Multiname m = constants.constant_multiname.get(m_index);
+        Multiname m = constants.getMultiname(m_index);
         if (m.kind == Multiname.TYPENAME) {
             GraphTargetItem obj = multinameToType(m.qname_index, constants);
             List<GraphTargetItem> params = new ArrayList<>();
@@ -222,7 +222,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                             propType = outPropType.getVal();
                             propIndex = abc.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.QNAME,
                                     abc.getSelectedAbc().constants.getStringId(propertyName, true),
-                                    abc.getSelectedAbc().constants.getNamespaceId(outPropNsKind.getVal(), outPropNs.getVal(), outPropNsIndex.getVal(), true), 0, 0, new ArrayList<>()), true
+                                    abc.getSelectedAbc().constants.getNamespaceId(outPropNsKind.getVal(), outPropNs.getVal(), outPropNsIndex.getVal(), true), 0), true
                             );
                             propValue = outPropValue.getVal();
                             propValueAbc = outPropValueAbc.getVal();
@@ -252,11 +252,11 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                             for (int i = 0; i < openedNamespaces.size(); i++) {
                                 int nsindex = openedNamespaces.get(i);
 
-                                int nsKind = abc.getSelectedAbc().constants.constant_namespace.get(openedNamespaces.get(i)).kind;
-                                DottedChain nsname = abc.getSelectedAbc().constants.constant_namespace.get(openedNamespaces.get(i)).getName(abc.getSelectedAbc().constants);
+                                int nsKind = abc.getSelectedAbc().constants.getMultiname(openedNamespaces.get(i)).kind;
+                                DottedChain nsname = abc.getSelectedAbc().constants.getNamespace(openedNamespaces.get(i)).getName(abc.getSelectedAbc().constants);
                                 int name_index = 0;
-                                for (int m = 1; m < abc.getSelectedAbc().constants.constant_multiname.size(); m++) {
-                                    Multiname mname = abc.getSelectedAbc().constants.constant_multiname.get(m);
+                                for (int m = 1; m < abc.getSelectedAbc().constants.getMultinameCount(); m++) {
+                                    Multiname mname = abc.getSelectedAbc().constants.getMultiname(m);
                                     if (mname.kind == Multiname.QNAME && mname.getName(abc.getSelectedAbc().constants, null, true).equals(propertyName) && mname.namespace_index == nsindex) {
                                         name_index = m;
                                         break;
@@ -331,7 +331,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                             propType = p.returnType;
                                             propIndex = abc.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.QNAME,
                                                     abc.getSelectedAbc().constants.getStringId(propertyName, true),
-                                                    abc.getSelectedAbc().constants.getNamespaceId(outPropNsKind.getVal(), outPropNs.getVal(), outPropNsIndex.getVal(), true), 0, 0, new ArrayList<>()), true
+                                                    abc.getSelectedAbc().constants.getNamespaceId(outPropNsKind.getVal(), outPropNs.getVal(), outPropNsIndex.getVal(), true), 0), true
                                             );
                                             propValue = p.value;
                                             propValueAbc = outPropValueAbc.getVal();
@@ -359,7 +359,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
             }
             propIndex = abc.getSelectedAbc().constants.getMultinameId(new Multiname(attr ? (pname.isEmpty() ? Multiname.MULTINAMELA : Multiname.MULTINAMEA) : Multiname.MULTINAME,
                     abc.getSelectedAbc().constants.getStringId("*".equals(pname) ? null : pname, true), 0, //Note: name = * is for .@* attribute
-                    attr && pname.isEmpty() ? abc.getSelectedAbc().constants.getNamespaceSetId(new NamespaceSet(new int[]{abc.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE_INTERNAL, localData.pkg, 0, true)}), true) : allNsSet(), 0, new ArrayList<>()), true);
+                    attr && pname.isEmpty() ? abc.getSelectedAbc().constants.getNamespaceSetId(new NamespaceSet(new int[]{abc.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE_INTERNAL, localData.pkg, 0, true)}), true) : allNsSet()), true);
             propType = TypeItem.UNBOUNDED;
             objType = TypeItem.UNBOUNDED;
             propValue = null;

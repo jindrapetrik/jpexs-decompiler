@@ -94,8 +94,8 @@ public class DebuggerTools {
                 if (dsp.abc == a) { //do not replace Loader in debugger itself
                     continue;
                 }
-                for (int i = 1; i < a.constants.constant_multiname.size(); i++) {
-                    Multiname m = a.constants.constant_multiname.get(i);
+                for (int i = 1; i < a.constants.getMultinameCount(); i++) {
+                    Multiname m = a.constants.getMultiname(i);
                     if ("flash.display.Loader".equals(m.getNameWithNamespace(a.constants).toRawString())) {
                         m.namespace_index = a.constants.getNamespaceId(Namespace.KIND_PACKAGE, debuggerPkg, 0, true);
                         m.name_index = a.constants.getStringId("DebugLoader", true);
@@ -112,8 +112,8 @@ public class DebuggerTools {
             //change trace to fname
             for (ABCContainerTag ct : swf.getAbcList()) {
                 ABC a = ct.getABC();
-                for (int i = 1; i < a.constants.constant_multiname.size(); i++) {
-                    Multiname m = a.constants.constant_multiname.get(i);
+                for (int i = 1; i < a.constants.getMultinameCount(); i++) {
+                    Multiname m = a.constants.getMultiname(i);
                     if ("trace".equals(m.getNameWithNamespace(a.constants).toRawString())) {
                         m.namespace_index = a.constants.getNamespaceId(Namespace.KIND_PACKAGE, debuggerPkg, 0, true);
                         m.name_index = a.constants.getStringId(fname, true);
@@ -135,8 +135,8 @@ public class DebuggerTools {
             //Change all debugger calls to normal trace / Loader
             for (ABCContainerTag ct : swf.getAbcList()) {
                 ABC a = ct.getABC();
-                for (int i = 1; i < a.constants.constant_multiname.size(); i++) {
-                    Multiname m = a.constants.constant_multiname.get(i);
+                for (int i = 1; i < a.constants.getMultinameCount(); i++) {
+                    Multiname m = a.constants.getMultiname(i);
                     String packageStr = m.getNameWithNamespace(a.constants).toString();
                     if (isDebuggerClass(packageStr, "debugTrace")
                             || isDebuggerClass(packageStr, "debugAlert")
@@ -175,15 +175,15 @@ public class DebuggerTools {
                 for (ABCContainerTag ds : debugSWF.getAbcList()) {
                     ABC a = ds.getABC();
                     //Append random hex to Debugger package name
-                    for (int i = 1; i < a.constants.constant_namespace.size(); i++) {
-                        if (a.constants.constant_namespace.get(i).hasName(DEBUGGER_PACKAGE, a.constants)) {
-                            a.constants.constant_namespace.get(i).name_index = a.constants.getStringId(newdebuggerpkg, true);
+                    for (int i = 1; i < a.constants.getNamespaceCount(); i++) {
+                        if (a.constants.getNamespace(i).hasName(DEBUGGER_PACKAGE, a.constants)) {
+                            a.constants.getNamespace(i).name_index = a.constants.getStringId(newdebuggerpkg, true);
                         }
                     }
                     //Set debugger port to actually set port
-                    for (int i = 0; i < a.constants.constant_int.size(); i++) {
-                        if (a.constants.constant_int.get(i) == 123456L) {
-                            a.constants.constant_int.set(i, (long) port);
+                    for (int i = 0; i < a.constants.getIntCount(); i++) {
+                        if (a.constants.getInt(i) == 123456L) {
+                            a.constants.setInt(i, (long) port);
                         }
                     }
                     //Add to target SWF

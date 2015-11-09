@@ -17,6 +17,8 @@
 package com.jpexs.decompiler.flash.abc.types;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.types.traits.Trait;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.graph.DottedChain;
@@ -30,6 +32,9 @@ public class ClassInfo {
 
     @Internal
     public boolean deleted;
+
+    @Internal
+    public int lastDispId = -1;
 
     public ClassInfo() {
         static_traits = new Traits();
@@ -46,5 +51,22 @@ public class ClassInfo {
 
     public String toString(ABC abc, List<DottedChain> fullyQualifiedNames) {
         return "method_index=" + cinit_index + "\r\n" + static_traits.toString(abc, fullyQualifiedNames);
+    }
+
+    public int getNextDispId() {
+        if (lastDispId == -1) {
+            lastDispId = 0;
+            for (Trait trait : static_traits.traits) {
+                if (trait instanceof TraitMethodGetterSetter) {
+                    int dispId = ((TraitMethodGetterSetter) trait).disp_id;
+                    if (dispId > lastDispId) {
+                        lastDispId = dispId;
+                    }
+                }
+            }
+        }
+
+        lastDispId++;
+        return lastDispId;
     }
 }

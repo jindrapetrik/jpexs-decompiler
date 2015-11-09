@@ -456,9 +456,9 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
             }
             List<MultinameUsage> usages = abc.findMultinameDefinition(multinameIndex);
 
-            Multiname m = abc.constants.constant_multiname.get(multinameIndex);
+            Multiname m = abc.constants.getMultiname(multinameIndex);
             //search other ABC tags if this is not private multiname
-            if (m.namespace_index > 0 && abc.constants.constant_namespace.get(m.namespace_index).kind != Namespace.KIND_PRIVATE) {
+            if (m.namespace_index > 0 && abc.constants.getNamespace(m.namespace_index).kind != Namespace.KIND_PRIVATE) {
                 for (ABCContainerTag at : getAbcList()) {
                     ABC a = at.getABC();
                     if (a == abc) {
@@ -496,9 +496,9 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         if (multinameIndex > -1) {
             List<MultinameUsage> usages = abc.findMultinameDefinition(multinameIndex);
 
-            Multiname m = abc.constants.constant_multiname.get(multinameIndex);
+            Multiname m = abc.constants.getMultiname(multinameIndex);
             //search other ABC tags if this is not private multiname
-            if (m.namespace_index > 0 && abc.constants.constant_namespace.get(m.namespace_index).kind != Namespace.KIND_PRIVATE) {
+            if (m.namespace_index > 0 && abc.constants.getNamespace(m.namespace_index).kind != Namespace.KIND_PRIVATE) {
                 for (ABCContainerTag at : getAbcList()) {
                     ABC a = at.getABC();
                     if (a == abc) {
@@ -787,7 +787,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
             nskind = newTraitDialog.getNamespaceKind();
             name = newTraitDialog.getTraitName();
             isStatic = newTraitDialog.getStatic();
-            m = new Multiname(Multiname.QNAME, abc.constants.getStringId(name, true), abc.constants.getNamespaceId(nskind, "", 0, true), 0, 0, new ArrayList<>());
+            m = new Multiname(Multiname.QNAME, abc.constants.getStringId(name, true), abc.constants.getNamespaceId(nskind, "", 0, true), 0);
             int mid = abc.constants.getMultinameId(m, false);
             if (mid <= 0) {
                 break;

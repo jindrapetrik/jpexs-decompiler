@@ -163,7 +163,7 @@ public abstract class InstructionDefinition implements Serializable {
     protected FullMultinameAVM2Item resolveMultiname(boolean property, TranslateStack stack, AVM2ConstantPool constants, int multinameIndex, AVM2Instruction ins) {
         GraphTargetItem ns = null;
         GraphTargetItem name = null;
-        if (multinameIndex > 0 && multinameIndex < constants.constant_multiname.size()) {
+        if (multinameIndex > 0 && multinameIndex < constants.getMultinameCount()) {
             if (constants.getMultiname(multinameIndex).needsName()) {
                 name = stack.pop();
             }
@@ -177,7 +177,7 @@ public abstract class InstructionDefinition implements Serializable {
 
     protected int getMultinameRequiredStackSize(AVM2ConstantPool constants, int multinameIndex) {
         int res = 0;
-        if (multinameIndex > 0 && multinameIndex < constants.constant_multiname.size()) {
+        if (multinameIndex > 0 && multinameIndex < constants.getMultinameCount()) {
             //Note: In official compiler, the stack can be wrong(greater) for some MULTINAMEL/A, e.g. increments
             /*
              var arr=[1,2,3];

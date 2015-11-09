@@ -105,14 +105,14 @@ public class NamespacedAVM2Item extends AssignableAVM2Item {
         if (name != null) {
             return toSourceMerge(localData, generator,
                     ns, NameAVM2Item.generateCoerce(localData, generator, new TypeItem(DottedChain.NAMESPACE)),
-                    ins(AVM2Instructions.FindPropertyStrict, g.abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.RTQNAME, g.abcIndex.getSelectedAbc().constants.getStringId(name, true), 0, 0, 0, new ArrayList<>()), true)),
+                    ins(AVM2Instructions.FindPropertyStrict, g.abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.RTQNAME, g.abcIndex.getSelectedAbc().constants.getStringId(name, true), 0, 0), true)),
                     dupSetTemp(localData, generator, name_temp),
                     ns, NameAVM2Item.generateCoerce(localData, generator, new TypeItem(DottedChain.NAMESPACE)),
                     dupSetTemp(localData, generator, ns_temp),
                     //Start get original
                     //getTemp(localData, generator, ns_temp), generateCoerce(generator, "Namespace"), ins(AVM2Instructions.FindPropertyStrict, g.abc.getLastAbc().constants.getMultinameId(new Multiname(Multiname.RTQNAME, g.abc.getLastAbc().constants.getStringId(variableName, true), 0, 0, 0, new ArrayList<Integer>()), true)),
                     //getTemp(localData, generator, ns_temp), generateCoerce(generator, "Namespace"),
-                    ins(AVM2Instructions.GetProperty, g.abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, allNsSet(g.abcIndex.getSelectedAbc()), 0, new ArrayList<>()), true)),
+                    ins(AVM2Instructions.GetProperty, g.abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, allNsSet(g.abcIndex.getSelectedAbc())), true)),
                     !isInteger ? ins(AVM2Instructions.ConvertD) : null,
                     //End get original
                     (!post) ? (decrement ? ins(isInteger ? AVM2Instructions.DecrementI : AVM2Instructions.Decrement) : ins(isInteger ? AVM2Instructions.IncrementI : AVM2Instructions.Increment)) : null,
@@ -122,7 +122,7 @@ public class NamespacedAVM2Item extends AssignableAVM2Item {
                     getTemp(localData, generator, name_temp),
                     getTemp(localData, generator, ns_temp),
                     getTemp(localData, generator, ret_temp),
-                    ins(AVM2Instructions.SetProperty, g.abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, allNsSet(g.abcIndex.getSelectedAbc()), 0, new ArrayList<>()), true)),
+                    ins(AVM2Instructions.SetProperty, g.abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, allNsSet(g.abcIndex.getSelectedAbc())), true)),
                     killTemp(localData, generator, Arrays.asList(ret_temp, name_temp, ns_temp))
             );
         } else {
@@ -156,20 +156,20 @@ public class NamespacedAVM2Item extends AssignableAVM2Item {
         if (name == null) {
             if (assignedValue != null) {
                 return toSourceMerge(localData, generator,
-                        obj == null ? ns : null, obj == null ? NameAVM2Item.generateCoerce(localData, generator, new TypeItem(DottedChain.NAMESPACE)) : null, nameItem, ins(AVM2Instructions.ConvertS), obj != null ? obj : ins(AVM2Instructions.FindPropertyStrict, g.abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<>()), true)),
+                        obj == null ? ns : null, obj == null ? NameAVM2Item.generateCoerce(localData, generator, new TypeItem(DottedChain.NAMESPACE)) : null, nameItem, ins(AVM2Instructions.ConvertS), obj != null ? obj : ins(AVM2Instructions.FindPropertyStrict, g.abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0), true)),
                         ns, NameAVM2Item.generateCoerce(localData, generator, new TypeItem(DottedChain.NAMESPACE)), nameItem, ins(AVM2Instructions.ConvertS), assignedValue,
                         needsReturn ? dupSetTemp(localData, generator, ret_temp) : null,
-                        ins(AVM2Instructions.SetProperty, g.abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<>()), true)),
+                        ins(AVM2Instructions.SetProperty, g.abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0), true)),
                         needsReturn ? getTemp(localData, generator, ret_temp) : null,
                         killTemp(localData, generator, Arrays.asList(ns_temp, index_temp, ret_temp))
                 );
             } else {
                 return toSourceMerge(localData, generator,
-                        obj == null ? ns : null, obj == null ? NameAVM2Item.generateCoerce(localData, generator, new TypeItem(DottedChain.NAMESPACE)) : null, nameItem, ins(AVM2Instructions.ConvertS), obj != null ? obj : ins(AVM2Instructions.FindPropertyStrict, g.abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<>()), true)),
+                        obj == null ? ns : null, obj == null ? NameAVM2Item.generateCoerce(localData, generator, new TypeItem(DottedChain.NAMESPACE)) : null, nameItem, ins(AVM2Instructions.ConvertS), obj != null ? obj : ins(AVM2Instructions.FindPropertyStrict, g.abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0), true)),
                         call ? dupSetTemp(localData, generator, obj_temp) : null,
                         ns, NameAVM2Item.generateCoerce(localData, generator, new TypeItem(DottedChain.NAMESPACE)), nameItem, ins(AVM2Instructions.ConvertS),
                         construct ? callargs : null,
-                        ins(construct ? AVM2Instructions.ConstructProp : delete ? AVM2Instructions.DeleteProperty : AVM2Instructions.GetProperty, g.abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0, 0, new ArrayList<>()), true), construct ? callargs.size() : null),
+                        ins(construct ? AVM2Instructions.ConstructProp : delete ? AVM2Instructions.DeleteProperty : AVM2Instructions.GetProperty, g.abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.RTQNAMEL, 0, 0, 0), true), construct ? callargs.size() : null),
                         call ? getTemp(localData, generator, obj_temp) : null,
                         call ? callargs : null,
                         call ? ins(AVM2Instructions.Call, callargs.size()) : null,
@@ -180,20 +180,20 @@ public class NamespacedAVM2Item extends AssignableAVM2Item {
         } else {
             if (assignedValue != null) {
                 return toSourceMerge(localData, generator,
-                        obj == null ? ns : null, obj == null ? NameAVM2Item.generateCoerce(localData, generator, new TypeItem(DottedChain.NAMESPACE)) : null, obj != null ? obj : ins(AVM2Instructions.FindPropertyStrict, g.abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(attr ? Multiname.RTQNAMEA : Multiname.RTQNAME, g.abcIndex.getSelectedAbc().constants.getStringId(name, true), 0, 0, 0, new ArrayList<>()), true)),
+                        obj == null ? ns : null, obj == null ? NameAVM2Item.generateCoerce(localData, generator, new TypeItem(DottedChain.NAMESPACE)) : null, obj != null ? obj : ins(AVM2Instructions.FindPropertyStrict, g.abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(attr ? Multiname.RTQNAMEA : Multiname.RTQNAME, g.abcIndex.getSelectedAbc().constants.getStringId(name, true), 0, 0), true)),
                         ns, NameAVM2Item.generateCoerce(localData, generator, new TypeItem(DottedChain.NAMESPACE)), assignedValue,
                         needsReturn ? dupSetTemp(localData, generator, ret_temp) : null,
-                        ins(AVM2Instructions.SetProperty, g.abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(attr ? Multiname.RTQNAMEA : Multiname.RTQNAME, g.abcIndex.getSelectedAbc().constants.getStringId(name, true), 0, 0, 0, new ArrayList<>()), true)),
+                        ins(AVM2Instructions.SetProperty, g.abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(attr ? Multiname.RTQNAMEA : Multiname.RTQNAME, g.abcIndex.getSelectedAbc().constants.getStringId(name, true), 0, 0), true)),
                         needsReturn ? getTemp(localData, generator, ret_temp) : null,
                         killTemp(localData, generator, Arrays.asList(ns_temp, index_temp, ret_temp))
                 );
             } else {
                 return toSourceMerge(localData, generator,
-                        obj == null ? ns : null, obj == null ? NameAVM2Item.generateCoerce(localData, generator, new TypeItem(DottedChain.NAMESPACE)) : null, obj != null ? obj : ins(AVM2Instructions.FindPropertyStrict, g.abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(attr ? Multiname.RTQNAMEA : Multiname.RTQNAME, g.abcIndex.getSelectedAbc().constants.getStringId(name, true), 0, 0, 0, new ArrayList<>()), true)),
+                        obj == null ? ns : null, obj == null ? NameAVM2Item.generateCoerce(localData, generator, new TypeItem(DottedChain.NAMESPACE)) : null, obj != null ? obj : ins(AVM2Instructions.FindPropertyStrict, g.abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(attr ? Multiname.RTQNAMEA : Multiname.RTQNAME, g.abcIndex.getSelectedAbc().constants.getStringId(name, true), 0, 0), true)),
                         call ? dupSetTemp(localData, generator, obj_temp) : null,
                         ns, NameAVM2Item.generateCoerce(localData, generator, new TypeItem(DottedChain.NAMESPACE)),
                         construct ? callargs : null,
-                        ins(construct ? AVM2Instructions.ConstructProp : delete ? AVM2Instructions.DeleteProperty : AVM2Instructions.GetProperty, g.abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(attr ? Multiname.RTQNAMEA : Multiname.RTQNAME, g.abcIndex.getSelectedAbc().constants.getStringId(name, true), 0, 0, 0, new ArrayList<>()), true), construct ? callargs.size() : null),
+                        ins(construct ? AVM2Instructions.ConstructProp : delete ? AVM2Instructions.DeleteProperty : AVM2Instructions.GetProperty, g.abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(attr ? Multiname.RTQNAMEA : Multiname.RTQNAME, g.abcIndex.getSelectedAbc().constants.getStringId(name, true), 0, 0), true), construct ? callargs.size() : null),
                         call ? getTemp(localData, generator, obj_temp) : null,
                         call ? callargs : null,
                         call ? ins(AVM2Instructions.Call, callargs.size()) : null,

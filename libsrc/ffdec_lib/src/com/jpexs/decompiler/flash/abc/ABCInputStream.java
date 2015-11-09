@@ -35,8 +35,6 @@ import com.jpexs.helpers.MemoryInputStream;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ABCInputStream implements AutoCloseable {
 
@@ -302,7 +300,7 @@ public class ABCInputStream implements AutoCloseable {
         int name_index = 0;
         int namespace_set_index = 0;
         int qname_index = 0;
-        List<Integer> params = new ArrayList<>();
+        int[] params = null;
 
         newDumpLevel(name, "Multiname");
         if ((kind == Multiname.QNAME) || (kind == Multiname.QNAMEA)) {
@@ -320,8 +318,9 @@ public class ABCInputStream implements AutoCloseable {
         } else if (kind == Multiname.TYPENAME) {
             qname_index = readU30("qname_index"); // Multiname index!!!
             int paramsLength = readU30("paramsLength");
+            params = new int[paramsLength];
             for (int i = 0; i < paramsLength; i++) {
-                params.add(readU30("param")); // multiname indices!
+                params[i] = readU30("param"); // multiname indices!
             }
         } else {
             throw new IOException("Unknown kind of Multiname:0x" + Integer.toHexString(kind));

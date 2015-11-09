@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.graph.DottedChain;
+import com.jpexs.helpers.HashArrayList;
 import com.jpexs.helpers.utf8.Utf8PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,32 +35,99 @@ public class AVM2ConstantPool implements Cloneable {
 
     private static final Logger logger = Logger.getLogger(AVM2ConstantPool.class.getName());
 
-    public List<Long> constant_int = new ArrayList<>();
+    private HashArrayList<Long> constant_int = new HashArrayList<>();
 
-    public List<Long> constant_uint = new ArrayList<>();
+    private HashArrayList<Long> constant_uint = new HashArrayList<>();
 
-    public List<Double> constant_double = new ArrayList<>();
+    private HashArrayList<Double> constant_double = new HashArrayList<>();
+
     /* Only for some minor versions */
+    private HashArrayList<Decimal> constant_decimal = new HashArrayList<>();
 
-    public List<Decimal> constant_decimal = new ArrayList<>();
+    private HashArrayList<String> constant_string = new HashArrayList<>();
 
-    public List<String> constant_string = new ArrayList<>();
+    private HashArrayList<Namespace> constant_namespace = new HashArrayList<>();
 
-    public List<Namespace> constant_namespace = new ArrayList<>();
+    private HashArrayList<NamespaceSet> constant_namespace_set = new HashArrayList<>();
 
-    public List<NamespaceSet> constant_namespace_set = new ArrayList<>();
+    private HashArrayList<Multiname> constant_multiname = new HashArrayList<>();
 
-    public List<Multiname> constant_multiname = new ArrayList<>();
+    public AVM2ConstantPool() {
+    }
 
     @Internal
     public Map<String, DottedChain> dottedChainCache = new HashMap<>();
 
+    private void ensureDefault(List<?> list) {
+        if (list.isEmpty()) {
+            list.add(null);
+        }
+    }
+
+    public void ensureIntCapacity(int capacity) {
+        constant_int.ensureCapacity(capacity);
+        if (capacity > 0) {
+            ensureDefault(constant_int);
+        }
+    }
+
+    public void ensureNamespaceCapacity(int capacity) {
+        constant_namespace.ensureCapacity(capacity);
+        if (capacity > 0) {
+            ensureDefault(constant_namespace);
+        }
+    }
+
+    public void ensureNamespaceSetCapacity(int capacity) {
+        constant_namespace_set.ensureCapacity(capacity);
+        if (capacity > 0) {
+            ensureDefault(constant_namespace_set);
+        }
+    }
+
+    public void ensureMultinameCapacity(int capacity) {
+        constant_multiname.ensureCapacity(capacity);
+        if (capacity > 0) {
+            ensureDefault(constant_multiname);
+        }
+    }
+
+    public void ensureUIntCapacity(int capacity) {
+        constant_uint.ensureCapacity(capacity);
+        if (capacity > 0) {
+            ensureDefault(constant_uint);
+        }
+    }
+
+    public void ensureDoubleCapacity(int capacity) {
+        constant_double.ensureCapacity(capacity);
+        if (capacity > 0) {
+            ensureDefault(constant_double);
+        }
+    }
+
+    public void ensureDecimalCapacity(int capacity) {
+        constant_decimal.ensureCapacity(capacity);
+        if (capacity > 0) {
+            ensureDefault(constant_decimal);
+        }
+    }
+
+    public void ensureStringCapacity(int capacity) {
+        constant_string.ensureCapacity(capacity);
+        if (capacity > 0) {
+            ensureDefault(constant_string);
+        }
+    }
+
     public synchronized int addInt(long value) {
+        ensureDefault(constant_int);
         constant_int.add(value);
         return constant_int.size() - 1;
     }
 
     public synchronized int addNamespace(Namespace ns) {
+        ensureDefault(constant_namespace);
         constant_namespace.add(ns);
         return constant_namespace.size() - 1;
     }
@@ -69,31 +137,37 @@ public class AVM2ConstantPool implements Cloneable {
     }
 
     public synchronized int addNamespaceSet(NamespaceSet nss) {
+        ensureDefault(constant_namespace_set);
         constant_namespace_set.add(nss);
         return constant_namespace_set.size() - 1;
     }
 
     public synchronized int addMultiname(Multiname m) {
+        ensureDefault(constant_multiname);
         constant_multiname.add(m);
         return constant_multiname.size() - 1;
     }
 
     public synchronized int addUInt(long value) {
+        ensureDefault(constant_uint);
         constant_uint.add(value);
         return constant_uint.size() - 1;
     }
 
     public synchronized int addDouble(double value) {
+        ensureDefault(constant_double);
         constant_double.add(value);
         return constant_double.size() - 1;
     }
 
     public synchronized int addDecimal(Decimal value) {
+        ensureDefault(constant_decimal);
         constant_decimal.add(value);
         return constant_decimal.size() - 1;
     }
 
     public synchronized int addString(String value) {
+        ensureDefault(constant_string);
         constant_string.add(value);
         return constant_string.size() - 1;
     }
@@ -140,6 +214,9 @@ public class AVM2ConstantPool implements Cloneable {
 
     public long getInt(int index) {
         try {
+            if (index == 0) {
+                return 0;
+            }
             return constant_int.get(index);
         } catch (IndexOutOfBoundsException ex) {
             logger.log(Level.SEVERE, "Int not found. Index: " + index, ex);
@@ -176,6 +253,9 @@ public class AVM2ConstantPool implements Cloneable {
 
     public long getUInt(int index) {
         try {
+            if (index == 0) {
+                return 0;
+            }
             return constant_uint.get(index);
         } catch (IndexOutOfBoundsException ex) {
             logger.log(Level.SEVERE, "UInt not found. Index: " + index, ex);
@@ -185,6 +265,9 @@ public class AVM2ConstantPool implements Cloneable {
 
     public double getDouble(int index) {
         try {
+            if (index == 0) {
+                return 0;
+            }
             return constant_double.get(index);
         } catch (IndexOutOfBoundsException ex) {
             logger.log(Level.SEVERE, "Double not found. Index: " + index, ex);
@@ -293,65 +376,27 @@ public class AVM2ConstantPool implements Cloneable {
     }
 
     private int getIntId(long value) {
-        for (int i = 1; i < constant_int.size(); i++) {
-            if (constant_int.get(i) == value) {
-                return i;
-            }
-        }
-        return -1;
+        return constant_int.indexOf(value);
     }
 
     private int getUIntId(long value) {
-        for (int i = 1; i < constant_uint.size(); i++) {
-            if (constant_uint.get(i) == value) {
-                return i;
-            }
-        }
-        return -1;
+        return constant_uint.indexOf(value);
     }
 
     private int getDoubleId(double value) {
-        for (int i = 1; i < constant_double.size(); i++) {
-            if (Double.isNaN(value) && Double.isNaN(constant_double.get(i))) {
-                return i;
-            }
-            if (Double.compare(constant_double.get(i), value) == 0) {
-                return i;
-            }
-        }
-        return -1;
+        return constant_double.indexOf(value);
     }
 
-    private int getStringId(String val) {
-        if (val == null) {
-            return 0;
-        }
-        for (int i = 1; i < constant_string.size(); i++) {
-            if (constant_string.get(i).equals(val)) {
-                return i;
-            }
-        }
-        return -1;
+    private int getStringId(String value) {
+        return constant_string.indexOf(value);
     }
 
-    private int getMultinameId(Multiname val) {
-        loopm:
-        for (int m = 1; m < constant_multiname.size(); m++) {
-            Multiname mul = constant_multiname.get(m);
-            if (mul.kind == val.kind && mul.name_index == val.name_index && mul.namespace_index == val.namespace_index && mul.namespace_set_index == val.namespace_set_index && mul.qname_index == val.qname_index && mul.params.size() == val.params.size()) {
-                for (int p = 0; p < mul.params.size(); p++) {
-                    if (mul.params.get(p) != val.params.get(p)) {
-                        continue loopm;
-                    }
-                }
-                return m;
-            }
-        }
-        return -1;
+    private int getMultinameId(Multiname value) {
+        return constant_multiname.indexOf(value);
     }
 
     public int getQnameId(String name, int namespaceKind, String namespaceName, boolean add) {
-        return getMultinameId(new Multiname(Multiname.QNAME, getStringId(name, add), getNamespaceId(namespaceKind, namespaceName, 0, add), 0, 0, new ArrayList<>()), add);
+        return getMultinameId(new Multiname(Multiname.QNAME, getStringId(name, add), getNamespaceId(namespaceKind, namespaceName, 0, add), 0), add);
     }
 
     public int getPublicQnameId(String name, boolean add) {
@@ -503,14 +548,14 @@ public class AVM2ConstantPool implements Cloneable {
     public AVM2ConstantPool clone() {
         try {
             AVM2ConstantPool ret = (AVM2ConstantPool) super.clone();
-            ret.constant_int = new ArrayList<>(constant_int);
-            ret.constant_uint = new ArrayList<>(constant_uint);
-            ret.constant_double = new ArrayList<>(constant_double);
-            ret.constant_decimal = new ArrayList<>(constant_decimal);
-            ret.constant_string = new ArrayList<>(constant_string);
-            ret.constant_namespace = new ArrayList<>(constant_namespace);
-            ret.constant_namespace_set = new ArrayList<>(constant_namespace_set);
-            ret.constant_multiname = new ArrayList<>(constant_multiname);
+            ret.constant_int = new HashArrayList<>(constant_int);
+            ret.constant_uint = new HashArrayList<>(constant_uint);
+            ret.constant_double = new HashArrayList<>(constant_double);
+            ret.constant_decimal = new HashArrayList<>(constant_decimal);
+            ret.constant_string = new HashArrayList<>(constant_string);
+            ret.constant_namespace = new HashArrayList<>(constant_namespace);
+            ret.constant_namespace_set = new HashArrayList<>(constant_namespace_set);
+            ret.constant_multiname = new HashArrayList<>(constant_multiname);
             ret.dottedChainCache = new HashMap<>();
             return ret;
         } catch (CloneNotSupportedException ex) {

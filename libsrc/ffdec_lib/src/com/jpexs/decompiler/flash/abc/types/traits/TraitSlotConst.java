@@ -46,7 +46,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
 
     @Override
     public void delete(ABC abc, boolean d) {
-        abc.constants.constant_multiname.get(name_index).deleted = d;
+        abc.constants.getMultiname(name_index).deleted = d;
     }
 
     @Override

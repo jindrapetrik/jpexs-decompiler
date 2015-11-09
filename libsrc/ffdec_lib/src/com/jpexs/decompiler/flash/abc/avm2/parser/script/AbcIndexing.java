@@ -51,7 +51,9 @@ import java.util.Set;
 public class AbcIndexing {
 
     private AbcIndexing parent = null;
+
     private List<ABC> abcs = new ArrayList<>();
+
     private ABC selectedAbc = null;
 
     /**
@@ -100,8 +102,11 @@ public class AbcIndexing {
     public static class PropertyDef {
 
         private final String propName;
+
         private final GraphTargetItem parent;
+
         private int propNsIndex = 0;
+
         private ABC abc = null;
 
         @Override
@@ -172,7 +177,6 @@ public class AbcIndexing {
             }
             return true;
         }
-
     }
 
     /**
@@ -181,9 +185,11 @@ public class AbcIndexing {
     public static class PropertyNsDef {
 
         private final String propName;
+
         private final DottedChain ns;
 
         private int propNsIndex = 0;
+
         private ABC abc = null;
 
         public void setPrivate(ABC abc, int propNsIndex) {
@@ -245,15 +251,18 @@ public class AbcIndexing {
             }
             return true;
         }
-
     }
 
     public static class TraitIndex {
 
         public Trait trait;
+
         public ABC abc;
+
         public GraphTargetItem returnType;
+
         public ValueKind value;
+
         public GraphTargetItem objType;
 
         public TraitIndex(Trait trait, ABC abc, GraphTargetItem type, ValueKind value, GraphTargetItem objType) {
@@ -263,13 +272,14 @@ public class AbcIndexing {
             this.value = value;
             this.objType = objType;
         }
-
     }
 
     public static class ClassIndex {
 
         public int index;
+
         public ABC abc;
+
         public ClassIndex parent;
 
         @Override
@@ -285,11 +295,15 @@ public class AbcIndexing {
     }
 
     private final Map<GraphTargetItem, ClassIndex> classes = new HashMap<>();
+
     private final Map<PropertyDef, TraitIndex> instanceProperties = new HashMap<>();
+
     private final Map<PropertyDef, TraitIndex> classProperties = new HashMap<>();
 
     private final Map<PropertyNsDef, TraitIndex> instanceNsProperties = new HashMap<>();
+
     private final Map<PropertyNsDef, TraitIndex> classNsProperties = new HashMap<>();
+
     private final Map<PropertyNsDef, TraitIndex> scriptProperties = new HashMap<>();
 
     public ClassIndex findClass(GraphTargetItem cls) {
@@ -397,7 +411,7 @@ public class AbcIndexing {
         if (m_index == 0) {
             return TypeItem.UNBOUNDED;
         }
-        Multiname m = constants.constant_multiname.get(m_index);
+        Multiname m = constants.getMultiname(m_index);
         if (m.kind == Multiname.TYPENAME) {
             GraphTargetItem obj = multinameToType(m.qname_index, constants);
             List<GraphTargetItem> params = new ArrayList<>();
@@ -445,7 +459,7 @@ public class AbcIndexing {
                 propValue = new ValueKind(tsc.value_index, tsc.value_kind);
             }
             if (map != null) {
-                PropertyDef dp = new PropertyDef(t.getName(abc).getName(abc.constants, new ArrayList<>() /*?*/, true), multinameToType(name_index, abc.constants), abc, abc.constants.constant_multiname.get(t.name_index).namespace_index);
+                PropertyDef dp = new PropertyDef(t.getName(abc).getName(abc.constants, new ArrayList<>() /*?*/, true), multinameToType(name_index, abc.constants), abc, abc.constants.getMultiname(t.name_index).namespace_index);
                 map.put(dp, new TraitIndex(t, abc, getTraitReturnType(abc, t), propValue, multinameToType(name_index, abc.constants)));
             }
             if (mapNs != null) {
@@ -568,5 +582,4 @@ public class AbcIndexing {
     public ABC getSelectedAbc() {
         return selectedAbc;
     }
-
 }

@@ -95,8 +95,6 @@ public class ABC {
 
     private Map<Integer, Integer> bodyIdxFromMethodIdx;
 
-    private long[] stringOffsets;
-
     public static final int MINORwithDECIMAL = 17;
 
     protected Set<EventListener> listeners = new HashSet<>();
@@ -114,13 +112,6 @@ public class ABC {
     public ABC(ABCContainerTag tag) {
         this.parentTag = tag;
         this.deobfuscation = null;
-        constants.constant_double.add(null);
-        constants.constant_int.add(null);
-        constants.constant_uint.add(null);
-        constants.constant_string.add(null);
-        constants.constant_multiname.add(null);
-        constants.constant_namespace.add(null);
-        constants.constant_namespace_set.add(null);
     }
 
     public SWF getSwf() {
@@ -140,6 +131,40 @@ public class ABC {
     public int addMethodInfo(MethodInfo mi) {
         method_info.add(mi);
         return method_info.size() - 1;
+    }
+
+    public TraitMethodGetterSetter addMethod(int classId, String name, boolean isStatic) {
+        Multiname multiname = new Multiname();
+        multiname.kind = Multiname.QNAME;
+        multiname.name_index = constants.getStringId(name, true);
+        multiname.namespace_index = constants.getNamespaceId(Namespace.KIND_PACKAGE, "", 0, true);
+        int multinameId = constants.getMultinameId(multiname, true);
+
+        MethodInfo methodInfo = new MethodInfo();
+        int methodInfoId = addMethodInfo(methodInfo);
+        MethodBody methodBody = new MethodBody();
+        methodBody.method_info = methodInfoId;
+        addMethodBody(methodBody);
+        methodInfo.setBody(methodBody);
+
+        TraitMethodGetterSetter trait = new TraitMethodGetterSetter();
+        trait.name_index = multinameId;
+        trait.kindType = Trait.TRAIT_METHOD;
+        if (isStatic) {
+            trait.kindFlags = Trait.ATTR_Final;
+        }
+
+        trait.method_info = methodInfoId;
+        if (isStatic) {
+            ClassInfo classInfo = class_info.get(classId);
+            classInfo.static_traits.addTrait(trait);
+            trait.disp_id = classInfo.getNextDispId();
+        } else {
+            InstanceInfo instanceInfo = instance_info.get(classId);
+            instanceInfo.instance_traits.addTrait(trait);
+        }
+
+        return trait;
     }
 
     public void addEventListener(EventListener listener) {
@@ -366,15 +391,11 @@ public class ABC {
         major_version = ais.readU16("major_version");
         logger.log(Level.FINE, "ABC minor_version: {0}, major_version: {1}", new Object[]{minor_version, major_version});
 
-        constants = new AVM2ConstantPool();
         ais.newDumpLevel("constant_pool", "cpool_info");
 
         // constant integers
         int constant_int_pool_count = ais.readU30("int_count");
-        constants.constant_int = new ArrayList<>(constant_int_pool_count);
-        if (constant_int_pool_count > 0) {
-            constants.addInt(0);
-        }
+        constants.ensureIntCapacity(constant_int_pool_count);
         if (constant_int_pool_count > 1) {
             ais.newDumpLevel("integers", "integer[]");
             for (int i = 1; i < constant_int_pool_count; i++) { // index 0 not used. Values 1..n-1
@@ -385,10 +406,7 @@ public class ABC {
 
         // constant unsigned integers
         int constant_uint_pool_count = ais.readU30("uint_count");
-        constants.constant_uint = new ArrayList<>(constant_uint_pool_count);
-        if (constant_uint_pool_count > 0) {
-            constants.addUInt(0);
-        }
+        constants.ensureUIntCapacity(constant_uint_pool_count);
         if (constant_uint_pool_count > 1) {
             ais.newDumpLevel("uintegers", "uinteger[]");
             for (int i = 1; i < constant_uint_pool_count; i++) { // index 0 not used. Values 1..n-1
@@ -399,10 +417,7 @@ public class ABC {
 
         // constant double
         int constant_double_pool_count = ais.readU30("double_count");
-        constants.constant_double = new ArrayList<>(constant_double_pool_count);
-        //if (constant_double_pool_count > 0) {
-        constants.addDouble(0);
-        //}
+        constants.ensureDoubleCapacity(constant_double_pool_count);
         if (constant_double_pool_count > 1) {
             ais.newDumpLevel("doubles", "double[]");
             for (int i = 1; i < constant_double_pool_count; i++) { // index 0 not used. Values 1..n-1
@@ -414,10 +429,7 @@ public class ABC {
         // constant decimal
         if (minor_version >= MINORwithDECIMAL) {
             int constant_decimal_pool_count = ais.readU30("decimal_count");
-            constants.constant_decimal = new ArrayList<>(constant_decimal_pool_count);
-            if (constant_decimal_pool_count > 0) {
-                constants.addDecimal(null);
-            }
+            constants.ensureDecimalCapacity(constant_decimal_pool_count);
             if (constant_decimal_pool_count > 1) {
                 ais.newDumpLevel("decimals", "decimal[]");
                 for (int i = 1; i < constant_decimal_pool_count; i++) { // index 0 not used. Values 1..n-1
@@ -425,33 +437,23 @@ public class ABC {
                 }
                 ais.endDumpLevel();
             }
-        } else {
-            constants.constant_decimal = new ArrayList<>(0);
         }
 
         // constant string
         int constant_string_pool_count = ais.readU30("string_count");
-        constants.constant_string = new ArrayList<>(constant_string_pool_count);
-        stringOffsets = new long[constant_string_pool_count];
-        //if (constant_string_pool_count > 0) {
-        constants.addString(null);
-        //}
+        constants.ensureStringCapacity(constant_string_pool_count);
         if (constant_string_pool_count > 1) {
             ais.newDumpLevel("strings", "string[]");
             for (int i = 1; i < constant_string_pool_count; i++) { // index 0 not used. Values 1..n-1
                 long pos = ais.getPosition();
                 constants.addString(ais.readString("string"));
-                stringOffsets[i] = pos;
             }
             ais.endDumpLevel();
         }
 
         // constant namespace
         int constant_namespace_pool_count = ais.readU30("namespace_count");
-        constants.constant_namespace = new ArrayList<>(constant_namespace_pool_count);
-        //if (constant_namespace_pool_count > 0) {
-        constants.addNamespace(null);
-        //}
+        constants.ensureNamespaceCapacity(constant_namespace_pool_count);
         if (constant_namespace_pool_count > 1) {
             ais.newDumpLevel("namespaces", "namespace[]");
             for (int i = 1; i < constant_namespace_pool_count; i++) { // index 0 not used. Values 1..n-1
@@ -462,10 +464,7 @@ public class ABC {
 
         // constant namespace set
         int constant_namespace_set_pool_count = ais.readU30("ns_set_count");
-        constants.constant_namespace_set = new ArrayList<>(constant_namespace_set_pool_count);
-        //if (constant_namespace_set_pool_count > 0) {
-        constants.addNamespaceSet(null);
-        //}
+        constants.ensureNamespaceSetCapacity(constant_namespace_set_pool_count);
         if (constant_namespace_set_pool_count > 1) {
             ais.newDumpLevel("ns_sets", "ns_set[]");
             for (int i = 1; i < constant_namespace_set_pool_count; i++) { // index 0 not used. Values 1..n-1
@@ -483,10 +482,7 @@ public class ABC {
 
         // constant multiname
         int constant_multiname_pool_count = ais.readU30("multiname_count");
-        constants.constant_multiname = new ArrayList<>(constant_multiname_pool_count);
-        //if (constant_multiname_pool_count > 0) {
-        constants.addMultiname(null);
-        //}
+        constants.ensureMultinameCapacity(constant_multiname_pool_count);
         if (constant_multiname_pool_count > 1) {
             ais.newDumpLevel("multiname", "multinames[]");
             for (int i = 1; i < constant_multiname_pool_count; i++) { // index 0 not used. Values 1..n-1

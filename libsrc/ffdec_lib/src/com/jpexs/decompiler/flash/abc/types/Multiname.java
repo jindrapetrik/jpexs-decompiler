@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -62,7 +63,7 @@ public class Multiname {
 
     public final int qname_index; //for TypeName
 
-    public final List<Integer> params; //for TypeName
+    public final int[] params; //for TypeName
 
     @Internal
     public boolean deleted;
@@ -85,7 +86,11 @@ public class Multiname {
         params = null;
     }
 
-    public Multiname(int kind, int name_index, int namespace_index, int namespace_set_index, int qname_index, List<Integer> params) {
+    public Multiname(int kind, int name_index, int namespace_index, int namespace_set_index) {
+        this(kind, name_index, namespace_index, namespace_set_index, 0, null);
+    }
+
+    public Multiname(int kind, int name_index, int namespace_index, int namespace_set_index, int qname_index, int[] params) {
         this.kind = kind;
         this.name_index = name_index;
         this.namespace_index = namespace_index;
@@ -178,7 +183,15 @@ public class Multiname {
     @Override
     public String toString() {
         String kindStr = getKindStr();
-        return "kind=" + kindStr + " name_index=" + name_index + " namespace_index=" + namespace_index + " namespace_set_index=" + namespace_set_index + " qname_index=" + qname_index + " params_size:" + params.size();
+        StringBuilder sb = new StringBuilder();
+        sb.append("kind=").append(kindStr);
+        sb.append(" name_index=").append(name_index);
+        sb.append(" namespace_index=").append(namespace_index);
+        sb.append(" namespace_set_index=").append(namespace_set_index);
+        sb.append(" qname_index=").append(qname_index);
+        sb.append(" params_size:");
+        sb.append(params == null ? "null" : params.length);
+        return sb.toString();
 
     }
 
@@ -247,11 +260,13 @@ public class Multiname {
                 String tret = getKindStr() + "(";
                 tret += multinameToString(constants, qname_index, fullyQualifiedNames);
                 tret += "<";
-                for (int i = 0; i < params.size(); i++) {
-                    if (i > 0) {
-                        tret += ",";
+                if (params != null) {
+                    for (int i = 0; i < params.length; i++) {
+                        if (i > 0) {
+                            tret += ",";
+                        }
+                        tret += multinameToString(constants, params[i], fullyQualifiedNames);
                     }
-                    tret += multinameToString(constants, params.get(i), fullyQualifiedNames);
                 }
                 tret += ">";
                 tret += ")";
@@ -266,16 +281,17 @@ public class Multiname {
         }
         StringBuilder typeNameStr = new StringBuilder();
         typeNameStr.append(constants.getMultiname(qname_index).getName(constants, fullyQualifiedNames, raw));
-        if (!params.isEmpty()) {
+        if (params != null && params.length > 0) {
             typeNameStr.append(".<");
-            for (int i = 0; i < params.size(); i++) {
+            for (int i = 0; i < params.length; i++) {
                 if (i > 0) {
                     typeNameStr.append(",");
                 }
-                if (params.get(i) == 0) {
+                int param = params[i];
+                if (param == 0) {
                     typeNameStr.append("*");
                 } else {
-                    typeNameStr.append(constants.getMultiname(params.get(i)).getName(constants, fullyQualifiedNames, raw));
+                    typeNameStr.append(constants.getMultiname(param).getName(constants, fullyQualifiedNames, raw));
                 }
             }
             typeNameStr.append(">");
@@ -373,7 +389,7 @@ public class Multiname {
         if (this.qname_index != other.qname_index) {
             return false;
         }
-        if (!Objects.equals(params, other.params)) {
+        if (!Arrays.equals(params, other.params)) {
             return false;
         }
         return true;

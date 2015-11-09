@@ -100,7 +100,7 @@ public class Namespace {
     public String getNameWithKind(AVM2ConstantPool constants) {
         String kindStr = getKindStr();
         String nameStr = constants.getString(name_index);
-        return kindStr + (nameStr.isEmpty() ? "" : " " + nameStr);
+        return kindStr + (nameStr == null || nameStr.isEmpty() ? "" : " " + nameStr);
     }
 
     public String getPrefix(ABC abc) {

@@ -465,8 +465,8 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
             switch (sh.getProperties().subtype) {
                 case TYPE_NAME:
                     String typeName = sh.getProperties().specialValue;
-                    for (int i = 1; i < abc.constants.constant_multiname.size(); i++) {
-                        Multiname m = abc.constants.constant_multiname.get(i);
+                    for (int i = 1; i < abc.constants.getMultinameCount(); i++) {
+                        Multiname m = abc.constants.getMultiname(i);
                         if (m != null) {
                             if (typeName.equals(m.getNameWithNamespace(abc.constants).toString())) {
                                 return i;

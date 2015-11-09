@@ -777,19 +777,19 @@ public class AVM2Code implements Cloneable {
     public void removeWrongIndices(AVM2ConstantPool constants) {
         for (AVM2Instruction ins : code) {
             for (int i = 0; i < ins.definition.operands.length; i++) {
-                if (ins.definition.operands[i] == DAT_MULTINAME_INDEX && ins.operands[i] >= constants.constant_multiname.size()) {
+                if (ins.definition.operands[i] == DAT_MULTINAME_INDEX && ins.operands[i] >= constants.getMultinameCount()) {
                     ins.operands[i] = 0;
                 }
-                if (ins.definition.operands[i] == DAT_DOUBLE_INDEX && ins.operands[i] >= constants.constant_double.size()) {
+                if (ins.definition.operands[i] == DAT_DOUBLE_INDEX && ins.operands[i] >= constants.getDoubleCount()) {
                     ins.operands[i] = 0;
                 }
-                if (ins.definition.operands[i] == DAT_INT_INDEX && ins.operands[i] >= constants.constant_int.size()) {
+                if (ins.definition.operands[i] == DAT_INT_INDEX && ins.operands[i] >= constants.getIntCount()) {
                     ins.operands[i] = 0;
                 }
-                if (ins.definition.operands[i] == DAT_UINT_INDEX && ins.operands[i] >= constants.constant_uint.size()) {
+                if (ins.definition.operands[i] == DAT_UINT_INDEX && ins.operands[i] >= constants.getUIntCount()) {
                     ins.operands[i] = 0;
                 }
-                if (ins.definition.operands[i] == DAT_STRING_INDEX && ins.operands[i] >= constants.constant_string.size()) {
+                if (ins.definition.operands[i] == DAT_STRING_INDEX && ins.operands[i] >= constants.getStringCount()) {
                     ins.operands[i] = 0;
                 }
             }
@@ -1044,8 +1044,12 @@ public class AVM2Code implements Cloneable {
     }
 
     public String toASMSource() {
+        return toASMSource(new AVM2ConstantPool());
+    }
+
+    public String toASMSource(AVM2ConstantPool constants) {
         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
-        toASMSource(new AVM2ConstantPool(), null, null, null, new ArrayList<>(), ScriptExportMode.PCODE, writer);
+        toASMSource(constants, null, null, null, new ArrayList<>(), ScriptExportMode.PCODE, writer);
         return writer.toString();
     }
 

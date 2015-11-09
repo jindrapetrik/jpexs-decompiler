@@ -36,6 +36,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.helpers.Helper;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
@@ -263,7 +264,7 @@ public class ASM3Parser {
         int namespace_index = 0;
         int namespace_set_index = 0;
         int qname_index = 0;
-        List<Integer> params = new ArrayList<>();
+        int[] params = null;
 
         switch (s.type) {
             case ParsedSymbol.TYPE_KEYWORD_NULL:
@@ -361,12 +362,14 @@ public class ASM3Parser {
                 expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
                 qname_index = parseMultiName(constants, lexer);
                 expected(ParsedSymbol.TYPE_LOWERTHAN, "<", lexer);
-                params.add(parseMultiName(constants, lexer));
+                List<Integer> paramsList = new ArrayList<>();
+                paramsList.add(parseMultiName(constants, lexer));
                 ParsedSymbol nt = lexer.lex();
                 while (nt.type == ParsedSymbol.TYPE_COMMA) {
-                    params.add(parseMultiName(constants, lexer));
+                    paramsList.add(parseMultiName(constants, lexer));
                     nt = lexer.lex();
                 }
+                params = Helper.toIntArray(paramsList);
                 expected(nt, ParsedSymbol.TYPE_GREATERTHAN, ">");
                 expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
                 break;

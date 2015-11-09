@@ -72,10 +72,10 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
         int protectedNS = instanceInfo.protectedNS;
         if (protectedNS != 0) {
-            abc.constants.constant_namespace.get(protectedNS).deleted = d;
+            abc.constants.getNamespace(protectedNS).deleted = d;
         }
 
-        abc.constants.constant_multiname.get(name_index).deleted = d;
+        abc.constants.getMultiname(name_index).deleted = d;
     }
 
     @Override
@@ -289,7 +289,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
                         || (ins.definition instanceof AsTypeIns)) {
                     int m = ins.operands[0];
                     if (m != 0) {
-                        if (m < abc.constants.constant_multiname.size()) {
+                        if (m < abc.constants.getMultinameCount()) {
                             parseImportsUsagesFromMultiname(abc, imports, uses, abc.constants.getMultiname(m), ignorePackage, fullyQualifiedNames);
                         }
                     }
@@ -297,7 +297,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
                     for (int k = 0; k < ins.definition.operands.length; k++) {
                         if (ins.definition.operands[k] == AVM2Code.DAT_MULTINAME_INDEX) {
                             int multinameIndex = ins.operands[k];
-                            if (multinameIndex < abc.constants.constant_multiname.size()) {
+                            if (multinameIndex < abc.constants.getMultinameCount()) {
                                 parseUsagesFromMultiname(abc, imports, uses, abc.constants.getMultiname(multinameIndex), ignorePackage, fullyQualifiedNames);
                             }
                         }

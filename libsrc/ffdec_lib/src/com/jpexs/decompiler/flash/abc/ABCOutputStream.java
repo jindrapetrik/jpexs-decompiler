@@ -176,25 +176,21 @@ public class ABCOutputStream extends OutputStream {
 
     public void writeMultiname(Multiname m) throws IOException {
         writeU8(m.kind);
-        if ((m.kind == 7) || (m.kind == 0xd)) { // CONSTANT_QName and CONSTANT_QNameA.
+        if ((m.kind == Multiname.QNAME) || (m.kind == Multiname.QNAMEA)) {
             writeU30(m.namespace_index);
             writeU30(m.name_index);
-        }
-        if ((m.kind == 9) || (m.kind == 0xe)) { // CONSTANT_Multiname and CONSTANT_MultinameA.
+        } else if ((m.kind == Multiname.MULTINAME) || (m.kind == Multiname.MULTINAMEA)) {
             writeU30(m.name_index);
             writeU30(m.namespace_set_index);
-        }
-        if ((m.kind == 0xf) || (m.kind == 0x10)) { // CONSTANT_RTQName and CONSTANT_RTQNameA
+        } else if ((m.kind == Multiname.RTQNAME) || (m.kind == Multiname.RTQNAMEA)) {
             writeU30(m.name_index);
-        }
-        if ((m.kind == 0x1B) || (m.kind == 0x1C)) { // CONSTANT_MultinameL and CONSTANT_MultinameLA
+        } else if ((m.kind == Multiname.MULTINAMEL) || (m.kind == Multiname.MULTINAMELA)) {
             writeU30(m.namespace_set_index);
-        }
-        if (m.kind == 0x1D) {
+        } else if (m.kind == Multiname.TYPENAME) {
             writeU30(m.qname_index);
-            writeU30(m.params.size());
-            for (int i = 0; i < m.params.size(); i++) {
-                writeU30(m.params.get(i));
+            writeU30(m.params.length);
+            for (int i = 0; i < m.params.length; i++) {
+                writeU30(m.params[i]);
             }
         }
         // kind==0x11,0x12 nothing CONSTANT_RTQNameL and CONSTANT_RTQNameLA.

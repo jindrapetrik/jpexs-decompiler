@@ -59,8 +59,8 @@ public class UsageFrame extends AppDialog implements MouseListener {
         super(abcPanel.getMainPanel().getMainFrame().getWindow());
         this.abcPanel = abcPanel;
         List<MultinameUsage> usages = definitions ? abc.findMultinameDefinition(multinameIndex) : abc.findMultinameUsage(multinameIndex);
-        Multiname m = abc.constants.constant_multiname.get(multinameIndex);
-        if (m.namespace_index > 0 && abc.constants.constant_namespace.get(m.namespace_index).kind != Namespace.KIND_PRIVATE) {
+        Multiname m = abc.constants.getMultiname(multinameIndex);
+        if (m.namespace_index > 0 && abc.constants.getNamespace(m.namespace_index).kind != Namespace.KIND_PRIVATE) {
             for (ABCContainerTag at : abc.getAbcTags()) {
                 ABC a = at.getABC();
                 if (a == abc) {

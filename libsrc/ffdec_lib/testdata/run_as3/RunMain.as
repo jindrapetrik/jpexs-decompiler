@@ -14,6 +14,7 @@
 			myTextBox = new TextField();    
 			myTextBox.text = "";
 			myTextBox.width = 400;
+			myTextBox.multiline = true;
 			addChild(myTextBox);  
 
 			var rectangleShape:Shape = new Shape();
@@ -21,8 +22,8 @@
 			rectangleShape.graphics.drawRect(0, 0, 100, 25);
 			rectangleShape.graphics.endFill();
 
-			var btnTextBox:TextField = new TextField();    
-			btnTextBox.text = "EXECUTE";    
+			var btnTextBox:TextField = new TextField();
+			btnTextBox.text = "EXECUTE";
 
 			var simpleButtonSprite:Sprite = new Sprite();
 			simpleButtonSprite.name = "simpleButtonSprite";
