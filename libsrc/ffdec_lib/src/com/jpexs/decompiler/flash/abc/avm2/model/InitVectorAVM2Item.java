@@ -127,7 +127,7 @@ public class InitVectorAVM2Item extends AVM2Item {
                     ins(AVM2Instructions.Dup),
                     new IntegerValueAVM2Item(null, (long) i),
                     arguments.get(i),
-                    ins(AVM2Instructions.SetProperty, g.abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, g.abcIndex.getSelectedAbc().constants.getNamespaceSetId(new NamespaceSet(new int[]{g.abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE, "", 0, true)}), true), precedence, arr), true))
+                    ins(AVM2Instructions.SetProperty, g.abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, g.abcIndex.getSelectedAbc().constants.getNamespaceSetId(new NamespaceSet(new int[]{g.abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE, "", 0, true)}), true)), true))
             ));
         }
         return ret;
