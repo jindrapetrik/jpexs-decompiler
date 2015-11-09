@@ -327,7 +327,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                     Reference<ABC> outPropValueAbc = new Reference<>(null);
                                     if (p != null && (p.objType instanceof TypeItem)) {
                                         if (AVM2SourceGenerator.searchPrototypeChain(localData.privateNs, localData.protectedNs, false, abc, nsname, (((TypeItem) p.objType).fullTypeName.getLast()), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc)) {
-                                            objType = new TypeItem("".equals(outNs.getVal()) ? outName.getVal() : outNs.getVal() + "." + outName.getVal());
+                                            objType = new TypeItem(outNs.getVal().add(outName.getVal()));
                                             propType = p.returnType;
                                             propIndex = abc.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.QNAME,
                                                     abc.getSelectedAbc().constants.getStringId(propertyName, true),
