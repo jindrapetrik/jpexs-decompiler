@@ -236,4 +236,10 @@ public class Traits implements Cloneable, Serializable {
             throw new RuntimeException();
         }
     }
+
+    public void getImportsUsages(ABC abc, List<DottedChain> imports, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) {
+        for (Trait t : traits) {
+            t.getImportsUsages(abc, imports, uses, ignorePackage, fullyQualifiedNames);
+        }
+    }
 }

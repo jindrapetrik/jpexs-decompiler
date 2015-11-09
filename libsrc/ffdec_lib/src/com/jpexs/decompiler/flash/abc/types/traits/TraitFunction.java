@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.helpers.Helper;
+import java.util.ArrayList;
 import java.util.List;
 
 public class TraitFunction extends Trait implements TraitWithSlot {
@@ -72,20 +73,18 @@ public class TraitFunction extends Trait implements TraitWithSlot {
 
     @Override
     public GraphTextWriter toString(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
+        writeImportsUsages(abc, writer, getPackage(abc), fullyQualifiedNames);
         getMetaData(abc, writer);
         writer.startMethod(method_info);
         toStringHeader(parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
-        if (abc.instance_info.get(classIndex).isInterface()) {
-            writer.appendNoHilight(";");
-        } else {
-            writer.appendNoHilight(" {").newLine();
-            int bodyIndex = abc.findBodyIndex(method_info);
-            if (bodyIndex != -1) {
-                abc.bodies.get(bodyIndex).toString(path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false), exportMode, abc, this, writer, fullyQualifiedNames);
-            }
-            writer.newLine();
-            writer.appendNoHilight("}");
+
+        writer.startBlock();
+        int bodyIndex = abc.findBodyIndex(method_info);
+        if (bodyIndex != -1) {
+            abc.bodies.get(bodyIndex).toString(path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false), exportMode, abc, this, writer, fullyQualifiedNames);
         }
+        writer.endBlock();
+
         writer.newLine();
         writer.endMethod();
         return writer;
@@ -93,13 +92,13 @@ public class TraitFunction extends Trait implements TraitWithSlot {
 
     @Override
     public void convert(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
+        fullyQualifiedNames = new ArrayList<>();
+        writeImportsUsages(abc, writer, getPackage(abc), fullyQualifiedNames);
         writer.startMethod(method_info);
         convertHeader(parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
-        if (!abc.instance_info.get(classIndex).isInterface()) {
-            int bodyIndex = abc.findBodyIndex(method_info);
-            if (bodyIndex != -1) {
-                abc.bodies.get(bodyIndex).convert(convertData, path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false), exportMode, isStatic, method_info, scriptIndex, classIndex, abc, this, new ScopeStack(), 0, writer, fullyQualifiedNames, null, true);
-            }
+        int bodyIndex = abc.findBodyIndex(method_info);
+        if (bodyIndex != -1) {
+            abc.bodies.get(bodyIndex).convert(convertData, path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false), exportMode, isStatic, method_info, scriptIndex, classIndex, abc, this, new ScopeStack(), 0, writer, fullyQualifiedNames, null, true);
         }
         writer.endMethod();
     }
@@ -118,4 +117,17 @@ public class TraitFunction extends Trait implements TraitWithSlot {
         TraitFunction ret = (TraitFunction) super.clone();
         return ret;
     }
+
+    @Override
+    public void getImportsUsages(ABC abc, List<DottedChain> imports, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) {
+        if (ignorePackage == null) {
+            ignorePackage = getPackage(abc);
+        }
+        super.getImportsUsages(abc, imports, uses, ignorePackage, fullyQualifiedNames);
+        //if (method_info != 0)
+        {
+            parseImportsUsagesFromMethodInfo(abc, method_info, imports, uses, ignorePackage, fullyQualifiedNames, new ArrayList<>());
+        }
+    }
+
 }

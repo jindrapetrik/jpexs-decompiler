@@ -181,4 +181,14 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         TraitSlotConst ret = (TraitSlotConst) super.clone();
         return ret;
     }
+
+    @Override
+    public void getImportsUsages(ABC abc, List<DottedChain> imports, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) {
+        if (ignorePackage == null) {
+            ignorePackage = getPackage(abc);
+        }
+        super.getImportsUsages(abc, imports, uses, ignorePackage, fullyQualifiedNames);
+        parseImportsUsagesFromMultiname(abc, imports, uses, abc.constants.getMultiname(type_index), getPackage(abc), fullyQualifiedNames);
+    }
+
 }

@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.helpers.Helper;
+import java.util.ArrayList;
 import java.util.List;
 
 public class TraitMethodGetterSetter extends Trait {
@@ -47,6 +48,19 @@ public class TraitMethodGetterSetter extends Trait {
 
     @Override
     public void convertHeader(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) {
+    }
+
+    @Override
+    public void getImportsUsages(ABC abc, List<DottedChain> imports, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) {
+        if (ignorePackage == null) {
+            ignorePackage = getPackage(abc);
+        }
+
+        super.getImportsUsages(abc, imports, uses, ignorePackage, fullyQualifiedNames);
+        //if (method_info != 0) 
+        {
+            parseImportsUsagesFromMethodInfo(abc, method_info, imports, uses, ignorePackage, fullyQualifiedNames, new ArrayList<>());
+        }
     }
 
     @Override
@@ -76,6 +90,9 @@ public class TraitMethodGetterSetter extends Trait {
 
     @Override
     public void convert(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
+        if (classIndex < 0) {
+            writeImportsUsages(abc, writer, getPackage(abc), fullyQualifiedNames);
+        }
         writer.startMethod(method_info);
         path = path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames, false);
         convertHeader(parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
@@ -90,6 +107,10 @@ public class TraitMethodGetterSetter extends Trait {
 
     @Override
     public GraphTextWriter toString(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
+
+        if (classIndex < 0) {
+            writeImportsUsages(abc, writer, getPackage(abc), fullyQualifiedNames);
+        }
         getMetaData(abc, writer);
         writer.startMethod(method_info);
         path = path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames, false);
