@@ -1196,13 +1196,13 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 if (ti instanceof SlotAVM2Item) {
                     val = ((SlotAVM2Item) ti).value;
                     isStatic = ((SlotAVM2Item) ti).isStatic();
-                    ns = ((SlotAVM2Item) ti).getNamespace();
+                    ns = genNs(importedClasses, pkg, ((SlotAVM2Item) ti).customNamespace, ((SlotAVM2Item) ti).getNamespace(), openedNamespaces, localData, ((SlotAVM2Item) ti).line);
                     tname = ((SlotAVM2Item) ti).var;
                 }
                 if (ti instanceof ConstAVM2Item) {
                     val = ((ConstAVM2Item) ti).value;
                     isStatic = ((ConstAVM2Item) ti).isStatic();
-                    ns = ((ConstAVM2Item) ti).getNamespace();
+                    ns = genNs(importedClasses, pkg, ((ConstAVM2Item) ti).customNamespace, ((ConstAVM2Item) ti).getNamespace(), openedNamespaces, localData, ((ConstAVM2Item) ti).line);
                     tname = ((ConstAVM2Item) ti).var;
                     isConst = true;
                 }
