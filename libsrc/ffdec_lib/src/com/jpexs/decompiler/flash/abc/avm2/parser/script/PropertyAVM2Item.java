@@ -252,7 +252,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                             for (int i = 0; i < openedNamespaces.size(); i++) {
                                 int nsindex = openedNamespaces.get(i);
 
-                                int nsKind = abc.getSelectedAbc().constants.getMultiname(openedNamespaces.get(i)).kind;
+                                int nsKind = abc.getSelectedAbc().constants.getNamespace(openedNamespaces.get(i)).kind;
                                 DottedChain nsname = abc.getSelectedAbc().constants.getNamespace(openedNamespaces.get(i)).getName(abc.getSelectedAbc().constants);
                                 int name_index = 0;
                                 for (int m = 1; m < abc.getSelectedAbc().constants.getMultinameCount(); m++) {
