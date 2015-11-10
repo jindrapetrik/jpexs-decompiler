@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWC;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.model.ApplyTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.BooleanAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
@@ -965,9 +966,6 @@ public class ActionScript3Parser {
 
     private GraphTargetItem classTraits(List<Map.Entry<String, Map<String, String>>> metadata, String scriptName, int gpublicNs, DottedChain pkg, List<DottedChain> importedClasses, boolean isDynamic, boolean isFinal, List<Integer> openedNamespaces, DottedChain packageName, int namespace, boolean isInterface, String nameStr, GraphTargetItem extendsStr, List<GraphTargetItem> implementsStr, List<AssignableAVM2Item> variables) throws IOException, AVM2ParseException, CompilationException {
 
-        GraphTargetItem ret = null;
-
-        ParsedSymbol s = null;
         List<GraphTargetItem> traits = new ArrayList<>();
 
         String classNameStr = nameStr;
@@ -977,28 +975,29 @@ public class ActionScript3Parser {
         int publicNs = 0;
         int privateNs = 0;
         int packageInternalNs = 0;
+        AVM2ConstantPool constants = abcIndex.getSelectedAbc().constants;
         if (pkg != null && !pkg.isEmpty()) {
-            openedNamespaces.add(packageInternalNs = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE_INTERNAL, abcIndex.getSelectedAbc().constants.getStringId(pkg, true), 0, true));
+            openedNamespaces.add(packageInternalNs = constants.getNamespaceId(Namespace.KIND_PACKAGE_INTERNAL, pkg, 0, true));
         } else {
-            openedNamespaces.add(packageInternalNs = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE_INTERNAL, abcIndex.getSelectedAbc().constants.getStringId("", true), 0, true));
+            openedNamespaces.add(packageInternalNs = constants.getNamespaceId(Namespace.KIND_PACKAGE_INTERNAL, "", 0, true));
         }
         if (pkg != null && !pkg.isEmpty()) {
-            openedNamespaces.add(publicNs = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE, "", 0, true));
+            openedNamespaces.add(publicNs = constants.getNamespaceId(Namespace.KIND_PACKAGE, "", 0, true));
         } else {
             publicNs = gpublicNs;
         }
 
-        openedNamespaces.add(privateNs = abcIndex.getSelectedAbc().constants.addNamespace(new Namespace(Namespace.KIND_PRIVATE, abcIndex.getSelectedAbc().constants.getStringId(pkg.toRawString() + ":" + nameStr, true))));
+        openedNamespaces.add(privateNs = constants.addNamespace(new Namespace(Namespace.KIND_PRIVATE, constants.getStringId(pkg.toRawString() + ":" + nameStr, true))));
 
-        openedNamespaces.add(abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_NAMESPACE, AS3_NAMESPACE, 0, true));
+        openedNamespaces.add(constants.getNamespaceId(Namespace.KIND_NAMESPACE, AS3_NAMESPACE, 0, true));
 
         //int privateNs = 0;
         int protectedNs = 0;
         //int publicNs = namespace;
         int protectedStaticNs = 0;
 
-        openedNamespaces.add(protectedNs = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PROTECTED, packageName == null ? (scriptName + "$0:"/*FIXME?*/ + classNameStr) : packageName.isTopLevel() ? classNameStr : packageName.toRawString() + ":" + classNameStr, 0, true));
-        openedNamespaces.add(protectedStaticNs = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_STATIC_PROTECTED, packageName == null || packageName.isTopLevel() ? classNameStr : packageName.toRawString() + ":" + classNameStr, 0, true));
+        openedNamespaces.add(protectedNs = constants.getNamespaceId(Namespace.KIND_PROTECTED, packageName == null ? (scriptName + "$0:"/*FIXME?*/ + classNameStr) : packageName.isTopLevel() ? classNameStr : packageName.toRawString() + ":" + classNameStr, 0, true));
+        openedNamespaces.add(protectedStaticNs = constants.getNamespaceId(Namespace.KIND_STATIC_PROTECTED, packageName == null || packageName.isTopLevel() ? classNameStr : packageName.toRawString() + ":" + classNameStr, 0, true));
 
         if (extendsStr != null) {
             List<Integer> indices = new ArrayList<>();
@@ -1010,7 +1009,7 @@ public class ActionScript3Parser {
                 if (namespaces.get(i) == null || namespaces.get(i).isEmpty()) {
                     continue;
                 }
-                openedNamespaces.add(abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_STATIC_PROTECTED, namespaces.get(i) + ":" + names.get(i), 0, true));
+                openedNamespaces.add(constants.getNamespaceId(Namespace.KIND_STATIC_PROTECTED, namespaces.get(i) + ":" + names.get(i), 0, true));
             }
         }
 

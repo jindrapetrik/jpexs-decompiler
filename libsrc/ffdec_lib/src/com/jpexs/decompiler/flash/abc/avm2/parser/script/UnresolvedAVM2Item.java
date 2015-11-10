@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
-import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.model.InitVectorAVM2Item;
@@ -26,9 +25,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.NanAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.UndefinedAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
-import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
-import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.DottedChain;
@@ -182,14 +179,6 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         return writer;
-    }
-
-    private int allNsSet(ABC abc) {
-        int[] nssa = new int[openedNamespaces.size()];
-        for (int i = 0; i < openedNamespaces.size(); i++) {
-            nssa[i] = openedNamespaces.get(i);
-        }
-        return abc.constants.getNamespaceSetId(new NamespaceSet(nssa), true);
     }
 
     public static GraphTargetItem getDefaultValue(String type) {

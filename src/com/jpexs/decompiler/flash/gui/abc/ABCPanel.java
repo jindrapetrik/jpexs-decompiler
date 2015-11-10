@@ -787,7 +787,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
             nskind = newTraitDialog.getNamespaceKind();
             name = newTraitDialog.getTraitName();
             isStatic = newTraitDialog.getStatic();
-            m = new Multiname(Multiname.QNAME, abc.constants.getStringId(name, true), abc.constants.getNamespaceId(nskind, "", 0, true), 0);
+            m = Multiname.createQName(false, abc.constants.getStringId(name, true), abc.constants.getNamespaceId(nskind, "", 0, true));
             int mid = abc.constants.getMultinameId(m, false);
             if (mid <= 0) {
                 break;

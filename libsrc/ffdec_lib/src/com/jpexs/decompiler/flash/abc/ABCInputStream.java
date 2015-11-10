@@ -296,38 +296,39 @@ public class ABCInputStream implements AutoCloseable {
 
     public Multiname readMultiname(String name) throws IOException {
         int kind = readU8("kind");
-        int namespace_index = 0;
-        int name_index = 0;
-        int namespace_set_index = 0;
-        int qname_index = 0;
-        int[] params = null;
+        Multiname result = null;
 
         newDumpLevel(name, "Multiname");
         if ((kind == Multiname.QNAME) || (kind == Multiname.QNAMEA)) {
-            namespace_index = readU30("namespace_index");
-            name_index = readU30("name_index");
+            int namespace_index = readU30("namespace_index");
+            int name_index = readU30("name_index");
+            result = Multiname.createQName(kind == Multiname.QNAMEA, name_index, namespace_index);
         } else if ((kind == Multiname.RTQNAME) || (kind == Multiname.RTQNAMEA)) {
-            name_index = readU30("name_index");
+            int name_index = readU30("name_index");
+            result = Multiname.createRTQName(kind == Multiname.RTQNAMEA, name_index);
         } else if ((kind == Multiname.RTQNAMEL) || (kind == Multiname.RTQNAMELA)) {
-
+            result = Multiname.createRTQNameL(kind == Multiname.RTQNAMELA);
         } else if ((kind == Multiname.MULTINAME) || (kind == Multiname.MULTINAMEA)) {
-            name_index = readU30("name_index");
-            namespace_set_index = readU30("namespace_set_index");
+            int name_index = readU30("name_index");
+            int namespace_set_index = readU30("namespace_set_index");
+            result = Multiname.createMultiname(kind == Multiname.MULTINAMEA, name_index, namespace_set_index);
         } else if ((kind == Multiname.MULTINAMEL) || (kind == Multiname.MULTINAMELA)) {
-            namespace_set_index = readU30("namespace_set_index");
+            int namespace_set_index = readU30("namespace_set_index");
+            result = Multiname.createMultinameL(kind == Multiname.MULTINAMELA, namespace_set_index);
         } else if (kind == Multiname.TYPENAME) {
-            qname_index = readU30("qname_index"); // Multiname index!!!
+            int qname_index = readU30("qname_index"); // Multiname index!!!
             int paramsLength = readU30("paramsLength");
-            params = new int[paramsLength];
+            int[] params = new int[paramsLength];
             for (int i = 0; i < paramsLength; i++) {
                 params[i] = readU30("param"); // multiname indices!
             }
+            result = Multiname.createTypeName(qname_index, params);
         } else {
             throw new IOException("Unknown kind of Multiname:0x" + Integer.toHexString(kind));
         }
 
         endDumpLevel();
-        return new Multiname(kind, name_index, namespace_index, namespace_set_index, qname_index, params);
+        return result;
     }
 
     public MethodInfo readMethodInfo(String name) throws IOException {

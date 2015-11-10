@@ -396,7 +396,7 @@ public class AVM2ConstantPool implements Cloneable {
     }
 
     public int getQnameId(String name, int namespaceKind, String namespaceName, boolean add) {
-        return getMultinameId(new Multiname(Multiname.QNAME, getStringId(name, add), getNamespaceId(namespaceKind, namespaceName, 0, add), 0), add);
+        return getMultinameId(Multiname.createQName(false, getStringId(name, add), getNamespaceId(namespaceKind, namespaceName, 0, add)), add);
     }
 
     public int getPublicQnameId(String name, boolean add) {
@@ -438,17 +438,17 @@ public class AVM2ConstantPool implements Cloneable {
         return id;
     }
 
-    private int getNamespaceSetId(NamespaceSet val) {
+    private int getNamespaceSetId(int[] namespaces) {
         loopi:
         for (int i = 1; i < constant_namespace_set.size(); i++) {
             NamespaceSet ts = constant_namespace_set.get(i);
-            if (ts.namespaces.length != val.namespaces.length) {
+            if (ts.namespaces.length != namespaces.length) {
                 continue;
             }
-            for (int j = 0; j < val.namespaces.length; j++) {
+            for (int j = 0; j < namespaces.length; j++) {
                 boolean found = false;
-                for (int k = 0; k < val.namespaces.length; k++) {
-                    if (ts.namespaces[j] == val.namespaces[k]) {
+                for (int k = 0; k < namespaces.length; k++) {
+                    if (ts.namespaces[j] == namespaces[k]) {
                         found = true;
                         break;
                     }
@@ -462,10 +462,10 @@ public class AVM2ConstantPool implements Cloneable {
         return -1;
     }
 
-    public int getNamespaceSetId(NamespaceSet val, boolean add) {
-        int id = getNamespaceSetId(val);
+    public int getNamespaceSetId(int[] namespaces, boolean add) {
+        int id = getNamespaceSetId(namespaces);
         if (add && id == -1) {
-            id = addNamespaceSet(val);
+            id = addNamespaceSet(new NamespaceSet(namespaces));
         }
         return id;
     }
@@ -498,7 +498,6 @@ public class AVM2ConstantPool implements Cloneable {
     }
 
     public void dump(Utf8PrintWriter writer) {
-        String s = "";
         for (int i = 1; i < constant_int.size(); i++) {
             writer.println("INT[" + i + "]=" + constant_int.get(i));
         }
