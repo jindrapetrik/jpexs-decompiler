@@ -149,7 +149,7 @@ public class ActionScript3Parser {
         if (debugMode) {
             System.out.println("commands:");
         }
-        GraphTargetItem cmd = null;
+        GraphTargetItem cmd;
         while ((cmd = command(thisType, pkg, needsActivation, importedClasses, openedNamespaces, loops, loopLabels, registerVars, inFunction, inMethod, forinlevel, true, variables)) != null) {
             ret.add(cmd);
         }
@@ -582,9 +582,33 @@ public class ActionScript3Parser {
                 PackageAVM2Item p = parsePackage(openedNamespaces);
                 pkg = p.packageName;
                 inPkg = true;
-                publicNs = p.publicNs;
+                //publicNs = p.publicNs;
                 importedClasses = p.importedClasses;
                 s = lex();
+
+                //GraphTargetItem ret = null;
+                //ParsedSymbol s = null;
+                //List<GraphTargetItem> traits = new ArrayList<>();
+                //String classNameStr = nameStr;
+                openedNamespaces = new ArrayList<>(openedNamespaces);
+
+                openedNamespaces.add(publicNs = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE, pkg, 0, true));
+                //openedNamespaces.add(packageInternalNs = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE_INTERNAL, pkg, 0, true));
+
+                if (pkg != null && !pkg.isEmpty()) {
+                    openedNamespaces.add(packageInternalNs = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE_INTERNAL, abcIndex.getSelectedAbc().constants.getStringId(pkg, true), 0, true));
+                } else {
+                    openedNamespaces.add(packageInternalNs = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE_INTERNAL, abcIndex.getSelectedAbc().constants.getStringId("", true), 0, true));
+                }
+                if (pkg != null && !pkg.isEmpty()) { //add "" namespace if not already present
+                    openedNamespaces.add(abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE, "", 0, true));
+                }
+                openedNamespaces.add(privateNs = abcIndex.getSelectedAbc().constants.addNamespace(new Namespace(Namespace.KIND_PRIVATE, abcIndex.getSelectedAbc().constants.getStringId(pkg == null ? "" : pkg.toRawString() + ":?"/* + nameStr*/, true))));
+
+                openedNamespaces.add(abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_NAMESPACE, AS3_NAMESPACE, 0, true));
+
+                openedNamespaces.add(protectedNs = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PROTECTED, pkg == null ? (scriptName + "$0:"/*FIXME?*/ + classNameStr) : pkg.isTopLevel() ? classNameStr : pkg.toRawString() + ":" + classNameStr, 0, true));
+                openedNamespaces.add(protectedStaticNs = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_STATIC_PROTECTED, pkg == null || pkg.isTopLevel() ? classNameStr : pkg.toRawString() + ":" + classNameStr, 0, true));
             }
 
             List<Map.Entry<String, Map<String, String>>> metadata = new ArrayList<>();
@@ -698,7 +722,7 @@ public class ActionScript3Parser {
                     namespace = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_NAMESPACE, pkg == null || pkg.isEmpty() ? classNameStr : pkg + ":" + classNameStr, 0, true);
                 } else {
                     if (packageInternalNs == 0) {
-                        packageInternalNs = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE_INTERNAL, abcIndex.getSelectedAbc().constants.getStringId(pkg.toRawString(), true), 0, true);
+                        packageInternalNs = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE_INTERNAL, abcIndex.getSelectedAbc().constants.getStringId(pkg == null ? "" : pkg.toRawString(), true), 0, true);
                     }
                     namespace = packageInternalNs;
                 }
@@ -712,74 +736,108 @@ public class ActionScript3Parser {
                  traits.add(parsePackage(openedNamespaces));
                  break;*/
                 case CLASS:
-                    List<Integer> subNamespaces = new ArrayList<>(openedNamespaces);
-                    if (classNameStr != null) {
-                        throw new AVM2ParseException("Nested classes not supported", lexer.yyline());
-                    }
-                    if (isOverride) {
-                        throw new AVM2ParseException("Override flag not allowed for classes", lexer.yyline());
-                    }
-
-                    //GraphTargetItem classTypeStr = type(thisType,pkg,needsActivation, importedClasses, openedNamespaces, variables);
-                    s = lex();
-                    expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
-                    String classTypeStr = s.value.toString();
-                    GraphTargetItem extendsTypeStr = null;
-                    s = lex();
-                    if (s.type == SymbolType.EXTENDS) {
-                        extendsTypeStr = type(thisType, pkg, new Reference<>(false), importedClasses, subNamespaces, new ArrayList<>());
-                        s = lex();
-                    }
-                    List<GraphTargetItem> implementsTypeStrs = new ArrayList<>();
-                    if (s.type == SymbolType.IMPLEMENTS) {
-                        do {
-                            GraphTargetItem implementsTypeStr = type(thisType, pkg, new Reference<>(false), importedClasses, subNamespaces, new ArrayList<>());
-                            implementsTypeStrs.add(implementsTypeStr);
-                            s = lex();
-                        } while (s.type == SymbolType.COMMA);
-                    }
-                    expected(s, lexer.yyline(), SymbolType.CURLY_OPEN);
-                    if (customAccess != null) {
-                        throw new AVM2ParseException("Class cannot have custom namespace", lexer.yyline());
-                    }
-                    traits.add((classTraits(metadata, scriptName, publicNs, pkg, importedClasses, isDynamic, isFinal, subNamespaces, pkg, namespace, false, classTypeStr, extendsTypeStr, implementsTypeStrs, new ArrayList<>())));
-                    expectedType(SymbolType.CURLY_CLOSE);
-                    break;
                 case INTERFACE:
-                    if (classNameStr != null) {
-                        throw new AVM2ParseException("Nested interfaces not supported", lexer.yyline());
-                    }
-                    if (isOverride) {
-                        throw new AVM2ParseException("Override flag not allowed for interfaces", lexer.yyline());
-                    }
-                    if (isFinal) {
-                        throw new AVM2ParseException("Final flag not allowed for interfaces", lexer.yyline());
-                    }
-                    if (isDynamic) {
-                        throw new AVM2ParseException("Dynamic flag not allowed for interfaces", lexer.yyline());
-                    }
-                    //GraphTargetItem interfaceTypeStr = type(thisType,pkg,needsActivation, importedClasses, openedNamespaces, variables);
-                    s = lex();
-                    expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
-                    String intTypeStr = s.value.toString();
-                    s = lex();
-                    List<GraphTargetItem> intExtendsTypeStrs = new ArrayList<>();
 
-                    if (s.type == SymbolType.EXTENDS) {
-                        do {
-                            GraphTargetItem intExtendsTypeStr = type(thisType, pkg, new Reference<>(false), importedClasses, openedNamespaces, new ArrayList<>());
-                            intExtendsTypeStrs.add(intExtendsTypeStr);
+                    boolean nisInterface = false;
+                    if (s.type == SymbolType.INTERFACE) {
+                        nisInterface = true;
+                    }
+                    GraphTargetItem extendsTypeStr = null;
+                    List<GraphTargetItem> interfaces = new ArrayList<>();
+                    String subNameStr = null;
+                    List<Integer> subNamespaces = new ArrayList<>(openedNamespaces);
+
+                    if (!nisInterface) {
+
+                        if (classNameStr != null) {
+                            throw new AVM2ParseException("Nested classes not supported", lexer.yyline());
+                        }
+                        if (isOverride) {
+                            throw new AVM2ParseException("Override flag not allowed for classes", lexer.yyline());
+                        }
+
+                        //GraphTargetItem classTypeStr = type(thisType,pkg,needsActivation, importedClasses, openedNamespaces, variables);
+                        s = lex();
+                        expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
+                        subNameStr = s.value.toString();
+
+                        s = lex();
+                        if (s.type == SymbolType.EXTENDS) {
+                            extendsTypeStr = type(thisType, pkg, new Reference<>(false), importedClasses, subNamespaces, new ArrayList<>());
                             s = lex();
-                        } while (s.type == SymbolType.COMMA);
+                        }
+                        if (s.type == SymbolType.IMPLEMENTS) {
+                            do {
+                                GraphTargetItem implementsTypeStr = type(thisType, pkg, new Reference<>(false), importedClasses, subNamespaces, new ArrayList<>());
+                                interfaces.add(implementsTypeStr);
+                                s = lex();
+                            } while (s.type == SymbolType.COMMA);
+                        }
+                        expected(s, lexer.yyline(), SymbolType.CURLY_OPEN);
+                        if (customAccess != null) {
+                            throw new AVM2ParseException("Class cannot have custom namespace", lexer.yyline());
+                        }
+                    } else {
+                        if (classNameStr != null) {
+                            throw new AVM2ParseException("Nested interfaces not supported", lexer.yyline());
+                        }
+                        if (isOverride) {
+                            throw new AVM2ParseException("Override flag not allowed for interfaces", lexer.yyline());
+                        }
+                        if (isFinal) {
+                            throw new AVM2ParseException("Final flag not allowed for interfaces", lexer.yyline());
+                        }
+                        if (isDynamic) {
+                            throw new AVM2ParseException("Dynamic flag not allowed for interfaces", lexer.yyline());
+                        }
+                        //GraphTargetItem interfaceTypeStr = type(thisType,pkg,needsActivation, importedClasses, openedNamespaces, variables);
+                        s = lex();
+                        expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
+                        subNameStr = s.value.toString();
+                        s = lex();
+
+                        if (s.type == SymbolType.EXTENDS) {
+                            do {
+                                GraphTargetItem intExtendsTypeStr = type(thisType, pkg, new Reference<>(false), importedClasses, subNamespaces, new ArrayList<>());
+                                interfaces.add(intExtendsTypeStr);
+                                s = lex();
+                            } while (s.type == SymbolType.COMMA);
+                        }
+                        expected(s, lexer.yyline(), SymbolType.CURLY_OPEN);
+                        if (customAccess != null) {
+                            throw new AVM2ParseException("Interface cannot have custom namespace", lexer.yyline());
+                        }
+
                     }
-                    expected(s, lexer.yyline(), SymbolType.CURLY_OPEN);
-                    if (customAccess != null) {
-                        throw new AVM2ParseException("Interface cannot have custom namespace", lexer.yyline());
+
+                    if (extendsTypeStr != null) {
+                        List<Integer> indices = new ArrayList<>();
+                        List<String> names = new ArrayList<>();
+                        List<String> namespaces = new ArrayList<>();
+                        //FIXME for Private classes in script!!!
+                        AVM2SourceGenerator.parentNamesAddNames(abcIndex, AVM2SourceGenerator.resolveType(new SourceGeneratorLocalData(new HashMap<>(), 0, false, 0), ((TypeItem) ((UnresolvedAVM2Item) extendsTypeStr).resolve(null, new ArrayList<>(), new ArrayList<>(), abcIndex, new ArrayList<>(), new ArrayList<>())), abcIndex), indices, names, namespaces);
+                        for (int i = 0; i < names.size(); i++) {
+                            if (namespaces.get(i) == null || namespaces.get(i).isEmpty()) {
+                                continue;
+                            }
+                            openedNamespaces.add(abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_STATIC_PROTECTED, namespaces.get(i) + ":" + names.get(i), 0, true));
+                        }
                     }
-                    traits.add((classTraits(metadata, scriptName, publicNs, pkg, importedClasses, false, isFinal, openedNamespaces, pkg, namespace, true, intTypeStr, null, intExtendsTypeStrs, new ArrayList<>())));
+                    Reference<Boolean> staticNeedsActivation = new Reference<>(false);
+                    List<GraphTargetItem> staticInit = new ArrayList<>();
+                    List<AssignableAVM2Item> sinit2Variables = new ArrayList<>();
+                    List<GraphTargetItem> traits2 = new ArrayList<>();
+                    GraphTargetItem constr2 = traits(scriptName, false, sinit2Variables, staticNeedsActivation, staticInit, importedClasses, privateNs, protectedNs, publicNs, packageInternalNs, protectedStaticNs, subNamespaces, pkg, subNameStr, nisInterface, traits2);
+
+                    if (nisInterface) {
+                        traits.add(new InterfaceAVM2Item(metadata, importedClasses, pkg, subNamespaces, isFinal, namespace, subNameStr, interfaces, traits2));
+                    } else {
+                        traits.add(new ClassAVM2Item(metadata, importedClasses, pkg, subNamespaces, privateNs, protectedNs, isDynamic, isFinal, namespace, subNameStr, extendsTypeStr, interfaces, staticInit, staticNeedsActivation.getVal(), sinitVariables, constr2, traits2));
+                    }
+
+                    //        traits.add((classTraits(metadata, scriptName, publicNs, pkg, importedClasses, isDynamic, isFinal, subNamespaces, pkg, namespace, false, classTypeStr, extendsTypeStr, implementsTypeStrs, new ArrayList<>())));
                     expectedType(SymbolType.CURLY_CLOSE);
                     break;
-
                 case FUNCTION:
 
                     if (isDynamic) {
@@ -835,7 +893,10 @@ public class ActionScript3Parser {
                         constr = (method(isPrivate, metadata, pkg, false, customAccess, new Reference<>(false), importedClasses, false, false, thisType, openedNamespaces, false, namespace, "", true, constrVariables));
                     } else {
                         GraphTargetItem t;
-                        if (classNameStr != null) {
+                        if (classNameStr == null) {
+                            isStatic = true;
+                        }
+                        {
                             MethodAVM2Item ft = method(isPrivate, metadata, pkg, isInterface, customAccess, new Reference<>(false), importedClasses, isOverride, isFinal, thisType, openedNamespaces, isStatic, namespace, fname, true, new ArrayList<>());
 
                             if (isGetter) {
@@ -865,9 +926,12 @@ public class ActionScript3Parser {
                                 t = ft;
                             }
 
-                        } else {
-                            t = function(metadata, pkg, isInterface, new Reference<Boolean>(false), importedClasses, namespace, thisType, openedNamespaces, fname, false, new ArrayList<AssignableAVM2Item>());
                         }
+                        //NOTE: Looks like TraitFunction does not work in FlashPlayer - use MethodTrait instead
+                        /*else {
+                         t = function(metadata, pkg, isInterface, new Reference<Boolean>(false), importedClasses, namespace, thisType, openedNamespaces, fname, false, new ArrayList<AssignableAVM2Item>());
+                         }*/
+
                         traits.add(t);
                     }
                     //}
@@ -879,7 +943,7 @@ public class ActionScript3Parser {
                     s = lex();
                     expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
                     String nname = s.value.toString();
-                    String nval = "";
+                    String nval;
                     s = lex();
 
                     if (s.type == SymbolType.ASSIGN) {
@@ -917,7 +981,7 @@ public class ActionScript3Parser {
                     expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
                     String vcname = s.value.toString();
                     s = lex();
-                    GraphTargetItem type = null;
+                    GraphTargetItem type;
                     if (s.type == SymbolType.COLON) {
                         type = type(thisType, pkg, new Reference<>(false), importedClasses, openedNamespaces, new ArrayList<>());
                         s = lex();
@@ -961,69 +1025,6 @@ public class ActionScript3Parser {
             }
         }
         return constr;
-    }
-
-    private GraphTargetItem classTraits(List<Map.Entry<String, Map<String, String>>> metadata, String scriptName, int gpublicNs, DottedChain pkg, List<DottedChain> importedClasses, boolean isDynamic, boolean isFinal, List<Integer> openedNamespaces, DottedChain packageName, int namespace, boolean isInterface, String nameStr, GraphTargetItem extendsStr, List<GraphTargetItem> implementsStr, List<AssignableAVM2Item> variables) throws IOException, AVM2ParseException, CompilationException {
-
-        GraphTargetItem ret = null;
-
-        ParsedSymbol s = null;
-        List<GraphTargetItem> traits = new ArrayList<>();
-
-        String classNameStr = nameStr;
-
-        openedNamespaces = new ArrayList<>(openedNamespaces);
-
-        int publicNs = 0;
-        int privateNs = 0;
-        int packageInternalNs = 0;
-        if (pkg != null && !pkg.isEmpty()) {
-            openedNamespaces.add(packageInternalNs = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE_INTERNAL, abcIndex.getSelectedAbc().constants.getStringId(pkg, true), 0, true));
-        } else {
-            openedNamespaces.add(packageInternalNs = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE_INTERNAL, abcIndex.getSelectedAbc().constants.getStringId("", true), 0, true));
-        }
-        if (pkg != null && !pkg.isEmpty()) {
-            openedNamespaces.add(publicNs = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE, "", 0, true));
-        } else {
-            publicNs = gpublicNs;
-        }
-
-        openedNamespaces.add(privateNs = abcIndex.getSelectedAbc().constants.addNamespace(new Namespace(Namespace.KIND_PRIVATE, abcIndex.getSelectedAbc().constants.getStringId(pkg.toRawString() + ":" + nameStr, true))));
-
-        openedNamespaces.add(abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_NAMESPACE, AS3_NAMESPACE, 0, true));
-
-        //int privateNs = 0;
-        int protectedNs = 0;
-        //int publicNs = namespace;
-        int protectedStaticNs = 0;
-
-        openedNamespaces.add(protectedNs = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PROTECTED, packageName == null ? (scriptName + "$0:"/*FIXME?*/ + classNameStr) : packageName.isTopLevel() ? classNameStr : packageName.toRawString() + ":" + classNameStr, 0, true));
-        openedNamespaces.add(protectedStaticNs = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_STATIC_PROTECTED, packageName == null || packageName.isTopLevel() ? classNameStr : packageName.toRawString() + ":" + classNameStr, 0, true));
-
-        if (extendsStr != null) {
-            List<Integer> indices = new ArrayList<>();
-            List<String> names = new ArrayList<>();
-            List<String> namespaces = new ArrayList<>();
-            //FIXME for Private classes in script!!!
-            AVM2SourceGenerator.parentNamesAddNames(abcIndex, AVM2SourceGenerator.resolveType(new SourceGeneratorLocalData(new HashMap<>(), 0, false, 0), ((TypeItem) ((UnresolvedAVM2Item) extendsStr).resolve(null, new ArrayList<>(), new ArrayList<>(), abcIndex, new ArrayList<>(), new ArrayList<>())), abcIndex), indices, names, namespaces);
-            for (int i = 0; i < names.size(); i++) {
-                if (namespaces.get(i) == null || namespaces.get(i).isEmpty()) {
-                    continue;
-                }
-                openedNamespaces.add(abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_STATIC_PROTECTED, namespaces.get(i) + ":" + names.get(i), 0, true));
-            }
-        }
-
-        Reference<Boolean> staticNeedsActivation = new Reference<>(false);
-        List<GraphTargetItem> staticInit = new ArrayList<>();
-        List<AssignableAVM2Item> sinitVariables = new ArrayList<>();
-        GraphTargetItem constr = traits(scriptName, false, sinitVariables, staticNeedsActivation, staticInit, importedClasses, privateNs, protectedNs, publicNs, packageInternalNs, protectedStaticNs, openedNamespaces, packageName, classNameStr, isInterface, traits);
-
-        if (isInterface) {
-            return new InterfaceAVM2Item(metadata, importedClasses, packageName, openedNamespaces, isFinal, namespace, classNameStr, implementsStr, traits);
-        } else {
-            return new ClassAVM2Item(metadata, importedClasses, packageName, openedNamespaces, privateNs, protectedNs, isDynamic, isFinal, namespace, classNameStr, extendsStr, implementsStr, staticInit, staticNeedsActivation.getVal(), sinitVariables, constr, traits);
-        }
     }
 
     private GraphTargetItem expressionCommands(ParsedSymbol s, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, int forinlevel, List<AssignableAVM2Item> variables) throws IOException, AVM2ParseException {
@@ -1124,7 +1125,7 @@ public class ActionScript3Parser {
     }
 
     private List<GraphTargetItem> xmltag(TypeItem thisType, DottedChain pkg, Reference<Boolean> usesVars, List<String> openedTags, Reference<Integer> closedVarTags, Reference<Boolean> needsActivation, List<DottedChain> importedClasses, List<Integer> openedNamespaces, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, List<AssignableAVM2Item> variables) throws IOException, AVM2ParseException {
-        ParsedSymbol s = null;
+        ParsedSymbol s;
         List<GraphTargetItem> rets = new ArrayList<>();
         //GraphTargetItem ret = null;
         StringBuilder sb = new StringBuilder();
@@ -1350,7 +1351,7 @@ public class ActionScript3Parser {
                     s = lexer.lex();
                     expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
                     needsActivation.setVal(true);
-                    ret = (function(new ArrayList<Map.Entry<String, Map<String, String>>>(), pkg, false, needsActivation, importedClasses, 0/*?*/, thisType, openedNamespaces, s.value.toString(), false, variables));
+                    ret = (function(new ArrayList<>(), pkg, false, needsActivation, importedClasses, 0/*?*/, thisType, openedNamespaces, s.value.toString(), false, variables));
                     break;
                 case VAR:
                     s = lex();
@@ -1541,10 +1542,8 @@ public class ActionScript3Parser {
                     List<Integer> valueMapping = new ArrayList<>();
                     int pos = 0;
                     while (s.type == SymbolType.CASE) {
-                        List<GraphTargetItem> caseExprs = new ArrayList<>();
                         while (s.type == SymbolType.CASE) {
                             GraphTargetItem curCaseExpr = expression(thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
-                            caseExprs.add(curCaseExpr);
                             expectedType(SymbolType.COLON);
                             s = lex();
                             caseExprsAll.add(curCaseExpr);
@@ -1664,7 +1663,7 @@ public class ActionScript3Parser {
                         for (AssignableAVM2Item a : catchVars) {
                             if (a instanceof UnresolvedAVM2Item) {
                                 UnresolvedAVM2Item ui = (UnresolvedAVM2Item) a;
-                                if (ui.getVariableName().equals(e.getVariableName())) {
+                                if (ui.getVariableName().equals(DottedChain.parse(e.getVariableName()))) {
                                     try {
                                         ui.resolve(null, new ArrayList<>(), new ArrayList<>(), abcIndex, new ArrayList<>(), variables);
                                     } catch (CompilationException ex) {
@@ -1687,7 +1686,7 @@ public class ActionScript3Parser {
                         if (av instanceof UnresolvedAVM2Item) {
                             UnresolvedAVM2Item ui = (UnresolvedAVM2Item) av;
                             for (NameAVM2Item e : catchExceptions) {
-                                if (ui.getVariableName().equals(e.getVariableName())) {
+                                if (ui.getVariableName().equals(DottedChain.parse(e.getVariableName()))) {
                                     try {
                                         ui.resolve(null, new ArrayList<>(), new ArrayList<>(), abcIndex, new ArrayList<>(), variables);
                                     } catch (CompilationException ex) {
@@ -1773,10 +1772,7 @@ public class ActionScript3Parser {
         if (item instanceof PropertyAVM2Item) {
             return true;
         }
-        if (item instanceof IndexAVM2Item) {
-            return true;
-        }
-        return false;
+        return (item instanceof IndexAVM2Item);
     }
 
     private boolean isType(GraphTargetItem item) {
@@ -1786,10 +1782,7 @@ public class ActionScript3Parser {
         while (item instanceof GetPropertyAVM2Item) {
             item = ((GetPropertyAVM2Item) item).object;
         }
-        if (item instanceof NameAVM2Item) {
-            return true;
-        }
-        return false;
+        return (item instanceof NameAVM2Item);
     }
 
     private int brackets(TypeItem thisType, DottedChain pkg, Reference<Boolean> needsActivation, List<DottedChain> importedClasses, List<Integer> openedNamespaces, List<GraphTargetItem> ret, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, List<AssignableAVM2Item> variables) throws IOException, AVM2ParseException {
@@ -2257,7 +2250,7 @@ public class ActionScript3Parser {
                         lexer.pushback(s);
                     }
                     needsActivation.setVal(true);
-                    ret = function(new ArrayList<Map.Entry<String, Map<String, String>>>(), pkg, false, needsActivation, importedClasses, 0/*?*/, thisType, openedNamespaces, ffname, false, variables);
+                    ret = function(new ArrayList<>(), pkg, false, needsActivation, importedClasses, 0/*?*/, thisType, openedNamespaces, ffname, false, variables);
                 } else if (s.type == SymbolType.LOWER_THAN) {
                     GraphTargetItem subtype = type(thisType, pkg, needsActivation, importedClasses, openedNamespaces, variables);
                     expectedType(SymbolType.GREATER_THAN);
@@ -2376,19 +2369,17 @@ public class ActionScript3Parser {
         }
 
         List<DottedChain> importedClasses = parseImports(openedNamespaces);
-        int publicNs;
-        openedNamespaces.add(publicNs = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE, name, 0, true));
 
         //traits(false, new ArrayList<AssignableAVM2Item>(), new Reference<Boolean>(false), new ArrayList<GraphTargetItem>(), importedClasses, privateNs, 0, publicNs, packageInternalNs, 0, openedNamespaces, name, null, false, items);
         //expectedType(SymbolType.CURLY_CLOSE);
-        return new PackageAVM2Item(publicNs, importedClasses, name, items);
+        return new PackageAVM2Item(importedClasses, name, items);
     }
 
     private List<GraphTargetItem> parseScript(String fileName) throws IOException, AVM2ParseException, CompilationException {
 
         List<Integer> openedNamespaces = new ArrayList<>();
 
-        int scriptPrivateNs = 0;
+        int scriptPrivateNs;
 
         if (fileName.contains("/")) {
             fileName = fileName.substring(fileName.lastIndexOf('/') + 1);
@@ -2396,10 +2387,10 @@ public class ActionScript3Parser {
         if (fileName.contains("\\")) {
             fileName = fileName.substring(fileName.lastIndexOf('\\') + 1);
         }
-        String className = fileName;
-        if (className.endsWith(".as")) {
-            className = className.substring(0, className.length() - 3);
-        }
+        /*String className = fileName;
+         if (className.endsWith(".as")) {
+         className = className.substring(0, className.length() - 3);
+         }*/
         openedNamespaces.add(scriptPrivateNs = abcIndex.getSelectedAbc().constants.addNamespace(Namespace.KIND_PRIVATE, 0)); //abc.getLastAbc().constants.getStringId(name + ":" + className, true)
 
         int publicNs;
