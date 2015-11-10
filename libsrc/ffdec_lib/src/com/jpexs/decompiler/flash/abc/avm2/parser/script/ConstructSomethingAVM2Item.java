@@ -21,7 +21,6 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
-import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -53,7 +52,7 @@ public class ConstructSomethingAVM2Item extends CallAVM2Item {
             nssa[i] = openedNamespaces.get(i);
         }
         nssa[nssa.length - 1] = abc.constants.getNamespaceId(Namespace.KIND_PACKAGE, "__AS3__.vec", 0, true);
-        return abc.constants.getNamespaceSetId(new NamespaceSet(nssa), true);
+        return abc.constants.getNamespaceSetId(nssa, true);
 
     }
 

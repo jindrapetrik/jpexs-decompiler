@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
@@ -59,8 +60,9 @@ public class XMLAVM2Item extends AVM2Item {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
+        AVM2ConstantPool constants = g.abcIndex.getSelectedAbc().constants;
         return toSourceMerge(localData, generator,
-                ins(AVM2Instructions.GetLex, g.abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.QNAME, g.abcIndex.getSelectedAbc().constants.getStringId("XML", true), g.abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE, "", 0, true), 0), true)),
+                ins(AVM2Instructions.GetLex, constants.getMultinameId(Multiname.createQName(false, constants.getStringId("XML", true), constants.getNamespaceId(Namespace.KIND_PACKAGE, "", 0, true)), true)),
                 value,
                 ins(AVM2Instructions.Construct, 1)
         );

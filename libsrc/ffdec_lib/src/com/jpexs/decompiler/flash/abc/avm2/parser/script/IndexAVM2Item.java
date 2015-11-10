@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
-import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -28,6 +27,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -55,11 +55,8 @@ public class IndexAVM2Item extends AssignableAVM2Item {
     }
 
     private int allNsSet(ABC abc) {
-        int[] nssa = new int[openedNamespaces.size()];
-        for (int i = 0; i < openedNamespaces.size(); i++) {
-            nssa[i] = openedNamespaces.get(i);
-        }
-        return abc.constants.getNamespaceSetId(new NamespaceSet(nssa), true);
+        int[] nssa = Helper.toIntArray(openedNamespaces);
+        return abc.constants.getNamespaceSetId(nssa, true);
     }
 
     @Override
@@ -88,7 +85,7 @@ public class IndexAVM2Item extends AssignableAVM2Item {
         Reference<Integer> index_temp = new Reference<>(-1);
         Reference<Integer> val_temp = new Reference<>(-1);
         AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
-        int indexPropIndex = g.abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(attr ? Multiname.MULTINAMELA : Multiname.MULTINAMEL, 0, 0, allNsSet(g.abcIndex.getSelectedAbc())), true);
+        int indexPropIndex = g.abcIndex.getSelectedAbc().constants.getMultinameId(Multiname.createMultinameL(attr, allNsSet(g.abcIndex.getSelectedAbc())), true);
 
         return toSourceMerge(localData, generator,
                 object, dupSetTemp(localData, generator, obj_temp),
@@ -110,7 +107,7 @@ public class IndexAVM2Item extends AssignableAVM2Item {
 
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator, boolean needsReturn, boolean call, List<GraphTargetItem> callargs, boolean delete, boolean construct) throws CompilationException {
         AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
-        int indexPropIndex = g.abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(attr ? Multiname.MULTINAMELA : Multiname.MULTINAMEL, 0, 0, allNsSet(g.abcIndex.getSelectedAbc())), true);
+        int indexPropIndex = g.abcIndex.getSelectedAbc().constants.getMultinameId(Multiname.createMultinameL(attr, allNsSet(g.abcIndex.getSelectedAbc())), true);
         Reference<Integer> ret_temp = new Reference<>(-1);
 
         if (assignedValue != null) {

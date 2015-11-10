@@ -260,11 +260,6 @@ public class ASM3Parser {
     private static int parseMultiName(AVM2ConstantPool constants, Flasm3Lexer lexer) throws AVM2ParseException, IOException {
         ParsedSymbol s = lexer.lex();
         int kind = 0;
-        int name_index = 0;
-        int namespace_index = 0;
-        int namespace_set_index = 0;
-        int qname_index = 0;
-        int[] params = null;
 
         switch (s.type) {
             case ParsedSymbol.TYPE_KEYWORD_NULL:
@@ -306,13 +301,15 @@ public class ASM3Parser {
                 throw new AVM2ParseException("Name expected", lexer.yyline());
         }
 
-        switch (s.type) {
-            case ParsedSymbol.TYPE_KEYWORD_QNAME:
-            case ParsedSymbol.TYPE_KEYWORD_QNAMEA:
+        Multiname multiname = null;
+        switch (kind) {
+            case Multiname.QNAME:
+            case Multiname.QNAMEA: {
                 expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
-                namespace_index = parseNamespace(constants, lexer);
+                int namespace_index = parseNamespace(constants, lexer);
                 expected(ParsedSymbol.TYPE_COMMA, ",", lexer);
                 ParsedSymbol name = lexer.lex();
+                int name_index;
                 if (name.type == ParsedSymbol.TYPE_KEYWORD_NULL) {
                     name_index = 0;
                 } else {
@@ -320,11 +317,14 @@ public class ASM3Parser {
                     name_index = constants.getStringId((String) name.value, true);
                 }
                 expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
+                multiname = Multiname.createQName(kind == Multiname.QNAMEA, name_index, namespace_index);
                 break;
-            case ParsedSymbol.TYPE_KEYWORD_RTQNAME:
-            case ParsedSymbol.TYPE_KEYWORD_RTQNAMEA:
+            }
+            case Multiname.RTQNAME:
+            case Multiname.RTQNAMEA: {
                 expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
                 ParsedSymbol rtqName = lexer.lex();
+                int name_index;
                 if (rtqName.type == ParsedSymbol.TYPE_KEYWORD_NULL) {
                     name_index = 0;
                 } else {
@@ -332,16 +332,21 @@ public class ASM3Parser {
                     name_index = constants.getStringId((String) rtqName.value, true);
                 }
                 expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
+                multiname = Multiname.createRTQName(kind == Multiname.RTQNAMEA, name_index);
                 break;
-            case ParsedSymbol.TYPE_KEYWORD_RTQNAMEL:
-            case ParsedSymbol.TYPE_KEYWORD_RTQNAMELA:
+            }
+            case Multiname.RTQNAMEL:
+            case Multiname.RTQNAMELA: {
                 expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
                 expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
+                multiname = Multiname.createRTQNameL(kind == Multiname.RTQNAMELA);
                 break;
-            case ParsedSymbol.TYPE_KEYWORD_MULTINAME:
-            case ParsedSymbol.TYPE_KEYWORD_MULTINAMEA:
+            }
+            case Multiname.MULTINAME:
+            case Multiname.MULTINAMEA: {
                 expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
                 ParsedSymbol mName = lexer.lex();
+                int name_index;
                 if (mName.type == ParsedSymbol.TYPE_KEYWORD_NULL) {
                     name_index = 0;
                 } else {
@@ -349,18 +354,22 @@ public class ASM3Parser {
                     name_index = constants.getStringId((String) mName.value, true);
                 }
                 expected(ParsedSymbol.TYPE_COMMA, ",", lexer);
-                namespace_set_index = parseNamespaceSet(constants, lexer);
+                int namespace_set_index = parseNamespaceSet(constants, lexer);
                 expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
+                multiname = Multiname.createMultiname(kind == Multiname.MULTINAMEA, name_index, namespace_set_index);
                 break;
-            case ParsedSymbol.TYPE_KEYWORD_MULTINAMEL:
-            case ParsedSymbol.TYPE_KEYWORD_MULTINAMELA:
+            }
+            case Multiname.MULTINAMEL:
+            case Multiname.MULTINAMELA: {
                 expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
-                namespace_set_index = parseNamespaceSet(constants, lexer);
+                int namespace_set_index = parseNamespaceSet(constants, lexer);
                 expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
+                multiname = Multiname.createMultinameL(kind == Multiname.MULTINAMELA, namespace_set_index);
                 break;
-            case ParsedSymbol.TYPE_KEYWORD_TYPENAME:
+            }
+            case Multiname.TYPENAME: {
                 expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
-                qname_index = parseMultiName(constants, lexer);
+                int qname_index = parseMultiName(constants, lexer);
                 expected(ParsedSymbol.TYPE_LOWERTHAN, "<", lexer);
                 List<Integer> paramsList = new ArrayList<>();
                 paramsList.add(parseMultiName(constants, lexer));
@@ -369,13 +378,15 @@ public class ASM3Parser {
                     paramsList.add(parseMultiName(constants, lexer));
                     nt = lexer.lex();
                 }
-                params = Helper.toIntArray(paramsList);
+                int[] params = Helper.toIntArray(paramsList);
                 expected(nt, ParsedSymbol.TYPE_GREATERTHAN, ">");
                 expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
+                multiname = Multiname.createTypeName(qname_index, params);
                 break;
+            }
         }
 
-        return constants.getMultinameId(new Multiname(kind, name_index, namespace_index, namespace_set_index, qname_index, params), true);
+        return constants.getMultinameId(multiname, true);
     }
 
     public static ValueKind parseValue(AVM2ConstantPool constants, Flasm3Lexer lexer) throws IOException, AVM2ParseException {

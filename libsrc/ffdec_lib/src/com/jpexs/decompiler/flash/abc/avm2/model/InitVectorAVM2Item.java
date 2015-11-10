@@ -18,12 +18,12 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
-import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.DottedChain;
@@ -61,11 +61,8 @@ public class InitVectorAVM2Item extends AVM2Item {
     List<Integer> openedNamespaces;
 
     private int allNsSet(ABC abc) {
-        int[] nssa = new int[openedNamespaces.size()];
-        for (int i = 0; i < openedNamespaces.size(); i++) {
-            nssa[i] = openedNamespaces.get(i);
-        }
-        return abc.constants.getNamespaceSetId(new NamespaceSet(nssa), true);
+        int[] nssa = Helper.toIntArray(openedNamespaces);
+        return abc.constants.getNamespaceSetId(nssa, true);
     }
 
     public InitVectorAVM2Item(AVM2Instruction ins, GraphTargetItem subtype, List<GraphTargetItem> arguments) {
@@ -112,9 +109,11 @@ public class InitVectorAVM2Item extends AVM2Item {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
+        ABC abc = g.abcIndex.getSelectedAbc();
+        AVM2ConstantPool constants = abc.constants;
         List<GraphSourceItem> ret = toSourceMerge(localData, generator,
-                ins(AVM2Instructions.FindPropertyStrict, g.abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.MULTINAME, g.abcIndex.getSelectedAbc().constants.getStringId("Vector", true), 0, g.abcIndex.getSelectedAbc().constants.getNamespaceSetId(new NamespaceSet(new int[]{g.abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE, "__AS3__.vec", 0, true)}), true)), true)),
-                ins(AVM2Instructions.GetProperty, g.abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.MULTINAME, g.abcIndex.getSelectedAbc().constants.getStringId("Vector", true), 0, allNsSet(g.abcIndex.getSelectedAbc())), true)),
+                ins(AVM2Instructions.FindPropertyStrict, constants.getMultinameId(Multiname.createMultiname(false, constants.getStringId("Vector", true), constants.getNamespaceSetId(new int[]{constants.getNamespaceId(Namespace.KIND_PACKAGE, "__AS3__.vec", 0, true)}, true)), true)),
+                ins(AVM2Instructions.GetProperty, constants.getMultinameId(Multiname.createMultiname(false, constants.getStringId("Vector", true), allNsSet(abc)), true)),
                 subtype,
                 ins(AVM2Instructions.ApplyType, 1),
                 new IntegerValueAVM2Item(null, (long) arguments.size()),
@@ -127,7 +126,7 @@ public class InitVectorAVM2Item extends AVM2Item {
                     ins(AVM2Instructions.Dup),
                     new IntegerValueAVM2Item(null, (long) i),
                     arguments.get(i),
-                    ins(AVM2Instructions.SetProperty, g.abcIndex.getSelectedAbc().constants.getMultinameId(new Multiname(Multiname.MULTINAMEL, 0, 0, g.abcIndex.getSelectedAbc().constants.getNamespaceSetId(new NamespaceSet(new int[]{g.abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE, "", 0, true)}), true)), true))
+                    ins(AVM2Instructions.SetProperty, constants.getMultinameId(Multiname.createMultinameL(false, constants.getNamespaceSetId(new int[]{constants.getNamespaceId(Namespace.KIND_PACKAGE, "", 0, true)}, true)), true))
             ));
         }
         return ret;

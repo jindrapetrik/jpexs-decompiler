@@ -86,11 +86,7 @@ public class Multiname {
         params = null;
     }
 
-    public Multiname(int kind, int name_index, int namespace_index, int namespace_set_index) {
-        this(kind, name_index, namespace_index, namespace_set_index, 0, null);
-    }
-
-    public Multiname(int kind, int name_index, int namespace_index, int namespace_set_index, int qname_index, int[] params) {
+    private Multiname(int kind, int name_index, int namespace_index, int namespace_set_index, int qname_index, int[] params) {
         this.kind = kind;
         this.name_index = name_index;
         this.namespace_index = namespace_index;
@@ -100,6 +96,30 @@ public class Multiname {
         if (!validType()) {
             throw new RuntimeException("Invalid multiname kind:" + kind);
         }
+    }
+
+    public static Multiname createQName(boolean attribute, int name_index, int namespace_index) {
+        return new Multiname(attribute ? QNAMEA : QNAME, name_index, namespace_index, 0, 0, null);
+    }
+
+    public static Multiname createRTQName(boolean attribute, int name_index) {
+        return new Multiname(attribute ? RTQNAMEA : RTQNAME, name_index, 0, 0, 0, null);
+    }
+
+    public static Multiname createRTQNameL(boolean attribute) {
+        return new Multiname(attribute ? RTQNAMELA : RTQNAMEL, 0, 0, 0, 0, null);
+    }
+
+    public static Multiname createMultiname(boolean attribute, int name_index, int namespace_set_index) {
+        return new Multiname(attribute ? MULTINAMEA : MULTINAME, name_index, 0, namespace_set_index, 0, null);
+    }
+
+    public static Multiname createMultinameL(boolean attribute, int namespace_set_index) {
+        return new Multiname(attribute ? MULTINAMELA : MULTINAMEL, 0, 0, namespace_set_index, 0, null);
+    }
+
+    public static Multiname createTypeName(int qname_index, int[] params) {
+        return new Multiname(TYPENAME, 0, 0, 0, qname_index, params);
     }
 
     public boolean isAttribute() {

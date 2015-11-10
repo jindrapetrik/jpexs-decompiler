@@ -208,7 +208,7 @@ public class ActionScript3AssemblerTest extends ActionScriptTestBase {
     @Test
     public void testInstructionStackSizes() throws Exception {
         ABC abc = new ABC(null);
-        Multiname multiname = new Multiname(Multiname.RTQNAMEL, 0, 0, 0);
+        Multiname multiname = Multiname.createRTQNameL(false);
         abc.constants.addMultiname(multiname);
         AVM2Instruction ins = new AVM2Instruction(0, null, new int[]{1, 20});
         for (InstructionDefinition def : AVM2Code.instructionSet) {
