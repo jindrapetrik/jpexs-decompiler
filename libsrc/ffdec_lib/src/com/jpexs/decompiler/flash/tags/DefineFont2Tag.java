@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.utf8.Utf8Helper;
@@ -41,6 +42,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
+@SWFVersion(from = 3)
 public class DefineFont2Tag extends FontTag {
 
     public static final int ID = 48;

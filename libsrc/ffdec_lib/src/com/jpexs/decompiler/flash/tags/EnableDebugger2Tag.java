@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Password;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.MD5Crypt;
 import java.io.IOException;
@@ -33,6 +34,7 @@ import java.io.IOException;
  *
  * @author JPEXS
  */
+@SWFVersion(from = 6)
 public class EnableDebugger2Tag extends Tag implements PasswordTag {
 
     public static final int ID = 64;
@@ -73,8 +75,16 @@ public class EnableDebugger2Tag extends Tag implements PasswordTag {
 
     @Override
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
-        reserved = sis.readUI16("reserved");
-        passwordHash = sis.readString("passwordHash");
+        if (sis.available() > 0) {
+            reserved = sis.readUI16("reserved");
+        } else {
+            reserved = 0;
+        }
+        if (sis.available() > 0) {
+            passwordHash = sis.readString("passwordHash");
+        } else {
+            passwordHash = null;
+        }
     }
 
     /**
@@ -86,7 +96,9 @@ public class EnableDebugger2Tag extends Tag implements PasswordTag {
     @Override
     public void getData(SWFOutputStream sos) throws IOException {
         sos.writeUI16(reserved);
-        sos.writeString(passwordHash);
+        if (passwordHash != null) {
+            sos.writeString(passwordHash);
+        }
     }
 
     @Override

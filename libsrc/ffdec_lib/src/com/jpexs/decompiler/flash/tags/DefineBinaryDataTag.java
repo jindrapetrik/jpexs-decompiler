@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.ByteArrayInputStream;
@@ -35,6 +36,7 @@ import java.io.InputStream;
  *
  * @author JPEXS
  */
+@SWFVersion(from = 9)
 public class DefineBinaryDataTag extends CharacterTag {
 
     public static final int ID = 87;

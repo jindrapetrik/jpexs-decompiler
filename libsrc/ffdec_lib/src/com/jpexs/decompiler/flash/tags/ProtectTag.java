@@ -20,7 +20,11 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.PasswordTag;
+import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Password;
+import com.jpexs.decompiler.flash.types.annotations.Reserved;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.MD5Crypt;
 import java.io.IOException;
@@ -30,11 +34,16 @@ import java.io.IOException;
  *
  * @author JPEXS
  */
+@SWFVersion(from = 2)
 public class ProtectTag extends Tag implements PasswordTag {
 
     public static final int ID = 24;
 
     public static final String NAME = "Protect";
+
+    @Reserved
+    @SWFType(BasicType.UI16)
+    public int reserved;
 
     /**
      * MD5 hash of password
@@ -50,6 +59,7 @@ public class ProtectTag extends Tag implements PasswordTag {
     public ProtectTag(SWF swf) {
         super(swf, ID, NAME, null);
         passwordHash = "";
+        reserved = 0;
     }
 
     /**
@@ -67,6 +77,9 @@ public class ProtectTag extends Tag implements PasswordTag {
     @Override
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         if (sis.available() > 0) {
+            reserved = sis.readUI16("reserved");
+        }
+        if (sis.available() > 0) {
             passwordHash = sis.readString("passwordHash");
         } else {
             passwordHash = "";
@@ -81,6 +94,7 @@ public class ProtectTag extends Tag implements PasswordTag {
      */
     @Override
     public void getData(SWFOutputStream sos) throws IOException {
+        sos.writeUI16(reserved);
         if (!"".equals(passwordHash)) {
             sos.writeString(passwordHash);
         }

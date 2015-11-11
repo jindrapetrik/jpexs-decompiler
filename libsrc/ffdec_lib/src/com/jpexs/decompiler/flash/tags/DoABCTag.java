@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.abc.ABCInputStream;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.decompiler.flash.types.annotations.SWFField;
+import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 
@@ -32,6 +33,7 @@ import java.io.IOException;
  *
  * @author JPEXS
  */
+@SWFVersion(from = 9)
 public class DoABCTag extends Tag implements ABCContainerTag {
 
     public static final int ID = 72;

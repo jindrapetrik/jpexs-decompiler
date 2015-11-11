@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Optional;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -33,6 +34,7 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
+@SWFVersion(from = 17)
 public class EnableTelemetryTag extends Tag {
 
     public static final int ID = 93;

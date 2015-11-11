@@ -39,6 +39,7 @@ import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Helper;
@@ -52,6 +53,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
+@SWFVersion(from = 1)
 public class DefineButtonTag extends ButtonTag implements ASMSource {
 
     public static final int ID = 7;

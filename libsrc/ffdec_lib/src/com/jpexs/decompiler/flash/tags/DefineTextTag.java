@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.tags.base.StaticTextTag;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
+import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -31,6 +32,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
+@SWFVersion(from = 1)
 public class DefineTextTag extends StaticTextTag {
 
     public static final int ID = 11;

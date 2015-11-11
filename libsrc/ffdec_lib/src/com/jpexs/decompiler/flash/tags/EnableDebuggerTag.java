@@ -20,7 +20,11 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.PasswordTag;
+import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Password;
+import com.jpexs.decompiler.flash.types.annotations.Reserved;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.MD5Crypt;
 import java.io.IOException;
@@ -30,11 +34,16 @@ import java.io.IOException;
  *
  * @author JPEXS
  */
+@SWFVersion(from = 5, to = 5)
 public class EnableDebuggerTag extends Tag implements PasswordTag {
 
     public static final int ID = 58;
 
     public static final String NAME = "EnableDebugger";
+
+    @Reserved
+    @SWFType(BasicType.UI16)
+    public int reserved;
 
     /**
      * MD5 hash of password
@@ -49,6 +58,7 @@ public class EnableDebuggerTag extends Tag implements PasswordTag {
      */
     public EnableDebuggerTag(SWF swf) {
         super(swf, ID, NAME, null);
+        reserved = 0;
         setPassword("");
     }
 
@@ -66,7 +76,16 @@ public class EnableDebuggerTag extends Tag implements PasswordTag {
 
     @Override
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
-        passwordHash = sis.readString("passwordHash");
+        if (sis.available() > 0) {
+            reserved = sis.readUI16("reserved");
+        } else {
+            reserved = 0;
+        }
+        if (sis.available() > 0) {
+            passwordHash = sis.readString("passwordHash");
+        } else {
+            passwordHash = null;
+        }
     }
 
     /**
@@ -77,6 +96,7 @@ public class EnableDebuggerTag extends Tag implements PasswordTag {
      */
     @Override
     public void getData(SWFOutputStream sos) throws IOException {
+        sos.writeUI16(reserved);
         if (passwordHash != null) {
             sos.writeString(passwordHash);
         }
@@ -84,7 +104,6 @@ public class EnableDebuggerTag extends Tag implements PasswordTag {
 
     @Override
     public void setPassword(String password) {
-        //Assuming EnableDebugger tag has same hash type as EnableDebugger2
         this.passwordHash = MD5Crypt.crypt(password, 2);
     }
 

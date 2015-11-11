@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
+import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import java.io.IOException;
@@ -39,6 +40,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
+@SWFVersion(from = 1)
 public class DoActionTag extends Tag implements ASMSource {
 
     public static final int ID = 12;

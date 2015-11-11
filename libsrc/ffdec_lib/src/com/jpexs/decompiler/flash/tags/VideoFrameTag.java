@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 
@@ -30,6 +31,7 @@ import java.io.IOException;
  *
  * @author JPEXS
  */
+@SWFVersion(from = 6)
 public class VideoFrameTag extends Tag implements CharacterIdTag {
 
     public static final int ID = 61;

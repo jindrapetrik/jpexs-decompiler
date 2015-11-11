@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.tags.base.SymbolClassTypeTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.flash.types.annotations.Table;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
@@ -34,6 +35,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
+@SWFVersion(from = 5)
 public class ExportAssetsTag extends SymbolClassTypeTag {
 
     public static final int ID = 56;

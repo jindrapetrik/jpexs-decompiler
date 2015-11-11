@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.types.MORPHLINESTYLE;
 import com.jpexs.decompiler.flash.types.MORPHLINESTYLEARRAY;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPE;
+import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -34,6 +35,7 @@ import java.io.IOException;
  *
  * @author JPEXS
  */
+@SWFVersion(from = 3)
 public class DefineMorphShapeTag extends MorphShapeTag {
 
     public static final int ID = 46;

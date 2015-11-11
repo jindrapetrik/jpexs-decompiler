@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
@@ -42,6 +43,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
+@SWFVersion(from = 3)
 public class PlaceObject2Tag extends PlaceObjectTypeTag implements ASMSourceContainer {
 
     public static final int ID = 26;

@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Dimension;
@@ -44,6 +45,7 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
+@SWFVersion(from = 3)
 public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
 
     public static final int ID = 36;
