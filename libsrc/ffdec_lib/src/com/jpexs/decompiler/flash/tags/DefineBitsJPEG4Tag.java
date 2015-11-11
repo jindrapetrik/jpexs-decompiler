@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Dimension;
@@ -41,6 +42,7 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
+@SWFVersion(from = 10)
 public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
 
     public static final int ID = 90;

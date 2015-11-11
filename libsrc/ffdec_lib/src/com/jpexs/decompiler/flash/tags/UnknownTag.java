@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 
@@ -25,6 +26,7 @@ import java.io.IOException;
  *
  * @author JPEXS
  */
+@SWFVersion(from = 1) //surprise!
 public class UnknownTag extends Tag {
 
     private ByteArrayRange unknownData;

@@ -19,12 +19,14 @@ package com.jpexs.decompiler.flash.action.swf7;
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.ImplementsOpActionItem;
+import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+@SWFVersion(from = 7)
 public class ActionImplementsOp extends Action {
 
     public ActionImplementsOp() {

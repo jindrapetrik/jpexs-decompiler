@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.types.ZONERECORD;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
+@SWFVersion(from = 8)
 public class DefineFontAlignZonesTag extends Tag implements CharacterIdTag {
 
     public static final int ID = 73;

@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Password;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.MD5Crypt;
 import java.io.IOException;
@@ -33,6 +34,7 @@ import java.io.IOException;
  *
  * @author JPEXS
  */
+@SWFVersion(from = 2)
 public class ProtectTag extends Tag implements PasswordTag {
 
     public static final int ID = 24;

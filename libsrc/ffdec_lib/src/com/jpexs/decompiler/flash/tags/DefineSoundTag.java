@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.flash.types.sound.MP3FRAME;
 import com.jpexs.decompiler.flash.types.sound.MP3SOUNDDATA;
 import com.jpexs.decompiler.flash.types.sound.SoundExportFormat;
@@ -45,6 +46,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
  *
  * @author JPEXS
  */
+@SWFVersion(from = 1)
 public class DefineSoundTag extends CharacterTag implements SoundTag {
 
     public static final int ID = 14;

@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.flash.types.annotations.Table;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
@@ -38,6 +39,7 @@ import java.util.Map;
  *
  * @author JPEXS
  */
+@SWFVersion(from = 8)
 public class ImportAssets2Tag extends Tag implements ImportTag {
 
     public static final int ID = 71;

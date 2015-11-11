@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.flash.types.sound.SoundExportFormat;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.helpers.ByteArrayRange;
@@ -39,6 +40,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
+@SWFVersion(from = 3)
 public class SoundStreamHead2Tag extends Tag implements SoundStreamHeadTypeTag {
 
     public static final int ID = 45;

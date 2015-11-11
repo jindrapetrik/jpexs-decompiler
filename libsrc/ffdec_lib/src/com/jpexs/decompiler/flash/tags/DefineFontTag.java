@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.helpers.ByteArrayRange;
 import java.awt.Font;
@@ -36,6 +37,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
+@SWFVersion(from = 1)
 public class DefineFontTag extends FontTag {
 
     public static final int ID = 10;

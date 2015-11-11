@@ -19,9 +19,12 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.types.annotations.Conditional;
+import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 
+@SWFVersion(from = 3)
 public class FrameLabelTag extends Tag {
 
     public static final int ID = 43;
@@ -30,6 +33,7 @@ public class FrameLabelTag extends Tag {
 
     public String name;
 
+    @Conditional(minSwfVersion = 6)
     public boolean namedAnchor = false;
 
     /**

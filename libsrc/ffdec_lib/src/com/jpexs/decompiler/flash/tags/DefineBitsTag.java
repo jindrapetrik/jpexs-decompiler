@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Dimension;
@@ -39,6 +40,7 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
+@SWFVersion(from = 1)
 public class DefineBitsTag extends ImageTag implements TagChangedListener {
 
     public static final int ID = 6;

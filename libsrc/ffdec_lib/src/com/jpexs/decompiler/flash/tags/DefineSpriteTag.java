@@ -34,6 +34,7 @@ import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.SerializableImage;
@@ -51,6 +52,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
+@SWFVersion(from = 3)
 public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timelined {
 
     public static final int ID = 39;

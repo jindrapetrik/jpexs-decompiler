@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.annotations.Optional;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
@@ -39,6 +40,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
+@SWFVersion(from = 1)
 public class PlaceObjectTag extends PlaceObjectTypeTag {
 
     public static final int ID = 4;

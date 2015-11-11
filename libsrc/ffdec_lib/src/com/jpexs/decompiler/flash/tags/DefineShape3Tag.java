@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
+import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 
@@ -29,6 +30,7 @@ import java.io.IOException;
  *
  * @author JPEXS
  */
+@SWFVersion(from = 3)
 public class DefineShape3Tag extends ShapeTag {
 
     public static final int ID = 32;

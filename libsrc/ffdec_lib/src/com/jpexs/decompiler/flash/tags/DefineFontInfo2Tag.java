@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.LANGCODE;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.IOException;
@@ -34,6 +35,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
+@SWFVersion(from = 6)
 public class DefineFontInfo2Tag extends Tag implements CharacterIdTag {
 
     public static final int ID = 62;

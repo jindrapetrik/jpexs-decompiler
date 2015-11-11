@@ -53,6 +53,7 @@ import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.utf8.Utf8Helper;
@@ -81,6 +82,7 @@ import org.xml.sax.helpers.DefaultHandler;
  *
  * @author JPEXS
  */
+@SWFVersion(from = 4)
 public class DefineEditTextTag extends TextTag {
 
     public static final int ID = 37;
