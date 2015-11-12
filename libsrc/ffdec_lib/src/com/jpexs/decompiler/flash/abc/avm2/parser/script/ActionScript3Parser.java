@@ -561,6 +561,7 @@ public class ActionScript3Parser {
         int originalPrivateNs = privateNs;
         boolean inPkg = pkg != null;
         int cpos = 0;
+        int emptyNs = 0;
         looptrait:
         while (true) {
             s = lex();
@@ -601,8 +602,9 @@ public class ActionScript3Parser {
                 } else {
                     openedNamespaces.add(packageInternalNs = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE_INTERNAL, abcIndex.getSelectedAbc().constants.getStringId("", true), 0, true));
                 }
+                emptyNs = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE, "", 0, true);
                 if (pkg != null && !pkg.isEmpty()) { //add "" namespace if not already present
-                    openedNamespaces.add(abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE, "", 0, true));
+                    openedNamespaces.add(emptyNs);
                 }
                 openedNamespaces.add(privateNs = abcIndex.getSelectedAbc().constants.addNamespace(new Namespace(Namespace.KIND_PRIVATE, abcIndex.getSelectedAbc().constants.getStringId(pkg == null ? "" : pkg.toRawString() + ":?"/* + nameStr*/, true))));
 
@@ -828,7 +830,7 @@ public class ActionScript3Parser {
                     List<GraphTargetItem> staticInit = new ArrayList<>();
                     List<AssignableAVM2Item> sinit2Variables = new ArrayList<>();
                     List<GraphTargetItem> traits2 = new ArrayList<>();
-                    GraphTargetItem constr2 = traits(scriptName, false, sinit2Variables, staticNeedsActivation, staticInit, importedClasses, privateNs, protectedNs, publicNs, packageInternalNs, protectedStaticNs, subNamespaces, pkg, subNameStr, nisInterface, traits2);
+                    GraphTargetItem constr2 = traits(scriptName, false, sinit2Variables, staticNeedsActivation, staticInit, importedClasses, privateNs, protectedNs, emptyNs, packageInternalNs, protectedStaticNs, subNamespaces, pkg, subNameStr, nisInterface, traits2);
 
                     if (nisInterface) {
                         traits.add(new InterfaceAVM2Item(metadata, importedClasses, pkg, subNamespaces, isFinal, namespace, subNameStr, interfaces, traits2));
