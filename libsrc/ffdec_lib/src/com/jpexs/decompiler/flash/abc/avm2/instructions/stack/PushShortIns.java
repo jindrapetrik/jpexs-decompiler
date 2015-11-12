@@ -36,7 +36,7 @@ public class PushShortIns extends InstructionDefinition implements PushIntegerTy
 
     @Override
     public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
-        lda.operandStack.push(((Number) ins.getParam(constants, 0)).longValue());
+        lda.operandStack.push((long) (short) ins.operands[0]);
         return true;
     }
 
