@@ -833,7 +833,7 @@ public class ActionScript3Parser {
                     if (nisInterface) {
                         traits.add(new InterfaceAVM2Item(metadata, importedClasses, pkg, subNamespaces, isFinal, namespace, subNameStr, interfaces, traits2));
                     } else {
-                        traits.add(new ClassAVM2Item(metadata, importedClasses, pkg, subNamespaces, privateNs, protectedNs, isDynamic, isFinal, namespace, subNameStr, extendsTypeStr, interfaces, staticInit, staticNeedsActivation.getVal(), sinitVariables, constr2, traits2));
+                        traits.add(new ClassAVM2Item(metadata, importedClasses, pkg, subNamespaces, privateNs, protectedNs, isDynamic, isFinal, namespace, subNameStr, extendsTypeStr, interfaces, staticInit, staticNeedsActivation.getVal(), sinit2Variables, constr2, traits2));
                     }
 
                     //        traits.add((classTraits(metadata, scriptName, publicNs, pkg, importedClasses, isDynamic, isFinal, subNamespaces, pkg, namespace, false, classTypeStr, extendsTypeStr, implementsTypeStrs, new ArrayList<>())));
