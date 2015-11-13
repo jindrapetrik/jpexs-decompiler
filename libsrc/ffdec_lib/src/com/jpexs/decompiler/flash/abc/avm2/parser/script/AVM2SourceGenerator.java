@@ -157,10 +157,10 @@ public class AVM2SourceGenerator implements SourceGenerator {
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, AndItem item) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
         ret.addAll(generateToActionList(localData, item.leftSide));
+        ret.add(ins(AVM2Instructions.Dup));
         if (!("" + item.leftSide.returnType()).equals("Boolean")) {
             ret.add(ins(AVM2Instructions.ConvertB));
         }
-        ret.add(ins(AVM2Instructions.Dup));
         List<AVM2Instruction> andExpr = generateToActionList(localData, item.rightSide);
         andExpr.add(0, ins(AVM2Instructions.Pop));
         int andExprLen = insToBytes(andExpr).length;
@@ -189,10 +189,10 @@ public class AVM2SourceGenerator implements SourceGenerator {
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, OrItem item) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
         ret.addAll(generateToActionList(localData, item.leftSide));
+        ret.add(ins(AVM2Instructions.Dup));
         if (!("" + item.leftSide.returnType()).equals("Boolean")) {
             ret.add(ins(AVM2Instructions.ConvertB));
         }
-        ret.add(ins(AVM2Instructions.Dup));
         List<AVM2Instruction> orExpr = generateToActionList(localData, item.rightSide);
         orExpr.add(0, ins(AVM2Instructions.Pop));
         int orExprLen = insToBytes(orExpr).length;
