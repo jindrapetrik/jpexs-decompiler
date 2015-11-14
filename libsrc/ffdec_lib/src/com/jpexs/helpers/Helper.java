@@ -607,11 +607,13 @@ public class Helper {
         return ret;
     }
 
-    public static int[] toIntArray(List<Integer> list) {
+    public static int[] toIntArray(Collection<Integer> list) {
         int[] ret = new int[list.size()];
-        for (int i = 0; i < ret.length; i++) {
-            ret[i] = list.get(i);
+        int i = 0;
+        for (int i2 : list) {
+            ret[i++] = i2;
         }
+
         return ret;
     }
 
