@@ -23,7 +23,6 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrictIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.ApplyTypeAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.InitVectorAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
@@ -582,7 +581,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
             String srcType = assignedValue.returnType().toString();
             GraphTargetItem coerced = assignedValue;
             if (!targetType.toString().equals(srcType) && !propertyName.startsWith("@")) {
-                coerced = new CoerceAVM2Item(null, assignedValue, targetType);
+                coerced = makeCoerced(assignedValue, targetType);
             }
             return toSourceMerge(localData, generator, obj, coerced,
                     needsReturn ? dupSetTemp(localData, generator, ret_temp) : null,

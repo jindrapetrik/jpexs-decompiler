@@ -20,10 +20,12 @@ import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.model.OrItem;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,6 +36,15 @@ import java.util.List;
 public abstract class AssignableAVM2Item extends AVM2Item {
 
     protected GraphTargetItem assignedValue;
+
+    protected GraphTargetItem makeCoerced(GraphTargetItem assignedValue, GraphTargetItem targetType) {
+        if (assignedValue instanceof OrItem) {
+            OrItem oi = (OrItem) assignedValue;
+            return new OrItem(assignedValue.getSrc(), makeCoerced(oi.leftSide, targetType), makeCoerced(oi.rightSide, targetType));
+        }
+        //TODO: Is it needed for AndItem too?
+        return new CoerceAVM2Item(null, assignedValue, targetType);
+    }
 
     public AssignableAVM2Item() {
         this(null);
