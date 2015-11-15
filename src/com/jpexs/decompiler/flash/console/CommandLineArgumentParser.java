@@ -698,7 +698,7 @@ public class CommandLineArgumentParser {
         } else if (command.equals("importscript")) {
             parseImportScript(args);
         } else if (command.equals("as3compiler")) {
-            ActionScript3Parser.compile(null /*?*/, args.pop(), args.pop(), 0);
+            ActionScript3Parser.compile(null /*?*/, args.pop(), args.pop(), 0, 0);
         } else if (nextParam.equals("--debugtool")) {
             parseDebugTool(args);
         } else if (nextParam.equals("--compareresources")) {
