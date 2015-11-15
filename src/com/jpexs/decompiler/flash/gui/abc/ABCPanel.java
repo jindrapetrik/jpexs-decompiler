@@ -200,6 +200,9 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
     }
 
     public void setAbc(ABC abc) {
+        if (abc == this.abc) {
+            return;
+        }
         this.abc = abc;
         setDecompiledEditMode(false);
         navigator.setAbc(abc);
@@ -654,7 +657,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
     public void updateSearchPos(ABCPanelSearchResult item) {
         ScriptPack pack = item.getScriptPack();
         setAbc(pack.abc);
-        decompiledTextArea.setScript(pack);
+        decompiledTextArea.setScript(pack, false);
         hilightScript(pack);
         decompiledTextArea.setCaretPosition(0);
 

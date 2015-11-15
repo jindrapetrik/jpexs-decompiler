@@ -21,6 +21,9 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.ConvertException;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.debug.DebugFileIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.debug.DebugIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.debug.DebugLineIns;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
@@ -299,10 +302,7 @@ public class ScriptPack extends AS3ClassTreeItem {
         if (scriptIndex != other.scriptIndex) {
             return false;
         }
-        if (!Objects.equals(path, other.path)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(path, other.path);
     }
 
     @Override
@@ -318,6 +318,7 @@ public class ScriptPack extends AS3ClassTreeItem {
      */
     public void injectDebugInfo(File directoryPath) {
         Map<Integer, Map<Integer, Integer>> bodyToPosToLine = new HashMap<>();
+        Set<Integer> lonelyBody = new HashSet<>();
         try {
             CachedDecompilation decompiled = SWF.getCached(this);
             int line = 1;
@@ -328,48 +329,55 @@ public class ScriptPack extends AS3ClassTreeItem {
                     line++;
                 }
                 Highlighting cls = Highlighting.searchPos(decompiled.classHilights, i);
-                if (cls == null) {
-                    continue;
-                }
+                /*if (cls == null) {
+                 continue;
+                 }*/
                 Highlighting trt = Highlighting.searchPos(decompiled.traitHilights, i);
-                if (trt == null) {
-                    continue;
-                }
+                /*if (trt == null) {
+                 continue;
+                 }*/
                 Highlighting method = Highlighting.searchPos(decompiled.methodHilights, i);
                 if (method == null) {
                     continue;
                 }
                 Highlighting instr = Highlighting.searchPos(decompiled.instructionHilights, i);
-                if (instr == null) {
-                    continue;
-                }
-                int classIndex = (int) cls.getProperties().index;
+                /*if (instr == null) {
+                 continue;
+                 }*/
+                int classIndex = cls == null ? -1 : (int) cls.getProperties().index;
                 int methodIndex = (int) method.getProperties().index;
                 int bodyIndex = abc.findBodyIndex(methodIndex);
                 if (bodyIndex == -1) {
                     continue;
                 }
-                long instrOffset = instr.getProperties().offset;
-                int traitIndex = (int) trt.getProperties().index;
-
-                Trait trait = abc.findTraitByTraitId(classIndex, traitIndex);
-                if (((trait instanceof TraitMethodGetterSetter) && (((TraitMethodGetterSetter) trait).method_info != methodIndex))
-                        || ((trait instanceof TraitFunction) && (((TraitFunction) trait).method_info != methodIndex))) {
-                    continue; //inner anonymous function - ignore. TODO: make work
-                }
                 int pos = -1;
-                try {
-                    pos = abc.bodies.get(bodyIndex).getCode().adr2pos(instrOffset);
-                } catch (ConvertException cex) {
-                    //ignore
+                if (instr != null) {
+                    long instrOffset = instr.getProperties().offset;
+                    if (trt != null && cls != null) {
+                        int traitIndex = (int) trt.getProperties().index;
+
+                        Trait trait = abc.findTraitByTraitId(classIndex, traitIndex);
+                        if (((trait instanceof TraitMethodGetterSetter) && (((TraitMethodGetterSetter) trait).method_info != methodIndex))
+                                || ((trait instanceof TraitFunction) && (((TraitFunction) trait).method_info != methodIndex))) {
+                            continue; //inner anonymous function - ignore. TODO: make work
+                        }
+                    }
+
+                    try {
+                        pos = abc.bodies.get(bodyIndex).getCode().adr2pos(instrOffset);
+                    } catch (ConvertException cex) {
+                        //ignore
+                    }
+                    if (pos == -1) {
+                        continue;
+                    }
+                    if (!bodyToPosToLine.containsKey(bodyIndex)) {
+                        bodyToPosToLine.put(bodyIndex, new HashMap<>());
+                    }
+                    bodyToPosToLine.get(bodyIndex).put(pos, line);
+                } else {
+                    lonelyBody.add(bodyIndex);
                 }
-                if (pos == -1) {
-                    continue;
-                }
-                if (!bodyToPosToLine.containsKey(bodyIndex)) {
-                    bodyToPosToLine.put(bodyIndex, new HashMap<>());
-                }
-                bodyToPosToLine.get(bodyIndex).put(pos, line);
 
             }
         } catch (InterruptedException ex) {
@@ -381,8 +389,45 @@ public class ScriptPack extends AS3ClassTreeItem {
         String cls = path.className;
         String filename = new File(directoryPath, path.packageStr.toFilePath()) + ";" + pkg.replace(".", File.separator) + ";" + cls + ".as";
 
+        //Remove debug info from lonely bodies
+        for (int bodyIndex : lonelyBody) {
+            if (!bodyToPosToLine.keySet().contains(bodyIndex)) {
+                MethodBody b = abc.bodies.get(bodyIndex);
+                List<AVM2Instruction> code = b.getCode().code;
+                for (int i = 0; i < code.size(); i++) {
+                    AVM2Instruction ins = code.get(i);
+                    if (ins.definition instanceof DebugLineIns) {
+                        b.removeInstruction(i);
+                        i--;
+                    } else if (ins.definition instanceof DebugFileIns) {
+                        b.removeInstruction(i);
+                        i--;
+                    } else if (ins.definition instanceof DebugIns) {
+                        b.removeInstruction(i);
+                        i--;
+                    }
+                }
+                b.setModified();
+            }
+        }
+
         for (int bodyIndex : bodyToPosToLine.keySet()) {
+            List<AVM2Instruction> delIns = new ArrayList<>();
+
             MethodBody b = abc.bodies.get(bodyIndex);
+            List<AVM2Instruction> code = b.getCode().code;
+            //add old debug instructions to TOREMOVE list
+            for (AVM2Instruction ins : code) {
+                if (ins.definition instanceof DebugLineIns) {
+                    delIns.add(ins);
+                }
+                if (ins.definition instanceof DebugFileIns) {
+                    delIns.add(ins);
+                }
+                if (ins.definition instanceof DebugIns) {
+                    delIns.add(ins);
+                }
+            }
             b.insertInstruction(0, new AVM2Instruction(0, AVM2Instructions.DebugFile, new int[]{abc.constants.getStringId(filename, true)}), true);
             List<Integer> pos = new ArrayList<>(bodyToPosToLine.get(bodyIndex).keySet());
             Collections.sort(pos);
@@ -394,9 +439,21 @@ public class ScriptPack extends AS3ClassTreeItem {
                     continue;
                 }
                 addedLines.add(line);
-                Logger.getLogger(ScriptPack.class.getName()).log(Level.WARNING, "Script " + path + ": Insert debugline(" + line + ") at pos " + i + " to body " + bodyIndex);
+                Logger.getLogger(ScriptPack.class.getName()).log(Level.FINE, "Script " + path + ": Insert debugline(" + line + ") at pos " + i + " to body " + bodyIndex);
                 b.insertInstruction(i, new AVM2Instruction(0, AVM2Instructions.DebugLine, new int[]{line}));
             }
+            //remove old debug instructions
+            for (int i = 0; i < code.size(); i++) {
+                AVM2Instruction ins = code.get(i);
+                for (AVM2Instruction d : delIns) {
+                    if (ins == d) {
+                        b.removeInstruction(i);
+                        i--;
+                        break;
+                    }
+                }
+            }
+
             b.setModified();
         }
 

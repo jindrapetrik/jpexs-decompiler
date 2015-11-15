@@ -342,6 +342,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
     }
 
+    public void updateMenu() {
+        mainMenu.updateComponents();
+    }
+
     private static void addTab(JTabbedPane tabbedPane, Component tab, String title, Icon icon) {
         tabbedPane.add(tab);
 
@@ -1530,14 +1534,15 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public void gotoClassLine(SWF swf, String cls, int line) {
         gotoClass(swf, cls);
         if (abcPanel != null) {
-            abcPanel.decompiledTextArea.selectLine(line);
+            abcPanel.decompiledTextArea.gotoLine(line);
         }
+
     }
 
     public void debuggerBreakAt(SWF swf, String cls, int line) {
         gotoClassLine(swf, cls, line);
         if (abcPanel != null) {
-            abcPanel.decompiledTextArea.setLineColor(line, Color.green);
+            abcPanel.decompiledTextArea.setLineColor(line - 1, Color.green);
         }
     }
 
@@ -1663,7 +1668,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     new CancellableWorker<Void>() {
                         @Override
                         protected Void doInBackground() throws Exception {
-                            List<TextTag> textResult = null;
+                            List<TextTag> textResult;
                             SearchPanel<TextTag> textSearchPanel = previewPanel.getTextPanel().getSearchPanel();
                             textSearchPanel.setOptions(ignoreCase, regexp);
                             textResult = searchText(txt, ignoreCase, regexp, swf);
@@ -2494,19 +2499,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public boolean alignText(TextTag textTag, TextAlign textAlign) {
-        if (textTag.alignText(textAlign)) {
-            return true;
-        }
-
-        return false;
+        return (textTag.alignText(textAlign));
     }
 
     public boolean translateText(TextTag textTag, int diff) {
-        if (textTag.translateText(diff)) {
-            return true;
-        }
-
-        return false;
+        return textTag.translateText(diff);
     }
 
     public boolean previousTag() {
@@ -2807,6 +2804,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
     }
 
+    public void clearDebuggerColors() {
+        if (abcPanel != null) {
+            abcPanel.decompiledTextArea.clearLineColors();
+        }
+    }
+
     private void stopFlashPlayer() {
         if (flashPanel != null) {
             if (!flashPanel.isStopped()) {
@@ -3040,7 +3043,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         ABCPanel abcPanel = getABCPanel();
                         abcPanel.detailPanel.methodTraitPanel.methodCodePanel.clear();
                         abcPanel.setAbc(scriptLeaf.abc);
-                        abcPanel.decompiledTextArea.setScript(scriptLeaf);
+                        abcPanel.decompiledTextArea.setScript(scriptLeaf, true);
                         abcPanel.decompiledTextArea.setNoTrait();
                         return null;
                     }

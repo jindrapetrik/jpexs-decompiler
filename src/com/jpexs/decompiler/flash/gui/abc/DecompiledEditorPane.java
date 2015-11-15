@@ -639,7 +639,10 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         script = null;
     }
 
-    public void setScript(ScriptPack scriptLeaf) {
+    public void setScript(ScriptPack scriptLeaf, boolean force) {
+        if (!force && this.script == scriptLeaf) {
+            return;
+        }
         abcPanel.scriptNameLabel.setText(scriptLeaf.getClassPath().toString());
         int scriptIndex = scriptLeaf.scriptIndex;
         ScriptInfo script = null;
@@ -688,7 +691,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         int ci = classIndex;
         SWF.uncache(script);
         if (script != null && getABC() != null) {
-            setScript(script);
+            setScript(script, true);
         }
         setNoTrait();
         setClassIndex(ci);

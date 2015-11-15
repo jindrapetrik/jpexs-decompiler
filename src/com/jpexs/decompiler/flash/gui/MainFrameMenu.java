@@ -645,6 +645,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         boolean isRunning = isRunning();
         boolean isDebugRunning = isDebugRunning();
         boolean isRunningOrDebugging = isRunning || isDebugRunning;
+        boolean isDebugPaused = isDebugPaused();
 
         boolean swfSelected = swf != null;
         boolean isWorking = Main.isWorking();
@@ -704,17 +705,17 @@ public abstract class MainFrameMenu implements MenuBuilder {
         setMenuEnabled("_/about", !isWorking);
         setMenuEnabled("/help/about", !isWorking);
 
-        setMenuEnabled("/execution/start/run", !isRunningOrDebugging);
+        setMenuEnabled("/execution/start/run", swfSelected && !isRunningOrDebugging);
         setMenuEnabled("/execution/start/debug", !isRunningOrDebugging);
         setMenuEnabled("/execution/start/stop", isRunningOrDebugging);
         setMenuEnabled("/execution/debug", isDebugRunning);
-        setMenuEnabled("/execution/debug/pause", isDebugRunning);
-        setMenuEnabled("/execution/debug/stepOver", isDebugRunning);
-        setMenuEnabled("/execution/debug/stepInto", isDebugRunning);
-        setMenuEnabled("/execution/debug/stepOut", isDebugRunning);
-        setMenuEnabled("/execution/debug/continue", isDebugRunning);
-        setMenuEnabled("/execution/debug/stack", isDebugRunning);
-        setMenuEnabled("/execution/debug/watch", isDebugRunning);
+        //setMenuEnabled("/execution/debug/pause", isDebugRunning);
+        setMenuEnabled("/execution/debug/stepOver", isDebugPaused);
+        setMenuEnabled("/execution/debug/stepInto", isDebugPaused);
+        setMenuEnabled("/execution/debug/stepOut", isDebugPaused);
+        setMenuEnabled("/execution/debug/continue", isDebugPaused);
+        setMenuEnabled("/execution/debug/stack", isDebugPaused);
+        setMenuEnabled("/execution/debug/watch", isDebugPaused);
 
     }
 
@@ -819,7 +820,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         finishMenu("/execution/start");
 
         addMenuItem("/execution/debug", translate("menu.execution.debug"), null, null, 0, null, false);
-        addMenuItem("/execution/debug/pause", translate("menu.execution.debug.pause"), "pause32", this::pauseActionPerformed, PRIORITY_TOP, null, true);
+        //addMenuItem("/execution/debug/pause", translate("menu.execution.debug.pause"), "pause32", this::pauseActionPerformed, PRIORITY_TOP, null, true);
         addMenuItem("/execution/debug/continue", translate("menu.execution.debug.continue"), "continue32", this::continueActionPerformed, PRIORITY_TOP, null, true);
         addMenuItem("/execution/debug/stepOver", translate("menu.execution.debug.stepOver"), "stepover32", this::stepOverActionPerformed, PRIORITY_MEDIUM, null, true);
         addMenuItem("/execution/debug/stepInto", translate("menu.execution.debug.stepInto"), "stepinto32", this::stepIntoActionPerformed, PRIORITY_MEDIUM, null, true);
@@ -1074,7 +1075,12 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
     private Process runProcess;
     private boolean runProcessDebug;
+
     private File runTempFile;
+
+    public synchronized boolean isDebugPaused() {
+        return runProcess != null && runProcessDebug && Main.getDebugHandler().isPaused();
+    }
 
     public synchronized boolean isDebugRunning() {
         return runProcess != null && runProcessDebug;
@@ -1084,16 +1090,13 @@ public abstract class MainFrameMenu implements MenuBuilder {
         return runProcess != null && !runProcessDebug;
     }
 
-    private synchronized void setProcess(Process p) {
-        this.runProcess = p;
-    }
-
     private synchronized void freeRun() {
         if (runTempFile != null) {
             runTempFile.delete();
             runTempFile = null;
         }
         runProcess = null;
+        mainFrame.getPanel().clearDebuggerColors();
     }
 
     private void runPlayer(String exePath, String file, String flashVars) {
@@ -1239,6 +1242,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
     public boolean stepOverActionPerformed(ActionEvent evt) {
         DebuggerCommands cmd = Main.getDebugHandler().getCommands();
         if (cmd != null) {
+            mainFrame.getPanel().clearDebuggerColors();
             cmd.stepOver();
         }
         return true;
@@ -1247,6 +1251,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
     public boolean stepIntoActionPerformed(ActionEvent evt) {
         DebuggerCommands cmd = Main.getDebugHandler().getCommands();
         if (cmd != null) {
+            mainFrame.getPanel().clearDebuggerColors();
             cmd.stepInto();
         }
         return true;
@@ -1255,6 +1260,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
     public boolean stepOutActionPerformed(ActionEvent evt) {
         DebuggerCommands cmd = Main.getDebugHandler().getCommands();
         if (cmd != null) {
+            mainFrame.getPanel().clearDebuggerColors();
             cmd.stepOut();
         }
         return true;
@@ -1263,7 +1269,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
     public boolean continueActionPerformed(ActionEvent evt) {
         DebuggerCommands cmd = Main.getDebugHandler().getCommands();
         if (cmd != null) {
-            cmd.stepContinue();
+            mainFrame.getPanel().clearDebuggerColors();
+            cmd.sendContinue();
         }
         return true;
     }

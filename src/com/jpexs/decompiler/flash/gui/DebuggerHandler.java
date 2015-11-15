@@ -21,8 +21,10 @@ import com.jpexs.debugger.flash.DebugMessageListener;
 import com.jpexs.debugger.flash.Debugger;
 import com.jpexs.debugger.flash.DebuggerCommands;
 import com.jpexs.debugger.flash.DebuggerConnection;
+import com.jpexs.debugger.flash.InDebuggerMessage;
 import com.jpexs.debugger.flash.messages.in.InAskBreakpoints;
 import com.jpexs.debugger.flash.messages.in.InBreakAt;
+import com.jpexs.debugger.flash.messages.in.InContinue;
 import com.jpexs.debugger.flash.messages.in.InNumScript;
 import com.jpexs.debugger.flash.messages.in.InScript;
 import com.jpexs.debugger.flash.messages.in.InSwfInfo;
@@ -45,6 +47,11 @@ public class DebuggerHandler implements DebugConnectionListener {
     private boolean connected = false;
     private DebuggerCommands commands = null;
     private List<InSwfInfo.SwfInfo> swfs = new ArrayList<>();
+    private boolean paused = true;
+
+    public synchronized boolean isPaused() {
+        return paused;
+    }
 
     public List<InSwfInfo.SwfInfo> getSwfs() {
         return swfs;
@@ -60,6 +67,12 @@ public class DebuggerHandler implements DebugConnectionListener {
 
     @Override
     public void connected(DebuggerConnection con) {
+
+        synchronized (DebuggerHandler.this) {
+            paused = true;
+        }
+
+        Main.getMainFrame().getPanel().updateMenu();
 
         Level level = Level.FINER;
 
@@ -103,10 +116,24 @@ public class DebuggerHandler implements DebugConnectionListener {
         }
 
         con.getMessage(InAskBreakpoints.class);
+        con.addMessageListener(new DebugMessageListener<InContinue>() {
+
+            @Override
+            public void message(InContinue msg) {
+                synchronized (DebuggerHandler.this) {
+                    paused = false;
+                }
+                Main.getMainFrame().getPanel().updateMenu();
+            }
+        });
         con.addMessageListener(new DebugMessageListener<InBreakAt>() {
 
             @Override
             public void message(InBreakAt message) {
+                synchronized (DebuggerHandler.this) {
+                    paused = true;
+                }
+                Main.getMainFrame().getPanel().updateMenu();
                 Logger.getLogger(DebuggerHandler.class.getName()).log(Level.INFO, "break at {0}:{1}", new Object[]{moduleNames.get(message.file), message.line});
                 if (!modulePaths.containsKey(message.file)) {
                     return;
@@ -116,7 +143,7 @@ public class DebuggerHandler implements DebugConnectionListener {
                 //dc.sendContinue();
             }
         });
-        commands.sendContinue();
+        //commands.sendContinue();
         connected = true;
     }
 }

@@ -69,11 +69,17 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
 
     private Map<Integer, Color> lineColors = new HashMap<>();
 
+    public void clearLineColors() {
+        lineColors.clear();
+        repaint();
+    }
+
     public void setLineColor(int line, Color color) {
         lineColors.remove(line);
         if (color != null) {
             lineColors.put(line, color);
         }
+        repaint();
     }
 
     public int getLine() {
