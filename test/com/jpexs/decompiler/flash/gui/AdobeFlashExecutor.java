@@ -264,7 +264,6 @@ public class AdobeFlashExecutor {
 
             f2.delete();
 
-            //String str = flash.GetVariable("myText.text");
             String flashResult = resultRef.getVal();
             if (!flashResult.startsWith("Result:") || !flashResult.endsWith(" Type:string")) {
                 return;
