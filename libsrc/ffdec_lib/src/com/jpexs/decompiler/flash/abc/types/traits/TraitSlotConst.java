@@ -18,6 +18,8 @@ package com.jpexs.decompiler.flash.abc.types.traits;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.model.NewFunctionAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.FunctionAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.AssignedValue;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
@@ -29,6 +31,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.graph.DottedChain;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
 import java.util.HashMap;
@@ -145,6 +148,12 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         }
         if (showModifier) {
             getModifiers(abc, isStatic, writer);
+        }
+        if (convertData.assignedValues.containsKey(this)) {
+            GraphTargetItem val = convertData.assignedValues.get(this).value;
+            if (val instanceof NewFunctionAVM2Item) {
+                return val.toString(writer, LocalData.create(abc.constants, new HashMap<>(), fullyQualifiedNames));
+            }
         }
         getNameStr(writer, abc, fullyQualifiedNames);
         if (value_kind != 0 || convertData.assignedValues.containsKey(this)) {

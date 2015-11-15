@@ -37,19 +37,17 @@ public class InterfaceAVM2Item extends AVM2Item {
 
     public List<GraphTargetItem> methods;
 
-    public int namespace;
-
     public boolean isFinal;
 
-    public List<Integer> openedNamespaces;
+    public List<NamespaceItem> openedNamespaces;
 
-    public DottedChain pkg;
+    public NamespaceItem pkg;
 
     public List<DottedChain> importedClasses;
 
     public List<Map.Entry<String, Map<String, String>>> metadata;
 
-    public InterfaceAVM2Item(List<Map.Entry<String, Map<String, String>>> metadata, List<DottedChain> importedClasses, DottedChain pkg, List<Integer> openedNamespaces, boolean isFinal, int namespace, String name, List<GraphTargetItem> superInterfaces, List<GraphTargetItem> traits) {
+    public InterfaceAVM2Item(List<Map.Entry<String, Map<String, String>>> metadata, List<DottedChain> importedClasses, NamespaceItem pkg, List<NamespaceItem> openedNamespaces, boolean isFinal, String name, List<GraphTargetItem> superInterfaces, List<GraphTargetItem> traits) {
         super(null, NOPRECEDENCE);
         this.metadata = metadata;
         this.importedClasses = importedClasses;
@@ -57,7 +55,6 @@ public class InterfaceAVM2Item extends AVM2Item {
         this.name = name;
         this.superInterfaces = superInterfaces;
         this.methods = traits;
-        this.namespace = namespace;
         this.isFinal = isFinal;
         this.openedNamespaces = openedNamespaces;
     }

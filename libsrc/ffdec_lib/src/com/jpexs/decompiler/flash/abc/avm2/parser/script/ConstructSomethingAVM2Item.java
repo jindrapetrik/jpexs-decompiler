@@ -34,9 +34,9 @@ import java.util.List;
  */
 public class ConstructSomethingAVM2Item extends CallAVM2Item {
 
-    public List<Integer> openedNamespaces;
+    public List<NamespaceItem> openedNamespaces;
 
-    public ConstructSomethingAVM2Item(int line, List<Integer> openedNamespaces, GraphTargetItem name, List<GraphTargetItem> arguments) {
+    public ConstructSomethingAVM2Item(int line, List<NamespaceItem> openedNamespaces, GraphTargetItem name, List<GraphTargetItem> arguments) {
         super(line, name, arguments);
         this.openedNamespaces = openedNamespaces;
     }
@@ -49,7 +49,7 @@ public class ConstructSomethingAVM2Item extends CallAVM2Item {
     private int allNsSetWithVec(ABC abc) {
         int[] nssa = new int[openedNamespaces.size() + 1];
         for (int i = 0; i < openedNamespaces.size(); i++) {
-            nssa[i] = openedNamespaces.get(i);
+            nssa[i] = openedNamespaces.get(i).getCpoolIndex(abc.constants);
         }
         nssa[nssa.length - 1] = abc.constants.getNamespaceId(Namespace.KIND_PACKAGE, "__AS3__.vec", 0, true);
         return abc.constants.getNamespaceSetId(nssa, true);

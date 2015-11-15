@@ -50,9 +50,9 @@ public class NamespacedAVM2Item extends AssignableAVM2Item {
 
     public boolean attr;
 
-    public List<Integer> openedNamespaces;
+    public List<NamespaceItem> openedNamespaces;
 
-    public NamespacedAVM2Item(GraphTargetItem ns, String name, GraphTargetItem nameItem, GraphTargetItem obj, boolean attr, List<Integer> openedNamespaces, GraphTargetItem storeValue) {
+    public NamespacedAVM2Item(GraphTargetItem ns, String name, GraphTargetItem nameItem, GraphTargetItem obj, boolean attr, List<NamespaceItem> openedNamespaces, GraphTargetItem storeValue) {
         super(storeValue);
         this.ns = ns;
         this.nameItem = nameItem;
@@ -63,7 +63,10 @@ public class NamespacedAVM2Item extends AssignableAVM2Item {
     }
 
     private int allNsSet(ABC abc) {
-        int[] nssa = Helper.toIntArray(openedNamespaces);
+        int[] nssa = new int[openedNamespaces.size()];
+        for (int i = 0; i < nssa.length; i++) {
+            nssa[i] = openedNamespaces.get(i).getCpoolIndex(abc.constants);
+        }
         return abc.constants.getNamespaceSetId(nssa, true);
     }
 

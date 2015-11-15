@@ -47,7 +47,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
 
     private int nsKind = -1;
 
-    public List<Integer> openedNamespaces;
+    public List<NamespaceItem> openedNamespaces;
 
     public int line;
 
@@ -153,7 +153,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         this.name = name;
     }
 
-    public UnresolvedAVM2Item(List<GraphTargetItem> subtypes, List<DottedChain> importedClasses, boolean mustBeType, GraphTargetItem type, int line, DottedChain name, GraphTargetItem storeValue, List<Integer> openedNamespaces) {
+    public UnresolvedAVM2Item(List<GraphTargetItem> subtypes, List<DottedChain> importedClasses, boolean mustBeType, GraphTargetItem type, int line, DottedChain name, GraphTargetItem storeValue, List<NamespaceItem> openedNamespaces) {
         super(storeValue);
         this.name = name;
         this.assignedValue = storeValue;
@@ -352,8 +352,8 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         }
 
         //Search for types in opened namespaces
-        for (int ni : openedNamespaces) {
-            Namespace ons = abc.getSelectedAbc().constants.getNamespace(ni);
+        for (NamespaceItem n : openedNamespaces) {
+            Namespace ons = abc.getSelectedAbc().constants.getNamespace(n.getCpoolIndex(abc.getSelectedAbc().constants));
             TypeItem ti = new TypeItem(ons.getName(abc.getSelectedAbc().constants).add(name.get(0)));
             AbcIndexing.ClassIndex ci = abc.findClass(ti);
             if (ci != null) {
@@ -381,7 +381,23 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
             if (thisType == null) {
                 throw new CompilationException("Cannot use this in that context", line);
             }
-            NameAVM2Item ret = new NameAVM2Item(thisType, line, name.get(0), null, false, openedNamespaces);
+
+            boolean isSuper = name.get(0).equals("super");
+            GraphTargetItem ntype = thisType;
+            if (isSuper) {
+                AbcIndexing.ClassIndex ci = abc.findClass(thisType);
+                if (ci == null) {
+                    throw new CompilationException("This class not found", line);
+                }
+                ci = ci.parent;
+                if (ci == null) {
+                    ntype = new TypeItem("Object");
+                } else {
+                    ntype = new TypeItem(ci.abc.instance_info.get(ci.index).getName(ci.abc.constants).getNameWithNamespace(ci.abc.constants));
+                }
+            }
+
+            NameAVM2Item ret = new NameAVM2Item(ntype, line, name.get(0), null, false, openedNamespaces);
             resolved = ret;
             for (int i = 1; i < name.size(); i++) {
                 resolved = new PropertyAVM2Item(resolved, name.get(i), abc, openedNamespaces, new ArrayList<>());

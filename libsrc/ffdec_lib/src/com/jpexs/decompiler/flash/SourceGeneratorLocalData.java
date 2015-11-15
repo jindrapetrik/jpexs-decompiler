@@ -52,6 +52,9 @@ public class SourceGeneratorLocalData implements Serializable {
 
     public String currentClass;
 
+    public String superClass = null;
+    public DottedChain superPkg = null;
+
     public int activationReg = 0;
 
     public List<MethodBody> callStack = new ArrayList<>();

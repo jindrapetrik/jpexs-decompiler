@@ -58,7 +58,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
 
     public AbcIndexing abcIndex;
 
-    private final List<Integer> openedNamespaces;
+    private final List<NamespaceItem> openedNamespaces;
 
     private final List<MethodBody> callStack;
 
@@ -70,7 +70,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
         return p;
     }
 
-    public PropertyAVM2Item(GraphTargetItem object, String propertyName, AbcIndexing abcIndex, List<Integer> openedNamespaces, List<MethodBody> callStack) {
+    public PropertyAVM2Item(GraphTargetItem object, String propertyName, AbcIndexing abcIndex, List<NamespaceItem> openedNamespaces, List<MethodBody> callStack) {
         this.propertyName = propertyName;
         this.object = object;
         this.abcIndex = abcIndex;
@@ -84,7 +84,11 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
     }
 
     private int allNsSet(ABC abc) {
-        int[] nssa = Helper.toIntArray(openedNamespaces);
+        int[] nssa = new int[openedNamespaces.size()];
+        for (int i = 0; i < nssa.length; i++) {
+            nssa[i] = openedNamespaces.get(i).getCpoolIndex(abc.constants);
+        }
+
         return abc.constants.getNamespaceSetId(nssa, true);
     }
 
@@ -249,10 +253,10 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                         if (objType == null) {
                             loopobjType:
                             for (int i = 0; i < openedNamespaces.size(); i++) {
-                                int nsindex = openedNamespaces.get(i);
+                                int nsindex = openedNamespaces.get(i).getCpoolIndex(constants);
 
-                                int nsKind = constants.getNamespace(openedNamespaces.get(i)).kind;
-                                DottedChain nsname = constants.getNamespace(openedNamespaces.get(i)).getName(constants);
+                                int nsKind = openedNamespaces.get(i).kind;
+                                DottedChain nsname = openedNamespaces.get(i).name;
                                 int name_index = 0;
                                 for (int m = 1; m < constants.getMultinameCount(); m++) {
                                     Multiname mname = constants.getMultiname(m);
@@ -314,7 +318,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                     }
                                 }
                                 if (nsKind == Namespace.KIND_PACKAGE && propertyName != null) {
-                                    AbcIndexing.TraitIndex p = abcIndex.findNsProperty(new AbcIndexing.PropertyNsDef(propertyName, nsname, abc, openedNamespaces.get(i)), true, true);
+                                    AbcIndexing.TraitIndex p = abcIndex.findNsProperty(new AbcIndexing.PropertyNsDef(propertyName, nsname, abc, openedNamespaces.get(i).getCpoolIndex(constants)), true, true);
 
                                     Reference<String> outName = new Reference<>("");
                                     Reference<DottedChain> outNs = new Reference<>(DottedChain.EMPTY);
@@ -577,7 +581,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
             GraphTargetItem targetType = propType.getVal();
             String srcType = assignedValue.returnType().toString();
             GraphTargetItem coerced = assignedValue;
-            if (!targetType.equals(srcType) && !propertyName.startsWith("@")) {
+            if (!targetType.toString().equals(srcType) && !propertyName.startsWith("@")) {
                 coerced = new CoerceAVM2Item(null, assignedValue, targetType);
             }
             return toSourceMerge(localData, generator, obj, coerced,
@@ -635,7 +639,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
             /*List<ABC> abcs = new ArrayList<>();
              abcs.add(abc);
              abcs.addAll(otherABCs);*/
-            if (!localData.subMethod && cname != null && AVM2SourceGenerator.searchPrototypeChain(localData.privateNs, localData.protectedNs, true, abcIndex, pkgName, cname, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc) && (localData.currentClass.equals(outNs.getVal().add(outName.getVal())))) {
+            if (!localData.subMethod && cname != null && AVM2SourceGenerator.searchPrototypeChain(localData.privateNs, localData.protectedNs, true, abcIndex, pkgName, cname, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc) && (localData.getFullClass().equals(outNs.getVal().add(outName.getVal()).toRawString()))) {
                 NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.getFullClass()), 0, "this", null, false, openedNamespaces);
                 nobj.setRegNumber(0);
                 obj = nobj;
@@ -670,7 +674,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
         Reference<Integer> ret_temp = new Reference<>(-1);
         Reference<Integer> obj_temp = new Reference<>(-1);
 
-        boolean isInteger = propType.getVal().equals("int");
+        boolean isInteger = propType.getVal().toString().equals("int");
 
         List<GraphSourceItem> ret = toSourceMerge(localData, generator, obj, dupSetTemp(localData, generator, obj_temp),
                 //Start get original

@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.ConditionalType;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import java.io.Serializable;
 import java.util.Set;
 
@@ -40,14 +41,17 @@ public class FILLSTYLE implements NeedsCharacters, Serializable {
 
     public static final int RADIAL_GRADIENT = 0x12;
 
+    @SWFVersion(from = 8)
     public static final int FOCAL_RADIAL_GRADIENT = 0x13;
 
     public static final int REPEATING_BITMAP = 0x40;
 
     public static final int CLIPPED_BITMAP = 0x41;
 
+    @SWFVersion(from = 7)
     public static final int NON_SMOOTHED_REPEATING_BITMAP = 0x42;
 
+    @SWFVersion(from = 7)
     public static final int NON_SMOOTHED_CLIPPED_BITMAP = 0x43;
 
     @Internal

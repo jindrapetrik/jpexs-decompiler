@@ -27,7 +27,7 @@ import java.util.Map;
  */
 public class GetterAVM2Item extends MethodAVM2Item {
 
-    public GetterAVM2Item(boolean isPrivate, List<Map.Entry<String, Map<String, String>>> metadata, DottedChain pkg, boolean isInterface, String customNamespace, boolean needsActivation, boolean hasRest, int line, boolean override, boolean isFinal, boolean isStatic, int namespace, String methodName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<AssignableAVM2Item> subvariables, GraphTargetItem retType) {
-        super(isPrivate, metadata, pkg, isInterface, customNamespace, needsActivation, hasRest, line, override, isFinal, isStatic, namespace, methodName, paramTypes, paramNames, paramValues, body, subvariables, retType);
+    public GetterAVM2Item(boolean outsidePackage, boolean isPrivate, List<Map.Entry<String, Map<String, String>>> metadata, NamespaceItem pkg, boolean isInterface, String customNamespace, boolean needsActivation, boolean hasRest, int line, boolean override, boolean isFinal, boolean isStatic, String methodName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<AssignableAVM2Item> subvariables, GraphTargetItem retType) {
+        super(outsidePackage, isPrivate, metadata, pkg, isInterface, customNamespace, needsActivation, hasRest, line, override, isFinal, isStatic, methodName, paramTypes, paramNames, paramValues, body, subvariables, retType);
     }
 }

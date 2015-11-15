@@ -39,8 +39,6 @@ public class FunctionAVM2Item extends AVM2Item {
 
     public String functionName;
 
-    public int namespace;
-
     public List<String> paramNames;
 
     public List<GraphTargetItem> body;
@@ -61,17 +59,16 @@ public class FunctionAVM2Item extends AVM2Item {
 
     public boolean isInterface;
 
-    public DottedChain pkg;
+    public NamespaceItem pkg;
 
     public List<Map.Entry<String, Map<String, String>>> metadata;
 
-    public FunctionAVM2Item(List<Map.Entry<String, Map<String, String>>> metadata, DottedChain pkg, boolean isInterface, boolean needsActivation, int namespace, boolean hasRest, int line, String functionName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<AssignableAVM2Item> subvariables, GraphTargetItem retType) {
+    public FunctionAVM2Item(List<Map.Entry<String, Map<String, String>>> metadata, NamespaceItem pkg, boolean isInterface, boolean needsActivation, boolean hasRest, int line, String functionName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<AssignableAVM2Item> subvariables, GraphTargetItem retType) {
 
         super(null, NOPRECEDENCE);
         this.metadata = metadata;
         this.pkg = pkg;
         this.needsActivation = needsActivation;
-        this.namespace = namespace;
         this.paramNames = paramNames;
         this.body = body;
         this.functionName = functionName;

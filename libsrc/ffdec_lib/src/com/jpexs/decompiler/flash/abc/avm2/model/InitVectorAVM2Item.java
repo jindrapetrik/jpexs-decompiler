@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.NamespaceItem;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -58,11 +59,10 @@ public class InitVectorAVM2Item extends AVM2Item {
 
     public List<GraphTargetItem> arguments;
 
-    List<Integer> openedNamespaces;
+    List<NamespaceItem> openedNamespaces;
 
     private int allNsSet(ABC abc) {
-        int[] nssa = Helper.toIntArray(openedNamespaces);
-        return abc.constants.getNamespaceSetId(nssa, true);
+        return NamespaceItem.getCpoolSetIndex(abc.constants, openedNamespaces);
     }
 
     public InitVectorAVM2Item(AVM2Instruction ins, GraphTargetItem subtype, List<GraphTargetItem> arguments) {
@@ -71,7 +71,7 @@ public class InitVectorAVM2Item extends AVM2Item {
         this.arguments = arguments;
     }
 
-    public InitVectorAVM2Item(GraphTargetItem subtype, List<GraphTargetItem> arguments, List<Integer> openedNamespaces) {
+    public InitVectorAVM2Item(GraphTargetItem subtype, List<GraphTargetItem> arguments, List<NamespaceItem> openedNamespaces) {
         super(null, PRECEDENCE_PRIMARY);
         this.subtype = subtype;
         this.arguments = arguments;
@@ -120,13 +120,11 @@ public class InitVectorAVM2Item extends AVM2Item {
                 ins(AVM2Instructions.Construct, 1)
         );
         for (int i = 0; i < arguments.size(); i++) {
-            // qname_index == precedence and params == openedNamespaced ???
-            int[] arr = Helper.toIntArray(openedNamespaces);
             ret.addAll(toSourceMerge(localData, generator,
                     ins(AVM2Instructions.Dup),
                     new IntegerValueAVM2Item(null, (long) i),
                     arguments.get(i),
-                    ins(AVM2Instructions.SetProperty, constants.getMultinameId(Multiname.createMultinameL(false, constants.getNamespaceSetId(new int[]{constants.getNamespaceId(Namespace.KIND_PACKAGE, "", 0, true)}, true)), true))
+                    ins(AVM2Instructions.SetProperty, constants.getMultinameId(Multiname.createMultinameL(false, NamespaceItem.getCpoolSetIndex(constants, openedNamespaces)), true))
             ));
         }
         return ret;

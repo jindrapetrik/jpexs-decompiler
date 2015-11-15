@@ -30,8 +30,6 @@ import java.util.Map;
  */
 public class SlotAVM2Item extends AVM2Item {
 
-    private final int namespace;
-
     private final boolean isStatic;
 
     public String var;
@@ -44,22 +42,17 @@ public class SlotAVM2Item extends AVM2Item {
 
     public List<Map.Entry<String, Map<String, String>>> metadata;
 
-    public DottedChain pkg;
-
-    public int getNamespace() {
-        return namespace;
-    }
+    public NamespaceItem pkg;
 
     public boolean isStatic() {
         return isStatic;
     }
 
-    public SlotAVM2Item(List<Map.Entry<String, Map<String, String>>> metadata, DottedChain pkg, String customNamespace, boolean isStatic, int namespace, String var, GraphTargetItem type, GraphTargetItem value, int line) {
+    public SlotAVM2Item(List<Map.Entry<String, Map<String, String>>> metadata, NamespaceItem pkg, String customNamespace, boolean isStatic, String var, GraphTargetItem type, GraphTargetItem value, int line) {
         super(null, NOPRECEDENCE, value);
         this.metadata = metadata;
         this.pkg = pkg;
         this.line = line;
-        this.namespace = namespace;
         this.isStatic = isStatic;
         this.var = var;
         this.type = type;

@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.NamespaceItem;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -34,12 +35,12 @@ public class GetDescendantsAVM2Item extends AVM2Item {
 
     public GraphTargetItem multiname;
 
-    public List<Integer> openedNamespaces;
+    public List<NamespaceItem> openedNamespaces;
 
     public String nameStr;
 
     //constructor for compiler
-    public GetDescendantsAVM2Item(GraphTargetItem object, String nameStr, List<Integer> openedNamespaces) {
+    public GetDescendantsAVM2Item(GraphTargetItem object, String nameStr, List<NamespaceItem> openedNamespaces) {
         super(null, PRECEDENCE_PRIMARY);
         this.object = object;
         this.nameStr = nameStr;

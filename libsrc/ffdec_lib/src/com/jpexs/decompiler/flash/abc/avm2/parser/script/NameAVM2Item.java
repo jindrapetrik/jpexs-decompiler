@@ -47,7 +47,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
 
     private int nsKind = -1;
 
-    public List<Integer> openedNamespaces;
+    public List<NamespaceItem> openedNamespaces;
 
     public int line;
 
@@ -127,7 +127,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
         return variableName;
     }
 
-    public NameAVM2Item(GraphTargetItem type, int line, String variableName, GraphTargetItem storeValue, boolean definition, List<Integer> openedNamespaces) {
+    public NameAVM2Item(GraphTargetItem type, int line, String variableName, GraphTargetItem storeValue, boolean definition, List<NamespaceItem> openedNamespaces) {
         super(storeValue);
         this.variableName = variableName;
         this.assignedValue = storeValue;
@@ -206,7 +206,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
         String name = variableName;
         boolean attr = false;
         if (name != null && name.startsWith("@")) {
-            name = name.substring(1);
+            //name = name.substring(1);
             attr = true;
         }
         AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
@@ -255,18 +255,12 @@ public class NameAVM2Item extends AssignableAVM2Item {
 
     @Override
     public boolean hasReturnValue() {
-        if (definition) {
-            return false;
-        }
-        return true;
+        return !definition;
     }
 
     @Override
     public boolean needsSemicolon() {
-        if (definition) {
-            return true;
-        }
-        return false;
+        return definition;
     }
 
     @Override

@@ -1937,6 +1937,11 @@ public class AVM2Code implements Cloneable {
                                     if (((TraitSlotConst) t).isConst() || initializerType == GraphTextWriter.TRAIT_CLASS_INITIALIZER || initializerType == GraphTextWriter.TRAIT_SCRIPT_INITIALIZER) {
                                         TraitSlotConst tsc = (TraitSlotConst) t;
                                         if (value != null && !convertData.assignedValues.containsKey(tsc)) {
+
+                                            if (value instanceof NewFunctionAVM2Item) {
+                                                NewFunctionAVM2Item f = (NewFunctionAVM2Item) value;
+                                                f.functionName = tsc.getName(abc).getName(abc.constants, fullyQualifiedNames, true);
+                                            }
                                             AssignedValue av = new AssignedValue(value, initializerType, methodIndex);
                                             convertData.assignedValues.put(tsc, av);
                                             list.remove(i);

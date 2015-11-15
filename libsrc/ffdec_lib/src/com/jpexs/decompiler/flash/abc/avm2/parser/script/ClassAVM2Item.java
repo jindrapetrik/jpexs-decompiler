@@ -38,28 +38,27 @@ public class ClassAVM2Item extends AVM2Item implements Block {
 
     public String className;
 
-    public GraphTargetItem constructor;
-
-    public int namespace;
-
-    public int protectedNs;
-    public int privateNs;
+    public GraphTargetItem iinit;
 
     public boolean isDynamic;
 
     public boolean isFinal;
 
-    public List<Integer> openedNamespaces;
+    public List<NamespaceItem> openedNamespaces;
 
     public List<GraphTargetItem> staticInit;
 
-    public boolean staticInitActivation;
+    public boolean cinitActivation;
 
-    public List<AssignableAVM2Item> sinitVariables;
+    public boolean iinitActivation;
+
+    public List<AssignableAVM2Item> cinitVariables;
 
     public List<DottedChain> importedClasses;
 
-    public DottedChain pkg;
+    public NamespaceItem pkg;
+
+    public List<AssignableAVM2Item> iinitVariables;
 
     public List<Map.Entry<String, Map<String, String>>> metadata;
 
@@ -72,25 +71,24 @@ public class ClassAVM2Item extends AVM2Item implements Block {
         return ret;
     }
 
-    public ClassAVM2Item(List<Map.Entry<String, Map<String, String>>> metadata, List<DottedChain> importedClasses, DottedChain pkg, List<Integer> openedNamespaces, int privateNs, int protectedNs, boolean isDynamic, boolean isFinal, int namespace, String className, GraphTargetItem extendsOp, List<GraphTargetItem> implementsOp, List<GraphTargetItem> staticInit, boolean staticInitActivation, List<AssignableAVM2Item> sinitVariables, GraphTargetItem constructor, List<GraphTargetItem> traits) {
+    public ClassAVM2Item(List<Map.Entry<String, Map<String, String>>> metadata, List<DottedChain> importedClasses, NamespaceItem pkg, List<NamespaceItem> openedNamespaces, boolean isFinal, boolean isDynamic, String className, GraphTargetItem extendsOp, List<GraphTargetItem> implementsOp, List<GraphTargetItem> cinit, boolean staticInitActivation, List<AssignableAVM2Item> cinitVariables, GraphTargetItem iinit, List<AssignableAVM2Item> iinitVariables, List<GraphTargetItem> traits, boolean iinitActivation) {
         super(null, NOPRECEDENCE);
         this.metadata = metadata;
         this.importedClasses = importedClasses;
         this.pkg = pkg;
-        this.privateNs = privateNs;
-        this.protectedNs = protectedNs;
         this.className = className;
         this.traits = traits;
         this.extendsOp = extendsOp;
         this.implementsOp = implementsOp;
-        this.constructor = constructor;
-        this.namespace = namespace;
+        this.iinitActivation = iinitActivation;
+        this.iinit = iinit;
         this.isDynamic = isDynamic;
         this.isFinal = isFinal;
         this.openedNamespaces = openedNamespaces;
-        this.staticInit = staticInit;
-        this.staticInitActivation = staticInitActivation;
-        this.sinitVariables = sinitVariables;
+        this.staticInit = cinit;
+        this.cinitActivation = staticInitActivation;
+        this.cinitVariables = cinitVariables;
+        this.iinitVariables = iinitVariables;
     }
 
     @Override

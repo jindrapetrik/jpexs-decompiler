@@ -38,7 +38,7 @@ import java.util.List;
  */
 public class IndexAVM2Item extends AssignableAVM2Item {
 
-    private final List<Integer> openedNamespaces;
+    private final List<NamespaceItem> openedNamespaces;
 
     public GraphTargetItem object;
 
@@ -46,7 +46,7 @@ public class IndexAVM2Item extends AssignableAVM2Item {
 
     public boolean attr;
 
-    public IndexAVM2Item(boolean attr, GraphTargetItem object, GraphTargetItem index, GraphTargetItem storeValue, List<Integer> openedNamespaces) {
+    public IndexAVM2Item(boolean attr, GraphTargetItem object, GraphTargetItem index, GraphTargetItem storeValue, List<NamespaceItem> openedNamespaces) {
         super(storeValue);
         this.object = object;
         this.index = index;
@@ -55,7 +55,10 @@ public class IndexAVM2Item extends AssignableAVM2Item {
     }
 
     private int allNsSet(ABC abc) {
-        int[] nssa = Helper.toIntArray(openedNamespaces);
+        int[] nssa = new int[openedNamespaces.size()];
+        for (int i = 0; i < nssa.length; i++) {
+            nssa[i] = openedNamespaces.get(i).getCpoolIndex(abc.constants);
+        }
         return abc.constants.getNamespaceSetId(nssa, true);
     }
 

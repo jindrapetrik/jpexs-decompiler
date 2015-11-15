@@ -155,9 +155,9 @@ public class ScriptPack extends AS3ClassTreeItem {
      }*/
     public void convert(final NulWriter writer, final List<Trait> traits, final ConvertData convertData, final ScriptExportMode exportMode, final boolean parallel) throws InterruptedException {
 
-        int script_init = abc.script_info.get(scriptIndex).init_index;
-        int bodyIndex = abc.findBodyIndex(script_init);
-        if (bodyIndex != -1) {
+        int sinit_index = abc.script_info.get(scriptIndex).init_index;
+        int sinit_bodyIndex = abc.findBodyIndex(sinit_index);
+        if (sinit_bodyIndex != -1) {
             List<Traits> ts = new ArrayList<>();
             //initialize all classes traits
             for (Trait t : traits) {
@@ -165,9 +165,9 @@ public class ScriptPack extends AS3ClassTreeItem {
                     ts.add(abc.class_info.get(((TraitClass) t).class_info).static_traits);
                 }
             }
-
+            ts.add(abc.script_info.get(scriptIndex).traits);
             writer.mark();
-            abc.bodies.get(bodyIndex).convert(convertData, path +/*packageName +*/ "/.scriptinitializer", exportMode, true, script_init, scriptIndex, -1, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_SCRIPT_INITIALIZER, writer, new ArrayList<>(), ts, true);
+            abc.bodies.get(sinit_bodyIndex).convert(convertData, path +/*packageName +*/ "/.scriptinitializer", exportMode, true, sinit_index, scriptIndex, -1, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_SCRIPT_INITIALIZER, writer, new ArrayList<>(), ts, true);
             scriptInitializerIsEmpty = !writer.getMark();
 
         }
