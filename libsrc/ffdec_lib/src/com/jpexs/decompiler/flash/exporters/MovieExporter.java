@@ -39,6 +39,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -110,8 +111,10 @@ public class MovieExporter {
         //flv.writeTag(new FLVTAG(0, SCRIPTDATA.onMetaData(ms * frames.size() / 1000.0, videoStream.width, videoStream.height, 0, frameRate, videoStream.codecID, 0, 0, false, 0, fileSize)));
         int horizontalAdjustment = 0;
         int verticalAdjustment = 0;
-        for (int i = 0; i < frames.size(); i++) {
-            VideoFrameTag tag = frames.get(i);
+        int[] frameNumArray = Helper.toIntArray(frames.keySet());
+        Arrays.sort(frameNumArray);
+        for (int i = 0; i < frameNumArray.length; i++) {
+            VideoFrameTag tag = frames.get(frameNumArray[i]);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
             int frameType = 1;
