@@ -87,32 +87,32 @@ public class TraitClass extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public void getImportsUsages(ABC abc, List<DottedChain> imports, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) {
-        super.getImportsUsages(abc, imports, uses, ignorePackage == null ? getPackage(abc) : ignorePackage, fullyQualifiedNames);
+    public void getImportsUsages(String customNs, ABC abc, List<DottedChain> imports, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) {
+        super.getImportsUsages(customNs, abc, imports, uses, ignorePackage == null ? getPackage(abc) : ignorePackage, fullyQualifiedNames);
         ClassInfo classInfo = abc.class_info.get(class_info);
         InstanceInfo instanceInfo = abc.instance_info.get(class_info);
         DottedChain packageName = instanceInfo.getName(abc.constants).getNamespace(abc.constants).getName(abc.constants); //assume not null name
 
-        parseImportsUsagesFromMultiname(abc, imports, uses, abc.constants.getMultiname(instanceInfo.name_index), packageName, fullyQualifiedNames);
+        parseImportsUsagesFromMultiname(customNs, abc, imports, uses, abc.constants.getMultiname(instanceInfo.name_index), packageName, fullyQualifiedNames);
 
         if (instanceInfo.super_index > 0) {
-            parseImportsUsagesFromMultiname(abc, imports, uses, abc.constants.getMultiname(instanceInfo.super_index), packageName, fullyQualifiedNames);
+            parseImportsUsagesFromMultiname(customNs, abc, imports, uses, abc.constants.getMultiname(instanceInfo.super_index), packageName, fullyQualifiedNames);
         }
         for (int i : instanceInfo.interfaces) {
-            parseImportsUsagesFromMultiname(abc, imports, uses, abc.constants.getMultiname(i), packageName, fullyQualifiedNames);
+            parseImportsUsagesFromMultiname(customNs, abc, imports, uses, abc.constants.getMultiname(i), packageName, fullyQualifiedNames);
         }
 
         //static
-        classInfo.static_traits.getImportsUsages(abc, imports, uses, packageName, fullyQualifiedNames);
+        classInfo.static_traits.getImportsUsages(customNs, abc, imports, uses, packageName, fullyQualifiedNames);
 
         //static initializer
-        parseImportsUsagesFromMethodInfo(abc, classInfo.cinit_index, imports, uses, packageName, fullyQualifiedNames, new ArrayList<>());
+        parseImportsUsagesFromMethodInfo(customNs, abc, classInfo.cinit_index, imports, uses, packageName, fullyQualifiedNames, new ArrayList<>());
 
         //instance
-        instanceInfo.instance_traits.getImportsUsages(abc, imports, uses, packageName, fullyQualifiedNames);
+        instanceInfo.instance_traits.getImportsUsages(customNs, abc, imports, uses, packageName, fullyQualifiedNames);
 
         //instance initializer
-        parseImportsUsagesFromMethodInfo(abc, instanceInfo.iinit_index, imports, uses, packageName, fullyQualifiedNames, new ArrayList<>());
+        parseImportsUsagesFromMethodInfo(customNs, abc, instanceInfo.iinit_index, imports, uses, packageName, fullyQualifiedNames, new ArrayList<>());
     }
 
     @Override
@@ -178,16 +178,14 @@ public class TraitClass extends Trait implements TraitWithSlot {
         if (!instanceInfo.isInterface()) {
             String modifier = "";
             Multiname m = abc.constants.getMultiname(instanceInfo.name_index);
-            if (m != null) {
-                Namespace ns = m.getNamespace(abc.constants);
-                if (ns != null) {
-                    modifier = ns.getPrefix(abc) + " ";
-                    if (modifier.equals(" ")) {
-                        modifier = "";
-                    }
-                    if (modifier.startsWith("private")) { //cannot have private constuctor
-                        modifier = "";
-                    }
+            Namespace ns = m.getNamespace(abc.constants);
+            if (ns != null) {
+                modifier = ns.getPrefix(abc) + " ";
+                if (modifier.equals(" ")) {
+                    modifier = "";
+                }
+                if (modifier.startsWith("private")) { //cannot have private constuctor
+                    modifier = "";
                 }
             }
 

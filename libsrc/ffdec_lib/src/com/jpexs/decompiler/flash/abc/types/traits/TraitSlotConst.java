@@ -192,12 +192,12 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public void getImportsUsages(ABC abc, List<DottedChain> imports, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) {
+    public void getImportsUsages(String customNs, ABC abc, List<DottedChain> imports, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) {
         if (ignorePackage == null) {
             ignorePackage = getPackage(abc);
         }
-        super.getImportsUsages(abc, imports, uses, ignorePackage, fullyQualifiedNames);
-        parseImportsUsagesFromMultiname(abc, imports, uses, abc.constants.getMultiname(type_index), getPackage(abc), fullyQualifiedNames);
+        super.getImportsUsages(customNs, abc, imports, uses, ignorePackage, fullyQualifiedNames);
+        parseImportsUsagesFromMultiname(customNs, abc, imports, uses, abc.constants.getMultiname(type_index), getPackage(abc), fullyQualifiedNames);
     }
 
 }

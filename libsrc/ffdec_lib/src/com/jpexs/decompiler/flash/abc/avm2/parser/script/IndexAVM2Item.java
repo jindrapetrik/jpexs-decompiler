@@ -54,12 +54,12 @@ public class IndexAVM2Item extends AssignableAVM2Item {
         this.attr = attr;
     }
 
-    private int allNsSet(ABC abc) {
+    private int allNsSet(AbcIndexing abc) throws CompilationException {
         int[] nssa = new int[openedNamespaces.size()];
         for (int i = 0; i < nssa.length; i++) {
-            nssa[i] = openedNamespaces.get(i).getCpoolIndex(abc.constants);
+            nssa[i] = openedNamespaces.get(i).getCpoolIndex(abc);
         }
-        return abc.constants.getNamespaceSetId(nssa, true);
+        return abc.getSelectedAbc().constants.getNamespaceSetId(nssa, true);
     }
 
     @Override
@@ -88,7 +88,7 @@ public class IndexAVM2Item extends AssignableAVM2Item {
         Reference<Integer> index_temp = new Reference<>(-1);
         Reference<Integer> val_temp = new Reference<>(-1);
         AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
-        int indexPropIndex = g.abcIndex.getSelectedAbc().constants.getMultinameId(Multiname.createMultinameL(attr, allNsSet(g.abcIndex.getSelectedAbc())), true);
+        int indexPropIndex = g.abcIndex.getSelectedAbc().constants.getMultinameId(Multiname.createMultinameL(attr, allNsSet(g.abcIndex)), true);
 
         return toSourceMerge(localData, generator,
                 object, dupSetTemp(localData, generator, obj_temp),
@@ -110,7 +110,7 @@ public class IndexAVM2Item extends AssignableAVM2Item {
 
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator, boolean needsReturn, boolean call, List<GraphTargetItem> callargs, boolean delete, boolean construct) throws CompilationException {
         AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
-        int indexPropIndex = g.abcIndex.getSelectedAbc().constants.getMultinameId(Multiname.createMultinameL(attr, allNsSet(g.abcIndex.getSelectedAbc())), true);
+        int indexPropIndex = g.abcIndex.getSelectedAbc().constants.getMultinameId(Multiname.createMultinameL(attr, allNsSet(g.abcIndex)), true);
         Reference<Integer> ret_temp = new Reference<>(-1);
 
         if (assignedValue != null) {

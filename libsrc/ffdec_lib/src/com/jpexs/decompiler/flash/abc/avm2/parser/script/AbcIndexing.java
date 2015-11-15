@@ -576,4 +576,17 @@ public class AbcIndexing {
     public ABC getSelectedAbc() {
         return selectedAbc;
     }
+
+    public DottedChain nsValueToName(String valueStr) {
+        for (ABC abc : abcs) {
+            DottedChain ret = abc.nsValueToName(valueStr);
+            if (!ret.isEmpty()) {
+                return ret;
+            }
+        }
+        if (parent != null) {
+            return parent.nsValueToName(valueStr);
+        }
+        return null;
+    }
 }

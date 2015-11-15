@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.types.traits;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
+import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
@@ -51,15 +52,21 @@ public class TraitMethodGetterSetter extends Trait {
     }
 
     @Override
-    public void getImportsUsages(ABC abc, List<DottedChain> imports, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) {
+    public void getImportsUsages(String customNs, ABC abc, List<DottedChain> imports, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) {
         if (ignorePackage == null) {
             ignorePackage = getPackage(abc);
         }
+        super.getImportsUsages(customNs, abc, imports, uses, ignorePackage, fullyQualifiedNames);
 
-        super.getImportsUsages(abc, imports, uses, ignorePackage, fullyQualifiedNames);
+        if (customNs == null) {
+            Namespace n = getName(abc).getNamespace(abc.constants);
+            if (n.kind == Namespace.KIND_NAMESPACE) {
+                customNs = n.getName(abc.constants).toRawString();
+            }
+        }
         //if (method_info != 0) 
         {
-            parseImportsUsagesFromMethodInfo(abc, method_info, imports, uses, ignorePackage, fullyQualifiedNames, new ArrayList<>());
+            parseImportsUsagesFromMethodInfo(customNs, abc, method_info, imports, uses, ignorePackage, fullyQualifiedNames, new ArrayList<>());
         }
     }
 

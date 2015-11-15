@@ -195,7 +195,7 @@ public class Traits implements Cloneable, Serializable {
             }
         } else {
             ExecutorService executor = Executors.newFixedThreadPool(Configuration.getParallelThreadCount());
-            List<Future<Void>> futureResults = null;
+            List<Future<Void>> futureResults;
 
             futureResults = new ArrayList<>();
             for (int t = 0; t < traits.size(); t++) {
@@ -237,9 +237,9 @@ public class Traits implements Cloneable, Serializable {
         }
     }
 
-    public void getImportsUsages(ABC abc, List<DottedChain> imports, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) {
+    public void getImportsUsages(String customNs, ABC abc, List<DottedChain> imports, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) {
         for (Trait t : traits) {
-            t.getImportsUsages(abc, imports, uses, ignorePackage, fullyQualifiedNames);
+            t.getImportsUsages(customNs, abc, imports, uses, ignorePackage, fullyQualifiedNames);
         }
     }
 }
