@@ -379,7 +379,7 @@ public class ScriptPack extends AS3ClassTreeItem {
         //String filepath = path.toString().replace('.', '/') + ".as";
         String pkg = path.packageStr.toString();
         String cls = path.className;
-        String filename = new File(directoryPath, path.packageStr.toFilePath()) + ";" + pkg + ";" + cls + ".as";
+        String filename = new File(directoryPath, path.packageStr.toFilePath()) + ";" + pkg.replace(".", File.separator) + ";" + cls + ".as";
 
         for (int bodyIndex : bodyToPosToLine.keySet()) {
             MethodBody b = abc.bodies.get(bodyIndex);

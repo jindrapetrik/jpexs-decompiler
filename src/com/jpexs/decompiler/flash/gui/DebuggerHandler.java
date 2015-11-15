@@ -27,8 +27,8 @@ import com.jpexs.debugger.flash.messages.in.InNumScript;
 import com.jpexs.debugger.flash.messages.in.InScript;
 import com.jpexs.debugger.flash.messages.in.InSwfInfo;
 import com.jpexs.decompiler.flash.abc.ClassPath;
-import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.graph.DottedChain;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,9 +38,25 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author Jindra
+ * @author JPEXS
  */
 public class DebuggerHandler implements DebugConnectionListener {
+
+    private boolean connected = false;
+    private DebuggerCommands commands = null;
+    private List<InSwfInfo.SwfInfo> swfs = new ArrayList<>();
+
+    public List<InSwfInfo.SwfInfo> getSwfs() {
+        return swfs;
+    }
+
+    public boolean isConnected() {
+        return connected;
+    }
+
+    public DebuggerCommands getCommands() {
+        return commands;
+    }
 
     @Override
     public void connected(DebuggerConnection con) {
@@ -54,17 +70,17 @@ public class DebuggerHandler implements DebugConnectionListener {
         rootLog.addHandler(ch);
         //rootLog.getHandlers()[0].setLevel(level);
 
-        final DebuggerCommands dc = new DebuggerCommands(con);
-        dc.stopWarning();
-        dc.setStopOnFault();
-        dc.setEnumerateOverride();
-        dc.setNotifyFailure();
-        dc.setInvokeSetters();
-        dc.setSwfLoadNotify();
-        dc.setGetterTimeout(1500);
-        dc.setSetterTimeout(5000);
-        dc.squelch(true);
-        List<InSwfInfo.SwfInfo> swfs = dc.getSwfInfo(1);
+        commands = new DebuggerCommands(con);
+        commands.stopWarning();
+        commands.setStopOnFault();
+        commands.setEnumerateOverride();
+        commands.setNotifyFailure();
+        commands.setInvokeSetters();
+        commands.setSwfLoadNotify();
+        commands.setGetterTimeout(1500);
+        commands.setSetterTimeout(5000);
+        commands.squelch(true);
+        swfs = commands.getSwfInfo(1);
         int numScript = con.getMessage(InNumScript.class).num;
         final Map<Integer, String> moduleNames = new HashMap<>();
         for (int i = 0; i < numScript; i++) {
@@ -81,24 +97,26 @@ public class DebuggerHandler implements DebugConnectionListener {
 
             if (parts.length == 3) {
                 String clsName = parts[2].replace(".as", "");
-                String pkg = parts[1];
+                String pkg = parts[1].replace("/", "\\").replace("\\", ".");
                 modulePaths.put(mname, new ClassPath(DottedChain.parse(pkg), clsName));
             }
         }
 
         con.getMessage(InAskBreakpoints.class);
-        //dc.addBreakPoint(15, 14);
-        dc.addBreakPoint(9, 26);
         con.addMessageListener(new DebugMessageListener<InBreakAt>() {
 
             @Override
             public void message(InBreakAt message) {
-                Logger.getLogger(DebuggerHandler.class.getName()).log(Level.WARNING, "break at {0}:{1}", new Object[]{moduleNames.get(message.file), message.line});
+                Logger.getLogger(DebuggerHandler.class.getName()).log(Level.INFO, "break at {0}:{1}", new Object[]{moduleNames.get(message.file), message.line});
+                if (!modulePaths.containsKey(message.file)) {
+                    return;
+                }
                 String cls = modulePaths.get(message.file).toString();
                 Main.getMainFrame().getPanel().debuggerBreakAt(Main.getMainFrame().getPanel().getCurrentSwf(), cls, message.line);
                 //dc.sendContinue();
             }
         });
-        dc.sendContinue();
+        commands.sendContinue();
+        connected = true;
     }
 }

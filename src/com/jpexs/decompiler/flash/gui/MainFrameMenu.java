@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.debugger.flash.DebuggerCommands;
 import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFBundle;
@@ -41,13 +42,19 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractButton;
@@ -635,6 +642,10 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
     public void updateComponents(SWF swf) {
         this.swf = swf;
+        boolean isRunning = isRunning();
+        boolean isDebugRunning = isDebugRunning();
+        boolean isRunningOrDebugging = isRunning || isDebugRunning;
+
         boolean swfSelected = swf != null;
         boolean isWorking = Main.isWorking();
         List<ABCContainerTag> abcList = swf != null ? swf.getAbcList() : null;
@@ -692,6 +703,19 @@ public abstract class MainFrameMenu implements MenuBuilder {
         setMenuEnabled("/help/homePage", !isWorking);
         setMenuEnabled("_/about", !isWorking);
         setMenuEnabled("/help/about", !isWorking);
+
+        setMenuEnabled("/execution/start/run", !isRunningOrDebugging);
+        setMenuEnabled("/execution/start/debug", !isRunningOrDebugging);
+        setMenuEnabled("/execution/start/stop", isRunningOrDebugging);
+        setMenuEnabled("/execution/debug", isDebugRunning);
+        setMenuEnabled("/execution/debug/pause", isDebugRunning);
+        setMenuEnabled("/execution/debug/stepOver", isDebugRunning);
+        setMenuEnabled("/execution/debug/stepInto", isDebugRunning);
+        setMenuEnabled("/execution/debug/stepOut", isDebugRunning);
+        setMenuEnabled("/execution/debug/continue", isDebugRunning);
+        setMenuEnabled("/execution/debug/stack", isDebugRunning);
+        setMenuEnabled("/execution/debug/watch", isDebugRunning);
+
     }
 
     private void registerHotKeys() {
@@ -773,6 +797,37 @@ public abstract class MainFrameMenu implements MenuBuilder {
         } else {
             setGroupSelection("view", "/file/view/viewResources");
         }
+
+        /*
+         menu.execution = Execution
+         menu.execution.start.run = Run
+         menu.execution.start.debug = Debug
+         menu.execution.start.stop = Stop
+         menu.execution.debug.pause = Pause
+         menu.execution.debug.stepOver = Step over
+         menu.execution.debug.stepInto = Step into
+         menu.execution.debug.stepOut = Step out
+         menu.execution.debug.continue = Continue
+         menu.execution.debug.stack = Stack...
+         menu.execution.debug.watch = New watch...
+         */
+        addMenuItem("/execution", translate("menu.execution"), null, null, 0, null, false);
+        addMenuItem("/execution/start", translate("menu.execution.start"), null, null, 0, null, false);
+        addMenuItem("/execution/start/run", translate("menu.execution.start.run"), "play32", this::runActionPerformed, PRIORITY_TOP, null, true);
+        addMenuItem("/execution/start/debug", translate("menu.execution.start.debug"), "debug32", this::debugActionPerformed, PRIORITY_TOP, null, true);
+        addMenuItem("/execution/start/stop", translate("menu.execution.start.stop"), "stop32", this::stopActionPerformed, PRIORITY_TOP, null, true);
+        finishMenu("/execution/start");
+
+        addMenuItem("/execution/debug", translate("menu.execution.debug"), null, null, 0, null, false);
+        addMenuItem("/execution/debug/pause", translate("menu.execution.debug.pause"), "pause32", this::pauseActionPerformed, PRIORITY_TOP, null, true);
+        addMenuItem("/execution/debug/continue", translate("menu.execution.debug.continue"), "continue32", this::continueActionPerformed, PRIORITY_TOP, null, true);
+        addMenuItem("/execution/debug/stepOver", translate("menu.execution.debug.stepOver"), "stepover32", this::stepOverActionPerformed, PRIORITY_MEDIUM, null, true);
+        addMenuItem("/execution/debug/stepInto", translate("menu.execution.debug.stepInto"), "stepinto32", this::stepIntoActionPerformed, PRIORITY_MEDIUM, null, true);
+        addMenuItem("/execution/debug/stepOut", translate("menu.execution.debug.stepOut"), "stepout32", this::stepOutActionPerformed, PRIORITY_MEDIUM, null, true);
+        addMenuItem("/execution/debug/stack", translate("menu.execution.debug.stack"), "stack32", this::stackActionPerformed, PRIORITY_MEDIUM, null, true);
+        addMenuItem("/execution/debug/watch", translate("menu.execution.debug.watch"), "watch32", this::watchActionPerformed, PRIORITY_MEDIUM, null, true);
+        finishMenu("/execution/debug");
+        finishMenu("/execution");
 
         addMenuItem("/tools", translate("menu.tools"), null, null, 0, null, false);
         addMenuItem("/tools/search", translate("menu.tools.search"), "search16", this::searchActionPerformed, PRIORITY_TOP, null, true);
@@ -1017,10 +1072,216 @@ public abstract class MainFrameMenu implements MenuBuilder {
         manager.removeKeyEventDispatcher(keyEventDispatcher);
     }
 
+    private Process runProcess;
+    private boolean runProcessDebug;
+    private File runTempFile;
+
+    public synchronized boolean isDebugRunning() {
+        return runProcess != null && runProcessDebug;
+    }
+
+    public synchronized boolean isRunning() {
+        return runProcess != null && !runProcessDebug;
+    }
+
+    private synchronized void setProcess(Process p) {
+        this.runProcess = p;
+    }
+
+    private synchronized void freeRun() {
+        if (runTempFile != null) {
+            runTempFile.delete();
+            runTempFile = null;
+        }
+        runProcess = null;
+    }
+
+    private void runPlayer(String exePath, String file, String flashVars) {
+        if (!new File(file).exists()) {
+            return;
+        }
+        final Process proc;
+        if (flashVars != null && !flashVars.isEmpty()) {
+            file += "?" + flashVars;
+        }
+        try {
+            proc = Runtime.getRuntime().exec("\"" + exePath + "\" \"file://" + file + "\"");
+
+        } catch (IOException ex) {
+            Logger.getLogger(MainFrameMenu.class
+                    .getName()).log(Level.SEVERE, null, ex);
+
+            return;
+        }
+        Thread t = new Thread() {
+
+            @Override
+            public void run() {
+                try {
+                    proc.waitFor();
+
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(MainFrameMenu.class
+                            .getName()).log(Level.SEVERE, null, ex);
+                }
+                freeRun();
+                updateComponents();
+            }
+
+        };
+        t.start();
+        synchronized (this) {
+            runProcess = proc;
+        }
+        updateComponents();
+    }
+
+    public boolean runActionPerformed(ActionEvent evt) {
+        String flashVars = "";//key=val&key2=val2
+        String playerLocation = Configuration.playerLocation.get();
+        if (playerLocation.isEmpty() || (!new File(playerLocation).exists())) {
+            View.showMessageDialog(null, AppStrings.translate("message.playerpath.notset"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+            return true;
+        }
+        if (swf == null) {
+            return true;
+        }
+        File tempFile;
+        try {
+            tempFile = File.createTempFile("ffdec_run_", ".swf");
+
+            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
+                swf.saveTo(fos);
+            }
+        } catch (IOException ex) {
+            return true;
+
+        }
+        if (tempFile != null) {
+            synchronized (this) {
+                runTempFile = tempFile;
+                runProcessDebug = false;
+            }
+            runPlayer(playerLocation, tempFile.getAbsolutePath(), flashVars);
+        }
+        return true;
+    }
+
+    public boolean debugActionPerformed(ActionEvent evt) {
+        String flashVars = "";//key=val&key2=val2
+        String playerLocation = Configuration.playerDebugLocation.get();
+        if (playerLocation.isEmpty() || (!new File(playerLocation).exists())) {
+            View.showMessageDialog(null, AppStrings.translate("message.playerpath.debug.notset"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+            return true;
+        }
+        if (swf == null) {
+            return true;
+        }
+        File tempFile;
+        try {
+            tempFile = File.createTempFile("ffdec_debug_", ".swf");
+
+            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
+                swf.saveTo(fos);
+            }
+            //Inject Loader
+            SWF instrSWF = null;
+            try (FileInputStream fis = new FileInputStream(tempFile)) {
+                instrSWF = new SWF(fis, false, false);
+
+            } catch (InterruptedException ex) {
+                Logger.getLogger(MainFrameMenu.class
+                        .getName()).log(Level.SEVERE, null, ex);
+            }
+            if (instrSWF != null) {
+                instrSWF.enableDebugging(true, new File("."));
+                try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
+                    instrSWF.saveTo(fos);
+
+                }
+            }
+
+        } catch (IOException ex) {
+            Logger.getLogger(MainFrameMenu.class
+                    .getName()).log(Level.SEVERE, "Cannot inject debug info", ex);
+
+            return true;
+        }
+        synchronized (this) {
+            runTempFile = tempFile;
+            runProcessDebug = true;
+        }
+        runPlayer(playerLocation, tempFile.getAbsolutePath(), flashVars);
+        return true;
+    }
+
+    public boolean stopActionPerformed(ActionEvent evt) {
+
+        synchronized (this) {
+            if (runProcess != null) {
+                runProcess.destroy();
+            }
+        }
+        freeRun();
+
+        updateComponents();
+        return true;
+    }
+
+    public boolean pauseActionPerformed(ActionEvent evt) {
+        DebuggerCommands cmd = Main.getDebugHandler().getCommands();
+        if (cmd != null) {
+            //TODO
+        }
+        return true;
+    }
+
+    public boolean stepOverActionPerformed(ActionEvent evt) {
+        DebuggerCommands cmd = Main.getDebugHandler().getCommands();
+        if (cmd != null) {
+            cmd.stepOver();
+        }
+        return true;
+    }
+
+    public boolean stepIntoActionPerformed(ActionEvent evt) {
+        DebuggerCommands cmd = Main.getDebugHandler().getCommands();
+        if (cmd != null) {
+            cmd.stepInto();
+        }
+        return true;
+    }
+
+    public boolean stepOutActionPerformed(ActionEvent evt) {
+        DebuggerCommands cmd = Main.getDebugHandler().getCommands();
+        if (cmd != null) {
+            cmd.stepOut();
+        }
+        return true;
+    }
+
+    public boolean continueActionPerformed(ActionEvent evt) {
+        DebuggerCommands cmd = Main.getDebugHandler().getCommands();
+        if (cmd != null) {
+            cmd.stepContinue();
+        }
+        return true;
+    }
+
+    public boolean stackActionPerformed(ActionEvent evt) {
+        //TODO
+        return true;
+    }
+
+    public boolean watchActionPerformed(ActionEvent evt) {
+        //TODO
+        return true;
+    }
+
     public boolean dispatchKeyEvent(KeyEvent e) {
         if (((JFrame) mainFrame).isActive() && e.getID() == KeyEvent.KEY_PRESSED) {
             int code = e.getKeyCode();
-            if (e.isControlDown() && e.isShiftDown()) {
+            if (e.isControlDown() && e.isShiftDown()) { //CTRL+SHIFT
                 switch (code) {
                     case KeyEvent.VK_O:
                         return openActionPerformed(null);
@@ -1041,12 +1302,27 @@ public abstract class MainFrameMenu implements MenuBuilder {
                     case KeyEvent.VK_E:
                         return export(false);
                 }
-            } else if (e.isControlDown() && !e.isShiftDown()) {
+            } else if (e.isControlDown() && !e.isShiftDown()) { //CTRL
                 switch (code) {
+                    case KeyEvent.VK_F7:
+                        return stepOutActionPerformed(null);
+                    case KeyEvent.VK_F5:
+                        return debugActionPerformed(null);
                     case KeyEvent.VK_UP:
                         return previousTag();
                     case KeyEvent.VK_DOWN:
                         return nextTag();
+                }
+            } else if (!e.isControlDown() && !e.isShiftDown()) { //no modifier
+                switch (code) {
+                    case KeyEvent.VK_F5:
+                        return continueActionPerformed(null);
+                    case KeyEvent.VK_F6:
+                        return runActionPerformed(null);
+                    case KeyEvent.VK_F7:
+                        return stepIntoActionPerformed(null);
+                    case KeyEvent.VK_F8:
+                        return stepOverActionPerformed(null);
                 }
             }
         }

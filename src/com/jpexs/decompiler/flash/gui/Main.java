@@ -151,6 +151,12 @@ public class Main {
 
     private static Debugger flashDebugger;
 
+    private static DebuggerHandler debugHandler = null;
+
+    public static DebuggerHandler getDebugHandler() {
+        return debugHandler;
+    }
+
     public static void ensureMainFrame() {
         if (mainFrame == null) {
             synchronized (Main.class) {
@@ -1025,10 +1031,11 @@ public class Main {
              rootLog.getHandlers()[0].setLevel(level);
              */
             flashDebugger = new Debugger();
-            flashDebugger.addConnectionListener(new DebuggerHandler());
+            debugHandler = new DebuggerHandler();
+            flashDebugger.addConnectionListener(debugHandler);
             flashDebugger.start();
         } catch (IOException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            //ignore
         }
 
     }

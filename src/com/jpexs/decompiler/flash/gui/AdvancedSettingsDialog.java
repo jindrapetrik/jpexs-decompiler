@@ -18,8 +18,11 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationCategory;
+import com.jpexs.decompiler.flash.configuration.ConfigurationDirectory;
+import com.jpexs.decompiler.flash.configuration.ConfigurationFile;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
 import com.jpexs.decompiler.flash.gui.helpers.SpringUtilities;
+import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -28,8 +31,11 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.text.ParseException;
@@ -47,6 +53,8 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -56,6 +64,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 import javax.swing.WindowConstants;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableModel;
 import org.pushingpixels.substance.api.ColorSchemeAssociationKind;
 import org.pushingpixels.substance.api.ComponentState;
@@ -241,7 +250,7 @@ public class AdvancedSettingsDialog extends AppDialog {
         Map<String, Component> tabs = new HashMap<>();
         getCategories(componentsMap, tabs, skinComboBox, getResourceBundle());
 
-        String catOrder[] = new String[]{"ui", "display", "decompilation", "script", "format", "export", "import", "limit", "update", "debug", "other"};
+        String catOrder[] = new String[]{"ui", "display", "decompilation", "script", "format", "export", "import", "paths", "limit", "update", "debug", "other"};
 
         for (String cat : catOrder) {
             if (!tabs.containsKey(cat)) {
@@ -254,6 +263,40 @@ public class AdvancedSettingsDialog extends AppDialog {
 
         cnt.add(tabPane, BorderLayout.CENTER);
         pack();
+    }
+
+    public static String selectConfigFile(ConfigurationItem config, String current, String pattern) {
+        JFileChooser fc = new JFileChooser();
+        fc.setSelectedFile(new File(current));
+        fc.setMultiSelectionEnabled(false);
+        fc.setCurrentDirectory(new File((String) config.get()));
+        FileFilter allSupportedFilter = new FileFilter() {
+            private final String[] supportedExtensions = new String[]{".swf", ".gfx", ".swc", ".zip"};
+
+            @Override
+            public boolean accept(File f) {
+                if (f.isDirectory()) {
+                    return true;
+                }
+                return f.getName().matches(pattern);
+            }
+
+            @Override
+            public String getDescription() {
+                return "";
+            }
+        };
+        fc.setFileFilter(allSupportedFilter);
+
+        fc.setAcceptAllFileFilterUsed(false);
+        JFrame f = new JFrame();
+        View.setWindowIcon(f);
+        int returnVal = fc.showOpenDialog(f);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            return Helper.fixDialogFile(fc.getSelectedFile()).getAbsolutePath();
+        } else {
+            return (String) config.get();
+        }
     }
 
     public static void getCategories(Map<String, Component> componentsMap, Map<String, Component> tabs, JComboBox<?> skinComboBox, ResourceBundle resourceBundle) {
@@ -315,11 +358,15 @@ public class AdvancedSettingsDialog extends AppDialog {
                     l.setToolTipText(description);
                     configPanel.add(l);
                     Component c = null;
+                    Component addComponent = null;
                     if (name.equals("gui.skin")) {
                         skinComboBox.setToolTipText(description);
                         skinComboBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, skinComboBox.getPreferredSize().height));
                         c = skinComboBox;
                     } else if ((itemType == String.class) || (itemType == Integer.class) || (itemType == Long.class) || (itemType == Double.class) || (itemType == Float.class) || (itemType == Calendar.class)) {
+                        ConfigurationFile confFile = field.getAnnotation(ConfigurationFile.class);
+                        ConfigurationDirectory confDirectory = field.getAnnotation(ConfigurationDirectory.class);
+
                         JTextField tf = new JTextField();
                         Object val = item.get();
                         if (val == null) {
@@ -332,7 +379,21 @@ public class AdvancedSettingsDialog extends AppDialog {
                         }
                         tf.setToolTipText(description);
                         tf.setMaximumSize(new Dimension(Integer.MAX_VALUE, tf.getPreferredSize().height));
+
                         c = tf;
+                        if (confFile != null) { //|| confDirectory != null) {
+                            JPanel p = new JPanel(new BorderLayout());
+                            p.setMaximumSize(new Dimension(Integer.MAX_VALUE, tf.getPreferredSize().height));
+                            p.add(tf, BorderLayout.CENTER);
+                            JButton butSelect = new JButton(View.getIcon("folderopen16"));
+                            butSelect.setToolTipText(AppStrings.translate("FileChooser.openButtonText"));
+                            butSelect.setMargin(new Insets(2, 2, 2, 2));
+                            butSelect.addActionListener((ActionEvent e) -> {
+                                tf.setText(selectConfigFile(item, tf.getText(), confFile.value()));
+                            });
+                            p.add(butSelect, BorderLayout.EAST);
+                            addComponent = p;
+                        }
                     } else if (itemType == Boolean.class) {
                         JCheckBox cb = new JCheckBox();
                         cb.setSelected((Boolean) item.get());
@@ -362,8 +423,11 @@ public class AdvancedSettingsDialog extends AppDialog {
                     }
 
                     componentsMap.put(name, c);
+                    if (addComponent == null) {
+                        addComponent = c;
+                    }
                     l.setLabelFor(c);
-                    configPanel.add(c);
+                    configPanel.add(addComponent);
                 } catch (IllegalArgumentException | IllegalAccessException ex) {
                     // Reflection exceptions. This should never happen
                     throw new Error(ex.getMessage());

@@ -234,12 +234,15 @@ public class Configuration {
     public static final ConfigurationItem<Integer> lastRenameType = null;
 
     @ConfigurationDefaultString(".")
+    @ConfigurationDirectory
     public static final ConfigurationItem<String> lastSaveDir = null;
 
     @ConfigurationDefaultString(".")
+    @ConfigurationDirectory
     public static final ConfigurationItem<String> lastOpenDir = null;
 
     @ConfigurationDefaultString(".")
+    @ConfigurationDirectory
     public static final ConfigurationItem<String> lastExportDir = null;
 
     @ConfigurationDefaultString("en")
@@ -502,6 +505,21 @@ public class Configuration {
     @ConfigurationCategory("ui")
     public static final ConfigurationItem<Boolean> autoOpenLoadedSWFs = null;
 
+    @ConfigurationDefaultString("")
+    @ConfigurationCategory("paths")
+    @ConfigurationFile
+    public static final ConfigurationItem<String> playerLocation = null;
+
+    @ConfigurationDefaultString("")
+    @ConfigurationCategory("paths")
+    @ConfigurationFile
+    public static final ConfigurationItem<String> playerDebugLocation = null;
+
+    @ConfigurationDefaultString("")
+    @ConfigurationCategory("paths")
+    @ConfigurationFile(".*\\.swc$")
+    public static final ConfigurationItem<String> playerLibLocation = null;
+
     private enum OSId {
 
         WINDOWS, OSX, UNIX
@@ -761,6 +779,12 @@ public class Configuration {
         } catch (IOException ex) {
             Logger.getLogger(Configuration.class.getName()).log(Level.SEVERE, null, ex);
         }
+        if (playerLibLocation.get("").isEmpty()) {
+            File swcFile = getPlayerSwcOld();
+            if (swcFile != null) {
+                playerLibLocation.set(swcFile.getAbsolutePath());
+            }
+        }
     }
 
     public static Object getDefaultValue(Field field) {
@@ -838,7 +862,7 @@ public class Configuration {
         String proxyAddress = Configuration.updateProxyAddress.get();
         URL url = new URL(urlString);
 
-        URLConnection uc = null;
+        URLConnection uc;
         if (proxyAddress != null && !proxyAddress.isEmpty()) {
             int port = 8080;
             if (proxyAddress.contains(":")) {
@@ -900,6 +924,21 @@ public class Configuration {
     }
 
     public static File getPlayerSWC() {
+        String libLocation = playerLibLocation.get("");
+        File ret = null;
+        if (!libLocation.isEmpty()) {
+            ret = new File(libLocation);
+        }
+        if (ret == null || !ret.exists()) {
+            ret = getPlayerSwcOld();
+            if (ret != null) {
+                playerLibLocation.set(ret.getAbsolutePath());
+            }
+        }
+        return ret;
+    }
+
+    private static File getPlayerSwcOld() {
         File libsDir = getFlashLibPath();
         if (libsDir != null && libsDir.exists()) {
             File[] libs = libsDir.listFiles(new FilenameFilter() {
