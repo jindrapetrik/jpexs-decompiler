@@ -212,6 +212,8 @@
 				}
 				trace("hello");
 			}
+import classes.TestNs;
+
 		}
 
 		public function testSwitchDefault()
@@ -917,6 +919,10 @@
 			}finally {
 				trace("infinally");
 			}
+		}
+		
+		public function other(){
+			var n:TestNs = new TestNs();
 		}
 	}
 }
