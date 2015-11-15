@@ -205,7 +205,7 @@ public class AdobeFlashExecutor {
         return null;
     }
 
-    public String executeAvm2(List<AS3ExecuteTask> tasks) {
+    public void executeAvm2(List<AS3ExecuteTask> tasks) {
         try {
             File f2 = new File("run_test_" + new Date().getTime() + "_" + id.getAndIncrement() + ".swf");
             f2.deleteOnExit();
@@ -264,18 +264,22 @@ public class AdobeFlashExecutor {
 
             f2.delete();
 
-            String str = flash.GetVariable("myText.text");
             String flashResult = resultRef.getVal();
-            return flashResult;
+            if (!flashResult.startsWith("Result:") || !flashResult.endsWith(" Type:string")) {
+                return;
+            }
+
+            flashResult = flashResult.substring(7);
+            flashResult = flashResult.substring(0, flashResult.length() - 12);
+            String[] lines = flashResult.split("(\r\n|\r|\n)");
+            if (lines.length == tasks.size()) {
+                for (int j = 0; j < tasks.size(); j++) {
+                    tasks.get(j).flashResult = lines[j];
+                }
+            }
         } catch (IOException | InterruptedException ex) {
             Logger.getLogger(AdobeFlashExecutor.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        for (AS3ExecuteTask code : tasks) {
-            code.flashResult = "";
-        }
-
-        return null;
     }
 
     private int addMethod(ABC abc, int classId, String name, boolean isStatic, AVM2Code code) {
