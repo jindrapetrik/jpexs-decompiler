@@ -119,14 +119,14 @@ public class TraitFunction extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public void getImportsUsages(ABC abc, List<DottedChain> imports, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) {
+    public void getImportsUsages(String customNs, ABC abc, List<DottedChain> imports, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) {
         if (ignorePackage == null) {
             ignorePackage = getPackage(abc);
         }
-        super.getImportsUsages(abc, imports, uses, ignorePackage, fullyQualifiedNames);
+        super.getImportsUsages(customNs, abc, imports, uses, ignorePackage, fullyQualifiedNames);
         //if (method_info != 0)
         {
-            parseImportsUsagesFromMethodInfo(abc, method_info, imports, uses, ignorePackage, fullyQualifiedNames, new ArrayList<>());
+            parseImportsUsagesFromMethodInfo(customNs, abc, method_info, imports, uses, ignorePackage, fullyQualifiedNames, new ArrayList<>());
         }
     }
 

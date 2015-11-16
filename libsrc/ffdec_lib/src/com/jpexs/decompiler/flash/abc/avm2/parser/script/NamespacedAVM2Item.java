@@ -62,12 +62,12 @@ public class NamespacedAVM2Item extends AssignableAVM2Item {
         this.openedNamespaces = openedNamespaces;
     }
 
-    private int allNsSet(ABC abc) {
+    private int allNsSet(AbcIndexing abc) throws CompilationException {
         int[] nssa = new int[openedNamespaces.size()];
         for (int i = 0; i < nssa.length; i++) {
-            nssa[i] = openedNamespaces.get(i).getCpoolIndex(abc.constants);
+            nssa[i] = openedNamespaces.get(i).getCpoolIndex(abc);
         }
-        return abc.constants.getNamespaceSetId(nssa, true);
+        return abc.getSelectedAbc().constants.getNamespaceSetId(nssa, true);
     }
 
     @Override
@@ -115,7 +115,7 @@ public class NamespacedAVM2Item extends AssignableAVM2Item {
                     //Start get original
                     //getTemp(localData, generator, ns_temp), generateCoerce(generator, "Namespace"), ins(AVM2Instructions.FindPropertyStrict, g.abc.getLastAbc().constants.getMultinameId(new Multiname(Multiname.RTQNAME, g.abc.getLastAbc().constants.getStringId(variableName, true), 0, 0, 0, new ArrayList<Integer>()), true)),
                     //getTemp(localData, generator, ns_temp), generateCoerce(generator, "Namespace"),
-                    ins(AVM2Instructions.GetProperty, constants.getMultinameId(Multiname.createMultinameL(false, allNsSet(abc)), true)),
+                    ins(AVM2Instructions.GetProperty, constants.getMultinameId(Multiname.createMultinameL(false, allNsSet(g.abcIndex)), true)),
                     !isInteger ? ins(AVM2Instructions.ConvertD) : null,
                     //End get original
                     (!post) ? (decrement ? ins(isInteger ? AVM2Instructions.DecrementI : AVM2Instructions.Decrement) : ins(isInteger ? AVM2Instructions.IncrementI : AVM2Instructions.Increment)) : null,
@@ -125,7 +125,7 @@ public class NamespacedAVM2Item extends AssignableAVM2Item {
                     getTemp(localData, generator, name_temp),
                     getTemp(localData, generator, ns_temp),
                     getTemp(localData, generator, ret_temp),
-                    ins(AVM2Instructions.SetProperty, constants.getMultinameId(Multiname.createMultinameL(false, allNsSet(abc)), true)),
+                    ins(AVM2Instructions.SetProperty, constants.getMultinameId(Multiname.createMultinameL(false, allNsSet(g.abcIndex)), true)),
                     killTemp(localData, generator, Arrays.asList(ret_temp, name_temp, ns_temp))
             );
         } else {

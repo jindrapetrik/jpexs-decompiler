@@ -37,7 +37,7 @@ public class ConstructSomethingAVM2Item extends CallAVM2Item {
     public List<NamespaceItem> openedNamespaces;
 
     public ConstructSomethingAVM2Item(int line, List<NamespaceItem> openedNamespaces, GraphTargetItem name, List<GraphTargetItem> arguments) {
-        super(line, name, arguments);
+        super(openedNamespaces, line, name, arguments);
         this.openedNamespaces = openedNamespaces;
     }
 
@@ -46,13 +46,13 @@ public class ConstructSomethingAVM2Item extends CallAVM2Item {
         return name.returnType();
     }
 
-    private int allNsSetWithVec(ABC abc) {
+    private int allNsSetWithVec(AbcIndexing abc) throws CompilationException {
         int[] nssa = new int[openedNamespaces.size() + 1];
         for (int i = 0; i < openedNamespaces.size(); i++) {
-            nssa[i] = openedNamespaces.get(i).getCpoolIndex(abc.constants);
+            nssa[i] = openedNamespaces.get(i).getCpoolIndex(abc);
         }
-        nssa[nssa.length - 1] = abc.constants.getNamespaceId(Namespace.KIND_PACKAGE, "__AS3__.vec", 0, true);
-        return abc.constants.getNamespaceSetId(nssa, true);
+        nssa[nssa.length - 1] = abc.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE, "__AS3__.vec", 0, true);
+        return abc.getSelectedAbc().constants.getNamespaceSetId(nssa, true);
 
     }
 

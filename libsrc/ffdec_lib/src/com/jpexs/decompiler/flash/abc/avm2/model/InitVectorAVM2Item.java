@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.NamespaceItem;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
@@ -61,8 +62,8 @@ public class InitVectorAVM2Item extends AVM2Item {
 
     List<NamespaceItem> openedNamespaces;
 
-    private int allNsSet(ABC abc) {
-        return NamespaceItem.getCpoolSetIndex(abc.constants, openedNamespaces);
+    private int allNsSet(AbcIndexing abc) throws CompilationException {
+        return NamespaceItem.getCpoolSetIndex(abc, openedNamespaces);
     }
 
     public InitVectorAVM2Item(AVM2Instruction ins, GraphTargetItem subtype, List<GraphTargetItem> arguments) {
@@ -113,7 +114,7 @@ public class InitVectorAVM2Item extends AVM2Item {
         AVM2ConstantPool constants = abc.constants;
         List<GraphSourceItem> ret = toSourceMerge(localData, generator,
                 ins(AVM2Instructions.FindPropertyStrict, constants.getMultinameId(Multiname.createMultiname(false, constants.getStringId("Vector", true), constants.getNamespaceSetId(new int[]{constants.getNamespaceId(Namespace.KIND_PACKAGE, "__AS3__.vec", 0, true)}, true)), true)),
-                ins(AVM2Instructions.GetProperty, constants.getMultinameId(Multiname.createMultiname(false, constants.getStringId("Vector", true), allNsSet(abc)), true)),
+                ins(AVM2Instructions.GetProperty, constants.getMultinameId(Multiname.createMultiname(false, constants.getStringId("Vector", true), allNsSet(g.abcIndex)), true)),
                 subtype,
                 ins(AVM2Instructions.ApplyType, 1),
                 new IntegerValueAVM2Item(null, (long) arguments.size()),
@@ -124,7 +125,7 @@ public class InitVectorAVM2Item extends AVM2Item {
                     ins(AVM2Instructions.Dup),
                     new IntegerValueAVM2Item(null, (long) i),
                     arguments.get(i),
-                    ins(AVM2Instructions.SetProperty, constants.getMultinameId(Multiname.createMultinameL(false, NamespaceItem.getCpoolSetIndex(constants, openedNamespaces)), true))
+                    ins(AVM2Instructions.SetProperty, constants.getMultinameId(Multiname.createMultinameL(false, NamespaceItem.getCpoolSetIndex(g.abcIndex, openedNamespaces)), true))
             ));
         }
         return ret;

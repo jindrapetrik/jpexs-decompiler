@@ -78,7 +78,7 @@ public abstract class AVM2Item extends GraphTargetItem {
             }
         }
 
-        if (!empty) {
+        if (!empty && object != null) {
             if (object.getPrecedence() > PRECEDENCE_PRIMARY) {
                 writer.append("(");
                 object.toString(writer, localData);

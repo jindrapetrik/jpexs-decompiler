@@ -196,7 +196,7 @@ public class ActionScript3Parser {
                     expectedType(SymbolType.PARENT_CLOSE);
                     break;
                 case PARENT_OPEN:
-                    ret = new CallAVM2Item(lexer.yyline(), ret, call(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, variables));
+                    ret = new CallAVM2Item(openedNamespaces, lexer.yyline(), ret, call(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, variables));
                     break;
                 case DESCENDANTS:
                     s = lex();
@@ -468,7 +468,7 @@ public class ActionScript3Parser {
 
     private MethodAVM2Item method(List<List<NamespaceItem>> allOpenedNamespaces, boolean outsidePackage, boolean isPrivate, List<Map.Entry<String, Map<String, String>>> metadata, NamespaceItem pkg, boolean isInterface, String customAccess, Reference<Boolean> needsActivation, List<DottedChain> importedClasses, boolean override, boolean isFinal, TypeItem thisType, List<NamespaceItem> openedNamespaces, boolean isStatic, String functionName, boolean isMethod, List<AssignableAVM2Item> variables) throws IOException, AVM2ParseException {
         FunctionAVM2Item f = function(allOpenedNamespaces, metadata, pkg, isInterface, needsActivation, importedClasses, thisType, openedNamespaces, functionName, isMethod, variables);
-        return new MethodAVM2Item(outsidePackage, isPrivate, f.metadata, f.pkg, f.isInterface, customAccess, f.needsActivation, f.hasRest, f.line, override, isFinal, isStatic, functionName, f.paramTypes, f.paramNames, f.paramValues, f.body, f.subvariables, f.retType);
+        return new MethodAVM2Item(allOpenedNamespaces, outsidePackage, isPrivate, f.metadata, f.pkg, f.isInterface, customAccess, f.needsActivation, f.hasRest, f.line, override, isFinal, isStatic, functionName, f.paramTypes, f.paramNames, f.paramValues, f.body, f.subvariables, f.retType);
     }
 
     private FunctionAVM2Item function(List<List<NamespaceItem>> allOpenedNamespaces, List<Map.Entry<String, Map<String, String>>> metadata, NamespaceItem pkg, boolean isInterface, Reference<Boolean> needsActivation, List<DottedChain> importedClasses, TypeItem thisType, List<NamespaceItem> openedNamespaces, String functionName, boolean isMethod, List<AssignableAVM2Item> variables) throws IOException, AVM2ParseException {
@@ -697,6 +697,10 @@ public class ActionScript3Parser {
             if (namespace == protectedNs && isStatic) {
                 namespace = staticProtectedNs;
             }
+            if (namespace == null && customNs != null) {
+                //Special: it will be resolved later:
+                namespace = new NamespaceItem(customNs, Namespace.KIND_NAMESPACE);
+            }
 
             switch (s.type) {
                 case FUNCTION:
@@ -766,10 +770,10 @@ public class ActionScript3Parser {
                                 }
                             }
                             if (isGetter) {
-                                GetterAVM2Item g = new GetterAVM2Item(outsidePackage, ft.isPrivate(), ft.metadata, ft.pkg, isInterface, customNs, ft.needsActivation, ft.hasRest, ft.line, ft.isOverride(), ft.isFinal(), isStatic, ft.functionName, ft.paramTypes, ft.paramNames, ft.paramValues, ft.body, ft.subvariables, ft.retType);
+                                GetterAVM2Item g = new GetterAVM2Item(allOpenedNamespaces, outsidePackage, ft.isPrivate(), ft.metadata, ft.pkg, isInterface, customNs, ft.needsActivation, ft.hasRest, ft.line, ft.isOverride(), ft.isFinal(), isStatic, ft.functionName, ft.paramTypes, ft.paramNames, ft.paramValues, ft.body, ft.subvariables, ft.retType);
                                 t = g;
                             } else if (isSetter) {
-                                SetterAVM2Item st = new SetterAVM2Item(outsidePackage, ft.isPrivate(), ft.metadata, ft.pkg, isInterface, customNs, ft.needsActivation, ft.hasRest, ft.line, ft.isOverride(), ft.isFinal(), isStatic, ft.functionName, ft.paramTypes, ft.paramNames, ft.paramValues, ft.body, ft.subvariables, ft.retType);
+                                SetterAVM2Item st = new SetterAVM2Item(allOpenedNamespaces, outsidePackage, ft.isPrivate(), ft.metadata, ft.pkg, isInterface, customNs, ft.needsActivation, ft.hasRest, ft.line, ft.isOverride(), ft.isFinal(), isStatic, ft.functionName, ft.paramTypes, ft.paramNames, ft.paramValues, ft.body, ft.subvariables, ft.retType);
                                 t = st;
                             } else {
                                 t = ft;
@@ -859,8 +863,8 @@ public class ActionScript3Parser {
         }
     }
 
-    private void scriptTraits(int scriptIndex, String scriptName, List<GraphTargetItem> traits) throws AVM2ParseException, IOException, CompilationException {
-        List<List<NamespaceItem>> allOpenedNamespaces = new ArrayList<>();
+    private void scriptTraits(List<List<NamespaceItem>> allOpenedNamespaces, int scriptIndex, String scriptName, List<GraphTargetItem> traits) throws AVM2ParseException, IOException, CompilationException {
+
         while (scriptTraitsBlock(allOpenedNamespaces, scriptIndex, scriptName, traits)) {
             //empty
         }
@@ -902,7 +906,9 @@ public class ActionScript3Parser {
         allOpenedNamespaces.add(openedNamespaces);
         NamespaceItem emptyNs = new NamespaceItem("", Namespace.KIND_PACKAGE);
         openedNamespaces.add(emptyNs);
-        openedNamespaces.add(new NamespaceItem(AS3_NAMESPACE, Namespace.KIND_NAMESPACE));
+        NamespaceItem as3Ns = new NamespaceItem(AS3_NAMESPACE, Namespace.KIND_NAMESPACE);
+        as3Ns.forceResolve(abcIndex);
+        openedNamespaces.add(as3Ns);
 
         for (List<NamespaceItem> ln : allOpenedNamespaces) {
             if (publicNs != null && !ln.contains(publicNs)) {
@@ -913,7 +919,7 @@ public class ActionScript3Parser {
             }
         }
 
-        List<DottedChain> importedClasses = parseImports(openedNamespaces);
+        List<DottedChain> importedClasses = parseImportsUsages(openedNamespaces);
 
         boolean isEmpty = true;
 
@@ -2393,37 +2399,46 @@ public class ActionScript3Parser {
 
     private List<String> constantPool;
 
-    private List<DottedChain> parseImports(List<NamespaceItem> openedNamespaces) throws IOException, AVM2ParseException {
+    private List<DottedChain> parseImportsUsages(List<NamespaceItem> openedNamespaces) throws IOException, AVM2ParseException {
 
         ParsedSymbol s;
         List<DottedChain> importedClasses = new ArrayList<>();
 
         s = lex();
-        while (s.type == SymbolType.IMPORT) {
+        while (s.isType(SymbolType.IMPORT, SymbolType.USE)) {
             boolean all = false;
+            boolean isUse = s.type == SymbolType.USE;
+            if (isUse) {
+                expectedType(SymbolType.NAMESPACE);
+            }
             s = lex();
             expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
-            DottedChain imp = new DottedChain();
-            imp = imp.add(s.value.toString());
+            DottedChain fullName = new DottedChain();
+            fullName = fullName.add(s.value.toString());
             s = lex();
             boolean isStar = false;
             while (s.type == SymbolType.DOT) {
 
                 s = lex();
-                if (s.type == SymbolType.MULTIPLY) {
+                if (s.type == SymbolType.MULTIPLY && !isUse) {
                     isStar = true;
                     s = lex();
                     break;
                 }
                 expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
-                imp = imp.add(s.value.toString());
+                fullName = fullName.add(s.value.toString());
                 s = lex();
             }
 
             if (isStar) {
-                openedNamespaces.add(new NamespaceItem(imp, Namespace.KIND_PACKAGE));
+                openedNamespaces.add(new NamespaceItem(fullName, Namespace.KIND_PACKAGE));
             } else {
-                importedClasses.add(imp);
+                if (isUse) {
+                    //Note: in this case, fullName attribute will be changed to real NS insude NamespaceItem
+                    openedNamespaces.add(new NamespaceItem(fullName, Namespace.KIND_NAMESPACE));
+                } else {
+                    importedClasses.add(fullName);
+                }
             }
 
             expected(s, lexer.yyline(), SymbolType.SEMICOLON);
@@ -2433,7 +2448,7 @@ public class ActionScript3Parser {
         return importedClasses;
     }
 
-    private List<GraphTargetItem> parseScript(int scriptIndex, String fileName) throws IOException, AVM2ParseException, CompilationException {
+    private List<GraphTargetItem> parseScript(List<List<NamespaceItem>> allOpenedNamespaces, int scriptIndex, String fileName) throws IOException, AVM2ParseException, CompilationException {
 
         //int scriptPrivateNs;
         if (fileName.contains("/")) {
@@ -2442,42 +2457,33 @@ public class ActionScript3Parser {
         if (fileName.contains("\\")) {
             fileName = fileName.substring(fileName.lastIndexOf('\\') + 1);
         }
-        /*String className = fileName;
-         if (className.endsWith(".as")) {
-         className = className.substring(0, className.length() - 3);
-         }*/
-        /*openedNamespaces.add(scriptPrivateNs = abcIndex.getSelectedAbc().constants.addNamespace(Namespace.KIND_PRIVATE, 0)); //abc.getLastAbc().constants.getStringId(name + ":" + className, true)
-
-         int publicNs;
-         openedNamespaces.add(publicNs = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE, "", 0, true));
-         */
         List<GraphTargetItem> items = new ArrayList<>();
-        scriptTraits(scriptIndex, fileName, items);
-        //FIXME traits(fileName, true, new ArrayList<>(), new Reference<>(false), new ArrayList<>(), new ArrayList<>(), scriptPrivateNs, 0, publicNs, 0, 0, openedNamespaces, null, null, false, items);
+        scriptTraits(allOpenedNamespaces, scriptIndex, fileName, items);
         return items;
     }
 
-    public List<GraphTargetItem> scriptTraitsFromString(String str, String fileName, int scriptIndex) throws AVM2ParseException, IOException, CompilationException {
+    public List<GraphTargetItem> scriptTraitsFromString(List<List<NamespaceItem>> allOpenedNamespaces, String str, String fileName, int scriptIndex) throws AVM2ParseException, IOException, CompilationException {
         lexer = new ActionScriptLexer(str);
 
-        List<GraphTargetItem> ret = parseScript(scriptIndex, fileName);
+        List<GraphTargetItem> ret = parseScript(allOpenedNamespaces, scriptIndex, fileName);
         if (lexer.lex().type != SymbolType.EOF) {
             throw new AVM2ParseException("Parsing finisned before end of the file", lexer.yyline());
         }
         return ret;
     }
 
-    public void addScriptFromTree(List<GraphTargetItem> items, boolean documentClass, int classPos) throws AVM2ParseException, CompilationException {
+    public void addScriptFromTree(List<List<NamespaceItem>> allOpenedNamespaces, List<GraphTargetItem> items, boolean documentClass, int classPos) throws AVM2ParseException, CompilationException {
         AVM2SourceGenerator gen = new AVM2SourceGenerator(abcIndex);
         SourceGeneratorLocalData localData = new SourceGeneratorLocalData(
                 new HashMap<>(), 0, Boolean.FALSE, 0);
         localData.documentClass = documentClass;
-        abcIndex.getSelectedAbc().script_info.add(gen.generateScriptInfo(localData, items, classPos));
+        abcIndex.getSelectedAbc().script_info.add(gen.generateScriptInfo(allOpenedNamespaces, localData, items, classPos));
     }
 
     public void addScript(String s, boolean documentClass, String fileName, int classPos, int scriptIndex) throws AVM2ParseException, IOException, CompilationException {
-        List<GraphTargetItem> traits = scriptTraitsFromString(s, fileName, scriptIndex);
-        addScriptFromTree(traits, documentClass, classPos);
+        List<List<NamespaceItem>> allOpenedNamespaces = new ArrayList<>();
+        List<GraphTargetItem> traits = scriptTraitsFromString(allOpenedNamespaces, s, fileName, scriptIndex);
+        addScriptFromTree(allOpenedNamespaces, traits, documentClass, classPos);
     }
 
     public ActionScript3Parser(ABC abc, List<ABC> otherAbcs) {

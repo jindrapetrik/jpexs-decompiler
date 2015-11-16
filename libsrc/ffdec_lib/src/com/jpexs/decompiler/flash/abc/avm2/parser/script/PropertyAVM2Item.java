@@ -44,6 +44,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -82,13 +84,13 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
         return writer;
     }
 
-    private int allNsSet(ABC abc) {
+    private int allNsSet(AbcIndexing abc) throws CompilationException {
         int[] nssa = new int[openedNamespaces.size()];
         for (int i = 0; i < nssa.length; i++) {
-            nssa[i] = openedNamespaces.get(i).getCpoolIndex(abc.constants);
+            nssa[i] = openedNamespaces.get(i).getCpoolIndex(abc);
         }
 
-        return abc.constants.getNamespaceSetId(nssa, true);
+        return abc.getSelectedAbc().constants.getNamespaceSetId(nssa, true);
     }
 
     public static GraphTargetItem multinameToType(int m_index, AVM2ConstantPool constants) {
@@ -108,7 +110,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
         }
     }
 
-    public void resolve(SourceGeneratorLocalData localData, Reference<GraphTargetItem> objectType, Reference<GraphTargetItem> propertyType, Reference<Integer> propertyIndex, Reference<ValueKind> propertyValue, Reference<ABC> propertyValueABC) {
+    public void resolve(boolean mustExist, SourceGeneratorLocalData localData, Reference<GraphTargetItem> objectType, Reference<GraphTargetItem> propertyType, Reference<Integer> propertyIndex, Reference<ValueKind> propertyValue, Reference<ABC> propertyValueABC) throws CompilationException {
         GraphTargetItem thisType = new TypeItem(localData.getFullClass());
         GraphTargetItem objType = null;
         GraphTargetItem objSubType = null;
@@ -219,7 +221,13 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                         Reference<GraphTargetItem> outPropType = new Reference<>(null);
                         Reference<ValueKind> outPropValue = new Reference<>(null);
                         Reference<ABC> outPropValueAbc = new Reference<>(null);
-                        if (AVM2SourceGenerator.searchPrototypeChain(localData.privateNs, localData.protectedNs, false, abcIndex, ftn.getWithoutLast(), ftn.getLast(), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc)) {
+                        List<Integer> otherNs = new ArrayList<>();
+                        for (NamespaceItem n : openedNamespaces) {
+                            if (n.isResolved()) {
+                                otherNs.add(n.getCpoolIndex(abcIndex));
+                            }
+                        }
+                        if (AVM2SourceGenerator.searchPrototypeChain(otherNs, localData.privateNs, localData.protectedNs, false, abcIndex, ftn.getWithoutLast(), ftn.getLast(), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc)) {
                             objType = new TypeItem(outNs.getVal().add(outName.getVal()));
                             propType = outPropType.getVal();
                             propIndex = constants.getMultinameId(Multiname.createQName(false,
@@ -252,7 +260,10 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                         if (objType == null) {
                             loopobjType:
                             for (int i = 0; i < openedNamespaces.size(); i++) {
-                                int nsindex = openedNamespaces.get(i).getCpoolIndex(constants);
+                                if (!openedNamespaces.get(i).isResolved()) {
+                                    continue;
+                                }
+                                int nsindex = openedNamespaces.get(i).getCpoolIndex(abcIndex);
 
                                 int nsKind = openedNamespaces.get(i).kind;
                                 DottedChain nsname = openedNamespaces.get(i).name;
@@ -317,7 +328,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                     }
                                 }
                                 if (nsKind == Namespace.KIND_PACKAGE && propertyName != null) {
-                                    AbcIndexing.TraitIndex p = abcIndex.findNsProperty(new AbcIndexing.PropertyNsDef(propertyName, nsname, abc, openedNamespaces.get(i).getCpoolIndex(constants)), true, true);
+                                    AbcIndexing.TraitIndex p = abcIndex.findNsProperty(new AbcIndexing.PropertyNsDef(propertyName, nsname, abc, openedNamespaces.get(i).getCpoolIndex(abcIndex)), true, true);
 
                                     Reference<String> outName = new Reference<>("");
                                     Reference<DottedChain> outNs = new Reference<>(DottedChain.EMPTY);
@@ -328,7 +339,13 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                     Reference<ValueKind> outPropValue = new Reference<>(null);
                                     Reference<ABC> outPropValueAbc = new Reference<>(null);
                                     if (p != null && (p.objType instanceof TypeItem)) {
-                                        if (AVM2SourceGenerator.searchPrototypeChain(localData.privateNs, localData.protectedNs, false, abcIndex, nsname, (((TypeItem) p.objType).fullTypeName.getLast()), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc)) {
+                                        List<Integer> otherns = new ArrayList<>();
+                                        for (NamespaceItem n : openedNamespaces) {
+                                            if (n.isResolved()) {
+                                                otherns.add(n.getCpoolIndex(abcIndex));
+                                            }
+                                        }
+                                        if (AVM2SourceGenerator.searchPrototypeChain(otherns, localData.privateNs, localData.protectedNs, false, abcIndex, nsname, (((TypeItem) p.objType).fullTypeName.getLast()), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc)) {
                                             objType = new TypeItem(outNs.getVal().add(outName.getVal()));
                                             propType = p.returnType;
                                             propIndex = constants.getMultinameId(Multiname.createQName(false,
@@ -353,7 +370,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
             }
         }
 
-        if (propIndex == 0) {
+        if (propIndex == 0 && !mustExist) {
             String pname = propertyName;
             boolean attr = pname.startsWith("@");
             if (attr) {
@@ -365,7 +382,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                         constants.getNamespaceSetId(new int[]{constants.getNamespaceId(Namespace.KIND_PACKAGE_INTERNAL, localData.pkg, 0, true)}, true));
             } else {
                 int name_index = constants.getStringId("*".equals(pname) ? null : pname, true); //Note: name = * is for .@* attribute
-                multiname = Multiname.createMultiname(attr, name_index, allNsSet(abc));
+                multiname = Multiname.createMultiname(attr, name_index, allNsSet(abcIndex));
             }
             propIndex = constants.getMultinameId(multiname, true);
             propType = TypeItem.UNBOUNDED;
@@ -381,13 +398,13 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
         objectType.setVal(objType);
     }
 
-    public int resolveProperty(SourceGeneratorLocalData localData) {
+    public int resolveProperty(SourceGeneratorLocalData localData) throws CompilationException {
         Reference<GraphTargetItem> objType = new Reference<>(null);
         Reference<GraphTargetItem> propType = new Reference<>(null);
         Reference<Integer> propIndex = new Reference<>(0);
         Reference<ValueKind> outPropValue = new Reference<>(null);
         Reference<ABC> outPropValueAbc = new Reference<>(null);
-        resolve(localData, objType, propType, propIndex, outPropValue, outPropValueAbc);
+        resolve(false, localData, objType, propType, propIndex, outPropValue, outPropValueAbc);
         return propIndex.getVal();
     }
 
@@ -552,15 +569,20 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
      }*/
     @Override
     public GraphTargetItem returnType() {
+
         Reference<GraphTargetItem> objType = new Reference<>(null);
         Reference<GraphTargetItem> propType = new Reference<>(null);
         Reference<Integer> propIndex = new Reference<>(0);
         Reference<ValueKind> outPropValue = new Reference<>(null);
         Reference<ABC> outPropValueAbc = new Reference<>(null);
+        try {
+            resolve(false, new SourceGeneratorLocalData(new HashMap<>(), 0, false, 0)/*???*/, objType, propType, propIndex, outPropValue, outPropValueAbc);
 
-        resolve(new SourceGeneratorLocalData(new HashMap<>(), 0, false, 0)/*???*/, objType, propType, propIndex, outPropValue, outPropValueAbc);
-
-        return propType.getVal();
+            return propType.getVal();
+        } catch (CompilationException ex) {
+            Logger.getLogger(PropertyAVM2Item.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
 
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator, boolean needsReturn) throws CompilationException {
@@ -571,7 +593,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
         Reference<ValueKind> outPropValue = new Reference<>(null);
         Reference<ABC> outPropValueAbc = new Reference<>(null);
 
-        resolve(localData, objType, propType, propIndex, outPropValue, outPropValueAbc);
+        resolve(false, localData, objType, propType, propIndex, outPropValue, outPropValueAbc);
 
         int propertyId = propIndex.getVal();
         Object obj = resolveObject(localData, generator);
@@ -620,7 +642,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
         return true;
     }
 
-    public Object resolveObject(SourceGeneratorLocalData localData, SourceGenerator generator) {
+    public Object resolveObject(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         Object obj = object;
 
         if (obj == null) {
@@ -638,7 +660,13 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
             /*List<ABC> abcs = new ArrayList<>();
              abcs.add(abc);
              abcs.addAll(otherABCs);*/
-            if (!localData.subMethod && cname != null && AVM2SourceGenerator.searchPrototypeChain(localData.privateNs, localData.protectedNs, true, abcIndex, pkgName, cname, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc) && (localData.getFullClass().equals(outNs.getVal().add(outName.getVal()).toRawString()))) {
+            List<Integer> otherNs = new ArrayList<>();
+            for (NamespaceItem n : openedNamespaces) {
+                if (n.isResolved()) {
+                    otherNs.add(n.getCpoolIndex(abcIndex));
+                }
+            }
+            if (!localData.subMethod && cname != null && AVM2SourceGenerator.searchPrototypeChain(otherNs, localData.privateNs, localData.protectedNs, true, abcIndex, pkgName, cname, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc) && (localData.getFullClass().equals(outNs.getVal().add(outName.getVal()).toRawString()))) {
                 NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.getFullClass()), 0, "this", null, false, openedNamespaces);
                 nobj.setRegNumber(0);
                 obj = nobj;
@@ -649,7 +677,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                 Reference<ValueKind> propValue = new Reference<>(null);
                 Reference<ABC> propValueAbc = new Reference<>(null);
 
-                resolve(localData, objType, propType, propIndex, outPropValue, propValueAbc);
+                resolve(false, localData, objType, propType, propIndex, outPropValue, propValueAbc);
                 obj = ins(AVM2Instructions.FindPropertyStrict, propIndex.getVal());
             }
         }
@@ -665,7 +693,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
         Reference<ValueKind> outPropValue = new Reference<>(null);
         Reference<ABC> outPropValueAbc = new Reference<>(null);
 
-        resolve(localData, objType, propType, propIndex, outPropValue, outPropValueAbc);
+        resolve(false, localData, objType, propType, propIndex, outPropValue, outPropValueAbc);
 
         int propertyId = propIndex.getVal();
         Object obj = resolveObject(localData, generator);
