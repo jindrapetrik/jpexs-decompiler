@@ -48,8 +48,13 @@ public class EcmaScript {
             return (double) (int) (Integer) o;
         }
         if (o instanceof String) {
+            String str = (String) o;
+            if (str.isEmpty()) {
+                return 0.0;
+            }
+
             try {
-                return Double.parseDouble((String) o);
+                return Double.parseDouble(str);
             } catch (NumberFormatException nfe) {
                 return Double.NaN;
             }

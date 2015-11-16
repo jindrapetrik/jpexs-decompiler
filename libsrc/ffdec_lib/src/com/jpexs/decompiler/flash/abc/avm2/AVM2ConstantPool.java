@@ -122,6 +122,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     public synchronized int addInt(long value) {
         ensureDefault(constant_int);
+        value = (int) value;
         constant_int.add(value);
         return constant_int.size() - 1;
     }
@@ -150,6 +151,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     public synchronized int addUInt(long value) {
         ensureDefault(constant_uint);
+        value &= 0xffffffffl;
         constant_uint.add(value);
         return constant_uint.size() - 1;
     }
