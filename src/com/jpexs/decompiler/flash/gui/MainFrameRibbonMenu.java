@@ -36,6 +36,7 @@ import org.pushingpixels.flamingo.api.common.CommandToggleButtonGroup;
 import org.pushingpixels.flamingo.api.common.JCommandButton;
 import org.pushingpixels.flamingo.api.common.JCommandButtonPanel;
 import org.pushingpixels.flamingo.api.common.JCommandToggleButton;
+import org.pushingpixels.flamingo.api.common.RichTooltip;
 import org.pushingpixels.flamingo.api.common.popup.JPopupPanel;
 import org.pushingpixels.flamingo.api.common.popup.PopupPanelCallback;
 import org.pushingpixels.flamingo.api.ribbon.AbstractRibbonBand;
@@ -66,8 +67,6 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
     private final Map<String, String> menuTitles = new HashMap<>();
 
     private final Map<String, String> menuIcons = new HashMap<>();
-
-    private final Map<String, ActionListener> menuActions = new HashMap<>();
 
     private final Map<String, ActionListener> menuLoaders = new HashMap<>();
 
@@ -268,15 +267,19 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
             String subTitle = menuTitles.get(sub);
             String subIcon = menuIcons.get(sub);
             String subGroup = menuGroup.get(sub);
+            HotKey subKey = menuHotkeys.get(sub);
             int subPriority = menuPriorities.get(sub);
             final ActionListener subLoader = menuLoaders.get(sub);
             AbstractCommandButton but = null;
             if (subType == TYPE_MENUITEM || (subType == TYPE_MENU && subAction != null)) {
-                JCommandButton cbut = null;
+                JCommandButton cbut;
                 if (subIcon != null) {
                     cbut = new JCommandButton(fixCommandTitle(subTitle), View.getResizableIcon(subIcon, subPriority == PRIORITY_TOP ? 32 : 16));
                 } else {
                     cbut = new JCommandButton(fixCommandTitle(subTitle));
+                }
+                if (subKey != null) {
+                    //cbut.setActionRichTooltip(new RichTooltip(subTitle, subKey.toString()));                    
                 }
                 if (subLoader != null) {
                     cbut.setCommandButtonKind(JCommandButton.CommandButtonKind.ACTION_AND_POPUP_MAIN_ACTION);
@@ -410,11 +413,12 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
     }
 
     @Override
-    public void addMenuItem(String path, String title, String icon, ActionListener action, int priority, ActionListener subLoader, boolean isLeaf) {
+    public void addMenuItem(String path, String title, String icon, ActionListener action, int priority, ActionListener subLoader, boolean isLeaf, HotKey key) {
         String parentPath = path.contains("/") ? path.substring(0, path.lastIndexOf('/')) : "";
         if (!menuSubs.containsKey(parentPath)) {
             throw new IllegalArgumentException("No parent menu exists: " + parentPath);
         }
+        menuHotkeys.put(path, key);
         menuSubs.get(parentPath).add(path);
         if (!isLeaf) {
             menuSubs.put(path, new ArrayList<>());
@@ -428,8 +432,8 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
     }
 
     @Override
-    public void addToggleMenuItem(String path, String title, String group, String icon, ActionListener action, int priority) {
-        addMenuItem(path, title, icon, action, priority, action, true);
+    public void addToggleMenuItem(String path, String title, String group, String icon, ActionListener action, int priority, HotKey key) {
+        addMenuItem(path, title, icon, action, priority, action, true, key);
         menuType.put(path, TYPE_TOGGLEMENUITEM);
         menuGroup.put(path, group);
         if (group == null) {
@@ -556,4 +560,5 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
     public boolean supportsAppMenu() {
         return true;
     }
+
 }

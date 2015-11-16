@@ -28,6 +28,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
+import javax.swing.KeyStroke;
 import javax.swing.MenuElement;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
@@ -97,8 +98,11 @@ public class MainFrameClassicMenu extends MainFrameMenu {
     }
 
     @Override
-    public void addMenuItem(String path, String title, String icon, ActionListener action, int priority, final ActionListener subLoader, boolean isLeaf) {
+    public void addMenuItem(String path, String title, String icon, ActionListener action, int priority, final ActionListener subLoader, boolean isLeaf, HotKey key) {
         path = mapping(path);
+
+        menuHotkeys.put(path, key);
+        menuActions.put(path, action);
 
         if (!isLeaf) {
             //action is ignored
@@ -123,6 +127,9 @@ public class MainFrameClassicMenu extends MainFrameMenu {
         if (action != null) {
             menuItem.addActionListener(action);
         }
+        if (key != null) {
+            menuItem.setAccelerator(KeyStroke.getKeyStroke(key.key, key.getModifier()));
+        }
         if (parentMenu instanceof JMenu) {
             ((JMenu) parentMenu).add(menuItem);
         } else {
@@ -132,8 +139,10 @@ public class MainFrameClassicMenu extends MainFrameMenu {
     }
 
     @Override
-    public void addToggleMenuItem(String path, String title, String group, String icon, ActionListener action, int priority) {
+    public void addToggleMenuItem(String path, String title, String group, String icon, ActionListener action, int priority, HotKey key) {
         path = mapping(path);
+        menuHotkeys.put(path, key);
+
         String parentPath = "";
         if (path.contains("/")) {
             parentPath = path.substring(0, path.lastIndexOf('/'));
