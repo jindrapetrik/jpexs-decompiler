@@ -84,6 +84,7 @@ import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
 import com.jpexs.decompiler.flash.gui.dumpview.DumpTree;
 import com.jpexs.decompiler.flash.gui.dumpview.DumpTreeModel;
 import com.jpexs.decompiler.flash.gui.dumpview.DumpViewPanel;
+import com.jpexs.decompiler.flash.gui.editor.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.gui.helpers.ObservableList;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTree;
@@ -1539,10 +1540,16 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     }
 
+    public void refreshBreakPoints() {
+        if (abcPanel != null) {
+            abcPanel.decompiledTextArea.refreshBreakPoints();
+        }
+    }
+
     public void debuggerBreakAt(SWF swf, String cls, int line) {
         gotoClassLine(swf, cls, line);
         if (abcPanel != null) {
-            abcPanel.decompiledTextArea.setLineColor(line - 1, Color.green);
+            abcPanel.decompiledTextArea.addColorMarker(line, DecompiledEditorPane.FG_IP_COLOR, DecompiledEditorPane.BG_IP_COLOR);
         }
     }
 
@@ -2806,7 +2813,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public void clearDebuggerColors() {
         if (abcPanel != null) {
-            abcPanel.decompiledTextArea.clearLineColors();
+            abcPanel.decompiledTextArea.removeColorMarkerOnAllLines(DecompiledEditorPane.FG_IP_COLOR, DecompiledEditorPane.BG_IP_COLOR);
         }
     }
 

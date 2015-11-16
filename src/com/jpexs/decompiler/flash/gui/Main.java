@@ -34,6 +34,7 @@ import com.jpexs.decompiler.flash.SWFSourceInfo;
 import com.jpexs.decompiler.flash.SearchMode;
 import com.jpexs.decompiler.flash.SwfOpenException;
 import com.jpexs.decompiler.flash.Version;
+import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.SwfSpecificConfiguration;
@@ -90,10 +91,14 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.WeakHashMap;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.ConsoleHandler;
@@ -152,6 +157,91 @@ public class Main {
     private static Debugger flashDebugger;
 
     private static DebuggerHandler debugHandler = null;
+
+    private static Map<ScriptPack, Set<Integer>> breakPointMap = new WeakHashMap<>();
+    private static Map<ScriptPack, Set<Integer>> invalidBreakPointMap = new WeakHashMap<>();
+
+    public static void clearBreakPoints(ScriptPack pack) {
+        if (breakPointMap.containsKey(pack)) {
+            breakPointMap.remove(pack);
+        }
+    }
+
+    public static boolean isBreakPointValid(ScriptPack pack, int line) {
+        if (!invalidBreakPointMap.containsKey(pack)) {
+            return true;
+        }
+        return !invalidBreakPointMap.get(pack).contains(line);
+
+    }
+
+    public static void markBreakPointInvalid(ScriptPack pack, int line) {
+        if (!invalidBreakPointMap.containsKey(pack)) {
+            invalidBreakPointMap.put(pack, new TreeSet<>());
+        }
+        invalidBreakPointMap.get(pack).add(line);
+    }
+
+    public static void addBreakPoint(ScriptPack pack, int line) {
+        if (!breakPointMap.containsKey(pack)) {
+            breakPointMap.put(pack, new TreeSet<>());
+        }
+        breakPointMap.get(pack).add(line);
+        if (debugHandler.isConnected()) {
+            int file = debugHandler.moduleIdOf(pack);
+            if (file > -1) {
+                try {
+                    if (!debugHandler.getCommands().addBreakPoint(file, line)) {
+                        markBreakPointInvalid(pack, line);
+                    }
+                } catch (IOException ex) {
+                    debugHandler.disconnect();
+                    //ignore
+                }
+            }
+        }
+    }
+
+    public static void removeBreakPoint(ScriptPack pack, int line) {
+        if (breakPointMap.containsKey(pack)) {
+            Set<Integer> lines = breakPointMap.get(pack);
+            if (lines != null) {
+                lines.remove(line);
+            }
+        }
+        if (debugHandler.isConnected()) {
+            int file = debugHandler.moduleIdOf(pack);
+            if (file > -1) {
+                try {
+                    debugHandler.getCommands().removeBreakPoint(file, line);
+                } catch (IOException ex) {
+                    debugHandler.disconnect();
+                    //ignore
+                }
+            }
+        }
+    }
+
+    public static boolean toggleBreakPoint(ScriptPack pack, int line) {
+        if (!breakPointMap.containsKey(pack)) {
+            addBreakPoint(pack, line);
+            return true;
+        }
+        if (breakPointMap.get(pack).contains(line)) {
+            removeBreakPoint(pack, line);
+            return false;
+        } else {
+            addBreakPoint(pack, line);
+            return true;
+        }
+    }
+
+    public static Set<Integer> getPackBreakPoints(ScriptPack pack) {
+        if (!breakPointMap.containsKey(pack)) {
+            return new HashSet<>();
+        }
+        return breakPointMap.get(pack);
+    }
 
     public static DebuggerHandler getDebugHandler() {
         return debugHandler;
@@ -1465,7 +1555,7 @@ public class Main {
             String proxyAddress = Configuration.updateProxyAddress.get();
             URL url = new URL(ApplicationInfo.updateCheckUrl);
 
-            URLConnection uc = null;
+            URLConnection uc;
             if (proxyAddress != null && !proxyAddress.isEmpty()) {
                 int port = 8080;
                 if (proxyAddress.contains(":")) {

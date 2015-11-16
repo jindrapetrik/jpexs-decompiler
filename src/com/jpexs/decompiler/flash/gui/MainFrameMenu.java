@@ -1097,6 +1097,9 @@ public abstract class MainFrameMenu implements MenuBuilder {
         }
         runProcess = null;
         mainFrame.getPanel().clearDebuggerColors();
+        if (runProcessDebug) {
+            Main.getDebugHandler().disconnect();
+        }
     }
 
     private void runPlayer(String exePath, String file, String flashVars) {
@@ -1124,8 +1127,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
                     proc.waitFor();
 
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(MainFrameMenu.class
-                            .getName()).log(Level.SEVERE, null, ex);
+                    //ignore
                 }
                 freeRun();
                 updateComponents();
@@ -1232,46 +1234,67 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     public boolean pauseActionPerformed(ActionEvent evt) {
-        DebuggerCommands cmd = Main.getDebugHandler().getCommands();
-        if (cmd != null) {
+        try {
+            DebuggerCommands cmd = Main.getDebugHandler().getCommands();
             //TODO
+
+        } catch (IOException ex) {
+            Main.getDebugHandler().disconnect();
+            //ignore
         }
         return true;
     }
 
     public boolean stepOverActionPerformed(ActionEvent evt) {
-        DebuggerCommands cmd = Main.getDebugHandler().getCommands();
-        if (cmd != null) {
+        try {
+
+            DebuggerCommands cmd = Main.getDebugHandler().getCommands();
             mainFrame.getPanel().clearDebuggerColors();
             cmd.stepOver();
+        } catch (IOException ex) {
+            Main.getDebugHandler().disconnect();
+            //ignore
         }
         return true;
     }
 
     public boolean stepIntoActionPerformed(ActionEvent evt) {
-        DebuggerCommands cmd = Main.getDebugHandler().getCommands();
-        if (cmd != null) {
+        try {
+            DebuggerCommands cmd = Main.getDebugHandler().getCommands();
             mainFrame.getPanel().clearDebuggerColors();
             cmd.stepInto();
+        } catch (IOException ex) {
+            Main.getDebugHandler().disconnect();
+            //ignore
         }
+
         return true;
     }
 
     public boolean stepOutActionPerformed(ActionEvent evt) {
-        DebuggerCommands cmd = Main.getDebugHandler().getCommands();
-        if (cmd != null) {
+        try {
+            DebuggerCommands cmd = Main.getDebugHandler().getCommands();
             mainFrame.getPanel().clearDebuggerColors();
+
             cmd.stepOut();
+        } catch (IOException ex) {
+            Main.getDebugHandler().disconnect();
+            //ignore
         }
+
         return true;
     }
 
     public boolean continueActionPerformed(ActionEvent evt) {
-        DebuggerCommands cmd = Main.getDebugHandler().getCommands();
-        if (cmd != null) {
+        try {
+            DebuggerCommands cmd = Main.getDebugHandler().getCommands();
             mainFrame.getPanel().clearDebuggerColors();
             cmd.sendContinue();
+        } catch (IOException ex) {
+            Main.getDebugHandler().disconnect();
+            //ignore
         }
+
         return true;
     }
 

@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui.editor;
 
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.Reference;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import java.awt.Color;
@@ -32,8 +33,11 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.plaf.TextUI;
@@ -44,10 +48,17 @@ import javax.swing.text.Element;
 import javax.swing.text.Highlighter.HighlightPainter;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.Position;
+import javax.swing.text.Segment;
+import javax.swing.text.TabExpander;
 import javax.swing.text.View;
+import jsyntaxpane.DefaultSyntaxKit;
 import jsyntaxpane.SyntaxDocument;
+import jsyntaxpane.SyntaxStyle;
 import jsyntaxpane.Token;
 import jsyntaxpane.actions.ActionUtils;
+import jsyntaxpane.components.BreakPointListener;
+import jsyntaxpane.components.LineNumbersRuler;
+import jsyntaxpane.components.Markers;
 
 /**
  *
@@ -56,6 +67,9 @@ import jsyntaxpane.actions.ActionUtils;
 public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHandler {
 
     private static final int truncateLimit = 2 * 1024 * 1024;
+
+    public static final Color BG_SELECTED_LINE = new Color(0xe9, 0xef, 0xf8);
+    public static final Color BG_ERROR_LINE = new Color(255, 200, 200);
 
     private int lastLine = -1;
 
@@ -67,17 +81,109 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
 
     private LinkHandler linkHandler = this;
 
-    private Map<Integer, Color> lineColors = new HashMap<>();
+    public static class LineMarker {
+
+        private Color bgColor;
+        private Color color;
+        private FgPainter fgPainter;
+        private int line;
+
+        public FgPainter getForegroundPainter() {
+            return fgPainter;
+        }
+
+        public LineMarker(int line, Color color, Color bgColor) {
+            this.line = line;
+            this.bgColor = bgColor;
+            this.color = color;
+            if (color != null) {
+                this.fgPainter = new FgPainter(color, bgColor);
+            }
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 5;
+            hash = 17 * hash + Objects.hashCode(this.bgColor);
+            hash = 17 * hash + Objects.hashCode(this.color);
+            hash = 17 * hash + this.line;
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final LineMarker other = (LineMarker) obj;
+            if (!Objects.equals(this.bgColor, other.bgColor)) {
+                return false;
+            }
+            if (!Objects.equals(this.color, other.color)) {
+                return false;
+            }
+            return this.line == other.line;
+        }
+
+        public Color getBgColor() {
+            return bgColor;
+        }
+
+        public Color getColor() {
+            return color;
+        }
+
+    }
+
+    private Map<Integer, List<LineMarker>> lineMarkers = new HashMap<>();
+
+    public void setLineMarkers(Map<Integer, List<LineMarker>> colorMarkers) {
+        this.lineMarkers = colorMarkers;
+    }
 
     public void clearLineColors() {
-        lineColors.clear();
+        lineMarkers.clear();
         repaint();
     }
 
-    public void setLineColor(int line, Color color) {
-        lineColors.remove(line);
-        if (color != null) {
-            lineColors.put(line, color);
+    public void removeColorMarker(int line, Color color, Color bgColor) {
+        if (lineMarkers.containsKey(line)) {
+            LineMarker lm = new LineMarker(line, color, bgColor);
+            lineMarkers.get(line).remove(lm);
+        }
+        repaint();
+    }
+
+    public void removeColorMarkerOnAllLines(Color color, Color bgColor) {
+        for (int line : lineMarkers.keySet()) {
+            removeColorMarker(line, color, bgColor);
+        }
+    }
+
+    public void toggleColorMarker(int line, Color color, Color bgColor) {
+        if (!lineMarkers.containsKey(line)) {
+            addColorMarker(line, color, bgColor);
+        } else {
+            if (lineMarkers.get(line).contains(color)) {
+                removeColorMarker(line, color, bgColor);
+            } else {
+                addColorMarker(line, color, bgColor);
+            }
+        }
+        repaint();
+    }
+
+    public void addColorMarker(int line, Color color, Color bgColor) {
+        if (!lineMarkers.containsKey(line)) {
+            lineMarkers.put(line, new ArrayList<>());
+
+        }
+        LineMarker marker = new LineMarker(line, color, bgColor);
+        if (!lineMarkers.get(line).contains(marker)) {
+            lineMarkers.get(line).add(marker);
         }
         repaint();
     }
@@ -94,7 +200,7 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
         setCaretPosition(ActionUtils.getDocumentPosition(this, line, 0));
     }
 
-    public void selectLine(int line) {
+    private void getLineBounds(int line, Reference<Integer> lineStart, Reference<Integer> lineEnd) {
         Document d = getDocument();
         String text = "";
         try {
@@ -103,27 +209,35 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
             //ignore
         }
         int lineCnt = 1;
-        int lineStart = 0;
-        int lineEnd = -1;
+        int lineStartVal = 0;
+        int lineEndVal = -1;
         for (int i = 0; i < text.length(); i++) {
             if (text.charAt(i) == '\n') {
                 lineCnt++;
                 if (lineCnt == line) {
-                    lineStart = i + 1;
+                    lineStartVal = i + 1;
                 }
                 if (lineCnt == line + 1) {
-                    lineEnd = i;
+                    lineEndVal = i;
                 }
             }
         }
         if (lineCnt == 1) {
-            lineEnd = text.length() - 1;
+            lineEndVal = text.length() - 1;
             if (line > 1) {
-                lineStart = text.length() - 1;
+                lineStartVal = text.length() - 1;
             }
         }
+        lineEnd.setVal(lineEndVal);
+        lineStart.setVal(lineStartVal);
+    }
 
-        select(lineStart, lineEnd);
+    public void selectLine(int line) {
+        Reference<Integer> lineStart = new Reference<>(0);
+        Reference<Integer> lineEnd = new Reference<>(0);
+        getLineBounds(line, lineStart, lineEnd);
+
+        select(lineStart.getVal(), lineEnd.getVal());
         requestFocus();
     }
 
@@ -287,15 +401,101 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
 
     }
 
+    public void setText(String t, Map<Integer, List<LineMarker>> lineMarkers) {
+        setText(t);
+        this.lineMarkers = lineMarkers;
+        repaint();
+    }
+
     @Override
     public void setText(String t) {
+        this.lineMarkers = new HashMap<>();
         lastLine = -1;
         error = false;
         if (Configuration.debugMode.get() && t != null && t.length() > truncateLimit) {
             t = t.substring(0, truncateLimit) + "\r\n" + AppStrings.translate("editorTruncateWarning").replace("%chars%", Integer.toString(truncateLimit));
         }
         super.setText(t);
-        setCaretPosition(0); //scroll to top
+        setCaretPosition(0); //scroll to top            
+    }
+
+    public static class FgPainter extends DefaultHighlighter.DefaultHighlightPainter {
+
+        private SyntaxStyle fgStyle;
+
+        public FgPainter(Color color, Color bgColor) {
+            super(bgColor);
+            this.fgStyle = new SyntaxStyle(color, false, false);
+        }
+
+        @Override
+        public void paint(Graphics g, int offs0, int offs1, Shape bounds, JTextComponent c) {
+            try {
+                // --- determine locations ---
+                TextUI mapper = c.getUI();
+
+                Segment seg = new Segment();
+                ((SyntaxDocument) c.getDocument()).getText(offs0, offs1 - offs0, seg);
+
+                Rectangle r = mapper.modelToView(c, offs0, Position.Bias.Forward);
+                FontMetrics fm = g.getFontMetrics();
+                //int fh = fm.getHeight();
+                fgStyle.drawText(seg, r.x, r.y + fm.getAscent(), g, null, offs0);
+                /*for (int i = offs0; i < offs1; i++) {
+
+                 Rectangle r = mapper.modelToView(c, i, Position.Bias.Forward);
+                 Rectangle r1 = mapper.modelToView(c, i + 1, Position.Bias.Forward);
+                 if (r1.y == r.y) {
+                 ((SyntaxDocument) c.getDocument()).getText(i, 1, seg);
+                 fgStyle.drawText(seg, r.x, r.y, g, null, i);
+                 //g.drawLine(r.x, r.y + r.height - 3, r1.x, r.y + r.height - 3);
+                 }
+                 }*/
+
+            } catch (BadLocationException e) {
+                // can't render
+            }
+        }
+
+        @Override
+        public Shape paintLayer(Graphics g, int offs0, int offs1,
+                Shape bounds, JTextComponent c, View view) {
+
+            g.setColor(c.getSelectionColor());
+
+            Rectangle r;
+
+            if (offs0 == view.getStartOffset()
+                    && offs1 == view.getEndOffset()) {
+                // Contained in view, can just use bounds.
+                if (bounds instanceof Rectangle) {
+                    r = (Rectangle) bounds;
+                } else {
+                    r = bounds.getBounds();
+                }
+            } else {
+                // Should only render part of View.
+                try {
+                    // --- determine locations ---
+                    Shape shape = view.modelToView(offs0, Position.Bias.Forward,
+                            offs1, Position.Bias.Backward,
+                            bounds);
+                    r = (shape instanceof Rectangle)
+                            ? (Rectangle) shape : shape.getBounds();
+                } catch (BadLocationException e) {
+                    // can't render
+                    r = null;
+                }
+            }
+
+            if (r != null) {
+                r.width = Math.max(r.width, 1);
+
+                paint(g, offs0, offs1, r, c);
+            }
+
+            return r;
+        }
     }
 
     public static class UnderLinePainter extends DefaultHighlighter.DefaultHighlightPainter {
@@ -381,16 +581,38 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
 
         if (lastLine > 0) {
             if (error) {
-                g.setColor(new Color(255, 200, 200));
+                g.setColor(BG_ERROR_LINE);
             } else {
-                g.setColor(new Color(0xee, 0xee, 0xee));
+                g.setColor(BG_SELECTED_LINE);
             }
             g.fillRect(0, d + lh * lastLine - 1, getWidth(), lh);
         }
-        for (int line : lineColors.keySet()) {
-            g.setColor(lineColors.get(line));
-            g.fillRect(0, d + lh * line - 1, getWidth(), lh);
+        for (int line : lineMarkers.keySet()) {
+            List<LineMarker> cs = lineMarkers.get(line);
+            if (cs.isEmpty()) {
+                continue;
+            }
+            LineMarker lastMarker = cs.get(cs.size() - 1);
+            if (lastMarker.getBgColor() == null) {
+                continue;
+            }
+            g.setColor(lastMarker.getBgColor());
+            g.fillRect(0, d + lh * (line - 1), getWidth(), lh);
         }
         super.paint(g);
+        for (int line : lineMarkers.keySet()) {
+            List<LineMarker> cs = lineMarkers.get(line);
+            if (cs.isEmpty()) {
+                continue;
+            }
+            Reference<Integer> lineStart = new Reference<>(0);
+            Reference<Integer> lineEnd = new Reference<>(0);
+            getLineBounds(line, lineStart, lineEnd);
+            FgPainter fgp = cs.get(cs.size() - 1).getForegroundPainter();
+            if (fgp != null) {
+                fgp.paint(g, lineStart.getVal(), lineEnd.getVal(), null, this);
+            }
+        }
     }
+
 }

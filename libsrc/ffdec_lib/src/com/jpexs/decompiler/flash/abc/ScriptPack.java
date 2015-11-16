@@ -281,7 +281,7 @@ public class ScriptPack extends AS3ClassTreeItem {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 79 * hash + Objects.hashCode(abc);
+        hash = 79 * hash + System.identityHashCode(abc);
         hash = 79 * hash + scriptIndex;
         hash = 79 * hash + Objects.hashCode(path);
         return hash;
@@ -296,7 +296,7 @@ public class ScriptPack extends AS3ClassTreeItem {
             return false;
         }
         final ScriptPack other = (ScriptPack) obj;
-        if (!Objects.equals(abc, other.abc)) {
+        if (abc != other.abc) {
             return false;
         }
         if (scriptIndex != other.scriptIndex) {
@@ -325,58 +325,61 @@ public class ScriptPack extends AS3ClassTreeItem {
             String txt = decompiled.text;
             txt = txt.replace("\r", "");
             for (int i = 0; i < txt.length(); i++) {
+                blk:
+                {
+                    Highlighting cls = Highlighting.searchPos(decompiled.classHilights, i);
+                    /*if (cls == null) {
+                     continue;
+                     }*/
+                    Highlighting trt = Highlighting.searchPos(decompiled.traitHilights, i);
+                    /*if (trt == null) {
+                     continue;
+                     }*/
+                    Highlighting method = Highlighting.searchPos(decompiled.methodHilights, i);
+                    if (method == null) {
+                        break blk;
+                    }
+                    Highlighting instr = Highlighting.searchPos(decompiled.instructionHilights, i);
+                    /*if (instr == null) {
+                     continue;
+                     }*/
+                    int classIndex = cls == null ? -1 : (int) cls.getProperties().index;
+                    int methodIndex = (int) method.getProperties().index;
+                    int bodyIndex = abc.findBodyIndex(methodIndex);
+                    if (bodyIndex == -1) {
+                        break blk;
+                    }
+                    int pos = -1;
+                    if (instr != null) {
+                        long instrOffset = instr.getProperties().offset;
+                        if (trt != null && cls != null) {
+                            int traitIndex = (int) trt.getProperties().index;
+
+                            Trait trait = abc.findTraitByTraitId(classIndex, traitIndex);
+                            if (((trait instanceof TraitMethodGetterSetter) && (((TraitMethodGetterSetter) trait).method_info != methodIndex))
+                                    || ((trait instanceof TraitFunction) && (((TraitFunction) trait).method_info != methodIndex))) {
+                                continue; //inner anonymous function - ignore. TODO: make work
+                            }
+                        }
+
+                        try {
+                            pos = abc.bodies.get(bodyIndex).getCode().adr2pos(instrOffset);
+                        } catch (ConvertException cex) {
+                            //ignore
+                        }
+                        if (pos == -1) {
+                            break blk;
+                        }
+                        if (!bodyToPosToLine.containsKey(bodyIndex)) {
+                            bodyToPosToLine.put(bodyIndex, new HashMap<>());
+                        }
+                        bodyToPosToLine.get(bodyIndex).put(pos, line);
+                    } else {
+                        lonelyBody.add(bodyIndex);
+                    }
+                }
                 if (txt.charAt(i) == '\n') {
                     line++;
-                }
-                Highlighting cls = Highlighting.searchPos(decompiled.classHilights, i);
-                /*if (cls == null) {
-                 continue;
-                 }*/
-                Highlighting trt = Highlighting.searchPos(decompiled.traitHilights, i);
-                /*if (trt == null) {
-                 continue;
-                 }*/
-                Highlighting method = Highlighting.searchPos(decompiled.methodHilights, i);
-                if (method == null) {
-                    continue;
-                }
-                Highlighting instr = Highlighting.searchPos(decompiled.instructionHilights, i);
-                /*if (instr == null) {
-                 continue;
-                 }*/
-                int classIndex = cls == null ? -1 : (int) cls.getProperties().index;
-                int methodIndex = (int) method.getProperties().index;
-                int bodyIndex = abc.findBodyIndex(methodIndex);
-                if (bodyIndex == -1) {
-                    continue;
-                }
-                int pos = -1;
-                if (instr != null) {
-                    long instrOffset = instr.getProperties().offset;
-                    if (trt != null && cls != null) {
-                        int traitIndex = (int) trt.getProperties().index;
-
-                        Trait trait = abc.findTraitByTraitId(classIndex, traitIndex);
-                        if (((trait instanceof TraitMethodGetterSetter) && (((TraitMethodGetterSetter) trait).method_info != methodIndex))
-                                || ((trait instanceof TraitFunction) && (((TraitFunction) trait).method_info != methodIndex))) {
-                            continue; //inner anonymous function - ignore. TODO: make work
-                        }
-                    }
-
-                    try {
-                        pos = abc.bodies.get(bodyIndex).getCode().adr2pos(instrOffset);
-                    } catch (ConvertException cex) {
-                        //ignore
-                    }
-                    if (pos == -1) {
-                        continue;
-                    }
-                    if (!bodyToPosToLine.containsKey(bodyIndex)) {
-                        bodyToPosToLine.put(bodyIndex, new HashMap<>());
-                    }
-                    bodyToPosToLine.get(bodyIndex).put(pos, line);
-                } else {
-                    lonelyBody.add(bodyIndex);
                 }
 
             }

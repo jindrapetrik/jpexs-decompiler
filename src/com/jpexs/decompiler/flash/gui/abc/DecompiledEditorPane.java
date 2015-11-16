@@ -35,6 +35,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.editor.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -43,18 +44,22 @@ import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.graph.DottedChain;
+import java.awt.Color;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import jsyntaxpane.DefaultSyntaxKit;
 import jsyntaxpane.SyntaxDocument;
 import jsyntaxpane.Token;
 import jsyntaxpane.TokenType;
+import jsyntaxpane.components.BreakPointListener;
 
-public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretListener {
+public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretListener, BreakPointListener {
 
     private List<Highlighting> highlights = new ArrayList<>();
 
@@ -85,6 +90,31 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     private boolean isStatic = false;
 
     private final List<Runnable> scriptListeners = new ArrayList<>();
+
+    public static final Color BG_BREAKPOINT_COLOR = new Color(0xfc, 0x9d, 0x9f);
+    public static final Color FG_BREAKPOINT_COLOR = null;
+
+    public static final Color BG_IP_COLOR = new Color(0xbd, 0xe6, 0xaa);
+    public static final Color FG_IP_COLOR = null;
+
+    public static final Color BG_INVALID_BREAKPOINT_COLOR = new Color(0xdc, 0xdc, 0xd8);
+    public static final Color FG_INVALID_BREAKPOINT_COLOR = null;
+
+    @Override
+    public void toggled(int line) {
+        boolean on = Main.toggleBreakPoint(script, line);
+        removeColorMarker(line, FG_INVALID_BREAKPOINT_COLOR, BG_INVALID_BREAKPOINT_COLOR);
+        if (on) {
+            if (Main.isBreakPointValid(script, line)) {
+                addColorMarker(line, FG_BREAKPOINT_COLOR, BG_BREAKPOINT_COLOR);
+            } else {
+                addColorMarker(line, FG_INVALID_BREAKPOINT_COLOR, BG_INVALID_BREAKPOINT_COLOR);
+            }
+        } else {
+            removeColorMarker(line, FG_BREAKPOINT_COLOR, BG_BREAKPOINT_COLOR);
+            removeColorMarker(line, FG_INVALID_BREAKPOINT_COLOR, BG_INVALID_BREAKPOINT_COLOR);
+        }
+    }
 
     public void addScriptListener(Runnable l) {
         scriptListeners.add(l);
@@ -573,7 +603,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                     }
                 }
                 currentMethodHighlight = null;
-                currentTrait = null;
+                //currentTrait = null;
                 String name = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants).toPrintableString(true);
                 currentTrait = getCurrentTrait();
                 isStatic = abc.isStaticTraitId(classIndex, lastTraitIndex);
@@ -599,8 +629,8 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
 
         Highlighting tc = Highlighting.searchIndex(classHighlights, classIndex);
         if (tc != null || isScriptInit) {
-            Highlighting th = Highlighting.searchIndex(traitHighlights, traitId, isScriptInit ? 0 : tc.startPos, isScriptInit ? -1 : tc.startPos + tc.len);
-            int pos;
+            Highlighting th = Highlighting.searchIndex(traitHighlights, traitId, isScriptInit || tc == null ? 0 : tc.startPos, isScriptInit || tc == null ? -1 : tc.startPos + tc.len);
+            int pos = 0;
             if (th != null) {
                 if (th.len > 1) {
                     ignoreCarret = true;
@@ -611,7 +641,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                     ignoreCarret = false;
                 }
                 pos = th.startPos;
-            } else {
+            } else if (tc != null) {
                 pos = tc.startPos;
             }
 
@@ -705,9 +735,25 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         return script == null ? null : script.abc;
     }
 
+    public void refreshBreakPoints() {
+        Set<Integer> bkptLines = Main.getPackBreakPoints(script);
+        removeColorMarkerOnAllLines(FG_BREAKPOINT_COLOR, BG_BREAKPOINT_COLOR);
+        removeColorMarkerOnAllLines(FG_INVALID_BREAKPOINT_COLOR, BG_INVALID_BREAKPOINT_COLOR);
+
+        for (int line : bkptLines) {
+            if (Main.isBreakPointValid(script, line)) {
+                addColorMarker(line, FG_BREAKPOINT_COLOR, BG_BREAKPOINT_COLOR);
+            } else {
+                addColorMarker(line, FG_INVALID_BREAKPOINT_COLOR, BG_INVALID_BREAKPOINT_COLOR);
+            }
+        }
+    }
+
     @Override
     public void setText(String t) {
         super.setText(t);
         setCaretPosition(0);
+        refreshBreakPoints();
+
     }
 }
