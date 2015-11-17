@@ -57,12 +57,12 @@ public class FastActionList implements Collection<ActionItem> {
         getJumps(actions, actionItemMap);
     }
 
-    final ActionItem insertItemAfter(ActionItem item, Action action) {
+    public final ActionItem insertItemAfter(ActionItem item, Action action) {
         ActionItem newItem = new ActionItem(action);
         return insertItemAfter(item, newItem);
     }
 
-    final ActionItem insertItemBefore(ActionItem item, ActionItem newItem) {
+    public final ActionItem insertItemBefore(ActionItem item, ActionItem newItem) {
         insertItemAfter(item.prev, newItem);
         if (item == firstItem) {
             firstItem = newItem;
@@ -71,7 +71,7 @@ public class FastActionList implements Collection<ActionItem> {
         return newItem;
     }
 
-    final ActionItem insertItemAfter(ActionItem item, ActionItem newItem) {
+    public final ActionItem insertItemAfter(ActionItem item, ActionItem newItem) {
         if (item == null && firstItem == null) {
             firstItem = newItem;
             newItem.next = newItem;
@@ -95,7 +95,7 @@ public class FastActionList implements Collection<ActionItem> {
         return newItem;
     }
 
-    ActionItem removeItem(ActionItem item) {
+    public ActionItem removeItem(ActionItem item) {
         ActionItem next = null;
         if (item == firstItem) {
             if (item.next == item) {
@@ -133,6 +133,19 @@ public class FastActionList implements Collection<ActionItem> {
         }
 
         return next;
+    }
+
+    public void removeItem(int index, int count) {
+        FastActionListIterator iterator = new FastActionListIterator(this, index);
+        for (int i = 0; i < count; i++) {
+            iterator.next();
+            iterator.remove();
+        }
+    }
+
+    public ActionItem get(int index) {
+        FastActionListIterator iterator = new FastActionListIterator(this, index);
+        return iterator.next();
     }
 
     public void replaceJumpTargets(ActionItem target, ActionItem newTarget) {
