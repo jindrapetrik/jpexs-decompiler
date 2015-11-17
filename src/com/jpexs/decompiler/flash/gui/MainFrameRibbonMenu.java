@@ -608,6 +608,16 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
         Object o = menuItems.get(path);
         if (o instanceof RibbonTask) {
             if (menuOptional.get(path)) {
+                View.execInEventDispatch(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        if (!ribbon.isVisible(optinalGroups.get(path))) {
+                            ribbon.setVisible(optinalGroups.get(path), true);
+                        }
+                        ribbon.setSelectedTask((RibbonTask) o);
+                    }
+                });
                 return;
             }
             final RibbonTask rt = (RibbonTask) o;
