@@ -164,6 +164,13 @@ public class Main {
     private static int ip = 0;
     private static ClassPath ipClass = null;
 
+    public static void debuggerNotSuspended() {
+        getDebugHandler().notSuspended();
+        mainFrame.getPanel().clearDebuggerColors();
+        ip = 0;
+        ipClass = null;
+    }
+
     public static void clearBreakPoints(ScriptPack pack) {
         if (breakPointMap.containsKey(pack)) {
             breakPointMap.remove(pack);
@@ -1144,6 +1151,18 @@ public class Main {
              */
             flashDebugger = new Debugger();
             debugHandler = new DebuggerHandler();
+            debugHandler.addConnectionListener(new DebuggerHandler.ConnectionListener() {
+
+                @Override
+                public void connected() {
+                }
+
+                @Override
+                public void disconnected() {
+                    ip = 0;
+                    ipClass = null;
+                }
+            });
             flashDebugger.addConnectionListener(debugHandler);
             flashDebugger.start();
         } catch (IOException ex) {

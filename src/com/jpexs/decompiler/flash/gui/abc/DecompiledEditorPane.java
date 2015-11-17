@@ -739,9 +739,15 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     }
 
     public void refreshMarkers() {
-        Set<Integer> bkptLines = Main.getPackBreakPoints(script);
         removeColorMarkerOnAllLines(FG_BREAKPOINT_COLOR, BG_BREAKPOINT_COLOR, PRIORITY_BREAKPOINT);
         removeColorMarkerOnAllLines(FG_INVALID_BREAKPOINT_COLOR, BG_INVALID_BREAKPOINT_COLOR, PRIORITY_INVALID_BREAKPOINT);
+        removeColorMarkerOnAllLines(FG_IP_COLOR, BG_IP_COLOR, PRIORITY_IP);
+
+        if (script == null) {
+            return;
+        }
+
+        Set<Integer> bkptLines = Main.getPackBreakPoints(script);
 
         for (int line : bkptLines) {
             if (Main.isBreakPointValid(script, line)) {
@@ -750,7 +756,6 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                 addColorMarker(line, FG_INVALID_BREAKPOINT_COLOR, BG_INVALID_BREAKPOINT_COLOR, PRIORITY_INVALID_BREAKPOINT);
             }
         }
-        removeColorMarkerOnAllLines(FG_IP_COLOR, BG_IP_COLOR, PRIORITY_IP);
         int ip = Main.getIp(script);
         ClassPath ipPath = Main.getIpClass();
         if (ip > 0 && ipPath != null && ipPath.equals(script.getClassPath())) {

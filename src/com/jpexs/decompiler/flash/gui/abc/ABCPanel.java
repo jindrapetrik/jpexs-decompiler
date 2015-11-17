@@ -152,16 +152,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
     public final JLabel scriptNameLabel;
 
-    private final JPanel debugPanel;
-
-    private JTable debugRegistersTable;
-    private JTable debugLocalsTable;
-    private JTable debugScopeTable;
-    private JTable callStackTable;
-    private JTable stackTable;
-
-    private JTabbedPane varTabs;
-    //private JTable debugArgumentsTable;
+    private final DebugPanel debugPanel;
 
     private final JLabel experimentalLabel = new JLabel(AppStrings.translate("action.edit.experimental"));
 
@@ -449,105 +440,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
             }
         });
 
-        debugPanel = new JPanel(new BorderLayout());
-        debugRegistersTable = new JTable(new VariablesTableModel(new ArrayList<>()));
-        debugLocalsTable = new JTable(new VariablesTableModel(new ArrayList<>()));
-        //debugArgumentsTable = new JTable(new VariablesTableModel(new ArrayList<>()));
-        debugScopeTable = new JTable(new VariablesTableModel(new ArrayList<>()));
-        callStackTable = new JTable();
-        stackTable = new JTable();
-
-        Main.getDebugHandler().addVariableChangedListener(new DebuggerHandler.VariableChangedListener() {
-
-            @Override
-            public void variablesChanged() {
-                InFrame f = Main.getDebugHandler().getFrame();
-                if (f != null) {
-                    debugRegistersTable.setModel(new VariablesTableModel(f.registers));
-                    List<Variable> locals = new ArrayList<>();
-                    locals.addAll(f.arguments);
-                    locals.addAll(f.variables);
-                    debugLocalsTable.setModel(new VariablesTableModel(locals));
-                    //debugArgumentsTable.setModel(new VariablesTableModel(f.arguments));
-                    debugScopeTable.setModel(new VariablesTableModel(f.scopeChain));
-                    debugPanel.setVisible(true);
-                } else {
-                    debugPanel.setVisible(false);
-                    return;
-                }
-                InBreakAtExt info = Main.getDebugHandler().getBreakInfo();
-                if (info != null) {
-                    //InBreakReason reason = Main.getDebugHandler().getBreakReason();
-                    List<String> callStackFiles = new ArrayList<>();
-                    List<Integer> callStackLines = new ArrayList<>();
-
-                    callStackFiles.add(Main.getDebugHandler().moduleToString(info.file));
-                    callStackLines.add(info.line);
-
-                    for (int i = 0; i < info.files.size(); i++) {
-                        callStackFiles.add(Main.getDebugHandler().moduleToString(info.files.get(i)));
-                        callStackLines.add(info.lines.get(i));
-                    }
-                    Object[][] data = new Object[callStackFiles.size()][2];
-                    for (int i = 0; i < callStackFiles.size(); i++) {
-                        data[i][0] = callStackFiles.get(i);
-                        data[i][1] = callStackLines.get(i);
-                    }
-
-                    DefaultTableModel tm = new DefaultTableModel(data, new Object[]{
-                        AppStrings.translate("callStack.header.file"),
-                        AppStrings.translate("callStack.header.line")
-                    });
-                    callStackTable.setModel(tm);
-
-                    Object[][] data2 = new Object[info.stacks.size()][1];
-                    for (int i = 0; i < info.stacks.size(); i++) {
-                        data2[i][0] = info.stacks.get(i);
-                    }
-                    stackTable.setModel(new DefaultTableModel(data2, new Object[]{AppStrings.translate("stack.header.item")}));
-                } else {
-                    callStackTable.setModel(new DefaultTableModel());
-                    stackTable.setModel(new DefaultTableModel());
-                }
-
-                varTabs.removeAll();
-                JPanel pa;
-                if (debugRegistersTable.getRowCount() > 0) {
-                    pa = new JPanel(new BorderLayout());
-                    pa.add(new JScrollPane(debugRegistersTable), BorderLayout.CENTER);
-                    varTabs.addTab(AppStrings.translate("variables.header.registers"), pa);
-                }
-                if (debugLocalsTable.getRowCount() > 0) {
-                    pa = new JPanel(new BorderLayout());
-                    pa.add(new JScrollPane(debugLocalsTable), BorderLayout.CENTER);
-                    varTabs.addTab(AppStrings.translate("variables.header.locals"), pa);
-                }
-
-                if (debugScopeTable.getRowCount() > 0) {
-                    pa = new JPanel(new BorderLayout());
-                    pa.add(new JScrollPane(debugScopeTable), BorderLayout.CENTER);
-                    varTabs.addTab(AppStrings.translate("variables.header.scopeChain"), pa);
-                }
-
-                if (callStackTable.getRowCount() > 0) {
-                    pa = new JPanel(new BorderLayout());
-                    pa.add(new JScrollPane(callStackTable), BorderLayout.CENTER);
-                    varTabs.addTab(AppStrings.translate("callStack.header"), pa);
-                }
-                if (stackTable.getRowCount() > 0) {
-                    pa = new JPanel(new BorderLayout());
-                    pa.add(new JScrollPane(stackTable), BorderLayout.CENTER);
-                    varTabs.addTab(AppStrings.translate("stack.header"), pa);
-                }
-                varTabs.setSelectedIndex(0);
-
-            }
-        });
-
-        varTabs = new JTabbedPane();
-
-        debugPanel.add(new HeaderLabel(AppStrings.translate("debugpanel.header")), BorderLayout.NORTH);
-        debugPanel.add(new JScrollPane(varTabs), BorderLayout.CENTER);
+        debugPanel = new DebugPanel();
 
         JPersistentSplitPane sp2;
 

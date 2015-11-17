@@ -1339,6 +1339,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     public boolean stepOverActionPerformed(ActionEvent evt) {
+        Main.debuggerNotSuspended();
+
         try {
 
             DebuggerCommands cmd = Main.getDebugHandler().getCommands();
@@ -1354,6 +1356,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     public boolean stepIntoActionPerformed(ActionEvent evt) {
+        Main.debuggerNotSuspended();
+
         try {
             DebuggerCommands cmd = Main.getDebugHandler().getCommands();
             mainFrame.getPanel().clearDebuggerColors();
@@ -1369,6 +1373,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     public boolean stepOutActionPerformed(ActionEvent evt) {
+        Main.debuggerNotSuspended();
+
         try {
             DebuggerCommands cmd = Main.getDebugHandler().getCommands();
             mainFrame.getPanel().clearDebuggerColors();
@@ -1383,9 +1389,10 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     public boolean continueActionPerformed(ActionEvent evt) {
+        Main.debuggerNotSuspended();
+
         try {
             DebuggerCommands cmd = Main.getDebugHandler().getCommands();
-            mainFrame.getPanel().clearDebuggerColors();
             Main.startWork(AppStrings.translate("work.debugging") + "...", null);
             cmd.sendContinue();
         } catch (IOException ex) {

@@ -32,12 +32,14 @@ import com.jpexs.debugger.flash.messages.in.InNumScript;
 import com.jpexs.debugger.flash.messages.in.InScript;
 import com.jpexs.debugger.flash.messages.in.InSetBreakpoint;
 import com.jpexs.debugger.flash.messages.in.InSwfInfo;
+import com.jpexs.debugger.flash.messages.in.InTrace;
 import com.jpexs.debugger.flash.messages.in.InVersion;
 import com.jpexs.debugger.flash.messages.out.OutGetBreakReason;
 import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.graph.DottedChain;
+import com.jpexs.helpers.CancellableWorker;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -67,9 +69,20 @@ public class DebuggerHandler implements DebugConnectionListener {
     private InBreakAtExt breakInfo;
     private InBreakReason breakReason;
 
-    private final List<VariableChangedListener> listeners = new ArrayList<>();
+    private final List<VariableChangedListener> varListeners = new ArrayList<>();
+
+    private final List<TraceListener> traceListeners = new ArrayList<>();
 
     private final List<ConnectionListener> clisteners = new ArrayList<>();
+
+    public void notSuspended() {
+        frame = null;
+        breakInfo = null;
+        breakReason = null;
+        for (VariableChangedListener l : varListeners) {
+            l.variablesChanged();
+        }
+    }
 
     public String moduleToString(int file) {
         if (!modulePaths.containsKey(file)) {
@@ -94,6 +107,12 @@ public class DebuggerHandler implements DebugConnectionListener {
 
     }
 
+    public static interface TraceListener {
+
+        public void trace(String... val);
+
+    }
+
     public static interface VariableChangedListener {
 
         public void variablesChanged();
@@ -101,11 +120,19 @@ public class DebuggerHandler implements DebugConnectionListener {
     }
 
     public void addVariableChangedListener(VariableChangedListener l) {
-        listeners.add(l);
+        varListeners.add(l);
+    }
+
+    public void addTraceListener(TraceListener l) {
+        traceListeners.add(l);
+    }
+
+    public void removeTraceListener(TraceListener l) {
+        traceListeners.remove(l);
     }
 
     public void removeVariableChangedListener(VariableChangedListener l) {
-        listeners.remove(l);
+        varListeners.remove(l);
     }
 
     public void addConnectionListener(ConnectionListener l) {
@@ -147,7 +174,7 @@ public class DebuggerHandler implements DebugConnectionListener {
         for (ConnectionListener l : clisteners) {
             l.disconnected();
         }
-        for (VariableChangedListener l : listeners) {
+        for (VariableChangedListener l : varListeners) {
             l.variablesChanged();
         }
     }
@@ -265,7 +292,7 @@ public class DebuggerHandler implements DebugConnectionListener {
                                 breakReason = con.sendMessage(new OutGetBreakReason(con), InBreakReason.class);
                                 frame = commands.getFrame(0);
 
-                                for (VariableChangedListener l : listeners) {
+                                for (VariableChangedListener l : varListeners) {
                                     l.variablesChanged();
                                 }
 
@@ -307,6 +334,24 @@ public class DebuggerHandler implements DebugConnectionListener {
             } else {
                 commands.sendContinue();
             }
+
+            new CancellableWorker() {
+
+                @Override
+                protected Object doInBackground() throws Exception {
+                    try {
+                        while (isConnected()) {
+                            InTrace tr = con.getMessage(InTrace.class);
+                            for (TraceListener l : traceListeners) {
+                                l.trace(tr.text);
+                            }
+                        }
+                    } catch (IOException ex) {
+                        //ignore
+                    }
+                    return null;
+                }
+            }.execute();
 
         } catch (IOException ex) {
             connected = false;
