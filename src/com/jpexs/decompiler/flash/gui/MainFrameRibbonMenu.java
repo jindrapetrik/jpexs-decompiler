@@ -607,7 +607,10 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
     public void hilightPath(String path) {
         Object o = menuItems.get(path);
         if (o instanceof RibbonTask) {
-            RibbonTask rt = (RibbonTask) o;
+            if (menuOptional.get(path)) {
+                return;
+            }
+            final RibbonTask rt = (RibbonTask) o;
             View.execInEventDispatch(new Runnable() {
 
                 @Override
