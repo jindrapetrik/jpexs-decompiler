@@ -1033,6 +1033,14 @@ public class AVM2Code implements Cloneable {
         return bos.toByteArray();
     }
 
+    public void markOffsets() {
+        long offset = 0;
+        for (int i = 0; i < code.size(); i++) {
+            code.get(i).offset = offset;
+            offset += code.get(i).getBytesLength();
+        }
+    }
+
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder();
