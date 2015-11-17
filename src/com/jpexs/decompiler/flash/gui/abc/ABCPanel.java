@@ -17,6 +17,9 @@
 package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.debugger.flash.Variable;
+import com.jpexs.debugger.flash.messages.in.InBreakAtExt;
+import com.jpexs.debugger.flash.messages.in.InBreakReason;
+import com.jpexs.debugger.flash.messages.in.InFrame;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ClassPath;
@@ -149,7 +152,16 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
     public final JLabel scriptNameLabel;
 
-    private JTable debugVariablesTable;
+    private final JPanel debugPanel;
+
+    private JTable debugRegistersTable;
+    private JTable debugLocalsTable;
+    private JTable debugScopeTable;
+    private JTable callStackTable;
+    private JTable stackTable;
+
+    private JTabbedPane varTabs;
+    //private JTable debugArgumentsTable;
 
     private final JLabel experimentalLabel = new JLabel(AppStrings.translate("action.edit.experimental"));
 
@@ -266,34 +278,17 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
     public static class VariablesTableModel implements TableModel {
 
-        DebuggerHandler.VariableChangedListener varChangeListener;
-
+        // DebuggerHandler.VariableChangedListener varChangeListener;
         List<TableModelListener> tableListeners = new ArrayList<>();
+        private List<Variable> vars;
 
-        public VariablesTableModel() {
-            varChangeListener = new DebuggerHandler.VariableChangedListener() {
-                private int oldNum = 0;
-
-                @Override
-                public void variablesChanged() {
-                    for (int i = 0; i < oldNum; i++) {
-                        for (TableModelListener l : tableListeners) {
-                            l.tableChanged(new TableModelEvent(VariablesTableModel.this, i, i, 0, TableModelEvent.DELETE));
-                        }
-                    }
-                    oldNum = 1 + Main.getDebugHandler().getNumVariables() + Main.getDebugHandler().getNumRegisters();
-                    for (TableModelListener l : tableListeners) {
-                        l.tableChanged(new TableModelEvent(VariablesTableModel.this, 0, oldNum - 1, 0, TableModelEvent.INSERT));
-                    }
-
-                }
-            };
-            Main.getDebugHandler().addVariableChangedListener(varChangeListener);
+        public VariablesTableModel(List<Variable> vars) {
+            this.vars = vars;
         }
 
         @Override
         public int getRowCount() {
-            return (Main.getDebugHandler().getFrameVariable() == null ? 0 : 1) + Main.getDebugHandler().getNumRegisters() + Main.getDebugHandler().getNumVariables();
+            return vars.size();
         }
 
         @Override
@@ -305,11 +300,11 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         public String getColumnName(int columnIndex) {
             switch (columnIndex) {
                 case 0:
-                    return "Name";
+                    return AppStrings.translate("variables.column.name");
                 case 1:
-                    return "Type";
+                    return AppStrings.translate("variables.column.type");
                 case 2:
-                    return "Value";
+                    return AppStrings.translate("variables.column.value");
                 default:
                     return null;
             }
@@ -322,20 +317,12 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
         @Override
         public boolean isCellEditable(int rowIndex, int columnIndex) {
-            return columnIndex == 1;
+            return false; //columnIndex == 2;  //TODO: edit variables
         }
 
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
-            int numReg = Main.getDebugHandler().getNumRegisters();
-            Variable v;
-            if (rowIndex == 0) {
-                v = Main.getDebugHandler().getFrameVariable();
-            } else if (rowIndex >= numReg + 1) {
-                v = Main.getDebugHandler().getVariable(rowIndex - 1 - numReg);
-            } else {
-                v = Main.getDebugHandler().getRegister(rowIndex - 1);
-            }
+            Variable v = vars.get(rowIndex);
 
             switch (columnIndex) {
                 case 0:
@@ -357,7 +344,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
         @Override
         public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-            Main.getDebugHandler().setVariableValue(rowIndex, "" + aValue);
+            //Main.getDebugHandler().setVariableValue(rowIndex, "" + aValue);
         }
 
         @Override
@@ -421,7 +408,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         iconDecPanel.add(iconsPanel);
         iconDecPanel.add(decompiledScrollPane);
 
-        JPanel decButtonsPan = new JPanel(new FlowLayout());
+        final JPanel decButtonsPan = new JPanel(new FlowLayout());
         decButtonsPan.setBorder(new BevelBorder(BevelBorder.RAISED));
         decButtonsPan.add(editDecompiledButton);
         decButtonsPan.add(experimentalLabel);
@@ -448,10 +435,127 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         JPanel panB = new JPanel();
         panB.setLayout(new BorderLayout());
         panB.add(decLabel, BorderLayout.NORTH);
-        panB.add(decPanel, BorderLayout.CENTER);
-        debugVariablesTable = new JTable(new VariablesTableModel());
 
-        panB.add(debugVariablesTable, BorderLayout.SOUTH);
+        Main.getDebugHandler().addConnectionListener(new DebuggerHandler.ConnectionListener() {
+
+            @Override
+            public void connected() {
+                decButtonsPan.setVisible(false);
+            }
+
+            @Override
+            public void disconnected() {
+                decButtonsPan.setVisible(true);
+            }
+        });
+
+        debugPanel = new JPanel(new BorderLayout());
+        debugRegistersTable = new JTable(new VariablesTableModel(new ArrayList<>()));
+        debugLocalsTable = new JTable(new VariablesTableModel(new ArrayList<>()));
+        //debugArgumentsTable = new JTable(new VariablesTableModel(new ArrayList<>()));
+        debugScopeTable = new JTable(new VariablesTableModel(new ArrayList<>()));
+        callStackTable = new JTable();
+        stackTable = new JTable();
+
+        Main.getDebugHandler().addVariableChangedListener(new DebuggerHandler.VariableChangedListener() {
+
+            @Override
+            public void variablesChanged() {
+                InFrame f = Main.getDebugHandler().getFrame();
+                if (f != null) {
+                    debugRegistersTable.setModel(new VariablesTableModel(f.registers));
+                    List<Variable> locals = new ArrayList<>();
+                    locals.addAll(f.arguments);
+                    locals.addAll(f.variables);
+                    debugLocalsTable.setModel(new VariablesTableModel(locals));
+                    //debugArgumentsTable.setModel(new VariablesTableModel(f.arguments));
+                    debugScopeTable.setModel(new VariablesTableModel(f.scopeChain));
+                    debugPanel.setVisible(true);
+                } else {
+                    debugPanel.setVisible(false);
+                    return;
+                }
+                InBreakAtExt info = Main.getDebugHandler().getBreakInfo();
+                if (info != null) {
+                    //InBreakReason reason = Main.getDebugHandler().getBreakReason();
+                    List<String> callStackFiles = new ArrayList<>();
+                    List<Integer> callStackLines = new ArrayList<>();
+
+                    callStackFiles.add(Main.getDebugHandler().moduleToString(info.file));
+                    callStackLines.add(info.line);
+
+                    for (int i = 0; i < info.files.size(); i++) {
+                        callStackFiles.add(Main.getDebugHandler().moduleToString(info.files.get(i)));
+                        callStackLines.add(info.lines.get(i));
+                    }
+                    Object[][] data = new Object[callStackFiles.size()][2];
+                    for (int i = 0; i < callStackFiles.size(); i++) {
+                        data[i][0] = callStackFiles.get(i);
+                        data[i][1] = callStackLines.get(i);
+                    }
+
+                    DefaultTableModel tm = new DefaultTableModel(data, new Object[]{
+                        AppStrings.translate("callStack.header.file"),
+                        AppStrings.translate("callStack.header.line")
+                    });
+                    callStackTable.setModel(tm);
+
+                    Object[][] data2 = new Object[info.stacks.size()][1];
+                    for (int i = 0; i < info.stacks.size(); i++) {
+                        data2[i][0] = info.stacks.get(i);
+                    }
+                    stackTable.setModel(new DefaultTableModel(data2, new Object[]{AppStrings.translate("stack.header.item")}));
+                } else {
+                    callStackTable.setModel(new DefaultTableModel());
+                    stackTable.setModel(new DefaultTableModel());
+                }
+
+                varTabs.removeAll();
+                JPanel pa;
+                if (debugRegistersTable.getRowCount() > 0) {
+                    pa = new JPanel(new BorderLayout());
+                    pa.add(new JScrollPane(debugRegistersTable), BorderLayout.CENTER);
+                    varTabs.addTab(AppStrings.translate("variables.header.registers"), pa);
+                }
+                if (debugLocalsTable.getRowCount() > 0) {
+                    pa = new JPanel(new BorderLayout());
+                    pa.add(new JScrollPane(debugLocalsTable), BorderLayout.CENTER);
+                    varTabs.addTab(AppStrings.translate("variables.header.locals"), pa);
+                }
+
+                if (debugScopeTable.getRowCount() > 0) {
+                    pa = new JPanel(new BorderLayout());
+                    pa.add(new JScrollPane(debugScopeTable), BorderLayout.CENTER);
+                    varTabs.addTab(AppStrings.translate("variables.header.scopeChain"), pa);
+                }
+
+                if (callStackTable.getRowCount() > 0) {
+                    pa = new JPanel(new BorderLayout());
+                    pa.add(new JScrollPane(callStackTable), BorderLayout.CENTER);
+                    varTabs.addTab(AppStrings.translate("callStack.header"), pa);
+                }
+                if (stackTable.getRowCount() > 0) {
+                    pa = new JPanel(new BorderLayout());
+                    pa.add(new JScrollPane(stackTable), BorderLayout.CENTER);
+                    varTabs.addTab(AppStrings.translate("stack.header"), pa);
+                }
+                varTabs.setSelectedIndex(0);
+
+            }
+        });
+
+        varTabs = new JTabbedPane();
+
+        debugPanel.add(new HeaderLabel(AppStrings.translate("debugpanel.header")), BorderLayout.NORTH);
+        debugPanel.add(new JScrollPane(varTabs), BorderLayout.CENTER);
+
+        JPersistentSplitPane sp2;
+
+        panB.add(sp2 = new JPersistentSplitPane(JSplitPane.VERTICAL_SPLIT, decPanel, debugPanel, Configuration.guiAvm2VarsSplitPaneDividerLocationPercent), BorderLayout.CENTER);
+        sp2.setContinuousLayout(true);
+
+        debugPanel.setVisible(false);
+
         decLabel.setHorizontalAlignment(SwingConstants.CENTER);
         //decLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
         splitPane = new JPersistentSplitPane(JSplitPane.HORIZONTAL_SPLIT, panB, detailPanel, Configuration.guiAvm2SplitPaneDividerLocationPercent);
@@ -813,23 +917,14 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
     private void editDecompiledButtonActionPerformed(ActionEvent evt) {
         File swc = Configuration.getPlayerSWC();
-        final String adobePage = "http://www.adobe.com/support/flashplayer/downloads.html";
-        if (swc == null) {
-            if (View.showConfirmDialog(this, AppStrings.translate("message.action.playerglobal.needed").replace("%adobehomepage%", adobePage), AppStrings.translate("message.action.playerglobal.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE) == JOptionPane.OK_OPTION) {
-
-                View.navigateUrl(adobePage);
-
-                int ret;
-                do {
-                    ret = View.showConfirmDialog(this, AppStrings.translate("message.action.playerglobal.place").replace("%libpath%", Configuration.getFlashLibPath().getAbsolutePath()), AppStrings.translate("message.action.playerglobal.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
-                    swc = Configuration.getPlayerSWC();
-                } while (ret == JOptionPane.OK_OPTION && swc == null);
+        if (swc == null || !swc.exists()) {
+            if (View.showConfirmDialog(this, AppStrings.translate("message.playerpath.lib.notset"), AppStrings.translate("message.action.playerglobal.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE) == JOptionPane.OK_OPTION) {
+                Main.advancedSettings("paths");
+                return;
             }
         }
-        if (swc != null) {
-            if (View.showConfirmDialog(null, AppStrings.translate("message.confirm.experimental.function"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, Configuration.warningExperimentalAS3Edit, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION) {
-                setDecompiledEditMode(true);
-            }
+        if (View.showConfirmDialog(null, AppStrings.translate("message.confirm.experimental.function"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, Configuration.warningExperimentalAS3Edit, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION) {
+            setDecompiledEditMode(true);
         }
     }
 

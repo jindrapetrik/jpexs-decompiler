@@ -19,7 +19,9 @@ package com.jpexs.decompiler.flash.gui.abc;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.gui.DebuggerHandler;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
+import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.TagEditorPanel;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.helpers.CancellableWorker;
@@ -76,6 +78,10 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
 
     private final JLabel traitNameLabel;
 
+    private boolean debugRunning = false;
+
+    private boolean buttonsShouldBeShown = false;
+
     public DetailPanel(ABCPanel abcPanel) {
         this.abcPanel = abcPanel;
         innerPanel = new JPanel();
@@ -119,6 +125,22 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
         selectedCard = UNSUPPORTED_TRAIT_CARD;
         layout.show(innerPanel, UNSUPPORTED_TRAIT_CARD);
         buttonsPanel.setVisible(false);
+
+        Main.getDebugHandler().addConnectionListener(new DebuggerHandler.ConnectionListener() {
+
+            @Override
+            public void connected() {
+                debugRunning = true;
+                buttonsPanel.setVisible(false);
+            }
+
+            @Override
+            public void disconnected() {
+                debugRunning = false;
+                buttonsPanel.setVisible(buttonsShouldBeShown);
+            }
+        });
+
         selectedLabel = new HeaderLabel("");
         selectedLabel.setText(selectedCard);
         //selectedLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
@@ -164,7 +186,8 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
             CardLayout layout = (CardLayout) innerPanel.getLayout();
             layout.show(innerPanel, name);
             boolean b = cardMap.get(name) instanceof TraitDetail;
-            buttonsPanel.setVisible(b);
+            buttonsShouldBeShown = b;
+            buttonsPanel.setVisible(b && !debugRunning);
 
             TraitDetail newDetail = null;
             if (b) {

@@ -40,10 +40,14 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ResourceBundle;
@@ -91,8 +95,8 @@ public class AdvancedSettingsDialog extends AppDialog {
     /**
      * Creates new form AdvancedSettingsDialog
      */
-    public AdvancedSettingsDialog() {
-        initComponents();
+    public AdvancedSettingsDialog(String selectedCategory) {
+        initComponents(selectedCategory);
         View.centerScreen(this);
         View.setWindowIcon(this);
 
@@ -150,7 +154,7 @@ public class AdvancedSettingsDialog extends AppDialog {
         }
     }
 
-    private void initComponents() {
+    private void initComponents(String selectedCategory) {
         okButton = new JButton();
         cancelButton = new JButton();
         resetButton = new JButton();
@@ -260,6 +264,9 @@ public class AdvancedSettingsDialog extends AppDialog {
             tabPane.add(translate("config.group.name." + cat), tabs.get(cat));
             tabPane.setToolTipTextAt(tabPane.getTabCount() - 1, translate("config.group.description." + cat));
         }
+        if (selectedCategory != null && tabs.containsKey(selectedCategory)) {
+            tabPane.setSelectedComponent(tabs.get(selectedCategory));
+        }
 
         cnt.add(tabPane, BorderLayout.CENTER);
         pack();
@@ -321,7 +328,14 @@ public class AdvancedSettingsDialog extends AppDialog {
         for (String cat : categorized.keySet()) {
             JPanel configPanel = new JPanel(new SpringLayout());
             int itemCount = 0;
-            for (String name : categorized.get(cat).keySet()) {
+            List<String> names = new ArrayList<>(categorized.get(cat).keySet());
+            Collections.sort(names, new Comparator<String>() {
+                @Override
+                public int compare(String name1, String name2) {
+                    return resourceBundle.getString("config.name." + name1).compareTo(resourceBundle.getString("config.name." + name2));
+                }
+            });
+            for (String name : names) {
                 Field field = categorized.get(cat).get(name);
 
                 String locName = resourceBundle.getString("config.name." + name);
@@ -440,6 +454,27 @@ public class AdvancedSettingsDialog extends AppDialog {
                     itemCount, 2, //rows, cols
                     6, 6, //initX, initY
                     6, 6);       //xPad, yPad
+            //https://www.adobe.com/support/flashplayer/debug_downloads.html
+            if (resourceBundle.containsKey("config.group.tip." + cat)) {
+                String tip = resourceBundle.getString("config.group.tip." + cat);
+                String url = null;
+                if (resourceBundle.containsKey("config.group.link." + cat)) {
+                    url = resourceBundle.getString("config.group.link." + cat);
+                }
+                JPanel p = new JPanel(new BorderLayout());
+                p.add(configPanel, BorderLayout.CENTER);
+                JPanel tipPanel = new JPanel(new FlowLayout());
+                tipPanel.add(new JLabel("<html><b>" + resourceBundle.getString("tip") + "</b>" + tip + "</html>"));
+                if (url != null) {
+                    String linkText = url;
+                    if (resourceBundle.containsKey("config.group.linkText." + cat)) {
+                        linkText = resourceBundle.getString("config.group.linkText." + cat);
+                    }
+                    tipPanel.add(new LinkLabel(linkText, url));
+                }
+                p.add(tipPanel, BorderLayout.SOUTH);
+                configPanel = p;
+            }
             tabs.put(cat, new JScrollPane(configPanel));
         }
     }

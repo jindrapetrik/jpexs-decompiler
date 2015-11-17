@@ -195,7 +195,7 @@ public interface MenuBuilder {
      * @param subloader Action which loads menu inside
      * @param isLeaf Has no subitems?
      */
-    public void addMenuItem(String path, String title, String icon, ActionListener action, int priority, ActionListener subloader, boolean isLeaf, HotKey key);
+    public void addMenuItem(String path, String title, String icon, ActionListener action, int priority, ActionListener subloader, boolean isLeaf, HotKey key, boolean isOptional);
 
     /**
      * Adds toggle item (radio/checkbox)

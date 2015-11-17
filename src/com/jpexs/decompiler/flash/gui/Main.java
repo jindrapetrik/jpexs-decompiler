@@ -1504,6 +1504,7 @@ public class Main {
         Configuration.saveConfig();
         if (mainFrame != null && mainFrame.getPanel() != null) {
             mainFrame.getPanel().unloadFlashPlayer();
+            mainFrame.dispose();
         }
         System.exit(0);
     }
@@ -1513,7 +1514,11 @@ public class Main {
     }
 
     public static void advancedSettings() {
-        (new AdvancedSettingsDialog()).setVisible(true);
+        advancedSettings(null);
+    }
+
+    public static void advancedSettings(String category) {
+        (new AdvancedSettingsDialog(category)).setVisible(true);
     }
 
     public static void autoCheckForUpdates() {

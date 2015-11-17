@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -98,7 +99,7 @@ public class MainFrameClassicMenu extends MainFrameMenu {
     }
 
     @Override
-    public void addMenuItem(String path, String title, String icon, ActionListener action, int priority, final ActionListener subLoader, boolean isLeaf, HotKey key) {
+    public void addMenuItem(String path, String title, String icon, ActionListener action, int priority, final ActionListener subLoader, boolean isLeaf, HotKey key, boolean isOptional) {
         path = mapping(path);
 
         menuHotkeys.put(path, key);
@@ -359,4 +360,18 @@ public class MainFrameClassicMenu extends MainFrameMenu {
         }
         return s;
     }
+
+    @Override
+    public void hilightPath(String path) {
+        //TODO
+    }
+
+    @Override
+    public void setPathVisible(String path, boolean val) {
+        MenuElement me = menuElements.get(path);
+        if (me instanceof JComponent) {
+            ((JComponent) me).setVisible(val);
+        }
+    }
+
 }

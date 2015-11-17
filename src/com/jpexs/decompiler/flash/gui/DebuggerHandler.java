@@ -36,6 +36,7 @@ import com.jpexs.debugger.flash.messages.in.InVersion;
 import com.jpexs.debugger.flash.messages.out.OutGetBreakReason;
 import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.graph.DottedChain;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -63,13 +64,41 @@ public class DebuggerHandler implements DebugConnectionListener {
 
     private InFrame frame;
 
+    private InBreakAtExt breakInfo;
+    private InBreakReason breakReason;
+
+    private final List<VariableChangedListener> listeners = new ArrayList<>();
+
+    private final List<ConnectionListener> clisteners = new ArrayList<>();
+
+    public String moduleToString(int file) {
+        if (!modulePaths.containsKey(file)) {
+            return "unknown";
+        }
+        return modulePaths.get(file).toString();
+    }
+
+    public InBreakAtExt getBreakInfo() {
+        return breakInfo;
+    }
+
+    public InBreakReason getBreakReason() {
+        return breakReason;
+    }
+
+    public static interface ConnectionListener {
+
+        public void connected();
+
+        public void disconnected();
+
+    }
+
     public static interface VariableChangedListener {
 
         public void variablesChanged();
 
     }
-
-    private List<VariableChangedListener> listeners = new ArrayList<>();
 
     public void addVariableChangedListener(VariableChangedListener l) {
         listeners.add(l);
@@ -79,41 +108,16 @@ public class DebuggerHandler implements DebugConnectionListener {
         listeners.remove(l);
     }
 
-    public void setVariableValue(int index, String value) {
-        //variables.get(index).value = value
-        //TODO:
+    public void addConnectionListener(ConnectionListener l) {
+        clisteners.add(l);
     }
 
-    public int getNumVariables() {
-        if (frame == null) {
-            return 0;
-        }
-        return frame.variables.size();
+    public void removeConnectionListener(ConnectionListener l) {
+        clisteners.remove(l);
     }
 
-    public Variable getFrameVariable() {
-        if (frame == null) {
-            return null;
-        }
-        return frame.frame;
-    }
-
-    public Variable getVariable(int index) {
-        if (frame == null) {
-            return null;
-        }
-        return frame.variables.get(index);
-    }
-
-    public int getNumRegisters() {
-        if (frame == null) {
-            return 0;
-        }
-        return frame.registers.size();
-    }
-
-    public Variable getRegister(int index) {
-        return frame.registers.get(index);
+    public InFrame getFrame() {
+        return frame;
     }
 
     public int moduleIdOf(ScriptPack pack) {
@@ -132,11 +136,20 @@ public class DebuggerHandler implements DebugConnectionListener {
     }
 
     public void disconnect() {
+        frame = null;
+        breakInfo = null;
+        breakReason = null;
         connected = false;
         if (commands != null) {
             commands.disconnect();
         }
         commands = null;
+        for (ConnectionListener l : clisteners) {
+            l.disconnected();
+        }
+        for (VariableChangedListener l : listeners) {
+            l.variablesChanged();
+        }
     }
 
     public boolean isConnected() {
@@ -243,10 +256,13 @@ public class DebuggerHandler implements DebugConnectionListener {
                             if (!modulePaths.containsKey(message.file)) {
                                 return;
                             }
+
                             String cls = modulePaths.get(message.file).toString();
+                            Main.startWork(AppStrings.translate("work.breakat") + cls + ":" + message.line, null);
+
                             try {
-                                InBreakAtExt bex = con.getMessage(InBreakAtExt.class);
-                                InBreakReason ibr = con.sendMessage(new OutGetBreakReason(con), InBreakReason.class);
+                                breakInfo = con.getMessage(InBreakAtExt.class);
+                                breakReason = con.sendMessage(new OutGetBreakReason(con), InBreakReason.class);
                                 frame = commands.getFrame(0);
 
                                 for (VariableChangedListener l : listeners) {
@@ -281,6 +297,17 @@ public class DebuggerHandler implements DebugConnectionListener {
             Main.getMainFrame()
                     .getPanel().refreshBreakPoints();
             connected = true;
+
+            for (ConnectionListener l : clisteners) {
+                l.connected();
+            }
+
+            if (Configuration.debugHalt.get()) {
+                Main.startWork(AppStrings.translate("work.halted"), null);
+            } else {
+                commands.sendContinue();
+            }
+
         } catch (IOException ex) {
             connected = false;
         }

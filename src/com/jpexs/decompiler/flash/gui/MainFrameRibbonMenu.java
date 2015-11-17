@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -46,6 +47,7 @@ import org.pushingpixels.flamingo.api.ribbon.JRibbonComponent;
 import org.pushingpixels.flamingo.api.ribbon.RibbonApplicationMenu;
 import org.pushingpixels.flamingo.api.ribbon.RibbonApplicationMenuEntryFooter;
 import org.pushingpixels.flamingo.api.ribbon.RibbonApplicationMenuEntryPrimary;
+import org.pushingpixels.flamingo.api.ribbon.RibbonContextualTaskGroup;
 import org.pushingpixels.flamingo.api.ribbon.RibbonElementPriority;
 import org.pushingpixels.flamingo.api.ribbon.RibbonTask;
 import org.pushingpixels.flamingo.api.ribbon.resize.BaseRibbonBandResizePolicy;
@@ -65,6 +67,8 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
     private final Map<String, Object> menuItems = new HashMap<>();
 
     private final Map<String, String> menuTitles = new HashMap<>();
+
+    private final Map<String, Boolean> menuOptional = new HashMap<>();
 
     private final Map<String, String> menuIcons = new HashMap<>();
 
@@ -87,6 +91,8 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
     private static final int TYPE_MENUITEM = 2;
 
     private static final int TYPE_TOGGLEMENUITEM = 3;
+
+    private Map<String, RibbonContextualTaskGroup> optinalGroups = new HashMap<>();
 
     public MainFrameRibbonMenu(MainFrameRibbon mainFrame, JRibbon ribbon, boolean externalFlashPlayerUnavailable) {
         super(mainFrame, externalFlashPlayerUnavailable);
@@ -268,6 +274,12 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
             String subIcon = menuIcons.get(sub);
             String subGroup = menuGroup.get(sub);
             HotKey subKey = menuHotkeys.get(sub);
+            if (subKey != null) {
+                String keyStr = subKey.toString();
+                if (keyStr.length() < 8) {
+                    subTitle += " (" + keyStr + ")";
+                }
+            }
             int subPriority = menuPriorities.get(sub);
             final ActionListener subLoader = menuLoaders.get(sub);
             AbstractCommandButton but = null;
@@ -381,7 +393,15 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
                     continue;
                 }
                 if (menuItems.get(sub) instanceof RibbonTask) {
-                    ribbon.addTask((RibbonTask) menuItems.get(sub));
+                    RibbonTask rt = (RibbonTask) menuItems.get(sub);
+                    if (menuOptional.get(sub)) {
+                        RibbonContextualTaskGroup rct = new RibbonContextualTaskGroup("", new Color(128, 0, 0), rt);
+                        ribbon.addContextualTaskGroup(rct);
+                        optinalGroups.put(sub, rct);
+                        //ribbon.setVisible(rct, false);
+                    } else {
+                        ribbon.addTask(rt);
+                    }
                 }
             }
         } else if (parts.length == 2) { //2nd level - it's a Task!
@@ -413,11 +433,12 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
     }
 
     @Override
-    public void addMenuItem(String path, String title, String icon, ActionListener action, int priority, ActionListener subLoader, boolean isLeaf, HotKey key) {
+    public void addMenuItem(String path, String title, String icon, ActionListener action, int priority, ActionListener subLoader, boolean isLeaf, HotKey key, boolean isOptional) {
         String parentPath = path.contains("/") ? path.substring(0, path.lastIndexOf('/')) : "";
         if (!menuSubs.containsKey(parentPath)) {
             throw new IllegalArgumentException("No parent menu exists: " + parentPath);
         }
+        menuOptional.put(path, isOptional);
         menuHotkeys.put(path, key);
         menuSubs.get(parentPath).add(path);
         if (!isLeaf) {
@@ -433,7 +454,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
 
     @Override
     public void addToggleMenuItem(String path, String title, String group, String icon, ActionListener action, int priority, HotKey key) {
-        addMenuItem(path, title, icon, action, priority, action, true, key);
+        addMenuItem(path, title, icon, action, priority, action, true, key, false);
         menuType.put(path, TYPE_TOGGLEMENUITEM);
         menuGroup.put(path, group);
         if (group == null) {
@@ -559,6 +580,43 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
     @Override
     public boolean supportsAppMenu() {
         return true;
+    }
+
+    @Override
+    public void setPathVisible(String path, boolean val) {
+        Object o = menuItems.get(path);
+        if (o instanceof RibbonTask) {
+            if (menuOptional.get(path)) {
+                RibbonContextualTaskGroup rg = optinalGroups.get(path);
+
+                if (ribbon.isVisible(rg) != val) {
+                    View.execInEventDispatch(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            ribbon.setVisible(rg, val);
+                        }
+                    });
+
+                }
+            }
+        }
+    }
+
+    @Override
+    public void hilightPath(String path) {
+        Object o = menuItems.get(path);
+        if (o instanceof RibbonTask) {
+            RibbonTask rt = (RibbonTask) o;
+            View.execInEventDispatch(new Runnable() {
+
+                @Override
+                public void run() {
+                    ribbon.setSelectedTask(rt);
+                }
+            });
+
+        }
     }
 
 }
