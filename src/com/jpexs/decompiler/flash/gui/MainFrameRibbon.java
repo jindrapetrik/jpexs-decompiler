@@ -194,4 +194,10 @@ public final class MainFrameRibbon extends AppRibbonFrame {
         Helper.emptyObject(this);
         super.dispose();
     }
+
+    @Override
+    public MainFrameMenu getMenu() {
+        return mainMenu;
+    }
+
 }

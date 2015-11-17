@@ -136,4 +136,10 @@ public final class MainFrameClassic extends AppFrame implements MainFrame {
         Helper.emptyObject(this);
         super.dispose();
     }
+
+    @Override
+    public MainFrameMenu getMenu() {
+        return mainMenu;
+    }
+
 }

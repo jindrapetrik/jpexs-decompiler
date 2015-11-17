@@ -1387,7 +1387,6 @@ public abstract class MainFrameMenu implements MenuBuilder {
             DebuggerCommands cmd = Main.getDebugHandler().getCommands();
             mainFrame.getPanel().clearDebuggerColors();
             Main.startWork(AppStrings.translate("work.debugging") + "...", null);
-
             cmd.sendContinue();
         } catch (IOException ex) {
             Main.getDebugHandler().disconnect();

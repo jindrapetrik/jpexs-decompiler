@@ -37,4 +37,6 @@ public interface MainFrame {
     public Window getWindow();
 
     public void dispose();
+
+    public MainFrameMenu getMenu();
 }

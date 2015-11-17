@@ -257,7 +257,7 @@ public class DebuggerHandler implements DebugConnectionListener {
                                 return;
                             }
 
-                            String cls = modulePaths.get(message.file).toString();
+                            ClassPath cls = modulePaths.get(message.file);
                             Main.startWork(AppStrings.translate("work.breakat") + cls + ":" + message.line, null);
 
                             try {
@@ -272,7 +272,7 @@ public class DebuggerHandler implements DebugConnectionListener {
                             } catch (IOException ex) {
                                 //ignore
                             }
-                            Main.getMainFrame().getPanel().debuggerBreakAt(Main.getMainFrame().getPanel().getCurrentSwf(), cls, message.line);
+                            Main.breakAt(cls, message.line);
                         }
                     }
                     );

@@ -82,6 +82,8 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
 
     private boolean buttonsShouldBeShown = false;
 
+    private DebuggerHandler.ConnectionListener conListener;
+
     public DetailPanel(ABCPanel abcPanel) {
         this.abcPanel = abcPanel;
         innerPanel = new JPanel();
@@ -126,20 +128,30 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
         layout.show(innerPanel, UNSUPPORTED_TRAIT_CARD);
         buttonsPanel.setVisible(false);
 
-        Main.getDebugHandler().addConnectionListener(new DebuggerHandler.ConnectionListener() {
+        conListener = new DebuggerHandler.ConnectionListener() {
 
             @Override
             public void connected() {
-                debugRunning = true;
-                buttonsPanel.setVisible(false);
+                synchronized (DetailPanel.this) {
+                    debugRunning = true;
+                    if (buttonsPanel != null) {
+                        buttonsPanel.setVisible(false);
+                    }
+                }
             }
 
             @Override
             public void disconnected() {
-                debugRunning = false;
-                buttonsPanel.setVisible(buttonsShouldBeShown);
+                synchronized (DetailPanel.this) {
+                    debugRunning = false;
+
+                    if (buttonsPanel != null) {
+                        buttonsPanel.setVisible(buttonsShouldBeShown);
+                    }
+                }
             }
-        });
+        };
+        Main.getDebugHandler().addConnectionListener(conListener);
 
         selectedLabel = new HeaderLabel("");
         selectedLabel.setText(selectedCard);
@@ -186,8 +198,12 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
             CardLayout layout = (CardLayout) innerPanel.getLayout();
             layout.show(innerPanel, name);
             boolean b = cardMap.get(name) instanceof TraitDetail;
-            buttonsShouldBeShown = b;
-            buttonsPanel.setVisible(b && !debugRunning);
+            boolean drun;
+            synchronized (this) {
+                buttonsShouldBeShown = b;
+                drun = debugRunning;
+            }
+            buttonsPanel.setVisible(b && !drun);
 
             TraitDetail newDetail = null;
             if (b) {

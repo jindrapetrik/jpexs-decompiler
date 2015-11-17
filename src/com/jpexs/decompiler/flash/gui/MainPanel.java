@@ -1537,21 +1537,29 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (abcPanel != null) {
             abcPanel.decompiledTextArea.gotoLine(line);
         }
+        refreshBreakPoints();
 
     }
 
     public void refreshBreakPoints() {
         if (abcPanel != null) {
-            abcPanel.decompiledTextArea.refreshBreakPoints();
+            abcPanel.decompiledTextArea.refreshMarkers();
         }
     }
+    /*
+     public void debuggerBreakAt(SWF swf, String cls, int line) {
+     View.execInEventDispatchLater(new Runnable() {
 
-    public void debuggerBreakAt(SWF swf, String cls, int line) {
-        gotoClassLine(swf, cls, line);
-        if (abcPanel != null) {
-            abcPanel.decompiledTextArea.addColorMarker(line, DecompiledEditorPane.FG_IP_COLOR, DecompiledEditorPane.BG_IP_COLOR);
-        }
-    }
+     @Override
+     public void run() {
+     gotoClassLine(swf, cls, line);
+     if (abcPanel != null) {
+     abcPanel.decompiledTextArea.addColorMarker(line, DecompiledEditorPane.FG_IP_COLOR, DecompiledEditorPane.BG_IP_COLOR, DecompiledEditorPane.PRIORITY_IP);
+     }
+     }
+     });
+
+     }*/
 
     public void gotoClass(SWF swf, String cls) {
         if (swf == null) {
@@ -2813,7 +2821,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public void clearDebuggerColors() {
         if (abcPanel != null) {
-            abcPanel.decompiledTextArea.removeColorMarkerOnAllLines(DecompiledEditorPane.FG_IP_COLOR, DecompiledEditorPane.BG_IP_COLOR);
+            abcPanel.decompiledTextArea.removeColorMarkerOnAllLines(DecompiledEditorPane.FG_IP_COLOR, DecompiledEditorPane.BG_IP_COLOR, DecompiledEditorPane.PRIORITY_IP);
         }
     }
 
@@ -3042,7 +3050,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 setSourceWorker.cancel(true);
                 setSourceWorker = null;
             }
-            if (!Main.isWorking()) {
+            if (!Main.isWorking() || Main.isDebugging()) {
                 CancellableWorker worker = new CancellableWorker() {
 
                     @Override

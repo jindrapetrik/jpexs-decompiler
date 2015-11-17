@@ -34,6 +34,7 @@ import com.jpexs.decompiler.flash.SWFSourceInfo;
 import com.jpexs.decompiler.flash.SearchMode;
 import com.jpexs.decompiler.flash.SwfOpenException;
 import com.jpexs.decompiler.flash.Version;
+import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -160,11 +161,32 @@ public class Main {
 
     private static Map<ScriptPack, Set<Integer>> breakPointMap = new WeakHashMap<>();
     private static Map<ScriptPack, Set<Integer>> invalidBreakPointMap = new WeakHashMap<>();
+    private static int ip = 0;
+    private static ClassPath ipClass = null;
 
     public static void clearBreakPoints(ScriptPack pack) {
         if (breakPointMap.containsKey(pack)) {
             breakPointMap.remove(pack);
         }
+    }
+
+    public static boolean isDebugging() {
+        return mainFrame.getMenu().isDebugRunning();
+    }
+
+    public static int getIp(ScriptPack pack) {
+        return ip;
+    }
+
+    public static ClassPath getIpClass() {
+        return ipClass;
+    }
+
+    public static void breakAt(ClassPath clsName, int ip) {
+        Main.ip = ip;
+        Main.ipClass = clsName;
+        mainFrame.getPanel().gotoClassLine(getMainFrame().getPanel().getCurrentSwf(), clsName.toString(), ip);
+        //Main.getMainFrame().getPanel().debuggerBreakAt(Main.getMainFrame().getPanel().getCurrentSwf(), cls, message.line);
     }
 
     public static boolean isBreakPointValid(ScriptPack pack, int line) {

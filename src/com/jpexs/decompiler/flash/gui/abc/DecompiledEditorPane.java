@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.gui.abc;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.CachedDecompilation;
+import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
@@ -92,26 +93,29 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
 
     public static final Color BG_BREAKPOINT_COLOR = new Color(0xfc, 0x9d, 0x9f);
     public static final Color FG_BREAKPOINT_COLOR = null;
+    public static final int PRIORITY_BREAKPOINT = 20;
 
     public static final Color BG_IP_COLOR = new Color(0xbd, 0xe6, 0xaa);
     public static final Color FG_IP_COLOR = null;
+    public static final int PRIORITY_IP = 0;
 
     public static final Color BG_INVALID_BREAKPOINT_COLOR = new Color(0xdc, 0xdc, 0xd8);
     public static final Color FG_INVALID_BREAKPOINT_COLOR = null;
+    public static final int PRIORITY_INVALID_BREAKPOINT = 10;
 
     @Override
     public void toggled(int line) {
         boolean on = Main.toggleBreakPoint(script, line);
-        removeColorMarker(line, FG_INVALID_BREAKPOINT_COLOR, BG_INVALID_BREAKPOINT_COLOR);
+        removeColorMarker(line, FG_INVALID_BREAKPOINT_COLOR, BG_INVALID_BREAKPOINT_COLOR, PRIORITY_INVALID_BREAKPOINT);
         if (on) {
             if (Main.isBreakPointValid(script, line)) {
-                addColorMarker(line, FG_BREAKPOINT_COLOR, BG_BREAKPOINT_COLOR);
+                addColorMarker(line, FG_BREAKPOINT_COLOR, BG_BREAKPOINT_COLOR, PRIORITY_BREAKPOINT);
             } else {
-                addColorMarker(line, FG_INVALID_BREAKPOINT_COLOR, BG_INVALID_BREAKPOINT_COLOR);
+                addColorMarker(line, FG_INVALID_BREAKPOINT_COLOR, BG_INVALID_BREAKPOINT_COLOR, PRIORITY_INVALID_BREAKPOINT);
             }
         } else {
-            removeColorMarker(line, FG_BREAKPOINT_COLOR, BG_BREAKPOINT_COLOR);
-            removeColorMarker(line, FG_INVALID_BREAKPOINT_COLOR, BG_INVALID_BREAKPOINT_COLOR);
+            removeColorMarker(line, FG_BREAKPOINT_COLOR, BG_BREAKPOINT_COLOR, PRIORITY_BREAKPOINT);
+            removeColorMarker(line, FG_INVALID_BREAKPOINT_COLOR, BG_INVALID_BREAKPOINT_COLOR, PRIORITY_INVALID_BREAKPOINT);
         }
     }
 
@@ -734,17 +738,23 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         return script == null ? null : script.abc;
     }
 
-    public void refreshBreakPoints() {
+    public void refreshMarkers() {
         Set<Integer> bkptLines = Main.getPackBreakPoints(script);
-        removeColorMarkerOnAllLines(FG_BREAKPOINT_COLOR, BG_BREAKPOINT_COLOR);
-        removeColorMarkerOnAllLines(FG_INVALID_BREAKPOINT_COLOR, BG_INVALID_BREAKPOINT_COLOR);
+        removeColorMarkerOnAllLines(FG_BREAKPOINT_COLOR, BG_BREAKPOINT_COLOR, PRIORITY_BREAKPOINT);
+        removeColorMarkerOnAllLines(FG_INVALID_BREAKPOINT_COLOR, BG_INVALID_BREAKPOINT_COLOR, PRIORITY_INVALID_BREAKPOINT);
 
         for (int line : bkptLines) {
             if (Main.isBreakPointValid(script, line)) {
-                addColorMarker(line, FG_BREAKPOINT_COLOR, BG_BREAKPOINT_COLOR);
+                addColorMarker(line, FG_BREAKPOINT_COLOR, BG_BREAKPOINT_COLOR, PRIORITY_BREAKPOINT);
             } else {
-                addColorMarker(line, FG_INVALID_BREAKPOINT_COLOR, BG_INVALID_BREAKPOINT_COLOR);
+                addColorMarker(line, FG_INVALID_BREAKPOINT_COLOR, BG_INVALID_BREAKPOINT_COLOR, PRIORITY_INVALID_BREAKPOINT);
             }
+        }
+        removeColorMarkerOnAllLines(FG_IP_COLOR, BG_IP_COLOR, PRIORITY_IP);
+        int ip = Main.getIp(script);
+        ClassPath ipPath = Main.getIpClass();
+        if (ip > 0 && ipPath != null && ipPath.equals(script.getClassPath())) {
+            addColorMarker(ip, FG_IP_COLOR, BG_IP_COLOR, PRIORITY_IP);
         }
     }
 
@@ -752,7 +762,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     public void setText(String t) {
         super.setText(t);
         setCaretPosition(0);
-        refreshBreakPoints();
+        refreshMarkers();
 
     }
 }
