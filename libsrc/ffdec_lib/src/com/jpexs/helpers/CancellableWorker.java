@@ -81,7 +81,15 @@ public abstract class CancellableWorker<T> implements RunnableFuture<T> {
 
     @Override
     public final boolean cancel(boolean mayInterruptIfRunning) {
-        return future.cancel(mayInterruptIfRunning);
+        boolean r = future.cancel(mayInterruptIfRunning);
+        if (r) {
+            workerCancelled();
+        }
+        return r;
+    }
+
+    public void workerCancelled() {
+
     }
 
     @Override

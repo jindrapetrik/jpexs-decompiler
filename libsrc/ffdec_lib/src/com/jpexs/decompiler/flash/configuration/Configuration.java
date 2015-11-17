@@ -520,6 +520,14 @@ public class Configuration {
     @ConfigurationFile(".*\\.swc$")
     public static final ConfigurationItem<String> playerLibLocation = null;
 
+    @ConfigurationDefaultDouble(0.7)
+    @ConfigurationName("gui.avm2.splitPane.vars.dividerLocationPercent")
+    public static final ConfigurationItem<Double> guiAvm2VarsSplitPaneDividerLocationPercent = null;
+
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("script")
+    public static final ConfigurationItem<Boolean> debugHalt = null;
+
     private enum OSId {
 
         WINDOWS, OSX, UNIX

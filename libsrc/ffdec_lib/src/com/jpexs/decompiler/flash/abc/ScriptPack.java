@@ -382,6 +382,7 @@ public class ScriptPack extends AS3ClassTreeItem {
                         }
 
                         if (instrOffset == -1) {
+                            lonelyBody.add(bodyIndex);
                             break blk;
                         }
                         try {
@@ -390,6 +391,7 @@ public class ScriptPack extends AS3ClassTreeItem {
                             //ignore
                         }
                         if (pos == -1) {
+                            lonelyBody.add(bodyIndex);
                             break blk;
                         }
                         if (!bodyToPosToLine.containsKey(bodyIndex)) {
