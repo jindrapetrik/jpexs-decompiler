@@ -54,8 +54,8 @@ public class SwitchItem extends LoopItem implements Block {
         return ret;
     }
 
-    public SwitchItem(GraphSourceItem instruction, Loop loop, GraphTargetItem switchedObject, List<GraphTargetItem> caseValues, List<List<GraphTargetItem>> caseCommands, List<GraphTargetItem> defaultCommands, List<Integer> valuesMapping) {
-        super(instruction, loop);
+    public SwitchItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, Loop loop, GraphTargetItem switchedObject, List<GraphTargetItem> caseValues, List<List<GraphTargetItem>> caseCommands, List<GraphTargetItem> defaultCommands, List<Integer> valuesMapping) {
+        super(instruction, lineStartIns, loop);
         this.switchedObject = switchedObject;
         this.caseValues = caseValues;
         this.caseCommands = caseCommands;

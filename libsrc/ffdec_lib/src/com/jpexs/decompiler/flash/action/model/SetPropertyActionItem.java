@@ -67,8 +67,8 @@ public class SetPropertyActionItem extends ActionItem implements SetTypeActionIt
         return value;
     }
 
-    public SetPropertyActionItem(GraphSourceItem instruction, GraphTargetItem target, int propertyIndex, GraphTargetItem value) {
-        super(instruction, PRECEDENCE_ASSIGMENT, value);
+    public SetPropertyActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem target, int propertyIndex, GraphTargetItem value) {
+        super(instruction, lineStartIns, PRECEDENCE_ASSIGMENT, value);
         this.target = target;
         this.propertyIndex = propertyIndex;
     }
@@ -86,7 +86,7 @@ public class SetPropertyActionItem extends ActionItem implements SetTypeActionIt
 
     @Override
     public GraphTargetItem getObject() {
-        return new GetPropertyActionItem(getSrc(), target, propertyIndex);
+        return new GetPropertyActionItem(getSrc(), getLineStartItem(), target, propertyIndex);
     }
 
     @Override

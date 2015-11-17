@@ -31,8 +31,8 @@ import java.util.List;
 
 public class StrictEqActionItem extends BinaryOpItem implements LogicalOpItem, Inverted, EqualsTypeItem {
 
-    public StrictEqActionItem(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, PRECEDENCE_EQUALITY, leftSide, rightSide, "===");
+    public StrictEqActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
+        super(instruction, lineStartIns, PRECEDENCE_EQUALITY, leftSide, rightSide, "===");
     }
 
     @Override
@@ -49,7 +49,7 @@ public class StrictEqActionItem extends BinaryOpItem implements LogicalOpItem, I
 
     @Override
     public GraphTargetItem invert(GraphSourceItem negSrc) {
-        return new StrictNeqActionItem(getSrc(), leftSide, rightSide);
+        return new StrictNeqActionItem(getSrc(), getLineStartItem(), leftSide, rightSide);
     }
 
     @Override

@@ -30,8 +30,8 @@ import java.util.List;
 
 public class InAVM2Item extends BinaryOpItem {
 
-    public InAVM2Item(AVM2Instruction instruction, GraphTargetItem name, GraphTargetItem object) {
-        super(instruction, PRECEDENCE_RELATIONAL, name, object, "in");
+    public InAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  GraphTargetItem name, GraphTargetItem object) {
+        super(instruction, lineStartIns, PRECEDENCE_RELATIONAL, name, object, "in");
     }
 
     @Override

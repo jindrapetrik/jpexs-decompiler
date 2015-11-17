@@ -72,7 +72,7 @@ public class ClassAVM2Item extends AVM2Item implements Block {
     }
 
     public ClassAVM2Item(List<Map.Entry<String, Map<String, String>>> metadata, List<DottedChain> importedClasses, NamespaceItem pkg, List<NamespaceItem> openedNamespaces, boolean isFinal, boolean isDynamic, String className, GraphTargetItem extendsOp, List<GraphTargetItem> implementsOp, List<GraphTargetItem> cinit, boolean staticInitActivation, List<AssignableAVM2Item> cinitVariables, GraphTargetItem iinit, List<AssignableAVM2Item> iinitVariables, List<GraphTargetItem> traits, boolean iinitActivation) {
-        super(null, NOPRECEDENCE);
+        super(null, null, NOPRECEDENCE);
         this.metadata = metadata;
         this.importedClasses = importedClasses;
         this.pkg = pkg;

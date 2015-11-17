@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.graph.model;
 
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 
 /**
@@ -26,7 +27,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 public class PushItem extends GraphTargetItem {
 
     public PushItem(GraphTargetItem value) {
-        super(value.getSrc(), value.getPrecedence(), value);
+        super(value.getSrc(), value.getLineStartItem(), value.getPrecedence(), value);
     }
 
     @Override

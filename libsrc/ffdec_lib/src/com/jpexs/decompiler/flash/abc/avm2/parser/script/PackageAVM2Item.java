@@ -38,7 +38,7 @@ public class PackageAVM2Item extends AVM2Item {
     public List<DottedChain> importedClasses = new ArrayList<>();
 
     public PackageAVM2Item(List<DottedChain> importedClasses, DottedChain packageName, List<GraphTargetItem> items) {
-        super(null, NOPRECEDENCE);
+        super(null, null, NOPRECEDENCE);
         this.importedClasses = importedClasses;
         this.items = items;
         this.packageName = packageName;

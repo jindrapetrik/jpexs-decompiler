@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -33,8 +33,8 @@ public class ThisAVM2Item extends AVM2Item {
 
     public Multiname className;
 
-    public ThisAVM2Item(GraphSourceItem instruction, Multiname className) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public ThisAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, Multiname className) {
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.className = className;
         getSrcData().localName = "this";
     }

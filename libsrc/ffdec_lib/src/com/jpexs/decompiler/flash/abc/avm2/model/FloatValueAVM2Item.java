@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -34,8 +34,8 @@ public class FloatValueAVM2Item extends NumberValueAVM2Item {
 
     public Double value;
 
-    public FloatValueAVM2Item(AVM2Instruction instruction, Double value) {
-        super(instruction);
+    public FloatValueAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, Double value) {
+        super(instruction, lineStartIns);
         this.value = value;
     }
 

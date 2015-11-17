@@ -29,8 +29,8 @@ import java.util.List;
 
 public class OrActionItem extends BinaryOpItem {
 
-    public OrActionItem(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, PRECEDENCE_LOGICALOR, leftSide, rightSide, "or");
+    public OrActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
+        super(instruction, lineStartIns, PRECEDENCE_LOGICALOR, leftSide, rightSide, "or");
     }
 
     @Override

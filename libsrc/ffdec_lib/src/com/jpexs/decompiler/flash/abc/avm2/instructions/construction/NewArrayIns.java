@@ -43,12 +43,12 @@ public class NewArrayIns extends InstructionDefinition {
             GraphTargetItem item = stack.pop();
             //No PopItems in this loop, since some obfuscators put there large numbers
             if (item instanceof PopItem) {
-                stack.push(new NullAVM2Item(ins));
+                stack.push(new NullAVM2Item(ins, localData.lineStartInstruction));
                 return;
             }
             args.add(0, item);
         }
-        stack.push(new NewArrayAVM2Item(ins, args));
+        stack.push(new NewArrayAVM2Item(ins, localData.lineStartInstruction, args));
     }
 
     @Override

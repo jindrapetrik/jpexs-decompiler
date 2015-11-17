@@ -35,8 +35,8 @@ public class EnumerateActionItem extends ActionItem {
         return ret;
     }
 
-    public EnumerateActionItem(GraphSourceItem instruction, GraphTargetItem object) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public EnumerateActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object) {
+        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
         this.object = object;
     }
 

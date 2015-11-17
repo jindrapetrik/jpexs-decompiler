@@ -31,8 +31,8 @@ import java.util.List;
 public class MBStringLengthActionItem extends ActionItem {
 
     //public GraphTargetItem value;
-    public MBStringLengthActionItem(GraphSourceItem instruction, GraphTargetItem value) {
-        super(instruction, PRECEDENCE_PRIMARY, value);
+    public MBStringLengthActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value) {
+        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY, value);
     }
 
     @Override

@@ -24,7 +24,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -33,8 +33,8 @@ import java.util.Set;
 
 public class UndefinedAVM2Item extends AVM2Item {
 
-    public UndefinedAVM2Item(AVM2Instruction instruction) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public UndefinedAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns) {
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
     }
 
     @Override

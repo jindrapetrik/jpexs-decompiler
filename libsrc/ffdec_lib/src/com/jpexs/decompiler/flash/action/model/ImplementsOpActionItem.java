@@ -29,8 +29,8 @@ public class ImplementsOpActionItem extends ActionItem {
 
     public List<GraphTargetItem> superclasses;
 
-    public ImplementsOpActionItem(GraphSourceItem instruction, GraphTargetItem subclass, List<GraphTargetItem> superclasses) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public ImplementsOpActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem subclass, List<GraphTargetItem> superclasses) {
+        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
         this.subclass = subclass;
         this.superclasses = superclasses;
     }

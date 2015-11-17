@@ -47,8 +47,8 @@ public class LoadMovieActionItem extends ActionItem {
         return ret;
     }
 
-    public LoadMovieActionItem(GraphSourceItem instruction, GraphTargetItem urlString, GraphTargetItem targetString, int method) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public LoadMovieActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem urlString, GraphTargetItem targetString, int method) {
+        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
         this.urlString = urlString;
         this.targetString = targetString;
         this.method = method;

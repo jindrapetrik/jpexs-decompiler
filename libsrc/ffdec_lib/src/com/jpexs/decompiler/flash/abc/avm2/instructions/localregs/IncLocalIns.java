@@ -47,11 +47,11 @@ public class IncLocalIns extends InstructionDefinition {
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         int regId = ins.operands[0];
-        output.add(new IncLocalAVM2Item(ins, regId));
+        output.add(new IncLocalAVM2Item(ins, localData.lineStartInstruction, regId));
         if (localData.localRegs.containsKey(regId)) {
-            localData.localRegs.put(regId, new AddAVM2Item(ins, localData.localRegs.get(regId), new IntegerValueAVM2Item(ins, 1L)));
+            localData.localRegs.put(regId, new AddAVM2Item(ins, localData.lineStartInstruction, localData.localRegs.get(regId), new IntegerValueAVM2Item(ins, localData.lineStartInstruction, 1L)));
         } else {
-            //localRegs.put(regIndex, new AddAVM2Item(ins, null, new IntegerValueAVM2Item(ins, new Long(1))));
+            //localRegs.put(regIndex, new AddAVM2Item(ins, localData.lineStartInstruction, null, new IntegerValueAVM2Item(ins, localData.lineStartInstruction, new Long(1))));
         }
         if (!localData.localRegAssignmentIps.containsKey(regId)) {
             localData.localRegAssignmentIps.put(regId, 0);

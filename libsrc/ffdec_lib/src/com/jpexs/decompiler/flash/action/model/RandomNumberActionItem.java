@@ -29,8 +29,8 @@ import java.util.List;
 
 public class RandomNumberActionItem extends ActionItem {
 
-    public RandomNumberActionItem(GraphSourceItem instruction, GraphTargetItem maximum) {
-        super(instruction, PRECEDENCE_PRIMARY, maximum);
+    public RandomNumberActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem maximum) {
+        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY, maximum);
     }
 
     @Override

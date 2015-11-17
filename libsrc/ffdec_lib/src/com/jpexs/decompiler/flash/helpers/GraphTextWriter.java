@@ -54,11 +54,12 @@ public abstract class GraphTextWriter {
      * Highlights specified text as instruction
      *
      * @param src
+     * @param firstLineItem
      * @param pos Offset of instruction
      * @param data
      * @return GraphTextWriter
      */
-    public GraphTextWriter startOffset(GraphSourceItem src, int pos, HighlightData data) {
+    public GraphTextWriter startOffset(GraphSourceItem src, GraphSourceItem startLineItem, int pos, HighlightData data) {
         return this;
     }
 

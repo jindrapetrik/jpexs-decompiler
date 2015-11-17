@@ -41,8 +41,8 @@ public class IfFrameLoadedActionItem extends ActionItem implements Block {
 
     private final GraphTargetItem frame;
 
-    public IfFrameLoadedActionItem(GraphTargetItem frame, List<GraphTargetItem> actions, GraphSourceItem instruction) {
-        super(instruction, NOPRECEDENCE);
+    public IfFrameLoadedActionItem(GraphTargetItem frame, List<GraphTargetItem> actions, GraphSourceItem instruction, GraphSourceItem lineStartIns) {
+        super(instruction, lineStartIns, NOPRECEDENCE);
         this.actions = actions;
         this.frame = frame;
     }

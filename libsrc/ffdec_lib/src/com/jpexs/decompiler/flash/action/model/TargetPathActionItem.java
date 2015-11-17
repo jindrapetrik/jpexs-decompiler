@@ -29,8 +29,8 @@ import java.util.List;
 
 public class TargetPathActionItem extends ActionItem {
 
-    public TargetPathActionItem(GraphSourceItem instruction, GraphTargetItem object) {
-        super(instruction, PRECEDENCE_PRIMARY, object);
+    public TargetPathActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object) {
+        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY, object);
     }
 
     @Override

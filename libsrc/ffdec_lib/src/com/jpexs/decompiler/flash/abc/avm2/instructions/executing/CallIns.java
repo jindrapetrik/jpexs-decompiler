@@ -58,7 +58,7 @@ public class CallIns extends InstructionDefinition {
         }
         GraphTargetItem receiver = stack.pop();
         GraphTargetItem function = stack.pop();
-        stack.push(new CallAVM2Item(ins, receiver, function, args));
+        stack.push(new CallAVM2Item(ins, localData.lineStartInstruction, receiver, function, args));
     }
 
     @Override

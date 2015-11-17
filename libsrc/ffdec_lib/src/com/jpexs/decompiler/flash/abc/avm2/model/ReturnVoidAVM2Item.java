@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -21,7 +22,7 @@ import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.ExitItem;
@@ -30,8 +31,8 @@ import java.util.List;
 
 public class ReturnVoidAVM2Item extends AVM2Item implements ExitItem {
 
-    public ReturnVoidAVM2Item(AVM2Instruction instruction) {
-        super(instruction, NOPRECEDENCE);
+    public ReturnVoidAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns) {
+        super(instruction, lineStartIns, NOPRECEDENCE);
     }
 
     @Override

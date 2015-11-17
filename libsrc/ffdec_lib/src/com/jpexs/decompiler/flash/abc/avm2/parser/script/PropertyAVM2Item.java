@@ -104,7 +104,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
             for (int pm : m.params) {
                 params.add(multinameToType(pm, constants));
             }
-            return new ApplyTypeAVM2Item(null, obj, params);
+            return new ApplyTypeAVM2Item(null, null, obj, params);
         } else {
             return new TypeItem(m.getNameWithNamespace(constants));
         }

@@ -18,7 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 
@@ -26,8 +26,8 @@ public class NameSpaceAVM2Item extends AVM2Item {
 
     public int namespaceIndex;
 
-    public NameSpaceAVM2Item(AVM2Instruction instruction, int namespaceIndex) {
-        super(instruction, NOPRECEDENCE);
+    public NameSpaceAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  int namespaceIndex) {
+        super(instruction, lineStartIns, NOPRECEDENCE);
         this.namespaceIndex = namespaceIndex;
     }
 

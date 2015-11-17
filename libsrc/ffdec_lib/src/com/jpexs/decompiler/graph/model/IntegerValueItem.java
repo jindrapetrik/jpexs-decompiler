@@ -30,8 +30,8 @@ public class IntegerValueItem extends GraphTargetItem implements IntegerValueTyp
 
     private final int intValue;
 
-    public IntegerValueItem(GraphSourceItem src, int value) {
-        super(src, PRECEDENCE_PRIMARY);
+    public IntegerValueItem(GraphSourceItem src, GraphSourceItem lineStartIns, int value) {
+        super(src, lineStartIns, PRECEDENCE_PRIMARY);
         this.intValue = value;
     }
 

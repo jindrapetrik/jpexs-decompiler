@@ -29,8 +29,8 @@ public class ExtendsActionItem extends ActionItem {
 
     public GraphTargetItem superclass;
 
-    public ExtendsActionItem(GraphSourceItem instruction, GraphTargetItem subclass, GraphTargetItem superclass) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public ExtendsActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem subclass, GraphTargetItem superclass) {
+        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
         this.subclass = subclass;
         this.superclass = superclass;
     }

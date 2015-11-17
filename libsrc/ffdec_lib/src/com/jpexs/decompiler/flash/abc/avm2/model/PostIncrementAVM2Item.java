@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.parser.script.AssignableAVM2Item;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
@@ -33,8 +33,8 @@ public class PostIncrementAVM2Item extends AVM2Item implements AssignmentAVM2Ite
 
     public GraphTargetItem object;
 
-    public PostIncrementAVM2Item(AVM2Instruction instruction, GraphTargetItem object) {
-        super(instruction, PRECEDENCE_POSTFIX);
+    public PostIncrementAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  GraphTargetItem object) {
+        super(instruction, lineStartIns, PRECEDENCE_POSTFIX);
         this.object = object;
     }
 

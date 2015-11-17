@@ -32,8 +32,8 @@ public class TernarOpItem extends GraphTargetItem {
 
     public GraphTargetItem onFalse;
 
-    public TernarOpItem(GraphSourceItem src, GraphTargetItem expression, GraphTargetItem onTrue, GraphTargetItem onFalse) {
-        super(src, PRECEDENCE_CONDITIONAL);
+    public TernarOpItem(GraphSourceItem src, GraphSourceItem lineStartIns, GraphTargetItem expression, GraphTargetItem onTrue, GraphTargetItem onFalse) {
+        super(src, lineStartIns, PRECEDENCE_CONDITIONAL);
         this.expression = expression;
         this.onTrue = onTrue;
         this.onFalse = onFalse;

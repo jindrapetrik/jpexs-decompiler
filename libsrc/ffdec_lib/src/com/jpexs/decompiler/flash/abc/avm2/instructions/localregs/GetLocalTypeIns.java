@@ -58,7 +58,7 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
             if (localData.isStatic) {
                 stack.push(new ClassAVM2Item(localData.getInstanceInfo().get(localData.classIndex).getName(localData.getConstants())));
             } else {
-                stack.push(new ThisAVM2Item(ins, localData.getInstanceInfo().get(localData.classIndex).getName(localData.getConstants())));
+                stack.push(new ThisAVM2Item(ins, localData.lineStartInstruction, localData.getInstanceInfo().get(localData.classIndex).getName(localData.getConstants())));
             }
             return;
         }
@@ -69,17 +69,17 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
             assignCount = localData.localRegAssignmentIps.get(regId);
         }
         if (assignCount > 5) { //Do not allow change register more than 5 - for deobfuscation
-            computedValue = new NotCompileTimeItem(ins, computedValue);
+            computedValue = new NotCompileTimeItem(ins, localData.lineStartInstruction, computedValue);
         }
         /*if (!isRegisterCompileTime(regId, ip, refs, code)) {
-         computedValue = new NotCompileTimeAVM2Item(ins, computedValue);
+         computedValue = new NotCompileTimeAVM2Item(ins, localData.lineStartInstruction, computedValue);
          }
          if (computedValue == null) {
          if (!localRegNames.containsKey(regId)) {
          computedValue = new UndefinedAVM2Item(null); //In some obfuscated code there seems to be reading of undefined registers
          }
          }*/
-        stack.push(new LocalRegAVM2Item(ins, regId, computedValue));
+        stack.push(new LocalRegAVM2Item(ins, localData.lineStartInstruction, regId, computedValue));
     }
 
     @Override

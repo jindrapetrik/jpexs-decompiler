@@ -47,8 +47,8 @@ public class PrintAsBitmapActionItem extends ActionItem {
         return ret;
     }
 
-    public PrintAsBitmapActionItem(GraphSourceItem instruction, GraphTargetItem target, GraphTargetItem boundingBox) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public PrintAsBitmapActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem target, GraphTargetItem boundingBox) {
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.target = target;
         this.boundingBox = boundingBox;
     }
@@ -67,7 +67,7 @@ public class PrintAsBitmapActionItem extends ActionItem {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
-        return toSourceMerge(localData, generator, new AddActionItem(getSrc(), asGenerator.pushConstTargetItem("printasbitmap:#"), boundingBox, true), target, new ActionGetURL2(0, false, false));
+        return toSourceMerge(localData, generator, new AddActionItem(getSrc(), getLineStartItem(), asGenerator.pushConstTargetItem("printasbitmap:#"), boundingBox, true), target, new ActionGetURL2(0, false, false));
     }
 
     @Override

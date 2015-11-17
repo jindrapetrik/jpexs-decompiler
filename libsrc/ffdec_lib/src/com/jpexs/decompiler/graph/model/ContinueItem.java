@@ -36,8 +36,8 @@ public class ContinueItem extends GraphTargetItem {
 
     private boolean labelRequired;
 
-    public ContinueItem(GraphSourceItem src, long loopId) {
-        super(src, NOPRECEDENCE);
+    public ContinueItem(GraphSourceItem src, GraphSourceItem lineStartIns, long loopId) {
+        super(src, lineStartIns, NOPRECEDENCE);
         this.loopId = loopId;
     }
 

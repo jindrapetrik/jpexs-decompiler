@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.TernarOpItem;
@@ -28,7 +28,7 @@ public class NameValuePair extends AVM2Item {
     //public GraphTargetItem value;
 
     public NameValuePair(GraphTargetItem name, GraphTargetItem value) {
-        super(name.getSrc(), NOPRECEDENCE, value);
+        super(name.getSrc(), name.getLineStartItem(), NOPRECEDENCE, value);
         this.name = name;
     }
 

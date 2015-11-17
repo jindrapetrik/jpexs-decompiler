@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -30,8 +31,8 @@ import java.util.List;
  */
 public class PopActionItem extends ActionItem {
 
-    public PopActionItem(GraphSourceItem instruction) {
-        super(instruction, NOPRECEDENCE);
+    public PopActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns) {
+        super(instruction, lineStartIns, NOPRECEDENCE);
     }
 
     @Override

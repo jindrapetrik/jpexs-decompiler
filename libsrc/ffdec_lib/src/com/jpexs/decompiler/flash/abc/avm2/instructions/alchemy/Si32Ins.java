@@ -57,7 +57,7 @@ public class Si32Ins extends InstructionDefinition implements AlchemyTypeIns {
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         GraphTargetItem ofs = stack.pop();
         GraphTargetItem value = stack.pop();
-        output.add(new AlchemyStoreAVM2Item(ins, value, ofs, 'i', 32));
+        output.add(new AlchemyStoreAVM2Item(ins, localData.lineStartInstruction, value, ofs, 'i', 32));
     }
 
     @Override

@@ -45,7 +45,7 @@ public class DupIns extends InstructionDefinition {
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         GraphTargetItem v = stack.pop();
         stack.push(v);
-        stack.push(new DuplicateItem(ins, v));
+        stack.push(new DuplicateItem(ins, localData.lineStartInstruction, v));
         //v.moreSrc.add(new GraphSourceItemPos(ins, 0));
 
     }

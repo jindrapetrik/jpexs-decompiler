@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.action.model.GotoFrame2ActionItem;
 import com.jpexs.decompiler.flash.action.model.GotoFrameActionItem;
 import com.jpexs.decompiler.flash.action.model.PlayActionItem;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
+import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.HashMap;
@@ -40,12 +41,12 @@ public class ActionPlay extends Action {
     }
 
     @Override
-    public void translate(TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
+    public void translate(GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         if (!output.isEmpty() && (output.get(output.size() - 1) instanceof GotoFrameActionItem)) {
             GotoFrameActionItem gta = (GotoFrameActionItem) output.remove(output.size() - 1);
-            output.add(new GotoFrame2ActionItem(this, new DirectValueActionItem(gta.frame + 1), false, true, 0));
+            output.add(new GotoFrame2ActionItem(this, lineStartAction, new DirectValueActionItem(gta.frame + 1), false, true, 0));
         } else {
-            output.add(new PlayActionItem(this));
+            output.add(new PlayActionItem(this, lineStartAction));
         }
     }
 }

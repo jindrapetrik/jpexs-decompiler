@@ -31,8 +31,8 @@ import java.util.List;
 
 public class DivideAVM2Item extends BinaryOpItem {
 
-    public DivideAVM2Item(AVM2Instruction instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, PRECEDENCE_MULTIPLICATIVE, leftSide, rightSide, "/");
+    public DivideAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  GraphTargetItem leftSide, GraphTargetItem rightSide) {
+        super(instruction, lineStartIns, PRECEDENCE_MULTIPLICATIVE, leftSide, rightSide, "/");
     }
 
     @Override

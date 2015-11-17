@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model.clauses;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 
@@ -33,8 +33,8 @@ public class FilterAVM2Item extends AVM2Item {
 
     public GraphTargetItem collection;
 
-    public FilterAVM2Item(AVM2Instruction instruction, GraphTargetItem collection, GraphTargetItem expression) {
-        super(instruction, NOPRECEDENCE);
+    public FilterAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  GraphTargetItem collection, GraphTargetItem expression) {
+        super(instruction, lineStartIns, NOPRECEDENCE);
         this.expression = expression;
         this.collection = collection;
     }

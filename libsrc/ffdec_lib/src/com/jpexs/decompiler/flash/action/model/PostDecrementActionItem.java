@@ -49,8 +49,8 @@ public class PostDecrementActionItem extends ActionItem implements SetTypeAction
         return ret;
     }
 
-    public PostDecrementActionItem(GraphSourceItem instruction, GraphTargetItem object) {
-        super(instruction, PRECEDENCE_POSTFIX);
+    public PostDecrementActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object) {
+        super(instruction, lineStartIns, PRECEDENCE_POSTFIX);
         this.object = object;
     }
 
@@ -77,7 +77,7 @@ public class PostDecrementActionItem extends ActionItem implements SetTypeAction
 
     @Override
     public GraphTargetItem getValue() {
-        return new SubtractActionItem(null, object, new DirectValueActionItem(null, 0, 1L, null));
+        return new SubtractActionItem(null, null, object, new DirectValueActionItem(null, null, 0, 1L, null));
     }
 
     @Override

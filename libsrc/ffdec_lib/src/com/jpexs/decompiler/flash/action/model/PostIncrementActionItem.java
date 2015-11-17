@@ -49,8 +49,8 @@ public class PostIncrementActionItem extends ActionItem implements SetTypeAction
         return ret;
     }
 
-    public PostIncrementActionItem(GraphSourceItem instruction, GraphTargetItem object) {
-        super(instruction, PRECEDENCE_POSTFIX);
+    public PostIncrementActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object) {
+        super(instruction, lineStartIns, PRECEDENCE_POSTFIX);
         this.object = object;
     }
 
@@ -77,7 +77,7 @@ public class PostIncrementActionItem extends ActionItem implements SetTypeAction
 
     @Override
     public GraphTargetItem getValue() {
-        return new AddActionItem(null, object, new DirectValueActionItem(null, 0, 1L, null), true);
+        return new AddActionItem(null, null, object, new DirectValueActionItem(null, null, 0, 1L, null), true);
     }
 
     @Override

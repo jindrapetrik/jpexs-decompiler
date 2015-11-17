@@ -45,8 +45,8 @@ public class FSCommand2ActionItem extends ActionItem {
         return ret;
     }
 
-    public FSCommand2ActionItem(GraphSourceItem instruction, GraphTargetItem command, List<GraphTargetItem> arguments) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public FSCommand2ActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem command, List<GraphTargetItem> arguments) {
+        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
         this.command = command;
         this.arguments = arguments;
     }

@@ -39,7 +39,7 @@ import java.util.List;
 public class XMLAVM2Item extends AVM2Item {
 
     public XMLAVM2Item(GraphTargetItem value) {
-        super(null, PRECEDENCE_PRIMARY, value);
+        super(null, null, PRECEDENCE_PRIMARY, value);
     }
 
     @Override

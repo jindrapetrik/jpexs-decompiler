@@ -33,8 +33,8 @@ import java.util.List;
 
 public class GtAVM2Item extends BinaryOpItem implements LogicalOpItem, IfCondition {
 
-    public GtAVM2Item(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, PRECEDENCE_RELATIONAL, leftSide, rightSide, ">");
+    public GtAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
+        super(instruction, lineStartIns, PRECEDENCE_RELATIONAL, leftSide, rightSide, ">");
     }
 
     @Override
@@ -49,7 +49,7 @@ public class GtAVM2Item extends BinaryOpItem implements LogicalOpItem, IfConditi
 
     @Override
     public GraphTargetItem invert(GraphSourceItem neqSrc) {
-        return new LeAVM2Item(getSrc(), leftSide, rightSide);
+        return new LeAVM2Item(getSrc(), getLineStartItem(), leftSide, rightSide);
     }
 
     @Override

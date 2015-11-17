@@ -27,8 +27,8 @@ public abstract class UnaryOpItem extends GraphTargetItem implements UnaryOp {
 
     public String operator;
 
-    public UnaryOpItem(GraphSourceItem instruction, int precedence, GraphTargetItem value, String operator) {
-        super(instruction, precedence, value);
+    public UnaryOpItem(GraphSourceItem instruction, GraphSourceItem lineStartItem, int precedence, GraphTargetItem value, String operator) {
+        super(instruction, lineStartItem, precedence, value);
         this.operator = operator;
     }
 

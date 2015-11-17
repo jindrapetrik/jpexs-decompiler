@@ -43,7 +43,7 @@ public class DecrementIIns extends InstructionDefinition {
 
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
-        stack.push(new DecrementAVM2Item(ins, stack.pop()));
+        stack.push(new DecrementAVM2Item(ins, localData.lineStartInstruction, stack.pop()));
     }
 
     @Override

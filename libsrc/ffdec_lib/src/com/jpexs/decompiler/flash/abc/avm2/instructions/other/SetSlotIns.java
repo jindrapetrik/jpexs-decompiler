@@ -119,15 +119,15 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
                         GraphTargetItem top = stack.peek().getNotCoerced().getThroughDuplicate();
                         if (top == inside) {
                             stack.pop();
-                            stack.push(new PostIncrementAVM2Item(ins, inside));
+                            stack.push(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, inside));
                         } else if ((top instanceof IncrementAVM2Item) && (((IncrementAVM2Item) top).value == inside)) {
                             stack.pop();
-                            stack.push(new PreIncrementAVM2Item(ins, inside));
+                            stack.push(new PreIncrementAVM2Item(ins, localData.lineStartInstruction, inside));
                         } else {
-                            output.add(new PostIncrementAVM2Item(ins, inside));
+                            output.add(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, inside));
                         }
                     } else {
-                        output.add(new PostIncrementAVM2Item(ins, inside));
+                        output.add(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, inside));
                     }
                     return;
                 }
@@ -144,22 +144,22 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
                         GraphTargetItem top = stack.peek().getNotCoerced().getThroughDuplicate();
                         if (top == inside) {
                             stack.pop();
-                            stack.push(new PostDecrementAVM2Item(ins, inside));
+                            stack.push(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, inside));
                         } else if ((top instanceof DecrementAVM2Item) && (((DecrementAVM2Item) top).value == inside)) {
                             stack.pop();
-                            stack.push(new PreDecrementAVM2Item(ins, inside));
+                            stack.push(new PreDecrementAVM2Item(ins, localData.lineStartInstruction, inside));
                         } else {
-                            output.add(new PostDecrementAVM2Item(ins, inside));
+                            output.add(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, inside));
                         }
                     } else {
-                        output.add(new PostDecrementAVM2Item(ins, inside));
+                        output.add(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, inside));
                     }
                     return;
                 }
             }
         }
 
-        output.add(new SetSlotAVM2Item(ins, obj, slotname, value));
+        output.add(new SetSlotAVM2Item(ins, localData.lineStartInstruction, obj, slotname, value));
     }
 
     @Override

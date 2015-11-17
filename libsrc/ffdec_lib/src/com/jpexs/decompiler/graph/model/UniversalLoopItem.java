@@ -37,8 +37,8 @@ public class UniversalLoopItem extends LoopItem implements Block {
 
     private boolean labelUsed;
 
-    public UniversalLoopItem(GraphSourceItem src, Loop loop) {
-        super(src, loop);
+    public UniversalLoopItem(GraphSourceItem src, GraphSourceItem lineStartIns, Loop loop) {
+        super(src, lineStartIns, loop);
     }
 
     @Override

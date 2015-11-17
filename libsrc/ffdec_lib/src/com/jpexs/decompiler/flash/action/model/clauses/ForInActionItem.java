@@ -63,8 +63,8 @@ public class ForInActionItem extends LoopActionItem implements Block {
         return ret;
     }
 
-    public ForInActionItem(Action instruction, Loop loop, GraphTargetItem variableName, GraphTargetItem enumVariable, List<GraphTargetItem> commands) {
-        super(instruction, loop);
+    public ForInActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, Loop loop, GraphTargetItem variableName, GraphTargetItem enumVariable, List<GraphTargetItem> commands) {
+        super(instruction, lineStartIns, loop);
         this.variableName = variableName;
         this.enumVariable = enumVariable;
         this.commands = commands;

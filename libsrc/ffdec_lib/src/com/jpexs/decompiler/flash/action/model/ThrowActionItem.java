@@ -29,8 +29,8 @@ import java.util.List;
 
 public class ThrowActionItem extends ActionItem {
 
-    public ThrowActionItem(GraphSourceItem instruction, GraphTargetItem object) {
-        super(instruction, PRECEDENCE_PRIMARY, object);
+    public ThrowActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object) {
+        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY, object);
     }
 
     @Override

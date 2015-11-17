@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui.abc;
 
+import com.jpexs.debugger.flash.Variable;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ClassPath;
@@ -40,6 +41,7 @@ import com.jpexs.decompiler.flash.abc.usages.TraitMultinameUsage;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppDialog;
 import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.gui.DebuggerHandler;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainPanel;
@@ -81,6 +83,7 @@ import java.awt.event.MouseMotionListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -98,7 +101,10 @@ import javax.swing.JTable;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 import javax.swing.text.Highlighter;
 import javax.swing.tree.TreePath;
 import jsyntaxpane.SyntaxDocument;
@@ -142,6 +148,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
     private NewTraitDialog newTraitDialog;
 
     public final JLabel scriptNameLabel;
+
+    private JTable debugVariablesTable;
 
     private final JLabel experimentalLabel = new JLabel(AppStrings.translate("action.edit.experimental"));
 
@@ -256,6 +264,114 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         decompiledTextArea.clearScript();
     }
 
+    public static class VariablesTableModel implements TableModel {
+
+        DebuggerHandler.VariableChangedListener varChangeListener;
+
+        List<TableModelListener> tableListeners = new ArrayList<>();
+
+        public VariablesTableModel() {
+            varChangeListener = new DebuggerHandler.VariableChangedListener() {
+                private int oldNum = 0;
+
+                @Override
+                public void variablesChanged() {
+                    for (int i = 0; i < oldNum; i++) {
+                        for (TableModelListener l : tableListeners) {
+                            l.tableChanged(new TableModelEvent(VariablesTableModel.this, i, i, 0, TableModelEvent.DELETE));
+                        }
+                    }
+                    oldNum = 1 + Main.getDebugHandler().getNumVariables() + Main.getDebugHandler().getNumRegisters();
+                    for (TableModelListener l : tableListeners) {
+                        l.tableChanged(new TableModelEvent(VariablesTableModel.this, 0, oldNum - 1, 0, TableModelEvent.INSERT));
+                    }
+
+                }
+            };
+            Main.getDebugHandler().addVariableChangedListener(varChangeListener);
+        }
+
+        @Override
+        public int getRowCount() {
+            return (Main.getDebugHandler().getFrameVariable() == null ? 0 : 1) + Main.getDebugHandler().getNumRegisters() + Main.getDebugHandler().getNumVariables();
+        }
+
+        @Override
+        public int getColumnCount() {
+            return 3;
+        }
+
+        @Override
+        public String getColumnName(int columnIndex) {
+            switch (columnIndex) {
+                case 0:
+                    return "Name";
+                case 1:
+                    return "Type";
+                case 2:
+                    return "Value";
+                default:
+                    return null;
+            }
+        }
+
+        @Override
+        public Class<?> getColumnClass(int columnIndex) {
+            return String.class;
+        }
+
+        @Override
+        public boolean isCellEditable(int rowIndex, int columnIndex) {
+            return columnIndex == 1;
+        }
+
+        @Override
+        public Object getValueAt(int rowIndex, int columnIndex) {
+            int numReg = Main.getDebugHandler().getNumRegisters();
+            Variable v;
+            if (rowIndex == 0) {
+                v = Main.getDebugHandler().getFrameVariable();
+            } else if (rowIndex >= numReg + 1) {
+                v = Main.getDebugHandler().getVariable(rowIndex - 1 - numReg);
+            } else {
+                v = Main.getDebugHandler().getRegister(rowIndex - 1);
+            }
+
+            switch (columnIndex) {
+                case 0:
+                    return v.name;
+                case 1:
+                    String typeStr = v.getTypeAsStr();
+                    if ("Object".equals(typeStr)) {
+                        typeStr = v.className;
+                    }
+                    if ("Object".equals(typeStr)) {
+                        typeStr = v.typeName;
+                    }
+                    return typeStr;
+                case 2:
+                    return v.getValueAsStr();
+            }
+            return null;
+        }
+
+        @Override
+        public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+            Main.getDebugHandler().setVariableValue(rowIndex, "" + aValue);
+        }
+
+        @Override
+        public void addTableModelListener(TableModelListener l) {
+            tableListeners.add(l);
+        }
+
+        @Override
+        public void removeTableModelListener(TableModelListener l) {
+            tableListeners.remove(l);
+        }
+
+    }
+
     public ABCPanel(MainPanel mainPanel) {
 
         this.mainPanel = mainPanel;
@@ -331,8 +447,11 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         detailPanel = new DetailPanel(this);
         JPanel panB = new JPanel();
         panB.setLayout(new BorderLayout());
-        panB.add(decPanel, BorderLayout.CENTER);
         panB.add(decLabel, BorderLayout.NORTH);
+        panB.add(decPanel, BorderLayout.CENTER);
+        debugVariablesTable = new JTable(new VariablesTableModel());
+
+        panB.add(debugVariablesTable, BorderLayout.SOUTH);
         decLabel.setHorizontalAlignment(SwingConstants.CENTER);
         //decLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
         splitPane = new JPersistentSplitPane(JSplitPane.HORIZONTAL_SPLIT, panB, detailPanel, Configuration.guiAvm2SplitPaneDividerLocationPercent);

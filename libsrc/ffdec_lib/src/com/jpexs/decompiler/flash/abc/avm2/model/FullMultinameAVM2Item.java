@@ -21,7 +21,8 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.DottedChain;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
@@ -38,24 +39,24 @@ public class FullMultinameAVM2Item extends AVM2Item {
 
     public boolean property;
 
-    public FullMultinameAVM2Item(boolean property, AVM2Instruction instruction, int multinameIndex, GraphTargetItem name) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public FullMultinameAVM2Item(boolean property, GraphSourceItem instruction, GraphSourceItem lineStartIns, int multinameIndex, GraphTargetItem name) {
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.multinameIndex = multinameIndex;
         this.name = name;
         this.namespace = null;
         this.property = property;
     }
 
-    public FullMultinameAVM2Item(boolean property, AVM2Instruction instruction, int multinameIndex) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public FullMultinameAVM2Item(boolean property, GraphSourceItem instruction, GraphSourceItem lineStartIns, int multinameIndex) {
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.multinameIndex = multinameIndex;
         this.name = null;
         this.namespace = null;
         this.property = property;
     }
 
-    public FullMultinameAVM2Item(boolean property, AVM2Instruction instruction, int multinameIndex, GraphTargetItem name, GraphTargetItem namespace) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public FullMultinameAVM2Item(boolean property, GraphSourceItem instruction, GraphSourceItem lineStartIns, int multinameIndex, GraphTargetItem name, GraphTargetItem namespace) {
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.multinameIndex = multinameIndex;
         this.name = name;
         this.namespace = namespace;
@@ -162,10 +163,7 @@ public class FullMultinameAVM2Item extends AVM2Item {
                 tiNameSpace2 = ((LocalRegAVM2Item) tiNameSpace2).computedValue.getThroughNotCompilable().getThroughDuplicate();
             }
         }
-        if (tiNameSpace != tiNameSpace2) {
-            return false;
-        }
-        return true;
+        return (tiNameSpace == tiNameSpace2);
     }
 
     @Override

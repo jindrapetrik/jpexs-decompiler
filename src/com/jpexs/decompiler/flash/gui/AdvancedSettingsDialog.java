@@ -386,7 +386,7 @@ public class AdvancedSettingsDialog extends AppDialog {
                             p.setMaximumSize(new Dimension(Integer.MAX_VALUE, tf.getPreferredSize().height));
                             p.add(tf, BorderLayout.CENTER);
                             JButton butSelect = new JButton(View.getIcon("folderopen16"));
-                            butSelect.setToolTipText(AppStrings.translate("FileChooser.openButtonText"));
+                            butSelect.setToolTipText(ResourceBundle.getBundle(AppStrings.getResourcePath(MainFrame.class)).getString("FileChooser.openButtonText"));
                             butSelect.setMargin(new Insets(2, 2, 2, 2));
                             butSelect.addActionListener((ActionEvent e) -> {
                                 tf.setText(selectConfigFile(item, tf.getText(), confFile.value()));

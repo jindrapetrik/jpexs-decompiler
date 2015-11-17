@@ -47,11 +47,11 @@ public class DirectValueActionItem extends ActionItem implements SimpleValue {
     public final int pos;
 
     public DirectValueActionItem(Object o) {
-        this(null, 0, o, new ArrayList<>());
+        this(null, null, 0, o, new ArrayList<>());
     }
 
-    public DirectValueActionItem(GraphSourceItem instruction, int instructionPos, Object value, List<String> constants) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public DirectValueActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, int instructionPos, Object value, List<String> constants) {
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.constants = constants;
         this.value = value;
         this.pos = instructionPos;
@@ -64,10 +64,7 @@ public class DirectValueActionItem extends ActionItem implements SimpleValue {
 
     @Override
     public boolean isVariableComputed() {
-        if (computedRegValue != null) {
-            return true;
-        }
-        return false;
+        return (computedRegValue != null);
     }
 
     @Override

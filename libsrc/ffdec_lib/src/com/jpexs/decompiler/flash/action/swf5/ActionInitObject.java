@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.InitObjectActionItem;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphSourceItem; import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,7 +39,7 @@ public class ActionInitObject extends Action {
     }
 
     @Override
-    public void translate(TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
+    public void translate(GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         long numArgs = popLong(stack);
         List<GraphTargetItem> values = new ArrayList<>();
         List<GraphTargetItem> names = new ArrayList<>();
@@ -47,7 +47,7 @@ public class ActionInitObject extends Action {
             values.add(stack.pop());
             names.add(stack.pop());
         }
-        stack.push(new InitObjectActionItem(this, names, values));
+        stack.push(new InitObjectActionItem(this, lineStartAction, names, values));
     }
 
     @Override

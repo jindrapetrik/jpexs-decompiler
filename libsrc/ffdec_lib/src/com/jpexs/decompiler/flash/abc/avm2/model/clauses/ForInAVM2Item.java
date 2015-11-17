@@ -27,7 +27,7 @@ import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.Loop;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
@@ -54,8 +54,8 @@ public class ForInAVM2Item extends LoopItem implements Block {
         return ret;
     }
 
-    public ForInAVM2Item(GraphSourceItem instruction, Loop loop, InAVM2Item expression, List<GraphTargetItem> commands) {
-        super(instruction, loop);
+    public ForInAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, Loop loop, InAVM2Item expression, List<GraphTargetItem> commands) {
+        super(instruction, lineStartIns, loop);
         if (!commands.isEmpty()) {
             GraphTargetItem firstAssign = commands.get(0);
             if (firstAssign instanceof SetTypeAVM2Item) {

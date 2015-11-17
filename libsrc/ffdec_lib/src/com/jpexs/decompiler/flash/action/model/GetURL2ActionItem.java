@@ -63,8 +63,8 @@ public class GetURL2ActionItem extends ActionItem {
         return writer.append(methodStr).append(")");
     }
 
-    public GetURL2ActionItem(GraphSourceItem instruction, GraphTargetItem urlString, GraphTargetItem targetString, int method) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public GetURL2ActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem urlString, GraphTargetItem targetString, int method) {
+        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
         this.urlString = urlString;
         this.targetString = targetString;
         this.sendVarsMethod = method;

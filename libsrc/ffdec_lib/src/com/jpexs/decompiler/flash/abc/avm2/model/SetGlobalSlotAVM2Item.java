@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphPart;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 
@@ -33,8 +33,8 @@ public class SetGlobalSlotAVM2Item extends AVM2Item {
         return value.getFirstPart();
     }
 
-    public SetGlobalSlotAVM2Item(AVM2Instruction instruction, int slotId, GraphTargetItem value) {
-        super(instruction, PRECEDENCE_ASSIGMENT, value);
+    public SetGlobalSlotAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  int slotId, GraphTargetItem value) {
+        super(instruction, lineStartIns, PRECEDENCE_ASSIGMENT, value);
         this.slotId = slotId;
     }
 

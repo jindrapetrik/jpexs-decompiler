@@ -42,7 +42,7 @@ public class PushShortIns extends InstructionDefinition implements PushIntegerTy
 
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
-        stack.push(new IntegerValueAVM2Item(ins, (long) (short) ins.operands[0]));
+        stack.push(new IntegerValueAVM2Item(ins, localData.lineStartInstruction, (long) (short) ins.operands[0]));
     }
 
     @Override

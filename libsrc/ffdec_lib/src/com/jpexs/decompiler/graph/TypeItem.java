@@ -51,7 +51,7 @@ public class TypeItem extends GraphTargetItem {
     }
 
     public TypeItem(DottedChain fullTypeName, List<GraphTargetItem> subtypes) {
-        super(null, NOPRECEDENCE);
+        super(null, null, NOPRECEDENCE);
         this.fullTypeName = fullTypeName;
     }
 
@@ -71,10 +71,7 @@ public class TypeItem extends GraphTargetItem {
             return false;
         }
         final TypeItem other = (TypeItem) obj;
-        if (!Objects.equals(fullTypeName, other.fullTypeName)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(fullTypeName, other.fullTypeName);
     }
 
     @Override

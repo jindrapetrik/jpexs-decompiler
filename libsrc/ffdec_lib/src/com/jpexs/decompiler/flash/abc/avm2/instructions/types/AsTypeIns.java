@@ -49,7 +49,7 @@ public class AsTypeIns extends InstructionDefinition {
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         GraphTargetItem val = stack.pop();
 
-        stack.push(new AsTypeAVM2Item(ins, val, new FullMultinameAVM2Item(false, ins, ins.operands[0])));
+        stack.push(new AsTypeAVM2Item(ins, localData.lineStartInstruction, val, new FullMultinameAVM2Item(false, ins, localData.lineStartInstruction, ins.operands[0])));
     }
 
     @Override

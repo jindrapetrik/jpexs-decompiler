@@ -25,7 +25,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.IntegerValueTypeItem;
@@ -38,8 +38,8 @@ public class IntegerValueAVM2Item extends NumberValueAVM2Item implements Integer
 
     public Long value;
 
-    public IntegerValueAVM2Item(AVM2Instruction instruction, Long value) {
-        super(instruction);
+    public IntegerValueAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, Long value) {
+        super(instruction, lineStartIns);
         this.value = value;
     }
 
@@ -128,7 +128,7 @@ public class IntegerValueAVM2Item extends NumberValueAVM2Item implements Integer
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
-        AVM2Instruction ins = null;
+        AVM2Instruction ins;
         if (value >= -128 && value <= 127) {
             ins = new AVM2Instruction(0, AVM2Instructions.PushByte, new int[]{(int) (long) value});
         } else if (value >= -32768 && value <= 32767) {

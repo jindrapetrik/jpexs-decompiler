@@ -62,11 +62,11 @@ public class CallPropVoidIns extends InstructionDefinition {
         for (int a = 0; a < argCount; a++) {
             args.add(0, stack.pop());
         }
-        FullMultinameAVM2Item multiname = resolveMultiname(true, stack, localData.getConstants(), multinameIndex, ins);
+        FullMultinameAVM2Item multiname = resolveMultiname(localData, true, stack, localData.getConstants(), multinameIndex, ins);
 
         GraphTargetItem receiver = stack.pop();
 
-        output.add(new CallPropertyAVM2Item(ins, true, receiver, multiname, args));
+        output.add(new CallPropertyAVM2Item(ins, localData.lineStartInstruction, true, receiver, multiname, args));
     }
 
     @Override

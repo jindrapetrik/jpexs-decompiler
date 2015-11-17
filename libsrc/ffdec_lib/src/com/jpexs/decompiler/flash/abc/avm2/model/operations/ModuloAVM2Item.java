@@ -31,8 +31,8 @@ import java.util.List;
 
 public class ModuloAVM2Item extends BinaryOpItem {
 
-    public ModuloAVM2Item(AVM2Instruction instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, PRECEDENCE_MULTIPLICATIVE, leftSide, rightSide, "%");
+    public ModuloAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  GraphTargetItem leftSide, GraphTargetItem rightSide) {
+        super(instruction, lineStartIns, PRECEDENCE_MULTIPLICATIVE, leftSide, rightSide, "%");
     }
 
     @Override

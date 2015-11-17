@@ -57,8 +57,8 @@ public class ForItem extends LoopItem implements Block {
         return ret;
     }
 
-    public ForItem(GraphSourceItem src, Loop loop, List<GraphTargetItem> firstCommands, GraphTargetItem expression, List<GraphTargetItem> finalCommands, List<GraphTargetItem> commands) {
-        super(src, loop);
+    public ForItem(GraphSourceItem src, GraphSourceItem lineStartIns, Loop loop, List<GraphTargetItem> firstCommands, GraphTargetItem expression, List<GraphTargetItem> finalCommands, List<GraphTargetItem> commands) {
+        super(src, lineStartIns, loop);
         this.firstCommands = firstCommands;
         this.expression = expression;
         this.finalCommands = finalCommands;

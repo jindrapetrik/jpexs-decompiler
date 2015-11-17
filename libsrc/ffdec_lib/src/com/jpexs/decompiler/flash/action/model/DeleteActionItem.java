@@ -43,8 +43,8 @@ public class DeleteActionItem extends ActionItem {
         return ret;
     }
 
-    public DeleteActionItem(GraphSourceItem instruction, GraphTargetItem object, GraphTargetItem propertyName) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public DeleteActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, GraphTargetItem propertyName) {
+        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
         this.object = object;
         this.propertyName = propertyName;
     }

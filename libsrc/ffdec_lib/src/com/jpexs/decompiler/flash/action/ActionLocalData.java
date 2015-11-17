@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
+import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
 
@@ -31,6 +32,8 @@ public class ActionLocalData extends BaseLocalData {
     public final HashMap<String, GraphTargetItem> variables;
 
     public final HashMap<String, GraphTargetItem> functions;
+
+    public GraphSourceItem lineStartAction;
 
     public ActionLocalData() {
         regNames = new HashMap<>();

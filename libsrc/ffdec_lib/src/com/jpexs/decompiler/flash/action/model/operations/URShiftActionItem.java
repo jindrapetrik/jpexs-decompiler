@@ -28,8 +28,8 @@ import java.util.List;
 
 public class URShiftActionItem extends BinaryOpItem {
 
-    public URShiftActionItem(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, PRECEDENCE_BITWISESHIFT, leftSide, rightSide, ">>>");
+    public URShiftActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
+        super(instruction, lineStartIns, PRECEDENCE_BITWISESHIFT, leftSide, rightSide, ">>>");
     }
 
     @Override

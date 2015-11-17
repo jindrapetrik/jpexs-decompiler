@@ -17,7 +17,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 
@@ -29,8 +29,8 @@ public class FilteredCheckAVM2Item extends AVM2Item {
 
     GraphTargetItem object;
 
-    public FilteredCheckAVM2Item(AVM2Instruction instruction, GraphTargetItem object) {
-        super(instruction, NOPRECEDENCE);
+    public FilteredCheckAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  GraphTargetItem object) {
+        super(instruction, lineStartIns, NOPRECEDENCE);
         this.object = object;
     }
 

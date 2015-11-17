@@ -16,9 +16,13 @@
  */
 package com.jpexs.decompiler.flash;
 
+import com.jpexs.decompiler.graph.GraphSourceItem;
+
 /**
  *
  * @author JPEXS
  */
 public abstract class BaseLocalData {
+
+    public GraphSourceItem lineStartInstruction;
 }

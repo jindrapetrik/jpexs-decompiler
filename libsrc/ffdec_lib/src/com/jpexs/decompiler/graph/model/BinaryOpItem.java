@@ -43,8 +43,8 @@ public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
         return fp;
     }
 
-    public BinaryOpItem(GraphSourceItem instruction, int precedence, GraphTargetItem leftSide, GraphTargetItem rightSide, String operator) {
-        super(instruction, precedence);
+    public BinaryOpItem(GraphSourceItem instruction, GraphSourceItem lineStartItem, int precedence, GraphTargetItem leftSide, GraphTargetItem rightSide, String operator) {
+        super(instruction, lineStartItem, precedence);
         this.leftSide = leftSide;
         this.rightSide = rightSide;
         this.operator = operator;
@@ -147,10 +147,7 @@ public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
         if (!Objects.equals(rightSide, other.rightSide)) {
             return false;
         }
-        if (!Objects.equals(operator, other.operator)) {
-            return false;
-        }
-        return true;
+        return (Objects.equals(operator, other.operator));
     }
 
     /*@Override

@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -31,8 +32,8 @@ import java.util.List;
  */
 public class GetVersionActionItem extends ActionItem {
 
-    public GetVersionActionItem(GraphSourceItem instruction) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public GetVersionActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns) {
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
     }
 
     @Override

@@ -45,7 +45,7 @@ public class PopScopeIns extends InstructionDefinition {
         GraphTargetItem scope = localData.scopeStack.pop();
         if (scope instanceof WithObjectAVM2Item) {
             scope = ((WithObjectAVM2Item) scope).scope;
-            output.add(new WithEndAVM2Item(ins, scope));
+            output.add(new WithEndAVM2Item(ins, localData.lineStartInstruction, scope));
         }
     }
 

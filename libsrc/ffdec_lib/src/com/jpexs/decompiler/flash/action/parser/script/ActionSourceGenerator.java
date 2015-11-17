@@ -139,7 +139,7 @@ public class ActionSourceGenerator implements SourceGenerator {
             ret.addAll(expression.toSource(localData, this));
             ret.add(new ActionNot());
         }
-        List<Action> onTrue = null;
+        List<Action> onTrue;
         List<Action> onFalse = null;
         if (ternar) {
             onTrue = toActionList(onTrueCmds.get(0).toSource(localData, this));
@@ -582,7 +582,7 @@ public class ActionSourceGenerator implements SourceGenerator {
         } while (item instanceof GetMemberActionItem);
         if (item instanceof GetVariableActionItem) {
             GetVariableActionItem v = (GetVariableActionItem) item;
-            item = new GetMemberActionItem(null, new GetVariableActionItem(null, new DirectValueActionItem(null, 0, "_global", new ArrayList<>())), v.name);
+            item = new GetMemberActionItem(null, null, new GetVariableActionItem(null, null, new DirectValueActionItem(null, null, 0, "_global", new ArrayList<>())), v.name);
             if (mem != null) {
                 mem.object = item;
             }
@@ -637,7 +637,7 @@ public class ActionSourceGenerator implements SourceGenerator {
             constantPool.add(s);
             index = constantPool.indexOf(s);
         }
-        return new DirectValueActionItem(null, 0, new ConstantIndex(index), constantPool);
+        return new DirectValueActionItem(null, null, 0, new ConstantIndex(index), constantPool);
     }
 
     public ActionPush pushConst(String s) {

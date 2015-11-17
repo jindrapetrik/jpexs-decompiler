@@ -49,8 +49,8 @@ public class LoadVariablesNumActionItem extends ActionItem {
         return ret;
     }
 
-    public LoadVariablesNumActionItem(GraphSourceItem instruction, GraphTargetItem urlString, GraphTargetItem num, int method) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public LoadVariablesNumActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem urlString, GraphTargetItem num, int method) {
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.urlString = urlString;
         this.num = num;
         this.method = method;
@@ -77,11 +77,11 @@ public class LoadVariablesNumActionItem extends ActionItem {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
-        Object lev = null;
+        Object lev;
         if ((num instanceof DirectValueActionItem) && (((DirectValueActionItem) num).value instanceof Long)) {
             lev = asGenerator.pushConstTargetItem("_level" + ((DirectValueActionItem) num).value);
         } else {
-            lev = new AddActionItem(getSrc(), asGenerator.pushConstTargetItem("_level"), num, true);
+            lev = new AddActionItem(getSrc(), getLineStartItem(), asGenerator.pushConstTargetItem("_level"), num, true);
         }
         return toSourceMerge(localData, generator, urlString, lev, new ActionGetURL2(method, true, false));
     }

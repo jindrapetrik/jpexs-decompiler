@@ -29,8 +29,8 @@ import java.util.List;
 
 public class RemoveSpriteActionItem extends ActionItem {
 
-    public RemoveSpriteActionItem(GraphSourceItem instruction, GraphTargetItem target) {
-        super(instruction, PRECEDENCE_PRIMARY, target);
+    public RemoveSpriteActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem target) {
+        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY, target);
     }
 
     @Override

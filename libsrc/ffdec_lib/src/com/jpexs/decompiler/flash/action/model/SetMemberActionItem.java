@@ -76,8 +76,8 @@ public class SetMemberActionItem extends ActionItem implements SetTypeActionItem
         return value;
     }
 
-    public SetMemberActionItem(GraphSourceItem instruction, GraphTargetItem object, GraphTargetItem objectName, GraphTargetItem value) {
-        super(instruction, PRECEDENCE_ASSIGMENT, value);
+    public SetMemberActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, GraphTargetItem objectName, GraphTargetItem value) {
+        super(instruction, lineStartIns, PRECEDENCE_ASSIGMENT, value);
         this.object = object;
         this.objectName = objectName;
     }
@@ -101,7 +101,7 @@ public class SetMemberActionItem extends ActionItem implements SetTypeActionItem
 
     @Override
     public GraphTargetItem getObject() {
-        return new GetMemberActionItem(getSrc(), object, objectName);
+        return new GetMemberActionItem(getSrc(), getLineStartItem(), object, objectName);
     }
 
     @Override

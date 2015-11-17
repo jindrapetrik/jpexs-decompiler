@@ -41,7 +41,7 @@ public class ReturnValueIns extends InstructionDefinition {
 
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
-        output.add(new ReturnValueAVM2Item(ins, stack.pop()));
+        output.add(new ReturnValueAVM2Item(ins, localData.lineStartInstruction, stack.pop()));
     }
 
     @Override

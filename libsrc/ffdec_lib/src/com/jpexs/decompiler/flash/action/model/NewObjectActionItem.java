@@ -42,8 +42,8 @@ public class NewObjectActionItem extends ActionItem {
         return ret;
     }
 
-    public NewObjectActionItem(GraphSourceItem instruction, GraphTargetItem objectName, List<GraphTargetItem> arguments) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public NewObjectActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem objectName, List<GraphTargetItem> arguments) {
+        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
         this.objectName = objectName;
         this.arguments = arguments;
     }

@@ -43,8 +43,8 @@ public class StartDragActionItem extends ActionItem {
 
     public GraphTargetItem x1;
 
-    public StartDragActionItem(GraphSourceItem instruction, GraphTargetItem target, GraphTargetItem lockCenter, GraphTargetItem constrain, GraphTargetItem x1, GraphTargetItem y1, GraphTargetItem x2, GraphTargetItem y2) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public StartDragActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem target, GraphTargetItem lockCenter, GraphTargetItem constrain, GraphTargetItem x1, GraphTargetItem y1, GraphTargetItem x2, GraphTargetItem y2) {
+        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
         this.target = target;
         this.lockCenter = lockCenter;
         this.constrain = constrain;

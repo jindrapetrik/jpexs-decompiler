@@ -22,7 +22,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -33,8 +33,8 @@ public class BooleanAVM2Item extends AVM2Item {
 
     public Boolean value;
 
-    public BooleanAVM2Item(AVM2Instruction instruction, Boolean value) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public BooleanAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  Boolean value) {
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.value = value;
     }
 

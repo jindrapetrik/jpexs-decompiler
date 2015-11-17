@@ -29,7 +29,7 @@ public class MarkItem extends GraphTargetItem {
     private final String mark;
 
     public MarkItem(String mark) {
-        super(null, NOPRECEDENCE);
+        super(null, null, NOPRECEDENCE);
         this.mark = mark;
     }
 

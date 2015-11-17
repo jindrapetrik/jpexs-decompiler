@@ -34,7 +34,7 @@ import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphSourceItem; import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.io.IOException;
 import java.util.HashMap;
@@ -81,7 +81,7 @@ public class ActionStoreRegister extends Action implements StoreTypeAction {
     }
 
     @Override
-    public void translate(TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
+    public void translate(GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem value = stack.pop();
         RegisterNumber rn = new RegisterNumber(registerNumber);
         if (regNames.containsKey(registerNumber)) {
@@ -117,7 +117,7 @@ public class ActionStoreRegister extends Action implements StoreTypeAction {
             GraphTargetItem obj = ((IncrementActionItem) value).object;
             if (!stack.isEmpty() && stack.peek().valueEquals(obj)) {
                 stack.pop();
-                stack.push(new PostIncrementActionItem(this, obj));
+                stack.push(new PostIncrementActionItem(this, lineStartAction, obj));
                 stack.push(obj);
                 return;
             }
@@ -126,12 +126,12 @@ public class ActionStoreRegister extends Action implements StoreTypeAction {
             GraphTargetItem obj = ((DecrementActionItem) value).object;
             if (!stack.isEmpty() && stack.peek().valueEquals(obj)) {
                 stack.pop();
-                stack.push(new PostDecrementActionItem(this, obj));
+                stack.push(new PostDecrementActionItem(this, lineStartAction, obj));
                 stack.push(obj);
                 return;
             }
         }
-        stack.push(new StoreRegisterActionItem(this, rn, value, define));
+        stack.push(new StoreRegisterActionItem(this, lineStartAction, rn, value, define));
     }
 
     @Override

@@ -30,8 +30,8 @@ import java.util.Set;
 
 public class CharToAsciiActionItem extends ActionItem {
 
-    public CharToAsciiActionItem(GraphSourceItem instruction, GraphTargetItem value) {
-        super(instruction, PRECEDENCE_PRIMARY, value);
+    public CharToAsciiActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value) {
+        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY, value);
     }
 
     @Override

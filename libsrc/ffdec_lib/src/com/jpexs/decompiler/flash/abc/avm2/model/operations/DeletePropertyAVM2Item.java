@@ -45,12 +45,12 @@ public class DeletePropertyAVM2Item extends AVM2Item {
 
     //Constructor for compiler
     public DeletePropertyAVM2Item(GraphTargetItem property, int line) {
-        this(null, property, null);
+        this(null, null, property, null);
         this.line = line;
     }
 
-    public DeletePropertyAVM2Item(AVM2Instruction instruction, GraphTargetItem object, GraphTargetItem propertyName) {
-        super(instruction, PRECEDENCE_UNARY);
+    public DeletePropertyAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, GraphTargetItem propertyName) {
+        super(instruction, lineStartIns, PRECEDENCE_UNARY);
         this.object = object;
         this.propertyName = propertyName;
     }

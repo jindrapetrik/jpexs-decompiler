@@ -40,8 +40,8 @@ public class IncrementActionItem extends ActionItem {
         return ret;
     }
 
-    public IncrementActionItem(GraphSourceItem instruction, GraphTargetItem object) {
-        super(instruction, PRECEDENCE_ADDITIVE);
+    public IncrementActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object) {
+        super(instruction, lineStartIns,  PRECEDENCE_ADDITIVE);
         this.object = object;
     }
 

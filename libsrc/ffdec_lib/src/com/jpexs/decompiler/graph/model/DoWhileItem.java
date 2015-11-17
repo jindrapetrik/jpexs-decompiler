@@ -52,8 +52,8 @@ public class DoWhileItem extends LoopItem implements Block {
         return ret;
     }
 
-    public DoWhileItem(GraphSourceItem src, Loop loop, List<GraphTargetItem> commands, List<GraphTargetItem> expression) {
-        super(src, loop);
+    public DoWhileItem(GraphSourceItem src, GraphSourceItem lineStartIns, Loop loop, List<GraphTargetItem> commands, List<GraphTargetItem> expression) {
+        super(src, lineStartIns, loop);
         this.expression = expression;
         this.commands = commands;
     }

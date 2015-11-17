@@ -22,7 +22,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -36,8 +36,8 @@ public class AlchemySignExtendAVM2Item extends AVM2Item {
 
     private final int size;
 
-    public AlchemySignExtendAVM2Item(GraphSourceItem instruction, GraphTargetItem value, int size) {
-        super(instruction, PRECEDENCE_PRIMARY, value);
+    public AlchemySignExtendAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value, int size) {
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY, value);
         this.size = size;
     }
 

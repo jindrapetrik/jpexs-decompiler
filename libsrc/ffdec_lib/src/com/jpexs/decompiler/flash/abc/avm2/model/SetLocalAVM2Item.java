@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.clauses.AssignmentAVM2Item;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -34,8 +34,8 @@ public class SetLocalAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assig
     public int regIndex;
     //public GraphTargetItem value;
 
-    public SetLocalAVM2Item(AVM2Instruction instruction, int regIndex, GraphTargetItem value) {
-        super(instruction, PRECEDENCE_ASSIGMENT, value);
+    public SetLocalAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, int regIndex, GraphTargetItem value) {
+        super(instruction, lineStartIns, PRECEDENCE_ASSIGMENT, value);
         this.regIndex = regIndex;
     }
 
@@ -49,7 +49,7 @@ public class SetLocalAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assig
 
     @Override
     public GraphTargetItem getObject() {
-        return new LocalRegAVM2Item(getInstruction(), regIndex, null);
+        return new LocalRegAVM2Item(getInstruction(), getLineStartIns(), regIndex, null);
     }
 
     @Override

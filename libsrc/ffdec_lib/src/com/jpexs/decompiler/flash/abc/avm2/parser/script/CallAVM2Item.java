@@ -48,7 +48,7 @@ public class CallAVM2Item extends AVM2Item {
     public List<NamespaceItem> openedNamespaces;
 
     public CallAVM2Item(List<NamespaceItem> openedNamespaces, int line, GraphTargetItem name, List<GraphTargetItem> arguments) {
-        super(null, NOPRECEDENCE);
+        super(null, null, NOPRECEDENCE);
         this.openedNamespaces = openedNamespaces;
         this.name = name;
         this.arguments = arguments;

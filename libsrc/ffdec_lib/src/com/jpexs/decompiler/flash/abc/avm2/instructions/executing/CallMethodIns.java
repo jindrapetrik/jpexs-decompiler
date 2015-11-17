@@ -59,7 +59,7 @@ public class CallMethodIns extends InstructionDefinition {
         }
         GraphTargetItem receiver = stack.pop();
         String methodName = localData.getMethodInfo().get(methodIndex).getName(localData.getConstants());
-        stack.push(new CallMethodAVM2Item(ins, receiver, methodName, args));
+        stack.push(new CallMethodAVM2Item(ins, localData.lineStartInstruction, receiver, methodName, args));
     }
 
     @Override

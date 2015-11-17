@@ -44,7 +44,7 @@ public class NegateIIns extends InstructionDefinition {
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         GraphTargetItem v = stack.pop();
-        stack.push(new NegAVM2Item(ins, v));
+        stack.push(new NegAVM2Item(ins, localData.lineStartInstruction, v));
     }
 
     @Override

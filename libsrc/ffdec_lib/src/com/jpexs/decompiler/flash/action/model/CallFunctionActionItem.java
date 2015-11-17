@@ -43,8 +43,8 @@ public class CallFunctionActionItem extends ActionItem {
         return arguments;
     }
 
-    public CallFunctionActionItem(GraphSourceItem instruction, GraphTargetItem functionName, List<GraphTargetItem> arguments) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public CallFunctionActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem functionName, List<GraphTargetItem> arguments) {
+        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
         this.functionName = functionName;
         this.arguments = arguments;
     }

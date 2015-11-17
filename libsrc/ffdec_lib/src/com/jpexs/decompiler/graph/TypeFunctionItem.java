@@ -38,7 +38,7 @@ public class TypeFunctionItem extends GraphTargetItem {
     public String fullTypeName;
 
     public TypeFunctionItem(String fullTypeName) {
-        super(null, NOPRECEDENCE);
+        super(null, null, NOPRECEDENCE);
         this.fullTypeName = fullTypeName;
     }
 
@@ -58,10 +58,7 @@ public class TypeFunctionItem extends GraphTargetItem {
             return false;
         }
         final TypeFunctionItem other = (TypeFunctionItem) obj;
-        if (!Objects.equals(fullTypeName, other.fullTypeName)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(fullTypeName, other.fullTypeName);
     }
 
     @Override

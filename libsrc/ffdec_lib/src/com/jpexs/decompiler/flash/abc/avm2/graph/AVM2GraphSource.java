@@ -22,10 +22,12 @@ import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.ConvertOutput;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.Reference;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSource;
+import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TranslateStack;
@@ -102,7 +104,9 @@ public class AVM2GraphSource extends GraphSource {
     public List<GraphTargetItem> translatePart(GraphPart part, BaseLocalData localData, TranslateStack stack, int start, int end, int staticOperation, String path) throws InterruptedException {
         List<GraphTargetItem> ret = new ArrayList<>();
         ScopeStack newstack = ((AVM2LocalData) localData).scopeStack;
-        ConvertOutput co = code.toSourceOutput(path, part, false, isStatic, scriptIndex, classIndex, localRegs, stack, newstack, abc, body, start, end, localRegNames, fullyQualifiedNames, new boolean[size()], localRegAssigmentIps, refs);
+        Reference<GraphSourceItem> lineStartItem = new Reference<>(localData.lineStartInstruction);
+        ConvertOutput co = code.toSourceOutput(lineStartItem, path, part, false, isStatic, scriptIndex, classIndex, localRegs, stack, newstack, abc, body, start, end, localRegNames, fullyQualifiedNames, new boolean[size()], localRegAssigmentIps, refs);
+        localData.lineStartInstruction = lineStartItem.getVal();
         ret.addAll(co.output);
         return ret;
     }

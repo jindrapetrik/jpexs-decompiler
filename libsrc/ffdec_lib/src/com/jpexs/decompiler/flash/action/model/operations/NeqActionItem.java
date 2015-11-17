@@ -34,8 +34,8 @@ public class NeqActionItem extends BinaryOpItem implements LogicalOpItem, Invert
 
     boolean version2;
 
-    public NeqActionItem(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide, boolean version2) {
-        super(instruction, PRECEDENCE_EQUALITY, leftSide, rightSide, "!=");
+    public NeqActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide, boolean version2) {
+        super(instruction, lineStartIns, PRECEDENCE_EQUALITY, leftSide, rightSide, "!=");
         this.version2 = version2;
     }
 
@@ -51,7 +51,7 @@ public class NeqActionItem extends BinaryOpItem implements LogicalOpItem, Invert
 
     @Override
     public GraphTargetItem invert(GraphSourceItem negSrc) {
-        return new EqActionItem(getSrc(), leftSide, rightSide, version2);
+        return new EqActionItem(getSrc(), getLineStartItem(), leftSide, rightSide, version2);
     }
 
     @Override

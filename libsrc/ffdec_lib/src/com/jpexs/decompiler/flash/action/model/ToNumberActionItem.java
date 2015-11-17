@@ -29,8 +29,8 @@ import java.util.List;
 
 public class ToNumberActionItem extends ActionItem {
 
-    public ToNumberActionItem(GraphSourceItem instruction, GraphTargetItem value) {
-        super(instruction, PRECEDENCE_PRIMARY, value);
+    public ToNumberActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value) {
+        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY, value);
     }
 
     @Override

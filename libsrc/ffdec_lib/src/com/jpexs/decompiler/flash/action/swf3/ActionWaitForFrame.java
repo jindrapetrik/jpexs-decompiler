@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.action.special.ActionStore;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
+import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.io.IOException;
@@ -88,10 +89,10 @@ public class ActionWaitForFrame extends Action implements ActionStore {
     }
 
     @Override
-    public void translate(TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) throws InterruptedException {
-        GraphTargetItem frameTi = new DirectValueActionItem(null, 0, new Long(frame), new ArrayList<>());
+    public void translate(GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) throws InterruptedException {
+        GraphTargetItem frameTi = new DirectValueActionItem(null, null, 0, new Long(frame), new ArrayList<>());
         List<GraphTargetItem> body = ActionGraph.translateViaGraph(regNames, variables, functions, skipped, SWF.DEFAULT_VERSION, staticOperation, path);
-        output.add(new IfFrameLoadedActionItem(frameTi, body, this));
+        output.add(new IfFrameLoadedActionItem(frameTi, body, this, lineStartAction));
     }
 
     @Override

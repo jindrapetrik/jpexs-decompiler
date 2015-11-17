@@ -55,7 +55,7 @@ public class Li32Ins extends InstructionDefinition implements AlchemyTypeIns {
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         GraphTargetItem ofs = stack.pop();
-        stack.push(new AlchemyLoadAVM2Item(ins, ofs, 'i', 32));
+        stack.push(new AlchemyLoadAVM2Item(ins, localData.lineStartInstruction, ofs, 'i', 32));
     }
 
     @Override

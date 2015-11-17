@@ -35,7 +35,7 @@ public class NextValueIns extends InstructionDefinition {
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         GraphTargetItem index = stack.pop();
         GraphTargetItem obj = stack.pop();
-        stack.push(new NextValueAVM2Item(ins, index, obj));
+        stack.push(new NextValueAVM2Item(ins, localData.lineStartInstruction, index, obj));
     }
 
     @Override

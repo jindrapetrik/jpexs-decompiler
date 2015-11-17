@@ -29,8 +29,8 @@ import java.util.List;
 
 public class CallActionItem extends ActionItem {
 
-    public CallActionItem(GraphSourceItem instruction, GraphTargetItem value) {
-        super(instruction, PRECEDENCE_PRIMARY, value);
+    public CallActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value) {
+        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY, value);
     }
 
     @Override

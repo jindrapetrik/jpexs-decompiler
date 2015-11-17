@@ -30,8 +30,8 @@ import java.util.List;
 
 public class IsTypeAVM2Item extends BinaryOpItem {
 
-    public IsTypeAVM2Item(AVM2Instruction instruction, GraphTargetItem value, GraphTargetItem type) {
-        super(instruction, PRECEDENCE_RELATIONAL, value, type, "is");
+    public IsTypeAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  GraphTargetItem value, GraphTargetItem type) {
+        super(instruction, lineStartIns, PRECEDENCE_RELATIONAL, value, type, "is");
     }
 
     @Override

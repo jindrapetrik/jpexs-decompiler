@@ -24,8 +24,8 @@ import java.util.Set;
 
 public class InActionItem extends BinaryOpItem {
 
-    public InActionItem(GraphSourceItem instruction, ActionItem name, ActionItem object) {
-        super(instruction, PRECEDENCE_RELATIONAL, name, object, "in");
+    public InActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, ActionItem name, ActionItem object) {
+        super(instruction, lineStartIns, PRECEDENCE_RELATIONAL, name, object, "in");
     }
 
     @Override

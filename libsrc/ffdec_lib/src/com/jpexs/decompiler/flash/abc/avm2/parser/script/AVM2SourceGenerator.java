@@ -311,7 +311,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 AssignableAVM2Item.dupSetTemp(localData, this, tempVal2),
                 ins(AVM2Instructions.PushWith)
         ));
-        localData.scopeStack.add(new LocalRegAVM2Item(null, tempVal2.getVal(), null));
+        localData.scopeStack.add(new LocalRegAVM2Item(null, null, tempVal2.getVal(), null));
         forBody.addAll(toInsList(item.value.toSource(localData, this)));
         List<AVM2Instruction> trueBody = new ArrayList<>();
         trueBody.addAll(toInsList(AssignableAVM2Item.getTemp(localData, this, xmlListReg)));
@@ -532,7 +532,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         ret.addAll(item.scope.toSource(localData, this));
         Reference<Integer> tempReg = new Reference<>(0);
         ret.addAll(AssignableAVM2Item.dupSetTemp(localData, this, tempReg));
-        localData.scopeStack.add(new WithObjectAVM2Item(null, new LocalRegAVM2Item(null, tempReg.getVal(), null)));
+        localData.scopeStack.add(new WithObjectAVM2Item(null, null, new LocalRegAVM2Item(null, null, tempReg.getVal(), null)));
         ret.add(ins(AVM2Instructions.PushWith));
         ret.addAll(generate(localData, item.items));
         ret.add(ins(AVM2Instructions.PopScope));
@@ -550,7 +550,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         if (item.expression != null) {
             ex.add(item.expression);
         } else {
-            ex.add(new BooleanAVM2Item(null, true));
+            ex.add(new BooleanAVM2Item(null, null, true));
         }
         GraphTargetItem lastItem = null;
         if (!ex.isEmpty()) {
@@ -598,11 +598,11 @@ public class AVM2SourceGenerator implements SourceGenerator {
         ret.add(forwardJump);
 
         List<AVM2Instruction> cases = new ArrayList<>();
-        cases.addAll(toInsList(new IntegerValueAVM2Item(null, (long) item.caseValues.size()).toSource(localData, this)));
+        cases.addAll(toInsList(new IntegerValueAVM2Item(null, null, (long) item.caseValues.size()).toSource(localData, this)));
         int cLen = insToBytes(cases).length;
         List<AVM2Instruction> caseLast = new ArrayList<>();
         caseLast.add(0, ins(AVM2Instructions.Jump, cLen));
-        caseLast.addAll(0, toInsList(new IntegerValueAVM2Item(null, (long) item.caseValues.size()).toSource(localData, this)));
+        caseLast.addAll(0, toInsList(new IntegerValueAVM2Item(null, null, (long) item.caseValues.size()).toSource(localData, this)));
         int cLastLen = insToBytes(caseLast).length;
         caseLast.add(0, ins(AVM2Instructions.Jump, cLastLen));
         cases.addAll(0, caseLast);
@@ -613,7 +613,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
         for (int i = item.caseValues.size() - 1; i >= 0; i--) {
             List<AVM2Instruction> sub = new ArrayList<>();
-            sub.addAll(toInsList(new IntegerValueAVM2Item(null, (long) i).toSource(localData, this)));
+            sub.addAll(toInsList(new IntegerValueAVM2Item(null, null, (long) i).toSource(localData, this)));
             sub.add(ins(AVM2Instructions.Jump, insToBytes(cases).length));
             int subLen = insToBytes(sub).length;
 
@@ -782,7 +782,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     }
                 }
             }
-            localData.scopeStack.add(new LocalRegAVM2Item(null, tempReg.getVal(), null));
+            localData.scopeStack.add(new LocalRegAVM2Item(null, null, tempReg.getVal(), null));
             catchCmd.addAll(generateToInsList(localData, item.catchCommands.get(c)));
             localData.scopeStack.remove(localData.scopeStack.size() - 1);
             catchCmd.add(ins(AVM2Instructions.PopScope));
@@ -1043,7 +1043,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 }
                 cnt++;
                 localData.finallyCounter.put(clauseId, cnt);
-                ret.addAll(new IntegerValueAVM2Item(null, (long) cnt).toSource(localData, this));
+                ret.addAll(new IntegerValueAVM2Item(null, null, (long) cnt).toSource(localData, this));
                 ret.add(ins(new FinallyJumpIns(clauseId), 0));
                 ret.add(ins(AVM2Instructions.Label));
                 ret.add(ins(AVM2Instructions.Pop));
@@ -1071,7 +1071,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 }
                 cnt++;
                 localData.finallyCounter.put(clauseId, cnt);
-                ret.addAll(new IntegerValueAVM2Item(null, (long) cnt).toSource(localData, this));
+                ret.addAll(new IntegerValueAVM2Item(null, null, (long) cnt).toSource(localData, this));
                 ret.add(ins(new FinallyJumpIns(clauseId), 0));
                 ret.add(ins(AVM2Instructions.Label));
                 ret.add(ins(AVM2Instructions.Pop));
@@ -1439,7 +1439,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         if (className != null) {
             String fullClassName = pkg.add(className).toRawString();
             registerTypes.add(fullClassName);
-            localData.scopeStack.add(new LocalRegAVM2Item(null, registerNames.size(), null));
+            localData.scopeStack.add(new LocalRegAVM2Item(null, null, registerNames.size(), null));
             registerNames.add("this");
 
         } else {
@@ -1477,7 +1477,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
             registerNames.add("+$activation");
             localData.activationReg = registerNames.size() - 1;
             registerTypes.add("Object");
-            localData.scopeStack.add(new LocalRegAVM2Item(null, localData.activationReg, null));
+            localData.scopeStack.add(new LocalRegAVM2Item(null, null, localData.activationReg, null));
         }
 
         String mask = Configuration.registerNameFormat.get();

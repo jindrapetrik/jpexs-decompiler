@@ -66,8 +66,8 @@ public class SetVariableActionItem extends ActionItem implements SetTypeActionIt
         return value;
     }
 
-    public SetVariableActionItem(GraphSourceItem instruction, GraphTargetItem name, GraphTargetItem value) {
-        super(instruction, PRECEDENCE_ASSIGMENT, value);
+    public SetVariableActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem name, GraphTargetItem value) {
+        super(instruction, lineStartIns, PRECEDENCE_ASSIGMENT, value);
         this.name = name;
     }
 
@@ -93,7 +93,7 @@ public class SetVariableActionItem extends ActionItem implements SetTypeActionIt
 
     @Override
     public GraphTargetItem getObject() {
-        return new GetVariableActionItem(getSrc(), name);
+        return new GetVariableActionItem(getSrc(), getLineStartItem(), name);
     }
 
     @Override

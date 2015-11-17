@@ -33,8 +33,8 @@ import java.util.Set;
  */
 public class DuplicateItem extends GraphTargetItem implements SimpleValue {
 
-    public DuplicateItem(GraphSourceItem src, GraphTargetItem value) {
-        super(src, value.getPrecedence(), value);
+    public DuplicateItem(GraphSourceItem src, GraphSourceItem lineStartIns, GraphTargetItem value) {
+        super(src, lineStartIns, value.getPrecedence(), value);
     }
 
     @Override

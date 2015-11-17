@@ -28,8 +28,8 @@ import java.util.List;
 
 public class BitAndActionItem extends BinaryOpItem {
 
-    public BitAndActionItem(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, PRECEDENCE_BITWISEAND, leftSide, rightSide, "&");
+    public BitAndActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
+        super(instruction, lineStartIns, PRECEDENCE_BITWISEAND, leftSide, rightSide, "&");
     }
 
     @Override

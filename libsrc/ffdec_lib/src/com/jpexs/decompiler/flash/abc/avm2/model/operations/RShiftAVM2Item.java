@@ -29,8 +29,8 @@ import java.util.List;
 
 public class RShiftAVM2Item extends BinaryOpItem {
 
-    public RShiftAVM2Item(AVM2Instruction instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, PRECEDENCE_BITWISESHIFT, leftSide, rightSide, ">>");
+    public RShiftAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  GraphTargetItem leftSide, GraphTargetItem rightSide) {
+        super(instruction, lineStartIns, PRECEDENCE_BITWISESHIFT, leftSide, rightSide, ">>");
     }
 
     @Override

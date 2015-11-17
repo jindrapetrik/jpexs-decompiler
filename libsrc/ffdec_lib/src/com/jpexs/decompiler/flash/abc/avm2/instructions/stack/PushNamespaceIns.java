@@ -34,7 +34,7 @@ public class PushNamespaceIns extends InstructionDefinition {
 
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
-        stack.push(new NameSpaceAVM2Item(ins, ins.operands[0]));
+        stack.push(new NameSpaceAVM2Item(ins, localData.lineStartInstruction, ins.operands[0]));
     }
 
     @Override

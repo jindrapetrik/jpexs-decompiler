@@ -36,8 +36,8 @@ public class BreakItem extends GraphTargetItem {
 
     private boolean labelRequired;
 
-    public BreakItem(GraphSourceItem src, long loopId) {
-        super(src, NOPRECEDENCE);
+    public BreakItem(GraphSourceItem src, GraphSourceItem lineStartIns, long loopId) {
+        super(src, lineStartIns, NOPRECEDENCE);
         this.loopId = loopId;
     }
 

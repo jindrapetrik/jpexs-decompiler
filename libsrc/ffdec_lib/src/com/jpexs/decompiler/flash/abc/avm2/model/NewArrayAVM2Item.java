@@ -22,7 +22,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -32,8 +32,8 @@ public class NewArrayAVM2Item extends AVM2Item {
 
     public List<GraphTargetItem> values;
 
-    public NewArrayAVM2Item(AVM2Instruction instruction, List<GraphTargetItem> values) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public NewArrayAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  List<GraphTargetItem> values) {
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.values = values;
     }
 

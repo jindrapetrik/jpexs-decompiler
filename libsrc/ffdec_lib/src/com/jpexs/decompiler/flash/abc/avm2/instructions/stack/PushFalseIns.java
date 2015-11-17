@@ -41,7 +41,7 @@ public class PushFalseIns extends InstructionDefinition {
 
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
-        stack.push(new FalseItem(ins));
+        stack.push(new FalseItem(ins, localData.lineStartInstruction));
     }
 
     @Override

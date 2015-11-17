@@ -49,7 +49,7 @@ public class SlotAVM2Item extends AVM2Item {
     }
 
     public SlotAVM2Item(List<Map.Entry<String, Map<String, String>>> metadata, NamespaceItem pkg, String customNamespace, boolean isStatic, String var, GraphTargetItem type, GraphTargetItem value, int line) {
-        super(null, NOPRECEDENCE, value);
+        super(null, null, NOPRECEDENCE, value);
         this.metadata = metadata;
         this.pkg = pkg;
         this.line = line;

@@ -24,8 +24,8 @@ public class StrictModeActionItem extends ActionItem {
 
     public int mode;
 
-    public StrictModeActionItem(GraphSourceItem instruction, int mode) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public StrictModeActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, int mode) {
+        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
         this.mode = mode;
     }
 

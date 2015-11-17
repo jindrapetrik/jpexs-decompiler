@@ -49,7 +49,7 @@ public class LessEqualsIns extends InstructionDefinition {
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         GraphTargetItem v2 = stack.pop();
         GraphTargetItem v1 = stack.pop();
-        stack.push(new LeAVM2Item(ins, v1, v2));
+        stack.push(new LeAVM2Item(ins, localData.lineStartInstruction, v1, v2));
     }
 
     @Override

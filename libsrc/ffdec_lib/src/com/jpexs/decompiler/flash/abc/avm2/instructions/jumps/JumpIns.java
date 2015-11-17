@@ -44,10 +44,10 @@ public class JumpIns extends InstructionDefinition implements IfTypeIns {
 
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
-        //stack.push(new BooleanAVM2Item(ins, Boolean.TRUE));// + ins.operands[0]);
+        //stack.push(new BooleanAVM2Item(ins, localData.lineStartInstruction, Boolean.TRUE));// + ins.operands[0]);
     }
 
     @Override
-    public void translateInverted(HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, AVM2Instruction ins) {
+    public void translateInverted(AVM2LocalData localData, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, AVM2Instruction ins) {
     }
 }

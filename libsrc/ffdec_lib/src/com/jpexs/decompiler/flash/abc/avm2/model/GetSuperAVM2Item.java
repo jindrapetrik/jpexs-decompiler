@@ -18,7 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 
@@ -28,8 +28,8 @@ public class GetSuperAVM2Item extends AVM2Item {
 
     public FullMultinameAVM2Item propertyName;
 
-    public GetSuperAVM2Item(AVM2Instruction instruction, GraphTargetItem object, FullMultinameAVM2Item propertyName) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public GetSuperAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  GraphTargetItem object, FullMultinameAVM2Item propertyName) {
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.object = object;
         this.propertyName = propertyName;
     }

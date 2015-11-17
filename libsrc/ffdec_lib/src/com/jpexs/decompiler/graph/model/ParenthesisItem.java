@@ -30,8 +30,8 @@ import java.util.List;
  */
 public class ParenthesisItem extends GraphTargetItem {
 
-    public ParenthesisItem(GraphSourceItem src, GraphTargetItem value) {
-        super(src, PRECEDENCE_PRIMARY, value);
+    public ParenthesisItem(GraphSourceItem src, GraphSourceItem lineStartIns, GraphTargetItem value) {
+        super(src, lineStartIns, PRECEDENCE_PRIMARY, value);
     }
 
     @Override

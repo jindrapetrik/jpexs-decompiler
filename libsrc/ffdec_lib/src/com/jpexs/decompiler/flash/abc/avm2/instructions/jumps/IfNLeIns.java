@@ -56,14 +56,14 @@ public class IfNLeIns extends InstructionDefinition implements IfTypeIns {
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         GraphTargetItem v2 = stack.pop();
         GraphTargetItem v1 = stack.pop();
-        stack.push(new GtAVM2Item(ins, v1, v2));
+        stack.push(new GtAVM2Item(ins, localData.lineStartInstruction, v1, v2));
     }
 
     @Override
-    public void translateInverted(HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, AVM2Instruction ins) {
+    public void translateInverted(AVM2LocalData localData, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, AVM2Instruction ins) {
         GraphTargetItem v2 = stack.pop();
         GraphTargetItem v1 = stack.pop();
-        stack.push(new LeAVM2Item(ins, v1, v2));
+        stack.push(new LeAVM2Item(ins, localData.lineStartInstruction, v1, v2));
     }
 
     @Override

@@ -40,8 +40,8 @@ import java.util.List;
 
 public class PreDecrementActionItem extends UnaryOpItem {
 
-    public PreDecrementActionItem(GraphSourceItem instruction, GraphTargetItem object) {
-        super(instruction, PRECEDENCE_UNARY, object, "--");
+    public PreDecrementActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object) {
+        super(instruction, lineStartIns, PRECEDENCE_UNARY, object, "--");
     }
 
     @Override

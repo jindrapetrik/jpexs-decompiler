@@ -76,11 +76,11 @@ public class FunctionActionItem extends ActionItem {
     }
 
     public FunctionActionItem() {
-        super(null, PRECEDENCE_PRIMARY);
+        super(null, null, PRECEDENCE_PRIMARY);
     }
 
-    public FunctionActionItem(GraphSourceItem instruction, String functionName, List<String> paramNames, List<GraphTargetItem> actions, List<String> constants, int regStart, List<VariableActionItem> variables) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public FunctionActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, String functionName, List<String> paramNames, List<GraphTargetItem> actions, List<String> constants, int regStart, List<VariableActionItem> variables) {
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.actions = actions;
         this.constants = constants;
         this.functionName = functionName;
@@ -272,18 +272,18 @@ public class FunctionActionItem extends ActionItem {
 
                 if (registerNames.contains(varName)) {
                     if (stored != null) {
-                        v.setBoxedValue(new StoreRegisterActionItem(null, new RegisterNumber(registerNames.indexOf(varName), varName), stored, false));
+                        v.setBoxedValue(new StoreRegisterActionItem(null, null, new RegisterNumber(registerNames.indexOf(varName), varName), stored, false));
                     } else {
                         v.setBoxedValue(new DirectValueActionItem(new RegisterNumber(registerNames.indexOf(varName), varName)));
                     }
                 } else {
                     if (v.isDefinition()) {
-                        v.setBoxedValue(new DefineLocalActionItem(null, ((ActionSourceGenerator) generator).pushConstTargetItem(varName), stored));
+                        v.setBoxedValue(new DefineLocalActionItem(null, null, ((ActionSourceGenerator) generator).pushConstTargetItem(varName), stored));
                     } else {
                         if (stored != null) {
-                            v.setBoxedValue(new SetVariableActionItem(null, ((ActionSourceGenerator) generator).pushConstTargetItem(varName), stored));
+                            v.setBoxedValue(new SetVariableActionItem(null, null, ((ActionSourceGenerator) generator).pushConstTargetItem(varName), stored));
                         } else {
-                            v.setBoxedValue(new GetVariableActionItem(null, ((ActionSourceGenerator) generator).pushConstTargetItem(varName)));
+                            v.setBoxedValue(new GetVariableActionItem(null, null, ((ActionSourceGenerator) generator).pushConstTargetItem(varName)));
                         }
                     }
                 }

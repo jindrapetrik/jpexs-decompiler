@@ -47,9 +47,9 @@ public class GetDescendantsIns extends InstructionDefinition {
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         int multinameIndex = ins.operands[0];
-        FullMultinameAVM2Item multiname = resolveMultiname(true, stack, localData.getConstants(), multinameIndex, ins);
+        FullMultinameAVM2Item multiname = resolveMultiname(localData, true, stack, localData.getConstants(), multinameIndex, ins);
         GraphTargetItem obj = stack.pop();
-        stack.push(new GetDescendantsAVM2Item(ins, obj, multiname));
+        stack.push(new GetDescendantsAVM2Item(ins, localData.lineStartInstruction, obj, multiname));
     }
 
     @Override

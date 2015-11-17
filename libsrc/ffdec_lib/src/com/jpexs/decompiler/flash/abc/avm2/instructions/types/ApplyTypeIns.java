@@ -55,7 +55,7 @@ public class ApplyTypeIns extends InstructionDefinition {
         for (int i = 0; i < argCount; i++) {
             params.add(0, stack.pop());
         }
-        stack.push(new ApplyTypeAVM2Item(ins, stack.pop(), params));
+        stack.push(new ApplyTypeAVM2Item(ins, localData.lineStartInstruction, stack.pop(), params));
     }
 
     @Override

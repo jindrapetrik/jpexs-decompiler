@@ -49,10 +49,10 @@ public class DeletePropertyIns extends InstructionDefinition {
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         int multinameIndex = ins.operands[0];
-        FullMultinameAVM2Item multiname = resolveMultiname(true, stack, localData.getConstants(), multinameIndex, ins);
+        FullMultinameAVM2Item multiname = resolveMultiname(localData, true, stack, localData.getConstants(), multinameIndex, ins);
         GraphTargetItem obj = stack.pop();
-        //stack.add(new BooleanAVM2Item(ins, Boolean.TRUE));//property successfully deleted
-        stack.add(new DeletePropertyAVM2Item(ins, obj, multiname));
+        //stack.add(new BooleanAVM2Item(ins, localData.lineStartInstruction, Boolean.TRUE));//property successfully deleted
+        stack.add(new DeletePropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname));
     }
 
     @Override

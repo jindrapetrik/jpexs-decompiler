@@ -35,8 +35,8 @@ public class StringExtractActionItem extends ActionItem {
 
     public GraphTargetItem count;
 
-    public StringExtractActionItem(GraphSourceItem instruction, GraphTargetItem value, GraphTargetItem index, GraphTargetItem count) {
-        super(instruction, PRECEDENCE_PRIMARY, value);
+    public StringExtractActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value, GraphTargetItem index, GraphTargetItem count) {
+        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY, value);
         this.index = index;
         this.count = count;
     }

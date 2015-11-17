@@ -18,7 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
@@ -31,8 +31,8 @@ public class ConstructPropAVM2Item extends AVM2Item {
 
     public List<GraphTargetItem> args;
 
-    public ConstructPropAVM2Item(AVM2Instruction instruction, GraphTargetItem object, GraphTargetItem propertyName, List<GraphTargetItem> args) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public ConstructPropAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  GraphTargetItem object, GraphTargetItem propertyName, List<GraphTargetItem> args) {
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.object = object;
         this.propertyName = propertyName;
         this.args = args;

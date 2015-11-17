@@ -31,8 +31,8 @@ import java.util.List;
 
 public class SubtractActionItem extends BinaryOpItem {
 
-    public SubtractActionItem(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, PRECEDENCE_ADDITIVE, leftSide, rightSide, "-");
+    public SubtractActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
+        super(instruction, lineStartIns, PRECEDENCE_ADDITIVE, leftSide, rightSide, "-");
     }
 
     @Override

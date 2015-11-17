@@ -85,9 +85,10 @@ public class HighlightedTextWriter extends GraphTextWriter {
      * @return HighlightedTextWriter
      */
     @Override
-    public HighlightedTextWriter startOffset(GraphSourceItem src, int pos, HighlightData data) {
+    public HighlightedTextWriter startOffset(GraphSourceItem src, GraphSourceItem startLineItem, int pos, HighlightData data) {
         GraphSourceItemPosition itemPos = new GraphSourceItemPosition();
         itemPos.graphSourceItem = src;
+        itemPos.startLineItem = startLineItem;
         itemPos.position = pos;
         itemPos.data = data;
         offsets.add(itemPos);
@@ -182,6 +183,9 @@ public class HighlightedTextWriter extends GraphTextWriter {
                 ndata.merge(itemPos.data);
                 ndata.merge(data);
                 ndata.offset = src.getOffset() + pos;
+                if (itemPos.startLineItem != null) {
+                    ndata.firstLineOffset = itemPos.startLineItem.getOffset();
+                }
                 h = new Highlighting(sb.length() - newLineCount, ndata, HighlightType.OFFSET, str);
                 instructionHilights.add(h);
             }

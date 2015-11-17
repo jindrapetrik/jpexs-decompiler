@@ -40,7 +40,7 @@ public class InterfaceActionItem extends ActionItem {
     public List<GraphTargetItem> superInterfaces;
 
     public InterfaceActionItem(GraphTargetItem name, List<GraphTargetItem> superInterfaces) {
-        super(null, NOPRECEDENCE);
+        super(null, null, NOPRECEDENCE);
         this.name = name;
         this.superInterfaces = superInterfaces;
     }

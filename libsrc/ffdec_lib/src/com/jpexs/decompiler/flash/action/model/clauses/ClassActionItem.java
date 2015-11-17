@@ -72,7 +72,7 @@ public class ClassActionItem extends ActionItem implements Block {
     }
 
     public ClassActionItem(GraphTargetItem className, GraphTargetItem extendsOp, List<GraphTargetItem> implementsOp, GraphTargetItem constructor, List<GraphTargetItem> functions, List<MyEntry<GraphTargetItem, GraphTargetItem>> vars, List<GraphTargetItem> staticFunctions, List<MyEntry<GraphTargetItem, GraphTargetItem>> staticVars) {
-        super(null, NOPRECEDENCE);
+        super(null, null, NOPRECEDENCE);
         this.className = className;
         this.functions = functions;
         this.vars = vars;

@@ -35,7 +35,7 @@ public class HasNextIns extends InstructionDefinition {
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         GraphTargetItem curIndex = stack.pop();
         GraphTargetItem obj = stack.pop();
-        stack.push(new HasNextAVM2Item(ins, curIndex, obj));
+        stack.push(new HasNextAVM2Item(ins, localData.lineStartInstruction, curIndex, obj));
 
     }
 

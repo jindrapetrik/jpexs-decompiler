@@ -17,12 +17,13 @@
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.SimpleValue;
 
 public abstract class NumberValueAVM2Item extends AVM2Item implements SimpleValue {
 
-    public NumberValueAVM2Item(AVM2Instruction instruction) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public NumberValueAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns) {
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
     }
 
     @Override

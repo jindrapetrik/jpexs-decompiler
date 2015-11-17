@@ -40,6 +40,7 @@ import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.graph.Graph;
+import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.NotCompileTimeItem;
@@ -594,9 +595,8 @@ public class ActionListReader {
 
     /**
      * Removes multiple actions from the action list, and updates all references
-     * This
-     * method will keep the inner actions of the container when you remove the
-     * container
+     * This method will keep the inner actions of the container when you remove
+     * the container
      *
      * @param actions
      * @param actionsToRemove
@@ -1120,10 +1120,10 @@ public class ActionListReader {
                     } else if (!(a instanceof GraphSourceItemContainer)) {
                         //return in for..in,   TODO:Handle this better way
                         if (((a instanceof ActionEquals) || (a instanceof ActionEquals2)) && (stack.size() == 1) && (stack.peek() instanceof DirectValueActionItem)) {
-                            stack.push(new DirectValueActionItem(null, 0, Null.INSTANCE, new ArrayList<>()));
+                            stack.push(new DirectValueActionItem(null, null, 0, Null.INSTANCE, new ArrayList<>()));
                         }
                         if ((a instanceof ActionStoreRegister) && stack.isEmpty()) {
-                            stack.push(new DirectValueActionItem(null, 0, Null.INSTANCE, new ArrayList<>()));
+                            stack.push(new DirectValueActionItem(null, null, 0, Null.INSTANCE, new ArrayList<>()));
                         }
                         a.translate(localData, stack, output, Graph.SOP_USE_STATIC/*Graph.SOP_SKIP_STATIC*/, path);
                     }
@@ -1136,7 +1136,7 @@ public class ActionListReader {
                 if (varname != null) {
                     GraphTargetItem varval = vars.get(varname);
                     if (varval != null && varval.isCompileTime() && indeterminate) {
-                        vars.put(varname, new NotCompileTimeItem(null, varval));
+                        vars.put(varname, new NotCompileTimeItem(null, null, varval));
                     }
                 }
             }
@@ -1166,7 +1166,11 @@ public class ActionListReader {
                         output2s.add(output2);
                         endAddr += size;
                     }
-                    cnt.translateContainer(output2s, stack, output, localData.regNames, localData.variables, localData.functions);
+                    GraphSourceItem lineStartItem = null;
+                    if (cnt instanceof GraphSourceItem) {
+                        lineStartItem = (GraphSourceItem) cnt;
+                    }
+                    cnt.translateContainer(output2s, lineStartItem, stack, output, localData.regNames, localData.variables, localData.functions);
                     ip = (int) endAddr;
                     continue;
                 }
@@ -1175,7 +1179,7 @@ public class ActionListReader {
             if (a instanceof ActionEnd) {
                 break;
             }
-            if (goaif) {
+            if (goaif && aif != null) {
                 aif.ignoreUsed = true;
                 aif.jumpUsed = true;
                 indeterminate = true;

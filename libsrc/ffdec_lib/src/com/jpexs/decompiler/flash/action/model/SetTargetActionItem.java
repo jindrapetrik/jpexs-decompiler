@@ -29,8 +29,8 @@ public class SetTargetActionItem extends ActionItem {
 
     public String target;
 
-    public SetTargetActionItem(GraphSourceItem instruction, String target) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public SetTargetActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, String target) {
+        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
         this.target = target;
     }
 

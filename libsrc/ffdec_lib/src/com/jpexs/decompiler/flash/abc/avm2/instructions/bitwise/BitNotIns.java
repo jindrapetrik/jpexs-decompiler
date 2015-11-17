@@ -44,7 +44,7 @@ public class BitNotIns extends InstructionDefinition {
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         GraphTargetItem v = stack.pop();
-        stack.push(new BitNotAVM2Item(ins, v));
+        stack.push(new BitNotAVM2Item(ins, localData.lineStartInstruction, v));
     }
 
     @Override

@@ -53,7 +53,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import jsyntaxpane.DefaultSyntaxKit;
 import jsyntaxpane.SyntaxDocument;
 import jsyntaxpane.Token;
 import jsyntaxpane.TokenType;

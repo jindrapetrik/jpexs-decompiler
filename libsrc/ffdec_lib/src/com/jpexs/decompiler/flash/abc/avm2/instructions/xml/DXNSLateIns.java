@@ -43,7 +43,7 @@ public class DXNSLateIns extends InstructionDefinition {
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         GraphTargetItem xmlns = stack.pop();
-        output.add(new DefaultXMLNamespace(ins, xmlns));
+        output.add(new DefaultXMLNamespace(ins, localData.lineStartInstruction, xmlns));
 
     }
 

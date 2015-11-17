@@ -21,7 +21,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.CallFunctionActionItem;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphSourceItem; import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
@@ -46,14 +46,14 @@ public class ActionCallFunction extends Action {
     }
 
     @Override
-    public void translate(TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
+    public void translate(GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem functionName = stack.pop();
         long numArgs = popLong(stack);
         List<GraphTargetItem> args = new ArrayList<>();
         for (long l = 0; l < numArgs; l++) {
             args.add(stack.pop());
         }
-        CallFunctionActionItem cft = new CallFunctionActionItem(this, functionName, args);
+        CallFunctionActionItem cft = new CallFunctionActionItem(this, lineStartAction, functionName, args);
         cft.calculatedFunction = functions.get(functionName.toStringNoQuotes(LocalData.empty));
         stack.push(cft);
     }

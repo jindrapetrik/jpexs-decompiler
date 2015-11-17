@@ -31,8 +31,8 @@ import java.util.List;
 
 public class MultiplyAVM2Item extends BinaryOpItem {
 
-    public MultiplyAVM2Item(AVM2Instruction instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, PRECEDENCE_MULTIPLICATIVE, leftSide, rightSide, "*");
+    public MultiplyAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  GraphTargetItem leftSide, GraphTargetItem rightSide) {
+        super(instruction, lineStartIns, PRECEDENCE_MULTIPLICATIVE, leftSide, rightSide, "*");
     }
 
     @Override

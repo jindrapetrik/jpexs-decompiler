@@ -104,13 +104,13 @@ public class ConstructIns extends InstructionDefinition {
                 GraphTargetItem arg = args.get(0);
                 List<GraphTargetItem> xmlLines = new ArrayList<>();
                 if (walkXML(arg, xmlLines)) {
-                    stack.push(new XMLAVM2Item(ins, xmlLines));
+                    stack.push(new XMLAVM2Item(ins, localData.lineStartInstruction, xmlLines));
                     return;
                 }
             }
         }
 
-        stack.push(new ConstructAVM2Item(ins, obj, args));
+        stack.push(new ConstructAVM2Item(ins, localData.lineStartInstruction, obj, args));
     }
 
     @Override

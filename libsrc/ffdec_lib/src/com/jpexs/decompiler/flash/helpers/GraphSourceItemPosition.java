@@ -30,5 +30,7 @@ public class GraphSourceItemPosition {
 
     public int position;
 
+    public GraphSourceItem startLineItem;
+
     public HighlightData data;
 }

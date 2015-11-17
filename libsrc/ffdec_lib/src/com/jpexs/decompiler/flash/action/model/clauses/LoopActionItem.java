@@ -12,19 +12,20 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.model.clauses;
 
-import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.ActionItem;
+import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.Loop;
 
 public abstract class LoopActionItem extends ActionItem {
 
     public Loop loop;
 
-    public LoopActionItem(Action instruction, Loop loop) {
-        super(instruction, NOPRECEDENCE);
+    public LoopActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, Loop loop) {
+        super(instruction, lineStartIns, NOPRECEDENCE);
         this.loop = loop;
     }
 }

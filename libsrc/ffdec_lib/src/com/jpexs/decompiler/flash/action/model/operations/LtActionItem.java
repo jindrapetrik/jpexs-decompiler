@@ -36,8 +36,8 @@ public class LtActionItem extends BinaryOpItem implements LogicalOpItem {
 
     boolean version2;
 
-    public LtActionItem(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide, boolean version2) {
-        super(instruction, PRECEDENCE_RELATIONAL, leftSide, rightSide, "<");
+    public LtActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide, boolean version2) {
+        super(instruction, lineStartIns, PRECEDENCE_RELATIONAL, leftSide, rightSide, "<");
         this.version2 = version2;
     }
 
@@ -63,7 +63,7 @@ public class LtActionItem extends BinaryOpItem implements LogicalOpItem {
 
     @Override
     public GraphTargetItem invert(GraphSourceItem neqSrc) {
-        return new GeActionItem(getSrc(), leftSide, rightSide, version2);
+        return new GeActionItem(getSrc(), getLineStartItem(), leftSide, rightSide, version2);
     }
 
     @Override

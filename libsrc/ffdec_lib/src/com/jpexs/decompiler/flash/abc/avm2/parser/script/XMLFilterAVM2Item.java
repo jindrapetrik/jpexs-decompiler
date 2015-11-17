@@ -39,7 +39,7 @@ public class XMLFilterAVM2Item extends AVM2Item {
     public GraphTargetItem object;
 
     public XMLFilterAVM2Item(GraphTargetItem object, GraphTargetItem value, List<NamespaceItem> openedNamespaces) {
-        super(null, NOPRECEDENCE, value);
+        super(null, null, NOPRECEDENCE, value);
         this.openedNamespaces = openedNamespaces;
         this.object = object;
     }

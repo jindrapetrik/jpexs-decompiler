@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.action.model.DefineLocalActionItem;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphSourceItem; import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.HashMap;
@@ -53,7 +53,7 @@ public class ActionDefineLocal extends Action {
     }
 
     @Override
-    public void translate(TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
+    public void translate(GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem value = stack.pop();
         GraphTargetItem name = stack.pop();
         String nameStr;
@@ -63,7 +63,7 @@ public class ActionDefineLocal extends Action {
             nameStr = EcmaScript.toString(name.getResult());
         }
         variables.put(nameStr, value);
-        output.add(new DefineLocalActionItem(this, name, value));
+        output.add(new DefineLocalActionItem(this, lineStartAction, name, value));
     }
 
     @Override

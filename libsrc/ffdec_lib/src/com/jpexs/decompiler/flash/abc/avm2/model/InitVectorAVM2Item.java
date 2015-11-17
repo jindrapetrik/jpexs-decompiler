@@ -30,7 +30,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -66,14 +66,14 @@ public class InitVectorAVM2Item extends AVM2Item {
         return NamespaceItem.getCpoolSetIndex(abc, openedNamespaces);
     }
 
-    public InitVectorAVM2Item(AVM2Instruction ins, GraphTargetItem subtype, List<GraphTargetItem> arguments) {
-        super(ins, PRECEDENCE_PRIMARY);
+    public InitVectorAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem subtype, List<GraphTargetItem> arguments) {
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.subtype = subtype;
         this.arguments = arguments;
     }
 
     public InitVectorAVM2Item(GraphTargetItem subtype, List<GraphTargetItem> arguments, List<NamespaceItem> openedNamespaces) {
-        super(null, PRECEDENCE_PRIMARY);
+        super(null, null, PRECEDENCE_PRIMARY);
         this.subtype = subtype;
         this.arguments = arguments;
         this.openedNamespaces = openedNamespaces;
@@ -104,7 +104,7 @@ public class InitVectorAVM2Item extends AVM2Item {
     public GraphTargetItem returnType() {
         List<GraphTargetItem> pars = new ArrayList<>();
         pars.add(subtype);
-        return new ApplyTypeAVM2Item(null, new TypeItem(VECTOR_FQN), pars);
+        return new ApplyTypeAVM2Item(null, null, new TypeItem(VECTOR_FQN), pars);
     }
 
     @Override
@@ -117,13 +117,13 @@ public class InitVectorAVM2Item extends AVM2Item {
                 ins(AVM2Instructions.GetProperty, constants.getMultinameId(Multiname.createMultiname(false, constants.getStringId("Vector", true), allNsSet(g.abcIndex)), true)),
                 subtype,
                 ins(AVM2Instructions.ApplyType, 1),
-                new IntegerValueAVM2Item(null, (long) arguments.size()),
+                new IntegerValueAVM2Item(null, null, (long) arguments.size()),
                 ins(AVM2Instructions.Construct, 1)
         );
         for (int i = 0; i < arguments.size(); i++) {
             ret.addAll(toSourceMerge(localData, generator,
                     ins(AVM2Instructions.Dup),
-                    new IntegerValueAVM2Item(null, (long) i),
+                    new IntegerValueAVM2Item(null, null, (long) i),
                     arguments.get(i),
                     ins(AVM2Instructions.SetProperty, constants.getMultinameId(Multiname.createMultinameL(false, NamespaceItem.getCpoolSetIndex(g.abcIndex, openedNamespaces)), true))
             ));

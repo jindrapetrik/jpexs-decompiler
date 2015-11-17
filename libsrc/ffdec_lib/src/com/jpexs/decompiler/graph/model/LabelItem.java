@@ -29,8 +29,8 @@ public class LabelItem extends GraphTargetItem {
 
     public String labelName;
 
-    public LabelItem(GraphSourceItem src, String labelName) {
-        super(src, PRECEDENCE_PRIMARY);
+    public LabelItem(GraphSourceItem src, GraphSourceItem lineStartIns, String labelName) {
+        super(src, lineStartIns, PRECEDENCE_PRIMARY);
         this.labelName = labelName;
     }
 

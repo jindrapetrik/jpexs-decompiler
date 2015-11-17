@@ -43,8 +43,8 @@ public class GetURLActionItem extends ActionItem {
         return writer.append("\")");
     }
 
-    public GetURLActionItem(GraphSourceItem instruction, String urlString, String targetString) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public GetURLActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, String urlString, String targetString) {
+        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
         this.urlString = urlString;
         this.targetString = targetString;
     }

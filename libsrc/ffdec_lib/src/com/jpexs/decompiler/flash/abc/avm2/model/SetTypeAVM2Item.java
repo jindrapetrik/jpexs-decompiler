@@ -15,7 +15,7 @@
  * License along with this library. */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
 
 /**
  *

@@ -55,7 +55,7 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         int multinameIndex = ins.operands[0];
         GraphTargetItem value = stack.pop();
-        FullMultinameAVM2Item multiname = resolveMultiname(true, stack, localData.getConstants(), multinameIndex, ins);
+        FullMultinameAVM2Item multiname = resolveMultiname(localData, true, stack, localData.getConstants(), multinameIndex, ins);
         GraphTargetItem obj = stack.pop();
         if (value.getThroughDuplicate().getThroughRegister().getThroughDuplicate() instanceof IncrementAVM2Item) {
             GraphTargetItem inside = ((IncrementAVM2Item) value.getThroughDuplicate().getThroughRegister().getThroughDuplicate()).value.getThroughRegister().getNotCoerced().getThroughDuplicate();
@@ -73,15 +73,15 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
                             GraphTargetItem top = stack.peek().getNotCoerced().getThroughDuplicate();
                             if (top == insideProp) {
                                 stack.pop();
-                                stack.push(new PostIncrementAVM2Item(ins, insideProp));
+                                stack.push(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, insideProp));
                             } else if ((top instanceof IncrementAVM2Item) && (((IncrementAVM2Item) top).value == inside)) {
                                 stack.pop();
-                                stack.push(new PreIncrementAVM2Item(ins, insideProp));
+                                stack.push(new PreIncrementAVM2Item(ins, localData.lineStartInstruction, insideProp));
                             } else {
-                                output.add(new PostIncrementAVM2Item(ins, insideProp));
+                                output.add(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, insideProp));
                             }
                         } else {
-                            output.add(new PostIncrementAVM2Item(ins, insideProp));
+                            output.add(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, insideProp));
                         }
                         return;
                     }
@@ -105,15 +105,15 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
                             GraphTargetItem top = stack.peek().getNotCoerced().getThroughDuplicate();
                             if (top == insideProp) {
                                 stack.pop();
-                                stack.push(new PostDecrementAVM2Item(ins, insideProp));
+                                stack.push(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, insideProp));
                             } else if ((top instanceof DecrementAVM2Item) && (((DecrementAVM2Item) top).value == inside)) {
                                 stack.pop();
-                                stack.push(new PreDecrementAVM2Item(ins, insideProp));
+                                stack.push(new PreDecrementAVM2Item(ins, localData.lineStartInstruction, insideProp));
                             } else {
-                                output.add(new PostDecrementAVM2Item(ins, insideProp));
+                                output.add(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, insideProp));
                             }
                         } else {
-                            output.add(new PostDecrementAVM2Item(ins, insideProp));
+                            output.add(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, insideProp));
                         }
                         return;
                     }
@@ -128,7 +128,7 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
                 c.args.clear();
                 List<GraphTargetItem> vals = new ArrayList<>();
                 vals.add(value);
-                c.object = new InitVectorAVM2Item(c.getInstruction(), at.params.get(0), vals);
+                c.object = new InitVectorAVM2Item(c.getInstruction(), c.getLineStartIns(), at.params.get(0), vals);
                 return;
             } else if (c.object instanceof InitVectorAVM2Item) {
                 InitVectorAVM2Item iv = (InitVectorAVM2Item) c.object;
@@ -137,7 +137,7 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
             }
         }
 
-        output.add(new SetPropertyAVM2Item(ins, obj, multiname, value));
+        output.add(new SetPropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname, value));
 
     }
 

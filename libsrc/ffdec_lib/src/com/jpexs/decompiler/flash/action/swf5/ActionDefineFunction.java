@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
+import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.helpers.Helper;
@@ -143,7 +144,7 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
     }
 
     @Override
-    public void translate(TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
+    public void translate(GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
     }
 
     @Override
@@ -152,8 +153,8 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
     }
 
     @Override
-    public void translateContainer(List<List<GraphTargetItem>> content, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-        FunctionActionItem fti = new FunctionActionItem(this, functionName, paramNames, content.get(0), constantPool, 1, new ArrayList<>());
+    public void translateContainer(List<List<GraphTargetItem>> content, GraphSourceItem lineStartItem, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        FunctionActionItem fti = new FunctionActionItem(this, lineStartItem, functionName, paramNames, content.get(0), constantPool, 1, new ArrayList<>());
         //ActionGraph.translateViaGraph(regNames, variables, functions, code, version)
         stack.push(fti);
         functions.put(functionName, fti);

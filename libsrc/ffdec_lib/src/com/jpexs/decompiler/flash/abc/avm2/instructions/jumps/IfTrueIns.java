@@ -52,7 +52,7 @@ public class IfTrueIns extends InstructionDefinition implements IfTypeIns {
     }
 
     @Override
-    public void translateInverted(HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, AVM2Instruction ins) {
+    public void translateInverted(AVM2LocalData localData, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, AVM2Instruction ins) {
         GraphTargetItem v1 = stack.pop();
         stack.push(v1.invert(null));
     }

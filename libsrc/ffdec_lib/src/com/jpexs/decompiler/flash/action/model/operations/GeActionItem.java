@@ -37,8 +37,8 @@ public class GeActionItem extends BinaryOpItem implements LogicalOpItem, Inverte
 
     boolean version2;
 
-    public GeActionItem(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide, boolean version2) {
-        super(instruction, PRECEDENCE_RELATIONAL, leftSide, rightSide, ">=");
+    public GeActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide, boolean version2) {
+        super(instruction, lineStartIns, PRECEDENCE_RELATIONAL, leftSide, rightSide, ">=");
         this.version2 = version2;
     }
 
@@ -60,7 +60,7 @@ public class GeActionItem extends BinaryOpItem implements LogicalOpItem, Inverte
 
     @Override
     public GraphTargetItem invert(GraphSourceItem negSrc) {
-        return new LtActionItem(getSrc(), leftSide, rightSide, version2);
+        return new LtActionItem(getSrc(), getLineStartItem(), leftSide, rightSide, version2);
     }
 
     @Override

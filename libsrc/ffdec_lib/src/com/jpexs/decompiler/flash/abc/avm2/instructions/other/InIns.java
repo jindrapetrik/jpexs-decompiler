@@ -35,7 +35,7 @@ public class InIns extends InstructionDefinition {
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         GraphTargetItem obj = stack.pop();
         GraphTargetItem name = stack.pop();
-        stack.push(new InAVM2Item(ins, name, obj));
+        stack.push(new InAVM2Item(ins, localData.lineStartInstruction, name, obj));
     }
 
     @Override

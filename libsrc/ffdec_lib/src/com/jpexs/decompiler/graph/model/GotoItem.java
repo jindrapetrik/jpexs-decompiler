@@ -29,8 +29,8 @@ public class GotoItem extends GraphTargetItem {
 
     public String labelName;
 
-    public GotoItem(GraphSourceItem src, String labelName) {
-        super(src, PRECEDENCE_PRIMARY);
+    public GotoItem(GraphSourceItem src, GraphSourceItem lineStartIns, String labelName) {
+        super(src, lineStartIns, PRECEDENCE_PRIMARY);
         this.labelName = labelName;
     }
 

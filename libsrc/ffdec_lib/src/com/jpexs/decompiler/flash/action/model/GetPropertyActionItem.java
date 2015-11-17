@@ -43,8 +43,8 @@ public class GetPropertyActionItem extends ActionItem {
         return ret;
     }
 
-    public GetPropertyActionItem(GraphSourceItem instruction, GraphTargetItem target, int propertyIndex) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public GetPropertyActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem target, int propertyIndex) {
+        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
         this.target = target;
         this.propertyIndex = propertyIndex;
     }

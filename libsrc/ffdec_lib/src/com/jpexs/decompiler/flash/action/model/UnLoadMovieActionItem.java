@@ -42,8 +42,8 @@ public class UnLoadMovieActionItem extends ActionItem {
         return ret;
     }
 
-    public UnLoadMovieActionItem(GraphSourceItem instruction, GraphTargetItem targetString) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public UnLoadMovieActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem targetString) {
+        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
         this.targetString = targetString;
     }
 

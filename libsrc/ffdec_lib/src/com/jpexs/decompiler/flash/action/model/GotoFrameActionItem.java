@@ -29,8 +29,8 @@ public class GotoFrameActionItem extends ActionItem {
 
     public int frame;
 
-    public GotoFrameActionItem(GraphSourceItem instruction, int frame) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public GotoFrameActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, int frame) {
+        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
         this.frame = frame;
     }
 

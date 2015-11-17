@@ -25,8 +25,8 @@ public class UnsupportedActionItem extends ActionItem {
 
     public String value;
 
-    public UnsupportedActionItem(GraphSourceItem instruction, String value) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public UnsupportedActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, String value) {
+        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
         this.value = value;
     }
 

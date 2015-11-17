@@ -34,8 +34,8 @@ import java.util.List;
 
 public class AddAVM2Item extends BinaryOpItem {
 
-    public AddAVM2Item(AVM2Instruction instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, PRECEDENCE_ADDITIVE, leftSide, rightSide, "+");
+    public AddAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  GraphTargetItem leftSide, GraphTargetItem rightSide) {
+        super(instruction, lineStartIns, PRECEDENCE_ADDITIVE, leftSide, rightSide, "+");
     }
 
     @Override

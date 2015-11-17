@@ -40,10 +40,10 @@ public abstract class AssignableAVM2Item extends AVM2Item {
     protected GraphTargetItem makeCoerced(GraphTargetItem assignedValue, GraphTargetItem targetType) {
         if (assignedValue instanceof OrItem) {
             OrItem oi = (OrItem) assignedValue;
-            return new OrItem(assignedValue.getSrc(), makeCoerced(oi.leftSide, targetType), makeCoerced(oi.rightSide, targetType));
+            return new OrItem(assignedValue.getSrc(), assignedValue.getLineStartItem(), makeCoerced(oi.leftSide, targetType), makeCoerced(oi.rightSide, targetType));
         }
         //TODO: Is it needed for AndItem too?
-        return new CoerceAVM2Item(null, assignedValue, targetType);
+        return new CoerceAVM2Item(null, null, assignedValue, targetType);
     }
 
     public AssignableAVM2Item() {
@@ -53,7 +53,7 @@ public abstract class AssignableAVM2Item extends AVM2Item {
     public abstract AssignableAVM2Item copy();
 
     public AssignableAVM2Item(GraphTargetItem storeValue) {
-        super(null, PRECEDENCE_PRIMARY);
+        super(null, null, PRECEDENCE_PRIMARY);
         this.assignedValue = storeValue;
     }
 

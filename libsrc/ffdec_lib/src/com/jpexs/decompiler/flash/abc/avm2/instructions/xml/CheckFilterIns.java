@@ -42,7 +42,7 @@ public class CheckFilterIns extends InstructionDefinition {
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         GraphTargetItem obj = stack.pop();
-        stack.push(new FilteredCheckAVM2Item(ins, obj));
+        stack.push(new FilteredCheckAVM2Item(ins, localData.lineStartInstruction, obj));
     }
 
     @Override

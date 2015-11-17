@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -35,8 +35,8 @@ public class GetPropertyAVM2Item extends AVM2Item {
 
     public GraphTargetItem propertyName;
 
-    public GetPropertyAVM2Item(AVM2Instruction instruction, GraphTargetItem object, GraphTargetItem propertyName) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public GetPropertyAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  GraphTargetItem object, GraphTargetItem propertyName) {
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.object = object;
         this.propertyName = propertyName;
     }

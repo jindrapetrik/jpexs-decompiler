@@ -42,8 +42,8 @@ import java.util.Set;
 public class ReturnActionItem extends ActionItem implements ExitItem {
 
     //public GraphTargetItem value;
-    public ReturnActionItem(GraphSourceItem instruction, GraphTargetItem value) {
-        super(instruction, PRECEDENCE_PRIMARY, value);
+    public ReturnActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value) {
+        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY, value);
     }
 
     @Override

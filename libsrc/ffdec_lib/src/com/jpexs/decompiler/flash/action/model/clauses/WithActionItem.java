@@ -36,14 +36,14 @@ public class WithActionItem extends ActionItem {
 
     public List<GraphTargetItem> items;
 
-    public WithActionItem(Action instruction, GraphTargetItem scope, List<GraphTargetItem> items) {
-        super(instruction, NOPRECEDENCE);
+    public WithActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem scope, List<GraphTargetItem> items) {
+        super(instruction, lineStartIns, NOPRECEDENCE);
         this.scope = scope;
         this.items = items;
     }
 
-    public WithActionItem(Action instruction, ActionItem scope) {
-        super(instruction, NOPRECEDENCE);
+    public WithActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, ActionItem scope) {
+        super(instruction, lineStartIns, NOPRECEDENCE);
         this.scope = scope;
         this.items = new ArrayList<>();
     }

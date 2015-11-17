@@ -32,8 +32,8 @@ import java.util.List;
 
 public class StrictNeqAVM2Item extends BinaryOpItem implements LogicalOpItem, IfCondition {
 
-    public StrictNeqAVM2Item(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, PRECEDENCE_EQUALITY, leftSide, rightSide, "!==");
+    public StrictNeqAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
+        super(instruction, lineStartIns, PRECEDENCE_EQUALITY, leftSide, rightSide, "!==");
     }
 
     @Override
@@ -48,7 +48,7 @@ public class StrictNeqAVM2Item extends BinaryOpItem implements LogicalOpItem, If
 
     @Override
     public GraphTargetItem invert(GraphSourceItem neqSrc) {
-        return new StrictEqAVM2Item(getSrc(), leftSide, rightSide);
+        return new StrictEqAVM2Item(getSrc(), getLineStartItem(), leftSide, rightSide);
     }
 
     @Override

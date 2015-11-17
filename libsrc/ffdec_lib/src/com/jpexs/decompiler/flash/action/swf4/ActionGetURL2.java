@@ -36,6 +36,7 @@ import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
+import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.io.IOException;
@@ -105,7 +106,7 @@ public class ActionGetURL2 extends Action {
     }
 
     @Override
-    public void translate(TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
+    public void translate(GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem targetString = stack.pop();
         GraphTargetItem urlString = stack.pop();
         Integer num = null;
@@ -124,15 +125,15 @@ public class ActionGetURL2 extends Action {
         }
         if (loadVariablesFlag) {
             if (num != null) {
-                output.add(new LoadVariablesNumActionItem(this, urlString, new DirectValueActionItem(null, 0, (Long) (long) (int) num, new ArrayList<>()), sendVarsMethod));
+                output.add(new LoadVariablesNumActionItem(this, lineStartAction, urlString, new DirectValueActionItem(null, null, 0, (Long) (long) (int) num, new ArrayList<>()), sendVarsMethod));
             } else {
-                output.add(new LoadVariablesActionItem(this, urlString, targetString, sendVarsMethod));
+                output.add(new LoadVariablesActionItem(this, lineStartAction, urlString, targetString, sendVarsMethod));
             }
         } else if (loadTargetFlag) {
             if ((urlString instanceof DirectValueActionItem) && (urlString.getResult().equals(""))) {
-                output.add(new UnLoadMovieActionItem(this, targetString));
+                output.add(new UnLoadMovieActionItem(this, lineStartAction, targetString));
             } else {
-                output.add(new LoadMovieActionItem(this, urlString, targetString, sendVarsMethod));
+                output.add(new LoadMovieActionItem(this, lineStartAction, urlString, targetString, sendVarsMethod));
             }
         } else {
             String printPrefix = "print:#";
@@ -144,22 +145,22 @@ public class ActionGetURL2 extends Action {
 
             if (num != null) {
                 if ("".equals(urlStr)) {
-                    output.add(new UnLoadMovieNumActionItem(this, new DirectValueActionItem(null, 0, (Long) (long) (int) num, new ArrayList<>())));
+                    output.add(new UnLoadMovieNumActionItem(this, lineStartAction, new DirectValueActionItem(null, null, 0, (Long) (long) (int) num, new ArrayList<>())));
                 } else if (urlStr != null && urlStr.startsWith(printPrefix)) {
-                    output.add(new PrintNumActionItem(this, new DirectValueActionItem((Long) (long) (int) num),
+                    output.add(new PrintNumActionItem(this, lineStartAction, new DirectValueActionItem((Long) (long) (int) num),
                             new DirectValueActionItem(urlStr.substring(printPrefix.length()))));
                 } else if (urlStr != null && urlStr.startsWith(printAsBitmapPrefix)) {
-                    output.add(new PrintAsBitmapNumActionItem(this, new DirectValueActionItem((Long) (long) (int) num), new DirectValueActionItem(urlStr.substring(printAsBitmapPrefix.length()))));
+                    output.add(new PrintAsBitmapNumActionItem(this, lineStartAction, new DirectValueActionItem((Long) (long) (int) num), new DirectValueActionItem(urlStr.substring(printAsBitmapPrefix.length()))));
                 } else {
-                    output.add(new LoadMovieNumActionItem(this, urlString, new DirectValueActionItem(null, 0, (Long) (long) (int) num, new ArrayList<>()), sendVarsMethod));
+                    output.add(new LoadMovieNumActionItem(this, lineStartAction, urlString, new DirectValueActionItem(null, null, 0, (Long) (long) (int) num, new ArrayList<>()), sendVarsMethod));
                 }
             } else {
                 if (urlStr != null && urlStr.startsWith(printPrefix)) {
-                    output.add(new PrintActionItem(this, targetString, new DirectValueActionItem(urlStr.substring(printPrefix.length()))));
+                    output.add(new PrintActionItem(this, lineStartAction, targetString, new DirectValueActionItem(urlStr.substring(printPrefix.length()))));
                 } else if (urlStr != null && urlStr.startsWith(printAsBitmapPrefix)) {
-                    output.add(new PrintAsBitmapActionItem(this, targetString, new DirectValueActionItem(urlStr.substring(printAsBitmapPrefix.length()))));
+                    output.add(new PrintAsBitmapActionItem(this, lineStartAction, targetString, new DirectValueActionItem(urlStr.substring(printAsBitmapPrefix.length()))));
                 } else {
-                    output.add(new GetURL2ActionItem(this, urlString, targetString, sendVarsMethod));
+                    output.add(new GetURL2ActionItem(this, lineStartAction, urlString, targetString, sendVarsMethod));
                 }
             }
         }

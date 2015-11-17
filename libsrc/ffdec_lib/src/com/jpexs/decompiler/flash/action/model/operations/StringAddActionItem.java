@@ -30,8 +30,8 @@ import java.util.Set;
 
 public class StringAddActionItem extends BinaryOpItem {
 
-    public StringAddActionItem(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, PRECEDENCE_ADDITIVE, leftSide, rightSide, "add");
+    public StringAddActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
+        super(instruction, lineStartIns, PRECEDENCE_ADDITIVE, leftSide, rightSide, "add");
     }
 
     @Override

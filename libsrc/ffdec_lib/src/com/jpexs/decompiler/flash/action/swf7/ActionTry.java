@@ -31,6 +31,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
+import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.helpers.Helper;
@@ -261,13 +262,13 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
     }
 
     @Override
-    public void translateContainer(List<List<GraphTargetItem>> contents, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+    public void translateContainer(List<List<GraphTargetItem>> contents, GraphSourceItem lineStartItem, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
         List<GraphTargetItem> tryCommands = contents.get(0);
         ActionItem catchName;
         if (catchInRegisterFlag) {
-            catchName = new DirectValueActionItem(this, -1, new RegisterNumber(this.catchRegister), new ArrayList<>());
+            catchName = new DirectValueActionItem(this, lineStartItem, -1, new RegisterNumber(this.catchRegister), new ArrayList<>());
         } else {
-            catchName = new DirectValueActionItem(this, -1, this.catchName, new ArrayList<>());
+            catchName = new DirectValueActionItem(this, lineStartItem, -1, this.catchName, new ArrayList<>());
         }
         List<GraphTargetItem> catchExceptions = new ArrayList<>();
         if (catchBlockFlag) {

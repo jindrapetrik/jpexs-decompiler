@@ -57,8 +57,8 @@ public class IfItem extends GraphTargetItem implements Block {
         return ret;
     }
 
-    public IfItem(GraphSourceItem src, GraphTargetItem expression, List<GraphTargetItem> onTrue, List<GraphTargetItem> onFalse) {
-        super(src, NOPRECEDENCE);
+    public IfItem(GraphSourceItem src, GraphSourceItem lineStartIns, GraphTargetItem expression, List<GraphTargetItem> onTrue, List<GraphTargetItem> onFalse) {
+        super(src, lineStartIns, NOPRECEDENCE);
         this.expression = expression;
         this.onTrue = onTrue;
         this.onFalse = onFalse;

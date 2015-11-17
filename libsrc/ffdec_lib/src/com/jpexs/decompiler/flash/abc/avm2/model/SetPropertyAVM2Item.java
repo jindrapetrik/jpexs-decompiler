@@ -25,7 +25,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -44,8 +44,8 @@ public class SetPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, As
         return value.getFirstPart();
     }
 
-    public SetPropertyAVM2Item(AVM2Instruction instruction, GraphTargetItem object, GraphTargetItem propertyName, GraphTargetItem value) {
-        super(instruction, PRECEDENCE_ASSIGMENT);
+    public SetPropertyAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, GraphTargetItem propertyName, GraphTargetItem value) {
+        super(instruction, lineStartIns, PRECEDENCE_ASSIGMENT);
         this.object = object;
         this.propertyName = propertyName;
         this.value = value;
@@ -60,7 +60,7 @@ public class SetPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, As
 
     @Override
     public GraphTargetItem getObject() {
-        return new GetPropertyAVM2Item(getInstruction(), object, propertyName);
+        return new GetPropertyAVM2Item(getInstruction(), getLineStartIns(), object, propertyName);
     }
 
     @Override

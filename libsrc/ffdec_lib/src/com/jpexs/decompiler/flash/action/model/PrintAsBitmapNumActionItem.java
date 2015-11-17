@@ -47,8 +47,8 @@ public class PrintAsBitmapNumActionItem extends ActionItem {
         return ret;
     }
 
-    public PrintAsBitmapNumActionItem(GraphSourceItem instruction, GraphTargetItem num, GraphTargetItem boundingBox) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public PrintAsBitmapNumActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem num, GraphTargetItem boundingBox) {
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.num = num;
         this.boundingBox = boundingBox;
     }
@@ -67,13 +67,13 @@ public class PrintAsBitmapNumActionItem extends ActionItem {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
-        Object lev = null;
+        Object lev;
         if ((num instanceof DirectValueActionItem) && (((DirectValueActionItem) num).value instanceof Long)) {
             lev = asGenerator.pushConstTargetItem("_level" + ((DirectValueActionItem) num).value);
         } else {
-            lev = new AddActionItem(getSrc(), asGenerator.pushConstTargetItem("_level"), num, true);
+            lev = new AddActionItem(getSrc(), getLineStartItem(), asGenerator.pushConstTargetItem("_level"), num, true);
         }
-        return toSourceMerge(localData, generator, new AddActionItem(getSrc(), asGenerator.pushConstTargetItem("printasbitmap:#"), boundingBox, true), lev, new ActionGetURL2(0, false, false));
+        return toSourceMerge(localData, generator, new AddActionItem(getSrc(), getLineStartItem(), asGenerator.pushConstTargetItem("printasbitmap:#"), boundingBox, true), lev, new ActionGetURL2(0, false, false));
     }
 
     @Override

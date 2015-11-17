@@ -28,8 +28,8 @@ import com.jpexs.decompiler.graph.TypeItem;
  */
 public class PopItem extends GraphTargetItem {
 
-    public PopItem(GraphSourceItem src) {
-        super(src, PRECEDENCE_PRIMARY);
+    public PopItem(GraphSourceItem src, GraphSourceItem lineStartIns) {
+        super(src, lineStartIns, PRECEDENCE_PRIMARY);
     }
 
     @Override

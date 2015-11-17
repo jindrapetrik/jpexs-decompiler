@@ -43,8 +43,8 @@ public class GetMemberActionItem extends ActionItem {
         return ret;
     }
 
-    public GetMemberActionItem(GraphSourceItem instruction, GraphTargetItem object, GraphTargetItem memberName) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public GetMemberActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, GraphTargetItem memberName) {
+        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
         this.object = object;
         this.memberName = memberName;
     }

@@ -47,7 +47,7 @@ public class AsTypeLateIns extends InstructionDefinition {
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         GraphTargetItem cls = stack.pop();
         GraphTargetItem val = stack.pop();
-        stack.push(new AsTypeAVM2Item(ins, val, cls));
+        stack.push(new AsTypeAVM2Item(ins, localData.lineStartInstruction, val, cls));
     }
 
     @Override

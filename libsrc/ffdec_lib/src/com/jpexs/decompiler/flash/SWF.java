@@ -1773,7 +1773,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 r.add(new ArrayList<>());
                 r.add(new ArrayList<>());
                 r.add(new ArrayList<>());
-                ((GraphSourceItemContainer) ins).translateContainer(r, stack, output, new HashMap<>(), new HashMap<>(), new HashMap<>());
+                ((GraphSourceItemContainer) ins).translateContainer(r, ins, stack, output, new HashMap<>(), new HashMap<>(), new HashMap<>());
                 continue;
             }
 
@@ -1799,7 +1799,7 @@ public final class SWF implements SWFContainerItem, Timelined {
 
             // for..in return
             if (((ins instanceof ActionEquals) || (ins instanceof ActionEquals2)) && (stack.size() == 1) && (stack.peek() instanceof DirectValueActionItem)) {
-                stack.push(new DirectValueActionItem(null, 0, Null.INSTANCE, new ArrayList<>()));
+                stack.push(new DirectValueActionItem(null, null, 0, Null.INSTANCE, new ArrayList<>()));
             }
 
             if (ins instanceof ActionConstantPool) {
@@ -2383,7 +2383,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
         boolean parallel = Configuration.parallelSpeedUp.get();
         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
-        pack.toSource(writer, script.traits.traits, new ConvertData(), ScriptExportMode.AS, parallel);
+        pack.toSource(writer, script == null ? null : script.traits.traits, new ConvertData(), ScriptExportMode.AS, parallel);
         HighlightedText hilightedCode = new HighlightedText(writer);
         CachedDecompilation res = new CachedDecompilation(hilightedCode);
         swf.as3Cache.put(pack, res);
@@ -2896,7 +2896,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 if (needed.contains(dep)) {
                     timeline.tags.remove(i);
                     i--;
-                    continue;
+                    //continue;
                 }
             }
             if (t == toRemove) {

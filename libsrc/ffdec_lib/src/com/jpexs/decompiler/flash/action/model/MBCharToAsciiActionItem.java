@@ -29,8 +29,8 @@ import java.util.List;
 
 public class MBCharToAsciiActionItem extends ActionItem {
 
-    public MBCharToAsciiActionItem(GraphSourceItem instruction, GraphTargetItem value) {
-        super(instruction, PRECEDENCE_PRIMARY, value);
+    public MBCharToAsciiActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value) {
+        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY, value);
     }
 
     @Override

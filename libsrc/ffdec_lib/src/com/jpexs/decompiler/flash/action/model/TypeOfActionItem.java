@@ -32,8 +32,8 @@ import java.util.Set;
 
 public class TypeOfActionItem extends ActionItem {
 
-    public TypeOfActionItem(GraphSourceItem instruction, GraphTargetItem value) {
-        super(instruction, PRECEDENCE_PRIMARY, value);
+    public TypeOfActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value) {
+        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY, value);
     }
 
     @Override

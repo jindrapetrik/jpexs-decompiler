@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.action.flashlite;
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.FSCommand2ActionItem;
+import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.ArrayList;
@@ -37,14 +38,14 @@ public class ActionFSCommand2 extends Action {
     }
 
     @Override
-    public void translate(TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
+    public void translate(GraphSourceItem lineStartItem, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         long numArgs = popLong(stack);
         GraphTargetItem command = stack.pop();
         List<GraphTargetItem> args = new ArrayList<>();
         for (long l = 0; l < numArgs; l++) {
             args.add(stack.pop());
         }
-        stack.push(new FSCommand2ActionItem(this, command, args));
+        stack.push(new FSCommand2ActionItem(this, lineStartItem, command, args));
     }
 
     @Override

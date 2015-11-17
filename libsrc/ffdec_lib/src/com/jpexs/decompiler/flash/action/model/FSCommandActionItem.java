@@ -37,8 +37,8 @@ public class FSCommandActionItem extends ActionItem {
 
     private final GraphTargetItem command;
 
-    public FSCommandActionItem(GraphSourceItem instruction, GraphTargetItem command) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public FSCommandActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem command) {
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.command = command;
     }
 
@@ -57,7 +57,7 @@ public class FSCommandActionItem extends ActionItem {
         if ((command instanceof DirectValueActionItem) && ((DirectValueActionItem) command).isString()) {
             return toSourceMerge(localData, generator, new ActionGetURL("FSCommand:" + ((DirectValueActionItem) command).getAsString(), ""));
         }
-        return toSourceMerge(localData, generator, new AddActionItem(null, asg.pushConstTargetItem("FSCommand:"), command, true), asg.pushConstTargetItem(""), new ActionGetURL2(1/*GET*/, false, false));
+        return toSourceMerge(localData, generator, new AddActionItem(null, null, asg.pushConstTargetItem("FSCommand:"), command, true), asg.pushConstTargetItem(""), new ActionGetURL2(1/*GET*/, false, false));
     }
 
     @Override

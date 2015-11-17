@@ -29,8 +29,8 @@ import java.util.List;
 
 public class ToIntegerActionItem extends ActionItem {
 
-    public ToIntegerActionItem(GraphSourceItem instruction, GraphTargetItem value) {
-        super(instruction, PRECEDENCE_PRIMARY, value);
+    public ToIntegerActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value) {
+        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY, value);
     }
 
     @Override

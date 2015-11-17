@@ -29,8 +29,8 @@ import java.util.List;
 
 public class MBAsciiToCharActionItem extends ActionItem {
 
-    public MBAsciiToCharActionItem(GraphSourceItem instruction, GraphTargetItem value) {
-        super(instruction, PRECEDENCE_PRIMARY, value);
+    public MBAsciiToCharActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value) {
+        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY, value);
     }
 
     @Override

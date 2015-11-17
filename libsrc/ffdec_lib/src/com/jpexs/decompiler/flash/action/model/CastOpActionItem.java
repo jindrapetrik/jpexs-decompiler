@@ -42,8 +42,8 @@ public class CastOpActionItem extends ActionItem {
         return ret;
     }
 
-    public CastOpActionItem(GraphSourceItem instruction, GraphTargetItem constructor, GraphTargetItem object) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public CastOpActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem constructor, GraphTargetItem object) {
+        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
         this.constructor = constructor;
         this.object = object;
     }

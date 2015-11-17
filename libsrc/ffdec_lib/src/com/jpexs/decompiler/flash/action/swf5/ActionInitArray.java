@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.InitArrayActionItem;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphSourceItem; import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,13 +34,13 @@ public class ActionInitArray extends Action {
     }
 
     @Override
-    public void translate(TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
+    public void translate(GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         long numArgs = popLong(stack);
         List<GraphTargetItem> args = new ArrayList<>();
         for (int l = 0; l < numArgs; l++) {
             args.add(stack.pop());
         }
-        stack.push(new InitArrayActionItem(this, args));
+        stack.push(new InitArrayActionItem(this, lineStartAction, args));
     }
 
     @Override

@@ -28,8 +28,8 @@ import java.util.List;
 
 public class DivideActionItem extends BinaryOpItem {
 
-    public DivideActionItem(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, PRECEDENCE_MULTIPLICATIVE, leftSide, rightSide, "/");
+    public DivideActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
+        super(instruction, lineStartIns, PRECEDENCE_MULTIPLICATIVE, leftSide, rightSide, "/");
     }
 
     @Override

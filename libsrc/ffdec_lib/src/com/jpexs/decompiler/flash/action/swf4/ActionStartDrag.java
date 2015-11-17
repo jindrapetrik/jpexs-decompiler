@@ -21,7 +21,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.StartDragActionItem;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphSourceItem; import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.HashMap;
 import java.util.List;
@@ -39,7 +39,7 @@ public class ActionStartDrag extends Action {
     }
 
     @Override
-    public void translate(TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
+    public void translate(GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem target = stack.pop();
         GraphTargetItem lockCenter = stack.pop();
         GraphTargetItem constrain = stack.pop();
@@ -62,7 +62,7 @@ public class ActionStartDrag extends Action {
             x1 = stack.pop();
         }
 
-        output.add(new StartDragActionItem(this, target, lockCenter, constrain, x1, y1, x2, y2));
+        output.add(new StartDragActionItem(this, lineStartAction, target, lockCenter, constrain, x1, y1, x2, y2));
     }
 
     @Override

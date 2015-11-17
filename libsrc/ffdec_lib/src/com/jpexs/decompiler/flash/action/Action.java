@@ -589,7 +589,7 @@ public abstract class Action implements GraphSourceItem {
                 } else {
                     if (lastPush) {
                         writer.newLine();
-                        lastPush = false;
+                        //lastPush = false;
                     }
 
                     writer.append("", offset);
@@ -623,11 +623,7 @@ public abstract class Action implements GraphSourceItem {
                         writer.newLine();
                     }
                 }
-                if (a instanceof ActionPush) {
-                    lastPush = true;
-                } else {
-                    lastPush = false;
-                }
+                lastPush = a instanceof ActionPush;
                 //}
             }
 
@@ -706,6 +702,7 @@ public abstract class Action implements GraphSourceItem {
     /**
      * Translates this function to stack and output.
      *
+     * @param lineStartIns Line start instruction
      * @param stack Stack
      * @param output Output
      * @param regNames Register names
@@ -715,7 +712,7 @@ public abstract class Action implements GraphSourceItem {
      * @param path the value of path
      * @throws java.lang.InterruptedException
      */
-    public void translate(TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) throws InterruptedException {
+    public void translate(GraphSourceItem lineStartIns, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) throws InterruptedException {
     }
 
     @Override
@@ -899,7 +896,7 @@ public abstract class Action implements GraphSourceItem {
          }
          expectedSize += getStackPushCount(localData, stack);*/
 
-        translate(stack, output, aLocalData.regNames, aLocalData.variables, aLocalData.functions, staticOperation, path);
+        translate(aLocalData.lineStartAction, stack, output, aLocalData.regNames, aLocalData.variables, aLocalData.functions, staticOperation, path);
         /*if (stack.size() != expectedSize && !(this instanceof ActionPushDuplicate)) {
          throw new Error("HONFIKA stack size mismatch");
          }*/
@@ -1015,7 +1012,8 @@ public abstract class Action implements GraphSourceItem {
                     outs.add(out);
                     endAddr += size;
                 }
-                ((GraphSourceItemContainer) action).translateContainer(outs, stack, output, registerNames, variables, functions);
+
+                ((GraphSourceItemContainer) action).translateContainer(outs, action, stack, output, registerNames, variables, functions);
                 ip = adr2ip(actions, endAddr);
                 continue;
             }
@@ -1153,7 +1151,7 @@ public abstract class Action implements GraphSourceItem {
             if (v.name instanceof DirectValueActionItem) {
                 if (((DirectValueActionItem) v.name).value instanceof String) {
                     if (((DirectValueActionItem) v.name).value.equals("_global")) {
-                        GetVariableActionItem gvt = new GetVariableActionItem(null, ((GetMemberActionItem) t).memberName);
+                        GetVariableActionItem gvt = new GetVariableActionItem(null, null, ((GetMemberActionItem) t).memberName);
                         if (lastMember == null) {
                             return gvt;
                         } else {
@@ -1280,7 +1278,7 @@ public abstract class Action implements GraphSourceItem {
                                                         ImplementsOpActionItem iot = (ImplementsOpActionItem) parts.get(1);
                                                         implementsOp = iot.superclasses;
                                                     } else {
-                                                        ok = false;
+                                                        //ok = false;
                                                         break;
                                                     }
                                                 }
@@ -1296,7 +1294,7 @@ public abstract class Action implements GraphSourceItem {
                                 }
                             }
                         } else {
-                            ok = false;
+                            //ok = false;
                         }
                     } else {
                         ok = false;
@@ -1383,15 +1381,15 @@ public abstract class Action implements GraphSourceItem {
         }
         if (ret instanceof GetVariableActionItem) {
             GetVariableActionItem gv = (GetVariableActionItem) ret;
-            ret = new SetVariableActionItem(null, gv.name, value);
+            ret = new SetVariableActionItem(null, null, gv.name, value);
         } else if (ret instanceof GetMemberActionItem) {
             GetMemberActionItem mem = (GetMemberActionItem) ret;
-            ret = new SetMemberActionItem(null, mem.object, mem.memberName, value);
+            ret = new SetMemberActionItem(null, null, mem.object, mem.memberName, value);
         } else if ((ret instanceof DirectValueActionItem) && ((DirectValueActionItem) ret).value instanceof RegisterNumber) {
-            ret = new StoreRegisterActionItem(null, (RegisterNumber) ((DirectValueActionItem) ret).value, value, false);
+            ret = new StoreRegisterActionItem(null, null, (RegisterNumber) ((DirectValueActionItem) ret).value, value, false);
         } else if (ret instanceof GetPropertyActionItem) {
             GetPropertyActionItem gp = (GetPropertyActionItem) ret;
-            ret = new SetPropertyActionItem(null, gp.target, gp.propertyIndex, value);
+            ret = new SetPropertyActionItem(null, null, gp.target, gp.propertyIndex, value);
         }
         if (boxed) {
             GraphTargetItem b = ret;

@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.ConvertException;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.debug.DebugFileIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.debug.DebugIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.debug.DebugLineIns;
@@ -318,15 +319,22 @@ public class ScriptPack extends AS3ClassTreeItem {
      */
     public void injectDebugInfo(File directoryPath) {
         Map<Integer, Map<Integer, Integer>> bodyToPosToLine = new HashMap<>();
+        Map<Integer, Map<Integer, Integer>> bodyLineToPos = new HashMap<>();
+        Map<Integer, Map<Integer, String>> bodyToRegToName = new HashMap<>();
+        Map<Integer, Map<Integer, Integer>> bodyToRegToLine = new HashMap<>();
+
         Set<Integer> lonelyBody = new HashSet<>();
         try {
             CachedDecompilation decompiled = SWF.getCached(this);
             int line = 1;
             String txt = decompiled.text;
             txt = txt.replace("\r", "");
+
             for (int i = 0; i < txt.length(); i++) {
                 blk:
                 {
+                    Highlighting sh = Highlighting.searchPos(decompiled.specialHilights, i);
+
                     Highlighting cls = Highlighting.searchPos(decompiled.classHilights, i);
                     /*if (cls == null) {
                      continue;
@@ -339,7 +347,7 @@ public class ScriptPack extends AS3ClassTreeItem {
                     if (method == null) {
                         break blk;
                     }
-                    Highlighting instr = Highlighting.searchPos(decompiled.instructionHilights, i);
+                    Highlighting instr = Highlighting.searchPos(decompiled.instructionHilights, i); //h
                     /*if (instr == null) {
                      continue;
                      }*/
@@ -350,8 +358,19 @@ public class ScriptPack extends AS3ClassTreeItem {
                         break blk;
                     }
                     int pos = -1;
+                    int regIndex = -1;
+                    String regName = null;
+                    if (sh != null && sh.getProperties().declaration && sh.getProperties().regIndex > -1) {
+                        regIndex = sh.getProperties().regIndex;
+                        regName = sh.getProperties().localName;
+                    }
                     if (instr != null) {
-                        long instrOffset = instr.getProperties().offset;
+                        if (instr.getProperties().declaration && instr.getProperties().regIndex > -1) {
+                            regIndex = instr.getProperties().regIndex;
+                            regName = instr.getProperties().localName;
+                        }
+
+                        long instrOffset = instr.getProperties().firstLineOffset;
                         if (trt != null && cls != null) {
                             int traitIndex = (int) trt.getProperties().index;
 
@@ -362,6 +381,9 @@ public class ScriptPack extends AS3ClassTreeItem {
                             }
                         }
 
+                        if (instrOffset == -1) {
+                            break blk;
+                        }
                         try {
                             pos = abc.bodies.get(bodyIndex).getCode().adr2pos(instrOffset);
                         } catch (ConvertException cex) {
@@ -372,10 +394,24 @@ public class ScriptPack extends AS3ClassTreeItem {
                         }
                         if (!bodyToPosToLine.containsKey(bodyIndex)) {
                             bodyToPosToLine.put(bodyIndex, new HashMap<>());
+                            bodyLineToPos.put(bodyIndex, new HashMap<>());
                         }
+                        //int origPos = bodyLineToPos.get(bodyIndex).containsKey(line) ? bodyLineToPos.get(bodyIndex).get(line) : -1;
+
                         bodyToPosToLine.get(bodyIndex).put(pos, line);
+                        bodyLineToPos.get(bodyIndex).put(line, pos);
                     } else {
                         lonelyBody.add(bodyIndex);
+                    }
+                    if (regIndex > -1 && regName != null) {
+                        if (!bodyToRegToName.containsKey(bodyIndex)) {
+                            bodyToRegToName.put(bodyIndex, new HashMap<>());
+                            bodyToRegToLine.put(bodyIndex, new HashMap<>());
+                        }
+                        if (!bodyToRegToName.get(bodyIndex).containsKey(regIndex)) {
+                            bodyToRegToName.get(bodyIndex).put(regIndex, regName);
+                            bodyToRegToLine.get(bodyIndex).put(regIndex, line);
+                        }
                     }
                 }
                 if (txt.charAt(i) == '\n') {
@@ -431,11 +467,20 @@ public class ScriptPack extends AS3ClassTreeItem {
                     delIns.add(ins);
                 }
             }
+            int dpos = 0;
             b.insertInstruction(0, new AVM2Instruction(0, AVM2Instructions.DebugFile, new int[]{abc.constants.getStringId(filename, true)}), true);
+            dpos++;
+            Set<Integer> regs = bodyToRegToName.containsKey(bodyIndex) ? bodyToRegToName.get(bodyIndex).keySet() : new TreeSet<>();
+            for (int r : regs) {
+                String name = bodyToRegToName.get(bodyIndex).get(r);
+                int line = bodyToRegToLine.get(bodyIndex).get(r);
+                b.insertInstruction(dpos++, new AVM2Instruction(0, AVM2Instructions.Debug, new int[]{1, abc.constants.getStringId(name, true), r - 1, line}));
+            }
             List<Integer> pos = new ArrayList<>(bodyToPosToLine.get(bodyIndex).keySet());
             Collections.sort(pos);
             Collections.reverse(pos);
             Set<Integer> addedLines = new HashSet<>();
+            loopi:
             for (int i : pos) {
                 int line = bodyToPosToLine.get(bodyIndex).get(i);
                 if (addedLines.contains(line)) {
@@ -443,7 +488,7 @@ public class ScriptPack extends AS3ClassTreeItem {
                 }
                 addedLines.add(line);
                 Logger.getLogger(ScriptPack.class.getName()).log(Level.FINE, "Script " + path + ": Insert debugline(" + line + ") at pos " + i + " to body " + bodyIndex);
-                b.insertInstruction(i, new AVM2Instruction(0, AVM2Instructions.DebugLine, new int[]{line}));
+                b.insertInstruction(i + dpos, new AVM2Instruction(0, AVM2Instructions.DebugLine, new int[]{line}));
             }
             //remove old debug instructions
             for (int i = 0; i < code.size(); i++) {

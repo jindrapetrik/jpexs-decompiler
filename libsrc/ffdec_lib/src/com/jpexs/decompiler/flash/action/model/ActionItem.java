@@ -33,15 +33,15 @@ import java.util.List;
 public abstract class ActionItem extends GraphTargetItem implements Serializable {
 
     public ActionItem() {
-        super(null, NOPRECEDENCE);
+        super(null, null, NOPRECEDENCE);
     }
 
-    public ActionItem(GraphSourceItem instruction, int precedence) {
-        super(instruction, precedence);
+    public ActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, int precedence) {
+        this(instruction, lineStartIns, precedence, null);
     }
 
-    public ActionItem(GraphSourceItem instruction, int precedence, GraphTargetItem value) {
-        super(instruction, precedence, value);
+    public ActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, int precedence, GraphTargetItem value) {
+        super(instruction, lineStartIns, precedence, value);
     }
 
     protected boolean isEmptyString(GraphTargetItem target) {

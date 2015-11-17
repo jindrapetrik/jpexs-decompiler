@@ -28,8 +28,8 @@ import java.util.List;
 
 public class PreIncrementAVM2Item extends UnaryOpItem {
 
-    public PreIncrementAVM2Item(AVM2Instruction instruction, GraphTargetItem object) {
-        super(instruction, PRECEDENCE_UNARY, object, "++");
+    public PreIncrementAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  GraphTargetItem object) {
+        super(instruction, lineStartIns, PRECEDENCE_UNARY, object, "++");
     }
 
     @Override

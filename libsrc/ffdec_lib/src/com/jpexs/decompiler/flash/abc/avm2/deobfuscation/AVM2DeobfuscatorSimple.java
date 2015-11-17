@@ -102,9 +102,9 @@ import java.util.Map;
  */
 public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
 
-    private static final UndefinedAVM2Item UNDEFINED_ITEM = new UndefinedAVM2Item(null);
+    private static final UndefinedAVM2Item UNDEFINED_ITEM = new UndefinedAVM2Item(null, null);
 
-    private static final NotCompileTimeItem NOT_COMPILE_TIME_UNDEFINED_ITEM = new NotCompileTimeItem(null, UNDEFINED_ITEM);
+    private static final NotCompileTimeItem NOT_COMPILE_TIME_UNDEFINED_ITEM = new NotCompileTimeItem(null, null, UNDEFINED_ITEM);
 
     private final int executionLimit = 30000;
 
@@ -178,7 +178,7 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
         Map<Integer, GraphTargetItem> staticRegs = new HashMap<>();
         for (AVM2Instruction ins : inlineIns) {
             if (ins.definition instanceof GetLocalTypeIns) {
-                staticRegs.put(((GetLocalTypeIns) ins.definition).getRegisterId(ins), new UndefinedAVM2Item(ins));
+                staticRegs.put(((GetLocalTypeIns) ins.definition).getRegisterId(ins), new UndefinedAVM2Item(ins, null));
             }
         }
 

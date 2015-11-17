@@ -32,8 +32,8 @@ import java.util.Set;
  */
 public class FalseItem extends GraphTargetItem implements LogicalOpItem, SimpleValue {
 
-    public FalseItem(GraphSourceItem src) {
-        super(src, PRECEDENCE_PRIMARY);
+    public FalseItem(GraphSourceItem src, GraphSourceItem lineStartIns) {
+        super(src, lineStartIns, PRECEDENCE_PRIMARY);
     }
 
     @Override
@@ -58,7 +58,7 @@ public class FalseItem extends GraphTargetItem implements LogicalOpItem, SimpleV
 
     @Override
     public GraphTargetItem invert(GraphSourceItem neqSrc) {
-        return new TrueItem(null);
+        return new TrueItem(getSrc(), getLineStartItem());
     }
 
     @Override

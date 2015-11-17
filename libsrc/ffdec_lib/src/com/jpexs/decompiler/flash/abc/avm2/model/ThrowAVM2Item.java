@@ -22,7 +22,7 @@ import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.ExitItem;
@@ -32,8 +32,8 @@ import java.util.List;
 public class ThrowAVM2Item extends AVM2Item implements ExitItem {
 
     //public GraphTargetItem value;
-    public ThrowAVM2Item(AVM2Instruction instruction, GraphTargetItem value) {
-        super(instruction, NOPRECEDENCE, value);
+    public ThrowAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  GraphTargetItem value) {
+        super(instruction, lineStartIns, NOPRECEDENCE, value);
     }
 
     @Override

@@ -57,7 +57,7 @@ public class ConstructSuperIns extends InstructionDefinition {
             args.add(0, stack.pop());
         }
         GraphTargetItem obj = stack.pop();
-        output.add(new ConstructSuperAVM2Item(ins, obj, args));
+        output.add(new ConstructSuperAVM2Item(ins, localData.lineStartInstruction, obj, args));
     }
 
     @Override

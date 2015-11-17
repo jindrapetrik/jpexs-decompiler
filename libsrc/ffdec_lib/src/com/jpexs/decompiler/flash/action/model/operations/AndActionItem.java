@@ -29,8 +29,8 @@ import java.util.List;
 
 public class AndActionItem extends BinaryOpItem {
 
-    public AndActionItem(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, PRECEDENCE_LOGICALAND, leftSide, rightSide, "and");
+    public AndActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
+        super(instruction, lineStartIns, PRECEDENCE_LOGICALAND, leftSide, rightSide, "and");
     }
 
     @Override

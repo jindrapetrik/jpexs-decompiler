@@ -29,8 +29,8 @@ import java.util.List;
 
 public class NegAVM2Item extends UnaryOpItem {
 
-    public NegAVM2Item(AVM2Instruction instruction, GraphTargetItem value) {
-        super(instruction, PRECEDENCE_UNARY, value, "-");
+    public NegAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  GraphTargetItem value) {
+        super(instruction, lineStartIns, PRECEDENCE_UNARY, value, "-");
     }
 
     @Override

@@ -66,8 +66,8 @@ public class StoreRegisterActionItem extends ActionItem implements SetTypeAction
         return value;
     }
 
-    public StoreRegisterActionItem(GraphSourceItem instruction, RegisterNumber register, GraphTargetItem value, boolean define) {
-        super(instruction, PRECEDENCE_ASSIGMENT, value);
+    public StoreRegisterActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, RegisterNumber register, GraphTargetItem value, boolean define) {
+        super(instruction, lineStartIns, PRECEDENCE_ASSIGMENT, value);
         this.register = register;
         this.define = define;
     }
@@ -88,7 +88,7 @@ public class StoreRegisterActionItem extends ActionItem implements SetTypeAction
 
     @Override
     public GraphTargetItem getObject() {
-        return new DirectValueActionItem(getSrc(), -1, register, null);
+        return new DirectValueActionItem(getSrc(), getLineStartItem(), -1, register, null);
     }
 
     @Override

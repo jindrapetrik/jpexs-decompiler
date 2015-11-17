@@ -27,7 +27,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
@@ -37,23 +37,28 @@ import java.util.List;
 public abstract class AVM2Item extends GraphTargetItem {
 
     private AVM2Instruction instruction;
+    private AVM2Instruction lineStartIns;
 
-    public AVM2Item(GraphSourceItem instruction, int precedence) {
-        super(instruction, precedence);
+    public AVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, int precedence) {
+        this(instruction, lineStartIns, precedence, null);
+    }
+
+    public AVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, int precedence, GraphTargetItem value) {
+        super(instruction, lineStartIns, precedence, value);
         if (instruction instanceof AVM2Instruction) {
             this.instruction = (AVM2Instruction) instruction;
         }
-    }
-
-    public AVM2Item(GraphSourceItem instruction, int precedence, GraphTargetItem value) {
-        super(instruction, precedence, value);
-        if (instruction instanceof AVM2Instruction) {
-            this.instruction = (AVM2Instruction) instruction;
+        if (lineStartIns instanceof AVM2Instruction) {
+            this.lineStartIns = (AVM2Instruction) lineStartIns;
         }
     }
 
     public AVM2Instruction getInstruction() {
         return instruction;
+    }
+
+    public AVM2Instruction getLineStartIns() {
+        return lineStartIns;
     }
 
     @Override

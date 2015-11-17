@@ -34,7 +34,7 @@ import com.jpexs.decompiler.flash.action.model.operations.PreDecrementActionItem
 import com.jpexs.decompiler.flash.action.model.operations.PreIncrementActionItem;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphSourceItem; import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.HashMap;
@@ -64,7 +64,7 @@ public class ActionSetVariable extends Action implements StoreTypeAction {
     }
 
     @Override
-    public void translate(TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
+    public void translate(GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem value = stack.pop().getThroughDuplicate();
         GraphTargetItem name = stack.pop();
         String nameStr;
@@ -78,7 +78,7 @@ public class ActionSetVariable extends Action implements StoreTypeAction {
             GraphTargetItem obj = ((IncrementActionItem) value).object;
             if (!stack.isEmpty() && stack.peek().valueEquals(obj)) {
                 stack.pop();
-                stack.push(new PostIncrementActionItem(this, obj));
+                stack.push(new PostIncrementActionItem(this, lineStartAction, obj));
                 return;
             }
         }
@@ -86,14 +86,14 @@ public class ActionSetVariable extends Action implements StoreTypeAction {
             GraphTargetItem obj = ((DecrementActionItem) value).object;
             if (!stack.isEmpty() && stack.peek().valueEquals(obj)) {
                 stack.pop();
-                stack.push(new PostDecrementActionItem(this, obj));
+                stack.push(new PostDecrementActionItem(this, lineStartAction, obj));
                 return;
             }
         }
         if (value instanceof IncrementActionItem) {
             if (((IncrementActionItem) value).object instanceof GetVariableActionItem) {
                 if (((GetVariableActionItem) ((IncrementActionItem) value).object).name.valueEquals(name)) {
-                    output.add(new PostIncrementActionItem(this, ((IncrementActionItem) value).object));
+                    output.add(new PostIncrementActionItem(this, lineStartAction, ((IncrementActionItem) value).object));
                     return;
                 }
             }
@@ -101,13 +101,13 @@ public class ActionSetVariable extends Action implements StoreTypeAction {
         if (value instanceof DecrementActionItem) {
             if (((DecrementActionItem) value).object instanceof GetVariableActionItem) {
                 if (((GetVariableActionItem) ((DecrementActionItem) value).object).name.valueEquals(name)) {
-                    output.add(new PostDecrementActionItem(this, ((DecrementActionItem) value).object));
+                    output.add(new PostDecrementActionItem(this, lineStartAction, ((DecrementActionItem) value).object));
                     return;
                 }
             }
         }
 
-        GraphTargetItem ret = new SetVariableActionItem(this, name, value);
+        GraphTargetItem ret = new SetVariableActionItem(this, lineStartAction, name, value);
 
         if (value instanceof StoreRegisterActionItem) {
             StoreRegisterActionItem sr = (StoreRegisterActionItem) value;
@@ -117,13 +117,13 @@ public class ActionSetVariable extends Action implements StoreTypeAction {
                 if (value instanceof IncrementActionItem) {
                     if (((IncrementActionItem) value).object instanceof GetVariableActionItem) {
                         if (((GetVariableActionItem) ((IncrementActionItem) value).object).name.valueEquals(name)) {
-                            ret = new PreIncrementActionItem(this, ((IncrementActionItem) value).object);
+                            ret = new PreIncrementActionItem(this, lineStartAction, ((IncrementActionItem) value).object);
                         }
                     }
                 } else if (value instanceof DecrementActionItem) {
                     if (((DecrementActionItem) value).object instanceof GetVariableActionItem) {
                         if (((GetVariableActionItem) ((DecrementActionItem) value).object).name.valueEquals(name)) {
-                            ret = new PreDecrementActionItem(this, ((DecrementActionItem) value).object);
+                            ret = new PreDecrementActionItem(this, lineStartAction, ((DecrementActionItem) value).object);
                         }
                     }
                 } else {

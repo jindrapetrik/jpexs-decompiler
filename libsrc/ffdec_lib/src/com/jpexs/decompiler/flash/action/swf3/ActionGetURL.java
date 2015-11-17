@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.action.model.UnLoadMovieNumActionItem;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
+import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.helpers.Helper;
@@ -86,11 +87,11 @@ public class ActionGetURL extends Action {
     }
 
     @Override
-    public void translate(TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
+    public void translate(GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         String fsCommandPrefix = "FSCommand:";
         if (urlString.startsWith(fsCommandPrefix) && targetString.isEmpty()) {
             String command = urlString.substring(fsCommandPrefix.length());
-            output.add(new FSCommandActionItem(this, new DirectValueActionItem(command)));
+            output.add(new FSCommandActionItem(this, lineStartAction, new DirectValueActionItem(command)));
             return;
         }
         String levelPrefix = "_level";
@@ -98,10 +99,10 @@ public class ActionGetURL extends Action {
             try {
                 int num = Integer.valueOf(targetString.substring(levelPrefix.length()));
                 if (urlString.isEmpty()) {
-                    output.add(new UnLoadMovieNumActionItem(this, new DirectValueActionItem((Long) (long) (int) num)));
+                    output.add(new UnLoadMovieNumActionItem(this, lineStartAction, new DirectValueActionItem((Long) (long) (int) num)));
                 } else {
-                    DirectValueActionItem urlStringDi = new DirectValueActionItem(null, 0, urlString, new ArrayList<>());
-                    output.add(new LoadMovieNumActionItem(this, urlStringDi, new DirectValueActionItem((Long) (long) (int) num), 1/*GET*/));
+                    DirectValueActionItem urlStringDi = new DirectValueActionItem(null, null, 0, urlString, new ArrayList<>());
+                    output.add(new LoadMovieNumActionItem(this, lineStartAction, urlStringDi, new DirectValueActionItem((Long) (long) (int) num), 1/*GET*/));
                 }
                 return;
             } catch (NumberFormatException nfe) {
@@ -110,10 +111,10 @@ public class ActionGetURL extends Action {
         }
 
         if (urlString.isEmpty()) {
-            DirectValueActionItem targetStringDi = new DirectValueActionItem(null, 0, targetString, new ArrayList<>());
-            output.add(new UnLoadMovieActionItem(this, targetStringDi));
+            DirectValueActionItem targetStringDi = new DirectValueActionItem(null, null, 0, targetString, new ArrayList<>());
+            output.add(new UnLoadMovieActionItem(this, lineStartAction, targetStringDi));
         } else {
-            output.add(new GetURLActionItem(this, urlString, targetString));
+            output.add(new GetURLActionItem(this, lineStartAction, urlString, targetString));
         }
 
     }

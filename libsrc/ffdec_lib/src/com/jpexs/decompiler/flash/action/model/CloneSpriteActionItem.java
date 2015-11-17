@@ -45,8 +45,8 @@ public class CloneSpriteActionItem extends ActionItem {
         return ret;
     }
 
-    public CloneSpriteActionItem(GraphSourceItem instruction, GraphTargetItem source, GraphTargetItem target, GraphTargetItem depth) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public CloneSpriteActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem source, GraphTargetItem target, GraphTargetItem depth) {
+        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
         this.source = source;
         this.target = target;
         this.depth = depth;

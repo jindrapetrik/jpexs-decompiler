@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.AssignmentAVM2Item;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 
@@ -30,8 +30,8 @@ public class InitPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, A
     public FullMultinameAVM2Item propertyName;
     //public GraphTargetItem value;
 
-    public InitPropertyAVM2Item(AVM2Instruction instruction, GraphTargetItem object, FullMultinameAVM2Item propertyName, GraphTargetItem value) {
-        super(instruction, PRECEDENCE_ASSIGMENT, value);
+    public InitPropertyAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, FullMultinameAVM2Item propertyName, GraphTargetItem value) {
+        super(instruction, lineStartIns, PRECEDENCE_ASSIGMENT, value);
         this.object = object;
         this.propertyName = propertyName;
     }
@@ -45,7 +45,7 @@ public class InitPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, A
 
     @Override
     public GraphTargetItem getObject() {
-        return new GetPropertyAVM2Item(getInstruction(), object, propertyName);
+        return new GetPropertyAVM2Item(getInstruction(), getLineStartIns(), object, propertyName);
     }
 
     @Override

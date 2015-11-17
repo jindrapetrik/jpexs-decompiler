@@ -47,8 +47,8 @@ public class FindPropertyStrictIns extends InstructionDefinition {
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         int multinameIndex = ins.operands[0];
-        FullMultinameAVM2Item multiname = resolveMultiname(true, stack, localData.getConstants(), multinameIndex, ins);
-        stack.push(new FindPropertyAVM2Item(ins, multiname));
+        FullMultinameAVM2Item multiname = resolveMultiname(localData, true, stack, localData.getConstants(), multinameIndex, ins);
+        stack.push(new FindPropertyAVM2Item(ins, localData.lineStartInstruction, multiname));
     }
 
     @Override

@@ -76,7 +76,7 @@ public class GetSlotIns extends InstructionDefinition {
 
             }
         }
-        stack.push(new GetSlotAVM2Item(ins, obj, slotname));
+        stack.push(new GetSlotAVM2Item(ins, localData.lineStartInstruction, obj, slotname));
     }
 
     @Override

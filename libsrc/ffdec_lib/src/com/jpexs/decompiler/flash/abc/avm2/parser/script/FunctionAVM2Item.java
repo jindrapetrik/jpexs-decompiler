@@ -65,7 +65,7 @@ public class FunctionAVM2Item extends AVM2Item {
 
     public FunctionAVM2Item(List<Map.Entry<String, Map<String, String>>> metadata, NamespaceItem pkg, boolean isInterface, boolean needsActivation, boolean hasRest, int line, String functionName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<AssignableAVM2Item> subvariables, GraphTargetItem retType) {
 
-        super(null, NOPRECEDENCE);
+        super(null, null, NOPRECEDENCE);
         this.metadata = metadata;
         this.pkg = pkg;
         this.needsActivation = needsActivation;

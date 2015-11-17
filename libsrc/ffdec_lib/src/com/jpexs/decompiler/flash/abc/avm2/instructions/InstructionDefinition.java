@@ -30,9 +30,11 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.IncLocalIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.Reference;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.DottedChain;
+import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TranslateStack;
@@ -134,11 +136,12 @@ public abstract class InstructionDefinition implements Serializable {
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) throws InterruptedException {
     }
 
-    public void translate(boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, AVM2Instruction ins, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) throws InterruptedException {
+    public void translate(Reference<GraphSourceItem> lineStartItem, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, AVM2Instruction ins, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) throws InterruptedException {
         AVM2LocalData localData = new AVM2LocalData();
         localData.isStatic = isStatic;
         localData.scriptIndex = scriptIndex;
         localData.classIndex = classIndex;
+        localData.lineStartInstruction = lineStartItem.getVal();
         localData.localRegs = localRegs;
         localData.scopeStack = scopeStack;
         localData.methodBody = body;
@@ -150,6 +153,7 @@ public abstract class InstructionDefinition implements Serializable {
         localData.refs = refs;
         localData.code = code;
         translate(localData, stack, ins, output, path);
+        lineStartItem.setVal(localData.lineStartInstruction);
     }
 
     public int getStackPopCount(AVM2Instruction ins, ABC abc) {
@@ -160,7 +164,7 @@ public abstract class InstructionDefinition implements Serializable {
         return 0;
     }
 
-    protected FullMultinameAVM2Item resolveMultiname(boolean property, TranslateStack stack, AVM2ConstantPool constants, int multinameIndex, AVM2Instruction ins) {
+    protected FullMultinameAVM2Item resolveMultiname(AVM2LocalData localData, boolean property, TranslateStack stack, AVM2ConstantPool constants, int multinameIndex, AVM2Instruction ins) {
         GraphTargetItem ns = null;
         GraphTargetItem name = null;
         if (multinameIndex > 0 && multinameIndex < constants.getMultinameCount()) {
@@ -172,7 +176,7 @@ public abstract class InstructionDefinition implements Serializable {
             }
 
         }
-        return new FullMultinameAVM2Item(property, ins, multinameIndex, name, ns);
+        return new FullMultinameAVM2Item(property, ins, localData.lineStartInstruction, multinameIndex, name, ns);
     }
 
     protected int getMultinameRequiredStackSize(AVM2ConstantPool constants, int multinameIndex) {

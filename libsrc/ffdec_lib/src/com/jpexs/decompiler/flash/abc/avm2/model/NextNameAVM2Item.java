@@ -18,7 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 
@@ -32,8 +32,8 @@ public class NextNameAVM2Item extends AVM2Item {
 
     GraphTargetItem obj;
 
-    public NextNameAVM2Item(AVM2Instruction instruction, GraphTargetItem index, GraphTargetItem obj) {
-        super(instruction, NOPRECEDENCE);
+    public NextNameAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  GraphTargetItem index, GraphTargetItem obj) {
+        super(instruction, lineStartIns, NOPRECEDENCE);
         this.index = index;
         this.obj = obj;
     }

@@ -46,8 +46,8 @@ public class CallMethodActionItem extends ActionItem {
         return ret;
     }
 
-    public CallMethodActionItem(GraphSourceItem instruction, GraphTargetItem scriptObject, GraphTargetItem methodName, List<GraphTargetItem> arguments) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public CallMethodActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem scriptObject, GraphTargetItem methodName, List<GraphTargetItem> arguments) {
+        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
         this.methodName = methodName;
         this.arguments = arguments;
         this.scriptObject = scriptObject;

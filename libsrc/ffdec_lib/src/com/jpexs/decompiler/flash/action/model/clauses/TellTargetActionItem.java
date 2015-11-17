@@ -38,8 +38,8 @@ public class TellTargetActionItem extends ActionItem {
 
     public GraphTargetItem target;
 
-    public TellTargetActionItem(GraphSourceItem instruction, GraphTargetItem target, List<GraphTargetItem> commands) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public TellTargetActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem target, List<GraphTargetItem> commands) {
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.target = target;
         this.commands = commands;
     }

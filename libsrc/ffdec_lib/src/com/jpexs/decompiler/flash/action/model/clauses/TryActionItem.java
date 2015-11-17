@@ -59,7 +59,7 @@ public class TryActionItem extends ActionItem implements Block {
     }
 
     public TryActionItem(List<GraphTargetItem> tryCommands, List<GraphTargetItem> catchExceptions, List<List<GraphTargetItem>> catchCommands, List<GraphTargetItem> finallyCommands) {
-        super(null, NOPRECEDENCE);
+        super(null, null, NOPRECEDENCE);
         this.tryCommands = tryCommands;
         this.catchExceptions = catchExceptions;
         this.catchCommands = catchCommands;

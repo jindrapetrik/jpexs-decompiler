@@ -18,7 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.HashMap;
@@ -27,8 +27,8 @@ public class NewActivationAVM2Item extends AVM2Item {
 
     public HashMap<Integer, GraphTargetItem> slots = new HashMap<>();
 
-    public NewActivationAVM2Item(AVM2Instruction instruction) {
-        super(instruction, NOPRECEDENCE);
+    public NewActivationAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns) {
+        super(instruction, lineStartIns, NOPRECEDENCE);
     }
 
     @Override

@@ -318,8 +318,9 @@ public class MethodInfo {
             HighlightData pdata = new HighlightData();
             pdata.declaration = true;
             pdata.declaredType = ptype;
+            pdata.regIndex = i + 1;
             if (!localRegNames.isEmpty()) {
-                pdata.localName = localRegNames.get(i + 1); //assuming it is a slot
+                pdata.localName = localRegNames.get(i + 1); //assuming it is a slot                
                 writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(true, localRegNames.get(i + 1)), HighlightSpecialType.PARAM_NAME, i, pdata);
             } else if ((paramNames.length > i) && (paramNames[i] != 0) && Configuration.paramNamesEnable.get()) {
                 pdata.localName = constants.getString(paramNames[i]);
@@ -358,6 +359,7 @@ public class MethodInfo {
             HighlightData pdata = new HighlightData();
             pdata.declaration = true;
             pdata.declaredType = DottedChain.ALL;
+            pdata.regIndex = param_types.length + 1;
             pdata.localName = restName;
             writer.append(restAdd);
             writer.hilightSpecial(restName, HighlightSpecialType.FLAG_NEED_REST, 0, pdata);

@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model.clauses;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 
@@ -28,7 +28,7 @@ public class ExceptionAVM2Item extends AVM2Item {
     public ABCException exception;
 
     public ExceptionAVM2Item(ABCException exception) {
-        super(null, NOPRECEDENCE);
+        super(null, null, NOPRECEDENCE);
         this.exception = exception;
     }
 

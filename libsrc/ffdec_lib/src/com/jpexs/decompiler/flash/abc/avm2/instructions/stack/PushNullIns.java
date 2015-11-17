@@ -42,7 +42,7 @@ public class PushNullIns extends InstructionDefinition {
 
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
-        stack.push(new NullAVM2Item(ins));
+        stack.push(new NullAVM2Item(ins, localData.lineStartInstruction));
     }
 
     @Override

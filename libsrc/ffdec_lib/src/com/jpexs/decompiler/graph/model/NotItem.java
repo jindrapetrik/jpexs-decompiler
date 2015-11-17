@@ -33,8 +33,8 @@ import java.util.Set;
  */
 public class NotItem extends UnaryOpItem implements LogicalOpItem, Inverted {
 
-    public NotItem(GraphSourceItem instruction, GraphTargetItem value) {
-        super(instruction, PRECEDENCE_UNARY, value, "!");
+    public NotItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value) {
+        super(instruction, lineStartIns, PRECEDENCE_UNARY, value, "!");
     }
 
     @Override

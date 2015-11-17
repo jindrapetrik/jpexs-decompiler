@@ -56,8 +56,8 @@ public class GetVariableActionItem extends ActionItem {
         return ret;
     }
 
-    public GetVariableActionItem(GraphSourceItem instruction, GraphTargetItem value) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public GetVariableActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value) {
+        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
         this.name = value;
     }
 

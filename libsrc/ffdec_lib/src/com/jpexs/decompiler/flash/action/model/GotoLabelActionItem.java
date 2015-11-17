@@ -30,8 +30,8 @@ public class GotoLabelActionItem extends ActionItem {
 
     public String label;
 
-    public GotoLabelActionItem(GraphSourceItem instruction, String label) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public GotoLabelActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, String label) {
+        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
         this.label = label;
     }
 

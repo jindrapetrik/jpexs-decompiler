@@ -35,8 +35,8 @@ import java.util.List;
 
 public class LeActionItem extends BinaryOpItem implements LogicalOpItem, Inverted {
 
-    public LeActionItem(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, PRECEDENCE_RELATIONAL, leftSide, rightSide, "<=");
+    public LeActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
+        super(instruction, lineStartIns, PRECEDENCE_RELATIONAL, leftSide, rightSide, "<=");
     }
 
     @Override
@@ -52,7 +52,7 @@ public class LeActionItem extends BinaryOpItem implements LogicalOpItem, Inverte
 
     @Override
     public GraphTargetItem invert(GraphSourceItem negSrc) {
-        return new GtActionItem(getSrc(), leftSide, rightSide);
+        return new GtActionItem(getSrc(), getLineStartItem(), leftSide, rightSide);
     }
 
     @Override

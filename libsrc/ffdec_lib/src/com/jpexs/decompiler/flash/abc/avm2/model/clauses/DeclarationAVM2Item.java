@@ -26,7 +26,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.SetSlotAVM2Item;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
 import com.jpexs.decompiler.graph.DottedChain;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 
@@ -41,7 +41,7 @@ public class DeclarationAVM2Item extends AVM2Item {
     public GraphTargetItem type;
 
     public DeclarationAVM2Item(GraphTargetItem assignment, GraphTargetItem type) {
-        super(assignment.getSrc(), assignment.getPrecedence());
+        super(assignment.getSrc(), assignment.getLineStartItem(), assignment.getPrecedence());
         this.type = type;
         this.assignment = assignment;
     }
@@ -59,6 +59,7 @@ public class DeclarationAVM2Item extends AVM2Item {
             HighlightData srcData = getSrcData();
             srcData.localName = localName;
             srcData.declaration = true;
+            srcData.regIndex = lti.regIndex;
             srcData.declaredType = DottedChain.ALL;
             writer.append("var ");
             writer.append(localName);
@@ -82,6 +83,7 @@ public class DeclarationAVM2Item extends AVM2Item {
             HighlightData srcData = getSrcData();
             srcData.localName = localName;
             srcData.declaration = true;
+            srcData.regIndex = lti.regIndex;
 
             GraphTargetItem coerType = TypeItem.UNBOUNDED;
             if (lti.value instanceof CoerceAVM2Item) {

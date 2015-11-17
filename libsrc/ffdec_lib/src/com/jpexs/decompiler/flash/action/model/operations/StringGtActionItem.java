@@ -32,8 +32,8 @@ import java.util.Set;
 
 public class StringGtActionItem extends BinaryOpItem implements Inverted {
 
-    public StringGtActionItem(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, PRECEDENCE_RELATIONAL, leftSide, rightSide, "gt");
+    public StringGtActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
+        super(instruction, lineStartIns, PRECEDENCE_RELATIONAL, leftSide, rightSide, "gt");
     }
 
     @Override
@@ -66,6 +66,6 @@ public class StringGtActionItem extends BinaryOpItem implements Inverted {
 
     @Override
     public GraphTargetItem invert(GraphSourceItem negSrc) {
-        return new StringLeActionItem(getSrc(), leftSide, rightSide);
+        return new StringLeActionItem(getSrc(), getLineStartItem(), leftSide, rightSide);
     }
 }

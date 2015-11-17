@@ -21,13 +21,19 @@ import com.jpexs.debugger.flash.DebugMessageListener;
 import com.jpexs.debugger.flash.Debugger;
 import com.jpexs.debugger.flash.DebuggerCommands;
 import com.jpexs.debugger.flash.DebuggerConnection;
+import com.jpexs.debugger.flash.Variable;
 import com.jpexs.debugger.flash.messages.in.InAskBreakpoints;
 import com.jpexs.debugger.flash.messages.in.InBreakAt;
+import com.jpexs.debugger.flash.messages.in.InBreakAtExt;
+import com.jpexs.debugger.flash.messages.in.InBreakReason;
 import com.jpexs.debugger.flash.messages.in.InContinue;
+import com.jpexs.debugger.flash.messages.in.InFrame;
 import com.jpexs.debugger.flash.messages.in.InNumScript;
 import com.jpexs.debugger.flash.messages.in.InScript;
 import com.jpexs.debugger.flash.messages.in.InSetBreakpoint;
 import com.jpexs.debugger.flash.messages.in.InSwfInfo;
+import com.jpexs.debugger.flash.messages.in.InVersion;
+import com.jpexs.debugger.flash.messages.out.OutGetBreakReason;
 import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.graph.DottedChain;
@@ -54,6 +60,61 @@ public class DebuggerHandler implements DebugConnectionListener {
     private boolean paused = true;
     private Map<Integer, ClassPath> modulePaths = new HashMap<>();
     private Map<ClassPath, Integer> classToModule = new HashMap<>();
+
+    private InFrame frame;
+
+    public static interface VariableChangedListener {
+
+        public void variablesChanged();
+
+    }
+
+    private List<VariableChangedListener> listeners = new ArrayList<>();
+
+    public void addVariableChangedListener(VariableChangedListener l) {
+        listeners.add(l);
+    }
+
+    public void removeVariableChangedListener(VariableChangedListener l) {
+        listeners.remove(l);
+    }
+
+    public void setVariableValue(int index, String value) {
+        //variables.get(index).value = value
+        //TODO:
+    }
+
+    public int getNumVariables() {
+        if (frame == null) {
+            return 0;
+        }
+        return frame.variables.size();
+    }
+
+    public Variable getFrameVariable() {
+        if (frame == null) {
+            return null;
+        }
+        return frame.frame;
+    }
+
+    public Variable getVariable(int index) {
+        if (frame == null) {
+            return null;
+        }
+        return frame.variables.get(index);
+    }
+
+    public int getNumRegisters() {
+        if (frame == null) {
+            return 0;
+        }
+        return frame.registers.size();
+    }
+
+    public Variable getRegister(int index) {
+        return frame.registers.get(index);
+    }
 
     public int moduleIdOf(ScriptPack pack) {
         if (classToModule.containsKey(pack.getClassPath())) {
@@ -89,6 +150,16 @@ public class DebuggerHandler implements DebugConnectionListener {
         return commands;
     }
 
+    private static void enlog(Class<?> cls) {
+        Level level = Level.FINEST;
+
+        Logger mylog = Logger.getLogger(cls.getName());
+        mylog.setLevel(level);
+        ConsoleHandler ch = new ConsoleHandler();
+        ch.setLevel(level);
+        mylog.addHandler(ch);
+    }
+
     @Override
     public void connected(DebuggerConnection con) {
 
@@ -98,15 +169,14 @@ public class DebuggerHandler implements DebugConnectionListener {
 
         Main.getMainFrame().getPanel().updateMenu();
 
-        Level level = Level.FINER;
-
-        Logger rootLog = Logger.getLogger(Debugger.class.getName());
-        rootLog.setLevel(level);
-        ConsoleHandler ch = new ConsoleHandler();
-        ch.setLevel(level);
-        rootLog.addHandler(ch);
-        //rootLog.getHandlers()[0].setLevel(level);
-
+        //enlog(DebuggerConnection.class);
+        //enlog(DebuggerCommands.class);
+        try {
+            //rootLog.getHandlers()[0].setLevel(level);
+            con.getMessage(InVersion.class);
+        } catch (IOException ex) {
+            Logger.getLogger(DebuggerHandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
         commands = new DebuggerCommands(con);
         try {
             commands.stopWarning();
@@ -163,13 +233,33 @@ public class DebuggerHandler implements DebugConnectionListener {
                     synchronized (DebuggerHandler.this) {
                         paused = true;
                     }
-                    Main.getMainFrame().getPanel().updateMenu();
-                    Logger.getLogger(DebuggerHandler.class.getName()).log(Level.INFO, "break at {0}:{1}", new Object[]{moduleNames.get(message.file), message.line});
-                    if (!modulePaths.containsKey(message.file)) {
-                        return;
+                    View.execInEventDispatchLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+
+                            Main.getMainFrame().getPanel().updateMenu();
+                            Logger.getLogger(DebuggerHandler.class.getName()).log(Level.INFO, "break at {0}:{1}", new Object[]{moduleNames.get(message.file), message.line});
+                            if (!modulePaths.containsKey(message.file)) {
+                                return;
+                            }
+                            String cls = modulePaths.get(message.file).toString();
+                            try {
+                                InBreakAtExt bex = con.getMessage(InBreakAtExt.class);
+                                InBreakReason ibr = con.sendMessage(new OutGetBreakReason(con), InBreakReason.class);
+                                frame = commands.getFrame(0);
+
+                                for (VariableChangedListener l : listeners) {
+                                    l.variablesChanged();
+                                }
+
+                            } catch (IOException ex) {
+                                //ignore
+                            }
+                            Main.getMainFrame().getPanel().debuggerBreakAt(Main.getMainFrame().getPanel().getCurrentSwf(), cls, message.line);
+                        }
                     }
-                    String cls = modulePaths.get(message.file).toString();
-                    Main.getMainFrame().getPanel().debuggerBreakAt(Main.getMainFrame().getPanel().getCurrentSwf(), cls, message.line);
+                    );
                     //dc.sendContinue();
                 }
             });
@@ -187,7 +277,9 @@ public class DebuggerHandler implements DebugConnectionListener {
                     }
                 }
             }
-            Main.getMainFrame().getPanel().refreshBreakPoints();
+
+            Main.getMainFrame()
+                    .getPanel().refreshBreakPoints();
             connected = true;
         } catch (IOException ex) {
             connected = false;

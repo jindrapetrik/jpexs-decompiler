@@ -37,6 +37,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.FalseItem;
@@ -392,7 +393,7 @@ public class ActionPush extends Action {
     }
 
     @Override
-    public void translate(TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
+    public void translate(GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         int pos = 0;
         for (Object o : values) {
             if (ignoredParts.contains(pos)) {
@@ -419,9 +420,9 @@ public class ActionPush extends Action {
              SetTypeActionItem stt = (SetTypeActionItem) last;
              stt.setTempRegister(((RegisterNumber) o).number);
              if ((stt.getValue() instanceof IncrementActionItem) && (((IncrementActionItem) stt.getValue()).object.equals(stt.getObject()))) {
-             stack.push(new PreIncrementActionItem(this, stt.getObject()));
+             stack.push(new PreIncrementActionItem(this, lineStartAction, stt.getObject()));
              } else if ((stt.getValue() instanceof DecrementActionItem) && (((DecrementActionItem) stt.getValue()).object.equals(stt.getObject()))) {
-             stack.push(new PreDecrementActionItem(this, stt.getObject()));
+             stack.push(new PreDecrementActionItem(this, lineStartAction, stt.getObject()));
              } else {
              //stack.push(last);
              continue;
@@ -438,12 +439,12 @@ public class ActionPush extends Action {
             if (o instanceof Boolean) {
                 Boolean b = (Boolean) o;
                 if (b) {
-                    stack.push(new TrueItem(this));
+                    stack.push(new TrueItem(this, lineStartAction));
                 } else {
-                    stack.push(new FalseItem(this));
+                    stack.push(new FalseItem(this, lineStartAction));
                 }
             } else {
-                DirectValueActionItem dvt = new DirectValueActionItem(this, pos, o, constantPool);
+                DirectValueActionItem dvt = new DirectValueActionItem(this, lineStartAction, pos, o, constantPool);
 
                 if (o instanceof RegisterNumber) {//TemporaryRegister
                     dvt.computedRegValue = variables.get("__register" + ((RegisterNumber) o).number);

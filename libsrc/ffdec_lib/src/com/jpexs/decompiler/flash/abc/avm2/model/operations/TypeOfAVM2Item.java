@@ -32,8 +32,8 @@ import java.util.Set;
 
 public class TypeOfAVM2Item extends UnaryOpItem {
 
-    public TypeOfAVM2Item(AVM2Instruction instruction, GraphTargetItem value) {
-        super(instruction, PRECEDENCE_UNARY, value, "typeof ");
+    public TypeOfAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  GraphTargetItem value) {
+        super(instruction, lineStartIns, PRECEDENCE_UNARY, value, "typeof ");
     }
 
     @Override

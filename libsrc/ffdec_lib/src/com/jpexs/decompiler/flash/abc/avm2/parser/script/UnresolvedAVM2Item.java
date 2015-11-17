@@ -184,13 +184,13 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
     public static GraphTargetItem getDefaultValue(String type) {
         switch (type) {
             case "*":
-                return new UndefinedAVM2Item(null);
+                return new UndefinedAVM2Item(null, null);
             case "int":
-                return new IntegerValueAVM2Item(null, 0L);
+                return new IntegerValueAVM2Item(null, null, 0L);
             case "Number":
-                return new NanAVM2Item(null);
+                return new NanAVM2Item(null, null);
             default:
-                return new NullAVM2Item(null);
+                return new NullAVM2Item(null, null);
         }
     }
 

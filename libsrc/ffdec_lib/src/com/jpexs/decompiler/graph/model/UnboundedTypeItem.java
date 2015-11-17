@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.graph.model;
 
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
@@ -26,7 +27,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 public class UnboundedTypeItem extends AVM2Item {
 
     public UnboundedTypeItem() {
-        super(null, NOPRECEDENCE);
+        super(null, null, NOPRECEDENCE);
     }
 
     @Override

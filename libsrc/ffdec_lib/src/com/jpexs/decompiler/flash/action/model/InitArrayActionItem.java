@@ -38,8 +38,8 @@ public class InitArrayActionItem extends ActionItem {
         return ret;
     }
 
-    public InitArrayActionItem(GraphSourceItem instruction, List<GraphTargetItem> values) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public InitArrayActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, List<GraphTargetItem> values) {
+        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
         this.values = values;
     }
 

@@ -21,7 +21,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.clauses.AssignmentAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphPart;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 
@@ -32,8 +32,8 @@ public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assign
     //public GraphTargetItem value;
     public GraphTargetItem scope;
 
-    public SetSlotAVM2Item(AVM2Instruction instruction, GraphTargetItem scope, Multiname slotName, GraphTargetItem value) {
-        super(instruction, PRECEDENCE_ASSIGMENT, value);
+    public SetSlotAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem scope, Multiname slotName, GraphTargetItem value) {
+        super(instruction, lineStartIns, PRECEDENCE_ASSIGMENT, value);
         this.slotName = slotName;
         this.scope = scope;
     }
@@ -68,7 +68,7 @@ public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assign
 
     @Override
     public GraphTargetItem getObject() {
-        return new GetSlotAVM2Item(getInstruction(), scope, slotName);
+        return new GetSlotAVM2Item(getInstruction(), getLineStartIns(), scope, slotName);
     }
 
     @Override

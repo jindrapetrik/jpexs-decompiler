@@ -46,8 +46,8 @@ public class UnLoadMovieNumActionItem extends ActionItem {
         return ret;
     }
 
-    public UnLoadMovieNumActionItem(GraphSourceItem instruction, GraphTargetItem num) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public UnLoadMovieNumActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem num) {
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.num = num;
     }
 
@@ -66,7 +66,7 @@ public class UnLoadMovieNumActionItem extends ActionItem {
         if ((num instanceof DirectValueActionItem) && (((DirectValueActionItem) num).value instanceof Long)) {
             return toSourceMerge(localData, generator, new ActionGetURL("", "_level" + ((DirectValueActionItem) num).value));
         } else {
-            return toSourceMerge(localData, generator, new ActionPush(""), new AddActionItem(getSrc(), asGenerator.pushConstTargetItem("_level"), num, true), new ActionGetURL2(0, false, true));
+            return toSourceMerge(localData, generator, new ActionPush(""), new AddActionItem(getSrc(), getLineStartItem(), asGenerator.pushConstTargetItem("_level"), num, true), new ActionGetURL2(0, false, true));
         }
 
     }

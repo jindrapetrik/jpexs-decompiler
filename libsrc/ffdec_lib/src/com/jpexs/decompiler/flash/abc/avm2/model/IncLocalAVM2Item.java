@@ -17,7 +17,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 
@@ -25,8 +25,8 @@ public class IncLocalAVM2Item extends AVM2Item {
 
     public int regIndex;
 
-    public IncLocalAVM2Item(AVM2Instruction instruction, int regIndex) {
-        super(instruction, PRECEDENCE_POSTFIX);
+    public IncLocalAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  int regIndex) {
+        super(instruction, lineStartIns, PRECEDENCE_POSTFIX);
         this.regIndex = regIndex;
     }
 

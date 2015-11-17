@@ -198,7 +198,7 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
         List<GraphTargetItem> output = new ArrayList<>();
         AVM2LocalData localData = newLocalData(scriptIndex, abc, abc.constants, body, isStatic, classIndex);
         initLocalRegs(localData, body.getLocalReservedCount(), body.max_regs);
-        localData.localRegs.put(0, new NullAVM2Item(null)); // this
+        localData.localRegs.put(0, new NullAVM2Item(null, null)); // this
 
         List<Integer> toVisit = new ArrayList<>();
         toVisit.add(idx);

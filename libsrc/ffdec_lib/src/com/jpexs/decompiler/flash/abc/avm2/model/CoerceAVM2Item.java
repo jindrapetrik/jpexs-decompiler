@@ -25,7 +25,7 @@ import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -38,13 +38,13 @@ public class CoerceAVM2Item extends AVM2Item {
     //public GraphTargetItem type;
     public GraphTargetItem typeObj;
 
-    /*public CoerceAVM2Item(AVM2Instruction instruction, GraphTargetItem value, String type) {
-     super(instruction, value.getPrecedence());
+    /*public CoerceAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  GraphTargetItem value, String type) {
+     super(instruction, lineStartIns, value.getPrecedence());
      this.value = value;
      this.type = type;
      }*/
-    public CoerceAVM2Item(AVM2Instruction instruction, GraphTargetItem value, GraphTargetItem typeObj) {
-        super(instruction, value.getPrecedence(), value);
+    public CoerceAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  GraphTargetItem value, GraphTargetItem typeObj) {
+        super(instruction, lineStartIns, value.getPrecedence(), value);
         this.typeObj = typeObj;
     }
 

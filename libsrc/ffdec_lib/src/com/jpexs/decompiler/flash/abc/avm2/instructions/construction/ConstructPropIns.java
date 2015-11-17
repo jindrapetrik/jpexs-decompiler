@@ -62,7 +62,7 @@ public class ConstructPropIns extends InstructionDefinition {
         for (int a = 0; a < argCount; a++) {
             args.add(0, stack.pop());
         }
-        FullMultinameAVM2Item multiname = resolveMultiname(true, stack, localData.getConstants(), multinameIndex, ins);
+        FullMultinameAVM2Item multiname = resolveMultiname(localData, true, stack, localData.getConstants(), multinameIndex, ins);
         GraphTargetItem obj = stack.pop();
         if (obj instanceof FindPropertyAVM2Item) {
             multiname.property = false;  //can be type
@@ -73,13 +73,13 @@ public class ConstructPropIns extends InstructionDefinition {
                 GraphTargetItem arg = args.get(0);
                 List<GraphTargetItem> xmlLines = new ArrayList<>();
                 if (ConstructIns.walkXML(arg, xmlLines)) {
-                    stack.push(new XMLAVM2Item(ins, xmlLines));
+                    stack.push(new XMLAVM2Item(ins, localData.lineStartInstruction, xmlLines));
                     return;
                 }
             }
         }
 
-        stack.push(new ConstructPropAVM2Item(ins, obj, multiname, args));
+        stack.push(new ConstructPropAVM2Item(ins, localData.lineStartInstruction, obj, multiname, args));
     }
 
     @Override

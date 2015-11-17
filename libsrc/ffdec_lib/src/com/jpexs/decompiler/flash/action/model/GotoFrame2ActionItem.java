@@ -47,8 +47,8 @@ public class GotoFrame2ActionItem extends ActionItem {
         return ret;
     }
 
-    public GotoFrame2ActionItem(GraphSourceItem instruction, GraphTargetItem frame, boolean sceneBiasFlag, boolean playFlag, int sceneBias) {
-        super(instruction, PRECEDENCE_PRIMARY);
+    public GotoFrame2ActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem frame, boolean sceneBiasFlag, boolean playFlag, int sceneBias) {
+        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
         this.frame = frame;
         this.sceneBiasFlag = sceneBiasFlag;
         this.playFlag = playFlag;

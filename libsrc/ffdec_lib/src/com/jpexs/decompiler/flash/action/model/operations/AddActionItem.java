@@ -35,8 +35,8 @@ public class AddActionItem extends BinaryOpItem {
 
     boolean version2;
 
-    public AddActionItem(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide, boolean version2) {
-        super(instruction, PRECEDENCE_ADDITIVE, leftSide, rightSide, "+");
+    public AddActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide, boolean version2) {
+        super(instruction, lineStartIns, PRECEDENCE_ADDITIVE, leftSide, rightSide, "+");
         this.version2 = version2;
     }
 

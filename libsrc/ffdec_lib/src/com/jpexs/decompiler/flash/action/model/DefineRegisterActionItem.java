@@ -30,7 +30,7 @@ public class DefineRegisterActionItem extends ActionItem {
     private final int register;
 
     public DefineRegisterActionItem(String identifier, int register) {
-        super(null, PRECEDENCE_PRIMARY);
+        super(null, null, PRECEDENCE_PRIMARY);
         this.identifier = identifier;
         this.register = register;
     }

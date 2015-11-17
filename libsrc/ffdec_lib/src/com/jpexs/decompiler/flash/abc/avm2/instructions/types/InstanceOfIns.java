@@ -35,7 +35,7 @@ public class InstanceOfIns extends InstructionDefinition {
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         GraphTargetItem type = stack.pop();
         GraphTargetItem value = stack.pop();
-        stack.push(new InstanceOfAVM2Item(ins, value, type));
+        stack.push(new InstanceOfAVM2Item(ins, localData.lineStartInstruction, value, type));
     }
 
     @Override

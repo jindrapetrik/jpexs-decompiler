@@ -33,8 +33,8 @@ import java.util.List;
 
 public class EqAVM2Item extends BinaryOpItem implements LogicalOpItem, IfCondition, EqualsTypeItem {
 
-    public EqAVM2Item(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, PRECEDENCE_EQUALITY, leftSide, rightSide, "==");
+    public EqAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
+        super(instruction, lineStartIns, PRECEDENCE_EQUALITY, leftSide, rightSide, "==");
     }
 
     @Override
@@ -54,7 +54,7 @@ public class EqAVM2Item extends BinaryOpItem implements LogicalOpItem, IfConditi
 
     @Override
     public GraphTargetItem invert(GraphSourceItem neqSrc) {
-        return new NeqAVM2Item(getSrc(), leftSide, rightSide);
+        return new NeqAVM2Item(getSrc(), getLineStartItem(), leftSide, rightSide);
     }
 
     @Override

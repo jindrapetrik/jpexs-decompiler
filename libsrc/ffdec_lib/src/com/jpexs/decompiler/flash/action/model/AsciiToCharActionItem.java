@@ -29,8 +29,8 @@ import java.util.List;
 
 public class AsciiToCharActionItem extends ActionItem {
 
-    public AsciiToCharActionItem(GraphSourceItem instruction, GraphTargetItem value) {
-        super(instruction, PRECEDENCE_PRIMARY, value);
+    public AsciiToCharActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value) {
+        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY, value);
     }
 
     @Override

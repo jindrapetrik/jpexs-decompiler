@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.ImplementsOpActionItem;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphSourceItem; import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,14 +39,14 @@ public class ActionImplementsOp extends Action {
     }
 
     @Override
-    public void translate(TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
+    public void translate(GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem subclass = stack.pop();
         long inCount = popLong(stack);
         List<GraphTargetItem> superclasses = new ArrayList<>();
         for (long l = 0; l < inCount; l++) {
             superclasses.add(stack.pop());
         }
-        output.add(new ImplementsOpActionItem(this, subclass, superclasses));
+        output.add(new ImplementsOpActionItem(this, lineStartAction, subclass, superclasses));
     }
 
     @Override

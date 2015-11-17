@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.graph.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -32,8 +33,8 @@ public class CommaExpressionItem extends GraphTargetItem {
 
     public List<GraphTargetItem> commands;
 
-    public CommaExpressionItem(GraphSourceItem src, List<GraphTargetItem> commands) {
-        super(src, PRECEDENCE_PRIMARY);
+    public CommaExpressionItem(GraphSourceItem src, GraphSourceItem lineStartIns, List<GraphTargetItem> commands) {
+        super(src, lineStartIns, PRECEDENCE_PRIMARY);
         this.commands = commands;
     }
 

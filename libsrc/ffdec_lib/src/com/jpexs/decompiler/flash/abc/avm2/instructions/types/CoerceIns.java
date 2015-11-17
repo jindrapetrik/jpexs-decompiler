@@ -67,7 +67,7 @@ public class CoerceIns extends InstructionDefinition implements CoerceOrConvertT
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         int multinameIndex = ins.operands[0];
-        stack.push(new CoerceAVM2Item(ins, stack.pop(), PropertyAVM2Item.multinameToType(multinameIndex, localData.getConstants())));
+        stack.push(new CoerceAVM2Item(ins, localData.lineStartInstruction, stack.pop(), PropertyAVM2Item.multinameToType(multinameIndex, localData.getConstants())));
     }
 
     @Override

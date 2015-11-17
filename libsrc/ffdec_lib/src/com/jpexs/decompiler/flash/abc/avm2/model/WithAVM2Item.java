@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.parser.script.AssignableAVM2Item;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -38,14 +38,14 @@ public class WithAVM2Item extends AVM2Item {
 
     public List<AssignableAVM2Item> subvariables = new ArrayList<>();
 
-    public WithAVM2Item(AVM2Instruction instruction, GraphTargetItem scope, List<GraphTargetItem> items) {
-        super(instruction, NOPRECEDENCE);
+    public WithAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  GraphTargetItem scope, List<GraphTargetItem> items) {
+        super(instruction, lineStartIns, NOPRECEDENCE);
         this.scope = scope;
         this.items = items;
     }
 
-    public WithAVM2Item(AVM2Instruction instruction, GraphTargetItem scope) {
-        super(instruction, NOPRECEDENCE);
+    public WithAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  GraphTargetItem scope) {
+        super(instruction, lineStartIns, NOPRECEDENCE);
         this.scope = scope;
         this.items = new ArrayList<>();
     }

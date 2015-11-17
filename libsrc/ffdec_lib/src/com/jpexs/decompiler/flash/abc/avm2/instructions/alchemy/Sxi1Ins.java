@@ -48,7 +48,7 @@ public class Sxi1Ins extends InstructionDefinition implements AlchemyTypeIns {
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         GraphTargetItem value = stack.pop();
-        stack.push(new AlchemySignExtendAVM2Item(ins, value, 1));
+        stack.push(new AlchemySignExtendAVM2Item(ins, localData.lineStartInstruction, value, 1));
     }
 
     @Override

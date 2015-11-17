@@ -59,7 +59,7 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
         int regId = getRegisterId(ins);
         GraphTargetItem value = stack.pop();
         /*if (localRegs.containsKey(regId)) {
-         localRegs.put(regId, new NotCompileTimeAVM2Item(ins, value));
+         localRegs.put(regId, new NotCompileTimeAVM2Item(ins, localData.lineStartInstruction, value));
          } else {
          localRegs.put(regId, value);
          }*/
@@ -85,15 +85,15 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
                         GraphTargetItem top = stack.peek().getNotCoerced().getThroughDuplicate();
                         if (top == inside) {
                             stack.pop();
-                            stack.push(new PostIncrementAVM2Item(ins, inside));
+                            stack.push(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, inside));
                         } else if ((top instanceof IncrementAVM2Item) && (((IncrementAVM2Item) top).value == inside)) {
                             stack.pop();
-                            stack.push(new PreIncrementAVM2Item(ins, inside));
+                            stack.push(new PreIncrementAVM2Item(ins, localData.lineStartInstruction, inside));
                         } else {
-                            output.add(new PostIncrementAVM2Item(ins, inside));
+                            output.add(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, inside));
                         }
                     } else {
-                        output.add(new PostIncrementAVM2Item(ins, inside));
+                        output.add(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, inside));
                     }
                     return;
                 }
@@ -108,15 +108,15 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
                         GraphTargetItem top = stack.peek().getNotCoerced().getThroughDuplicate();
                         if (top == inside) {
                             stack.pop();
-                            stack.push(new PostDecrementAVM2Item(ins, inside));
+                            stack.push(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, inside));
                         } else if ((top instanceof DecrementAVM2Item) && (((DecrementAVM2Item) top).value == inside)) {
                             stack.pop();
-                            stack.push(new PreDecrementAVM2Item(ins, inside));
+                            stack.push(new PreDecrementAVM2Item(ins, localData.lineStartInstruction, inside));
                         } else {
-                            output.add(new PostDecrementAVM2Item(ins, inside));
+                            output.add(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, inside));
                         }
                     } else {
-                        output.add(new PostDecrementAVM2Item(ins, inside));
+                        output.add(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, inside));
                     }
                     return;
                 }
@@ -125,7 +125,7 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
 
         //if(val.startsWith("catchscope ")) return;
         //if(val.startsWith("newactivation()")) return;
-        output.add(new SetLocalAVM2Item(ins, regId, value));
+        output.add(new SetLocalAVM2Item(ins, localData.lineStartInstruction, regId, value));
     }
 
     @Override

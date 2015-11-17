@@ -44,17 +44,17 @@ public class NewObjectIns extends InstructionDefinition {
             //No PopItems in this loop, since some obfuscators put there large numbers
             GraphTargetItem value = stack.pop();
             if (value instanceof PopItem) {
-                stack.push(new NullAVM2Item(ins));
+                stack.push(new NullAVM2Item(ins, localData.lineStartInstruction));
                 return;
             }
             GraphTargetItem name = stack.pop();
             if (value instanceof PopItem) {
-                stack.push(new NullAVM2Item(ins));
+                stack.push(new NullAVM2Item(ins, localData.lineStartInstruction));
                 return;
             }
             args.add(0, new NameValuePair(name, value));
         }
-        stack.push(new NewObjectAVM2Item(ins, args));
+        stack.push(new NewObjectAVM2Item(ins, localData.lineStartInstruction, args));
     }
 
     @Override

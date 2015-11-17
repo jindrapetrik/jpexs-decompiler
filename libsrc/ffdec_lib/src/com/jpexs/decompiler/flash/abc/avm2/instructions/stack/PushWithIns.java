@@ -35,9 +35,9 @@ public class PushWithIns extends InstructionDefinition {
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         GraphTargetItem w = stack.pop();
-        WithObjectAVM2Item wot = new WithObjectAVM2Item(ins, w);
+        WithObjectAVM2Item wot = new WithObjectAVM2Item(ins, localData.lineStartInstruction, w);
         localData.scopeStack.push(wot);
-        output.add(new WithAVM2Item(ins, w));
+        output.add(new WithAVM2Item(ins, localData.lineStartInstruction, w));
     }
 
     @Override

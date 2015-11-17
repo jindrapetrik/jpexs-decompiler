@@ -26,7 +26,7 @@ import com.jpexs.decompiler.flash.action.model.GetVersionActionItem;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
-import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphSourceItem; import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.HashMap;
@@ -60,7 +60,7 @@ public class ActionGetVariable extends Action {
     }
 
     @Override
-    public void translate(TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
+    public void translate(GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem name = stack.pop();
         String nameStr;
         if (name instanceof DirectValueActionItem) {
@@ -70,11 +70,11 @@ public class ActionGetVariable extends Action {
         }
         GraphTargetItem computedVal = variables.get(nameStr);
         if (name instanceof DirectValueActionItem && ((DirectValueActionItem) name).value.equals("/:$version")) {
-            stack.push(new GetVersionActionItem(this));
+            stack.push(new GetVersionActionItem(this, lineStartAction));
         } else if (!(name instanceof DirectValueActionItem) && !(name instanceof GetVariableActionItem)) {
-            stack.push(new EvalActionItem(this, name));
+            stack.push(new EvalActionItem(this, lineStartAction, name));
         } else {
-            GetVariableActionItem gvt = new GetVariableActionItem(this, name);
+            GetVariableActionItem gvt = new GetVariableActionItem(this, lineStartAction, name);
             gvt.setComputedValue(computedVal);
             stack.push(gvt);
         }

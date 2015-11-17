@@ -24,8 +24,8 @@ public abstract class LoopItem extends GraphTargetItem {
 
     public Loop loop;
 
-    public LoopItem(GraphSourceItem src, Loop loop) {
-        super(src, NOPRECEDENCE);
+    public LoopItem(GraphSourceItem src, GraphSourceItem lineStartItem, Loop loop) {
+        super(src, lineStartItem, NOPRECEDENCE);
         this.loop = loop;
     }
 }

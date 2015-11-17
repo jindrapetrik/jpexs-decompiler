@@ -29,8 +29,8 @@ import java.util.List;
 
 public class BitOrAVM2Item extends BinaryOpItem {
 
-    public BitOrAVM2Item(AVM2Instruction instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, PRECEDENCE_BITWISEOR, leftSide, rightSide, "|");
+    public BitOrAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  GraphTargetItem leftSide, GraphTargetItem rightSide) {
+        super(instruction, lineStartIns, PRECEDENCE_BITWISEOR, leftSide, rightSide, "|");
     }
 
     @Override

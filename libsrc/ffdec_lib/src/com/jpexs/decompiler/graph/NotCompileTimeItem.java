@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -27,8 +28,8 @@ public class NotCompileTimeItem extends GraphTargetItem {
 
     public GraphTargetItem object;
 
-    public NotCompileTimeItem(GraphSourceItem instruction, GraphTargetItem object) {
-        super(instruction, NOPRECEDENCE);
+    public NotCompileTimeItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object) {
+        super(instruction, lineStartIns, NOPRECEDENCE);
         this.object = object;
     }
 
