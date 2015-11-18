@@ -1,21 +1,24 @@
-﻿package  {
-	
+﻿package 
+{
+
 	import flash.display.*;
 	import flash.text.TextField;
 	import flash.events.MouseEvent;
 	import flash.external.ExternalInterface;
 	import flash.system.fscommand;
-	
-	public class RunMain extends MovieClip {
-		
+
+	public class RunMain extends MovieClip
+	{
+
 		private var myTextBox:TextField;
-		
-		public function RunMain() {
-			myTextBox = new TextField();    
+
+		public function RunMain()
+		{
+			myTextBox = new TextField();
 			myTextBox.text = "";
 			myTextBox.width = 400;
 			myTextBox.multiline = true;
-			addChild(myTextBox);  
+			addChild(myTextBox);
 
 			var rectangleShape:Shape = new Shape();
 			rectangleShape.graphics.beginFill(0xFF0000);
@@ -39,30 +42,36 @@
 			simpleButton.y = 100;
 			simpleButton.addEventListener(MouseEvent.CLICK, this.clickListener);
 			addChild(simpleButton);
-			
-			ExternalInterface.addCallback("testFunc", testFunction);
-			
-			var result;
-			try {
-				result = testFunction();
-			} catch (e) {
-				result = e.toString();
+
+			if (ExternalInterface.available)
+			{
+				ExternalInterface.addCallback("testFunc", testFunction);
 			}
-			
+
+			var result = testFunction();
+			myText.text = result;
 			fscommand("run", result);
 		}
-		
-		function testFunction() {
-			try {
+
+		function testFunction()
+		{
+			try
+			{
 				var result = Run.run();
 				return "Result:" + result + " Type:" + typeof(result);
-			} catch (ex) {
+			}
+			catch (ex)
+			{
 				return "Error:" + ex;
 			}
 		}
 
-		function clickListener(e:MouseEvent) {
-			myTextBox.text = testFunction();
+		function clickListener(e:MouseEvent)
+		{
+			var result = testFunction();
+			myTextBox.text = result;
+
+			fscommand("run", result);
 		}
 	}
 }
