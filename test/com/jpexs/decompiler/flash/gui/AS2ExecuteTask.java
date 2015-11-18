@@ -31,7 +31,5 @@ public class AS2ExecuteTask {
 
     public String flashResult;
 
-    public String ffdecTranslateResult;
-
     public String ffdecResult;
 }

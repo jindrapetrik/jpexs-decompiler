@@ -13,32 +13,23 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library. */
-package com.jpexs.decompiler.flash.abc.avm2.exceptions;
+package com.jpexs.decompiler.flash.abc.avm2;
 
 /**
  *
  * @author JPEXS
  */
-public class AVM2TypeErrorException extends AVM2ExecutionException {
+public class AVM2RuntimeInfo {
 
-    public AVM2TypeErrorException(int code, boolean debug) {
-        super(codeToMessage(code, debug, null));
-    }
+    public AVM2Runtime runtime;
 
-    public AVM2TypeErrorException(int code, boolean debug, Object[] params) {
-        super(codeToMessage(code, debug, params));
-    }
+    public int version;
 
-    private static String codeToMessage(int code, boolean debug, Object[] params) {
-        String msg = null;
-        switch (code) {
-        }
+    public boolean debug;
 
-        String result = "TypeError: Error #" + code;
-        if (debug && msg != null) {
-            result += ": " + msg;
-        }
-
-        return result;
+    public AVM2RuntimeInfo(AVM2Runtime runtime, int version, boolean debug) {
+        this.runtime = runtime;
+        this.version = version;
+        this.debug = debug;
     }
 }

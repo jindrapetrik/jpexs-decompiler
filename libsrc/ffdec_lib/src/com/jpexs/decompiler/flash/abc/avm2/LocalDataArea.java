@@ -35,9 +35,7 @@ public class LocalDataArea {
 
     public String executionException;
 
-    public AVM2Runtime runtime;
-
-    public int runtimeVersion;
+    public AVM2RuntimeInfo runtimeInfo;
 
     private byte[] domainMemory;
 
@@ -46,10 +44,18 @@ public class LocalDataArea {
 
     public byte[] getDomainMemory() {
         if (domainMemory == null) {
-            domainMemory = new byte[1024 * 1024];
+            domainMemory = new byte[1024]; // in flash player this is the default size
         }
 
         return domainMemory;
+    }
+
+    public AVM2Runtime getRuntime() {
+        return runtimeInfo == null ? AVM2Runtime.UNKNOWN : runtimeInfo.runtime;
+    }
+
+    public boolean isDebug() {
+        return runtimeInfo != null && runtimeInfo.debug;
     }
 
     public void clear() {

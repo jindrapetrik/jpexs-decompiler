@@ -27,15 +27,15 @@ public class AVM2VerifyErrorException extends AVM2ExecutionException {
 
     public static final int CPOOL_INDEX_OUT_OF_RANGE = 1032;
 
-    public AVM2VerifyErrorException(int code) {
-        super(codeToMessage(code, null));
+    public AVM2VerifyErrorException(int code, boolean debug) {
+        super(codeToMessage(code, debug, null));
     }
 
-    public AVM2VerifyErrorException(int code, Object[] params) {
-        super(codeToMessage(code, params));
+    public AVM2VerifyErrorException(int code, boolean debug, Object[] params) {
+        super(codeToMessage(code, debug, params));
     }
 
-    private static String codeToMessage(int code, Object[] params) {
+    private static String codeToMessage(int code, boolean debug, Object[] params) {
         String msg = null;
         switch (code) {
             case ILLEGAL_OPCODE:
@@ -56,9 +56,9 @@ public class AVM2VerifyErrorException extends AVM2ExecutionException {
         }
 
         String result = "VerifyError: Error #" + code;
-        /*if (msg != null) {
-         result += ": " + msg;
-         }*/
+        if (debug && msg != null) {
+            result += ": " + msg;
+        }
 
         return result;
     }

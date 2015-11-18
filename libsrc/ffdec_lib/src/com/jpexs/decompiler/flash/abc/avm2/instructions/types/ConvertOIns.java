@@ -42,11 +42,11 @@ public class ConvertOIns extends InstructionDefinition implements CoerceOrConver
     public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) throws AVM2TypeErrorException {
         Object obj = lda.operandStack.peek();
         if (EcmaScript.type(obj) == EcmaType.NULL) {
-            throw new AVM2TypeErrorException(1009);
+            throw new AVM2TypeErrorException(1009, lda.isDebug());
         }
 
         if (EcmaScript.type(obj) == EcmaType.UNDEFINED) {
-            throw new AVM2TypeErrorException(1010);
+            throw new AVM2TypeErrorException(1010, lda.isDebug());
         }
 
         //throw if pop is not object

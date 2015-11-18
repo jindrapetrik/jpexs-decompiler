@@ -98,27 +98,27 @@ public abstract class InstructionDefinition implements Serializable {
             if (operand == AVM2Code.DAT_MULTINAME_INDEX) {
                 int idx = ins.operands[i];
                 if (idx <= 0 || idx >= constants.getMultinameCount()) {
-                    throw new AVM2VerifyErrorException(AVM2VerifyErrorException.CPOOL_INDEX_OUT_OF_RANGE, new Object[]{idx, constants.getMultinameCount()});
+                    throw new AVM2VerifyErrorException(AVM2VerifyErrorException.CPOOL_INDEX_OUT_OF_RANGE, lda.isDebug(), new Object[]{idx, constants.getMultinameCount()});
                 }
             } else if (operand == AVM2Code.DAT_DOUBLE_INDEX) {
                 int idx = ins.operands[i];
                 if (idx <= 0 || idx >= constants.getDoubleCount()) {
-                    throw new AVM2VerifyErrorException(AVM2VerifyErrorException.CPOOL_INDEX_OUT_OF_RANGE, new Object[]{idx, constants.getDoubleCount()});
+                    throw new AVM2VerifyErrorException(AVM2VerifyErrorException.CPOOL_INDEX_OUT_OF_RANGE, lda.isDebug(), new Object[]{idx, constants.getDoubleCount()});
                 }
             } else if (operand == AVM2Code.DAT_INT_INDEX) {
                 int idx = ins.operands[i];
                 if (idx <= 0 || idx >= constants.getIntCount()) {
-                    throw new AVM2VerifyErrorException(AVM2VerifyErrorException.CPOOL_INDEX_OUT_OF_RANGE, new Object[]{idx, constants.getIntCount()});
+                    throw new AVM2VerifyErrorException(AVM2VerifyErrorException.CPOOL_INDEX_OUT_OF_RANGE, lda.isDebug(), new Object[]{idx, constants.getIntCount()});
                 }
             } else if (operand == AVM2Code.DAT_UINT_INDEX) {
                 int idx = ins.operands[i];
                 if (idx <= 0 || idx >= constants.getUIntCount()) {
-                    throw new AVM2VerifyErrorException(AVM2VerifyErrorException.CPOOL_INDEX_OUT_OF_RANGE, new Object[]{idx, constants.getUIntCount()});
+                    throw new AVM2VerifyErrorException(AVM2VerifyErrorException.CPOOL_INDEX_OUT_OF_RANGE, lda.isDebug(), new Object[]{idx, constants.getUIntCount()});
                 }
             } else if (operand == AVM2Code.DAT_STRING_INDEX) {
                 int idx = ins.operands[i];
                 if (idx <= 0 || idx >= constants.getStringCount()) {
-                    throw new AVM2VerifyErrorException(AVM2VerifyErrorException.CPOOL_INDEX_OUT_OF_RANGE, new Object[]{idx, constants.getStringCount()});
+                    throw new AVM2VerifyErrorException(AVM2VerifyErrorException.CPOOL_INDEX_OUT_OF_RANGE, lda.isDebug(), new Object[]{idx, constants.getStringCount()});
                 }
             }
         }
@@ -130,7 +130,7 @@ public abstract class InstructionDefinition implements Serializable {
     }
 
     protected void illegalOpCode(LocalDataArea lda, AVM2Instruction ins) throws AVM2VerifyErrorException {
-        throw new AVM2VerifyErrorException(AVM2VerifyErrorException.ILLEGAL_OPCODE, new Object[]{lda.methodName, instructionCode, ins.getOffset()});
+        throw new AVM2VerifyErrorException(AVM2VerifyErrorException.ILLEGAL_OPCODE, lda.isDebug(), new Object[]{lda.methodName, instructionCode, ins.getOffset()});
     }
 
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) throws InterruptedException {
