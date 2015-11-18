@@ -725,7 +725,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         setMenuEnabled("/help/about", !isWorking);
 
         setMenuEnabled("/file/start/run", swfSelected && !isRunningOrDebugging);
-        setMenuEnabled("/file/start/debug", !isRunningOrDebugging);
+        setMenuEnabled("/file/start/debug", hasAbc && !isRunningOrDebugging);
 
         setMenuEnabled("/file/start/stop", isRunningOrDebugging);
         setMenuEnabled("/debugging/debug/stop", isRunningOrDebugging); //same as previous
