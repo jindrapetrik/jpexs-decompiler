@@ -36,13 +36,13 @@ public class PushByteIns extends InstructionDefinition implements PushIntegerTyp
 
     @Override
     public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
-        lda.operandStack.push(ins.getParam(constants, 0));
+        lda.operandStack.push((long) (byte) ins.operands[0]);
         return true;
     }
 
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
-        stack.push(new IntegerValueAVM2Item(ins, localData.lineStartInstruction, (long) ins.operands[0]));
+        stack.push(new IntegerValueAVM2Item(ins, localData.lineStartInstruction, (long) (byte) ins.operands[0]));
     }
 
     @Override

@@ -28,7 +28,14 @@ import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
+import com.jpexs.decompiler.flash.action.fastactionlist.ActionItem;
+import com.jpexs.decompiler.flash.action.fastactionlist.FastActionList;
+import com.jpexs.decompiler.flash.action.swf4.ActionPush;
+import com.jpexs.decompiler.flash.action.swf5.ActionCallFunction;
+import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
+import com.jpexs.decompiler.flash.action.swf5.ActionReturn;
 import com.jpexs.decompiler.flash.tags.DoABC2Tag;
+import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.javactivex.ActiveX;
@@ -133,6 +140,73 @@ public class AdobeFlashExecutor {
         return null;
     }
 
+    public void executeActionLists(List<AS2ExecuteTask> tasks) {
+        try {
+            File f2 = new File("run_test_" + new Date().getTime() + "_" + id.getAndIncrement() + ".swf");
+            f2.deleteOnExit();
+
+            SWF swf;
+            try (InputStream is = new BufferedInputStream(new FileInputStream(runFileAs2))) {
+                swf = new SWF(is, false);
+            }
+
+            Map<String, ASMSource> asms = swf.getASMs(true);
+            ASMSource asm = asms.get("\\frame_1\\DoAction");
+            int asmIndex = swf.tags.indexOf(asm);
+
+            ActionList actionsList = asm.getActions();
+            FastActionList actions = new FastActionList(actionsList);
+            actions.removeItem(2, 4);
+
+            int i = 0;
+            ActionItem item = actions.get(1);
+            for (AS2ExecuteTask task : tasks) {
+                DoActionTag doaTag = new DoActionTag(swf);
+                List<Action> actions2 = new ArrayList<>();
+                int codeSize = 1; // 1 == size of return action
+                for (Action actionsToExecute : task.actions) {
+                    codeSize += actionsToExecute.getBytesLength();
+                }
+
+                actions2.add(new ActionDefineFunction("testRun" + i, new ArrayList<>(), codeSize, swf.version));
+                actions2.addAll(task.actions);
+                actions2.add(new ActionReturn());
+
+                doaTag.setActions(actions2);
+                swf.tags.add(asmIndex, doaTag);
+
+                i++;
+            }
+
+            item = actions.insertItemAfter(item, new ActionPush(new Object[]{tasks.size(), 1, "runTests"}));
+            actions.insertItemAfter(item, new ActionCallFunction());
+            asm.setActions(actions.toActionList());
+            asm.setModified();
+            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(f2))) {
+                swf.saveTo(fos);
+            }
+
+            flash.setMovie(f2.getAbsolutePath());
+
+            synchronized (lockObj) {
+                lockObj.wait();
+            }
+
+            //String str = flash.GetVariable("myText.text");
+            f2.delete();
+
+            String flashResult = resultRef.getVal();
+            String[] lines = flashResult.split("(\r\n|\r|\n)");
+            if (lines.length == tasks.size()) {
+                for (int j = 0; j < tasks.size(); j++) {
+                    tasks.get(j).flashResult = lines[j];
+                }
+            }
+        } catch (IOException | InterruptedException ex) {
+            Logger.getLogger(AdobeFlashExecutor.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     public void loadTestSwf() throws IOException, InterruptedException {
         SWF swf = new SWF(new BufferedInputStream(new FileInputStream(runFileAs3)), false);
         swf.version = SWF.MAX_VERSION;
@@ -163,7 +237,6 @@ public class AdobeFlashExecutor {
             body.max_regs = 10;
 
             body.setCode(code);
-            body.markOffsets();
 
             abcTag.setModified(true);
 
@@ -247,8 +320,8 @@ public class AdobeFlashExecutor {
             }
 
             code.add(new AVM2Instruction(0, AVM2Instructions.ReturnValue, null));
+            ccode.markOffsets();
             body.setCode(ccode);
-            body.markOffsets();
 
             abcTag.setModified(true);
 
@@ -292,7 +365,6 @@ public class AdobeFlashExecutor {
         methodBody.max_scope_depth = 10;
 
         methodBody.setCode(code);
-        methodBody.markOffsets();
 
         return methodTrait.name_index;
     }

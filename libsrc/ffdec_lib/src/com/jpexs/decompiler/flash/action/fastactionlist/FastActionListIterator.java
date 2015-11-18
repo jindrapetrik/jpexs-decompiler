@@ -23,7 +23,7 @@ import java.util.Iterator;
  *
  * @author JPEXS
  */
-public class FastActionListIterator implements Iterator<ActionItem> {
+public final class FastActionListIterator implements Iterator<ActionItem> {
 
     private ActionItem item;
 
@@ -34,6 +34,18 @@ public class FastActionListIterator implements Iterator<ActionItem> {
     FastActionListIterator(FastActionList list) {
         item = list.first();
         this.list = list;
+    }
+
+    FastActionListIterator(FastActionList list, int index) {
+        item = list.first();
+        this.list = list;
+        for (int i = 0; i < index; i++) {
+            if (!hasNext()) {
+                throw new Error("Invalid index");
+            }
+
+            next();
+        }
     }
 
     @Override
