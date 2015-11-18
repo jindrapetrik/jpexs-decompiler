@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.PasswordTag;
 import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.annotations.HashType;
 import com.jpexs.decompiler.flash.types.annotations.Password;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
@@ -48,7 +49,7 @@ public class ProtectTag extends Tag implements PasswordTag {
     /**
      * MD5 hash of password
      */
-    @Password
+    @Password(type = HashType.MD5CRYPT)
     public String passwordHash;
 
     /**

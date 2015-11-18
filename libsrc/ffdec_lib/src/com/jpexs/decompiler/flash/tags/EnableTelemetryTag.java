@@ -19,13 +19,20 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.tags.base.PasswordTag;
 import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.annotations.HashType;
 import com.jpexs.decompiler.flash.types.annotations.Optional;
+import com.jpexs.decompiler.flash.types.annotations.Password;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
+import com.jpexs.helpers.Helper;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,7 +42,7 @@ import java.util.logging.Logger;
  * @author JPEXS
  */
 @SWFVersion(from = 17)
-public class EnableTelemetryTag extends Tag {
+public class EnableTelemetryTag extends Tag implements PasswordTag {
 
     public static final int ID = 93;
 
@@ -46,8 +53,8 @@ public class EnableTelemetryTag extends Tag {
     public int reserved;
 
     @Optional
-    @SWFType(value = BasicType.UI8, count = 32)
-    public byte[] passwordHash;
+    @Password(type = HashType.SHA256)
+    public String passwordHash;
 
     /**
      * Constructor
@@ -56,7 +63,7 @@ public class EnableTelemetryTag extends Tag {
      */
     public EnableTelemetryTag(SWF swf) {
         super(swf, ID, NAME, null);
-        passwordHash = new byte[32];
+        passwordHash = sha256("");
     }
 
     /**
@@ -79,7 +86,7 @@ public class EnableTelemetryTag extends Tag {
                 Logger.getLogger(EnableTelemetryTag.class.getName()).log(Level.WARNING, "PasswordHash should be 32 bytes");
             }
 
-            passwordHash = sis.readBytesEx(32, "passwordHash");
+            passwordHash = Helper.byteArrayToHex(sis.readBytesEx(32, "passwordHash"));
         }
     }
 
@@ -93,7 +100,30 @@ public class EnableTelemetryTag extends Tag {
     public void getData(SWFOutputStream sos) throws IOException {
         sos.writeUB(16, reserved);
         if (passwordHash != null) {
-            sos.write(passwordHash);
+            sos.write(Helper.hexToByteArray(passwordHash));
         }
+    }
+
+    private String sha256(String password) {
+        MessageDigest md;
+
+        try {
+            md = MessageDigest.getInstance("SHA-256");
+            md.update(password.getBytes("UTF-8"));
+            return Helper.byteArrayToHex(md.digest());
+        } catch (NoSuchAlgorithmException | UnsupportedEncodingException ex) {
+
+        }
+        return null;
+    }
+
+    @Override
+    public void setPassword(String password) {
+        this.passwordHash = sha256(password);
+    }
+
+    @Override
+    public boolean hasPassword(String password) {
+        return sha256(password).equals(this.passwordHash);
     }
 }

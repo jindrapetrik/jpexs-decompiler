@@ -82,6 +82,7 @@ import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.EnableDebugger2Tag;
 import com.jpexs.decompiler.flash.tags.EnableDebuggerTag;
+import com.jpexs.decompiler.flash.tags.EnableTelemetryTag;
 import com.jpexs.decompiler.flash.tags.EndTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
@@ -536,6 +537,16 @@ public final class SWF implements SWFContainerItem, Timelined {
         return (fileAttributes != null && fileAttributes.actionScript3) || (fileAttributes == null && !getAbcList().isEmpty());
     }
 
+    public MetadataTag getMetadata() {
+        for (Tag t : tags) {
+            if (t instanceof MetadataTag) {
+                return (MetadataTag) t;
+            }
+        }
+
+        return null;
+    }
+
     public FileAttributesTag getFileAttributes() {
         for (Tag t : tags) {
             if (t instanceof FileAttributesTag) {
@@ -543,6 +554,15 @@ public final class SWF implements SWFContainerItem, Timelined {
             }
         }
 
+        return null;
+    }
+
+    public EnableTelemetryTag getEnableTelemetry() {
+        for (Tag t : tags) {
+            if (t instanceof EnableTelemetryTag) {
+                return (EnableTelemetryTag) t;
+            }
+        }
         return null;
     }
 
@@ -3094,8 +3114,23 @@ public final class SWF implements SWFContainerItem, Timelined {
      * and debugfile instructions to AS3 code
      *
      * @param injectCode Modify AS3 code with debugfile / debugline ?
+     * @param decompileDir Directory to virtual decompile (will affect
+     * debugfile)
      */
     public void enableDebugging(boolean injectCode, File decompileDir) {
+        enableDebugging(injectCode, decompileDir, false);
+    }
+
+    /**
+     * Enables debugging. Adds tags to enable debugging and injects debugline
+     * and debugfile instructions to AS3 code. Optionally enables Telemetry
+     *
+     * @param injectCode Modify AS3 code with debugfile / debugline ?
+     * @param decompileDir Directory to virtual decompile (will affect
+     * debugfile)
+     * @param telemetry Enable telemetry info?
+     */
+    public void enableDebugging(boolean injectCode, File decompileDir, boolean telemetry) {
 
         if (injectCode) {
             List<ScriptPack> packs = getAS3Packs();
@@ -3134,5 +3169,28 @@ public final class SWF implements SWFContainerItem, Timelined {
         } else {
             tags.add(pos, new ProtectTag(this));
         }
+    }
+
+    public boolean enableTelemetry(String password) {
+
+        EnableTelemetryTag et = getEnableTelemetry();
+
+        if (et == null) {
+            FileAttributesTag fat = getFileAttributes();
+            if (fat == null) {
+                return false;
+            }
+            int insertTo = tags.indexOf(fat) + 1;
+            MetadataTag mt = getMetadata();
+            if (mt != null) {
+                insertTo = tags.indexOf(mt) + 1;
+            }
+
+            et = new EnableTelemetryTag(this);
+            tags.add(insertTo, et);
+        }
+        et.setPassword(password);
+        //TODO: SWFs with tag 92 (signed) are unsupported
+        return true;
     }
 }

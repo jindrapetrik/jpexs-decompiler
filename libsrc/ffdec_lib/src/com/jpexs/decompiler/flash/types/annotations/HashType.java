@@ -12,24 +12,15 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types.annotations;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 /**
- * Password field - it has MD5 crypted password.
- *
- * TODO: use this in GUI tag editor to set passwords
  *
  * @author JPEXS
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
-public @interface Password {
+public enum HashType {
 
-    HashType type();
+    MD5CRYPT, SHA256
 }
