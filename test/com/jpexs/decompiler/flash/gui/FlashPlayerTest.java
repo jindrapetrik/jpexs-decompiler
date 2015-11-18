@@ -277,8 +277,12 @@ public class FlashPlayerTest {
             StringBuilder expeced = new StringBuilder();
             StringBuilder current = new StringBuilder();
             for (AS3ExecuteTask task : tasks) {
-                System.out.println("Flash result (" + task.description + "): " + task.flashResult);
-                System.out.println("FFDec execte result: " + task.ffdecResult);
+                if (!task.flashResult.equals(task.ffdecResult)) {
+                    System.out.println("Flash result (" + task.description + "): " + task.flashResult);
+                    System.out.println("FFDec execte result: " + task.ffdecResult);
+                    expeced.append(task.flashResult).append(Helper.newLine);
+                    current.append(task.ffdecResult).append(Helper.newLine);
+                }
 
                 /*if (!task.ffdecResult.equals(task.flashResult)) {
                  String ffdecExecuteResult;
@@ -290,10 +294,6 @@ public class FlashPlayerTest {
                  }
                  }*/
                 assertEquals(task.ffdecResult, task.flashResult);
-                if (!task.flashResult.equals(task.ffdecResult)) {
-                    expeced.append(task.flashResult).append(Helper.newLine);
-                    current.append(task.ffdecResult).append(Helper.newLine);
-                }
             }
 
             //Helper.writeFile("expected\\" + i + ".txt", Utf8Helper.getBytes(expeced.toString()));
@@ -516,10 +516,12 @@ public class FlashPlayerTest {
         StringBuilder expeced = new StringBuilder();
         StringBuilder current = new StringBuilder();
         for (AS2ExecuteTask task : tasks) {
-            System.out.println(task.description);
-            String flashResult = task.flashResult;
-            String ffdecResult = task.ffdecResult;
-            System.out.println("FFDec result: " + ffdecResult);
+            if (!task.flashResult.equals(task.ffdecResult)) {
+                System.out.println("Flash result (" + task.description + "): " + task.flashResult);
+                System.out.println("FFDec result: " + task.ffdecResult);
+                expeced.append(task.description).append(task.flashResult).append(Helper.newLine);
+                current.append(task.description).append(task.ffdecResult).append(Helper.newLine);
+            }
 
             boolean checkOnlyStart = false;
             /*if (flashResult.length() > 10) {
@@ -549,14 +551,9 @@ public class FlashPlayerTest {
              Object res = lda.stack.pop();
              }*/
             if (checkOnlyStart) {
-                assertTrue(((String) ffdecResult).startsWith(flashResult));
+                assertTrue(((String) task.ffdecResult).startsWith(task.flashResult));
             } else {
-                assertEquals(ffdecResult, flashResult);
-            }
-
-            if (!task.flashResult.equals(task.ffdecResult)) {
-                expeced.append(task.description).append(task.flashResult).append(Helper.newLine);
-                current.append(task.description).append(task.ffdecResult).append(Helper.newLine);
+                assertEquals(task.ffdecResult, task.flashResult);
             }
         }
 

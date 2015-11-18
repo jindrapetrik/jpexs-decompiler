@@ -38,7 +38,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.fail;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 /**
  *
@@ -84,7 +83,7 @@ public class ActionScript3ExecuteTest {
         }
     }
 
-    @Test
+    //@Test
     public void testAddMethod() throws IOException, InterruptedException {
         int classId = abc.findClassByName("Run");
         MethodBody runBody = abc.findBodyByClassAndName("Run", "runInstance");
