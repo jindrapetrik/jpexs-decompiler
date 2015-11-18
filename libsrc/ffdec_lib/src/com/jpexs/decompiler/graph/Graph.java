@@ -971,12 +971,20 @@ public class Graph {
         if (stopPart.contains(part)) {
             return null;
         }
+
+        GraphSourceItem firstIns = null;
+        if (part != null) {
+            if (part.start >= 0 && part.start < code.size()) {
+                firstIns = code.get(part.start);
+            }
+        }
+
         for (Loop l : loops) {
             if (l.loopContinue == part) {
-                return (new ContinueItem(null, part == null ? null : code.get(part.start), l.id));
+                return (new ContinueItem(null, firstIns, l.id));
             }
             if (l.loopBreak == part) {
-                return (new BreakItem(null, part == null ? null : code.get(part.start), l.id));
+                return (new BreakItem(null, firstIns, l.id));
             }
         }
         return null;
