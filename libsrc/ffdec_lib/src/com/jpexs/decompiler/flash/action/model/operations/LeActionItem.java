@@ -41,13 +41,13 @@ public class LeActionItem extends BinaryOpItem implements LogicalOpItem, Inverte
 
     @Override
     public Object getResult() {
-        Object ret = EcmaScript.compare(rightSide.getResult(), leftSide.getResult(), true);
+        Object ret = EcmaScript.compare(leftSide.getResult(), rightSide.getResult(), true);
         if (ret == Undefined.INSTANCE) {
             return ret;
         }
 
         int reti = (int) ret;
-        return reti != -1;
+        return reti != 1;
     }
 
     @Override

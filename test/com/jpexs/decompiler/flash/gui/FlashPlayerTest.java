@@ -76,7 +76,6 @@ import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.helpers.Helper;
-import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -278,10 +277,10 @@ public class FlashPlayerTest {
             StringBuilder expeced = new StringBuilder();
             StringBuilder current = new StringBuilder();
             for (AS3ExecuteTask task : tasks) {
-                /*System.out.println("Flash result (" + task.description + "): " + task.flashResult);
-                 System.out.println("FFDec execte result: " + task.ffdecResult);
+                System.out.println("Flash result (" + task.description + "): " + task.flashResult);
+                System.out.println("FFDec execte result: " + task.ffdecResult);
 
-                 if (!task.ffdecResult.equals(task.flashResult)) {
+                /*if (!task.ffdecResult.equals(task.flashResult)) {
                  String ffdecExecuteResult;
                  try {
                  Object res = task.code.execute(new HashMap<>(), abc.constants, adobeRuntime);
@@ -289,15 +288,16 @@ public class FlashPlayerTest {
                  } catch (AVM2ExecutionException ex) {
                  ffdecExecuteResult = "Error:" + ex.getMessage();
                  }
-                 }
-
-                 assertEquals(task.ffdecResult, task.flashResult);*/
-                expeced.append(task.flashResult).append(Helper.newLine);
-                current.append(task.ffdecResult).append(Helper.newLine);
+                 }*/
+                assertEquals(task.ffdecResult, task.flashResult);
+                if (!task.flashResult.equals(task.ffdecResult)) {
+                    expeced.append(task.flashResult).append(Helper.newLine);
+                    current.append(task.ffdecResult).append(Helper.newLine);
+                }
             }
 
-            Helper.writeFile("c:\\1\\expected\\" + i + ".txt", Utf8Helper.getBytes(expeced.toString()));
-            Helper.writeFile("c:\\1\\current\\" + i + ".txt", Utf8Helper.getBytes(current.toString()));
+            //Helper.writeFile("expected\\" + i + ".txt", Utf8Helper.getBytes(expeced.toString()));
+            //Helper.writeFile("current\\" + i + ".txt", Utf8Helper.getBytes(current.toString()));
         }
     }
 
@@ -322,6 +322,8 @@ public class FlashPlayerTest {
             new AVM2Instruction(0, AVM2Instructions.PushString, new int[]{abc.constants.getStringId("4294967296", true)}), // 16
             new AVM2Instruction(0, AVM2Instructions.PushString, new int[]{abc.constants.getStringId("1test", true)}), // 17
             new AVM2Instruction(0, AVM2Instructions.PushString, new int[]{abc.constants.getStringId("test", true)}), // 18
+            new AVM2Instruction(0, AVM2Instructions.PushString, new int[]{abc.constants.getStringId("test2", true)}), // 18
+            new AVM2Instruction(0, AVM2Instructions.PushString, new int[]{abc.constants.getStringId("test3", true)}), // 18
             new AVM2Instruction(0, AVM2Instructions.PushDouble, new int[]{0}), // 19
             new AVM2Instruction(0, AVM2Instructions.PushDouble, new int[]{abc.constants.getDoubleId(-1, true)}), // 20
             new AVM2Instruction(0, AVM2Instructions.PushDouble, new int[]{abc.constants.getDoubleId(-0.5, true)}), // 21
@@ -465,7 +467,10 @@ public class FlashPlayerTest {
                     newActions.add(new ActionStringAdd());
 
                     AS2ExecuteTask task = new AS2ExecuteTask();
-                    task.description = i + " " + opAction.toString() + " p1:" + p1o + " p2:" + p2o + " r3:" + "mystring";
+                    String desc = i + " " + opAction.toString() + " p1:"
+                            + (p1o instanceof String ? "'" + p1o + "'" : p1o) + " p2:"
+                            + (p2o instanceof String ? "'" + p2o + "'" : p2o) + " r3:" + "mystring";
+                    task.description = desc;
                     task.actions = newActions;
 
                     List<GraphTargetItem> output = new ArrayList<>();
@@ -533,34 +538,30 @@ public class FlashPlayerTest {
              }
              }*/
 
-            if (flashResult.equals("Result:number-0.00390625000090949 Type:string")) {
-                flashResult = "Result:number-0.0039062500009095 Type:string";
-            } else if (flashResult.equals("Result:number-0.0000610349234335671 Type:string")) {
-                flashResult = "Result:number-0.0000610349234335672 Type:string";
-            }
+            /*if (!ffdecResult.equals(flashResult)) {
+             LocalDataArea lda = new LocalDataArea();
+             for (Action a : task.actions) {
+             if (!a.execute(lda)) {
+             fail();
+             }
+             }
 
-            if (!ffdecResult.equals(flashResult)) {
-                LocalDataArea lda = new LocalDataArea();
-                for (Action a : task.actions) {
-                    if (!a.execute(lda)) {
-                        fail();
-                    }
-                }
-
-                Object res = lda.stack.pop();
-            }
-
+             Object res = lda.stack.pop();
+             }*/
             if (checkOnlyStart) {
                 assertTrue(((String) ffdecResult).startsWith(flashResult));
             } else {
                 assertEquals(ffdecResult, flashResult);
             }
-            expeced.append(task.description).append(task.flashResult).append(Helper.newLine);
-            current.append(task.description).append(task.ffdecResult).append(Helper.newLine);
+
+            if (!task.flashResult.equals(task.ffdecResult)) {
+                expeced.append(task.description).append(task.flashResult).append(Helper.newLine);
+                current.append(task.description).append(task.ffdecResult).append(Helper.newLine);
+            }
         }
 
-        Helper.writeFile("c:\\1\\expected.txt", Utf8Helper.getBytes(expeced.toString()));
-        Helper.writeFile("c:\\1\\current.txt", Utf8Helper.getBytes(current.toString()));
+        //Helper.writeFile("expected.txt", Utf8Helper.getBytes(expeced.toString()));
+        //Helper.writeFile("current.txt", Utf8Helper.getBytes(current.toString()));
     }
 
     private Object[] getAs2Pushes() {
@@ -570,7 +571,7 @@ public class FlashPlayerTest {
             Undefined.INSTANCE, Null.INSTANCE,
             false, true,
             Double.NaN,
-            "", "-2147483649", "-2147483648", "-2147483647", "-1", "0", "1", "2147483647", "2147483648", "4294967295", "4294967296", "1test", "test", "0.0", "1.0", "-1.0",
+            "", "-2147483649", "-2147483648", "-2147483647", "-1", "0", "1", "2147483647", "2147483648", "4294967295", "4294967296", "1test", "test", "test2", "test3", "0.0", "1.0", "-1.0",
             -1.0, -0.5, 0, 0.5, 1.0,
             -2147483648, -2147483647, -1073741824, -1073741823, -536870912, -536870911, -268435456, -134217728, -134217727, -67108864, -67108863, -33554432,
             -33554431, -16777216, -16777215, -8388608, -8388607, -4194304, -4194303, -2097152, -2097151, -1048576, -1048575, -524288, -524287, -262144, -262143, -131072, -131071, -65536, -65535, -32768, -32767, -1, 0, 1, 32767, 32768, 268435455,

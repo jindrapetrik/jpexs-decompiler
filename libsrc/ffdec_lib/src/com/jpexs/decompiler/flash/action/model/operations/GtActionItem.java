@@ -44,13 +44,13 @@ public class GtActionItem extends BinaryOpItem implements LogicalOpItem {
     }
 
     public static Object getResult(Object rightResult, Object leftResult) {
-        Object ret = EcmaScript.compare(rightResult, leftResult, true);
+        Object ret = EcmaScript.compare(leftResult, rightResult, true);
         if (ret == Undefined.INSTANCE) {
             return ret;
         }
 
         int reti = (int) ret;
-        return reti == -1;
+        return reti == 1;
     }
 
     @Override

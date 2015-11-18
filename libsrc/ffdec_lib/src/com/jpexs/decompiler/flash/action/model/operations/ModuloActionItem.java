@@ -38,10 +38,10 @@ public class ModuloActionItem extends BinaryOpItem {
     }
 
     public static Number getResult(Double rightResult, Double leftResult) {
-        if (Double.isNaN(rightResult) || Double.compare(rightResult, 0) == 0) {
+        if (Double.isNaN(leftResult) || Double.isNaN(rightResult) || Double.compare(rightResult, 0) == 0) {
             return Double.NaN;
         }
-        return ((long) (double) leftResult) % ((long) (double) rightResult);
+        return ((double) leftResult) % ((double) rightResult);
     }
 
     @Override

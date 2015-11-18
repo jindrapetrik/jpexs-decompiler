@@ -188,6 +188,15 @@ public class EcmaScript {
             if (sx.equals(sy)) {
                 return 0;
             }
+            if (as2) {
+                // in AS2 an empty string is greater than a non-empty string...
+                if (sx.isEmpty()) {
+                    return 1;
+                }
+                if (sy.isEmpty()) {
+                    return -1;
+                }
+            }
             if (sx.startsWith(sy)) {
                 return 1;
             }
