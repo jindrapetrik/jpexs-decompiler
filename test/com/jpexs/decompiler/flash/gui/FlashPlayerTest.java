@@ -85,7 +85,6 @@ import java.util.Random;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
-import org.testng.annotations.Test;
 
 /**
  *
@@ -142,7 +141,7 @@ public class FlashPlayerTest {
         }
     }
 
-    @Test
+    //@Test
     public void testAs3() throws IOException, InterruptedException {
         AdobeFlashExecutor adobeExecutor = new AdobeFlashExecutor();
 
