@@ -424,6 +424,10 @@ public class ScriptPack extends AS3ClassTreeItem {
         } catch (InterruptedException ex) {
             Logger.getLogger(ScriptPack.class.getName()).log(Level.SEVERE, "Cannot decompile", ex);
         }
+        int scriptInitBody = abc.findBodyIndex(abc.script_info.get(scriptIndex).init_index);
+        if (!bodyToRegToName.containsKey(scriptInitBody)) {
+            lonelyBody.add(scriptInitBody);
+        }
 
         //String filepath = path.toString().replace('.', '/') + ".as";
         String pkg = path.packageStr.toString();
