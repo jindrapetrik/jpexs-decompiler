@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.swf4.ActionToInteger;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -51,11 +52,11 @@ public class ToIntegerActionItem extends ActionItem {
 
     @Override
     public Object getResult() {
-        return getResult(value.getResultAsNumber());
+        return getResult(value.getResult());
     }
 
-    public static long getResult(Double num) {
-        return Math.round(num);
+    public static long getResult(Object num) {
+        return EcmaScript.toInt32(num);
     }
 
     @Override

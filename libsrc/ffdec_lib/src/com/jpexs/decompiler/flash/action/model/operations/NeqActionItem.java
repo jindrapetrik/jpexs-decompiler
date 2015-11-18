@@ -42,7 +42,7 @@ public class NeqActionItem extends BinaryOpItem implements LogicalOpItem, Invert
     @Override
     public Object getResult() {
         if (version2) {
-            return !EcmaScript.equals(leftSide.getResult(), rightSide.getResult());
+            return !EcmaScript.equals(true, leftSide.getResult(), rightSide.getResult());
         } else {
             //For SWF 4 and older, it should return 1 or 0
             return (Action.toFloatPoint(leftSide.getResult()) != Action.toFloatPoint(rightSide.getResult()));

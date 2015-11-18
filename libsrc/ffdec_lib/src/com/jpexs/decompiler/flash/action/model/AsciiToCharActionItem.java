@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.swf4.ActionAsciiToChar;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -51,11 +52,11 @@ public class AsciiToCharActionItem extends ActionItem {
 
     @Override
     public Object getResult() {
-        return getResult(value.getResultAsNumber());
+        return getResult(value.getResult());
     }
 
-    public static String getResult(Double ascii) {
-        int res = (int) (double) ascii;
+    public static String getResult(Object ascii) {
+        int res = (char) EcmaScript.toInt32(ascii);
         if (res == 0) {
             return "";
         }

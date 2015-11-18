@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
@@ -38,7 +39,7 @@ public class ConvertSIns extends InstructionDefinition implements CoerceOrConver
     @Override
     public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         Object obj = lda.operandStack.pop();
-        lda.operandStack.push(obj.toString());
+        lda.operandStack.push(EcmaScript.toString(obj));
         return true;
     }
 

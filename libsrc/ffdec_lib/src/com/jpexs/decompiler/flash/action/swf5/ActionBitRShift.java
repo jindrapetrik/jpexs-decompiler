@@ -44,7 +44,7 @@ public class ActionBitRShift extends Action {
             return false;
         }
 
-        lda.stack.push(RShiftActionItem.getResult(lda.popAsNumber(), lda.popAsNumber()));
+        lda.stack.push(RShiftActionItem.getResult(lda.pop(), lda.pop()));
         return true;
     }
 

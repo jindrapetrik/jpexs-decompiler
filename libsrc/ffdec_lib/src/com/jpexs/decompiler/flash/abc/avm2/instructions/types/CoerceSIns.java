@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.graph.DottedChain;
@@ -47,7 +48,7 @@ public class CoerceSIns extends InstructionDefinition implements CoerceOrConvert
         if (value == Null.INSTANCE) {
             lda.operandStack.push(value);
         } else {
-            lda.operandStack.push(value.toString());
+            lda.operandStack.push(EcmaScript.toString(value));
         }
 
         return true;

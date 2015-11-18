@@ -45,7 +45,7 @@ public class ActionAsciiToChar extends Action {
             return false;
         }
 
-        lda.stack.push(AsciiToCharActionItem.getResult(lda.popAsNumber()));
+        lda.stack.push(AsciiToCharActionItem.getResult(lda.pop()));
         return true;
     }
 

@@ -44,7 +44,7 @@ public class ActionBitAnd extends Action {
             return false;
         }
 
-        lda.stack.push(BitAndActionItem.getResult(lda.popAsNumber(), lda.popAsNumber()));
+        lda.stack.push(BitAndActionItem.getResult(lda.pop(), lda.pop()));
         return true;
     }
 

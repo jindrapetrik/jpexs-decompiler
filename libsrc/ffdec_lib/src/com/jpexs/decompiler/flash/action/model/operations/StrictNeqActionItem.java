@@ -39,8 +39,7 @@ public class StrictNeqActionItem extends BinaryOpItem implements LogicalOpItem, 
     public Object getResult() {
         Object x = leftSide.getResult();
         Object y = rightSide.getResult();
-        return EcmaScript.type(x) != EcmaScript.type(y)
-                || (!EcmaScript.equals(x, y));
+        return !EcmaScript.strictEquals(true, x, y);
     }
 
     @Override
