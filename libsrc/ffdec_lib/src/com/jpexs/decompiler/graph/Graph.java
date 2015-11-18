@@ -973,10 +973,10 @@ public class Graph {
         }
         for (Loop l : loops) {
             if (l.loopContinue == part) {
-                return (new ContinueItem(null, code.get(part.start), l.id));
+                return (new ContinueItem(null, part == null ? null : code.get(part.start), l.id));
             }
             if (l.loopBreak == part) {
-                return (new BreakItem(null, code.get(part.start), l.id));
+                return (new BreakItem(null, part == null ? null : code.get(part.start), l.id));
             }
         }
         return null;
