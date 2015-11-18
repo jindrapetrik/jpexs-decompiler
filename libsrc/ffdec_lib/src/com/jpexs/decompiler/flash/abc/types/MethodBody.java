@@ -163,12 +163,7 @@ public final class MethodBody implements Cloneable {
     }
 
     public void markOffsets() {
-        long offset = 0;
-        AVM2Code code = getCode();
-        for (int i = 0; i < code.code.size(); i++) {
-            code.code.get(i).offset = offset;
-            offset += code.code.get(i).getBytesLength();
-        }
+        getCode().markOffsets();
     }
 
     @Override
