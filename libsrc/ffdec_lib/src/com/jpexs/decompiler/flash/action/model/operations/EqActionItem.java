@@ -46,7 +46,7 @@ public class EqActionItem extends BinaryOpItem implements LogicalOpItem, EqualsT
 
     public static Boolean getResult(Object rightResult, Object leftResult, boolean version2) {
         if (version2) {
-            return EcmaScript.equals(leftResult, rightResult);
+            return EcmaScript.equals(true, leftResult, rightResult);
         } else {
             //For SWF 4 and older, it should return 1 or 0
             return (Action.toFloatPoint(leftResult) == Action.toFloatPoint(rightResult));

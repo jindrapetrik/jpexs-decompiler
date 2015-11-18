@@ -69,6 +69,10 @@ public class EcmaScript {
             return Double.NaN;
         }
 
+        if (o instanceof String && ((String) o).isEmpty()) {
+            return Double.NaN;
+        }
+
         return toNumber(o);
     }
 
@@ -184,6 +188,15 @@ public class EcmaScript {
             if (sx.equals(sy)) {
                 return 0;
             }
+            if (as2) {
+                // in AS2 an empty string is greater than a non-empty string...
+                if (sx.isEmpty()) {
+                    return 1;
+                }
+                if (sy.isEmpty()) {
+                    return -1;
+                }
+            }
             if (sx.startsWith(sy)) {
                 return 1;
             }
@@ -213,14 +226,22 @@ public class EcmaScript {
     }
 
     public static boolean strictEquals(Object x, Object y) {
+        return strictEquals(false, x, y);
+    }
+
+    public static boolean equals(Object x, Object y) {
+        return equals(false, x, y);
+    }
+
+    public static boolean strictEquals(boolean as2, Object x, Object y) {
         if (type(x) != type(y)) {
             return false;
         }
 
-        return equals(x, y);
+        return equals(as2, x, y);
     }
 
-    public static boolean equals(Object x, Object y) {
+    public static boolean equals(boolean as2, Object x, Object y) {
         EcmaType typeX = type(x);
         EcmaType typeY = type(y);
         if (typeX == typeY) {
@@ -279,16 +300,16 @@ public class EcmaScript {
         }
 
         if ((typeX == EcmaType.NUMBER) && (typeY == EcmaType.STRING)) {
-            return equals(x, toNumber(y));
+            return equals(as2, x, as2 ? toNumberAs2(y) : toNumber(y));
         }
         if ((typeX == EcmaType.STRING) && (typeY == EcmaType.NUMBER)) {
-            return equals(toNumber(x), y);
+            return equals(as2, as2 ? toNumberAs2(x) : toNumber(x), y);
         }
         if (typeX == EcmaType.BOOLEAN) {
-            return equals(toNumber(x), y);
+            return equals(as2, as2 ? toNumberAs2(x) : toNumber(x), y);
         }
         if (typeY == EcmaType.BOOLEAN) {
-            return equals(x, toNumber(y));
+            return equals(as2, x, as2 ? toNumberAs2(y) : toNumber(y));
         }
         if (typeX == EcmaType.STRING || typeX == EcmaType.NUMBER) {
             //y is object

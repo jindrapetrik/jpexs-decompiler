@@ -41,10 +41,10 @@ public class Li8Ins extends InstructionDefinition implements AlchemyTypeIns {
 
     @Override
     public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) throws AVM2RangeErrorException {
-        int addr = (int) (double) EcmaScript.toNumber(lda.operandStack.pop());
+        int addr = EcmaScript.toInt32(lda.operandStack.pop());
         byte[] domainMemory = lda.getDomainMemory();
         if (addr < 0 || addr >= domainMemory.length) {
-            throw new AVM2RangeErrorException(1506);
+            throw new AVM2RangeErrorException(1506, lda.isDebug());
         }
 
         lda.operandStack.push((Double) (double) (domainMemory[addr]));

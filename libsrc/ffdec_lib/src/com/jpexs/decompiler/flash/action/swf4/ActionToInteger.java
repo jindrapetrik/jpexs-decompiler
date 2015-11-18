@@ -44,7 +44,7 @@ public class ActionToInteger extends Action {
             return false;
         }
 
-        lda.stack.push(ToIntegerActionItem.getResult(lda.popAsNumber()));
+        lda.stack.push(ToIntegerActionItem.getResult(lda.pop()));
         return true;
     }
 

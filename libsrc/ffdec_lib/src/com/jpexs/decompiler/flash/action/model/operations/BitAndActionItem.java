@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.swf5.ActionBitAnd;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -34,11 +35,11 @@ public class BitAndActionItem extends BinaryOpItem {
 
     @Override
     public Object getResult() {
-        return getResult(rightSide.getResultAsNumber(), leftSide.getResultAsNumber());
+        return getResult(rightSide.getResult(), leftSide.getResult());
     }
 
-    public static long getResult(Double rightResult, Double leftResult) {
-        return ((long) (double) leftResult) & ((long) (double) rightResult);
+    public static long getResult(Object rightResult, Object leftResult) {
+        return EcmaScript.toInt32(leftResult) & EcmaScript.toInt32(rightResult);
     }
 
     @Override

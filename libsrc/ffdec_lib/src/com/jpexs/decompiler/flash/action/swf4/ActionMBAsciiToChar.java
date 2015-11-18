@@ -44,7 +44,7 @@ public class ActionMBAsciiToChar extends Action {
             return false;
         }
 
-        lda.stack.push(MBAsciiToCharActionItem.getResult(lda.popAsNumber()));
+        lda.stack.push(MBAsciiToCharActionItem.getResult(lda.pop()));
         return true;
     }
 

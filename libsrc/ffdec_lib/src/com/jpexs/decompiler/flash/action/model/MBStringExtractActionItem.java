@@ -46,7 +46,7 @@ public class MBStringExtractActionItem extends ActionItem {
     }
 
     public MBStringExtractActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value, GraphTargetItem index, GraphTargetItem count) {
-        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY, value);
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY, value);
         this.index = index;
         this.count = count;
     }
@@ -80,10 +80,10 @@ public class MBStringExtractActionItem extends ActionItem {
 
     public static String getResult(Object count, Object index, Object value) {
         String str = EcmaScript.toString(value);
-        int idx = (int) (double) EcmaScript.toNumberAs2(index);
+        int idx = EcmaScript.toInt32(index);
         idx--; // index seems to be 1 based
 
-        int cnt = (int) (double) EcmaScript.toNumberAs2(count);
+        int cnt = EcmaScript.toInt32(count);
 
         /*if (idx < 0) {
          idx = str.length() + idx;

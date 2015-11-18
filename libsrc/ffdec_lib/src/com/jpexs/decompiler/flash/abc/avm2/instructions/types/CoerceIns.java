@@ -20,9 +20,9 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2ExecutionException;
 import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2TypeErrorException;
-import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
@@ -46,7 +46,7 @@ public class CoerceIns extends InstructionDefinition implements CoerceOrConvertT
     public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) throws AVM2ExecutionException {
         Multiname multiname = (Multiname) ins.getParam(constants, 0);
         if (multiname == null) {
-            throw new AVM2TypeErrorException(1034);
+            throw new AVM2TypeErrorException(1034, lda.isDebug());
         }
 
         Object value = lda.operandStack.pop();
@@ -54,13 +54,22 @@ public class CoerceIns extends InstructionDefinition implements CoerceOrConvertT
             value = Null.INSTANCE;
         }
 
+        //push and pop coerced value to specified type
         EcmaType type = EcmaScript.type(value);
-        if (type != EcmaType.NULL && type != EcmaType.OBJECT) {
-            throw new AVM2TypeErrorException(1034);
+        switch (type) {
+            case NUMBER:
+            case BOOLEAN:
+                lda.operandStack.push(EcmaScript.toString(value));
+                break;
+            case NULL:
+            case OBJECT:
+            case STRING:
+                lda.operandStack.push(value);
+                break;
+            default:
+                throw new AVM2TypeErrorException(1034, lda.isDebug());
         }
 
-        //push and pop coerced value to specified type
-        lda.operandStack.push(value);
         return true;
     }
 

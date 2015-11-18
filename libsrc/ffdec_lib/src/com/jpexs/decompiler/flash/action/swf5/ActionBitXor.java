@@ -44,7 +44,7 @@ public class ActionBitXor extends Action {
             return false;
         }
 
-        lda.stack.push(BitXorActionItem.getResult(lda.popAsNumber(), lda.popAsNumber()));
+        lda.stack.push(BitXorActionItem.getResult(lda.pop(), lda.pop()));
         return true;
     }
 

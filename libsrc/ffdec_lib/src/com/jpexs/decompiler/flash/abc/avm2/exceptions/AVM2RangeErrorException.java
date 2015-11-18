@@ -21,23 +21,23 @@ package com.jpexs.decompiler.flash.abc.avm2.exceptions;
  */
 public class AVM2RangeErrorException extends AVM2ExecutionException {
 
-    public AVM2RangeErrorException(int code) {
-        super(codeToMessage(code, null));
+    public AVM2RangeErrorException(int code, boolean debug) {
+        super(codeToMessage(code, debug, null));
     }
 
-    public AVM2RangeErrorException(int code, Object[] params) {
-        super(codeToMessage(code, params));
+    public AVM2RangeErrorException(int code, boolean debug, Object[] params) {
+        super(codeToMessage(code, debug, params));
     }
 
-    private static String codeToMessage(int code, Object[] params) {
+    private static String codeToMessage(int code, boolean debug, Object[] params) {
         String msg = null;
         switch (code) {
         }
 
         String result = "RangeError: Error #" + code;
-        /*if (msg != null) {
-         result += ": " + msg;
-         }*/
+        if (debug && msg != null) {
+            result += ": " + msg;
+        }
 
         return result;
     }

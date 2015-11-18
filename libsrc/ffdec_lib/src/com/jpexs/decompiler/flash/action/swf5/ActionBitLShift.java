@@ -44,7 +44,7 @@ public class ActionBitLShift extends Action {
             return false;
         }
 
-        lda.stack.push(LShiftActionItem.getResult(lda.popAsNumber(), lda.popAsNumber()));
+        lda.stack.push(LShiftActionItem.getResult(lda.pop(), lda.pop()));
         return true;
     }
 

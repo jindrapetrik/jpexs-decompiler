@@ -17,8 +17,9 @@
 package com.jpexs.decompiler.flash.abc.avm2.instructions;
 
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
-import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2ExecutionException;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
+import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2ExecutionException;
+import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2VerifyErrorException;
 
 /**
  *
@@ -31,8 +32,12 @@ public class UnknownInstruction extends InstructionDefinition {
     }
 
     @Override
-    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) throws AVM2ExecutionException {
+    public void verify(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) throws AVM2VerifyErrorException {
         illegalOpCode(lda, ins);
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) throws AVM2ExecutionException {
         return false;
     }
 }

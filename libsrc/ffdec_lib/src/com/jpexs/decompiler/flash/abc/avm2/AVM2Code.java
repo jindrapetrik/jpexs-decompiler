@@ -656,16 +656,16 @@ public class AVM2Code implements Cloneable {
     }
 
     public Object execute(HashMap<Integer, Object> arguments, AVM2ConstantPool constants) throws AVM2ExecutionException {
-        return execute(arguments, constants, AVM2Runtime.UNKNOWN, 0);
+        return execute(arguments, constants, null);
     }
 
-    public Object execute(HashMap<Integer, Object> arguments, AVM2ConstantPool constants, AVM2Runtime runtime, int runtimeVersoin) throws AVM2ExecutionException {
+    public Object execute(HashMap<Integer, Object> arguments, AVM2ConstantPool constants, AVM2RuntimeInfo runtimeInfo) throws AVM2ExecutionException {
         int pos = 0;
         LocalDataArea lda = new LocalDataArea();
         lda.methodName = "methodName"; // todo: needed for VerifyError exception message
         lda.localRegisters = arguments;
-        lda.runtime = runtime;
-        lda.runtimeVersion = runtimeVersoin;
+        lda.runtimeInfo = runtimeInfo;
+
         for (AVM2Instruction ins : code) {
             ins.definition.verify(lda, constants, ins);
         }
@@ -680,7 +680,7 @@ public class AVM2Code implements Cloneable {
                 try {
                     pos = adr2pos(lda.jump);
                 } catch (ConvertException ex) {
-                    throw new AVM2VerifyErrorException(AVM2VerifyErrorException.BRANCH_TARGET_INVALID_INSTRUCTION);
+                    throw new AVM2VerifyErrorException(AVM2VerifyErrorException.BRANCH_TARGET_INVALID_INSTRUCTION, lda.isDebug());
                 }
                 lda.jump = null;
             } else {

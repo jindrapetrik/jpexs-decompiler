@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.swf5.ActionBitLShift;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -34,11 +35,11 @@ public class LShiftActionItem extends BinaryOpItem {
 
     @Override
     public Object getResult() {
-        return getResult(rightSide.getResultAsNumber(), leftSide.getResultAsNumber());
+        return getResult(rightSide.getResult(), leftSide.getResult());
     }
 
-    public static int getResult(Double rightResult, Double leftResult) {
-        return ((int) (double) leftResult) << ((int) (double) rightResult);
+    public static int getResult(Object rightResult, Object leftResult) {
+        return EcmaScript.toInt32(leftResult) << EcmaScript.toInt32(rightResult);
     }
 
     @Override

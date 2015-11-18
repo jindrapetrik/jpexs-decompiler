@@ -46,6 +46,7 @@ import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -251,6 +252,13 @@ public class ActionPush extends Action {
         super(0x96, 0);
         this.values = new ArrayList<>();
         this.values.add(value);
+        updateLength();
+    }
+
+    public ActionPush(Object[] values) {
+        super(0x96, 0);
+        this.values = new ArrayList<>();
+        this.values.addAll(Arrays.asList(values));
         updateLength();
     }
 
