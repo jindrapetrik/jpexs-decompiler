@@ -59,12 +59,12 @@ public class CachedDecompilation implements Serializable {
         return specialHilights;
     }
 
-    public CachedDecompilation(HighlightedText HighlightedText) {
-        this.text = HighlightedText.text;
-        this.traitHilights = HighlightedText.traitHilights;
-        this.classHilights = HighlightedText.classHilights;
-        this.methodHilights = HighlightedText.methodHilights;
-        this.instructionHilights = HighlightedText.instructionHilights;
-        this.specialHilights = HighlightedText.specialHilights;
+    public CachedDecompilation(HighlightedText highlightedText) {
+        this.text = highlightedText.text;
+        this.traitHilights = highlightedText.traitHilights;
+        this.classHilights = highlightedText.classHilights;
+        this.methodHilights = highlightedText.methodHilights;
+        this.instructionHilights = highlightedText.instructionHilights;
+        this.specialHilights = highlightedText.specialHilights;
     }
 }
