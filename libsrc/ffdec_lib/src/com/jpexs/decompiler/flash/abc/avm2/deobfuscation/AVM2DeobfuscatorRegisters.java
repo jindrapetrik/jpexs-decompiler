@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.abc.avm2.deobfuscation;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
-import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
@@ -36,7 +35,6 @@ import com.jpexs.decompiler.flash.abc.avm2.parser.script.Reference;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
-import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSource;
@@ -60,11 +58,6 @@ import java.util.Set;
  * @author JPEXS
  */
 public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
-
-    @Override
-    public void actionListParsed(ActionList actions, SWF swf) {
-
-    }
 
     private Set<Integer> getRegisters(AVM2Code code) {
         Set<Integer> regs = new HashSet<>();
@@ -178,7 +171,7 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
                 GetLocalTypeIns glt = (GetLocalTypeIns) ins.definition;
                 int regId = glt.getRegisterId(ins);
                 if (singleRegisters.containsKey(regId)) {
-                    code.replaceInstruction(i, makePush(singleRegisters.get(regId).getResult(), cpool), body);
+                    code.replaceInstruction(i, cpool.makePush(singleRegisters.get(regId).getResult()), body);
                 }
             }
         }

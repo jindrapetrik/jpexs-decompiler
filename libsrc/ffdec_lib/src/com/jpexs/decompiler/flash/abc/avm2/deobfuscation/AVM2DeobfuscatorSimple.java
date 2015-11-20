@@ -113,60 +113,27 @@ public class AVM2DeobfuscatorSimple implements SWFDecompilerListener {
 
     }
 
-    protected AVM2Instruction makePush(Object ovalue, AVM2ConstantPool cpool) {
-        if (ovalue instanceof Long) {
-            long value = (Long) ovalue;
-            if (value >= -128 && value <= 127) {
-                return new AVM2Instruction(0, AVM2Instructions.PushByte, new int[]{(int) (long) value});
-            } else if (value >= -32768 && value <= 32767) {
-                return new AVM2Instruction(0, AVM2Instructions.PushShort, new int[]{((int) (long) value) & 0xffff});
-            } else {
-                return new AVM2Instruction(0, AVM2Instructions.PushInt, new int[]{cpool.getIntId(value, true)});
-            }
-        }
-        if (ovalue instanceof Double) {
-            return new AVM2Instruction(0, AVM2Instructions.PushDouble, new int[]{cpool.getDoubleId((Double) ovalue, true)});
-        }
-        if (ovalue instanceof String) {
-            return new AVM2Instruction(0, AVM2Instructions.PushString, new int[]{cpool.getStringId((String) ovalue, true)});
-        }
-        if (ovalue instanceof Boolean) {
-            if ((Boolean) ovalue) {
-                return new AVM2Instruction(0, AVM2Instructions.PushTrue, null);
-            }
-            return new AVM2Instruction(0, AVM2Instructions.PushFalse, null);
-        }
-        if (ovalue instanceof Null) {
-            return new AVM2Instruction(0, AVM2Instructions.PushNull, null);
-        }
-        if (ovalue instanceof Undefined) {
-            return new AVM2Instruction(0, AVM2Instructions.PushUndefined, null);
-        }
-        return null;
-    }
-
     protected AVM2Instruction makePush(AVM2ConstantPool cpool, GraphTargetItem graphTargetItem) {
-        AVM2Instruction ins = null;
         if (graphTargetItem instanceof IntegerValueAVM2Item) {
             IntegerValueAVM2Item iv = (IntegerValueAVM2Item) graphTargetItem;
-            return makePush(iv.value, cpool);
+            return cpool.makePush(iv.value);
         } else if (graphTargetItem instanceof FloatValueAVM2Item) {
             FloatValueAVM2Item fv = (FloatValueAVM2Item) graphTargetItem;
-            return makePush(fv.value, cpool);
+            return cpool.makePush(fv.value);
         } else if (graphTargetItem instanceof StringAVM2Item) {
             StringAVM2Item fv = (StringAVM2Item) graphTargetItem;
-            return makePush(fv.getValue(), cpool);
+            return cpool.makePush(fv.getValue());
         } else if (graphTargetItem instanceof TrueItem) {
-            return makePush(Boolean.TRUE, cpool);
+            return cpool.makePush(Boolean.TRUE);
         } else if (graphTargetItem instanceof FalseItem) {
-            return makePush(Boolean.FALSE, cpool);
+            return cpool.makePush(Boolean.FALSE);
         } else if (graphTargetItem instanceof NullAVM2Item) {
-            return makePush(Null.INSTANCE, cpool);
+            return cpool.makePush(Null.INSTANCE);
         } else if (graphTargetItem instanceof UndefinedAVM2Item) {
-            return makePush(Undefined.INSTANCE, cpool);
-        } else {
-            return null;
+            return cpool.makePush(Undefined.INSTANCE);
         }
+
+        return null;
     }
 
     protected boolean removeObfuscationIfs(int classIndex, boolean isStatic, int scriptIndex, ABC abc, MethodBody body, List<AVM2Instruction> inlineIns) throws InterruptedException {

@@ -23,7 +23,6 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.FixItemCounterTranslateStack;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.DeobfuscatePopIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.IfTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
@@ -38,8 +37,6 @@ import com.jpexs.decompiler.flash.abc.avm2.model.UndefinedAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.action.ActionList;
-import com.jpexs.decompiler.flash.ecma.Null;
-import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerListener;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -70,38 +67,6 @@ public class AVM2DeobfuscatorGetSet implements SWFDecompilerListener {
     @Override
     public void actionListParsed(ActionList actions, SWF swf) {
 
-    }
-
-    protected AVM2Instruction makePush(Object ovalue, AVM2ConstantPool cpool) {
-        if (ovalue instanceof Long) {
-            long value = (Long) ovalue;
-            if (value >= -128 && value <= 127) {
-                return new AVM2Instruction(0, AVM2Instructions.PushByte, new int[]{(int) (long) value});
-            } else if (value >= -32768 && value <= 32767) {
-                return new AVM2Instruction(0, AVM2Instructions.PushShort, new int[]{((int) (long) value) & 0xffff});
-            } else {
-                return new AVM2Instruction(0, AVM2Instructions.PushInt, new int[]{cpool.getIntId(value, true)});
-            }
-        }
-        if (ovalue instanceof Double) {
-            return new AVM2Instruction(0, AVM2Instructions.PushDouble, new int[]{cpool.getDoubleId((Double) ovalue, true)});
-        }
-        if (ovalue instanceof String) {
-            return new AVM2Instruction(0, AVM2Instructions.PushString, new int[]{cpool.getStringId((String) ovalue, true)});
-        }
-        if (ovalue instanceof Boolean) {
-            if ((Boolean) ovalue) {
-                return new AVM2Instruction(0, AVM2Instructions.PushTrue, null);
-            }
-            return new AVM2Instruction(0, AVM2Instructions.PushFalse, null);
-        }
-        if (ovalue == Null.INSTANCE) {
-            return new AVM2Instruction(0, AVM2Instructions.PushNull, null);
-        }
-        if (ovalue == Undefined.INSTANCE) {
-            return new AVM2Instruction(0, AVM2Instructions.PushUndefined, null);
-        }
-        return null;
     }
 
     protected boolean removeObfuscationGetSets(int classIndex, boolean isStatic, int scriptIndex, ABC abc, MethodBody body, List<AVM2Instruction> inlineIns) throws InterruptedException {
