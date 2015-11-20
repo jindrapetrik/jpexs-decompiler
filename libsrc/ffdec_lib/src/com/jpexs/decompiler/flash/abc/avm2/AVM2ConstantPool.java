@@ -16,10 +16,14 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2;
 
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.types.Decimal;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
+import com.jpexs.decompiler.flash.ecma.Null;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.HashArrayList;
@@ -562,5 +566,37 @@ public class AVM2ConstantPool implements Cloneable {
         } catch (CloneNotSupportedException ex) {
             throw new RuntimeException();
         }
+    }
+
+    public AVM2Instruction makePush(Object ovalue) {
+        if (ovalue instanceof Long) {
+            long value = (Long) ovalue;
+            if (value >= -128 && value <= 127) {
+                return new AVM2Instruction(0, AVM2Instructions.PushByte, new int[]{(int) (long) value});
+            } else if (value >= -32768 && value <= 32767) {
+                return new AVM2Instruction(0, AVM2Instructions.PushShort, new int[]{((int) (long) value) & 0xffff});
+            } else {
+                return new AVM2Instruction(0, AVM2Instructions.PushInt, new int[]{getIntId(value, true)});
+            }
+        }
+        if (ovalue instanceof Double) {
+            return new AVM2Instruction(0, AVM2Instructions.PushDouble, new int[]{getDoubleId((Double) ovalue, true)});
+        }
+        if (ovalue instanceof String) {
+            return new AVM2Instruction(0, AVM2Instructions.PushString, new int[]{getStringId((String) ovalue, true)});
+        }
+        if (ovalue instanceof Boolean) {
+            if ((Boolean) ovalue) {
+                return new AVM2Instruction(0, AVM2Instructions.PushTrue, null);
+            }
+            return new AVM2Instruction(0, AVM2Instructions.PushFalse, null);
+        }
+        if (ovalue == Null.INSTANCE) {
+            return new AVM2Instruction(0, AVM2Instructions.PushNull, null);
+        }
+        if (ovalue == Undefined.INSTANCE) {
+            return new AVM2Instruction(0, AVM2Instructions.PushUndefined, null);
+        }
+        return null;
     }
 }
