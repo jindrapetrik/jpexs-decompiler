@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.action.deobfuscation;
+package com.jpexs.decompiler.flash.helpers.collections;
 
 import java.util.Stack;
 
