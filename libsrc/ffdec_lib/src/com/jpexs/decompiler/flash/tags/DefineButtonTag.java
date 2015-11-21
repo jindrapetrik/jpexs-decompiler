@@ -84,6 +84,13 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
 
     private boolean isSingleFrame;
 
+    private String scriptName = "-";
+
+    @Override
+    public String getScriptName() {
+        return scriptName;
+    }
+
     /**
      * Constructor
      *
@@ -106,6 +113,11 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
     public DefineButtonTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public void setScriptName(String scriptName) {
+        this.scriptName = scriptName;
     }
 
     @Override

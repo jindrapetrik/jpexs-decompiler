@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui.action;
 
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraph;
 import com.jpexs.decompiler.flash.action.ActionList;
@@ -34,6 +35,7 @@ import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.gui.DebuggerHandler;
 import com.jpexs.decompiler.flash.gui.GraphDialog;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
 import com.jpexs.decompiler.flash.gui.Main;
@@ -42,8 +44,19 @@ import com.jpexs.decompiler.flash.gui.SearchListener;
 import com.jpexs.decompiler.flash.gui.SearchPanel;
 import com.jpexs.decompiler.flash.gui.TagEditorPanel;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.gui.DebugPanel;
+import static com.jpexs.decompiler.flash.gui.abc.DecompiledEditorPane.BG_BREAKPOINT_COLOR;
+import static com.jpexs.decompiler.flash.gui.abc.DecompiledEditorPane.BG_INVALID_BREAKPOINT_COLOR;
+import static com.jpexs.decompiler.flash.gui.abc.DecompiledEditorPane.BG_IP_COLOR;
+import static com.jpexs.decompiler.flash.gui.abc.DecompiledEditorPane.FG_BREAKPOINT_COLOR;
+import static com.jpexs.decompiler.flash.gui.abc.DecompiledEditorPane.FG_INVALID_BREAKPOINT_COLOR;
+import static com.jpexs.decompiler.flash.gui.abc.DecompiledEditorPane.FG_IP_COLOR;
+import static com.jpexs.decompiler.flash.gui.abc.DecompiledEditorPane.PRIORITY_BREAKPOINT;
+import static com.jpexs.decompiler.flash.gui.abc.DecompiledEditorPane.PRIORITY_INVALID_BREAKPOINT;
+import static com.jpexs.decompiler.flash.gui.abc.DecompiledEditorPane.PRIORITY_IP;
 import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
 import com.jpexs.decompiler.flash.gui.controls.NoneSelectedButtonGroup;
+import com.jpexs.decompiler.flash.gui.editor.DebuggableEditorPane;
 import com.jpexs.decompiler.flash.gui.editor.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
 import com.jpexs.decompiler.flash.helpers.HighlightedText;
@@ -66,6 +79,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -96,7 +110,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
 
     public LineMarkedEditorPane editor;
 
-    public LineMarkedEditorPane decompiledEditor;
+    public DebuggableEditorPane decompiledEditor;
 
     public JPersistentSplitPane splitPane;
 
@@ -170,6 +184,26 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         srcConstants = null;
     }
 
+    /*public void refreshMarkers() {
+     decompiledEditor.removeColorMarkerOnAllLines(FG_BREAKPOINT_COLOR, BG_BREAKPOINT_COLOR, PRIORITY_BREAKPOINT);
+     decompiledEditor.removeColorMarkerOnAllLines(FG_INVALID_BREAKPOINT_COLOR, BG_INVALID_BREAKPOINT_COLOR, PRIORITY_INVALID_BREAKPOINT);
+     decompiledEditor.removeColorMarkerOnAllLines(FG_IP_COLOR, BG_IP_COLOR, PRIORITY_IP);
+
+     Set<Integer> bkptLines = Main.getScriptBreakPoints(sc);
+
+     for (int line : bkptLines) {
+     if (Main.isBreakPointValid(lastASM, line)) {
+     decompiledEditor.addColorMarker(line, FG_BREAKPOINT_COLOR, BG_BREAKPOINT_COLOR, PRIORITY_BREAKPOINT);
+     } else {
+     decompiledEditor.addColorMarker(line, FG_INVALID_BREAKPOINT_COLOR, BG_INVALID_BREAKPOINT_COLOR, PRIORITY_INVALID_BREAKPOINT);
+     }
+     }
+     int ip = Main.getIp(lastASM);
+     String ipPath = Main.getIpClass();
+     if (ip > 0 && ipPath != null && lastASM.getSwf().getASMs(false).get(ipPath) == lastASM) {
+     decompiledEditor.addColorMarker(ip, FG_IP_COLOR, BG_IP_COLOR, PRIORITY_IP);
+     }
+     }*/
     public String getStringUnderCursor() {
         int pos = decompiledEditor.getCaretPosition();
 
@@ -206,7 +240,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
                             selIns = ins;
                             break;
                         }
-                        if (ins.getOffset() > h.getProperties().offset) {
+                        if (ins.getOffset() > h.getProperties().offset && lastIns != null) {
                             inspos = (int) (h.getProperties().offset - lastIns.getAddress());
                             selIns = lastIns;
                             break;
@@ -274,9 +308,10 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         return null;
     }
 
-    private void setDecompiledText(final String text) {
+    private void setDecompiledText(final String scriptName, final String text) {
         View.execInEventDispatch(() -> {
             ignoreCarret = true;
+            decompiledEditor.setScriptName(scriptName);
             decompiledEditor.setText(text);
             ignoreCarret = false;
         });
@@ -415,12 +450,13 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
 
             @Override
             protected Void doInBackground() throws Exception {
+
                 setEditorText("; " + AppStrings.translate("work.disassembling") + "...", "text/flasm");
                 if (Configuration.decompile.get()) {
-                    setDecompiledText("// " + AppStrings.translate("work.waitingfordissasembly") + "...");
+                    setDecompiledText("-", "// " + AppStrings.translate("work.waitingfordissasembly") + "...");
                 } else {
                     lastDecompiled = Helper.getDecompilationSkippedComment();
-                    setDecompiledText(lastDecompiled);
+                    setDecompiledText(asm.getScriptName(), lastDecompiled);
                 }
                 DisassemblyListener listener = getDisassemblyListener();
                 asm.addDisassemblyListener(listener);
@@ -433,7 +469,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
                 srcConstants = null;
                 setHex(getExportMode());
                 if (Configuration.decompile.get()) {
-                    setDecompiledText("// " + AppStrings.translate("work.decompiling") + "...");
+                    setDecompiledText("-", "// " + AppStrings.translate("work.decompiling") + "...");
                     if (!useCache) {
                         SWF.uncache(asm);
                     }
@@ -442,10 +478,11 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
                     decompiledHilights = sc.hilights;
                     lastDecompiled = sc.text;
                     lastASM = asm;
-                    setDecompiledText(lastDecompiled);
+                    setDecompiledText(lastASM.getScriptName(), lastDecompiled);
                 }
                 setEditMode(false);
                 setDecompiledEditMode(false);
+
                 return null;
             }
 
@@ -453,21 +490,25 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
             protected void done() {
                 View.execInEventDispatch(() -> {
                     setSourceWorker = null;
-                    Main.stopWork();
+                    if (!Main.isDebugging()) {
+                        Main.stopWork();
+                    }
 
                     try {
                         get();
                     } catch (CancellationException ex) {
                         setEditorText("; " + AppStrings.translate("work.canceled"), "text/flasm");
                     } catch (Exception ex) {
-                        setDecompiledText("// " + AppStrings.translate("decompilationError") + ": " + ex);
+                        setDecompiledText("-", "// " + AppStrings.translate("decompilationError") + ": " + ex);
                     }
                 });
             }
         };
         worker.execute();
         setSourceWorker = worker;
-        Main.startWork(AppStrings.translate("work.decompiling") + "...", worker);
+        if (!Main.isDebugging()) {
+            Main.startWork(AppStrings.translate("work.decompiling") + "...", worker);
+        }
     }
 
     public void hilightOffset(long offset) {
@@ -477,7 +518,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         this.mainPanel = mainPanel;
         editor = new LineMarkedEditorPane();
         editor.setEditable(false);
-        decompiledEditor = new LineMarkedEditorPane();
+        decompiledEditor = new DebuggableEditorPane();
         decompiledEditor.setEditable(false);
 
         searchPanel = new SearchPanel<>(new FlowLayout(), this);
@@ -570,15 +611,37 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         saveDecompiledButton.setVisible(false);
         cancelDecompiledButton.setVisible(false);
 
-        JPanel decPanel = new JPanel(new BorderLayout());
-        decPanel.add(new JScrollPane(decompiledEditor), BorderLayout.CENTER);
-        //decPanel.add(searchPanel, BorderLayout.NORTH);
+        JPanel panA = new JPanel(new BorderLayout());
 
-        JPanel panA = new JPanel();
-        panA.setLayout(new BorderLayout());
-        panA.add(decPanel, BorderLayout.CENTER);
         panA.add(decLabel, BorderLayout.NORTH);
+
+        DebugPanel debugPanel = new DebugPanel();
+
+        panA.add(new JPersistentSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(decompiledEditor), debugPanel, Configuration.guiActionVarsSplitPaneDividerLocationPercent), BorderLayout.CENTER);
         panA.add(decButtonsPan, BorderLayout.SOUTH);
+
+        //decPanel.add(searchPanel, BorderLayout.NORTH);
+        Main.getDebugHandler().addConnectionListener(new DebuggerHandler.ConnectionListener() {
+
+            @Override
+            public void connected() {
+                decButtonsPan.setVisible(false);
+            }
+
+            @Override
+            public void disconnected() {
+                decButtonsPan.setVisible(true);
+            }
+        });
+
+        //new JSplitPane(JSplitPane.VERTICAL_SPLIT, decompiledEditor, debugPanel)
+        //decPanel.add(decButtonsPan, BorderLayout.SOUTH);
+        //JPanel panBot = new JPanel(new BorderLayout());
+        //panBot.add(decButtonsPan, BorderLayout.NORTH);
+        //panBot.add(debugPanel, BorderLayout.CENTER);
+        //panA.add(decButtonsPan, BorderLayout.SOUTH);
+        debugPanel.setVisible(false);
+
         decLabel.setHorizontalAlignment(SwingConstants.CENTER);
         //decLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
 
@@ -678,63 +741,66 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
     }
 
     public void setEditMode(boolean val) {
-        if (val) {
-            if (hexOnlyButton.isSelected()) {
-                setHex(ScriptExportMode.HEX);
-            } else if (constantsViewButton.isSelected()) {
-                setHex(ScriptExportMode.CONSTANTS);
-            } else {
-                setHex(ScriptExportMode.PCODE);
+        View.execInEventDispatch(() -> {
+            if (val) {
+                if (hexOnlyButton.isSelected()) {
+                    setHex(ScriptExportMode.HEX);
+                } else if (constantsViewButton.isSelected()) {
+                    setHex(ScriptExportMode.CONSTANTS);
+                } else {
+                    setHex(ScriptExportMode.PCODE);
+                }
             }
-        }
 
-        editor.setEditable(val);
-        saveButton.setVisible(val);
-        saveButton.setEnabled(false);
-        editButton.setVisible(!val);
-        cancelButton.setVisible(val);
+            editor.setEditable(val);
+            saveButton.setVisible(val);
+            saveButton.setEnabled(false);
+            editButton.setVisible(!val);
+            cancelButton.setVisible(val);
 
-        editor.getCaret().setVisible(true);
-        asmLabel.setIcon(val ? View.getIcon("editing16") : null); // this line is not working
-        topButtonsPan.setVisible(!val);
-        editMode = val;
-        editor.requestFocusInWindow();
+            editor.getCaret().setVisible(true);
+            asmLabel.setIcon(val ? View.getIcon("editing16") : null); // this line is not working
+            topButtonsPan.setVisible(!val);
+            editMode = val;
+            editor.requestFocusInWindow();
+        });
     }
 
     public void setDecompiledEditMode(boolean val) {
         if (lastASM == null) {
             return;
         }
-
-        int lastLine = decompiledEditor.getLine();
-        int prefLines = lastASM.getPrefixLineCount();
-        if (val) {
-            String newText = lastASM.removePrefixAndSuffix(lastDecompiled);
-            setDecompiledText(newText);
-            if (lastLine > -1) {
-                if (lastLine - prefLines >= 0) {
-                    decompiledEditor.gotoLine(lastLine - prefLines + 1);
+        View.execInEventDispatch(() -> {
+            int lastLine = decompiledEditor.getLine();
+            int prefLines = lastASM.getPrefixLineCount();
+            if (val) {
+                String newText = lastASM.removePrefixAndSuffix(lastDecompiled);
+                setDecompiledText(lastASM.getScriptName(), newText);
+                if (lastLine > -1) {
+                    if (lastLine - prefLines >= 0) {
+                        decompiledEditor.gotoLine(lastLine - prefLines + 1);
+                    }
+                }
+            } else {
+                String newText = lastDecompiled;
+                setDecompiledText(lastASM.getScriptName(), newText);
+                if (lastLine > -1) {
+                    decompiledEditor.gotoLine(lastLine + prefLines + 1);
                 }
             }
-        } else {
-            String newText = lastDecompiled;
-            setDecompiledText(newText);
-            if (lastLine > -1) {
-                decompiledEditor.gotoLine(lastLine + prefLines + 1);
-            }
-        }
 
-        decompiledEditor.setEditable(val);
-        saveDecompiledButton.setVisible(val);
-        saveDecompiledButton.setEnabled(false);
-        editDecompiledButton.setVisible(!val);
-        experimentalLabel.setVisible(!val);
-        cancelDecompiledButton.setVisible(val);
+            decompiledEditor.setEditable(val);
+            saveDecompiledButton.setVisible(val);
+            saveDecompiledButton.setEnabled(false);
+            editDecompiledButton.setVisible(!val);
+            experimentalLabel.setVisible(!val);
+            cancelDecompiledButton.setVisible(val);
 
-        decompiledEditor.getCaret().setVisible(true);
-        decLabel.setIcon(val ? View.getIcon("editing16") : null);
-        editDecompiledMode = val;
-        decompiledEditor.requestFocusInWindow();
+            decompiledEditor.getCaret().setVisible(true);
+            decLabel.setIcon(val ? View.getIcon("editing16") : null);
+            editDecompiledMode = val;
+            decompiledEditor.requestFocusInWindow();
+        });
     }
 
     private void graphButtonActionPerformed(ActionEvent evt) {

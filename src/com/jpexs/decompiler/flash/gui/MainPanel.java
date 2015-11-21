@@ -142,6 +142,7 @@ import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.decompiler.flash.xfl.FLAVersion;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
@@ -319,6 +320,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public static final int MORPH_SHAPE_ANIMATION_FRAME_RATE = 30;
 
     private static final Logger logger = Logger.getLogger(MainPanel.class.getName());
+
+    private Map<String, ASMSource> asms = new HashMap<>();
 
     public void setPercent(int percent) {
         progressBar.setValue(percent);
@@ -816,6 +819,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         mainFrame.setTitle(ApplicationInfo.applicationVerName + (Configuration.displayFileName.get() ? " - " + swf.getFileTitle() : ""));
 
         List<ABCContainerTag> abcList = swf.getAbcList();
+        asms = swf.getASMs(true);
 
         boolean hasAbc = !abcList.isEmpty();
 
@@ -1533,9 +1537,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void gotoClassLine(SWF swf, String cls, int line) {
-        gotoClass(swf, cls);
+        gotoScriptName(swf, cls);
         if (abcPanel != null) {
             abcPanel.decompiledTextArea.gotoLine(line);
+        } else if (actionPanel != null) {
+            actionPanel.decompiledEditor.gotoLine(line);
         }
         refreshBreakPoints();
 
@@ -1561,15 +1567,21 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
      }*/
 
-    public void gotoClass(SWF swf, String cls) {
+    public void gotoScriptName(SWF swf, String scriptName) {
         if (swf == null) {
             return;
         }
-        List<ABCContainerTag> abcList = swf.getAbcList();
-        if (!abcList.isEmpty()) {
-            ABCPanel abcPanel = getABCPanel();
-            abcPanel.setAbc(abcList.get(0).getABC());
-            abcPanel.hilightScript(swf, cls);
+        if (swf.isAS3()) {
+            List<ABCContainerTag> abcList = swf.getAbcList();
+            if (!abcList.isEmpty()) {
+                ABCPanel abcPanel = getABCPanel();
+                abcPanel.setAbc(abcList.get(0).getABC());
+                abcPanel.hilightScript(swf, scriptName);
+            }
+        } else {
+            if (actionPanel != null && asms.containsKey(scriptName)) {
+                actionPanel.setSource(asms.get(scriptName), true);
+            }
         }
     }
 
@@ -1583,8 +1595,13 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             List<ABCContainerTag> abcList = swf.getAbcList();
             if (!abcList.isEmpty()) {
                 ABCPanel abcPanel = getABCPanel();
-                abcPanel.setAbc(abcList.get(0).getABC());
-                abcPanel.hilightScript(swf, documentClass);
+                for (ABCContainerTag c : abcList) {
+                    if (c.getABC().findClassByName(documentClass) > -1) {
+                        abcPanel.setAbc(c.getABC());
+                        abcPanel.hilightScript(swf, documentClass);
+                        break;
+                    }
+                }
             }
         }
     }
@@ -2823,6 +2840,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (abcPanel != null) {
             abcPanel.decompiledTextArea.removeColorMarkerOnAllLines(DecompiledEditorPane.FG_IP_COLOR, DecompiledEditorPane.BG_IP_COLOR, DecompiledEditorPane.PRIORITY_IP);
         }
+        if (actionPanel != null) {
+            actionPanel.decompiledEditor.removeColorMarkerOnAllLines(DecompiledEditorPane.FG_IP_COLOR, DecompiledEditorPane.BG_IP_COLOR, DecompiledEditorPane.PRIORITY_IP);
+        }
     }
 
     private void stopFlashPlayer() {
@@ -3050,7 +3070,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 setSourceWorker.cancel(true);
                 setSourceWorker = null;
             }
-            if (!Main.isWorking() || Main.isDebugging()) {
+            if (!Main.isInited() || !Main.isWorking() || Main.isDebugging()) {
                 CancellableWorker worker = new CancellableWorker() {
 
                     @Override

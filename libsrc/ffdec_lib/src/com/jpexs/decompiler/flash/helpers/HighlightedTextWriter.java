@@ -184,7 +184,7 @@ public class HighlightedTextWriter extends GraphTextWriter {
                 ndata.merge(data);
                 ndata.offset = src.getOffset() + pos;
                 if (itemPos.startLineItem != null) {
-                    ndata.firstLineOffset = itemPos.startLineItem.getOffset();
+                    ndata.firstLineOffset = itemPos.startLineItem.getLineOffset();
                 }
                 h = new Highlighting(sb.length() - newLineCount, ndata, HighlightType.OFFSET, str);
                 instructionHilights.add(h);

@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
+import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
@@ -53,6 +54,14 @@ public class DoActionTag extends Tag implements ASMSource {
     //public List<Action> actions = new ArrayList<Action>();
     @HideInRawEdit
     public ByteArrayRange actionBytes;
+
+    @Internal
+    private String scriptName = "-";
+
+    @Override
+    public String getScriptName() {
+        return scriptName;
+    }
 
     /**
      * Constructor
@@ -85,6 +94,11 @@ public class DoActionTag extends Tag implements ASMSource {
     public DoActionTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
+    }
+
+    @Override
+    public void setScriptName(String scriptName) {
+        this.scriptName = scriptName;
     }
 
     @Override

@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
+import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
@@ -61,6 +62,14 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
     @HideInRawEdit
     public ByteArrayRange actionBytes;
 
+    @Internal
+    private String scriptName = "-";
+
+    @Override
+    public String getScriptName() {
+        return scriptName;
+    }
+
     /**
      * Constructor
      *
@@ -69,6 +78,11 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
     public DoInitActionTag(SWF swf) {
         super(swf, ID, NAME, null);
         actionBytes = ByteArrayRange.EMPTY;
+    }
+
+    @Override
+    public void setScriptName(String scriptName) {
+        this.scriptName = scriptName;
     }
 
     /**

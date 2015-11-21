@@ -91,4 +91,8 @@ public interface ASMSource extends Exportable {
     public Tag getSourceTag();
 
     public void setSourceTag(Tag t);
+
+    public String getScriptName();
+
+    public void setScriptName(String scriptName);
 }

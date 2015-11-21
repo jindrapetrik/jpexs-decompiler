@@ -38,6 +38,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.gui.editor.DebuggableEditorPane;
 import com.jpexs.decompiler.flash.gui.editor.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
@@ -59,7 +60,7 @@ import jsyntaxpane.Token;
 import jsyntaxpane.TokenType;
 import jsyntaxpane.components.BreakPointListener;
 
-public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretListener, BreakPointListener {
+public class DecompiledEditorPane extends DebuggableEditorPane implements CaretListener {
 
     private List<Highlighting> highlights = new ArrayList<>();
 
@@ -90,34 +91,6 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     private boolean isStatic = false;
 
     private final List<Runnable> scriptListeners = new ArrayList<>();
-
-    public static final Color BG_BREAKPOINT_COLOR = new Color(0xfc, 0x9d, 0x9f);
-    public static final Color FG_BREAKPOINT_COLOR = null;
-    public static final int PRIORITY_BREAKPOINT = 20;
-
-    public static final Color BG_IP_COLOR = new Color(0xbd, 0xe6, 0xaa);
-    public static final Color FG_IP_COLOR = null;
-    public static final int PRIORITY_IP = 0;
-
-    public static final Color BG_INVALID_BREAKPOINT_COLOR = new Color(0xdc, 0xdc, 0xd8);
-    public static final Color FG_INVALID_BREAKPOINT_COLOR = null;
-    public static final int PRIORITY_INVALID_BREAKPOINT = 10;
-
-    @Override
-    public void toggled(int line) {
-        boolean on = Main.toggleBreakPoint(script, line);
-        removeColorMarker(line, FG_INVALID_BREAKPOINT_COLOR, BG_INVALID_BREAKPOINT_COLOR, PRIORITY_INVALID_BREAKPOINT);
-        if (on) {
-            if (Main.isBreakPointValid(script, line)) {
-                addColorMarker(line, FG_BREAKPOINT_COLOR, BG_BREAKPOINT_COLOR, PRIORITY_BREAKPOINT);
-            } else {
-                addColorMarker(line, FG_INVALID_BREAKPOINT_COLOR, BG_INVALID_BREAKPOINT_COLOR, PRIORITY_INVALID_BREAKPOINT);
-            }
-        } else {
-            removeColorMarker(line, FG_BREAKPOINT_COLOR, BG_BREAKPOINT_COLOR, PRIORITY_BREAKPOINT);
-            removeColorMarker(line, FG_INVALID_BREAKPOINT_COLOR, BG_INVALID_BREAKPOINT_COLOR, PRIORITY_INVALID_BREAKPOINT);
-        }
-    }
 
     public void addScriptListener(Runnable l) {
         scriptListeners.add(l);
@@ -676,14 +649,16 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         if (!force && this.script == scriptLeaf) {
             return;
         }
-        abcPanel.scriptNameLabel.setText(scriptLeaf.getClassPath().toString());
+        String sn = scriptLeaf.getClassPath().toString();
+        setScriptName(sn);
+        abcPanel.scriptNameLabel.setText(sn);
         int scriptIndex = scriptLeaf.scriptIndex;
-        ScriptInfo script = null;
+        ScriptInfo nscript = null;
         ABC abc = scriptLeaf.abc;
         if (scriptIndex > -1) {
-            script = abc.script_info.get(scriptIndex);
+            nscript = abc.script_info.get(scriptIndex);
         }
-        if (script == null) {
+        if (nscript == null) {
             highlights = new ArrayList<>();
             specialHighlights = new ArrayList<>();
             traitHighlights = new ArrayList<>();
@@ -738,36 +713,9 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         return script == null ? null : script.abc;
     }
 
-    public void refreshMarkers() {
-        removeColorMarkerOnAllLines(FG_BREAKPOINT_COLOR, BG_BREAKPOINT_COLOR, PRIORITY_BREAKPOINT);
-        removeColorMarkerOnAllLines(FG_INVALID_BREAKPOINT_COLOR, BG_INVALID_BREAKPOINT_COLOR, PRIORITY_INVALID_BREAKPOINT);
-        removeColorMarkerOnAllLines(FG_IP_COLOR, BG_IP_COLOR, PRIORITY_IP);
-
-        if (script == null) {
-            return;
-        }
-
-        Set<Integer> bkptLines = Main.getPackBreakPoints(script);
-
-        for (int line : bkptLines) {
-            if (Main.isBreakPointValid(script, line)) {
-                addColorMarker(line, FG_BREAKPOINT_COLOR, BG_BREAKPOINT_COLOR, PRIORITY_BREAKPOINT);
-            } else {
-                addColorMarker(line, FG_INVALID_BREAKPOINT_COLOR, BG_INVALID_BREAKPOINT_COLOR, PRIORITY_INVALID_BREAKPOINT);
-            }
-        }
-        int ip = Main.getIp(script);
-        ClassPath ipPath = Main.getIpClass();
-        if (ip > 0 && ipPath != null && ipPath.equals(script.getClassPath())) {
-            addColorMarker(ip, FG_IP_COLOR, BG_IP_COLOR, PRIORITY_IP);
-        }
-    }
-
     @Override
     public void setText(String t) {
         super.setText(t);
         setCaretPosition(0);
-        refreshMarkers();
-
     }
 }

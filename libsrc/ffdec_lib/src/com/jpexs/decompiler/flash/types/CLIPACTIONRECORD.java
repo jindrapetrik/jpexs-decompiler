@@ -42,6 +42,13 @@ import java.util.List;
  */
 public class CLIPACTIONRECORD implements ASMSource, Serializable {
 
+    private String scriptName = "-";
+
+    @Override
+    public String getScriptName() {
+        return scriptName;
+    }
+
     public static String keyToString(int key) {
         if ((key < CLIPACTIONRECORD.KEYNAMES.length) && (key > 0) && (CLIPACTIONRECORD.KEYNAMES[key] != null)) {
             return CLIPACTIONRECORD.KEYNAMES[key];
@@ -98,6 +105,11 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable {
         tag = null;
         eventFlags = new CLIPEVENTFLAGS();
         actionBytes = ByteArrayRange.EMPTY;
+    }
+
+    @Override
+    public void setScriptName(String scriptName) {
+        this.scriptName = scriptName;
     }
 
     public CLIPACTIONRECORD(SWF swf, SWFInputStream sis, Tag tag) throws IOException {
