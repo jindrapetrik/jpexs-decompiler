@@ -247,6 +247,7 @@ public class Main {
                     }
                 }
                 freeRun();
+                stopDebugger();
                 mainFrame.getMenu().updateComponents();
                 return null;
             }
