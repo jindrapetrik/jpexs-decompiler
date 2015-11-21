@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash;
 
 import SevenZip.Compression.LZMA.Decoder;
 import SevenZip.Compression.LZMA.Encoder;
+import com.jpexs.debugger.flash.SWD;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.CachedDecompilation;
 import com.jpexs.decompiler.flash.abc.ClassPath;
@@ -77,6 +78,7 @@ import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.flash.tags.DebugIDTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
@@ -157,6 +159,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -171,10 +174,15 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.Stack;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
@@ -1094,12 +1102,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             }
         }
 
-        /*preload shape tags
-         for (Tag tag : tags) {
-         if (tag instanceof ShapeTag) {
-         ((ShapeTag) tag).getShapes();
-         }
-         }*/
+        getASMs(true); // Add scriptNames to ASMs
     }
 
     @Override
@@ -1473,11 +1476,14 @@ public final class SWF implements SWFContainerItem, Timelined {
         TreeItem realItem = treeItem instanceof TagScript ? ((TagScript) treeItem).getTag() : treeItem;
         if (realItem instanceof ASMSource && (exportAll || exportNode)) {
             String npath = path;
+            String exPath = path;
             int ppos = 1;
             while (asmsToExport.containsKey(npath)) {
                 ppos++;
                 npath = path + (exportFileNames ? "[" + ppos + "]" : "_" + ppos);
+                exPath = path + "[" + ppos + "]";
             }
+            ((ASMSource) realItem).setScriptName(exPath);
             asmsToExport.put(npath, (ASMSource) realItem);
         }
 
@@ -3143,6 +3149,8 @@ public final class SWF implements SWFContainerItem, Timelined {
 
         int pos = 0;
 
+        boolean hasEnabled = false;
+
         for (int i = 0; i < tags.size(); i++) {
             Tag t = tags.get(i);
             if (t instanceof MetadataTag) {
@@ -3152,23 +3160,183 @@ public final class SWF implements SWFContainerItem, Timelined {
                 pos = i + 1;
             }
             if (version >= 6 && (t instanceof EnableDebugger2Tag)) {
-                return;
+                hasEnabled = true;
+                break;
             }
             if (version == 5 && (t instanceof EnableDebuggerTag)) {
-                return;
+                hasEnabled = true;
+                break;
             }
             if (version < 5 && (t instanceof ProtectTag)) {
-                return;
+                hasEnabled = true;
+                break;
             }
         }
 
-        if (version >= 6) {
-            tags.add(pos, new EnableDebugger2Tag(this));
-        } else if (version == 5) {
-            tags.add(pos, new EnableDebuggerTag(this));
-        } else {
-            tags.add(pos, new ProtectTag(this));
+        if (!hasEnabled) {
+            if (version >= 6) {
+                tags.add(pos, new EnableDebugger2Tag(this));
+            } else if (version == 5) {
+                tags.add(pos, new EnableDebuggerTag(this));
+            } else {
+                tags.add(pos, new ProtectTag(this));
+            }
         }
+
+        addDebugId();
+    }
+
+    public DebugIDTag getDebugId() {
+        for (Tag t : tags) {
+            if (t instanceof DebugIDTag) {
+                return (DebugIDTag) t;
+            }
+        }
+        return null;
+    }
+
+    public DebugIDTag addDebugId() {
+        DebugIDTag r = getDebugId();
+        if (r == null) {
+            for (int i = 0; i < tags.size(); i++) {
+                Tag t = tags.get(i);
+                if ((t instanceof EnableDebuggerTag) || (t instanceof EnableDebugger2Tag)) {
+                    r = new DebugIDTag(this);
+                    tags.add(i + 1, r);
+                    new Random().nextBytes(r.debugId);
+                    break;
+                }
+            }
+        }
+        return r;
+    }
+
+    public boolean generateSwdFile(File file, Map<String, Set<Integer>> breakpoints) throws IOException {
+        DebugIDTag dit = getDebugId();
+        if (dit == null) {
+            return false;
+        }
+        List<SWD.DebugItem> items = new ArrayList<>();
+        Map<String, ASMSource> asms = getASMs(true);
+
+        try {
+            items.add(new SWD.DebugId(dit.debugId));
+            Random rnd = new Random();
+
+            //Map<String, Integer> moduleIds = new HashMap<>();
+            List<SWD.DebugOffset> swdOffsets = new ArrayList<>();
+            List<SWD.DebugBreakpoint> swfBps = new ArrayList<>();
+            int moduleId = 0;
+            List<String> names = new ArrayList<>(asms.keySet());
+            Collections.sort(names);
+            //Collections.reverse(names);
+            for (String name : names) {
+                moduleId++;
+                CachedScript cs;
+                try {
+                    cs = SWF.getCached(asms.get(name), asms.get(name).getActions());
+                } catch (InterruptedException ex) {
+                    return false;
+                }
+                String txt = cs.text.replace("\r", "");
+                int line = 1;
+                Map<Integer, Integer> lineToOffset = new HashMap<>();
+                Map<Integer, String> regNames = new HashMap<>();
+
+                for (int pos = 0; pos < txt.length(); pos++) {
+                    Highlighting h = Highlighting.searchPos(cs.hilights, pos);
+                    if (h != null) {
+
+                        int firstLineOffset = (int) h.getProperties().firstLineOffset;
+                        if (firstLineOffset != -1) {
+                            if (h.getProperties().declaration && h.getProperties().regIndex > -1) {
+                                regNames.put(h.getProperties().regIndex, h.getProperties().localName);
+
+                                /*List<Integer> curRegIndexes = new ArrayList<>(regNames.keySet());
+                                 List<String> curRegNames = new ArrayList<>();
+                                 for (int i = 0; i < curRegIndexes.size(); i++) {
+                                 curRegNames.add(regNames.get(i));
+                                 }
+                                 items.add(new SWD.DebugRegisters((int) h.getProperties().firstLineOffset, curRegIndexes, curRegNames));*/
+                            }
+                        }
+                        if (firstLineOffset != -1 && !lineToOffset.containsKey(line)) {
+                            lineToOffset.put(line, firstLineOffset);
+                        }
+                    }
+                    if (txt.charAt(pos) == '\n') {
+                        line++;
+                    }
+                }
+
+                Map<Integer, Integer> offSetToLine = new TreeMap<>();
+                for (Map.Entry<Integer, Integer> en : lineToOffset.entrySet()) {
+                    offSetToLine.put(en.getValue(), en.getKey());
+                }
+
+                //final String NONAME = "[No instance name assigned]";
+                String sname = name;
+                int bitmap = SWD.bitmapAction;
+                /* Matcher m;
+                 int bitmap = SWD.bitmapAction;
+                 m = Pattern.compile("^\\\\frame_([0-9]+)\\\\DoAction$").matcher(sname);
+                 if (m.matches()) {
+                 //TODO: scenes?, layers?
+                 sname = "Actions for Scene 1: Frame " + m.group(1) + " of Layer Name Layer 1";
+                 } else if ((m = Pattern.compile("^\\\\__Packages\\\\(.*)$").matcher(sname)).matches()) {
+                 sname = m.group(1).replace("\\", ".") + ": .\\" + m.group(1) + ".as";
+                 } else {
+                 continue; //FIXME!
+                 }
+                 m = Pattern.compile("^\\\\DefineSprite_([0-9])+\\\\frame_([0-9]+)\\\\DoAction$").matcher(sname);
+                 if (m.matches()) {
+                 //TODO: layers?
+                 //sname = "Actions for Symbol " + m.group(1) + ": Frame " + m.group(2) + " of Layer Name Layer 1";
+                 continue; //FIXME!
+                 }
+
+                 //TODO: handle onxxx together ?
+                 m = Pattern.compile("^\\\\DefineButton2?_([0-9]+)\\\\on\\(.*$").matcher(sname);
+                 if (m.matches()) {
+                 //bitmap = SWD.bitmapOnAction;
+                 //sname = "Actions for " + NONAME + " (Symbol " + m.group(1) + ")";
+                 continue; //FIXME!
+                 }
+
+                 //TODO: handle onClipEvent together ?
+                 m = Pattern.compile("^\\\\frame_([0-9]+)\\\\PlaceObject[2-3]?_([0-9]+)_[^\\\\]*\\\\onClipEvent\\(.*$").matcher(sname);
+                 if (m.matches()) {
+                 //bitmap = SWD.bitmapOnClipAction;
+                 //sname = "Actions for " + NONAME + " (Symbol " + m.group(2) + ")";
+                 continue; //FIXME!
+                 }//*/
+
+                items.add(new SWD.DebugScript(moduleId, bitmap, sname, txt));
+                for (int ofs : offSetToLine.keySet()) {
+                    items.add(new SWD.DebugOffset(moduleId, offSetToLine.get(ofs), ofs));
+                }
+                if (breakpoints.containsKey(name)) {
+                    Set<Integer> bplines = breakpoints.get(name);
+                    for (int bpline : bplines) {
+                        if (lineToOffset.containsKey(bpline)) {
+                            items.add(new SWD.DebugBreakpoint(moduleId, bpline));
+                        }
+                    }
+                }
+                //moduleId++;
+            }
+            //items.addAll(swdOffsets);
+            //items.addAll(swfBps);
+
+        } catch (Throwable t) {
+            Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, "message", t);
+            return false;
+        }
+        SWD swd = new SWD(7, items);
+        try (FileOutputStream fis = new FileOutputStream(file)) {
+            swd.saveTo(fis);
+        }
+        return true;
     }
 
     public boolean enableTelemetry(String password) {

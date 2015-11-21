@@ -796,6 +796,7 @@ public class ActionListReader {
                 if ((a = sis.readAction()) == null) {
                     break;
                 }
+                a.fileOffset = ip;
 
                 int actionLengthWithHeader = a.getTotalActionLength();
 

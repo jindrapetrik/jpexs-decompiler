@@ -524,6 +524,10 @@ public class Configuration {
     @ConfigurationName("gui.avm2.splitPane.vars.dividerLocationPercent")
     public static final ConfigurationItem<Double> guiAvm2VarsSplitPaneDividerLocationPercent = null;
 
+    @ConfigurationDefaultDouble(0.7)
+    @ConfigurationName("gui.action.splitPane.vars.dividerLocationPercent")
+    public static final ConfigurationItem<Double> guiActionVarsSplitPaneDividerLocationPercent = null;
+
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("script")
     public static final ConfigurationItem<Boolean> debugHalt = null;

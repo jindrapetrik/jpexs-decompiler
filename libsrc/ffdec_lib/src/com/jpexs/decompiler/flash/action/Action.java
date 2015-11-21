@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.Reference;
 import com.jpexs.decompiler.flash.action.deobfuscation.ActionDeobfuscator;
 import com.jpexs.decompiler.flash.action.model.ActionItem;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
@@ -109,6 +110,8 @@ public abstract class Action implements GraphSourceItem {
 
     private boolean ignored = false;
 
+    public long fileOffset = -1;
+
     /**
      * Action type identifier
      */
@@ -120,6 +123,11 @@ public abstract class Action implements GraphSourceItem {
     public int actionLength;
 
     private long address;
+
+    @Override
+    public long getLineOffset() {
+        return fileOffset;
+    }
 
     /**
      * Names of ActionScript properties
@@ -937,11 +945,12 @@ public abstract class Action implements GraphSourceItem {
         this.ignored = ignored;
     }
 
-    public static List<GraphTargetItem> actionsPartToTree(HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, TranslateStack stack, List<Action> actions, int start, int end, int version, int staticOperation, String path) throws InterruptedException {
+    public static List<GraphTargetItem> actionsPartToTree(Reference<GraphSourceItem> fi, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, TranslateStack stack, List<Action> actions, int start, int end, int version, int staticOperation, String path) throws InterruptedException {
         if (start < actions.size() && (end > 0) && (start > 0)) {
             logger.log(Level.FINE, "Entering {0}-{1}{2}", new Object[]{start, end, actions.size() > 0 ? (" (" + actions.get(start).toString() + " - " + actions.get(end == actions.size() ? end - 1 : end) + ")") : ""});
         }
         ActionLocalData localData = new ActionLocalData(registerNames, variables, functions);
+        localData.lineStartAction = fi.getVal();
         List<GraphTargetItem> output = new ArrayList<>();
         int ip = start;
         boolean isWhile = false;
@@ -963,6 +972,10 @@ public abstract class Action implements GraphSourceItem {
             if (action.isIgnored()) {
                 ip++;
                 continue;
+            }
+            if (stack.isEmpty()) {
+                localData.lineStartAction = action;
+                fi.setVal(action);
             }
             if (action instanceof GraphSourceItemContainer) {
                 GraphSourceItemContainer cnt = (GraphSourceItemContainer) action;

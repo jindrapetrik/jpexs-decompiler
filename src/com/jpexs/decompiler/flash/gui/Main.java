@@ -21,6 +21,7 @@ import com.jpexs.debugger.flash.DebugMessageListener;
 import com.jpexs.debugger.flash.Debugger;
 import com.jpexs.debugger.flash.DebuggerCommands;
 import com.jpexs.debugger.flash.DebuggerConnection;
+import com.jpexs.debugger.flash.SWD;
 import com.jpexs.debugger.flash.messages.in.InAskBreakpoints;
 import com.jpexs.debugger.flash.messages.in.InBreakAt;
 import com.jpexs.debugger.flash.messages.in.InNumScript;
@@ -81,6 +82,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
@@ -159,117 +161,285 @@ public class Main {
 
     private static DebuggerHandler debugHandler = null;
 
-    private static Map<ScriptPack, Set<Integer>> breakPointMap = new WeakHashMap<>();
-    private static Map<ScriptPack, Set<Integer>> invalidBreakPointMap = new WeakHashMap<>();
-    private static int ip = 0;
-    private static ClassPath ipClass = null;
+    //private static int ip = 0;
+    //private static String ipClass = null;
+    private static Process runProcess;
+    private static boolean runProcessDebug;
 
-    public static void debuggerNotSuspended() {
-        getDebugHandler().notSuspended();
+    private static boolean inited = false;
+
+    private static File runTempFile;
+
+    public static void freeRun() {
+        synchronized (Main.class) {
+            if (runTempFile != null) {
+                runTempFile.delete();
+                runTempFile = null;
+            }
+
+            runProcess = null;
+        }
         mainFrame.getPanel().clearDebuggerColors();
-        ip = 0;
-        ipClass = null;
-    }
-
-    public static void clearBreakPoints(ScriptPack pack) {
-        if (breakPointMap.containsKey(pack)) {
-            breakPointMap.remove(pack);
+        if (runProcessDebug) {
+            Main.getDebugHandler().disconnect();
         }
     }
 
-    public static boolean isDebugging() {
-        return mainFrame.getMenu().isDebugRunning();
+    public static synchronized boolean isDebugPaused() {
+        return runProcess != null && runProcessDebug && getDebugHandler().isPaused();
     }
 
-    public static int getIp(ScriptPack pack) {
-        return ip;
+    public static synchronized boolean isDebugRunning() {
+        return runProcess != null && runProcessDebug;
     }
 
-    public static ClassPath getIpClass() {
-        return ipClass;
+    public static synchronized boolean isDebugConnected() {
+        return getDebugHandler().isConnected();
     }
 
-    public static void breakAt(ClassPath clsName, int ip) {
-        Main.ip = ip;
-        Main.ipClass = clsName;
-        mainFrame.getPanel().gotoClassLine(getMainFrame().getPanel().getCurrentSwf(), clsName.toString(), ip);
-        //Main.getMainFrame().getPanel().debuggerBreakAt(Main.getMainFrame().getPanel().getCurrentSwf(), cls, message.line);
+    public static synchronized boolean isRunning() {
+        return runProcess != null && !runProcessDebug;
     }
 
-    public static boolean isBreakPointValid(ScriptPack pack, int line) {
-        if (!invalidBreakPointMap.containsKey(pack)) {
-            return true;
+    public static void runPlayer(String title, final String exePath, String file, String flashVars) {
+        if (flashVars != null && !flashVars.isEmpty()) {
+            file += "?" + flashVars;
         }
-        return !invalidBreakPointMap.get(pack).contains(line);
-
-    }
-
-    public static void markBreakPointInvalid(ScriptPack pack, int line) {
-        if (!invalidBreakPointMap.containsKey(pack)) {
-            invalidBreakPointMap.put(pack, new TreeSet<>());
+        if (!new File(file).exists()) {
+            return;
         }
-        invalidBreakPointMap.get(pack).add(line);
-    }
 
-    public static void addBreakPoint(ScriptPack pack, int line) {
-        if (!breakPointMap.containsKey(pack)) {
-            breakPointMap.put(pack, new TreeSet<>());
-        }
-        breakPointMap.get(pack).add(line);
-        if (debugHandler.isConnected()) {
-            int file = debugHandler.moduleIdOf(pack);
-            if (file > -1) {
+        final String ffile = file;
+
+        CancellableWorker runWorker = new CancellableWorker() {
+
+            @Override
+            protected Object doInBackground() throws Exception {
+                Process proc;
                 try {
-                    if (!debugHandler.getCommands().addBreakPoint(file, line)) {
-                        markBreakPointInvalid(pack, line);
+                    proc = Runtime.getRuntime().exec("\"" + exePath + "\" \"file://" + ffile + "\"");
+                } catch (IOException ex) {
+                    Logger.getLogger(MainFrameMenu.class.getName()).log(Level.SEVERE, null, ex);
+
+                    return null;
+                }
+                boolean isDebug;
+
+                synchronized (Main.class) {
+                    runProcess = proc;
+                    isDebug = runProcessDebug;
+                }
+                if (isDebug) {
+                    mainFrame.getMenu().hilightPath("/debugging");
+                }
+                mainFrame.getMenu().updateComponents();
+                try {
+                    if (proc != null) {
+                        proc.waitFor();
                     }
-                } catch (IOException ex) {
-                    debugHandler.disconnect();
-                    //ignore
+                } catch (InterruptedException ex) {
+                    if (proc != null) {
+                        try {
+                            proc.destroy();
+                        } catch (Exception ex2) {
+                            //ignore
+                        }
+                    }
                 }
+                freeRun();
+                mainFrame.getMenu().updateComponents();
+                return null;
             }
+
+            @Override
+            protected void done() {
+                Main.stopWork();
+            }
+
+            @Override
+            public void workerCancelled() {
+                Main.stopWork();
+                synchronized (Main.class) {
+                    if (runProcess != null) {
+                        try {
+                            runProcess.destroy();
+                        } catch (Exception ex) {
+
+                        }
+                    }
+                }
+                freeRun();
+                mainFrame.getMenu().updateComponents();
+            }
+
+        };
+
+        mainFrame.getMenu().updateComponents();
+        Main.startWork(title + "...", runWorker);
+        runWorker.execute();
+    }
+
+    public static void stopRun() {
+
+        synchronized (Main.class) {
+            if (runProcess != null) {
+                runProcess.destroy();
+            }
+        }
+        freeRun();
+        stopDebugger();
+        mainFrame.getMenu().updateComponents();
+    }
+
+    public static void run(SWF swf) {
+        String flashVars = "";//key=val&key2=val2
+        String playerLocation = Configuration.playerLocation.get();
+        if (playerLocation.isEmpty() || (!new File(playerLocation).exists())) {
+            View.showMessageDialog(null, AppStrings.translate("message.playerpath.notset"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+            advancedSettings("paths");
+            return;
+        }
+        if (swf == null) {
+            return;
+        }
+        File tempFile;
+        try {
+            tempFile = File.createTempFile("ffdec_run_", ".swf");
+
+            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
+                swf.saveTo(fos);
+            }
+        } catch (IOException ex) {
+            return;
+
+        }
+        if (tempFile != null) {
+            synchronized (Main.class) {
+                runTempFile = tempFile;
+                runProcessDebug = false;
+            }
+            runPlayer(AppStrings.translate("work.running"), playerLocation, tempFile.getAbsolutePath(), flashVars);
         }
     }
 
-    public static void removeBreakPoint(ScriptPack pack, int line) {
-        if (breakPointMap.containsKey(pack)) {
-            Set<Integer> lines = breakPointMap.get(pack);
-            if (lines != null) {
-                lines.remove(line);
-            }
+    public static void runDebug(SWF swf) {
+        String flashVars = "";//key=val&key2=val2
+        String playerLocation = Configuration.playerDebugLocation.get();
+        if (playerLocation.isEmpty() || (!new File(playerLocation).exists())) {
+            View.showMessageDialog(null, AppStrings.translate("message.playerpath.debug.notset"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+            Main.advancedSettings("paths");
+            return;
         }
-        if (debugHandler.isConnected()) {
-            int file = debugHandler.moduleIdOf(pack);
-            if (file > -1) {
-                try {
-                    debugHandler.getCommands().removeBreakPoint(file, line);
-                } catch (IOException ex) {
-                    debugHandler.disconnect();
-                    //ignore
+        if (swf == null) {
+            return;
+        }
+        File tempFile = null;
+
+        try {
+            tempFile = File.createTempFile("ffdec_debug_", ".swf");
+        } catch (Exception ex) {
+
+        }
+        if (tempFile != null) {
+            final File fTempFile = tempFile;
+            CancellableWorker instrumentWorker = new CancellableWorker() {
+
+                @Override
+                protected Object doInBackground() throws Exception {
+
+                    try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(fTempFile))) {
+                        swf.saveTo(fos);
+                    }
+                    //Inject Loader
+                    SWF instrSWF = null;
+                    try (FileInputStream fis = new FileInputStream(fTempFile)) {
+                        instrSWF = new SWF(fis, false, false);
+
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(MainFrameMenu.class
+                                .getName()).log(Level.SEVERE, null, ex);
+                    }
+                    if (instrSWF != null) {
+                        if (instrSWF.isAS3()) {
+                            instrSWF.enableDebugging(true, new File("."));
+                        } else {
+                            instrSWF.enableDebugging(false, new File("."));
+                            File swdFile = new File(fTempFile.getAbsolutePath().replace(".swf", ".swd"));
+                            instrSWF.generateSwdFile(swdFile, getPackBreakPoints(true));
+                        }
+                        try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(fTempFile))) {
+                            instrSWF.saveTo(fos);
+                        }
+                    }
+                    return null;
                 }
-            }
+
+                @Override
+                public void workerCancelled() {
+                    Main.stopWork();
+                }
+
+                @Override
+                protected void done() {
+                    synchronized (Main.class) {
+                        runTempFile = fTempFile;
+                        runProcessDebug = true;
+                    }
+                    Main.stopWork();
+                    Main.startDebugger();
+                    runPlayer(AppStrings.translate("work.debugging.wait"), playerLocation, fTempFile.getAbsolutePath(), flashVars);
+                }
+
+            };
+
+            Main.startWork(AppStrings.translate("work.debugging.instrumenting"), instrumentWorker);
+            instrumentWorker.execute();
         }
     }
 
-    public static boolean toggleBreakPoint(ScriptPack pack, int line) {
-        if (!breakPointMap.containsKey(pack)) {
-            addBreakPoint(pack, line);
-            return true;
-        }
-        if (breakPointMap.get(pack).contains(line)) {
-            removeBreakPoint(pack, line);
+    /*    public static void debuggerNotSuspended() {
+        
+     }*/
+    public static boolean isDebugging() {
+        return isDebugRunning();
+    }
+
+    public synchronized static int getIp(Object pack) {
+        return getDebugHandler().getBreakIp();
+    }
+
+    public synchronized static String getIpClass() {
+        return getDebugHandler().getBreakScriptName();
+    }
+
+    public static synchronized boolean isBreakPointValid(String scriptName, int line) {
+        return !getDebugHandler().isBreakpointInvalid(scriptName, line);
+    }
+
+    public synchronized static void addBreakPoint(String scriptName, int line) {
+        getDebugHandler().addBreakPoint(scriptName, line);
+    }
+
+    public synchronized static void removeBreakPoint(String scriptName, int line) {
+        getDebugHandler().removeBreakPoint(scriptName, line);
+    }
+
+    public synchronized static boolean toggleBreakPoint(String scriptName, int line) {
+        if (getDebugHandler().isBreakpointToAdd(scriptName, line) || getDebugHandler().isBreakpointConfirmed(scriptName, line)) {
+            getDebugHandler().removeBreakPoint(scriptName, line);
             return false;
         } else {
-            addBreakPoint(pack, line);
+            getDebugHandler().addBreakPoint(scriptName, line);
             return true;
         }
     }
 
-    public static Set<Integer> getPackBreakPoints(ScriptPack pack) {
-        if (!breakPointMap.containsKey(pack)) {
-            return new HashSet<>();
-        }
-        return breakPointMap.get(pack);
+    public synchronized static Map<String, Set<Integer>> getPackBreakPoints(boolean validOnly) {
+        return getDebugHandler().getAllBreakPoints(validOnly);
+    }
+
+    public synchronized static Set<Integer> getScriptBreakPoints(String pack) {
+        return getDebugHandler().getBreakPoints(pack);
     }
 
     public static DebuggerHandler getDebugHandler() {
@@ -317,6 +487,14 @@ public class Main {
         } else {
             AVM2Code.toSourceLimit = -1;
         }
+    }
+
+    public synchronized static boolean isInited() {
+        return inited;
+    }
+
+    public synchronized static void setSessionLoaded(boolean v) {
+        inited = v;
     }
 
     public static boolean isWorking() {
@@ -1151,24 +1329,49 @@ public class Main {
              */
             flashDebugger = new Debugger();
             debugHandler = new DebuggerHandler();
+            debugHandler.addBreakListener(new DebuggerHandler.BreakListener() {
+
+                @Override
+                public void doContinue() {
+                    mainFrame.getPanel().clearDebuggerColors();
+                }
+
+                @Override
+                public void breakAt(String scriptName, int line) {
+                    View.execInEventDispatch(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            mainFrame.getPanel().gotoClassLine(getMainFrame().getPanel().getCurrentSwf(), scriptName, line);
+                        }
+                    });
+                }
+            });
             debugHandler.addConnectionListener(new DebuggerHandler.ConnectionListener() {
 
                 @Override
                 public void connected() {
+                    Main.mainFrame.getMenu().updateComponents();
                 }
 
                 @Override
                 public void disconnected() {
-                    ip = 0;
-                    ipClass = null;
+
                 }
             });
             flashDebugger.addConnectionListener(debugHandler);
-            flashDebugger.start();
         } catch (IOException ex) {
-            //ignore
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, "eeex", ex);
         }
 
+    }
+
+    public static void startDebugger() {
+        flashDebugger.startDebugger();
+    }
+
+    public static void stopDebugger() {
+        flashDebugger.stopDebugger();
     }
 
     public static void showModeFrame() {
@@ -1371,6 +1574,7 @@ public class Main {
      * @throws IOException On error
      */
     public static void main(String[] args) throws IOException {
+        setSessionLoaded(false);
         clearTemp();
 
         try {
@@ -1400,6 +1604,7 @@ public class Main {
                 }
             });
         } else {
+            setSessionLoaded(true);
             String[] filesToOpen = CommandLineArgumentParser.parseArguments(args);
             if (filesToOpen != null && filesToOpen.length > 0) {
                 View.execInEventDispatch(() -> {
@@ -1447,9 +1652,16 @@ public class Main {
                 if (sourceInfos.length > 0) {
                     openFile(sourceInfos, () -> {
                         mainFrame.getPanel().tagTree.setSelectionPathString(Configuration.lastSessionSelection.get());
+                        setSessionLoaded(true);
                     });
+                } else {
+                    setSessionLoaded(true);
                 }
+            } else {
+                setSessionLoaded(true);
             }
+        } else {
+            setSessionLoaded(true);
         }
     }
 

@@ -37,6 +37,8 @@ public interface GraphSourceItem extends Serializable, Cloneable {
 
     public long getOffset();
 
+    public long getLineOffset();
+
     public boolean ignoredLoops();
 
     public List<Integer> getBranches(GraphSource code);

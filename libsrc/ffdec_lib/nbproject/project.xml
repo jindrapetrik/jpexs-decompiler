@@ -52,7 +52,7 @@ auxiliary.show.customizer.message=<message>
                 <action name="rebuild">
                     <target>clean</target>
                     <target>build</target>
-                </action>                  
+                </action>
                 <action name="debug">
                     <script>../../nbproject/ide-targets.xml</script>
                     <target>debug-nb</target>
@@ -137,7 +137,7 @@ auxiliary.show.customizer.message=<message>
                         <arity>
                             <one-file-only/>
                         </arity>
-                    </context>                    
+                    </context>
                 </action>
                 <action name="debug.test.single">
                     <script>nbproject/ide-file-targets.xml</script>
@@ -147,7 +147,7 @@ auxiliary.show.customizer.message=<message>
                         <folder>test</folder>
                         <pattern>\.java$</pattern>
                         <format>java-name</format>
-                        <arity>                            
+                        <arity>
                             <one-file-only/>
                         </arity>
                     </context>
@@ -181,7 +181,7 @@ auxiliary.show.customizer.message=<message>
                             <one-file-only/>
                         </arity>
                     </context>
-                </action>              
+                </action>
             </ide-actions>
             <export>
                 <type>folder</type>
@@ -219,7 +219,7 @@ auxiliary.show.customizer.message=<message>
                     </source-file>
                     <source-file>
                         <location>nbproject/ide-file-targets.xml</location>
-                    </source-file>                    
+                    </source-file>
                 </items>
                 <context-menu>
                     <ide-action name="build"/>
@@ -236,7 +236,7 @@ auxiliary.show.customizer.message=<message>
         <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/4">
             <compilation-unit>
                 <package-root>src</package-root>
-                <classpath mode="compile">../../lib/LZMA.jar;../../lib/avi.jar;../../lib/gif.jar;../../lib/gnujpdf.jar;../../lib/jl1.0.1.jar;../../lib/jpacker.jar;../../lib/nellymoser.jar;../../lib/sfntly.jar;../../lib/ttf.jar;../../lib/cmykjpeg.jar;../../src</classpath>
+                <classpath mode="compile">../../lib/LZMA.jar;../../lib/avi.jar;../../lib/gif.jar;../../lib/gnujpdf.jar;../../lib/jl1.0.1.jar;../../lib/jpacker.jar;../../lib/nellymoser.jar;../../lib/sfntly.jar;../../lib/ttf.jar;../../lib/cmykjpeg.jar;../../src;../../lib/flashdebugger.jar</classpath>
                 <built-to>build</built-to>
                 <built-to>reports</built-to>
                 <built-to>dist</built-to>

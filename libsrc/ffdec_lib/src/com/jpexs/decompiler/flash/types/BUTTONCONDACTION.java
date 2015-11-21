@@ -47,11 +47,23 @@ public class BUTTONCONDACTION implements ASMSource, Serializable {
 
     private Tag tag;
 
+    private String scriptName = "-";
+
+    @Override
+    public String getScriptName() {
+        return scriptName;
+    }
+
     // Constructor for Generic tag editor.
     public BUTTONCONDACTION() {
         swf = null;
         tag = null;
         actionBytes = new ByteArrayRange(SWFInputStream.BYTE_ARRAY_EMPTY);
+    }
+
+    @Override
+    public void setScriptName(String scriptName) {
+        this.scriptName = scriptName;
     }
 
     public BUTTONCONDACTION(SWF swf, SWFInputStream sis, Tag tag) throws IOException {

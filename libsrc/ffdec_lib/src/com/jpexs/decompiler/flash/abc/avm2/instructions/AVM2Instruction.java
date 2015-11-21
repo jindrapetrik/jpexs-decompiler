@@ -61,6 +61,11 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     private String file;
 
+    @Override
+    public long getLineOffset() {
+        return getOffset();
+    }
+
     public void setFileLine(String file, int line) {
         this.file = file;
         this.line = line;

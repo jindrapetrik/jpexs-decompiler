@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.debugger.flash.DebuggerCommands;
+import com.jpexs.debugger.flash.messages.out.OutStepContinue;
 import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFBundle;
@@ -661,10 +662,11 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
     public void updateComponents(SWF swf) {
         this.swf = swf;
-        boolean isRunning = isRunning();
-        boolean isDebugRunning = isDebugRunning();
+        boolean isRunning = Main.isRunning();
+        boolean isDebugRunning = Main.isDebugRunning();
+        boolean isDebugPaused = Main.isDebugPaused();
+
         boolean isRunningOrDebugging = isRunning || isDebugRunning;
-        boolean isDebugPaused = isDebugPaused();
 
         boolean swfSelected = swf != null;
         boolean isWorking = Main.isWorking();
@@ -725,7 +727,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         setMenuEnabled("/help/about", !isWorking);
 
         setMenuEnabled("/file/start/run", swfSelected && !isRunningOrDebugging);
-        setMenuEnabled("/file/start/debug", hasAbc && !isRunningOrDebugging);
+        setMenuEnabled("/file/start/debug", !isRunningOrDebugging);
 
         setMenuEnabled("/file/start/stop", isRunningOrDebugging);
         setMenuEnabled("/debugging/debug/stop", isRunningOrDebugging); //same as previous
@@ -1098,231 +1100,22 @@ public abstract class MainFrameMenu implements MenuBuilder {
         KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
         manager.removeKeyEventDispatcher(keyEventDispatcher);
 
-        if (runProcess != null) {
-            try {
-                runProcess.destroy();
-            } catch (Exception ex) {
-
-            }
-        }
-    }
-
-    private Process runProcess;
-    private boolean runProcessDebug;
-
-    private File runTempFile;
-
-    public synchronized boolean isDebugPaused() {
-        return runProcess != null && runProcessDebug && Main.getDebugHandler().isPaused();
-    }
-
-    public synchronized boolean isDebugRunning() {
-        return runProcess != null && runProcessDebug;
-    }
-
-    public synchronized boolean isRunning() {
-        return runProcess != null && !runProcessDebug;
-    }
-
-    private synchronized void freeRun() {
-        if (runTempFile != null) {
-            runTempFile.delete();
-            runTempFile = null;
-        }
-        runProcess = null;
-        mainFrame.getPanel().clearDebuggerColors();
-        if (runProcessDebug) {
-            Main.getDebugHandler().disconnect();
-        }
-    }
-
-    private void runPlayer(String title, final String exePath, String file, String flashVars) {
-        if (flashVars != null && !flashVars.isEmpty()) {
-            file += "?" + flashVars;
-        }
-        if (!new File(file).exists()) {
-            return;
-        }
-
-        final String ffile = file;
-
-        CancellableWorker runWorker = new CancellableWorker() {
-
-            @Override
-            protected Object doInBackground() throws Exception {
-                Process proc;
-                try {
-                    proc = Runtime.getRuntime().exec("\"" + exePath + "\" \"file://" + ffile + "\"");
-                } catch (IOException ex) {
-                    Logger.getLogger(MainFrameMenu.class.getName()).log(Level.SEVERE, null, ex);
-
-                    return null;
-                }
-                synchronized (this) {
-                    runProcess = proc;
-                }
-                if (runProcessDebug) {
-                    hilightPath("/debugging");
-                }
-                updateComponents();
-                try {
-                    if (proc != null) {
-                        proc.waitFor();
-                    }
-                } catch (InterruptedException ex) {
-                    if (proc != null) {
-                        try {
-                            proc.destroy();
-                        } catch (Exception ex2) {
-                            //ignore
-                        }
-                    }
-                }
-                freeRun();
-                updateComponents();
-                return null;
-            }
-
-            @Override
-            protected void done() {
-                Main.stopWork();
-            }
-
-            @Override
-            public void workerCancelled() {
-                Main.stopWork();
-                synchronized (MainFrameMenu.this) {
-                    if (runProcess != null) {
-                        try {
-                            runProcess.destroy();
-                        } catch (Exception ex) {
-
-                        }
-                    }
-                }
-                freeRun();
-                updateComponents();
-            }
-
-        };
-
-        updateComponents();
-        Main.startWork(title + "...", runWorker);
-        runWorker.execute();
+        Main.stopRun();
     }
 
     public boolean runActionPerformed(ActionEvent evt) {
-        String flashVars = "";//key=val&key2=val2
-        String playerLocation = Configuration.playerLocation.get();
-        if (playerLocation.isEmpty() || (!new File(playerLocation).exists())) {
-            View.showMessageDialog(null, AppStrings.translate("message.playerpath.notset"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-            Main.advancedSettings("paths");
-            return true;
-        }
-        if (swf == null) {
-            return true;
-        }
-        File tempFile;
-        try {
-            tempFile = File.createTempFile("ffdec_run_", ".swf");
-
-            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
-                swf.saveTo(fos);
-            }
-        } catch (IOException ex) {
-            return true;
-
-        }
-        if (tempFile != null) {
-            synchronized (this) {
-                runTempFile = tempFile;
-                runProcessDebug = false;
-            }
-            runPlayer(AppStrings.translate("work.running"), playerLocation, tempFile.getAbsolutePath(), flashVars);
-        }
+        Main.run(swf);
         return true;
     }
 
     public boolean debugActionPerformed(ActionEvent evt) {
-        String flashVars = "";//key=val&key2=val2
-        String playerLocation = Configuration.playerDebugLocation.get();
-        if (playerLocation.isEmpty() || (!new File(playerLocation).exists())) {
-            View.showMessageDialog(null, AppStrings.translate("message.playerpath.debug.notset"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-            Main.advancedSettings("paths");
-            return true;
-        }
-        if (swf == null) {
-            return true;
-        }
-        File tempFile = null;
-
-        try {
-            tempFile = File.createTempFile("ffdec_debug_", ".swf");
-        } catch (Exception ex) {
-
-        }
-        if (tempFile != null) {
-            final File fTempFile = tempFile;
-            CancellableWorker instrumentWorker = new CancellableWorker() {
-
-                @Override
-                protected Object doInBackground() throws Exception {
-
-                    try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(fTempFile))) {
-                        swf.saveTo(fos);
-                    }
-                    //Inject Loader
-                    SWF instrSWF = null;
-                    try (FileInputStream fis = new FileInputStream(fTempFile)) {
-                        instrSWF = new SWF(fis, false, false);
-
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(MainFrameMenu.class
-                                .getName()).log(Level.SEVERE, null, ex);
-                    }
-                    if (instrSWF != null) {
-                        instrSWF.enableDebugging(true, new File("."));
-                        try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(fTempFile))) {
-                            instrSWF.saveTo(fos);
-                        }
-                    }
-                    return null;
-                }
-
-                @Override
-                public void workerCancelled() {
-                    Main.stopWork();
-                }
-
-                @Override
-                protected void done() {
-                    synchronized (MainFrameMenu.this) {
-                        runTempFile = fTempFile;
-                        runProcessDebug = true;
-                    }
-                    Main.stopWork();
-                    runPlayer(AppStrings.translate("work.debugging"), playerLocation, fTempFile.getAbsolutePath(), flashVars);
-                }
-
-            };
-
-            Main.startWork(AppStrings.translate("work.debugging.instrumenting"), instrumentWorker);
-            instrumentWorker.execute();
-        }
+        Main.runDebug(swf);
         return true;
 
     }
 
     public boolean stopActionPerformed(ActionEvent evt) {
-
-        synchronized (this) {
-            if (runProcess != null) {
-                runProcess.destroy();
-            }
-        }
-        freeRun();
-
-        updateComponents();
+        Main.stopRun();
         return true;
     }
 
@@ -1339,7 +1132,6 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     public boolean stepOverActionPerformed(ActionEvent evt) {
-        Main.debuggerNotSuspended();
 
         try {
 
@@ -1356,8 +1148,6 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     public boolean stepIntoActionPerformed(ActionEvent evt) {
-        Main.debuggerNotSuspended();
-
         try {
             DebuggerCommands cmd = Main.getDebugHandler().getCommands();
             mainFrame.getPanel().clearDebuggerColors();
@@ -1373,8 +1163,6 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     public boolean stepOutActionPerformed(ActionEvent evt) {
-        Main.debuggerNotSuspended();
-
         try {
             DebuggerCommands cmd = Main.getDebugHandler().getCommands();
             mainFrame.getPanel().clearDebuggerColors();
@@ -1389,10 +1177,9 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     public boolean continueActionPerformed(ActionEvent evt) {
-        Main.debuggerNotSuspended();
-
         try {
             DebuggerCommands cmd = Main.getDebugHandler().getCommands();
+            mainFrame.getPanel().clearDebuggerColors();
             Main.startWork(AppStrings.translate("work.debugging") + "...", null);
             cmd.sendContinue();
         } catch (IOException ex) {

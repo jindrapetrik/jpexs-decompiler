@@ -539,18 +539,22 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
             throw new IllegalArgumentException("Menu not found: " + path);
         }
         Object o = menuItems.get(path);
-        if (o instanceof JRibbonBand) {
-            ((JRibbonBand) o).setEnabled(enabled);
-        } else if (o instanceof AbstractCommandButton) {
-            ((AbstractCommandButton) o).setEnabled(enabled);
-        } else if (o instanceof RibbonApplicationMenuEntryPrimary) {
-            ((RibbonApplicationMenuEntryPrimary) o).setEnabled(enabled);
-        } else if (o instanceof RibbonApplicationMenuEntryFooter) {
-            ((RibbonApplicationMenuEntryFooter) o).setEnabled(enabled);
-        } else if (o instanceof JComponent) {
-            ((JComponent) o).setEnabled(enabled);
-        } else {
-            throw new IllegalArgumentException("Cannot set enabled to: " + path);
+        try {
+            if (o instanceof JRibbonBand) {
+                ((JRibbonBand) o).setEnabled(enabled);
+            } else if (o instanceof AbstractCommandButton) {
+                ((AbstractCommandButton) o).setEnabled(enabled);
+            } else if (o instanceof RibbonApplicationMenuEntryPrimary) {
+                ((RibbonApplicationMenuEntryPrimary) o).setEnabled(enabled);
+            } else if (o instanceof RibbonApplicationMenuEntryFooter) {
+                ((RibbonApplicationMenuEntryFooter) o).setEnabled(enabled);
+            } else if (o instanceof JComponent) {
+                ((JComponent) o).setEnabled(enabled);
+            } else {
+                throw new IllegalArgumentException("Cannot set enabled to: " + path);
+            }
+        } catch (Exception ex) {
+            //some substance issues, ignore
         }
     }
 
@@ -594,7 +598,11 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
 
                         @Override
                         public void run() {
-                            ribbon.setVisible(rg, val);
+                            try {
+                                ribbon.setVisible(rg, val);
+                            } catch (Exception ex) {
+
+                            }
                         }
                     });
 

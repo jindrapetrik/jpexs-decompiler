@@ -897,7 +897,7 @@ public class SWFInputStream implements AutoCloseable {
         InflaterInputStream dis = new InflaterInputStream(new ByteArrayInputStream(data, offset, length));
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         byte[] buf = new byte[4096];
-        int c = 0;
+        int c;
         while ((c = dis.read(buf)) > 0) {
             baos.write(buf, 0, c);
         }
@@ -1202,11 +1202,7 @@ public class SWFInputStream implements AutoCloseable {
                         break;
                     case DoActionTag.ID:
                     case DoInitActionTag.ID:
-                        if (isAS3) {
-                            doParse = false;
-                        } else {
-                            doParse = true;
-                        }
+                        doParse = !isAS3;
                         break;
                     case ShowFrameTag.ID:
                     case PlaceObjectTag.ID:
@@ -1233,7 +1229,7 @@ public class SWFInputStream implements AutoCloseable {
 
                 }
             }
-            if (parseTags && doParse && parallel1 && tag instanceof TagStub) {
+            if (parseTags && doParse && parallel1 && tag instanceof TagStub && executor != null) {
                 Future<Tag> future = executor.submit(new TagResolutionTask((TagStub) tag, di, level, parallel1, skipUnusualTags, lazy));
                 futureResults.add(future);
             } else {
@@ -1262,7 +1258,9 @@ public class SWFInputStream implements AutoCloseable {
                 }
             }
 
-            executor.shutdown();
+            if (executor != null) {
+                executor.shutdown();
+            }
         }
         return tags;
     }
@@ -1670,7 +1668,7 @@ public class SWFInputStream implements AutoCloseable {
      * @throws IOException
      */
     public Action readAction() throws IOException {
-        int actionCode = -1;
+        int actionCode;
 
         try {
             actionCode = readUI8("actionCode");

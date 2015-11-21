@@ -7,6 +7,7 @@
 *.conflict~
 *.identcache
 *.recompiled.swf
+run_test_*.swf
 Thumbs.db
 /build/
 /reports/

@@ -14,17 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.gui.abc;
+package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.debugger.flash.Variable;
 import com.jpexs.debugger.flash.messages.in.InBreakAtExt;
 import com.jpexs.debugger.flash.messages.in.InFrame;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.DebuggerHandler;
-import com.jpexs.decompiler.flash.gui.DebuggerHandler.VariableChangedListener;
+import com.jpexs.decompiler.flash.gui.DebuggerHandler.BreakListener;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.gui.abc.ABCPanel;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -55,14 +56,23 @@ public class DebugPanel extends JPanel {
     private JTable callStackTable;
     private JTable stackTable;
     private JTabbedPane varTabs;
-    private VariableChangedListener listener;
+    private BreakListener listener;
     private JTextArea traceLogTextarea;
     private int logLength = 0;
     private List<SelectedTab> tabTypes = new ArrayList<>();
+    private boolean loading = false;
 
     public static enum SelectedTab {
 
         LOG, STACK, SCOPECHAIN, LOCALS, REGISTERS, CALLSTACK
+    }
+
+    public synchronized boolean isLoading() {
+        return loading;
+    }
+
+    public synchronized void setLoading(boolean loading) {
+        this.loading = loading;
     }
 
     private SelectedTab selectedTab = null;
@@ -101,11 +111,30 @@ public class DebugPanel extends JPanel {
             }
         });
 
-        Main.getDebugHandler().addVariableChangedListener(listener = new DebuggerHandler.VariableChangedListener() {
+        Main.getDebugHandler().addBreakListener(listener = new DebuggerHandler.BreakListener() {
 
             @Override
-            public void variablesChanged() {
-                refresh();
+            public void doContinue() {
+                View.execInEventDispatch(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        refresh();
+                    }
+
+                });
+            }
+
+            @Override
+            public void breakAt(String scriptName, int line) {
+                View.execInEventDispatch(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        refresh();
+                    }
+                });
+
             }
         });
 
@@ -115,6 +144,9 @@ public class DebugPanel extends JPanel {
             @Override
             public void stateChanged(ChangeEvent e) {
                 if (e.getSource() == varTabs) {
+                    if (isLoading()) {
+                        return;
+                    }
                     synchronized (DebugPanel.this) {
                         int si = varTabs.getSelectedIndex();
                         if (si > -1 && si < tabTypes.size()) {
@@ -135,10 +167,10 @@ public class DebugPanel extends JPanel {
 
             @Override
             public void run() {
+                setLoading(true);
                 synchronized (DebugPanel.this) {
+
                     SelectedTab oldSel = selectedTab;
-                    SelectedTab firstVisible = null;
-                    SelectedTab newSel = null;
                     InFrame f = Main.getDebugHandler().getFrame();
                     if (f != null) {
                         debugRegistersTable.setModel(new ABCPanel.VariablesTableModel(f.registers));
@@ -251,23 +283,24 @@ public class DebugPanel extends JPanel {
                         setVisible(newVisible);
                     }
                     if (!tabTypes.isEmpty()) {
-                        if (oldSel != null && tabTypes.contains(oldSel)) {
-                            selectedTab = oldSel;
-                        } else {
-                            selectedTab = tabTypes.get(0);
+                        if (oldSel != null && !tabTypes.contains(oldSel)) {
+                            oldSel = null;
                         }
-                        varTabs.setSelectedIndex(tabTypes.indexOf(selectedTab));
-                    } else {
-                        selectedTab = null;
                     }
+                    if (oldSel != null) {
+                        selectedTab = oldSel;
+                        varTabs.setSelectedIndex(tabTypes.indexOf(selectedTab));
+                    }
+                    setLoading(false);
                 }
+
             }
         });
 
     }
 
     public void dispose() {
-        Main.getDebugHandler().removeVariableChangedListener(listener);
+        Main.getDebugHandler().removeBreakListener(listener);
     }
 
 }
