@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.IfTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
+import com.jpexs.decompiler.flash.helpers.SWFDecompilerAdapter;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +35,7 @@ import java.util.Map;
  *
  * @author JPEXS
  */
-public class AVM2DeobfuscatorJumps extends AVM2DeobfuscatorSimple {
+public class AVM2DeobfuscatorJumps extends SWFDecompilerAdapter {
 
     @Override
     public void avm2CodeRemoveTraps(String path, int classIndex, boolean isStatic, int scriptIndex, ABC abc, Trait trait, int methodInfo, MethodBody body) throws InterruptedException {
@@ -67,7 +68,8 @@ public class AVM2DeobfuscatorJumps extends AVM2DeobfuscatorSimple {
                     }
                 }
             }
-            removeUnreachableInstructions(body.getCode(), body);
+
+            code.removeDeadCode(body);
         } while (found);
     }
 }

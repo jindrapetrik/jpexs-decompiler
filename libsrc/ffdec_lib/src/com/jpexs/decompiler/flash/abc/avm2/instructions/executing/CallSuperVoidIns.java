@@ -37,19 +37,30 @@ public class CallSuperVoidIns extends InstructionDefinition {
     }
 
     @Override
+    public boolean isNotCompileTimeSupported() {
+        return true;
+    }
+
+    @Override
     public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
-        /*int multinameIndex = ins.getParamAsLong(constants, 0).intValue();
-         int argCount = ins.getParamAsLong(constants, 1).intValue();
-         List<Object> passArguments = new ArrayList<Object>();
+        int multinameIndex = ins.operands[0];
+        int argCount = ins.getParamAsLong(constants, 1).intValue();
+        /*List<Object> passArguments = new ArrayList<Object>();
          for (int i = argCount - 1; i >= 0; i--) {
          passArguments.set(i, lda.operandStack.pop());
-         }
-         //if multiname[multinameIndex] is runtime
-         //pop(name) pop(ns)
-         Object receiver = lda.operandStack.pop();*/
-        lda.executionException = "Call to unknown super method";
-        return false;
+         }*/
+        for (int i = 0; i < argCount; i++) {
+            lda.operandStack.pop();
+        }
+
+        //if multiname[multinameIndex] is runtime
+        //pop(name) pop(ns)
+        resolveMultiname(lda, constants, multinameIndex);
+        Object receiver = lda.operandStack.pop();
+
         //do not push anything
+        //lda.executionException = "Call to unknown super method";
+        return true;
     }
 
     @Override

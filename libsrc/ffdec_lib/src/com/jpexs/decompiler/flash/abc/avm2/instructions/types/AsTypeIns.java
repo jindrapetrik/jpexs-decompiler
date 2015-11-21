@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.AsTypeAVM2Item;
+import com.jpexs.decompiler.flash.ecma.NotCompileTime;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
@@ -40,8 +41,9 @@ public class AsTypeIns extends InstructionDefinition {
         //Long typeIndex = ins.getParamAsLong(constants, 0);
         Object obj = lda.operandStack.pop();
         //if multiname[typeIndex]==obj
-        lda.operandStack.push(obj);
+        //lda.operandStack.push(obj);
         //else push null
+        lda.operandStack.push(NotCompileTime.INSTANCE);
         return true;
     }
 

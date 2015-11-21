@@ -204,25 +204,25 @@ public class ActionScript3DeobfuscatorTest extends ActionScript2TestBase {
                 + "if(a){"
                 + "trace(\"OK1\");"
                 + "}else{"
-                + "trace(\"OK2\");"
+                + "trace(\"FAIL1\");"
                 + "}"
                 + "a = 59;"
                 + "if(b){"
-                + "trace(\"FAIL1\");"
+                + "trace(\"FAIL2\");"
                 + "}else{"
-                + "trace(\"OK3\");"
+                + "trace(\"OK2\");"
                 + "}");
         if (!res.contains("\"OK1\"")) {
             fail("!OK1:" + res);
         }
+        if (res.contains("\"FAIL1\"")) {
+            fail("FAIL1");
+        }
         if (!res.contains("\"OK2\"")) {
             fail("!OK2");
         }
-        if (!res.contains("\"OK3\"")) {
-            fail("!OK3");
-        }
-        if (res.contains("\"FAIL1\"")) {
-            fail("FAIL1");
+        if (res.contains("\"FAIL2\"")) {
+            fail("FAIL2");
         }
     }
 

@@ -51,7 +51,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     public String comment;
 
-    public boolean ignored = false;
+    private boolean ignored = false;
 
     public long mappedOffset = -1;
 
@@ -298,7 +298,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
     }
 
     public String getComment() {
-        if (ignored) {
+        if (isIgnored()) {
             return " ;ignored";
         }
         if ((comment == null) || comment.isEmpty()) {

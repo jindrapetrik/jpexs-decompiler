@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.CallAVM2Item;
+import com.jpexs.decompiler.flash.ecma.NotCompileTime;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.ArrayList;
@@ -36,17 +37,28 @@ public class CallIns extends InstructionDefinition {
     }
 
     @Override
+    public boolean isNotCompileTimeSupported() {
+        return true;
+    }
+
+    @Override
     public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
-        /*int argCount = ins.getParamAsLong(constants, 0).intValue();
-         List<Object> passArguments = new ArrayList<Object>();
+        int argCount = ins.getParamAsLong(constants, 0).intValue();
+        /* List<Object> passArguments = new ArrayList<Object>();
          for (int i = argCount - 1; i >= 0; i--) {
          passArguments.set(i, lda.operandStack.pop());
-         }
-         Object receiver = lda.operandStack.pop();
-         Object function = lda.operandStack.pop();*/
-        lda.executionException = "Call to unknown function";
-        return false;
+         }*/
+        for (int i = 0; i < argCount; i++) {
+            lda.operandStack.pop();
+        }
+
+        Object receiver = lda.operandStack.pop();
+        Object function = lda.operandStack.pop();
+
         //push(result)
+        lda.operandStack.push(NotCompileTime.INSTANCE);
+        //lda.executionException = "Call to unknown function";
+        return true;
     }
 
     @Override

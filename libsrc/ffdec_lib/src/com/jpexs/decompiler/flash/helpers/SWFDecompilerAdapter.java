@@ -28,22 +28,35 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public interface SWFDecompilerListener {
+public class SWFDecompilerAdapter implements SWFDecompilerListener {
 
-    byte[] proxyFileCatched(byte[] data);
+    @Override
+    public byte[] proxyFileCatched(byte[] data) {
+        return null;
+    }
 
-    void swfParsed(SWF swf);
+    @Override
+    public void swfParsed(SWF swf) {
+    }
 
-    void actionListParsed(ActionList actions, SWF swf) throws InterruptedException;
+    @Override
+    public void actionListParsed(ActionList actions, SWF swf) throws InterruptedException {
+    }
 
-    void actionTreeCreated(List<GraphTargetItem> tree, SWF swf) throws InterruptedException;
+    @Override
+    public void actionTreeCreated(List<GraphTargetItem> tree, SWF swf) throws InterruptedException {
+    }
 
-    void abcParsed(ABC abc, SWF swf);
+    @Override
+    public void abcParsed(ABC abc, SWF swf) {
+    }
 
-    void methodBodyParsed(MethodBody body, SWF swf);
+    @Override
+    public void methodBodyParsed(MethodBody body, SWF swf) {
+    }
 
     /**
-     * this method is only called when deobfuscation is enabled and new
+     * This method is only called when deobfuscation is enabled and new
      * deobfuscation mode is selected
      *
      * @param path
@@ -56,5 +69,7 @@ public interface SWFDecompilerListener {
      * @param body
      * @throws InterruptedException
      */
-    void avm2CodeRemoveTraps(String path, int classIndex, boolean isStatic, int scriptIndex, ABC abc, Trait trait, int methodInfo, MethodBody body) throws InterruptedException;
+    @Override
+    public void avm2CodeRemoveTraps(String path, int classIndex, boolean isStatic, int scriptIndex, ABC abc, Trait trait, int methodInfo, MethodBody body) throws InterruptedException {
+    }
 }

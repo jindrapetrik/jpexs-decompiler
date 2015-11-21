@@ -33,6 +33,11 @@ public class PushScopeIns extends InstructionDefinition {
     }
 
     @Override
+    public boolean isNotCompileTimeSupported() {
+        return true;
+    }
+
+    @Override
     public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         lda.scopeStack.push(lda.operandStack.pop());
         return true;

@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.DecLocalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.SubtractAVM2Item;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.flash.ecma.NotCompileTime;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
@@ -40,7 +41,10 @@ public class DecLocalIIns extends InstructionDefinition {
     public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         int locRegIndex = ins.getParamAsLong(constants, 0).intValue();
         Object obj = lda.localRegisters.get(locRegIndex);
-        lda.localRegisters.put(locRegIndex, EcmaScript.toInt32(obj) - 1);
+        if (obj != NotCompileTime.INSTANCE) {
+            lda.localRegisters.put(locRegIndex, EcmaScript.toInt32(obj) - 1);
+        }
+
         return true;
     }
 

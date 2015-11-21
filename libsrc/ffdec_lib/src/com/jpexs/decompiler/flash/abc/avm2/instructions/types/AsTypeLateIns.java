@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.AsTypeAVM2Item;
+import com.jpexs.decompiler.flash.ecma.NotCompileTime;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
@@ -38,8 +39,9 @@ public class AsTypeLateIns extends InstructionDefinition {
         //Object objClass = lda.operandStack.pop();
         Object obj = lda.operandStack.pop();
         //if obj.class=objClass
-        lda.operandStack.push(obj);
+        //lda.operandStack.push(obj);
         //else push null
+        lda.operandStack.push(NotCompileTime.INSTANCE);
         return true;
     }
 

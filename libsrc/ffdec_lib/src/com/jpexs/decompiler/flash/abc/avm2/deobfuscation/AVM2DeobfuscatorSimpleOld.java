@@ -17,9 +17,10 @@
 package com.jpexs.decompiler.flash.abc.avm2.deobfuscation;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
-import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
-import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2ExecutionException;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.FixItemCounterTranslateStack;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.DeobfuscatePopIns;
@@ -69,58 +70,96 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushTrueIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushUndefinedIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.SwapIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceOrConvertTypeIns;
+import com.jpexs.decompiler.flash.abc.avm2.model.FloatValueAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.StringAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.UndefinedAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
-import com.jpexs.decompiler.flash.ecma.NotCompileTime;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerAdapter;
-import com.jpexs.decompiler.flash.helpers.collections.FixItemCounterStack;
+import com.jpexs.decompiler.graph.Graph;
+import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.NotCompileTimeItem;
+import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TranslateException;
+import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.model.FalseItem;
+import com.jpexs.decompiler.graph.model.TrueItem;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
 
 /**
  *
  * @author JPEXS
  */
-public class AVM2DeobfuscatorSimple extends SWFDecompilerAdapter {
+public class AVM2DeobfuscatorSimpleOld extends SWFDecompilerAdapter {
+
+    private static final UndefinedAVM2Item UNDEFINED_ITEM = new UndefinedAVM2Item(null, null);
+
+    private static final NotCompileTimeItem NOT_COMPILE_TIME_UNDEFINED_ITEM = new NotCompileTimeItem(null, null, UNDEFINED_ITEM);
 
     private final int executionLimit = 30000;
 
-    protected boolean removeObfuscationIfs(int classIndex, boolean isStatic, int scriptIndex, ABC abc, MethodBody body, AVM2Instruction inlineIns) throws InterruptedException {
+    protected AVM2Instruction makePush(AVM2ConstantPool cpool, GraphTargetItem graphTargetItem) {
+        if (graphTargetItem instanceof IntegerValueAVM2Item) {
+            IntegerValueAVM2Item iv = (IntegerValueAVM2Item) graphTargetItem;
+            return cpool.makePush(iv.value);
+        } else if (graphTargetItem instanceof FloatValueAVM2Item) {
+            FloatValueAVM2Item fv = (FloatValueAVM2Item) graphTargetItem;
+            return cpool.makePush(fv.value);
+        } else if (graphTargetItem instanceof StringAVM2Item) {
+            StringAVM2Item fv = (StringAVM2Item) graphTargetItem;
+            return cpool.makePush(fv.getValue());
+        } else if (graphTargetItem instanceof TrueItem) {
+            return cpool.makePush(Boolean.TRUE);
+        } else if (graphTargetItem instanceof FalseItem) {
+            return cpool.makePush(Boolean.FALSE);
+        } else if (graphTargetItem instanceof NullAVM2Item) {
+            return cpool.makePush(Null.INSTANCE);
+        } else if (graphTargetItem instanceof UndefinedAVM2Item) {
+            return cpool.makePush(Undefined.INSTANCE);
+        }
+
+        return null;
+    }
+
+    protected boolean removeObfuscationIfs(int classIndex, boolean isStatic, int scriptIndex, ABC abc, MethodBody body, List<AVM2Instruction> inlineIns) throws InterruptedException {
         AVM2Code code = body.getCode();
         if (code.code.isEmpty()) {
             return false;
         }
 
-        Map<Integer, Object> staticRegs = new HashMap<>();
-        if (inlineIns != null && inlineIns.definition instanceof GetLocalTypeIns) {
-            staticRegs.put(((GetLocalTypeIns) inlineIns.definition).getRegisterId(inlineIns), Undefined.INSTANCE);
+        Map<Integer, GraphTargetItem> staticRegs = new HashMap<>();
+        for (AVM2Instruction ins : inlineIns) {
+            if (ins.definition instanceof GetLocalTypeIns) {
+                staticRegs.put(((GetLocalTypeIns) ins.definition).getRegisterId(ins), new UndefinedAVM2Item(ins, null));
+            }
         }
 
         if (code.code.isEmpty()) {
             return false;
         }
 
-        FixItemCounterStack stack = new FixItemCounterStack();
-        LocalDataArea localData = new LocalDataArea();
-        localData.operandStack = stack;
-
+        AVM2LocalData localData = newLocalData(scriptIndex, abc, abc.constants, body, isStatic, classIndex);
         int localReservedCount = body.getLocalReservedCount();
         for (int i = 0; i < code.code.size(); i++) {
             if (Thread.currentThread().isInterrupted()) {
                 throw new InterruptedException();
             }
 
-            localData.clear();
-            initLocalRegs(localData, localReservedCount, body.max_regs, i == 0);
+            localData.scopeStack.clear();
+            localData.localRegs.clear();
+            localData.localRegAssignmentIps.clear();
+            localData.localRegs.clear();
+            initLocalRegs(localData, localReservedCount, body.max_regs);
 
-            if (executeInstructions(staticRegs, body, abc, code, localData, i, code.code.size() - 1, null, inlineIns)) {
-                code.removeDeadCode(body);
-                i--;
-            }
+            executeInstructions(staticRegs, body, abc, code, localData, i, code.code.size() - 1, null, inlineIns);
         }
 
         return false;
@@ -145,21 +184,37 @@ public class AVM2DeobfuscatorSimple extends SWFDecompilerAdapter {
         return result;
     }
 
-    protected void initLocalRegs(LocalDataArea localData, int localReservedCount, int maxRegs, boolean executeFromFirst) {
+    protected AVM2LocalData newLocalData(int scriptIndex, ABC abc, AVM2ConstantPool cpool, MethodBody body, boolean isStatic, int classIndex) {
+        AVM2LocalData localData = new AVM2LocalData();
+        localData.isStatic = isStatic;
+        localData.classIndex = classIndex;
+        localData.localRegs = new HashMap<>(body.max_regs);
+        localData.localRegAssignmentIps = new HashMap<>();
+        localData.scopeStack = new ScopeStack(true);
+        localData.methodBody = body;
+        localData.abc = abc;
+        localData.localRegNames = new HashMap<>();
+        localData.scriptIndex = scriptIndex;
+        localData.ip = 0;
+        localData.code = body.getCode();
+        return localData;
+    }
+
+    protected void initLocalRegs(AVM2LocalData localData, int localReservedCount, int maxRegs) {
         for (int i = 0; i < localReservedCount; i++) {
-            localData.localRegisters.put(i, NotCompileTime.INSTANCE);
+            localData.localRegs.put(i, NOT_COMPILE_TIME_UNDEFINED_ITEM);
         }
         for (int i = localReservedCount; i < maxRegs; i++) {
-            localData.localRegisters.put(i, executeFromFirst ? Undefined.INSTANCE : NotCompileTime.INSTANCE);
+            localData.localRegs.put(i, UNDEFINED_ITEM);
         }
     }
 
-    private boolean executeInstructions(Map<Integer, Object> staticRegs, MethodBody body, ABC abc, AVM2Code code, LocalDataArea localData, int idx, int endIdx, ExecutionResult result, AVM2Instruction inlineIns) throws InterruptedException {
+    private void executeInstructions(Map<Integer, GraphTargetItem> staticRegs, MethodBody body, ABC abc, AVM2Code code, AVM2LocalData localData, int idx, int endIdx, ExecutionResult result, List<AVM2Instruction> inlineIns) throws InterruptedException {
+        List<GraphTargetItem> output = new ArrayList<>();
+
+        FixItemCounterTranslateStack stack = new FixItemCounterTranslateStack("");
         int instructionsProcessed = 0;
 
-        FixItemCounterStack stack = (FixItemCounterStack) localData.operandStack;
-        Set<Long> refs = code.getImportantOffsets(body);
-        boolean modified = false;
         while (true) {
             if (idx > endIdx) {
                 break;
@@ -170,83 +225,56 @@ public class AVM2DeobfuscatorSimple extends SWFDecompilerAdapter {
             }
 
             AVM2Instruction ins = code.code.get(idx);
-            if (instructionsProcessed > 0 && refs.contains(ins.offset)) {
-                break;
+            if (ins.definition instanceof NewFunctionIns) {
+                if (idx + 1 < code.code.size()) {
+                    if (code.code.get(idx + 1).definition instanceof PopIns) {
+                        code.removeInstruction(idx + 1, body);
+                        code.removeInstruction(idx, body);
+                        continue;
+                    }
+                }
+            } else {
+                // do not throw EmptyStackException, much faster
+                int requiredStackSize = ins.getStackPopCount(localData);
+                if (stack.size() < requiredStackSize) {
+                    return;
+                }
+
+                ins.translate(localData, stack, output, Graph.SOP_USE_STATIC, "");
             }
 
-            modified = modified | code.inlineJumpExit();
             InstructionDefinition def = ins.definition;
-            if (inlineIns == ins) {
+
+            if (inlineIns.contains(ins)) {
                 if (def instanceof SetLocalTypeIns) {
                     int regId = ((SetLocalTypeIns) def).getRegisterId(ins);
-                    staticRegs.put(regId, localData.localRegisters.get(regId));
+                    staticRegs.put(regId, localData.localRegs.get(regId).getNotCoerced());
                     code.replaceInstruction(idx, new AVM2Instruction(0, DeobfuscatePopIns.getInstance(), null), body);
                 }
             }
             if (def instanceof GetLocalTypeIns) {
                 int regId = ((GetLocalTypeIns) def).getRegisterId(ins);
                 if (staticRegs.containsKey(regId)) {
-                    AVM2Instruction pushins = abc.constants.makePush(staticRegs.get(regId));
+                    if (stack.isEmpty()) {
+                        return;
+                    }
+
+                    stack.pop();
+                    AVM2Instruction pushins = makePush(abc.constants, staticRegs.get(regId));
                     if (pushins == null) {
-                        break;
+                        return;
                     }
 
                     code.replaceInstruction(idx, pushins, body);
+                    stack.push(staticRegs.get(regId));
                     ins = pushins;
                     def = ins.definition;
                 }
             }
 
-            if (def instanceof NewFunctionIns) {
-                if (idx + 1 < code.code.size()) {
-                    if (code.code.get(idx + 1).definition instanceof PopIns) {
-                        code.removeInstruction(idx + 1, body);
-                        code.removeInstruction(idx, body);
-                        modified = true;
-                        continue;
-                    }
-                }
-            } else {
-                // do not throw EmptyStackException, much faster
-                int requiredStackSize = def.getStackPopCount(ins, abc);
-                if (stack.size() < requiredStackSize) {
-                    break;
-                }
-
-                if (requiredStackSize > 0 && !def.isNotCompileTimeSupported()) {
-                    boolean notCompileTime = false;
-                    for (int i = 0; i < requiredStackSize; i++) {
-                        if (stack.peek(i + 1) == NotCompileTime.INSTANCE) {
-                            notCompileTime = true;
-                            break;
-                        }
-                    }
-
-                    if (notCompileTime) {
-                        break;
-                    }
-                }
-
-                if (localData.scopeStack.size() < -def.getScopeStackDelta(ins, abc)) {
-                    break;
-                }
-
-                boolean supported;
-                try {
-                    localData.jump = null;
-                    supported = def.execute(localData, abc.constants, ins);
-                } catch (AVM2ExecutionException ex) {
-                    supported = false;
-                }
-
-                if (!supported) {
-                    break;
-                }
-            }
-
             boolean ok = false;
             // todo: honfika: order by statistics
-            if (def.isNotCompileTimeSupported() || def instanceof PushByteIns
+            if (def instanceof PushByteIns
                     || def instanceof PushShortIns
                     || def instanceof PushIntIns
                     || def instanceof PushDoubleIns
@@ -289,7 +317,6 @@ public class AVM2DeobfuscatorSimple extends SWFDecompilerAdapter {
                     || def instanceof StrictEqualsIns
                     || def instanceof PopIns
                     || def instanceof GetLocalTypeIns
-                    || def instanceof SetLocalTypeIns
                     || def instanceof NewFunctionIns
                     || def instanceof CoerceOrConvertTypeIns) {
                 ok = true;
@@ -299,16 +326,43 @@ public class AVM2DeobfuscatorSimple extends SWFDecompilerAdapter {
                 break;
             }
 
+            if (def instanceof GetLocalTypeIns) {
+                int regId = ((GetLocalTypeIns) def).getRegisterId(ins);
+                if (staticRegs.containsKey(regId)) {
+                    if (stack.isEmpty()) {
+                        return;
+                    }
+
+                    stack.pop();
+                    stack.push(staticRegs.get(regId));
+                } else {
+                    break;
+                }
+            }
+
             boolean ifed = false;
-            if (def instanceof IfTypeIns && !(def instanceof JumpIns)) {
+            if (def instanceof JumpIns) {
                 long address = ins.offset + ins.getBytesLength() + ins.operands[0];
-                int nidx = code.adr2pos(address);
+                idx = code.adr2pos(address);
+
+                if (idx == -1) {
+                    throw new TranslateException("Jump target not found: " + address);
+                }
+            } else if (def instanceof IfTypeIns) {
+                if (stack.isEmpty()) {
+                    return;
+                }
+
+                GraphTargetItem top = stack.pop();
+                Object res = top.getResult();
+                long address = ins.offset + ins.getBytesLength() + ins.operands[0];
+                int nidx = code.adr2pos(address);//code.indexOf(code.getByAddress(address));
                 AVM2Instruction tarIns = code.code.get(nidx);
 
                 //Some IfType instructions need more than 1 operand, we must pop out all of them
                 int stackCount = -def.getStackDelta(ins, abc);
 
-                if (localData.jump != null) {
+                if (EcmaScript.toBoolean(res)) {
                     //System.err.println("replacing " + ins + " on " + idx + " with jump");
                     AVM2Instruction jumpIns = new AVM2Instruction(0, AVM2Instructions.Jump, new int[]{0});
                     //jumpIns.operands[0] = ins.operands[0] /*- ins.getBytes().length*/ + jumpIns.getBytes().length;
@@ -328,9 +382,8 @@ public class AVM2DeobfuscatorSimple extends SWFDecompilerAdapter {
                     //ins.definition = DeobfuscatePopIns.getInstance();
                     idx++;
                 }
-
-                modified = true;
                 ifed = true;
+                //break;
             } else {
                 idx++;
             }
@@ -347,24 +400,14 @@ public class AVM2DeobfuscatorSimple extends SWFDecompilerAdapter {
             if (ifed) {
                 break;
             }
-
-            if (localData.jump != null) {
-                idx = code.adr2pos(localData.jump);
-
-                if (idx == -1) {
-                    throw new TranslateException("Jump target not found: " + localData.jump);
-                }
-            }
         }
-
-        return modified;
     }
 
     @Override
     public void avm2CodeRemoveTraps(String path, int classIndex, boolean isStatic, int scriptIndex, ABC abc, Trait trait, int methodInfo, MethodBody body) throws InterruptedException {
         AVM2Code code = body.getCode();
         code.removeDeadCode(body);
-        removeObfuscationIfs(classIndex, isStatic, scriptIndex, abc, body, null);
+        removeObfuscationIfs(classIndex, isStatic, scriptIndex, abc, body, new ArrayList<>());
         removeZeroJumps(code, body);
     }
 
@@ -374,6 +417,6 @@ public class AVM2DeobfuscatorSimple extends SWFDecompilerAdapter {
 
         public int instructionsProcessed = -1;
 
-        public Stack<Object> stack = new Stack<>();
+        public TranslateStack stack = new TranslateStack("?");
     }
 }

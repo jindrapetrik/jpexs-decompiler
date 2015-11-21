@@ -32,6 +32,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.Reference;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
+import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -124,6 +125,10 @@ public abstract class InstructionDefinition implements Serializable {
         }
     }
 
+    public boolean isNotCompileTimeSupported() {
+        return false;
+    }
+
     public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) throws AVM2ExecutionException {
         //throw new UnsupportedOperationException("Instruction " + instructionName + " not implemented");
         return false;
@@ -164,18 +169,31 @@ public abstract class InstructionDefinition implements Serializable {
         return 0;
     }
 
+    protected void resolveMultiname(LocalDataArea localData, AVM2ConstantPool constants, int multinameIndex) {
+        if (multinameIndex > 0 && multinameIndex < constants.getMultinameCount()) {
+            Multiname multiname = constants.getMultiname(multinameIndex);
+            if (multiname.needsName()) {
+                Object name = localData.operandStack.pop();
+            }
+            if (multiname.needsNs()) {
+                Object ns = localData.operandStack.pop();
+            }
+        }
+    }
+
     protected FullMultinameAVM2Item resolveMultiname(AVM2LocalData localData, boolean property, TranslateStack stack, AVM2ConstantPool constants, int multinameIndex, AVM2Instruction ins) {
         GraphTargetItem ns = null;
         GraphTargetItem name = null;
         if (multinameIndex > 0 && multinameIndex < constants.getMultinameCount()) {
-            if (constants.getMultiname(multinameIndex).needsName()) {
+            Multiname multiname = constants.getMultiname(multinameIndex);
+            if (multiname.needsName()) {
                 name = stack.pop();
             }
-            if (constants.getMultiname(multinameIndex).needsNs()) {
+            if (multiname.needsNs()) {
                 ns = stack.pop();
             }
-
         }
+
         return new FullMultinameAVM2Item(property, ins, localData.lineStartInstruction, multinameIndex, name, ns);
     }
 
