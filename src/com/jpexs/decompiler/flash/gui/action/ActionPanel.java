@@ -830,6 +830,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         try {
             ActionScript2Parser par = new ActionScript2Parser(mainPanel.getCurrentSwf().version);
             src.setActions(par.actionsFromString(decompiledEditor.getText()));
+            SWF.uncache(src);
             src.setModified();
             setSource(src, false);
 
