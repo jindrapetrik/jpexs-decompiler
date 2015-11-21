@@ -426,7 +426,7 @@ public class Main {
     }
 
     public synchronized static boolean toggleBreakPoint(String scriptName, int line) {
-        if (getDebugHandler().isBreakpointToAdd(scriptName, line) || getDebugHandler().isBreakpointConfirmed(scriptName, line)) {
+        if (getDebugHandler().isBreakpointToAdd(scriptName, line) || getDebugHandler().isBreakpointConfirmed(scriptName, line) || getDebugHandler().isBreakpointInvalid(scriptName, line)) {
             getDebugHandler().removeBreakPoint(scriptName, line);
             return false;
         } else {

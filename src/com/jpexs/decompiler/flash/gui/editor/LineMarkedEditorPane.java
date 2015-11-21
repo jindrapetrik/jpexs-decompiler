@@ -82,7 +82,7 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
         private Color bgColor;
         private Color color;
         private FgPainter fgPainter;
-        private int line;
+        //private int line;
         private int priority;
 
         public FgPainter getForegroundPainter() {
@@ -91,11 +91,10 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
 
         @Override
         public String toString() {
-            return bgColor.toString() + " line " + line + " priority:" + priority;
+            return bgColor.toString() + " priority:" + priority;
         }
 
-        public LineMarker(int line, Color color, Color bgColor, int priority) {
-            this.line = line;
+        public LineMarker(Color color, Color bgColor, int priority) {
             this.bgColor = bgColor;
             this.color = color;
             this.priority = priority;
@@ -109,7 +108,6 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
             int hash = 5;
             hash = 17 * hash + Objects.hashCode(this.bgColor);
             hash = 17 * hash + Objects.hashCode(this.color);
-            hash = 17 * hash + this.line;
             return hash;
         }
 
@@ -125,10 +123,7 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
             if (!Objects.equals(this.bgColor, other.bgColor)) {
                 return false;
             }
-            if (!Objects.equals(this.color, other.color)) {
-                return false;
-            }
-            return this.line == other.line;
+            return (Objects.equals(this.color, other.color));
         }
 
         public Color getBgColor() {
@@ -156,41 +151,45 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
         repaint();
     }
 
-    public void removeColorMarker(int line, Color color, Color bgColor, int priority) {
+    public boolean hasColorMarker(int line, LineMarker lm) {
         if (lineMarkers.containsKey(line)) {
-            LineMarker lm = new LineMarker(line, color, bgColor, priority);
+            return lineMarkers.get(line).contains(lm);
+        }
+        return false;
+    }
+
+    public void removeColorMarker(int line, LineMarker lm) {
+        if (lineMarkers.containsKey(line)) {
             lineMarkers.get(line).remove(lm);
         }
-        repaint();
+        getParent().repaint();
     }
 
-    public void removeColorMarkerOnAllLines(Color color, Color bgColor, int priority) {
+    public void removeColorMarkerOnAllLines(LineMarker lm) {
         for (int line : lineMarkers.keySet()) {
-            removeColorMarker(line, color, bgColor, priority);
+            removeColorMarker(line, lm);
         }
     }
 
-    public void toggleColorMarker(int line, Color color, Color bgColor, int priority) {
+    public void toggleColorMarker(int line, LineMarker lm) {
         if (!lineMarkers.containsKey(line)) {
-            addColorMarker(line, color, bgColor, priority);
+            addColorMarker(line, lm);
         } else {
-            LineMarker m = new LineMarker(line, color, bgColor, priority);
-            if (lineMarkers.get(line).contains(m)) {
-                removeColorMarker(line, color, bgColor, priority);
+            if (lineMarkers.get(line).contains(lm)) {
+                removeColorMarker(line, lm);
             } else {
-                addColorMarker(line, color, bgColor, priority);
+                addColorMarker(line, lm);
             }
         }
-        repaint();
+        getParent().repaint();
     }
 
-    public void addColorMarker(int line, Color color, Color bgColor, int priority) {
+    public void addColorMarker(int line, LineMarker lm) {
         if (!lineMarkers.containsKey(line)) {
             lineMarkers.put(line, Collections.synchronizedSortedSet(new TreeSet<>()));
         }
-        LineMarker marker = new LineMarker(line, color, bgColor, priority);
-        lineMarkers.get(line).add(marker);
-        repaint();
+        lineMarkers.get(line).add(lm);
+        getParent().repaint();
     }
 
     public int getLine() {

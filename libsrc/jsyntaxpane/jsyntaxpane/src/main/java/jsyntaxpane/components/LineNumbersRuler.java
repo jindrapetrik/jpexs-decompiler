@@ -75,7 +75,7 @@ public class LineNumbersRuler extends JPanel
     private Status status;
     private final static int HEIGHT = Integer.MAX_VALUE - 1000000;
     //  Text component this TextTextLineNumber component is in sync with
-    private JEditorPane editor;
+    protected JEditorPane editor; //JPEXS: changed to protected
     private int minimumDisplayDigits = 2;
     //  Keep history information to reduce the number of times the component
     //  needs to be repainted

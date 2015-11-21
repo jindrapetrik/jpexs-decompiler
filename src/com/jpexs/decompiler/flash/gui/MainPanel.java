@@ -2838,10 +2838,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public void clearDebuggerColors() {
         if (abcPanel != null) {
-            abcPanel.decompiledTextArea.removeColorMarkerOnAllLines(DecompiledEditorPane.FG_IP_COLOR, DecompiledEditorPane.BG_IP_COLOR, DecompiledEditorPane.PRIORITY_IP);
+            abcPanel.decompiledTextArea.removeColorMarkerOnAllLines(DecompiledEditorPane.IP_MARKER);
         }
         if (actionPanel != null) {
-            actionPanel.decompiledEditor.removeColorMarkerOnAllLines(DecompiledEditorPane.FG_IP_COLOR, DecompiledEditorPane.BG_IP_COLOR, DecompiledEditorPane.PRIORITY_IP);
+            actionPanel.decompiledEditor.removeColorMarkerOnAllLines(DecompiledEditorPane.IP_MARKER);
         }
     }
 

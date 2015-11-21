@@ -13,11 +13,17 @@
  */
 package jsyntaxpane.components;
 
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Insets;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JEditorPane;
 import javax.swing.text.BadLocationException;
+import jsyntaxpane.SyntaxView;
 import jsyntaxpane.actions.ActionUtils;
 
 /**
@@ -29,6 +35,9 @@ public class LineNumbersBreakpointsRuler extends LineNumbersRuler {
     @Override
     public void install(final JEditorPane editor) {
         super.install(editor);
+        if (editor instanceof LineMarkerPainter) {
+            ((LineMarkerPainter) editor).installLineMarker(this);
+        }
         removeMouseListener(mouseListener);
         mouseListener = new MouseAdapter() {
 
@@ -52,6 +61,40 @@ public class LineNumbersBreakpointsRuler extends LineNumbersRuler {
 
         };
         addMouseListener(mouseListener);
+    }
+
+    @Override
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        if (editor instanceof LineMarkerPainter) {
+            FontMetrics fontMetrics = editor.getFontMetrics(editor.getFont());
+            int lh = fontMetrics.getHeight();
+            Rectangle bounds = g.getClipBounds();
+            int minY = bounds.y;
+            int maxY = minY + bounds.height;
+            int maxLines = ActionUtils.getLineCount(editor);
+            Insets insets = getInsets();
+
+            int currentLine = -1;
+            try {
+                // get current line, and add one as we start from 1 for the display
+                currentLine = ActionUtils.getLineNumber(editor, editor.getCaretPosition()) + 1;
+            } catch (BadLocationException ex) {
+                // this wont happen, even if it does, we can ignore it and we will not have
+                // a current line to worry about...
+            }
+
+            for (int line = 1; line <= maxLines; line++) {
+                int y = line * lh;
+                if (y < minY) {
+                    continue;
+                }
+                if (y - lh > maxY) {
+                    break;
+                }
+                ((LineMarkerPainter) editor).paintLineMarker(g, line, insets.left, y - lh + fontMetrics.getDescent() - 1, y, lh, currentLine == line, maxLines);
+            }
+        }
     }
 
 }

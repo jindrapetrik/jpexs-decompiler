@@ -111,6 +111,18 @@ public class DebugPanel extends JPanel {
             }
         });
 
+        Main.getDebugHandler().addConnectionListener(new DebuggerHandler.ConnectionListener() {
+
+            @Override
+            public void connected() {
+            }
+
+            @Override
+            public void disconnected() {
+                refresh();
+            }
+        });
+
         Main.getDebugHandler().addBreakListener(listener = new DebuggerHandler.BreakListener() {
 
             @Override

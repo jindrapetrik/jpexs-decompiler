@@ -92,6 +92,10 @@ public class DebuggerHandler implements DebugConnectionListener {
 
     public synchronized void removeBreakPoint(String scriptName, int line) {
         if (isBreakpointInvalid(scriptName, line)) {
+            invalidBreakPointMap.get(scriptName).remove(line);
+            if (invalidBreakPointMap.get(scriptName).isEmpty()) {
+                invalidBreakPointMap.remove(scriptName);
+            }
             return;
         }
         if (isBreakpointToAdd(scriptName, line)) {
@@ -160,7 +164,7 @@ public class DebuggerHandler implements DebugConnectionListener {
 
     public boolean addBreakPoint(String scriptName, int line) {
         synchronized (this) {
-            Logger.getLogger(DebuggerHandler.class.getName()).log(Level.INFO, "adding bp " + scriptName + ":" + line);
+            Logger.getLogger(DebuggerHandler.class.getName()).log(Level.FINE, "adding bp " + scriptName + ":" + line);
             if (isBreakpointToRemove(scriptName, line)) {
                 toRemoveBPointMap.get(scriptName).remove(line);
                 if (toRemoveBPointMap.get(scriptName).isEmpty()) {
@@ -169,18 +173,18 @@ public class DebuggerHandler implements DebugConnectionListener {
             }
 
             if (isBreakpointConfirmed(scriptName, line)) {
-                Logger.getLogger(DebuggerHandler.class.getName()).log(Level.INFO, "bp " + scriptName + ":" + line + " already confirmed");
+                Logger.getLogger(DebuggerHandler.class.getName()).log(Level.FINE, "bp " + scriptName + ":" + line + " already confirmed");
                 return true;
             }
             if (isBreakpointInvalid(scriptName, line)) {
-                Logger.getLogger(DebuggerHandler.class.getName()).log(Level.INFO, "bp " + scriptName + ":" + line + " already invalid");
+                Logger.getLogger(DebuggerHandler.class.getName()).log(Level.FINE, "bp " + scriptName + ":" + line + " already invalid");
                 return false;
             }
             if (!toAddBPointMap.containsKey(scriptName)) {
                 toAddBPointMap.put(scriptName, new TreeSet<>());
             }
             toAddBPointMap.get(scriptName).add(line);
-            Logger.getLogger(DebuggerHandler.class.getName()).log(Level.INFO, "bp " + scriptName + ":" + line + " added to todo");
+            Logger.getLogger(DebuggerHandler.class.getName()).log(Level.FINE, "bp " + scriptName + ":" + line + " added to todo");
         }
         try {
             sendBreakPoints(false);
@@ -328,6 +332,15 @@ public class DebuggerHandler implements DebugConnectionListener {
             commands.disconnect();
         }
         commands = null;
+        synchronized (this) {
+            for (String scriptName : confirmedPointMap.keySet()) {
+                if (!toAddBPointMap.containsKey(scriptName)) {
+                    toAddBPointMap.put(scriptName, new TreeSet<>());
+                }
+                toAddBPointMap.get(scriptName).addAll(confirmedPointMap.get(scriptName));
+            }
+            confirmedPointMap.clear();
+        }
         for (ConnectionListener l : clisteners) {
             l.disconnected();
         }
