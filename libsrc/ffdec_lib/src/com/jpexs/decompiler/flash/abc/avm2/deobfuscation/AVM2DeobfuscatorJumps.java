@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.deobfuscation;
 
-import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
@@ -24,7 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.IfTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
-import com.jpexs.decompiler.flash.action.ActionList;
+import com.jpexs.decompiler.flash.helpers.SWFDecompilerAdapter;
 import java.util.List;
 import java.util.Map;
 
@@ -36,19 +35,11 @@ import java.util.Map;
  *
  * @author JPEXS
  */
-public class AVM2DeobfuscatorJumps extends AVM2DeobfuscatorSimple {
-
-    //private final int executionLimit = 30000;
-    @Override
-    public void actionListParsed(ActionList actions, SWF swf) {
-
-    }
+public class AVM2DeobfuscatorJumps extends SWFDecompilerAdapter {
 
     @Override
     public void avm2CodeRemoveTraps(String path, int classIndex, boolean isStatic, int scriptIndex, ABC abc, Trait trait, int methodInfo, MethodBody body) throws InterruptedException {
 
-        //body.getCode().markMappedOffsets();
-        //removeUnreachableInstructions(body.getCode(), cpool, trait, minfo, body);
         AVM2Code code = body.getCode();
 
         boolean found;
@@ -66,12 +57,10 @@ public class AVM2DeobfuscatorJumps extends AVM2DeobfuscatorSimple {
                                 AVM2Instruction srcIns = code.code.get(r);
 
                                 if ((srcIns.definition instanceof JumpIns) || ((srcIns.definition instanceof IfTypeIns) && (r != i - 1))) {
-                                    {
-                                        int oldop = srcIns.operands[0];
-                                        srcIns.operands[0] = (int) (targetAddr - (srcIns.offset + srcIns.getBytesLength()));
-                                        if (srcIns.operands[0] != oldop) {
-                                            found = true;
-                                        }
+                                    int oldop = srcIns.operands[0];
+                                    srcIns.operands[0] = (int) (targetAddr - (srcIns.offset + srcIns.getBytesLength()));
+                                    if (srcIns.operands[0] != oldop) {
+                                        found = true;
                                     }
                                 }
                             }
@@ -79,7 +68,8 @@ public class AVM2DeobfuscatorJumps extends AVM2DeobfuscatorSimple {
                     }
                 }
             }
-            removeUnreachableInstructions(body.getCode(), body);
+
+            code.removeDeadCode(body);
         } while (found);
     }
 }

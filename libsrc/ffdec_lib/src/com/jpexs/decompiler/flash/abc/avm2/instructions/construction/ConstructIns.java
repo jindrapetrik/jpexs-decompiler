@@ -52,7 +52,7 @@ public class ConstructIns extends InstructionDefinition {
          passArguments.set(i, lda.operandStack.pop());
          }
          Object obj = lda.operandStack.pop();*/
-        lda.executionException = "Cannot call constructor";
+        //lda.executionException = "Cannot call constructor";
         return false;
         //call construct property of obj
         //push new instance

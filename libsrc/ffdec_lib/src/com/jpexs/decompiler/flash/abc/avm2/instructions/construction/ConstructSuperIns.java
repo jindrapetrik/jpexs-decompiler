@@ -43,7 +43,7 @@ public class ConstructSuperIns extends InstructionDefinition {
          passArguments.set(i, lda.operandStack.pop());
          }
          Object obj = lda.operandStack.pop();*/
-        lda.executionException = "Cannot call super constructor";
+        //lda.executionException = "Cannot call super constructor";
         return false;
         //call construct property of obj
         //do not push anything

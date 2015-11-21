@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.FindPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
+import com.jpexs.decompiler.flash.ecma.NotCompileTime;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
@@ -36,11 +37,18 @@ public class FindPropertyIns extends InstructionDefinition {
     }
 
     @Override
+    public boolean isNotCompileTimeSupported() {
+        return true;
+    }
+
+    @Override
     public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
-        //int multiIndex = ins.getParamAsLong(constants, 0).intValue();
+        int multinameIndex = ins.operands[0];
         //if is runtime
         //pop(name), pop(ns)
-        lda.executionException = "Cannot find property";
+        resolveMultiname(lda, constants, multinameIndex);
+        lda.operandStack.push(NotCompileTime.INSTANCE);
+        //lda.executionException = "Cannot find property";
         return false;
     }
 

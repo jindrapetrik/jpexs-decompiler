@@ -37,21 +37,31 @@ public class CallPropVoidIns extends InstructionDefinition {
     }
 
     @Override
+    public boolean isNotCompileTimeSupported() {
+        return true;
+    }
+
+    @Override
     public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         //same as callproperty
-/*
-         int multinameIndex = ins.getParamAsLong(constants, 0).intValue();
-         int argCount = ins.getParamAsLong(constants, 1).intValue();
-         List<Object> passArguments = new ArrayList<Object>();
+        int multinameIndex = ins.operands[0];
+        int argCount = ins.getParamAsLong(constants, 1).intValue();
+        /*List<Object> passArguments = new ArrayList<Object>();
          for (int i = argCount - 1; i >= 0; i--) {
          passArguments.set(i, lda.operandStack.pop());
-         }
-         //if multiname[multinameIndex] is runtime
-         //pop(name) pop(ns)
-         Object obj = lda.operandStack.pop();*/
-        lda.executionException = "Call to unknown property";
-        return false;
+         }*/
+        for (int i = 0; i < argCount; i++) {
+            lda.operandStack.pop();
+        }
+
+        //if multiname[multinameIndex] is runtime
+        //pop(name) pop(ns)
+        resolveMultiname(lda, constants, multinameIndex);
+        Object obj = lda.operandStack.pop();
+
         //do not push anything
+        //lda.executionException = "Call to unknown property";
+        return true;
     }
 
     @Override

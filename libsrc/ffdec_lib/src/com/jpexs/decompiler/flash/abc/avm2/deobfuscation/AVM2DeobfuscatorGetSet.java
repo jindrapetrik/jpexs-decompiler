@@ -16,14 +16,12 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.deobfuscation;
 
-import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.FixItemCounterTranslateStack;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.DeobfuscatePopIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.IfTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
@@ -37,10 +35,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.UndefinedAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
-import com.jpexs.decompiler.flash.action.ActionList;
-import com.jpexs.decompiler.flash.ecma.Null;
-import com.jpexs.decompiler.flash.ecma.Undefined;
-import com.jpexs.decompiler.flash.helpers.SWFDecompilerListener;
+import com.jpexs.decompiler.flash.helpers.SWFDecompilerAdapter;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.NotCompileTimeItem;
@@ -59,50 +54,13 @@ import java.util.Map;
  *
  * @author JPEXS
  */
-public class AVM2DeobfuscatorGetSet implements SWFDecompilerListener {
+public class AVM2DeobfuscatorGetSet extends SWFDecompilerAdapter {
 
     private static final UndefinedAVM2Item UNDEFINED_ITEM = new UndefinedAVM2Item(null, null);
 
     private static final NotCompileTimeItem NOT_COMPILE_TIME_UNDEFINED_ITEM = new NotCompileTimeItem(null, null, UNDEFINED_ITEM);
 
     private final int executionLimit = 30000;
-
-    @Override
-    public void actionListParsed(ActionList actions, SWF swf) {
-
-    }
-
-    protected AVM2Instruction makePush(Object ovalue, AVM2ConstantPool cpool) {
-        if (ovalue instanceof Long) {
-            long value = (Long) ovalue;
-            if (value >= -128 && value <= 127) {
-                return new AVM2Instruction(0, AVM2Instructions.PushByte, new int[]{(int) (long) value});
-            } else if (value >= -32768 && value <= 32767) {
-                return new AVM2Instruction(0, AVM2Instructions.PushShort, new int[]{((int) (long) value) & 0xffff});
-            } else {
-                return new AVM2Instruction(0, AVM2Instructions.PushInt, new int[]{cpool.getIntId(value, true)});
-            }
-        }
-        if (ovalue instanceof Double) {
-            return new AVM2Instruction(0, AVM2Instructions.PushDouble, new int[]{cpool.getDoubleId((Double) ovalue, true)});
-        }
-        if (ovalue instanceof String) {
-            return new AVM2Instruction(0, AVM2Instructions.PushString, new int[]{cpool.getStringId((String) ovalue, true)});
-        }
-        if (ovalue instanceof Boolean) {
-            if ((Boolean) ovalue) {
-                return new AVM2Instruction(0, AVM2Instructions.PushTrue, null);
-            }
-            return new AVM2Instruction(0, AVM2Instructions.PushFalse, null);
-        }
-        if (ovalue == Null.INSTANCE) {
-            return new AVM2Instruction(0, AVM2Instructions.PushNull, null);
-        }
-        if (ovalue == Undefined.INSTANCE) {
-            return new AVM2Instruction(0, AVM2Instructions.PushUndefined, null);
-        }
-        return null;
-    }
 
     protected boolean removeObfuscationGetSets(int classIndex, boolean isStatic, int scriptIndex, ABC abc, MethodBody body, List<AVM2Instruction> inlineIns) throws InterruptedException {
         AVM2Code code = body.getCode();
@@ -251,28 +209,6 @@ public class AVM2DeobfuscatorGetSet implements SWFDecompilerListener {
                 break;
             }
         }
-    }
-
-    @Override
-    public void actionTreeCreated(List<GraphTargetItem> tree, SWF swf) {
-    }
-
-    @Override
-    public byte[] proxyFileCatched(byte[] data) {
-        return null;
-    }
-
-    @Override
-    public void swfParsed(SWF swf) {
-    }
-
-    @Override
-    public void abcParsed(ABC abc, SWF swf) {
-    }
-
-    @Override
-    public void methodBodyParsed(MethodBody body, SWF swf) {
-
     }
 
     @Override

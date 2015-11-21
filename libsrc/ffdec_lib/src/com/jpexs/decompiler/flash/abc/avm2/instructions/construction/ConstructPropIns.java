@@ -48,7 +48,7 @@ public class ConstructPropIns extends InstructionDefinition {
          }*/
         //if multiname[multinameIndex] is runtime
         //pop(name) pop(ns)
-        lda.executionException = "Cannot construct property";
+        //lda.executionException = "Cannot construct property";
         return false;
         //create property
         //push new instance

@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.CallPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
+import com.jpexs.decompiler.flash.ecma.NotCompileTime;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.ArrayList;
@@ -37,19 +38,30 @@ public class CallPropertyIns extends InstructionDefinition {
     }
 
     @Override
+    public boolean isNotCompileTimeSupported() {
+        return true;
+    }
+
+    @Override
     public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
-        /*int multinameIndex = ins.getParamAsLong(constants, 0).intValue();
-         int argCount = ins.getParamAsLong(constants, 1).intValue();
-         List<Object> passArguments = new ArrayList<Object>();
+        int multinameIndex = ins.operands[0];
+        int argCount = ins.getParamAsLong(constants, 1).intValue();
+        /*List<Object> passArguments = new ArrayList<Object>();
          for (int i = argCount - 1; i >= 0; i--) {
          passArguments.set(i, lda.operandStack.pop());
-         }
-         //if multiname[multinameIndex] is runtime
-         //pop(name) pop(ns)
-         Object obj = lda.operandStack.pop();*/
-        lda.executionException = "Call to unknown property";
-        return false;
-        //push(result)
+         }*/
+        for (int i = 0; i < argCount; i++) {
+            lda.operandStack.pop();
+        }
+
+        //if multiname[multinameIndex] is runtime
+        //pop(name) pop(ns)
+        resolveMultiname(lda, constants, multinameIndex);
+        Object obj = lda.operandStack.pop();
+
+        lda.operandStack.push(NotCompileTime.INSTANCE);
+        //lda.executionException = "Call to unknown property";
+        return true;
     }
 
     @Override

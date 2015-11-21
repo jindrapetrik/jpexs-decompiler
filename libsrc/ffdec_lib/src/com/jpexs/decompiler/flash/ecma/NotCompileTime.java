@@ -14,28 +14,19 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.abc.avm2;
+package com.jpexs.decompiler.flash.ecma;
 
-import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.decompiler.graph.TranslateStack;
-import java.util.List;
+import java.io.Serializable;
 
-public class UnknownJumpException extends RuntimeException {
+public class NotCompileTime implements Serializable {
 
-    public TranslateStack stack;
+    public static NotCompileTime INSTANCE = new NotCompileTime();
 
-    public int ip;
-
-    public List<GraphTargetItem> output;
-
-    public UnknownJumpException(TranslateStack stack, int ip, List<GraphTargetItem> output) {
-        this.stack = stack;
-        this.ip = ip;
-        this.output = output;
+    private NotCompileTime() {
     }
 
     @Override
     public String toString() {
-        return "Unknown jump to " + ip;
+        return "not_compile_time";
     }
 }

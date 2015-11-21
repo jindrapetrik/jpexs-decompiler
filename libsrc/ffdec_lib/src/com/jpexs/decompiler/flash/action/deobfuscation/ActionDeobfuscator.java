@@ -17,9 +17,6 @@
 package com.jpexs.decompiler.flash.action.deobfuscation;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.abc.types.MethodBody;
-import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.ActionListReader;
@@ -78,7 +75,8 @@ import com.jpexs.decompiler.flash.action.swf5.ActionTypeOf;
 import com.jpexs.decompiler.flash.action.swf6.ActionGreater;
 import com.jpexs.decompiler.flash.action.swf6.ActionStringGreater;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
-import com.jpexs.decompiler.flash.helpers.SWFDecompilerListener;
+import com.jpexs.decompiler.flash.helpers.SWFDecompilerAdapter;
+import com.jpexs.decompiler.flash.helpers.collections.FixItemCounterStack;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.FalseItem;
 import com.jpexs.decompiler.graph.model.PushItem;
@@ -95,7 +93,7 @@ import java.util.Stack;
  *
  * @author JPEXS
  */
-public class ActionDeobfuscator implements SWFDecompilerListener {
+public class ActionDeobfuscator extends SWFDecompilerAdapter {
 
     private final int executionLimit = 5000;
 
@@ -663,27 +661,6 @@ public class ActionDeobfuscator implements SWFDecompilerListener {
                 tree.remove(0);
             }
         }
-    }
-
-    @Override
-    public byte[] proxyFileCatched(byte[] data) {
-        return null;
-    }
-
-    @Override
-    public void swfParsed(SWF swf) {
-    }
-
-    @Override
-    public void abcParsed(ABC abc, SWF swf) {
-    }
-
-    @Override
-    public void methodBodyParsed(MethodBody body, SWF swf) {
-    }
-
-    @Override
-    public void avm2CodeRemoveTraps(String path, int classIndex, boolean isStatic, int scriptIndex, ABC abc, Trait trait, int methodInfo, MethodBody body) throws InterruptedException {
     }
 
     class ExecutionResult {

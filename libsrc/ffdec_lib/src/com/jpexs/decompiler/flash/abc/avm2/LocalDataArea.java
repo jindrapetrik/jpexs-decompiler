@@ -33,8 +33,6 @@ public class LocalDataArea {
 
     public Object returnValue;
 
-    public String executionException;
-
     public AVM2RuntimeInfo runtimeInfo;
 
     private byte[] domainMemory;
@@ -64,6 +62,5 @@ public class LocalDataArea {
         localRegisters.clear();
         jump = null;
         returnValue = null;
-        executionException = null;
     }
 }

@@ -42,7 +42,7 @@ public class DeletePropertyIns extends InstructionDefinition {
          //pop(name) pop(ns)
          Object obj = lda.operandStack.pop();
          //push true if removed*/
-        lda.executionException = "Cannot remove property";
+        //lda.executionException = "Cannot remove property";
         return false;
     }
 

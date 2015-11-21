@@ -18,10 +18,9 @@ package com.jpexs.decompiler.flash.abc.avm2.deobfuscation;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
-import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
-import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2ExecutionException;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.DeobfuscatePopIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
@@ -31,11 +30,12 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalTypeIn
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnValueIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnVoidIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ThrowIns;
+import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.Reference;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
-import com.jpexs.decompiler.flash.ecma.Null;
+import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSource;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -43,13 +43,11 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateException;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -59,7 +57,7 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
+public class AVM2DeobfuscatorRegistersOld extends AVM2DeobfuscatorSimpleOld {
 
     private Set<Integer> getRegisters(AVM2Code code) {
         Set<Integer> regs = new HashSet<>();
@@ -111,7 +109,7 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
 
             MethodBody bodybefore = body;
             body = bodybefore.clone();
-            setReg = getFirstRegisterSetter(assignmentRef, body, abc, ignoredRegs, ignoredRegGets);
+            setReg = getFirstRegisterSetter(assignmentRef, classIndex, isStatic, scriptIndex, abc, body, ignoredRegs, ignoredRegGets);
             //System.err.println("setreg " + setReg + " ass:" + assignmentRef.getVal());
             if (setReg < 0) {
                 break;
@@ -135,7 +133,7 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
             AVM2Instruction assignment = assignmentRef.getVal();
             InstructionDefinition def = assignment.definition;
             if ((def instanceof SetLocalTypeIns) || (def instanceof GetLocalTypeIns /*First usage -> value undefined*/)) {
-                super.removeObfuscationIfs(classIndex, isStatic, scriptIndex, abc, body, assignment);
+                super.removeObfuscationIfs(classIndex, isStatic, scriptIndex, abc, body, Arrays.asList(assignment));
             }
 
             if (def instanceof GetLocalTypeIns) {
@@ -179,24 +177,25 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
         }
     }
 
-    private int getFirstRegisterSetter(Reference<AVM2Instruction> assignment, MethodBody body, ABC abc, Set<Integer> ignoredRegisters, Set<Integer> ignoredGets) throws InterruptedException {
+    private int getFirstRegisterSetter(Reference<AVM2Instruction> assignment, int classIndex, boolean isStatic, int scriptIndex, ABC abc, MethodBody body, Set<Integer> ignoredRegisters, Set<Integer> ignoredGets) throws InterruptedException {
         AVM2Code code = body.getCode();
 
         if (code.code.isEmpty()) {
             return -1;
         }
 
-        return visitCode(assignment, new HashSet<>(), new Stack<>(), body, abc, code, 0, code.code.size() - 1, ignoredRegisters, ignoredGets);
+        return visitCode(assignment, new HashSet<>(), new TranslateStack("deo"), classIndex, isStatic, body, scriptIndex, abc, code, 0, code.code.size() - 1, ignoredRegisters, ignoredGets);
     }
 
-    private int visitCode(Reference<AVM2Instruction> assignment, Set<Integer> visited, Stack<Object> stack, MethodBody body, ABC abc, AVM2Code code, int idx, int endIdx, Set<Integer> ignored, Set<Integer> ignoredGets) throws InterruptedException {
-        LocalDataArea localData = new LocalDataArea();
-        initLocalRegs(localData, body.getLocalReservedCount(), body.max_regs, false);
-        localData.localRegisters.put(0, Null.INSTANCE); // this
+    private int visitCode(Reference<AVM2Instruction> assignment, Set<Integer> visited, TranslateStack stack, int classIndex, boolean isStatic, MethodBody body, int scriptIndex, ABC abc, AVM2Code code, int idx, int endIdx, Set<Integer> ignored, Set<Integer> ignoredGets) throws InterruptedException {
+        List<GraphTargetItem> output = new ArrayList<>();
+        AVM2LocalData localData = newLocalData(scriptIndex, abc, abc.constants, body, isStatic, classIndex);
+        initLocalRegs(localData, body.getLocalReservedCount(), body.max_regs);
+        localData.localRegs.put(0, new NullAVM2Item(null, null)); // this
 
         List<Integer> toVisit = new ArrayList<>();
         toVisit.add(idx);
-        List<Stack<Object>> toVisitStacks = new ArrayList<>();
+        List<TranslateStack> toVisitStacks = new ArrayList<>();
         toVisitStacks.add(stack);
         outer:
         while (!toVisit.isEmpty()) {
@@ -221,17 +220,12 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
                     //System.err.println("" + idx + ": " + ins + " stack:" + stack.size());
 
                 // do not throw EmptyStackException, much faster
-                int requiredStackSize = def.getStackPopCount(ins, abc);
+                int requiredStackSize = ins.getStackPopCount(localData);
                 if (stack.size() < requiredStackSize) {
                     continue outer;
                 }
 
-                localData.operandStack = stack;
-                try {
-                    ins.definition.execute(localData, abc.constants, ins);
-                } catch (AVM2ExecutionException ex) {
-                    Logger.getLogger(AVM2DeobfuscatorRegisters.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                ins.translate(localData, stack, output, Graph.SOP_USE_STATIC, "");
 
                 //if (!(def instanceof KillIns))
                 if (def instanceof SetLocalTypeIns) {
@@ -311,9 +305,7 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
                             continue;
                         }
                         toVisit.add(nidx);
-                        @SuppressWarnings("unchecked")
-                        Stack<Object> cloneStack = (Stack<Object>) stack.clone();
-                        toVisitStacks.add(cloneStack);
+                        toVisitStacks.add((TranslateStack) stack.clone());
                     }
                 }
                 /*if (ins.definition instanceof IfTypeIns) {
