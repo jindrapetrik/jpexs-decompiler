@@ -206,7 +206,8 @@ public class ActionScript3DeobfuscatorTest extends ActionScript2TestBase {
                 + "}else{"
                 + "trace(\"FAIL1\");"
                 + "}"
-                + "a = 59;"
+                //TODO:
+                //+ "a = 59;"
                 + "if(b){"
                 + "trace(\"FAIL2\");"
                 + "}else{"
