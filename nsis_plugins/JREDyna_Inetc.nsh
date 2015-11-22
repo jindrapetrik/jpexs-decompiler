@@ -52,14 +52,14 @@ Function CUSTOM_PAGE_JREINFO
 
 
 NoFound:
-  !insertmacro MUI_HEADER_TEXT "JRE Installation Required" "This application requires Java ${JRE_VERSION} or higher"
-  ${NSD_CreateLabel} 0 0 100% 100% "This application requires installation of the Java Runtime Environment. This will be downloaded and installed as part of the installation."
+  !insertmacro MUI_HEADER_TEXT "$(STRING_JRE_REQUIRED_TITLE)" "$(STRING_JRE_REQUIRED)"
+  ${NSD_CreateLabel} 0 0 100% 100% "$(STRING_JRE_REQUITED_INFO)"
   pop $1
   goto ShowDialog
 
 FoundOld:
-  !insertmacro MUI_HEADER_TEXT "JRE Update Required" "This application requires Java ${JRE_VERSION} or higher"
-  ${NSD_CreateLabel} 0 0 100% 100% "This application requires a more recent version of the Java Runtime Environment. This will be downloaded and installed as part of the installation."
+  !insertmacro MUI_HEADER_TEXT "$(STRING_JRE_UPDATEREQUIRED_TITLE)" "$(STRING_JRE_UPDATEREQUIRED)"
+  ${NSD_CreateLabel} 0 0 100% 100% "$(STRING_JRE_UPDATEREQUIRED_INFO)"
   pop $1
   goto ShowDialog
 
@@ -91,12 +91,12 @@ Function DownloadAndInstallJREIfNecessary
   Push $0
   Push $1
 
-  DetailPrint "Detecting JRE Version"
+  DetailPrint "$(STRING_JRE_DETECTVERSION)"
   Push "${JRE_VERSION}"
   Call DetectJRE
   Pop $0	; Get return value from stack
   Pop $1	; get JRE path (or error message)
-  DetailPrint "JRE Version detection complete - result = $1"
+  DetailPrint "$(STRING_JRE_DETECTCOMPLETE)$1"
 
 
   strcmp $0 "OK" End downloadJRE
@@ -110,19 +110,19 @@ downloadJRE:
   ${EndIf}
   Pop $JRE_URL
 
-  DetailPrint "About to download JRE from $JRE_URL"
+  DetailPrint "$(STRING_JRE_WILLDOWNLOAD)$JRE_URL"
   Inetc::get "$JRE_URL" "$TEMP\jre_Setup.exe" /END
   Pop $0 # return value = exit code, "OK" if OK
-  DetailPrint "Download result = $0"
+  DetailPrint "$(STRING_JRE_DOWNRESULT)$0"
 
   strcmp $0 "OK" downloadsuccessful
-  MessageBox MB_ABORTRETRYIGNORE|MB_ICONSTOP "Cannot download Java. You can download it later manually." /SD IDIGNORE IDRETRY downloadJRE IDIGNORE End
+  MessageBox MB_ABORTRETRYIGNORE|MB_ICONSTOP "$(STRING_JRE_CANNOTDOWNLOAD)" /SD IDIGNORE IDRETRY downloadJRE IDIGNORE End
   Abort
  
 downloadsuccessful:
 
 
-  DetailPrint "Launching JRE setup"
+  DetailPrint "$(STRING_JRE_LAUNCHSETUP)"
   
   IfSilent doSilent
   ExecWait '"$TEMP\jre_setup.exe" REBOOT=Suppress /L \"$TEMP\jre_setup.log\"' $0
@@ -132,14 +132,14 @@ doSilent:
   
 
 jreSetupFinished:
-  DetailPrint "JRE Setup finished"
+  DetailPrint "$(STRING_JRE_SETUPFINISHED)"
   Delete "$TEMP\jre_setup.exe"
   StrCmp $0 "0" InstallVerif 0
-  Push "The JRE setup has been abnormally interrupted - return code $0"
+  Push "$(STRING_JRE_INTERRUPTED)$0"
   Goto ExitInstallJRE
  
 InstallVerif:
-  DetailPrint "Checking the JRE Setup's outcome"
+  DetailPrint "$(STRING_JRE_SETUPOUTCOME)"
   Push "${JRE_VERSION}"
   Call DetectJRE  
   Pop $0	  ; DetectJRE's return value
@@ -147,7 +147,7 @@ InstallVerif:
   StrCmp $0 "OK" 0 JavaVerStillWrong
   Goto JREPathStorage
 JavaVerStillWrong:
-  Push "Unable to find JRE with version above ${JRE_VERSION}, even though the JRE setup was successful$\n$\n$1"
+  Push "$(STRING_JRE_UNABLEFINDAFTER)$\n$\n$1"
   Goto ExitInstallJRE
  
 JREPathStorage:
@@ -158,7 +158,7 @@ JREPathStorage:
  
 ExitInstallJRE:
   Pop $1
-  MessageBox MB_ABORTRETRYIGNORE|MB_ICONSTOP "Unable to install Java. You can installl it later manually.$\n$\n$1" /SD IDIGNORE IDRETRY downloadJRE IDIGNORE End
+  MessageBox MB_ABORTRETRYIGNORE|MB_ICONSTOP "$(STRING_JRE_UNABLEINSTALL)$\n$\n$1" /SD IDIGNORE IDRETRY downloadJRE IDIGNORE End
   Pop $1 	; Restore $1
   Pop $0 	; Restore $0
   Abort
@@ -229,20 +229,20 @@ GetJRE:
   IfFileExists "$2\bin\java.exe" 0 NoFound
 
   ${VersionCompare} $0 $1 $3 ; $3 now contains the result of the comparison
-  DetailPrint "Comparing version $0 to $1 results in $3"
+  DetailPrint "$(STRING_JRE_DETECTCOMPARE_1)$0$(STRING_JRE_DETECTCOMPARE_2)$1$(STRING_JRE_DETECTCOMPARE_3)$3"
   intcmp $3 1 FoundOld
   goto FoundNew
  
 NoFound:
   ; No JRE found
   strcpy $0 "0"
-  strcpy $1 "No JRE Found"
+  strcpy $1 "$(STRING_JRE_DETECTCOMPLETE_NO)"
   Goto DetectJREEnd
  
 FoundOld:
   ; An old JRE was found
   strcpy $0 "-1"
-  strcpy $1 "Old JRE found"
+  strcpy $1 "$(STRING_JRE_DETECTCOMPLETE_OLD)"
   Goto DetectJREEnd  
 FoundNew:
   ; A suitable JRE was found 

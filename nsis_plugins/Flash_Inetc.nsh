@@ -29,8 +29,8 @@ Function CUSTOM_PAGE_FLASHINFO
   pop $1
 
 
-  !insertmacro MUI_HEADER_TEXT "Flash Player ActiveX control required" "This application requires Flash ActiveX control"
-  ${NSD_CreateLabel} 0 0 100% 100% "This application requires installation of the Flash ActiveX control. This will be downloaded and installed as part of the installation."
+  !insertmacro MUI_HEADER_TEXT $(STRING_FLASH_AX_REQUIRED_TITLE) $(STRING_FLASH_AX_REQUIRED)  
+  ${NSD_CreateLabel} 0 0 100% 100% $(STRING_FLASH_AX_WILLINSTALL)
   pop $1
   goto ShowDialog
 
@@ -49,29 +49,29 @@ Function DownloadAndInstallFlashIfNecessary
   Push $0
   Push $1
 
-  DetailPrint "Detecting Flash ActiveX"
+  DetailPrint "$(STRING_FLASH_AX_DETECTING)"
   SetRegView 32
   ClearErrors
   ReadRegStr $R0 HKCR "CLSID\{D27CDB6E-AE6D-11cf-96B8-444553540000}" ""
   IfErrors downloadFlash 
-  DetailPrint "Flash ActiveX already installed"   
+  DetailPrint "$(STRING_FLASH_AX_ALREADYINSTALLED)"   
   Goto End
 
 downloadFlash:
-  DetailPrint "Result: Flash Active X is missing."
-  DetailPrint "About to download Flash from ${FLASH_URL}"
+  DetailPrint "$(STRING_FLASH_AX_MISSING)"
+  DetailPrint "$(STRING_FLASH_AX_WILLDOWNLOAD) ${FLASH_URL}"
   Inetc::get "${FLASH_URL}" "$TEMP\flash_ax_setup.exe" /END
   Pop $0 # return value = exit code, "OK" if OK
-  DetailPrint "Download result = $0"
+  DetailPrint "$(STRING_FLASH_AX_DOWNRESULT)$0"
 
   strcmp $0 "OK" downloadsuccessful
-  MessageBox MB_ABORTRETRYIGNORE|MB_ICONSTOP "Cannot download Flash ActiveX. You can download it later manually or use our own flash viewer." /SD IDIGNORE IDRETRY downloadFlash IDIGNORE End
+  MessageBox MB_ABORTRETRYIGNORE|MB_ICONSTOP "$(STRING_FLASH_AX_CANNOTDOWNLOAD)" /SD IDIGNORE IDRETRY downloadFlash IDIGNORE End
   Abort
 
 downloadsuccessful:
 
 
-  DetailPrint "Launching Flash setup"
+  DetailPrint "$(STRING_FLASH_AX_LAUNCHSETUP)"
   
   IfSilent doSilent
   ExecWait '"$TEMP\flash_ax_setup.exe"' $0
@@ -81,24 +81,24 @@ doSilent:
   
 
 flashSetupFinished:
-  DetailPrint "Flash Setup finished"
+  DetailPrint "$(STRING_FLASH_AX_SETUPFINISHED)"
   Delete "$TEMP\flash_ax_setup.exe"
   StrCmp $0 "0" InstallVerif 0
-  Push "The Flash setup has been abnormally interrupted - return code $0"
+  Push "$(STRING_FLASH_AX_INTERRUPTED) $0"
   Goto ExitInstallFlash
  
 InstallVerif:
-  DetailPrint "Checking the Flash Setup's outcome"
+  DetailPrint "$(STRING_FLASH_AX_SETUPOUTCOME)"
   SetRegView 32
   ClearErrors
   ReadRegStr $R0 HKCR "CLSID\{D27CDB6E-AE6D-11cf-96B8-444553540000}" ""
   IfErrors 0 ExitInstallFlash 
-  Push "Unable to find Flash ActiveX, even though the Flash setup was successful$\n$\n$1"
+  Push "$(STRING_FLASH_AX_UNABLEFINDAFTER)$\n$\n$1"
   Goto ExitInstallFlash
   
 ExitInstallFlash:
   Pop $1
-  MessageBox MB_ABORTRETRYIGNORE|MB_ICONSTOP "Unable to install Flash ActiveX. You can download it later manually or use our own flash viewer.\n$\n$1" /SD IDIGNORE IDRETRY downloadFlash IDIGNORE End
+  MessageBox MB_ABORTRETRYIGNORE|MB_ICONSTOP "$(STRING_FLASH_AX_UNABLEINSTALL)\n$\n$1" /SD IDIGNORE IDRETRY downloadFlash IDIGNORE End
   Pop $1 	; Restore $1
   Pop $0 	; Restore $0
   Abort

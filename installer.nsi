@@ -6,18 +6,24 @@
 ;--------------------------------
 ;General
 
-;These are defined in Ant script: 
-;!define APP_VER "4.0"
-;!define APP_VER_MAJOR 4
-;!define APP_VER_MINOR 0
-;!define APP_URL "http://www.free-decompiler.com/flash/"
-;!define APP_PUBLISHER "JPEXS"
-;!define APP_NAME "JPEXS Free Flash Decompiler"
-;!define JRE_VERSION "1.8"
+;These are defined in Ant script:
+!ifndef APP_VER 
+  !define APP_VER "0.0"
+  !define APP_VER_MAJOR 0
+  !define APP_VER_MINOR 0
+  !define APP_URL "https://www.free-decompiler.com/flash/"
+  !define APP_PUBLISHER "JPEXS"
+  !define APP_NAME "JPEXS Free Flash Decompiler"
+  !define JRE_VERSION "1.8"
+!endif
+
+  Unicode true
+
+
 !define APP_EXENAME "ffdec.exe"
 
-!addplugindir "nsis_plugins\ansi\"
-;!addplugindir "nsis_plugins\unicode\"
+;!addplugindir "nsis_plugins\ansi\"
+!addplugindir "nsis_plugins\unicode\"
 
 
 SetCompressor /SOLID lzma
@@ -72,8 +78,6 @@ SetCompressor /SOLID lzma
 !insertmacro MUI_UNPAGE_WELCOME
 !insertmacro MUI_UNPAGE_INSTFILES
 
-
-
 !include LogicLib.nsh
  
 ; Return on top of stack the total size of the selected (installed) sections, formated as DWORD
@@ -126,7 +130,7 @@ Function StrLoc
    $R6 = TempStr (temp)*/
  
   ;Get input from user
-  Exch $R0
+  Exch $R0                         
   Exch
   Exch $R1
   Exch 2
@@ -382,22 +386,64 @@ var SMDir
 
 ;--------------------------------
 ;Languages
- 
-  !insertmacro MUI_LANGUAGE "English"
-  !insertmacro MUI_LANGUAGE "Czech"  
-  !insertmacro MUI_LANGUAGE "SimpChinese"
-  !insertmacro MUI_LANGUAGE "Dutch"
-  !insertmacro MUI_LANGUAGE "French"
-  !insertmacro MUI_LANGUAGE "German"
-  !insertmacro MUI_LANGUAGE "Hungarian"
-  !insertmacro MUI_LANGUAGE "Polish"
-  !insertmacro MUI_LANGUAGE "Portuguese"
-  !insertmacro MUI_LANGUAGE "PortugueseBR"
-  !insertmacro MUI_LANGUAGE "Russian"
-  !insertmacro MUI_LANGUAGE "Spanish"
-  !insertmacro MUI_LANGUAGE "Swedish"
-  !insertmacro MUI_LANGUAGE "Ukrainian"
 
+
+
+
+
+
+!define !IfExist `!insertmacro _!IfExist ""`
+
+!define !IfNExist `!insertmacro _!IfExist "n"`
+    !macro _!IfExist _OP _FilePath
+        !ifdef !IfExistIsTrue
+            !undef !IfExistIsTrue
+        !endif
+        !tempfile "!IfExistTmp"
+        !system `IF EXIST "${_FilePath}" Echo !define "!IfExistIsTrue" > "${!IfExistTmp}"`
+        !include /NONFATAL "${!IfExistTmp}"
+        !delfile /NONFATAL "${!IfExistTmp}"
+        !undef !IfExistTmp
+        !if${_OP}def !IfExistIsTrue
+    !macroend
+
+!macro LANG_LOAD LANGLOAD
+  !insertmacro MUI_LANGUAGE "${LANGLOAD}"
+  ${!IfExist} "nsis_locales\${LANGLOAD}.nsh"  
+    !verbose push
+    !verbose 0
+    !include "nsis_locales\${LANGLOAD}.nsh"
+    !verbose pop
+    !undef LANG
+  !endif
+!macroend
+ 
+!macro LANG_STRING NAME VALUE
+  LangString "${NAME}" ${LANG_${LANG}} "${VALUE}"
+!macroend
+ 
+!macro LANG_UNSTRING NAME VALUE
+  !insertmacro LANG_STRING "un.${NAME}" "${VALUE}"
+!macroend
+
+
+ 
+  !insertmacro LANG_LOAD "English"
+  !insertmacro LANG_LOAD "Catalan"    
+  !insertmacro LANG_LOAD "Czech"  
+  !insertmacro LANG_LOAD "SimpChinese"
+  !insertmacro LANG_LOAD "Dutch"
+  !insertmacro LANG_LOAD "French"
+  !insertmacro LANG_LOAD "German"
+  !insertmacro LANG_LOAD "Hungarian"
+  !insertmacro LANG_LOAD "Polish"
+  !insertmacro LANG_LOAD "Portuguese"
+  !insertmacro LANG_LOAD "PortugueseBR"
+  !insertmacro LANG_LOAD "Russian"
+  !insertmacro LANG_LOAD "Spanish"
+  !insertmacro LANG_LOAD "Swedish"
+  !insertmacro LANG_LOAD "Ukrainian"
+  !insertmacro LANG_LOAD "Italian"
 
 
 ;--------------------------------
@@ -431,7 +477,7 @@ var SMDir
 !macroend
 
 Function HelpUsClick
-  ExecShell "Open" "http://www.free-decompiler.com/flash/help_us.html"
+  ExecShell "Open" "https://www.free-decompiler.com/flash/help_us.html"
 FunctionEnd
 
 
@@ -530,14 +576,14 @@ Function CUSTOM_PAGE_HELPUS
   pop $1
 
 
-  !insertmacro MUI_HEADER_TEXT "Help us" "Do you know you can help us?"
-  ${NSD_CreateLabel} 0 0 100% 50 "This whole decompiler is Free and OpenSource. If you want to support us, you can tell other people about our decompiler. Use link to our pages, share a word."
+  !insertmacro MUI_HEADER_TEXT "$(STRING_HELP_US)" "$(STRING_HELP_US_DOYOU)"
+  ${NSD_CreateLabel} 0 0 100% 50  "$(STRING_HELP_US_FREE)"
   pop $1
-  ${NSD_CreateLabel} 0 75 100% 50 "If you wish to express your appreciation for the time and resources the author has spent developing, we also do accept and appreciate monetary donations."
+  ${NSD_CreateLabel} 0 75 100% 50  "$(STRING_HELP_US_DONATE)"
   pop $1
-  ${NSD_CreateLabel} 0 150 125 25 "Click here for more info:"
+  ${NSD_CreateLabel} 0 150 200 25  "$(STRING_HELP_US_MORE)"
   pop $1
-  ${NSD_CreateButton} 130 145 75 25 "Help us!"
+  ${NSD_CreateButton} 225 145 80 25 "$(STRING_HELP_US_BUTTON)"
   pop $1
   ${NSD_OnClick} $1 HelpUsClick
   nsDialogs::Show
@@ -680,7 +726,7 @@ FunctionEnd
 
 
 Section "FFDec" SecDummy
-
+                                      
   SetShellVarContext all
 
   SetOutPath "$INSTDIR"
@@ -755,18 +801,16 @@ var f
 var pgname
 var pghtml
 
-Section "Download PlayerGlobal.swc" SecPlayerGlobal
-checkadobe:
-DetailPrint "Checking Adobe site for newest PlayerGlobal.swc file"
+Section "$(STRING_SWC)" SecPlayerGlobal
+;checkadobe:
+DetailPrint "$(STRING_SWC_CHECK)"
 GetTempFileName $pghtml
 inetc::get /SILENT /USERAGENT "${APP_NAME} Setup" "https://www.adobe.com/support/flashplayer/downloads.html" "$pghtml"
 Pop $0
 StrCmp $0 "OK" dlok
-MessageBox MB_ABORTRETRYIGNORE|MB_ICONSTOP "PlayerGlobal.SWC was not found on Adobe webpages. You can download it later manually." /SD IDIGNORE IDRETRY checkadobe IDIGNORE exit
-;MessageBox MB_ABORTRETRYIGNORE|MB_ICONSTOP "PlayerGlobal.SWC was not found on Adobe webpages. You can download it later manually. (Error returned was: $0, tempfile: $pghtml)" /SD IDIGNORE IDRETRY checkadobe IDIGNORE exit
-Abort
+MessageBox MB_OK "$(STRING_SWC_NOTFOUND)"
+Goto exit
 dlok:
-
 StrCpy $pgfound 0
 
 FileOpen $f "$pghtml" r
@@ -790,9 +834,8 @@ loop:
 done:
   FileClose $f
   StrCmp $pgfound 2 +3
-  MessageBox MB_ABORTRETRYIGNORE|MB_ICONSTOP "PlayerGlobal.SWC was not found on Adobe webpages. You can download it later manually." /SD IDIGNORE IDRETRY checkadobe IDIGNORE exit
-Abort
-
+  MessageBox MB_OK "$(STRING_SWC_NOTFOUND)"
+  Goto exit
 
   ${StrRPos} $pos $txt "/"
   IntOp $pos $pos + 1
@@ -801,21 +844,22 @@ Abort
 
   IfFileExists "$APPDATA\JPEXS\FFDec\flashlib\$pgname" swcexists
     CreateDirectory "$APPDATA\JPEXS\FFDec\flashlib"
-    DetailPrint "Starting download PlayerGlobal.swc"
+    DetailPrint "$(STRING_STARTING_DOWNLOAS) PlayerGlobal.swc"
     inetc::get /USERAGENT "${APP_NAME} Setup" $txt "$APPDATA\JPEXS\FFDec\flashlib\$pgname"
     Pop $0
     StrCmp $0 "OK" saved
-    MessageBox MB_ABORTRETRYIGNORE|MB_ICONSTOP "Failed to download PlayerGlobal.SWC from Adobe webpages. You can download it later manually." /SD IDIGNORE IDRETRY checkadobe IDIGNORE exit
-    Abort
+    MessageBox MB_OK "$(STRING_SWC_NOTFOUND)"
+    Goto exit
+
     saved:
-     DetailPrint "PlayerGlobal.swc saved to $APPDATA\JPEXS\FFDec\flashlib\$pgname"
+     DetailPrint "PlayerGlobal.swc $(STRING_SAVED_TO) $APPDATA\JPEXS\FFDec\flashlib\$pgname"
   Goto exit
   swcexists:
-     DetailPrint "$APPDATA\JPEXS\FFDec\flashlib\$pgname already exists, skipping download"
+     DetailPrint "$APPDATA\JPEXS\FFDec\flashlib\$pgname $(STRING_EXISTS_SKIP_DOWNLOAD)"
   exit:
 SectionEnd
 
-Section "Desktop Shortcut"
+Section $(STRING_DESKTOP_SHORTCUT) SecShortcut
 SetShellVarContext all
 CreateShortCut "$DESKTOP\${APP_NAME}.lnk" "$INSTDIR\${APP_EXENAME}" ""
 SectionEnd
@@ -826,7 +870,7 @@ Function .onInit
   SectionSetFlags ${SecDummy} $0  
 FunctionEnd
 
-Section "Add to context menu" SecContextMenu
+Section "$(STRING_ADD_CONTEXT_MENU)" SecContextMenu
     SetRegView 64
     Push "swf"
     Call AddToExtContextMenu
@@ -844,23 +888,13 @@ SectionEnd
 ;--------------------------------
 ;Descriptions
 
-  ;Language strings
-  ;LangString DESC_SecDummy ${LANG_ENGLISH} "Application GUI and Libraries"
-  ;LangString DESC_SecDummy ${LANG_CZECH} "Aplika�n� rozhran� a knihovny"
-
-  ;LangString DESC_PlayerGlobal ${LANG_ENGLISH} "Download FlashPlayer library from Adobe site - useful for ActionScript direct editation and other features"
-  ;LangString DESC_PlayerGlobal ${LANG_CZECH} "St�hnout knihovnu FlashPlayeru ze str�nek Adobe - u�ite�n� pro p��mou editaci ActionScriptu a dal�� v�ci"
-
   ;Assign language strings to sections
   !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
-    !insertmacro MUI_DESCRIPTION_TEXT ${SecDummy} "Application GUI and Libraries"
-    !insertmacro MUI_DESCRIPTION_TEXT ${SecPlayerGlobal} "Download FlashPlayer library from Adobe site - useful for ActionScript direct editation and other features"   
-    !insertmacro MUI_DESCRIPTION_TEXT ${SecContextMenu} "Adds FFDec to context menu of SWF and GFX files in windows explorer."
+    !insertmacro MUI_DESCRIPTION_TEXT ${SecDummy} "$(STRING_SECTION_APP)"
+    !insertmacro MUI_DESCRIPTION_TEXT ${SecPlayerGlobal} "$(STRING_SECTION_SWC)" 
+    !insertmacro MUI_DESCRIPTION_TEXT ${SecContextMenu} "$(STRING_SECTION_CONTEXT_MENU)"
+    !insertmacro MUI_DESCRIPTION_TEXT ${SecShortcut} "$(STRING_SECTION_SHORTCUT)"
   !insertmacro MUI_FUNCTION_DESCRIPTION_END
-
-         
-;LangString DESC_UninstLocal ${LANG_ENGLISH} "Remove user configuration"
-;LangString DESC_UninstLocal ${LANG_CZECH} "Odstranit u�ivatelskou konfiguraci"
 
 
 
@@ -869,7 +903,7 @@ Var mycheckbox
 Var uninstlocal
 
 Function un.ModifyUnWelcome
-${NSD_CreateCheckbox} 120u -18u 50% 12u "Remove user configuration"
+${NSD_CreateCheckbox} 120u -18u 50% 12u "$(STRING_UNINST_USER)"
 Pop $mycheckbox
 SetCtlColors $mycheckbox "" ${MUI_BGCOLOR}
 ;${NSD_Check} $mycheckbox ; Check it by default
