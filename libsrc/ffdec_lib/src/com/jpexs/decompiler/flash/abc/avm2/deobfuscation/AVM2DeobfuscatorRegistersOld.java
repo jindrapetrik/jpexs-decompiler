@@ -219,7 +219,7 @@ public class AVM2DeobfuscatorRegistersOld extends AVM2DeobfuscatorSimpleOld {
 
                 AVM2Instruction ins = code.code.get(idx);
                 InstructionDefinition def = ins.definition;
-                System.err.println("" + idx + ": " + ins + " stack:" + stack.size());
+                //System.err.println("" + idx + ": " + ins + " stack:" + stack.size());
 
                 // do not throw EmptyStackException, much faster
                 int requiredStackSize = ins.getStackPopCount(localData);
