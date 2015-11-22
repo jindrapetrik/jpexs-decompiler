@@ -181,6 +181,7 @@ public class AVM2DeobfuscatorSimple extends SWFDecompilerAdapter {
                     int regId = ((SetLocalTypeIns) def).getRegisterId(ins);
                     staticRegs.put(regId, localData.localRegisters.get(regId));
                     code.replaceInstruction(idx, new AVM2Instruction(0, DeobfuscatePopIns.getInstance(), null), body);
+                    modified = true;
                 }
             }
             if (def instanceof GetLocalTypeIns) {
@@ -192,6 +193,7 @@ public class AVM2DeobfuscatorSimple extends SWFDecompilerAdapter {
                     }
 
                     code.replaceInstruction(idx, pushins, body);
+                    modified = true;
                     ins = pushins;
                     def = ins.definition;
                 }
