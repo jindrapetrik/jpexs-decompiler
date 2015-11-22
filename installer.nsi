@@ -409,13 +409,11 @@ var SMDir
 
 !macro LANG_LOAD LANGLOAD
   !insertmacro MUI_LANGUAGE "${LANGLOAD}"
-  ${!IfExist} "nsis_locales\${LANGLOAD}.nsh"  
-    !verbose push
-    !verbose 0
-    !include "nsis_locales\${LANGLOAD}.nsh"
-    !verbose pop
-    !undef LANG
-  !endif
+  !verbose push
+  !verbose 0
+  !include "nsis_locales/${LANGLOAD}.nsh"
+  !verbose pop
+  !undef LANG
 !macroend
  
 !macro LANG_STRING NAME VALUE
