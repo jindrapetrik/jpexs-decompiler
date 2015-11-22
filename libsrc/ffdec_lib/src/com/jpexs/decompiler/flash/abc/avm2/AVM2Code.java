@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorGetSet;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorJumps;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorRegisters;
+import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorRegistersOld;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorSimple;
 import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2ExecutionException;
 import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2VerifyErrorException;
@@ -349,8 +350,7 @@ public class AVM2Code implements Cloneable {
 
     public static final int DAT_DEBUG_TYPE = OPT_U8 + 0x05;
 
-    public static final int DAT_REGISTER_INDEX = OPT_U8 + 0x06;
-
+    //public static final int DAT_REGISTER_INDEX = OPT_U8 + 0x06;
     public static final int DAT_LINENUM = OPT_U30 + 0x07;
 
     public static final int DAT_LOCAL_REG_INDEX = OPT_U30 + 0x08;
@@ -2335,7 +2335,7 @@ public class AVM2Code implements Cloneable {
                 new AVM2DeobfuscatorSimple().avm2CodeRemoveTraps(path, classIndex, isStatic, scriptIndex, abc, trait, methodInfo, body);
             }
             try (Statistics s = new Statistics("AVM2DeobfuscatorRegisters")) {
-                new AVM2DeobfuscatorRegisters().avm2CodeRemoveTraps(path, classIndex, isStatic, scriptIndex, abc, trait, methodInfo, body);
+                new AVM2DeobfuscatorRegistersOld().avm2CodeRemoveTraps(path, classIndex, isStatic, scriptIndex, abc, trait, methodInfo, body);
             }
             try (Statistics s = new Statistics("AVM2DeobfuscatorJumps")) {
                 new AVM2DeobfuscatorJumps().avm2CodeRemoveTraps(path, classIndex, isStatic, scriptIndex, abc, trait, methodInfo, body);
@@ -2399,7 +2399,7 @@ public class AVM2Code implements Cloneable {
             } else {
                 for (int i = 0; i < ins.definition.operands.length; i++) {
                     int op = ins.definition.operands[i];
-                    if (op == DAT_REGISTER_INDEX/* || op == DAT_LOCAL_REG_INDEX ???*/) {
+                    if (op == DAT_LOCAL_REG_INDEX) {
                         handleRegister(stats, ins.operands[i]);
                     }
                 }

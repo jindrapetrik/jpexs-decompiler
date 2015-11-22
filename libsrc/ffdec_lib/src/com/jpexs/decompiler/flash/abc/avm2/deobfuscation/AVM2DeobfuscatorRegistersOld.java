@@ -24,8 +24,10 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.DeobfuscatePopIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.debug.DebugIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocalTypeIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.KillIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnValueIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnVoidIns;
@@ -72,7 +74,7 @@ public class AVM2DeobfuscatorRegistersOld extends AVM2DeobfuscatorSimpleOld {
             } else {
                 for (int p = 0; p < ins.definition.operands.length; p++) {
                     int op = ins.definition.operands[p];
-                    if (op == AVM2Code.DAT_REGISTER_INDEX || op == AVM2Code.DAT_LOCAL_REG_INDEX) {
+                    if (op == AVM2Code.DAT_LOCAL_REG_INDEX) {
                         int regId = ins.operands[p];
                         regs.add(regId);
                     }
@@ -217,7 +219,7 @@ public class AVM2DeobfuscatorRegistersOld extends AVM2DeobfuscatorSimpleOld {
 
                 AVM2Instruction ins = code.code.get(idx);
                 InstructionDefinition def = ins.definition;
-                    //System.err.println("" + idx + ": " + ins + " stack:" + stack.size());
+                System.err.println("" + idx + ": " + ins + " stack:" + stack.size());
 
                 // do not throw EmptyStackException, much faster
                 int requiredStackSize = ins.getStackPopCount(localData);
@@ -226,8 +228,6 @@ public class AVM2DeobfuscatorRegistersOld extends AVM2DeobfuscatorSimpleOld {
                 }
 
                 ins.translate(localData, stack, output, Graph.SOP_USE_STATIC, "");
-
-                //if (!(def instanceof KillIns))
                 if (def instanceof SetLocalTypeIns) {
                     int regId = ((SetLocalTypeIns) def).getRegisterId(ins);
                     if (!ignored.contains(regId)) {
@@ -240,10 +240,11 @@ public class AVM2DeobfuscatorRegistersOld extends AVM2DeobfuscatorSimpleOld {
                         assignment.setVal(ins);
                         return regId;
                     }
-                } else {
+                } else if (!(def instanceof KillIns) && !(def instanceof DebugIns)) {
+                    //can be inclocal, declocal, hasnext...
                     for (int p = 0; p < ins.definition.operands.length; p++) {
                         int op = ins.definition.operands[p];
-                        if (op == AVM2Code.DAT_REGISTER_INDEX/* || op == AVM2Code.DAT_LOCAL_REG_INDEX ???*/) {
+                        if (op == AVM2Code.DAT_LOCAL_REG_INDEX) {
                             int regId = ins.operands[p];
                             if (!ignored.contains(regId)) {
                                 assignment.setVal(ins);
