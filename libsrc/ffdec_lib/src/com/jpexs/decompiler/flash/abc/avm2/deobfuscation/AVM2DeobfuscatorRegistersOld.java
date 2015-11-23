@@ -146,37 +146,11 @@ public class AVM2DeobfuscatorRegistersOld extends AVM2DeobfuscatorSimpleOld {
             listedLastBodies.add(bodybefore);
         }
 
+        body.getCode().removeDeadCode(body);
+
         originalBody.exceptions = body.exceptions;
         originalBody.setCode(body.getCode());
-        body.getCode().removeDeadCode(body);
-        //System.err.println("/deo");
-    }
 
-    private void replaceSingleUseRegisters(Map<Integer, GraphTargetItem> singleRegisters, List<AVM2Instruction> setInss, int classIndex, boolean isStatic, int scriptIndex, ABC abc, AVM2ConstantPool cpool, Trait trait, MethodInfo minfo, MethodBody body) throws InterruptedException {
-        AVM2Code code = body.getCode();
-
-        for (int i = 0; i < code.code.size(); i++) {
-            if (Thread.currentThread().isInterrupted()) {
-                throw new InterruptedException();
-            }
-
-            AVM2Instruction ins = code.code.get(i);
-            if (((setInss == null) || setInss.contains(ins)) && (ins.definition instanceof SetLocalTypeIns)) {
-                SetLocalTypeIns slt = (SetLocalTypeIns) ins.definition;
-                int regId = slt.getRegisterId(ins);
-                if (singleRegisters.containsKey(regId)) {
-                    code.replaceInstruction(i, new AVM2Instruction(ins.offset, DeobfuscatePopIns.getInstance(), null), body);
-                }
-            }
-
-            if (ins.definition instanceof GetLocalTypeIns) {
-                GetLocalTypeIns glt = (GetLocalTypeIns) ins.definition;
-                int regId = glt.getRegisterId(ins);
-                if (singleRegisters.containsKey(regId)) {
-                    code.replaceInstruction(i, cpool.makePush(singleRegisters.get(regId).getResult()), body);
-                }
-            }
-        }
     }
 
     private int getFirstRegisterSetter(Reference<AVM2Instruction> assignment, int classIndex, boolean isStatic, int scriptIndex, ABC abc, MethodBody body, Set<Integer> ignoredRegisters, Set<Integer> ignoredGets) throws InterruptedException {

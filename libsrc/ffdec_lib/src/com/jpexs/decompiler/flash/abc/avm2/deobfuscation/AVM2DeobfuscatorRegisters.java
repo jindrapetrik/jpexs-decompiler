@@ -148,9 +148,9 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
             listedLastBodies.add(bodybefore);
         }
 
+        body.getCode().removeDeadCode(body);
         originalBody.exceptions = body.exceptions;
         originalBody.setCode(body.getCode());
-        body.getCode().removeDeadCode(body);
         //System.err.println("/deo");
     }
 

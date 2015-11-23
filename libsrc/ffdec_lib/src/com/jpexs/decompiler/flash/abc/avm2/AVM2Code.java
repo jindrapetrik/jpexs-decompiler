@@ -2088,9 +2088,9 @@ public class AVM2Code implements Cloneable {
 
             @Override
             public int updateOperandOffset(long insAddr, long targetAddress, int offset) {
-                if (insAddr == -1) { //do not check exceptions
-                    return offset;
-                }
+                /*if (insAddr == -1) {
+                 return offset;
+                 }*/
                 adr2pos(targetAddress);
                 return offset;
             }

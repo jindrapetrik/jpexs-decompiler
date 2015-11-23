@@ -789,24 +789,31 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
     }
 
     public void setDecompiledEditMode(boolean val) {
-        if (val) {
-            lastDecompiled = decompiledTextArea.getText();
-        } else {
-            decompiledTextArea.setText(lastDecompiled);
-        }
+        View.execInEventDispatch(new Runnable() {
 
-        decompiledTextArea.setEditable(val);
-        saveDecompiledButton.setVisible(val);
-        saveDecompiledButton.setEnabled(false);
-        editDecompiledButton.setVisible(!val);
-        experimentalLabel.setVisible(!val);
-        cancelDecompiledButton.setVisible(val);
-        decompiledTextArea.getCaret().setVisible(true);
-        decLabel.setIcon(val ? View.getIcon("editing16") : null);
-        detailPanel.setVisible(!val);
+            @Override
+            public void run() {
+                if (val) {
+                    lastDecompiled = decompiledTextArea.getText();
+                } else {
+                    decompiledTextArea.setText(lastDecompiled);
+                }
 
-        decompiledTextArea.ignoreCarret = val;
-        decompiledTextArea.requestFocusInWindow();
+                decompiledTextArea.setEditable(val);
+                saveDecompiledButton.setVisible(val);
+                saveDecompiledButton.setEnabled(false);
+                editDecompiledButton.setVisible(!val);
+                experimentalLabel.setVisible(!val);
+                cancelDecompiledButton.setVisible(val);
+                decompiledTextArea.getCaret().setVisible(true);
+                decLabel.setIcon(val ? View.getIcon("editing16") : null);
+                detailPanel.setVisible(!val);
+
+                decompiledTextArea.ignoreCarret = val;
+                decompiledTextArea.requestFocusInWindow();
+            }
+        });
+
     }
 
     private void editDecompiledButtonActionPerformed(ActionEvent evt) {
