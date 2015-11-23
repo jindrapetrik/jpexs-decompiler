@@ -32,6 +32,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
+import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFField;
 import com.jpexs.decompiler.graph.DottedChain;
@@ -196,6 +197,8 @@ public final class MethodBody implements Cloneable {
             removeTraps(abc, trait, scriptIndex, classIndex, isStatic, path);
             restoreControlFlow(abc.constants, trait, abc.method_info.get(method_info));
         }
+
+        ((Tag) abc.parentTag).setModified(true);
     }
 
     public void removeInstruction(int pos) {

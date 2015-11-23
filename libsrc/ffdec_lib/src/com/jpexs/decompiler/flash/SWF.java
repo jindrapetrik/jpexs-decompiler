@@ -178,11 +178,8 @@ import java.util.Random;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
@@ -3112,6 +3109,8 @@ public final class SWF implements SWFContainerItem, Timelined {
                 tag.getABC().removeTraps();
                 tag.getABC().restoreControlFlow();
             }
+
+            ((Tag) tag).setModified(true);
         }
     }
 
