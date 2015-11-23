@@ -398,9 +398,9 @@ public class DebuggerHandler implements DebugConnectionListener {
 
         Main.getMainFrame().getPanel().updateMenu();
 
-        enlog(DebuggerConnection.class);
-        enlog(DebuggerCommands.class);
-        enlog(DebuggerHandler.class);
+        //enlog(DebuggerConnection.class);
+        //enlog(DebuggerCommands.class);
+        //enlog(DebuggerHandler.class);
         try {
             con.getMessage(InVersion.class);
         } catch (IOException ex) {
