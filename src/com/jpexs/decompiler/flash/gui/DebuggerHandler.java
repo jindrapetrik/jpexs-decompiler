@@ -361,7 +361,7 @@ public class DebuggerHandler implements DebugConnectionListener {
     }
 
     private static void enlog(Class<?> cls) {
-        Level level = Level.INFO;
+        Level level = Level.FINEST;
 
         Logger mylog = Logger.getLogger(cls.getName());
         mylog.setLevel(level);
@@ -400,7 +400,7 @@ public class DebuggerHandler implements DebugConnectionListener {
 
         //enlog(DebuggerConnection.class);
         //enlog(DebuggerCommands.class);
-        enlog(DebuggerHandler.class);
+        //enlog(DebuggerHandler.class);
         try {
             con.getMessage(InVersion.class);
         } catch (IOException ex) {
@@ -433,7 +433,7 @@ public class DebuggerHandler implements DebugConnectionListener {
             modulePaths = new HashMap<>();
             classToModule = new HashMap<>();
             //Pattern patMainFrame = Pattern.compile("^Actions for Scene ([0-9]+): Frame ([0-9]+) of Layer Name .*$");
-            //Pattern patSymbol = Pattern.compile("^Actions for Symbol ([0-9]+): Frame ([0-9]+) of Layer Name .*$");             
+            //Pattern patSymbol = Pattern.compile("^Actions for Symbol ([0-9]+): Frame ([0-9]+) of Layer Name .*$");
             //Pattern patAS2 = Pattern.compile("^([^:]+): .*\\.as$");
             Pattern patAS3 = Pattern.compile("^(.*);(.*);(.*)\\.as$");
             for (int file : moduleNames.keySet()) {
@@ -468,10 +468,12 @@ public class DebuggerHandler implements DebugConnectionListener {
             commands.setSwfLoadNotify();
             commands.setGetterTimeout(1500);
             commands.setSetterTimeout(5000);
-            con.wideLines = commands.getOption("wide_line_player", "false").equals("true");
-            if (con.wideLines) {
-                commands.setOption("wide_line_debugger", "on");
-            }
+            /*
+             //TODO:
+             con.wideLines = commands.getOption("wide_line_player", "false").equals("true");
+             if (con.wideLines) {
+             commands.setOption("wide_line_debugger", "on");
+             }*/
             commands.squelch(true);
 
             swfs = commands.getSwfInfo(1);
@@ -531,8 +533,10 @@ public class DebuggerHandler implements DebugConnectionListener {
 
                     String newBreakScriptName = "unknown";
                     if (modulePaths.containsKey(message.file)) {
-                        //Logger.getLogger(DebuggerCommands.class.getName()).log(Level.SEVERE, "Invalid file: " + message.file);
                         newBreakScriptName = modulePaths.get(message.file);
+                    } else {
+                        Logger.getLogger(DebuggerCommands.class.getName()).log(Level.SEVERE, "Invalid file: " + message.file);
+                        return;
                     }
 
                     try {
