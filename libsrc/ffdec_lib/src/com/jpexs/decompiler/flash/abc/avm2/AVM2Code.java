@@ -23,9 +23,7 @@ import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorGetSet;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorJumps;
-import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorRegisters;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorRegistersOld;
-import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorSimple;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorSimpleOld;
 import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2ExecutionException;
 import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2VerifyErrorException;
@@ -354,7 +352,7 @@ public class AVM2Code implements Cloneable {
     //public static final int DAT_REGISTER_INDEX = OPT_U8 + 0x06;
     public static final int DAT_LINENUM = OPT_U30 + 0x07;
 
-    public static final int DAT_LOCAL_REG_INDEX = OPT_U30 + 0x08;
+    public static final int DAT_LOCAL_REG_INDEX = OPT_U8 + 0x08;
 
     public static final int DAT_SLOT_INDEX = OPT_U30 + 0x09;
 
