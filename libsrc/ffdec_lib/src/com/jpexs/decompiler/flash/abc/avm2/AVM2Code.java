@@ -349,10 +349,11 @@ public class AVM2Code implements Cloneable {
 
     public static final int DAT_DEBUG_TYPE = OPT_U8 + 0x05;
 
-    //public static final int DAT_REGISTER_INDEX = OPT_U8 + 0x06;
+    public static final int DAT_REGISTER_INDEX = OPT_U8 + 0x06;
+
     public static final int DAT_LINENUM = OPT_U30 + 0x07;
 
-    public static final int DAT_LOCAL_REG_INDEX = OPT_U8 + 0x08;
+    public static final int DAT_LOCAL_REG_INDEX = OPT_U30 + 0x08;
 
     public static final int DAT_SLOT_INDEX = OPT_U30 + 0x09;
 
