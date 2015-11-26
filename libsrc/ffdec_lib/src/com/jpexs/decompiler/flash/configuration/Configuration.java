@@ -94,10 +94,6 @@ public class Configuration {
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("")
-    public static final ConfigurationItem<Boolean> deobfuscationOldMode = null;
-
-    @ConfigurationDefaultBoolean(false)
-    @ConfigurationCategory("")
     public static final ConfigurationItem<Boolean> cacheOnDisk = null;
 
     @ConfigurationDefaultBoolean(false)

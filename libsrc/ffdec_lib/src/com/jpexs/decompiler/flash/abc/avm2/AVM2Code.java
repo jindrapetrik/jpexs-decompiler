@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.abc.avm2;
 import com.jpexs.decompiler.flash.EndOfStreamException;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ABCInputStream;
-import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorGetSet;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorJumps;
@@ -31,7 +30,6 @@ import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2Graph;
 import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2GraphSource;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.DeobfuscatePopIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.IfTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.UnknownInstruction;
@@ -245,9 +243,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.xml.DXNSIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.xml.DXNSLateIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.xml.EscXAttrIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.xml.EscXElemIns;
-import com.jpexs.decompiler.flash.abc.avm2.model.BooleanAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.HasNextAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.InitPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewFunctionAVM2Item;
@@ -278,7 +274,6 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
-import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -287,13 +282,10 @@ import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.DottedChain;
-import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.decompiler.graph.NotCompileTimeItem;
 import com.jpexs.decompiler.graph.ScopeStack;
-import com.jpexs.decompiler.graph.TranslateException;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.ExitItem;
@@ -1053,6 +1045,14 @@ public class AVM2Code implements Cloneable {
         }
     }
 
+    public void markMappedOffsets() {
+        int ofs = 0;
+        for (int i = 0; i < code.size(); i++) {
+            code.get(i).mappedOffset = ofs;
+            ofs += code.get(i).getBytesLength();
+        }
+    }
+
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder();
@@ -1290,26 +1290,13 @@ public class AVM2Code implements Cloneable {
                         if (markOffsets) {
                             writer.append("", ins.mappedOffset > -1 ? ins.mappedOffset : ofs);
                         }
-                        int fixBranch = ins.getFixBranch();
-                        if (fixBranch > -1) {
-                            if (ins.definition instanceof IfTypeIns) {
-                                for (int i = 0; i < -ins.definition.getStackDelta(ins, null/*IfTypeIns do not require ABCs*/); i++) {
-                                    writer.appendNoHilight(DeobfuscatePopIns.NAME).newLine();
-                                }
-                                if (fixBranch == 0) { // jump
-                                    writer.appendNoHilight(JumpIns.NAME + " ofs" + Helper.formatAddress(ofs + ins.getBytesLength() + ins.operands[0]));
-                                } else {
-                                    // nojump, ignore
-                                }
-                            }
-                            // TODO: lookupswitch ?
+
+                        if (ins.changeJumpTo > -1) {
+                            writer.appendNoHilight(ins.definition.instructionName + " ofs" + Helper.formatAddress(pos2adr(ins.changeJumpTo)));
                         } else {
-                            if (ins.changeJumpTo > -1) {
-                                writer.appendNoHilight(ins.definition.instructionName + " ofs" + Helper.formatAddress(pos2adr(ins.changeJumpTo)));
-                            } else {
-                                writer.appendNoHilight(ins.toStringNoAddress(constants, new ArrayList<>()));
-                            }
+                            writer.appendNoHilight(ins.toStringNoAddress(constants, new ArrayList<>()));
                         }
+
                         writer.newLine();
                         outputMap.add(ip);
                     }
@@ -2288,71 +2275,21 @@ public class AVM2Code implements Cloneable {
         //checkValidOffsets(body);
     }
 
-    @SuppressWarnings("unchecked")
-    private static AVM2LocalData prepareBranchLocalData(AVM2LocalData localData) {
-        AVM2LocalData ret = new AVM2LocalData();
-        ret.isStatic = localData.isStatic;
-        ret.classIndex = localData.classIndex;
-        ret.localRegs = new HashMap<>(localData.localRegs);
-        ret.scopeStack = (ScopeStack) (localData.scopeStack).clone();
-        ret.methodBody = localData.methodBody;
-        ret.abc = localData.abc;
-        ret.localRegNames = localData.localRegNames;
-        ret.fullyQualifiedNames = localData.fullyQualifiedNames;
-        ret.parsedExceptions = localData.parsedExceptions;
-        ret.finallyJumps = localData.finallyJumps;
-        ret.ignoredSwitches = localData.ignoredSwitches;
-        ret.ignoredSwitches2 = localData.ignoredSwitches2;
-        ret.scriptIndex = localData.scriptIndex;
-        ret.localRegAssignmentIps = localData.localRegAssignmentIps;
-        ret.ip = localData.ip;
-        ret.refs = localData.refs;
-        ret.code = localData.code;
-        return ret;
-    }
-
-    private int removeTrapsOld(Trait trait, int methodInfo, MethodBody body, ABC abc, int scriptIndex, int classIndex, boolean isStatic, String path) throws InterruptedException {
-        removeDeadCode(body);
-        AVM2LocalData localData = new AVM2LocalData();
-        localData.isStatic = isStatic;
-        localData.classIndex = classIndex;
-        localData.localRegs = new HashMap<>();
-        localData.scopeStack = new ScopeStack();
-        localData.methodBody = body;
-        localData.abc = abc;
-        localData.localRegNames = body.getLocalRegNames(abc);
-        localData.scriptIndex = scriptIndex;
-        localData.ip = 0;
-        HashMap<Integer, List<Integer>> refs = visitCode(body);
-        localData.refs = refs;
-        localData.code = this;
-        int ret = 0;
-        ret += removeTrapsOld(trait, methodInfo, body, localData, new AVM2GraphSource(this, false, -1, -1, new HashMap<>(), new ScopeStack(), abc, body, new HashMap<>(), new ArrayList<>(), new HashMap<>(), refs), 0, path, refs);
-        removeIgnored(body);
-        removeDeadCode(body);
-
-        return ret;
-    }
-
     public int removeTraps(Trait trait, int methodInfo, MethodBody body, ABC abc, int scriptIndex, int classIndex, boolean isStatic, String path) throws InterruptedException {
-        if (Configuration.deobfuscationOldMode.get()) {
-            return removeTrapsOld(trait, methodInfo, body, abc, scriptIndex, classIndex, isStatic, path);
-        } else {
-            SWFDecompilerPlugin.fireAvm2CodeRemoveTraps(path, classIndex, isStatic, scriptIndex, abc, trait, methodInfo, body);
-            try (Statistics s = new Statistics("AVM2DeobfuscatorGetSet")) {
-                new AVM2DeobfuscatorGetSet().avm2CodeRemoveTraps(path, classIndex, isStatic, scriptIndex, abc, trait, methodInfo, body);
-            }
-            try (Statistics s = new Statistics("AVM2DeobfuscatorSimple")) {
-                new AVM2DeobfuscatorSimpleOld().avm2CodeRemoveTraps(path, classIndex, isStatic, scriptIndex, abc, trait, methodInfo, body);
-            }
-            try (Statistics s = new Statistics("AVM2DeobfuscatorRegisters")) {
-                new AVM2DeobfuscatorRegistersOld().avm2CodeRemoveTraps(path, classIndex, isStatic, scriptIndex, abc, trait, methodInfo, body);
-            }
-            try (Statistics s = new Statistics("AVM2DeobfuscatorJumps")) {
-                new AVM2DeobfuscatorJumps().avm2CodeRemoveTraps(path, classIndex, isStatic, scriptIndex, abc, trait, methodInfo, body);
-            }
-            return 1;
+        SWFDecompilerPlugin.fireAvm2CodeRemoveTraps(path, classIndex, isStatic, scriptIndex, abc, trait, methodInfo, body);
+        try (Statistics s = new Statistics("AVM2DeobfuscatorGetSet")) {
+            new AVM2DeobfuscatorGetSet().avm2CodeRemoveTraps(path, classIndex, isStatic, scriptIndex, abc, trait, methodInfo, body);
         }
+        try (Statistics s = new Statistics("AVM2DeobfuscatorSimple")) {
+            new AVM2DeobfuscatorSimpleOld().avm2CodeRemoveTraps(path, classIndex, isStatic, scriptIndex, abc, trait, methodInfo, body);
+        }
+        try (Statistics s = new Statistics("AVM2DeobfuscatorRegisters")) {
+            new AVM2DeobfuscatorRegistersOld().avm2CodeRemoveTraps(path, classIndex, isStatic, scriptIndex, abc, trait, methodInfo, body);
+        }
+        try (Statistics s = new Statistics("AVM2DeobfuscatorJumps")) {
+            new AVM2DeobfuscatorJumps().avm2CodeRemoveTraps(path, classIndex, isStatic, scriptIndex, abc, trait, methodInfo, body);
+        }
+        return 1;
     }
 
     private void handleRegister(CodeStats stats, int reg) {
@@ -2495,10 +2432,11 @@ public class AVM2Code implements Cloneable {
                     nextIp = adr2pos(pos2adr(nextIp) + code.get(maxIp).operands[0]);
                 }
                 if (nextIp < stats.instructionStats.length) {
-                    int origScopePos = stats.instructionStats[nextIp].scopepos;
-                    int origStackPos = stats.instructionStats[nextIp].stackpos;
+                    InstructionStats nextIpStat = stats.instructionStats[nextIp];
+                    int origScopePos = nextIpStat.scopepos;
+                    int origStackPos = nextIpStat.stackpos;
 
-                    if (prevStart == ex.start && ex.isFinally() && !code.get(nextIp).isExit() && stats.instructionStats[nextIp].seen) {
+                    if (prevStart == ex.start && ex.isFinally() && !code.get(nextIp).isExit() && nextIpStat.seen) {
                         for (int i = 0; i < stats.instructionStats.length; i++) {
                             stats.instructionStats[i].seen = false;
                         }
@@ -2612,7 +2550,7 @@ public class AVM2Code implements Cloneable {
         }
     }
 
-    public void restoreControlFlow(int ip, HashMap<Integer, List<Integer>> refs, int[] visited2, HashMap<Integer, List<Object>> appended) throws ConvertException {
+    private void restoreControlFlow(int ip, HashMap<Integer, List<Integer>> refs, int[] visited2, HashMap<Integer, List<Object>> appended) throws ConvertException {
         List<Object> buf = new ArrayList<>();
         boolean cont = false;
         int continueip;
@@ -2832,25 +2770,6 @@ public class AVM2Code implements Cloneable {
         return modified;
     }
 
-    public void markMappedOffsets() {
-        int ofs = 0;
-        for (int i = 0; i < code.size(); i++) {
-            code.get(i).mappedOffset = ofs;
-            ofs += code.get(i).getBytesLength();
-        }
-    }
-
-    private static class Decision {
-
-        public boolean jumpUsed = false;
-
-        public boolean skipUsed = false;
-
-        public Set<Integer> casesUsed = new HashSet<>();
-
-        HashMap<Integer, GraphTargetItem> registers = new HashMap<>();
-    }
-
     private static int getMostCommonIp(AVM2GraphSource code, List<Integer> branches) {
         List<List<Integer>> reachable = new ArrayList<>();
         for (int i = 0; i < branches.size(); i++) {
@@ -2993,294 +2912,6 @@ public class AVM2Code implements Cloneable {
         } while (currentIp >= 0);
         return true;
     }
-
-    @SuppressWarnings("unchecked")
-    private static int removeTrapsOld(HashMap<Integer, List<Integer>> refs, boolean secondPass, boolean indeterminate, AVM2LocalData localData, TranslateStack stack, List<GraphTargetItem> output, AVM2GraphSource code, int ip, HashMap<Integer, Integer> visited, HashMap<Integer, HashMap<Integer, GraphTargetItem>> visitedStates, HashMap<AVM2Instruction, Decision> decisions, String path, int recursionLevel) throws InterruptedException {
-        if (Thread.currentThread().isInterrupted()) {
-            throw new InterruptedException();
-        }
-        if (recursionLevel > code.size() + 1) {
-            throw new TranslateException("removeTraps max recursion level reached.");
-        }
-        boolean debugMode = false;
-        int ret = 0;
-        iploop:
-        while ((ip > -1) && ip < code.size()) {
-
-            if (false) { //useVisited) {
-                if (visited.containsKey(ip)) {
-                    break;
-                }
-                if (!visited.containsKey(ip)) {
-                    visited.put(ip, 0);
-                } else {
-                    visited.put(ip, visited.get(ip) + 1);
-                }
-            } else {
-                HashMap<Integer, GraphTargetItem> currentState = localData.localRegs;
-
-                if (visitedStates.containsKey(ip)) {
-                    HashMap<Integer, GraphTargetItem> lastState = visitedStates.get(ip);
-                    if (lastState.equals(currentState)) {
-                        break;
-                    }
-                }
-                visitedStates.put(ip, (HashMap<Integer, GraphTargetItem>) currentState.clone());
-
-            }
-
-            int curVisited;
-            if (!visited.containsKey(ip)) {
-                curVisited = 1;
-            } else {
-                curVisited = visited.get(ip) + 1;
-            }
-            visited.put(ip, curVisited);
-
-            List<Integer> r = refs.get(ip);
-            /*if (r != null) {
-             if (r.size() > 1) {
-             if (!stack.isEmpty()) {
-             GraphTargetItem it = stack.pop();
-             stack.push(new NotCompileTimeAVM2Item(null, it));
-             }
-             }
-             }*/
-
-            AVM2Instruction ins = code.get(ip);
-            // Errorneous code inserted by some obfuscators
-            if (ins.definition instanceof NewObjectIns) {
-                if (ins.operands[0] > stack.size()) {
-                    ins.setIgnored(true, 0);
-                }
-            }
-            if (ins.definition instanceof NewArrayIns) {
-                if (ins.operands[0] > stack.size()) {
-                    ins.setIgnored(true, 0);
-                }
-            }
-
-            if (ins.isIgnored()) {
-                ip++;
-                continue;
-            }
-
-            if (debugMode) {
-                System.out.println((indeterminate ? "useV " : "") + (secondPass ? "secondPass " : "") + "Visit " + ip + ": " + ins + " stack:" + stack.toString());
-                HashMap<Integer, GraphTargetItem> registers = localData.localRegs;
-                System.out.print("Registers:");
-                for (int reg : registers.keySet()) {
-                    try {
-                        System.out.print(" r" + reg + ": " + registers.get(reg).getResult());
-                    } catch (NullPointerException npe) {
-                        System.out.print(" r" + reg + ": " + "null");
-                    }
-                }
-                System.out.println("");
-            }
-            if (secondPass) {
-                /*if ((ins instanceof AVM2Instruction) && (((AVM2Instruction) ins).definition instanceof PopIns)) {
-                 GraphTargetItem top = stack.peek();
-                 for (GraphSourceItemPos p : top.getNeededSources()) {
-                 if (p == null) {
-                 continue;
-                 }
-                 if (p.item == null) {
-                 continue;
-                 }
-                 if (p.item.isIgnored()) {
-                 ins.setIgnored(true, 0);
-                 break;
-                 }
-                 }
-                 }*/
-            }
-
-            if (ins.definition instanceof NewFunctionIns) {
-                stack.push(new BooleanAVM2Item(null, null, true));
-            } else {
-                localData.ip = ip;
-                ins.translate(localData, stack, output, Graph.SOP_USE_STATIC, path);
-            }
-
-            if (ins.definition instanceof SetLocalTypeIns) {
-                SetLocalTypeIns slt = (SetLocalTypeIns) ins.definition;
-                int regId = slt.getRegisterId(ins);
-                if (indeterminate) {
-                    HashMap<Integer, GraphTargetItem> registers = localData.localRegs;
-                    GraphTargetItem regVal = registers.get(regId);
-                    if (regVal.isCompileTime()) {
-                        registers.put(regId, new NotCompileTimeItem(null, null, regVal));
-                    }
-                }
-            }
-
-            if (ins.isExit()) {
-                break;
-            }
-
-            if (ins.isBranch() || ins.isJump()) {
-                List<Integer> branches = ins.getBranches(code);
-                if (ins.definition instanceof IfTypeIns
-                        && (!(ins.definition instanceof JumpIns))
-                        && (!stack.isEmpty())
-                        && (stack.peek().isCompileTime())
-                        && (!stack.peek().hasSideEffect())) {
-                    boolean condition = EcmaScript.toBoolean(stack.peek().getResult());
-                    if (debugMode) {
-                        if (condition) {
-                            System.out.println("JUMP");
-                        } else {
-                            System.out.println("SKIP");
-                        }
-                    }
-                    Decision dec = new Decision();
-                    if (decisions.containsKey(ins)) {
-                        dec = decisions.get(ins);
-                    } else {
-                        decisions.put(ins, dec);
-                    }
-                    if (condition) {
-                        dec.jumpUsed = true;
-                    } else {
-                        dec.skipUsed = true;
-                    }
-
-                    if (branches.size() > 1) {
-                        if (secondPass) {
-                            if (condition && (dec.jumpUsed) && (!dec.skipUsed)) {
-                                ins.setFixBranch(0);
-                                //ins.definition = AVM2Code.instructionSet[AVM2Instructions.Jump];
-                            }
-                            if ((!condition) && (!dec.jumpUsed) && (dec.skipUsed)) {
-                                ins.setFixBranch(1);
-                                //ins.setIgnored(true, 0);
-                            }
-                        }
-                    }
-                    GraphTargetItem tar = stack.pop();
-                    /*if (secondPass && (dec.jumpUsed != dec.skipUsed)) {
-                     for (GraphSourceItemPos pos : tar.getNeededSources()) {
-                     if (pos.item instanceof AVM2Instruction) {
-                     if (((AVM2Instruction) pos.item).definition instanceof DupIns) {
-                     pos.item.setIgnored(true, 0);
-                     break;
-                     }
-                     }
-                     if (pos.item != ins) {
-                     pos.item.setIgnored(true, 0);
-                     }
-                     }
-
-                     }*/
-                    if (branches.size() == 1) {
-                        ip = branches.get(0);
-                    } else {
-                        ip = condition ? branches.get(0) : branches.get(1);
-                    }
-                    continue;
-                } else {
-                    if (ins.isBranch() && (!ins.isJump())) {
-                        GraphTargetItem top = stack.pop();
-
-                        Decision dec = new Decision();
-                        if (decisions.containsKey(ins)) {
-                            dec = decisions.get(ins);
-                        } else {
-                            decisions.put(ins, dec);
-                        }
-                        HashMap<Integer, GraphTargetItem> registers = localData.localRegs;
-                        boolean regChanged = false;
-                        if (!dec.registers.isEmpty()) {
-                            if (dec.registers.size() != registers.size()) {
-                                regChanged = true;
-                            } else {
-                                for (int reg : registers.keySet()) {
-                                    if (!dec.registers.containsKey(reg)) {
-                                        regChanged = true;
-                                        break;
-                                    }
-                                    if (!registers.get(reg).isCompileTime() && dec.registers.get(reg).isCompileTime()) {
-                                        regChanged = true;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                        dec.registers.putAll(registers);
-                        dec.jumpUsed = true;
-                        dec.skipUsed = true;
-
-                        if (!regChanged && ((!(top instanceof HasNextAVM2Item) && curVisited > 1) || (curVisited > 2))) {
-                            for (int b : branches) {
-                                int visc = 0;
-                                if (visited.containsKey(b)) {
-                                    visc = visited.get(b);
-                                }
-                                if (visc == 0) {//<curVisited){
-                                    ip = b;
-                                    continue iploop;
-                                }
-                            }
-                            break;
-                        }
-                        indeterminate = true;
-                    }
-
-                    for (int b : branches) {
-                        TranslateStack brStack = (TranslateStack) stack.clone();
-                        if (b >= 0) { //useVisited || (!ins.isJump())
-                            ret += removeTrapsOld(refs, secondPass, indeterminate, prepareBranchLocalData(localData), brStack, output, code, b, visited, visitedStates, decisions, path, recursionLevel + 1);
-                        } else {
-                            if (debugMode) {
-                                System.out.println("Negative branch:" + b);
-                            }
-                        }
-                    }
-                }
-                break;
-            }
-            ip++;
-        }
-        if (ip < 0 && debugMode) {
-            System.out.println("Visited Negative: " + ip);
-        }
-        return ret;
-    }
-
-    public static int removeTrapsOld(Trait trait, int methodInfo, MethodBody body, AVM2LocalData localData, AVM2GraphSource code, int addr, String path, HashMap<Integer, List<Integer>> refs) throws InterruptedException {
-        HashMap<AVM2Instruction, AVM2Code.Decision> decisions = new HashMap<>();
-        removeTrapsOld(refs, false, false, localData, new TranslateStack(path), new ArrayList<>(), code, code.adr2pos(addr), new HashMap<>(), new HashMap<>(), decisions, path, 0);
-        int cnt = 0;
-        for (AVM2Instruction src : decisions.keySet()) {
-            Decision dec = decisions.get(src);
-            if (dec != null) {
-                if (src.definition instanceof LookupSwitchIns) {
-                    if (dec.casesUsed.size() == 1) {
-                        for (int c : dec.casesUsed) {
-                            src.setFixBranch(c);
-                            cnt++;
-                        }
-                    }
-                } else {
-                    if (dec.jumpUsed && !dec.skipUsed) {
-                        src.setFixBranch(0);
-                        cnt++;
-                    }
-                    if (!dec.jumpUsed && dec.skipUsed) {
-                        src.setFixBranch(1);
-                        cnt++;
-                    }
-                }
-            }
-        }
-        code.getCode().removeIgnored(body);
-        return cnt;
-    }
-    /*public static int removeTraps(AVM2LocalData localData, AVM2GraphSource code, int addr) {
-     AVM2Graph.translateViaGraph(localData, "", code, new ArrayList<Integer>(), Graph.SOP_REMOVE_STATIC);
-     return 1;
-     }*/
 
     @Override
     public AVM2Code clone() {

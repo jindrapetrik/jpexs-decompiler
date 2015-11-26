@@ -384,7 +384,7 @@ public final class MethodBody implements Cloneable {
         code.markMappedOffsets();
         code.fixJumps(path, body);
 
-        if (convertData.deobfuscationMode != -1) {
+        if (convertData.deobfuscationMode != 0) {
             try {
                 code.removeTraps(trait, method_info, body, abc, scriptIndex, classIndex, isStatic, path);
             } catch (ThreadDeath | InterruptedException ex) {
@@ -405,7 +405,7 @@ public final class MethodBody implements Cloneable {
 
     public String toSource() {
         ConvertData convertData = new ConvertData();
-        convertData.deobfuscationMode = -1;
+        convertData.deobfuscationMode = 0;
         try {
             convert(convertData, "", ScriptExportMode.AS, false, method_info, 0, 0, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true);
             HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);

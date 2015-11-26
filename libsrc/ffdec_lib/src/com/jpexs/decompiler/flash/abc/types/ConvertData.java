@@ -32,6 +32,6 @@ public class ConvertData {
     public Map<TraitSlotConst, AssignedValue> assignedValues = new HashMap<>();
 
     public ConvertData() {
-        deobfuscationMode = Configuration.autoDeobfuscate.get() ? (Configuration.deobfuscationOldMode.get() ? 0 : 1) : -1;
+        deobfuscationMode = Configuration.autoDeobfuscate.get() ? 1 : 0;
     }
 }

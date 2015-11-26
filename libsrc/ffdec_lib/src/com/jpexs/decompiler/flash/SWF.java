@@ -2341,7 +2341,7 @@ public final class SWF implements SWFContainerItem, Timelined {
     public static ActionList getCachedActionList(ASMSource src, final List<DisassemblyListener> listeners) throws InterruptedException {
         synchronized (src) {
             SWF swf = src.getSwf();
-            int deobfuscationMode = Configuration.autoDeobfuscate.get() ? (Configuration.deobfuscationOldMode.get() ? 0 : 1) : -1;
+            int deobfuscationMode = Configuration.autoDeobfuscate.get() ? 1 : 0;
             if (swf != null && swf.as2PcodeCache.contains(src)) {
                 ActionList result = swf.as2PcodeCache.get(src);
                 if (result.deobfuscationMode == deobfuscationMode) {

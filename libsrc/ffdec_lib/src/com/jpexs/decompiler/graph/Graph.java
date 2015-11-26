@@ -18,7 +18,6 @@ package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.FinalProcessLocalData;
-import com.jpexs.decompiler.flash.abc.avm2.parser.script.Reference;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -298,11 +297,9 @@ public class Graph {
         getReachableParts(part, ret, loops, true);
     }
 
-    /**
-     * Non recursive version of getReachablePartsOld
-     */
     private void getReachableParts(GraphPart part, LinkedHashSet<GraphPart> ret, List<Loop> loops, boolean first) {
 
+        // todo: honfika: why call with first = true parameter always?
         Stack<GraphPartQueue> stack = new Stack<>();
         GraphPartQueue queue = new GraphPartQueue();
         queue.add(part);
@@ -386,77 +383,6 @@ public class Graph {
         }
     }
 
-    private void getReachablePartsOld(GraphPart part, LinkedHashSet<GraphPart> ret, List<Loop> loops, boolean first) {
-
-        // todo: honfika: why call with first = true parameter always?
-        if (first) {
-            for (Loop l : loops) {
-                l.reachableMark = 0;
-            }
-        }
-
-        Loop currentLoop = null;
-        for (Loop l : loops) {
-            if ((l.phase == 1) || (l.reachableMark == 1)) {
-                if (l.loopContinue == part) {
-                    return;
-                }
-                if (l.loopBreak == part) {
-                    return;
-                }
-                if (l.loopPreContinue == part) {
-                    return;
-                }
-            }
-            if (l.reachableMark == 0) {
-                if (l.loopContinue == part) {
-                    l.reachableMark = 1;
-                    currentLoop = l;
-                }
-            }
-        }
-
-        List<GraphPart> newparts = new ArrayList<>();
-        loopnext:
-        for (GraphPart next : part.nextParts) {
-            for (Loop l : loops) {
-                if ((l.phase == 1) || (l.reachableMark == 1)) {
-                    if (l.loopContinue == next) {
-                        continue loopnext;
-                    }
-                    if (l.loopBreak == next) {
-                        continue loopnext;
-                    }
-                    if (l.loopPreContinue == next) {
-                        continue loopnext;
-                    }
-                }
-
-            }
-            if (!ret.contains(next)) {
-                newparts.add(next);
-            }
-        }
-
-        ret.addAll(newparts);
-        for (GraphPart next : newparts) {
-            getReachableParts(next, ret, loops, true);
-        }
-
-        if (currentLoop != null) {
-            if (currentLoop.loopBreak != null) {
-                if (!ret.contains(currentLoop.loopBreak)) {
-                    ret.add(currentLoop.loopBreak);
-                    currentLoop.reachableMark = 2;
-                    getReachableParts(currentLoop.loopBreak, ret, loops, true);
-                }
-            }
-        }
-    }
-
-    /* public GraphPart getNextCommonPart(GraphPart part, List<Loop> loops) {
-     return getNextCommonPart(part, new ArrayList<GraphPart>(),loops);
-     }*/
     public GraphPart getNextCommonPart(BaseLocalData localData, GraphPart part, List<Loop> loops) throws InterruptedException {
         return getCommonPart(localData, part.nextParts, loops);
     }
