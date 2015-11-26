@@ -842,152 +842,158 @@ public class AVM2Code implements Cloneable {
             try {
                 ais.seek(address);
                 while (ais.available() > 0) {
-                    DumpInfo di = ais.newDumpLevel("instruction", "instruction");
                     long startOffset = ais.getPosition();
 
                     if (codeMap.containsKey(startOffset) && !(codeMap.get(startOffset).definition instanceof NopIns)) {
                         continue loopaddr;
                     }
 
-                    int instructionCode = ais.read("instructionCode");
-                    InstructionDefinition instr = instructionSet[instructionCode];
-                    if (instructionCode == AVM2Instructions.LookupSwitch) {
-                        if (!isSwitch) {
-                            switchAddresses.add(startOffset);
-                            continue loopaddr;
-                        } else {
-                            isSwitch = false;
-                        }
-                    }
-                    if (di != null) {
-                        di.name = instr.instructionName;
-                    }
-                    if (instr != null) {
-                        int[] actualOperands = null;
-
-                        if (instructionCode == AVM2Instructions.LookupSwitch) { // switch
-                            int firstOperand = ais.readS24("default_offset");
-                            int case_count = ais.readU30("case_count");
-                            long afterCasePos = ais.getPosition() + 3 * (case_count + 1);
-
-                            boolean invalidSwitch = false;
-                            //If there are already some instructions in the lookupswitch bytes, the lookupswitch is invalid (obfuscation)
-                            for (long a = startOffset; a < afterCasePos; a++) {
-                                if (codeMap.containsKey(a) && (!(codeMap.get(a).definition instanceof NopIns))) {
-                                    invalidSwitch = true;
-                                    break;
-                                }
-                            }
-
-                            long totalBytes = ais.getPosition() + ais.available();
-
-                            //If the lookupswitch case_count are larger than available bytes, the lookupswitch is invalid (obfuscation)
-                            if (afterCasePos > totalBytes) {
-                                invalidSwitch = true;
-                            }
-                            if (invalidSwitch) {
+                    DumpInfo di = ais.newDumpLevel("instruction", "instruction");
+                    InstructionDefinition instr = null;
+                    try {
+                        int instructionCode = ais.read("instructionCode");
+                        instr = instructionSet[instructionCode];
+                        if (instructionCode == AVM2Instructions.LookupSwitch) {
+                            if (!isSwitch) {
+                                switchAddresses.add(startOffset);
                                 continue loopaddr;
                             } else {
-                                actualOperands = new int[case_count + 3];
-                                actualOperands[0] = firstOperand;
-                                actualOperands[1] = case_count;
-                                for (int c = 0; c < case_count + 1; c++) {
-                                    actualOperands[2 + c] = ais.readS24("actualOperand");
-                                }
+                                isSwitch = false;
                             }
-                        } else {
-                            if (instr.operands.length > 0) {
-                                actualOperands = new int[instr.operands.length];
-                                for (int op = 0; op < instr.operands.length; op++) {
-                                    switch (instr.operands[op] & 0xff00) {
-                                        case OPT_U30:
-                                            actualOperands[op] = ais.readU30("operand");
-                                            break;
-                                        case OPT_U30_SHORT:
-                                            actualOperands[op] = (short) ais.readU30("operand");
-                                            break;
-                                        case OPT_U8:
-                                            actualOperands[op] = ais.read("operand");
-                                            break;
-                                        case OPT_BYTE:
-                                            actualOperands[op] = (byte) ais.read("operand");
-                                            break;
-                                        case OPT_S24:
-                                            actualOperands[op] = ais.readS24("operand");
-                                            break;
+                        }
+                        if (di != null) {
+                            di.name = instr.instructionName;
+                        }
+                        if (instr != null) {
+                            int[] actualOperands = null;
+
+                            if (instructionCode == AVM2Instructions.LookupSwitch) { // switch
+                                int firstOperand = ais.readS24("default_offset");
+                                int case_count = ais.readU30("case_count");
+                                long afterCasePos = ais.getPosition() + 3 * (case_count + 1);
+
+                                boolean invalidSwitch = false;
+                                //If there are already some instructions in the lookupswitch bytes, the lookupswitch is invalid (obfuscation)
+                                for (long a = startOffset; a < afterCasePos; a++) {
+                                    if (codeMap.containsKey(a) && (!(codeMap.get(a).definition instanceof NopIns))) {
+                                        invalidSwitch = true;
+                                        break;
+                                    }
+                                }
+
+                                long totalBytes = ais.getPosition() + ais.available();
+
+                                //If the lookupswitch case_count are larger than available bytes, the lookupswitch is invalid (obfuscation)
+                                if (afterCasePos > totalBytes) {
+                                    invalidSwitch = true;
+                                }
+                                if (invalidSwitch) {
+                                    continue loopaddr;
+                                } else {
+                                    actualOperands = new int[case_count + 3];
+                                    actualOperands[0] = firstOperand;
+                                    actualOperands[1] = case_count;
+                                    for (int c = 0; c < case_count + 1; c++) {
+                                        actualOperands[2 + c] = ais.readS24("actualOperand");
+                                    }
+                                }
+                            } else {
+                                if (instr.operands.length > 0) {
+                                    actualOperands = new int[instr.operands.length];
+                                    for (int op = 0; op < instr.operands.length; op++) {
+                                        switch (instr.operands[op] & 0xff00) {
+                                            case OPT_U30:
+                                                actualOperands[op] = ais.readU30("operand");
+                                                break;
+                                            case OPT_U30_SHORT:
+                                                actualOperands[op] = (short) ais.readU30("operand");
+                                                break;
+                                            case OPT_U8:
+                                                actualOperands[op] = ais.read("operand");
+                                                break;
+                                            case OPT_BYTE:
+                                                actualOperands[op] = (byte) ais.read("operand");
+                                                break;
+                                            case OPT_S24:
+                                                actualOperands[op] = ais.readS24("operand");
+                                                break;
+                                        }
                                     }
                                 }
                             }
-                        }
 
-                        AVM2Instruction ai = new AVM2Instruction(startOffset, instr, actualOperands);
-                        long endOffset = ais.getPosition();
+                            AVM2Instruction ai = new AVM2Instruction(startOffset, instr, actualOperands);
+                            long endOffset = ais.getPosition();
 
-                        boolean hasRoom = true;
-                        for (long p = startOffset; p < endOffset; p++) {
-                            if (codeMap.containsKey(p) && !(codeMap.get(p).definition instanceof NopIns)) {
-                                hasRoom = false;
-                            }
-                        }
-
-                        //There is no room for this instruction (it is invalid?)
-                        if (!hasRoom) {
-                            continue loopaddr;
-                        }
-                        for (long p = startOffset; p < endOffset; p++) {
-                            codeMap.put(p, ai);
-                        }
-
-                        ais.endDumpLevel(instr.instructionCode);
-
-                        if ((instr instanceof IfTypeIns)) {
-                            if (handleJumps) {
-                                long target = ais.getPosition() + actualOperands[0];
-                                addresses.add(target);
-                            } else {
-                                actualOperands[0] = 0;
-                            }
-                        }
-
-                        if (instr instanceof JumpIns) {
-                            if (handleJumps) {
-                                long target = ais.getPosition() + actualOperands[0];
-                                addresses.add(target);
-                                unAdresses.add(ais.getPosition());
-                                continue loopaddr;
-                            } else {
-                                actualOperands[0] = 0;
-                            }
-                        }
-
-                        if (instr.isExitInstruction()) { //do not process jumps if there is return/throw instruction
-                            if (handleJumps) {
-                                unAdresses.add(ais.getPosition());
-                                continue loopaddr;
-                            }
-                        }
-                        if ((instr instanceof LookupSwitchIns) && actualOperands != null) {
-                            if (handleJumps) {
-                                addresses.add(startOffset + actualOperands[0]);
-
-                                for (int c = 2; c < actualOperands.length; c++) {
-                                    addresses.add(startOffset + actualOperands[c]);
-                                }
-                                unAdresses.add(ais.getPosition());
-                                continue loopaddr;
-                            } else {
-                                int swlen = (int) (endOffset - startOffset);
-                                actualOperands[0] = swlen;
-                                for (int c = 2; c < actualOperands.length; c++) {
-                                    actualOperands[c] = swlen;
+                            boolean hasRoom = true;
+                            for (long p = startOffset; p < endOffset; p++) {
+                                if (codeMap.containsKey(p) && !(codeMap.get(p).definition instanceof NopIns)) {
+                                    hasRoom = false;
                                 }
                             }
-                        }
 
-                    } else {
-                        ais.endDumpLevel();
-                        break; // Unknown instructions are ignored (Some of the obfuscators add unknown instructions)
-                        //throw new UnknownInstructionCode(instructionCode);
+                            //There is no room for this instruction (it is invalid?)
+                            if (!hasRoom) {
+                                continue loopaddr;
+                            }
+                            for (long p = startOffset; p < endOffset; p++) {
+                                codeMap.put(p, ai);
+                            }
+
+                            if ((instr instanceof IfTypeIns)) {
+                                if (handleJumps) {
+                                    long target = ais.getPosition() + actualOperands[0];
+                                    addresses.add(target);
+                                } else {
+                                    actualOperands[0] = 0;
+                                }
+                            }
+
+                            if (instr instanceof JumpIns) {
+                                if (handleJumps) {
+                                    long target = ais.getPosition() + actualOperands[0];
+                                    addresses.add(target);
+                                    unAdresses.add(ais.getPosition());
+                                    continue loopaddr;
+                                } else {
+                                    actualOperands[0] = 0;
+                                }
+                            }
+
+                            if (instr.isExitInstruction()) { //do not process jumps if there is return/throw instruction
+                                if (handleJumps) {
+                                    unAdresses.add(ais.getPosition());
+                                    continue loopaddr;
+                                }
+                            }
+                            if ((instr instanceof LookupSwitchIns) && actualOperands != null) {
+                                if (handleJumps) {
+                                    addresses.add(startOffset + actualOperands[0]);
+
+                                    for (int c = 2; c < actualOperands.length; c++) {
+                                        addresses.add(startOffset + actualOperands[c]);
+                                    }
+                                    unAdresses.add(ais.getPosition());
+                                    continue loopaddr;
+                                } else {
+                                    int swlen = (int) (endOffset - startOffset);
+                                    actualOperands[0] = swlen;
+                                    for (int c = 2; c < actualOperands.length; c++) {
+                                        actualOperands[c] = swlen;
+                                    }
+                                }
+                            }
+
+                        } else {
+                            break; // Unknown instructions are ignored (Some of the obfuscators add unknown instructions)
+                            //throw new UnknownInstructionCode(instructionCode);
+                        }
+                    } finally {
+                        if (instr == null) {
+                            ais.endDumpLevel();
+                        } else {
+                            ais.endDumpLevel(instr.instructionCode);
+                        }
                     }
                 }
             } catch (EndOfStreamException ex) {
@@ -995,6 +1001,11 @@ public class AVM2Code implements Cloneable {
                 ais.endDumpLevelUntil(diParent);
             }
         }
+
+        if (diParent != null) {
+            diParent.sortChildren();
+        }
+
         AVM2Instruction prev = null;
         for (int i = 0; i < availableBytes; i++) {
             AVM2Instruction ins = codeMap.get((long) i);
