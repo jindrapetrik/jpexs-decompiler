@@ -197,12 +197,6 @@ public class ABC {
         return rem;
     }
 
-    public void restoreControlFlow() throws InterruptedException {
-        for (MethodBody body : bodies) {
-            body.restoreControlFlow(constants, null/*FIXME*/, method_info.get(body.method_info));
-        }
-    }
-
     public Set<Integer> getNsStringUsages() {
         Set<Integer> ret = new HashSet<>();
         for (int n = 1; n < constants.getNamespaceCount(); n++) {

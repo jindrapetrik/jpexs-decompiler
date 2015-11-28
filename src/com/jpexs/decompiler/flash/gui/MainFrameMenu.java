@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.debugger.flash.DebuggerCommands;
-import com.jpexs.debugger.flash.messages.out.OutStepContinue;
 import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFBundle;
@@ -29,7 +28,6 @@ import com.jpexs.decompiler.flash.gui.helpers.CheckResources;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Cache;
-import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import com.sun.jna.Platform;
@@ -44,21 +42,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractButton;
@@ -79,6 +71,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
     private KeyEventDispatcher keyEventDispatcher;
 
     private SWF swf;
+
     protected final Map<String, HotKey> menuHotkeys = new HashMap<>();
 
     @Override
@@ -324,26 +317,6 @@ public abstract class MainFrameMenu implements MenuBuilder {
         }
 
         return false;
-    }
-
-    protected void restoreControlFlow(ActionEvent evt) {
-        if (Main.isWorking()) {
-            return;
-        }
-
-        restoreControlFlow(false);
-    }
-
-    protected void restoreControlFlowAll(ActionEvent evt) {
-        if (Main.isWorking()) {
-            return;
-        }
-
-        restoreControlFlow(true);
-    }
-
-    protected void restoreControlFlow(boolean all) {
-        mainFrame.getPanel().restoreControlFlow(all);
     }
 
     protected void showProxyActionPerformed(ActionEvent evt) {

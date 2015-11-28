@@ -256,8 +256,6 @@ import com.jpexs.decompiler.flash.abc.avm2.model.WithAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.DeclarationAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ForEachInAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ForInAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
-import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.ASM3Parser;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.PropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.Reference;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
@@ -296,7 +294,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1045,14 +1042,6 @@ public class AVM2Code implements Cloneable {
         }
     }
 
-    public void markMappedOffsets() {
-        int ofs = 0;
-        for (int i = 0; i < code.size(); i++) {
-            code.get(i).mappedOffset = ofs;
-            ofs += code.get(i).getBytesLength();
-        }
-    }
-
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder();
@@ -1263,44 +1252,17 @@ public class AVM2Code implements Cloneable {
                  ret.append("exceptiontarget " + e + ":");
                  }
                  }*/
-                if (ins.replaceWith != null) {
-                    for (Object o : ins.replaceWith) {
-                        if (o instanceof Integer) {
-                            AVM2Instruction ins2 = code.get((Integer) o);
-                            if (ins2.isIgnored()) {
-                                continue;
-                            }
-                            writer.append("", ins2.mappedOffset > -1 ? ins2.mappedOffset : ofs);
-                            writer.appendNoHilight(ins2.toStringNoAddress(constants, new ArrayList<>()) + " ;copy from " + Helper.formatAddress(pos2adr((Integer) o)));
-                            writer.newLine();
-                            outputMap.add((Integer) o);
-                        } else if (o instanceof ControlFlowTag) {
-                            ControlFlowTag cft = (ControlFlowTag) o;
-                            if (cft.name.equals("appendjump")) {
-                                writer.appendNoHilight("jump ofs" + Helper.formatAddress(pos2adr(cft.value))).newLine();
-                                outputMap.add(-1);
-                            }
-                            if (cft.name.equals("mark")) {
-                                writer.appendNoHilight("ofs" + Helper.formatAddress(pos2adr(cft.value)) + ":");
-                            }
-                        }
-                    }
-                } else {
-                    if (!ins.isIgnored()) {
-                        if (markOffsets) {
-                            writer.append("", ins.mappedOffset > -1 ? ins.mappedOffset : ofs);
-                        }
 
-                        if (ins.changeJumpTo > -1) {
-                            writer.appendNoHilight(ins.definition.instructionName + " ofs" + Helper.formatAddress(pos2adr(ins.changeJumpTo)));
-                        } else {
-                            writer.appendNoHilight(ins.toStringNoAddress(constants, new ArrayList<>()));
-                        }
-
-                        writer.newLine();
-                        outputMap.add(ip);
+                if (!ins.isIgnored()) {
+                    if (markOffsets) {
+                        writer.append("", ofs);
                     }
+
+                    writer.appendNoHilight(ins.toStringNoAddress(constants, new ArrayList<>()));
+                    writer.newLine();
+                    outputMap.add(ip);
                 }
+
                 ip++;
             }
         } else if (exportMode == ScriptExportMode.CONSTANTS) {
@@ -1322,16 +1284,6 @@ public class AVM2Code implements Cloneable {
 
         for (AVM2Instruction ins : code) {
             ret.addAll(ins.getOffsets());
-            if (ins.replaceWith != null) {
-                for (Object o : ins.replaceWith) {
-                    if (o instanceof ControlFlowTag) {
-                        ControlFlowTag cft = (ControlFlowTag) o;
-                        if (cft.name.equals("appendjump")) {
-                            ret.add((long) pos2adr(cft.value));
-                        }
-                    }
-                }
-            }
         }
 
         return ret;
@@ -2536,163 +2488,6 @@ public class AVM2Code implements Cloneable {
             }
         }
         return refs;
-    }
-
-    private static class ControlFlowTag {
-
-        public String name;
-
-        public int value;
-
-        public ControlFlowTag(String name, int value) {
-            this.name = name;
-            this.value = value;
-        }
-    }
-
-    private void restoreControlFlow(int ip, HashMap<Integer, List<Integer>> refs, int[] visited2, HashMap<Integer, List<Object>> appended) throws ConvertException {
-        List<Object> buf = new ArrayList<>();
-        boolean cont = false;
-        int continueip;
-        for (; ip < code.size(); ip++) {
-            AVM2Instruction ins = code.get(ip);
-
-            if ((refs.containsKey(ip) && refs.get(ip).size() > 1) || (visited2[ip] > 0)) {
-                if (cont) {
-                    buf.add(new ControlFlowTag("appendjump", ip));
-                }
-                cont = false;
-                if (visited2[ip] > 0) {
-                    break;
-                }
-            }
-            visited2[ip]++;
-            if (ins.definition instanceof LookupSwitchIns) {
-
-                if (cont) {
-                    buf.add(new ControlFlowTag("appendjump", ip));
-                }
-                //cont = false;
-                restoreControlFlow(adr2pos(pos2adr(ip) + ins.operands[0]), refs, visited2, appended);
-                for (int i = 2; i < ins.operands.length; i++) {
-                    restoreControlFlow(adr2pos(pos2adr(ip) + ins.operands[i]), refs, visited2, appended);
-                }
-                break;
-            }
-            if (ins.definition instanceof JumpIns) {
-                int newip = adr2pos(pos2adr(ip + 1) + ins.operands[0]);
-
-                boolean allJumpsOrIfs = true;
-                for (int ref : refs.get(ip)) {
-                    if (ref < 0) {
-                        continue;
-                    }
-                    if (!(code.get(ref).definition instanceof JumpIns)) {
-                        if (!(code.get(ref).definition instanceof IfTypeIns)) {
-                            allJumpsOrIfs = false;
-                            break;
-                        } else {
-                            if (adr2pos(pos2adr(ref + 1) + code.get(ref).operands[0]) != ip) {
-                                allJumpsOrIfs = false;
-                                break;
-                            }
-                        }
-                    }
-                }
-                if (allJumpsOrIfs) {
-                    for (int ref : refs.get(ip)) {
-                        if (ref < 0) {
-                            continue;
-                        }
-                        code.get(ref).changeJumpTo = newip;
-                    }
-                }
-                if ((newip < code.size()) && (refs.containsKey(newip) && refs.get(newip).size() == 1)) {
-                    if (!cont) {
-                        continueip = ip;
-                        buf = new ArrayList<>();
-                        appended.put(continueip, buf);
-                    }
-                    cont = true;
-                } else {
-                    if (cont) {
-                        buf.add(new ControlFlowTag("appendjump", newip));
-                    }
-                    cont = false;
-                }
-                ip = newip - 1;
-            } else if (ins.definition instanceof IfTypeIns) {
-                int newip = adr2pos(pos2adr(ip + 1) + ins.operands[0]);
-                if (cont) {
-                    buf.add(new ControlFlowTag("appendjump", ip));
-                }
-                cont = false;
-                restoreControlFlow(newip, refs, visited2, appended);
-            } else if ((ins.definition instanceof ReturnVoidIns) || (ins.definition instanceof ReturnValueIns) || (ins.definition instanceof ThrowIns)) {
-                if (cont) {
-                    buf.add(ip);
-                }
-                break;
-            } else if (cont) {
-                buf.add(ip);
-            }
-        }
-
-    }
-
-    private void restoreControlFlowPass(AVM2ConstantPool constants, Trait trait, MethodInfo info, MethodBody body) throws InterruptedException {
-        try {
-            HashMap<Integer, List<Integer>> refs;
-            int[] visited2 = new int[code.size()];
-            refs = visitCode(body);
-            HashMap<Integer, List<Object>> appended = new HashMap<>();
-
-            restoreControlFlow(0, refs, visited2, appended);
-            for (ABCException e : body.exceptions) {
-                try {
-                    restoreControlFlow(adr2pos(e.start, true), refs, visited2, appended);
-                    restoreControlFlow(adr2pos(e.target), refs, visited2, appended);
-                    restoreControlFlow(adr2pos(e.end, true), refs, visited2, appended);
-                } catch (ConvertException ex) {
-                    logger.log(Level.FINE, null, ex);
-                }
-            }
-
-            for (int ip : appended.keySet()) {
-                code.get(ip).replaceWith = appended.get(ip);
-            }
-        } catch (ConvertException cex) {
-            logger.log(Level.SEVERE, "Error during restore control flow", cex);
-        }
-        try {
-            List<Integer> outputMap = new ArrayList<>();
-            HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
-            toASMSource(constants, trait, info, body, outputMap, ScriptExportMode.PCODE, writer);
-            String src = writer.toString();
-
-            AVM2Code acode = ASM3Parser.parse(new StringReader(src), constants, null, body, info);
-            for (int i = 0; i < acode.code.size(); i++) {
-                if (outputMap.size() > i) {
-                    int tpos = outputMap.get(i);
-                    if (tpos == -1) {
-                    } else if (code.get(tpos).mappedOffset >= 0) {
-                        acode.code.get(i).mappedOffset = code.get(tpos).mappedOffset;
-                    } else {
-                        acode.code.get(i).mappedOffset = pos2adr(tpos);
-                    }
-                }
-            }
-            this.code = acode.code;
-        } catch (IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
-        } catch (AVM2ParseException ex) {
-            logger.log(Level.FINE, null, ex);
-        }
-        removeDeadCode(body);
-    }
-
-    public void restoreControlFlow(AVM2ConstantPool constants, Trait trait, MethodInfo info, MethodBody body) throws InterruptedException {
-        restoreControlFlowPass(constants, trait, info, body);
     }
 
     public void removeIgnored(MethodBody body) throws InterruptedException {

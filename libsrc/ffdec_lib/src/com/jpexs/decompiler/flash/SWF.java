@@ -3107,7 +3107,6 @@ public final class SWF implements SWFContainerItem, Timelined {
                 tag.getABC().removeTraps();
             } else if (level == DeobfuscationLevel.LEVEL_RESTORE_CONTROL_FLOW) {
                 tag.getABC().removeTraps();
-                tag.getABC().restoreControlFlow();
             }
 
             ((Tag) tag).setModified(true);

@@ -53,12 +53,6 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     private boolean ignored = false;
 
-    public long mappedOffset = -1;
-
-    public int changeJumpTo = -1;
-
-    public List<Object> replaceWith;
-
     private int line;
 
     private String file;
@@ -378,7 +372,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     @Override
     public long getOffset() {
-        return mappedOffset > -1 ? mappedOffset : offset;
+        return offset;
     }
 
     @Override

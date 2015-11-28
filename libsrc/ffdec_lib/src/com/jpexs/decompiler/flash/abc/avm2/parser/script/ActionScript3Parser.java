@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.SWC;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.model.ApplyTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.BooleanAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
@@ -38,7 +37,6 @@ import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NameValuePair;
 import com.jpexs.decompiler.flash.abc.avm2.model.NanAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewArrayAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.NewFunctionAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewObjectAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.PostDecrementAVM2Item;
@@ -2486,12 +2484,9 @@ public class ActionScript3Parser {
         addScriptFromTree(allOpenedNamespaces, traits, documentClass, classPos);
     }
 
-    public ActionScript3Parser(ABC abc, List<ABC> otherAbcs) {
-        try {
-            initPlayer();
-        } catch (IOException | InterruptedException ex) {
+    public ActionScript3Parser(ABC abc, List<ABC> otherAbcs) throws IOException, InterruptedException {
+        initPlayer();
 
-        }
         abcIndex = new AbcIndexing(playerGlobalAbcIndex);
         for (ABC a : otherAbcs) {
             abcIndex.addAbc(a);
