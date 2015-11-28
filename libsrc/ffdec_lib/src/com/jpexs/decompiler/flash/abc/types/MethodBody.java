@@ -360,8 +360,10 @@ public final class MethodBody implements Cloneable {
                     HashMap<Integer, String> localRegNames = getLocalRegNames(abc);
                     //writer.startMethod(this.method_info);
                     if (Configuration.showMethodBodyId.get()) {
-                        writer.appendNoHilight("// method body id: ");
+                        writer.appendNoHilight("// method body index: ");
                         writer.appendNoHilight(abc.findBodyIndex(this.method_info));
+                        writer.appendNoHilight(" method index: ");
+                        writer.appendNoHilight(this.method_info);
                         writer.newLine();
                     }
                     Graph.graphToString(convertedItems, writer, LocalData.create(abc.constants, localRegNames, fullyQualifiedNames));
