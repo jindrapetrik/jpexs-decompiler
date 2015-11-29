@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
+import com.jpexs.decompiler.flash.action.fastactionlist.FastActionList;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.action.swf4.ActionJump;
@@ -67,7 +68,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
         return actions;
     }
 
-    public void testRemoveAction(String actionsString, String expectedResult, int[] actionsToRemove) {
+    public void testRemoveActionNormal(String actionsString, String expectedResult, int[] actionsToRemove) {
         try {
             ActionList actions = ASMParser.parse(0, true, actionsString, swf.version, false);
 
@@ -90,11 +91,65 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
         }
     }
 
-    public void testAddAction(String actionsString, String expectedResult, Action action, int index) {
+    public void testRemoveActionFast(String actionsString, String expectedResult, int[] actionsToRemove) {
+        try {
+            ActionList actions = ASMParser.parse(0, true, actionsString, swf.version, false);
+            FastActionList fastActions = new FastActionList(actions);
+
+            for (int i : actionsToRemove) {
+                fastActions.removeItem(i, 1);
+            }
+
+            actions = fastActions.toActionList();
+
+            DoActionTag doa = getFirstActionTag();
+            doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
+            HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
+            doa.getASMSource(ScriptExportMode.PCODE, writer, doa.getActions());
+            String actualResult = normalizeLabels(writer.toString());
+
+            actualResult = cleanPCode(actualResult);
+            expectedResult = cleanPCode(expectedResult);
+
+            Assert.assertEquals(actualResult, expectedResult);
+        } catch (IOException | ActionParseException | InterruptedException ex) {
+            fail();
+        }
+    }
+
+    public void testRemoveAction(String actionsString, String expectedResult, int[] actionsToRemove) {
+        testRemoveActionNormal(actionsString, expectedResult, actionsToRemove);
+        testRemoveActionFast(actionsString, expectedResult, actionsToRemove);
+    }
+
+    public void testAddActionNormal(String actionsString, String expectedResult, Action action, int index) {
         try {
             ActionList actions = ASMParser.parse(0, true, actionsString, swf.version, false);
 
             actions.addAction(index, action);
+
+            DoActionTag doa = getFirstActionTag();
+            doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
+            HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
+            doa.getASMSource(ScriptExportMode.PCODE, writer, doa.getActions());
+            String actualResult = normalizeLabels(writer.toString());
+
+            actualResult = cleanPCode(actualResult);
+            expectedResult = cleanPCode(expectedResult);
+
+            Assert.assertEquals(actualResult, expectedResult);
+        } catch (IOException | ActionParseException | InterruptedException ex) {
+            fail();
+        }
+    }
+
+    public void testAddActionFast(String actionsString, String expectedResult, Action action, int index) {
+        try {
+            ActionList actions = ASMParser.parse(0, true, actionsString, swf.version, false);
+            FastActionList fastActions = new FastActionList(actions);
+
+            fastActions.insertItemBefore(fastActions.get(index), action);
+            actions = fastActions.toActionList();
 
             DoActionTag doa = getFirstActionTag();
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
@@ -228,6 +283,33 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
     }
 
     @Test
+    public void testAddAtionFirst() {
+        String actionsString
+                = "ConstantPool\n"
+                + "DefineFunction \"test\" 1 \"p1\" {\n"
+                + "Push 1\n"
+                + "GetVariable\n"
+                + "}\n"
+                + "Push 2\n"
+                + "If label_1\n"
+                + "Push 3\n"
+                + "label_1:Push 4";
+        String expectedResult
+                = "GetMember\n"
+                + "ConstantPool\n"
+                + "DefineFunction \"test\" 1 \"p1\" {\n"
+                + "Push 1\n"
+                + "GetVariable\n"
+                + "}\n"
+                + "Push 2\n"
+                + "If label_1\n"
+                + "Push 3\n"
+                + "label_1:Push 4";
+        testAddActionNormal(actionsString, expectedResult, new ActionGetMember(), 0);
+        testAddActionFast(actionsString, expectedResult, new ActionGetMember(), 0);
+    }
+
+    @Test
     public void testAddAtion1() {
         String actionsString
                 = "ConstantPool\n"
@@ -250,7 +332,8 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
                 + "If label_1\n"
                 + "Push 3\n"
                 + "label_1:Push 4";
-        testAddAction(actionsString, expectedResult, new ActionGetMember(), 1);
+        testAddActionNormal(actionsString, expectedResult, new ActionGetMember(), 1);
+        testAddActionFast(actionsString, expectedResult, new ActionGetMember(), 1);
     }
 
     @Test
@@ -276,7 +359,8 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
                 + "If label_1\n"
                 + "Push 3\n"
                 + "label_1:Push 4";
-        testAddAction(actionsString, expectedResult, new ActionGetMember(), 2);
+        testAddActionNormal(actionsString, expectedResult, new ActionGetMember(), 2);
+        testAddActionFast(actionsString, expectedResult, new ActionGetMember(), 2);
     }
 
     @Test
@@ -302,7 +386,8 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
                 + "Push 3\n"
                 + "GetMember\n"
                 + "label_1:Push 4";
-        testAddAction(actionsString, expectedResult, new ActionGetMember(), 7);
+        testAddActionNormal(actionsString, expectedResult, new ActionGetMember(), 7);
+        testAddActionFast(actionsString, expectedResult, new ActionGetMember(), 7);
     }
 
     @Test
@@ -328,7 +413,8 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
                 + "If label_1\n"
                 + "Push 3\n"
                 + "label_1:Push 4";
-        testAddAction(actionsString, expectedResult, new ActionGetMember(), 4);
+        testAddActionNormal(actionsString, expectedResult, new ActionGetMember(), 4);
+        testAddActionFast(actionsString, expectedResult, new ActionGetMember(), 4);
     }
 
     @Test
@@ -353,6 +439,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
         ActionJump jump = new ActionJump(0);
         jump.setAddress(9);
         jump.setJumpOffset(24 - 9 - 5);
-        testAddAction(actionsString, expectedResult, jump, 3);
+        testAddActionNormal(actionsString, expectedResult, jump, 3);
+        testAddActionFast(actionsString, expectedResult, jump, 3);
     }
 }
