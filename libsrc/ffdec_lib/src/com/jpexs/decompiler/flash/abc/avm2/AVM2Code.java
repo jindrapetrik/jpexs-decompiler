@@ -635,8 +635,6 @@ public class AVM2Code implements Cloneable {
         }
     }
 
-    public boolean hideTemporaryRegisters = true;
-
     public static final String IDENTOPEN = "/*IDENTOPEN*/";
 
     public static final String IDENTCLOSE = "/*IDENTCLOSE*/";
