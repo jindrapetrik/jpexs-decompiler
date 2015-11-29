@@ -19,13 +19,10 @@ package com.jpexs.decompiler.flash.abc.avm2;
 import com.jpexs.decompiler.flash.EndOfStreamException;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ABCInputStream;
-import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorGetSet;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorJumps;
-import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorRegisters;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorRegistersOld;
-import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorSimple;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorSimpleOld;
 import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2ExecutionException;
 import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2VerifyErrorException;
@@ -33,7 +30,6 @@ import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2Graph;
 import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2GraphSource;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.DeobfuscatePopIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.IfTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.UnknownInstruction;
@@ -247,9 +243,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.xml.DXNSIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.xml.DXNSLateIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.xml.EscXAttrIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.xml.EscXElemIns;
-import com.jpexs.decompiler.flash.abc.avm2.model.BooleanAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.HasNextAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.InitPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewFunctionAVM2Item;
@@ -262,8 +256,6 @@ import com.jpexs.decompiler.flash.abc.avm2.model.WithAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.DeclarationAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ForEachInAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ForInAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
-import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.ASM3Parser;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.PropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.Reference;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
@@ -280,7 +272,6 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
-import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -289,13 +280,10 @@ import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.DottedChain;
-import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.decompiler.graph.NotCompileTimeItem;
 import com.jpexs.decompiler.graph.ScopeStack;
-import com.jpexs.decompiler.graph.TranslateException;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.ExitItem;
@@ -306,7 +294,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -351,7 +338,8 @@ public class AVM2Code implements Cloneable {
 
     public static final int DAT_DEBUG_TYPE = OPT_U8 + 0x05;
 
-    //public static final int DAT_REGISTER_INDEX = OPT_U8 + 0x06;
+    public static final int DAT_REGISTER_INDEX = OPT_U8 + 0x06;
+
     public static final int DAT_LINENUM = OPT_U30 + 0x07;
 
     public static final int DAT_LOCAL_REG_INDEX = OPT_U30 + 0x08;
@@ -843,152 +831,158 @@ public class AVM2Code implements Cloneable {
             try {
                 ais.seek(address);
                 while (ais.available() > 0) {
-                    DumpInfo di = ais.newDumpLevel("instruction", "instruction");
                     long startOffset = ais.getPosition();
 
                     if (codeMap.containsKey(startOffset) && !(codeMap.get(startOffset).definition instanceof NopIns)) {
                         continue loopaddr;
                     }
 
-                    int instructionCode = ais.read("instructionCode");
-                    InstructionDefinition instr = instructionSet[instructionCode];
-                    if (instructionCode == AVM2Instructions.LookupSwitch) {
-                        if (!isSwitch) {
-                            switchAddresses.add(startOffset);
-                            continue loopaddr;
-                        } else {
-                            isSwitch = false;
-                        }
-                    }
-                    if (di != null) {
-                        di.name = instr.instructionName;
-                    }
-                    if (instr != null) {
-                        int[] actualOperands = null;
-
-                        if (instructionCode == AVM2Instructions.LookupSwitch) { // switch
-                            int firstOperand = ais.readS24("default_offset");
-                            int case_count = ais.readU30("case_count");
-                            long afterCasePos = ais.getPosition() + 3 * (case_count + 1);
-
-                            boolean invalidSwitch = false;
-                            //If there are already some instructions in the lookupswitch bytes, the lookupswitch is invalid (obfuscation)
-                            for (long a = startOffset; a < afterCasePos; a++) {
-                                if (codeMap.containsKey(a) && (!(codeMap.get(a).definition instanceof NopIns))) {
-                                    invalidSwitch = true;
-                                    break;
-                                }
-                            }
-
-                            long totalBytes = ais.getPosition() + ais.available();
-
-                            //If the lookupswitch case_count are larger than available bytes, the lookupswitch is invalid (obfuscation)
-                            if (afterCasePos > totalBytes) {
-                                invalidSwitch = true;
-                            }
-                            if (invalidSwitch) {
+                    DumpInfo di = ais.newDumpLevel("instruction", "instruction");
+                    InstructionDefinition instr = null;
+                    try {
+                        int instructionCode = ais.read("instructionCode");
+                        instr = instructionSet[instructionCode];
+                        if (instructionCode == AVM2Instructions.LookupSwitch) {
+                            if (!isSwitch) {
+                                switchAddresses.add(startOffset);
                                 continue loopaddr;
                             } else {
-                                actualOperands = new int[case_count + 3];
-                                actualOperands[0] = firstOperand;
-                                actualOperands[1] = case_count;
-                                for (int c = 0; c < case_count + 1; c++) {
-                                    actualOperands[2 + c] = ais.readS24("actualOperand");
-                                }
+                                isSwitch = false;
                             }
-                        } else {
-                            if (instr.operands.length > 0) {
-                                actualOperands = new int[instr.operands.length];
-                                for (int op = 0; op < instr.operands.length; op++) {
-                                    switch (instr.operands[op] & 0xff00) {
-                                        case OPT_U30:
-                                            actualOperands[op] = ais.readU30("operand");
-                                            break;
-                                        case OPT_U30_SHORT:
-                                            actualOperands[op] = (short) ais.readU30("operand");
-                                            break;
-                                        case OPT_U8:
-                                            actualOperands[op] = ais.read("operand");
-                                            break;
-                                        case OPT_BYTE:
-                                            actualOperands[op] = (byte) ais.read("operand");
-                                            break;
-                                        case OPT_S24:
-                                            actualOperands[op] = ais.readS24("operand");
-                                            break;
+                        }
+                        if (di != null) {
+                            di.name = instr.instructionName;
+                        }
+                        if (instr != null) {
+                            int[] actualOperands = null;
+
+                            if (instructionCode == AVM2Instructions.LookupSwitch) { // switch
+                                int firstOperand = ais.readS24("default_offset");
+                                int case_count = ais.readU30("case_count");
+                                long afterCasePos = ais.getPosition() + 3 * (case_count + 1);
+
+                                boolean invalidSwitch = false;
+                                //If there are already some instructions in the lookupswitch bytes, the lookupswitch is invalid (obfuscation)
+                                for (long a = startOffset; a < afterCasePos; a++) {
+                                    if (codeMap.containsKey(a) && (!(codeMap.get(a).definition instanceof NopIns))) {
+                                        invalidSwitch = true;
+                                        break;
+                                    }
+                                }
+
+                                long totalBytes = ais.getPosition() + ais.available();
+
+                                //If the lookupswitch case_count are larger than available bytes, the lookupswitch is invalid (obfuscation)
+                                if (afterCasePos > totalBytes) {
+                                    invalidSwitch = true;
+                                }
+                                if (invalidSwitch) {
+                                    continue loopaddr;
+                                } else {
+                                    actualOperands = new int[case_count + 3];
+                                    actualOperands[0] = firstOperand;
+                                    actualOperands[1] = case_count;
+                                    for (int c = 0; c < case_count + 1; c++) {
+                                        actualOperands[2 + c] = ais.readS24("actualOperand");
+                                    }
+                                }
+                            } else {
+                                if (instr.operands.length > 0) {
+                                    actualOperands = new int[instr.operands.length];
+                                    for (int op = 0; op < instr.operands.length; op++) {
+                                        switch (instr.operands[op] & 0xff00) {
+                                            case OPT_U30:
+                                                actualOperands[op] = ais.readU30("operand");
+                                                break;
+                                            case OPT_U30_SHORT:
+                                                actualOperands[op] = (short) ais.readU30("operand");
+                                                break;
+                                            case OPT_U8:
+                                                actualOperands[op] = ais.read("operand");
+                                                break;
+                                            case OPT_BYTE:
+                                                actualOperands[op] = (byte) ais.read("operand");
+                                                break;
+                                            case OPT_S24:
+                                                actualOperands[op] = ais.readS24("operand");
+                                                break;
+                                        }
                                     }
                                 }
                             }
-                        }
 
-                        AVM2Instruction ai = new AVM2Instruction(startOffset, instr, actualOperands);
-                        long endOffset = ais.getPosition();
+                            AVM2Instruction ai = new AVM2Instruction(startOffset, instr, actualOperands);
+                            long endOffset = ais.getPosition();
 
-                        boolean hasRoom = true;
-                        for (long p = startOffset; p < endOffset; p++) {
-                            if (codeMap.containsKey(p) && !(codeMap.get(p).definition instanceof NopIns)) {
-                                hasRoom = false;
-                            }
-                        }
-
-                        //There is no room for this instruction (it is invalid?)
-                        if (!hasRoom) {
-                            continue loopaddr;
-                        }
-                        for (long p = startOffset; p < endOffset; p++) {
-                            codeMap.put(p, ai);
-                        }
-
-                        ais.endDumpLevel(instr.instructionCode);
-
-                        if ((instr instanceof IfTypeIns)) {
-                            if (handleJumps) {
-                                long target = ais.getPosition() + actualOperands[0];
-                                addresses.add(target);
-                            } else {
-                                actualOperands[0] = 0;
-                            }
-                        }
-
-                        if (instr instanceof JumpIns) {
-                            if (handleJumps) {
-                                long target = ais.getPosition() + actualOperands[0];
-                                addresses.add(target);
-                                unAdresses.add(ais.getPosition());
-                                continue loopaddr;
-                            } else {
-                                actualOperands[0] = 0;
-                            }
-                        }
-
-                        if (instr.isExitInstruction()) { //do not process jumps if there is return/throw instruction
-                            if (handleJumps) {
-                                unAdresses.add(ais.getPosition());
-                                continue loopaddr;
-                            }
-                        }
-                        if ((instr instanceof LookupSwitchIns) && actualOperands != null) {
-                            if (handleJumps) {
-                                addresses.add(startOffset + actualOperands[0]);
-
-                                for (int c = 2; c < actualOperands.length; c++) {
-                                    addresses.add(startOffset + actualOperands[c]);
-                                }
-                                unAdresses.add(ais.getPosition());
-                                continue loopaddr;
-                            } else {
-                                int swlen = (int) (endOffset - startOffset);
-                                actualOperands[0] = swlen;
-                                for (int c = 2; c < actualOperands.length; c++) {
-                                    actualOperands[c] = swlen;
+                            boolean hasRoom = true;
+                            for (long p = startOffset; p < endOffset; p++) {
+                                if (codeMap.containsKey(p) && !(codeMap.get(p).definition instanceof NopIns)) {
+                                    hasRoom = false;
                                 }
                             }
-                        }
 
-                    } else {
-                        ais.endDumpLevel();
-                        break; // Unknown instructions are ignored (Some of the obfuscators add unknown instructions)
-                        //throw new UnknownInstructionCode(instructionCode);
+                            //There is no room for this instruction (it is invalid?)
+                            if (!hasRoom) {
+                                continue loopaddr;
+                            }
+                            for (long p = startOffset; p < endOffset; p++) {
+                                codeMap.put(p, ai);
+                            }
+
+                            if ((instr instanceof IfTypeIns)) {
+                                if (handleJumps) {
+                                    long target = ais.getPosition() + actualOperands[0];
+                                    addresses.add(target);
+                                } else {
+                                    actualOperands[0] = 0;
+                                }
+                            }
+
+                            if (instr instanceof JumpIns) {
+                                if (handleJumps) {
+                                    long target = ais.getPosition() + actualOperands[0];
+                                    addresses.add(target);
+                                    unAdresses.add(ais.getPosition());
+                                    continue loopaddr;
+                                } else {
+                                    actualOperands[0] = 0;
+                                }
+                            }
+
+                            if (instr.isExitInstruction()) { //do not process jumps if there is return/throw instruction
+                                if (handleJumps) {
+                                    unAdresses.add(ais.getPosition());
+                                    continue loopaddr;
+                                }
+                            }
+                            if ((instr instanceof LookupSwitchIns) && actualOperands != null) {
+                                if (handleJumps) {
+                                    addresses.add(startOffset + actualOperands[0]);
+
+                                    for (int c = 2; c < actualOperands.length; c++) {
+                                        addresses.add(startOffset + actualOperands[c]);
+                                    }
+                                    unAdresses.add(ais.getPosition());
+                                    continue loopaddr;
+                                } else {
+                                    int swlen = (int) (endOffset - startOffset);
+                                    actualOperands[0] = swlen;
+                                    for (int c = 2; c < actualOperands.length; c++) {
+                                        actualOperands[c] = swlen;
+                                    }
+                                }
+                            }
+
+                        } else {
+                            break; // Unknown instructions are ignored (Some of the obfuscators add unknown instructions)
+                            //throw new UnknownInstructionCode(instructionCode);
+                        }
+                    } finally {
+                        if (instr == null) {
+                            ais.endDumpLevel();
+                        } else {
+                            ais.endDumpLevel(instr.instructionCode);
+                        }
                     }
                 }
             } catch (EndOfStreamException ex) {
@@ -996,6 +990,11 @@ public class AVM2Code implements Cloneable {
                 ais.endDumpLevelUntil(diParent);
             }
         }
+
+        if (diParent != null) {
+            diParent.sortChildren();
+        }
+
         AVM2Instruction prev = null;
         for (int i = 0; i < availableBytes; i++) {
             AVM2Instruction ins = codeMap.get((long) i);
@@ -1253,57 +1252,17 @@ public class AVM2Code implements Cloneable {
                  ret.append("exceptiontarget " + e + ":");
                  }
                  }*/
-                if (ins.replaceWith != null) {
-                    for (Object o : ins.replaceWith) {
-                        if (o instanceof Integer) {
-                            AVM2Instruction ins2 = code.get((Integer) o);
-                            if (ins2.isIgnored()) {
-                                continue;
-                            }
-                            writer.append("", ins2.mappedOffset > -1 ? ins2.mappedOffset : ofs);
-                            writer.appendNoHilight(ins2.toStringNoAddress(constants, new ArrayList<>()) + " ;copy from " + Helper.formatAddress(pos2adr((Integer) o)));
-                            writer.newLine();
-                            outputMap.add((Integer) o);
-                        } else if (o instanceof ControlFlowTag) {
-                            ControlFlowTag cft = (ControlFlowTag) o;
-                            if (cft.name.equals("appendjump")) {
-                                writer.appendNoHilight("jump ofs" + Helper.formatAddress(pos2adr(cft.value))).newLine();
-                                outputMap.add(-1);
-                            }
-                            if (cft.name.equals("mark")) {
-                                writer.appendNoHilight("ofs" + Helper.formatAddress(pos2adr(cft.value)) + ":");
-                            }
-                        }
+
+                if (!ins.isIgnored()) {
+                    if (markOffsets) {
+                        writer.append("", ofs);
                     }
-                } else {
-                    if (!ins.isIgnored()) {
-                        if (markOffsets) {
-                            writer.append("", ins.mappedOffset > -1 ? ins.mappedOffset : ofs);
-                        }
-                        int fixBranch = ins.getFixBranch();
-                        if (fixBranch > -1) {
-                            if (ins.definition instanceof IfTypeIns) {
-                                for (int i = 0; i < -ins.definition.getStackDelta(ins, null/*IfTypeIns do not require ABCs*/); i++) {
-                                    writer.appendNoHilight(DeobfuscatePopIns.NAME).newLine();
-                                }
-                                if (fixBranch == 0) { // jump
-                                    writer.appendNoHilight(JumpIns.NAME + " ofs" + Helper.formatAddress(ofs + ins.getBytesLength() + ins.operands[0]));
-                                } else {
-                                    // nojump, ignore
-                                }
-                            }
-                            // TODO: lookupswitch ?
-                        } else {
-                            if (ins.changeJumpTo > -1) {
-                                writer.appendNoHilight(ins.definition.instructionName + " ofs" + Helper.formatAddress(pos2adr(ins.changeJumpTo)));
-                            } else {
-                                writer.appendNoHilight(ins.toStringNoAddress(constants, new ArrayList<>()));
-                            }
-                        }
-                        writer.newLine();
-                        outputMap.add(ip);
-                    }
+
+                    writer.appendNoHilight(ins.toStringNoAddress(constants, new ArrayList<>()));
+                    writer.newLine();
+                    outputMap.add(ip);
                 }
+
                 ip++;
             }
         } else if (exportMode == ScriptExportMode.CONSTANTS) {
@@ -1325,16 +1284,6 @@ public class AVM2Code implements Cloneable {
 
         for (AVM2Instruction ins : code) {
             ret.addAll(ins.getOffsets());
-            if (ins.replaceWith != null) {
-                for (Object o : ins.replaceWith) {
-                    if (o instanceof ControlFlowTag) {
-                        ControlFlowTag cft = (ControlFlowTag) o;
-                        if (cft.name.equals("appendjump")) {
-                            ret.add((long) pos2adr(cft.value));
-                        }
-                    }
-                }
-            }
         }
 
         return ret;
@@ -2278,71 +2227,21 @@ public class AVM2Code implements Cloneable {
         //checkValidOffsets(body);
     }
 
-    @SuppressWarnings("unchecked")
-    private static AVM2LocalData prepareBranchLocalData(AVM2LocalData localData) {
-        AVM2LocalData ret = new AVM2LocalData();
-        ret.isStatic = localData.isStatic;
-        ret.classIndex = localData.classIndex;
-        ret.localRegs = new HashMap<>(localData.localRegs);
-        ret.scopeStack = (ScopeStack) (localData.scopeStack).clone();
-        ret.methodBody = localData.methodBody;
-        ret.abc = localData.abc;
-        ret.localRegNames = localData.localRegNames;
-        ret.fullyQualifiedNames = localData.fullyQualifiedNames;
-        ret.parsedExceptions = localData.parsedExceptions;
-        ret.finallyJumps = localData.finallyJumps;
-        ret.ignoredSwitches = localData.ignoredSwitches;
-        ret.ignoredSwitches2 = localData.ignoredSwitches2;
-        ret.scriptIndex = localData.scriptIndex;
-        ret.localRegAssignmentIps = localData.localRegAssignmentIps;
-        ret.ip = localData.ip;
-        ret.refs = localData.refs;
-        ret.code = localData.code;
-        return ret;
-    }
-
-    private int removeTrapsOld(Trait trait, int methodInfo, MethodBody body, ABC abc, int scriptIndex, int classIndex, boolean isStatic, String path) throws InterruptedException {
-        removeDeadCode(body);
-        AVM2LocalData localData = new AVM2LocalData();
-        localData.isStatic = isStatic;
-        localData.classIndex = classIndex;
-        localData.localRegs = new HashMap<>();
-        localData.scopeStack = new ScopeStack();
-        localData.methodBody = body;
-        localData.abc = abc;
-        localData.localRegNames = body.getLocalRegNames(abc);
-        localData.scriptIndex = scriptIndex;
-        localData.ip = 0;
-        HashMap<Integer, List<Integer>> refs = visitCode(body);
-        localData.refs = refs;
-        localData.code = this;
-        int ret = 0;
-        ret += removeTrapsOld(trait, methodInfo, body, localData, new AVM2GraphSource(this, false, -1, -1, new HashMap<>(), new ScopeStack(), abc, body, new HashMap<>(), new ArrayList<>(), new HashMap<>(), refs), 0, path, refs);
-        removeIgnored(body);
-        removeDeadCode(body);
-
-        return ret;
-    }
-
     public int removeTraps(Trait trait, int methodInfo, MethodBody body, ABC abc, int scriptIndex, int classIndex, boolean isStatic, String path) throws InterruptedException {
-        if (Configuration.deobfuscationOldMode.get()) {
-            return removeTrapsOld(trait, methodInfo, body, abc, scriptIndex, classIndex, isStatic, path);
-        } else {
-            SWFDecompilerPlugin.fireAvm2CodeRemoveTraps(path, classIndex, isStatic, scriptIndex, abc, trait, methodInfo, body);
-            try (Statistics s = new Statistics("AVM2DeobfuscatorGetSet")) {
-                new AVM2DeobfuscatorGetSet().avm2CodeRemoveTraps(path, classIndex, isStatic, scriptIndex, abc, trait, methodInfo, body);
-            }
-            try (Statistics s = new Statistics("AVM2DeobfuscatorSimple")) {
-                new AVM2DeobfuscatorSimpleOld().avm2CodeRemoveTraps(path, classIndex, isStatic, scriptIndex, abc, trait, methodInfo, body);
-            }
-            try (Statistics s = new Statistics("AVM2DeobfuscatorRegisters")) {
-                new AVM2DeobfuscatorRegistersOld().avm2CodeRemoveTraps(path, classIndex, isStatic, scriptIndex, abc, trait, methodInfo, body);
-            }
-            try (Statistics s = new Statistics("AVM2DeobfuscatorJumps")) {
-                new AVM2DeobfuscatorJumps().avm2CodeRemoveTraps(path, classIndex, isStatic, scriptIndex, abc, trait, methodInfo, body);
-            }
-            return 1;
+        SWFDecompilerPlugin.fireAvm2CodeRemoveTraps(path, classIndex, isStatic, scriptIndex, abc, trait, methodInfo, body);
+        try (Statistics s = new Statistics("AVM2DeobfuscatorGetSet")) {
+            new AVM2DeobfuscatorGetSet().avm2CodeRemoveTraps(path, classIndex, isStatic, scriptIndex, abc, trait, methodInfo, body);
         }
+        try (Statistics s = new Statistics("AVM2DeobfuscatorSimple")) {
+            new AVM2DeobfuscatorSimpleOld().avm2CodeRemoveTraps(path, classIndex, isStatic, scriptIndex, abc, trait, methodInfo, body);
+        }
+        try (Statistics s = new Statistics("AVM2DeobfuscatorRegisters")) {
+            new AVM2DeobfuscatorRegistersOld().avm2CodeRemoveTraps(path, classIndex, isStatic, scriptIndex, abc, trait, methodInfo, body);
+        }
+        try (Statistics s = new Statistics("AVM2DeobfuscatorJumps")) {
+            new AVM2DeobfuscatorJumps().avm2CodeRemoveTraps(path, classIndex, isStatic, scriptIndex, abc, trait, methodInfo, body);
+        }
+        return 1;
     }
 
     private void handleRegister(CodeStats stats, int reg) {
@@ -2485,10 +2384,11 @@ public class AVM2Code implements Cloneable {
                     nextIp = adr2pos(pos2adr(nextIp) + code.get(maxIp).operands[0]);
                 }
                 if (nextIp < stats.instructionStats.length) {
-                    int origScopePos = stats.instructionStats[nextIp].scopepos;
-                    int origStackPos = stats.instructionStats[nextIp].stackpos;
+                    InstructionStats nextIpStat = stats.instructionStats[nextIp];
+                    int origScopePos = nextIpStat.scopepos;
+                    int origStackPos = nextIpStat.stackpos;
 
-                    if (prevStart == ex.start && ex.isFinally() && !code.get(nextIp).isExit() && stats.instructionStats[nextIp].seen) {
+                    if (prevStart == ex.start && ex.isFinally() && !code.get(nextIp).isExit() && nextIpStat.seen) {
                         for (int i = 0; i < stats.instructionStats.length; i++) {
                             stats.instructionStats[i].seen = false;
                         }
@@ -2590,163 +2490,6 @@ public class AVM2Code implements Cloneable {
         return refs;
     }
 
-    private static class ControlFlowTag {
-
-        public String name;
-
-        public int value;
-
-        public ControlFlowTag(String name, int value) {
-            this.name = name;
-            this.value = value;
-        }
-    }
-
-    public void restoreControlFlow(int ip, HashMap<Integer, List<Integer>> refs, int[] visited2, HashMap<Integer, List<Object>> appended) throws ConvertException {
-        List<Object> buf = new ArrayList<>();
-        boolean cont = false;
-        int continueip;
-        for (; ip < code.size(); ip++) {
-            AVM2Instruction ins = code.get(ip);
-
-            if ((refs.containsKey(ip) && refs.get(ip).size() > 1) || (visited2[ip] > 0)) {
-                if (cont) {
-                    buf.add(new ControlFlowTag("appendjump", ip));
-                }
-                cont = false;
-                if (visited2[ip] > 0) {
-                    break;
-                }
-            }
-            visited2[ip]++;
-            if (ins.definition instanceof LookupSwitchIns) {
-
-                if (cont) {
-                    buf.add(new ControlFlowTag("appendjump", ip));
-                }
-                //cont = false;
-                restoreControlFlow(adr2pos(pos2adr(ip) + ins.operands[0]), refs, visited2, appended);
-                for (int i = 2; i < ins.operands.length; i++) {
-                    restoreControlFlow(adr2pos(pos2adr(ip) + ins.operands[i]), refs, visited2, appended);
-                }
-                break;
-            }
-            if (ins.definition instanceof JumpIns) {
-                int newip = adr2pos(pos2adr(ip + 1) + ins.operands[0]);
-
-                boolean allJumpsOrIfs = true;
-                for (int ref : refs.get(ip)) {
-                    if (ref < 0) {
-                        continue;
-                    }
-                    if (!(code.get(ref).definition instanceof JumpIns)) {
-                        if (!(code.get(ref).definition instanceof IfTypeIns)) {
-                            allJumpsOrIfs = false;
-                            break;
-                        } else {
-                            if (adr2pos(pos2adr(ref + 1) + code.get(ref).operands[0]) != ip) {
-                                allJumpsOrIfs = false;
-                                break;
-                            }
-                        }
-                    }
-                }
-                if (allJumpsOrIfs) {
-                    for (int ref : refs.get(ip)) {
-                        if (ref < 0) {
-                            continue;
-                        }
-                        code.get(ref).changeJumpTo = newip;
-                    }
-                }
-                if ((newip < code.size()) && (refs.containsKey(newip) && refs.get(newip).size() == 1)) {
-                    if (!cont) {
-                        continueip = ip;
-                        buf = new ArrayList<>();
-                        appended.put(continueip, buf);
-                    }
-                    cont = true;
-                } else {
-                    if (cont) {
-                        buf.add(new ControlFlowTag("appendjump", newip));
-                    }
-                    cont = false;
-                }
-                ip = newip - 1;
-            } else if (ins.definition instanceof IfTypeIns) {
-                int newip = adr2pos(pos2adr(ip + 1) + ins.operands[0]);
-                if (cont) {
-                    buf.add(new ControlFlowTag("appendjump", ip));
-                }
-                cont = false;
-                restoreControlFlow(newip, refs, visited2, appended);
-            } else if ((ins.definition instanceof ReturnVoidIns) || (ins.definition instanceof ReturnValueIns) || (ins.definition instanceof ThrowIns)) {
-                if (cont) {
-                    buf.add(ip);
-                }
-                break;
-            } else if (cont) {
-                buf.add(ip);
-            }
-        }
-
-    }
-
-    private void restoreControlFlowPass(AVM2ConstantPool constants, Trait trait, MethodInfo info, MethodBody body) throws InterruptedException {
-        try {
-            HashMap<Integer, List<Integer>> refs;
-            int[] visited2 = new int[code.size()];
-            refs = visitCode(body);
-            HashMap<Integer, List<Object>> appended = new HashMap<>();
-
-            restoreControlFlow(0, refs, visited2, appended);
-            for (ABCException e : body.exceptions) {
-                try {
-                    restoreControlFlow(adr2pos(e.start, true), refs, visited2, appended);
-                    restoreControlFlow(adr2pos(e.target), refs, visited2, appended);
-                    restoreControlFlow(adr2pos(e.end, true), refs, visited2, appended);
-                } catch (ConvertException ex) {
-                    logger.log(Level.FINE, null, ex);
-                }
-            }
-
-            for (int ip : appended.keySet()) {
-                code.get(ip).replaceWith = appended.get(ip);
-            }
-        } catch (ConvertException cex) {
-            logger.log(Level.SEVERE, "Error during restore control flow", cex);
-        }
-        try {
-            List<Integer> outputMap = new ArrayList<>();
-            HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
-            toASMSource(constants, trait, info, body, outputMap, ScriptExportMode.PCODE, writer);
-            String src = writer.toString();
-
-            AVM2Code acode = ASM3Parser.parse(new StringReader(src), constants, null, body, info);
-            for (int i = 0; i < acode.code.size(); i++) {
-                if (outputMap.size() > i) {
-                    int tpos = outputMap.get(i);
-                    if (tpos == -1) {
-                    } else if (code.get(tpos).mappedOffset >= 0) {
-                        acode.code.get(i).mappedOffset = code.get(tpos).mappedOffset;
-                    } else {
-                        acode.code.get(i).mappedOffset = pos2adr(tpos);
-                    }
-                }
-            }
-            this.code = acode.code;
-        } catch (IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
-        } catch (AVM2ParseException ex) {
-            logger.log(Level.FINE, null, ex);
-        }
-        removeDeadCode(body);
-    }
-
-    public void restoreControlFlow(AVM2ConstantPool constants, Trait trait, MethodInfo info, MethodBody body) throws InterruptedException {
-        restoreControlFlowPass(constants, trait, info, body);
-    }
-
     public void removeIgnored(MethodBody body) throws InterruptedException {
         //System.err.println("removing ignored...");
         for (int i = 0; i < code.size(); i++) {
@@ -2820,25 +2563,6 @@ public class AVM2Code implements Cloneable {
         }
 
         return modified;
-    }
-
-    public void markMappedOffsets() {
-        int ofs = 0;
-        for (int i = 0; i < code.size(); i++) {
-            code.get(i).mappedOffset = ofs;
-            ofs += code.get(i).getBytesLength();
-        }
-    }
-
-    private static class Decision {
-
-        public boolean jumpUsed = false;
-
-        public boolean skipUsed = false;
-
-        public Set<Integer> casesUsed = new HashSet<>();
-
-        HashMap<Integer, GraphTargetItem> registers = new HashMap<>();
     }
 
     private static int getMostCommonIp(AVM2GraphSource code, List<Integer> branches) {
@@ -2983,294 +2707,6 @@ public class AVM2Code implements Cloneable {
         } while (currentIp >= 0);
         return true;
     }
-
-    @SuppressWarnings("unchecked")
-    private static int removeTrapsOld(HashMap<Integer, List<Integer>> refs, boolean secondPass, boolean indeterminate, AVM2LocalData localData, TranslateStack stack, List<GraphTargetItem> output, AVM2GraphSource code, int ip, HashMap<Integer, Integer> visited, HashMap<Integer, HashMap<Integer, GraphTargetItem>> visitedStates, HashMap<AVM2Instruction, Decision> decisions, String path, int recursionLevel) throws InterruptedException {
-        if (Thread.currentThread().isInterrupted()) {
-            throw new InterruptedException();
-        }
-        if (recursionLevel > code.size() + 1) {
-            throw new TranslateException("removeTraps max recursion level reached.");
-        }
-        boolean debugMode = false;
-        int ret = 0;
-        iploop:
-        while ((ip > -1) && ip < code.size()) {
-
-            if (false) { //useVisited) {
-                if (visited.containsKey(ip)) {
-                    break;
-                }
-                if (!visited.containsKey(ip)) {
-                    visited.put(ip, 0);
-                } else {
-                    visited.put(ip, visited.get(ip) + 1);
-                }
-            } else {
-                HashMap<Integer, GraphTargetItem> currentState = localData.localRegs;
-
-                if (visitedStates.containsKey(ip)) {
-                    HashMap<Integer, GraphTargetItem> lastState = visitedStates.get(ip);
-                    if (lastState.equals(currentState)) {
-                        break;
-                    }
-                }
-                visitedStates.put(ip, (HashMap<Integer, GraphTargetItem>) currentState.clone());
-
-            }
-
-            int curVisited;
-            if (!visited.containsKey(ip)) {
-                curVisited = 1;
-            } else {
-                curVisited = visited.get(ip) + 1;
-            }
-            visited.put(ip, curVisited);
-
-            List<Integer> r = refs.get(ip);
-            /*if (r != null) {
-             if (r.size() > 1) {
-             if (!stack.isEmpty()) {
-             GraphTargetItem it = stack.pop();
-             stack.push(new NotCompileTimeAVM2Item(null, it));
-             }
-             }
-             }*/
-
-            AVM2Instruction ins = code.get(ip);
-            // Errorneous code inserted by some obfuscators
-            if (ins.definition instanceof NewObjectIns) {
-                if (ins.operands[0] > stack.size()) {
-                    ins.setIgnored(true, 0);
-                }
-            }
-            if (ins.definition instanceof NewArrayIns) {
-                if (ins.operands[0] > stack.size()) {
-                    ins.setIgnored(true, 0);
-                }
-            }
-
-            if (ins.isIgnored()) {
-                ip++;
-                continue;
-            }
-
-            if (debugMode) {
-                System.out.println((indeterminate ? "useV " : "") + (secondPass ? "secondPass " : "") + "Visit " + ip + ": " + ins + " stack:" + stack.toString());
-                HashMap<Integer, GraphTargetItem> registers = localData.localRegs;
-                System.out.print("Registers:");
-                for (int reg : registers.keySet()) {
-                    try {
-                        System.out.print(" r" + reg + ": " + registers.get(reg).getResult());
-                    } catch (NullPointerException npe) {
-                        System.out.print(" r" + reg + ": " + "null");
-                    }
-                }
-                System.out.println("");
-            }
-            if (secondPass) {
-                /*if ((ins instanceof AVM2Instruction) && (((AVM2Instruction) ins).definition instanceof PopIns)) {
-                 GraphTargetItem top = stack.peek();
-                 for (GraphSourceItemPos p : top.getNeededSources()) {
-                 if (p == null) {
-                 continue;
-                 }
-                 if (p.item == null) {
-                 continue;
-                 }
-                 if (p.item.isIgnored()) {
-                 ins.setIgnored(true, 0);
-                 break;
-                 }
-                 }
-                 }*/
-            }
-
-            if (ins.definition instanceof NewFunctionIns) {
-                stack.push(new BooleanAVM2Item(null, null, true));
-            } else {
-                localData.ip = ip;
-                ins.translate(localData, stack, output, Graph.SOP_USE_STATIC, path);
-            }
-
-            if (ins.definition instanceof SetLocalTypeIns) {
-                SetLocalTypeIns slt = (SetLocalTypeIns) ins.definition;
-                int regId = slt.getRegisterId(ins);
-                if (indeterminate) {
-                    HashMap<Integer, GraphTargetItem> registers = localData.localRegs;
-                    GraphTargetItem regVal = registers.get(regId);
-                    if (regVal.isCompileTime()) {
-                        registers.put(regId, new NotCompileTimeItem(null, null, regVal));
-                    }
-                }
-            }
-
-            if (ins.isExit()) {
-                break;
-            }
-
-            if (ins.isBranch() || ins.isJump()) {
-                List<Integer> branches = ins.getBranches(code);
-                if (ins.definition instanceof IfTypeIns
-                        && (!(ins.definition instanceof JumpIns))
-                        && (!stack.isEmpty())
-                        && (stack.peek().isCompileTime())
-                        && (!stack.peek().hasSideEffect())) {
-                    boolean condition = EcmaScript.toBoolean(stack.peek().getResult());
-                    if (debugMode) {
-                        if (condition) {
-                            System.out.println("JUMP");
-                        } else {
-                            System.out.println("SKIP");
-                        }
-                    }
-                    Decision dec = new Decision();
-                    if (decisions.containsKey(ins)) {
-                        dec = decisions.get(ins);
-                    } else {
-                        decisions.put(ins, dec);
-                    }
-                    if (condition) {
-                        dec.jumpUsed = true;
-                    } else {
-                        dec.skipUsed = true;
-                    }
-
-                    if (branches.size() > 1) {
-                        if (secondPass) {
-                            if (condition && (dec.jumpUsed) && (!dec.skipUsed)) {
-                                ins.setFixBranch(0);
-                                //ins.definition = AVM2Code.instructionSet[AVM2Instructions.Jump];
-                            }
-                            if ((!condition) && (!dec.jumpUsed) && (dec.skipUsed)) {
-                                ins.setFixBranch(1);
-                                //ins.setIgnored(true, 0);
-                            }
-                        }
-                    }
-                    GraphTargetItem tar = stack.pop();
-                    /*if (secondPass && (dec.jumpUsed != dec.skipUsed)) {
-                     for (GraphSourceItemPos pos : tar.getNeededSources()) {
-                     if (pos.item instanceof AVM2Instruction) {
-                     if (((AVM2Instruction) pos.item).definition instanceof DupIns) {
-                     pos.item.setIgnored(true, 0);
-                     break;
-                     }
-                     }
-                     if (pos.item != ins) {
-                     pos.item.setIgnored(true, 0);
-                     }
-                     }
-
-                     }*/
-                    if (branches.size() == 1) {
-                        ip = branches.get(0);
-                    } else {
-                        ip = condition ? branches.get(0) : branches.get(1);
-                    }
-                    continue;
-                } else {
-                    if (ins.isBranch() && (!ins.isJump())) {
-                        GraphTargetItem top = stack.pop();
-
-                        Decision dec = new Decision();
-                        if (decisions.containsKey(ins)) {
-                            dec = decisions.get(ins);
-                        } else {
-                            decisions.put(ins, dec);
-                        }
-                        HashMap<Integer, GraphTargetItem> registers = localData.localRegs;
-                        boolean regChanged = false;
-                        if (!dec.registers.isEmpty()) {
-                            if (dec.registers.size() != registers.size()) {
-                                regChanged = true;
-                            } else {
-                                for (int reg : registers.keySet()) {
-                                    if (!dec.registers.containsKey(reg)) {
-                                        regChanged = true;
-                                        break;
-                                    }
-                                    if (!registers.get(reg).isCompileTime() && dec.registers.get(reg).isCompileTime()) {
-                                        regChanged = true;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                        dec.registers.putAll(registers);
-                        dec.jumpUsed = true;
-                        dec.skipUsed = true;
-
-                        if (!regChanged && ((!(top instanceof HasNextAVM2Item) && curVisited > 1) || (curVisited > 2))) {
-                            for (int b : branches) {
-                                int visc = 0;
-                                if (visited.containsKey(b)) {
-                                    visc = visited.get(b);
-                                }
-                                if (visc == 0) {//<curVisited){
-                                    ip = b;
-                                    continue iploop;
-                                }
-                            }
-                            break;
-                        }
-                        indeterminate = true;
-                    }
-
-                    for (int b : branches) {
-                        TranslateStack brStack = (TranslateStack) stack.clone();
-                        if (b >= 0) { //useVisited || (!ins.isJump())
-                            ret += removeTrapsOld(refs, secondPass, indeterminate, prepareBranchLocalData(localData), brStack, output, code, b, visited, visitedStates, decisions, path, recursionLevel + 1);
-                        } else {
-                            if (debugMode) {
-                                System.out.println("Negative branch:" + b);
-                            }
-                        }
-                    }
-                }
-                break;
-            }
-            ip++;
-        }
-        if (ip < 0 && debugMode) {
-            System.out.println("Visited Negative: " + ip);
-        }
-        return ret;
-    }
-
-    public static int removeTrapsOld(Trait trait, int methodInfo, MethodBody body, AVM2LocalData localData, AVM2GraphSource code, int addr, String path, HashMap<Integer, List<Integer>> refs) throws InterruptedException {
-        HashMap<AVM2Instruction, AVM2Code.Decision> decisions = new HashMap<>();
-        removeTrapsOld(refs, false, false, localData, new TranslateStack(path), new ArrayList<>(), code, code.adr2pos(addr), new HashMap<>(), new HashMap<>(), decisions, path, 0);
-        int cnt = 0;
-        for (AVM2Instruction src : decisions.keySet()) {
-            Decision dec = decisions.get(src);
-            if (dec != null) {
-                if (src.definition instanceof LookupSwitchIns) {
-                    if (dec.casesUsed.size() == 1) {
-                        for (int c : dec.casesUsed) {
-                            src.setFixBranch(c);
-                            cnt++;
-                        }
-                    }
-                } else {
-                    if (dec.jumpUsed && !dec.skipUsed) {
-                        src.setFixBranch(0);
-                        cnt++;
-                    }
-                    if (!dec.jumpUsed && dec.skipUsed) {
-                        src.setFixBranch(1);
-                        cnt++;
-                    }
-                }
-            }
-        }
-        code.getCode().removeIgnored(body);
-        return cnt;
-    }
-    /*public static int removeTraps(AVM2LocalData localData, AVM2GraphSource code, int addr) {
-     AVM2Graph.translateViaGraph(localData, "", code, new ArrayList<Integer>(), Graph.SOP_REMOVE_STATIC);
-     return 1;
-     }*/
 
     @Override
     public AVM2Code clone() {

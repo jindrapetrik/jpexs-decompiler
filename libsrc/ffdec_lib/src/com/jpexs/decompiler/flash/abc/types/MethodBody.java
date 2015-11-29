@@ -179,10 +179,6 @@ public final class MethodBody implements Cloneable {
         return getCode().removeDeadCode(this);
     }
 
-    public void restoreControlFlow(AVM2ConstantPool constants, Trait trait, MethodInfo info) throws InterruptedException {
-        getCode().restoreControlFlow(constants, trait, info, this);
-    }
-
     public int removeTraps(ABC abc, Trait trait, int scriptIndex, int classIndex, boolean isStatic, String path) throws InterruptedException {
 
         return getCode().removeTraps(trait, method_info, this, abc, scriptIndex, classIndex, isStatic, path);
@@ -195,7 +191,6 @@ public final class MethodBody implements Cloneable {
             removeTraps(abc, trait, scriptIndex, classIndex, isStatic, path);
         } else if (level == DeobfuscationLevel.LEVEL_RESTORE_CONTROL_FLOW) {
             removeTraps(abc, trait, scriptIndex, classIndex, isStatic, path);
-            restoreControlFlow(abc.constants, trait, abc.method_info.get(method_info));
         }
 
         ((Tag) abc.parentTag).setModified(true);
@@ -360,8 +355,10 @@ public final class MethodBody implements Cloneable {
                     HashMap<Integer, String> localRegNames = getLocalRegNames(abc);
                     //writer.startMethod(this.method_info);
                     if (Configuration.showMethodBodyId.get()) {
-                        writer.appendNoHilight("// method body id: ");
+                        writer.appendNoHilight("// method body index: ");
                         writer.appendNoHilight(abc.findBodyIndex(this.method_info));
+                        writer.appendNoHilight(" method index: ");
+                        writer.appendNoHilight(this.method_info);
                         writer.newLine();
                     }
                     Graph.graphToString(convertedItems, writer, LocalData.create(abc.constants, localRegNames, fullyQualifiedNames));
@@ -381,10 +378,9 @@ public final class MethodBody implements Cloneable {
     public MethodBody convertMethodBody(ConvertData convertData, String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, Trait trait, ScopeStack scopeStack, boolean isStaticInitializer, List<DottedChain> fullyQualifiedNames, List<Traits> initTraits) throws InterruptedException {
         MethodBody body = clone();
         AVM2Code code = body.getCode();
-        code.markMappedOffsets();
         code.fixJumps(path, body);
 
-        if (convertData.deobfuscationMode != -1) {
+        if (convertData.deobfuscationMode != 0) {
             try {
                 code.removeTraps(trait, method_info, body, abc, scriptIndex, classIndex, isStatic, path);
             } catch (ThreadDeath | InterruptedException ex) {
@@ -394,7 +390,6 @@ public final class MethodBody implements Cloneable {
                 logger.log(Level.SEVERE, "Deobfuscation failed in: " + path, ex);
                 body = clone();
                 code = body.getCode();
-                code.markMappedOffsets();
                 code.fixJumps(path, body);
                 return body;
             }
@@ -405,7 +400,7 @@ public final class MethodBody implements Cloneable {
 
     public String toSource() {
         ConvertData convertData = new ConvertData();
-        convertData.deobfuscationMode = -1;
+        convertData.deobfuscationMode = 0;
         try {
             convert(convertData, "", ScriptExportMode.AS, false, method_info, 0, 0, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true);
             HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);

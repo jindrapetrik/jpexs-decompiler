@@ -18,6 +18,8 @@ package com.jpexs.decompiler.flash.dumpview;
 
 import com.jpexs.decompiler.flash.tags.TagStub;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -75,6 +77,25 @@ public class DumpInfo {
             childInfos = new ArrayList<>();
         }
         return childInfos;
+    }
+
+    public void sortChildren() {
+        if (childInfos == null) {
+            return;
+        }
+
+        Collections.sort(childInfos, new Comparator<DumpInfo>() {
+
+            @Override
+            public int compare(DumpInfo o1, DumpInfo o2) {
+                int res = Long.compare(o1.startByte, o2.startByte);
+                if (res != 0) {
+                    return res;
+                }
+
+                return Integer.compare(o1.startBit, o1.startBit);
+            }
+        });
     }
 
     public long getEndByte() {

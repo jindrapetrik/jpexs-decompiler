@@ -838,8 +838,7 @@ public abstract class Action implements GraphSourceItem {
                     int staticOperation = Graph.SOP_USE_STATIC; //(Boolean) Configuration.getConfig("autoDeobfuscate", true) ? Graph.SOP_SKIP_STATIC : Graph.SOP_USE_STATIC;
                     List<GraphTargetItem> tree = actionsToTree(new HashMap<>(), new HashMap<>(), new HashMap<>(), actions, version, staticOperation, path);
                     SWFDecompilerPlugin.fireActionTreeCreated(tree, swf);
-                    int deobfuscationMode = Configuration.autoDeobfuscate.get() ? (Configuration.deobfuscationOldMode.get() ? 0 : 1) : -1;
-                    if (deobfuscationMode == 1) {
+                    if (Configuration.autoDeobfuscate.get()) {
                         new ActionDeobfuscator().actionTreeCreated(tree, swf);
                     }
 

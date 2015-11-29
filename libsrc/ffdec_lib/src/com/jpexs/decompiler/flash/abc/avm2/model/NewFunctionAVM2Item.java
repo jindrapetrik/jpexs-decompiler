@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -25,7 +24,8 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.graph.DottedChain;
-import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -49,7 +49,7 @@ public class NewFunctionAVM2Item extends AVM2Item {
 
     public int methodIndex;
 
-    public NewFunctionAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  String functionName, String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, List<DottedChain> fullyQualifiedNames, int methodIndex) {
+    public NewFunctionAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, String functionName, String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, List<DottedChain> fullyQualifiedNames, int methodIndex) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.functionName = functionName;
         this.path = path;
@@ -71,8 +71,10 @@ public class NewFunctionAVM2Item extends AVM2Item {
         abc.method_info.get(methodIndex).getParamStr(writer, abc.constants, body, abc, fullyQualifiedNames);
         writer.appendNoHilight("):");
         if (Configuration.showMethodBodyId.get()) {
-            writer.appendNoHilight("// method body id: ");
+            writer.appendNoHilight("// method body index: ");
             writer.appendNoHilight(abc.findBodyIndex(methodIndex));
+            writer.appendNoHilight(" method index: ");
+            writer.appendNoHilight(methodIndex);
             writer.newLine();
         }
         abc.method_info.get(methodIndex).getReturnTypeStr(writer, abc.constants, fullyQualifiedNames);

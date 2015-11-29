@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.abc.types.traits;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewFunctionAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.parser.script.FunctionAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.AssignedValue;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
@@ -106,8 +105,10 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
             writer.startTrait(assignment.initializer);
             writer.startMethod(assignment.method);
             if (Configuration.showMethodBodyId.get()) {
-                writer.appendNoHilight("// method body id: ");
+                writer.appendNoHilight("// method body index: ");
                 writer.appendNoHilight(abc.findBodyIndex(assignment.method));
+                writer.appendNoHilight(" method index: ");
+                writer.appendNoHilight(assignment.method);
                 writer.newLine();
             }
 
@@ -199,5 +200,4 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         super.getImportsUsages(customNs, abc, imports, uses, ignorePackage, fullyQualifiedNames);
         parseImportsUsagesFromMultiname(customNs, abc, imports, uses, abc.constants.getMultiname(type_index), getPackage(abc), fullyQualifiedNames);
     }
-
 }

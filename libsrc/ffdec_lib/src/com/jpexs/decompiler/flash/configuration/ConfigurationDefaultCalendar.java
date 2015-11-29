@@ -14,24 +14,20 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.abc.types;
+package com.jpexs.decompiler.flash.configuration;
 
-import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
-import com.jpexs.decompiler.flash.configuration.Configuration;
-import java.util.HashMap;
-import java.util.Map;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  *
  * @author JPEXS
  */
-public class ConvertData {
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
+public @interface ConfigurationDefaultCalendar {
 
-    public int deobfuscationMode;
-
-    public Map<TraitSlotConst, AssignedValue> assignedValues = new HashMap<>();
-
-    public ConvertData() {
-        deobfuscationMode = Configuration.autoDeobfuscate.get() ? 1 : 0;
-    }
+    long value();
 }

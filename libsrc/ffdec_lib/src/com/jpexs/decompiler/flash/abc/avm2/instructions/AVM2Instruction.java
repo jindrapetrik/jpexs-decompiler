@@ -53,10 +53,6 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     private boolean ignored = false;
 
-    public long mappedOffset = -1;
-
-    public int changeJumpTo = -1;
-
     private int line;
 
     private String file;
@@ -329,8 +325,6 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
         return s;
     }
 
-    public List<Object> replaceWith;
-
     @Override
     public void translate(BaseLocalData localData, TranslateStack stack, List<GraphTargetItem> output, int staticOperation, String path) throws InterruptedException {
         AVM2LocalData aLocalData = (AVM2LocalData) localData;
@@ -363,14 +357,11 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     @Override
     public boolean isJump() {
-        return (definition instanceof JumpIns) || (fixedBranch > -1);
+        return definition instanceof JumpIns;
     }
 
     @Override
     public boolean isBranch() {
-        if (fixedBranch > -1) {
-            return false;
-        }
         return (definition instanceof IfTypeIns) || (definition instanceof LookupSwitchIns);
     }
 
@@ -381,7 +372,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     @Override
     public long getOffset() {
-        return mappedOffset > -1 ? mappedOffset : offset;
+        return offset;
     }
 
     @Override
@@ -389,23 +380,15 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
         List<Integer> ret = new ArrayList<>();
         if (definition instanceof IfTypeIns) {
 
-            if (fixedBranch == -1 || fixedBranch == 0) {
-                ret.add(code.adr2pos(offset + getBytesLength() + operands[0]));
-            }
+            ret.add(code.adr2pos(offset + getBytesLength() + operands[0]));
             if (!(definition instanceof JumpIns)) {
-                if (fixedBranch == -1 || fixedBranch == 1) {
-                    ret.add(code.adr2pos(offset + getBytesLength()));
-                }
+                ret.add(code.adr2pos(offset + getBytesLength()));
             }
         }
         if (definition instanceof LookupSwitchIns) {
-            if (fixedBranch == -1 || fixedBranch == 0) {
-                ret.add(code.adr2pos(offset + operands[0]));
-            }
+            ret.add(code.adr2pos(offset + operands[0]));
             for (int k = 2; k < operands.length; k++) {
-                if (fixedBranch == -1 || fixedBranch == k - 1) {
-                    ret.add(code.adr2pos(offset + operands[k]));
-                }
+                ret.add(code.adr2pos(offset + operands[k]));
             }
         }
         return ret;
@@ -419,16 +402,6 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
     @Override
     public void setIgnored(boolean ignored, int pos) {
         this.ignored = ignored;
-    }
-
-    public void setFixBranch(int pos) {
-        this.fixedBranch = pos;
-    }
-
-    private int fixedBranch = -1;
-
-    public int getFixBranch() {
-        return fixedBranch;
     }
 
     @Override

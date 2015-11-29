@@ -34,7 +34,6 @@ import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -94,6 +93,8 @@ public class AdvancedSettingsDialog extends AppDialog {
 
     /**
      * Creates new form AdvancedSettingsDialog
+     *
+     * @param selectedCategory
      */
     public AdvancedSettingsDialog(String selectedCategory) {
         initComponents(selectedCategory);
@@ -387,7 +388,7 @@ public class AdvancedSettingsDialog extends AppDialog {
                             val = "";
                         }
                         if (itemType == Calendar.class) {
-                            tf.setText(new SimpleDateFormat().format(((Calendar) item.get()).getTime()));
+                            tf.setText(new SimpleDateFormat().format(((Calendar) val).getTime()));
                         } else {
                             tf.setText(val.toString());
                         }

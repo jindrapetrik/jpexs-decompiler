@@ -94,10 +94,6 @@ public class Configuration {
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("")
-    public static final ConfigurationItem<Boolean> deobfuscationOldMode = null;
-
-    @ConfigurationDefaultBoolean(false)
-    @ConfigurationCategory("")
     public static final ConfigurationItem<Boolean> cacheOnDisk = null;
 
     @ConfigurationDefaultBoolean(false)
@@ -262,6 +258,7 @@ public class Configuration {
 
     public static final ConfigurationItem<HashMap<String, SwfSpecificConfiguration>> swfSpecificConfigs = null;
 
+    @ConfigurationDefaultCalendar(0)
     public static final ConfigurationItem<Calendar> lastUpdatesCheckDate = null;
 
     @ConfigurationDefaultInt(1000)
@@ -741,12 +738,6 @@ public class Configuration {
         }
         //limit paralel threads?
         //int processorCount = Runtime.getRuntime().availableProcessors();
-
-        if (lastUpdatesCheckDate.get() == null) {
-            GregorianCalendar mingc = new GregorianCalendar();
-            mingc.setTime(new Date(Long.MIN_VALUE));
-            lastUpdatesCheckDate.set(mingc);
-        }
     }
 
     @SuppressWarnings("unchecked")
@@ -816,6 +807,12 @@ public class Configuration {
         ConfigurationDefaultDouble aDouble = field.getAnnotation(ConfigurationDefaultDouble.class);
         if (aDouble != null) {
             defaultValue = aDouble.value();
+        }
+        ConfigurationDefaultCalendar aCalendar = field.getAnnotation(ConfigurationDefaultCalendar.class);
+        if (aCalendar != null) {
+            GregorianCalendar mingc = new GregorianCalendar();
+            mingc.setTime(new Date(aCalendar.value()));
+            defaultValue = mingc;
         }
         return defaultValue;
     }

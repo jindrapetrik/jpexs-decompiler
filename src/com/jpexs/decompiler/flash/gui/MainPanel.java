@@ -23,7 +23,6 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFBundle;
 import com.jpexs.decompiler.flash.SWFSourceInfo;
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
@@ -84,7 +83,6 @@ import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
 import com.jpexs.decompiler.flash.gui.dumpview.DumpTree;
 import com.jpexs.decompiler.flash.gui.dumpview.DumpTreeModel;
 import com.jpexs.decompiler.flash.gui.dumpview.DumpViewPanel;
-import com.jpexs.decompiler.flash.gui.editor.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.gui.helpers.ObservableList;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTree;
@@ -142,7 +140,6 @@ import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.decompiler.flash.xfl.FLAVersion;
-import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
@@ -2272,47 +2269,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     logger.log(Level.SEVERE, null, ex);
                 }
             }
-        }
-    }
-
-    public void restoreControlFlow(final boolean all) {
-        if ((!all) || confirmExperimental()) {
-            new CancellableWorker<Void>() {
-                @Override
-                protected Void doInBackground() throws Exception {
-                    ABCPanel abcPanel = getABCPanel();
-                    if (all) {
-                        for (ABCContainerTag tag : abcPanel.getAbcList()) {
-                            tag.getABC().restoreControlFlow();
-                        }
-                    } else {
-                        ABC abc = abcPanel.abc;
-                        int bi = abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex();
-                        if (bi != -1) {
-                            abc.bodies.get(bi).restoreControlFlow(abc.constants, abcPanel.decompiledTextArea.getCurrentTrait(), abc.method_info.get(abc.bodies.get(bi).method_info));
-                        }
-
-                        abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abc, abcPanel.decompiledTextArea.getCurrentTrait(), abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getScriptIndex());
-                    }
-                    return null;
-                }
-
-                @Override
-                protected void onStart() {
-                    Main.startWork(translate("work.restoringControlFlow"), this);
-                }
-
-                @Override
-                protected void done() {
-                    View.execInEventDispatch(() -> {
-                        Main.stopWork();
-                        View.showMessageDialog(null, translate("work.restoringControlFlow.complete"));
-
-                        getABCPanel().reload();
-                        updateClassesList();
-                    });
-                }
-            }.execute();
         }
     }
 

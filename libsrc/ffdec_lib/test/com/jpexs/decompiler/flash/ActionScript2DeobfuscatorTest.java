@@ -49,7 +49,6 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
     public void init() throws IOException, InterruptedException {
         //Main.initLogging(false);
         Configuration.autoDeobfuscate.set(true);
-        Configuration.deobfuscationOldMode.set(false);
         swf = new SWF(new BufferedInputStream(new FileInputStream("testdata/as2/as2.swf")), false);
     }
 

@@ -20,45 +20,26 @@ import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.action.deobfuscation.ActionDeobfuscator;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
-import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.special.ActionDeobfuscateJump;
 import com.jpexs.decompiler.flash.action.special.ActionEnd;
 import com.jpexs.decompiler.flash.action.special.ActionNop;
 import com.jpexs.decompiler.flash.action.special.ActionStore;
-import com.jpexs.decompiler.flash.action.swf4.ActionEquals;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.action.swf4.ActionJump;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf5.ActionConstantPool;
-import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
-import com.jpexs.decompiler.flash.action.swf5.ActionEquals2;
-import com.jpexs.decompiler.flash.action.swf5.ActionStoreRegister;
-import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.configuration.Configuration;
-import com.jpexs.decompiler.flash.ecma.EcmaScript;
-import com.jpexs.decompiler.flash.ecma.Null;
-import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
-import com.jpexs.decompiler.graph.Graph;
-import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
-import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.decompiler.graph.NotCompileTimeItem;
-import com.jpexs.decompiler.graph.TranslateException;
-import com.jpexs.decompiler.graph.TranslateStack;
-import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.CancellableWorker;
-import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.stat.Statistics;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Scanner;
 import java.util.TreeMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -169,17 +150,9 @@ public class ActionListReader {
             actions = fixActionList(actions, null);
         }
 
-        if (deobfuscationMode == 0) {
+        if (deobfuscationMode == 1) {
             try {
-                actions = deobfuscateActionListOld(listeners, actions, version, 0, path);
-                updateActionLengths(actions);
-            } catch (OutOfMemoryError | StackOverflowError | TranslateException ex) {
-                // keep orignal (not deobfuscated) actions
-                logger.log(Level.SEVERE, null, ex);
-            }
-        } else if (deobfuscationMode == 1) {
-            try {
-                try (Statistics s = new Statistics("ActionDeobfuscatorSimpleFast")) {
+                try (Statistics s = new Statistics("ActionDeobfuscator")) {
                     new ActionDeobfuscator().actionListParsed(actions, sis.getSwf());
                 }
             } catch (ThreadDeath | InterruptedException ex) {
@@ -247,81 +220,6 @@ public class ActionListReader {
                 startIp, startIp, endIp + 1, "", false, new ArrayList<>());
 
         return new ArrayList<>(actionMap.values());
-    }
-
-    /**
-     * Reads list of actions from the stream. Reading ends with
-     * ActionEndFlag(=0) or end of the stream.
-     *
-     * @param listeners
-     * @param actions
-     * @param version
-     * @param ip
-     * @param path
-     * @return List of actions
-     * @throws IOException
-     * @throws java.lang.InterruptedException
-     */
-    private static ActionList deobfuscateActionListOld(List<DisassemblyListener> listeners, ActionList actions, int version, int ip, String path) throws IOException, InterruptedException {
-        if (actions.isEmpty()) {
-            return actions;
-        }
-
-        Action lastAction = actions.get(actions.size() - 1);
-        int endIp = (int) lastAction.getAddress();
-
-        List<Action> retMap = new ArrayList<>(endIp);
-        for (int i = 0; i < endIp; i++) {
-            retMap.add(null);
-        }
-        List<Action> actionMap = new ArrayList<>(endIp + 1);
-        for (int i = 0; i <= endIp; i++) {
-            actionMap.add(null);
-        }
-        for (Action a : actions) {
-            actionMap.set((int) a.getAddress(), a);
-        }
-
-        int maxRecursionLevel = 0;
-        for (int i = 0; i < actions.size(); i++) {
-            Action a = actions.get(i);
-            if (a instanceof ActionIf || a instanceof GraphSourceItemContainer) {
-                maxRecursionLevel++;
-            }
-            if (a instanceof ActionIf) {
-                ActionIf aif = (ActionIf) a;
-                aif.ignoreUsed = false;
-                aif.jumpUsed = false;
-            }
-        }
-
-        deobfustaceActionListAtPosRecursiveOld(listeners,
-                new ArrayList<>(),
-                new HashMap<>(),
-                new ActionLocalData(),
-                new TranslateStack(path),
-                new ConstantPool(),
-                actionMap, ip, retMap, ip, endIp, path,
-                new HashMap<>(), false,
-                new HashMap<>(),
-                version, 0, maxRecursionLevel);
-
-        ActionList ret = new ActionList();
-        Action last = null;
-        for (Action a : retMap) {
-            if (a != last && a != null) {
-                ret.add(a);
-            }
-            last = a;
-        }
-        ret.removeNops();
-        ActionList reta = new ActionList();
-        for (Object o : ret) {
-            if (o instanceof Action) {
-                reta.add((Action) o);
-            }
-        }
-        return reta;
     }
 
     private static long getNearAddress(ActionList actions, long address, boolean next) {
@@ -996,253 +894,5 @@ public class ActionListReader {
         }
 
         return ret;
-    }
-
-    private static void deobfustaceActionListAtPosRecursiveOld(List<DisassemblyListener> listeners, List<GraphTargetItem> output, HashMap<Long, List<GraphSourceItemContainer>> containers, ActionLocalData localData, TranslateStack stack, ConstantPool cpool, List<Action> actions, int ip, List<Action> ret, int startIp, int endip, String path, Map<Integer, Integer> visited, boolean indeterminate, Map<Integer, HashMap<String, GraphTargetItem>> decisionStates, int version, int recursionLevel, int maxRecursionLevel) throws IOException, InterruptedException {
-        boolean debugMode = false;
-        boolean decideBranch = false;
-
-        if (recursionLevel > maxRecursionLevel + 1) {
-            throw new TranslateException("deobfustaceActionListAtPosRecursive max recursion level reached.");
-        }
-
-        Action a;
-        Scanner sc = null;
-        loopip:
-        while (((endip == -1) || (endip > ip)) && (a = actions.get(ip)) != null) {
-            if (Thread.currentThread().isInterrupted()) {
-                throw new InterruptedException();
-            }
-
-            int actionLen = a.getTotalActionLength();
-            if (!visited.containsKey(ip)) {
-                visited.put(ip, 0);
-            }
-            int curVisited = visited.get(ip);
-            curVisited++;
-            visited.put(ip, curVisited);
-            for (int i = 0; i < listeners.size(); i++) {
-                listeners.get(i).progressDeobfuscating(ip, actions.size());
-            }
-            int info = a.getTotalActionLength();
-
-            if (a instanceof ActionPush) {
-                if (cpool != null) {
-                    ((ActionPush) a).constantPool = cpool.constants;
-                }
-            }
-
-            if (debugMode) {
-                String atos = a.getASMSource(new ActionList(), new HashSet<>(), ScriptExportMode.PCODE);
-                if (a instanceof GraphSourceItemContainer) {
-                    atos = a.toString();
-                }
-                System.err.println("readActionListAtPos ip: " + (ip - startIp) + " (0x" + Helper.formatAddress(ip - startIp) + ") " + " action(len " + a.actionLength + "): " + atos + (a.isIgnored() ? " (ignored)" : "") + " stack:" + Helper.stackToString(stack, LocalData.create(cpool)) + " " + Helper.byteArrToString(a.getBytes(version)));
-                System.err.print("variables: ");
-                for (Map.Entry<String, GraphTargetItem> v : localData.variables.entrySet()) {
-                    System.err.print("'" + v + "' = " + v.getValue().toString(LocalData.create(cpool)) + ", ");
-                }
-                System.err.println();
-                String add = "";
-                if (a instanceof ActionIf) {
-                    add = " change: " + ((ActionIf) a).getJumpOffset();
-                }
-                if (a instanceof ActionJump) {
-                    add = " change: " + ((ActionJump) a).getJumpOffset();
-                }
-                System.err.println(add);
-            }
-
-            int newip = -1;
-
-            if (a instanceof ActionConstantPool) {
-                if (cpool == null) {
-                    cpool = new ConstantPool();
-                }
-                cpool.setNew(((ActionConstantPool) a).constantPool);
-            }
-            ActionIf aif = null;
-            boolean goaif = false;
-            if (!a.isIgnored()) {
-                String varname = null;
-                if (a instanceof StoreTypeAction) {
-                    StoreTypeAction sta = (StoreTypeAction) a;
-                    varname = sta.getVariableName(stack, cpool);
-                }
-
-                try {
-                    if (a instanceof ActionIf) {
-                        aif = (ActionIf) a;
-
-                        GraphTargetItem top = stack.pop();
-                        int nip = ip + actionLen + aif.getJumpOffset();
-
-                        if (decideBranch) {
-                            System.out.print("newip " + nip + ", ");
-                            System.out.print("Action: jump(j),ignore(i),compute(c)?");
-                            if (sc == null) {
-                                sc = new Scanner(System.in);
-                            }
-                            String next = sc.next();
-                            switch (next) {
-                                case "j":
-                                    newip = nip;
-                                    break;
-                                case "i":
-                                    break;
-                                case "c":
-                                    goaif = true;
-                                    break;
-                            }
-                        } else if (top.isCompileTime() && (!top.hasSideEffect())) {
-                            if (debugMode) {
-                                System.err.print("is compiletime -> ");
-                            }
-                            if (EcmaScript.toBoolean(top.getResult())) {
-                                newip = nip;
-                                aif.jumpUsed = true;
-                                if (debugMode) {
-                                    System.err.println("jump");
-                                }
-                            } else {
-                                aif.ignoreUsed = true;
-                                if (debugMode) {
-                                    System.err.println("ignore");
-                                }
-                            }
-                        } else {
-                            if (debugMode) {
-                                System.err.println("goaif");
-                            }
-                            goaif = true;
-                        }
-                    } else if (a instanceof ActionJump) {
-                        newip = ip + actionLen + ((ActionJump) a).getJumpOffset();
-                    } else if (!(a instanceof GraphSourceItemContainer)) {
-                        //return in for..in,   TODO:Handle this better way
-                        if (((a instanceof ActionEquals) || (a instanceof ActionEquals2)) && (stack.size() == 1) && (stack.peek() instanceof DirectValueActionItem)) {
-                            stack.push(new DirectValueActionItem(null, null, 0, Null.INSTANCE, new ArrayList<>()));
-                        }
-                        if ((a instanceof ActionStoreRegister) && stack.isEmpty()) {
-                            stack.push(new DirectValueActionItem(null, null, 0, Null.INSTANCE, new ArrayList<>()));
-                        }
-                        a.translate(localData, stack, output, Graph.SOP_USE_STATIC/*Graph.SOP_SKIP_STATIC*/, path);
-                    }
-                } catch (RuntimeException ex) {
-                    logger.log(Level.SEVERE, "Disassembly exception", ex);
-                    break;
-                }
-
-                HashMap<String, GraphTargetItem> vars = localData.variables;
-                if (varname != null) {
-                    GraphTargetItem varval = vars.get(varname);
-                    if (varval != null && varval.isCompileTime() && indeterminate) {
-                        vars.put(varname, new NotCompileTimeItem(null, null, varval));
-                    }
-                }
-            }
-            for (int i = 0; i < actionLen; i++) {
-                ret.set(ip + i, a);
-            }
-
-            if (a instanceof GraphSourceItemContainer) {
-                GraphSourceItemContainer cnt = (GraphSourceItemContainer) a;
-                if (a instanceof Action) {
-                    long endAddr = a.getAddress() + cnt.getHeaderSize();
-                    String cntName = cnt.getName();
-                    List<List<GraphTargetItem>> output2s = new ArrayList<>();
-                    for (long size : cnt.getContainerSizes()) {
-                        if (size == 0) {
-                            output2s.add(new ArrayList<>());
-                            continue;
-                        }
-                        ActionLocalData localData2;
-                        List<GraphTargetItem> output2 = new ArrayList<>();
-                        if ((cnt instanceof ActionDefineFunction) || (cnt instanceof ActionDefineFunction2)) {
-                            localData2 = new ActionLocalData();
-                        } else {
-                            localData2 = localData;
-                        }
-                        deobfustaceActionListAtPosRecursiveOld(listeners, output2, containers, localData2, new TranslateStack(path), cpool, actions, (int) endAddr, ret, startIp, (int) (endAddr + size), path + (cntName == null ? "" : "/" + cntName), visited, indeterminate, decisionStates, version, recursionLevel + 1, maxRecursionLevel);
-                        output2s.add(output2);
-                        endAddr += size;
-                    }
-                    GraphSourceItem lineStartItem = null;
-                    if (cnt instanceof GraphSourceItem) {
-                        lineStartItem = (GraphSourceItem) cnt;
-                    }
-                    cnt.translateContainer(output2s, lineStartItem, stack, output, localData.regNames, localData.variables, localData.functions);
-                    ip = (int) endAddr;
-                    continue;
-                }
-            }
-
-            if (a instanceof ActionEnd) {
-                break;
-            }
-            if (goaif && aif != null) {
-                aif.ignoreUsed = true;
-                aif.jumpUsed = true;
-                indeterminate = true;
-
-                HashMap<String, GraphTargetItem> vars = localData.variables;
-                boolean stateChanged = false;
-                if (decisionStates.containsKey(ip)) {
-                    HashMap<String, GraphTargetItem> oldstate = decisionStates.get(ip);
-                    if (oldstate.size() != vars.size()) {
-                        stateChanged = true;
-                    } else {
-                        for (String k : vars.keySet()) {
-                            if (!oldstate.containsKey(k)) {
-                                stateChanged = true;
-                                break;
-                            }
-                            if (!vars.get(k).isCompileTime() && oldstate.get(k).isCompileTime()) {
-                                stateChanged = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-                HashMap<String, GraphTargetItem> curstate = new HashMap<>();
-                curstate.putAll(vars);
-                decisionStates.put(ip, curstate);
-
-                if ((!stateChanged) && curVisited > 1) {
-                    List<Integer> branches = new ArrayList<>();
-                    branches.add(ip + actionLen + aif.getJumpOffset());
-                    branches.add(ip + actionLen);
-                    for (int br : branches) {
-                        int visc = 0;
-                        if (visited.containsKey(br)) {
-                            visc = visited.get(br);
-                        }
-                        if (visc == 0) {//<curVisited){
-                            ip = br;
-                            continue loopip;
-                        }
-                    }
-                    break loopip;
-                }
-
-                TranslateStack subStack = (TranslateStack) stack.clone();
-                ActionLocalData subLocalData = new ActionLocalData(new HashMap<>(localData.regNames),
-                        new HashMap<>(localData.variables), new HashMap<>(localData.functions));
-                deobfustaceActionListAtPosRecursiveOld(listeners, output, containers, subLocalData, subStack, cpool, actions, ip + actionLen + aif.getJumpOffset(), ret, startIp, endip, path, visited, indeterminate, decisionStates, version, recursionLevel + 1, maxRecursionLevel);
-            }
-
-            if (newip > -1) {
-                ip = newip;
-            } else {
-                ip += info;
-            }
-
-            if (a.isExit()) {
-                break;
-            }
-        }
-        for (DisassemblyListener listener : listeners) {
-            listener.progressDeobfuscating(ip, actions.size());
-        }
     }
 }

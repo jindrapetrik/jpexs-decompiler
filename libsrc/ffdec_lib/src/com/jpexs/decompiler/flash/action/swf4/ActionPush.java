@@ -37,7 +37,6 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.FalseItem;
@@ -59,31 +58,6 @@ public class ActionPush extends Action {
     public List<Object> replacement;
 
     public List<String> constantPool;
-
-    public List<Integer> ignoredParts = new ArrayList<>();
-
-    @Override
-    public boolean isIgnored() {
-        return ignoredParts.size() == values.size();
-    }
-
-    @Override
-    public void setIgnored(boolean ignored, int pos) {
-        if (ignored) {
-            if (!ignoredParts.contains(pos)) {
-                ignoredParts.add(pos);
-                if (ignoredParts.size() == values.size()) {
-                    super.setIgnored(ignored, 0);
-                }
-            }
-        } else {
-            if (ignoredParts.contains(pos)) {
-                ignoredParts.remove(pos);
-                super.setIgnored(false, 0);
-            }
-        }
-
-    }
 
     public ActionPush(int actionLength, SWFInputStream sis, int version) throws IOException {
         super(0x96, actionLength);
@@ -360,9 +334,6 @@ public class ActionPush extends Action {
     public GraphTextWriter paramsToString(GraphTextWriter writer) {
         int pos = 0;
         for (int i = 0; i < values.size(); i++) {
-            if (ignoredParts.contains(i)) {
-                continue;
-            }
             if (pos > 0) {
                 writer.appendNoHilight(" ");
             }
@@ -404,10 +375,6 @@ public class ActionPush extends Action {
     public void translate(GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         int pos = 0;
         for (Object o : values) {
-            if (ignoredParts.contains(pos)) {
-                pos++;
-                continue;
-            }
             if (o instanceof ConstantIndex) {
                 if ((constantPool == null) || (((ConstantIndex) o).index >= constantPool.size())) {
                     o = "§§constant" + ((ConstantIndex) o).index;
