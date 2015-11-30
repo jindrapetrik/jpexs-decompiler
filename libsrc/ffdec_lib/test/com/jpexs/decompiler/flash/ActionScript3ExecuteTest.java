@@ -31,7 +31,6 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import static org.testng.Assert.assertEquals;
@@ -90,7 +89,6 @@ public class ActionScript3ExecuteTest {
         runBody.max_stack = 10;
 
         AVM2Code ccode = new AVM2Code();
-        ccode.code = new ArrayList<>();
         List<AVM2Instruction> code = ccode.code;
         code.add(new AVM2Instruction(0, AVM2Instructions.GetLocal0, null));
         code.add(new AVM2Instruction(0, AVM2Instructions.PushScope, null));
@@ -98,7 +96,6 @@ public class ActionScript3ExecuteTest {
 
         for (int testMethodId = 1; testMethodId < 10; testMethodId++) {
             AVM2Code ccode2 = new AVM2Code();
-            ccode2.code = new ArrayList<>();
             List<AVM2Instruction> code2 = ccode2.code;
             code2.add(new AVM2Instruction(0, AVM2Instructions.GetLocal0, null));
             code2.add(new AVM2Instruction(0, AVM2Instructions.PushScope, null));

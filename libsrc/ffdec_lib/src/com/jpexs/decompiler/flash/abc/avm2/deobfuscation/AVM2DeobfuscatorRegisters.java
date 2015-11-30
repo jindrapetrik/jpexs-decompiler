@@ -167,7 +167,7 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
                 SetLocalTypeIns slt = (SetLocalTypeIns) ins.definition;
                 int regId = slt.getRegisterId(ins);
                 if (singleRegisters.containsKey(regId)) {
-                    code.replaceInstruction(i, new AVM2Instruction(ins.offset, DeobfuscatePopIns.getInstance(), null), body);
+                    code.replaceInstruction(i, new AVM2Instruction(ins.getOffset(), DeobfuscatePopIns.getInstance(), null), body);
                 }
             }
 
@@ -264,7 +264,7 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
 
                 if (ins.definition instanceof JumpIns) {
 
-                    long address = ins.offset + ins.getBytesLength() + ins.operands[0];
+                    long address = ins.getOffset() + ins.getBytesLength() + ins.operands[0];
                     idx = code.adr2pos(address);//code.indexOf(code.getByAddress(address));
                     if (idx == -1) {
                         throw new TranslateException("Jump target not found: " + address);

@@ -149,7 +149,7 @@ public class AVM2DeobfuscatorGetSet extends SWFDecompilerAdapter {
                 int regId = ((SetLocalTypeIns) def).getRegisterId(ins);
                 if (!stack.isEmpty() && (stack.peek() instanceof LocalRegAVM2Item) && (((LocalRegAVM2Item) stack.peek()).regIndex == regId)) {
                     stack.pop();
-                    code.replaceInstruction(idx, new AVM2Instruction(ins.offset, DeobfuscatePopIns.getInstance(), null), body);
+                    code.replaceInstruction(idx, new AVM2Instruction(ins.getOffset(), DeobfuscatePopIns.getInstance(), null), body);
                     idx++;
                     continue;
                 }
@@ -185,7 +185,7 @@ public class AVM2DeobfuscatorGetSet extends SWFDecompilerAdapter {
 
             boolean ifed = false;
             if (def instanceof JumpIns) {
-                long address = ins.offset + ins.getBytesLength() + ins.operands[0];
+                long address = ins.getOffset() + ins.getBytesLength() + ins.operands[0];
                 idx = code.adr2pos(address);
 
                 if (idx == -1) {

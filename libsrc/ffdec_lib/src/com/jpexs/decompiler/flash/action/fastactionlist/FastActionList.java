@@ -672,7 +672,7 @@ public class FastActionList implements Collection<ActionItem> {
         if (o instanceof ActionItem) {
             item = (ActionItem) o;
         } else if (o instanceof Action) {
-            item = actionItemMap.get(o);
+            item = actionItemMap.get((Action) o);
         }
 
         if (item == null) {

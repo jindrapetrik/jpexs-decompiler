@@ -170,7 +170,7 @@ public class AVM2DeobfuscatorSimple extends SWFDecompilerAdapter {
             }
 
             AVM2Instruction ins = code.code.get(idx);
-            if (instructionsProcessed > 0 && refs.contains(ins.offset)) {
+            if (instructionsProcessed > 0 && refs.contains(ins.getOffset())) {
                 break;
             }
 
@@ -199,51 +199,13 @@ public class AVM2DeobfuscatorSimple extends SWFDecompilerAdapter {
                 }
             }
 
-            if (def instanceof NewFunctionIns) {
-                if (idx + 1 < code.code.size()) {
-                    if (code.code.get(idx + 1).definition instanceof PopIns) {
-                        code.removeInstruction(idx + 1, body);
-                        code.removeInstruction(idx, body);
-                        modified = true;
-                        continue;
-                    }
-                }
-            } else {
-                // do not throw EmptyStackException, much faster
-                int requiredStackSize = def.getStackPopCount(ins, abc);
-                if (stack.size() < requiredStackSize) {
-                    break;
-                }
-
-                if (requiredStackSize > 0 && !def.isNotCompileTimeSupported()) {
-                    boolean notCompileTime = false;
-                    for (int i = 0; i < requiredStackSize; i++) {
-                        if (stack.peek(i + 1) == NotCompileTime.INSTANCE) {
-                            notCompileTime = true;
-                            break;
-                        }
-                    }
-
-                    if (notCompileTime) {
-                        break;
-                    }
-                }
-
-                if (localData.scopeStack.size() < -def.getScopeStackDelta(ins, abc)) {
-                    break;
-                }
-
-                boolean supported;
-                try {
-                    localData.jump = null;
-                    supported = def.execute(localData, abc.constants, ins);
-                } catch (AVM2ExecutionException ex) {
-                    supported = false;
-                }
-
-                if (!supported) {
-                    break;
-                }
+            if (def instanceof NewFunctionIns
+                    && idx + 1 < code.code.size()
+                    && code.code.get(idx + 1).definition instanceof PopIns) {
+                code.removeInstruction(idx + 1, body);
+                code.removeInstruction(idx, body);
+                modified = true;
+                continue;
             }
 
             boolean ok = false;
@@ -301,9 +263,47 @@ public class AVM2DeobfuscatorSimple extends SWFDecompilerAdapter {
                 break;
             }
 
+            if (!(def instanceof NewFunctionIns)) {
+                // do not throw EmptyStackException, much faster
+                int requiredStackSize = def.getStackPopCount(ins, abc);
+                if (stack.size() < requiredStackSize) {
+                    break;
+                }
+
+                if (requiredStackSize > 0 && !def.isNotCompileTimeSupported()) {
+                    boolean notCompileTime = false;
+                    for (int i = 0; i < requiredStackSize; i++) {
+                        if (stack.peek(i + 1) == NotCompileTime.INSTANCE) {
+                            notCompileTime = true;
+                            break;
+                        }
+                    }
+
+                    if (notCompileTime) {
+                        break;
+                    }
+                }
+
+                if (localData.scopeStack.size() < -def.getScopeStackDelta(ins, abc)) {
+                    break;
+                }
+
+                boolean supported;
+                try {
+                    localData.jump = null;
+                    supported = def.execute(localData, abc.constants, ins);
+                } catch (AVM2ExecutionException ex) {
+                    supported = false;
+                }
+
+                if (!supported) {
+                    break;
+                }
+            }
+
             boolean ifed = false;
             if (def instanceof IfTypeIns && !(def instanceof JumpIns)) {
-                long address = ins.offset + ins.getBytesLength() + ins.operands[0];
+                long address = ins.getOffset() + ins.getBytesLength() + ins.operands[0];
                 int nidx = code.adr2pos(address);
                 AVM2Instruction tarIns = code.code.get(nidx);
 
@@ -315,17 +315,17 @@ public class AVM2DeobfuscatorSimple extends SWFDecompilerAdapter {
                     AVM2Instruction jumpIns = new AVM2Instruction(0, AVM2Instructions.Jump, new int[]{0});
                     //jumpIns.operands[0] = ins.operands[0] /*- ins.getBytes().length*/ + jumpIns.getBytes().length;
                     code.replaceInstruction(idx, jumpIns, body);
-                    jumpIns.operands[0] = (int) (tarIns.offset - jumpIns.offset - jumpIns.getBytesLength());
+                    jumpIns.operands[0] = (int) (tarIns.getOffset() - jumpIns.getOffset() - jumpIns.getBytesLength());
                     for (int s = 0; s < stackCount; s++) {
-                        code.insertInstruction(idx, new AVM2Instruction(ins.offset, DeobfuscatePopIns.getInstance(), null), true, body);
+                        code.insertInstruction(idx, new AVM2Instruction(ins.getOffset(), DeobfuscatePopIns.getInstance(), null), true, body);
                     }
 
-                    idx = code.adr2pos(jumpIns.offset + jumpIns.getBytesLength() + jumpIns.operands[0]);
+                    idx = code.adr2pos(jumpIns.getOffset() + jumpIns.getBytesLength() + jumpIns.operands[0]);
                 } else {
                     //System.err.println("replacing " + ins + " on " + idx + " with pop");
-                    code.replaceInstruction(idx, new AVM2Instruction(ins.offset, DeobfuscatePopIns.getInstance(), null), body);
+                    code.replaceInstruction(idx, new AVM2Instruction(ins.getOffset(), DeobfuscatePopIns.getInstance(), null), body);
                     for (int s = 1 /*first is replaced*/; s < stackCount; s++) {
-                        code.insertInstruction(idx, new AVM2Instruction(ins.offset, DeobfuscatePopIns.getInstance(), null), true, body);
+                        code.insertInstruction(idx, new AVM2Instruction(ins.getOffset(), DeobfuscatePopIns.getInstance(), null), true, body);
                     }
                     //ins.definition = DeobfuscatePopIns.getInstance();
                     idx++;

@@ -238,7 +238,7 @@ public abstract class InstructionDefinition implements Serializable {
         if (constants.getMultiname(multinameIndex).needsName()) {
             name = stack.get(pos).toString();
         } else {
-            name = GraphTextWriter.hilighOffset(constants.getMultiname(multinameIndex).getName(constants, fullyQualifiedNames, false), ins.offset);
+            name = GraphTextWriter.hilighOffset(constants.getMultiname(multinameIndex).getName(constants, fullyQualifiedNames, false), ins.getOffset());
         }
         return name + ns;
     }

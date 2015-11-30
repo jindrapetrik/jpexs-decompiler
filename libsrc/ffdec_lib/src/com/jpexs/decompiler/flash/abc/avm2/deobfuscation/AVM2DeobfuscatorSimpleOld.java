@@ -342,7 +342,7 @@ public class AVM2DeobfuscatorSimpleOld extends SWFDecompilerAdapter {
 
             boolean ifed = false;
             if (def instanceof JumpIns) {
-                long address = ins.offset + ins.getBytesLength() + ins.operands[0];
+                long address = ins.getOffset() + ins.getBytesLength() + ins.operands[0];
                 idx = code.adr2pos(address);
 
                 if (idx == -1) {
@@ -355,7 +355,7 @@ public class AVM2DeobfuscatorSimpleOld extends SWFDecompilerAdapter {
 
                 GraphTargetItem top = stack.pop();
                 Object res = top.getResult();
-                long address = ins.offset + ins.getBytesLength() + ins.operands[0];
+                long address = ins.getOffset() + ins.getBytesLength() + ins.operands[0];
                 int nidx = code.adr2pos(address);//code.indexOf(code.getByAddress(address));
                 AVM2Instruction tarIns = code.code.get(nidx);
 
@@ -367,17 +367,17 @@ public class AVM2DeobfuscatorSimpleOld extends SWFDecompilerAdapter {
                     AVM2Instruction jumpIns = new AVM2Instruction(0, AVM2Instructions.Jump, new int[]{0});
                     //jumpIns.operands[0] = ins.operands[0] /*- ins.getBytes().length*/ + jumpIns.getBytes().length;
                     code.replaceInstruction(idx, jumpIns, body);
-                    jumpIns.operands[0] = (int) (tarIns.offset - jumpIns.offset - jumpIns.getBytesLength());
+                    jumpIns.operands[0] = (int) (tarIns.getOffset() - jumpIns.getOffset() - jumpIns.getBytesLength());
                     for (int s = 0; s < stackCount; s++) {
-                        code.insertInstruction(idx, new AVM2Instruction(ins.offset, DeobfuscatePopIns.getInstance(), null), true, body);
+                        code.insertInstruction(idx, new AVM2Instruction(ins.getOffset(), DeobfuscatePopIns.getInstance(), null), true, body);
                     }
 
-                    idx = code.adr2pos(jumpIns.offset + jumpIns.getBytesLength() + jumpIns.operands[0]);
+                    idx = code.adr2pos(jumpIns.getOffset() + jumpIns.getBytesLength() + jumpIns.operands[0]);
                 } else {
                     //System.err.println("replacing " + ins + " on " + idx + " with pop");
-                    code.replaceInstruction(idx, new AVM2Instruction(ins.offset, DeobfuscatePopIns.getInstance(), null), body);
+                    code.replaceInstruction(idx, new AVM2Instruction(ins.getOffset(), DeobfuscatePopIns.getInstance(), null), body);
                     for (int s = 1 /*first is replaced*/; s < stackCount; s++) {
-                        code.insertInstruction(idx, new AVM2Instruction(ins.offset, DeobfuscatePopIns.getInstance(), null), true, body);
+                        code.insertInstruction(idx, new AVM2Instruction(ins.getOffset(), DeobfuscatePopIns.getInstance(), null), true, body);
                     }
                     //ins.definition = DeobfuscatePopIns.getInstance();
                     idx++;

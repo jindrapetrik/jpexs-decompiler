@@ -301,7 +301,6 @@ public class AdobeFlashExecutor {
             int multinameId = abc.constants.getMultinameId(multiname, true);
 
             AVM2Code ccode = new AVM2Code();
-            ccode.code = new ArrayList<>();
             List<AVM2Instruction> code = ccode.code;
             code.add(new AVM2Instruction(0, AVM2Instructions.GetLocal0, null));
             code.add(new AVM2Instruction(0, AVM2Instructions.PushScope, null));

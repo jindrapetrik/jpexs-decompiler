@@ -47,7 +47,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     public int[] operands;
 
-    public long offset;
+    private long offset;
 
     public String comment;
 
@@ -373,6 +373,10 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
     @Override
     public long getOffset() {
         return offset;
+    }
+
+    public void setOffset(long offset) {
+        this.offset = offset;
     }
 
     @Override
