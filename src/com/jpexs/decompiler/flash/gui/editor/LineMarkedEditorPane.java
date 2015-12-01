@@ -65,6 +65,7 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
     private static final int truncateLimit = 2 * 1024 * 1024;
 
     public static final Color BG_SELECTED_LINE = new Color(0xe9, 0xef, 0xf8);
+
     public static final Color BG_ERROR_LINE = new Color(255, 200, 200);
 
     private int lastLine = -1;
@@ -80,8 +81,11 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
     public static class LineMarker implements Comparable<LineMarker> {
 
         private Color bgColor;
+
         private Color color;
+
         private FgPainter fgPainter;
+
         //private int line;
         private int priority;
 
@@ -140,6 +144,7 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
         }
     }
 //(Map<Integer, TreeSet<LineMarker>>)
+
     private Map<Integer, SortedSet<LineMarker>> lineMarkers = Collections.synchronizedMap(new HashMap<Integer, SortedSet<LineMarker>>());
 
     public void setLineMarkers(Map<Integer, SortedSet<LineMarker>> colorMarkers) {
@@ -415,7 +420,7 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
             t = t.substring(0, truncateLimit) + "\r\n" + AppStrings.translate("editorTruncateWarning").replace("%chars%", Integer.toString(truncateLimit));
         }
         super.setText(t);
-        setCaretPosition(0); //scroll to top            
+        setCaretPosition(0); //scroll to top
     }
 
     public static class FgPainter extends DefaultHighlighter.DefaultHighlightPainter {
@@ -613,5 +618,4 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
             }
         }
     }
-
 }

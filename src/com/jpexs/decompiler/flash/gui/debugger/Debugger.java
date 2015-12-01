@@ -30,7 +30,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
-import java.util.regex.Pattern;
 
 /**
  *
@@ -59,10 +58,13 @@ public class Debugger {
         private final int id;
 
         public boolean finished = false;
+
         private final Map<String, String> parameters = new HashMap<>();
 
         public static final int MSG_STRING = 0;
+
         public static final int MSG_LOADER_URL = 1;
+
         public static final int MSG_LOADER_BYTES = 2;
 
         public String getParameter(String name, String defValue) {

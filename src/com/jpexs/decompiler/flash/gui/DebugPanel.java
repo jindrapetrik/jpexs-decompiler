@@ -19,12 +19,7 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.debugger.flash.Variable;
 import com.jpexs.debugger.flash.messages.in.InBreakAtExt;
 import com.jpexs.debugger.flash.messages.in.InFrame;
-import com.jpexs.decompiler.flash.gui.AppStrings;
-import com.jpexs.decompiler.flash.gui.DebuggerHandler;
 import com.jpexs.decompiler.flash.gui.DebuggerHandler.BreakListener;
-import com.jpexs.decompiler.flash.gui.HeaderLabel;
-import com.jpexs.decompiler.flash.gui.Main;
-import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.abc.ABCPanel;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -51,15 +46,25 @@ import javax.swing.table.DefaultTableModel;
 public class DebugPanel extends JPanel {
 
     private JTable debugRegistersTable;
+
     private JTable debugLocalsTable;
+
     private JTable debugScopeTable;
+
     private JTable callStackTable;
+
     private JTable stackTable;
+
     private JTabbedPane varTabs;
+
     private BreakListener listener;
+
     private JTextArea traceLogTextarea;
+
     private int logLength = 0;
+
     private List<SelectedTab> tabTypes = new ArrayList<>();
+
     private boolean loading = false;
 
     public static enum SelectedTab {
@@ -314,5 +319,4 @@ public class DebugPanel extends JPanel {
     public void dispose() {
         Main.getDebugHandler().removeBreakListener(listener);
     }
-
 }
