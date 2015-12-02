@@ -185,7 +185,7 @@ public class AVM2DeobfuscatorGetSet extends SWFDecompilerAdapter {
 
             boolean ifed = false;
             if (def instanceof JumpIns) {
-                long address = ins.getOffset() + ins.getBytesLength() + ins.operands[0];
+                long address = ins.getTargetAddress();
                 idx = code.adr2pos(address);
 
                 if (idx == -1) {

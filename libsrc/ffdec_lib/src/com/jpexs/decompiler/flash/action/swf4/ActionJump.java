@@ -117,11 +117,12 @@ public class ActionJump extends Action {
     @Override
     public List<Integer> getBranches(GraphSource code) {
         List<Integer> ret = super.getBranches(code);
-        int length = getBytesLength();
-        int ofs = code.adr2pos(getAddress() + length + offset);
+        long targetAddress = getTargetAddress();
+        int ofs = code.adr2pos(targetAddress);
         if (ofs == -1) {
+            int length = getBytesLength();
             ofs = code.adr2pos(getAddress() + length);
-            Logger.getLogger(ActionJump.class.getName()).log(Level.SEVERE, "Invalid jump to ofs" + Helper.formatAddress(getAddress() + length + offset) + " from ofs" + Helper.formatAddress(getAddress()));
+            Logger.getLogger(ActionJump.class.getName()).log(Level.SEVERE, "Invalid jump to ofs" + Helper.formatAddress(targetAddress) + " from ofs" + Helper.formatAddress(getAddress()));
         }
         ret.add(ofs);
         return ret;

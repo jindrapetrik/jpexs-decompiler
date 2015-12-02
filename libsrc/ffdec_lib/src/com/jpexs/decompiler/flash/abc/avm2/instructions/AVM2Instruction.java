@@ -379,12 +379,16 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
         this.offset = offset;
     }
 
+    public long getTargetAddress() {
+        return offset + 4 /*getBytesLength()*/ + operands[0];
+    }
+
     @Override
     public List<Integer> getBranches(GraphSource code) {
         List<Integer> ret = new ArrayList<>();
         if (definition instanceof IfTypeIns) {
 
-            ret.add(code.adr2pos(offset + getBytesLength() + operands[0]));
+            ret.add(code.adr2pos(getTargetAddress()));
             if (!(definition instanceof JumpIns)) {
                 ret.add(code.adr2pos(offset + getBytesLength()));
             }

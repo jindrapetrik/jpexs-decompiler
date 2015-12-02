@@ -303,7 +303,7 @@ public class AVM2DeobfuscatorSimple extends SWFDecompilerAdapter {
 
             boolean ifed = false;
             if (def instanceof IfTypeIns && !(def instanceof JumpIns)) {
-                long address = ins.getOffset() + ins.getBytesLength() + ins.operands[0];
+                long address = ins.getTargetAddress();
                 int nidx = code.adr2pos(address);
                 AVM2Instruction tarIns = code.code.get(nidx);
 
@@ -320,7 +320,7 @@ public class AVM2DeobfuscatorSimple extends SWFDecompilerAdapter {
                         code.insertInstruction(idx, new AVM2Instruction(ins.getOffset(), DeobfuscatePopIns.getInstance(), null), true, body);
                     }
 
-                    idx = code.adr2pos(jumpIns.getOffset() + jumpIns.getBytesLength() + jumpIns.operands[0]);
+                    idx = code.adr2pos(jumpIns.getTargetAddress());
                 } else {
                     //System.err.println("replacing " + ins + " on " + idx + " with pop");
                     code.replaceInstruction(idx, new AVM2Instruction(ins.getOffset(), DeobfuscatePopIns.getInstance(), null), body);
