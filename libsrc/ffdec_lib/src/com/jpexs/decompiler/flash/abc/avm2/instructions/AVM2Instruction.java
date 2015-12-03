@@ -383,6 +383,10 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
         return offset + 4 /*getBytesLength()*/ + operands[0];
     }
 
+    public void setTargetOffset(int offset) {
+        operands[0] = offset;
+    }
+
     @Override
     public List<Integer> getBranches(GraphSource code) {
         List<Integer> ret = new ArrayList<>();

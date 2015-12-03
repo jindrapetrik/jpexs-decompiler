@@ -1297,6 +1297,16 @@ public class AVM2Code implements Cloneable {
         return ret;
     }
 
+    public AVM2Instruction adr2ins(long address) throws ConvertException {
+        int pos = adr2pos(address, false);
+        if (pos == code.size()) {
+            // end
+            return null;
+        }
+
+        return code.get(pos);
+    }
+
     public int adr2pos(long address) throws ConvertException {
         return adr2pos(address, false);
     }

@@ -1793,22 +1793,27 @@ public class Graph {
                             hasExpr = true;
                         }
                     }
-
                 }
+
                 first = true;
                 pos = 0;
                 //This is tied to AS3 switch implementation which has nextparts switched from index 1. TODO: Make more universal
                 GraphPart defaultPart = hasExpr ? part.nextParts.get(1 + defaultBranch) : part.nextParts.get(0);
 
-                for (GraphPart p : part.nextParts) {
-                    if (p != defaultPart) {
+                for (int i = 1; i < part.nextParts.size(); i++) {
+                    if (hasExpr && i == 1 + defaultBranch) {
+                        continue;
+                    }
+
+                    if (part.nextParts.get(i) != defaultPart) {
                         if (caseExpressions.containsKey(pos)) {
                             caseValues.add(caseExpressions.get(pos));
                         } else {
                             caseValues.add(new IntegerValueItem(null, localData.lineStartInstruction, pos));
                         }
-                        pos++;
                     }
+
+                    pos++;
                 }
 
                 first = true;
