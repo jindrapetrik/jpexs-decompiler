@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
+import com.jpexs.decompiler.flash.types.annotations.SWFField;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.HashArrayList;
 import com.jpexs.helpers.utf8.Utf8PrintWriter;
@@ -39,21 +40,29 @@ public class AVM2ConstantPool implements Cloneable {
 
     private static final Logger logger = Logger.getLogger(AVM2ConstantPool.class.getName());
 
+    @SWFField
     private HashArrayList<Long> constant_int = new HashArrayList<>();
 
+    @SWFField
     private HashArrayList<Long> constant_uint = new HashArrayList<>();
 
+    @SWFField
     private HashArrayList<Double> constant_double = new HashArrayList<>();
 
     /* Only for some minor versions */
+    @SWFField
     private HashArrayList<Decimal> constant_decimal = new HashArrayList<>();
 
+    @SWFField
     private HashArrayList<String> constant_string = new HashArrayList<>();
 
+    @SWFField
     private HashArrayList<Namespace> constant_namespace = new HashArrayList<>();
 
+    @SWFField
     private HashArrayList<NamespaceSet> constant_namespace_set = new HashArrayList<>();
 
+    @SWFField
     private HashArrayList<Multiname> constant_multiname = new HashArrayList<>();
 
     public AVM2ConstantPool() {
