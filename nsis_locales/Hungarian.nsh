@@ -2,7 +2,7 @@
 !insertmacro LANG_STRING STRING_SWC_NOTFOUND "PlayerGlobal.SWC was not found on Adobe webpages. Maybe your firewall is blocking access or you have some proxy enabled. You can set the path to the SWC file later in advanced settings."
 !insertmacro LANG_STRING STRING_SAVED_TO "saved to"
 !insertmacro LANG_STRING STRING_EXISTS_SKIP_DOWNLOAD "already exists, skipping download"
-!insertmacro LANG_STRING STRING_STARTING_DOWNLOAS "Starting download"
+!insertmacro LANG_STRING STRING_STARTING_DOWNLOAD "Starting download"
 !insertmacro LANG_STRING STRING_DESKTOP_SHORTCUT "Desktop Shortcut"
 !insertmacro LANG_STRING STRING_ADD_CONTEXT_MENU "Add to context menu"
 !insertmacro LANG_STRING STRING_SECTION_APP "Application GUI and Libraries"
@@ -38,7 +38,7 @@
 ;JRE:
 !insertmacro LANG_STRING STRING_JRE_REQUIRED_TITLE "JRE Installation Required"
 !insertmacro LANG_STRING STRING_JRE_REQUIRED "This application requires Java ${JRE_VERSION} or higher"
-!insertmacro LANG_STRING STRING_JRE_REQUITED_INFO "This application requires installation of the Java Runtime Environment. This will be downloaded and installed as part of the installation."
+!insertmacro LANG_STRING STRING_JRE_REQUIRED_INFO "This application requires installation of the Java Runtime Environment. This will be downloaded and installed as part of the installation."
 !insertmacro LANG_STRING STRING_JRE_UPDATEREQUIRED_TITLE "JRE Update Required"
 !insertmacro LANG_STRING STRING_JRE_UPDATEREQUIRED "This application requires Java ${JRE_VERSION} or higher"
 !insertmacro LANG_STRING STRING_JRE_UPDATEREQUIRED_INFO "This application requires a more recent version of the Java Runtime Environment. This will be downloaded and installed as part of the installation."

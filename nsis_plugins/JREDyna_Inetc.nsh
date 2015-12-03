@@ -53,7 +53,7 @@ Function CUSTOM_PAGE_JREINFO
 
 NoFound:
   !insertmacro MUI_HEADER_TEXT "$(STRING_JRE_REQUIRED_TITLE)" "$(STRING_JRE_REQUIRED)"
-  ${NSD_CreateLabel} 0 0 100% 100% "$(STRING_JRE_REQUITED_INFO)"
+  ${NSD_CreateLabel} 0 0 100% 100% "$(STRING_JRE_REQUIRED_INFO)"
   pop $1
   goto ShowDialog
 

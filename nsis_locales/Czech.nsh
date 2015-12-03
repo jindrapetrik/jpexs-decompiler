@@ -2,7 +2,7 @@
 !insertmacro LANG_STRING STRING_SWC_NOTFOUND "Knihovna PlayerGlobal.SWC nebyla nalezena na stránkách Adobe. Možná přístup blokuje váš firewall nebo používáte proxy. Cestu k SWC souboru lze později nastavit v rozšířených nastaveních v aplikaci."
 !insertmacro LANG_STRING STRING_SAVED_TO "staženo do"
 !insertmacro LANG_STRING STRING_EXISTS_SKIP_DOWNLOAD "již existuje, nestahuji"
-!insertmacro LANG_STRING STRING_STARTING_DOWNLOAS "Začátek stahování"
+!insertmacro LANG_STRING STRING_STARTING_DOWNLOAD "Začátek stahování"
 !insertmacro LANG_STRING STRING_DESKTOP_SHORTCUT "Zástupce na ploše"
 !insertmacro LANG_STRING STRING_ADD_CONTEXT_MENU "Přidat do kontextového menu"
 !insertmacro LANG_STRING STRING_SECTION_APP "Grafické rozhraní a knihovny"
@@ -40,7 +40,7 @@
 ;JRE:
 !insertmacro LANG_STRING STRING_JRE_REQUIRED_TITLE "Vyžadována instalace JRE"
 !insertmacro LANG_STRING STRING_JRE_REQUIRED "Tato aplikace vyžaduje Javu ${JRE_VERSION} nebo vyšší"
-!insertmacro LANG_STRING STRING_JRE_REQUITED_INFO "Tato aplikace vyžaduje instalaci Java Runtime Environment. Ten bude stažen a instalován jako součást instalace."
+!insertmacro LANG_STRING STRING_JRE_REQUIRED_INFO "Tato aplikace vyžaduje instalaci Java Runtime Environment. Ten bude stažen a instalován jako součást instalace."
 !insertmacro LANG_STRING STRING_JRE_UPDATEREQUIRED_TITLE "Vyžadována aktualizace JRE"
 !insertmacro LANG_STRING STRING_JRE_UPDATEREQUIRED "Tato aplikace vyžaduje Javu ${JRE_VERSION} či vyšší"
 !insertmacro LANG_STRING STRING_JRE_UPDATEREQUIRED_INFO "Tato aplikace vyžaduje novější Java Runtime Environment. Ten bude stažen a nainstalován jako součást instalace."

@@ -842,7 +842,7 @@ done:
 
   IfFileExists "$APPDATA\JPEXS\FFDec\flashlib\$pgname" swcexists
     CreateDirectory "$APPDATA\JPEXS\FFDec\flashlib"
-    DetailPrint "$(STRING_STARTING_DOWNLOAS) PlayerGlobal.swc"
+    DetailPrint "$(STRING_STARTING_DOWNLOAD) PlayerGlobal.swc"
     inetc::get /USERAGENT "${APP_NAME} Setup" $txt "$APPDATA\JPEXS\FFDec\flashlib\$pgname"
     Pop $0
     StrCmp $0 "OK" saved
