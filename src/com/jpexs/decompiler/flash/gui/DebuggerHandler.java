@@ -39,7 +39,9 @@ import com.jpexs.debugger.flash.messages.in.InVersion;
 import com.jpexs.debugger.flash.messages.out.OutGetBreakReason;
 import com.jpexs.debugger.flash.messages.out.OutGetSwd;
 import com.jpexs.debugger.flash.messages.out.OutGetSwf;
+import com.jpexs.debugger.flash.messages.out.OutPlay;
 import com.jpexs.debugger.flash.messages.out.OutProcessedTag;
+import com.jpexs.debugger.flash.messages.out.OutRewind;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.graph.DottedChain;
 import java.io.IOException;
@@ -86,10 +88,16 @@ public class DebuggerHandler implements DebugConnectionListener {
     private String breakScriptName = null;
 
     public int getBreakIp() {
+        if (!isPaused()) {
+            return -1;
+        }
         return breakIp;
     }
 
     public String getBreakScriptName() {
+        if (!isPaused()) {
+            return "-";
+        }
         return breakScriptName;
     }
 
@@ -532,17 +540,17 @@ public class DebuggerHandler implements DebugConnectionListener {
                         Logger.getLogger(DebuggerHandler.class.getName()).log(Level.FINE, "paused");
                     }
 
-                    String newBreakScriptName = "unknown";
-                    if (modulePaths.containsKey(message.file)) {
-                        newBreakScriptName = modulePaths.get(message.file);
-                    } else {
-                        Logger.getLogger(DebuggerCommands.class.getName()).log(Level.SEVERE, "Invalid file: " + message.file);
-                        return;
-                    }
-
                     try {
                         breakInfo = con.getMessage(InBreakAtExt.class);
                         breakReason = con.sendMessage(new OutGetBreakReason(con), InBreakReason.class);
+
+                        String newBreakScriptName = "unknown";
+                        if (modulePaths.containsKey(message.file)) {
+                            newBreakScriptName = modulePaths.get(message.file);
+                        } else if (breakReason.reason != InBreakReason.REASON_SCRIPT_LOADED) {
+                            Logger.getLogger(DebuggerCommands.class.getName()).log(Level.SEVERE, "Invalid file: " + message.file);
+                            return;
+                        }
 
                         final String[] reasonNames = new String[]{"unknown", "breakpoint", "watch", "fault", "stopRequest", "step", "halt", "scriptLoaded"};
                         String reason = breakReason.reason < reasonNames.length ? reasonNames[breakReason.reason] : reasonNames[0];
@@ -593,6 +601,8 @@ public class DebuggerHandler implements DebugConnectionListener {
 
             if (!isAS3) {
                 Logger.getLogger(DebuggerHandler.class.getName()).log(Level.FINER, "End of connect - sending continue");
+                con.writeMessage(new OutRewind(con));
+                con.writeMessage(new OutPlay(con));
                 commands.sendContinue();
             }
 

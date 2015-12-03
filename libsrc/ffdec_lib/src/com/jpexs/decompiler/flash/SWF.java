@@ -1099,7 +1099,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             }
         }
 
-        getASMs(true); // Add scriptNames to ASMs
+        getASMs(true); // Add scriptNames to ASMs              
     }
 
     @Override

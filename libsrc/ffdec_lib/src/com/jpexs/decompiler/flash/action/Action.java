@@ -974,7 +974,17 @@ public abstract class Action implements GraphSourceItem {
                 ip++;
                 continue;
             }
-            if (stack.isEmpty()) {
+
+            //FunctionActionItem after DefineFunction(/2) are left on the stack. For linestart offsets we consider this kind of stack empty.
+            boolean isStackEmpty = true;
+            for (int i = 0; i < stack.size(); i++) {
+                if ((!(stack.get(i) instanceof FunctionActionItem))) {
+                    isStackEmpty = false;
+                    break;
+                }
+            }
+
+            if (isStackEmpty) {
                 localData.lineStartAction = action;
                 fi.setVal(action);
             }

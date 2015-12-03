@@ -31,6 +31,7 @@ import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFBundle;
+import com.jpexs.decompiler.flash.SWFCompression;
 import com.jpexs.decompiler.flash.SWFSourceInfo;
 import com.jpexs.decompiler.flash.SearchMode;
 import com.jpexs.decompiler.flash.SwfOpenException;
@@ -179,7 +180,9 @@ public class Main {
 
             runProcess = null;
         }
-        mainFrame.getPanel().clearDebuggerColors();
+        if (mainFrame != null && mainFrame.getPanel() != null) {
+            mainFrame.getPanel().clearDebuggerColors();
+        }
         if (runProcessDebug) {
             Main.getDebugHandler().disconnect();
         }
@@ -310,6 +313,22 @@ public class Main {
             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
                 swf.saveTo(fos);
             }
+
+            if (swf.isAS3() && Configuration.autoOpenLoadedSWFs.get()) {
+                SWF instrSWF = null;
+                try (FileInputStream fis = new FileInputStream(tempFile)) {
+                    instrSWF = new SWF(fis, false, false);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(MainFrameMenu.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                if (instrSWF != null) {
+                    DebuggerTools.injectDebugLoader(instrSWF);
+                    instrSWF.enableDebugging(true, new File("."));
+                    try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
+                        instrSWF.saveTo(fos);
+                    }
+                }
+            }
         } catch (IOException ex) {
             return;
 
@@ -351,25 +370,33 @@ public class Main {
                     try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(fTempFile))) {
                         swf.saveTo(fos);
                     }
-                    //Inject Loader
                     SWF instrSWF = null;
                     try (FileInputStream fis = new FileInputStream(fTempFile)) {
                         instrSWF = new SWF(fis, false, false);
-
                     } catch (InterruptedException ex) {
-                        Logger.getLogger(MainFrameMenu.class
-                                .getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(MainFrameMenu.class.getName()).log(Level.SEVERE, null, ex);
                     }
                     if (instrSWF != null) {
-                        if (instrSWF.isAS3()) {
-                            instrSWF.enableDebugging(true, new File("."));
-                        } else {
-                            instrSWF.enableDebugging(false, new File("."));
-                            File swdFile = new File(fTempFile.getAbsolutePath().replace(".swf", ".swd"));
-                            instrSWF.generateSwdFile(swdFile, getPackBreakPoints(true));
+                        if (instrSWF.isAS3() && Configuration.autoOpenLoadedSWFs.get()) {
+                            DebuggerTools.injectDebugLoader(instrSWF);
                         }
+                        instrSWF.enableDebugging(true, new File("."));
                         try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(fTempFile))) {
                             instrSWF.saveTo(fos);
+                        }
+                        if (!instrSWF.isAS3()) {
+                            //Read again, because line file offsets changed with adding debug tags
+                            //TODO: handle somehow without rereading?
+                            instrSWF = null;
+                            try (FileInputStream fis = new FileInputStream(fTempFile)) {
+                                instrSWF = new SWF(fis, false, false);
+                            } catch (InterruptedException ex) {
+                                Logger.getLogger(MainFrameMenu.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                            if (instrSWF != null) {
+                                File swdFile = new File(fTempFile.getAbsolutePath().replace(".swf", ".swd"));
+                                instrSWF.generateSwdFile(swdFile, getPackBreakPoints(true));
+                            }
                         }
                     }
                     return null;
