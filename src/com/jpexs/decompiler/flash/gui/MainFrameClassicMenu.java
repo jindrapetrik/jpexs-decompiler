@@ -373,5 +373,4 @@ public class MainFrameClassicMenu extends MainFrameMenu {
             ((JComponent) me).setVisible(val);
         }
     }
-
 }

@@ -550,6 +550,10 @@ public class ASMParser {
             }
         }
 
+        if (ret.size() == 0 || !(ret.get(ret.size() - 1) instanceof ActionEnd)) {
+            ret.add(new ActionEnd());
+        }
+
         return ret;
     }
 }

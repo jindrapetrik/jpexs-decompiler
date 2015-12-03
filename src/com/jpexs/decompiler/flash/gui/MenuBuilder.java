@@ -32,6 +32,7 @@ public interface MenuBuilder {
     public static class HotKey {
 
         private static Map<Integer, String> keyCodesToNames = new HashMap<>();
+
         private static Map<String, Integer> keyNamesToCodes = new HashMap<>();
 
         {
@@ -57,8 +58,11 @@ public interface MenuBuilder {
         }
 
         public int key;
+
         public boolean shiftDown;
+
         public boolean ctrlDown;
+
         public boolean altDown;
 
         @Override
@@ -163,7 +167,6 @@ public interface MenuBuilder {
 
             return s;
         }
-
     }
 
     public static final int PRIORITY_LOW = 1;

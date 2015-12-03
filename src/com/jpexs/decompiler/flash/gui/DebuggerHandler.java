@@ -21,8 +21,6 @@ import com.jpexs.debugger.flash.DebugMessageListener;
 import com.jpexs.debugger.flash.Debugger;
 import com.jpexs.debugger.flash.DebuggerCommands;
 import com.jpexs.debugger.flash.DebuggerConnection;
-import com.jpexs.debugger.flash.SWD;
-import com.jpexs.debugger.flash.Variable;
 import com.jpexs.debugger.flash.messages.in.InAskBreakpoints;
 import com.jpexs.debugger.flash.messages.in.InBreakAt;
 import com.jpexs.debugger.flash.messages.in.InBreakAtExt;
@@ -42,15 +40,11 @@ import com.jpexs.debugger.flash.messages.out.OutGetBreakReason;
 import com.jpexs.debugger.flash.messages.out.OutGetSwd;
 import com.jpexs.debugger.flash.messages.out.OutGetSwf;
 import com.jpexs.debugger.flash.messages.out.OutProcessedTag;
-import com.jpexs.decompiler.flash.abc.ClassPath;
-import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.graph.DottedChain;
-import com.jpexs.helpers.CancellableWorker;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -68,18 +62,27 @@ import java.util.regex.Pattern;
 public class DebuggerHandler implements DebugConnectionListener {
 
     private boolean connected = false;
+
     private DebuggerCommands commands = null;
+
     private List<InSwfInfo.SwfInfo> swfs = new ArrayList<>();
+
     private boolean paused = true;
+
     private Map<Integer, String> modulePaths = new HashMap<>();
+
     private Map<String, Integer> classToModule = new HashMap<>();
 
     private Map<String, Set<Integer>> toAddBPointMap = new HashMap<>();
+
     private Map<String, Set<Integer>> confirmedPointMap = new HashMap<>();
+
     private Map<String, Set<Integer>> invalidBreakPointMap = new HashMap<>();
+
     private Map<String, Set<Integer>> toRemoveBPointMap = new HashMap<>();
 
     private int breakIp = -1;
+
     private String breakScriptName = null;
 
     public int getBreakIp() {
@@ -221,6 +224,7 @@ public class DebuggerHandler implements DebugConnectionListener {
     private InFrame frame;
 
     private InBreakAtExt breakInfo;
+
     private InBreakReason breakReason;
 
     private final List<BreakListener> breakListeners = new ArrayList<>();
@@ -255,13 +259,11 @@ public class DebuggerHandler implements DebugConnectionListener {
         public void connected();
 
         public void disconnected();
-
     }
 
     public static interface TraceListener {
 
         public void trace(String... val);
-
     }
 
     public static interface BreakListener {
@@ -269,7 +271,6 @@ public class DebuggerHandler implements DebugConnectionListener {
         public void breakAt(String scriptName, int line);
 
         public void doContinue();
-
     }
 
     public void addBreakListener(BreakListener l) {

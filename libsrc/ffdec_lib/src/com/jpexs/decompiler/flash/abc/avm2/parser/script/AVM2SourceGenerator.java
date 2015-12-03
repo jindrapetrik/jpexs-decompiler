@@ -201,8 +201,8 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return ret;
     }
 
-    public List<AVM2Instruction> toInsList(List<GraphSourceItem> items) {
-        List<AVM2Instruction> ret = new ArrayList<>();
+    public ArrayList<AVM2Instruction> toInsList(List<GraphSourceItem> items) {
+        ArrayList<AVM2Instruction> ret = new ArrayList<>();
         for (GraphSourceItem s : items) {
             if (s instanceof AVM2Instruction) {
                 ret.add((AVM2Instruction) s);
@@ -1675,9 +1675,8 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
             mbody.method_info = abcIndex.getSelectedAbc().addMethodInfo(mi);
             mi.setBody(mbody);
-            List<AVM2Instruction> mbodyCode = toInsList(src);
-            mbody.setCode(new AVM2Code());
-            mbody.getCode().code = mbodyCode;
+            ArrayList<AVM2Instruction> mbodyCode = toInsList(src);
+            mbody.setCode(new AVM2Code(mbodyCode));
 
             if (needsActivation) {
                 if (localData.traitUsages.containsKey(mbody)) {

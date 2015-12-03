@@ -37,7 +37,6 @@ import org.pushingpixels.flamingo.api.common.CommandToggleButtonGroup;
 import org.pushingpixels.flamingo.api.common.JCommandButton;
 import org.pushingpixels.flamingo.api.common.JCommandButtonPanel;
 import org.pushingpixels.flamingo.api.common.JCommandToggleButton;
-import org.pushingpixels.flamingo.api.common.RichTooltip;
 import org.pushingpixels.flamingo.api.common.popup.JPopupPanel;
 import org.pushingpixels.flamingo.api.common.popup.PopupPanelCallback;
 import org.pushingpixels.flamingo.api.ribbon.AbstractRibbonBand;
@@ -291,7 +290,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
                     cbut = new JCommandButton(fixCommandTitle(subTitle));
                 }
                 if (subKey != null) {
-                    //cbut.setActionRichTooltip(new RichTooltip(subTitle, subKey.toString()));                    
+                    //cbut.setActionRichTooltip(new RichTooltip(subTitle, subKey.toString()));
                 }
                 if (subLoader != null) {
                     cbut.setCommandButtonKind(JCommandButton.CommandButtonKind.ACTION_AND_POPUP_MAIN_ACTION);
@@ -639,5 +638,4 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
 
         }
     }
-
 }

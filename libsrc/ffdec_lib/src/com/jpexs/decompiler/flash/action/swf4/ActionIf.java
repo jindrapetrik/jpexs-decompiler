@@ -126,10 +126,11 @@ public class ActionIf extends Action {
     public List<Integer> getBranches(GraphSource code) {
         List<Integer> ret = super.getBranches(code);
         int length = getTotalActionLength();
-        int jmp = code.adr2pos(getAddress() + length + offset);
+        long targetAddress = getTargetAddress();
+        int jmp = code.adr2pos(targetAddress);
         int after = code.adr2pos(getAddress() + length);
         if (jmp == -1) {
-            Logger.getLogger(ActionIf.class.getName()).log(Level.SEVERE, "Invalid IF jump to ofs" + Helper.formatAddress(getAddress() + length + offset));
+            Logger.getLogger(ActionIf.class.getName()).log(Level.SEVERE, "Invalid IF jump to ofs" + Helper.formatAddress(targetAddress));
             ret.add(after);
         } else {
             ret.add(jmp);

@@ -50,7 +50,7 @@ public class AVM2DeobfuscatorJumps extends SWFDecompilerAdapter {
             for (int i = 0; i < code.code.size(); i++) {
                 AVM2Instruction ins = code.code.get(i);
                 if (ins.definition instanceof JumpIns) {
-                    long targetAddr = ins.offset + ins.operands[0] + ins.getBytesLength();
+                    long targetAddr = ins.getTargetAddress();
                     {
                         for (int r : refs.get(i)) {
                             if (r >= 0) { //Not Exception start/end
@@ -58,7 +58,7 @@ public class AVM2DeobfuscatorJumps extends SWFDecompilerAdapter {
 
                                 if ((srcIns.definition instanceof JumpIns) || ((srcIns.definition instanceof IfTypeIns) && (r != i - 1))) {
                                     int oldop = srcIns.operands[0];
-                                    srcIns.operands[0] = (int) (targetAddr - (srcIns.offset + srcIns.getBytesLength()));
+                                    srcIns.operands[0] = (int) (targetAddr - (srcIns.getOffset() + srcIns.getBytesLength()));
                                     if (srcIns.operands[0] != oldop) {
                                         found = true;
                                     }

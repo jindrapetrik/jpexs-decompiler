@@ -35,25 +35,35 @@ import jsyntaxpane.components.LineNumbersBreakpointsRuler;
 public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakPointListener, LineMarkerPainter {
 
     private static final Color BG_CURRENT_COLOR = new Color(0xd6, 0xe8, 0xe2);
+
     private static final Color BG_RULER_COLOR = new Color(0xe9, 0xe8, 0xe2);
 
     private static final Color BG_BREAKPOINT_COLOR = new Color(0xfc, 0x9d, 0x9f);
+
     private static final Color FG_BREAKPOINT_COLOR = null;
+
     private static final int PRIORITY_BREAKPOINT = 20;
 
     private static final Color BG_IP_COLOR = new Color(0xbd, 0xe6, 0xaa);
+
     private static final Color FG_IP_COLOR = null;
+
     private static final int PRIORITY_IP = 0;
 
     private static final Color BG_INVALID_BREAKPOINT_COLOR = new Color(0xdc, 0xdc, 0xd8);
+
     private static final Color FG_INVALID_BREAKPOINT_COLOR = null;
+
     private static final int PRIORITY_INVALID_BREAKPOINT = 10;
 
     public static final LineMarker BREAKPOINT_MARKER = new LineMarker(FG_BREAKPOINT_COLOR, BG_BREAKPOINT_COLOR, PRIORITY_BREAKPOINT);
+
     public static final LineMarker IP_MARKER = new LineMarker(FG_IP_COLOR, BG_IP_COLOR, PRIORITY_IP);
+
     public static final LineMarker INVALID_BREAKPOINT_MARKER = new LineMarker(FG_INVALID_BREAKPOINT_COLOR, BG_INVALID_BREAKPOINT_COLOR, PRIORITY_INVALID_BREAKPOINT);
 
     protected String scriptName = null;
+
     private LineNumbersBreakpointsRuler ruler;
 
     public synchronized void setScriptName(String scriptName) {
@@ -180,5 +190,4 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
         super.removeColorMarker(line, lm);
         ruler.repaint();
     }
-
 }

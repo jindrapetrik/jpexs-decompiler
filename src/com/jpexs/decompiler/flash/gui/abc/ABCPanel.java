@@ -16,11 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui.abc;
 
-import com.jpexs.decompiler.flash.gui.DebugPanel;
 import com.jpexs.debugger.flash.Variable;
-import com.jpexs.debugger.flash.messages.in.InBreakAtExt;
-import com.jpexs.debugger.flash.messages.in.InBreakReason;
-import com.jpexs.debugger.flash.messages.in.InFrame;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ClassPath;
@@ -45,6 +41,7 @@ import com.jpexs.decompiler.flash.abc.usages.TraitMultinameUsage;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppDialog;
 import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.gui.DebugPanel;
 import com.jpexs.decompiler.flash.gui.DebuggerHandler;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
 import com.jpexs.decompiler.flash.gui.Main;
@@ -87,7 +84,6 @@ import java.awt.event.MouseMotionListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -105,7 +101,6 @@ import javax.swing.JTable;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
-import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
@@ -272,6 +267,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
         // DebuggerHandler.VariableChangedListener varChangeListener;
         List<TableModelListener> tableListeners = new ArrayList<>();
+
         private List<Variable> vars;
 
         public VariablesTableModel(List<Variable> vars) {
@@ -348,7 +344,6 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         public void removeTableModelListener(TableModelListener l) {
             tableListeners.remove(l);
         }
-
     }
 
     public ABCPanel(MainPanel mainPanel) {

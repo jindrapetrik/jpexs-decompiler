@@ -84,7 +84,6 @@ import java.util.Random;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
-import org.testng.annotations.Test;
 
 /**
  *
@@ -109,7 +108,6 @@ public class FlashPlayerTest {
         List<AS3ExecuteTask> tasks = new ArrayList<>();
         for (int p1 = 0; p1 < pushes.length; p1++) {
             AVM2Code ccode = new AVM2Code();
-            ccode.code = new ArrayList<>();
             List<AVM2Instruction> code = ccode.code;
             code.add(new AVM2Instruction(0, AVM2Instructions.GetLocal0, null));
             code.add(new AVM2Instruction(0, AVM2Instructions.PushScope, null));
@@ -213,7 +211,6 @@ public class FlashPlayerTest {
                     }
 
                     AVM2Code ccode = new AVM2Code();
-                    ccode.code = new ArrayList<>();
                     List<AVM2Instruction> code = ccode.code;
                     code.add(new AVM2Instruction(0, AVM2Instructions.GetLocal0, null));
                     code.add(new AVM2Instruction(0, AVM2Instructions.PushScope, null));

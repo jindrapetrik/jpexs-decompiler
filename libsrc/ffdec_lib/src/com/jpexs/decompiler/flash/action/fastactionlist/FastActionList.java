@@ -57,6 +57,11 @@ public class FastActionList implements Collection<ActionItem> {
         getJumps(actions, actionItemMap);
     }
 
+    public final ActionItem insertItemBefore(ActionItem item, Action action) {
+        ActionItem newItem = new ActionItem(action);
+        return insertItemBefore(item, newItem);
+    }
+
     public final ActionItem insertItemAfter(ActionItem item, Action action) {
         ActionItem newItem = new ActionItem(action);
         return insertItemAfter(item, newItem);
@@ -667,7 +672,7 @@ public class FastActionList implements Collection<ActionItem> {
         if (o instanceof ActionItem) {
             item = (ActionItem) o;
         } else if (o instanceof Action) {
-            item = actionItemMap.get(o);
+            item = actionItemMap.get((Action) o);
         }
 
         if (item == null) {

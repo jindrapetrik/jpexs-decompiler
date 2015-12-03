@@ -96,6 +96,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.helpers.ByteArrayRange;
+import com.jpexs.helpers.HashArrayList;
 import com.jpexs.helpers.ReflectionTools;
 import java.io.IOException;
 import java.io.StringReader;
@@ -205,7 +206,7 @@ public class SwfXmlImporter {
                     Field field = getField(cls, name);
                     Class childCls = field.getType();
                     if (List.class.isAssignableFrom(childCls)) {
-                        List list = new ArrayList();
+                        List list = HashArrayList.class.isAssignableFrom(childCls) ? new HashArrayList() : new ArrayList();
                         for (int j = 0; j < child.getChildNodes().getLength(); j++) {
                             Node childChildNode = child.getChildNodes().item(j);
                             if (childChildNode instanceof Element) {

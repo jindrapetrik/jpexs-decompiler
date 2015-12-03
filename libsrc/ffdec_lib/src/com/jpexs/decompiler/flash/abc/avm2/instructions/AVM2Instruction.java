@@ -47,7 +47,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     public int[] operands;
 
-    public long offset;
+    private long offset;
 
     public String comment;
 
@@ -375,12 +375,24 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
         return offset;
     }
 
+    public void setOffset(long offset) {
+        this.offset = offset;
+    }
+
+    public long getTargetAddress() {
+        return offset + 4 /*getBytesLength()*/ + operands[0];
+    }
+
+    public void setTargetOffset(int offset) {
+        operands[0] = offset;
+    }
+
     @Override
     public List<Integer> getBranches(GraphSource code) {
         List<Integer> ret = new ArrayList<>();
         if (definition instanceof IfTypeIns) {
 
-            ret.add(code.adr2pos(offset + getBytesLength() + operands[0]));
+            ret.add(code.adr2pos(getTargetAddress()));
             if (!(definition instanceof JumpIns)) {
                 ret.add(code.adr2pos(offset + getBytesLength()));
             }
