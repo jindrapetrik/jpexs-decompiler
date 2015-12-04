@@ -16,9 +16,14 @@
  */
 package com.jpexs.decompiler.flash;
 
+import com.jpexs.decompiler.flash.abc.NotSameException;
 import com.jpexs.decompiler.flash.configuration.Configuration;
-import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
-import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
+import com.jpexs.decompiler.flash.exporters.swf.SwfXmlExporter;
+import com.jpexs.decompiler.flash.importers.SwfXmlImporter;
+import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
+import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.base.FontTag;
+import com.jpexs.helpers.Helper;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -35,7 +40,7 @@ import org.testng.annotations.Test;
  *
  * @author JPEXS
  */
-public class ExportTest extends FileTestBase {
+public class SwfXmlExportImportTest extends FileTestBase {
 
     @BeforeClass
     public void init() {
@@ -79,37 +84,68 @@ public class ExportTest extends FileTestBase {
     }
 
     @Test(dataProvider = "provideFiles")
-    public void testDecompileAS(String filePath) {
-        testDecompile(filePath, ScriptExportMode.AS);
-    }
-
-    @Test(dataProvider = "provideFiles")
-    public void testDecompilePcode(String filePath) {
-        testDecompile(filePath, ScriptExportMode.PCODE);
-    }
-
-    public void testDecompile(String filePath, ScriptExportMode exportMode) {
+    public void testExportImportXml(String filePath) {
         try {
             File f = new File(filePath);
             SWF swf = new SWF(new BufferedInputStream(new FileInputStream(filePath)), false);
-            String folderName = exportMode == ScriptExportMode.AS ? "output" : "outputp";
+            String folderName = "xml";
             File fdir = new File(TESTDATADIR + File.separator + folderName + File.separator + f.getName());
             fdir.mkdirs();
 
-            swf.exportActionScript(new AbortRetryIgnoreHandler() {
-                @Override
-                public int handle(Throwable thrown) {
-                    return AbortRetryIgnoreHandler.ABORT;
+            File outFile = new File(fdir + File.separator + Helper.makeFileName("swf.xml"));
+            new SwfXmlExporter().exportXml(swf, outFile);
+            String xml = Helper.readTextFile(outFile.getPath());
+
+            SWF swf2 = new SWF();
+            new SwfXmlImporter().importSwf(swf2, xml);
+
+            if (swf.tags.size() != swf2.tags.size()) {
+                throw new NotSameException(0);
+            }
+
+            for (int i = 0; i < swf.tags.size(); i++) {
+                Tag oldTag = swf.tags.get(i);
+                Tag newTag = swf2.tags.get(i);
+                if (oldTag.getClass() != newTag.getClass()) {
+                    throw new NotSameException(0);
                 }
 
-                @Override
-                public AbortRetryIgnoreHandler getNewInstance() {
-                    return this;
-                }
+                if (oldTag instanceof DefineSpriteTag) {
+                    DefineSpriteTag oldSprite = (DefineSpriteTag) oldTag;
+                    DefineSpriteTag newSprite = (DefineSpriteTag) newTag;
+                    if (oldSprite.subTags.size() != newSprite.subTags.size()) {
+                        throw new NotSameException(0);
+                    }
 
-            }, fdir.getAbsolutePath(), new ScriptExportSettings(exportMode, false), false, null);
+                    for (int k = 0; k < oldSprite.subTags.size(); k++) {
+                        compareTags(oldSprite.subTags.get(k), newSprite.subTags.get(k));
+                    }
+                } else if (!(oldTag instanceof FontTag)) {
+                    compareTags(oldTag, newTag);
+                }
+            }
         } catch (Exception ex) {
-            fail("Exception during decompilation: " + filePath + " " + ex.getMessage());
+            fail("Exception during SWF xml export/import: " + filePath + " " + ex.getMessage());
+        }
+    }
+
+    private void compareTags(Tag tag1, Tag tag2) {
+        if (tag1.getClass() != tag2.getClass()) {
+            throw new NotSameException(0);
+        }
+
+        byte[] data1 = tag1.getData();
+        byte[] data2 = tag2.getData();
+
+        int length = Math.min(data1.length, data2.length);
+        for (int j = 0; j < length; j++) {
+            if (data1[j] != data2[j]) {
+                throw new NotSameException(j);
+            }
+        }
+
+        if (data1.length != data2.length) {
+            throw new NotSameException(length);
         }
     }
 
