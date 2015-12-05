@@ -134,7 +134,7 @@ public class DefineEditTextTag extends TextTag {
     public String fontClass;
 
     @SWFType(BasicType.UI16)
-    @Conditional("hasFont")
+    @Conditional("hasFont|hasFontClass")
     public int fontHeight;
 
     @Conditional("hasTextColor")
@@ -219,7 +219,8 @@ public class DefineEditTextTag extends TextTag {
         if (hasFontClass) {
             fontClass = sis.readString("fontClass");
         }
-        if (hasFont) {
+        // condition is wrong in the documentation
+        if (hasFont || hasFontClass) {
             fontHeight = sis.readUI16("fontHeight");
         }
         if (hasTextColor) {
@@ -274,7 +275,7 @@ public class DefineEditTextTag extends TextTag {
         if (hasFontClass) {
             sos.writeString(fontClass);
         }
-        if (hasFont) {
+        if (hasFont || hasFontClass) {
             sos.writeUI16(fontHeight);
         }
         if (hasTextColor) {
