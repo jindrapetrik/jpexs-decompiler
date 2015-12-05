@@ -1771,6 +1771,14 @@ public class Main {
             mainFrame.getPanel().unloadFlashPlayer();
             mainFrame.dispose();
         }
+        if (fileTxt != null) {
+            try {
+                fileTxt.flush();
+                fileTxt.close();
+            } catch (Exception ex) {
+                //ignore
+            }
+        }
         System.exit(0);
     }
 
@@ -1965,11 +1973,11 @@ public class Main {
             oldFileTxt.close();
         }
 
-        String fileName;
+        String fileName = null;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-hh-mm-ss");
 
         try {
-            fileName = Configuration.getFFDecHome() + File.separator + "logs" + File.separator;
+            fileName = Configuration.getFFDecHome() + "logs" + File.separator;
             if (Configuration.useDetailedLogging.get()) {
                 fileName += "log-" + sdf.format(new Date()) + ".txt";
             } else {
@@ -1981,12 +1989,30 @@ public class Main {
             }
             fileTxt = new FileHandler(fileName);
         } catch (IOException | SecurityException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            //cannot get lock error
+            if (ex.getMessage().contains("lock for")) {
+                //remove all old log files and their .lck
+                for (int i = 0; i <= 100; i++) {
+                    File flog = new File(fileName + (i == 0 ? "" : "." + i));
+                    File flog_lock = new File(fileName + (i == 0 ? "" : "." + i) + ".lck");
+                    flog.delete();
+                    flog_lock.delete();
+                }
+                try {
+                    fileTxt = new FileHandler(fileName);
+                } catch (IOException | SecurityException ex1) {
+                    logger.log(Level.SEVERE, "Cannot initialize logging", ex);
+                }
+            } else {
+                logger.log(Level.SEVERE, "Cannot initialize logging", ex);
+            }
         }
 
         Formatter formatterTxt = new LogFormatter();
-        fileTxt.setFormatter(formatterTxt);
-        logger.addHandler(fileTxt);
+        if (fileTxt != null) {
+            fileTxt.setFormatter(formatterTxt);
+            logger.addHandler(fileTxt);
+        }
 
         if (!GraphicsEnvironment.isHeadless() && ErrorLogFrame.hasInstance()) {
             ErrorLogFrame.getInstance().clearErrorState();
