@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -36,8 +37,10 @@ import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class FunctionActionItem extends ActionItem {
@@ -49,6 +52,8 @@ public class FunctionActionItem extends ActionItem {
     public String functionName;
 
     public List<String> paramNames;
+
+    public Map<Integer, String> regNames;
 
     public GraphTargetItem calculatedFunctionName;
 
@@ -79,18 +84,26 @@ public class FunctionActionItem extends ActionItem {
         super(null, null, PRECEDENCE_PRIMARY);
     }
 
-    public FunctionActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, String functionName, List<String> paramNames, List<GraphTargetItem> actions, List<String> constants, int regStart, List<VariableActionItem> variables) {
+    public FunctionActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, String functionName, List<String> paramNames, Map<Integer, String> regNames, List<GraphTargetItem> actions, List<String> constants, int regStart, List<VariableActionItem> variables) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.actions = actions;
         this.constants = constants;
         this.functionName = functionName;
         this.paramNames = paramNames;
+        this.regNames = regNames;
         this.regStart = regStart;
         this.variables = variables;
     }
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        String n = calculatedFunctionName != null ? calculatedFunctionName.toStringNoQuotes(localData) : functionName;
+        writer.startFunction(n);
+        HighlightData srcData = getSrcData();
+        if (n != null) {
+            srcData.localName = n;
+            srcData.declaration = true;
+        }
         writer.append("function");
         if (calculatedFunctionName != null) {
             writer.append(" ");
@@ -111,6 +124,11 @@ public class FunctionActionItem extends ActionItem {
         writer.spaceBeforeCallParenthesies(paramNames.size());
         writer.append("(");
 
+        Map<String, Integer> n2r = new HashMap<>();
+        for (int r : regNames.keySet()) {
+            n2r.put(regNames.get(r), r);
+        }
+
         for (int p = 0; p < paramNames.size(); p++) {
             if (p > 0) {
                 writer.append(", ");
@@ -119,16 +137,26 @@ public class FunctionActionItem extends ActionItem {
             if (pname == null || pname.isEmpty()) {
                 pname = new RegisterNumber(regStart + p).translate();
             }
+            HighlightData d = getSrcData();
+            d.localName = pname;
+            if (n2r.containsKey(pname)) {
+                d.regIndex = n2r.get(pname);
+            }
+            d.declaration = true;
+
             if (!IdentifiersDeobfuscation.isValidName(false, pname)) {
                 IdentifiersDeobfuscation.appendObfuscatedIdentifier(pname, writer);
+            } else {
+                writer.append(pname);
             }
-            writer.append(pname);
         }
         writer.append(")").startBlock();
 
         Graph.graphToString(actions, writer, localData);
 
-        return writer.endBlock();
+        writer.endBlock();
+        writer.endMethod();
+        return writer;
     }
 
     @Override

@@ -2385,10 +2385,16 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
 
         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
+        writer.startFunction("!script");
         Action.actionsToSource(src, actions, src.toString()/*FIXME?*/, writer);
+        writer.endFunction();
         List<Highlighting> hilights = writer.instructionHilights;
+        List<Highlighting> methodHilights = writer.methodHilights;
+        List<Highlighting> classHilights = writer.classHilights;
+        List<Highlighting> specialHilights = writer.specialHilights;
+
         String srcNoHex = writer.toString();
-        CachedScript res = new CachedScript(srcNoHex, hilights);
+        CachedScript res = new CachedScript(srcNoHex, hilights, methodHilights, classHilights, specialHilights);
         swf.as2Cache.put(src, res);
         return res;
     }
@@ -3114,29 +3120,36 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     /**
-     * Enables debugging. Adds tags to enable debugging and injects debugline
-     * and debugfile instructions to AS3 code
+     * Enables debugging. Adds tags to enable debugging and optinally injects
+     * debugline and debugfile instructions to AS3 code by decompiling it first
      *
-     * @param injectCode Modify AS3 code with debugfile / debugline ?
+     * @param injectAS3Code Modify AS3 code with debugfile / debugline ?
      * @param decompileDir Directory to virtual decompile (will affect
      * debugfile)
      */
-    public void enableDebugging(boolean injectCode, File decompileDir) {
-        enableDebugging(injectCode, decompileDir, false);
+    public void enableDebugging(boolean injectAS3Code, File decompileDir) {
+        enableDebugging(injectAS3Code, decompileDir, false);
+    }
+
+    /**
+     * Enables debugging. Adds tags to enable debugging.
+     */
+    public void enableDebugging() {
+        enableDebugging(false, null, false);
     }
 
     /**
      * Enables debugging. Adds tags to enable debugging and injects debugline
      * and debugfile instructions to AS3 code. Optionally enables Telemetry
      *
-     * @param injectCode Modify AS3 code with debugfile / debugline ?
+     * @param injectAS3Code Modify AS3 code with debugfile / debugline ?
      * @param decompileDir Directory to virtual decompile (will affect
      * debugfile)
      * @param telemetry Enable telemetry info?
      */
-    public void enableDebugging(boolean injectCode, File decompileDir, boolean telemetry) {
+    public void enableDebugging(boolean injectAS3Code, File decompileDir, boolean telemetry) {
 
-        if (injectCode) {
+        if (injectAS3Code) {
             List<ScriptPack> packs = getAS3Packs();
             for (ScriptPack s : packs) {
                 if (s.isSimple) {
@@ -3181,9 +3194,14 @@ public final class SWF implements SWFContainerItem, Timelined {
             }
         }
 
-        addDebugId();
+        getOrAddDebugId();
     }
 
+    /**
+     * Finds DebugID tag
+     *
+     * @return the tag or null if not found
+     */
     public DebugIDTag getDebugId() {
         for (Tag t : tags) {
             if (t instanceof DebugIDTag) {
@@ -3193,7 +3211,12 @@ public final class SWF implements SWFContainerItem, Timelined {
         return null;
     }
 
-    public DebugIDTag addDebugId() {
+    /**
+     * Finds DebugID tag and generates new one if none exists
+     *
+     * @return the tag or null if there is not debugging enabled in the swf file
+     */
+    public DebugIDTag getOrAddDebugId() {
         DebugIDTag r = getDebugId();
         if (r == null) {
             for (int i = 0; i < tags.size(); i++) {
@@ -3229,6 +3252,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             Collections.sort(names);
             //Collections.reverse(names);
             for (String name : names) {
+                List<SWD.DebugRegisters> regitems = new ArrayList<>();
                 moduleId++;
                 CachedScript cs;
                 try {
@@ -3246,18 +3270,17 @@ public final class SWF implements SWFContainerItem, Timelined {
                     if (h != null) {
 
                         int firstLineOffset = (int) h.getProperties().firstLineOffset;
-                        if (firstLineOffset != -1) {
-                            if (h.getProperties().declaration && h.getProperties().regIndex > -1) {
-                                regNames.put(h.getProperties().regIndex, h.getProperties().localName);
+                        if (firstLineOffset > -1 && h.getProperties().declaration && h.getProperties().regIndex > -1 && (!regNames.containsKey(h.getProperties().regIndex) || !regNames.get(h.getProperties().regIndex).equals(h.getProperties().localName))) {
+                            regNames.put(h.getProperties().regIndex, h.getProperties().localName);
 
-                                /*List<Integer> curRegIndexes = new ArrayList<>(regNames.keySet());
-                                 List<String> curRegNames = new ArrayList<>();
-                                 for (int i = 0; i < curRegIndexes.size(); i++) {
-                                 curRegNames.add(regNames.get(i));
-                                 }
-                                 items.add(new SWD.DebugRegisters((int) h.getProperties().firstLineOffset, curRegIndexes, curRegNames));*/
+                            List<Integer> curRegIndexes = new ArrayList<>(regNames.keySet());
+                            List<String> curRegNames = new ArrayList<>();
+                            for (int i = 0; i < curRegIndexes.size(); i++) {
+                                curRegNames.add(regNames.get(curRegIndexes.get(i)));
                             }
+                            regitems.add(new SWD.DebugRegisters((int) h.getProperties().firstLineOffset, curRegIndexes, curRegNames));
                         }
+
                         if (firstLineOffset != -1 && !lineToOffset.containsKey(line)) {
                             lineToOffset.put(line, firstLineOffset);
                         }
@@ -3321,6 +3344,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                         }
                     }
                 }
+                items.addAll(regitems);
                 //moduleId++;
             }
             //items.addAll(swdOffsets);

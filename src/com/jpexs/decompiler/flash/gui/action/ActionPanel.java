@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.gui.action;
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ClassPath;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.Reference;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraph;
 import com.jpexs.decompiler.flash.action.ActionList;
@@ -49,9 +50,11 @@ import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
 import com.jpexs.decompiler.flash.gui.controls.NoneSelectedButtonGroup;
 import com.jpexs.decompiler.flash.gui.editor.DebuggableEditorPane;
 import com.jpexs.decompiler.flash.gui.editor.LineMarkedEditorPane;
+import com.jpexs.decompiler.flash.gui.editor.LinkHandler;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
 import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -87,6 +90,7 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import javax.swing.text.Highlighter;
 import javax.swing.tree.TreePath;
 import jsyntaxpane.SyntaxDocument;
 import jsyntaxpane.Token;
@@ -132,6 +136,9 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
     public JLabel decLabel = new HeaderLabel(AppStrings.translate("panel.decompiled"));
 
     public List<Highlighting> decompiledHilights = new ArrayList<>();
+    public List<Highlighting> specialHighlights = new ArrayList<>();
+    public List<Highlighting> classHighlights = new ArrayList<>();
+    public List<Highlighting> methodHighlights = new ArrayList<>();
 
     public List<Highlighting> disassembledHilights = new ArrayList<>();
 
@@ -467,6 +474,9 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
 
                     CachedScript sc = SWF.getCached(asm, actions);
                     decompiledHilights = sc.hilights;
+                    methodHighlights = sc.methodHilights;
+                    classHighlights = sc.classHilights;
+                    specialHighlights = sc.specialHilights;
                     lastDecompiled = sc.text;
                     lastASM = asm;
                     setDecompiledText(lastASM.getScriptName(), lastDecompiled);
@@ -505,12 +515,92 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
     public void hilightOffset(long offset) {
     }
 
+    public int getLocalDeclarationOfPos(int pos) {
+        Highlighting sh = Highlighting.searchPos(specialHighlights, pos);
+        Highlighting h = Highlighting.searchPos(decompiledHilights, pos);
+
+        if (h == null) {
+            return -1;
+        }
+
+        List<Highlighting> tms = Highlighting.searchAllPos(methodHighlights, pos);
+        if (tms.isEmpty()) {
+            return -1;
+        }
+        for (Highlighting tm : tms) {
+
+            List<Highlighting> tm_tms = Highlighting.searchAllLocalNames(methodHighlights, tm.getProperties().localName);
+            //is it already declaration?
+            if (h.getProperties().declaration || (sh != null && sh.getProperties().declaration)) {
+                return -1; //no jump
+            }
+
+            String lname = h.getProperties().localName;
+            if ("this".equals(lname)) {
+                Highlighting ch = Highlighting.searchPos(classHighlights, pos);
+                //    int cindex = (int) ch.getProperties().index;
+                return ch.startPos;
+            }
+
+            HighlightData hData = h.getProperties();
+            HighlightData search = new HighlightData();
+            search.declaration = hData.declaration;
+            //search.declaredType = hData.declaredType;
+            search.localName = hData.localName;
+            //search.specialValue = hData.specialValue;
+            if (search.isEmpty()) {
+                return -1;
+            }
+            search.declaration = true;
+
+            for (Highlighting tm1 : tm_tms) {
+                Highlighting rh = Highlighting.search(decompiledHilights, search, tm1.startPos, tm1.startPos + tm1.len);
+                if (rh != null) {
+                    return rh.startPos;
+                }
+            }
+        }
+
+        return -1;
+    }
+
     public ActionPanel(MainPanel mainPanel) {
         this.mainPanel = mainPanel;
         editor = new LineMarkedEditorPane();
         editor.setEditable(false);
         decompiledEditor = new DebuggableEditorPane();
         decompiledEditor.setEditable(false);
+        decompiledEditor.setLinkHandler(new LinkHandler() {
+
+            @Override
+            public boolean isLink(Token token) {
+                int pos = token.start;
+                Highlighting h = Highlighting.searchPos(decompiledHilights, pos);
+                if (h != null) {
+                    if (h.getProperties().localName != null && !h.getProperties().declaration) {
+                        return getLocalDeclarationOfPos(pos) != -1;
+                    }
+                }
+                return false;
+            }
+
+            @Override
+            public void handleLink(Token token) {
+                int pos = token.start;
+                int tpos = getLocalDeclarationOfPos(pos);
+                if (tpos > -1) {
+                    //System.err.println("goto " + tpos);
+                    decompiledEditor.setCaretPosition(tpos);
+                } else {
+                    //System.err.println("cannot handle");
+                }
+            }
+
+            @Override
+            public Highlighter.HighlightPainter linkPainter() {
+                return decompiledEditor.linkPainter();
+            }
+        });
 
         searchPanel = new SearchPanel<>(new FlowLayout(), this);
 

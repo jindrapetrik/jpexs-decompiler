@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.action.swf4.ActionSetVariable;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionStoreRegister;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -74,6 +75,9 @@ public class SetVariableActionItem extends ActionItem implements SetTypeActionIt
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         if (((name instanceof DirectValueActionItem)) && (((DirectValueActionItem) name).isString()) && (!IdentifiersDeobfuscation.isValidName(false, ((DirectValueActionItem) name).toStringNoQuotes(localData), "this", "super"))) {
+            HighlightData srcData = getSrcData();
+            srcData.localName = name.toStringNoQuotes(localData);
+
             IdentifiersDeobfuscation.appendObfuscatedIdentifier(((DirectValueActionItem) name).toStringNoQuotes(localData), writer);
             writer.append(" = ");
             return value.toString(writer, localData);
@@ -86,6 +90,9 @@ public class SetVariableActionItem extends ActionItem implements SetTypeActionIt
             value.toString(writer, localData);
             return writer.append(")");
         }
+        HighlightData srcData = getSrcData();
+        srcData.localName = name.toStringNoQuotes(localData);
+
         stripQuotes(name, localData, writer);
         writer.append(" = ");
         return value.toString(writer, localData);

@@ -153,6 +153,7 @@ public class ClassActionItem extends ActionItem implements Block {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        writer.startClass(className.toStringNoQuotes(localData));
         writer.append("class ");
         className.toStringNoQuotes(writer, localData);
         if (extendsOp != null) {
@@ -204,7 +205,9 @@ public class ClassActionItem extends ActionItem implements Block {
             f.toString(writer, localData).newLine();
         }
 
-        return writer.endBlock();
+        writer.endBlock();
+        writer.endClass();
+        return writer;
     }
 
     @Override

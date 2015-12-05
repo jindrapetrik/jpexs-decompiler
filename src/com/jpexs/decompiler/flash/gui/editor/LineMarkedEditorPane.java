@@ -39,6 +39,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.plaf.TextUI;
@@ -291,6 +293,37 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
 
     }
 
+    public Token tokenAtPos(Point lastPos) {
+        Document d = getDocument();
+        if (d instanceof SyntaxDocument) {
+            SyntaxDocument sd = (SyntaxDocument) d;
+
+            //correction of token last character
+            int pos = viewToModel(lastPos);
+            Rectangle r;
+            try {
+                r = modelToView(pos);
+                if (lastPos.x < r.x) {
+                    pos--;
+                }
+            } catch (BadLocationException ex) {
+                //ignore
+            }
+            Token t = sd.getTokenAt(pos);
+
+            //Correction of token of length 1 character
+            if (pos > 0 && pos < d.getLength() - 1 && t != null && t.length == 1) {
+                Token tprev = sd.getTokenAt(pos - 1);
+                if (tprev == t) {
+                    t = sd.getTokenAt(pos + 1);
+                }
+            }
+
+            return t;
+        }
+        return null;
+    }
+
     private class LinkAdapter extends MouseAdapter implements KeyListener {
 
         private Point lastPos = new Point(0, 0);
@@ -320,38 +353,30 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
 
         private void update() {
             if (ctrlDown) {
-                Document d = getDocument();
-                if (d instanceof SyntaxDocument) {
-                    SyntaxDocument sd = (SyntaxDocument) d;
-                    int pos = viewToModel(lastPos);
-                    if (pos <= 0) {
-                        return;
-                    }
-                    Token t = sd.getTokenAt(pos);
-                    if (t != lastUnderlined) {
-                        if (t == null || lastUnderlined == null || !t.equals(lastUnderlined)) {
-                            MyMarkers.removeMarkers(LineMarkedEditorPane.this, underLinePainter);
+                Token t = tokenAtPos(lastPos);
 
-                            if (t != null && linkHandler.isLink(t)) {
-                                lastUnderlined = t;
-                                setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                if (t != lastUnderlined) {
+                    if (t == null || lastUnderlined == null || !t.equals(lastUnderlined)) {
+                        MyMarkers.removeMarkers(LineMarkedEditorPane.this, underLinePainter);
 
-                            } else {
-                                lastUnderlined = null;
-                            }
+                        if (t != null && linkHandler.isLink(t)) {
+                            lastUnderlined = t;
+                            setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
                         } else {
                             lastUnderlined = null;
                         }
-                    }
-
-                    if (lastUnderlined != null) {
-                        MyMarkers.markToken(LineMarkedEditorPane.this, lastUnderlined, underLinePainter);
                     } else {
-                        setCursor(Cursor.getDefaultCursor());
+                        lastUnderlined = null;
                     }
-                    repaint();
-
                 }
+
+                if (lastUnderlined != null) {
+                    MyMarkers.markToken(LineMarkedEditorPane.this, lastUnderlined, underLinePainter);
+                } else {
+                    setCursor(Cursor.getDefaultCursor());
+                }
+                repaint();
             } else {
                 lastUnderlined = null;
                 MyMarkers.removeMarkers(LineMarkedEditorPane.this, underLinePainter);
@@ -363,12 +388,7 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
         @Override
         public void mouseClicked(MouseEvent e) {
             if (ctrlDown) {
-                SyntaxDocument sd = (SyntaxDocument) getDocument();
-                int pos = viewToModel(e.getPoint());
-                if (pos < 0) {
-                    return;
-                }
-                Token t = sd.getTokenAt(pos + 1);
+                Token t = tokenAtPos(lastPos);
                 if (t != null && linkHandler.isLink(t)) {
                     linkHandler.handleLink(t);
                 }

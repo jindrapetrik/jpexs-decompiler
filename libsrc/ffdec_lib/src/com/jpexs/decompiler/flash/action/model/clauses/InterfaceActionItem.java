@@ -47,6 +47,7 @@ public class InterfaceActionItem extends ActionItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        writer.startClass(name.toStringNoQuotes(localData));
         writer.append("interface ");
         name.toStringNoQuotes(writer, localData);
         boolean first = true;
@@ -60,7 +61,7 @@ public class InterfaceActionItem extends ActionItem {
             first = false;
             Action.getWithoutGlobal(ti).toStringNoQuotes(writer, localData);
         }
-        return writer.startBlock().endBlock();
+        return writer.startBlock().endBlock().endClass();
     }
 
     @Override

@@ -20,7 +20,9 @@ import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionStoreRegister;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
 import com.jpexs.decompiler.graph.CompilationException;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
@@ -77,7 +79,13 @@ public class StoreRegisterActionItem extends ActionItem implements SetTypeAction
         if (temporary) {
             value.toString(writer, localData);
         } else {
+            HighlightData srcData = getSrcData();
+            srcData.localName = register.translate();
+            srcData.regIndex = register.number;
+
             if (define) {
+                srcData.declaration = true;
+                srcData.declaredType = DottedChain.ALL;
                 writer.append("var ");
             }
             writer.append(register.translate()).append(" = ");

@@ -300,7 +300,7 @@ public class ActionScript2Parser {
             expectedType(SymbolType.CURLY_CLOSE);
         }
 
-        return new FunctionActionItem(null, null, functionName, paramNames, body, constantPool, -1, subvariables);
+        return new FunctionActionItem(null, null, functionName, paramNames, new HashMap<>() /*?*/, body, constantPool, -1, subvariables);
     }
 
     private GraphTargetItem traits(boolean isInterface, GraphTargetItem nameStr, GraphTargetItem extendsStr, List<GraphTargetItem> implementsStr, List<VariableActionItem> variables) throws IOException, ActionParseException {

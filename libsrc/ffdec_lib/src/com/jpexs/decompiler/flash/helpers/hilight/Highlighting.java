@@ -190,6 +190,17 @@ public class Highlighting implements Serializable {
         return ret;
     }
 
+    public static List<Highlighting> searchAllLocalNames(List<Highlighting> list, String localName) {
+        List<Highlighting> ret = new ArrayList<>();
+        for (Highlighting h : list) {
+            if (localName.equals(h.getProperties().localName)) {
+                ret.add(h);
+            }
+        }
+
+        return ret;
+    }
+
     /**
      * Returns a string representation of the object
      *

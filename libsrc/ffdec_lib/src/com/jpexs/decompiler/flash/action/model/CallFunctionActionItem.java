@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.swf5.ActionCallFunction;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
@@ -44,13 +45,17 @@ public class CallFunctionActionItem extends ActionItem {
     }
 
     public CallFunctionActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem functionName, List<GraphTargetItem> arguments) {
-        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.functionName = functionName;
         this.arguments = arguments;
     }
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+
+        HighlightData srcData = getSrcData();
+        srcData.localName = functionName.toStringNoQuotes(localData);
+
         if (functionName instanceof DirectValueActionItem) {
             writer.append(IdentifiersDeobfuscation.printIdentifier(false, (functionName).toStringNoQuotes(localData)));
         } else {

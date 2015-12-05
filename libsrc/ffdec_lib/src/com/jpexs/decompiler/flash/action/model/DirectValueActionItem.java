@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -171,7 +172,12 @@ public class DirectValueActionItem extends ActionItem implements SimpleValue {
             return writer.append("\"").append(Helper.escapeActionScriptString(this.constants.get(((ConstantIndex) value).index))).append("\"");
         }
         if (value instanceof RegisterNumber) {
-            return writer.append(((RegisterNumber) value).translate());
+
+            HighlightData srcData = getSrcData();
+            srcData.localName = ((RegisterNumber) value).translate();
+            srcData.regIndex = ((RegisterNumber) value).number;
+
+            return writer.appendWithData(((RegisterNumber) value).translate(), srcData);
         }
         //return writer.append(value.toString());
         return writer.append(EcmaScript.toString(value, true)); // todo, use this line

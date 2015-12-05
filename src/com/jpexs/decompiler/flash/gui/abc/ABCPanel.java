@@ -358,12 +358,12 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
             @Override
             public boolean isLink(Token token) {
-                return hasDeclaration(token.length == 1 ? token.start : token.start + 1);
+                return hasDeclaration(token.start);
             }
 
             @Override
             public void handleLink(Token token) {
-                gotoDeclaration(token.length == 1 ? token.start : token.start + 1);
+                gotoDeclaration(token.start);
             }
 
             @Override

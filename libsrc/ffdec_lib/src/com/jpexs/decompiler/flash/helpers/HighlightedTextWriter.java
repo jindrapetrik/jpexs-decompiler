@@ -115,7 +115,19 @@ public class HighlightedTextWriter extends GraphTextWriter {
     }
 
     @Override
+    public HighlightedTextWriter startFunction(String name) {
+        HighlightData data = new HighlightData();
+        data.localName = name;
+        return start(data, HighlightType.METHOD);
+    }
+
+    @Override
     public HighlightedTextWriter endMethod() {
+        return end(HighlightType.METHOD);
+    }
+
+    @Override
+    public HighlightedTextWriter endFunction() {
         return end(HighlightType.METHOD);
     }
 
@@ -129,6 +141,13 @@ public class HighlightedTextWriter extends GraphTextWriter {
     public HighlightedTextWriter startClass(long index) {
         HighlightData data = new HighlightData();
         data.index = index;
+        return start(data, HighlightType.CLASS);
+    }
+
+    @Override
+    public HighlightedTextWriter startClass(String className) {
+        HighlightData data = new HighlightData();
+        data.localName = className;
         return start(data, HighlightType.CLASS);
     }
 

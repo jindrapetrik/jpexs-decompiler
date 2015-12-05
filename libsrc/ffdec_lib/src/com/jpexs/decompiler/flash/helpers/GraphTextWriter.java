@@ -77,7 +77,21 @@ public abstract class GraphTextWriter {
         return this;
     }
 
+    /**
+     * Highlights specified text as method/function
+     *
+     * @param name Function name
+     * @return GraphTextWriter
+     */
+    public GraphTextWriter startFunction(String name) {
+        return this;
+    }
+
     public GraphTextWriter endMethod() {
+        return this;
+    }
+
+    public GraphTextWriter endFunction() {
         return this;
     }
 
@@ -88,6 +102,10 @@ public abstract class GraphTextWriter {
      * @return GraphTextWriter
      */
     public GraphTextWriter startClass(long index) {
+        return this;
+    }
+
+    public GraphTextWriter startClass(String className) {
         return this;
     }
 

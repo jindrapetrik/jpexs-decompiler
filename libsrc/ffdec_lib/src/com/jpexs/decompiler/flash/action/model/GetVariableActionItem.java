@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.swf4.ActionGetVariable;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
@@ -57,7 +58,7 @@ public class GetVariableActionItem extends ActionItem {
     }
 
     public GetVariableActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value) {
-        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.name = value;
     }
 
@@ -65,12 +66,17 @@ public class GetVariableActionItem extends ActionItem {
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
 
         if (((name instanceof DirectValueActionItem)) && (((DirectValueActionItem) name).isString()) && (!IdentifiersDeobfuscation.isValidNameWithDot(false, ((DirectValueActionItem) name).toStringNoQuotes(localData), "this", "super"))) {
+            HighlightData srcData = getSrcData();
+            srcData.localName = name.toStringNoQuotes(localData);
+
             return IdentifiersDeobfuscation.appendObfuscatedIdentifier(((DirectValueActionItem) name).toStringNoQuotes(localData), writer);
         } else if ((!(name instanceof DirectValueActionItem)) || (!((DirectValueActionItem) name).isString())) {
             writer.append("eval(");
             name.appendTo(writer, localData);
             return writer.append(")");
         }
+        HighlightData srcData = getSrcData();
+        srcData.localName = name.toStringNoQuotes(localData);
         return stripQuotes(name, localData, writer);
     }
 
