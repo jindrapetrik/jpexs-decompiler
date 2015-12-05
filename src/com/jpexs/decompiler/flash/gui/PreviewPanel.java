@@ -1076,16 +1076,15 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             }
             //Inject Loader
             if (swf.isAS3() && Configuration.autoOpenLoadedSWFs.get() && !Configuration.internalFlashViewer.get() && !DebuggerTools.hasDebugger(swf)) {
-                SWF instrSWF = null;
+                SWF instrSWF;
                 try (FileInputStream fis = new FileInputStream(tempFile)) {
                     instrSWF = new SWF(fis, false, false);
                 }
-                if (instrSWF != null) {
-                    DebuggerTools.switchDebugger(instrSWF);
-                    DebuggerTools.injectDebugLoader(instrSWF);
-                    try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
-                        instrSWF.saveTo(fos);
-                    }
+
+                DebuggerTools.switchDebugger(instrSWF);
+                DebuggerTools.injectDebugLoader(instrSWF);
+                try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
+                    instrSWF.saveTo(fos);
                 }
             }
             flashPanel.displaySWF(tempFile.getAbsolutePath(), backgroundColor, swf.frameRate);

@@ -107,7 +107,7 @@ public abstract class StaticTextTag extends TextTag {
         for (TEXTRECORD tr : textRecords) {
             for (GLYPHENTRY ge : tr.glyphEntries) {
                 glyphBits = SWFOutputStream.enlargeBitCountU(glyphBits, ge.glyphIndex);
-                advanceBits = SWFOutputStream.enlargeBitCountS(advanceBits, ge.glyphAdvance);
+                advanceBits = SWFOutputStream.enlargeBitCountU(advanceBits, ge.glyphAdvance);
             }
         }
 
