@@ -477,19 +477,21 @@ public class DebuggerHandler implements DebugConnectionListener {
             commands.setSwfLoadNotify();
             commands.setGetterTimeout(1500);
             commands.setSetterTimeout(5000);
-            /*
-             //TODO:
-             con.wideLines = commands.getOption("wide_line_player", "false").equals("true");
-             if (con.wideLines) {
-             commands.setOption("wide_line_debugger", "on");
-             }*/
+
+            boolean isAS3 = (Main.getMainFrame().getPanel().getCurrentSwf().isAS3());
+
+            //Widelines - only AS3, it hangs in AS1/2 and SWD does not support UI32 lines
+            if (isAS3) {
+                con.wideLines = commands.getOption("wide_line_player", "false").equals("true");
+                if (con.wideLines) {
+                    commands.setOption("wide_line_debugger", "on");
+                }
+            }
             commands.squelch(true);
 
             swfs = commands.getSwfInfo(1);
             con.sendMessage(new OutGetSwf(con, 0), InGetSwf.class);
             InGetSwd iswd = con.sendMessage(new OutGetSwd(con, 0), InGetSwd.class);
-
-            boolean isAS3 = (Main.getMainFrame().getPanel().getCurrentSwf().isAS3());
 
             InSetBreakpoint isb = con.getMessage(InSetBreakpoint.class);
             synchronized (this) {

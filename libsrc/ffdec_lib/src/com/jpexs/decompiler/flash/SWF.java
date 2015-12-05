@@ -3341,7 +3341,12 @@ public final class SWF implements SWFContainerItem, Timelined {
                     Set<Integer> bplines = breakpoints.get(name);
                     for (int bpline : bplines) {
                         if (lineToOffset.containsKey(bpline)) {
-                            items.add(new SWD.DebugBreakpoint(moduleId, bpline));
+                            try {
+                                SWD.DebugBreakpoint dbp = new SWD.DebugBreakpoint(moduleId, bpline);
+                                items.add(dbp);
+                            } catch (IllegalArgumentException iex) {
+                                Logger.getLogger(SWF.class.getName()).log(Level.WARNING, "Cannot generate breakpoint to SWD: {0}", iex.getMessage());
+                            }
                         }
                     }
                 }
