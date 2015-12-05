@@ -956,7 +956,8 @@ public final class SWF implements SWFContainerItem, Timelined {
      * Constructs an empty SWF
      */
     public SWF() {
-
+        version = SWF.DEFAULT_VERSION;
+        displayRect = new RECT(0, 1, 0, 1);
     }
 
     /**
@@ -1099,7 +1100,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             }
         }
 
-        getASMs(true); // Add scriptNames to ASMs              
+        getASMs(true); // Add scriptNames to ASMs
     }
 
     @Override

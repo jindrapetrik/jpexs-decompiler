@@ -16,28 +16,15 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
-import com.jpexs.debugger.flash.DebugConnectionListener;
-import com.jpexs.debugger.flash.DebugMessageListener;
 import com.jpexs.debugger.flash.Debugger;
-import com.jpexs.debugger.flash.DebuggerCommands;
-import com.jpexs.debugger.flash.DebuggerConnection;
-import com.jpexs.debugger.flash.SWD;
-import com.jpexs.debugger.flash.messages.in.InAskBreakpoints;
-import com.jpexs.debugger.flash.messages.in.InBreakAt;
-import com.jpexs.debugger.flash.messages.in.InNumScript;
-import com.jpexs.debugger.flash.messages.in.InScript;
-import com.jpexs.debugger.flash.messages.in.InSwfInfo;
 import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFBundle;
-import com.jpexs.decompiler.flash.SWFCompression;
 import com.jpexs.decompiler.flash.SWFSourceInfo;
 import com.jpexs.decompiler.flash.SearchMode;
 import com.jpexs.decompiler.flash.SwfOpenException;
 import com.jpexs.decompiler.flash.Version;
-import com.jpexs.decompiler.flash.abc.ClassPath;
-import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.SwfSpecificConfiguration;
@@ -94,15 +81,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TreeSet;
-import java.util.WeakHashMap;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.ConsoleHandler;
@@ -165,6 +148,7 @@ public class Main {
     //private static int ip = 0;
     //private static String ipClass = null;
     private static Process runProcess;
+
     private static boolean runProcessDebug;
 
     private static boolean inited = false;
@@ -426,7 +410,7 @@ public class Main {
     }
 
     /*    public static void debuggerNotSuspended() {
-        
+
      }*/
     public static boolean isDebugging() {
         return isDebugRunning();

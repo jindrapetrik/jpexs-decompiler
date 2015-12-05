@@ -357,6 +357,10 @@ public class TagTreeContextMenu extends JPopupMenu {
             } else if (firstItem instanceof Tag) {
                 List<Integer> allowedTagTypes = tagTree.getNestedTagIds((Tag) firstItem);
                 addAddTagMenuItems(allowedTagTypes, addTagMenu, firstItem);
+            } else if (firstItem instanceof Frame) {
+                // todo: honfika: add to the selected frame
+                //List<Integer> allowedTagTypes = tagTree.getFrameNestedTagIds();
+                //addAddTagMenuItems(allowedTagTypes, addTagMenu, firstItem);
             }
 
             addTagMenu.setVisible(addTagMenu.getItemCount() > 0);
@@ -623,7 +627,7 @@ public class TagTreeContextMenu extends JPopupMenu {
     }
 
     private void openSwfInsideActionPerformed(ActionEvent evt) {
-        List<TreeItem> sel = tagTree.getSelected(tagTree);
+        List<TreeItem> sel = tagTree.getSelected();
         List<DefineBinaryDataTag> binaryDatas = new ArrayList<>();
         for (TreeItem item : sel) {
             DefineBinaryDataTag binaryData = (DefineBinaryDataTag) item;
@@ -680,7 +684,7 @@ public class TagTreeContextMenu extends JPopupMenu {
     }
 
     private void removeItemActionPerformed(ActionEvent evt, boolean removeDependencies) {
-        List<TreeItem> sel = tagTree.getSelected(tagTree);
+        List<TreeItem> sel = tagTree.getSelected();
 
         List<Tag> tagsToRemove = new ArrayList<>();
         for (TreeItem item : sel) {
@@ -730,7 +734,7 @@ public class TagTreeContextMenu extends JPopupMenu {
     }
 
     private void undoTagActionPerformed(ActionEvent evt) {
-        List<TreeItem> sel = tagTree.getSelected(tagTree);
+        List<TreeItem> sel = tagTree.getSelected();
 
         for (TreeItem item : sel) {
             if (item instanceof Tag) {
@@ -749,7 +753,7 @@ public class TagTreeContextMenu extends JPopupMenu {
     }
 
     private void closeSwfActionPerformed(ActionEvent evt) {
-        List<TreeItem> sel = tagTree.getSelected(tagTree);
+        List<TreeItem> sel = tagTree.getSelected();
         for (TreeItem item : sel) {
             if (item instanceof SWF) {
                 SWF swf = (SWF) item;

@@ -60,16 +60,18 @@ public class BinaryDataExporter {
         int currentIndex = 1;
         for (final Tag t : tags) {
             if (t instanceof DefineBinaryDataTag) {
+                DefineBinaryDataTag bdt = (DefineBinaryDataTag) t;
                 if (evl != null) {
                     evl.handleExportingEvent("binarydata", currentIndex, count, t.getName());
                 }
 
-                int characterID = ((DefineBinaryDataTag) t).getCharacterId();
+                int characterID = bdt.getCharacterId();
 
-                final File file = new File(outdir + File.separator + characterID + ".bin");
+                String ext = bdt.innerSwf == null ? ".bin" : ".swf";
+                final File file = new File(outdir + File.separator + characterID + ext);
                 new RetryTask(() -> {
                     try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
-                        fos.write(((DefineBinaryDataTag) t).binaryData.getRangeData());
+                        fos.write(bdt.binaryData.getRangeData());
                     }
                 }, handler).run();
 

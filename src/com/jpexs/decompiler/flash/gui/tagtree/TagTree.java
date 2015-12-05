@@ -408,7 +408,12 @@ public class TagTree extends JTree {
                 ret = Arrays.asList(DefineBinaryDataTag.ID);
                 break;
             case TagTreeModel.FOLDER_FRAMES:
-                ret = new ArrayList<>();
+                // same as nested tags of DefineSpriteTag?
+                ret = Arrays.asList(PlaceObjectTag.ID, PlaceObject2Tag.ID, PlaceObject3Tag.ID, PlaceObject4Tag.ID,
+                        RemoveObjectTag.ID, RemoveObject2Tag.ID, ShowFrameTag.ID, FrameLabelTag.ID,
+                        StartSoundTag.ID, StartSound2Tag.ID, VideoFrameTag.ID,
+                        SoundStreamBlockTag.ID, SoundStreamHeadTag.ID, SoundStreamHead2Tag.ID,
+                        DefineScalingGridTag.ID);
                 break;
             case TagTreeModel.FOLDER_OTHERS:
                 ret = Arrays.asList(
@@ -426,6 +431,14 @@ public class TagTree extends JTree {
         }
 
         return ret;
+    }
+
+    public List<Integer> getFrameNestedTagIds() {
+        return Arrays.asList(PlaceObjectTag.ID, PlaceObject2Tag.ID, PlaceObject3Tag.ID, PlaceObject4Tag.ID,
+                RemoveObjectTag.ID, RemoveObject2Tag.ID, FrameLabelTag.ID,
+                StartSoundTag.ID, StartSound2Tag.ID, VideoFrameTag.ID,
+                SoundStreamBlockTag.ID, SoundStreamHeadTag.ID, SoundStreamHead2Tag.ID,
+                DefineScalingGridTag.ID);
     }
 
     public List<Integer> getNestedTagIds(Tag obj) {
@@ -455,16 +468,16 @@ public class TagTree extends JTree {
         return !getSelection(mainPanel.getCurrentSwf()).isEmpty();
     }
 
-    public void getAllSubs(JTree tree, TreeItem o, List<TreeItem> ret) {
-        TagTreeModel tm = (TagTreeModel) tree.getModel();
+    public void getAllSubs(TreeItem o, List<TreeItem> ret) {
+        TagTreeModel tm = getModel();
         for (TreeItem c : tm.getAllChildren(o)) {
             ret.add(c);
-            getAllSubs(tree, c, ret);
+            getAllSubs(c, ret);
         }
     }
 
-    public List<TreeItem> getAllSelected(TagTree tree) {
-        TreeSelectionModel tsm = tree.getSelectionModel();
+    public List<TreeItem> getAllSelected() {
+        TreeSelectionModel tsm = getSelectionModel();
         TreePath[] tps = tsm.getSelectionPaths();
         List<TreeItem> ret = new ArrayList<>();
         if (tps == null) {
@@ -474,16 +487,16 @@ public class TagTree extends JTree {
         for (TreePath tp : tps) {
             TreeItem treeNode = (TreeItem) tp.getLastPathComponent();
             ret.add(treeNode);
-            getAllSubs(tree, treeNode, ret);
+            getAllSubs(treeNode, ret);
         }
         return ret;
     }
 
-    public List<TreeItem> getSelected(JTree tree) {
+    public List<TreeItem> getSelected() {
         if (!mainPanel.folderPreviewPanel.selectedItems.isEmpty()) {
             return new ArrayList<>(mainPanel.folderPreviewPanel.selectedItems.values());
         }
-        TreeSelectionModel tsm = tree.getSelectionModel();
+        TreeSelectionModel tsm = getSelectionModel();
         TreePath[] tps = tsm.getSelectionPaths();
         List<TreeItem> ret = new ArrayList<>();
         if (tps == null) {
@@ -500,7 +513,7 @@ public class TagTree extends JTree {
     public List<TreeItem> getSelection(SWF swf) {
         List<TreeItem> sel;
         if (mainPanel.folderPreviewPanel.selectedItems.isEmpty()) {
-            sel = getAllSelected(this);
+            sel = getAllSelected();
         } else {
             sel = new ArrayList<>(mainPanel.folderPreviewPanel.selectedItems.values());
         }

@@ -1063,7 +1063,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public List<File> exportSelection(AbortRetryIgnoreHandler handler, String selFile, ExportDialog export) throws IOException, InterruptedException {
 
         List<File> ret = new ArrayList<>();
-        List<TreeItem> sel = folderPreviewPanel.selectedItems.isEmpty() ? tagTree.getAllSelected(tagTree) : new ArrayList<>(folderPreviewPanel.selectedItems.values());
+        List<TreeItem> sel = folderPreviewPanel.selectedItems.isEmpty() ? tagTree.getAllSelected() : new ArrayList<>(folderPreviewPanel.selectedItems.values());
 
         Set<SWF> usedSwfs = new HashSet<>();
         for (TreeItem d : sel) {
@@ -2148,7 +2148,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public void export(final boolean onlySel) {
 
         final SWF swf = getCurrentSwf();
-        List<TreeItem> sel = tagTree.getSelection(swf);
+        List<TreeItem> sel = tagTree.getAllSelected();
         if (!onlySel) {
             sel = null;
         } else {
@@ -2201,7 +2201,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void exportJavaSource() {
-        List<TreeItem> sel = tagTree.getSelected(tagTree);
+        List<TreeItem> sel = tagTree.getSelected();
         for (TreeItem item : sel) {
             if (item instanceof SWF) {
                 SWF swf = (SWF) item;
@@ -2221,7 +2221,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void exportSwfXml() {
-        List<TreeItem> sel = tagTree.getSelected(tagTree);
+        List<TreeItem> sel = tagTree.getSelected();
         Set<SWF> swfs = new HashSet<>();
 
         for (TreeItem item : sel) {
@@ -2245,7 +2245,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void importSwfXml() {
-        List<TreeItem> sel = tagTree.getSelected(tagTree);
+        List<TreeItem> sel = tagTree.getSelected();
         Set<SWF> swfs = new HashSet<>();
         for (TreeItem item : sel) {
             swfs.add(item.getSwf());

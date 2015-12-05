@@ -400,7 +400,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
      * @throws IOException
      */
     public void writeTag(SWFOutputStream sos) throws IOException {
-        if (isModified()) {
+        if (Configuration.debugCopy.get() || isModified()) {
             byte[] newData = getData();
             byte[] newHeaderData = getHeader(newData.length);
             sos.write(newHeaderData);
@@ -463,16 +463,9 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
         if (Configuration.debugCopy.get()) {
-            // todo: honfika: why only the following tags?
-            if (this instanceof DefineSpriteTag
-                    || this instanceof DefineButtonTag || this instanceof DefineButton2Tag
-                    || this instanceof DefineFont3Tag
-                    || this instanceof DoABCTag || this instanceof DoABC2Tag
-                    || this instanceof PlaceObject2Tag || this instanceof PlaceObject3Tag || this instanceof PlaceObject4Tag) {
-                byte[] originalData = getOriginalData();
-                if (originalData != null) {
-                    os = new CopyOutputStream(os, new ByteArrayInputStream(getOriginalData()));
-                }
+            byte[] originalData = getOriginalData();
+            if (originalData != null) {
+                os = new CopyOutputStream(os, new ByteArrayInputStream(getOriginalData()));
             }
         }
 
