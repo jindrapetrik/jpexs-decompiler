@@ -21,6 +21,7 @@ import com.jpexs.debugger.flash.DebugMessageListener;
 import com.jpexs.debugger.flash.Debugger;
 import com.jpexs.debugger.flash.DebuggerCommands;
 import com.jpexs.debugger.flash.DebuggerConnection;
+import com.jpexs.debugger.flash.Variable;
 import com.jpexs.debugger.flash.messages.in.InAskBreakpoints;
 import com.jpexs.debugger.flash.messages.in.InBreakAt;
 import com.jpexs.debugger.flash.messages.in.InBreakAtExt;
@@ -29,6 +30,7 @@ import com.jpexs.debugger.flash.messages.in.InContinue;
 import com.jpexs.debugger.flash.messages.in.InFrame;
 import com.jpexs.debugger.flash.messages.in.InGetSwd;
 import com.jpexs.debugger.flash.messages.in.InGetSwf;
+import com.jpexs.debugger.flash.messages.in.InGetVariable;
 import com.jpexs.debugger.flash.messages.in.InNumScript;
 import com.jpexs.debugger.flash.messages.in.InProcessTag;
 import com.jpexs.debugger.flash.messages.in.InScript;
@@ -36,6 +38,7 @@ import com.jpexs.debugger.flash.messages.in.InSetBreakpoint;
 import com.jpexs.debugger.flash.messages.in.InSwfInfo;
 import com.jpexs.debugger.flash.messages.in.InTrace;
 import com.jpexs.debugger.flash.messages.in.InVersion;
+import com.jpexs.debugger.flash.messages.out.OutAddWatch2;
 import com.jpexs.debugger.flash.messages.out.OutGetBreakReason;
 import com.jpexs.debugger.flash.messages.out.OutGetSwd;
 import com.jpexs.debugger.flash.messages.out.OutGetSwf;
@@ -128,6 +131,17 @@ public class DebuggerHandler implements DebugConnectionListener {
             sendBreakPoints(false);
         } catch (IOException ex) {
             //ignore
+        }
+    }
+
+    private int watchTag = 1;
+
+    public synchronized com.jpexs.debugger.flash.DebuggerCommands.Watch addWatch(Variable v, long v_id, boolean watchRead, boolean watchWrite) {
+        int tag = watchTag++;
+        try {
+            return commands.addWatch(v_id, v.name, (watchRead ? OutAddWatch2.FLAG_READ : 0) | (watchWrite ? OutAddWatch2.FLAG_WRITE : 0), tag);
+        } catch (IOException ex) {
+            return null;
         }
     }
 
@@ -424,8 +438,8 @@ public class DebuggerHandler implements DebugConnectionListener {
 
         Main.getMainFrame().getPanel().updateMenu();
 
-        //enlog(DebuggerConnection.class);
-        //enlog(DebuggerCommands.class);
+        enlog(DebuggerConnection.class);
+        enlog(DebuggerCommands.class);
         //enlog(DebuggerHandler.class);
         try {
             con.getMessage(InVersion.class);
@@ -502,6 +516,7 @@ public class DebuggerHandler implements DebugConnectionListener {
             commands.setSetterTimeout(5000);
 
             boolean isAS3 = (Main.getMainFrame().getPanel().getCurrentSwf().isAS3());
+            con.isAS3 = isAS3;
 
             //Widelines - only AS3, it hangs in AS1/2 and SWD does not support UI32 lines
             if (isAS3) {

@@ -269,9 +269,19 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         List<TableModelListener> tableListeners = new ArrayList<>();
 
         private List<Variable> vars;
+        private List<Long> varIds;
 
-        public VariablesTableModel(List<Variable> vars) {
+        public List<Long> getVarIds() {
+            return varIds;
+        }
+
+        public List<Variable> getVars() {
+            return new ArrayList<>(vars);
+        }
+
+        public VariablesTableModel(List<Variable> vars, List<Long> varIds) {
             this.vars = vars;
+            this.varIds = varIds;
         }
 
         @Override
