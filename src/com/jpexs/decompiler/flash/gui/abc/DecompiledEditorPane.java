@@ -221,7 +221,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         abcPanel.detailPanel.showCard(DetailPanel.METHOD_TRAIT_CARD, trait);
         MethodCodePanel methodCodePanel = abcPanel.detailPanel.methodTraitPanel.methodCodePanel;
         if (reset || (methodCodePanel.getBodyIndex() != bi)) {
-            methodCodePanel.setBodyIndex(bi, abc, name, trait, script.scriptIndex);
+            methodCodePanel.setBodyIndex(scriptName, bi, abc, name, trait, script.scriptIndex);
             abcPanel.detailPanel.setEditMode(false);
             this.isStatic = isStatic;
         }

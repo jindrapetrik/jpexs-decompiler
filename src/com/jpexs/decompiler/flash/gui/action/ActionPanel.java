@@ -103,7 +103,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
 
     private MainPanel mainPanel;
 
-    public LineMarkedEditorPane editor;
+    public DebuggableEditorPane editor;
 
     public DebuggableEditorPane decompiledEditor;
 
@@ -182,26 +182,6 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         srcConstants = null;
     }
 
-    /*public void refreshMarkers() {
-     decompiledEditor.removeColorMarkerOnAllLines(FG_BREAKPOINT_COLOR, BG_BREAKPOINT_COLOR, PRIORITY_BREAKPOINT);
-     decompiledEditor.removeColorMarkerOnAllLines(FG_INVALID_BREAKPOINT_COLOR, BG_INVALID_BREAKPOINT_COLOR, PRIORITY_INVALID_BREAKPOINT);
-     decompiledEditor.removeColorMarkerOnAllLines(FG_IP_COLOR, BG_IP_COLOR, PRIORITY_IP);
-
-     Set<Integer> bkptLines = Main.getScriptBreakPoints(sc);
-
-     for (int line : bkptLines) {
-     if (Main.isBreakPointValid(lastASM, line)) {
-     decompiledEditor.addColorMarker(line, FG_BREAKPOINT_COLOR, BG_BREAKPOINT_COLOR, PRIORITY_BREAKPOINT);
-     } else {
-     decompiledEditor.addColorMarker(line, FG_INVALID_BREAKPOINT_COLOR, BG_INVALID_BREAKPOINT_COLOR, PRIORITY_INVALID_BREAKPOINT);
-     }
-     }
-     int ip = Main.getIp(lastASM);
-     String ipPath = Main.getIpClass();
-     if (ip > 0 && ipPath != null && lastASM.getSwf().getASMs(false).get(ipPath) == lastASM) {
-     decompiledEditor.addColorMarker(ip, FG_IP_COLOR, BG_IP_COLOR, PRIORITY_IP);
-     }
-     }*/
     public String getStringUnderCursor() {
         int pos = decompiledEditor.getCaretPosition();
 
@@ -315,16 +295,17 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         });
     }
 
-    private void setEditorText(final String text, final String contentType) {
+    private void setEditorText(final String scriptName, final String text, final String contentType) {
         View.execInEventDispatch(() -> {
             ignoreCarret = true;
+            editor.setScriptName("#PCODE " + scriptName);
             editor.changeContentType(contentType);
             editor.setText(text);
             ignoreCarret = false;
         });
     }
 
-    private void setText(final HighlightedText text, final String contentType) {
+    private void setText(final HighlightedText text, final String contentType, final String scriptName) {
         View.execInEventDispatch(() -> {
             int pos = editor.getCaretPosition();
             Highlighting lastH = null;
@@ -337,7 +318,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
             Long offset = lastH == null ? 0 : lastH.getProperties().offset;
             disassembledHilights = text.instructionHilights;
             String stripped = text.text;
-            setEditorText(stripped, contentType);
+            setEditorText(scriptName, stripped, contentType);
             Highlighting h = Highlighting.searchOffset(disassembledHilights, offset);
             if (h != null) {
                 if (h.startPos <= editor.getDocument().getLength()) {
@@ -361,21 +342,21 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         return new HighlightedText(writer);
     }
 
-    public void setHex(ScriptExportMode exportMode) {
+    public void setHex(ScriptExportMode exportMode, String scriptName) {
         switch (exportMode) {
             case PCODE:
                 if (srcNoHex == null) {
                     srcNoHex = getHighlightedText(exportMode);
                 }
 
-                setText(srcNoHex, "text/flasm");
+                setText(srcNoHex, "text/flasm", scriptName);
                 break;
             case PCODE_HEX:
                 if (srcWithHex == null) {
                     srcWithHex = getHighlightedText(exportMode);
                 }
 
-                setText(srcWithHex, "text/flasm");
+                setText(srcWithHex, "text/flasm", scriptName);
                 break;
             case HEX:
                 if (srcHexOnly == null) {
@@ -384,14 +365,14 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
                     srcHexOnly = new HighlightedText(writer);
                 }
 
-                setText(srcHexOnly, "text/plain");
+                setText(srcHexOnly, "text/plain", scriptName);
                 break;
             case CONSTANTS:
                 if (srcConstants == null) {
                     srcConstants = getHighlightedText(exportMode);
                 }
 
-                setText(srcConstants, "text/plain");
+                setText(srcConstants, "text/plain", scriptName);
                 break;
             default:
                 throw new Error("Export mode not supported: " + exportMode);
@@ -413,7 +394,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
                     percent = newpercent;
                     this.phase = phase;
                     // todo: honfika: it is very slow to show every percent
-                    setEditorText("; " + AppStrings.translate("work.disassembling") + " - " + phase + " " + percent + "%...", "text/flasm");
+                    setEditorText("-", "; " + AppStrings.translate("work.disassembling") + " - " + phase + " " + percent + "%...", "text/flasm");
                 }
             }
 
@@ -449,7 +430,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
             @Override
             protected Void doInBackground() throws Exception {
 
-                setEditorText("; " + AppStrings.translate("work.disassembling") + "...", "text/flasm");
+                setEditorText(asm.getScriptName(), "; " + AppStrings.translate("work.disassembling") + "...", "text/flasm");
                 if (Configuration.decompile.get()) {
                     setDecompiledText("-", "// " + AppStrings.translate("work.waitingfordissasembly") + "...");
                 } else {
@@ -465,7 +446,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
                 srcNoHex = null;
                 srcHexOnly = null;
                 srcConstants = null;
-                setHex(getExportMode());
+                setHex(getExportMode(), asm.getScriptName());
                 if (Configuration.decompile.get()) {
                     setDecompiledText("-", "// " + AppStrings.translate("work.decompiling") + "...");
                     if (!useCache) {
@@ -498,7 +479,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
                     try {
                         get();
                     } catch (CancellationException ex) {
-                        setEditorText("; " + AppStrings.translate("work.canceled"), "text/flasm");
+                        setEditorText("-", "; " + AppStrings.translate("work.canceled"), "text/flasm");
                     } catch (Exception ex) {
                         setDecompiledText("-", "// " + AppStrings.translate("decompilationError") + ": " + ex);
                     }
@@ -566,7 +547,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
 
     public ActionPanel(MainPanel mainPanel) {
         this.mainPanel = mainPanel;
-        editor = new LineMarkedEditorPane();
+        editor = new DebuggableEditorPane();
         editor.setEditable(false);
         decompiledEditor = new DebuggableEditorPane();
         decompiledEditor.setEditable(false);
@@ -825,11 +806,11 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         View.execInEventDispatch(() -> {
             if (val) {
                 if (hexOnlyButton.isSelected()) {
-                    setHex(ScriptExportMode.HEX);
+                    setHex(ScriptExportMode.HEX, src.getScriptName());
                 } else if (constantsViewButton.isSelected()) {
-                    setHex(ScriptExportMode.CONSTANTS);
+                    setHex(ScriptExportMode.CONSTANTS, src.getScriptName());
                 } else {
-                    setHex(ScriptExportMode.PCODE);
+                    setHex(ScriptExportMode.PCODE, src.getScriptName());
                 }
             }
 
@@ -900,15 +881,15 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
     }
 
     private void hexButtonActionPerformed(ActionEvent evt) {
-        setHex(getExportMode());
+        setHex(getExportMode(), src.getScriptName());
     }
 
     private void hexOnlyButtonActionPerformed(ActionEvent evt) {
-        setHex(getExportMode());
+        setHex(getExportMode(), src.getScriptName());
     }
 
     private void constantsViewButtonActionPerformed(ActionEvent evt) {
-        setHex(getExportMode());
+        setHex(getExportMode(), src.getScriptName());
     }
 
     private void resolveConstantsButtonActionPerformed(ActionEvent evt) {
@@ -918,12 +899,12 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         srcWithHex = null;
         srcNoHex = null;
         // srcHexOnly = null; is not needed since it does not contains the resolved constant names
-        setHex(getExportMode());
+        setHex(getExportMode(), src.getScriptName());
     }
 
     private void cancelActionButtonActionPerformed(ActionEvent evt) {
         setEditMode(false);
-        setHex(getExportMode());
+        setHex(getExportMode(), src.getScriptName());
     }
 
     private void saveActionButtonActionPerformed(ActionEvent evt) {

@@ -81,6 +81,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -151,6 +152,8 @@ public class Main {
 
     private static boolean runProcessDebug;
 
+    private static boolean runProcessDebugPCode;
+
     private static boolean inited = false;
 
     private static File runTempFile;
@@ -178,6 +181,10 @@ public class Main {
 
     public static synchronized boolean isDebugRunning() {
         return runProcess != null && runProcessDebug;
+    }
+
+    public static synchronized boolean isDebugPCode() {
+        return runProcessDebugPCode;
     }
 
     public static synchronized boolean isDebugConnected() {
@@ -326,7 +333,7 @@ public class Main {
         }
     }
 
-    public static void runDebug(SWF swf) {
+    public static void runDebug(SWF swf, final boolean doPCode) {
         String flashVars = "";//key=val&key2=val2
         String playerLocation = Configuration.playerDebugLocation.get();
         if (playerLocation.isEmpty() || (!new File(playerLocation).exists())) {
@@ -344,6 +351,7 @@ public class Main {
         } catch (Exception ex) {
 
         }
+
         if (tempFile != null) {
             final File fTempFile = tempFile;
             CancellableWorker instrumentWorker = new CancellableWorker() {
@@ -364,7 +372,7 @@ public class Main {
                         if (instrSWF.isAS3() && Configuration.autoOpenLoadedSWFs.get()) {
                             DebuggerTools.injectDebugLoader(instrSWF);
                         }
-                        instrSWF.enableDebugging(true, new File("."));
+                        instrSWF.enableDebugging(true, new File("."), true, doPCode);
                         try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(fTempFile))) {
                             instrSWF.saveTo(fos);
                         }
@@ -378,8 +386,18 @@ public class Main {
                                 Logger.getLogger(MainFrameMenu.class.getName()).log(Level.SEVERE, null, ex);
                             }
                             if (instrSWF != null) {
-                                File swdFile = new File(fTempFile.getAbsolutePath().replace(".swf", ".swd"));
-                                instrSWF.generateSwdFile(swdFile, getPackBreakPoints(true));
+                                String swfFileName = fTempFile.getAbsolutePath();
+                                if (swfFileName.toLowerCase().endsWith(".swf")) {
+                                    swfFileName = swfFileName.substring(0, swfFileName.length() - 4) + ".swd";
+                                } else {
+                                    swfFileName = swfFileName + ".swd";
+                                }
+                                File swdFile = new File(swfFileName);
+                                if (doPCode) {
+                                    instrSWF.generatePCodeSwdFile(swdFile, getPackBreakPoints(true));
+                                } else {
+                                    instrSWF.generateSwdFile(swdFile, getPackBreakPoints(true));
+                                }
                             }
                         }
                     }
@@ -396,6 +414,7 @@ public class Main {
                     synchronized (Main.class) {
                         runTempFile = fTempFile;
                         runProcessDebug = true;
+                        runProcessDebugPCode = doPCode;
                     }
                     Main.stopWork();
                     Main.startDebugger();
@@ -450,8 +469,8 @@ public class Main {
         return getDebugHandler().getAllBreakPoints(validOnly);
     }
 
-    public synchronized static Set<Integer> getScriptBreakPoints(String pack) {
-        return getDebugHandler().getBreakPoints(pack);
+    public synchronized static Set<Integer> getScriptBreakPoints(String pack, boolean onlyValid) {
+        return getDebugHandler().getBreakPoints(pack, onlyValid);
     }
 
     public static DebuggerHandler getDebugHandler() {
@@ -1349,12 +1368,12 @@ public class Main {
                 }
 
                 @Override
-                public void breakAt(String scriptName, int line) {
+                public void breakAt(String scriptName, int line, final int classIndex, final int traitIndex, final int methodIndex) {
                     View.execInEventDispatch(new Runnable() {
 
                         @Override
                         public void run() {
-                            mainFrame.getPanel().gotoClassLine(getMainFrame().getPanel().getCurrentSwf(), scriptName, line);
+                            mainFrame.getPanel().gotoScriptLine(getMainFrame().getPanel().getCurrentSwf(), scriptName, line, classIndex, traitIndex, methodIndex);
                         }
                     });
                 }
@@ -1368,7 +1387,7 @@ public class Main {
 
                 @Override
                 public void disconnected() {
-
+                    Main.mainFrame.getPanel().refreshBreakPoints();
                 }
             });
             flashDebugger.addConnectionListener(debugHandler);

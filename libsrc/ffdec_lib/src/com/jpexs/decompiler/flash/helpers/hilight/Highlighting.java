@@ -100,7 +100,7 @@ public class Highlighting implements Serializable {
                     continue;
                 }
             }
-            if (pos == -1 || (pos >= h.startPos && (pos < h.startPos + h.len))) {
+            if (pos == -1 || (pos >= h.startPos && ((h.len == 0 && pos == h.startPos) || pos < h.startPos + h.len))) {
                 if (ret == null || h.startPos > ret.startPos) { //get the closest one
                     ret = h;
                 }

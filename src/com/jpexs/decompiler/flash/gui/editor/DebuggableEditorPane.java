@@ -75,10 +75,10 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
         if (scriptName == null) {
             return;
         }
-        boolean on = Main.toggleBreakPoint(scriptName, line);
+        boolean on = Main.toggleBreakPoint(scriptName, line - firstLineOffset());
         removeColorMarker(line, INVALID_BREAKPOINT_MARKER);
         if (on) {
-            if (Main.isBreakPointValid(scriptName, line)) {
+            if (Main.isBreakPointValid(scriptName, line - firstLineOffset())) {
                 addColorMarker(line, BREAKPOINT_MARKER);
             } else {
                 addColorMarker(line, INVALID_BREAKPOINT_MARKER);
@@ -98,19 +98,19 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
             return;
         }
 
-        Set<Integer> bkptLines = Main.getScriptBreakPoints(scriptName);
+        Set<Integer> bkptLines = Main.getScriptBreakPoints(scriptName, false);
 
         for (int line : bkptLines) {
             if (Main.isBreakPointValid(scriptName, line)) {
-                addColorMarker(line, BREAKPOINT_MARKER);
+                addColorMarker(line + firstLineOffset(), BREAKPOINT_MARKER);
             } else {
-                addColorMarker(line, INVALID_BREAKPOINT_MARKER);
+                addColorMarker(line + firstLineOffset(), INVALID_BREAKPOINT_MARKER);
             }
         }
         int ip = Main.getIp(scriptName);
         String ipPath = Main.getIpClass();
         if (ip > 0 && ipPath != null && ipPath.equals(scriptName)) {
-            addColorMarker(ip, IP_MARKER);
+            addColorMarker(ip + firstLineOffset(), IP_MARKER);
         }
     }
 

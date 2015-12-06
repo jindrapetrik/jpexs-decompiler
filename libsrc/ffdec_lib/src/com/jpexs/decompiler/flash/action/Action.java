@@ -375,6 +375,11 @@ public abstract class Action implements GraphSourceItem {
         return baos2.toByteArray();
     }
 
+    @Override
+    public long getFileOffset() {
+        return fileOffset;
+    }
+
     /**
      * Converts list of Actions to bytes
      *
@@ -602,7 +607,7 @@ public abstract class Action implements GraphSourceItem {
                         //lastPush = false;
                     }
 
-                    writer.append("", offset);
+                    writer.append("", offset, a.getFileOffset());
 
                     int fixBranch = -1;
                     if (a instanceof ActionIf) {

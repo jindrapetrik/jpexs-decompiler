@@ -143,7 +143,7 @@ public class DebugPanel extends JPanel {
             }
 
             @Override
-            public void breakAt(String scriptName, int line) {
+            public void breakAt(String scriptName, int line, int classIndex, int traitIndex, int methodIndex) {
                 View.execInEventDispatch(new Runnable() {
 
                     @Override

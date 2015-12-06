@@ -37,6 +37,8 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
 import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.helpers.HighlightedText;
+import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -505,6 +507,96 @@ public class ScriptPack extends AS3ClassTreeItem {
                 }
             }
 
+            b.setModified();
+        }
+
+        ((Tag) abc.parentTag).setModified(true);
+    }
+
+    public void injectPCodeDebugInfo(int abcIndex) {
+
+        Map<Integer, String> bodyToIdentifier = new HashMap<>();
+
+        try {
+            CachedDecompilation decompiled = SWF.getCached(this);
+            String txt = decompiled.text;
+            txt = txt.replace("\r", "");
+
+            for (int i = 0; i < txt.length(); i++) {
+                blk:
+                {
+                    Highlighting sh = Highlighting.searchPos(decompiled.specialHilights, i);
+
+                    Highlighting cls = Highlighting.searchPos(decompiled.classHilights, i);
+                    Highlighting trt = Highlighting.searchPos(decompiled.traitHilights, i);
+                    Highlighting method = Highlighting.searchPos(decompiled.methodHilights, i);
+                    if (method == null) {
+                        break blk;
+                    }
+
+                    int classIndex = cls == null ? -1 : (int) cls.getProperties().index;
+                    int methodIndex = (int) method.getProperties().index;
+                    int bodyIndex = abc.findBodyIndex(methodIndex);
+                    if (bodyIndex == -1) {
+                        break blk;
+                    }
+
+                    Trait trait;
+                    int traitIndex = -10;
+                    if (trt != null && cls != null) {
+                        traitIndex = (int) trt.getProperties().index;
+
+                        trait = abc.findTraitByTraitId(classIndex, traitIndex);
+                        if (((trait instanceof TraitMethodGetterSetter) && (((TraitMethodGetterSetter) trait).method_info != methodIndex))
+                                || ((trait instanceof TraitFunction) && (((TraitFunction) trait).method_info != methodIndex))) {
+                            continue; //inner anonymous function - ignore. TODO: make work
+                        }
+                    }
+                    bodyToIdentifier.put(bodyIndex, "abc:" + abcIndex + ",script:" + scriptIndex + ",class:" + classIndex + ",trait:" + traitIndex + ",method:" + methodIndex + ",body:" + bodyIndex);
+                }
+            }
+        } catch (InterruptedException ex) {
+            Logger.getLogger(ScriptPack.class.getName()).log(Level.SEVERE, "Cannot decompile", ex);
+        }
+
+        int scriptInitBody = abc.findBodyIndex(abc.script_info.get(scriptIndex).init_index);
+
+        if (!bodyToIdentifier.containsKey(scriptInitBody)) {
+            bodyToIdentifier.put(scriptInitBody, "abc:" + abcIndex + ",script:" + scriptIndex + ",class:-1,trait:-3,method:" + abc.script_info.get(scriptIndex).init_index);
+        }
+
+        String pkg = path.packageStr.toString();
+        String cls = path.className;
+
+        for (int bodyIndex : bodyToIdentifier.keySet()) {
+            String bodyName = bodyToIdentifier.get(bodyIndex);
+
+            MethodBody b = abc.bodies.get(bodyIndex);
+            List<AVM2Instruction> list = b.getCode().code;
+
+            int siz = list.size();
+
+            for (int i = 0; i < siz; i++) {
+                b.insertInstruction(i * 2, new AVM2Instruction(0, AVM2Instructions.DebugLine, new int[]{i + 1}));
+            }
+            for (int i = 1 /*odd, even are new debuglines*/; i < list.size(); i += 2) {
+                if (list.get(i).definition instanceof DebugLineIns) {
+                    b.removeInstruction(i);
+                    b.removeInstruction(i - 1); //remove its new debugline too
+                    i -= 2; //for loop to work correctly
+                } else if (list.get(i).definition instanceof DebugFileIns) {
+                    b.removeInstruction(i);
+                    b.removeInstruction(i - 1);
+                    i -= 2;
+                } else if (list.get(i).definition instanceof DebugIns) {
+                    b.removeInstruction(i);
+                    b.removeInstruction(i - 1);
+                    i -= 2;
+                }
+            }
+            String filename = "#PCODE " + bodyName + ";" + pkg.replace(".", File.separator) + ";" + cls + ".as";
+
+            b.insertInstruction(0, new AVM2Instruction(0, AVM2Instructions.DebugFile, new int[]{abc.constants.getStringId(filename, true)}));
             b.setModified();
         }
 

@@ -337,7 +337,7 @@ public class ActionPush extends Action {
             if (pos > 0) {
                 writer.appendNoHilight(" ");
             }
-            writer.append(toString(i), getAddress() + pos + 1);
+            writer.append(toString(i), getAddress() + pos + 1, getFileOffset());
             pos++;
         }
         return writer;

@@ -171,7 +171,7 @@ public abstract class GraphTextWriter {
 
     public abstract GraphTextWriter append(String str);
 
-    public abstract GraphTextWriter append(String str, long offset);
+    public abstract GraphTextWriter append(String str, long offset, long fileOffset);
 
     public abstract GraphTextWriter appendNoHilight(int i);
 

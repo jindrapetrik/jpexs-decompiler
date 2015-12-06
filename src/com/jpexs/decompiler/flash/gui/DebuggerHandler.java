@@ -73,7 +73,11 @@ public class DebuggerHandler implements DebugConnectionListener {
 
     private Map<Integer, String> modulePaths = new HashMap<>();
 
-    private Map<String, Integer> classToModule = new HashMap<>();
+    private Map<String, Integer> scriptToModule = new HashMap<>();
+
+    private Map<Integer, Integer> moduleToTraitIndex = new HashMap<>();
+    private Map<Integer, Integer> moduleToClassIndex = new HashMap<>();
+    private Map<Integer, Integer> moduleToMethodIndex = new HashMap<>();
 
     private Map<String, Set<Integer>> toAddBPointMap = new HashMap<>();
 
@@ -127,13 +131,16 @@ public class DebuggerHandler implements DebugConnectionListener {
         }
     }
 
-    public synchronized Set<Integer> getBreakPoints(String scriptName) {
+    public synchronized Set<Integer> getBreakPoints(String scriptName, boolean onlyValid) {
         Set<Integer> lines = new TreeSet<>();
         if (confirmedPointMap.containsKey(scriptName)) {
             lines.addAll(confirmedPointMap.get(scriptName));
         }
         if (toAddBPointMap.containsKey(scriptName)) {
             lines.addAll(toAddBPointMap.get(scriptName));
+        }
+        if (!onlyValid && invalidBreakPointMap.containsKey(scriptName)) {
+            lines.addAll(invalidBreakPointMap.get(scriptName));
         }
         return lines;
     }
@@ -144,6 +151,12 @@ public class DebuggerHandler implements DebugConnectionListener {
                 toAddBPointMap.put(scriptName, new TreeSet<>());
             }
             toAddBPointMap.get(scriptName).addAll(confirmedPointMap.get(scriptName));
+        }
+        for (String scriptName : invalidBreakPointMap.keySet()) {
+            if (!toAddBPointMap.containsKey(scriptName)) {
+                toAddBPointMap.put(scriptName, new TreeSet<>());
+            }
+            toAddBPointMap.get(scriptName).addAll(invalidBreakPointMap.get(scriptName));
         }
         confirmedPointMap.clear();
         invalidBreakPointMap.clear();
@@ -276,7 +289,7 @@ public class DebuggerHandler implements DebugConnectionListener {
 
     public static interface BreakListener {
 
-        public void breakAt(String scriptName, int line);
+        public void breakAt(String scriptName, int line, int classIndex, int traitIndex, int methodIndex);
 
         public void doContinue();
     }
@@ -313,8 +326,8 @@ public class DebuggerHandler implements DebugConnectionListener {
     }
 
     public synchronized int moduleIdOf(String pack) {
-        if (classToModule.containsKey(pack)) {
-            return classToModule.get(pack);
+        if (scriptToModule.containsKey(pack)) {
+            return scriptToModule.get(pack);
         }
         return -1;
     }
@@ -349,13 +362,17 @@ public class DebuggerHandler implements DebugConnectionListener {
                 toAddBPointMap.get(scriptName).addAll(confirmedPointMap.get(scriptName));
             }
             confirmedPointMap.clear();
+            for (String scriptName : invalidBreakPointMap.keySet()) {
+                if (!toAddBPointMap.containsKey(scriptName)) {
+                    toAddBPointMap.put(scriptName, new TreeSet<>());
+                }
+                toAddBPointMap.get(scriptName).addAll(invalidBreakPointMap.get(scriptName));
+            }
+            invalidBreakPointMap.clear();
         }
         for (ConnectionListener l : clisteners) {
             l.disconnected();
         }
-        /*for (BreakListener l : breakListeners) {
-         l.breakAt();
-         }*/
     }
 
     public synchronized boolean isConnected() {
@@ -440,30 +457,36 @@ public class DebuggerHandler implements DebugConnectionListener {
             }
 
             modulePaths = new HashMap<>();
-            classToModule = new HashMap<>();
+            scriptToModule = new HashMap<>();
             //Pattern patMainFrame = Pattern.compile("^Actions for Scene ([0-9]+): Frame ([0-9]+) of Layer Name .*$");
             //Pattern patSymbol = Pattern.compile("^Actions for Symbol ([0-9]+): Frame ([0-9]+) of Layer Name .*$");
             //Pattern patAS2 = Pattern.compile("^([^:]+): .*\\.as$");
             Pattern patAS3 = Pattern.compile("^(.*);(.*);(.*)\\.as$");
+            //"abc:" + abcIndex + ",script:" + scriptIndex + ",class:" + classIndex + ",trait:" + traitIndex + ",method:" 
+            Pattern patAS3PCode = Pattern.compile("^#PCODE abc:([0-9]+),script:([0-9]+),class:(-?[0-9]+),trait:(-?[0-9]+),method:([0-9]+),body:([0-9]+);(.*)$");
+
             for (int file : moduleNames.keySet()) {
                 String name = moduleNames.get(file);
                 String[] parts = name.split(";");
 
                 Matcher m;
-                /*if ((m = patMainFrame.matcher(name)).matches()) {
-                 name = "\\frame_" + m.group(2) + "\\DoAction";
-                 } else if ((m = patSymbol.matcher(name)).matches()) {
-                 name = "\\DefineSprite(" + m.group(1) + ")\\frame_" + m.group(2) + "\\DoAction";
-                 } else if ((m = patAS2.matcher(name)).matches()) {
-                 name = "\\_Packages\\" + m.group(1).replace(".", "\\");
-                 } else*/
                 if ((m = patAS3.matcher(name)).matches()) {
                     String clsName = m.group(3);
                     String pkg = m.group(2).replace("\\", ".");
-                    name = DottedChain.parse(pkg).add(clsName).toString();
+                    m = patAS3PCode.matcher(name);
+
+                    if (m.matches()) {
+                        moduleToClassIndex.put(file, Integer.parseInt(m.group(3)));
+                        moduleToTraitIndex.put(file, Integer.parseInt(m.group(4)));
+                        moduleToMethodIndex.put(file, Integer.parseInt(m.group(5)));
+                        name = DottedChain.parse(pkg).add(clsName).toString();
+                        name = "#PCODE abc:" + m.group(1) + ",body:" + m.group(6) + ";" + name;
+                    } else {
+                        name = DottedChain.parse(pkg).add(clsName).toString();
+                    }
                 }
                 modulePaths.put(file, name);
-                classToModule.put(name, file);
+                scriptToModule.put(name, file);
             }
 
             //con.getMessage(InSetBreakpoint.class);
@@ -577,7 +600,11 @@ public class DebuggerHandler implements DebugConnectionListener {
                         frame = commands.getFrame(0);
 
                         for (BreakListener l : breakListeners) {
-                            l.breakAt(newBreakScriptName, message.line);
+                            l.breakAt(newBreakScriptName, message.line,
+                                    moduleToClassIndex.containsKey(message.file) ? moduleToClassIndex.get(message.file) : -1,
+                                    moduleToTraitIndex.containsKey(message.file) ? moduleToTraitIndex.get(message.file) : -1,
+                                    moduleToMethodIndex.containsKey(message.file) ? moduleToMethodIndex.get(message.file) : -1
+                            );
                         }
 
                     } catch (IOException ex) {
@@ -654,9 +681,14 @@ public class DebuggerHandler implements DebugConnectionListener {
                             markBreakPointInvalid(scriptName, line);
                         }
                     }
+                } else {
+                    for (int line : toAddBPointMap.get(scriptName)) {
+                        markBreakPointInvalid(scriptName, line);
+                    }
                 }
             }
             toAddBPointMap.clear();
+
         }
         Logger.getLogger(DebuggerHandler.class.getName()).log(Level.FINEST, "sending bps finished");
 

@@ -1263,7 +1263,7 @@ public class AVM2Code implements Cloneable {
 
                 if (!ins.isIgnored()) {
                     if (markOffsets) {
-                        writer.append("", ofs);
+                        writer.append("", ofs, ins.getFileOffset());
                     }
 
                     writer.appendNoHilight(ins.toStringNoAddress(constants, new ArrayList<>()));

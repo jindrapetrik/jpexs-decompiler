@@ -202,6 +202,7 @@ public class HighlightedTextWriter extends GraphTextWriter {
                 ndata.merge(itemPos.data);
                 ndata.merge(data);
                 ndata.offset = src.getOffset() + pos;
+                ndata.fileOffset = src.getFileOffset();
                 if (itemPos.startLineItem != null) {
                     ndata.firstLineOffset = itemPos.startLineItem.getLineOffset();
                 }
@@ -217,11 +218,12 @@ public class HighlightedTextWriter extends GraphTextWriter {
     }
 
     @Override
-    public HighlightedTextWriter append(String str, long offset) {
+    public HighlightedTextWriter append(String str, long offset, long fileOffset) {
         Highlighting h = null;
         if (hilight) {
             HighlightData data = new HighlightData();
             data.offset = offset;
+            data.fileOffset = fileOffset;
             h = new Highlighting(sb.length() - newLineCount, data, HighlightType.OFFSET, str);
             instructionHilights.add(h);
         }

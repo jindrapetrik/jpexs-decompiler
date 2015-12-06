@@ -132,7 +132,7 @@ public class NulWriter extends GraphTextWriter {
     }
 
     @Override
-    public NulWriter append(String str, long offset) {
+    public NulWriter append(String str, long offset, long fileOffset) {
         stringAdded = true;
         return this;
     }

@@ -1533,12 +1533,30 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
     }
 
-    public void gotoClassLine(SWF swf, String cls, int line) {
-        gotoScriptName(swf, cls);
+    public void gotoScriptLine(SWF swf, String scriptName, int line, int classIndex, int traitIndex, int methodIndex) {
+        gotoScriptName(swf, scriptName);
         if (abcPanel != null) {
-            abcPanel.decompiledTextArea.gotoLine(line);
+            if (Main.isDebugPCode()) {
+                if (classIndex != -1) {
+                    boolean classChanged = false;
+                    if (abcPanel.decompiledTextArea.getClassIndex() != classIndex) {
+                        abcPanel.decompiledTextArea.setClassIndex(classIndex);
+                        classChanged = true;
+                    }
+                    if (traitIndex != -10 && (classChanged || abcPanel.decompiledTextArea.lastTraitIndex != traitIndex)) {
+                        abcPanel.decompiledTextArea.gotoTrait(traitIndex);
+                    }
+                }
+                abcPanel.detailPanel.methodTraitPanel.methodCodePanel.gotoInstrLine(line);
+            } else {
+                abcPanel.decompiledTextArea.gotoLine(line);
+            }
         } else if (actionPanel != null) {
-            actionPanel.decompiledEditor.gotoLine(line);
+            if (Main.isDebugPCode()) {
+                actionPanel.editor.gotoLine(line);
+            } else {
+                actionPanel.decompiledEditor.gotoLine(line);
+            }
         }
         refreshBreakPoints();
 
@@ -1547,6 +1565,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public void refreshBreakPoints() {
         if (abcPanel != null) {
             abcPanel.decompiledTextArea.refreshMarkers();
+            abcPanel.detailPanel.methodTraitPanel.methodCodePanel.refreshMarkers();
+        }
+        if (actionPanel != null) {
+            actionPanel.decompiledEditor.refreshMarkers();
+            actionPanel.editor.refreshMarkers();
         }
     }
     /*
@@ -1569,15 +1592,24 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             return;
         }
         if (swf.isAS3()) {
+            String rawScriptName = scriptName;
+            if (rawScriptName.startsWith("#PCODE ")) {
+                rawScriptName = rawScriptName.substring(rawScriptName.indexOf(";") + 1);
+            }
+
             List<ABCContainerTag> abcList = swf.getAbcList();
             if (!abcList.isEmpty()) {
                 ABCPanel abcPanel = getABCPanel();
                 abcPanel.setAbc(abcList.get(0).getABC());
-                abcPanel.hilightScript(swf, scriptName);
+                abcPanel.hilightScript(swf, rawScriptName);
             }
         } else {
-            if (actionPanel != null && asms.containsKey(scriptName)) {
-                actionPanel.setSource(asms.get(scriptName), true);
+            String rawScriptName = scriptName;
+            if (rawScriptName.startsWith("#PCODE ")) {
+                rawScriptName = rawScriptName.substring("#PCODE ".length());
+            }
+            if (actionPanel != null && asms.containsKey(rawScriptName)) {
+                actionPanel.setSource(asms.get(rawScriptName), true);
             }
         }
     }
@@ -2341,8 +2373,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                                 boolean isStatic = decompiledTextArea.getIsStatic();
                                 abc.bodies.get(bi).deobfuscate(level, t, scriptIndex, classIndex, isStatic, ""/*FIXME*/);
                             }
-
-                            abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abc, t, abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getScriptIndex());
+                            abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(decompiledTextArea.getScriptLeaf().getPathScriptName(), bi, abc, t, abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getScriptIndex());
                         }
                     } catch (Exception ex) {
                         logger.log(Level.SEVERE, "Deobfuscation error", ex);
@@ -2795,9 +2826,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public void clearDebuggerColors() {
         if (abcPanel != null) {
             abcPanel.decompiledTextArea.removeColorMarkerOnAllLines(DecompiledEditorPane.IP_MARKER);
+            abcPanel.detailPanel.methodTraitPanel.methodCodePanel.clearDebuggerColors();
         }
         if (actionPanel != null) {
             actionPanel.decompiledEditor.removeColorMarkerOnAllLines(DecompiledEditorPane.IP_MARKER);
+            actionPanel.editor.removeColorMarkerOnAllLines(DecompiledEditorPane.IP_MARKER);
         }
     }
 

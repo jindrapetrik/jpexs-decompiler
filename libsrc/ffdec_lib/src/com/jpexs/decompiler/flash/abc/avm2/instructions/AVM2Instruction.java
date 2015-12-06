@@ -58,6 +58,11 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
     private String file;
 
     @Override
+    public long getFileOffset() {
+        return -1;
+    }
+
+    @Override
     public long getLineOffset() {
         return getOffset();
     }

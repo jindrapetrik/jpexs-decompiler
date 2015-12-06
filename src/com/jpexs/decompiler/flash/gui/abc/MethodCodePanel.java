@@ -50,6 +50,18 @@ public class MethodCodePanel extends JPanel {
 
     private final JToggleButton hexOnlyButton;
 
+    public void refreshMarkers() {
+        sourceTextArea.refreshMarkers();
+    }
+
+    public void clearDebuggerColors() {
+        sourceTextArea.removeColorMarkerOnAllLines(DecompiledEditorPane.IP_MARKER);
+    }
+
+    public void gotoInstrLine(int line) {
+        sourceTextArea.gotoInstrLine(line);
+    }
+
     public void focusEditor() {
         sourceTextArea.requestFocusInWindow();
     }
@@ -74,12 +86,12 @@ public class MethodCodePanel extends JPanel {
         sourceTextArea.hilighSpecial(type, specialValue);
     }
 
-    public void setBodyIndex(int bodyIndex, ABC abc, Trait trait, int scriptIndex) {
-        sourceTextArea.setBodyIndex(bodyIndex, abc, sourceTextArea.getName(), trait, scriptIndex);
+    public void setBodyIndex(String scriptPathName, int bodyIndex, ABC abc, Trait trait, int scriptIndex) {
+        sourceTextArea.setBodyIndex(scriptPathName, bodyIndex, abc, sourceTextArea.getName(), trait, scriptIndex);
     }
 
-    public void setBodyIndex(int bodyIndex, ABC abc, String name, Trait trait, int scriptIndex) {
-        sourceTextArea.setBodyIndex(bodyIndex, abc, name, trait, scriptIndex);
+    public void setBodyIndex(String scriptPathName, int bodyIndex, ABC abc, String name, Trait trait, int scriptIndex) {
+        sourceTextArea.setBodyIndex(scriptPathName, bodyIndex, abc, name, trait, scriptIndex);
     }
 
     public int getBodyIndex() {

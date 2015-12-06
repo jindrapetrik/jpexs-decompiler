@@ -29,6 +29,8 @@ public interface GraphSourceItem extends Serializable, Cloneable {
 
     public int getStackPushCount(BaseLocalData localData, TranslateStack stack);
 
+    public long getFileOffset();
+
     public boolean isJump();
 
     public boolean isBranch();

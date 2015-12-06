@@ -459,10 +459,12 @@ public class CommandLineArgumentParser {
         }
 
         if (filter == null || filter.equals("enabledebugging")) {
-            out.println(" " + (cnt++) + ") -enabledebugging [-injectas3] <infile> <outfile>");
+            out.println(" " + (cnt++) + ") -enabledebugging [-injectas3|-generateswd] [-pcode] <infile> <outfile>");
             out.println("  ...Enables debugging for <infile> and saves result to <outfile>");
-            out.println("  ...When optional -injectas3 parameter specified, debugfile and debugline instructions are injected into the code to match decompiled source.");
-            out.println("  ...WARNING: not everything works yet");
+            out.println("  ...-injectas3 (optional) causes debugfile and debugline instructions to be injected into the code to match decompiled/pcode source.");
+            out.println("  ...-generateswd (optional) parameter creates SWD file needed for AS1/2 debugging. for <outfile.swf>, <outfile.swd> is generated");
+            out.println("  ...-pcode (optional) parameter specified after -injectas3 or -generateswd causes lines to be handled as lines in P-code => All P-code lines are injected, etc.");
+            out.println("  ...WARNING: Injected/SWD script filenames may be different than from standard compiler");
         }
 
         printCmdLineUsageExamples(out, filter);
@@ -522,6 +524,7 @@ public class CommandLineArgumentParser {
 
         if (filter == null || filter.equals("enabledebugging")) {
             out.println("java -jar ffdec.jar -enabledebugging -injectas3 myas3file.swf myas3file_debug.swf");
+            out.println("java -jar ffdec.jar -enabledebugging -generateswd myas2file.swf myas2file_debug.swf");
             exampleFound = true;
         }
 
@@ -2788,7 +2791,16 @@ public class CommandLineArgumentParser {
         }
 
         boolean injectas3 = false;
+        boolean doPCode = false;
+        boolean generateSwd = false;
         String file = args.pop();
+        if (file.equals("-generateswd")) {
+            if (args.size() < 2) {
+                badArguments("enabledebugging");
+            }
+            file = args.pop();
+            generateSwd = true;
+        }
         if (file.equals("-injectas3")) {
             if (args.size() < 2) {
                 badArguments("enabledebugging");
@@ -2796,16 +2808,53 @@ public class CommandLineArgumentParser {
             file = args.pop();
             injectas3 = true;
         }
+        if (file.equals("-pcode")) {
+            if (args.size() < 2) {
+                badArguments("enabledebugging");
+            }
+            doPCode = true;
+            file = args.pop();
+        }
         String outfile = args.pop();
         try {
             System.out.print("Working...");
             FileInputStream fis = new FileInputStream(file);
             SWF swf = new SWF(fis, Configuration.parallelSpeedUp.get());
             fis.close();
-            swf.enableDebugging(injectas3, new File(outfile).getParentFile());
+            if (swf.isAS3()) {
+                swf.enableDebugging(injectas3, new File(outfile).getParentFile(), doPCode);
+            } else {
+                swf.enableDebugging();
+            }
             FileOutputStream fos = new FileOutputStream(outfile);
             swf.saveTo(fos);
             fos.close();
+            if (!swf.isAS3()) {
+                if (generateSwd) {
+                    fis = new FileInputStream(outfile);
+                    swf = new SWF(fis, Configuration.parallelSpeedUp.get());
+                    fis.close();
+                    String outSwd = outfile;
+                    if (outSwd.toLowerCase().endsWith(".swf")) {
+                        outSwd = outSwd.substring(0, outSwd.length() - 4) + ".swd";
+                    } else {
+                        outSwd = outSwd + ".swd";
+                    }
+                    if (doPCode) {
+                        if (!swf.generatePCodeSwdFile(new File(outSwd), new HashMap<>())) {
+                            System.err.println("Generating SWD failed");
+                        }
+                    } else {
+                        if (!swf.generateSwdFile(new File(outSwd), new HashMap<>())) {
+                            System.err.println("Generating SWD failed");
+                        }
+                    }
+                }
+            } else {
+                if (generateSwd) {
+                    System.err.println("WARNING: Cannot generate SWD for AS3 file");
+                }
+            }
             System.out.println("OK");
         } catch (FileNotFoundException ex) {
             Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, "Cannot read " + file);

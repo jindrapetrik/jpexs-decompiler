@@ -159,6 +159,7 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
     }
 
     public boolean hasColorMarker(int line, LineMarker lm) {
+        line -= firstLineOffset();
         if (lineMarkers.containsKey(line)) {
             return lineMarkers.get(line).contains(lm);
         }
@@ -166,6 +167,7 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
     }
 
     public void removeColorMarker(int line, LineMarker lm) {
+        line -= firstLineOffset();
         if (lineMarkers.containsKey(line)) {
             lineMarkers.get(line).remove(lm);
         }
@@ -174,15 +176,20 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
 
     public void removeColorMarkerOnAllLines(LineMarker lm) {
         for (int line : lineMarkers.keySet()) {
+            line += firstLineOffset();
             removeColorMarker(line, lm);
         }
     }
 
+    public int firstLineOffset() {
+        return 0;
+    }
+
     public void toggleColorMarker(int line, LineMarker lm) {
-        if (!lineMarkers.containsKey(line)) {
+        if (!lineMarkers.containsKey(line - firstLineOffset())) {
             addColorMarker(line, lm);
         } else {
-            if (lineMarkers.get(line).contains(lm)) {
+            if (lineMarkers.get(line - firstLineOffset()).contains(lm)) {
                 removeColorMarker(line, lm);
             } else {
                 addColorMarker(line, lm);
@@ -192,6 +199,7 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
     }
 
     public void addColorMarker(int line, LineMarker lm) {
+        line -= firstLineOffset();
         if (!lineMarkers.containsKey(line)) {
             lineMarkers.put(line, Collections.synchronizedSortedSet(new TreeSet<>()));
         }
@@ -621,16 +629,21 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
                 continue;
             }
             g.setColor(lastMarker.getBgColor());
+            line += firstLineOffset();
             g.fillRect(0, d + lh * (line - 1), getWidth(), lh);
         }
         super.paint(g);
         for (int line : lineMarkers.keySet()) {
+
             SortedSet<LineMarker> cs = lineMarkers.get(line);
             if (cs.isEmpty()) {
                 continue;
             }
+            line += firstLineOffset();
+
             Reference<Integer> lineStart = new Reference<>(0);
             Reference<Integer> lineEnd = new Reference<>(0);
+
             getLineBounds(line, lineStart, lineEnd);
             FgPainter fgp = cs.first().getForegroundPainter();
             if (fgp != null) {

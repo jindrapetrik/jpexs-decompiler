@@ -3149,13 +3149,54 @@ public final class SWF implements SWFContainerItem, Timelined {
      * @param telemetry Enable telemetry info?
      */
     public void enableDebugging(boolean injectAS3Code, File decompileDir, boolean telemetry) {
+        enableDebugging(injectAS3Code, decompileDir, telemetry, false);
+    }
+
+    /**
+     * Injects debugline and debugfile instructions to AS3 P-code (lines of
+     * P-code)
+     */
+    public void injectAS3PcodeDebugInfo() {
+        List<ScriptPack> packs = getAS3Packs();
+        for (ScriptPack s : packs) {
+            int abcIndex = s.allABCs.indexOf(s.abc);
+            if (s.isSimple) {
+                s.injectPCodeDebugInfo(abcIndex);
+            }
+        }
+    }
+
+    /**
+     * Injects debugline and debugfile instructions to AS3 code
+     *
+     * @param decompileDir Directory to set file information paths
+     */
+    public void injectAS3DebugInfo(File decompileDir) {
+        List<ScriptPack> packs = getAS3Packs();
+        for (ScriptPack s : packs) {
+            if (s.isSimple) {
+                s.injectDebugInfo(decompileDir);
+            }
+        }
+    }
+
+    /**
+     * Enables debugging. Adds tags to enable debugging and injects debugline
+     * and debugfile instructions to AS3 code. Optionally enables Telemetry
+     *
+     * @param injectAS3Code Modify AS3 code with debugfile / debugline ?
+     * @param decompileDir Directory to virtual decompile (will affect
+     * debugfile)
+     * @param telemetry Enable telemetry info?
+     * @param pcodeLevel inject Pcode lines instead of decompiled lines
+     */
+    public void enableDebugging(boolean injectAS3Code, File decompileDir, boolean telemetry, boolean pcodeLevel) {
 
         if (injectAS3Code) {
-            List<ScriptPack> packs = getAS3Packs();
-            for (ScriptPack s : packs) {
-                if (s.isSimple) {
-                    s.injectDebugInfo(decompileDir);
-                }
+            if (pcodeLevel) {
+                injectAS3PcodeDebugInfo();
+            } else {
+                injectAS3DebugInfo(decompileDir);
             }
         }
 
@@ -3233,6 +3274,82 @@ public final class SWF implements SWFContainerItem, Timelined {
         return r;
     }
 
+    public boolean generatePCodeSwdFile(File file, Map<String, Set<Integer>> breakpoints) throws IOException {
+        DebugIDTag dit = getDebugId();
+        if (dit == null) {
+            return false;
+        }
+        List<SWD.DebugItem> items = new ArrayList<>();
+        Map<String, ASMSource> asms = getASMs(true);
+
+        try {
+            items.add(new SWD.DebugId(dit.debugId));
+
+        } catch (Throwable t) {
+            Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, "message", t);
+            return false;
+        }
+
+        int moduleId = 0;
+        List<String> names = new ArrayList<>(asms.keySet());
+        Collections.sort(names);
+        for (String name : names) {
+            moduleId++;
+            String sname = "#PCODE " + name;
+            int bitmap = SWD.bitmapAction;
+            items.add(new SWD.DebugScript(moduleId, bitmap, sname, ""));
+
+            HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
+            try {
+                asms.get(name).getASMSource(ScriptExportMode.PCODE, writer, asms.get(name).getActions());
+            } catch (InterruptedException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+            List<Highlighting> hls = writer.instructionHilights;
+
+            Map<Integer, Integer> offsetToLine = new TreeMap<>();
+            String txt = writer.toString();
+            txt = txt.replace("\r", "");
+            int line = 1;
+            for (int i = 0; i < txt.length(); i++) {
+                Highlighting h = Highlighting.searchPos(hls, i);
+                if (h != null) {
+                    int of = (int) h.getProperties().fileOffset;
+                    if (of > -1 && !offsetToLine.containsKey(of) && !offsetToLine.containsValue(line)) {
+                        offsetToLine.put(of, line);
+                    }
+                }
+                if (txt.charAt(i) == '\n') {
+                    line++;
+                }
+            }
+
+            for (int ofs : offsetToLine.keySet()) {
+                items.add(new SWD.DebugOffset(moduleId, offsetToLine.get(ofs), ofs));
+            }
+
+            if (breakpoints.containsKey(sname)) {
+                Set<Integer> bplines = breakpoints.get(sname);
+                for (int bpline : bplines) {
+                    if (offsetToLine.containsValue(bpline)) {
+                        try {
+                            SWD.DebugBreakpoint dbp = new SWD.DebugBreakpoint(moduleId, bpline);
+                            items.add(dbp);
+                        } catch (IllegalArgumentException iex) {
+                            Logger.getLogger(SWF.class.getName()).log(Level.WARNING, "Cannot generate breakpoint to SWD: {0}", iex.getMessage());
+                        }
+                    }
+                }
+            }
+        }
+
+        SWD swd = new SWD(7, items);
+        try (FileOutputStream fis = new FileOutputStream(file)) {
+            swd.saveTo(fis);
+        }
+        return true;
+    }
+
     public boolean generateSwdFile(File file, Map<String, Set<Integer>> breakpoints) throws IOException {
         DebugIDTag dit = getDebugId();
         if (dit == null) {
@@ -3243,15 +3360,10 @@ public final class SWF implements SWFContainerItem, Timelined {
 
         try {
             items.add(new SWD.DebugId(dit.debugId));
-            Random rnd = new Random();
 
-            //Map<String, Integer> moduleIds = new HashMap<>();
-            List<SWD.DebugOffset> swdOffsets = new ArrayList<>();
-            List<SWD.DebugBreakpoint> swfBps = new ArrayList<>();
             int moduleId = 0;
             List<String> names = new ArrayList<>(asms.keySet());
             Collections.sort(names);
-            //Collections.reverse(names);
             for (String name : names) {
                 List<SWD.DebugRegisters> regitems = new ArrayList<>();
                 moduleId++;

@@ -701,6 +701,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         setMenuEnabled("/file/start/run", swfSelected && !isRunningOrDebugging);
         setMenuEnabled("/file/start/debug", swfSelected && !isRunningOrDebugging);
+        setMenuEnabled("/file/start/debugpcode", swfSelected && !isRunningOrDebugging);
 
         setMenuEnabled("/file/start/stop", isRunningOrDebugging);
         setMenuEnabled("/debugging/debug/stop", isRunningOrDebugging); //same as previous
@@ -779,6 +780,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addMenuItem("/file/start/run", translate("menu.file.start.run"), "play32", this::runActionPerformed, PRIORITY_TOP, null, true, new HotKey("F6"), false);
         addMenuItem("/file/start/debug", translate("menu.file.start.debug"), "debug32", this::debugActionPerformed, PRIORITY_TOP, null, true, new HotKey("CTRL+F5"), false);
         addMenuItem("/file/start/stop", translate("menu.file.start.stop"), "stop32", this::stopActionPerformed, PRIORITY_TOP, null, true, null, false);
+        addMenuItem("/file/start/debugpcode", translate("menu.file.start.debugpcode"), "debug32", this::debugPCodeActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         finishMenu("/file/start");
 
         addMenuItem("/file/view", translate("menu.view"), null, null, 0, null, false, null, false);
@@ -1093,9 +1095,13 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     public boolean debugActionPerformed(ActionEvent evt) {
-        Main.runDebug(swf);
+        Main.runDebug(swf, false);
         return true;
+    }
 
+    public boolean debugPCodeActionPerformed(ActionEvent evt) {
+        Main.runDebug(swf, true);
+        return true;
     }
 
     public boolean stopActionPerformed(ActionEvent evt) {

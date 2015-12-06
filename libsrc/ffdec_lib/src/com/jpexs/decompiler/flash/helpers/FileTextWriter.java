@@ -65,7 +65,7 @@ public class FileTextWriter extends GraphTextWriter implements AutoCloseable {
     }
 
     @Override
-    public FileTextWriter append(String str, long offset) {
+    public FileTextWriter append(String str, long offset, long fileOffset) {
         writeToFile(str);
         return this;
     }

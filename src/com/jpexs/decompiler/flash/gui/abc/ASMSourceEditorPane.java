@@ -29,11 +29,13 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.gui.GraphDialog;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.gui.editor.DebuggableEditorPane;
 import com.jpexs.decompiler.flash.gui.editor.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.helpers.Helper;
@@ -47,7 +49,7 @@ import java.util.logging.Logger;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
-public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretListener {
+public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretListener {
 
     public ABC abc;
 
@@ -78,6 +80,8 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
     private ScriptExportMode exportMode = ScriptExportMode.PCODE;
 
     private Trait trait;
+
+    private int firstInstrLine = -1;
 
     public ABCPanel getAbcPanel() {
         return decompiledEditor.getAbcPanel();
@@ -172,7 +176,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
         return super.getName();
     }
 
-    public void setBodyIndex(int bodyIndex, ABC abc, String name, Trait trait, int scriptIndex) {
+    public void setBodyIndex(String scriptPathName, int bodyIndex, ABC abc, String name, Trait trait, int scriptIndex) {
         this.bodyIndex = bodyIndex;
         this.abc = abc;
         this.name = name;
@@ -184,6 +188,16 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
         textWithHex = null;
         textNoHex = null;
         textHexOnly = null;
+        List<ABCContainerTag> cs = abc.getAbcTags();
+        int abcIndex = -1;
+        for (int i = 0; i < cs.size(); i++) {
+            if (cs.get(i).getABC() == abc) {
+                abcIndex = i;
+                break;
+            }
+        }
+        String aname = "#PCODE abc:" + abcIndex + ",body:" + bodyIndex + ";" + scriptPathName;
+        setScriptName(aname);
         setHex(exportMode, true);
     }
 
@@ -266,11 +280,32 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
         setCaretPosition(0);
     }
 
-    public void setText(HighlightedText HighlightedText) {
-        disassembledHilights = HighlightedText.instructionHilights;
-        specialHilights = HighlightedText.specialHilights;
-        super.setText(HighlightedText.text);
+    public void setText(HighlightedText highlightedText) {
+        disassembledHilights = highlightedText.instructionHilights;
+        if (!disassembledHilights.isEmpty()) {
+            int firstPos = disassembledHilights.get(0).startPos;
+            String txt = highlightedText.text;
+            txt = txt.replace("\r", "");
+            int line = 0;
+            for (int i = 0; i < firstPos; i++) {
+                if (txt.charAt(i) == '\n') {
+                    line++;
+                }
+            }
+            firstInstrLine = line;
+        }
+        specialHilights = highlightedText.specialHilights;
+        super.setText(highlightedText.text);
         setCaretPosition(0);
+    }
+
+    @Override
+    public int firstLineOffset() {
+        return firstInstrLine;
+    }
+
+    public void gotoInstrLine(int line) {
+        super.gotoLine(firstInstrLine + line);
     }
 
     public void clear() {
