@@ -3028,6 +3028,93 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
     }
 
+    /**
+     * Adds a tag to the SWF
+     * If targetTreeItem is:
+     * - Frame: adds the tag to the Frame. Frame can be a frame of the main
+     * timeline or a DefineSprite frame
+     * - DefineSprite: adds the tag to the and of the DefineSprite's tag list
+     * - Any other tag in the SWF: adds the new tag exactly before the specified
+     * tag
+     * - Other: adds the tag to the end of the SWF's tag list
+     *
+     * @param tag
+     * @param targetTreeItem
+     */
+    public void addTag(Tag tag, TreeItem targetTreeItem) {
+        SWF swf = tag.getSwf();
+        Frame frame = targetTreeItem instanceof Frame ? (Frame) targetTreeItem : null;
+        Timelined timelined;
+        if (frame != null) {
+            timelined = frame.timeline.timelined;
+        } else {
+            timelined = swf.getTimelined(targetTreeItem);
+        }
+
+        tag.setTimelined(timelined);
+
+        List<Tag> tags;
+        if (timelined instanceof DefineSpriteTag) {
+            DefineSpriteTag sprite = (DefineSpriteTag) timelined;
+            tags = sprite.subTags;
+        } else {
+            tags = swf.tags;
+        }
+
+        int index;
+        if (frame != null) {
+            if (frame.showFrameTag != null) {
+                index = tags.indexOf(frame.showFrameTag);
+            } else {
+                index = -1;
+            }
+        } else if (timelined instanceof DefineSpriteTag) {
+            index = -1;
+        } else if (targetTreeItem instanceof Tag) {
+            if (tag instanceof CharacterIdTag && targetTreeItem instanceof CharacterTag) {
+                ((CharacterIdTag) tag).setCharacterId(((CharacterTag) targetTreeItem).getCharacterId());
+            }
+
+            index = tags.indexOf(targetTreeItem); // todo: honfika: why not index + 1?
+        } else {
+            index = -1;
+            if (tag instanceof CharacterTag) {
+                // add before the last ShowFrame tag
+                for (int i = tags.size() - 1; i >= 0; i--) {
+                    if (tags.get(i) instanceof ShowFrameTag) {
+                        index = i;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (index > -1) {
+            tags.add(index, tag);
+        } else {
+            tags.add(tag);
+        }
+
+        timelined.resetTimeline();
+
+        if (timelined instanceof DefineSpriteTag) {
+            DefineSpriteTag sprite = (DefineSpriteTag) timelined;
+            sprite.frameCount = timelined.getTimeline().getFrameCount();
+        }
+    }
+
+    public Timelined getTimelined(TreeItem treeItem) {
+        if (treeItem instanceof Frame) {
+            return ((Frame) treeItem).timeline.timelined;
+        }
+
+        if (treeItem instanceof DefineSpriteTag) {
+            return (DefineSpriteTag) treeItem;
+        }
+
+        return treeItem.getSwf();
+    }
+
     public void packCharacterIds() {
         int maxId = getNextCharacterId();
         int id = 1;
