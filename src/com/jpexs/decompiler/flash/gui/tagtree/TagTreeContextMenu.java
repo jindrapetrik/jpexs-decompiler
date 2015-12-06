@@ -24,10 +24,8 @@ import com.jpexs.decompiler.flash.gui.ReplaceCharacterDialog;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
-import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
-import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
@@ -35,7 +33,6 @@ import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.TagScript;
-import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.FolderItem;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
@@ -358,9 +355,8 @@ public class TagTreeContextMenu extends JPopupMenu {
                 List<Integer> allowedTagTypes = tagTree.getNestedTagIds((Tag) firstItem);
                 addAddTagMenuItems(allowedTagTypes, addTagMenu, firstItem);
             } else if (firstItem instanceof Frame) {
-                // todo: honfika: add to the selected frame
-                //List<Integer> allowedTagTypes = tagTree.getFrameNestedTagIds();
-                //addAddTagMenuItems(allowedTagTypes, addTagMenu, firstItem);
+                List<Integer> allowedTagTypes = tagTree.getFrameNestedTagIds();
+                addAddTagMenuItems(allowedTagTypes, addTagMenu, firstItem);
             }
 
             addTagMenu.setVisible(addTagMenu.getItemCount() > 0);
@@ -444,43 +440,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         try {
             SWF swf = firstItem.getSwf();
             Tag t = (Tag) cl.getDeclaredConstructor(SWF.class).newInstance(new Object[]{swf});
-            boolean isDefineSprite = firstItem instanceof DefineSpriteTag;
-            Timelined timelined = isDefineSprite ? (DefineSpriteTag) firstItem : swf;
-            t.setTimelined(timelined);
-            if (isDefineSprite) {
-                DefineSpriteTag sprite = (DefineSpriteTag) firstItem;
-                timelined.resetTimeline();
-                sprite.subTags.add(t);
-                sprite.frameCount = timelined.getTimeline().getFrameCount();
-            } else {
-                int index;
-                if (firstItem instanceof Tag) {
-                    if ((t instanceof CharacterIdTag) && (firstItem instanceof CharacterTag)) {
-                        ((CharacterIdTag) t).setCharacterId(((CharacterTag) firstItem).getCharacterId());
-                    }
-                    index = swf.tags.indexOf(firstItem);
-                } else {
-                    index = -1;
-                    if (t instanceof CharacterTag) {
-                        // add before the last ShowFrame tag
-                        for (int i = swf.tags.size() - 1; i >= 0; i--) {
-                            if (swf.tags.get(i) instanceof ShowFrameTag) {
-                                index = i;
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                if (index > -1) {
-                    swf.tags.add(index, t);
-                } else {
-                    swf.tags.add(t);
-                }
-
-                timelined.resetTimeline();
-            }
-
+            swf.addTag(t, firstItem);
             swf.updateCharacters();
             mainPanel.refreshTree(swf);
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException ex) {
