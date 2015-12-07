@@ -17,6 +17,8 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.debugger.flash.Debugger;
+import com.jpexs.debugger.flash.DebuggerCommands;
+import com.jpexs.debugger.flash.Variable;
 import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.SWF;
@@ -193,6 +195,11 @@ public class Main {
 
     public static synchronized boolean isRunning() {
         return runProcess != null && !runProcessDebug;
+    }
+
+    public static synchronized boolean addWatch(Variable v, long v_id, boolean watchRead, boolean watchWrite) {
+        DebuggerCommands.Watch w = getDebugHandler().addWatch(v, v_id, watchRead, watchWrite);
+        return w != null;
     }
 
     public static void runPlayer(String title, final String exePath, String file, String flashVars) {

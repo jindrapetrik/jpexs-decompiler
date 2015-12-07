@@ -26,11 +26,17 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
@@ -84,9 +90,79 @@ public class DebugPanel extends JPanel {
 
     public DebugPanel() {
         super(new BorderLayout());
-        debugRegistersTable = new JTable(new ABCPanel.VariablesTableModel(new ArrayList<>()));
-        debugLocalsTable = new JTable(new ABCPanel.VariablesTableModel(new ArrayList<>()));
-        debugScopeTable = new JTable(new ABCPanel.VariablesTableModel(new ArrayList<>()));
+        debugRegistersTable = new JTable(new ABCPanel.VariablesTableModel(new ArrayList<>(), new ArrayList<>()));
+        debugLocalsTable = new JTable(new ABCPanel.VariablesTableModel(new ArrayList<>(), new ArrayList<>()));
+
+        //Add watch feature, commented out. I tried it, but without success. I can't add watch in Flash Pro or FDB either. :-(
+        /*
+         //locales
+         debug.watch.add = Add watch to %name%
+         debug.watch.add.read = Read
+         debug.watch.add.write = Write
+         debug.watch.add.readwrite = Read+Write
+
+         error.debug.watch.add = Cannot add watch to this variable.
+        
+        
+         MouseAdapter watchHandler = new MouseAdapter() {
+
+         @Override
+         public void mousePressed(MouseEvent e) {
+         if (e.isPopupTrigger()) {
+         dopop(e);
+         }
+         }
+
+         @Override
+         public void mouseReleased(MouseEvent e) {
+         if (e.isPopupTrigger()) {
+         dopop(e);
+         }
+         }
+
+         private void dopop(MouseEvent e) {
+         if (debugLocalsTable.getSelectedRow() == -1) {
+         return;
+         }
+         Variable v = ((ABCPanel.VariablesTableModel) debugLocalsTable.getModel()).getVars().get(debugLocalsTable.getSelectedRow());
+         final long v_id = ((ABCPanel.VariablesTableModel) debugLocalsTable.getModel()).getVarIds().get(debugLocalsTable.getSelectedRow());
+
+         JPopupMenu pm = new JPopupMenu();
+         JMenu addWatchMenu = new JMenu(AppStrings.translate("debug.watch.add").replace("%name%", v.name));
+         JMenuItem watchReadMenuItem = new JMenuItem(AppStrings.translate("debug.watch.add.read"));
+         watchReadMenuItem.addActionListener((ActionEvent e1) -> {
+         if (!Main.addWatch(v, v_id, true, false)) {
+         View.showMessageDialog(DebugPanel.this, AppStrings.translate("debug.watch.add"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+         }
+         });
+         JMenuItem watchWriteMenuItem = new JMenuItem(AppStrings.translate("debug.watch.add.write"));
+         watchWriteMenuItem.addActionListener((ActionEvent e1) -> {
+         if (!Main.addWatch(v, v_id, false, true)) {
+         View.showMessageDialog(DebugPanel.this, AppStrings.translate("debug.watch.add"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+         }
+         });
+         JMenuItem watchReadWriteMenuItem = new JMenuItem(AppStrings.translate("debug.watch.add.readwrite"));
+         watchReadWriteMenuItem.addActionListener((ActionEvent e1) -> {
+         if (!Main.addWatch(v, v_id, true, true)) {
+         View.showMessageDialog(DebugPanel.this, AppStrings.translate("debug.watch.add"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+         }
+         });
+
+         addWatchMenu.add(watchReadMenuItem);
+         addWatchMenu.add(watchWriteMenuItem);
+         addWatchMenu.add(watchReadWriteMenuItem);
+         pm.add(addWatchMenu);
+
+         pm.show(e.getComponent(), e.getX(), e.getY());
+         }
+         };
+
+         debugLocalsTable.addMouseListener(watchHandler);
+         debugScopeTable.addMouseListener(watchHandler);
+
+         */
+        debugScopeTable = new JTable(new ABCPanel.VariablesTableModel(new ArrayList<>(), new ArrayList<>()));
+
         callStackTable = new JTable();
         stackTable = new JTable();
         traceLogTextarea = new JTextArea();
@@ -190,12 +266,22 @@ public class DebugPanel extends JPanel {
                     SelectedTab oldSel = selectedTab;
                     InFrame f = Main.getDebugHandler().getFrame();
                     if (f != null) {
-                        debugRegistersTable.setModel(new ABCPanel.VariablesTableModel(f.registers));
+
+                        List<Long> regVarIds = new ArrayList<>();
+                        for (int i = 0; i < f.registers.size(); i++) {
+                            regVarIds.add(0L);
+                        }
+                        debugRegistersTable.setModel(new ABCPanel.VariablesTableModel(f.registers, regVarIds));
                         List<Variable> locals = new ArrayList<>();
                         locals.addAll(f.arguments);
                         locals.addAll(f.variables);
-                        debugLocalsTable.setModel(new ABCPanel.VariablesTableModel(locals));
-                        debugScopeTable.setModel(new ABCPanel.VariablesTableModel(f.scopeChain));
+
+                        List<Long> localIds = new ArrayList<>();
+                        localIds.addAll(f.argumentIds);
+                        localIds.addAll(f.variableIds);
+
+                        debugLocalsTable.setModel(new ABCPanel.VariablesTableModel(locals, localIds));
+                        debugScopeTable.setModel(new ABCPanel.VariablesTableModel(f.scopeChain, f.scopeChainIds));
                     } else {
                         debugRegistersTable.setModel(new DefaultTableModel());
                         debugLocalsTable.setModel(new DefaultTableModel());
