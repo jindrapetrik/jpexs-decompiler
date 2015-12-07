@@ -257,11 +257,12 @@ public class Timeline {
                 newFrameNeeded = true;
                 PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
                 int depth = po.getDepth();
-                if (!frame.layers.containsKey(depth)) {
-                    frame.layers.put(depth, new DepthState(swf, frame));
+                DepthState fl = frame.layers.get(depth);
+                if (fl == null) {
+                    frame.layers.put(depth, fl = new DepthState(swf, frame));
                 }
                 frame.layersChanged = true;
-                DepthState fl = frame.layers.get(depth);
+                fl.placeObjectTag = po;
                 int characterId = po.getCharacterId();
                 if (characterId != -1) {
                     fl.characterId = characterId;
@@ -314,7 +315,7 @@ public class Timeline {
                     fl.clipActions = po.getClipActions();
                     fl.clipDepth = po.getClipDepth();
                 }
-                fl.key = true;
+                fl.key = characterId != -1;
             } else if (t instanceof RemoveTag) {
                 newFrameNeeded = true;
                 RemoveTag r = (RemoveTag) t;
@@ -342,8 +343,7 @@ public class Timeline {
 
         maxDepth = getMaxDepthInternal();
 
-        // todo: enable again after TweenDetector.detectRanges implemented
-        //detectTweens();
+        detectTweens();
         calculateMaxDepthFrames();
 
         createASPackages();
@@ -355,10 +355,6 @@ public class Timeline {
         initialized = true;
     }
 
-    private boolean compare(int a, int b, int c, int tolerance) {
-        return Math.abs((b - a) - (c - b)) < tolerance;
-    }
-
     private void detectTweens() {
         for (int d = 1; d <= maxDepth; d++) {
             int characterId = -1;
@@ -366,26 +362,31 @@ public class Timeline {
             for (int f = 0; f <= frames.size(); f++) {
                 DepthState ds = f >= frames.size() ? null : frames.get(f).layers.get(d);
 
-                if (f < frames.size() && ds != null && ds.characterId == characterId && ds.characterId != -1) {
+                if (ds != null && characterId != -1 && ds.characterId == characterId) {
                     len++;
                 } else {
                     if (characterId != -1) {
-                        List<MATRIX> matrices = new ArrayList<>();
+                        int startPos = f - len;
+                        List<DepthState> matrices = new ArrayList<>(len);
                         for (int k = 0; k < len; k++) {
-                            matrices.add(frames.get(f - len + k).layers.get(d).matrix);
+                            matrices.add(frames.get(startPos + k).layers.get(d));
                         }
+
                         List<TweenRange> ranges = TweenDetector.detectRanges(matrices);
                         for (TweenRange r : ranges) {
                             for (int t = r.startPosition; t <= r.endPosition; t++) {
-                                DepthState layer = frames.get(f - len + t).layers.get(d);
+                                DepthState layer = frames.get(startPos + t).layers.get(d);
                                 layer.motionTween = true;
                                 layer.key = false;
                             }
-                            frames.get(r.startPosition).layers.get(d).key = true;
+
+                            frames.get(startPos + r.startPosition).layers.get(d).key = true;
                         }
                     }
+
                     len = 1;
                 }
+
                 characterId = ds == null ? -1 : ds.characterId;
             }
         }
@@ -396,7 +397,7 @@ public class Timeline {
         for (int d = 1; d <= maxDepth; d++) {
             for (int f = frames.size() - 1; f >= 0; f--) {
                 if (frames.get(f).layers.get(d) != null) {
-                    depthMaxFrame.put(d, f + 1);
+                    depthMaxFrame.put(d, f);
                     break;
                 }
             }

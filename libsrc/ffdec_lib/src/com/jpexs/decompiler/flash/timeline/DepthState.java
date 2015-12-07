@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.timeline;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
@@ -64,6 +65,8 @@ public class DepthState {
 
     public Frame frame;
 
+    public PlaceObjectTypeTag placeObjectTag;
+
     public long instanceId;
 
     public boolean motionTween = false;
@@ -96,6 +99,7 @@ public class DepthState {
         ratio = obj.ratio;
         clipDepth = obj.clipDepth;
         time = obj.time;
+        placeObjectTag = obj.placeObjectTag;
         if (sameInstance) {
             time++;
             instanceId = obj.instanceId;
