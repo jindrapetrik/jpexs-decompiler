@@ -135,7 +135,7 @@ public abstract class InstructionDefinition implements Serializable {
     }
 
     protected void illegalOpCode(LocalDataArea lda, AVM2Instruction ins) throws AVM2VerifyErrorException {
-        throw new AVM2VerifyErrorException(AVM2VerifyErrorException.ILLEGAL_OPCODE, lda.isDebug(), new Object[]{lda.methodName, instructionCode, ins.getOffset()});
+        throw new AVM2VerifyErrorException(AVM2VerifyErrorException.ILLEGAL_OPCODE, lda.isDebug(), new Object[]{lda.methodName, instructionCode, ins.getAddress()});
     }
 
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) throws InterruptedException {
@@ -238,7 +238,7 @@ public abstract class InstructionDefinition implements Serializable {
         if (constants.getMultiname(multinameIndex).needsName()) {
             name = stack.get(pos).toString();
         } else {
-            name = GraphTextWriter.hilighOffset(constants.getMultiname(multinameIndex).getName(constants, fullyQualifiedNames, false), ins.getOffset());
+            name = GraphTextWriter.hilighOffset(constants.getMultiname(multinameIndex).getName(constants, fullyQualifiedNames, false), ins.getAddress());
         }
         return name + ns;
     }

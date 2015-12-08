@@ -201,7 +201,7 @@ public class HighlightedTextWriter extends GraphTextWriter {
                 HighlightData ndata = new HighlightData();
                 ndata.merge(itemPos.data);
                 ndata.merge(data);
-                ndata.offset = src.getOffset() + pos;
+                ndata.offset = src.getAddress() + pos;
                 ndata.fileOffset = src.getFileOffset();
                 if (itemPos.startLineItem != null) {
                     ndata.firstLineOffset = itemPos.startLineItem.getLineOffset();

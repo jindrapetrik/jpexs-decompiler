@@ -47,7 +47,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     public int[] operands;
 
-    private long offset;
+    private long address;
 
     public String comment;
 
@@ -64,7 +64,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     @Override
     public long getLineOffset() {
-        return getOffset();
+        return getAddress();
     }
 
     public void setFileLine(String file, int line) {
@@ -76,10 +76,10 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
         this(offset, AVM2Code.instructionSet[insructionCode], operands);
     }
 
-    public AVM2Instruction(long offset, InstructionDefinition definition, int[] operands) {
+    public AVM2Instruction(long address, InstructionDefinition definition, int[] operands) {
         this.definition = definition;
         this.operands = operands != null && operands.length > 0 ? operands : null;
-        this.offset = offset;
+        this.address = address;
     }
 
     public byte[] getBytes() {
@@ -168,14 +168,14 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
         for (int i = 0; i < definition.operands.length; i++) {
             switch (definition.operands[i]) {
                 case AVM2Code.DAT_OFFSET:
-                    ret.add(offset + operands[i] + getBytesLength());
+                    ret.add(address + operands[i] + getBytesLength());
                     break;
                 case AVM2Code.DAT_CASE_BASEOFFSET:
-                    ret.add(offset + operands[i]);
+                    ret.add(address + operands[i]);
                     break;
                 case AVM2Code.OPT_CASE_OFFSETS:
                     for (int j = i + 1; j < operands.length; j++) {
-                        ret.add(offset + operands[j]);
+                        ret.add(address + operands[j]);
                     }
                     break;
             }
@@ -201,9 +201,9 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
             case AVM2Code.DAT_DOUBLE_INDEX:
                 return constants.getDouble(operands[idx]);
             case AVM2Code.DAT_OFFSET:
-                return offset + operands[idx] + getBytesLength();
+                return address + operands[idx] + getBytesLength();
             case AVM2Code.DAT_CASE_BASEOFFSET:
-                return offset + operands[idx];
+                return address + operands[idx];
             case AVM2Code.OPT_CASE_OFFSETS:
                 return (long) operands[idx]; // offsets: offset + operands[i];
             default:
@@ -278,12 +278,12 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
                 case AVM2Code.DAT_OFFSET:
                     s.append(" ");
                     s.append("ofs");
-                    s.append(Helper.formatAddress(offset + operands[i] + getBytesLength()));
+                    s.append(Helper.formatAddress(address + operands[i] + getBytesLength()));
                     break;
                 case AVM2Code.DAT_CASE_BASEOFFSET:
                     s.append(" ");
                     s.append("ofs");
-                    s.append(Helper.formatAddress(offset + operands[i]));
+                    s.append(Helper.formatAddress(address + operands[i]));
                     break;
                 case AVM2Code.OPT_CASE_OFFSETS:
                     s.append(" ");
@@ -291,7 +291,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
                     for (int j = i + 1; j < operands.length; j++) {
                         s.append(" ");
                         s.append("ofs");
-                        s.append(Helper.formatAddress(offset + operands[j]));
+                        s.append(Helper.formatAddress(address + operands[j]));
                     }
                     break;
                 default:
@@ -319,7 +319,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
     }
 
     public GraphTextWriter toString(GraphTextWriter writer, LocalData localData) {
-        writer.appendNoHilight(Helper.formatAddress(offset) + " " + String.format("%-30s", Helper.byteArrToString(getBytes())) + definition.instructionName);
+        writer.appendNoHilight(Helper.formatAddress(address) + " " + String.format("%-30s", Helper.byteArrToString(getBytes())) + definition.instructionName);
         writer.appendNoHilight(getParams(localData.constantsAvm2, localData.fullyQualifiedNames) + getComment());
         return writer;
     }
@@ -376,16 +376,16 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
     }
 
     @Override
-    public long getOffset() {
-        return offset;
+    public long getAddress() {
+        return address;
     }
 
-    public void setOffset(long offset) {
-        this.offset = offset;
+    public void setAddress(long address) {
+        this.address = address;
     }
 
     public long getTargetAddress() {
-        return offset + 4 /*getBytesLength()*/ + operands[0];
+        return address + 4 /*getBytesLength()*/ + operands[0];
     }
 
     public void setTargetOffset(int offset) {
@@ -399,13 +399,13 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
             ret.add(code.adr2pos(getTargetAddress()));
             if (!(definition instanceof JumpIns)) {
-                ret.add(code.adr2pos(offset + getBytesLength()));
+                ret.add(code.adr2pos(address + getBytesLength()));
             }
         }
         if (definition instanceof LookupSwitchIns) {
-            ret.add(code.adr2pos(offset + operands[0]));
+            ret.add(code.adr2pos(address + operands[0]));
             for (int k = 2; k < operands.length; k++) {
-                ret.add(code.adr2pos(offset + operands[k]));
+                ret.add(code.adr2pos(address + operands[k]));
             }
         }
         return ret;

@@ -969,9 +969,9 @@ public class ASM3Parser {
                     AVM2Instruction ins = code.code.get((int) oi.insPosition);
                     int relOffset;
                     if (oi instanceof CaseOffsetItem) {
-                        relOffset = li.offset - (int) ins.getOffset();
+                        relOffset = li.offset - (int) ins.getAddress();
                     } else {
-                        relOffset = li.offset - ((int) ins.getOffset() + ins.getBytesLength());
+                        relOffset = li.offset - ((int) ins.getAddress() + ins.getBytesLength());
                     }
                     ins.operands[oi.insOperandIndex] = relOffset;
                 }
