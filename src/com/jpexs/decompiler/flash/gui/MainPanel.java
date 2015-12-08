@@ -2137,10 +2137,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 updateClassesList();
             }
 
-            if (countAs2 == 0 && countAs3 == 0 && swf.isAS3()) {
-                View.showMessageDialog(this, translate("import.script.as12warning"));
-            } else {
-                View.showMessageDialog(this, translate("import.script.result").replace("%count%", Integer.toString(countAs2)));
+            View.showMessageDialog(this, translate("import.script.result").replace("%count%", Integer.toString(countAs2 + countAs3)));
+            if (countAs2 != 0 || countAs3 != 0) {
                 reload(true);
             }
         }
