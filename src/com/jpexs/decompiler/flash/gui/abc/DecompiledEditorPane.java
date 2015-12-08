@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.gui.abc;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.CachedDecompilation;
-import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
@@ -36,21 +35,17 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.gui.AppStrings;
-import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.editor.DebuggableEditorPane;
-import com.jpexs.decompiler.flash.gui.editor.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.graph.DottedChain;
-import java.awt.Color;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.event.CaretEvent;
@@ -58,7 +53,6 @@ import javax.swing.event.CaretListener;
 import jsyntaxpane.SyntaxDocument;
 import jsyntaxpane.Token;
 import jsyntaxpane.TokenType;
-import jsyntaxpane.components.BreakPointListener;
 
 public class DecompiledEditorPane extends DebuggableEditorPane implements CaretListener {
 
@@ -420,11 +414,11 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                 AVM2Instruction lastIns = null;
                 AVM2Instruction selIns = null;
                 for (AVM2Instruction ins : list) {
-                    if (highlightOffset == ins.getOffset()) {
+                    if (highlightOffset == ins.getAddress()) {
                         selIns = ins;
                         break;
                     }
-                    if (ins.getOffset() > highlightOffset) {
+                    if (ins.getAddress() > highlightOffset) {
                         selIns = lastIns;
                         break;
                     }

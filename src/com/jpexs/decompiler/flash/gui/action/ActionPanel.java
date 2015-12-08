@@ -18,8 +18,6 @@ package com.jpexs.decompiler.flash.gui.action;
 
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.abc.ClassPath;
-import com.jpexs.decompiler.flash.abc.avm2.parser.script.Reference;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraph;
 import com.jpexs.decompiler.flash.action.ActionList;
@@ -36,6 +34,7 @@ import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.gui.DebugPanel;
 import com.jpexs.decompiler.flash.gui.DebuggerHandler;
 import com.jpexs.decompiler.flash.gui.GraphDialog;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
@@ -45,11 +44,9 @@ import com.jpexs.decompiler.flash.gui.SearchListener;
 import com.jpexs.decompiler.flash.gui.SearchPanel;
 import com.jpexs.decompiler.flash.gui.TagEditorPanel;
 import com.jpexs.decompiler.flash.gui.View;
-import com.jpexs.decompiler.flash.gui.DebugPanel;
 import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
 import com.jpexs.decompiler.flash.gui.controls.NoneSelectedButtonGroup;
 import com.jpexs.decompiler.flash.gui.editor.DebuggableEditorPane;
-import com.jpexs.decompiler.flash.gui.editor.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.gui.editor.LinkHandler;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
 import com.jpexs.decompiler.flash.helpers.HighlightedText;
@@ -73,7 +70,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -136,8 +132,11 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
     public JLabel decLabel = new HeaderLabel(AppStrings.translate("panel.decompiled"));
 
     public List<Highlighting> decompiledHilights = new ArrayList<>();
+
     public List<Highlighting> specialHighlights = new ArrayList<>();
+
     public List<Highlighting> classHighlights = new ArrayList<>();
+
     public List<Highlighting> methodHighlights = new ArrayList<>();
 
     public List<Highlighting> disassembledHilights = new ArrayList<>();
@@ -214,11 +213,11 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
                     int inspos = 0;
                     Action selIns = null;
                     for (Action ins : list) {
-                        if (h.getProperties().offset == ins.getOffset()) {
+                        if (h.getProperties().offset == ins.getAddress()) {
                             selIns = ins;
                             break;
                         }
-                        if (ins.getOffset() > h.getProperties().offset && lastIns != null) {
+                        if (ins.getAddress() > h.getProperties().offset && lastIns != null) {
                             inspos = (int) (h.getProperties().offset - lastIns.getAddress());
                             selIns = lastIns;
                             break;
