@@ -25,6 +25,10 @@ import java.util.List;
 import javax.swing.ListModel;
 import javax.swing.event.ListDataListener;
 
+/**
+ *
+ * @author JPEXS
+ */
 public final class TraitsListModel implements ListModel<Object> {
 
     private List<TraitsListItem> items;
