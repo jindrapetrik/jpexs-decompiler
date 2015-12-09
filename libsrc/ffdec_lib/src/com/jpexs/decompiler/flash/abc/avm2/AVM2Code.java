@@ -2561,16 +2561,6 @@ public class AVM2Code implements Cloneable {
                         AVM2Instruction ins2 = code.get(ni);
                         if (ins2.isExit()) {
                             code.set(i, new AVM2Instruction(ofs, ins2.definition, ins2.operands));
-                            // todo: honfika: why to add 3 NOPs?
-                            AVM2Instruction nopIns;
-                            nopIns = new AVM2Instruction(ofs + 1, AVM2Instructions.Nop, null);
-                            code.add(i + 1, nopIns);
-                            nopIns = new AVM2Instruction(ofs + 2, AVM2Instructions.Nop, null);
-                            code.add(i + 2, nopIns);
-                            nopIns = new AVM2Instruction(ofs + 3, AVM2Instructions.Nop, null);
-                            code.add(i + 3, nopIns);
-                            i += 3;
-                            csize = code.size();
                             modified = true;
                         }
                     }
