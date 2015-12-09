@@ -26,6 +26,10 @@ import javax.swing.JList;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class TraitsList extends JList<Object> implements ListSelectionListener {
 
     private ABC abc;
