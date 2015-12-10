@@ -36,6 +36,10 @@ import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class ABCInputStream implements AutoCloseable {
 
     private static final int CLASS_PROTECTED_NS = 8;

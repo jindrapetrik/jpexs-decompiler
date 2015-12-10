@@ -28,6 +28,10 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class JumpIns extends InstructionDefinition implements IfTypeIns {
 
     public static final String NAME = "jump";

@@ -20,6 +20,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class CopyOutputStream extends OutputStream {
 
     private final OutputStream os;

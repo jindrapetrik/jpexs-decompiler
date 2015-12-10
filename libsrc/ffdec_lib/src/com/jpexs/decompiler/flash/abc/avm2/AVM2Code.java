@@ -304,6 +304,10 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class AVM2Code implements Cloneable {
 
     private static final Logger logger = Logger.getLogger(AVM2Code.class.getName());

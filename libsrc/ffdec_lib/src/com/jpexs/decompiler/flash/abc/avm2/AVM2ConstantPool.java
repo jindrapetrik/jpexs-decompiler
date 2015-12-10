@@ -36,6 +36,10 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class AVM2ConstantPool implements Cloneable {
 
     private static final Logger logger = Logger.getLogger(AVM2ConstantPool.class.getName());

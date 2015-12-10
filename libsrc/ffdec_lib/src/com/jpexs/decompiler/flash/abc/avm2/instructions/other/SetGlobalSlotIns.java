@@ -32,6 +32,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class SetGlobalSlotIns extends InstructionDefinition implements SetTypeIns {
 
     public SetGlobalSlotIns() {

@@ -27,6 +27,10 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class HasNext2Ins extends InstructionDefinition {
 
     public HasNext2Ins() {
