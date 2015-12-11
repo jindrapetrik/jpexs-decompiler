@@ -41,6 +41,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     public InstructionDefinition definition;

@@ -29,6 +29,10 @@ import com.jpexs.decompiler.graph.model.PopItem;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class NewArrayIns extends InstructionDefinition {
 
     public NewArrayIns() {

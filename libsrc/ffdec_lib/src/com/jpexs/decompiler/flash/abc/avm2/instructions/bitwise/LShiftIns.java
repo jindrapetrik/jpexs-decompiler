@@ -28,6 +28,10 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class LShiftIns extends InstructionDefinition {
 
     public LShiftIns() {
