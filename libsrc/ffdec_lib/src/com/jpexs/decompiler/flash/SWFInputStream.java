@@ -2981,7 +2981,7 @@ public class SWFInputStream implements AutoCloseable {
         GLYPHENTRY ret = new GLYPHENTRY();
         newDumpLevel(name, "GLYPHENTRY");
         ret.glyphIndex = (int) readUB(glyphBits, "glyphIndex");
-        ret.glyphAdvance = (int) readUB(advanceBits, "glyphAdvance");
+        ret.glyphAdvance = (int) readSB(advanceBits, "glyphAdvance");
         endDumpLevel();
         return ret;
     }
