@@ -2650,6 +2650,36 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
     }
 
+    public void replaceNoFillButtonActionPerformed(ActionEvent evt) {
+        TreeItem item = tagTree.getCurrentTreeItem();
+        if (item == null) {
+            return;
+        }
+
+        if (item instanceof ShapeTag) {
+            ShapeTag st = (ShapeTag) item;
+            File selectedFile = showImportFileChooser("filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp");
+            if (selectedFile != null) {
+                File selfile = Helper.fixDialogFile(selectedFile);
+                byte[] data = Helper.readFile(selfile.getAbsolutePath());
+                try {
+                    Tag newTag = new ShapeImporter().importImage(st, data, 0, false);
+                    SWF swf = st.getSwf();
+                    if (newTag != null) {
+                        refreshTree(swf);
+                        setTagTreeSelectedNode(newTag);
+                    }
+
+                    swf.clearImageCache();
+                } catch (IOException ex) {
+                    logger.log(Level.SEVERE, "Invalid image", ex);
+                    View.showMessageDialog(null, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
+                }
+                reload(true);
+            }
+        }
+    }
+
     public void replaceAlphaButtonActionPerformed(ActionEvent evt) {
         TreeItem item = tagTree.getCurrentTreeItem();
         if (item == null) {

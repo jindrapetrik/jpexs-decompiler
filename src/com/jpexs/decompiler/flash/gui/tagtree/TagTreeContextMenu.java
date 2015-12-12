@@ -82,6 +82,8 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private JMenuItem replaceMenuItem;
 
+    private JMenuItem replaceNoFillMenuItem;
+
     private JMenuItem replaceWithTagMenuItem;
 
     private JMenuItem rawEditMenuItem;
@@ -136,6 +138,10 @@ public class TagTreeContextMenu extends JPopupMenu {
         replaceMenuItem = new JMenuItem(mainPanel.translate("button.replace"));
         replaceMenuItem.addActionListener(mainPanel::replaceButtonActionPerformed);
         add(replaceMenuItem);
+
+        replaceNoFillMenuItem = new JMenuItem(mainPanel.translate("button.replaceNoFill"));
+        replaceNoFillMenuItem.addActionListener(mainPanel::replaceNoFillButtonActionPerformed);
+        add(replaceNoFillMenuItem);
 
         replaceWithTagMenuItem = new JMenuItem(mainPanel.translate("button.replaceWithTag"));
         replaceWithTagMenuItem.addActionListener(this::replaceWithTagActionPerformed);
@@ -293,6 +299,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         undoTagMenuItem.setVisible(allSelectedIsTag);
         exportSelectionMenuItem.setEnabled(tagTree.hasExportableNodes());
         replaceMenuItem.setVisible(false);
+        replaceNoFillMenuItem.setVisible(false);
         replaceWithTagMenuItem.setVisible(false);
         rawEditMenuItem.setVisible(false);
         jumpToCharacterMenuItem.setVisible(false);
@@ -322,6 +329,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
             if (firstItem instanceof ShapeTag) {
                 replaceMenuItem.setVisible(true);
+                replaceNoFillMenuItem.setVisible(true);
             }
 
             if (firstItem instanceof DefineBinaryDataTag) {
