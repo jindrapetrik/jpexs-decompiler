@@ -27,10 +27,14 @@ import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class RandomNumberActionItem extends ActionItem {
 
     public RandomNumberActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem maximum) {
-        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY, maximum);
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY, maximum);
     }
 
     @Override

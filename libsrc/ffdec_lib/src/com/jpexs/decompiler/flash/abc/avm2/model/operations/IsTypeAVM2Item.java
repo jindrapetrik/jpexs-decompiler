@@ -28,9 +28,13 @@ import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class IsTypeAVM2Item extends BinaryOpItem {
 
-    public IsTypeAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  GraphTargetItem value, GraphTargetItem type) {
+    public IsTypeAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value, GraphTargetItem type) {
         super(instruction, lineStartIns, PRECEDENCE_RELATIONAL, value, type, "is");
     }
 

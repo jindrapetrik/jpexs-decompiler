@@ -43,6 +43,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class FunctionActionItem extends ActionItem {
 
     public List<GraphTargetItem> actions;

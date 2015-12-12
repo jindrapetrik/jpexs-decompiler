@@ -16,6 +16,10 @@
  */
 package com.jpexs.decompiler.flash.action.parser.pcode;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class ASMParsedSymbol {
 
     public int type;

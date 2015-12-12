@@ -33,6 +33,10 @@ import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import com.jpexs.decompiler.graph.model.LogicalOpItem;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class LeActionItem extends BinaryOpItem implements LogicalOpItem, Inverted {
 
     public LeActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {

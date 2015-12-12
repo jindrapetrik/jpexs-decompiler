@@ -20,12 +20,16 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class StrictModeActionItem extends ActionItem {
 
     public int mode;
 
     public StrictModeActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, int mode) {
-        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.mode = mode;
     }
 

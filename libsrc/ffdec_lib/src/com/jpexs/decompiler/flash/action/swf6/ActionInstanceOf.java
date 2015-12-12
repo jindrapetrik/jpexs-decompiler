@@ -20,11 +20,16 @@ import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.operations.InstanceOfActionItem;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
-import com.jpexs.decompiler.graph.GraphSourceItem; import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 @SWFVersion(from = 6)
 public class ActionInstanceOf extends Action {
 

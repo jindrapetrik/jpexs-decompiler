@@ -29,6 +29,10 @@ import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import com.jpexs.decompiler.graph.model.LogicalOpItem;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class StrictEqActionItem extends BinaryOpItem implements LogicalOpItem, Inverted, EqualsTypeItem {
 
     public StrictEqActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {

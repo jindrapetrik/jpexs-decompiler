@@ -29,6 +29,10 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class FSCommand2ActionItem extends ActionItem {
 
     public String target;
@@ -46,7 +50,7 @@ public class FSCommand2ActionItem extends ActionItem {
     }
 
     public FSCommand2ActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem command, List<GraphTargetItem> arguments) {
-        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.command = command;
         this.arguments = arguments;
     }

@@ -27,6 +27,10 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 @SWFVersion(from = 4)
 public class ActionAnd extends Action {
 

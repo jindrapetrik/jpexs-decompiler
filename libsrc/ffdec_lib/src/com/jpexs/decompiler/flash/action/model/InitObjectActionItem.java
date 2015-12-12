@@ -30,6 +30,10 @@ import com.jpexs.decompiler.graph.model.TernarOpItem;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class InitObjectActionItem extends ActionItem {
 
     public List<GraphTargetItem> names;
@@ -45,7 +49,7 @@ public class InitObjectActionItem extends ActionItem {
     }
 
     public InitObjectActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, List<GraphTargetItem> names, List<GraphTargetItem> values) {
-        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.values = values;
         this.names = names;
     }

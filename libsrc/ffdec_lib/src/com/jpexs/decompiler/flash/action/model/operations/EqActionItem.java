@@ -30,6 +30,10 @@ import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import com.jpexs.decompiler.graph.model.LogicalOpItem;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class EqActionItem extends BinaryOpItem implements LogicalOpItem, EqualsTypeItem {
 
     boolean version2;

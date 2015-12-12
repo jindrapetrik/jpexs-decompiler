@@ -28,6 +28,10 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class CloneSpriteActionItem extends ActionItem {
 
     public GraphTargetItem source;
@@ -46,7 +50,7 @@ public class CloneSpriteActionItem extends ActionItem {
     }
 
     public CloneSpriteActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem source, GraphTargetItem target, GraphTargetItem depth) {
-        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.source = source;
         this.target = target;
         this.depth = depth;

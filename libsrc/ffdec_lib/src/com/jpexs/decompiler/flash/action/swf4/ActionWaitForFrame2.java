@@ -38,6 +38,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+/**
+ *
+ * @author JPEXS
+ */
 @SWFVersion(from = 4)
 public class ActionWaitForFrame2 extends Action implements ActionStore {
 

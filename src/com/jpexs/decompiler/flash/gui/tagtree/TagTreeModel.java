@@ -53,6 +53,10 @@ import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class TagTreeModel implements TreeModel {
 
     public static final String FOLDER_SHAPES = "shapes";

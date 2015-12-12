@@ -30,6 +30,10 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class WithActionItem extends ActionItem {
 
     public GraphTargetItem scope;

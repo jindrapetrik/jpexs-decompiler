@@ -17,12 +17,11 @@
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -30,13 +29,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class ApplyTypeAVM2Item extends AVM2Item {
 
     public GraphTargetItem object;
 
     public List<GraphTargetItem> params;
 
-    public ApplyTypeAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  GraphTargetItem object, List<GraphTargetItem> params) {
+    public ApplyTypeAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, List<GraphTargetItem> params) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.params = params;
         this.object = object;

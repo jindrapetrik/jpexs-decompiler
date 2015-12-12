@@ -56,6 +56,10 @@ import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ *
+ * @author JPEXS
+ */
 public final class MethodBody implements Cloneable {
 
     private static final Logger logger = Logger.getLogger(MethodBody.class.getName());

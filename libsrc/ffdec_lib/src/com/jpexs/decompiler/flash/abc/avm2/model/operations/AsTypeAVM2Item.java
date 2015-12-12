@@ -26,9 +26,13 @@ import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class AsTypeAVM2Item extends BinaryOpItem {
 
-    public AsTypeAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  GraphTargetItem value, GraphTargetItem type) {
+    public AsTypeAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value, GraphTargetItem type) {
         super(instruction, lineStartIns, PRECEDENCE_RELATIONAL, value, type, "as");
     }
 

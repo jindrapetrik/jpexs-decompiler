@@ -27,6 +27,10 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.FalseItem;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class PushFalseIns extends InstructionDefinition {
 
     public PushFalseIns() {

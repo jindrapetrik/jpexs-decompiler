@@ -27,16 +27,21 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public abstract class AVM2Item extends GraphTargetItem {
 
     private AVM2Instruction instruction;
+
     private AVM2Instruction lineStartIns;
 
     public AVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, int precedence) {

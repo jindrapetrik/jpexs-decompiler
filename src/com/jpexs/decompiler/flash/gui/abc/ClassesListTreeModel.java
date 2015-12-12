@@ -32,6 +32,10 @@ import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel {
 
     private final SWF swf;

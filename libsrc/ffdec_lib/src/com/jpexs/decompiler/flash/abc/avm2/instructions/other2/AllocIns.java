@@ -24,6 +24,10 @@ import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2VerifyErrorException;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class AllocIns extends InstructionDefinition {
 
     public AllocIns() {

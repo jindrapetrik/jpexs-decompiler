@@ -31,6 +31,10 @@ import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class AddActionItem extends BinaryOpItem {
 
     boolean version2;

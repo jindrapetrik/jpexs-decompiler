@@ -29,9 +29,13 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class MultiplyAVM2Item extends BinaryOpItem {
 
-    public MultiplyAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  GraphTargetItem leftSide, GraphTargetItem rightSide) {
+    public MultiplyAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
         super(instruction, lineStartIns, PRECEDENCE_MULTIPLICATIVE, leftSide, rightSide, "*");
     }
 

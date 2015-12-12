@@ -28,6 +28,10 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class CoerceAIns extends InstructionDefinition implements CoerceOrConvertTypeIns {
 
     public CoerceAIns() {

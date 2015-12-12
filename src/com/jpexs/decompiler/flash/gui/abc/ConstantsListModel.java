@@ -22,6 +22,10 @@ import java.util.ArrayList;
 import javax.swing.ListModel;
 import javax.swing.event.ListDataListener;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class ConstantsListModel implements ListModel {
 
     private final AVM2ConstantPool constants;

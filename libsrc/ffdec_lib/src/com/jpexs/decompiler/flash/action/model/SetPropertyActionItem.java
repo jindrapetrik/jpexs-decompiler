@@ -33,12 +33,15 @@ import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class SetPropertyActionItem extends ActionItem implements SetTypeActionItem {
 
     public GraphTargetItem target;
 
     public int propertyIndex;
-    //public GraphTargetItem value;
 
     @Override
     public GraphPart getFirstPart() {

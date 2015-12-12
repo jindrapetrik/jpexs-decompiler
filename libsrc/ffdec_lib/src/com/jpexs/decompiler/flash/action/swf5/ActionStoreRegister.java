@@ -33,13 +33,18 @@ import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
+import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
-import com.jpexs.decompiler.graph.GraphSourceItem; import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 @SWFVersion(from = 5)
 public class ActionStoreRegister extends Action implements StoreTypeAction {
 

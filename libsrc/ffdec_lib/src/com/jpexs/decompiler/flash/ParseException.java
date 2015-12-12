@@ -16,6 +16,10 @@
  */
 package com.jpexs.decompiler.flash;
 
+/**
+ *
+ * @author JPEXS
+ */
 public abstract class ParseException extends Exception {
 
     public long line;

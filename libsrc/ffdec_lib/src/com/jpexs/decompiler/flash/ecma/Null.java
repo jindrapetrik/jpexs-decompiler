@@ -18,6 +18,10 @@ package com.jpexs.decompiler.flash.ecma;
 
 import java.io.Serializable;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class Null implements Serializable {
 
     public static Null INSTANCE = new Null();

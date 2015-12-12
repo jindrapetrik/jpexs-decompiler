@@ -35,6 +35,10 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class TryActionItem extends ActionItem implements Block {
 
     public List<GraphTargetItem> tryCommands;

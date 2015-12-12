@@ -32,6 +32,10 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class TellTargetActionItem extends ActionItem {
 
     public List<GraphTargetItem> commands;

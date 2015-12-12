@@ -24,6 +24,10 @@ import com.jpexs.helpers.Helper;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class ABCException implements Serializable, Cloneable {
 
     public int start;

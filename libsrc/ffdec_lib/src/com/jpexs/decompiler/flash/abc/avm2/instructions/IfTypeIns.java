@@ -21,6 +21,10 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.HashMap;
 
+/**
+ *
+ * @author JPEXS
+ */
 public interface IfTypeIns {
 
     public abstract void translateInverted(AVM2LocalData localData, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, AVM2Instruction ins);

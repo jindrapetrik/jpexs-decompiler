@@ -17,36 +17,25 @@
 package com.jpexs.decompiler.flash.abc.types.traits;
 
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.abc.ClassPath;
-import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.AlchemyTypeIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewFunctionIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrictIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetLexIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.AsTypeIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceIns;
-import com.jpexs.decompiler.flash.abc.avm2.model.InitVectorAVM2Item;
-import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.ClassInfo;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
-import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
-import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
-import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class TraitClass extends Trait implements TraitWithSlot {
 
     public int slot_id;

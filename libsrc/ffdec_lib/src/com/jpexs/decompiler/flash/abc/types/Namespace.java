@@ -21,6 +21,10 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.graph.DottedChain;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class Namespace {
 
     public static final int KIND_NAMESPACE = 8;

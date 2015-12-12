@@ -26,6 +26,10 @@ import com.jpexs.decompiler.graph.DottedChain;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class ScriptInfo {
 
     @Internal

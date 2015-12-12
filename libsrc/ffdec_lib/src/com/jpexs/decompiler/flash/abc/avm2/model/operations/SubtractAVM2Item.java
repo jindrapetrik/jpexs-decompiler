@@ -30,9 +30,13 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class SubtractAVM2Item extends BinaryOpItem {
 
-    public SubtractAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  GraphTargetItem leftSide, GraphTargetItem rightSide) {
+    public SubtractAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
         super(instruction, lineStartIns, PRECEDENCE_ADDITIVE, leftSide, rightSide, "-");
     }
 

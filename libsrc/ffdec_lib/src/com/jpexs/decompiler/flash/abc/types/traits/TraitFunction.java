@@ -29,6 +29,10 @@ import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class TraitFunction extends Trait implements TraitWithSlot {
 
     public int slot_id;
@@ -129,5 +133,4 @@ public class TraitFunction extends Trait implements TraitWithSlot {
             parseImportsUsagesFromMethodInfo(customNs, abc, method_info, imports, uses, ignorePackage, fullyQualifiedNames, new ArrayList<>());
         }
     }
-
 }

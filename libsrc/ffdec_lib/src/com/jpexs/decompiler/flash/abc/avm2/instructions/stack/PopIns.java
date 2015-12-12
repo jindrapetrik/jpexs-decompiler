@@ -27,6 +27,10 @@ import com.jpexs.decompiler.graph.MarkItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class PopIns extends InstructionDefinition {
 
     public PopIns() {

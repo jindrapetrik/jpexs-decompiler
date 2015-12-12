@@ -22,6 +22,10 @@ import java.util.List;
 import javax.swing.ComboBoxModel;
 import javax.swing.event.ListDataListener;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class ABCComboBoxModel implements ComboBoxModel<ABCContainerTag> {
 
     public List<ABCContainerTag> list;

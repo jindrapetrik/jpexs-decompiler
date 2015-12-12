@@ -136,6 +136,10 @@ import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class ASMParser {
 
     private static final Logger logger = Logger.getLogger(ASMParser.class.getName());

@@ -19,6 +19,10 @@ package com.jpexs.decompiler.flash.action.swf4;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import java.io.Serializable;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class RegisterNumber implements Serializable {
 
     public final int number;

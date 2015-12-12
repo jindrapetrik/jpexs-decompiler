@@ -23,6 +23,10 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class ImplementsOpActionItem extends ActionItem {
 
     public GraphTargetItem subclass;
@@ -30,7 +34,7 @@ public class ImplementsOpActionItem extends ActionItem {
     public List<GraphTargetItem> superclasses;
 
     public ImplementsOpActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem subclass, List<GraphTargetItem> superclasses) {
-        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.subclass = subclass;
         this.superclasses = superclasses;
     }

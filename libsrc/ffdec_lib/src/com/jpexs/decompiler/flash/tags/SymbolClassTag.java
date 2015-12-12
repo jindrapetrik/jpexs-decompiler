@@ -30,6 +30,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 @SWFVersion(from = 9)
 public class SymbolClassTag extends SymbolClassTypeTag {
 

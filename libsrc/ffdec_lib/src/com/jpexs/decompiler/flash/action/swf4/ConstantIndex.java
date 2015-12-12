@@ -20,6 +20,10 @@ import com.jpexs.helpers.Helper;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class ConstantIndex implements Serializable {
 
     public int index;

@@ -93,6 +93,10 @@ import jsyntaxpane.Token;
 import jsyntaxpane.TokenType;
 import jsyntaxpane.actions.ActionUtils;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class ActionPanel extends JPanel implements SearchListener<ActionSearchResult>, TagEditorPanel {
 
     private static final Logger logger = Logger.getLogger(ActionPanel.class.getName());

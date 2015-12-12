@@ -28,9 +28,12 @@ import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class StringExtractActionItem extends ActionItem {
 
-    //public GraphTargetItem value;
     public GraphTargetItem index;
 
     public GraphTargetItem count;

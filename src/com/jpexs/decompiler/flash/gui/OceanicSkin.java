@@ -35,6 +35,10 @@ import org.pushingpixels.substance.api.painter.highlight.ClassicHighlightPainter
 import org.pushingpixels.substance.api.painter.overlay.BottomLineOverlayPainter;
 import org.pushingpixels.substance.api.shaper.ClassicButtonShaper;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class OceanicSkin extends SubstanceSkin {
 
     /**

@@ -103,6 +103,8 @@ import java.util.logging.Logger;
 
 /**
  * Represents one ACTIONRECORD, also has some static method to work with Actions
+ *
+ * @author JPEXS
  */
 public abstract class Action implements GraphSourceItem {
 

@@ -32,11 +32,14 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 import java.util.Set;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class StoreRegisterActionItem extends ActionItem implements SetTypeActionItem {
 
     public RegisterNumber register;
 
-    //public GraphTargetItem value;
     public boolean define = false;
 
     public boolean temporary = false;

@@ -16,18 +16,22 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
-import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
-import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class FindDefAVM2Item extends AVM2Item {
 
     public Multiname propertyName;
 
-    public FindDefAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  Multiname propertyName) {
+    public FindDefAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, Multiname propertyName) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.propertyName = propertyName;
     }

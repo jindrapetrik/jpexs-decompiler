@@ -30,8 +30,8 @@ import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
-import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.helpers.Helper;
@@ -42,6 +42,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+/**
+ *
+ * @author JPEXS
+ */
 @SWFVersion(from = 7)
 public class ActionTry extends Action implements GraphSourceItemContainer {
 

@@ -44,6 +44,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class ASM3Parser {
 
     private static class OffsetItem {

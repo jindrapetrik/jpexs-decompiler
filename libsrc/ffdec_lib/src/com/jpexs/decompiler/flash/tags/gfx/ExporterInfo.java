@@ -26,7 +26,6 @@ import java.util.List;
 
 /**
  *
- *
  * @author JPEXS
  */
 public class ExporterInfo extends Tag {

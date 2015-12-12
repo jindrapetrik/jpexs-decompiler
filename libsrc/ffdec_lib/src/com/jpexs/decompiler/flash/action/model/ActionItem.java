@@ -30,6 +30,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public abstract class ActionItem extends GraphTargetItem implements Serializable {
 
     public ActionItem() {

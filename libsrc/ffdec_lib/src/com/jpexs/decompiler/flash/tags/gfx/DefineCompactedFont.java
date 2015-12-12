@@ -46,7 +46,6 @@ import java.util.List;
 
 /**
  *
- *
  * @author JPEXS
  */
 public final class DefineCompactedFont extends FontTag {

@@ -28,6 +28,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class IfItem extends GraphTargetItem implements Block {
 
     public GraphTargetItem expression;

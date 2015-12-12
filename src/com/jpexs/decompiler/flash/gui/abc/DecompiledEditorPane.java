@@ -54,6 +54,10 @@ import jsyntaxpane.SyntaxDocument;
 import jsyntaxpane.Token;
 import jsyntaxpane.TokenType;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class DecompiledEditorPane extends DebuggableEditorPane implements CaretListener {
 
     private List<Highlighting> highlights = new ArrayList<>();

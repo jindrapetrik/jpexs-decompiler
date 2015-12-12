@@ -30,6 +30,10 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class ConvertDIns extends InstructionDefinition implements CoerceOrConvertTypeIns {
 
     public ConvertDIns() {

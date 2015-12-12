@@ -24,6 +24,10 @@ import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 
+/**
+ *
+ * @author JPEXS
+ */
 @SWFVersion(from = 3)
 public class FrameLabelTag extends Tag {
 

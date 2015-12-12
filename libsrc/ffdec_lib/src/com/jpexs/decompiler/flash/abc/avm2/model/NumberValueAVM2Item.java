@@ -16,10 +16,13 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
-import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.SimpleValue;
 
+/**
+ *
+ * @author JPEXS
+ */
 public abstract class NumberValueAVM2Item extends AVM2Item implements SimpleValue {
 
     public NumberValueAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns) {

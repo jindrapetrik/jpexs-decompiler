@@ -46,6 +46,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
+/**
+ *
+ * @author JPEXS
+ */
 public abstract class InstructionDefinition implements Serializable {
 
     public static final long serialVersionUID = 1L;

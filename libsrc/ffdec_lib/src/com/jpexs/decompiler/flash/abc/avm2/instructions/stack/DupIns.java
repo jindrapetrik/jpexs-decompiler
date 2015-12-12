@@ -27,6 +27,10 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class DupIns extends InstructionDefinition {
 
     public DupIns() {

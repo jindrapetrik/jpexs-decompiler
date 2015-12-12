@@ -25,6 +25,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class Multiname {
 
     public static final int QNAME = 7;
