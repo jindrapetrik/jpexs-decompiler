@@ -31,12 +31,35 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
+import com.jpexs.decompiler.flash.types.FILLSTYLE;
+import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
+import com.jpexs.decompiler.flash.types.LINESTYLE;
+import com.jpexs.decompiler.flash.types.LINESTYLE2;
+import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
 import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.RGB;
+import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
+import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
+import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
+import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
+import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  *
@@ -116,6 +139,132 @@ public class ShapeImporter {
         SHAPEWITHSTYLE shapes = imageTag.getShape(rect, fill);
         st.shapes = shapes;
         return (Tag) st;
+    }
+
+    public Tag importSvg(ShapeTag st, String svgXml) {
+        SWF swf = st.getSwf();
+
+        SHAPEWITHSTYLE shapes = new SHAPEWITHSTYLE();
+        shapes.fillStyles = new FILLSTYLEARRAY();
+        shapes.lineStyles = new LINESTYLEARRAY();
+
+        int shapeNum = st.getShapeNum();
+        shapes.fillStyles.fillStyles = new FILLSTYLE[1];
+        shapes.fillStyles.fillStyles[0] = new FILLSTYLE();
+        shapes.fillStyles.fillStyles[0].color = shapeNum >= 3 ? new RGBA(0, 255, 0, 255) : new RGB(0, 255, 0);
+        shapes.fillStyles.fillStyles[0].fillStyleType = FILLSTYLE.SOLID;
+        shapes.lineStyles.lineStyles = new LINESTYLE[1];
+        shapes.lineStyles.lineStyles[0] = shapeNum <= 3 ? new LINESTYLE() : new LINESTYLE2();
+        shapes.lineStyles.lineStyles[0].color = shapeNum >= 3 ? new RGBA(255, 0, 0, 255) : new RGB(255, 0, 0);
+        shapes.lineStyles.lineStyles[0].width = (int) SWF.unitDivisor;
+
+        shapes.shapeRecords = new ArrayList<>();
+
+        try {
+            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+            Document doc = docBuilder.parse(new InputSource(new StringReader(svgXml)));
+            Element rootElement = doc.getDocumentElement();
+
+            if (!"svg".equals(rootElement.getTagName())) {
+                throw new IOException("SVG root element should be 'svg'");
+            }
+
+            processSvgObject(shapes, rootElement);
+
+        } catch (SAXException | IOException | ParserConfigurationException ex) {
+            Logger.getLogger(ShapeImporter.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        shapes.shapeRecords.add(new EndShapeRecord());
+
+        st.shapes = shapes;
+        st.setModified(true);
+
+        return (Tag) st;
+    }
+
+    private void processSvgObject(SHAPEWITHSTYLE shapes, Element element) {
+        for (int i = 0; i < element.getChildNodes().getLength(); i++) {
+            Node childNode = element.getChildNodes().item(i);
+            if (childNode instanceof Element) {
+                Element childElement = (Element) childNode;
+                String tagName = childElement.getTagName();
+                if ("g".equals(tagName)) {
+                    processSvgObject(shapes, childElement);
+                } else if ("path".equals(tagName)) {
+                    processPath(shapes, childElement);
+                }
+            }
+        }
+    }
+
+    private void processPath(SHAPEWITHSTYLE shapes, Element childElement) {
+        String data = childElement.getAttribute("d");
+        if (data == null) {
+            return;
+        }
+
+        char command = 0;
+        String[] parts = data.split(" ");
+        double x0 = 0;
+        double y0 = 0;
+        for (int i = 0; i < parts.length; i += 2) {
+            String part = parts[i];
+            if (part.length() == 0) {
+                continue;
+            }
+
+            char ch = part.charAt(0);
+            if (ch == 'M' || ch == 'L' || ch == 'Q') {
+                command = ch;
+                part = part.substring(1);
+            }
+
+            double x = Double.parseDouble(part);
+
+            part = parts[i + 1];
+            double y = Double.parseDouble(part);
+
+            switch (command) {
+                case 'M':
+                    StyleChangeRecord scr = new StyleChangeRecord();
+                    scr.moveDeltaX = (int) ((x - x0) * SWF.unitDivisor);
+                    scr.moveDeltaY = (int) ((y - y0) * SWF.unitDivisor);
+                    scr.stateMoveTo = true;
+                    scr.stateFillStyle0 = true;
+                    scr.stateLineStyle = true;
+                    scr.fillStyle0 = 1;
+                    scr.lineStyle = 1;
+                    shapes.shapeRecords.add(scr);
+                    break;
+                case 'L':
+                    StraightEdgeRecord ser = new StraightEdgeRecord();
+                    ser.deltaX = (int) ((x - x0) * SWF.unitDivisor);
+                    ser.deltaY = (int) ((y - y0) * SWF.unitDivisor);
+                    ser.generalLineFlag = true;
+                    shapes.shapeRecords.add(ser);
+                    break;
+                case 'Q':
+                    CurvedEdgeRecord cer = new CurvedEdgeRecord();
+                    cer.controlDeltaX = (int) ((x - x0) * SWF.unitDivisor);
+                    cer.controlDeltaY = (int) ((y - y0) * SWF.unitDivisor);
+                    x0 = x;
+                    y0 = y;
+                    part = parts[i + 2];
+                    x = Double.parseDouble(part);
+                    part = parts[i + 3];
+                    y = Double.parseDouble(part);
+                    i += 2;
+                    cer.anchorDeltaX = (int) ((x - x0) * SWF.unitDivisor);
+                    cer.anchorDeltaY = (int) ((y - y0) * SWF.unitDivisor);
+                    shapes.shapeRecords.add(cer);
+                    break;
+            }
+
+            x0 = x;
+            y0 = y;
+        }
     }
 
     public static int getShapeTagType(String format) {
