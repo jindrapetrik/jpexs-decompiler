@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.abc;
 
-import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.graph.DottedChain;
 import java.util.Objects;
 

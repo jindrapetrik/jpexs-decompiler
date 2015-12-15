@@ -2059,11 +2059,19 @@ public class CommandLineArgumentParser {
                                         if (args.isEmpty()) {
                                             badArguments("replace");
                                         }
+
                                         int bodyIndex = Integer.parseInt(args.pop());
+                                        ABC abc = pack.abc;
+                                        List<Trait> resultTraits = abc.getMethodIndexing().findMethodTraits(pack, bodyIndex);
+
                                         //int classIndex = 0;
                                         //int traitId = 0;
                                         Trait trait = null; //abc.findTraitByTraitId(classIndex, traitId);
-                                        replaceAS3PCode(repText, pack.abc, bodyIndex, trait);
+                                        if (resultTraits.size() == 1) {
+                                            trait = resultTraits.get(0);
+                                        }
+
+                                        replaceAS3PCode(repText, abc, bodyIndex, trait);
                                     }
                                 }
                             }

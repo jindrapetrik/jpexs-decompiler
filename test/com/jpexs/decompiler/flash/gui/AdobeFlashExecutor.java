@@ -357,7 +357,7 @@ public class AdobeFlashExecutor {
     private int addMethod(ABC abc, int classId, String name, boolean isStatic, AVM2Code code) {
         TraitMethodGetterSetter methodTrait = abc.addMethod(classId, name, isStatic);
         MethodInfo methodInfo = abc.method_info.get(methodTrait.method_info);
-        MethodBody methodBody = methodInfo.getBody();
+        MethodBody methodBody = abc.findBody(methodInfo);
         methodBody.max_stack = 10;
         methodBody.max_regs = 10;
         methodBody.init_scope_depth = 3;

@@ -1674,7 +1674,6 @@ public class AVM2SourceGenerator implements SourceGenerator {
             List<GraphSourceItem> src = body == null ? new ArrayList<>() : generate(localData, body);
 
             mbody.method_info = abcIndex.getSelectedAbc().addMethodInfo(mi);
-            mi.setBody(mbody);
             ArrayList<AVM2Instruction> mbodyCode = toInsList(src);
             mbody.setCode(new AVM2Code(mbodyCode));
 
