@@ -2524,7 +2524,7 @@ public class ActionScript3Parser {
                 abc.class_info = originalAbc.class_info;
                 abc.script_info = originalAbc.script_info;
                 abc.bodies = originalAbc.bodies;
-                abc.createBodyIdxFromMethodIdxMap();
+                abc.getMethodIndexing();
             }
         }
     }

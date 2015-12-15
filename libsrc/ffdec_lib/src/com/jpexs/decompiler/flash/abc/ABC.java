@@ -97,7 +97,7 @@ public class ABC {
 
     public List<MethodBody> bodies = new ArrayList<>();
 
-    private Map<Integer, Integer> bodyIdxFromMethodIdx;
+    private ABCMethodIndexing abcMethodIndexing;
 
     public static final int MINORwithDECIMAL = 17;
 
@@ -128,7 +128,7 @@ public class ABC {
 
     public int addMethodBody(MethodBody body) {
         bodies.add(body);
-        bodyIdxFromMethodIdx = null;
+        abcMethodIndexing = null;
         return bodies.size() - 1;
     }
 
@@ -149,7 +149,6 @@ public class ABC {
         MethodBody methodBody = new MethodBody();
         methodBody.method_info = methodInfoId;
         addMethodBody(methodBody);
-        methodInfo.setBody(methodBody);
 
         TraitMethodGetterSetter trait = new TraitMethodGetterSetter();
         trait.name_index = multinameId;
@@ -566,13 +565,12 @@ public class ABC {
             }
             mb.traits = ais.readTraits("traits");
             bodies.add(mb);
-            method_info.get(mb.method_info).setBody(mb);
             ais.endDumpLevel();
 
             SWFDecompilerPlugin.fireMethodBodyParsed(mb, swf);
         }
 
-        createBodyIdxFromMethodIdxMap();
+        getMethodIndexing();
 
         /*for(int i=0;i<script_count;i++){
          MethodBody bod=bodies.get(bodyIdxFromMethodIdx.get(script_info.get(i).init_index));
@@ -690,24 +688,20 @@ public class ABC {
         }
     }
 
+    public MethodBody findBody(MethodInfo methodInfo) {
+        return getMethodIndexing().findMethodBody(methodInfo);
+    }
+
     public MethodBody findBody(int methodInfo) {
-        if (methodInfo < 0) {
-            return null;
-        }
-        return method_info.get(methodInfo).getBody();
+        return getMethodIndexing().findMethodBody(methodInfo);
+    }
+
+    public int findBodyIndex(MethodInfo methodInfo) {
+        return getMethodIndexing().findMethodBodyIndex(methodInfo);
     }
 
     public int findBodyIndex(int methodInfo) {
-        if (methodInfo == -1) {
-            return -1;
-        }
-
-        Integer result = getBodyIdxFromMethodIdx().get(methodInfo);
-        if (result == null) {
-            return -1;
-        }
-
-        return result;
+        return getMethodIndexing().findMethodBodyIndex(methodInfo);
     }
 
     public MethodBody findBodyByClassAndName(String className, String methodName) {
@@ -839,21 +833,12 @@ public class ABC {
         return deobfuscation;
     }
 
-    public final void createBodyIdxFromMethodIdxMap() {
-        Map<Integer, Integer> map = new HashMap<>(bodies.size());
-        for (int i = 0; i < bodies.size(); i++) {
-            MethodBody mb = bodies.get(i);
-            map.put(mb.method_info, i);
+    public final ABCMethodIndexing getMethodIndexing() {
+        if (abcMethodIndexing == null) {
+            abcMethodIndexing = new ABCMethodIndexing(this);
         }
 
-        bodyIdxFromMethodIdx = map;
-    }
-
-    private Map<Integer, Integer> getBodyIdxFromMethodIdx() {
-        if (bodyIdxFromMethodIdx == null) {
-            createBodyIdxFromMethodIdxMap();
-        }
-        return bodyIdxFromMethodIdx;
+        return abcMethodIndexing;
     }
 
     public DottedChain nsValueToName(String valueStr) {
@@ -1234,7 +1219,7 @@ public class ABC {
             removeMethodFromTraits(si.traits, index);
         }
 
-        bodyIdxFromMethodIdx = null;
+        abcMethodIndexing = null;
 
         method_info.remove(index);
     }
@@ -1302,6 +1287,6 @@ public class ABC {
             }
         }
 
-        createBodyIdxFromMethodIdxMap();
+        getMethodIndexing();
     }
 }
