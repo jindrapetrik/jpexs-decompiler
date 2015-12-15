@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.debugger.flash.Variable;
 import com.jpexs.debugger.flash.VariableType;
-import com.jpexs.debugger.flash.messages.in.InFrame;
 import com.jpexs.debugger.flash.messages.in.InGetVariable;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -42,9 +41,6 @@ import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.abc.usages.MultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.TraitMultinameUsage;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
-import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
-import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
-import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScriptLexer;
 import com.jpexs.decompiler.flash.action.parser.script.ParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.script.SymbolType;
@@ -120,12 +116,10 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.EventListenerList;
-import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 import javax.swing.text.Highlighter;
 import javax.swing.tree.TreePath;
 import jsyntaxpane.SyntaxDocument;
@@ -290,13 +284,17 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         public List<VariableNode> path = new ArrayList<>();
 
         public Long parentId;
+
         public int level;
 
         public Variable thisVar;
+
         public Variable thisTrait;
+
         public long thisTraitId;
 
         private List<Variable> childs;
+
         private List<Variable> childTraits;
 
         @Override
@@ -420,7 +418,6 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
             loaded = true;
         }
-
     }
 
     public static class VariablesTableModel implements MyTreeTableModel {
@@ -428,13 +425,17 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         List<TableModelListener> tableListeners = new ArrayList<>();
 
         VariableNode root;
+
         private Map<VariableNode, List<VariableNode>> nodeCache = new HashMap<>();
 
         protected EventListenerList listenerList = new EventListenerList();
 
         private static final int CHANGED = 0;
+
         private static final int INSERTED = 1;
+
         private static final int REMOVED = 2;
+
         private static final int STRUCTURE_CHANGED = 3;
 
         private MyTreeTable ttable;
@@ -1251,7 +1252,6 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
                 traits.traits = new ArrayList<>();
                 body.traits = traits;
                 abc.addMethodBody(body);
-                mi.setBody(body);
                 t = tm;
                 break;
             case Trait.TRAIT_SLOT:
