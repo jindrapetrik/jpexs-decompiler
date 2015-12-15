@@ -66,3 +66,6 @@ hs_err_pid*.log
 /libsrc/Plugins/nbproject/private/
 /libsrc/Plugins/build/
 /libsrc/Plugins/dist/
+/libsrc/treetable/nbproject/private/
+/libsrc/treetable/build/
+/libsrc/treetable/dist/

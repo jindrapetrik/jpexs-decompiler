@@ -21,6 +21,11 @@ import com.jpexs.debugger.flash.messages.in.InBreakAtExt;
 import com.jpexs.debugger.flash.messages.in.InFrame;
 import com.jpexs.decompiler.flash.gui.DebuggerHandler.BreakListener;
 import com.jpexs.decompiler.flash.gui.abc.ABCPanel;
+import de.hameister.treetable.MyAbstractTreeTableModel;
+import de.hameister.treetable.MyTreeTable;
+import de.hameister.treetable.MyTreeTableModel;
+import de.hameister.treetable.MyTreeTableModelAdapter;
+import de.hameister.treetable.MyTreeTableSelectionModel;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -43,7 +48,15 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
+import javax.swing.plaf.basic.BasicTableUI;
+import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 
 /**
  *
@@ -51,11 +64,11 @@ import javax.swing.table.DefaultTableModel;
  */
 public class DebugPanel extends JPanel {
 
-    private JTable debugRegistersTable;
+    private MyTreeTable debugRegistersTable;
 
-    private JTable debugLocalsTable;
+    private MyTreeTable debugLocalsTable; //JTable debugLocalsTable;
 
-    private JTable debugScopeTable;
+    private MyTreeTable debugScopeTable;
 
     private JTable callStackTable;
 
@@ -88,10 +101,34 @@ public class DebugPanel extends JPanel {
 
     private SelectedTab selectedTab = null;
 
+    private void safeSetTreeModel(MyTreeTable tt, MyTreeTableModel tmodel) {
+        List<List<String>> expanded = View.getExpandedNodes(tt.getTree());
+
+        int selRows[] = tt.getSelectedRows();
+
+        TreePath selPaths[] = new TreePath[selRows.length];
+        for (int i = 0; i < selRows.length; i++) {
+            selPaths[i] = tt.getTree().getPathForRow(selRows[i]);
+        }
+        tt.setTreeModel(tmodel);
+        //tt.getTree().setRootVisible(false);
+
+        View.expandTreeNodes(tt.getTree(), expanded);
+        for (int i = 0; i < selRows.length; i++) {
+            selRows[i] = tt.getTree().getRowForPath(selPaths[i]);
+            if (i == 0) {
+                tt.setRowSelectionInterval(selRows[i], selRows[i]);
+            } else {
+                tt.addRowSelectionInterval(selRows[i], selRows[i]);
+            }
+        }
+
+    }
+
     public DebugPanel() {
         super(new BorderLayout());
-        debugRegistersTable = new JTable(new ABCPanel.VariablesTableModel(new ArrayList<>(), new ArrayList<>()));
-        debugLocalsTable = new JTable(new ABCPanel.VariablesTableModel(new ArrayList<>(), new ArrayList<>()));
+        debugRegistersTable = new MyTreeTable(new ABCPanel.VariablesTableModel(debugRegistersTable, new ArrayList<>(), new ArrayList<>()));
+        debugLocalsTable = new MyTreeTable(new ABCPanel.VariablesTableModel(debugLocalsTable, new ArrayList<>(), new ArrayList<>()));
 
         //Add watch feature, commented out. I tried it, but without success. I can't add watch in Flash Pro or FDB either. :-(
         /*
@@ -161,7 +198,7 @@ public class DebugPanel extends JPanel {
          debugScopeTable.addMouseListener(watchHandler);
 
          */
-        debugScopeTable = new JTable(new ABCPanel.VariablesTableModel(new ArrayList<>(), new ArrayList<>()));
+        debugScopeTable = new MyTreeTable(new ABCPanel.VariablesTableModel(debugScopeTable, new ArrayList<>(), new ArrayList<>()));
 
         callStackTable = new JTable();
         stackTable = new JTable();
@@ -271,21 +308,56 @@ public class DebugPanel extends JPanel {
                         for (int i = 0; i < f.registers.size(); i++) {
                             regVarIds.add(0L);
                         }
-                        debugRegistersTable.setModel(new ABCPanel.VariablesTableModel(f.registers, regVarIds));
+                        safeSetTreeModel(debugRegistersTable, new ABCPanel.VariablesTableModel(debugRegistersTable, f.registers, regVarIds));
                         List<Variable> locals = new ArrayList<>();
                         locals.addAll(f.arguments);
                         locals.addAll(f.variables);
 
                         List<Long> localIds = new ArrayList<>();
-                        localIds.addAll(f.argumentIds);
-                        localIds.addAll(f.variableIds);
+                        localIds.addAll(f.argumentFrameIds);
+                        localIds.addAll(f.frameIds);
 
-                        debugLocalsTable.setModel(new ABCPanel.VariablesTableModel(locals, localIds));
-                        debugScopeTable.setModel(new ABCPanel.VariablesTableModel(f.scopeChain, f.scopeChainIds));
+                        safeSetTreeModel(debugLocalsTable, new ABCPanel.VariablesTableModel(debugLocalsTable, locals, localIds));
+                        safeSetTreeModel(debugScopeTable, new ABCPanel.VariablesTableModel(debugScopeTable, f.scopeChain, f.scopeChainFrameIds));
+
+                        /*TableModelListener refreshListener = new TableModelListener() {
+                            @Override
+                            public void tableChanged(TableModelEvent e) {
+                                Main.getDebugHandler().refreshFrame();
+                                refresh();
+                            }
+                        };*/
+                        TreeModelListener refreshListener = new TreeModelListener() {
+                            @Override
+                            public void treeNodesChanged(TreeModelEvent e) {
+                                Main.getDebugHandler().refreshFrame();
+                                refresh();
+                            }
+
+                            @Override
+                            public void treeNodesInserted(TreeModelEvent e) {
+                                Main.getDebugHandler().refreshFrame();
+                                refresh();
+                            }
+
+                            @Override
+                            public void treeNodesRemoved(TreeModelEvent e) {
+                                Main.getDebugHandler().refreshFrame();
+                                refresh();
+                            }
+
+                            @Override
+                            public void treeStructureChanged(TreeModelEvent e) {
+                                Main.getDebugHandler().refreshFrame();
+                                refresh();
+                            }
+                        };
+                        debugLocalsTable.getTreeTableModel().addTreeModelListener(refreshListener);
+                        debugScopeTable.getTreeTableModel().addTreeModelListener(refreshListener);
                     } else {
-                        debugRegistersTable.setModel(new DefaultTableModel());
-                        debugLocalsTable.setModel(new DefaultTableModel());
-                        debugScopeTable.setModel(new DefaultTableModel());
+                        debugRegistersTable.setTreeModel(new ABCPanel.VariablesTableModel(debugRegistersTable, new ArrayList<>(), new ArrayList<>()));
+                        debugLocalsTable.setTreeModel(new ABCPanel.VariablesTableModel(debugLocalsTable, new ArrayList<>(), new ArrayList<>()));
+                        debugScopeTable.setTreeModel(new ABCPanel.VariablesTableModel(debugScopeTable, new ArrayList<>(), new ArrayList<>()));
                     }
                     InBreakAtExt info = Main.getDebugHandler().getBreakInfo();
                     if (info != null) {
@@ -325,13 +397,13 @@ public class DebugPanel extends JPanel {
                     varTabs.removeAll();
                     tabTypes.clear();
                     JPanel pa;
-                    if (debugRegistersTable.getRowCount() > 0) {
+                    if (debugRegistersTable.getRowCount() > 1 /*root*/) {
                         tabTypes.add(SelectedTab.REGISTERS);
                         pa = new JPanel(new BorderLayout());
                         pa.add(new JScrollPane(debugRegistersTable), BorderLayout.CENTER);
                         varTabs.addTab(AppStrings.translate("variables.header.registers"), pa);
                     }
-                    if (debugLocalsTable.getRowCount() > 0) {
+                    if (debugLocalsTable.getRowCount() > 1 /*root*/) {
                         tabTypes.add(SelectedTab.LOCALS);
 
                         pa = new JPanel(new BorderLayout());
@@ -339,7 +411,7 @@ public class DebugPanel extends JPanel {
                         varTabs.addTab(AppStrings.translate("variables.header.locals"), pa);
                     }
 
-                    if (debugScopeTable.getRowCount() > 0) {
+                    if (debugScopeTable.getRowCount() > 1 /*root*/) {
                         tabTypes.add(SelectedTab.SCOPECHAIN);
 
                         pa = new JPanel(new BorderLayout());

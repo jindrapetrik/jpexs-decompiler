@@ -519,6 +519,10 @@ public class Main {
         loadFromMemoryFrame.setVisible(true);
     }
 
+    public static void setVariable(long parentId, String varName, int valueType, Object value) {
+        getDebugHandler().setVariable(parentId, varName, valueType, value);
+    }
+
     public static void setSubLimiter(boolean value) {
         if (value) {
             AVM2Code.toSourceLimit = Configuration.sublimiter.get();
@@ -1394,7 +1398,9 @@ public class Main {
 
                 @Override
                 public void disconnected() {
-                    Main.mainFrame.getPanel().refreshBreakPoints();
+                    if (Main.mainFrame != null && Main.mainFrame.getPanel() != null) {
+                        Main.mainFrame.getPanel().refreshBreakPoints();
+                    }
                 }
             });
             flashDebugger.addConnectionListener(debugHandler);

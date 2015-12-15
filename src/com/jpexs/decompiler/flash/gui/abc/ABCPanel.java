@@ -17,6 +17,9 @@
 package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.debugger.flash.Variable;
+import com.jpexs.debugger.flash.VariableType;
+import com.jpexs.debugger.flash.messages.in.InFrame;
+import com.jpexs.debugger.flash.messages.in.InGetVariable;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ClassPath;
@@ -38,6 +41,13 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.abc.usages.MultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.TraitMultinameUsage;
+import com.jpexs.decompiler.flash.action.parser.ActionParseException;
+import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
+import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
+import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
+import com.jpexs.decompiler.flash.action.parser.script.ActionScriptLexer;
+import com.jpexs.decompiler.flash.action.parser.script.ParsedSymbol;
+import com.jpexs.decompiler.flash.action.parser.script.SymbolType;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppDialog;
 import com.jpexs.decompiler.flash.gui.AppStrings;
@@ -66,6 +76,9 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.helpers.CancellableWorker;
+import com.jpexs.helpers.Helper;
+import de.hameister.treetable.MyTreeTable;
+import de.hameister.treetable.MyTreeTableModel;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.FlowLayout;
@@ -82,8 +95,13 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -101,7 +119,11 @@ import javax.swing.JTable;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
+import javax.swing.event.EventListenerList;
+import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.text.Highlighter;
@@ -263,30 +285,167 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         decompiledTextArea.clearScript();
     }
 
-    public static class VariablesTableModel implements TableModel {
+    public static class VariableNode {
 
-        // DebuggerHandler.VariableChangedListener varChangeListener;
-        List<TableModelListener> tableListeners = new ArrayList<>();
+        public List<VariableNode> path = new ArrayList<>();
 
-        private List<Variable> vars;
-        private List<Long> varIds;
+        public Long parentId;
+        public int level;
 
-        public List<Long> getVarIds() {
-            return varIds;
-        }
+        public Variable thisVar;
+        public Variable thisTrait;
+        public long thisTraitId;
 
-        public List<Variable> getVars() {
-            return new ArrayList<>(vars);
-        }
+        private List<Variable> childs;
+        private List<Variable> childTraits;
 
-        public VariablesTableModel(List<Variable> vars, List<Long> varIds) {
-            this.vars = vars;
-            this.varIds = varIds;
+        @Override
+        public int hashCode() {
+            int hash = 3;
+            hash = 53 * hash + Objects.hashCode(this.parentId);
+            hash = 53 * hash + (this.thisVar == null ? 0 : Objects.hashCode(this.thisVar.name));
+            return hash;
         }
 
         @Override
-        public int getRowCount() {
-            return vars.size();
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final VariableNode other = (VariableNode) obj;
+            if (!Objects.equals(this.parentId, other.parentId)) {
+                return false;
+            }
+            if (this.thisVar == null && other.thisVar == null) {
+                return true;
+            }
+            if (this.thisVar == null) {
+                return false;
+            }
+            if (other.thisVar == null) {
+                return false;
+            }
+            return Objects.equals(this.thisVar.name, other.thisVar.name);
+        }
+
+        public boolean loaded = false;
+
+        private static boolean isTraits(Variable v) {
+            return (v.vType == VariableType.UNKNOWN && "traits".equals(v.typeName));
+        }
+
+        @Override
+        public String toString() {
+            if (level == 0) {
+                return "root"; //TODO: localize?
+            }
+            return thisVar.name;
+        }
+
+        private void refresh() {
+            if (path.size() > 1) {
+                path.get(path.size() - 2).reloadChildren();
+            } else {
+                //Main.getDebugHandler().refreshFrame();
+                //InFrame fr = Main.getDebugHandler().getFrame();
+            }
+        }
+
+        private void reloadChildren() {
+            InGetVariable igv = Main.getDebugHandler().getVariable(parentId, thisVar.name, true);
+            childs = new ArrayList<>();
+            childTraits = new ArrayList<>();
+
+            Variable curTrait = null;
+
+            for (int i = 0; i < igv.childs.size(); i++) {
+                if (!isTraits(igv.childs.get(i))) {
+                    childs.add(igv.childs.get(i));
+                    childTraits.add(curTrait);
+                } else {
+                    curTrait = igv.childs.get(i);
+                }
+            }
+        }
+
+        private void ensureLoaded() {
+            if (!loaded) {
+                reloadChildren();
+                loaded = true;
+            }
+        }
+
+        public VariableNode getChildAt(int index) {
+            ensureLoaded();
+            Long parId = 0L;
+            if (thisVar != null && thisVar.vType == VariableType.OBJECT) {
+                parId = (Long) thisVar.value;
+            }
+            VariableNode vn = new VariableNode(level + 1, childs.get(index), parId, childTraits.get(index));
+            vn.path.addAll(path);
+            vn.path.add(vn);
+            return vn;
+        }
+
+        public int getChildCount() {
+            ensureLoaded();
+            return childs.size();
+        }
+
+        public VariableNode(int level, Variable thisVar, Long parentId, Variable thisTrait) {
+            this.parentId = parentId;
+            this.thisVar = thisVar;
+            this.level = level;
+            this.thisTrait = thisTrait;
+        }
+
+        public VariableNode(int level, Variable thisVar, Long parentId, Variable thisTrait, Long thisTraitId, List<Variable> vars, List<Variable> varTraits) {
+            this.parentId = parentId;
+
+            this.thisVar = thisVar;
+
+            this.level = level;
+            this.childs = vars;
+
+            this.thisTrait = thisTrait;
+
+            this.childTraits = varTraits;
+            this.path.add(this);
+
+            loaded = true;
+        }
+
+    }
+
+    public static class VariablesTableModel implements MyTreeTableModel {
+
+        List<TableModelListener> tableListeners = new ArrayList<>();
+
+        VariableNode root;
+        private Map<VariableNode, List<VariableNode>> nodeCache = new HashMap<>();
+
+        protected EventListenerList listenerList = new EventListenerList();
+
+        private static final int CHANGED = 0;
+        private static final int INSERTED = 1;
+        private static final int REMOVED = 2;
+        private static final int STRUCTURE_CHANGED = 3;
+
+        private MyTreeTable ttable;
+
+        public VariablesTableModel(MyTreeTable ttable, List<Variable> vars, List<Long> parentIds) {
+            this.ttable = ttable;
+            List<Variable> varTraits = new ArrayList<>();
+            for (int i = 0; i < vars.size(); i++) {
+                varTraits.add(null);
+            }
+            root = new VariableNode(0, null, 0L, null, 0L, vars, varTraits);
         }
 
         @Override
@@ -310,17 +469,21 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
         @Override
         public Class<?> getColumnClass(int columnIndex) {
+            if (columnIndex == 0) {
+                return MyTreeTableModel.class;
+            }
             return String.class;
         }
 
         @Override
-        public boolean isCellEditable(int rowIndex, int columnIndex) {
-            return false; //columnIndex == 2;  //TODO: edit variables
-        }
-
-        @Override
-        public Object getValueAt(int rowIndex, int columnIndex) {
-            Variable v = vars.get(rowIndex);
+        public Object getValueAt(Object node, int columnIndex) {
+            if (node == root) {
+                if (columnIndex == 0) {
+                    return "root";
+                }
+                return "";
+            }
+            Variable v = ((VariableNode) node).thisVar;
 
             switch (columnIndex) {
                 case 0:
@@ -335,24 +498,157 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
                     }
                     return typeStr;
                 case 2:
-                    return v.getValueAsStr();
+                    switch (v.vType) {
+                        case VariableType.OBJECT:
+                        case VariableType.MOVIECLIP:
+                        case VariableType.FUNCTION:
+                            return v.getTypeAsStr() + "(" + v.value + ")";
+                        case VariableType.STRING:
+                            return "\"" + Helper.escapeActionScriptString("" + v.value) + "\"";
+                        default:
+                            return "" + v.value;
+                    }
+
             }
             return null;
         }
 
         @Override
-        public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-            //Main.getDebugHandler().setVariableValue(rowIndex, "" + aValue);
+        public boolean isCellEditable(Object node, int column) {
+            return column == 0 || (column == 2 && node != root && ((VariableNode) node).thisVar.isPrimitive);
         }
 
         @Override
-        public void addTableModelListener(TableModelListener l) {
-            tableListeners.add(l);
+        public void setValueAt(Object aValue, Object node, int column) {
+            ActionScriptLexer lexer = new ActionScriptLexer(new StringReader("" + aValue));
+            ParsedSymbol symb;
+            try {
+                symb = lexer.lex();
+                ParsedSymbol f = lexer.yylex();
+                if (f.type != SymbolType.EOF) {
+                    return;
+                }
+            } catch (IOException | ActionParseException ex) {
+                return;
+            }
+            int valType;
+            switch (symb.type) {
+                case DOUBLE:
+                    valType = VariableType.NUMBER;
+                    break;
+                case INTEGER:
+                    valType = VariableType.NUMBER;
+                    break;
+                case NULL:
+                    valType = VariableType.NULL;
+                    break;
+                case STRING:
+                    valType = VariableType.STRING;
+                    break;
+                case UNDEFINED:
+                    valType = VariableType.UNDEFINED;
+                    break;
+                default:
+                    return;
+            }
+            Main.getDebugHandler().setVariable(((VariableNode) node).parentId, ((VariableNode) node).thisVar.name, valType, symb.value);
+            //((VariableNode) node).refresh();
+            Object path[] = new Object[((VariableNode) node).path.size()];
+            for (int i = 0; i < path.length; i++) {
+                path[i] = ((VariableNode) node).path.get(i);
+            }
+            valueForPathChanged(new TreePath(path), aValue);
+            //fireTreeNodesChanged(this, path, new int[0]/*removed*/, new Object[]{node});
         }
 
         @Override
-        public void removeTableModelListener(TableModelListener l) {
-            tableListeners.remove(l);
+        public Object getRoot() {
+            return root;
+        }
+
+        @Override
+        public Object getChild(Object parent, int index) {
+            return ((VariableNode) parent).getChildAt(index);
+        }
+
+        @Override
+        public int getChildCount(Object parent) {
+            int cnt = ((VariableNode) parent).getChildCount();
+            return cnt;
+        }
+
+        @Override
+        public boolean isLeaf(Object node) {
+            return getChildCount(node) == 0;
+        }
+
+        @Override
+        public void valueForPathChanged(TreePath path, Object newValue) {
+            fireTreeNodesChanged(ttable, path.getParentPath().getPath(), new int[0], new Object[]{path.getLastPathComponent()});
+        }
+
+        @Override
+        public int getIndexOfChild(Object parent, Object child) {
+            int cnt = getChildCount(parent);
+            for (int i = 0; i < cnt; i++) {
+                if (getChild(parent, i) == child) {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        @Override
+        public void addTreeModelListener(TreeModelListener l) {
+            listenerList.add(TreeModelListener.class, l);
+        }
+
+        @Override
+        public void removeTreeModelListener(TreeModelListener l) {
+            listenerList.remove(TreeModelListener.class, l);
+        }
+
+        protected void fireTreeNodesChanged(Object source, Object[] path, int[] childIndices, Object[] children) {
+            fireTreeNode(CHANGED, source, path, childIndices, children);
+        }
+
+        protected void fireTreeNodesInserted(Object source, Object[] path, int[] childIndices, Object[] children) {
+            fireTreeNode(INSERTED, source, path, childIndices, children);
+        }
+
+        protected void fireTreeNodesRemoved(Object source, Object[] path, int[] childIndices, Object[] children) {
+            fireTreeNode(REMOVED, source, path, childIndices, children);
+        }
+
+        protected void fireTreeStructureChanged(Object source, Object[] path, int[] childIndices, Object[] children) {
+            fireTreeNode(STRUCTURE_CHANGED, source, path, childIndices, children);
+        }
+
+        private void fireTreeNode(int changeType, Object source, Object[] path, int[] childIndices, Object[] children) {
+            Object[] listeners = listenerList.getListenerList();
+            TreeModelEvent e = new TreeModelEvent(source, path, childIndices, children);
+            for (int i = listeners.length - 2; i >= 0; i -= 2) {
+                if (listeners[i] == TreeModelListener.class) {
+
+                    switch (changeType) {
+                        case CHANGED:
+                            ((TreeModelListener) listeners[i + 1]).treeNodesChanged(e);
+                            break;
+                        case INSERTED:
+                            ((TreeModelListener) listeners[i + 1]).treeNodesInserted(e);
+                            break;
+                        case REMOVED:
+                            ((TreeModelListener) listeners[i + 1]).treeNodesRemoved(e);
+                            break;
+                        case STRUCTURE_CHANGED:
+                            ((TreeModelListener) listeners[i + 1]).treeStructureChanged(e);
+                            break;
+                        default:
+                            break;
+                    }
+
+                }
+            }
         }
     }
 
@@ -650,6 +946,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         int dpos = decompiledTextArea.getLocalDeclarationOfPos(pos, new Reference<>(null));
         if (dpos > -1) {
             decompiledTextArea.setCaretPosition(dpos);
+
         }
 
     }
@@ -872,8 +1169,10 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
             decompiledTextArea.gotoLine((int) ex.line);
             decompiledTextArea.markError();
             View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+
         } catch (Throwable ex) {
-            Logger.getLogger(ABCPanel.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ABCPanel.class
+                    .getName()).log(Level.SEVERE, null, ex);
         }
     }
 

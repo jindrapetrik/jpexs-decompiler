@@ -22,6 +22,7 @@ import com.jpexs.debugger.flash.Debugger;
 import com.jpexs.debugger.flash.DebuggerCommands;
 import com.jpexs.debugger.flash.DebuggerConnection;
 import com.jpexs.debugger.flash.Variable;
+import com.jpexs.debugger.flash.VariableType;
 import com.jpexs.debugger.flash.messages.in.InAskBreakpoints;
 import com.jpexs.debugger.flash.messages.in.InBreakAt;
 import com.jpexs.debugger.flash.messages.in.InBreakAtExt;
@@ -106,6 +107,40 @@ public class DebuggerHandler implements DebugConnectionListener {
             return "-";
         }
         return breakScriptName;
+    }
+
+    public InGetVariable getVariable(long parentId, String varName, boolean children) {
+        try {
+            return commands.getVariable(parentId, varName, true, children);
+        } catch (IOException ex) {
+            return null;
+        }
+    }
+
+    public void setVariable(long parentId, String varName, int valueType, Object value) {
+        try {
+            String svalue = "";
+            switch (valueType) {
+                case VariableType.STRING:
+                    svalue = "" + value;
+                    break;
+                case VariableType.NUMBER:
+                    svalue = "" + value;
+                    break;
+                case VariableType.BOOLEAN:
+                    svalue = ((Boolean) value) ? "true" : "false";
+                    break;
+                case VariableType.UNDEFINED:
+                    svalue = "undefined";
+                    break;
+                case VariableType.NULL:
+                    svalue = "undefined";
+                    break;
+            }
+            commands.setVariable(parentId, varName, valueType, svalue);
+        } catch (IOException ex) {
+            //ignore
+        }
     }
 
     public synchronized void removeBreakPoint(String scriptName, int line) {
@@ -330,6 +365,17 @@ public class DebuggerHandler implements DebugConnectionListener {
 
     public void removeConnectionListener(ConnectionListener l) {
         clisteners.remove(l);
+    }
+
+    public synchronized void refreshFrame() {
+        if (!paused) {
+            return;
+        }
+        try {
+            frame = commands.getFrame(0);
+        } catch (IOException ex) {
+            //ignore
+        }
     }
 
     public synchronized InFrame getFrame() {
