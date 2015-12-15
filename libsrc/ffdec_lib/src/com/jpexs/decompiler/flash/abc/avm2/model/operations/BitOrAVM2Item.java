@@ -27,9 +27,13 @@ import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class BitOrAVM2Item extends BinaryOpItem {
 
-    public BitOrAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  GraphTargetItem leftSide, GraphTargetItem rightSide) {
+    public BitOrAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
         super(instruction, lineStartIns, PRECEDENCE_BITWISEOR, leftSide, rightSide, "|");
     }
 

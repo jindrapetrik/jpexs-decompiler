@@ -20,6 +20,10 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.Loop;
 
+/**
+ *
+ * @author JPEXS
+ */
 public abstract class LoopItem extends GraphTargetItem {
 
     public Loop loop;

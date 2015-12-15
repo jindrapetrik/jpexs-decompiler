@@ -27,10 +27,14 @@ import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class RemoveSpriteActionItem extends ActionItem {
 
     public RemoveSpriteActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem target) {
-        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY, target);
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY, target);
     }
 
     @Override

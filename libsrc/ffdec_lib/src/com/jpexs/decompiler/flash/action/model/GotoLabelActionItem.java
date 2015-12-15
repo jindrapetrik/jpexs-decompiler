@@ -26,12 +26,16 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class GotoLabelActionItem extends ActionItem {
 
     public String label;
 
     public GotoLabelActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, String label) {
-        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.label = label;
     }
 

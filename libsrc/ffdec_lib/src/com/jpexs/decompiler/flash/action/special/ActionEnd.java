@@ -24,6 +24,10 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class ActionEnd extends Action {
 
     public ActionEnd() {

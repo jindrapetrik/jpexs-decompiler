@@ -26,6 +26,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+/**
+ *
+ * @author JPEXS
+ */
 public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
 
     public GraphTargetItem leftSide;

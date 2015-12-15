@@ -26,7 +26,6 @@ import java.io.IOException;
 
 /**
  *
- *
  * @author JPEXS
  */
 @SWFVersion(from = 1)

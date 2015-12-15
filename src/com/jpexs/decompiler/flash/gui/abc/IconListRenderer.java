@@ -25,6 +25,10 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JList;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class IconListRenderer extends DefaultListCellRenderer {
 
     private final Icon constIcon;

@@ -27,6 +27,10 @@ import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class LShiftActionItem extends BinaryOpItem {
 
     public LShiftActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {

@@ -26,6 +26,10 @@ import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class MultiplyActionItem extends BinaryOpItem {
 
     public MultiplyActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {

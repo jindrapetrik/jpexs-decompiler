@@ -38,6 +38,10 @@ import com.jpexs.decompiler.graph.model.UnaryOpItem;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class PreDecrementActionItem extends UnaryOpItem {
 
     public PreDecrementActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object) {

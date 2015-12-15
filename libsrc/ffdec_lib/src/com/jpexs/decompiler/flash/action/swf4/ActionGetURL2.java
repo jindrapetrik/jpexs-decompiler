@@ -44,6 +44,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 @SWFVersion(from = 4)
 public class ActionGetURL2 extends Action {
 

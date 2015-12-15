@@ -27,6 +27,10 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.TrueItem;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class PushTrueIns extends InstructionDefinition {
 
     public PushTrueIns() {

@@ -26,6 +26,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class ActionFSCommand2 extends Action {
 
     public ActionFSCommand2() {

@@ -24,6 +24,10 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class TernarOpItem extends GraphTargetItem {
 
     public GraphTargetItem expression;

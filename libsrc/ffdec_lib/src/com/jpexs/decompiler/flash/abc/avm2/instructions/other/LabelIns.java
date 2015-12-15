@@ -21,6 +21,10 @@ import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class LabelIns extends InstructionDefinition {
 //this can be target of branch
 

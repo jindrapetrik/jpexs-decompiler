@@ -28,6 +28,10 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class NewObjectActionItem extends ActionItem {
 
     public GraphTargetItem objectName;
@@ -43,7 +47,7 @@ public class NewObjectActionItem extends ActionItem {
     }
 
     public NewObjectActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem objectName, List<GraphTargetItem> arguments) {
-        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.objectName = objectName;
         this.arguments = arguments;
     }

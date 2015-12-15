@@ -16,6 +16,10 @@
  */
 package com.jpexs.decompiler.flash.abc.methodinfo_parser;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class ParsedSymbol {
 
     public int type;

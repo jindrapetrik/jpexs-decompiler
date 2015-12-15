@@ -28,6 +28,10 @@ import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import java.util.List;
 import java.util.Set;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class StringNeActionItem extends BinaryOpItem implements Inverted {
 
     public StringNeActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {

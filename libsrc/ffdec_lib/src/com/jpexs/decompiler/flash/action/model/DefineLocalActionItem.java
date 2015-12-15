@@ -31,11 +31,14 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class DefineLocalActionItem extends ActionItem implements SetTypeActionItem {
 
     public GraphTargetItem name;
 
-    //public GraphTargetItem value;
     private int tempRegister = -1;
 
     @Override

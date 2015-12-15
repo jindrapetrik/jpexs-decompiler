@@ -19,8 +19,8 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions.other;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
-import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2ExecutionException;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
+import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2ExecutionException;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.ThrowAVM2Item;
@@ -29,6 +29,10 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class ThrowIns extends InstructionDefinition {
 
     public ThrowIns() {

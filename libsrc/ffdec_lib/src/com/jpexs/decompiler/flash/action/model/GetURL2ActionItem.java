@@ -28,6 +28,10 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class GetURL2ActionItem extends ActionItem {
 
     public GraphTargetItem urlString;
@@ -64,7 +68,7 @@ public class GetURL2ActionItem extends ActionItem {
     }
 
     public GetURL2ActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem urlString, GraphTargetItem targetString, int method) {
-        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.urlString = urlString;
         this.targetString = targetString;
         this.sendVarsMethod = method;

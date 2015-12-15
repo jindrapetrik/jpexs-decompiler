@@ -30,6 +30,10 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class IfTrueIns extends InstructionDefinition implements IfTypeIns {
 
     public IfTrueIns() {

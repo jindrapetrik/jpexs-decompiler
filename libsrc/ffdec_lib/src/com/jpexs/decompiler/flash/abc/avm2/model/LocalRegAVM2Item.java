@@ -23,13 +23,17 @@ import com.jpexs.decompiler.flash.abc.avm2.model.clauses.FilterAVM2Item;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 import java.util.Set;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class LocalRegAVM2Item extends AVM2Item {
 
     public final int regIndex;
@@ -40,7 +44,7 @@ public class LocalRegAVM2Item extends AVM2Item {
 
     private boolean isCT = false;
 
-    public LocalRegAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  int regIndex, GraphTargetItem computedValue) {
+    public LocalRegAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, int regIndex, GraphTargetItem computedValue) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.regIndex = regIndex;
         if (computedValue == null) {

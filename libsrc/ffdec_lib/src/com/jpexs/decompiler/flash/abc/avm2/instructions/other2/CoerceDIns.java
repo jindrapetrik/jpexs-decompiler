@@ -27,6 +27,10 @@ import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TypeItem;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class CoerceDIns extends InstructionDefinition implements CoerceOrConvertTypeIns {
 
     public CoerceDIns() {

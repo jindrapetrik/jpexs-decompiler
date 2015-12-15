@@ -25,32 +25,29 @@ import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 import java.util.Set;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class CoerceAVM2Item extends AVM2Item {
 
-    //public GraphTargetItem value;
-    //public GraphTargetItem type;
     public GraphTargetItem typeObj;
 
-    /*public CoerceAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  GraphTargetItem value, String type) {
-     super(instruction, lineStartIns, value.getPrecedence());
-     this.value = value;
-     this.type = type;
-     }*/
-    public CoerceAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  GraphTargetItem value, GraphTargetItem typeObj) {
+    public CoerceAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value, GraphTargetItem typeObj) {
         super(instruction, lineStartIns, value.getPrecedence(), value);
         this.typeObj = typeObj;
     }
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        //return hilight("("+type+")", highlight)+
+        //return hilight("(" + type + ")", highlight)+
         return value.toString(writer, localData);
     }
 

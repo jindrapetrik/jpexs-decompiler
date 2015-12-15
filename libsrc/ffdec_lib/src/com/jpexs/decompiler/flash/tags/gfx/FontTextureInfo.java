@@ -29,7 +29,6 @@ import java.io.IOException;
 
 /**
  *
- *
  * @author JPEXS
  */
 public class FontTextureInfo extends Tag {

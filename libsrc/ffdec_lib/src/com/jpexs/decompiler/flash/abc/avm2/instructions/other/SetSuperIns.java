@@ -36,6 +36,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class SetSuperIns extends InstructionDefinition implements SetTypeIns {
 
     public SetSuperIns() {

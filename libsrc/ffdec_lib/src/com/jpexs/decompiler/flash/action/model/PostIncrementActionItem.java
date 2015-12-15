@@ -36,6 +36,10 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class PostIncrementActionItem extends ActionItem implements SetTypeActionItem {
 
     public GraphTargetItem object;

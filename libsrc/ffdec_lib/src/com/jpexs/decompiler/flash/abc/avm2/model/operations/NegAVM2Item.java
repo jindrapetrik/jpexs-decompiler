@@ -27,9 +27,13 @@ import com.jpexs.decompiler.graph.model.UnaryOpItem;
 import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class NegAVM2Item extends UnaryOpItem {
 
-    public NegAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  GraphTargetItem value) {
+    public NegAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value) {
         super(instruction, lineStartIns, PRECEDENCE_UNARY, value, "-");
     }
 

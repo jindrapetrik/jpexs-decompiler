@@ -29,6 +29,10 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class NewClassIns extends InstructionDefinition {
 
     public NewClassIns() {

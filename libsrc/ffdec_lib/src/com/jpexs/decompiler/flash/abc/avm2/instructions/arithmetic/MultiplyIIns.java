@@ -28,6 +28,10 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class MultiplyIIns extends InstructionDefinition {
 
     public MultiplyIIns() {

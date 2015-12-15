@@ -44,6 +44,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class ForInActionItem extends LoopActionItem implements Block {
 
     public GraphTargetItem variableName;

@@ -29,6 +29,10 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class ActionStrictMode extends Action {
 
     public int mode;

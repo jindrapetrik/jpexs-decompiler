@@ -529,6 +529,10 @@ public class Configuration {
     @ConfigurationCategory("script")
     public static final ConfigurationItem<Boolean> debugHalt = null;
 
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("import")
+    public static final ConfigurationItem<Boolean> experimentalSvgImportEnabled = null;
+
     private enum OSId {
 
         WINDOWS, OSX, UNIX

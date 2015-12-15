@@ -28,6 +28,10 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class CastOpActionItem extends ActionItem {
 
     public GraphTargetItem constructor;
@@ -43,7 +47,7 @@ public class CastOpActionItem extends ActionItem {
     }
 
     public CastOpActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem constructor, GraphTargetItem object) {
-        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.constructor = constructor;
         this.object = object;
     }

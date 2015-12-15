@@ -2137,10 +2137,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 updateClassesList();
             }
 
-            if (countAs2 == 0 && countAs3 == 0 && swf.isAS3()) {
-                View.showMessageDialog(this, translate("import.script.as12warning"));
-            } else {
-                View.showMessageDialog(this, translate("import.script.result").replace("%count%", Integer.toString(countAs2)));
+            View.showMessageDialog(this, translate("import.script.result").replace("%count%", Integer.toString(countAs2 + countAs3)));
+            if (countAs2 != 0 || countAs3 != 0) {
                 reload(true);
             }
         }
@@ -2619,12 +2617,24 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
         if (item instanceof ShapeTag) {
             ShapeTag st = (ShapeTag) item;
-            File selectedFile = showImportFileChooser("filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp");
+            String filter = "filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp";
+            if (Configuration.experimentalSvgImportEnabled.get()) {
+                filter += ";*.svg";
+            }
+
+            File selectedFile = showImportFileChooser(filter);
             if (selectedFile != null) {
                 File selfile = Helper.fixDialogFile(selectedFile);
-                byte[] data = Helper.readFile(selfile.getAbsolutePath());
+                byte[] data = null;
+                String svgText = null;
+                if (".svg".equals(Path.getExtension(selfile))) {
+                    svgText = Helper.readTextFile(selfile.getAbsolutePath());
+                } else {
+                    data = Helper.readFile(selfile.getAbsolutePath());
+                }
                 try {
-                    Tag newTag = new ShapeImporter().importImage(st, data);
+                    ShapeImporter shapeImporter = new ShapeImporter();
+                    Tag newTag = svgText != null ? shapeImporter.importSvg(st, svgText) : shapeImporter.importImage(st, data);
                     SWF swf = st.getSwf();
                     if (newTag != null) {
                         refreshTree(swf);
@@ -2647,6 +2657,36 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 byte[] data = Helper.readFile(selfile.getAbsolutePath());
                 new BinaryDataImporter().importData(bt, data);
                 refreshTree(bt.getSwf());
+                reload(true);
+            }
+        }
+    }
+
+    public void replaceNoFillButtonActionPerformed(ActionEvent evt) {
+        TreeItem item = tagTree.getCurrentTreeItem();
+        if (item == null) {
+            return;
+        }
+
+        if (item instanceof ShapeTag) {
+            ShapeTag st = (ShapeTag) item;
+            File selectedFile = showImportFileChooser("filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp");
+            if (selectedFile != null) {
+                File selfile = Helper.fixDialogFile(selectedFile);
+                byte[] data = Helper.readFile(selfile.getAbsolutePath());
+                try {
+                    Tag newTag = new ShapeImporter().importImage(st, data, 0, false);
+                    SWF swf = st.getSwf();
+                    if (newTag != null) {
+                        refreshTree(swf);
+                        setTagTreeSelectedNode(newTag);
+                    }
+
+                    swf.clearImageCache();
+                } catch (IOException ex) {
+                    logger.log(Level.SEVERE, "Invalid image", ex);
+                    View.showMessageDialog(null, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
+                }
                 reload(true);
             }
         }

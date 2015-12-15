@@ -23,6 +23,10 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.List;
 import java.util.Set;
 
+/**
+ *
+ * @author JPEXS
+ */
 public abstract class UnaryOpItem extends GraphTargetItem implements UnaryOp {
 
     public String operator;

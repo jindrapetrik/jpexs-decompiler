@@ -21,12 +21,16 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class UnsupportedActionItem extends ActionItem {
 
     public String value;
 
     public UnsupportedActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, String value) {
-        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.value = value;
     }
 

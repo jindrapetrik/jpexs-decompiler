@@ -31,9 +31,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.types.AsTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.InitVectorAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
-import com.jpexs.decompiler.flash.abc.types.ClassInfo;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
-import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
@@ -53,6 +51,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+/**
+ *
+ * @author JPEXS
+ */
 public abstract class Trait implements Cloneable, Serializable {
 
     public static final String METADATA_CTOR_DEFINITION = "__go_to_ctor_definition_help";

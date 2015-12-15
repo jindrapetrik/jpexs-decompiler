@@ -25,12 +25,16 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class SetTargetActionItem extends ActionItem {
 
     public String target;
 
     public SetTargetActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, String target) {
-        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.target = target;
     }
 

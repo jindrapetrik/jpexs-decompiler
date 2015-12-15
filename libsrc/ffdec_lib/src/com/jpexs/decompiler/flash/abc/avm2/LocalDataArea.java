@@ -19,6 +19,10 @@ package com.jpexs.decompiler.flash.abc.avm2;
 import java.util.HashMap;
 import java.util.Stack;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class LocalDataArea {
 
     public String methodName;

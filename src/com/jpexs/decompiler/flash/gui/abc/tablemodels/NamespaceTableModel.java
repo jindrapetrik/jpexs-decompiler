@@ -21,6 +21,10 @@ import com.jpexs.decompiler.graph.DottedChain;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class NamespaceTableModel implements TableModel {
 
     private final ABC abc;

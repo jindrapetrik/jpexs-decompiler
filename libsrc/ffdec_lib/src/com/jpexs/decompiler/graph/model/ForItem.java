@@ -30,6 +30,10 @@ import com.jpexs.decompiler.graph.TypeItem;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class ForItem extends LoopItem implements Block {
 
     public List<GraphTargetItem> firstCommands;

@@ -304,6 +304,10 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class AVM2Code implements Cloneable {
 
     private static final Logger logger = Logger.getLogger(AVM2Code.class.getName());
@@ -1043,10 +1047,10 @@ public class AVM2Code implements Cloneable {
     }
 
     public void markOffsets() {
-        long offset = 0;
+        long address = 0;
         for (int i = 0; i < code.size(); i++) {
-            code.get(i).setOffset(offset);
-            offset += code.get(i).getBytesLength();
+            code.get(i).setAddress(address);
+            address += code.get(i).getBytesLength();
         }
     }
 
@@ -1240,14 +1244,14 @@ public class AVM2Code implements Cloneable {
             Helper.byteArrayToHexWithHeader(writer, getBytes());
         } else if (exportMode == ScriptExportMode.PCODE || exportMode == ScriptExportMode.PCODE_HEX) {
             for (AVM2Instruction ins : code) {
-                long ofs = ins.getOffset();
+                long addr = ins.getAddress();
                 if (exportMode == ScriptExportMode.PCODE_HEX) {
                     writer.appendNoHilight("; ");
                     writer.appendNoHilight(Helper.bytesToHexString(ins.getBytes()));
                     writer.newLine();
                 }
-                if (Configuration.showAllAddresses.get() || importantOffsets.contains(ofs)) {
-                    writer.appendNoHilight("ofs" + Helper.formatAddress(ofs) + ":");
+                if (Configuration.showAllAddresses.get() || importantOffsets.contains(addr)) {
+                    writer.appendNoHilight("ofs" + Helper.formatAddress(addr) + ":");
                 }
                 /*for (int e = 0; e < body.exceptions.length; e++) {
                  if (body.exceptions[e].start == ofs) {
@@ -1263,7 +1267,7 @@ public class AVM2Code implements Cloneable {
 
                 if (!ins.isIgnored()) {
                     if (markOffsets) {
-                        writer.append("", ofs, ins.getFileOffset());
+                        writer.append("", addr, ins.getFileOffset());
                     }
 
                     writer.appendNoHilight(ins.toStringNoAddress(constants, new ArrayList<>()));
@@ -1328,7 +1332,7 @@ public class AVM2Code implements Cloneable {
 
         while (max >= min) {
             int mid = (min + max) / 2;
-            long midValue = code.get(mid).getOffset();
+            long midValue = code.get(mid).getAddress();
             if (midValue == address) {
                 return mid;
             } else if (midValue < address) {
@@ -1349,7 +1353,7 @@ public class AVM2Code implements Cloneable {
         if (pos == code.size()) {
             return getEndOffset();
         }
-        return (int) code.get(pos).getOffset();
+        return (int) code.get(pos).getAddress();
     }
 
     public long getEndOffset() {
@@ -1358,7 +1362,7 @@ public class AVM2Code implements Cloneable {
         }
 
         AVM2Instruction ins = code.get(code.size() - 1);
-        return (int) (ins.getOffset() + ins.getBytesLength());
+        return (int) (ins.getAddress() + ins.getBytesLength());
     }
 
     /**
@@ -1974,11 +1978,11 @@ public class AVM2Code implements Cloneable {
         for (int i = 0; i < code.size(); i++) {
             AVM2Instruction ins = code.get(i);
             if (ins.definition instanceof LookupSwitchIns) {
-                long target = ins.getOffset() + ins.operands[0];
-                ins.operands[0] = updater.updateOperandOffset(ins.getOffset(), target, ins.operands[0]);
+                long target = ins.getAddress() + ins.operands[0];
+                ins.operands[0] = updater.updateOperandOffset(ins.getAddress(), target, ins.operands[0]);
                 for (int k = 2; k < ins.operands.length; k++) {
-                    target = ins.getOffset() + ins.operands[k];
-                    ins.operands[k] = updater.updateOperandOffset(ins.getOffset(), target, ins.operands[k]);
+                    target = ins.getAddress() + ins.operands[k];
+                    ins.operands[k] = updater.updateOperandOffset(ins.getAddress(), target, ins.operands[k]);
                 }
             } else {
                 /*for (int j = 0; j < ins.definition.operands.length; j++) {
@@ -1991,13 +1995,13 @@ public class AVM2Code implements Cloneable {
                 if (ins.definition instanceof IfTypeIns) {
                     long target = ins.getTargetAddress();
                     try {
-                        ins.operands[0] = updater.updateOperandOffset(ins.getOffset(), target, ins.operands[0]);
+                        ins.operands[0] = updater.updateOperandOffset(ins.getAddress(), target, ins.operands[0]);
                     } catch (ConvertException cex) {
                         throw new ConvertException("Invalid offset (" + ins + ")", i);
                     }
                 }
             }
-            ins.setOffset(updater.updateInstructionOffset(ins.getOffset()));
+            ins.setAddress(updater.updateInstructionOffset(ins.getAddress()));
         }
 
         for (ABCException ex : body.exceptions) {
@@ -2071,7 +2075,7 @@ public class AVM2Code implements Cloneable {
         }
 
         AVM2Instruction ins = code.get(pos);
-        final long remOffset = ins.getOffset();
+        final long remOffset = ins.getAddress();
         int bc = ins.getBytesLength();
 
         final int byteCount = bc;
@@ -2136,7 +2140,7 @@ public class AVM2Code implements Cloneable {
      */
     public void replaceInstruction(int pos, AVM2Instruction instruction, MethodBody body) {
         AVM2Instruction oldInstruction = code.get(pos);
-        instruction.setOffset(oldInstruction.getOffset());
+        instruction.setAddress(oldInstruction.getAddress());
         int oldByteCount = oldInstruction.getBytesLength();
         int newByteCount = instruction.getBytesLength();
         int byteDelta = newByteCount - oldByteCount;
@@ -2146,7 +2150,7 @@ public class AVM2Code implements Cloneable {
 
                 @Override
                 public long updateInstructionOffset(long address) {
-                    if (address > instruction.getOffset()) {
+                    if (address > instruction.getAddress()) {
                         return address + byteDelta;
                     }
                     return address;
@@ -2154,10 +2158,10 @@ public class AVM2Code implements Cloneable {
 
                 @Override
                 public int updateOperandOffset(long insAddr, long targetAddress, int offset) {
-                    if (targetAddress > instruction.getOffset() && insAddr <= instruction.getOffset()) {
+                    if (targetAddress > instruction.getAddress() && insAddr <= instruction.getAddress()) {
                         return offset + byteDelta;
                     }
-                    if (targetAddress <= instruction.getOffset() && insAddr > instruction.getOffset()) {
+                    if (targetAddress <= instruction.getAddress() && insAddr > instruction.getAddress()) {
                         return offset - byteDelta;
                     }
                     return offset;
@@ -2188,11 +2192,11 @@ public class AVM2Code implements Cloneable {
         }
         final int byteCount = instruction.getBytesLength();
         if (pos == code.size()) {
-            instruction.setOffset(code.get(pos - 1).getOffset() + code.get(pos - 1).getBytesLength());
+            instruction.setAddress(code.get(pos - 1).getAddress() + code.get(pos - 1).getBytesLength());
         } else {
-            instruction.setOffset(code.get(pos).getOffset());
+            instruction.setAddress(code.get(pos).getAddress());
         }
-        final long x = instruction.getOffset();
+        final long x = instruction.getAddress();
         updateOffsets(new OffsetUpdater() {
 
             @Override
@@ -2240,7 +2244,7 @@ public class AVM2Code implements Cloneable {
                 return offset_jt;
             }
         }, body);
-        instruction.setOffset(x);
+        instruction.setAddress(x);
         code.add(pos, instruction);
         //checkValidOffsets(body);
     }
@@ -2561,16 +2565,6 @@ public class AVM2Code implements Cloneable {
                         AVM2Instruction ins2 = code.get(ni);
                         if (ins2.isExit()) {
                             code.set(i, new AVM2Instruction(ofs, ins2.definition, ins2.operands));
-                            // todo: honfika: why to add 3 NOPs?
-                            AVM2Instruction nopIns;
-                            nopIns = new AVM2Instruction(ofs + 1, AVM2Instructions.Nop, null);
-                            code.add(i + 1, nopIns);
-                            nopIns = new AVM2Instruction(ofs + 2, AVM2Instructions.Nop, null);
-                            code.add(i + 2, nopIns);
-                            nopIns = new AVM2Instruction(ofs + 3, AVM2Instructions.Nop, null);
-                            code.add(i + 3, nopIns);
-                            i += 3;
-                            csize = code.size();
                             modified = true;
                         }
                     }

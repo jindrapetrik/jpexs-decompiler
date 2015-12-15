@@ -28,6 +28,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class ClassAVM2Item extends AVM2Item implements Block {
 
     public List<GraphTargetItem> traits;

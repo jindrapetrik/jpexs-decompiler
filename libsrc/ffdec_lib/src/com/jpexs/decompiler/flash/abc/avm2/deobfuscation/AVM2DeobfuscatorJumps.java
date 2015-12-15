@@ -58,7 +58,7 @@ public class AVM2DeobfuscatorJumps extends SWFDecompilerAdapter {
 
                                 if ((srcIns.definition instanceof JumpIns) || ((srcIns.definition instanceof IfTypeIns) && (r != i - 1))) {
                                     int oldop = srcIns.operands[0];
-                                    srcIns.operands[0] = (int) (targetAddr - (srcIns.getOffset() + srcIns.getBytesLength()));
+                                    srcIns.operands[0] = (int) (targetAddr - (srcIns.getAddress() + srcIns.getBytesLength()));
                                     if (srcIns.operands[0] != oldop) {
                                         found = true;
                                     }

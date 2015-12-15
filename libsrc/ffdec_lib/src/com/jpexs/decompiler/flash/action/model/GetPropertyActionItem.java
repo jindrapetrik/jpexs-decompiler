@@ -30,6 +30,10 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class GetPropertyActionItem extends ActionItem {
 
     public GraphTargetItem target;
@@ -44,7 +48,7 @@ public class GetPropertyActionItem extends ActionItem {
     }
 
     public GetPropertyActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem target, int propertyIndex) {
-        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.target = target;
         this.propertyIndex = propertyIndex;
     }

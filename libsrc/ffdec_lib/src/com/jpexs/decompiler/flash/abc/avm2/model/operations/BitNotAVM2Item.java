@@ -27,6 +27,10 @@ import com.jpexs.decompiler.graph.model.UnaryOpItem;
 import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class BitNotAVM2Item extends UnaryOpItem {
 
     public BitNotAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value) {

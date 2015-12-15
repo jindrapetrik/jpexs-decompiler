@@ -167,7 +167,7 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
                 SetLocalTypeIns slt = (SetLocalTypeIns) ins.definition;
                 int regId = slt.getRegisterId(ins);
                 if (singleRegisters.containsKey(regId)) {
-                    code.replaceInstruction(i, new AVM2Instruction(ins.getOffset(), DeobfuscatePopIns.getInstance(), null), body);
+                    code.replaceInstruction(i, new AVM2Instruction(ins.getAddress(), DeobfuscatePopIns.getInstance(), null), body);
                 }
             }
 

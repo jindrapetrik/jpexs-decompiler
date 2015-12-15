@@ -30,6 +30,10 @@ import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class TraitMethodGetterSetter extends Trait {
 
     public int disp_id; //compiler assigned value that helps overriding
@@ -64,7 +68,7 @@ public class TraitMethodGetterSetter extends Trait {
                 customNs = n.getName(abc.constants).toRawString();
             }
         }
-        //if (method_info != 0) 
+        //if (method_info != 0)
         {
             parseImportsUsagesFromMethodInfo(customNs, abc, method_info, imports, uses, ignorePackage, fullyQualifiedNames, new ArrayList<>());
         }

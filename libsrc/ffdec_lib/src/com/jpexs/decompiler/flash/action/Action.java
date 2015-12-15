@@ -103,6 +103,8 @@ import java.util.logging.Logger;
 
 /**
  * Represents one ACTIONRECORD, also has some static method to work with Actions
+ *
+ * @author JPEXS
  */
 public abstract class Action implements GraphSourceItem {
 
@@ -122,7 +124,6 @@ public abstract class Action implements GraphSourceItem {
      */
     public int actionLength;
 
-    // todo: honfika: rename to offset to be similar with AS3
     private long address;
 
     @Override
@@ -181,6 +182,7 @@ public abstract class Action implements GraphSourceItem {
      *
      * @return address of this action
      */
+    @Override
     public long getAddress() {
         return address;
     }
@@ -209,7 +211,6 @@ public abstract class Action implements GraphSourceItem {
     }
 
     public int getTotalActionLength() {
-        // honfika: todo rename to getBytesLength to match the name with the similar method in AS3
         return actionLength + 1 + (actionCode >= 0x80 ? 2 : 0);
     }
 
@@ -929,11 +930,6 @@ public abstract class Action implements GraphSourceItem {
     @Override
     public boolean isExit() {
         return false;
-    }
-
-    @Override
-    public long getOffset() {
-        return getAddress();
     }
 
     @Override

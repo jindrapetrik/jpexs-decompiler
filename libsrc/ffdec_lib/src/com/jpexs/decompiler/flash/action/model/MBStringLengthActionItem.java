@@ -28,11 +28,14 @@ import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class MBStringLengthActionItem extends ActionItem {
 
-    //public GraphTargetItem value;
     public MBStringLengthActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value) {
-        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY, value);
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY, value);
     }
 
     @Override

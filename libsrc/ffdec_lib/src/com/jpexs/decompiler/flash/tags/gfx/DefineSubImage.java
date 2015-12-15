@@ -24,7 +24,6 @@ import java.io.IOException;
 
 /**
  *
- *
  * @author JPEXS
  */
 public class DefineSubImage extends Tag {

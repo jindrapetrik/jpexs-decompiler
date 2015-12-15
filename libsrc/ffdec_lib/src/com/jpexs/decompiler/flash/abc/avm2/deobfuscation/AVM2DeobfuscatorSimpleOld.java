@@ -367,17 +367,17 @@ public class AVM2DeobfuscatorSimpleOld extends SWFDecompilerAdapter {
                     AVM2Instruction jumpIns = new AVM2Instruction(0, AVM2Instructions.Jump, new int[]{0});
                     //jumpIns.operands[0] = ins.operands[0] /*- ins.getBytes().length*/ + jumpIns.getBytes().length;
                     code.replaceInstruction(idx, jumpIns, body);
-                    jumpIns.operands[0] = (int) (tarIns.getOffset() - jumpIns.getOffset() - jumpIns.getBytesLength());
+                    jumpIns.operands[0] = (int) (tarIns.getAddress() - jumpIns.getAddress() - jumpIns.getBytesLength());
                     for (int s = 0; s < stackCount; s++) {
-                        code.insertInstruction(idx, new AVM2Instruction(ins.getOffset(), DeobfuscatePopIns.getInstance(), null), true, body);
+                        code.insertInstruction(idx, new AVM2Instruction(ins.getAddress(), DeobfuscatePopIns.getInstance(), null), true, body);
                     }
 
                     idx = code.adr2pos(jumpIns.getTargetAddress());
                 } else {
                     //System.err.println("replacing " + ins + " on " + idx + " with pop");
-                    code.replaceInstruction(idx, new AVM2Instruction(ins.getOffset(), DeobfuscatePopIns.getInstance(), null), body);
+                    code.replaceInstruction(idx, new AVM2Instruction(ins.getAddress(), DeobfuscatePopIns.getInstance(), null), body);
                     for (int s = 1 /*first is replaced*/; s < stackCount; s++) {
-                        code.insertInstruction(idx, new AVM2Instruction(ins.getOffset(), DeobfuscatePopIns.getInstance(), null), true, body);
+                        code.insertInstruction(idx, new AVM2Instruction(ins.getAddress(), DeobfuscatePopIns.getInstance(), null), true, body);
                     }
                     //ins.definition = DeobfuscatePopIns.getInstance();
                     idx++;

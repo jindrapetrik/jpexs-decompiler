@@ -19,6 +19,10 @@ package com.jpexs.decompiler.flash.abc.types;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.helpers.Helper;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class ValueKind {
 
     public static final int CONSTANT_Decimal = 0x02; //decimal

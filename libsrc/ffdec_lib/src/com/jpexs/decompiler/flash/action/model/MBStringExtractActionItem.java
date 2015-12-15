@@ -29,9 +29,12 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class MBStringExtractActionItem extends ActionItem {
 
-    //public GraphTargetItem value;
     public GraphTargetItem index;
 
     public GraphTargetItem count;

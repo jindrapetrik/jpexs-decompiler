@@ -20,6 +20,10 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class DecimalTableModel implements TableModel {
 
     private final ABC abc;

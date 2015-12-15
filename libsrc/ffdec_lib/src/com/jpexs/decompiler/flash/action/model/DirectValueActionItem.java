@@ -37,6 +37,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class DirectValueActionItem extends ActionItem implements SimpleValue {
 
     public Object value;

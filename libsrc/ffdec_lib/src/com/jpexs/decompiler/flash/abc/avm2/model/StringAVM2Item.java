@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphTargetItem;import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SimpleValue;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
@@ -32,13 +32,17 @@ import com.jpexs.helpers.Helper;
 import java.util.List;
 import java.util.Set;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class StringAVM2Item extends AVM2Item implements SimpleValue {
 
     private String value;
 
     private Double numberValue;
 
-    public StringAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  String value) {
+    public StringAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, String value) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.value = value;
     }

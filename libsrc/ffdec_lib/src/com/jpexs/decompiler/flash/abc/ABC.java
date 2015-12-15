@@ -73,6 +73,10 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class ABC {
 
     public int major_version = 46;

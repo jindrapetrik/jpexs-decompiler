@@ -30,9 +30,13 @@ import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
 import java.util.List;
 import java.util.Set;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class TypeOfAVM2Item extends UnaryOpItem {
 
-    public TypeOfAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns,  GraphTargetItem value) {
+    public TypeOfAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value) {
         super(instruction, lineStartIns, PRECEDENCE_UNARY, value, "typeof ");
     }
 

@@ -30,6 +30,10 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class GotoFrame2ActionItem extends ActionItem {
 
     public GraphTargetItem frame;
@@ -48,7 +52,7 @@ public class GotoFrame2ActionItem extends ActionItem {
     }
 
     public GotoFrame2ActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem frame, boolean sceneBiasFlag, boolean playFlag, int sceneBias) {
-        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.frame = frame;
         this.sceneBiasFlag = sceneBiasFlag;
         this.playFlag = playFlag;

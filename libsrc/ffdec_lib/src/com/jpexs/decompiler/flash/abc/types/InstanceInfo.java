@@ -26,6 +26,10 @@ import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class InstanceInfo {
 
     public int name_index;

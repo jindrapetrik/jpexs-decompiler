@@ -31,6 +31,10 @@ import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.IOException;
 import java.io.OutputStream;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class ABCOutputStream extends OutputStream {
 
     private final OutputStream os;

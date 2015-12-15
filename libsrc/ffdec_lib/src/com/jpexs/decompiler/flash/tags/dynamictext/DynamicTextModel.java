@@ -22,7 +22,6 @@ import java.util.List;
 
 /**
  *
- *
  * @author JPEXS
  */
 public class DynamicTextModel {

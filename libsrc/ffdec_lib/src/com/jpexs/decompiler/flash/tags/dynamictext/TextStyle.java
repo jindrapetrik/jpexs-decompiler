@@ -21,7 +21,6 @@ import com.jpexs.decompiler.flash.types.RGBA;
 
 /**
  *
- *
  * @author JPEXS
  */
 public final class TextStyle implements Cloneable {

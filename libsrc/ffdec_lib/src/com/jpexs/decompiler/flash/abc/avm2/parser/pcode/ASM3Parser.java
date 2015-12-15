@@ -44,6 +44,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class ASM3Parser {
 
     private static class OffsetItem {
@@ -969,9 +973,9 @@ public class ASM3Parser {
                     AVM2Instruction ins = code.code.get((int) oi.insPosition);
                     int relOffset;
                     if (oi instanceof CaseOffsetItem) {
-                        relOffset = li.offset - (int) ins.getOffset();
+                        relOffset = li.offset - (int) ins.getAddress();
                     } else {
-                        relOffset = li.offset - ((int) ins.getOffset() + ins.getBytesLength());
+                        relOffset = li.offset - ((int) ins.getAddress() + ins.getBytesLength());
                     }
                     ins.operands[oi.insOperandIndex] = relOffset;
                 }

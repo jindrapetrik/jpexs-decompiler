@@ -164,12 +164,12 @@ public class ActionScript3AssemblerTest extends ActionScriptTestBase {
         for (int i = 0; i < code.code.size(); i++) {
             AVM2Instruction ins = code.code.get(i);
             int length = ins.getBytesLength();
-            expected.put(ins.getOffset(), i);
-            expectedNearest.put(ins.getOffset(), i);
-            Assert.assertEquals(code.pos2adr(i), ins.getOffset());
+            expected.put(ins.getAddress(), i);
+            expectedNearest.put(ins.getAddress(), i);
+            Assert.assertEquals(code.pos2adr(i), ins.getAddress());
             for (int j = 1; j < length; j++) {
-                expected.put(ins.getOffset() + j, -1);
-                expectedNearest.put(ins.getOffset() + j, i + 1);
+                expected.put(ins.getAddress() + j, -1);
+                expectedNearest.put(ins.getAddress() + j, i + 1);
             }
         }
 

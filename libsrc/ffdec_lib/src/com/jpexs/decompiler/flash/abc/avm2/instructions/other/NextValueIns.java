@@ -25,6 +25,10 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class NextValueIns extends InstructionDefinition {
 
     public NextValueIns() {

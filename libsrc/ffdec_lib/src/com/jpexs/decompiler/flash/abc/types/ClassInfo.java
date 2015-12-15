@@ -24,6 +24,10 @@ import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.graph.DottedChain;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class ClassInfo {
 
     public int cinit_index; //MethodInfo - static initializer

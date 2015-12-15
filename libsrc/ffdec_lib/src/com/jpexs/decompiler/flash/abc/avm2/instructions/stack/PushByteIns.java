@@ -28,6 +28,10 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class PushByteIns extends InstructionDefinition implements PushIntegerTypeIns {
 
     public PushByteIns() {

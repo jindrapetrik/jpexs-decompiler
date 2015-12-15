@@ -24,6 +24,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
+/**
+ *
+ * @author JPEXS
+ */
 public interface SetTypeIns {
 
     public abstract String getObject(Stack<AVM2Item> stack, ABC abc, AVM2Instruction ins, List<AVM2Item> output, MethodBody body, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames) throws InterruptedException;

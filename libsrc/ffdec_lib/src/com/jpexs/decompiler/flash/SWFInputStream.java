@@ -2687,10 +2687,9 @@ public class SWFInputStream implements AutoCloseable {
         LINESTYLE ret = new LINESTYLE();
         newDumpLevel(name, "LINESTYLE");
         ret.width = readUI16("width");
-        if ((shapeNum == 1) || (shapeNum == 2)) {
+        if (shapeNum == 1 || shapeNum == 2) {
             ret.color = readRGB("color");
-        }
-        if (shapeNum == 3) {
+        } else if (shapeNum == 3) {
             ret.color = readRGBA("color");
         }
         endDumpLevel();
@@ -2981,7 +2980,7 @@ public class SWFInputStream implements AutoCloseable {
         GLYPHENTRY ret = new GLYPHENTRY();
         newDumpLevel(name, "GLYPHENTRY");
         ret.glyphIndex = (int) readUB(glyphBits, "glyphIndex");
-        ret.glyphAdvance = (int) readUB(advanceBits, "glyphAdvance");
+        ret.glyphAdvance = (int) readSB(advanceBits, "glyphAdvance");
         endDumpLevel();
         return ret;
     }

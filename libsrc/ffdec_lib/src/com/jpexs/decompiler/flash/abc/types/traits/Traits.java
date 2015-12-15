@@ -34,6 +34,10 @@ import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class Traits implements Cloneable, Serializable {
 
     public List<Trait> traits;

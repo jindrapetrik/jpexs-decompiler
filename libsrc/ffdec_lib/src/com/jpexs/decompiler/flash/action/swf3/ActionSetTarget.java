@@ -32,6 +32,10 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 @SWFVersion(from = 3)
 public class ActionSetTarget extends Action {
 

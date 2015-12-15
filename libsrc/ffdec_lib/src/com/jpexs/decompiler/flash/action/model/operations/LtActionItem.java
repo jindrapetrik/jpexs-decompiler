@@ -32,6 +32,10 @@ import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import com.jpexs.decompiler.graph.model.LogicalOpItem;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class LtActionItem extends BinaryOpItem implements LogicalOpItem {
 
     boolean version2;

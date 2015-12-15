@@ -32,6 +32,10 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class ConvertOIns extends InstructionDefinition implements CoerceOrConvertTypeIns {
 
     public ConvertOIns() {

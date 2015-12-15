@@ -37,7 +37,7 @@ public interface GraphSourceItem extends Serializable, Cloneable {
 
     public boolean isExit();
 
-    public long getOffset();
+    public long getAddress();
 
     public long getLineOffset();
 

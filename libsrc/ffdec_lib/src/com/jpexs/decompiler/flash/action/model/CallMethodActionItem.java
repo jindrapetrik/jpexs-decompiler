@@ -30,6 +30,10 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class CallMethodActionItem extends ActionItem {
 
     public GraphTargetItem methodName;
@@ -47,7 +51,7 @@ public class CallMethodActionItem extends ActionItem {
     }
 
     public CallMethodActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem scriptObject, GraphTargetItem methodName, List<GraphTargetItem> arguments) {
-        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.methodName = methodName;
         this.arguments = arguments;
         this.scriptObject = scriptObject;

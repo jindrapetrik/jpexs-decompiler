@@ -32,6 +32,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class MethodInfo {
 
     @Internal
@@ -320,7 +324,7 @@ public class MethodInfo {
             pdata.declaredType = ptype;
             pdata.regIndex = i + 1;
             if (!localRegNames.isEmpty()) {
-                pdata.localName = localRegNames.get(i + 1); //assuming it is a slot                
+                pdata.localName = localRegNames.get(i + 1); //assuming it is a slot
                 writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(true, localRegNames.get(i + 1)), HighlightSpecialType.PARAM_NAME, i, pdata);
             } else if ((paramNames.length > i) && (paramNames[i] != 0) && Configuration.paramNamesEnable.get()) {
                 pdata.localName = constants.getString(paramNames[i]);

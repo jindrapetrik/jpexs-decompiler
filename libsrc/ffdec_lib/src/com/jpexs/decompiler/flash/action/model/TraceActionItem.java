@@ -27,6 +27,10 @@ import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class TraceActionItem extends ActionItem {
 
     public TraceActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value) {

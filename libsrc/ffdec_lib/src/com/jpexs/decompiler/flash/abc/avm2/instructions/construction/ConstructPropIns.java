@@ -32,6 +32,10 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class ConstructPropIns extends InstructionDefinition {
 
     public ConstructPropIns() {

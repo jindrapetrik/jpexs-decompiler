@@ -42,6 +42,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
+/**
+ *
+ * @author JPEXS
+ */
 public abstract class SetLocalTypeIns extends InstructionDefinition implements SetTypeIns {
 
     public SetLocalTypeIns(int instructionCode, String instructionName, int[] operands, boolean canThrow) {

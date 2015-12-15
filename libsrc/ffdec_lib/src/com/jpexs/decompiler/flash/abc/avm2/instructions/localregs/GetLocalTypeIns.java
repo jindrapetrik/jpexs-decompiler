@@ -32,6 +32,10 @@ import com.jpexs.decompiler.graph.NotCompileTimeItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public abstract class GetLocalTypeIns extends InstructionDefinition {
 
     public GetLocalTypeIns(int instructionCode, String instructionName, int[] operands, boolean canThrow) {

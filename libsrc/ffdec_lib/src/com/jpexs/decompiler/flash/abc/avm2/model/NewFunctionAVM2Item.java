@@ -31,6 +31,10 @@ import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class NewFunctionAVM2Item extends AVM2Item {
 
     public String functionName;

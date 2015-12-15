@@ -18,6 +18,10 @@ package com.jpexs.decompiler.flash.ecma;
 
 import java.io.Serializable;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class Undefined implements Serializable {
 
     public static Undefined INSTANCE = new Undefined();

@@ -29,6 +29,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class IncrementActionItem extends ActionItem {
 
     public GraphTargetItem object;
@@ -41,7 +45,7 @@ public class IncrementActionItem extends ActionItem {
     }
 
     public IncrementActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object) {
-        super(instruction, lineStartIns,  PRECEDENCE_ADDITIVE);
+        super(instruction, lineStartIns, PRECEDENCE_ADDITIVE);
         this.object = object;
     }
 

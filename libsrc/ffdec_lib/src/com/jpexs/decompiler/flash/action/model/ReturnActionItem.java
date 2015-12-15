@@ -39,11 +39,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class ReturnActionItem extends ActionItem implements ExitItem {
 
-    //public GraphTargetItem value;
     public ReturnActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value) {
-        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY, value);
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY, value);
     }
 
     @Override

@@ -68,6 +68,10 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+/**
+ *
+ * @author JPEXS
+ */
 public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private static final Logger logger = Logger.getLogger(ImagePanel.class.getName());

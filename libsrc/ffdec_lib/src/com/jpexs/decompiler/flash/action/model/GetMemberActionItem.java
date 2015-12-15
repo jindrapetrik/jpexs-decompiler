@@ -30,6 +30,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class GetMemberActionItem extends ActionItem {
 
     public GraphTargetItem object;
@@ -44,7 +48,7 @@ public class GetMemberActionItem extends ActionItem {
     }
 
     public GetMemberActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, GraphTargetItem memberName) {
-        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.object = object;
         this.memberName = memberName;
     }

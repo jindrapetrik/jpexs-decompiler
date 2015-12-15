@@ -27,10 +27,14 @@ import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class ThrowActionItem extends ActionItem {
 
     public ThrowActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object) {
-        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY, object);
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY, object);
     }
 
     @Override

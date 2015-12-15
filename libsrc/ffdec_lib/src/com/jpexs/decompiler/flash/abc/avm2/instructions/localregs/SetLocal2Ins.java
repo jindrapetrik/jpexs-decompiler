@@ -18,6 +18,10 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions.localregs;
 
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class SetLocal2Ins extends SetLocalTypeIns {
 
     public SetLocal2Ins() {

@@ -36,6 +36,10 @@ import com.jpexs.helpers.Helper;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class TraitSlotConst extends Trait implements TraitWithSlot {
 
     public int slot_id;

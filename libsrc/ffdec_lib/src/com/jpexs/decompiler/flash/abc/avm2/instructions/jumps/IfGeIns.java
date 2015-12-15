@@ -33,6 +33,10 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ *
+ * @author JPEXS
+ */
 public class IfGeIns extends InstructionDefinition implements IfTypeIns {
 
     public IfGeIns() {
