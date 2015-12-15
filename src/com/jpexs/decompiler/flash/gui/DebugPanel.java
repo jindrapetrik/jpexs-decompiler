@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.debugger.flash.Variable;
 import com.jpexs.debugger.flash.messages.in.InBreakAtExt;
+import com.jpexs.debugger.flash.messages.in.InConstantPool;
 import com.jpexs.debugger.flash.messages.in.InFrame;
 import com.jpexs.decompiler.flash.gui.DebuggerHandler.BreakListener;
 import com.jpexs.decompiler.flash.gui.abc.ABCPanel;
@@ -74,6 +75,8 @@ public class DebugPanel extends JPanel {
 
     private JTable stackTable;
 
+    private JTable constantPoolTable;
+
     private JTabbedPane varTabs;
 
     private BreakListener listener;
@@ -88,7 +91,7 @@ public class DebugPanel extends JPanel {
 
     public static enum SelectedTab {
 
-        LOG, STACK, SCOPECHAIN, LOCALS, REGISTERS, CALLSTACK
+        LOG, STACK, SCOPECHAIN, LOCALS, REGISTERS, CALLSTACK, CONSTANTPOOL
     }
 
     public synchronized boolean isLoading() {
@@ -202,6 +205,7 @@ public class DebugPanel extends JPanel {
 
         callStackTable = new JTable();
         stackTable = new JTable();
+        constantPoolTable = new JTable();
         traceLogTextarea = new JTextArea();
         traceLogTextarea.setEditable(false);
         traceLogTextarea.setOpaque(false);
@@ -381,17 +385,47 @@ public class DebugPanel extends JPanel {
                         DefaultTableModel tm = new DefaultTableModel(data, new Object[]{
                             AppStrings.translate("callStack.header.file"),
                             AppStrings.translate("callStack.header.line")
-                        });
+                        }) {
+                            @Override
+                            public boolean isCellEditable(int row, int column) {
+                                return false;
+                            }
+
+                        };
                         callStackTable.setModel(tm);
 
                         Object[][] data2 = new Object[info.stacks.size()][1];
                         for (int i = 0; i < info.stacks.size(); i++) {
                             data2[i][0] = info.stacks.get(i);
                         }
-                        stackTable.setModel(new DefaultTableModel(data2, new Object[]{AppStrings.translate("stack.header.item")}));
+                        stackTable.setModel(new DefaultTableModel(data2, new Object[]{AppStrings.translate("stack.header.item")}) {
+                            @Override
+                            public boolean isCellEditable(int row, int column) {
+                                return false;
+                            }
+
+                        });
                     } else {
                         callStackTable.setModel(new DefaultTableModel());
                         stackTable.setModel(new DefaultTableModel());
+                    }
+                    InConstantPool cpool = Main.getDebugHandler().getConstantPool();
+                    if (cpool != null) {
+                        Object[][] data2 = new Object[cpool.vars.size()][2];
+                        for (int i = 0; i < cpool.vars.size(); i++) {
+                            data2[i][0] = cpool.ids.get(i);
+                            data2[i][1] = cpool.vars.get(i).value;
+                        }
+                        constantPoolTable.setModel(new DefaultTableModel(data2, new Object[]{
+                            AppStrings.translate("constantpool.header.id"),
+                            AppStrings.translate("constantpool.header.value")
+                        }) {
+                            @Override
+                            public boolean isCellEditable(int row, int column) {
+                                return false;
+                            }
+
+                        });
                     }
 
                     varTabs.removeAll();
@@ -417,6 +451,14 @@ public class DebugPanel extends JPanel {
                         pa = new JPanel(new BorderLayout());
                         pa.add(new JScrollPane(debugScopeTable), BorderLayout.CENTER);
                         varTabs.addTab(AppStrings.translate("variables.header.scopeChain"), pa);
+                    }
+
+                    if (constantPoolTable.getRowCount() > 0) {
+                        tabTypes.add(SelectedTab.CONSTANTPOOL);
+
+                        pa = new JPanel(new BorderLayout());
+                        pa.add(new JScrollPane(constantPoolTable), BorderLayout.CENTER);
+                        varTabs.addTab(AppStrings.translate("constantpool.header"), pa);
                     }
 
                     if (callStackTable.getRowCount() > 0) {

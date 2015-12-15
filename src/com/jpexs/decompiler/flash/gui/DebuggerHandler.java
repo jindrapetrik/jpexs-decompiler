@@ -27,6 +27,7 @@ import com.jpexs.debugger.flash.messages.in.InAskBreakpoints;
 import com.jpexs.debugger.flash.messages.in.InBreakAt;
 import com.jpexs.debugger.flash.messages.in.InBreakAtExt;
 import com.jpexs.debugger.flash.messages.in.InBreakReason;
+import com.jpexs.debugger.flash.messages.in.InConstantPool;
 import com.jpexs.debugger.flash.messages.in.InContinue;
 import com.jpexs.debugger.flash.messages.in.InFrame;
 import com.jpexs.debugger.flash.messages.in.InGetSwd;
@@ -292,6 +293,7 @@ public class DebuggerHandler implements DebugConnectionListener {
     }
 
     private InFrame frame;
+    private InConstantPool pool;
 
     private InBreakAtExt breakInfo;
 
@@ -373,6 +375,7 @@ public class DebuggerHandler implements DebugConnectionListener {
         }
         try {
             frame = commands.getFrame(0);
+            pool = commands.getConstantPool(0);
         } catch (IOException ex) {
             //ignore
         }
@@ -407,6 +410,7 @@ public class DebuggerHandler implements DebugConnectionListener {
 
     public void disconnect() {
         frame = null;
+        pool = null;
         breakInfo = null;
         breakReason = null;
         connected = false;
@@ -659,6 +663,7 @@ public class DebuggerHandler implements DebugConnectionListener {
                             Main.startWork(AppStrings.translate("work.breakat") + newBreakScriptName + ":" + message.line + " " + AppStrings.translate("debug.break.reason." + reason), null);
                         }
                         frame = commands.getFrame(0);
+                        pool = commands.getConstantPool(0);
 
                         for (BreakListener l : breakListeners) {
                             l.breakAt(newBreakScriptName, message.line,
@@ -753,5 +758,12 @@ public class DebuggerHandler implements DebugConnectionListener {
         }
         Logger.getLogger(DebuggerHandler.class.getName()).log(Level.FINEST, "sending bps finished");
 
+    }
+
+    public synchronized InConstantPool getConstantPool() {
+        if (!paused) {
+            return null;
+        }
+        return pool;
     }
 }

@@ -507,6 +507,13 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
                         case VariableType.STRING:
                             return "\"" + Helper.escapeActionScriptString("" + v.value) + "\"";
                         default:
+                            if (v.value instanceof Number) {
+                                String sv = "" + v.value;
+                                if (sv.endsWith(".0")) {
+                                    sv = sv.substring(0, sv.length() - 2);
+                                }
+                                return sv;
+                            }
                             return "" + v.value;
                     }
 
