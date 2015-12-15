@@ -127,8 +127,8 @@ public class DebugPanel extends JPanel {
 
     public DebugPanel() {
         super(new BorderLayout());
-        debugRegistersTable = new MyTreeTable(new ABCPanel.VariablesTableModel(debugRegistersTable, new ArrayList<>(), new ArrayList<>()));
-        debugLocalsTable = new MyTreeTable(new ABCPanel.VariablesTableModel(debugLocalsTable, new ArrayList<>(), new ArrayList<>()));
+        debugRegistersTable = new MyTreeTable(new ABCPanel.VariablesTableModel(debugRegistersTable, new ArrayList<>(), new ArrayList<>()), false);
+        debugLocalsTable = new MyTreeTable(new ABCPanel.VariablesTableModel(debugLocalsTable, new ArrayList<>(), new ArrayList<>()), false);
 
         //Add watch feature, commented out. I tried it, but without success. I can't add watch in Flash Pro or FDB either. :-(
         /*
@@ -198,7 +198,7 @@ public class DebugPanel extends JPanel {
          debugScopeTable.addMouseListener(watchHandler);
 
          */
-        debugScopeTable = new MyTreeTable(new ABCPanel.VariablesTableModel(debugScopeTable, new ArrayList<>(), new ArrayList<>()));
+        debugScopeTable = new MyTreeTable(new ABCPanel.VariablesTableModel(debugScopeTable, new ArrayList<>(), new ArrayList<>()), false);
 
         callStackTable = new JTable();
         stackTable = new JTable();
@@ -397,13 +397,13 @@ public class DebugPanel extends JPanel {
                     varTabs.removeAll();
                     tabTypes.clear();
                     JPanel pa;
-                    if (debugRegistersTable.getRowCount() > 1 /*root*/) {
+                    if (debugRegistersTable.getRowCount() > 0) {
                         tabTypes.add(SelectedTab.REGISTERS);
                         pa = new JPanel(new BorderLayout());
                         pa.add(new JScrollPane(debugRegistersTable), BorderLayout.CENTER);
                         varTabs.addTab(AppStrings.translate("variables.header.registers"), pa);
                     }
-                    if (debugLocalsTable.getRowCount() > 1 /*root*/) {
+                    if (debugLocalsTable.getRowCount() > 0) {
                         tabTypes.add(SelectedTab.LOCALS);
 
                         pa = new JPanel(new BorderLayout());
@@ -411,7 +411,7 @@ public class DebugPanel extends JPanel {
                         varTabs.addTab(AppStrings.translate("variables.header.locals"), pa);
                     }
 
-                    if (debugScopeTable.getRowCount() > 1 /*root*/) {
+                    if (debugScopeTable.getRowCount() > 0) {
                         tabTypes.add(SelectedTab.SCOPECHAIN);
 
                         pa = new JPanel(new BorderLayout());

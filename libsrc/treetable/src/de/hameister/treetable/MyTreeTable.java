@@ -9,6 +9,7 @@ public class MyTreeTable extends JTable {
 
     private MyTreeTableCellRenderer tree;
     private MyTreeTableModel treeTableModel;
+    private boolean showRoot;
 
     public MyTreeTableCellRenderer getTree() {
         return tree;
@@ -22,6 +23,8 @@ public class MyTreeTable extends JTable {
         // JTree erstellen.
         this.treeTableModel = treeTableModel;
         tree = new MyTreeTableCellRenderer(this, treeTableModel);
+        tree.setRootVisible(showRoot);
+        tree.setShowsRootHandles(true);
 
         // Modell setzen.
         super.setModel(new MyTreeTableModelAdapter(treeTableModel, tree));
@@ -43,8 +46,9 @@ public class MyTreeTable extends JTable {
         setIntercellSpacing(new Dimension(0, 0));
     }
 
-    public MyTreeTable(MyTreeTableModel treeTableModel) {
+    public MyTreeTable(MyTreeTableModel treeTableModel, boolean showRoot) {
         super();
+        this.showRoot = showRoot;
         setUI(new BasicTableUI());
         setTreeModel(treeTableModel);
     }

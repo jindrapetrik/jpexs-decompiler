@@ -21,7 +21,7 @@ public class TreeTableMain extends JFrame {
         setLayout(new GridLayout(0, 1));
         MyAbstractTreeTableModel treeTableModel = new MyDataModel(createDataStructure());
 
-        MyTreeTable myTreeTable = new MyTreeTable(treeTableModel);
+        MyTreeTable myTreeTable = new MyTreeTable(treeTableModel, false);
 
         Container cPane = getContentPane();
 
@@ -33,19 +33,19 @@ public class TreeTableMain extends JFrame {
     }
 
     private static MyDataNode createDataStructure() {
-        List<MyDataNode> children1 = new ArrayList<MyDataNode>();
+        List<MyDataNode> children1 = new ArrayList<>();
         children1.add(new MyDataNode("N12", "C12", new Date(), Integer.valueOf(50), null));
         children1.add(new MyDataNode("N13", "C13", new Date(), Integer.valueOf(60), null));
         children1.add(new MyDataNode("N14", "C14", new Date(), Integer.valueOf(70), null));
         children1.add(new MyDataNode("N15", "C15", new Date(), Integer.valueOf(80), null));
 
-        List<MyDataNode> children2 = new ArrayList<MyDataNode>();
+        List<MyDataNode> children2 = new ArrayList<>();
         children2.add(new MyDataNode("N12", "C12", new Date(), Integer.valueOf(10), null));
         children2.add(new MyDataNode("N13", "C13", new Date(), Integer.valueOf(20), children1));
         children2.add(new MyDataNode("N14", "C14", new Date(), Integer.valueOf(30), null));
         children2.add(new MyDataNode("N15", "C15", new Date(), Integer.valueOf(40), null));
 
-        List<MyDataNode> rootNodes = new ArrayList<MyDataNode>();
+        List<MyDataNode> rootNodes = new ArrayList<>();
         rootNodes.add(new MyDataNode("N1", "C1", new Date(), Integer.valueOf(10), children2));
         rootNodes.add(new MyDataNode("N2", "C2", new Date(), Integer.valueOf(10), children1));
         rootNodes.add(new MyDataNode("N3", "C3", new Date(), Integer.valueOf(10), children2));
