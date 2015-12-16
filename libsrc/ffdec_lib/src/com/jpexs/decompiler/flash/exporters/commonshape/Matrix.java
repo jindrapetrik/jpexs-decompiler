@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.exporters.commonshape;
 
+import com.jpexs.decompiler.flash.importers.SvgPathReader;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import java.awt.geom.AffineTransform;
 
@@ -229,7 +230,7 @@ public final class Matrix implements Cloneable {
         return transform;
     }
 
-    public String getTransformationString(double translateDivisor, double unitDivisor) {
+    public String getSvgTransformationString(double translateDivisor, double unitDivisor) {
         double translateX = roundPixels400(this.translateX / translateDivisor);
         double translateY = roundPixels400(this.translateY / translateDivisor);
         double rotateSkew0 = roundPixels400(this.rotateSkew0 / unitDivisor);
@@ -238,6 +239,47 @@ public final class Matrix implements Cloneable {
         double scaleY = roundPixels400(this.scaleY / unitDivisor);
         return "matrix(" + scaleX + ", " + rotateSkew0 + ", "
                 + rotateSkew1 + ", " + scaleY + ", " + translateX + ", " + translateY + ")";
+    }
+
+    public static Matrix parseSvgMatrix(String matrixStr, double translateDivisor, double unitDivisor) {
+        matrixStr = matrixStr.trim();
+        if (matrixStr.startsWith("matrix")) {
+            matrixStr = matrixStr.substring(6).trim();
+            if (matrixStr.startsWith("(") && matrixStr.endsWith(")")) {
+                matrixStr = matrixStr.substring(1, matrixStr.length() - 1);
+                SvgPathReader reader = new SvgPathReader(matrixStr);
+                double scaleX = reader.readDouble() * unitDivisor;
+                double rotateSkew0 = reader.readDouble() * unitDivisor;
+                double rotateSkew1 = reader.readDouble() * unitDivisor;
+                double scaleY = reader.readDouble() * unitDivisor;
+                double translateX = reader.readDouble() * translateDivisor;
+                double translateY = reader.readDouble() * translateDivisor;
+                Matrix result = new Matrix();
+                result.translateX = translateX;
+                result.translateY = translateY;
+                result.rotateSkew0 = rotateSkew0;
+                result.rotateSkew1 = rotateSkew1;
+                result.scaleX = scaleX;
+                result.scaleY = scaleY;
+                return result;
+            }
+        } else if (matrixStr.startsWith("translate")) {
+            matrixStr = matrixStr.substring(9).trim();
+            if (matrixStr.startsWith("(") && matrixStr.endsWith(")")) {
+                matrixStr = matrixStr.substring(1, matrixStr.length() - 1);
+                SvgPathReader reader = new SvgPathReader(matrixStr);
+                double translateX = reader.readDouble() * translateDivisor;
+                double translateY = reader.readDouble() * translateDivisor;
+                Matrix result = new Matrix();
+                result.translateX = translateX;
+                result.translateY = translateY;
+                result.scaleX = unitDivisor;
+                result.scaleY = unitDivisor;
+                return result;
+            }
+        }
+
+        return null;
     }
 
     private double roundPixels400(double pixels) {

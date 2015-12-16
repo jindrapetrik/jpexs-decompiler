@@ -150,7 +150,7 @@ public class SVGExporter {
 
     public final Element createSubGroup(Matrix transform, String id) {
         Element group = createSubGroup(id, "g");
-        group.setAttribute("transform", transform.getTransformationString(SWF.unitDivisor, 1));
+        group.setAttribute("transform", transform.getSvgTransformationString(SWF.unitDivisor, 1));
         return group;
     }
 
@@ -210,7 +210,7 @@ public class SVGExporter {
     public Element addUse(Matrix transform, RECT boundRect, String href, String instanceName) {
         Element image = _svg.createElement("use");
         if (transform != null) {
-            image.setAttribute("transform", transform.getTransformationString(SWF.unitDivisor, 1));
+            image.setAttribute("transform", transform.getSvgTransformationString(SWF.unitDivisor, 1));
             image.setAttribute("width", Double.toString(boundRect.getWidth() / (double) SWF.unitDivisor));
             image.setAttribute("height", Double.toString(boundRect.getHeight() / (double) SWF.unitDivisor));
         }

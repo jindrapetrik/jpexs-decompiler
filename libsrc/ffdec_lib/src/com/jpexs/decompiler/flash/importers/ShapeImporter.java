@@ -17,6 +17,8 @@
 package com.jpexs.decompiler.flash.importers;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
+import com.jpexs.decompiler.flash.exporters.commonshape.Point;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
@@ -67,6 +69,8 @@ import org.xml.sax.SAXException;
  * @author JPEXS
  */
 public class ShapeImporter {
+
+    private boolean cubicWarning = false;
 
     public Tag importImage(ShapeTag st, byte[] newData) throws IOException {
         return importImage(st, newData, 0, true);
@@ -143,6 +147,10 @@ public class ShapeImporter {
     }
 
     public Tag importSvg(ShapeTag st, String svgXml) {
+        return importSvg(st, svgXml, true);
+    }
+
+    public Tag importSvg(ShapeTag st, String svgXml, boolean fill) {
         SWF swf = st.getSwf();
 
         SHAPEWITHSTYLE shapes = new SHAPEWITHSTYLE();
@@ -164,13 +172,30 @@ public class ShapeImporter {
                 throw new IOException("SVG root element should be 'svg'");
             }
 
-            processSvgObject(shapeNum, shapes, rootElement);
-
+            SvgStyle style = new SvgStyle();
+            style = style.apply(rootElement);
+            Matrix transform = Matrix.getScaleInstance(SWF.unitDivisor);
+            processSvgObject(shapeNum, shapes, rootElement, transform, style);
         } catch (SAXException | IOException | ParserConfigurationException ex) {
             Logger.getLogger(ShapeImporter.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         shapes.shapeRecords.add(new EndShapeRecord());
+
+        RECT rect = st.getRect();
+        int origXmin = rect.Xmin;
+        int origYmin = rect.Ymin;
+        rect.Xmin -= origXmin;
+        rect.Xmax -= origXmin;
+        rect.Ymin -= origYmin;
+        rect.Ymax -= origYmin;
+
+        if (!fill) {
+            // todo: how to calulate the real SVG size?
+            RECT bounds = shapes.getBounds();
+            rect.Xmax = rect.Xmin + bounds.getWidth();
+            rect.Ymax = rect.Ymin + bounds.getHeight();
+        }
 
         st.shapes = shapes;
         st.setModified(true);
@@ -178,43 +203,29 @@ public class ShapeImporter {
         return (Tag) st;
     }
 
-    private void processSvgObject(int shapeNum, SHAPEWITHSTYLE shapes, Element element) {
+    private void processSvgObject(int shapeNum, SHAPEWITHSTYLE shapes, Element element, Matrix transform, SvgStyle style) {
         for (int i = 0; i < element.getChildNodes().getLength(); i++) {
             Node childNode = element.getChildNodes().item(i);
             if (childNode instanceof Element) {
                 Element childElement = (Element) childNode;
                 String tagName = childElement.getTagName();
+                SvgStyle newStyle = style.apply(childElement);
                 if ("g".equals(tagName)) {
-                    processSvgObject(shapeNum, shapes, childElement);
+                    Matrix m = Matrix.parseSvgMatrix(childElement.getAttribute("transform"), SWF.unitDivisor, 1);
+                    Matrix m2 = m == null ? transform : m.concatenate(transform);
+                    processSvgObject(shapeNum, shapes, childElement, m2, newStyle);
                 } else if ("path".equals(tagName)) {
-                    processPath(shapeNum, shapes, childElement);
+                    processPath(shapeNum, shapes, childElement, transform, newStyle);
                 }
             }
         }
     }
 
-    private void processPath(int shapeNum, SHAPEWITHSTYLE shapes, Element childElement) {
+    private void processPath(int shapeNum, SHAPEWITHSTYLE shapes, Element childElement, Matrix transform, SvgStyle style) {
         String data = childElement.getAttribute("d");
-        if (data == null) {
-            return;
-        }
-
-        String attr = childElement.getAttribute("fill");
-        Color fillColor = parseColor(attr);
-
-        attr = childElement.getAttribute("fill-opacity");
-        if (fillColor != null && attr != null && attr.length() > 0) {
-            double opacity = Double.parseDouble(attr);
-            fillColor = new Color(fillColor.getRed(), fillColor.getGreen(), fillColor.getBlue(), (int) Math.round(opacity * 255));
-        }
-
-        attr = childElement.getAttribute("stroke");
-        Color lineColor = parseColor(attr);
-
-        attr = childElement.getAttribute("stroke-width");
-        int lineWidth = (int) Math.round((attr == null || attr.length() == 0 ? 1 : Double.parseDouble(attr)) * SWF.unitDivisor);
 
         char command = 0;
+        Point prevPoint = new Point(0, 0);
         double x0 = 0;
         double y0 = 0;
 
@@ -229,65 +240,20 @@ public class ShapeImporter {
 
             boolean isRelative = Character.isLowerCase(command);
 
-            double x = pathReader.readDouble();
-            double y = pathReader.readDouble();
-            if (isRelative) {
-                x += x0;
-                y += y0;
-            }
+            double x = x0;
+            double y = y0;
 
+            Point p = null;
             switch (Character.toUpperCase(command)) {
                 case 'M':
-                    StyleChangeRecord scr = new StyleChangeRecord();
-                    scr.moveDeltaX = (int) Math.round((x - x0) * SWF.unitDivisor);
-                    scr.moveDeltaY = (int) Math.round((y - y0) * SWF.unitDivisor);
-                    scr.stateMoveTo = true;
-
+                    StyleChangeRecord scr;
                     if (newShape) {
                         newShape = false;
-                        scr.stateNewStyles = true;
-                        scr.fillStyles = new FILLSTYLEARRAY();
-                        scr.stateFillStyle1 = true;
-                        scr.stateLineStyle = true;
-                        if (fillColor != null) {
-                            scr.fillStyles.fillStyles = new FILLSTYLE[1];
-                            scr.fillStyles.fillStyles[0] = new FILLSTYLE();
-                            scr.fillStyles.fillStyles[0].color = shapeNum >= 3 ? new RGBA(fillColor) : new RGB(fillColor);
-                            scr.fillStyles.fillStyles[0].fillStyleType = FILLSTYLE.SOLID;
-                            scr.fillStyle1 = 1;
-                        } else {
-                            scr.fillStyles.fillStyles = new FILLSTYLE[0];
-                            scr.fillStyle1 = 0;
-                        }
-
-                        scr.lineStyles = new LINESTYLEARRAY();
-                        if (lineColor != null) {
-                            scr.lineStyles.lineStyles = new LINESTYLE[1];
-                            scr.lineStyles.lineStyles[0] = shapeNum <= 3 ? new LINESTYLE() : new LINESTYLE2();
-                            scr.lineStyles.lineStyles[0].color = shapeNum >= 3 ? new RGBA(lineColor) : new RGB(lineColor);
-                            scr.lineStyles.lineStyles[0].width = lineWidth;
-                            scr.lineStyle = 1;
-                        } else {
-                            scr.lineStyles.lineStyles = new LINESTYLE[0];
-                            scr.lineStyle = 0;
-                        }
+                        scr = getStyleChangeRecord(shapeNum, style);
+                    } else {
+                        scr = new StyleChangeRecord();
                     }
 
-                    shapes.shapeRecords.add(scr);
-                    break;
-                case 'L':
-                    StraightEdgeRecord ser = new StraightEdgeRecord();
-                    ser.deltaX = (int) Math.round((x - x0) * SWF.unitDivisor);
-                    ser.deltaY = (int) Math.round((y - y0) * SWF.unitDivisor);
-                    ser.generalLineFlag = true;
-                    shapes.shapeRecords.add(ser);
-                    break;
-                case 'Q':
-                    CurvedEdgeRecord cer = new CurvedEdgeRecord();
-                    cer.controlDeltaX = (int) Math.round((x - x0) * SWF.unitDivisor);
-                    cer.controlDeltaY = (int) Math.round((y - y0) * SWF.unitDivisor);
-                    x0 = x;
-                    y0 = y;
                     x = pathReader.readDouble();
                     y = pathReader.readDouble();
                     if (isRelative) {
@@ -295,9 +261,138 @@ public class ShapeImporter {
                         y += y0;
                     }
 
-                    cer.anchorDeltaX = (int) Math.round((x - x0) * SWF.unitDivisor);
-                    cer.anchorDeltaY = (int) Math.round((y - y0) * SWF.unitDivisor);
+                    p = transform.transform(x, y);
+                    scr.moveDeltaX = (int) Math.round(p.x);
+                    scr.moveDeltaY = (int) Math.round(p.y);
+                    prevPoint = p;
+                    System.out.println("M" + scr.moveDeltaX + "," + scr.moveDeltaY);
+                    scr.stateMoveTo = true;
+
+                    shapes.shapeRecords.add(scr);
+                    break;
+                case 'L':
+                    StraightEdgeRecord ser = new StraightEdgeRecord();
+                    x = pathReader.readDouble();
+                    y = pathReader.readDouble();
+                    if (isRelative) {
+                        x += x0;
+                        y += y0;
+                    }
+
+                    p = transform.transform(x, y);
+                    ser.deltaX = (int) Math.round(p.x - prevPoint.x);
+                    ser.deltaY = (int) Math.round(p.y - prevPoint.y);
+                    prevPoint = p;
+                    System.out.println("L" + ser.deltaX + "," + ser.deltaY);
+                    ser.generalLineFlag = true;
+                    shapes.shapeRecords.add(ser);
+                    break;
+                case 'H':
+                    StraightEdgeRecord serh = new StraightEdgeRecord();
+                    x = pathReader.readDouble();
+                    if (isRelative) {
+                        x += x0;
+                    }
+
+                    p = transform.transform(x, y);
+                    serh.deltaX = (int) Math.round(p.x - prevPoint.x);
+                    prevPoint = p;
+                    System.out.println("H" + serh.deltaX);
+                    shapes.shapeRecords.add(serh);
+                    break;
+                case 'V':
+                    StraightEdgeRecord serv = new StraightEdgeRecord();
+                    y = pathReader.readDouble();
+                    if (isRelative) {
+                        y += y0;
+                    }
+
+                    p = transform.transform(x, y);
+                    serv.deltaY = (int) Math.round(p.x - prevPoint.x);
+                    prevPoint = p;
+                    System.out.println("V" + serv.deltaX);
+                    serv.vertLineFlag = true;
+                    shapes.shapeRecords.add(serv);
+                    break;
+                case 'Q':
+                    CurvedEdgeRecord cer = new CurvedEdgeRecord();
+                    x = pathReader.readDouble();
+                    y = pathReader.readDouble();
+                    if (isRelative) {
+                        x += x0;
+                        y += y0;
+                    }
+
+                    p = transform.transform(x, y);
+                    cer.controlDeltaX = (int) Math.round(p.x - prevPoint.x);
+                    cer.controlDeltaY = (int) Math.round(p.y - prevPoint.y);
+                    prevPoint = p;
+
+                    x = pathReader.readDouble();
+                    y = pathReader.readDouble();
+                    if (isRelative) {
+                        x += x0;
+                        y += y0;
+                    }
+
+                    p = transform.transform(x, y);
+                    cer.anchorDeltaX = (int) Math.round(p.x - prevPoint.x);
+                    cer.anchorDeltaY = (int) Math.round(p.y - prevPoint.y);
+                    prevPoint = p;
+                    System.out.println("Q" + cer.controlDeltaX + "," + cer.controlDeltaY + "," + cer.anchorDeltaX + "," + cer.controlDeltaY);
                     shapes.shapeRecords.add(cer);
+                    break;
+                case 'C':
+                    if (!cubicWarning) {
+                        cubicWarning = true;
+                        Logger.getLogger(ShapeImporter.class.getName()).log(Level.WARNING, "Cubic curves are not supported by Flash.");
+                    }
+
+                    // create at least something...
+                    CurvedEdgeRecord cer2 = new CurvedEdgeRecord();
+                    x = pathReader.readDouble();
+                    y = pathReader.readDouble();
+                    if (isRelative) {
+                        x += x0;
+                        y += y0;
+                    }
+
+                    p = transform.transform(x, y);
+                    int controlDeltaX1 = (int) Math.round(p.x - prevPoint.x);
+                    int controlDeltaY1 = (int) Math.round(p.y - prevPoint.y);
+                    prevPoint = p;
+
+                    x = pathReader.readDouble();
+                    y = pathReader.readDouble();
+                    if (isRelative) {
+                        x += x0;
+                        y += y0;
+                    }
+
+                    p = transform.transform(x, y);
+                    int controlDeltaX2 = (int) Math.round(p.x - prevPoint.x);
+                    int controlDeltaY2 = (int) Math.round(p.y - prevPoint.y);
+                    prevPoint = p;
+
+                    x = pathReader.readDouble();
+                    y = pathReader.readDouble();
+                    if (isRelative) {
+                        x += x0;
+                        y += y0;
+                    }
+
+                    cer2.controlDeltaX = (controlDeltaX1 + controlDeltaX2) / 2;
+                    cer2.controlDeltaY = (controlDeltaY1 + controlDeltaY2) / 2;
+
+                    p = transform.transform(x, y);
+                    cer2.anchorDeltaX = (int) Math.round(p.x - prevPoint.x);
+                    cer2.anchorDeltaY = (int) Math.round(p.y - prevPoint.y);
+                    prevPoint = p;
+                    System.out.println("C" + cer2.controlDeltaX + "," + cer2.controlDeltaY + "," + cer2.anchorDeltaX + "," + cer2.controlDeltaY);
+                    shapes.shapeRecords.add(cer2);
+                    break;
+                default:
+                    Logger.getLogger(ShapeImporter.class.getName()).log(Level.WARNING, "Unknown command: {0}", command);
                     break;
             }
 
@@ -306,18 +401,128 @@ public class ShapeImporter {
         }
     }
 
+    private StyleChangeRecord getStyleChangeRecord(int shapeNum, SvgStyle style) {
+        StyleChangeRecord scr = new StyleChangeRecord();
+
+        scr.stateNewStyles = true;
+        scr.fillStyles = new FILLSTYLEARRAY();
+        scr.stateFillStyle1 = true;
+        scr.stateLineStyle = true;
+        Color fillColor = style.getFillColorWithOpacity();
+        if (fillColor != null) {
+            scr.fillStyles.fillStyles = new FILLSTYLE[1];
+            scr.fillStyles.fillStyles[0] = new FILLSTYLE();
+            scr.fillStyles.fillStyles[0].color = shapeNum >= 3 ? new RGBA(fillColor) : new RGB(fillColor);
+            scr.fillStyles.fillStyles[0].fillStyleType = FILLSTYLE.SOLID;
+            scr.fillStyle1 = 1;
+        } else {
+            scr.fillStyles.fillStyles = new FILLSTYLE[0];
+            scr.fillStyle1 = 0;
+        }
+
+        scr.lineStyles = new LINESTYLEARRAY();
+        Color lineColor = style.strokeColor;
+        if (lineColor != null) {
+            scr.lineStyles.lineStyles = new LINESTYLE[1];
+            scr.lineStyles.lineStyles[0] = shapeNum <= 3 ? new LINESTYLE() : new LINESTYLE2();
+            scr.lineStyles.lineStyles[0].color = shapeNum >= 3 ? new RGBA(lineColor) : new RGB(lineColor);
+            scr.lineStyles.lineStyles[0].width = (int) Math.round(style.strokeWidth * SWF.unitDivisor);
+            scr.lineStyle = 1;
+        } else {
+            scr.lineStyles.lineStyles = new LINESTYLE[0];
+            scr.lineStyle = 0;
+        }
+
+        return scr;
+    }
+
     private Color parseColor(String rgbStr) {
         if (rgbStr == null) {
             return null;
         }
 
+        // todo: honfika: named colors: http://www.w3.org/TR/SVG/types.html#ColorKeywords
+        switch (rgbStr) {
+            case "none":
+                return new Color(0, true);
+        }
+
         if (rgbStr.startsWith("#")) {
             String s = rgbStr.substring(1);
+            if (s.length() == 3) {
+                s = "" + s.charAt(0) + s.charAt(0) + s.charAt(1) + s.charAt(1) + s.charAt(2) + s.charAt(2);
+            }
+
             int i = Integer.parseInt(s, 16);
-            return new Color(i, s.length() > 6);
+            return new Color(i, false);
         }
 
         return null;
+    }
+
+    class SvgStyle {
+
+        public Color fillColor;
+
+        public double fillOpacity;
+
+        public Color strokeColor;
+
+        public double strokeWidth;
+
+        public SvgStyle() {
+            fillColor = Color.BLACK;
+            fillOpacity = 1;
+            strokeColor = null;
+            strokeWidth = 1;
+        }
+
+        public Color getFillColorWithOpacity() {
+            if (fillColor == null) {
+                return null;
+            }
+
+            int opacity = (int) Math.round(fillOpacity * 255);
+            if (opacity == 255) {
+                return fillColor;
+            }
+
+            return new Color(fillColor.getRed(), fillColor.getGreen(), fillColor.getBlue(), opacity);
+        }
+
+        private SvgStyle apply(Element element) {
+            SvgStyle result = new SvgStyle();
+            result.fillColor = fillColor;
+            result.fillOpacity = fillOpacity;
+            result.strokeColor = strokeColor;
+            result.strokeWidth = strokeWidth;
+
+            String attr = element.getAttribute("fill");
+            Color fillColor = parseColor(attr);
+            if (fillColor != null) {
+                result.fillColor = fillColor;
+            }
+
+            attr = element.getAttribute("fill-opacity");
+            if (attr.length() > 0) {
+                double opacity = Double.parseDouble(attr);
+                result.fillOpacity = opacity;
+            }
+
+            attr = element.getAttribute("stroke");
+            Color strokeColor = parseColor(attr);
+            if (strokeColor != null) {
+                result.strokeColor = strokeColor;
+            }
+
+            attr = element.getAttribute("stroke-width");
+            if (attr.length() > 0) {
+                double strokeWidth = Double.parseDouble(attr);
+                result.strokeWidth = strokeWidth;
+            }
+
+            return result;
+        }
     }
 
     public static int getShapeTagType(String format) {

@@ -105,4 +105,16 @@ public class StraightEdgeRecord extends SHAPERECORD {
             numBits = 0;
         }
     }
+
+    public void simplify() {
+        if (generalLineFlag) {
+            if (deltaX == 0) {
+                generalLineFlag = false;
+                vertLineFlag = true;
+            } else if (deltaY == 0) {
+                generalLineFlag = false;
+                vertLineFlag = false;
+            }
+        }
+    }
 }
