@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.Point;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
+import com.jpexs.decompiler.flash.importers.svg.CubicToQuad;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG4Tag;
@@ -53,6 +54,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
@@ -193,8 +195,8 @@ public class ShapeImporter {
         if (!fill) {
             // todo: how to calulate the real SVG size?
             RECT bounds = shapes.getBounds();
-            rect.Xmax = rect.Xmin + bounds.getWidth();
-            rect.Ymax = rect.Ymin + bounds.getHeight();
+            rect.Xmax = rect.Xmin + bounds.Xmax - Math.min(0, bounds.Xmin);
+            rect.Ymax = rect.Ymin + bounds.Ymax - Math.min(0, bounds.Ymin);
         }
 
         st.shapes = shapes;
@@ -226,6 +228,8 @@ public class ShapeImporter {
 
         char command = 0;
         Point prevPoint = new Point(0, 0);
+        Point startPoint = prevPoint;
+        Point prevCControlPoint = null;
         double x0 = 0;
         double y0 = 0;
 
@@ -235,7 +239,6 @@ public class ShapeImporter {
             char newCommand;
             if ((newCommand = pathReader.readCommand()) != 0) {
                 command = newCommand;
-                continue;
             }
 
             boolean isRelative = Character.isLowerCase(command);
@@ -244,7 +247,8 @@ public class ShapeImporter {
             double y = y0;
 
             Point p = null;
-            switch (Character.toUpperCase(command)) {
+            char cmd = Character.toUpperCase(command);
+            switch (cmd) {
                 case 'M':
                     StyleChangeRecord scr;
                     if (newShape) {
@@ -269,9 +273,20 @@ public class ShapeImporter {
                     scr.stateMoveTo = true;
 
                     shapes.shapeRecords.add(scr);
+                    startPoint = p;
+                    break;
+                case 'Z':
+                    StraightEdgeRecord serz = new StraightEdgeRecord();
+                    p = startPoint;
+                    serz.deltaX = (int) Math.round(p.x - prevPoint.x);
+                    serz.deltaY = (int) Math.round(p.y - prevPoint.y);
+                    prevPoint = p;
+                    System.out.println("Z" + serz.deltaX + "," + serz.deltaY);
+                    serz.generalLineFlag = true;
+                    shapes.shapeRecords.add(serz);
                     break;
                 case 'L':
-                    StraightEdgeRecord ser = new StraightEdgeRecord();
+                    StraightEdgeRecord serl = new StraightEdgeRecord();
                     x = pathReader.readDouble();
                     y = pathReader.readDouble();
                     if (isRelative) {
@@ -280,12 +295,12 @@ public class ShapeImporter {
                     }
 
                     p = transform.transform(x, y);
-                    ser.deltaX = (int) Math.round(p.x - prevPoint.x);
-                    ser.deltaY = (int) Math.round(p.y - prevPoint.y);
+                    serl.deltaX = (int) Math.round(p.x - prevPoint.x);
+                    serl.deltaY = (int) Math.round(p.y - prevPoint.y);
                     prevPoint = p;
-                    System.out.println("L" + ser.deltaX + "," + ser.deltaY);
-                    ser.generalLineFlag = true;
-                    shapes.shapeRecords.add(ser);
+                    System.out.println("L" + serl.deltaX + "," + serl.deltaY);
+                    serl.generalLineFlag = true;
+                    shapes.shapeRecords.add(serl);
                     break;
                 case 'H':
                     StraightEdgeRecord serh = new StraightEdgeRecord();
@@ -343,13 +358,43 @@ public class ShapeImporter {
                     shapes.shapeRecords.add(cer);
                     break;
                 case 'C':
+                case 'S':
                     if (!cubicWarning) {
                         cubicWarning = true;
                         Logger.getLogger(ShapeImporter.class.getName()).log(Level.WARNING, "Cubic curves are not supported by Flash.");
                     }
 
                     // create at least something...
-                    CurvedEdgeRecord cer2 = new CurvedEdgeRecord();
+                    Point pStart = prevPoint;
+                    Point pControl1;
+
+                    if (cmd == 'C') {
+                        x = pathReader.readDouble();
+                        y = pathReader.readDouble();
+                        if (isRelative) {
+                            x += x0;
+                            y += y0;
+                        }
+
+                        pControl1 = transform.transform(x, y);
+                    } else {
+                        if (prevCControlPoint != null) {
+                            pControl1 = new Point(2 * pStart.x - prevCControlPoint.x, 2 * pStart.y - prevCControlPoint.y);
+                        } else {
+                            pControl1 = pStart;
+                        }
+                    }
+
+                    x = pathReader.readDouble();
+                    y = pathReader.readDouble();
+                    if (isRelative) {
+                        x += x0;
+                        y += y0;
+                    }
+
+                    Point pControl2 = transform.transform(x, y);
+                    prevCControlPoint = pControl2;
+
                     x = pathReader.readDouble();
                     y = pathReader.readDouble();
                     if (isRelative) {
@@ -358,42 +403,35 @@ public class ShapeImporter {
                     }
 
                     p = transform.transform(x, y);
-                    int controlDeltaX1 = (int) Math.round(p.x - prevPoint.x);
-                    int controlDeltaY1 = (int) Math.round(p.y - prevPoint.y);
-                    prevPoint = p;
 
-                    x = pathReader.readDouble();
-                    y = pathReader.readDouble();
-                    if (isRelative) {
-                        x += x0;
-                        y += y0;
+                    //StraightEdgeRecord serc = new StraightEdgeRecord();
+                    //serc.generalLineFlag = true;
+                    //serc.deltaX = (int) Math.round(p.x - prevPoint.x);
+                    //serc.deltaY = (int) Math.round(p.y - prevPoint.y);
+                    //shapes.shapeRecords.add(serc);
+                    List<Double> quadCoordinates = new CubicToQuad().cubicToQuad(pStart.x, pStart.y, pControl1.x, pControl1.y, pControl2.x, pControl2.y, p.x, p.y, 0.0006);
+                    for (int i = 2; i < quadCoordinates.size();) {
+                        CurvedEdgeRecord cerc = new CurvedEdgeRecord();
+                        p = new Point(quadCoordinates.get(i++), quadCoordinates.get(i++));
+                        cerc.controlDeltaX = (int) Math.round(p.x - prevPoint.x);
+                        cerc.controlDeltaY = (int) Math.round(p.y - prevPoint.y);
+                        prevPoint = p;
+
+                        p = new Point(quadCoordinates.get(i++), quadCoordinates.get(i++));
+                        cerc.anchorDeltaX = (int) Math.round(p.x - prevPoint.x);
+                        cerc.anchorDeltaY = (int) Math.round(p.y - prevPoint.y);
+                        prevPoint = p;
+                        shapes.shapeRecords.add(cerc);
                     }
 
-                    p = transform.transform(x, y);
-                    int controlDeltaX2 = (int) Math.round(p.x - prevPoint.x);
-                    int controlDeltaY2 = (int) Math.round(p.y - prevPoint.y);
-                    prevPoint = p;
-
-                    x = pathReader.readDouble();
-                    y = pathReader.readDouble();
-                    if (isRelative) {
-                        x += x0;
-                        y += y0;
-                    }
-
-                    cer2.controlDeltaX = (controlDeltaX1 + controlDeltaX2) / 2;
-                    cer2.controlDeltaY = (controlDeltaY1 + controlDeltaY2) / 2;
-
-                    p = transform.transform(x, y);
-                    cer2.anchorDeltaX = (int) Math.round(p.x - prevPoint.x);
-                    cer2.anchorDeltaY = (int) Math.round(p.y - prevPoint.y);
-                    prevPoint = p;
-                    System.out.println("C" + cer2.controlDeltaX + "," + cer2.controlDeltaY + "," + cer2.anchorDeltaX + "," + cer2.controlDeltaY);
-                    shapes.shapeRecords.add(cer2);
                     break;
                 default:
                     Logger.getLogger(ShapeImporter.class.getName()).log(Level.WARNING, "Unknown command: {0}", command);
-                    break;
+                    return;
+            }
+
+            if (cmd != 'C') {
+                prevCControlPoint = null;
             }
 
             x0 = x;
@@ -421,7 +459,7 @@ public class ShapeImporter {
         }
 
         scr.lineStyles = new LINESTYLEARRAY();
-        Color lineColor = style.strokeColor;
+        Color lineColor = style.getStrokeColorWithOpacity();
         if (lineColor != null) {
             scr.lineStyles.lineStyles = new LINESTYLE[1];
             scr.lineStyles.lineStyles[0] = shapeNum <= 3 ? new LINESTYLE() : new LINESTYLE2();
@@ -464,6 +502,8 @@ public class ShapeImporter {
 
         public Color fillColor;
 
+        public double opacity;
+
         public double fillOpacity;
 
         public Color strokeColor;
@@ -475,6 +515,7 @@ public class ShapeImporter {
             fillOpacity = 1;
             strokeColor = null;
             strokeWidth = 1;
+            opacity = 1;
         }
 
         public Color getFillColorWithOpacity() {
@@ -482,12 +523,25 @@ public class ShapeImporter {
                 return null;
             }
 
-            int opacity = (int) Math.round(fillOpacity * 255);
+            int opacity = (int) Math.round(this.opacity * fillOpacity * 255);
             if (opacity == 255) {
                 return fillColor;
             }
 
             return new Color(fillColor.getRed(), fillColor.getGreen(), fillColor.getBlue(), opacity);
+        }
+
+        public Color getStrokeColorWithOpacity() {
+            if (strokeColor == null) {
+                return null;
+            }
+
+            int opacity = (int) Math.round(this.opacity * 255);
+            if (opacity == 255) {
+                return strokeColor;
+            }
+
+            return new Color(strokeColor.getRed(), strokeColor.getGreen(), strokeColor.getBlue(), opacity);
         }
 
         private SvgStyle apply(Element element) {
@@ -519,6 +573,12 @@ public class ShapeImporter {
             if (attr.length() > 0) {
                 double strokeWidth = Double.parseDouble(attr);
                 result.strokeWidth = strokeWidth;
+            }
+
+            attr = element.getAttribute("opacity");
+            if (attr.length() > 0) {
+                double opacity = Double.parseDouble(attr);
+                result.opacity = opacity;
             }
 
             return result;
