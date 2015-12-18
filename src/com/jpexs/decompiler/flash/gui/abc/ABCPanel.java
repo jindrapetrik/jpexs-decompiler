@@ -382,7 +382,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         public VariableNode getChildAt(int index) {
             ensureLoaded();
             Long parId = 0L;
-            if (thisVar != null && thisVar.vType == VariableType.OBJECT) {
+            if (thisVar != null && (thisVar.vType == VariableType.OBJECT || thisVar.vType == VariableType.MOVIECLIP)) {
                 parId = (Long) thisVar.value;
             }
             VariableNode vn = new VariableNode(level + 1, childs.get(index), parId, childTraits.get(index));
