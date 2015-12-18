@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.exporters.commonshape;
 
-import com.jpexs.decompiler.flash.importers.SvgPathReader;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import java.awt.geom.AffineTransform;
 
@@ -241,45 +240,107 @@ public final class Matrix implements Cloneable {
                 + rotateSkew1 + ", " + scaleY + ", " + translateX + ", " + translateY + ")";
     }
 
-    public static Matrix parseSvgMatrix(String matrixStr, double translateDivisor, double unitDivisor) {
-        matrixStr = matrixStr.trim();
-        if (matrixStr.startsWith("matrix")) {
-            matrixStr = matrixStr.substring(6).trim();
-            if (matrixStr.startsWith("(") && matrixStr.endsWith(")")) {
-                matrixStr = matrixStr.substring(1, matrixStr.length() - 1);
-                SvgPathReader reader = new SvgPathReader(matrixStr);
-                double scaleX = reader.readDouble() * unitDivisor;
-                double rotateSkew0 = reader.readDouble() * unitDivisor;
-                double rotateSkew1 = reader.readDouble() * unitDivisor;
-                double scaleY = reader.readDouble() * unitDivisor;
-                double translateX = reader.readDouble() * translateDivisor;
-                double translateY = reader.readDouble() * translateDivisor;
-                Matrix result = new Matrix();
-                result.translateX = translateX;
-                result.translateY = translateY;
-                result.rotateSkew0 = rotateSkew0;
-                result.rotateSkew1 = rotateSkew1;
-                result.scaleX = scaleX;
-                result.scaleY = scaleY;
-                return result;
-            }
-        } else if (matrixStr.startsWith("translate")) {
-            matrixStr = matrixStr.substring(9).trim();
-            if (matrixStr.startsWith("(") && matrixStr.endsWith(")")) {
-                matrixStr = matrixStr.substring(1, matrixStr.length() - 1);
-                SvgPathReader reader = new SvgPathReader(matrixStr);
-                double translateX = reader.readDouble() * translateDivisor;
-                double translateY = reader.readDouble() * translateDivisor;
-                Matrix result = new Matrix();
-                result.translateX = translateX;
-                result.translateY = translateY;
-                result.scaleX = unitDivisor;
-                result.scaleY = unitDivisor;
-                return result;
+    public static Matrix parseSvgMatrix(String transformStr, double translateDivisor, double unitDivisor) {
+        Matrix ret = new Matrix();
+        while (transformStr.length() > 0) {
+            String funcName = transformStr.split("\\(")[0];
+            transformStr = transformStr.substring(funcName.length() + 1);
+            String params = transformStr.split("\\)")[0];
+            transformStr = transformStr.substring(params.length() + 1);
+            String[] args = params.split(",");
+            funcName = funcName.trim();
+            switch (funcName) {
+                case "matrix":
+                    if (args.length == 6) {
+                        double scaleX = Double.parseDouble(args[0].trim()) * unitDivisor;
+                        double rotateSkew0 = Double.parseDouble(args[1].trim()) * unitDivisor;
+                        double rotateSkew1 = Double.parseDouble(args[2].trim()) * unitDivisor;
+                        double scaleY = Double.parseDouble(args[3].trim()) * unitDivisor;
+                        double translateX = Double.parseDouble(args[4].trim()) * translateDivisor;
+                        double translateY = Double.parseDouble(args[5].trim()) * translateDivisor;
+                        Matrix result = new Matrix();
+                        result.translateX = translateX;
+                        result.translateY = translateY;
+                        result.rotateSkew0 = rotateSkew0;
+                        result.rotateSkew1 = rotateSkew1;
+                        result.scaleX = scaleX;
+                        result.scaleY = scaleY;
+                        ret = ret.concatenate(result);
+                    }
+                    break;
+                case "translate":
+                    if (args.length == 1 || args.length == 2) {
+                        double translateX = Double.parseDouble(args[0].trim()) * translateDivisor;
+                        double translateY = 0;
+                        if (args.length == 2) {
+                            translateY = Double.parseDouble(args[1].trim()) * translateDivisor;
+                        }
+
+                        Matrix result = new Matrix();
+                        result.translateX = translateX;
+                        result.translateY = translateY;
+                        result.scaleX = unitDivisor;
+                        result.scaleY = unitDivisor;
+                        ret = ret.concatenate(result);
+                    }
+                    break;
+                case "scale":
+                    if (args.length == 1 || args.length == 2) {
+                        double scaleX = Double.parseDouble(args[0].trim());
+                        double scaleY = scaleX;
+                        if (args.length == 2) {
+                            scaleY = Double.parseDouble(args[1].trim());
+                        }
+
+                        Matrix result = new Matrix();
+                        result.scaleX = scaleX;
+                        result.scaleY = scaleY;
+                        ret = ret.concatenate(result);
+                    }
+                    break;
+                case "skewX":
+                    if (args.length == 1) {
+                        double angle = Double.parseDouble(args[0].trim()) * Math.PI / 180;
+
+                        Matrix result = new Matrix();
+                        result.rotateSkew1 = Math.tan(angle);
+                        ret = ret.concatenate(result);
+                    }
+                    break;
+                case "skewY":
+                    if (args.length == 1) {
+                        double angle = Double.parseDouble(args[0].trim()) * Math.PI / 180;
+
+                        Matrix result = new Matrix();
+                        result.rotateSkew0 = Math.tan(angle);
+                        ret = ret.concatenate(result);
+                    }
+                    break;
+                case "rotate":
+                    if (args.length == 1 || args.length == 3) {
+                        double rotateAngle = Double.parseDouble(args[0].trim());
+                        double tx = 0;
+                        double ty = 0;
+                        if (args.length > 1) {
+                            tx = Double.parseDouble(args[1].trim());
+                            ty = Double.parseDouble(args[2].trim());
+                        }
+
+                        double angleRad = -rotateAngle * Math.PI / 180;
+                        Matrix result = new Matrix();
+                        result.rotateSkew0 = -Math.sin(angleRad);
+                        result.rotateSkew1 = Math.sin(angleRad);
+                        result.scaleX = Math.cos(angleRad);
+                        result.scaleY = Math.cos(angleRad);
+                        result = result.preConcatenate(getTranslateInstance(tx * translateDivisor, ty * translateDivisor))
+                                .concatenate(getTranslateInstance(-tx * translateDivisor, -ty * translateDivisor));
+                        ret = ret.concatenate(result);
+                    }
+                    break;
             }
         }
 
-        return null;
+        return ret;
     }
 
     private double roundPixels400(double pixels) {

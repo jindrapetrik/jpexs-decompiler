@@ -34,6 +34,12 @@ public class LINESTYLE2 extends LINESTYLE implements Serializable {
     @SWFType(value = BasicType.UB, count = 2)
     public int joinStyle;
 
+    public static final int ROUND_CAP = 0;
+
+    public static final int NO_CAP = 1;
+
+    public static final int SQUARE_CAP = 2;
+
     public static final int ROUND_JOIN = 0;
 
     public static final int BEVEL_JOIN = 1;
@@ -56,12 +62,6 @@ public class LINESTYLE2 extends LINESTYLE implements Serializable {
 
     @SWFType(value = BasicType.UB, count = 2)
     public int endCapStyle;
-
-    public static final int ROUND_CAP = 0;
-
-    public static final int NO_CAP = 1;
-
-    public static final int SQUARE_CAP = 2;
 
     @SWFType(BasicType.UI16)
     @Conditional(value = "joinStyle", options = MITER_JOIN)

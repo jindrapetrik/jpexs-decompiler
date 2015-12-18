@@ -49,6 +49,7 @@ public class SvgPathReader {
             return 0;
         }
 
+        readWhiteSpaces();
         char ch = peek();
         char command = 0;
         if ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z')) {
@@ -63,6 +64,7 @@ public class SvgPathReader {
     public double readDouble() {
         int startPos = pos;
 
+        readWhiteSpaces();
         if (peek() == '-') {
             pos++;
         }
@@ -87,6 +89,17 @@ public class SvgPathReader {
         double result = Double.parseDouble(str.substring(startPos, pos));
         readSeparators();
         return result;
+    }
+
+    private void readWhiteSpaces() {
+        while (hasNext()) {
+            char ch = peek();
+            if (ch != ' ' && ch != '\r' && ch != '\n') {
+                return;
+            }
+
+            readChar();
+        }
     }
 
     private void readSeparators() {
