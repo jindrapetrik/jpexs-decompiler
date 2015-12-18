@@ -780,7 +780,7 @@ public class Helper {
         if (lastChar == ' ') {
             sb.setLength(sb.length() - 1);
             sb.append("%20");
-        } else if (lastChar == ' ') {
+        } else if (lastChar == '.') {
             sb.setLength(sb.length() - 1);
             sb.append("%2E");
         }
