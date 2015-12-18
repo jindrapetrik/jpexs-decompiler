@@ -225,6 +225,18 @@ public class ShapeImporter {
                     processSvgObject(shapeNum, shapes, childElement, m2, newStyle);
                 } else if ("path".equals(tagName)) {
                     processPath(shapeNum, shapes, childElement, m2, newStyle);
+                } else if ("circle".equals(tagName)) {
+                    processCircle(shapeNum, shapes, childElement, m2, newStyle);
+                } else if ("ellipse".equals(tagName)) {
+                    processEllipse(shapeNum, shapes, childElement, m2, newStyle);
+                } else if ("rect".equals(tagName)) {
+                    processRect(shapeNum, shapes, childElement, m2, newStyle);
+                } else if ("line".equals(tagName)) {
+                    processLine(shapeNum, shapes, childElement, m2, newStyle);
+                } else if ("polyline".equals(tagName)) {
+                    processPolyline(shapeNum, shapes, childElement, m2, newStyle);
+                } else if ("polygon".equals(tagName)) {
+                    processPolygon(shapeNum, shapes, childElement, m2, newStyle);
                 } else {
                     showWarning(tagName + "tagNotSupported", "The SVG tag '" + tagName + "' is not supported.");
                 }
@@ -567,9 +579,9 @@ public class ShapeImporter {
                 case 'A':
                     double rx = pathReader.readDouble();
                     double ry = pathReader.readDouble();
-                    double xRot = pathReader.readDouble();
-                    int largeFlag = (int) pathReader.readDouble();
-                    int sweepFlag = (int) pathReader.readDouble();
+                    double fi = pathReader.readDouble() * Math.PI / 180;
+                    boolean largeFlag = (int) pathReader.readDouble() != 0;
+                    boolean sweepFlag = (int) pathReader.readDouble() != 0;
 
                     x = pathReader.readDouble();
                     y = pathReader.readDouble();
@@ -578,8 +590,35 @@ public class ShapeImporter {
                         y += y0;
                     }
 
+                    double x1 = x0;
+                    double y1 = y0;
+                    double x2 = x;
+                    double y2 = y;
+
+                    double d1 = (x1 - x2) / 2;
+                    double d2 = (y1 - y2) / 2;
+                    double x1Comma = Math.cos(fi) * d1 + Math.sin(fi) * d2;
+                    double y1Comma = -Math.sin(fi) * d1 + Math.cos(fi) * d2;
+
+                    double c = Math.sqrt((rx * rx * ry * ry - rx * rx * y1Comma * y1Comma - ry * ry * x1Comma * x1Comma) / (rx * rx * y1Comma * y1Comma + ry * ry * x1Comma * x1Comma));
+                    double cxComma = c * rx * y1Comma / ry;
+                    double cyComma = c * -ry * x1Comma / rx;
+
+                    if (largeFlag == sweepFlag) {
+                        cxComma = -cxComma;
+                        cyComma = -cyComma;
+                    }
+
+                    double cx = Math.cos(fi) * cxComma - Math.sin(fi) * cyComma + (x1 + x2) / 2;
+                    double cy = Math.sin(fi) * cxComma + Math.cos(fi) * cyComma + (y1 + y2) / 2;
+
                     // todo: draw arc, now draw only a line
                     PathCommand sera = new PathCommand();
+                    sera.command = 'L';
+                    sera.params = new double[]{cx, cy};
+                    pathCommands.add(sera);
+
+                    sera = new PathCommand();
                     sera.command = 'L';
                     sera.params = new double[]{x, y};
                     pathCommands.add(sera);
@@ -600,6 +639,301 @@ public class ShapeImporter {
 
             x0 = x;
             y0 = y;
+        }
+
+        processCommands(shapeNum, shapes, pathCommands, transform, style);
+    }
+
+    private void processCircle(int shapeNum, SHAPEWITHSTYLE shapes, Element childElement, Matrix transform, SvgStyle style) {
+        String attr = childElement.getAttribute("cx");
+        double cx = attr.length() > 0 ? Double.parseDouble(attr) : 0;
+
+        attr = childElement.getAttribute("cy");
+        double cy = attr.length() > 0 ? Double.parseDouble(attr) : 0;
+
+        attr = childElement.getAttribute("r");
+        double r = attr.length() > 0 ? Double.parseDouble(attr) : 0;
+        double sqrt2RHalf = Math.sqrt(2) * r / 2;
+        double sqrt2Minus1R = (Math.sqrt(2) - 1) * r;
+
+        List<PathCommand> pathCommands = new ArrayList<>();
+        PathCommand scr = new PathCommand();
+        scr.command = 'M';
+        scr.params = new double[]{cx + r, cy};
+        pathCommands.add(scr);
+
+        double[] points = new double[]{
+            cx + r, cy - sqrt2Minus1R,
+            cx + sqrt2RHalf, cy - sqrt2RHalf,
+            cx + sqrt2Minus1R, cy - r,
+            cx, cy - r,
+            cx - sqrt2Minus1R, cy - r,
+            cx - sqrt2RHalf, cy - sqrt2RHalf,
+            cx - r, cy - sqrt2Minus1R,
+            cx - r, cy,
+            cx - r, cy + sqrt2Minus1R,
+            cx - sqrt2RHalf, cy + sqrt2RHalf,
+            cx - sqrt2Minus1R, cy + r,
+            cx, cy + r,
+            cx + sqrt2Minus1R, cy + r,
+            cx + sqrt2RHalf, cy + sqrt2RHalf,
+            cx + r, cy + sqrt2Minus1R,
+            cx + r, cy};
+
+        for (int i = 0; i < points.length; i += 4) {
+            PathCommand cer = new PathCommand();
+            cer.command = 'Q';
+            cer.params = new double[]{points[i], points[i + 1], points[i + 2], points[i + 3]};
+
+            pathCommands.add(cer);
+        }
+
+        processCommands(shapeNum, shapes, pathCommands, transform, style);
+    }
+
+    private void processEllipse(int shapeNum, SHAPEWITHSTYLE shapes, Element childElement, Matrix transform, SvgStyle style) {
+        String attr = childElement.getAttribute("cx");
+        double cx = attr.length() > 0 ? Double.parseDouble(attr) : 0;
+
+        attr = childElement.getAttribute("cy");
+        double cy = attr.length() > 0 ? Double.parseDouble(attr) : 0;
+
+        attr = childElement.getAttribute("rx");
+        double rx = attr.length() > 0 ? Double.parseDouble(attr) : 0;
+
+        attr = childElement.getAttribute("ry");
+        double ry = attr.length() > 0 ? Double.parseDouble(attr) : 0;
+
+        double sqrt2RXHalf = Math.sqrt(2) * rx / 2;
+        double sqrt2Minus1RX = (Math.sqrt(2) - 1) * rx;
+        double sqrt2RYHalf = Math.sqrt(2) * ry / 2;
+        double sqrt2Minus1RY = (Math.sqrt(2) - 1) * ry;
+
+        List<PathCommand> pathCommands = new ArrayList<>();
+        PathCommand scr = new PathCommand();
+        scr.command = 'M';
+        scr.params = new double[]{cx + rx, cy};
+        pathCommands.add(scr);
+
+        double[] points = new double[]{
+            cx + rx, cy - sqrt2Minus1RY,
+            cx + sqrt2RXHalf, cy - sqrt2RYHalf,
+            cx + sqrt2Minus1RX, cy - ry,
+            cx, cy - ry,
+            cx - sqrt2Minus1RX, cy - ry,
+            cx - sqrt2RXHalf, cy - sqrt2RYHalf,
+            cx - rx, cy - sqrt2Minus1RY,
+            cx - rx, cy,
+            cx - rx, cy + sqrt2Minus1RY,
+            cx - sqrt2RXHalf, cy + sqrt2RYHalf,
+            cx - sqrt2Minus1RX, cy + ry,
+            cx, cy + ry,
+            cx + sqrt2Minus1RX, cy + ry,
+            cx + sqrt2RXHalf, cy + sqrt2RYHalf,
+            cx + rx, cy + sqrt2Minus1RY,
+            cx + rx, cy};
+
+        for (int i = 0; i < points.length; i += 4) {
+            PathCommand cer = new PathCommand();
+            cer.command = 'Q';
+            cer.params = new double[]{points[i], points[i + 1], points[i + 2], points[i + 3]};
+
+            pathCommands.add(cer);
+        }
+
+        processCommands(shapeNum, shapes, pathCommands, transform, style);
+    }
+
+    private void processRect(int shapeNum, SHAPEWITHSTYLE shapes, Element childElement, Matrix transform, SvgStyle style) {
+        String attr = childElement.getAttribute("x");
+        double x = attr.length() > 0 ? Double.parseDouble(attr) : 0;
+
+        attr = childElement.getAttribute("y");
+        double y = attr.length() > 0 ? Double.parseDouble(attr) : 0;
+
+        attr = childElement.getAttribute("width");
+        double width = attr.length() > 0 ? Double.parseDouble(attr) : 0;
+
+        attr = childElement.getAttribute("height");
+        double height = attr.length() > 0 ? Double.parseDouble(attr) : 0;
+
+        attr = childElement.getAttribute("rx");
+        double rx = attr.length() > 0 ? Double.parseDouble(attr) : 0;
+
+        attr = childElement.getAttribute("ry");
+        double ry = attr.length() > 0 ? Double.parseDouble(attr) : 0;
+
+        if (rx == 0 && ry != 0) {
+            rx = ry;
+        } else if (rx != 0 && ry == 0) {
+            ry = rx;
+        }
+
+        if (rx > width / 2) {
+            rx = width / 2;
+        }
+
+        if (ry > height / 2) {
+            ry = height / 2;
+        }
+
+        List<PathCommand> pathCommands = new ArrayList<>();
+
+        if (rx > 0 || ry > 0) {
+            PathCommand scr = new PathCommand();
+            scr.command = 'M';
+            scr.params = new double[]{x + width, y + ry};
+            pathCommands.add(scr);
+
+            double sqrt2RXHalf = Math.sqrt(2) * rx / 2;
+            double sqrt2Minus1RX = (Math.sqrt(2) - 1) * rx;
+            double sqrt2RYHalf = Math.sqrt(2) * ry / 2;
+            double sqrt2Minus1RY = (Math.sqrt(2) - 1) * ry;
+
+            double[] points = new double[]{
+                x + width, y + ry - sqrt2Minus1RY,
+                x + width - rx + sqrt2RXHalf, y + ry - sqrt2RYHalf,
+                x + width - rx + sqrt2Minus1RX, y,
+                x + width - rx, y,
+                x + rx, y,
+                x + rx - sqrt2Minus1RX, y,
+                x + rx - sqrt2RXHalf, y + ry - sqrt2RYHalf,
+                x, y + ry - sqrt2Minus1RY,
+                x, y + ry,
+                x, y + height - ry,
+                x, y + height - ry + sqrt2Minus1RY,
+                x + rx - sqrt2RXHalf, y + height - ry + sqrt2RYHalf,
+                x + rx - sqrt2Minus1RX, y + height,
+                x + rx, y + height,
+                x + width - rx, y + height,
+                x + width - rx + sqrt2Minus1RX, y + height,
+                x + width - rx + sqrt2RXHalf, y + height - ry + sqrt2RYHalf,
+                x + width, y + height - ry + sqrt2Minus1RY,
+                x + width, y + height - ry,
+                x + width, y + ry};
+
+            for (int i = 0; i < points.length;) {
+                if (i % 10 == 8) {
+                    PathCommand cer = new PathCommand();
+                    cer.command = 'L';
+                    cer.params = new double[]{points[i], points[i + 1]};
+                    pathCommands.add(cer);
+                    i += 2;
+                } else {
+                    PathCommand cer = new PathCommand();
+                    cer.command = 'Q';
+                    cer.params = new double[]{points[i], points[i + 1], points[i + 2], points[i + 3]};
+                    pathCommands.add(cer);
+                    i += 4;
+                }
+            }
+        } else {
+            PathCommand scr = new PathCommand();
+            scr.command = 'M';
+            scr.params = new double[]{x, y};
+            pathCommands.add(scr);
+
+            double[] points = new double[]{
+                x + width, y,
+                x + width, y + height,
+                x, y + height,
+                x, y};
+
+            for (int i = 0; i < points.length; i += 2) {
+                PathCommand cer = new PathCommand();
+                cer.command = 'L';
+                cer.params = new double[]{points[i], points[i + 1]};
+
+                pathCommands.add(cer);
+            }
+        }
+
+        processCommands(shapeNum, shapes, pathCommands, transform, style);
+    }
+
+    private void processLine(int shapeNum, SHAPEWITHSTYLE shapes, Element childElement, Matrix transform, SvgStyle style) {
+        String attr = childElement.getAttribute("x1");
+        double x1 = attr.length() > 0 ? Double.parseDouble(attr) : 0;
+
+        attr = childElement.getAttribute("y1");
+        double y1 = attr.length() > 0 ? Double.parseDouble(attr) : 0;
+
+        attr = childElement.getAttribute("x2");
+        double x2 = attr.length() > 0 ? Double.parseDouble(attr) : 0;
+
+        attr = childElement.getAttribute("y2");
+        double y2 = attr.length() > 0 ? Double.parseDouble(attr) : 0;
+
+        List<PathCommand> pathCommands = new ArrayList<>();
+        PathCommand scr = new PathCommand();
+        scr.command = 'M';
+        scr.params = new double[]{x1, y1};
+        pathCommands.add(scr);
+
+        PathCommand cer = new PathCommand();
+        cer.command = 'L';
+        cer.params = new double[]{x2, y2};
+
+        pathCommands.add(cer);
+
+        processCommands(shapeNum, shapes, pathCommands, transform, style);
+    }
+
+    private void processPolyline(int shapeNum, SHAPEWITHSTYLE shapes, Element childElement, Matrix transform, SvgStyle style) {
+        processPolyline(shapeNum, shapes, childElement, transform, style, false);
+    }
+
+    private void processPolygon(int shapeNum, SHAPEWITHSTYLE shapes, Element childElement, Matrix transform, SvgStyle style) {
+        processPolyline(shapeNum, shapes, childElement, transform, style, true);
+    }
+
+    private void processPolyline(int shapeNum, SHAPEWITHSTYLE shapes, Element childElement, Matrix transform, SvgStyle style, boolean close) {
+        String data = childElement.getAttribute("points");
+
+        char command = 'M';
+        Point startPoint = new Point(0, 0);
+        double x0 = 0;
+        double y0 = 0;
+
+        List<PathCommand> pathCommands = new ArrayList<>();
+        SvgPathReader pathReader = new SvgPathReader(data);
+        while (pathReader.hasNext()) {
+            double x = x0;
+            double y = y0;
+
+            Point p = null;
+            switch (command) {
+                case 'M':
+                    PathCommand scr = new PathCommand();
+                    scr.command = 'M';
+
+                    x = pathReader.readDouble();
+                    y = pathReader.readDouble();
+                    scr.params = new double[]{x, y};
+
+                    pathCommands.add(scr);
+                    startPoint = new Point(x, y);
+                    break;
+                case 'L':
+                    PathCommand serl = new PathCommand();
+                    serl.command = 'L';
+                    x = pathReader.readDouble();
+                    y = pathReader.readDouble();
+                    serl.params = new double[]{x, y};
+                    pathCommands.add(serl);
+                    break;
+            }
+
+            x0 = x;
+            y0 = y;
+            command = 'L';
+        }
+
+        if (close) {
+            PathCommand serz = new PathCommand();
+            serz.command = 'Z';
+            serz.params = new double[]{startPoint.x, startPoint.y};
+            pathCommands.add(serz);
         }
 
         processCommands(shapeNum, shapes, pathCommands, transform, style);
@@ -674,6 +1008,300 @@ public class ShapeImporter {
         switch (rgbStr) {
             case "none":
                 return TRANSPARENT;
+            case "aliceblue":
+                return new Color(240, 248, 255);
+            case "antiquewhite":
+                return new Color(250, 235, 215);
+            case "aqua":
+                return new Color(0, 255, 255);
+            case "aquamarine":
+                return new Color(127, 255, 212);
+            case "azure":
+                return new Color(240, 255, 255);
+            case "beige":
+                return new Color(245, 245, 220);
+            case "bisque":
+                return new Color(255, 228, 196);
+            case "black":
+                return new Color(0, 0, 0);
+            case "blanchedalmond":
+                return new Color(255, 235, 205);
+            case "blue":
+                return new Color(0, 0, 255);
+            case "blueviolet":
+                return new Color(138, 43, 226);
+            case "brown":
+                return new Color(165, 42, 42);
+            case "burlywood":
+                return new Color(222, 184, 135);
+            case "cadetblue":
+                return new Color(95, 158, 160);
+            case "chartreuse":
+                return new Color(127, 255, 0);
+            case "chocolate":
+                return new Color(210, 105, 30);
+            case "coral":
+                return new Color(255, 127, 80);
+            case "cornflowerblue":
+                return new Color(100, 149, 237);
+            case "cornsilk":
+                return new Color(255, 248, 220);
+            case "crimson":
+                return new Color(220, 20, 60);
+            case "cyan":
+                return new Color(0, 255, 255);
+            case "darkblue":
+                return new Color(0, 0, 139);
+            case "darkcyan":
+                return new Color(0, 139, 139);
+            case "darkgoldenrod":
+                return new Color(184, 134, 11);
+            case "darkgray":
+                return new Color(169, 169, 169);
+            case "darkgreen":
+                return new Color(0, 100, 0);
+            case "darkgrey":
+                return new Color(169, 169, 169);
+            case "darkkhaki":
+                return new Color(189, 183, 107);
+            case "darkmagenta":
+                return new Color(139, 0, 139);
+            case "darkolivegreen":
+                return new Color(85, 107, 47);
+            case "darkorange":
+                return new Color(255, 140, 0);
+            case "darkorchid":
+                return new Color(153, 50, 204);
+            case "darkred":
+                return new Color(139, 0, 0);
+            case "darksalmon":
+                return new Color(233, 150, 122);
+            case "darkseagreen":
+                return new Color(143, 188, 143);
+            case "darkslateblue":
+                return new Color(72, 61, 139);
+            case "darkslategray":
+                return new Color(47, 79, 79);
+            case "darkslategrey":
+                return new Color(47, 79, 79);
+            case "darkturquoise":
+                return new Color(0, 206, 209);
+            case "darkviolet":
+                return new Color(148, 0, 211);
+            case "deeppink":
+                return new Color(255, 20, 147);
+            case "deepskyblue":
+                return new Color(0, 191, 255);
+            case "dimgray":
+                return new Color(105, 105, 105);
+            case "dimgrey":
+                return new Color(105, 105, 105);
+            case "dodgerblue":
+                return new Color(30, 144, 255);
+            case "firebrick":
+                return new Color(178, 34, 34);
+            case "floralwhite":
+                return new Color(255, 250, 240);
+            case "forestgreen":
+                return new Color(34, 139, 34);
+            case "fuchsia":
+                return new Color(255, 0, 255);
+            case "gainsboro":
+                return new Color(220, 220, 220);
+            case "ghostwhite":
+                return new Color(248, 248, 255);
+            case "gold":
+                return new Color(255, 215, 0);
+            case "goldenrod":
+                return new Color(218, 165, 32);
+            case "gray":
+                return new Color(128, 128, 128);
+            case "grey":
+                return new Color(128, 128, 128);
+            case "green":
+                return new Color(0, 128, 0);
+            case "greenyellow":
+                return new Color(173, 255, 47);
+            case "honeydew":
+                return new Color(240, 255, 240);
+            case "hotpink":
+                return new Color(255, 105, 180);
+            case "indianred":
+                return new Color(205, 92, 92);
+            case "indigo":
+                return new Color(75, 0, 130);
+            case "ivory":
+                return new Color(255, 255, 240);
+            case "khaki":
+                return new Color(240, 230, 140);
+            case "lavender":
+                return new Color(230, 230, 250);
+            case "lavenderblush":
+                return new Color(255, 240, 245);
+            case "lawngreen":
+                return new Color(124, 252, 0);
+            case "lemonchiffon":
+                return new Color(255, 250, 205);
+            case "lightblue":
+                return new Color(173, 216, 230);
+            case "lightcoral":
+                return new Color(240, 128, 128);
+            case "lightcyan":
+                return new Color(224, 255, 255);
+            case "lightgoldenrodyellow":
+                return new Color(250, 250, 210);
+            case "lightgray":
+                return new Color(211, 211, 211);
+            case "lightgreen":
+                return new Color(144, 238, 144);
+            case "lightgrey":
+                return new Color(211, 211, 211);
+            case "lightpink":
+                return new Color(255, 182, 193);
+            case "lightsalmon":
+                return new Color(255, 160, 122);
+            case "lightseagreen":
+                return new Color(32, 178, 170);
+            case "lightskyblue":
+                return new Color(135, 206, 250);
+            case "lightslategray":
+                return new Color(119, 136, 153);
+            case "lightslategrey":
+                return new Color(119, 136, 153);
+            case "lightsteelblue":
+                return new Color(176, 196, 222);
+            case "lightyellow":
+                return new Color(255, 255, 224);
+            case "lime":
+                return new Color(0, 255, 0);
+            case "limegreen":
+                return new Color(50, 205, 50);
+            case "linen":
+                return new Color(250, 240, 230);
+            case "magenta":
+                return new Color(255, 0, 255);
+            case "maroon":
+                return new Color(128, 0, 0);
+            case "mediumaquamarine":
+                return new Color(102, 205, 170);
+            case "mediumblue":
+                return new Color(0, 0, 205);
+            case "mediumorchid":
+                return new Color(186, 85, 211);
+            case "mediumpurple":
+                return new Color(147, 112, 219);
+            case "mediumseagreen":
+                return new Color(60, 179, 113);
+            case "mediumslateblue":
+                return new Color(123, 104, 238);
+            case "mediumspringgreen":
+                return new Color(0, 250, 154);
+            case "mediumturquoise":
+                return new Color(72, 209, 204);
+            case "mediumvioletred":
+                return new Color(199, 21, 133);
+            case "midnightblue":
+                return new Color(25, 25, 112);
+            case "mintcream":
+                return new Color(245, 255, 250);
+            case "mistyrose":
+                return new Color(255, 228, 225);
+            case "moccasin":
+                return new Color(255, 228, 181);
+            case "navajowhite":
+                return new Color(255, 222, 173);
+            case "navy":
+                return new Color(0, 0, 128);
+            case "oldlace":
+                return new Color(253, 245, 230);
+            case "olive":
+                return new Color(128, 128, 0);
+            case "olivedrab":
+                return new Color(107, 142, 35);
+            case "orange":
+                return new Color(255, 165, 0);
+            case "orangered":
+                return new Color(255, 69, 0);
+            case "orchid":
+                return new Color(218, 112, 214);
+            case "palegoldenrod":
+                return new Color(238, 232, 170);
+            case "palegreen":
+                return new Color(152, 251, 152);
+            case "paleturquoise":
+                return new Color(175, 238, 238);
+            case "palevioletred":
+                return new Color(219, 112, 147);
+            case "papayawhip":
+                return new Color(255, 239, 213);
+            case "peachpuff":
+                return new Color(255, 218, 185);
+            case "peru":
+                return new Color(205, 133, 63);
+            case "pink":
+                return new Color(255, 192, 203);
+            case "plum":
+                return new Color(221, 160, 221);
+            case "powderblue":
+                return new Color(176, 224, 230);
+            case "purple":
+                return new Color(128, 0, 128);
+            case "red":
+                return new Color(255, 0, 0);
+            case "rosybrown":
+                return new Color(188, 143, 143);
+            case "royalblue":
+                return new Color(65, 105, 225);
+            case "saddlebrown":
+                return new Color(139, 69, 19);
+            case "salmon":
+                return new Color(250, 128, 114);
+            case "sandybrown":
+                return new Color(244, 164, 96);
+            case "seagreen":
+                return new Color(46, 139, 87);
+            case "seashell":
+                return new Color(255, 245, 238);
+            case "sienna":
+                return new Color(160, 82, 45);
+            case "silver":
+                return new Color(192, 192, 192);
+            case "skyblue":
+                return new Color(135, 206, 235);
+            case "slateblue":
+                return new Color(106, 90, 205);
+            case "slategray":
+                return new Color(112, 128, 144);
+            case "slategrey":
+                return new Color(112, 128, 144);
+            case "snow":
+                return new Color(255, 250, 250);
+            case "springgreen":
+                return new Color(0, 255, 127);
+            case "steelblue":
+                return new Color(70, 130, 180);
+            case "tan":
+                return new Color(210, 180, 140);
+            case "teal":
+                return new Color(0, 128, 128);
+            case "thistle":
+                return new Color(216, 191, 216);
+            case "tomato":
+                return new Color(255, 99, 71);
+            case "turquoise":
+                return new Color(64, 224, 208);
+            case "violet":
+                return new Color(238, 130, 238);
+            case "wheat":
+                return new Color(245, 222, 179);
+            case "white":
+                return new Color(255, 255, 255);
+            case "whitesmoke":
+                return new Color(245, 245, 245);
+            case "yellow":
+                return new Color(255, 255, 0);
+            case "yellowgreen":
+                return new Color(154, 205, 50);
         }
 
         if (rgbStr.startsWith("#")) {
@@ -684,10 +1312,34 @@ public class ShapeImporter {
 
             int i = Integer.parseInt(s, 16);
             return new Color(i, false);
+        } else if (rgbStr.startsWith("rgb")) {
+            rgbStr = rgbStr.substring(3).trim();
+            if (rgbStr.startsWith("(") && rgbStr.endsWith(")")) {
+                rgbStr = rgbStr.substring(1, rgbStr.length() - 1);
+                String[] args = rgbStr.split(",");
+                if (args.length == 3) {
+                    String a0 = args[0].trim();
+                    String a1 = args[1].trim();
+                    String a2 = args[2].trim();
+                    if (a0.endsWith("%") && a1.endsWith("%") && a2.endsWith("%")) {
+                        int r = (int) Math.round(Integer.parseInt(a0.substring(0, a0.length() - 1)) * 255.0 / 100);
+                        int g = (int) Math.round(Integer.parseInt(a1.substring(0, a1.length() - 1)) * 255.0 / 100);
+                        int b = (int) Math.round(Integer.parseInt(a2.substring(0, a2.length() - 1)) * 255.0 / 100);
+                        return new Color(r, g, b);
+                    } else {
+                        int r = Integer.parseInt(a0);
+                        int g = Integer.parseInt(a1);
+                        int b = Integer.parseInt(a2);
+                        return new Color(r, g, b);
+                    }
+                }
+            }
         } else {
             showWarning("fillNotSupported", "Only solid fills are supported. Random color assigned.");
             return new Color(random.nextInt(256), random.nextInt(256), random.nextInt(256));
         }
+
+        return null;
     }
 
     class PathCommand {
