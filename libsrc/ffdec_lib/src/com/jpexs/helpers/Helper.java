@@ -775,18 +775,25 @@ public class Helper {
                 sb.append((char) ch);
             }
         }
+
+        char lastChar = sb.charAt(sb.length() - 1);
+        if (lastChar == ' ') {
+            sb.setLength(sb.length() - 1);
+            sb.append("%20");
+        } else if (lastChar == ' ') {
+            sb.setLength(sb.length() - 1);
+            sb.append("%2E");
+        }
+
         str = sb.toString();
-        if (str.endsWith(" ")) {
-            str = str.substring(0, str.length() - 1) + "%20";
-        }
-        if (str.endsWith(".")) {
-            str = str.substring(0, str.length() - 1) + "%2E";
-        }
-        str = "." + str + ".";
         for (String inv : invalidFilenamesParts) {
-            str = Pattern.compile("\\." + Pattern.quote(inv) + "\\.", Pattern.CASE_INSENSITIVE).matcher(str).replaceAll("._" + inv + ".");
+            if (str.startsWith(inv)) {
+                if (str.equals(inv) || str.startsWith(".")) {
+                    str = "_" + str;
+                }
+            }
         }
-        str = str.substring(1, str.length() - 1); //remove dots
+
         if (str.isEmpty()) {
             str = "unnamed";
         }

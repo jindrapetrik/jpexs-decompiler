@@ -318,8 +318,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     private static final Logger logger = Logger.getLogger(MainPanel.class.getName());
 
-    private Map<String, ASMSource> asms = new HashMap<>();
-
     public void setPercent(int percent) {
         progressBar.setValue(percent);
         progressBar.setVisible(true);
@@ -816,7 +814,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         mainFrame.setTitle(ApplicationInfo.applicationVerName + (Configuration.displayFileName.get() ? " - " + swf.getFileTitle() : ""));
 
         List<ABCContainerTag> abcList = swf.getAbcList();
-        asms = swf.getASMs(true);
 
         boolean hasAbc = !abcList.isEmpty();
 
@@ -1608,6 +1605,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             if (rawScriptName.startsWith("#PCODE ")) {
                 rawScriptName = rawScriptName.substring("#PCODE ".length());
             }
+            Map<String, ASMSource> asms = swf.getASMs(true);
             if (actionPanel != null && asms.containsKey(rawScriptName)) {
                 actionPanel.setSource(asms.get(rawScriptName), true);
             }
@@ -2670,12 +2668,24 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         if (item instanceof ShapeTag) {
             ShapeTag st = (ShapeTag) item;
-            File selectedFile = showImportFileChooser("filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp");
+            String filter = "filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp";
+            if (Configuration.experimentalSvgImportEnabled.get()) {
+                filter += ";*.svg";
+            }
+
+            File selectedFile = showImportFileChooser(filter);
             if (selectedFile != null) {
                 File selfile = Helper.fixDialogFile(selectedFile);
-                byte[] data = Helper.readFile(selfile.getAbsolutePath());
+                byte[] data = null;
+                String svgText = null;
+                if (".svg".equals(Path.getExtension(selfile))) {
+                    svgText = Helper.readTextFile(selfile.getAbsolutePath());
+                } else {
+                    data = Helper.readFile(selfile.getAbsolutePath());
+                }
                 try {
-                    Tag newTag = new ShapeImporter().importImage(st, data, 0, false);
+                    ShapeImporter shapeImporter = new ShapeImporter();
+                    Tag newTag = svgText != null ? shapeImporter.importSvg(st, svgText, false) : shapeImporter.importImage(st, data, 0, false);
                     SWF swf = st.getSwf();
                     if (newTag != null) {
                         refreshTree(swf);
