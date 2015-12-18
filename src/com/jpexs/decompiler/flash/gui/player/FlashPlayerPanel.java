@@ -250,7 +250,7 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
 
     private Thread playQueue;
 
-    private Object queueLock = new Object();
+    private final Object queueLock = new Object();
 
     public synchronized void displaySWF(final String flashName, final Color bgColor, final float frameRate) {
 

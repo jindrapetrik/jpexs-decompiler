@@ -237,7 +237,7 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
         final int animationLength = 2; // todo
         final String animationLengthStr = animationLength + "s";
 
-        element.setAttribute(attribute, matrix.getTransformationString(SWF.unitDivisor / zoom, 1));
+        element.setAttribute(attribute, matrix.getSvgTransformationString(SWF.unitDivisor / zoom, 1));
 
         // QR decomposition
         double translateX = roundPixels400(matrix.translateX * zoom / SWF.unitDivisor);
