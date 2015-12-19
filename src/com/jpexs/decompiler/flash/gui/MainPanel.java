@@ -2615,11 +2615,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
         if (item instanceof ShapeTag) {
             ShapeTag st = (ShapeTag) item;
-            String filter = "filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp";
-            if (Configuration.experimentalSvgImportEnabled.get()) {
-                filter += ";*.svg";
-            }
-
+            String filter = "filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.svg";
             File selectedFile = showImportFileChooser(filter);
             if (selectedFile != null) {
                 File selfile = Helper.fixDialogFile(selectedFile);
@@ -2627,6 +2623,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 String svgText = null;
                 if (".svg".equals(Path.getExtension(selfile))) {
                     svgText = Helper.readTextFile(selfile.getAbsolutePath());
+                    showSvgImportWarning();
                 } else {
                     data = Helper.readFile(selfile.getAbsolutePath());
                 }
@@ -2668,11 +2665,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         if (item instanceof ShapeTag) {
             ShapeTag st = (ShapeTag) item;
-            String filter = "filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp";
-            if (Configuration.experimentalSvgImportEnabled.get()) {
-                filter += ";*.svg";
-            }
-
+            String filter = "filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.svg";
             File selectedFile = showImportFileChooser(filter);
             if (selectedFile != null) {
                 File selfile = Helper.fixDialogFile(selectedFile);
@@ -2680,6 +2673,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 String svgText = null;
                 if (".svg".equals(Path.getExtension(selfile))) {
                     svgText = Helper.readTextFile(selfile.getAbsolutePath());
+                    showSvgImportWarning();
                 } else {
                     data = Helper.readFile(selfile.getAbsolutePath());
                 }
@@ -2700,6 +2694,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 reload(true);
             }
         }
+    }
+
+    private void showSvgImportWarning() {
+        View.showMessageDialog(null, AppStrings.translate("message.warning.svgImportExperimental"), AppStrings.translate("message.warning"), JOptionPane.WARNING_MESSAGE, Configuration.warningSvgImport);
     }
 
     public void replaceAlphaButtonActionPerformed(ActionEvent evt) {
@@ -2794,7 +2792,19 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
                 @Override
                 public String getDescription() {
-                    return translate(filterName);
+                    StringBuilder extStr = new StringBuilder();
+                    boolean first = true;
+                    for (String ext : extensions) {
+                        if (first) {
+                            first = false;
+                        } else {
+                            extStr.append(",");
+                        }
+
+                        extStr.append("*").append(ext);
+                    }
+
+                    return translate(filterName).replace("%extensions%", extStr);
                 }
             };
             if (first) {

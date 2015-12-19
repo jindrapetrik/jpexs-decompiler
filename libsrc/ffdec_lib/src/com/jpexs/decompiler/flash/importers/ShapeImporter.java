@@ -586,39 +586,141 @@ public class ShapeImporter {
                         y += y0;
                     }
 
-                    double x1 = x0;
-                    double y1 = y0;
-                    double x2 = x;
-                    double y2 = y;
+                    if (rx == 0 || ry == 0) {
+                        // straight line to (x, y)
+                        PathCommand sera = new PathCommand();
+                        sera.command = 'L';
+                        sera.params = new double[]{x, y};
+                        pathCommands.add(sera);
+                    } else {
+                        rx = Math.abs(rx);
+                        ry = Math.abs(ry);
 
-                    double d1 = (x1 - x2) / 2;
-                    double d2 = (y1 - y2) / 2;
-                    double x1Comma = Math.cos(fi) * d1 + Math.sin(fi) * d2;
-                    double y1Comma = -Math.sin(fi) * d1 + Math.cos(fi) * d2;
+                        double x1 = x0;
+                        double y1 = y0;
+                        double x2 = x;
+                        double y2 = y;
 
-                    double c = Math.sqrt((rx * rx * ry * ry - rx * rx * y1Comma * y1Comma - ry * ry * x1Comma * x1Comma) / (rx * rx * y1Comma * y1Comma + ry * ry * x1Comma * x1Comma));
-                    double cxComma = c * rx * y1Comma / ry;
-                    double cyComma = c * -ry * x1Comma / rx;
+                        double d1 = (x1 - x2) / 2;
+                        double d2 = (y1 - y2) / 2;
+                        double x1Comma = Math.cos(fi) * d1 + Math.sin(fi) * d2;
+                        double y1Comma = -Math.sin(fi) * d1 + Math.cos(fi) * d2;
 
-                    if (largeFlag == sweepFlag) {
-                        cxComma = -cxComma;
-                        cyComma = -cyComma;
+                        // Correction of out-of-range radii
+                        double lambda = x1Comma * x1Comma / (rx * rx) + y1Comma * y1Comma / (ry * ry);
+                        if (lambda > 1) {
+                            double sqrtLambda = Math.sqrt(lambda);
+                            rx = sqrtLambda * rx;
+                            ry = sqrtLambda * ry;
+                        }
+
+                        double c = Math.sqrt((rx * rx * ry * ry - rx * rx * y1Comma * y1Comma - ry * ry * x1Comma * x1Comma) / (rx * rx * y1Comma * y1Comma + ry * ry * x1Comma * x1Comma));
+                        double cxComma = c * rx * y1Comma / ry;
+                        double cyComma = c * -ry * x1Comma / rx;
+
+                        if (largeFlag == sweepFlag) {
+                            cxComma = -cxComma;
+                            cyComma = -cyComma;
+                        }
+
+                        double cx = Math.cos(fi) * cxComma - Math.sin(fi) * cyComma + (x1 + x2) / 2;
+                        double cy = Math.sin(fi) * cxComma + Math.cos(fi) * cyComma + (y1 + y2) / 2;
+
+                        double px1 = (x1Comma - cxComma) / rx;
+                        double py1 = (y1Comma - cyComma) / ry;
+                        double theta1 = calcAngle(1, 0, px1, py1);
+
+                        double px2 = (-x1Comma - cxComma) / rx;
+                        double py2 = (-y1Comma - cyComma) / ry;
+                        double deltaTheta = calcAngle(px1, py1, px2, py2);
+                        if (sweepFlag) {
+                            if (deltaTheta < 0) {
+                                deltaTheta += 2 * Math.PI;
+                            }
+                        } else {
+                            if (deltaTheta > 0) {
+                                deltaTheta -= 2 * Math.PI;
+                            }
+                        }
+
+                        double rcp = Math.sqrt(4 - 2 * Math.sqrt(2));
+                        double delta = Math.PI / 4 / 45;
+                        if (deltaTheta > 0) {
+                            int segmentCount = (int) Math.ceil(deltaTheta / delta);
+
+                            double theta = theta1;
+
+                            PathCommand sera;
+                            for (int i = 0; i < segmentCount - 1; i++) {
+                                theta += delta;
+                                sera = new PathCommand();
+                                sera.command = 'L';
+                                double x12 = Math.cos(theta) * rx;
+                                double y12 = Math.sin(theta) * ry;
+                                x1Comma = Math.cos(fi) * x12 - Math.sin(fi) * y12;
+                                y1Comma = Math.sin(fi) * x12 + Math.cos(fi) * y12;
+                                sera.params = new double[]{cx + x1Comma, cy + y1Comma};
+                                pathCommands.add(sera);
+
+                                /*sera = new PathCommand();
+                                 sera.command = 'Q';
+                                 double x12 = Math.cos(theta) * rx;
+                                 double y12 = Math.sin(theta) * ry;
+                                 x1Comma = Math.cos(fi) * x12 - Math.sin(fi) * y12;
+                                 y1Comma = Math.sin(fi) * x12 + Math.cos(fi) * y12;
+
+                                 double theta2 = theta - Math.PI / 8;
+                                 x12 = Math.cos(theta2) * rx * rcp;
+                                 y12 = Math.sin(theta2) * ry * rcp;
+                                 double x1Comma2 = Math.cos(fi) * x12 - Math.sin(fi) * y12;
+                                 double y1Comma2 = Math.sin(fi) * x12 + Math.cos(fi) * y12;
+                                 sera.params = new double[]{cx + x1Comma2, cy + y1Comma2, cx + x1Comma, cy + y1Comma};
+                                 pathCommands.add(sera);*/
+                            }
+
+                            sera = new PathCommand();
+                            sera.command = 'L';
+                            sera.params = new double[]{x, y};
+                            pathCommands.add(sera);
+                        } else {
+                            int segmentCount = (int) Math.ceil(-deltaTheta / delta);
+
+                            double theta = theta1;
+
+                            PathCommand sera;
+                            for (int i = 0; i < segmentCount - 1; i++) {
+                                theta -= delta;
+                                sera = new PathCommand();
+                                sera.command = 'L';
+                                double x12 = Math.cos(theta) * rx;
+                                double y12 = Math.sin(theta) * ry;
+                                x1Comma = Math.cos(fi) * x12 - Math.sin(fi) * y12;
+                                y1Comma = Math.sin(fi) * x12 + Math.cos(fi) * y12;
+                                sera.params = new double[]{cx + x1Comma, cy + y1Comma};
+                                pathCommands.add(sera);
+
+                                /*sera = new PathCommand();
+                                 sera.command = 'Q';
+                                 double x12 = Math.cos(theta) * rx;
+                                 double y12 = Math.sin(theta) * ry;
+                                 x1Comma = Math.cos(fi) * x12 - Math.sin(fi) * y12;
+                                 y1Comma = Math.sin(fi) * x12 + Math.cos(fi) * y12;
+
+                                 double theta2 = theta + Math.PI / 8;
+                                 x12 = Math.cos(theta2) * rx * rcp;
+                                 y12 = Math.sin(theta2) * ry * rcp;
+                                 double x1Comma2 = Math.cos(fi) * x12 - Math.sin(fi) * y12;
+                                 double y1Comma2 = Math.sin(fi) * x12 + Math.cos(fi) * y12;
+                                 sera.params = new double[]{cx + x1Comma2, cy + y1Comma2, cx + x1Comma, cy + y1Comma};
+                                 pathCommands.add(sera);*/
+                            }
+
+                            sera = new PathCommand();
+                            sera.command = 'L';
+                            sera.params = new double[]{x, y};
+                            pathCommands.add(sera);
+                        }
                     }
-
-                    double cx = Math.cos(fi) * cxComma - Math.sin(fi) * cyComma + (x1 + x2) / 2;
-                    double cy = Math.sin(fi) * cxComma + Math.cos(fi) * cyComma + (y1 + y2) / 2;
-
-                    // todo: draw arc, now draw only a line
-                    PathCommand sera = new PathCommand();
-                    sera.command = 'L';
-                    sera.params = new double[]{cx, cy};
-                    pathCommands.add(sera);
-
-                    sera = new PathCommand();
-                    sera.command = 'L';
-                    sera.params = new double[]{x, y};
-                    pathCommands.add(sera);
-
                     break;
                 default:
                     Logger.getLogger(ShapeImporter.class.getName()).log(Level.WARNING, "Unknown command: {0}", command);
@@ -640,6 +742,23 @@ public class ShapeImporter {
         processCommands(shapeNum, shapes, pathCommands, transform, style);
     }
 
+    private double[] getCoordinates() {
+        //rx, -sqrt2Minus1RY,
+        //sqrt2RXHalf, -sqrt2RYHalf,
+        return null;
+    }
+
+    private double calcAngle(double ux, double uy, double vx, double vy) {
+        double lu = Math.sqrt(ux * ux + uy * uy);
+        double lv = Math.sqrt(ux * ux + uy * uy);
+        double sign = Math.signum(ux * vy - uy * vx);
+        if (sign == 0) {
+            sign = 1;
+        }
+
+        return sign * Math.acos(ux * vx + uy * vy / (lu * lv));
+    }
+
     private void processCircle(int shapeNum, SHAPEWITHSTYLE shapes, Element childElement, Matrix transform, SvgStyle style) {
         String attr = childElement.getAttribute("cx");
         double cx = attr.length() > 0 ? Double.parseDouble(attr) : 0;
@@ -649,42 +768,8 @@ public class ShapeImporter {
 
         attr = childElement.getAttribute("r");
         double r = attr.length() > 0 ? Double.parseDouble(attr) : 0;
-        double sqrt2RHalf = Math.sqrt(2) * r / 2;
-        double sqrt2Minus1R = (Math.sqrt(2) - 1) * r;
 
-        List<PathCommand> pathCommands = new ArrayList<>();
-        PathCommand scr = new PathCommand();
-        scr.command = 'M';
-        scr.params = new double[]{cx + r, cy};
-        pathCommands.add(scr);
-
-        double[] points = new double[]{
-            cx + r, cy - sqrt2Minus1R,
-            cx + sqrt2RHalf, cy - sqrt2RHalf,
-            cx + sqrt2Minus1R, cy - r,
-            cx, cy - r,
-            cx - sqrt2Minus1R, cy - r,
-            cx - sqrt2RHalf, cy - sqrt2RHalf,
-            cx - r, cy - sqrt2Minus1R,
-            cx - r, cy,
-            cx - r, cy + sqrt2Minus1R,
-            cx - sqrt2RHalf, cy + sqrt2RHalf,
-            cx - sqrt2Minus1R, cy + r,
-            cx, cy + r,
-            cx + sqrt2Minus1R, cy + r,
-            cx + sqrt2RHalf, cy + sqrt2RHalf,
-            cx + r, cy + sqrt2Minus1R,
-            cx + r, cy};
-
-        for (int i = 0; i < points.length; i += 4) {
-            PathCommand cer = new PathCommand();
-            cer.command = 'Q';
-            cer.params = new double[]{points[i], points[i + 1], points[i + 2], points[i + 3]};
-
-            pathCommands.add(cer);
-        }
-
-        processCommands(shapeNum, shapes, pathCommands, transform, style);
+        processEllipse(shapeNum, shapes, transform, style, cx, cy, r, r);
     }
 
     private void processEllipse(int shapeNum, SHAPEWITHSTYLE shapes, Element childElement, Matrix transform, SvgStyle style) {
@@ -700,6 +785,10 @@ public class ShapeImporter {
         attr = childElement.getAttribute("ry");
         double ry = attr.length() > 0 ? Double.parseDouble(attr) : 0;
 
+        processEllipse(shapeNum, shapes, transform, style, cx, cy, rx, ry);
+    }
+
+    private void processEllipse(int shapeNum, SHAPEWITHSTYLE shapes, Matrix transform, SvgStyle style, double cx, double cy, double rx, double ry) {
         double sqrt2RXHalf = Math.sqrt(2) * rx / 2;
         double sqrt2Minus1RX = (Math.sqrt(2) - 1) * rx;
         double sqrt2RYHalf = Math.sqrt(2) * ry / 2;
@@ -712,28 +801,41 @@ public class ShapeImporter {
         pathCommands.add(scr);
 
         double[] points = new double[]{
-            cx + rx, cy - sqrt2Minus1RY,
-            cx + sqrt2RXHalf, cy - sqrt2RYHalf,
-            cx + sqrt2Minus1RX, cy - ry,
-            cx, cy - ry,
-            cx - sqrt2Minus1RX, cy - ry,
-            cx - sqrt2RXHalf, cy - sqrt2RYHalf,
-            cx - rx, cy - sqrt2Minus1RY,
-            cx - rx, cy,
-            cx - rx, cy + sqrt2Minus1RY,
-            cx - sqrt2RXHalf, cy + sqrt2RYHalf,
-            cx - sqrt2Minus1RX, cy + ry,
-            cx, cy + ry,
-            cx + sqrt2Minus1RX, cy + ry,
-            cx + sqrt2RXHalf, cy + sqrt2RYHalf,
-            cx + rx, cy + sqrt2Minus1RY,
-            cx + rx, cy};
+            rx, -sqrt2Minus1RY,
+            sqrt2RXHalf, -sqrt2RYHalf,
+            sqrt2Minus1RX, -ry,
+            0, -ry,
+            -sqrt2Minus1RX, -ry,
+            -sqrt2RXHalf, -sqrt2RYHalf,
+            -rx, -sqrt2Minus1RY,
+            -rx, 0,
+            -rx, sqrt2Minus1RY,
+            -sqrt2RXHalf, sqrt2RYHalf,
+            -sqrt2Minus1RX, ry,
+            0, ry,
+            sqrt2Minus1RX, ry,
+            sqrt2RXHalf, sqrt2RYHalf,
+            rx, sqrt2Minus1RY,
+            rx, 0};
 
         for (int i = 0; i < points.length; i += 4) {
             PathCommand cer = new PathCommand();
             cer.command = 'Q';
-            cer.params = new double[]{points[i], points[i + 1], points[i + 2], points[i + 3]};
+            cer.params = new double[]{cx + points[i], cy + points[i + 1], cx + points[i + 2], cy + points[i + 3]};
 
+            /*double tetha = 30;
+             tetha *= Math.PI / 180;
+             double x1 = points[i];
+             double y1 = points[i + 1];
+             double x2 = points[i + 2];
+             double y2 = points[i + 3];
+
+             double x1Comma = Math.cos(tetha) * x1 + Math.sin(tetha) * y1;
+             double y1Comma = -Math.sin(tetha) * x1 + Math.cos(tetha) * y1;
+             double x2Comma = Math.cos(tetha) * x2 + Math.sin(tetha) * y2;
+             double y2Comma = -Math.sin(tetha) * x2 + Math.cos(tetha) * y2;
+
+             cer.params = new double[]{cx + x1Comma, cy + y1Comma, cx + x2Comma, cy + y2Comma};*/
             pathCommands.add(cer);
         }
 
