@@ -637,10 +637,8 @@ public class ShapeImporter {
                             if (deltaTheta < 0) {
                                 deltaTheta += 2 * Math.PI;
                             }
-                        } else {
-                            if (deltaTheta > 0) {
-                                deltaTheta -= 2 * Math.PI;
-                            }
+                        } else if (deltaTheta > 0) {
+                            deltaTheta -= 2 * Math.PI;
                         }
 
                         double rcp = Math.sqrt(4 - 2 * Math.sqrt(2));
@@ -1067,8 +1065,10 @@ public class ShapeImporter {
         }
 
         scr.lineStyles = new LINESTYLEARRAY();
-        Color lineColor = style.getStrokeColorWithOpacity().toColor();
-        if (lineColor != null) {
+        SvgFill strokeFill = style.getStrokeColorWithOpacity();
+        if (strokeFill != null) {
+            Color lineColor = strokeFill.toColor();
+
             scr.lineStyles.lineStyles = new LINESTYLE[1];
             LINESTYLE lineStyle = shapeNum <= 3 ? new LINESTYLE() : new LINESTYLE2();;
             lineStyle.color = shapeNum >= 3 ? new RGBA(lineColor) : new RGB(lineColor);
