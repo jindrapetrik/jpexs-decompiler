@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui.player;
 
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.FlashUnsupportedException;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.javactivex.ActiveX;
@@ -45,6 +46,8 @@ import java.util.regex.Pattern;
  * @author JPEXS
  */
 public final class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
+
+    private final int setMovieDelay = Configuration.setMovieDelay.get();
 
     private final List<MediaDisplayListener> listeners = new ArrayList<>();
 
@@ -254,7 +257,7 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
 
     public synchronized void displaySWF(final String flashName, final Color bgColor, final float frameRate) {
 
-        //Minimum of 1000 ms delay before calling flash.setMovie to avoid illegalAccess errors
+        // Minimum of 1000 ms (setMovieDelay) delay before calling flash.setMovie to avoid illegalAccess errors
         if (playQueue == null) {
             playQueue = new Thread() {
                 long lastTime;
@@ -279,7 +282,7 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
                                 movieToPlay = null;
                             }
                             try {
-                                Thread.sleep(1000);
+                                Thread.sleep(setMovieDelay);
                             } catch (InterruptedException ex) {
                                 break;
                             }

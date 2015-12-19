@@ -472,7 +472,7 @@ public class View {
         return showConfirmDialog(parentComponent, message, title, optionType, JOptionPane.PLAIN_MESSAGE, showAgainConfig, defaultOption);
     }
 
-    public static int showConfirmDialog(final Component parentComponent, String message, final String title, final int optionType, final int messageTyp, ConfigurationItem<Boolean> showAgainConfig, int defaultOption) {
+    public static int showConfirmDialog(final Component parentComponent, String message, final String title, final int optionType, final int messageType, ConfigurationItem<Boolean> showAgainConfig, int defaultOption) {
 
         JLabel warLabel = new JLabel("<html>" + message.replace("\r\n", "<br>") + "</html>");
         final JPanel warPanel = new JPanel(new BorderLayout());
@@ -487,7 +487,7 @@ public class View {
 
         final int ret[] = new int[1];
         execInEventDispatch(() -> {
-            ret[0] = JOptionPane.showConfirmDialog(parentComponent, warPanel, title, optionType, messageTyp);
+            ret[0] = JOptionPane.showConfirmDialog(parentComponent, warPanel, title, optionType, messageType);
         });
         showAgainConfig.set(!donotShowAgainCheckBox.isSelected());
         return ret[0];

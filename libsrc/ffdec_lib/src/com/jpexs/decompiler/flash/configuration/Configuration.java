@@ -104,6 +104,10 @@ public class Configuration {
     @ConfigurationCategory("display")
     public static final ConfigurationItem<Boolean> internalFlashViewer = null;
 
+    @ConfigurationDefaultInt(1000)
+    @ConfigurationCategory("display")
+    public static final ConfigurationItem<Integer> setMovieDelay = null;
+
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("display")
     public static final ConfigurationItem<Boolean> dumpView = null;
@@ -529,9 +533,10 @@ public class Configuration {
     @ConfigurationCategory("script")
     public static final ConfigurationItem<Boolean> debugHalt = null;
 
-    @ConfigurationDefaultBoolean(false)
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationName("warning.svgImport")
     @ConfigurationCategory("import")
-    public static final ConfigurationItem<Boolean> experimentalSvgImportEnabled = null;
+    public static final ConfigurationItem<Boolean> warningSvgImport = null;
 
     private enum OSId {
 
