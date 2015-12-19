@@ -77,7 +77,7 @@ public class ShapeImporter {
 
     private final Set<String> shownWarnings = new HashSet<>();
 
-    private static final Color TRANSPARENT = new Color(0, true);
+    private final SvgColor TRANSPARENT = new SvgColor(new Color(0, true));
 
     private final Random random = new Random();
 
@@ -265,7 +265,7 @@ public class ShapeImporter {
 
             double x = x0;
             double y = y0;
-            Point p = null;
+            Point p;
             char cmd = Character.toUpperCase(command.command);
             switch (cmd) {
                 case 'M':
@@ -511,12 +511,10 @@ public class ShapeImporter {
                         }
 
                         pControl = new Point(x, y);
+                    } else if (prevQControlPoint != null) {
+                        pControl = new Point(2 * x0 - prevQControlPoint.x, 2 * y0 - prevQControlPoint.y);
                     } else {
-                        if (prevQControlPoint != null) {
-                            pControl = new Point(2 * x0 - prevQControlPoint.x, 2 * y0 - prevQControlPoint.y);
-                        } else {
-                            pControl = new Point(x0, y0);
-                        }
+                        pControl = new Point(x0, y0);
                     }
 
                     prevQControlPoint = pControl;
@@ -545,12 +543,10 @@ public class ShapeImporter {
                         }
 
                         pControl1 = new Point(x, y);
+                    } else if (prevCControlPoint != null) {
+                        pControl1 = new Point(2 * x0 - prevCControlPoint.x, 2 * y0 - prevCControlPoint.y);
                     } else {
-                        if (prevCControlPoint != null) {
-                            pControl1 = new Point(2 * x0 - prevCControlPoint.x, 2 * y0 - prevCControlPoint.y);
-                        } else {
-                            pControl1 = new Point(x0, y0);
-                        }
+                        pControl1 = new Point(x0, y0);
                     }
 
                     x = pathReader.readDouble();
@@ -641,10 +637,8 @@ public class ShapeImporter {
                             if (deltaTheta < 0) {
                                 deltaTheta += 2 * Math.PI;
                             }
-                        } else {
-                            if (deltaTheta > 0) {
-                                deltaTheta -= 2 * Math.PI;
-                            }
+                        } else if (deltaTheta > 0) {
+                            deltaTheta -= 2 * Math.PI;
                         }
 
                         double rcp = Math.sqrt(4 - 2 * Math.sqrt(2));
@@ -1018,12 +1012,22 @@ public class ShapeImporter {
         scr.fillStyles = new FILLSTYLEARRAY();
         scr.stateFillStyle1 = true;
         scr.stateLineStyle = true;
-        Color fillColor = style.getFillColorWithOpacity();
-        if (fillColor != null) {
+        SvgFill fill = style.getFillWithOpacity();
+        if (fill != null) {
             scr.fillStyles.fillStyles = new FILLSTYLE[1];
             scr.fillStyles.fillStyles[0] = new FILLSTYLE();
-            scr.fillStyles.fillStyles[0].color = shapeNum >= 3 ? new RGBA(fillColor) : new RGB(fillColor);
+            Color colorFill = fill.toColor();
+            scr.fillStyles.fillStyles[0].color = shapeNum >= 3 ? new RGBA(colorFill) : new RGB(colorFill);
             scr.fillStyles.fillStyles[0].fillStyleType = FILLSTYLE.SOLID;
+            //TODO: handle different fills
+            if (fill instanceof SvgColor) {
+                //TODO
+            } else if (fill instanceof SvgLinearGradient) {
+                //TODO
+            } else if (fill instanceof SvgRadialGradient) {
+                //TODO
+            }
+
             scr.fillStyle1 = 1;
         } else {
             scr.fillStyles.fillStyles = new FILLSTYLE[0];
@@ -1031,8 +1035,10 @@ public class ShapeImporter {
         }
 
         scr.lineStyles = new LINESTYLEARRAY();
-        Color lineColor = style.getStrokeColorWithOpacity();
-        if (lineColor != null) {
+        SvgFill strokeFill = style.getStrokeColorWithOpacity();
+        if (strokeFill != null) {
+            Color lineColor = strokeFill.toColor();
+
             scr.lineStyles.lineStyles = new LINESTYLE[1];
             LINESTYLE lineStyle = shapeNum <= 3 ? new LINESTYLE() : new LINESTYLE2();;
             lineStyle.color = shapeNum >= 3 ? new RGBA(lineColor) : new RGB(lineColor);
@@ -1071,7 +1077,7 @@ public class ShapeImporter {
         return scr;
     }
 
-    private Color parseColor(String rgbStr) {
+    private SvgFill parseFill(String rgbStr) {
         if (rgbStr == null) {
             return null;
         }
@@ -1081,299 +1087,299 @@ public class ShapeImporter {
             case "none":
                 return TRANSPARENT;
             case "aliceblue":
-                return new Color(240, 248, 255);
+                return new SvgColor(240, 248, 255);
             case "antiquewhite":
-                return new Color(250, 235, 215);
+                return new SvgColor(250, 235, 215);
             case "aqua":
-                return new Color(0, 255, 255);
+                return new SvgColor(0, 255, 255);
             case "aquamarine":
-                return new Color(127, 255, 212);
+                return new SvgColor(127, 255, 212);
             case "azure":
-                return new Color(240, 255, 255);
+                return new SvgColor(240, 255, 255);
             case "beige":
-                return new Color(245, 245, 220);
+                return new SvgColor(245, 245, 220);
             case "bisque":
-                return new Color(255, 228, 196);
+                return new SvgColor(255, 228, 196);
             case "black":
-                return new Color(0, 0, 0);
+                return new SvgColor(0, 0, 0);
             case "blanchedalmond":
-                return new Color(255, 235, 205);
+                return new SvgColor(255, 235, 205);
             case "blue":
-                return new Color(0, 0, 255);
+                return new SvgColor(0, 0, 255);
             case "blueviolet":
-                return new Color(138, 43, 226);
+                return new SvgColor(138, 43, 226);
             case "brown":
-                return new Color(165, 42, 42);
+                return new SvgColor(165, 42, 42);
             case "burlywood":
-                return new Color(222, 184, 135);
+                return new SvgColor(222, 184, 135);
             case "cadetblue":
-                return new Color(95, 158, 160);
+                return new SvgColor(95, 158, 160);
             case "chartreuse":
-                return new Color(127, 255, 0);
+                return new SvgColor(127, 255, 0);
             case "chocolate":
-                return new Color(210, 105, 30);
+                return new SvgColor(210, 105, 30);
             case "coral":
-                return new Color(255, 127, 80);
+                return new SvgColor(255, 127, 80);
             case "cornflowerblue":
-                return new Color(100, 149, 237);
+                return new SvgColor(100, 149, 237);
             case "cornsilk":
-                return new Color(255, 248, 220);
+                return new SvgColor(255, 248, 220);
             case "crimson":
-                return new Color(220, 20, 60);
+                return new SvgColor(220, 20, 60);
             case "cyan":
-                return new Color(0, 255, 255);
+                return new SvgColor(0, 255, 255);
             case "darkblue":
-                return new Color(0, 0, 139);
+                return new SvgColor(0, 0, 139);
             case "darkcyan":
-                return new Color(0, 139, 139);
+                return new SvgColor(0, 139, 139);
             case "darkgoldenrod":
-                return new Color(184, 134, 11);
+                return new SvgColor(184, 134, 11);
             case "darkgray":
-                return new Color(169, 169, 169);
+                return new SvgColor(169, 169, 169);
             case "darkgreen":
-                return new Color(0, 100, 0);
+                return new SvgColor(0, 100, 0);
             case "darkgrey":
-                return new Color(169, 169, 169);
+                return new SvgColor(169, 169, 169);
             case "darkkhaki":
-                return new Color(189, 183, 107);
+                return new SvgColor(189, 183, 107);
             case "darkmagenta":
-                return new Color(139, 0, 139);
+                return new SvgColor(139, 0, 139);
             case "darkolivegreen":
-                return new Color(85, 107, 47);
+                return new SvgColor(85, 107, 47);
             case "darkorange":
-                return new Color(255, 140, 0);
+                return new SvgColor(255, 140, 0);
             case "darkorchid":
-                return new Color(153, 50, 204);
+                return new SvgColor(153, 50, 204);
             case "darkred":
-                return new Color(139, 0, 0);
+                return new SvgColor(139, 0, 0);
             case "darksalmon":
-                return new Color(233, 150, 122);
+                return new SvgColor(233, 150, 122);
             case "darkseagreen":
-                return new Color(143, 188, 143);
+                return new SvgColor(143, 188, 143);
             case "darkslateblue":
-                return new Color(72, 61, 139);
+                return new SvgColor(72, 61, 139);
             case "darkslategray":
-                return new Color(47, 79, 79);
+                return new SvgColor(47, 79, 79);
             case "darkslategrey":
-                return new Color(47, 79, 79);
+                return new SvgColor(47, 79, 79);
             case "darkturquoise":
-                return new Color(0, 206, 209);
+                return new SvgColor(0, 206, 209);
             case "darkviolet":
-                return new Color(148, 0, 211);
+                return new SvgColor(148, 0, 211);
             case "deeppink":
-                return new Color(255, 20, 147);
+                return new SvgColor(255, 20, 147);
             case "deepskyblue":
-                return new Color(0, 191, 255);
+                return new SvgColor(0, 191, 255);
             case "dimgray":
-                return new Color(105, 105, 105);
+                return new SvgColor(105, 105, 105);
             case "dimgrey":
-                return new Color(105, 105, 105);
+                return new SvgColor(105, 105, 105);
             case "dodgerblue":
-                return new Color(30, 144, 255);
+                return new SvgColor(30, 144, 255);
             case "firebrick":
-                return new Color(178, 34, 34);
+                return new SvgColor(178, 34, 34);
             case "floralwhite":
-                return new Color(255, 250, 240);
+                return new SvgColor(255, 250, 240);
             case "forestgreen":
-                return new Color(34, 139, 34);
+                return new SvgColor(34, 139, 34);
             case "fuchsia":
-                return new Color(255, 0, 255);
+                return new SvgColor(255, 0, 255);
             case "gainsboro":
-                return new Color(220, 220, 220);
+                return new SvgColor(220, 220, 220);
             case "ghostwhite":
-                return new Color(248, 248, 255);
+                return new SvgColor(248, 248, 255);
             case "gold":
-                return new Color(255, 215, 0);
+                return new SvgColor(255, 215, 0);
             case "goldenrod":
-                return new Color(218, 165, 32);
+                return new SvgColor(218, 165, 32);
             case "gray":
-                return new Color(128, 128, 128);
+                return new SvgColor(128, 128, 128);
             case "grey":
-                return new Color(128, 128, 128);
+                return new SvgColor(128, 128, 128);
             case "green":
-                return new Color(0, 128, 0);
+                return new SvgColor(0, 128, 0);
             case "greenyellow":
-                return new Color(173, 255, 47);
+                return new SvgColor(173, 255, 47);
             case "honeydew":
-                return new Color(240, 255, 240);
+                return new SvgColor(240, 255, 240);
             case "hotpink":
-                return new Color(255, 105, 180);
+                return new SvgColor(255, 105, 180);
             case "indianred":
-                return new Color(205, 92, 92);
+                return new SvgColor(205, 92, 92);
             case "indigo":
-                return new Color(75, 0, 130);
+                return new SvgColor(75, 0, 130);
             case "ivory":
-                return new Color(255, 255, 240);
+                return new SvgColor(255, 255, 240);
             case "khaki":
-                return new Color(240, 230, 140);
+                return new SvgColor(240, 230, 140);
             case "lavender":
-                return new Color(230, 230, 250);
+                return new SvgColor(230, 230, 250);
             case "lavenderblush":
-                return new Color(255, 240, 245);
+                return new SvgColor(255, 240, 245);
             case "lawngreen":
-                return new Color(124, 252, 0);
+                return new SvgColor(124, 252, 0);
             case "lemonchiffon":
-                return new Color(255, 250, 205);
+                return new SvgColor(255, 250, 205);
             case "lightblue":
-                return new Color(173, 216, 230);
+                return new SvgColor(173, 216, 230);
             case "lightcoral":
-                return new Color(240, 128, 128);
+                return new SvgColor(240, 128, 128);
             case "lightcyan":
-                return new Color(224, 255, 255);
+                return new SvgColor(224, 255, 255);
             case "lightgoldenrodyellow":
-                return new Color(250, 250, 210);
+                return new SvgColor(250, 250, 210);
             case "lightgray":
-                return new Color(211, 211, 211);
+                return new SvgColor(211, 211, 211);
             case "lightgreen":
-                return new Color(144, 238, 144);
+                return new SvgColor(144, 238, 144);
             case "lightgrey":
-                return new Color(211, 211, 211);
+                return new SvgColor(211, 211, 211);
             case "lightpink":
-                return new Color(255, 182, 193);
+                return new SvgColor(255, 182, 193);
             case "lightsalmon":
-                return new Color(255, 160, 122);
+                return new SvgColor(255, 160, 122);
             case "lightseagreen":
-                return new Color(32, 178, 170);
+                return new SvgColor(32, 178, 170);
             case "lightskyblue":
-                return new Color(135, 206, 250);
+                return new SvgColor(135, 206, 250);
             case "lightslategray":
-                return new Color(119, 136, 153);
+                return new SvgColor(119, 136, 153);
             case "lightslategrey":
-                return new Color(119, 136, 153);
+                return new SvgColor(119, 136, 153);
             case "lightsteelblue":
-                return new Color(176, 196, 222);
+                return new SvgColor(176, 196, 222);
             case "lightyellow":
-                return new Color(255, 255, 224);
+                return new SvgColor(255, 255, 224);
             case "lime":
-                return new Color(0, 255, 0);
+                return new SvgColor(0, 255, 0);
             case "limegreen":
-                return new Color(50, 205, 50);
+                return new SvgColor(50, 205, 50);
             case "linen":
-                return new Color(250, 240, 230);
+                return new SvgColor(250, 240, 230);
             case "magenta":
-                return new Color(255, 0, 255);
+                return new SvgColor(255, 0, 255);
             case "maroon":
-                return new Color(128, 0, 0);
+                return new SvgColor(128, 0, 0);
             case "mediumaquamarine":
-                return new Color(102, 205, 170);
+                return new SvgColor(102, 205, 170);
             case "mediumblue":
-                return new Color(0, 0, 205);
+                return new SvgColor(0, 0, 205);
             case "mediumorchid":
-                return new Color(186, 85, 211);
+                return new SvgColor(186, 85, 211);
             case "mediumpurple":
-                return new Color(147, 112, 219);
+                return new SvgColor(147, 112, 219);
             case "mediumseagreen":
-                return new Color(60, 179, 113);
+                return new SvgColor(60, 179, 113);
             case "mediumslateblue":
-                return new Color(123, 104, 238);
+                return new SvgColor(123, 104, 238);
             case "mediumspringgreen":
-                return new Color(0, 250, 154);
+                return new SvgColor(0, 250, 154);
             case "mediumturquoise":
-                return new Color(72, 209, 204);
+                return new SvgColor(72, 209, 204);
             case "mediumvioletred":
-                return new Color(199, 21, 133);
+                return new SvgColor(199, 21, 133);
             case "midnightblue":
-                return new Color(25, 25, 112);
+                return new SvgColor(25, 25, 112);
             case "mintcream":
-                return new Color(245, 255, 250);
+                return new SvgColor(245, 255, 250);
             case "mistyrose":
-                return new Color(255, 228, 225);
+                return new SvgColor(255, 228, 225);
             case "moccasin":
-                return new Color(255, 228, 181);
+                return new SvgColor(255, 228, 181);
             case "navajowhite":
-                return new Color(255, 222, 173);
+                return new SvgColor(255, 222, 173);
             case "navy":
-                return new Color(0, 0, 128);
+                return new SvgColor(0, 0, 128);
             case "oldlace":
-                return new Color(253, 245, 230);
+                return new SvgColor(253, 245, 230);
             case "olive":
-                return new Color(128, 128, 0);
+                return new SvgColor(128, 128, 0);
             case "olivedrab":
-                return new Color(107, 142, 35);
+                return new SvgColor(107, 142, 35);
             case "orange":
-                return new Color(255, 165, 0);
+                return new SvgColor(255, 165, 0);
             case "orangered":
-                return new Color(255, 69, 0);
+                return new SvgColor(255, 69, 0);
             case "orchid":
-                return new Color(218, 112, 214);
+                return new SvgColor(218, 112, 214);
             case "palegoldenrod":
-                return new Color(238, 232, 170);
+                return new SvgColor(238, 232, 170);
             case "palegreen":
-                return new Color(152, 251, 152);
+                return new SvgColor(152, 251, 152);
             case "paleturquoise":
-                return new Color(175, 238, 238);
+                return new SvgColor(175, 238, 238);
             case "palevioletred":
-                return new Color(219, 112, 147);
+                return new SvgColor(219, 112, 147);
             case "papayawhip":
-                return new Color(255, 239, 213);
+                return new SvgColor(255, 239, 213);
             case "peachpuff":
-                return new Color(255, 218, 185);
+                return new SvgColor(255, 218, 185);
             case "peru":
-                return new Color(205, 133, 63);
+                return new SvgColor(205, 133, 63);
             case "pink":
-                return new Color(255, 192, 203);
+                return new SvgColor(255, 192, 203);
             case "plum":
-                return new Color(221, 160, 221);
+                return new SvgColor(221, 160, 221);
             case "powderblue":
-                return new Color(176, 224, 230);
+                return new SvgColor(176, 224, 230);
             case "purple":
-                return new Color(128, 0, 128);
+                return new SvgColor(128, 0, 128);
             case "red":
-                return new Color(255, 0, 0);
+                return new SvgColor(255, 0, 0);
             case "rosybrown":
-                return new Color(188, 143, 143);
+                return new SvgColor(188, 143, 143);
             case "royalblue":
-                return new Color(65, 105, 225);
+                return new SvgColor(65, 105, 225);
             case "saddlebrown":
-                return new Color(139, 69, 19);
+                return new SvgColor(139, 69, 19);
             case "salmon":
-                return new Color(250, 128, 114);
+                return new SvgColor(250, 128, 114);
             case "sandybrown":
-                return new Color(244, 164, 96);
+                return new SvgColor(244, 164, 96);
             case "seagreen":
-                return new Color(46, 139, 87);
+                return new SvgColor(46, 139, 87);
             case "seashell":
-                return new Color(255, 245, 238);
+                return new SvgColor(255, 245, 238);
             case "sienna":
-                return new Color(160, 82, 45);
+                return new SvgColor(160, 82, 45);
             case "silver":
-                return new Color(192, 192, 192);
+                return new SvgColor(192, 192, 192);
             case "skyblue":
-                return new Color(135, 206, 235);
+                return new SvgColor(135, 206, 235);
             case "slateblue":
-                return new Color(106, 90, 205);
+                return new SvgColor(106, 90, 205);
             case "slategray":
-                return new Color(112, 128, 144);
+                return new SvgColor(112, 128, 144);
             case "slategrey":
-                return new Color(112, 128, 144);
+                return new SvgColor(112, 128, 144);
             case "snow":
-                return new Color(255, 250, 250);
+                return new SvgColor(255, 250, 250);
             case "springgreen":
-                return new Color(0, 255, 127);
+                return new SvgColor(0, 255, 127);
             case "steelblue":
-                return new Color(70, 130, 180);
+                return new SvgColor(70, 130, 180);
             case "tan":
-                return new Color(210, 180, 140);
+                return new SvgColor(210, 180, 140);
             case "teal":
-                return new Color(0, 128, 128);
+                return new SvgColor(0, 128, 128);
             case "thistle":
-                return new Color(216, 191, 216);
+                return new SvgColor(216, 191, 216);
             case "tomato":
-                return new Color(255, 99, 71);
+                return new SvgColor(255, 99, 71);
             case "turquoise":
-                return new Color(64, 224, 208);
+                return new SvgColor(64, 224, 208);
             case "violet":
-                return new Color(238, 130, 238);
+                return new SvgColor(238, 130, 238);
             case "wheat":
-                return new Color(245, 222, 179);
+                return new SvgColor(245, 222, 179);
             case "white":
-                return new Color(255, 255, 255);
+                return new SvgColor(255, 255, 255);
             case "whitesmoke":
-                return new Color(245, 245, 245);
+                return new SvgColor(245, 245, 245);
             case "yellow":
-                return new Color(255, 255, 0);
+                return new SvgColor(255, 255, 0);
             case "yellowgreen":
-                return new Color(154, 205, 50);
+                return new SvgColor(154, 205, 50);
         }
 
         if (rgbStr.startsWith("#")) {
@@ -1383,7 +1389,7 @@ public class ShapeImporter {
             }
 
             int i = Integer.parseInt(s, 16);
-            return new Color(i, false);
+            return new SvgColor(new Color(i, false));
         } else if (rgbStr.startsWith("rgb")) {
             rgbStr = rgbStr.substring(3).trim();
             if (rgbStr.startsWith("(") && rgbStr.endsWith(")")) {
@@ -1397,18 +1403,18 @@ public class ShapeImporter {
                         int r = (int) Math.round(Integer.parseInt(a0.substring(0, a0.length() - 1)) * 255.0 / 100);
                         int g = (int) Math.round(Integer.parseInt(a1.substring(0, a1.length() - 1)) * 255.0 / 100);
                         int b = (int) Math.round(Integer.parseInt(a2.substring(0, a2.length() - 1)) * 255.0 / 100);
-                        return new Color(r, g, b);
+                        return new SvgColor(r, g, b);
                     } else {
                         int r = Integer.parseInt(a0);
                         int g = Integer.parseInt(a1);
                         int b = Integer.parseInt(a2);
-                        return new Color(r, g, b);
+                        return new SvgColor(r, g, b);
                     }
                 }
             }
         } else {
             showWarning("fillNotSupported", "Only solid fills are supported. Random color assigned.");
-            return new Color(random.nextInt(256), random.nextInt(256), random.nextInt(256));
+            return new SvgColor(random.nextInt(256), random.nextInt(256), random.nextInt(256));
         }
 
         return null;
@@ -1431,15 +1437,90 @@ public class ShapeImporter {
         MITER, ROUND, BEVEL
     }
 
+    enum SvgSpreadMethod {
+        PAD, REFLECT, REPEAT
+    }
+
+    enum SvgGradientUnits {
+        USER_SPACE_ON_USE, OBJECT_BOUNDING_BOX
+    }
+
+    abstract class SvgFill implements Cloneable {
+
+        public abstract Color toColor();
+    }
+
+    abstract class SvgGradient extends SvgFill {
+
+        public List<String> gradOffsets;
+        public List<Color> gradColors;
+
+        public SvgGradientUnits gradientUnits;
+        public String gradientTransform;
+        public SvgSpreadMethod spreadMethod;
+
+        @Override
+        public Color toColor() {
+            if (gradColors.isEmpty()) {
+                return Color.BLACK;
+            }
+            return gradColors.get(0);
+        }
+
+    }
+
+    class SvgLinearGradient extends SvgGradient {
+
+        public double x1;
+        public double y1;
+        public double x2;
+        public double y2;
+
+        //xlink?
+    }
+
+    class SvgRadialGradient extends SvgGradient {
+
+        public double cx;
+        public double cy;
+        public double r;
+        public double fx;
+        public double fy;
+
+        //xlink?
+    }
+
+    class SvgColor extends SvgFill {
+
+        public Color color;
+
+        public SvgColor(int r, int g, int b, int opacity) {
+            this(new Color(r, g, b, opacity));
+        }
+
+        public SvgColor(int r, int g, int b) {
+            this(new Color(r, g, b));
+        }
+
+        public SvgColor(Color color) {
+            this.color = color;
+        }
+
+        @Override
+        public Color toColor() {
+            return this.color;
+        }
+
+    }
+
     class SvgStyle implements Cloneable {
 
-        public Color fillColor;
-
+        public SvgFill fill;
         public double opacity;
 
         public double fillOpacity;
 
-        public Color strokeColor;
+        public SvgFill strokeFill;
 
         public double strokeWidth;
 
@@ -1452,9 +1533,9 @@ public class ShapeImporter {
         public double strokeMiterLimit;
 
         public SvgStyle() {
-            fillColor = Color.BLACK;
+            fill = new SvgColor(Color.black);
             fillOpacity = 1;
-            strokeColor = null;
+            strokeFill = null;
             strokeWidth = 1;
             strokeOpacity = 1;
             opacity = 1;
@@ -1463,30 +1544,39 @@ public class ShapeImporter {
             strokeMiterLimit = 4;
         }
 
-        public Color getFillColorWithOpacity() {
-            if (fillColor == null) {
+        public SvgFill getFillWithOpacity() {
+            if (fill == null) {
                 return null;
             }
+            if (!(fill instanceof SvgColor)) {
+                return fill;
+            }
+            Color fillColor = ((SvgColor) fill).color;
 
             int opacity = (int) Math.round(this.opacity * fillOpacity * 255);
             if (opacity == 255) {
-                return fillColor;
+                return fill;
             }
 
-            return new Color(fillColor.getRed(), fillColor.getGreen(), fillColor.getBlue(), opacity);
+            return new SvgColor(fillColor.getRed(), fillColor.getGreen(), fillColor.getBlue(), opacity);
         }
 
-        public Color getStrokeColorWithOpacity() {
-            if (strokeColor == null) {
+        public SvgFill getStrokeColorWithOpacity() {
+            if (strokeFill == null) {
                 return null;
             }
+            if (!(strokeFill instanceof SvgColor)) {
+                return strokeFill;
+            }
+
+            Color strokeColor = ((SvgColor) strokeFill).color;
 
             int opacity = (int) Math.round(this.opacity * strokeOpacity * 255);
             if (opacity == 255) {
-                return strokeColor;
+                return strokeFill;
             }
 
-            return new Color(strokeColor.getRed(), strokeColor.getGreen(), strokeColor.getBlue(), opacity);
+            return new SvgColor(strokeColor.getRed(), strokeColor.getGreen(), strokeColor.getBlue(), opacity);
         }
 
         @Override
@@ -1506,9 +1596,9 @@ public class ShapeImporter {
 
             switch (name) {
                 case "fill": {
-                    Color fillColor = parseColor(value);
-                    if (fillColor != null) {
-                        style.fillColor = fillColor == TRANSPARENT ? null : fillColor;
+                    SvgFill fill = parseFill(value);
+                    if (fill != null) {
+                        style.fill = fill == TRANSPARENT ? null : fill;
                     }
                 }
                 break;
@@ -1518,9 +1608,9 @@ public class ShapeImporter {
                 }
                 break;
                 case "stroke": {
-                    Color strokeColor = parseColor(value);
-                    if (strokeColor != null) {
-                        style.strokeColor = strokeColor == TRANSPARENT ? null : strokeColor;
+                    SvgFill strokeFill = parseFill(value);
+                    if (strokeFill != null) {
+                        style.strokeFill = strokeFill == TRANSPARENT ? null : strokeFill;
                     }
                 }
                 break;
