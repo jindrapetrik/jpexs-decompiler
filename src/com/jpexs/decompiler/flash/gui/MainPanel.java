@@ -2486,7 +2486,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 final Font f = FontTag.installedFontsByName.get(fontName);
                 if (f == null || !f.canDisplay(character)) {
                     String msg = translate("error.font.nocharacter").replace("%char%", "" + character);
-                    logger.log(Level.SEVERE, msg + " FontId: " + font.getCharacterId() + " TextId: " + textTag.getCharacterId());
+                    logger.log(Level.SEVERE, "{0} FontId: {1} TextId: {2}", new Object[]{msg, font.getCharacterId(), textTag.getCharacterId()});
                     ignoreMissingCharacters = View.showConfirmDialog(null, msg, translate("error"),
                             JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE,
                             showAgainIgnoreMissingCharacters,

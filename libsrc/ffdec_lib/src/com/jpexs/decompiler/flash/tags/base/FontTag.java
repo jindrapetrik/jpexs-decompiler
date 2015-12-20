@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.configuration.SwfSpecificConfiguration;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
@@ -181,16 +182,30 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
     }
 
     public String getSystemFontName() {
-        Map<String, String> fontPairs = Configuration.getFontToNameMap();
-        String key = swf.getShortFileName() + "_" + getFontId() + "_" + getFontNameIntag();
-        if (fontPairs.containsKey(key)) {
-            return fontPairs.get(key);
+        int fontId = getFontId();
+        String selectedFont = swf.sourceFontNamesMap.get(fontId);
+        if (selectedFont == null) {
+            SwfSpecificConfiguration swfConf = Configuration.getSwfSpecificConfiguration(swf.getShortFileName());
+            String key = fontId + "_" + getFontNameIntag();
+            if (swfConf != null) {
+                selectedFont = swfConf.fontPairingMap.get(key);
+            }
         }
-        key = getFontNameIntag();
-        if (fontPairs.containsKey(key)) {
-            return fontPairs.get(key);
+
+        if (selectedFont == null) {
+            selectedFont = Configuration.getFontToNameMap().get(getFontNameIntag());
         }
-        return defaultFontName;
+
+        if (selectedFont != null && FontTag.installedFontsByName.containsKey(selectedFont)) {
+            return selectedFont;
+        }
+
+        // findInstalledFontName always returns an available font name
+        return FontTag.findInstalledFontName(getFontName());
+    }
+
+    public Font getSystemFont() {
+        return FontTag.installedFontsByName.get(getSystemFontName());
     }
 
     protected void shiftGlyphIndices(int fontId, int startIndex) {
