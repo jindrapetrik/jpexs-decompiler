@@ -41,6 +41,7 @@ import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.EndTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
+import com.jpexs.decompiler.flash.tags.FileAttributesTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
 import com.jpexs.decompiler.flash.tags.MetadataTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
@@ -609,11 +610,9 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 Frame fn = (Frame) tagObj;
                 swf = fn.getSwf();
                 if (fn.timeline.timelined == swf) {
-                    for (Tag t : swf.tags) {
-                        if (t instanceof SetBackgroundColorTag) {
-                            backgroundColor = ((SetBackgroundColorTag) t).backgroundColor.toColor();
-                            break;
-                        }
+                    SetBackgroundColorTag setBgColorTag = swf.getBackgroundColor();
+                    if (setBgColorTag != null) {
+                        backgroundColor = setBgColorTag.backgroundColor.toColor();
                     }
                 }
             }
@@ -664,10 +663,17 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 sos2.writeFIXED8(frameRate);
                 sos2.writeUI16(frameCount); //framecnt
 
-                /*FileAttributesTag fa = new FileAttributesTag();
-                 sos2.writeTag(fa);
-                 */
-                new SetBackgroundColorTag(swf, new RGB(backgroundColor)).writeTag(sos2);
+                FileAttributesTag fa = swf.getFileAttributes();
+                if (fa != null) {
+                    fa.writeTag(sos2);
+                }
+
+                SetBackgroundColorTag setBgColorTag = swf.getBackgroundColor();
+                if (setBgColorTag == null) {
+                    setBgColorTag = new SetBackgroundColorTag(swf, new RGB(backgroundColor));
+                }
+
+                setBgColorTag.writeTag(sos2);
 
                 if (tagObj instanceof Frame) {
                     Frame fn = (Frame) tagObj;
@@ -676,10 +682,15 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                     List<Integer> doneCharacters = new ArrayList<>();
                     int frameCnt = 0;
                     for (Tag t : subs) {
+                        if (t instanceof FileAttributesTag || t instanceof SetBackgroundColorTag) {
+                            continue;
+                        }
+
                         if (t instanceof ShowFrameTag) {
                             frameCnt++;
                             continue;
                         }
+
                         if (frameCnt > fn.frame) {
                             break;
                         }
@@ -1059,11 +1070,9 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     public void showSwf(SWF swf) {
         Color backgroundColor = View.getDefaultBackgroundColor();
-        for (Tag t : swf.tags) {
-            if (t instanceof SetBackgroundColorTag) {
-                backgroundColor = ((SetBackgroundColorTag) t).backgroundColor.toColor();
-                break;
-            }
+        SetBackgroundColorTag setBgColorTag = swf.getBackgroundColor();
+        if (setBgColorTag != null) {
+            backgroundColor = setBgColorTag.backgroundColor.toColor();
         }
 
         if (tempFile != null) {

@@ -91,6 +91,7 @@ import com.jpexs.decompiler.flash.tags.FileAttributesTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
 import com.jpexs.decompiler.flash.tags.MetadataTag;
 import com.jpexs.decompiler.flash.tags.ProtectTag;
+import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.SymbolClassTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -556,6 +557,16 @@ public final class SWF implements SWFContainerItem, Timelined {
         for (Tag t : tags) {
             if (t instanceof FileAttributesTag) {
                 return (FileAttributesTag) t;
+            }
+        }
+
+        return null;
+    }
+
+    public SetBackgroundColorTag getBackgroundColor() {
+        for (Tag t : tags) {
+            if (t instanceof SetBackgroundColorTag) {
+                return (SetBackgroundColorTag) t;
             }
         }
 

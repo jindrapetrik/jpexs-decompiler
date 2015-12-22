@@ -103,7 +103,6 @@ import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.decompiler.flash.types.sound.MP3FRAME;
 import com.jpexs.decompiler.flash.types.sound.MP3SOUNDDATA;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
-import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.utf8.Utf8Helper;
@@ -2688,12 +2687,11 @@ public class XFLConverter {
         Map<Integer, String> characterVariables = getCharacterVariables(swf.tags);
 
         String backgroundColor = "#ffffff";
-        for (Tag t : swf.tags) {
-            if (t instanceof SetBackgroundColorTag) {
-                SetBackgroundColorTag sbc = (SetBackgroundColorTag) t;
-                backgroundColor = sbc.backgroundColor.toHexRGB();
-            }
+        SetBackgroundColorTag setBgColorTag = swf.getBackgroundColor();
+        if (setBgColorTag != null) {
+            backgroundColor = setBgColorTag.backgroundColor.toHexRGB();
         }
+
         domDocument.append("<DOMDocument xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://ns.adobe.com/xfl/2008/\" currentTimeline=\"1\" xflVersion=\"").append(flaVersion.xflVersion()).append("\" creatorInfo=\"").append(generator).append("\" platform=\"Windows\" versionInfo=\"Saved by ").append(generatorVerName).append("\" majorVersion=\"").append(generatorVersion).append("\" buildNumber=\"\" nextSceneIdentifier=\"2\" playOptionsPlayLoop=\"false\" playOptionsPlayPages=\"false\" playOptionsPlayFrameActions=\"false\" autoSaveHasPrompted=\"true\"");
         domDocument.append(" backgroundColor=\"").append(backgroundColor).append("\"");
         domDocument.append(" frameRate=\"").append((int) swf.frameRate).append("\""); // todo: is the cast to int needed?
