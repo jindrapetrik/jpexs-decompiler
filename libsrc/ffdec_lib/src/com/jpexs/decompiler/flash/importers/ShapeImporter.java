@@ -173,6 +173,7 @@ public class ShapeImporter {
 
         try {
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+            docFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
             Document doc = docBuilder.parse(new InputSource(new StringReader(svgXml)));
             Element rootElement = doc.getDocumentElement();
