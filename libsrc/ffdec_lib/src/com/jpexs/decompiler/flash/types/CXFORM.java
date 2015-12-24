@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.types.annotations.Calculated;
+import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 
 /**
@@ -44,36 +45,42 @@ public class CXFORM extends ColorTransform {
     /**
      * Red multiply value
      */
+    @Conditional("hasMultTerms")
     @SWFType(value = BasicType.SB, countField = "nbits")
     public int redMultTerm;
 
     /**
      * Green multiply value
      */
+    @Conditional("hasMultTerms")
     @SWFType(value = BasicType.SB, countField = "nbits")
     public int greenMultTerm;
 
     /**
      * Blue multiply value
      */
+    @Conditional("hasMultTerms")
     @SWFType(value = BasicType.SB, countField = "nbits")
     public int blueMultTerm;
 
     /**
      * Red addition value
      */
+    @Conditional("hasAddTerms")
     @SWFType(value = BasicType.SB, countField = "nbits")
     public int redAddTerm;
 
     /**
      * Green addition value
      */
+    @Conditional("hasAddTerms")
     @SWFType(value = BasicType.SB, countField = "nbits")
     public int greenAddTerm;
 
     /**
      * Blue addition value
      */
+    @Conditional("hasAddTerms")
     @SWFType(value = BasicType.SB, countField = "nbits")
     public int blueAddTerm;
 
@@ -105,6 +112,20 @@ public class CXFORM extends ColorTransform {
     @Override
     public int getBlueMulti() {
         return hasMultTerms ? blueMultTerm : super.getBlueMulti();
+    }
+
+    public CXFORM() {
+    }
+
+    public CXFORM(ColorTransform colorTransform) {
+        redMultTerm = colorTransform.getRedMulti();
+        greenMultTerm = colorTransform.getGreenMulti();
+        blueMultTerm = colorTransform.getBlueMulti();
+        redAddTerm = colorTransform.getRedAdd();
+        greenAddTerm = colorTransform.getGreenAdd();
+        blueAddTerm = colorTransform.getBlueAdd();
+        hasAddTerms = redAddTerm != 0 || greenAddTerm != 0 || blueAddTerm != 0;
+        hasMultTerms = redMultTerm != 255 || greenMultTerm != 255 || blueMultTerm != 255;
     }
 
     @Override

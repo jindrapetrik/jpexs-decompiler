@@ -127,13 +127,18 @@ public class PlaceObjectTag extends PlaceObjectTypeTag {
     public CXFORM colorTransform;
 
     @Override
-    public List<FILTER> getFilters() {
-        return null;
+    public int getPlaceObjectNum() {
+        return 1;
     }
 
     @Override
     public int getClipDepth() {
         return -1;
+    }
+
+    @Override
+    public List<FILTER> getFilters() {
+        return null;
     }
 
     @Override
@@ -170,6 +175,11 @@ public class PlaceObjectTag extends PlaceObjectTypeTag {
     @Override
     public MATRIX getMatrix() {
         return matrix;
+    }
+
+    @Override
+    public void setMatrix(MATRIX matrix) {
+        this.matrix = matrix;
     }
 
     @Override

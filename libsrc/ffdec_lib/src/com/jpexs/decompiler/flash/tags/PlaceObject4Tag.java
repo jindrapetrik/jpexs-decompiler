@@ -241,6 +241,39 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
         super(swf, ID, NAME, null);
     }
 
+    public PlaceObject4Tag(SWF swf, boolean placeFlagMove, int depth, String className, int characterId, MATRIX matrix, CXFORMWITHALPHA colorTransform, int ratio, String name, int clipDepth, List<FILTER> surfaceFilterList, int blendMode, int bitmapCache, int visible, RGBA backgroundColor, CLIPACTIONS clipActions, byte[] amfData) {
+        super(swf, ID, NAME, null);
+        this.placeFlagHasClassName = className != null;
+        this.placeFlagHasFilterList = surfaceFilterList != null;
+        this.placeFlagHasBlendMode = blendMode >= 0;
+        this.placeFlagHasCacheAsBitmap = bitmapCache >= 0;
+        this.placeFlagHasVisible = visible >= 0;
+        this.placeFlagOpaqueBackground = backgroundColor != null;
+        this.placeFlagHasClipActions = clipActions != null;
+        this.placeFlagHasClipDepth = clipDepth >= 0;
+        this.placeFlagHasName = name != null;
+        this.placeFlagHasRatio = ratio >= 0;
+        this.placeFlagHasColorTransform = colorTransform != null;
+        this.placeFlagHasMatrix = matrix != null;
+        this.placeFlagHasCharacter = characterId >= 0;
+        this.placeFlagMove = placeFlagMove;
+        this.depth = depth;
+        this.className = className;
+        this.characterId = characterId;
+        this.matrix = matrix;
+        this.colorTransform = colorTransform;
+        this.ratio = ratio;
+        this.name = name;
+        this.clipDepth = clipDepth;
+        this.surfaceFilterList = surfaceFilterList;
+        this.blendMode = blendMode;
+        this.bitmapCache = bitmapCache;
+        this.visible = visible;
+        this.backgroundColor = backgroundColor;
+        this.clipActions = clipActions;
+        this.amfData = amfData;
+    }
+
     /**
      * Constructor
      *
@@ -394,12 +427,8 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
     }
 
     @Override
-    public List<FILTER> getFilters() {
-        if (placeFlagHasFilterList) {
-            return surfaceFilterList;
-        } else {
-            return null;
-        }
+    public int getPlaceObjectNum() {
+        return 4;
     }
 
     @Override
@@ -408,6 +437,15 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
             return clipDepth;
         }
         return -1;
+    }
+
+    @Override
+    public List<FILTER> getFilters() {
+        if (placeFlagHasFilterList) {
+            return surfaceFilterList;
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -468,6 +506,11 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
         } else {
             return null;
         }
+    }
+
+    @Override
+    public void setMatrix(MATRIX matrix) {
+        this.matrix = matrix;
     }
 
     @Override

@@ -38,9 +38,13 @@ public abstract class PlaceObjectTypeTag extends Tag implements CharacterIdTag {
         super(swf, id, name, data);
     }
 
+    public abstract int getPlaceObjectNum();
+
     public abstract int getDepth();
 
     public abstract MATRIX getMatrix();
+
+    public abstract void setMatrix(MATRIX matrix);
 
     public abstract String getInstanceName();
 
