@@ -17,8 +17,14 @@
 package com.jpexs.decompiler.flash.importers;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.exporters.ShapeExporter;
+import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.Point;
+import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
+import com.jpexs.decompiler.flash.exporters.modes.ShapeExportMode;
+import com.jpexs.decompiler.flash.exporters.settings.ShapeExportSettings;
+import com.jpexs.decompiler.flash.exporters.shape.BitmapExporter;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.importers.svg.CubicToQuad;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
@@ -34,11 +40,16 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
+import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
+import com.jpexs.decompiler.flash.types.FOCALGRADIENT;
+import com.jpexs.decompiler.flash.types.GRADIENT;
+import com.jpexs.decompiler.flash.types.GRADRECORD;
 import com.jpexs.decompiler.flash.types.LINESTYLE;
 import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
+import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
@@ -47,25 +58,38 @@ import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
+import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Rectangle;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
+import javax.imageio.ImageIO;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -159,6 +183,19 @@ public class ShapeImporter {
         return importSvg(st, svgXml, true);
     }
 
+    //Generate id-element map, because getElementById does not work in some cases (namespaces?)
+    protected void populateIds(Element el, Map<String, Element> out) {
+        if (el.hasAttribute("id")) {
+            out.put(el.getAttribute("id"), el);
+        }
+        NodeList nodes = el.getChildNodes();
+        for (int i = 0; i < nodes.getLength(); i++) {
+            if (nodes.item(i) instanceof Element) {
+                populateIds((Element) nodes.item(i), out);
+            }
+        }
+    }
+
     public Tag importSvg(ShapeTag st, String svgXml, boolean fill) {
         SWF swf = st.getSwf();
 
@@ -173,18 +210,28 @@ public class ShapeImporter {
 
         try {
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+            docFactory.setValidating(false);
+            docFactory.setNamespaceAware(true);
+            docFactory.setFeature("http://xml.org/sax/features/namespaces", false);
+            docFactory.setFeature("http://xml.org/sax/features/validation", false);
+            docFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
+            docFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+
             Document doc = docBuilder.parse(new InputSource(new StringReader(svgXml)));
             Element rootElement = doc.getDocumentElement();
+
+            Map<String, Element> idMap = new HashMap<>();
+            populateIds(rootElement, idMap);
 
             if (!"svg".equals(rootElement.getTagName())) {
                 throw new IOException("SVG root element should be 'svg'");
             }
 
             SvgStyle style = new SvgStyle();
-            style = style.apply(rootElement);
+            style = style.apply(rootElement, idMap);
             Matrix transform = Matrix.getScaleInstance(SWF.unitDivisor);
-            processSvgObject(shapeNum, shapes, rootElement, transform, style);
+            processSvgObject(idMap, shapeNum, shapes, rootElement, transform, style);
         } catch (SAXException | IOException | ParserConfigurationException ex) {
             Logger.getLogger(ShapeImporter.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -212,17 +259,17 @@ public class ShapeImporter {
         return (Tag) st;
     }
 
-    private void processSvgObject(int shapeNum, SHAPEWITHSTYLE shapes, Element element, Matrix transform, SvgStyle style) {
+    private void processSvgObject(Map<String, Element> idMap, int shapeNum, SHAPEWITHSTYLE shapes, Element element, Matrix transform, SvgStyle style) {
         for (int i = 0; i < element.getChildNodes().getLength(); i++) {
             Node childNode = element.getChildNodes().item(i);
             if (childNode instanceof Element) {
                 Element childElement = (Element) childNode;
                 String tagName = childElement.getTagName();
-                SvgStyle newStyle = style.apply(childElement);
+                SvgStyle newStyle = style.apply(childElement, idMap);
                 Matrix m = Matrix.parseSvgMatrix(childElement.getAttribute("transform"), SWF.unitDivisor, 1);
                 Matrix m2 = m == null ? transform : m.concatenate(transform);
                 if ("g".equals(tagName)) {
-                    processSvgObject(shapeNum, shapes, childElement, m2, newStyle);
+                    processSvgObject(idMap, shapeNum, shapes, childElement, m2, newStyle);
                 } else if ("path".equals(tagName)) {
                     processPath(shapeNum, shapes, childElement, m2, newStyle);
                 } else if ("circle".equals(tagName)) {
@@ -250,7 +297,7 @@ public class ShapeImporter {
         double x0 = 0;
         double y0 = 0;
 
-        StyleChangeRecord scrStyle = getStyleChangeRecord(shapeNum, style);
+        StyleChangeRecord scrStyle = getStyleChangeRecord(transform, shapeNum, style);
         int fillStyle = scrStyle.fillStyle1;
         int lineStyle = scrStyle.lineStyle;
         scrStyle.stateFillStyle0 = true;
@@ -286,7 +333,7 @@ public class ShapeImporter {
                     scr.moveDeltaX = (int) Math.round(p.x);
                     scr.moveDeltaY = (int) Math.round(p.y);
                     prevPoint = p;
-                    System.out.println("M" + scr.moveDeltaX + "," + scr.moveDeltaY);
+                    //System.out.println("M" + scr.moveDeltaX + "," + scr.moveDeltaY);
                     scr.stateMoveTo = true;
 
                     shapes.shapeRecords.add(scr);
@@ -311,7 +358,6 @@ public class ShapeImporter {
                     serl.deltaX = (int) Math.round(p.x - prevPoint.x);
                     serl.deltaY = (int) Math.round(p.y - prevPoint.y);
                     prevPoint = p;
-                    System.out.println("L" + serl.deltaX + "," + serl.deltaY);
                     serl.generalLineFlag = true;
                     serl.simplify();
                     shapes.shapeRecords.add(serl);
@@ -408,6 +454,7 @@ public class ShapeImporter {
             x0 = x;
             y0 = y;
         }
+        applyStyleGradients(shapes.getBounds(), scrStyle, transform, shapeNum, style);
     }
 
     private void processPath(int shapeNum, SHAPEWITHSTYLE shapes, Element childElement, Matrix transform, SvgStyle style) {
@@ -1035,7 +1082,187 @@ public class ShapeImporter {
         processCommands(shapeNum, shapes, pathCommands, transform, style);
     }
 
-    private StyleChangeRecord getStyleChangeRecord(int shapeNum, SvgStyle style) {
+    //Stub for w3 test. TODO: refactor and move to test directory. It's here because of easy access - compiling single file
+    private static void svgTest(String name) throws IOException, InterruptedException {
+        URL svgUrl = new URL("http://www.w3.org/Graphics/SVG/Test/20061213/svggen/" + name + ".svg");
+        byte[] svgData = Helper.readStream(svgUrl.openStream());
+        Helper.writeFile(name + ".original.svg", svgData);
+
+        URL pngUrl = new URL("http://www.w3.org/Graphics/SVG/Test/20061213/png/full-" + name + ".png");
+        byte[] pngData = Helper.readStream(pngUrl.openStream());
+        Helper.writeFile(name + ".original.png", pngData);
+
+        String svgDataS = new String(svgData);
+        //String svgDataS = Helper.readTextFile(name + ".original.svg");
+
+        SWF swf = new SWF();
+        DefineShape4Tag st = new DefineShape4Tag(swf);
+        st = (DefineShape4Tag) (new ShapeImporter().importSvg(st, svgDataS));
+        swf.tags.add(st);
+        SerializableImage si = new SerializableImage(800, 600, BufferedImage.TYPE_4BYTE_ABGR);
+        BitmapExporter.export(swf, st.shapes, Color.yellow, si, new Matrix(), new ColorTransform());
+        List<Tag> li = new ArrayList<>();
+        li.add(st);
+        ImageIO.write(si.getBufferedImage(), "PNG", new File(name + ".imported.png"));
+        new ShapeExporter().exportShapes(null, "./outex/", li, new ShapeExportSettings(ShapeExportMode.SVG, 1), null);
+    }
+
+    //Test for SVG
+    public static void main(String[] args) throws IOException, InterruptedException {
+        //svgTest("pservers-grad-01-b");
+        svgTest("pservers-grad-04-b");
+    }
+
+    private void applyStyleGradients(RECT bounds, StyleChangeRecord scr, Matrix transform, int shapeNum, SvgStyle style) {
+        SvgFill fill = style.getFillWithOpacity();
+        if (fill != null) {
+            if (fill instanceof SvgGradient) {
+                SvgGradient gfill = (SvgGradient) fill;
+                scr.fillStyles.fillStyles[0].gradientMatrix = Matrix.parseSvgMatrix(gfill.gradientTransform, 1, 1).toMATRIX();
+                if (fill instanceof SvgLinearGradient) {
+                    SvgLinearGradient lgfill = (SvgLinearGradient) fill;
+                    scr.fillStyles.fillStyles[0].fillStyleType = FILLSTYLE.LINEAR_GRADIENT;
+                    scr.fillStyles.fillStyles[0].gradient = new GRADIENT();
+                    double x1;
+                    if (lgfill.x1.endsWith("%")) {
+                        x1 = Double.parseDouble(lgfill.x1.substring(0, lgfill.x1.length() - 1)) / 100;
+                    } else {
+                        x1 = Double.parseDouble(lgfill.x1);
+                    }
+                    //x1 = x1 - (-819.2);
+
+                    double y1;
+                    if (lgfill.y1.endsWith("%")) {
+                        y1 = Double.parseDouble(lgfill.y1.substring(0, lgfill.y1.length() - 1)) / 100;
+                    } else {
+                        y1 = Double.parseDouble(lgfill.y1);
+                    }
+                    double x2;
+                    if (lgfill.x2.endsWith("%")) {
+                        x2 = Double.parseDouble(lgfill.x2.substring(0, lgfill.x2.length() - 1)) / 100;
+                    } else {
+                        x2 = Double.parseDouble(lgfill.x2);
+                    }
+                    //x2 = x2 - 819.2;
+                    double y2;
+                    if (lgfill.y2.endsWith("%")) {
+                        y2 = Double.parseDouble(lgfill.y2.substring(0, lgfill.y2.length() - 1)) / 100;
+                    } else {
+                        y2 = Double.parseDouble(lgfill.y2);
+                    }
+                    if (lgfill.gradientUnits == SvgGradientUnits.OBJECT_BOUNDING_BOX) {
+                        x1 = bounds.Xmin + bounds.getWidth() * x1;
+                        x2 = bounds.Xmin + bounds.getWidth() * x2;
+                        y1 = bounds.Ymin + bounds.getHeight() * y1;
+                        y2 = bounds.Ymin + bounds.getHeight() * y2;
+                    } else {
+                        x1 = x1 * SWF.unitDivisor;
+                        y1 = y1 * SWF.unitDivisor;
+                        x2 = x2 * SWF.unitDivisor;
+                        y2 = y2 * SWF.unitDivisor;
+                    }
+
+                    //FIXME: make following transformations correct for "pservers-grad-04-b"
+                    Matrix xyMatrix = new Matrix();
+                    xyMatrix.scaleX = x2 - x1;
+                    xyMatrix.rotateSkew0 = y2 - y1;
+                    xyMatrix.rotateSkew1 = -xyMatrix.rotateSkew0;
+                    xyMatrix.scaleY = xyMatrix.scaleX;
+
+                    Matrix zeroStartMatrix = Matrix.getTranslateInstance(0.5, 0);
+
+                    Matrix scaleMatrix = Matrix.getScaleInstance(1 / 16384.0 / 2);
+                    Matrix transMatrix = Matrix.getTranslateInstance(x1, y1);
+
+                    Matrix tMatrix = new Matrix();
+                    tMatrix = tMatrix.preConcatenate(scaleMatrix);
+                    tMatrix = tMatrix.preConcatenate(zeroStartMatrix);
+                    tMatrix = tMatrix.preConcatenate(xyMatrix);
+
+                    tMatrix = tMatrix.preConcatenate(transMatrix);
+                    Point p1 = tMatrix.transform(new Point(-16384, 0));
+                    Point p2 = tMatrix.transform(new Point(16384, 0));
+
+                    tMatrix = tMatrix.preConcatenate(new Matrix(scr.fillStyles.fillStyles[0].gradientMatrix));
+                    scr.fillStyles.fillStyles[0].gradientMatrix = tMatrix.toMATRIX();
+                } else if (fill instanceof SvgRadialGradient) {
+                    SvgRadialGradient rgfill = (SvgRadialGradient) fill;
+                    double cx;
+                    if (rgfill.cx.endsWith("%")) {
+                        cx = Double.parseDouble(rgfill.cx.substring(0, rgfill.cx.length() - 1)) / 100;
+                    } else {
+                        cx = Double.parseDouble(rgfill.cx);
+                    }
+                    double cy;
+                    if (rgfill.cy.endsWith("%")) {
+                        cy = Double.parseDouble(rgfill.cy.substring(0, rgfill.cy.length() - 1)) / 100;
+                    } else {
+                        cy = Double.parseDouble(rgfill.cy);
+                    }
+
+                    double r;
+                    if (rgfill.r.endsWith("%")) {
+                        r = Double.parseDouble(rgfill.r.substring(0, rgfill.r.length() - 1)) / 100;
+                    } else {
+                        r = Double.parseDouble(rgfill.r);
+                    }
+                    //TODO: apply cx,cy,r to matrix
+
+                    double fx;
+                    if (rgfill.fx.endsWith("%")) {
+                        fx = Double.parseDouble(rgfill.fx.substring(0, rgfill.fx.length() - 1)) / 100;
+                    } else {
+                        fx = Double.parseDouble(rgfill.fx);
+                    }
+                    double fy;
+                    if (rgfill.fy.endsWith("%")) {
+                        fy = Double.parseDouble(rgfill.fy.substring(0, rgfill.fy.length() - 1)) / 100;
+                    } else {
+                        fy = Double.parseDouble(rgfill.fy);
+                    }
+                    double f = (fx / cx + fy / cy) / 2;
+                    if (!rgfill.fx.equals(rgfill.cx) || !rgfill.fy.equals(rgfill.cy)) {
+                        scr.fillStyles.fillStyles[0].fillStyleType = FILLSTYLE.FOCAL_RADIAL_GRADIENT;
+                        scr.fillStyles.fillStyles[0].gradient = new FOCALGRADIENT();
+                        FOCALGRADIENT fg = (FOCALGRADIENT) scr.fillStyles.fillStyles[0].gradient;
+                        fg.focalPoint = (float) f;
+                    } else {
+                        scr.fillStyles.fillStyles[0].fillStyleType = FILLSTYLE.RADIAL_GRADIENT;
+                        scr.fillStyles.fillStyles[0].gradient = new GRADIENT();
+                    }
+                }
+                switch (gfill.spreadMethod) {
+                    case PAD:
+                        scr.fillStyles.fillStyles[0].gradient.spreadMode = GRADIENT.SPREAD_PAD_MODE;
+                        break;
+                    case REFLECT:
+                        scr.fillStyles.fillStyles[0].gradient.spreadMode = GRADIENT.SPREAD_REFLECT_MODE;
+                        break;
+                    case REPEAT:
+                        scr.fillStyles.fillStyles[0].gradient.spreadMode = GRADIENT.SPREAD_REPEAT_MODE;
+                        break;
+                }
+                switch (gfill.interpolation) {
+                    case LINEAR_RGB:
+                        scr.fillStyles.fillStyles[0].gradient.interpolationMode = GRADIENT.INTERPOLATION_LINEAR_RGB_MODE;
+                        break;
+                    case SRGB:
+                        scr.fillStyles.fillStyles[0].gradient.interpolationMode = GRADIENT.INTERPOLATION_RGB_MODE;
+                        break;
+                }
+
+                scr.fillStyles.fillStyles[0].gradient.gradientRecords = new GRADRECORD[gfill.stops.size()];
+                for (int i = 0; i < gfill.stops.size(); i++) {
+                    scr.fillStyles.fillStyles[0].gradient.gradientRecords[i] = new GRADRECORD();
+                    scr.fillStyles.fillStyles[0].gradient.gradientRecords[i].inShape3 = shapeNum >= 3;
+                    scr.fillStyles.fillStyles[0].gradient.gradientRecords[i].color = shapeNum >= 3 ? new RGBA(gfill.stops.get(i).color) : new RGB(gfill.stops.get(i).color);
+                    scr.fillStyles.fillStyles[0].gradient.gradientRecords[i].ratio = (int) Math.round(gfill.stops.get(i).offset * 255);
+                }
+            }
+        }
+    }
+
+    private StyleChangeRecord getStyleChangeRecord(Matrix transform, int shapeNum, SvgStyle style) {
         StyleChangeRecord scr = new StyleChangeRecord();
 
         scr.stateNewStyles = true;
@@ -1046,16 +1273,12 @@ public class ShapeImporter {
         if (fill != null) {
             scr.fillStyles.fillStyles = new FILLSTYLE[1];
             scr.fillStyles.fillStyles[0] = new FILLSTYLE();
-            Color colorFill = fill.toColor();
-            scr.fillStyles.fillStyles[0].color = shapeNum >= 3 ? new RGBA(colorFill) : new RGB(colorFill);
-            scr.fillStyles.fillStyles[0].fillStyleType = FILLSTYLE.SOLID;
-            //TODO: handle different fills
             if (fill instanceof SvgColor) {
-                //TODO
-            } else if (fill instanceof SvgLinearGradient) {
-                //TODO
-            } else if (fill instanceof SvgRadialGradient) {
-                //TODO
+                Color colorFill = fill.toColor();
+                scr.fillStyles.fillStyles[0].color = shapeNum >= 3 ? new RGBA(colorFill) : new RGB(colorFill);
+                scr.fillStyles.fillStyles[0].fillStyleType = FILLSTYLE.SOLID;
+            } else if (fill instanceof SvgGradient) {
+                //...aply in second step - applyStyleGradients
             }
 
             scr.fillStyle1 = 1;
@@ -1107,7 +1330,266 @@ public class ShapeImporter {
         return scr;
     }
 
-    private SvgFill parseFill(String rgbStr) {
+    private class SvgStop implements Comparable<SvgStop> {
+
+        public Color color;
+        public double offset;
+
+        public SvgStop(Color color, double offset) {
+            this.color = color;
+            this.offset = offset;
+        }
+
+        @Override
+        public int compareTo(SvgStop o) {
+            return (int) Math.signum(offset - o.offset);
+        }
+
+    }
+
+    //FIXME - matrices
+    private SvgFill parseGradient(Map<String, Element> idMap, Element el, SvgStyle style) {
+        SvgGradientUnits gradientUnits = null;
+        String gradientTransform = null;
+        SvgSpreadMethod spreadMethod = null;
+        SvgInterpolation interpolation = null;
+
+        String x1 = null;
+        String y1 = null;
+        String x2 = null;
+        String y2 = null;
+
+        String cx = null;
+        String cy = null;
+        String fx = null;
+        String fy = null;
+        String r = null;
+
+        List<SvgStop> stops = new ArrayList<>();
+        //inheritance:
+        if (el.hasAttribute("xlink:href")) {
+            String parent = el.getAttribute("xlink:href");
+            if (parent.startsWith("#")) {
+                String parentId = parent.substring(1);
+                Element parent_el = idMap.get(parentId);
+                if (parent_el == null) {
+                    showWarning("fillNotSupported", "Parent gradient not found.");
+                    return new SvgColor(random.nextInt(256), random.nextInt(256), random.nextInt(256));
+                }
+
+                if ("linearGradient".equals(el.getTagName()) && parent_el.getTagName().equals(el.getTagName())) {
+                    SvgLinearGradient parentFill = (SvgLinearGradient) parseGradient(idMap, parent_el, style);
+                    gradientUnits = parentFill.gradientUnits;
+                    gradientTransform = parentFill.gradientTransform;
+                    spreadMethod = parentFill.spreadMethod;
+
+                    x1 = parentFill.x1;
+                    y1 = parentFill.y1;
+                    x2 = parentFill.x2;
+                    y2 = parentFill.y2;
+                    interpolation = parentFill.interpolation;
+                    stops = parentFill.stops;
+                }
+                if ("radialGradient".equals(el.getTagName()) && parent_el.getTagName().equals(el.getTagName())) {
+                    SvgRadialGradient parentFill = (SvgRadialGradient) parseGradient(idMap, parent_el, style);
+                    gradientUnits = parentFill.gradientUnits;
+                    gradientTransform = parentFill.gradientTransform;
+                    spreadMethod = parentFill.spreadMethod;
+
+                    cx = parentFill.cx;
+                    cy = parentFill.cy;
+                    fx = parentFill.fx;
+                    fy = parentFill.fy;
+                    r = parentFill.r;
+                    interpolation = parentFill.interpolation;
+                    stops = parentFill.stops;
+                }
+
+            } else {
+                showWarning("fillNotSupported", "Parent gradient invalid.");
+                return new SvgColor(random.nextInt(256), random.nextInt(256), random.nextInt(256));
+            }
+        }
+
+        if (el.hasAttribute("gradientUnits")) {
+            switch (el.getAttribute("gradientUnits")) {
+                case "userSpaceOnUse":
+                    gradientUnits = SvgGradientUnits.USER_SPACE_ON_USE;
+                    break;
+                case "objectBoundingBox":
+                    gradientUnits = SvgGradientUnits.OBJECT_BOUNDING_BOX;
+                    break;
+                default:
+                    showWarning("fillNotSupported", "Unsupported  gradientUnits: " + el.getAttribute("gradientUnits"));
+                    return new SvgColor(random.nextInt(256), random.nextInt(256), random.nextInt(256));
+            }
+
+        }
+        if (el.hasAttribute("gradientTransform")) {
+            gradientTransform = el.getAttribute("gradientTransform");
+        }
+        if (el.hasAttribute("spreadMethod")) {
+            switch (el.getAttribute("spreadMethod")) {
+                case "pad":
+                    spreadMethod = SvgSpreadMethod.PAD;
+                    break;
+                case "reflect":
+                    spreadMethod = SvgSpreadMethod.REFLECT;
+                    break;
+                case "repeat":
+                    spreadMethod = SvgSpreadMethod.REPEAT;
+                    break;
+            }
+        }
+        if (el.hasAttribute("x1")) {
+            x1 = el.getAttribute("x1").trim();
+        }
+        if (el.hasAttribute("y1")) {
+            y1 = el.getAttribute("y1").trim();
+        }
+        if (el.hasAttribute("x2")) {
+            x2 = el.getAttribute("x2").trim();
+        }
+        if (el.hasAttribute("y2")) {
+            y2 = el.getAttribute("y2").trim();
+        }
+
+        if (el.hasAttribute("cx")) {
+            cx = el.getAttribute("cx").trim();
+        }
+        if (el.hasAttribute("cy")) {
+            cy = el.getAttribute("cy").trim();
+        }
+        if (el.hasAttribute("fx")) {
+            fx = el.getAttribute("fx").trim();
+        }
+        if (el.hasAttribute("fy")) {
+            fy = el.getAttribute("fy").trim();
+        }
+        if (el.hasAttribute("r")) {
+            r = el.getAttribute("r").trim();
+        }
+        if (el.hasAttribute("color-interpolation") && interpolation == null) { //prefer inherit
+            switch (el.getAttribute("color-interpolation")) {
+                case "sRGB":
+                    interpolation = SvgInterpolation.SRGB;
+                    break;
+                case "linearRGB":
+                    interpolation = SvgInterpolation.LINEAR_RGB;
+                    break;
+                case "auto": //without preference, put SRGB there
+                    interpolation = SvgInterpolation.SRGB;
+                    break;
+            }
+        }
+        if (interpolation == null) {
+            interpolation = SvgInterpolation.SRGB;
+        }
+
+        if (gradientUnits == null) {
+            gradientUnits = SvgGradientUnits.OBJECT_BOUNDING_BOX;
+        }
+        if (spreadMethod == null) {
+            spreadMethod = SvgSpreadMethod.PAD;
+        }
+
+        if (gradientTransform == null) {
+            gradientTransform = "";
+        }
+
+        if (x1 == null) {
+            x1 = "0%";
+        }
+        if (y1 == null) {
+            y1 = "0%";
+        }
+
+        if (x2 == null) {
+            x2 = "100%";
+        }
+        if (y2 == null) {
+            y2 = "0%";
+        }
+
+        if (cx == null) {
+            cx = "50%";
+        }
+        if (cy == null) {
+            cy = "50%";
+        }
+
+        if (r == null) {
+            r = "50%";
+        }
+        if (fx == null) {
+            fx = cx;
+        }
+        if (fy == null) {
+            fy = cy;
+        }
+
+        NodeList stopNodes = el.getElementsByTagName("stop");
+        boolean stopsCleared = false;
+        for (int i = 0; i < stopNodes.getLength(); i++) {
+            Node node = stopNodes.item(i);
+            if (node instanceof Element) {
+                Element stopEl = (Element) node;
+                SvgStyle newStyle = style.apply(stopEl, idMap);
+
+                String offsetStr = stopEl.getAttribute("offset");
+                double offset;
+                if (offsetStr.endsWith("%")) {
+                    offset = Double.parseDouble(offsetStr.substring(0, offsetStr.length() - 1)) / 100;
+                } else {
+                    offset = Double.parseDouble(offsetStr);
+                }
+                Color color = newStyle.stopColor;
+                int alpha = (int) Math.round(newStyle.stopOpacity * 255);
+                color = new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
+                if (!stopsCleared) { //It has some stop nodes -> remove all inherited stops
+                    stopsCleared = true;
+                    stops = new ArrayList<>();
+                }
+                stops.add(new SvgStop(color, offset));
+            }
+        }
+
+        if ("linearGradient".equals(el.getTagName())) {
+            SvgLinearGradient ret = new SvgLinearGradient();
+            ret.x1 = x1;
+            ret.y1 = y1;
+            ret.x2 = x2;
+            ret.y2 = y2;
+            ret.spreadMethod = spreadMethod;
+            ret.gradientTransform = gradientTransform;
+            ret.gradientUnits = gradientUnits;
+            ret.stops = stops;
+            ret.interpolation = interpolation;
+            return ret;
+        } else if ("radialGradient".equals(el.getTagName())) {
+            SvgRadialGradient ret = new SvgRadialGradient();
+            ret.cx = cx;
+            ret.cy = cy;
+            ret.fx = fx;
+            ret.fy = fy;
+            ret.r = r;
+            ret.spreadMethod = spreadMethod;
+            ret.gradientTransform = gradientTransform;
+            ret.gradientUnits = gradientUnits;
+            ret.stops = stops;
+            ret.interpolation = interpolation;
+            return ret;
+        } else {
+            return null;
+        }
+    }
+
+    private Color parseColor(String rgbStr) {
+        SvgFill fill = parseFill(new HashMap<>(), rgbStr);
+        return fill.toColor();
+    }
+
+    private SvgFill parseFill(Map<String, Element> idMap, String rgbStr) {
         if (rgbStr == null) {
             return null;
         }
@@ -1412,6 +1894,28 @@ public class ShapeImporter {
                 return new SvgColor(154, 205, 50);
         }
 
+        Pattern idPat = Pattern.compile("url\\(#([^)]+)\\)");
+        java.util.regex.Matcher mPat = idPat.matcher(rgbStr);
+
+        /*
+        //TODO:FIX gradient matrices, then ucomment
+        if (mPat.matches()) {
+            String elementId = mPat.group(1);
+            Element e = idMap.get(elementId);
+            if (e == null) {
+                showWarning("fillNotSupported", "Linked fill id not found. Random color assigned.");
+                return new SvgColor(random.nextInt(256), random.nextInt(256), random.nextInt(256));
+            }
+            String tagName = e.getTagName();
+            if ("linearGradient".equals(tagName)) {
+                return parseGradient(idMap, e, new SvgStyle()); //? new style
+            } else if ("radialGradient".equals(tagName)) {
+                return parseGradient(idMap, e, new SvgStyle()); //? new style
+            } else {
+                showWarning("fillNotSupported", "Unknown fill style. Random color assigned.");
+                return new SvgColor(random.nextInt(256), random.nextInt(256), random.nextInt(256));
+            }
+        } else */
         if (rgbStr.startsWith("#")) {
             String s = rgbStr.substring(1);
             if (s.length() == 3) {
@@ -1444,6 +1948,7 @@ public class ShapeImporter {
             }
         } else {
             showWarning("fillNotSupported", "Only solid fills are supported. Random color assigned.");
+            //showWarning("fillNotSupported", "Unknown fill style. Random color assigned.");
             return new SvgColor(random.nextInt(256), random.nextInt(256), random.nextInt(256));
         }
 
@@ -1480,42 +1985,46 @@ public class ShapeImporter {
         public abstract Color toColor();
     }
 
+    enum SvgInterpolation {
+        SRGB, LINEAR_RGB
+    }
+
     abstract class SvgGradient extends SvgFill {
 
-        public List<String> gradOffsets;
-        public List<Color> gradColors;
+        public List<SvgStop> stops;
 
         public SvgGradientUnits gradientUnits;
         public String gradientTransform;
         public SvgSpreadMethod spreadMethod;
+        public SvgInterpolation interpolation;
 
         @Override
         public Color toColor() {
-            if (gradColors.isEmpty()) {
+            if (stops.isEmpty()) {
                 return Color.BLACK;
             }
-            return gradColors.get(0);
+            return stops.get(0).color;
         }
 
     }
 
     class SvgLinearGradient extends SvgGradient {
 
-        public double x1;
-        public double y1;
-        public double x2;
-        public double y2;
+        public String x1;
+        public String y1;
+        public String x2;
+        public String y2;
 
         //xlink?
     }
 
     class SvgRadialGradient extends SvgGradient {
 
-        public double cx;
-        public double cy;
-        public double r;
-        public double fx;
-        public double fy;
+        public String cx;
+        public String cy;
+        public String r;
+        public String fx;
+        public String fy;
 
         //xlink?
     }
@@ -1552,6 +2061,10 @@ public class ShapeImporter {
 
         public SvgFill strokeFill;
 
+        public Color stopColor;
+
+        public double stopOpacity;
+
         public double strokeWidth;
 
         public double strokeOpacity;
@@ -1569,6 +2082,8 @@ public class ShapeImporter {
             strokeWidth = 1;
             strokeOpacity = 1;
             opacity = 1;
+            stopOpacity = 1;
+            stopColor = null;
             strokeLineCap = SvgLineCap.BUTT;
             strokeLineJoin = SvgLineJoin.MITER;
             strokeMiterLimit = 4;
@@ -1619,17 +2134,21 @@ public class ShapeImporter {
             }
         }
 
-        private void applyStyle(SvgStyle style, String name, String value) {
+        private void applyStyle(Map<String, Element> idMap, SvgStyle style, String name, String value) {
             if (value == null || value.length() == 0) {
                 return;
             }
 
             switch (name) {
                 case "fill": {
-                    SvgFill fill = parseFill(value);
+                    SvgFill fill = parseFill(idMap, value);
                     if (fill != null) {
                         style.fill = fill == TRANSPARENT ? null : fill;
                     }
+                }
+                break;
+                case "stop-color": {
+                    style.stopColor = parseColor(value);
                 }
                 break;
                 case "fill-opacity": {
@@ -1637,8 +2156,13 @@ public class ShapeImporter {
                     style.fillOpacity = opacity;
                 }
                 break;
+                case "stop-opacity": {
+                    double stopOpacity = Double.parseDouble(value);
+                    style.stopOpacity = stopOpacity;
+                }
+                break;
                 case "stroke": {
-                    SvgFill strokeFill = parseFill(value);
+                    SvgFill strokeFill = parseFill(idMap, value);
                     if (strokeFill != null) {
                         style.strokeFill = strokeFill == TRANSPARENT ? null : strokeFill;
                     }
@@ -1694,20 +2218,19 @@ public class ShapeImporter {
             }
         }
 
-        private SvgStyle apply(Element element) {
+        private SvgStyle apply(Element element, Map<String, Element> idMap) {
             SvgStyle result = clone();
 
             String[] styles = new String[]{
                 "fill", "fill-opacity",
                 "stroke", "stroke-width", "stroke-opacity", "stroke-linecap", "stroke-linejoin", "stroke-miterlimit",
-                "opacity"
+                "opacity", "stop-color", "stop-opacity"
             };
 
             for (String style : styles) {
                 if (element.hasAttribute(style)) {
                     String attr = element.getAttribute(style);
-                    applyStyle(result, style, attr);
-
+                    applyStyle(idMap, result, style, attr);
                 }
             }
 
@@ -1715,7 +2238,7 @@ public class ShapeImporter {
                 String[] styleDefs = element.getAttribute("style").split(";");
                 for (String styleDef : styleDefs) {
                     String[] parts = styleDef.split(":", 2);
-                    applyStyle(result, parts[0], parts[1].trim());
+                    applyStyle(idMap, result, parts[0], parts[1].trim());
                 }
             }
 
