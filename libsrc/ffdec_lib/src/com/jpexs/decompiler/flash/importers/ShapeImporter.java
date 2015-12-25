@@ -18,10 +18,8 @@ package com.jpexs.decompiler.flash.importers;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.ShapeExporter;
-import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.Point;
-import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.modes.ShapeExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.ShapeExportSettings;
 import com.jpexs.decompiler.flash.exporters.shape.BitmapExporter;
@@ -49,7 +47,6 @@ import com.jpexs.decompiler.flash.types.GRADRECORD;
 import com.jpexs.decompiler.flash.types.LINESTYLE;
 import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
-import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
@@ -62,8 +59,6 @@ import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Rectangle;
-import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -71,10 +66,8 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -183,7 +176,7 @@ public class ShapeImporter {
         return importSvg(st, svgXml, true);
     }
 
-    //Generate id-element map, because getElementById does not work in some cases (namespaces?)
+    // Generate id-element map, because getElementById does not work in some cases (namespaces?)
     protected void populateIds(Element el, Map<String, Element> out) {
         if (el.hasAttribute("id")) {
             out.put(el.getAttribute("id"), el);
@@ -197,8 +190,6 @@ public class ShapeImporter {
     }
 
     public Tag importSvg(ShapeTag st, String svgXml, boolean fill) {
-        SWF swf = st.getSwf();
-
         SHAPEWITHSTYLE shapes = new SHAPEWITHSTYLE();
         shapes.fillStyles = new FILLSTYLEARRAY();
         shapes.lineStyles = new LINESTYLEARRAY();
@@ -210,11 +201,11 @@ public class ShapeImporter {
 
         try {
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-            docFactory.setValidating(false);
-            docFactory.setNamespaceAware(true);
-            docFactory.setFeature("http://xml.org/sax/features/namespaces", false);
-            docFactory.setFeature("http://xml.org/sax/features/validation", false);
-            docFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
+            /*docFactory.setValidating(false);
+             docFactory.setNamespaceAware(true);
+             docFactory.setFeature("http://xml.org/sax/features/namespaces", false);
+             docFactory.setFeature("http://xml.org/sax/features/validation", false);
+             docFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);*/
             docFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 
@@ -297,7 +288,7 @@ public class ShapeImporter {
         double x0 = 0;
         double y0 = 0;
 
-        StyleChangeRecord scrStyle = getStyleChangeRecord(transform, shapeNum, style);
+        StyleChangeRecord scrStyle = getStyleChangeRecord(shapeNum, style);
         int fillStyle = scrStyle.fillStyle1;
         int lineStyle = scrStyle.lineStyle;
         scrStyle.stateFillStyle0 = true;
@@ -333,7 +324,6 @@ public class ShapeImporter {
                     scr.moveDeltaX = (int) Math.round(p.x);
                     scr.moveDeltaY = (int) Math.round(p.y);
                     prevPoint = p;
-                    //System.out.println("M" + scr.moveDeltaX + "," + scr.moveDeltaY);
                     scr.stateMoveTo = true;
 
                     shapes.shapeRecords.add(scr);
@@ -345,7 +335,6 @@ public class ShapeImporter {
                     serz.deltaX = (int) Math.round(p.x - prevPoint.x);
                     serz.deltaY = (int) Math.round(p.y - prevPoint.y);
                     prevPoint = p;
-                    System.out.println("Z" + serz.deltaX + "," + serz.deltaY);
                     serz.generalLineFlag = true;
                     shapes.shapeRecords.add(serz);
                     break;
@@ -369,7 +358,6 @@ public class ShapeImporter {
                     p = transform.transform(x, y);
                     serh.deltaX = (int) Math.round(p.x - prevPoint.x);
                     prevPoint = p;
-                    System.out.println("H" + serh.deltaX);
                     shapes.shapeRecords.add(serh);
                     break;
                 case 'V':
@@ -379,7 +367,6 @@ public class ShapeImporter {
                     p = transform.transform(x, y);
                     serv.deltaY = (int) Math.round(p.y - prevPoint.y);
                     prevPoint = p;
-                    System.out.println("V" + serv.deltaY);
                     serv.vertLineFlag = true;
                     shapes.shapeRecords.add(serv);
                     break;
@@ -400,7 +387,6 @@ public class ShapeImporter {
                     cer.anchorDeltaX = (int) Math.round(p.x - prevPoint.x);
                     cer.anchorDeltaY = (int) Math.round(p.y - prevPoint.y);
                     prevPoint = p;
-                    System.out.println("Q" + cer.controlDeltaX + "," + cer.controlDeltaY + "," + cer.anchorDeltaX + "," + cer.controlDeltaY);
                     shapes.shapeRecords.add(cer);
                     break;
                 case 'C':
@@ -1088,7 +1074,9 @@ public class ShapeImporter {
         if (fill != null) {
             if (fill instanceof SvgGradient) {
                 SvgGradient gfill = (SvgGradient) fill;
-                scr.fillStyles.fillStyles[0].gradientMatrix = Matrix.parseSvgMatrix(gfill.gradientTransform, 1, 1).toMATRIX();
+                Matrix gradientMatrix = Matrix.parseSvgMatrix(gfill.gradientTransform, SWF.unitDivisor, 1);
+                gradientMatrix = transform.concatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor)).concatenate(gradientMatrix);
+                scr.fillStyles.fillStyles[0].gradientMatrix = gradientMatrix.toMATRIX();
                 if (fill instanceof SvgLinearGradient) {
                     SvgLinearGradient lgfill = (SvgLinearGradient) fill;
                     scr.fillStyles.fillStyles[0].fillStyleType = FILLSTYLE.LINEAR_GRADIENT;
@@ -1232,7 +1220,7 @@ public class ShapeImporter {
         }
     }
 
-    private StyleChangeRecord getStyleChangeRecord(Matrix transform, int shapeNum, SvgStyle style) {
+    private StyleChangeRecord getStyleChangeRecord(int shapeNum, SvgStyle style) {
         StyleChangeRecord scr = new StyleChangeRecord();
 
         scr.stateNewStyles = true;
@@ -1303,6 +1291,7 @@ public class ShapeImporter {
     private class SvgStop implements Comparable<SvgStop> {
 
         public Color color;
+
         public double offset;
 
         public SvgStop(Color color, double offset) {
@@ -1314,7 +1303,6 @@ public class ShapeImporter {
         public int compareTo(SvgStop o) {
             return (int) Math.signum(offset - o.offset);
         }
-
     }
 
     //FIXME - matrices
@@ -1564,7 +1552,7 @@ public class ShapeImporter {
             return null;
         }
 
-        // todo: honfika: named colors: http://www.w3.org/TR/SVG/types.html#ColorKeywords
+        // named colors from: http://www.w3.org/TR/SVG/types.html#ColorKeywords
         switch (rgbStr) {
             case "none":
                 return TRANSPARENT;
@@ -1867,8 +1855,6 @@ public class ShapeImporter {
         Pattern idPat = Pattern.compile("url\\(#([^)]+)\\)");
         java.util.regex.Matcher mPat = idPat.matcher(rgbStr);
 
-        /*
-        //TODO:FIX gradient matrices, then ucomment
         if (mPat.matches()) {
             String elementId = mPat.group(1);
             Element e = idMap.get(elementId);
@@ -1885,8 +1871,7 @@ public class ShapeImporter {
                 showWarning("fillNotSupported", "Unknown fill style. Random color assigned.");
                 return new SvgColor(random.nextInt(256), random.nextInt(256), random.nextInt(256));
             }
-        } else */
-        if (rgbStr.startsWith("#")) {
+        } else if (rgbStr.startsWith("#")) {
             String s = rgbStr.substring(1);
             if (s.length() == 3) {
                 s = "" + s.charAt(0) + s.charAt(0) + s.charAt(1) + s.charAt(1) + s.charAt(2) + s.charAt(2);
@@ -1943,10 +1928,12 @@ public class ShapeImporter {
     }
 
     enum SvgSpreadMethod {
+
         PAD, REFLECT, REPEAT
     }
 
     enum SvgGradientUnits {
+
         USER_SPACE_ON_USE, OBJECT_BOUNDING_BOX
     }
 
@@ -1956,6 +1943,7 @@ public class ShapeImporter {
     }
 
     enum SvgInterpolation {
+
         SRGB, LINEAR_RGB
     }
 
@@ -1964,8 +1952,11 @@ public class ShapeImporter {
         public List<SvgStop> stops;
 
         public SvgGradientUnits gradientUnits;
+
         public String gradientTransform;
+
         public SvgSpreadMethod spreadMethod;
+
         public SvgInterpolation interpolation;
 
         @Override
@@ -1975,27 +1966,31 @@ public class ShapeImporter {
             }
             return stops.get(0).color;
         }
-
     }
 
     class SvgLinearGradient extends SvgGradient {
 
         public String x1;
-        public String y1;
-        public String x2;
-        public String y2;
 
+        public String y1;
+
+        public String x2;
+
+        public String y2;
         //xlink?
     }
 
     class SvgRadialGradient extends SvgGradient {
 
         public String cx;
-        public String cy;
-        public String r;
-        public String fx;
-        public String fy;
 
+        public String cy;
+
+        public String r;
+
+        public String fx;
+
+        public String fy;
         //xlink?
     }
 
@@ -2019,12 +2014,12 @@ public class ShapeImporter {
         public Color toColor() {
             return this.color;
         }
-
     }
 
     class SvgStyle implements Cloneable {
 
         public SvgFill fill;
+
         public double opacity;
 
         public double fillOpacity;
