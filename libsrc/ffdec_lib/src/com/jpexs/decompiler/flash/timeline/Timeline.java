@@ -263,6 +263,7 @@ public class Timeline {
                 }
                 frame.layersChanged = true;
                 fl.placeObjectTag = po;
+                fl.minPlaceObjectNum = Math.max(fl.minPlaceObjectNum, po.getPlaceObjectNum());
                 int characterId = po.getCharacterId();
                 if (characterId != -1) {
                     fl.characterId = characterId;

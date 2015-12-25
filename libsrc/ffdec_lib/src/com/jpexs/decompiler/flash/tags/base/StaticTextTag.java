@@ -261,6 +261,12 @@ public abstract class StaticTextTag extends TextTag {
                     writer.append("font ").append(rec.fontId).newLine();
                     writer.append("height ").append(rec.textHeight).newLine();
                 }
+                if (fnt != null) {
+                    int letterSpacing = detectLetterSpacing(rec, fnt, rec.textHeight);
+                    if (letterSpacing != 0) {
+                        writer.append("letterspacing ").append(letterSpacing).newLine();
+                    }
+                }
                 if (rec.styleFlagsHasColor) {
                     if (getTextNum() == 1) {
                         writer.append("color ").append(rec.textColor.toHexRGB()).newLine();
@@ -296,8 +302,8 @@ public abstract class StaticTextTag extends TextTag {
             RGBA colorA = null;
             int fontId = -1;
             int textHeight = -1;
+            int letterSpacing = 0;
             FontTag font = null;
-            String fontName = null;
             Integer x = null;
             Integer y = null;
             int currentX = 0;
@@ -342,7 +348,6 @@ public abstract class StaticTextTag extends TextTag {
                                     }
 
                                     font = (FontTag) ft;
-                                    fontName = font.getSystemFontName();
                                 } catch (NumberFormatException nfe) {
                                     throw new TextParseException("Invalid font id - number expected. Found: " + paramValue, lexer.yyline());
                                 }
@@ -352,6 +357,13 @@ public abstract class StaticTextTag extends TextTag {
                                     textHeight = Integer.parseInt(paramValue);
                                 } catch (NumberFormatException nfe) {
                                     throw new TextParseException("Invalid font height - number expected. Found: " + paramValue, lexer.yyline());
+                                }
+                                break;
+                            case "letterspacing":
+                                try {
+                                    letterSpacing = Integer.parseInt(paramValue);
+                                } catch (NumberFormatException nfe) {
+                                    throw new TextParseException("Invalid font letter spacing - number expected. Found: " + paramValue, lexer.yyline());
                                 }
                                 break;
                             case "x":
@@ -527,17 +539,7 @@ public abstract class StaticTextTag extends TextTag {
                             GLYPHENTRY ge = new GLYPHENTRY();
                             ge.glyphIndex = font.charToGlyph(c);
 
-                            int advance;
-                            if (font.hasLayout()) {
-                                int kerningAdjustment = 0;
-                                if (nextChar != null) {
-                                    kerningAdjustment = font.getCharKerningAdjustment(c, nextChar);
-                                }
-                                advance = (int) Math.round(((double) textHeight * (font.getGlyphAdvance(ge.glyphIndex) + kerningAdjustment)) / (font.getDivider() * 1024.0));
-                            } else {
-                                advance = (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(fontName, font.getFontStyle(), (int) (textHeight / SWF.unitDivisor), c, nextChar));
-                            }
-
+                            int advance = getAdvance(font, ge.glyphIndex, textHeight, c, nextChar) + letterSpacing;
                             ge.glyphAdvance = advance;
                             tr.glyphEntries.add(ge);
 
@@ -566,6 +568,42 @@ public abstract class StaticTextTag extends TextTag {
 
         updateTextBounds();
         return true;
+    }
+
+    private int getAdvance(FontTag font, int glyphIndex, int textHeight, char c, Character nextChar) {
+        int advance;
+        if (font.hasLayout()) {
+            int kerningAdjustment = 0;
+            if (nextChar != null) {
+                kerningAdjustment = font.getCharKerningAdjustment(c, nextChar);
+            }
+            advance = (int) Math.round(((double) textHeight * (font.getGlyphAdvance(glyphIndex) + kerningAdjustment)) / (font.getDivider() * 1024.0));
+        } else {
+            String fontName = font.getSystemFontName();
+            advance = (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(fontName, font.getFontStyle(), (int) (textHeight / SWF.unitDivisor), c, nextChar));
+        }
+
+        return advance;
+    }
+
+    private int detectLetterSpacing(TEXTRECORD textRecord, FontTag font, int textHeight) {
+        int totalLetterSpacing = 0;
+        List<GLYPHENTRY> glyphEntries = textRecord.glyphEntries;
+        for (int i = 0; i < glyphEntries.size(); i++) {
+            GLYPHENTRY glyph = glyphEntries.get(i);
+            GLYPHENTRY nextGlyph = null;
+            if (i + 1 < glyphEntries.size()) {
+                nextGlyph = glyphEntries.get(i + 1);
+            }
+
+            char c = font.glyphToChar(glyph.glyphIndex);
+            Character nextChar = nextGlyph == null ? null : font.glyphToChar(nextGlyph.glyphIndex);
+            int advance = getAdvance(font, glyph.glyphIndex, textHeight, c, nextChar);
+            int letterSpacing = glyph.glyphAdvance - advance;
+            totalLetterSpacing += letterSpacing;
+        }
+
+        return (int) Math.round(totalLetterSpacing / glyphEntries.size());
     }
 
     @Override

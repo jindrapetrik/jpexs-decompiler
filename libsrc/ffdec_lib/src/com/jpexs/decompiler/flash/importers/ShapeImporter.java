@@ -689,82 +689,58 @@ public class ShapeImporter {
                         }
 
                         double rcp = Math.sqrt(4 - 2 * Math.sqrt(2));
-                        double delta = Math.PI / 4 / 45;
-                        if (deltaTheta > 0) {
-                            int segmentCount = (int) Math.ceil(deltaTheta / delta);
+                        double delta = Math.signum(deltaTheta) * Math.PI / 4;
 
-                            double theta = theta1;
+                        int segmentCount = (int) Math.ceil(deltaTheta / delta);
+                        double theta = theta1;
 
-                            PathCommand sera;
-                            for (int i = 0; i < segmentCount - 1; i++) {
-                                theta += delta;
-                                sera = new PathCommand();
-                                sera.command = 'L';
-                                double x12 = Math.cos(theta) * rx;
-                                double y12 = Math.sin(theta) * ry;
-                                x1Comma = Math.cos(fi) * x12 - Math.sin(fi) * y12;
-                                y1Comma = Math.sin(fi) * x12 + Math.cos(fi) * y12;
-                                sera.params = new double[]{cx + x1Comma, cy + y1Comma};
-                                pathCommands.add(sera);
-
-                                /*sera = new PathCommand();
-                                 sera.command = 'Q';
-                                 double x12 = Math.cos(theta) * rx;
-                                 double y12 = Math.sin(theta) * ry;
-                                 x1Comma = Math.cos(fi) * x12 - Math.sin(fi) * y12;
-                                 y1Comma = Math.sin(fi) * x12 + Math.cos(fi) * y12;
-
-                                 double theta2 = theta - Math.PI / 8;
-                                 x12 = Math.cos(theta2) * rx * rcp;
-                                 y12 = Math.sin(theta2) * ry * rcp;
-                                 double x1Comma2 = Math.cos(fi) * x12 - Math.sin(fi) * y12;
-                                 double y1Comma2 = Math.sin(fi) * x12 + Math.cos(fi) * y12;
-                                 sera.params = new double[]{cx + x1Comma2, cy + y1Comma2, cx + x1Comma, cy + y1Comma};
-                                 pathCommands.add(sera);*/
-                            }
+                        PathCommand sera;
+                        for (int i = 0; i < segmentCount - 1; i++) {
+                            theta += delta;
+                            /*sera = new PathCommand();
+                             sera.command = 'L';
+                             double x12 = Math.cos(theta) * rx;
+                             double y12 = Math.sin(theta) * ry;
+                             x1Comma = Math.cos(fi) * x12 - Math.sin(fi) * y12;
+                             y1Comma = Math.sin(fi) * x12 + Math.cos(fi) * y12;
+                             sera.params = new double[]{cx + x1Comma, cy + y1Comma};
+                             pathCommands.add(sera);*/
 
                             sera = new PathCommand();
-                            sera.command = 'L';
-                            sera.params = new double[]{x, y};
-                            pathCommands.add(sera);
-                        } else {
-                            int segmentCount = (int) Math.ceil(-deltaTheta / delta);
+                            sera.command = 'Q';
+                            double x12 = Math.cos(theta) * rx;
+                            double y12 = Math.sin(theta) * ry;
+                            x1Comma = Math.cos(fi) * x12 - Math.sin(fi) * y12;
+                            y1Comma = Math.sin(fi) * x12 + Math.cos(fi) * y12;
 
-                            double theta = theta1;
-
-                            PathCommand sera;
-                            for (int i = 0; i < segmentCount - 1; i++) {
-                                theta -= delta;
-                                sera = new PathCommand();
-                                sera.command = 'L';
-                                double x12 = Math.cos(theta) * rx;
-                                double y12 = Math.sin(theta) * ry;
-                                x1Comma = Math.cos(fi) * x12 - Math.sin(fi) * y12;
-                                y1Comma = Math.sin(fi) * x12 + Math.cos(fi) * y12;
-                                sera.params = new double[]{cx + x1Comma, cy + y1Comma};
-                                pathCommands.add(sera);
-
-                                /*sera = new PathCommand();
-                                 sera.command = 'Q';
-                                 double x12 = Math.cos(theta) * rx;
-                                 double y12 = Math.sin(theta) * ry;
-                                 x1Comma = Math.cos(fi) * x12 - Math.sin(fi) * y12;
-                                 y1Comma = Math.sin(fi) * x12 + Math.cos(fi) * y12;
-
-                                 double theta2 = theta + Math.PI / 8;
-                                 x12 = Math.cos(theta2) * rx * rcp;
-                                 y12 = Math.sin(theta2) * ry * rcp;
-                                 double x1Comma2 = Math.cos(fi) * x12 - Math.sin(fi) * y12;
-                                 double y1Comma2 = Math.sin(fi) * x12 + Math.cos(fi) * y12;
-                                 sera.params = new double[]{cx + x1Comma2, cy + y1Comma2, cx + x1Comma, cy + y1Comma};
-                                 pathCommands.add(sera);*/
-                            }
-
-                            sera = new PathCommand();
-                            sera.command = 'L';
-                            sera.params = new double[]{x, y};
+                            double theta2 = theta - delta / 2;
+                            x12 = Math.cos(theta2) * rx * rcp;
+                            y12 = Math.sin(theta2) * ry * rcp;
+                            double x1Comma2 = Math.cos(fi) * x12 - Math.sin(fi) * y12;
+                            double y1Comma2 = Math.sin(fi) * x12 + Math.cos(fi) * y12;
+                            sera.params = new double[]{cx + x1Comma2, cy + y1Comma2, cx + x1Comma, cy + y1Comma};
                             pathCommands.add(sera);
                         }
+
+                        sera = new PathCommand();
+                        sera.command = 'Q';
+
+                        theta += delta;
+                        double diff = theta1 + deltaTheta - theta;
+                        diff = -delta - diff;
+                        theta = theta - delta - diff / 2;
+
+                        double rcpm = 1 + (rcp - 1) * (diff / delta) * (diff / delta);
+                        double x12 = Math.cos(theta) * rx * rcpm;
+                        double y12 = Math.sin(theta) * ry * rcpm;
+                        x1Comma = Math.cos(fi) * x12 - Math.sin(fi) * y12;
+                        y1Comma = Math.sin(fi) * x12 + Math.cos(fi) * y12;
+                        sera.params = new double[]{cx + x1Comma, cy + y1Comma, x, y};
+                        pathCommands.add(sera);
+                        /*sera = new PathCommand();
+                         sera.command = 'L';
+                         sera.params = new double[]{x, y};
+                         pathCommands.add(sera);*/
                     }
                     break;
                 default:
@@ -785,12 +761,6 @@ public class ShapeImporter {
         }
 
         processCommands(shapeNum, shapes, pathCommands, transform, style);
-    }
-
-    private double[] getCoordinates() {
-        //rx, -sqrt2Minus1RY,
-        //sqrt2RXHalf, -sqrt2RYHalf,
-        return null;
     }
 
     private double calcAngle(double ux, double uy, double vx, double vy) {

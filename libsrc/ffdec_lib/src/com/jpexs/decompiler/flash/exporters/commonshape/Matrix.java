@@ -247,6 +247,13 @@ public final class Matrix implements Cloneable {
             transformStr = transformStr.substring(funcName.length() + 1);
             String params = transformStr.split("\\)")[0];
             transformStr = transformStr.substring(params.length() + 1);
+            while (params.contains("  ")) {
+                params = params.replaceAll("  ", " ");
+            }
+
+            params = params.trim();
+            params = params.replace(", ", ",");
+            params = params.replace(" ", ",");
             String[] args = params.split(",");
             funcName = funcName.trim();
             switch (funcName) {

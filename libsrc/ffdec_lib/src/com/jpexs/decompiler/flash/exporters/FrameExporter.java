@@ -34,7 +34,6 @@ import com.jpexs.decompiler.flash.helpers.BMPFile;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
-import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.timeline.DepthState;
@@ -173,13 +172,9 @@ public class FrameExporter {
         final List<Integer> fframes = frames;
 
         Color backgroundColor = null;
-        if (settings.mode == FrameExportMode.AVI) {
-            for (Tag t : swf.tags) {
-                if (t instanceof SetBackgroundColorTag) {
-                    SetBackgroundColorTag sb = (SetBackgroundColorTag) t;
-                    backgroundColor = sb.backgroundColor.toColor();
-                }
-            }
+        SetBackgroundColorTag setBgColorTag = swf.getBackgroundColor();
+        if (setBgColorTag != null) {
+            backgroundColor = setBgColorTag.backgroundColor.toColor();
         }
 
         if (settings.mode == FrameExportMode.SVG) {
@@ -189,7 +184,7 @@ public class FrameExporter {
                 }
 
                 final int fi = i;
-                final Color fbackgroundColor = backgroundColor;
+                final Color fbackgroundColor = null;
                 new RetryTask(() -> {
                     int frame = fframes.get(fi);
                     File f = new File(foutdir + File.separator + frame + ".svg");
@@ -223,7 +218,7 @@ public class FrameExporter {
             }
 
             final Timeline ftim = tim;
-            final Color fbackgroundColor = backgroundColor;
+            final Color fbackgroundColor = null;
             final SWF fswf = swf;
             new RetryTask(() -> {
                 File fcanvas = new File(foutdir + File.separator + "canvas.js");
@@ -259,11 +254,8 @@ public class FrameExporter {
                     }
                     sb.append("\r\n");
                     RGB backgroundColor1 = new RGB(255, 255, 255);
-                    for (Tag t : fswf.tags) {
-                        if (t instanceof SetBackgroundColorTag) {
-                            SetBackgroundColorTag sbgct = (SetBackgroundColorTag) t;
-                            backgroundColor1 = sbgct.backgroundColor;
-                        }
+                    if (setBgColorTag != null) {
+                        backgroundColor1 = setBgColorTag.backgroundColor;
                     }
 
                     sb.append("var backgroundColor = \"").append(backgroundColor1.toHexRGB()).append("\";\r\n");

@@ -38,6 +38,10 @@ public class CXFORMWITHALPHA extends ColorTransform {
      */
     public boolean hasMultTerms;
 
+    @Calculated
+    @SWFType(value = BasicType.UB, count = 4)
+    public int nbits;
+
     /**
      * Red multiply value
      */
@@ -94,10 +98,6 @@ public class CXFORMWITHALPHA extends ColorTransform {
     @SWFType(value = BasicType.SB, countField = "nbits")
     public int alphaAddTerm;
 
-    @Calculated
-    @SWFType(value = BasicType.UB, count = 4)
-    public int nbits;
-
     @Override
     public int getRedAdd() {
         return hasAddTerms ? redAddTerm : super.getRedAdd();
@@ -136,6 +136,22 @@ public class CXFORMWITHALPHA extends ColorTransform {
     @Override
     public int getAlphaMulti() {
         return hasMultTerms ? alphaMultTerm : super.getAlphaMulti();
+    }
+
+    public CXFORMWITHALPHA() {
+    }
+
+    public CXFORMWITHALPHA(ColorTransform colorTransform) {
+        redMultTerm = colorTransform.getRedMulti();
+        greenMultTerm = colorTransform.getGreenMulti();
+        blueMultTerm = colorTransform.getBlueMulti();
+        alphaMultTerm = colorTransform.getAlphaMulti();
+        redAddTerm = colorTransform.getRedAdd();
+        greenAddTerm = colorTransform.getGreenAdd();
+        blueAddTerm = colorTransform.getBlueAdd();
+        alphaAddTerm = colorTransform.getAlphaAdd();
+        hasAddTerms = redAddTerm != 0 || greenAddTerm != 0 || blueAddTerm != 0 || alphaAddTerm != 0;
+        hasMultTerms = redMultTerm != 255 || greenMultTerm != 255 || blueMultTerm != 255 || alphaMultTerm != 255;
     }
 
     @Override

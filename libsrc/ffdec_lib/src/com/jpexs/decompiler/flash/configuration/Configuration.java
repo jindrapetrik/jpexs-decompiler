@@ -538,6 +538,11 @@ public class Configuration {
     @ConfigurationCategory("import")
     public static final ConfigurationItem<Boolean> warningSvgImport = null;
 
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationName("shapeImport.useNonSmoothedFill")
+    @ConfigurationCategory("import")
+    public static final ConfigurationItem<Boolean> shapeImportUseNonSmoothedFill = null;
+
     private enum OSId {
 
         WINDOWS, OSX, UNIX

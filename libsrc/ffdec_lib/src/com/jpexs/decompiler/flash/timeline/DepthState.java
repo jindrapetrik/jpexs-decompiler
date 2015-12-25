@@ -17,8 +17,14 @@
 package com.jpexs.decompiler.flash.timeline;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
+import com.jpexs.decompiler.flash.tags.PlaceObject3Tag;
+import com.jpexs.decompiler.flash.tags.PlaceObject4Tag;
+import com.jpexs.decompiler.flash.tags.PlaceObjectTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
+import com.jpexs.decompiler.flash.types.CXFORM;
+import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RGBA;
@@ -35,11 +41,11 @@ public class DepthState {
 
     public int characterId = -1;
 
-    public MATRIX matrix = null;
+    public MATRIX matrix;
 
-    public String instanceName = null;
+    public String instanceName;
 
-    public ColorTransform colorTransForm = null;
+    public ColorTransform colorTransForm;
 
     public boolean cacheAsBitmap = false;
 
@@ -49,9 +55,11 @@ public class DepthState {
 
     public boolean isVisible = true;
 
-    public RGBA backGroundColor = null;
+    public RGBA backGroundColor;
 
-    public CLIPACTIONS clipActions = null;
+    public CLIPACTIONS clipActions;
+
+    public byte[] amfData;
 
     public int ratio = -1;
 
@@ -66,6 +74,8 @@ public class DepthState {
     public Frame frame;
 
     public PlaceObjectTypeTag placeObjectTag;
+
+    public int minPlaceObjectNum;
 
     public long instanceId;
 
@@ -100,11 +110,28 @@ public class DepthState {
         clipDepth = obj.clipDepth;
         time = obj.time;
         placeObjectTag = obj.placeObjectTag;
+        minPlaceObjectNum = obj.minPlaceObjectNum;
         if (sameInstance) {
             time++;
             instanceId = obj.instanceId;
         } else {
             instanceId = getNewInstanceId();
         }
+    }
+
+    public PlaceObjectTypeTag toPlaceObjectTag(int depth) {
+        if (minPlaceObjectNum <= 1) {
+            CXFORM cxForm0 = colorTransForm == null ? null : new CXFORM(colorTransForm);
+            return new PlaceObjectTag(swf, characterId, depth, matrix, cxForm0);
+        } else if (minPlaceObjectNum == 2) {
+            CXFORMWITHALPHA cxForm = colorTransForm == null ? null : new CXFORMWITHALPHA(colorTransForm);
+            return new PlaceObject2Tag(swf, false, depth, characterId, matrix, cxForm, ratio, instanceName, clipDepth, clipActions);
+        } else if (minPlaceObjectNum == 3) {
+            CXFORMWITHALPHA cxForm = colorTransForm == null ? null : new CXFORMWITHALPHA(colorTransForm);
+            return new PlaceObject3Tag(swf, false, depth, null/*todo: className*/, characterId, matrix, cxForm, ratio, instanceName, clipDepth, filters, blendMode, cacheAsBitmap ? 1 : 0, isVisible ? 1 : 0, backGroundColor, clipActions);
+        }
+
+        CXFORMWITHALPHA cxForm = colorTransForm == null ? null : new CXFORMWITHALPHA(colorTransForm);
+        return new PlaceObject4Tag(swf, false, depth, null/*todo: className*/, characterId, matrix, cxForm, ratio, instanceName, clipDepth, filters, blendMode, cacheAsBitmap ? 1 : 0, isVisible ? 1 : 0, backGroundColor, clipActions, null);
     }
 }

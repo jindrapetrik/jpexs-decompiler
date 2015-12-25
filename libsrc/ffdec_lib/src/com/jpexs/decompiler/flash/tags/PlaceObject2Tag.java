@@ -149,15 +149,15 @@ public class PlaceObject2Tag extends PlaceObjectTypeTag implements ASMSourceCont
         super(swf, ID, NAME, null);
     }
 
-    public PlaceObject2Tag(SWF swf, boolean placeFlagHasClipActions, boolean placeFlagHasClipDepth, boolean placeFlagHasName, boolean placeFlagHasRatio, boolean placeFlagHasColorTransform, boolean placeFlagHasMatrix, boolean placeFlagHasCharacter, boolean placeFlagMove, int depth, int characterId, MATRIX matrix, CXFORMWITHALPHA colorTransform, int ratio, String name, int clipDepth, CLIPACTIONS clipActions) {
+    public PlaceObject2Tag(SWF swf, boolean placeFlagMove, int depth, int characterId, MATRIX matrix, CXFORMWITHALPHA colorTransform, int ratio, String name, int clipDepth, CLIPACTIONS clipActions) {
         super(swf, ID, NAME, null);
-        this.placeFlagHasClipActions = placeFlagHasClipActions;
-        this.placeFlagHasClipDepth = placeFlagHasClipDepth;
-        this.placeFlagHasName = placeFlagHasName;
-        this.placeFlagHasRatio = placeFlagHasRatio;
-        this.placeFlagHasColorTransform = placeFlagHasColorTransform;
-        this.placeFlagHasMatrix = placeFlagHasMatrix;
-        this.placeFlagHasCharacter = placeFlagHasCharacter;
+        this.placeFlagHasClipActions = clipActions != null;
+        this.placeFlagHasClipDepth = clipDepth >= 0;
+        this.placeFlagHasName = name != null;
+        this.placeFlagHasRatio = ratio >= 0;
+        this.placeFlagHasColorTransform = colorTransform != null;
+        this.placeFlagHasMatrix = matrix != null;
+        this.placeFlagHasCharacter = characterId >= 0;
         this.placeFlagMove = placeFlagMove;
         this.depth = depth;
         this.characterId = characterId;
@@ -257,6 +257,11 @@ public class PlaceObject2Tag extends PlaceObjectTypeTag implements ASMSourceCont
     }
 
     @Override
+    public int getPlaceObjectNum() {
+        return 2;
+    }
+
+    @Override
     public int getClipDepth() {
         if (placeFlagHasClipDepth) {
             return clipDepth;
@@ -327,6 +332,11 @@ public class PlaceObject2Tag extends PlaceObjectTypeTag implements ASMSourceCont
         } else {
             return null;
         }
+    }
+
+    @Override
+    public void setMatrix(MATRIX matrix) {
+        this.matrix = matrix;
     }
 
     @Override

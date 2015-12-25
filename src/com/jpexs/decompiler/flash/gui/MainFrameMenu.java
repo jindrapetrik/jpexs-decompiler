@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFBundle;
 import com.jpexs.decompiler.flash.SWFSourceInfo;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.configuration.ConfigurationItemChangeListener;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
 import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.decompiler.flash.gui.helpers.CheckResources;
@@ -71,6 +72,20 @@ public abstract class MainFrameMenu implements MenuBuilder {
     private KeyEventDispatcher keyEventDispatcher;
 
     private SWF swf;
+
+    private ConfigurationItemChangeListener<Boolean> configListenerAutoDeobfuscate;
+
+    private ConfigurationItemChangeListener<Boolean> configListenerInternalFlashViewer;
+
+    private ConfigurationItemChangeListener<Boolean> configListenerParallelSpeedUp;
+
+    private ConfigurationItemChangeListener<Boolean> configListenerDecompile;
+
+    private ConfigurationItemChangeListener<Boolean> configListenerCacheOnDisk;
+
+    private ConfigurationItemChangeListener<Boolean> configListenerGotoMainClassOnStartup;
+
+    private ConfigurationItemChangeListener<Boolean> configListenerAutoRenameIdentifiers;
 
     protected final Map<String, HotKey> menuHotkeys = new HashMap<>();
 
@@ -895,37 +910,37 @@ public abstract class MainFrameMenu implements MenuBuilder {
         finishMenu("/settings");
 
         setMenuChecked("/settings/autoDeobfuscation", Configuration.autoDeobfuscate.get());
-        Configuration.autoDeobfuscate.addListener((Boolean newValue) -> {
+        Configuration.autoDeobfuscate.addListener(configListenerAutoDeobfuscate = (Boolean newValue) -> {
             setMenuChecked("/settings/autoDeobfuscation", newValue);
         });
 
         setMenuChecked("/settings/internalViewer", Configuration.internalFlashViewer.get() || externalFlashPlayerUnavailable);
-        Configuration.internalFlashViewer.addListener((Boolean newValue) -> {
+        Configuration.internalFlashViewer.addListener(configListenerInternalFlashViewer = (Boolean newValue) -> {
             setMenuChecked("/settings/internalViewer", newValue || externalFlashPlayerUnavailable);
         });
 
         setMenuChecked("/settings/parallelSpeedUp", Configuration.parallelSpeedUp.get());
-        Configuration.parallelSpeedUp.addListener((Boolean newValue) -> {
+        Configuration.parallelSpeedUp.addListener(configListenerParallelSpeedUp = (Boolean newValue) -> {
             setMenuChecked("/settings/parallelSpeedUp", newValue);
         });
 
         setMenuChecked("/settings/disableDecompilation", !Configuration.decompile.get());
-        Configuration.decompile.addListener((Boolean newValue) -> {
+        Configuration.decompile.addListener(configListenerDecompile = (Boolean newValue) -> {
             setMenuChecked("/settings/disableDecompilation", !newValue);
         });
 
         setMenuChecked("/settings/cacheOnDisk", Configuration.cacheOnDisk.get());
-        Configuration.cacheOnDisk.addListener((Boolean newValue) -> {
+        Configuration.cacheOnDisk.addListener(configListenerCacheOnDisk = (Boolean newValue) -> {
             setMenuChecked("/settings/cacheOnDisk", newValue);
         });
 
         setMenuChecked("/settings/gotoMainClassOnStartup", Configuration.gotoMainClassOnStartup.get());
-        Configuration.gotoMainClassOnStartup.addListener((Boolean newValue) -> {
+        Configuration.gotoMainClassOnStartup.addListener(configListenerGotoMainClassOnStartup = (Boolean newValue) -> {
             setMenuChecked("/settings/gotoMainClassOnStartup", newValue);
         });
 
         setMenuChecked("/settings/autoRenameIdentifiers", Configuration.autoRenameIdentifiers.get());
-        Configuration.autoRenameIdentifiers.addListener((Boolean newValue) -> {
+        Configuration.autoRenameIdentifiers.addListener(configListenerAutoRenameIdentifiers = (Boolean newValue) -> {
             setMenuChecked("/settings/autoRenameIdentifiers", newValue);
         });
 
@@ -1085,6 +1100,14 @@ public abstract class MainFrameMenu implements MenuBuilder {
     public void dispose() {
         KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
         manager.removeKeyEventDispatcher(keyEventDispatcher);
+
+        Configuration.autoDeobfuscate.removeListener(configListenerAutoDeobfuscate);
+        Configuration.internalFlashViewer.removeListener(configListenerInternalFlashViewer);
+        Configuration.parallelSpeedUp.removeListener(configListenerParallelSpeedUp);
+        Configuration.decompile.removeListener(configListenerDecompile);
+        Configuration.cacheOnDisk.removeListener(configListenerCacheOnDisk);
+        Configuration.gotoMainClassOnStartup.removeListener(configListenerGotoMainClassOnStartup);
+        Configuration.autoRenameIdentifiers.removeListener(configListenerAutoRenameIdentifiers);
 
         Main.stopRun();
     }

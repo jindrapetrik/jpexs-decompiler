@@ -54,7 +54,6 @@ import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +61,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.imageio.ImageIO;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JLabel;
@@ -518,14 +516,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         return 1;
     }
 
-    public void setImage(byte[] data) {
-        try {
-            setImage(new SerializableImage(ImageIO.read(new ByteArrayInputStream(data))));
-        } catch (IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
-        }
-    }
-
     @Override
     public synchronized boolean zoomAvailable() {
         return zoomAvailable;
@@ -961,7 +951,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
         float frameRate = timeline.frameRate;
         int msPerFrame = frameRate == 0 ? 1000 : (int) (1000.0 / frameRate);
-        final boolean singleFrame = !playing || (timeline.getRealFrameCount() <= 1 && timeline.isSingleFrame());
+        final boolean singleFrame = !playing
+                || (stillFrame && timeline.isSingleFrame(frame))
+                || (!stillFrame && timeline.getRealFrameCount() <= 1 && timeline.isSingleFrame());
 
         timer = new Timer();
         TimerTask task = new TimerTask() {
