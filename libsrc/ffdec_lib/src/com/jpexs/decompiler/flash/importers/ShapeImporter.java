@@ -275,6 +275,9 @@ public class ShapeImporter {
                     processPolyline(shapeNum, shapes, childElement, m2, newStyle);
                 } else if ("polygon".equals(tagName)) {
                     processPolygon(shapeNum, shapes, childElement, m2, newStyle);
+                } else if ("defs".equals(tagName) || "title".equals(tagName) || "desc".equals(tagName)
+                        || "radialGradient".equals(tagName) || "linearGradient".equals(tagName)) {
+                    // ignore
                 } else {
                     showWarning(tagName + "tagNotSupported", "The SVG tag '" + tagName + "' is not supported.");
                 }
@@ -1852,26 +1855,28 @@ public class ShapeImporter {
                 return new SvgColor(154, 205, 50);
         }
 
-        Pattern idPat = Pattern.compile("url\\(#([^)]+)\\)");
+        Pattern idPat = Pattern.compile("url\\(#([^)]+)\\).*");
         java.util.regex.Matcher mPat = idPat.matcher(rgbStr);
 
         if (mPat.matches()) {
             String elementId = mPat.group(1);
             Element e = idMap.get(elementId);
-            if (e == null) {
-                showWarning("fillNotSupported", "Linked fill id not found. Random color assigned.");
-                return new SvgColor(random.nextInt(256), random.nextInt(256), random.nextInt(256));
+            if (e != null) {
+                String tagName = e.getTagName();
+                if ("linearGradient".equals(tagName)) {
+                    return parseGradient(idMap, e, new SvgStyle()); //? new style
+                } else if ("radialGradient".equals(tagName)) {
+                    return parseGradient(idMap, e, new SvgStyle()); //? new style
+                } else {
+                    showWarning("fillNotSupported", "Unknown fill style. Random color assigned.");
+                    return new SvgColor(random.nextInt(256), random.nextInt(256), random.nextInt(256));
+                }
             }
-            String tagName = e.getTagName();
-            if ("linearGradient".equals(tagName)) {
-                return parseGradient(idMap, e, new SvgStyle()); //? new style
-            } else if ("radialGradient".equals(tagName)) {
-                return parseGradient(idMap, e, new SvgStyle()); //? new style
-            } else {
-                showWarning("fillNotSupported", "Unknown fill style. Random color assigned.");
-                return new SvgColor(random.nextInt(256), random.nextInt(256), random.nextInt(256));
-            }
-        } else if (rgbStr.startsWith("#")) {
+
+            rgbStr = rgbStr.substring(elementId.length() + 6).trim(); // remove url(#...)
+        }
+
+        if (rgbStr.startsWith("#")) {
             String s = rgbStr.substring(1);
             if (s.length() == 3) {
                 s = "" + s.charAt(0) + s.charAt(0) + s.charAt(1) + s.charAt(1) + s.charAt(2) + s.charAt(2);
@@ -2194,7 +2199,7 @@ public class ShapeImporter {
 
             for (String style : styles) {
                 if (element.hasAttribute(style)) {
-                    String attr = element.getAttribute(style);
+                    String attr = element.getAttribute(style).trim();
                     applyStyle(idMap, result, style, attr);
                 }
             }
