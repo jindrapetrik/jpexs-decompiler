@@ -53,6 +53,7 @@ import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
+import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.helpers.Helper;
@@ -310,7 +311,10 @@ public class ShapeImporter {
         scrStyle.fillStyle0 = 0;
         scrStyle.fillStyle1 = 0;
         scrStyle.lineStyle = 0;
-        shapes.shapeRecords.add(scrStyle);
+
+        List<SHAPERECORD> newRecords = new ArrayList<>();
+
+        newRecords.add(scrStyle);
 
         LINESTYLE lineStyleObj = scrStyle.lineStyles.lineStyles.length < 1 ? null : scrStyle.lineStyles.lineStyles[0];
         LINESTYLE2 lineStyle2Obj = null;
@@ -345,7 +349,7 @@ public class ShapeImporter {
                     prevPoint = p;
                     scr.stateMoveTo = true;
 
-                    shapes.shapeRecords.add(scr);
+                    newRecords.add(scr);
                     startPoint = p;
                     break;
                 case 'Z':
@@ -355,7 +359,7 @@ public class ShapeImporter {
                     serz.deltaY = (int) Math.round(p.y - prevPoint.y);
                     prevPoint = p;
                     serz.generalLineFlag = true;
-                    shapes.shapeRecords.add(serz);
+                    newRecords.add(serz);
                     if (lineStyle2Obj != null) {
                         lineStyle2Obj.noClose = false;
                     }
@@ -371,7 +375,7 @@ public class ShapeImporter {
                     prevPoint = p;
                     serl.generalLineFlag = true;
                     serl.simplify();
-                    shapes.shapeRecords.add(serl);
+                    newRecords.add(serl);
                     break;
                 case 'H':
                     StraightEdgeRecord serh = new StraightEdgeRecord();
@@ -380,7 +384,7 @@ public class ShapeImporter {
                     p = transform2.transform(x, y);
                     serh.deltaX = (int) Math.round(p.x - prevPoint.x);
                     prevPoint = p;
-                    shapes.shapeRecords.add(serh);
+                    newRecords.add(serh);
                     break;
                 case 'V':
                     StraightEdgeRecord serv = new StraightEdgeRecord();
@@ -390,7 +394,7 @@ public class ShapeImporter {
                     serv.deltaY = (int) Math.round(p.y - prevPoint.y);
                     prevPoint = p;
                     serv.vertLineFlag = true;
-                    shapes.shapeRecords.add(serv);
+                    newRecords.add(serv);
                     break;
                 case 'Q':
                     CurvedEdgeRecord cer = new CurvedEdgeRecord();
@@ -409,7 +413,7 @@ public class ShapeImporter {
                     cer.anchorDeltaX = (int) Math.round(p.x - prevPoint.x);
                     cer.anchorDeltaY = (int) Math.round(p.y - prevPoint.y);
                     prevPoint = p;
-                    shapes.shapeRecords.add(cer);
+                    newRecords.add(cer);
                     break;
                 case 'C':
                     showWarning("cubicCurvesNotSupported", "Cubic curves are not supported by Flash.");
@@ -437,7 +441,7 @@ public class ShapeImporter {
                     //serc.generalLineFlag = true;
                     //serc.deltaX = (int) Math.round(p.x - prevPoint.x);
                     //serc.deltaY = (int) Math.round(p.y - prevPoint.y);
-                    //shapes.shapeRecords.add(serc);
+                    //newRecords.add(serc);
                     List<Double> quadCoordinates = new CubicToQuad().cubicToQuad(pStart.x, pStart.y, pControl1.x, pControl1.y, pControl2.x, pControl2.y, p.x, p.y, 1);
                     for (int i = 2; i < quadCoordinates.size();) {
                         CurvedEdgeRecord cerc = new CurvedEdgeRecord();
@@ -450,7 +454,7 @@ public class ShapeImporter {
                         cerc.anchorDeltaX = (int) Math.round(p.x - prevPoint.x);
                         cerc.anchorDeltaY = (int) Math.round(p.y - prevPoint.y);
                         prevPoint = p;
-                        shapes.shapeRecords.add(cerc);
+                        newRecords.add(cerc);
                     }
 
                     break;
@@ -462,7 +466,8 @@ public class ShapeImporter {
             x0 = x;
             y0 = y;
         }
-        applyStyleGradients(shapes.getBounds(), scrStyle, transform2, shapeNum, style);
+        applyStyleGradients(SHAPERECORD.getBounds(newRecords), scrStyle, transform2, shapeNum, style);
+        shapes.shapeRecords.addAll(newRecords);
     }
 
     private void processPath(int shapeNum, SHAPEWITHSTYLE shapes, Element childElement, Matrix transform, SvgStyle style) {
@@ -1061,17 +1066,18 @@ public class ShapeImporter {
 
     //Stub for w3 test. TODO: refactor and move to test directory. It's here because of easy access - compiling single file
     private static void svgTest(String name) throws IOException, InterruptedException {
-        URL svgUrl = new URL("http://www.w3.org/Graphics/SVG/Test/20061213/svggen/" + name + ".svg");
-        byte[] svgData = Helper.readStream(svgUrl.openStream());
-        Helper.writeFile(name + ".original.svg", svgData);
+        if (!new File(name + ".original.svg").exists()) {
+            URL svgUrl = new URL("http://www.w3.org/Graphics/SVG/Test/20061213/svggen/" + name + ".svg");
+            byte[] svgData = Helper.readStream(svgUrl.openStream());
+            Helper.writeFile(name + ".original.svg", svgData);
 
-        URL pngUrl = new URL("http://www.w3.org/Graphics/SVG/Test/20061213/png/full-" + name + ".png");
-        byte[] pngData = Helper.readStream(pngUrl.openStream());
-        Helper.writeFile(name + ".original.png", pngData);
+            URL pngUrl = new URL("http://www.w3.org/Graphics/SVG/Test/20061213/png/full-" + name + ".png");
+            byte[] pngData = Helper.readStream(pngUrl.openStream());
+            Helper.writeFile(name + ".original.png", pngData);
+        }
+        //String svgDataS = new String(svgData);
 
-        String svgDataS = new String(svgData);
-        //String svgDataS = Helper.readTextFile(name + ".original.svg");
-
+        String svgDataS = Helper.readTextFile(name + ".original.svg");
         SWF swf = new SWF();
         DefineShape4Tag st = new DefineShape4Tag(swf);
         st = (DefineShape4Tag) (new ShapeImporter().importSvg(st, svgDataS));
@@ -1087,7 +1093,7 @@ public class ShapeImporter {
     //Test for SVG
     public static void main(String[] args) throws IOException, InterruptedException {
         //svgTest("pservers-grad-01-b");
-        svgTest("pservers-grad-04-b");
+        svgTest("pservers-grad-05-b");
     }
 
     private void applyStyleGradients(RECT bounds, StyleChangeRecord scr, Matrix transform, int shapeNum, SvgStyle style) {
@@ -1130,24 +1136,28 @@ public class ShapeImporter {
                     } else {
                         y2 = Double.parseDouble(lgfill.y2);
                     }
+                    x1 = x1 * SWF.unitDivisor;
+                    y1 = y1 * SWF.unitDivisor;
+                    x2 = x2 * SWF.unitDivisor;
+                    y2 = y2 * SWF.unitDivisor;
+
+                    Matrix boundingBoxMatrix = new Matrix();
                     if (lgfill.gradientUnits == SvgGradientUnits.OBJECT_BOUNDING_BOX) {
-                        x1 = bounds.Xmin + bounds.getWidth() * x1;
-                        x2 = bounds.Xmin + bounds.getWidth() * x2;
-                        y1 = bounds.Ymin + bounds.getHeight() * y1;
-                        y2 = bounds.Ymin + bounds.getHeight() * y2;
-                    } else {
-                        x1 = x1 * SWF.unitDivisor;
-                        y1 = y1 * SWF.unitDivisor;
-                        x2 = x2 * SWF.unitDivisor;
-                        y2 = y2 * SWF.unitDivisor;
+                        boundingBoxMatrix.scaleX = (bounds.Xmax - bounds.Xmin) / SWF.unitDivisor;
+                        boundingBoxMatrix.rotateSkew0 = 0;
+                        boundingBoxMatrix.rotateSkew1 = 0;
+                        boundingBoxMatrix.scaleY = (bounds.Ymax - bounds.Ymin) / SWF.unitDivisor;
+                        boundingBoxMatrix.translateX = bounds.Xmin;
+                        boundingBoxMatrix.translateY = bounds.Ymin;
                     }
 
-                    //FIXME: make following transformations correct for "pservers-grad-04-b"
                     Matrix xyMatrix = new Matrix();
                     xyMatrix.scaleX = x2 - x1;
                     xyMatrix.rotateSkew0 = y2 - y1;
                     xyMatrix.rotateSkew1 = -xyMatrix.rotateSkew0;
                     xyMatrix.scaleY = xyMatrix.scaleX;
+
+                    xyMatrix = xyMatrix.preConcatenate(boundingBoxMatrix);
 
                     Matrix zeroStartMatrix = Matrix.getTranslateInstance(0.5, 0);
 
@@ -1187,8 +1197,17 @@ public class ShapeImporter {
                         r = Double.parseDouble(rgfill.r);
                     }
 
-                    //TODO: apply cx,cy,r to matrix
-                    fillStyle.gradientMatrix = Matrix.getTranslateInstance(SWF.unitDivisor * cx, SWF.unitDivisor * cy).concatenate(Matrix.getScaleInstance(r / 819.2)).concatenate(new Matrix(fillStyle.gradientMatrix)).toMATRIX();
+                    Matrix boundingBoxMatrix = new Matrix();
+                    if (rgfill.gradientUnits == SvgGradientUnits.OBJECT_BOUNDING_BOX) {
+                        boundingBoxMatrix.scaleX = (bounds.Xmax - bounds.Xmin) / SWF.unitDivisor;
+                        boundingBoxMatrix.rotateSkew0 = 0;
+                        boundingBoxMatrix.rotateSkew1 = 0;
+                        boundingBoxMatrix.scaleY = (bounds.Ymax - bounds.Ymin) / SWF.unitDivisor;
+                        boundingBoxMatrix.translateX = bounds.Xmin;
+                        boundingBoxMatrix.translateY = bounds.Ymin;
+                    }
+
+                    fillStyle.gradientMatrix = Matrix.getTranslateInstance(SWF.unitDivisor * cx, SWF.unitDivisor * cy).concatenate(new Matrix(fillStyle.gradientMatrix)).concatenate(Matrix.getScaleInstance(r / 819.2)).preConcatenate(boundingBoxMatrix).toMATRIX();
 
                     double fx;
                     if (rgfill.fx.endsWith("%")) {
