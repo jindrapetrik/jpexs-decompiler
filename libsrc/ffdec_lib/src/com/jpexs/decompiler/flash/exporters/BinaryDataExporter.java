@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.exporters.settings.BinaryDataExportSettings;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -65,10 +66,8 @@ public class BinaryDataExporter {
                     evl.handleExportingEvent("binarydata", currentIndex, count, t.getName());
                 }
 
-                int characterID = bdt.getCharacterId();
-
                 String ext = bdt.innerSwf == null ? ".bin" : ".swf";
-                final File file = new File(outdir + File.separator + characterID + ext);
+                final File file = new File(outdir + File.separator + Helper.makeFileName(bdt.getCharacterExportFileName() + ext));
                 new RetryTask(() -> {
                     try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
                         fos.write(bdt.binaryData.getRangeData());
