@@ -52,9 +52,10 @@ public class SWFDecompilerPlugin {
 
     private static final List<SWFDecompilerListener> listeners = new ArrayList<>();
 
-    public static void loadPlugins() {
+    public static File getPluginsDir() {
+        File pluginPath = null;
+
         try {
-            File pluginPath = null;
             String pluginPathConfig = Configuration.pluginPath.get();
             if (pluginPathConfig != null && !pluginPathConfig.isEmpty()) {
                 pluginPath = new File(pluginPathConfig);
@@ -65,20 +66,25 @@ public class SWFDecompilerPlugin {
                 File dir = f.getAbsoluteFile().getParentFile().getParentFile();
                 pluginPath = new File(Path.combine(dir.getPath(), "plugins")).getCanonicalFile();
             }
-
-            if (pluginPath.exists()) {
-                System.out.println("Loading plugins from " + pluginPath.getPath());
-                File[] files = pluginPath.listFiles();
-                if (files != null) {
-                    for (File file : files) {
-                        System.out.println("Loading plugin: " + file.getPath());
-                        loadPlugin(file.getPath());
-                    }
-                }
-            }
         } catch (IOException | URISyntaxException ex) {
             Logger.getLogger(SWFDecompilerPlugin.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return pluginPath;
+    }
+
+    public static void loadPlugins() {
+        File pluginPath = getPluginsDir();
+        if (pluginPath != null && pluginPath.exists()) {
+            System.out.println("Loading plugins from " + pluginPath.getPath());
+            File[] files = pluginPath.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    System.out.println("Loading plugin: " + file.getPath());
+                    loadPlugin(file.getPath());
+                }
+            }
+        }
+
     }
 
     public static void loadPlugin(String path) {

@@ -216,8 +216,8 @@ public class XFLConverter {
                         + "<SolidColor color=\"")
                 .append(ls.color.toHexRGB()).append("\"")
                 .append(shapeNum == 3 ? " alpha=\"" + ((RGBA) ls.color).getAlphaFloat() + "\"" : "").append(" />"
-                        + "</fill>"
-                        + "</SolidStroke>");
+                + "</fill>"
+                + "</SolidStroke>");
     }
 
     private static void convertLineStyle(HashMap<Integer, CharacterTag> characters, LINESTYLE2 ls, int shapeNum, StringBuilder ret) {
@@ -250,7 +250,7 @@ public class XFLConverter {
                 break;
             case LINESTYLE2.MITER_JOIN:
                 params.append(" joints=\"miter\"");
-                float miterLimitFactor = toFloat(ls.miterLimitFactor);
+                float miterLimitFactor = ls.miterLimitFactor;
                 if (miterLimitFactor != 3.0f) {
                     params.append(" miterLimit=\"").append(miterLimitFactor).append("\"");
                 }
@@ -272,10 +272,6 @@ public class XFLConverter {
         }
         ret.append("</fill>");
         ret.append("</SolidStroke>");
-    }
-
-    private static float toFloat(int i) {
-        return ((float) i) / (1 << 16);
     }
 
     private static void convertFillStyle(MATRIX mat, HashMap<Integer, CharacterTag> characters, FILLSTYLE fs, int shapeNum, StringBuilder ret) {
@@ -2183,7 +2179,7 @@ public class XFLConverter {
         if (ret2.length() > 0) {
             ret.append("<DOMLayer name=\"Layer ").append(layerIndex).append("\" color=\"").append(randomOutlineColor()).append("\">"
                     + "<frames>").append(ret2).append("</frames>"
-                            + "</DOMLayer>");
+                    + "</DOMLayer>");
         }
     }
 

@@ -147,7 +147,7 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
     }
 
     @Override
-    public void lineStyle(double thickness, double thicknessEnd, RGB color, RGB colorEnd, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, int miterLimit) {
+    public void lineStyle(double thickness, double thicknessEnd, RGB color, RGB colorEnd, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, float miterLimit) {
         finalizePath();
         thickness *= zoom / SWF.unitDivisor;
         thicknessEnd *= zoom / SWF.unitDivisor;
@@ -187,8 +187,8 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
                 break;
             default:
                 path.setAttribute("stroke-linejoin", "miter");
-                if (miterLimit >= 1 && miterLimit != 4) {
-                    path.setAttribute("stroke-miterlimit", Integer.toString(miterLimit));
+                if (miterLimit >= 1 && miterLimit != 4f) {
+                    path.setAttribute("stroke-miterlimit", Double.toString(miterLimit));
                 }
                 break;
         }

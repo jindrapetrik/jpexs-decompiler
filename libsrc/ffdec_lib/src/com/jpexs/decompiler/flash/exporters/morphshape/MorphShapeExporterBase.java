@@ -199,12 +199,10 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
                     if (straightEdgeRecord.generalLineFlag) {
                         xPos += straightEdgeRecord.deltaX;
                         yPos += straightEdgeRecord.deltaY;
+                    } else if (straightEdgeRecord.vertLineFlag) {
+                        yPos += straightEdgeRecord.deltaY;
                     } else {
-                        if (straightEdgeRecord.vertLineFlag) {
-                            yPos += straightEdgeRecord.deltaY;
-                        } else {
-                            xPos += straightEdgeRecord.deltaX;
-                        }
+                        xPos += straightEdgeRecord.deltaX;
                     }
 
                     StraightEdgeRecord straightEdgeRecordEnd = (StraightEdgeRecord) shapeRecordEnd;
@@ -213,12 +211,10 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
                     if (straightEdgeRecordEnd.generalLineFlag) {
                         xPosEnd += straightEdgeRecordEnd.deltaX;
                         yPosEnd += straightEdgeRecordEnd.deltaY;
+                    } else if (straightEdgeRecordEnd.vertLineFlag) {
+                        yPosEnd += straightEdgeRecordEnd.deltaY;
                     } else {
-                        if (straightEdgeRecordEnd.vertLineFlag) {
-                            yPosEnd += straightEdgeRecordEnd.deltaY;
-                        } else {
-                            xPosEnd += straightEdgeRecordEnd.deltaX;
-                        }
+                        xPosEnd += straightEdgeRecordEnd.deltaX;
                     }
 
                     subPath.add(new StraightMorphEdge(xPosFrom, yPosFrom, xPos, yPos, xPosEndFrom, yPosEndFrom, xPosEnd, yPosEnd, currentLineStyleIdx, currentFillStyleIdx1));
@@ -397,7 +393,7 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
                         int startCapStyle = LINESTYLE2.ROUND_CAP;
                         int endCapStyle = LINESTYLE2.ROUND_CAP;
                         int joinStyle = LINESTYLE2.ROUND_JOIN;
-                        int miterLimitFactor = 3;
+                        float miterLimitFactor = 3f;
                         boolean hasFillFlag = false;
                         if (lineStyle instanceof LINESTYLE2) {
                             LINESTYLE2 lineStyle2 = (LINESTYLE2) lineStyle;

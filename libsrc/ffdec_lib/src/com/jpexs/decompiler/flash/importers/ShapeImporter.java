@@ -870,6 +870,9 @@ public class ShapeImporter {
     }
 
     private void processRect(int shapeNum, SHAPEWITHSTYLE shapes, Element childElement, Matrix transform, SvgStyle style) {
+
+        Point startPoint = new Point(0, 0);
+
         String attr = childElement.getAttribute("x");
         double x = attr.length() > 0 ? Double.parseDouble(attr) : 0;
 
@@ -909,6 +912,8 @@ public class ShapeImporter {
             scr.command = 'M';
             scr.params = new double[]{x + width, y + ry};
             pathCommands.add(scr);
+            startPoint.x = x + width;
+            startPoint.y = y + ry;
 
             double sqrt2RXHalf = Math.sqrt(2) * rx / 2;
             double sqrt2Minus1RX = (Math.sqrt(2) - 1) * rx;
@@ -956,6 +961,8 @@ public class ShapeImporter {
             PathCommand scr = new PathCommand();
             scr.command = 'M';
             scr.params = new double[]{x, y};
+            startPoint.x = x;
+            startPoint.y = y;
             pathCommands.add(scr);
 
             double[] points = new double[]{
@@ -972,6 +979,11 @@ public class ShapeImporter {
                 pathCommands.add(cer);
             }
         }
+
+        PathCommand serz = new PathCommand();
+        serz.command = 'Z';
+        serz.params = new double[]{startPoint.x, startPoint.y};
+        pathCommands.add(serz);
 
         processCommands(shapeNum, shapes, pathCommands, transform, style);
     }
@@ -1093,183 +1105,194 @@ public class ShapeImporter {
     //Test for SVG
     public static void main(String[] args) throws IOException, InterruptedException {
         //svgTest("pservers-grad-01-b");
-        svgTest("pservers-grad-05-b");
+        svgTest("pservers-grad-07-b");
+    }
+
+    private void applyFillGradients(SvgFill fill, FILLSTYLE fillStyle, RECT bounds, StyleChangeRecord scr, Matrix transform, int shapeNum, SvgStyle style) {
+        if (fill == null || fillStyle == null) {
+            return;
+        }
+        if (fill instanceof SvgGradient) {
+            SvgGradient gfill = (SvgGradient) fill;
+            Matrix gradientMatrix = Matrix.parseSvgMatrix(gfill.gradientTransform, SWF.unitDivisor, 1);
+            gradientMatrix = transform.concatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor)).concatenate(gradientMatrix);
+            fillStyle.gradientMatrix = gradientMatrix.toMATRIX();
+            if (fill instanceof SvgLinearGradient) {
+                SvgLinearGradient lgfill = (SvgLinearGradient) fill;
+                fillStyle.fillStyleType = FILLSTYLE.LINEAR_GRADIENT;
+                fillStyle.gradient = new GRADIENT();
+                double x1;
+                if (lgfill.x1.endsWith("%")) {
+                    x1 = Double.parseDouble(lgfill.x1.substring(0, lgfill.x1.length() - 1)) / 100;
+                } else {
+                    x1 = Double.parseDouble(lgfill.x1);
+                }
+                //x1 = x1 - (-819.2);
+
+                double y1;
+                if (lgfill.y1.endsWith("%")) {
+                    y1 = Double.parseDouble(lgfill.y1.substring(0, lgfill.y1.length() - 1)) / 100;
+                } else {
+                    y1 = Double.parseDouble(lgfill.y1);
+                }
+                double x2;
+                if (lgfill.x2.endsWith("%")) {
+                    x2 = Double.parseDouble(lgfill.x2.substring(0, lgfill.x2.length() - 1)) / 100;
+                } else {
+                    x2 = Double.parseDouble(lgfill.x2);
+                }
+                //x2 = x2 - 819.2;
+                double y2;
+                if (lgfill.y2.endsWith("%")) {
+                    y2 = Double.parseDouble(lgfill.y2.substring(0, lgfill.y2.length() - 1)) / 100;
+                } else {
+                    y2 = Double.parseDouble(lgfill.y2);
+                }
+                x1 = x1 * SWF.unitDivisor;
+                y1 = y1 * SWF.unitDivisor;
+                x2 = x2 * SWF.unitDivisor;
+                y2 = y2 * SWF.unitDivisor;
+
+                Matrix boundingBoxMatrix = new Matrix();
+                if (lgfill.gradientUnits == SvgGradientUnits.OBJECT_BOUNDING_BOX) {
+                    boundingBoxMatrix.scaleX = (bounds.Xmax - bounds.Xmin) / SWF.unitDivisor;
+                    boundingBoxMatrix.rotateSkew0 = 0;
+                    boundingBoxMatrix.rotateSkew1 = 0;
+                    boundingBoxMatrix.scaleY = (bounds.Ymax - bounds.Ymin) / SWF.unitDivisor;
+                    boundingBoxMatrix.translateX = bounds.Xmin;
+                    boundingBoxMatrix.translateY = bounds.Ymin;
+                }
+
+                Matrix xyMatrix = new Matrix();
+                xyMatrix.scaleX = x2 - x1;
+                xyMatrix.rotateSkew0 = y2 - y1;
+                xyMatrix.rotateSkew1 = -xyMatrix.rotateSkew0;
+                xyMatrix.scaleY = xyMatrix.scaleX;
+
+                xyMatrix = xyMatrix.preConcatenate(boundingBoxMatrix);
+
+                Matrix zeroStartMatrix = Matrix.getTranslateInstance(0.5, 0);
+
+                Matrix scaleMatrix = Matrix.getScaleInstance(1 / 16384.0 / 2);
+                Matrix transMatrix = Matrix.getTranslateInstance(x1, y1);
+
+                Matrix tMatrix = new Matrix();
+                tMatrix = tMatrix.preConcatenate(scaleMatrix);
+                tMatrix = tMatrix.preConcatenate(zeroStartMatrix);
+                tMatrix = tMatrix.preConcatenate(xyMatrix);
+
+                tMatrix = tMatrix.preConcatenate(transMatrix);
+                Point p1 = tMatrix.transform(new Point(-16384, 0));
+                Point p2 = tMatrix.transform(new Point(16384, 0));
+
+                tMatrix = tMatrix.preConcatenate(new Matrix(fillStyle.gradientMatrix));
+                fillStyle.gradientMatrix = tMatrix.toMATRIX();
+            } else if (fill instanceof SvgRadialGradient) {
+                SvgRadialGradient rgfill = (SvgRadialGradient) fill;
+                double cx;
+                if (rgfill.cx.endsWith("%")) {
+                    cx = Double.parseDouble(rgfill.cx.substring(0, rgfill.cx.length() - 1)) / 100;
+                } else {
+                    cx = Double.parseDouble(rgfill.cx);
+                }
+                double cy;
+                if (rgfill.cy.endsWith("%")) {
+                    cy = Double.parseDouble(rgfill.cy.substring(0, rgfill.cy.length() - 1)) / 100;
+                } else {
+                    cy = Double.parseDouble(rgfill.cy);
+                }
+
+                double r;
+                if (rgfill.r.endsWith("%")) {
+                    r = Double.parseDouble(rgfill.r.substring(0, rgfill.r.length() - 1)) / 100;
+                } else {
+                    r = Double.parseDouble(rgfill.r);
+                }
+
+                Matrix boundingBoxMatrix = new Matrix();
+                if (rgfill.gradientUnits == SvgGradientUnits.OBJECT_BOUNDING_BOX) {
+                    boundingBoxMatrix.scaleX = (bounds.Xmax - bounds.Xmin) / SWF.unitDivisor;
+                    boundingBoxMatrix.rotateSkew0 = 0;
+                    boundingBoxMatrix.rotateSkew1 = 0;
+                    boundingBoxMatrix.scaleY = (bounds.Ymax - bounds.Ymin) / SWF.unitDivisor;
+                    boundingBoxMatrix.translateX = bounds.Xmin;
+                    boundingBoxMatrix.translateY = bounds.Ymin;
+                }
+
+                fillStyle.gradientMatrix = Matrix.getTranslateInstance(SWF.unitDivisor * cx, SWF.unitDivisor * cy).concatenate(new Matrix(fillStyle.gradientMatrix)).concatenate(Matrix.getScaleInstance(r / 819.2)).preConcatenate(boundingBoxMatrix).toMATRIX();
+
+                double fx;
+                if (rgfill.fx.endsWith("%")) {
+                    fx = Double.parseDouble(rgfill.fx.substring(0, rgfill.fx.length() - 1)) / 100;
+                } else {
+                    fx = Double.parseDouble(rgfill.fx);
+                }
+                double fy;
+                if (rgfill.fy.endsWith("%")) {
+                    fy = Double.parseDouble(rgfill.fy.substring(0, rgfill.fy.length() - 1)) / 100;
+                } else {
+                    fy = Double.parseDouble(rgfill.fy);
+                }
+                if (!rgfill.fx.equals(rgfill.cx) || !rgfill.fy.equals(rgfill.cy)) {
+                    fillStyle.fillStyleType = FILLSTYLE.FOCAL_RADIAL_GRADIENT;
+                    fillStyle.gradient = new FOCALGRADIENT();
+                    FOCALGRADIENT fg = (FOCALGRADIENT) fillStyle.gradient;
+                    double f = Math.sqrt((fx - cx) * (fx - cx) + (fy - cy) * (fy - cy)) / 819.2;
+                    fg.focalPoint = (float) f;
+                } else {
+                    fillStyle.fillStyleType = FILLSTYLE.RADIAL_GRADIENT;
+                    fillStyle.gradient = new GRADIENT();
+                }
+            }
+            switch (gfill.spreadMethod) {
+                case PAD:
+                    fillStyle.gradient.spreadMode = GRADIENT.SPREAD_PAD_MODE;
+                    break;
+                case REFLECT:
+                    fillStyle.gradient.spreadMode = GRADIENT.SPREAD_REFLECT_MODE;
+                    break;
+                case REPEAT:
+                    fillStyle.gradient.spreadMode = GRADIENT.SPREAD_REPEAT_MODE;
+                    break;
+            }
+            switch (gfill.interpolation) {
+                case LINEAR_RGB:
+                    fillStyle.gradient.interpolationMode = GRADIENT.INTERPOLATION_LINEAR_RGB_MODE;
+                    break;
+                case SRGB:
+                    fillStyle.gradient.interpolationMode = GRADIENT.INTERPOLATION_RGB_MODE;
+                    break;
+            }
+
+            fillStyle.gradient.gradientRecords = new GRADRECORD[gfill.stops.size()];
+            for (int i = 0; i < gfill.stops.size(); i++) {
+                SvgStop stop = gfill.stops.get(i);
+                Color color = stop.color;
+                color = new Color(color.getRed(), color.getGreen(), color.getBlue(), (int) Math.round(color.getAlpha() * style.opacity));
+                fillStyle.gradient.gradientRecords[i] = new GRADRECORD();
+                fillStyle.gradient.gradientRecords[i].inShape3 = shapeNum >= 3;
+                fillStyle.gradient.gradientRecords[i].color = getRGB(shapeNum, color);
+                fillStyle.gradient.gradientRecords[i].ratio = (int) Math.round(stop.offset * 255);
+            }
+        } else if (fill instanceof SvgBitmapFill) {
+            SvgBitmapFill bfill = (SvgBitmapFill) fill;
+            fillStyle.fillStyleType = FILLSTYLE.REPEATING_BITMAP;
+            fillStyle.bitmapId = bfill.characterId;
+            Matrix fillMatrix = Matrix.parseSvgMatrix(bfill.patternTransform, SWF.unitDivisor, SWF.unitDivisor);
+            fillMatrix = transform.concatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor)).concatenate(fillMatrix);
+            fillStyle.bitmapMatrix = fillMatrix.toMATRIX();
+        }
     }
 
     private void applyStyleGradients(RECT bounds, StyleChangeRecord scr, Matrix transform, int shapeNum, SvgStyle style) {
         SvgFill fill = style.getFillWithOpacity();
         if (fill != null) {
-            if (fill instanceof SvgGradient) {
-                FILLSTYLE fillStyle = scr.fillStyles.fillStyles[0];
-                SvgGradient gfill = (SvgGradient) fill;
-                Matrix gradientMatrix = Matrix.parseSvgMatrix(gfill.gradientTransform, SWF.unitDivisor, 1);
-                gradientMatrix = transform.concatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor)).concatenate(gradientMatrix);
-                fillStyle.gradientMatrix = gradientMatrix.toMATRIX();
-                if (fill instanceof SvgLinearGradient) {
-                    SvgLinearGradient lgfill = (SvgLinearGradient) fill;
-                    fillStyle.fillStyleType = FILLSTYLE.LINEAR_GRADIENT;
-                    fillStyle.gradient = new GRADIENT();
-                    double x1;
-                    if (lgfill.x1.endsWith("%")) {
-                        x1 = Double.parseDouble(lgfill.x1.substring(0, lgfill.x1.length() - 1)) / 100;
-                    } else {
-                        x1 = Double.parseDouble(lgfill.x1);
-                    }
-                    //x1 = x1 - (-819.2);
-
-                    double y1;
-                    if (lgfill.y1.endsWith("%")) {
-                        y1 = Double.parseDouble(lgfill.y1.substring(0, lgfill.y1.length() - 1)) / 100;
-                    } else {
-                        y1 = Double.parseDouble(lgfill.y1);
-                    }
-                    double x2;
-                    if (lgfill.x2.endsWith("%")) {
-                        x2 = Double.parseDouble(lgfill.x2.substring(0, lgfill.x2.length() - 1)) / 100;
-                    } else {
-                        x2 = Double.parseDouble(lgfill.x2);
-                    }
-                    //x2 = x2 - 819.2;
-                    double y2;
-                    if (lgfill.y2.endsWith("%")) {
-                        y2 = Double.parseDouble(lgfill.y2.substring(0, lgfill.y2.length() - 1)) / 100;
-                    } else {
-                        y2 = Double.parseDouble(lgfill.y2);
-                    }
-                    x1 = x1 * SWF.unitDivisor;
-                    y1 = y1 * SWF.unitDivisor;
-                    x2 = x2 * SWF.unitDivisor;
-                    y2 = y2 * SWF.unitDivisor;
-
-                    Matrix boundingBoxMatrix = new Matrix();
-                    if (lgfill.gradientUnits == SvgGradientUnits.OBJECT_BOUNDING_BOX) {
-                        boundingBoxMatrix.scaleX = (bounds.Xmax - bounds.Xmin) / SWF.unitDivisor;
-                        boundingBoxMatrix.rotateSkew0 = 0;
-                        boundingBoxMatrix.rotateSkew1 = 0;
-                        boundingBoxMatrix.scaleY = (bounds.Ymax - bounds.Ymin) / SWF.unitDivisor;
-                        boundingBoxMatrix.translateX = bounds.Xmin;
-                        boundingBoxMatrix.translateY = bounds.Ymin;
-                    }
-
-                    Matrix xyMatrix = new Matrix();
-                    xyMatrix.scaleX = x2 - x1;
-                    xyMatrix.rotateSkew0 = y2 - y1;
-                    xyMatrix.rotateSkew1 = -xyMatrix.rotateSkew0;
-                    xyMatrix.scaleY = xyMatrix.scaleX;
-
-                    xyMatrix = xyMatrix.preConcatenate(boundingBoxMatrix);
-
-                    Matrix zeroStartMatrix = Matrix.getTranslateInstance(0.5, 0);
-
-                    Matrix scaleMatrix = Matrix.getScaleInstance(1 / 16384.0 / 2);
-                    Matrix transMatrix = Matrix.getTranslateInstance(x1, y1);
-
-                    Matrix tMatrix = new Matrix();
-                    tMatrix = tMatrix.preConcatenate(scaleMatrix);
-                    tMatrix = tMatrix.preConcatenate(zeroStartMatrix);
-                    tMatrix = tMatrix.preConcatenate(xyMatrix);
-
-                    tMatrix = tMatrix.preConcatenate(transMatrix);
-                    Point p1 = tMatrix.transform(new Point(-16384, 0));
-                    Point p2 = tMatrix.transform(new Point(16384, 0));
-
-                    tMatrix = tMatrix.preConcatenate(new Matrix(fillStyle.gradientMatrix));
-                    fillStyle.gradientMatrix = tMatrix.toMATRIX();
-                } else if (fill instanceof SvgRadialGradient) {
-                    SvgRadialGradient rgfill = (SvgRadialGradient) fill;
-                    double cx;
-                    if (rgfill.cx.endsWith("%")) {
-                        cx = Double.parseDouble(rgfill.cx.substring(0, rgfill.cx.length() - 1)) / 100;
-                    } else {
-                        cx = Double.parseDouble(rgfill.cx);
-                    }
-                    double cy;
-                    if (rgfill.cy.endsWith("%")) {
-                        cy = Double.parseDouble(rgfill.cy.substring(0, rgfill.cy.length() - 1)) / 100;
-                    } else {
-                        cy = Double.parseDouble(rgfill.cy);
-                    }
-
-                    double r;
-                    if (rgfill.r.endsWith("%")) {
-                        r = Double.parseDouble(rgfill.r.substring(0, rgfill.r.length() - 1)) / 100;
-                    } else {
-                        r = Double.parseDouble(rgfill.r);
-                    }
-
-                    Matrix boundingBoxMatrix = new Matrix();
-                    if (rgfill.gradientUnits == SvgGradientUnits.OBJECT_BOUNDING_BOX) {
-                        boundingBoxMatrix.scaleX = (bounds.Xmax - bounds.Xmin) / SWF.unitDivisor;
-                        boundingBoxMatrix.rotateSkew0 = 0;
-                        boundingBoxMatrix.rotateSkew1 = 0;
-                        boundingBoxMatrix.scaleY = (bounds.Ymax - bounds.Ymin) / SWF.unitDivisor;
-                        boundingBoxMatrix.translateX = bounds.Xmin;
-                        boundingBoxMatrix.translateY = bounds.Ymin;
-                    }
-
-                    fillStyle.gradientMatrix = Matrix.getTranslateInstance(SWF.unitDivisor * cx, SWF.unitDivisor * cy).concatenate(new Matrix(fillStyle.gradientMatrix)).concatenate(Matrix.getScaleInstance(r / 819.2)).preConcatenate(boundingBoxMatrix).toMATRIX();
-
-                    double fx;
-                    if (rgfill.fx.endsWith("%")) {
-                        fx = Double.parseDouble(rgfill.fx.substring(0, rgfill.fx.length() - 1)) / 100;
-                    } else {
-                        fx = Double.parseDouble(rgfill.fx);
-                    }
-                    double fy;
-                    if (rgfill.fy.endsWith("%")) {
-                        fy = Double.parseDouble(rgfill.fy.substring(0, rgfill.fy.length() - 1)) / 100;
-                    } else {
-                        fy = Double.parseDouble(rgfill.fy);
-                    }
-                    if (!rgfill.fx.equals(rgfill.cx) || !rgfill.fy.equals(rgfill.cy)) {
-                        fillStyle.fillStyleType = FILLSTYLE.FOCAL_RADIAL_GRADIENT;
-                        fillStyle.gradient = new FOCALGRADIENT();
-                        FOCALGRADIENT fg = (FOCALGRADIENT) fillStyle.gradient;
-                        double f = Math.sqrt((fx - cx) * (fx - cx) + (fy - cy) * (fy - cy)) / 819.2;
-                        fg.focalPoint = (float) f;
-                    } else {
-                        fillStyle.fillStyleType = FILLSTYLE.RADIAL_GRADIENT;
-                        fillStyle.gradient = new GRADIENT();
-                    }
-                }
-                switch (gfill.spreadMethod) {
-                    case PAD:
-                        fillStyle.gradient.spreadMode = GRADIENT.SPREAD_PAD_MODE;
-                        break;
-                    case REFLECT:
-                        fillStyle.gradient.spreadMode = GRADIENT.SPREAD_REFLECT_MODE;
-                        break;
-                    case REPEAT:
-                        fillStyle.gradient.spreadMode = GRADIENT.SPREAD_REPEAT_MODE;
-                        break;
-                }
-                switch (gfill.interpolation) {
-                    case LINEAR_RGB:
-                        fillStyle.gradient.interpolationMode = GRADIENT.INTERPOLATION_LINEAR_RGB_MODE;
-                        break;
-                    case SRGB:
-                        fillStyle.gradient.interpolationMode = GRADIENT.INTERPOLATION_RGB_MODE;
-                        break;
-                }
-
-                fillStyle.gradient.gradientRecords = new GRADRECORD[gfill.stops.size()];
-                for (int i = 0; i < gfill.stops.size(); i++) {
-                    SvgStop stop = gfill.stops.get(i);
-                    Color color = stop.color;
-                    color = new Color(color.getRed(), color.getGreen(), color.getBlue(), (int) Math.round(color.getAlpha() * style.opacity));
-                    fillStyle.gradient.gradientRecords[i] = new GRADRECORD();
-                    fillStyle.gradient.gradientRecords[i].inShape3 = shapeNum >= 3;
-                    fillStyle.gradient.gradientRecords[i].color = getRGB(shapeNum, color);
-                    fillStyle.gradient.gradientRecords[i].ratio = (int) Math.round(stop.offset * 255);
-                }
-            } else if (fill instanceof SvgBitmapFill) {
-                FILLSTYLE fillStyle = scr.fillStyles.fillStyles[0];
-                SvgBitmapFill bfill = (SvgBitmapFill) fill;
-                fillStyle.fillStyleType = FILLSTYLE.REPEATING_BITMAP;
-                fillStyle.bitmapId = bfill.characterId;
-                Matrix fillMatrix = Matrix.parseSvgMatrix(bfill.patternTransform, SWF.unitDivisor, SWF.unitDivisor);
-                fillMatrix = transform.concatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor)).concatenate(fillMatrix);
-                fillStyle.bitmapMatrix = fillMatrix.toMATRIX();
+            applyFillGradients(fill, scr.fillStyles.fillStyles[0], bounds, scr, transform, shapeNum, style);
+        }
+        SvgFill strokeFill = style.getStrokeFillWithOpacity();
+        if (strokeFill != null) {
+            if (scr.lineStyles.lineStyles.length > 0 && scr.lineStyles.lineStyles[0] instanceof LINESTYLE2) {
+                applyFillGradients(strokeFill, ((LINESTYLE2) scr.lineStyles.lineStyles[0]).fillType, bounds, scr, transform, shapeNum, style);
             }
         }
     }
@@ -1300,7 +1323,7 @@ public class ShapeImporter {
         }
 
         scr.lineStyles = new LINESTYLEARRAY();
-        SvgFill strokeFill = style.getStrokeColorWithOpacity();
+        SvgFill strokeFill = style.getStrokeFillWithOpacity();
         if (strokeFill != null) {
             Color lineColor = strokeFill.toColor();
 
@@ -1317,12 +1340,17 @@ public class ShapeImporter {
                                 : lineCap == SvgLineCap.SQUARE ? LINESTYLE2.SQUARE_CAP : 0;
                 lineStyle2.startCapStyle = swfCap;
                 lineStyle2.endCapStyle = swfCap;
+                if (!(strokeFill instanceof SvgColor)) {
+                    lineStyle2.hasFillFlag = true;
+                    lineStyle2.fillType = new FILLSTYLE();
+                    //...apply in second step - applyStyleGradients
+                }//Single color does not need fillType attribute
 
                 int swfJoin = lineJoin == SvgLineJoin.MITER ? LINESTYLE2.MITER_JOIN
                         : lineJoin == SvgLineJoin.ROUND ? LINESTYLE2.ROUND_JOIN
                                 : lineJoin == SvgLineJoin.BEVEL ? LINESTYLE2.BEVEL_JOIN : 0;
                 lineStyle2.joinStyle = swfJoin;
-                lineStyle2.miterLimitFactor = (int) Math.round(style.strokeMiterLimit * 256);
+                lineStyle2.miterLimitFactor = (float) style.strokeMiterLimit;
             } else {
                 if (lineCap != SvgLineCap.ROUND) {
                     showWarning("lineCapNotSupported", "LineCap style not supported in shape " + shapeNum);
@@ -2183,6 +2211,23 @@ public class ShapeImporter {
             }
 
             return new SvgColor(fillColor.getRed(), fillColor.getGreen(), fillColor.getBlue(), opacity);
+        }
+
+        public SvgFill getStrokeFillWithOpacity() {
+            if (strokeFill == null) {
+                return null;
+            }
+            if (!(strokeFill instanceof SvgColor)) {
+                return strokeFill;
+            }
+            Color strokeFillColor = ((SvgColor) strokeFill).color;
+
+            int opacity = (int) Math.round(this.opacity * strokeOpacity * 255);
+            if (opacity == 255) {
+                return strokeFill;
+            }
+
+            return new SvgColor(strokeFillColor.getRed(), strokeFillColor.getGreen(), strokeFillColor.getBlue(), opacity);
         }
 
         public SvgFill getStrokeColorWithOpacity() {
