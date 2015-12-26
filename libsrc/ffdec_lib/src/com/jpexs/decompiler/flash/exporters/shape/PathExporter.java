@@ -77,7 +77,7 @@ public class PathExporter extends ShapeExporterBase {
     }
 
     @Override
-    public void endLines() {
+    public void endLines(boolean close) {
         finalizePath();
     }
 

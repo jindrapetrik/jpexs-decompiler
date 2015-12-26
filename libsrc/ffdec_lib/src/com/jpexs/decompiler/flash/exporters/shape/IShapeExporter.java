@@ -37,7 +37,7 @@ public interface IShapeExporter {
 
     public void beginLines();
 
-    public void endLines();
+    public void endLines(boolean close);
 
     public void beginFill(RGB color);
 

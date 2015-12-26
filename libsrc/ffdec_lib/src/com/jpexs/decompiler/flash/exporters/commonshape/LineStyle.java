@@ -44,6 +44,8 @@ public class LineStyle {
 
     public int joinStyle;
 
+    public boolean noClose;
+
     public int miterLimitFactor;
 
     public boolean hasFillFlag;
@@ -62,6 +64,7 @@ public class LineStyle {
             startCapStyle = lineStyle2.startCapStyle;
             endCapStyle = lineStyle2.endCapStyle;
             joinStyle = lineStyle2.joinStyle;
+            noClose = lineStyle2.noClose;
             miterLimitFactor = lineStyle2.miterLimitFactor;
             hasFillFlag = lineStyle2.hasFillFlag;
             fillType = lineStyle2.fillType == null ? null : new FillStyle(lineStyle2.fillType);

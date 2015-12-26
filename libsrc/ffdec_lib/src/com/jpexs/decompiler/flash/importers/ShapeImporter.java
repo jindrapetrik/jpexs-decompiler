@@ -303,8 +303,14 @@ public class ShapeImporter {
         scrStyle.lineStyle = 0;
         shapes.shapeRecords.add(scrStyle);
 
-        for (PathCommand command : commands) {
+        LINESTYLE lineStyleObj = scrStyle.lineStyles.lineStyles.length < 1 ? null : scrStyle.lineStyles.lineStyles[0];
+        LINESTYLE2 lineStyle2Obj = null;
+        if (lineStyleObj instanceof LINESTYLE2) {
+            lineStyle2Obj = (LINESTYLE2) lineStyleObj;
+            lineStyle2Obj.noClose = true;
+        }
 
+        for (PathCommand command : commands) {
             double x = x0;
             double y = y0;
             Point p;
@@ -341,6 +347,9 @@ public class ShapeImporter {
                     prevPoint = p;
                     serz.generalLineFlag = true;
                     shapes.shapeRecords.add(serz);
+                    if (lineStyle2Obj != null) {
+                        lineStyle2Obj.noClose = false;
+                    }
                     break;
                 case 'L':
                     StraightEdgeRecord serl = new StraightEdgeRecord();
@@ -1245,7 +1254,7 @@ public class ShapeImporter {
                 scr.fillStyles.fillStyles[0].color = shapeNum >= 3 ? new RGBA(colorFill) : new RGB(colorFill);
                 scr.fillStyles.fillStyles[0].fillStyleType = FILLSTYLE.SOLID;
             } else if (fill instanceof SvgGradient) {
-                //...aply in second step - applyStyleGradients
+                //...apply in second step - applyStyleGradients
             }
 
             scr.fillStyle1 = 1;
@@ -1260,7 +1269,7 @@ public class ShapeImporter {
             Color lineColor = strokeFill.toColor();
 
             scr.lineStyles.lineStyles = new LINESTYLE[1];
-            LINESTYLE lineStyle = shapeNum <= 3 ? new LINESTYLE() : new LINESTYLE2();;
+            LINESTYLE lineStyle = shapeNum <= 3 ? new LINESTYLE() : new LINESTYLE2();
             lineStyle.color = shapeNum >= 3 ? new RGBA(lineColor) : new RGB(lineColor);
             lineStyle.width = (int) Math.round(style.strokeWidth * SWF.unitDivisor);
             SvgLineCap lineCap = style.strokeLineCap;
@@ -1277,7 +1286,7 @@ public class ShapeImporter {
                         : lineJoin == SvgLineJoin.ROUND ? LINESTYLE2.ROUND_JOIN
                                 : lineJoin == SvgLineJoin.BEVEL ? LINESTYLE2.BEVEL_JOIN : 0;
                 lineStyle2.joinStyle = swfJoin;
-                lineStyle2.miterLimitFactor = (int) style.strokeMiterLimit;
+                lineStyle2.miterLimitFactor = (int) Math.round(style.strokeMiterLimit * 256);
             } else {
                 if (lineCap != SvgLineCap.ROUND) {
                     showWarning("lineCapNotSupported", "LineCap style not supported in shape " + shapeNum);

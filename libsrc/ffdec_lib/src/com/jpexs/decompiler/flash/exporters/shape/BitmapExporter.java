@@ -184,7 +184,11 @@ public class BitmapExporter extends ShapeExporterBase {
     }
 
     @Override
-    public void endLines() {
+    public void endLines(boolean close) {
+        if (close) {
+            path.closePath();
+        }
+
         finalizePath();
     }
 

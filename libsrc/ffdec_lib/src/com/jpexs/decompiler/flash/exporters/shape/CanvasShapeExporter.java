@@ -179,7 +179,11 @@ public class CanvasShapeExporter extends ShapeExporterBase {
     }
 
     @Override
-    public void endLines() {
+    public void endLines(boolean close) {
+        if (close) {
+            pathData.append('Z').append(" ");
+        }
+
         finalizePath();
     }
 

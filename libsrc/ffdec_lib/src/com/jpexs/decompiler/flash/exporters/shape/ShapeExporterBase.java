@@ -328,6 +328,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         int posY = Integer.MAX_VALUE;
         int lineStyleIdx = Integer.MAX_VALUE;
         if (path.size() > 0) {
+            boolean autoClose = true;
             beginLines();
             for (int i = 0; i < path.size(); i++) {
                 IEdge e = path.get(i);
@@ -348,7 +349,11 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                         int joinStyle = LINESTYLE2.ROUND_JOIN;
                         int miterLimitFactor = 3;
                         boolean hasFillFlag = false;
+                        autoClose = true;
                         if (lineStyle.isLineStyle2) {
+                            if (lineStyle.noClose) {
+                                autoClose = false;
+                            }
                             if (lineStyle.noHScaleFlag && lineStyle.noVScaleFlag) {
                                 scaleMode = "NONE";
                             } else if (lineStyle.noHScaleFlag) {
@@ -408,7 +413,8 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                 posX = e.getToX();
                 posY = e.getToY();
             }
-            endLines();
+            IEdge firstEdge = path.get(0);
+            endLines(autoClose && firstEdge.getFromX() == posX && firstEdge.getFromY() == posY);
         }
     }
 
