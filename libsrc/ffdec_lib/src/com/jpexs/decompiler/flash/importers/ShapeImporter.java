@@ -221,7 +221,7 @@ public class ShapeImporter {
 
             SvgStyle style = new SvgStyle();
             style = style.apply(rootElement, idMap);
-            Matrix transform = Matrix.getScaleInstance(SWF.unitDivisor);
+            Matrix transform = new Matrix();
             processSvgObject(idMap, shapeNum, shapes, rootElement, transform, style);
         } catch (SAXException | IOException | ParserConfigurationException ex) {
             Logger.getLogger(ShapeImporter.class.getName()).log(Level.SEVERE, null, ex);
@@ -257,8 +257,8 @@ public class ShapeImporter {
                 Element childElement = (Element) childNode;
                 String tagName = childElement.getTagName();
                 SvgStyle newStyle = style.apply(childElement, idMap);
-                Matrix m = Matrix.parseSvgMatrix(childElement.getAttribute("transform"), SWF.unitDivisor, 1);
-                Matrix m2 = m == null ? transform : m.concatenate(transform);
+                Matrix m = Matrix.parseSvgMatrix(childElement.getAttribute("transform"), 1, 1);
+                Matrix m2 = m == null ? transform : transform.concatenate(m);
                 if ("g".equals(tagName)) {
                     processSvgObject(idMap, shapeNum, shapes, childElement, m2, newStyle);
                 } else if ("path".equals(tagName)) {
@@ -286,6 +286,7 @@ public class ShapeImporter {
     }
 
     private void processCommands(int shapeNum, SHAPEWITHSTYLE shapes, List<PathCommand> commands, Matrix transform, SvgStyle style) {
+        Matrix transform2 = transform.preConcatenate(Matrix.getScaleInstance(SWF.unitDivisor));
         Point prevPoint = new Point(0, 0);
         Point startPoint = prevPoint;
         double x0 = 0;
@@ -323,7 +324,7 @@ public class ShapeImporter {
                     x = command.params[0];
                     y = command.params[1];
 
-                    p = transform.transform(x, y);
+                    p = transform2.transform(x, y);
                     scr.moveDeltaX = (int) Math.round(p.x);
                     scr.moveDeltaY = (int) Math.round(p.y);
                     prevPoint = p;
@@ -346,7 +347,7 @@ public class ShapeImporter {
                     x = command.params[0];
                     y = command.params[1];
 
-                    p = transform.transform(x, y);
+                    p = transform2.transform(x, y);
                     serl.deltaX = (int) Math.round(p.x - prevPoint.x);
                     serl.deltaY = (int) Math.round(p.y - prevPoint.y);
                     prevPoint = p;
@@ -358,7 +359,7 @@ public class ShapeImporter {
                     StraightEdgeRecord serh = new StraightEdgeRecord();
                     x = command.params[0];
 
-                    p = transform.transform(x, y);
+                    p = transform2.transform(x, y);
                     serh.deltaX = (int) Math.round(p.x - prevPoint.x);
                     prevPoint = p;
                     shapes.shapeRecords.add(serh);
@@ -367,7 +368,7 @@ public class ShapeImporter {
                     StraightEdgeRecord serv = new StraightEdgeRecord();
                     y = command.params[0];
 
-                    p = transform.transform(x, y);
+                    p = transform2.transform(x, y);
                     serv.deltaY = (int) Math.round(p.y - prevPoint.y);
                     prevPoint = p;
                     serv.vertLineFlag = true;
@@ -378,7 +379,7 @@ public class ShapeImporter {
                     x = command.params[0];
                     y = command.params[1];
 
-                    p = transform.transform(x, y);
+                    p = transform2.transform(x, y);
                     cer.controlDeltaX = (int) Math.round(p.x - prevPoint.x);
                     cer.controlDeltaY = (int) Math.round(p.y - prevPoint.y);
                     prevPoint = p;
@@ -386,7 +387,7 @@ public class ShapeImporter {
                     x = command.params[2];
                     y = command.params[3];
 
-                    p = transform.transform(x, y);
+                    p = transform2.transform(x, y);
                     cer.anchorDeltaX = (int) Math.round(p.x - prevPoint.x);
                     cer.anchorDeltaY = (int) Math.round(p.y - prevPoint.y);
                     prevPoint = p;
@@ -402,24 +403,24 @@ public class ShapeImporter {
                     x = command.params[0];
                     y = command.params[1];
 
-                    pControl1 = transform.transform(x, y);
+                    pControl1 = transform2.transform(x, y);
 
                     x = command.params[2];
                     y = command.params[3];
 
-                    Point pControl2 = transform.transform(x, y);
+                    Point pControl2 = transform2.transform(x, y);
 
                     x = command.params[4];
                     y = command.params[5];
 
-                    p = transform.transform(x, y);
+                    p = transform2.transform(x, y);
 
                     //StraightEdgeRecord serc = new StraightEdgeRecord();
                     //serc.generalLineFlag = true;
                     //serc.deltaX = (int) Math.round(p.x - prevPoint.x);
                     //serc.deltaY = (int) Math.round(p.y - prevPoint.y);
                     //shapes.shapeRecords.add(serc);
-                    List<Double> quadCoordinates = new CubicToQuad().cubicToQuad(pStart.x, pStart.y, pControl1.x, pControl1.y, pControl2.x, pControl2.y, p.x, p.y, 0.0006);
+                    List<Double> quadCoordinates = new CubicToQuad().cubicToQuad(pStart.x, pStart.y, pControl1.x, pControl1.y, pControl2.x, pControl2.y, p.x, p.y, 1);
                     for (int i = 2; i < quadCoordinates.size();) {
                         CurvedEdgeRecord cerc = new CurvedEdgeRecord();
                         p = new Point(quadCoordinates.get(i++), quadCoordinates.get(i++));
@@ -443,7 +444,7 @@ public class ShapeImporter {
             x0 = x;
             y0 = y;
         }
-        applyStyleGradients(shapes.getBounds(), scrStyle, transform, shapeNum, style);
+        applyStyleGradients(shapes.getBounds(), scrStyle, transform2, shapeNum, style);
     }
 
     private void processPath(int shapeNum, SHAPEWITHSTYLE shapes, Element childElement, Matrix transform, SvgStyle style) {
@@ -606,7 +607,6 @@ public class ShapeImporter {
                     cerc.command = 'C';
                     cerc.params = new double[]{pControl1.x, pControl1.y, pControl2.x, pControl2.y, x, y};
                     pathCommands.add(cerc);
-
                     break;
                 case 'A':
                     double rx = pathReader.readDouble();
@@ -1076,14 +1076,15 @@ public class ShapeImporter {
         SvgFill fill = style.getFillWithOpacity();
         if (fill != null) {
             if (fill instanceof SvgGradient) {
+                FILLSTYLE fillStyle = scr.fillStyles.fillStyles[0];
                 SvgGradient gfill = (SvgGradient) fill;
                 Matrix gradientMatrix = Matrix.parseSvgMatrix(gfill.gradientTransform, SWF.unitDivisor, 1);
                 gradientMatrix = transform.concatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor)).concatenate(gradientMatrix);
-                scr.fillStyles.fillStyles[0].gradientMatrix = gradientMatrix.toMATRIX();
+                fillStyle.gradientMatrix = gradientMatrix.toMATRIX();
                 if (fill instanceof SvgLinearGradient) {
                     SvgLinearGradient lgfill = (SvgLinearGradient) fill;
-                    scr.fillStyles.fillStyles[0].fillStyleType = FILLSTYLE.LINEAR_GRADIENT;
-                    scr.fillStyles.fillStyles[0].gradient = new GRADIENT();
+                    fillStyle.fillStyleType = FILLSTYLE.LINEAR_GRADIENT;
+                    fillStyle.gradient = new GRADIENT();
                     double x1;
                     if (lgfill.x1.endsWith("%")) {
                         x1 = Double.parseDouble(lgfill.x1.substring(0, lgfill.x1.length() - 1)) / 100;
@@ -1144,8 +1145,8 @@ public class ShapeImporter {
                     Point p1 = tMatrix.transform(new Point(-16384, 0));
                     Point p2 = tMatrix.transform(new Point(16384, 0));
 
-                    tMatrix = tMatrix.preConcatenate(new Matrix(scr.fillStyles.fillStyles[0].gradientMatrix));
-                    scr.fillStyles.fillStyles[0].gradientMatrix = tMatrix.toMATRIX();
+                    tMatrix = tMatrix.preConcatenate(new Matrix(fillStyle.gradientMatrix));
+                    fillStyle.gradientMatrix = tMatrix.toMATRIX();
                 } else if (fill instanceof SvgRadialGradient) {
                     SvgRadialGradient rgfill = (SvgRadialGradient) fill;
                     double cx;
@@ -1167,7 +1168,9 @@ public class ShapeImporter {
                     } else {
                         r = Double.parseDouble(rgfill.r);
                     }
+
                     //TODO: apply cx,cy,r to matrix
+                    fillStyle.gradientMatrix = Matrix.getTranslateInstance(SWF.unitDivisor * cx, SWF.unitDivisor * cy).concatenate(Matrix.getScaleInstance(r / 819.2)).concatenate(new Matrix(fillStyle.gradientMatrix)).toMATRIX();
 
                     double fx;
                     if (rgfill.fx.endsWith("%")) {
@@ -1181,43 +1184,46 @@ public class ShapeImporter {
                     } else {
                         fy = Double.parseDouble(rgfill.fy);
                     }
-                    double f = (fx / cx + fy / cy) / 2;
                     if (!rgfill.fx.equals(rgfill.cx) || !rgfill.fy.equals(rgfill.cy)) {
-                        scr.fillStyles.fillStyles[0].fillStyleType = FILLSTYLE.FOCAL_RADIAL_GRADIENT;
-                        scr.fillStyles.fillStyles[0].gradient = new FOCALGRADIENT();
-                        FOCALGRADIENT fg = (FOCALGRADIENT) scr.fillStyles.fillStyles[0].gradient;
+                        fillStyle.fillStyleType = FILLSTYLE.FOCAL_RADIAL_GRADIENT;
+                        fillStyle.gradient = new FOCALGRADIENT();
+                        FOCALGRADIENT fg = (FOCALGRADIENT) fillStyle.gradient;
+                        double f = Math.sqrt((fx - cx) * (fx - cx) + (fy - cy) * (fy - cy)) / 819.2;
                         fg.focalPoint = (float) f;
                     } else {
-                        scr.fillStyles.fillStyles[0].fillStyleType = FILLSTYLE.RADIAL_GRADIENT;
-                        scr.fillStyles.fillStyles[0].gradient = new GRADIENT();
+                        fillStyle.fillStyleType = FILLSTYLE.RADIAL_GRADIENT;
+                        fillStyle.gradient = new GRADIENT();
                     }
                 }
                 switch (gfill.spreadMethod) {
                     case PAD:
-                        scr.fillStyles.fillStyles[0].gradient.spreadMode = GRADIENT.SPREAD_PAD_MODE;
+                        fillStyle.gradient.spreadMode = GRADIENT.SPREAD_PAD_MODE;
                         break;
                     case REFLECT:
-                        scr.fillStyles.fillStyles[0].gradient.spreadMode = GRADIENT.SPREAD_REFLECT_MODE;
+                        fillStyle.gradient.spreadMode = GRADIENT.SPREAD_REFLECT_MODE;
                         break;
                     case REPEAT:
-                        scr.fillStyles.fillStyles[0].gradient.spreadMode = GRADIENT.SPREAD_REPEAT_MODE;
+                        fillStyle.gradient.spreadMode = GRADIENT.SPREAD_REPEAT_MODE;
                         break;
                 }
                 switch (gfill.interpolation) {
                     case LINEAR_RGB:
-                        scr.fillStyles.fillStyles[0].gradient.interpolationMode = GRADIENT.INTERPOLATION_LINEAR_RGB_MODE;
+                        fillStyle.gradient.interpolationMode = GRADIENT.INTERPOLATION_LINEAR_RGB_MODE;
                         break;
                     case SRGB:
-                        scr.fillStyles.fillStyles[0].gradient.interpolationMode = GRADIENT.INTERPOLATION_RGB_MODE;
+                        fillStyle.gradient.interpolationMode = GRADIENT.INTERPOLATION_RGB_MODE;
                         break;
                 }
 
-                scr.fillStyles.fillStyles[0].gradient.gradientRecords = new GRADRECORD[gfill.stops.size()];
+                fillStyle.gradient.gradientRecords = new GRADRECORD[gfill.stops.size()];
                 for (int i = 0; i < gfill.stops.size(); i++) {
-                    scr.fillStyles.fillStyles[0].gradient.gradientRecords[i] = new GRADRECORD();
-                    scr.fillStyles.fillStyles[0].gradient.gradientRecords[i].inShape3 = shapeNum >= 3;
-                    scr.fillStyles.fillStyles[0].gradient.gradientRecords[i].color = shapeNum >= 3 ? new RGBA(gfill.stops.get(i).color) : new RGB(gfill.stops.get(i).color);
-                    scr.fillStyles.fillStyles[0].gradient.gradientRecords[i].ratio = (int) Math.round(gfill.stops.get(i).offset * 255);
+                    SvgStop stop = gfill.stops.get(i);
+                    Color color = stop.color;
+                    color = new Color(color.getRed(), color.getGreen(), color.getBlue(), (int) Math.round(color.getAlpha() * style.opacity));
+                    fillStyle.gradient.gradientRecords[i] = new GRADRECORD();
+                    fillStyle.gradient.gradientRecords[i].inShape3 = shapeNum >= 3;
+                    fillStyle.gradient.gradientRecords[i].color = shapeNum >= 3 ? new RGBA(color) : new RGB(color);
+                    fillStyle.gradient.gradientRecords[i].ratio = (int) Math.round(stop.offset * 255);
                 }
             }
         }
@@ -1505,6 +1511,10 @@ public class ShapeImporter {
                     offset = Double.parseDouble(offsetStr);
                 }
                 Color color = newStyle.stopColor;
+                if (color == null) {
+                    color = Color.BLACK;
+                }
+
                 int alpha = (int) Math.round(newStyle.stopOpacity * 255);
                 color = new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
                 if (!stopsCleared) { //It has some stop nodes -> remove all inherited stops
@@ -2118,7 +2128,11 @@ public class ShapeImporter {
                 }
                 break;
                 case "stop-color": {
-                    style.stopColor = parseColor(value);
+                    if ("inherit".equals(value) || "currentColor".equals(value)) {
+                        showWarning(value + "StopColorNotSupported", "The stop color value '" + value + "' is not supported.");
+                    } else {
+                        style.stopColor = parseColor(value);
+                    }
                 }
                 break;
                 case "fill-opacity": {
@@ -2127,8 +2141,12 @@ public class ShapeImporter {
                 }
                 break;
                 case "stop-opacity": {
-                    double stopOpacity = Double.parseDouble(value);
-                    style.stopOpacity = stopOpacity;
+                    if ("inherit".equals(value)) {
+                        showWarning(value + "StopOpacityNotSupported", "The stop opacity value '" + value + "' is not supported.");
+                    } else {
+                        double stopOpacity = Double.parseDouble(value);
+                        style.stopOpacity = stopOpacity;
+                    }
                 }
                 break;
                 case "stroke": {
@@ -2208,7 +2226,7 @@ public class ShapeImporter {
                 String[] styleDefs = element.getAttribute("style").split(";");
                 for (String styleDef : styleDefs) {
                     String[] parts = styleDef.split(":", 2);
-                    applyStyle(idMap, result, parts[0], parts[1].trim());
+                    applyStyle(idMap, result, parts[0].trim(), parts[1].trim());
                 }
             }
 

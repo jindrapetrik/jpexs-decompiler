@@ -246,7 +246,7 @@ public final class Matrix implements Cloneable {
             String funcName = transformStr.split("\\(")[0];
             transformStr = transformStr.substring(funcName.length() + 1);
             String params = transformStr.split("\\)")[0];
-            transformStr = transformStr.substring(params.length() + 1);
+            transformStr = transformStr.substring(params.length() + 1).trim();
             while (params.contains("  ")) {
                 params = params.replaceAll("  ", " ");
             }
@@ -259,12 +259,12 @@ public final class Matrix implements Cloneable {
             switch (funcName) {
                 case "matrix":
                     if (args.length == 6) {
-                        double scaleX = Double.parseDouble(args[0].trim()) * unitDivisor;
-                        double rotateSkew0 = Double.parseDouble(args[1].trim()) * unitDivisor;
-                        double rotateSkew1 = Double.parseDouble(args[2].trim()) * unitDivisor;
-                        double scaleY = Double.parseDouble(args[3].trim()) * unitDivisor;
-                        double translateX = Double.parseDouble(args[4].trim()) * translateDivisor;
-                        double translateY = Double.parseDouble(args[5].trim()) * translateDivisor;
+                        double scaleX = Double.parseDouble(args[0].trim());
+                        double rotateSkew0 = Double.parseDouble(args[1].trim());
+                        double rotateSkew1 = Double.parseDouble(args[2].trim());
+                        double scaleY = Double.parseDouble(args[3].trim());
+                        double translateX = Double.parseDouble(args[4].trim());
+                        double translateY = Double.parseDouble(args[5].trim());
                         Matrix result = new Matrix();
                         result.translateX = translateX;
                         result.translateY = translateY;
@@ -277,17 +277,15 @@ public final class Matrix implements Cloneable {
                     break;
                 case "translate":
                     if (args.length == 1 || args.length == 2) {
-                        double translateX = Double.parseDouble(args[0].trim()) * translateDivisor;
+                        double translateX = Double.parseDouble(args[0].trim());
                         double translateY = 0;
                         if (args.length == 2) {
-                            translateY = Double.parseDouble(args[1].trim()) * translateDivisor;
+                            translateY = Double.parseDouble(args[1].trim());
                         }
 
                         Matrix result = new Matrix();
                         result.translateX = translateX;
                         result.translateY = translateY;
-                        result.scaleX = unitDivisor;
-                        result.scaleY = unitDivisor;
                         ret = ret.concatenate(result);
                     }
                     break;
@@ -339,14 +337,20 @@ public final class Matrix implements Cloneable {
                         result.rotateSkew1 = Math.sin(angleRad);
                         result.scaleX = Math.cos(angleRad);
                         result.scaleY = Math.cos(angleRad);
-                        result = result.preConcatenate(getTranslateInstance(tx * translateDivisor, ty * translateDivisor))
-                                .concatenate(getTranslateInstance(-tx * translateDivisor, -ty * translateDivisor));
+                        result = result.preConcatenate(getTranslateInstance(tx, ty))
+                                .concatenate(getTranslateInstance(-tx, -ty));
                         ret = ret.concatenate(result);
                     }
                     break;
             }
         }
 
+        ret.translateX *= translateDivisor;
+        ret.translateY *= translateDivisor;
+        ret.rotateSkew0 *= unitDivisor;
+        ret.rotateSkew1 *= unitDivisor;
+        ret.scaleX *= unitDivisor;
+        ret.scaleY *= unitDivisor;
         return ret;
     }
 

@@ -256,7 +256,7 @@ public class CubicToQuad {
     }
 
     private boolean _isApproximationClose(Point a, Point b, Point c, Point d, List<Point[]> quadCurves, double errorBound) {
-        double dt = 1 / quadCurves.size();
+        double dt = 1.0 / quadCurves.size();
         for (int i = 0; i < quadCurves.size(); i++) {
             Point p1 = quadCurves.get(i)[0];
             Point c1 = quadCurves.get(i)[1];
