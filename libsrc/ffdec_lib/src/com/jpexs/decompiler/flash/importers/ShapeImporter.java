@@ -96,6 +96,8 @@ public class ShapeImporter {
 
     private final SvgColor TRANSPARENT = new SvgColor(new Color(0, true));
 
+    private ShapeTag shapeTag;
+
     private final Random random = new Random();
 
     public Tag importImage(ShapeTag st, byte[] newData) throws IOException {
@@ -103,6 +105,22 @@ public class ShapeImporter {
     }
 
     public Tag importImage(ShapeTag st, byte[] newData, int tagType, boolean fill) throws IOException {
+        ImageTag imageTag = addImage(st, newData, tagType);
+        st.setModified(true);
+
+        RECT rect = st.getRect();
+        if (!fill) {
+            Dimension dimension = imageTag.getImageDimension();
+            rect.Xmax = rect.Xmin + (int) (SWF.unitDivisor * dimension.getWidth());
+            rect.Ymax = rect.Ymin + (int) (SWF.unitDivisor * dimension.getHeight());
+        }
+
+        SHAPEWITHSTYLE shapes = imageTag.getShape(rect, fill);
+        st.shapes = shapes;
+        return (Tag) st;
+    }
+
+    private ImageTag addImage(ShapeTag st, byte[] newData, int tagType) throws IOException {
         SWF swf = st.getSwf();
 
         if (newData[0] == 'B' && newData[1] == 'M') {
@@ -158,18 +176,7 @@ public class ShapeImporter {
         }
 
         swf.updateCharacters();
-        st.setModified(true);
-
-        RECT rect = st.getRect();
-        if (!fill) {
-            Dimension dimension = imageTag.getImageDimension();
-            rect.Xmax = rect.Xmin + (int) (SWF.unitDivisor * dimension.getWidth());
-            rect.Ymax = rect.Ymin + (int) (SWF.unitDivisor * dimension.getHeight());
-        }
-
-        SHAPEWITHSTYLE shapes = imageTag.getShape(rect, fill);
-        st.shapes = shapes;
-        return (Tag) st;
+        return imageTag;
     }
 
     public Tag importSvg(ShapeTag st, String svgXml) {
@@ -190,6 +197,8 @@ public class ShapeImporter {
     }
 
     public Tag importSvg(ShapeTag st, String svgXml, boolean fill) {
+        shapeTag = st;
+
         SHAPEWITHSTYLE shapes = new SHAPEWITHSTYLE();
         shapes.fillStyles = new FILLSTYLEARRAY();
         shapes.lineStyles = new LINESTYLEARRAY();
@@ -1231,9 +1240,17 @@ public class ShapeImporter {
                     color = new Color(color.getRed(), color.getGreen(), color.getBlue(), (int) Math.round(color.getAlpha() * style.opacity));
                     fillStyle.gradient.gradientRecords[i] = new GRADRECORD();
                     fillStyle.gradient.gradientRecords[i].inShape3 = shapeNum >= 3;
-                    fillStyle.gradient.gradientRecords[i].color = shapeNum >= 3 ? new RGBA(color) : new RGB(color);
+                    fillStyle.gradient.gradientRecords[i].color = getRGB(shapeNum, color);
                     fillStyle.gradient.gradientRecords[i].ratio = (int) Math.round(stop.offset * 255);
                 }
+            } else if (fill instanceof SvgBitmapFill) {
+                FILLSTYLE fillStyle = scr.fillStyles.fillStyles[0];
+                SvgBitmapFill bfill = (SvgBitmapFill) fill;
+                fillStyle.fillStyleType = FILLSTYLE.REPEATING_BITMAP;
+                fillStyle.bitmapId = bfill.characterId;
+                Matrix fillMatrix = Matrix.parseSvgMatrix(bfill.patternTransform, SWF.unitDivisor, SWF.unitDivisor);
+                fillMatrix = transform.concatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor)).concatenate(fillMatrix);
+                fillStyle.bitmapMatrix = fillMatrix.toMATRIX();
             }
         }
     }
@@ -1251,7 +1268,7 @@ public class ShapeImporter {
             scr.fillStyles.fillStyles[0] = new FILLSTYLE();
             if (fill instanceof SvgColor) {
                 Color colorFill = fill.toColor();
-                scr.fillStyles.fillStyles[0].color = shapeNum >= 3 ? new RGBA(colorFill) : new RGB(colorFill);
+                scr.fillStyles.fillStyles[0].color = getRGB(shapeNum, colorFill);
                 scr.fillStyles.fillStyles[0].fillStyleType = FILLSTYLE.SOLID;
             } else if (fill instanceof SvgGradient) {
                 //...apply in second step - applyStyleGradients
@@ -1270,7 +1287,7 @@ public class ShapeImporter {
 
             scr.lineStyles.lineStyles = new LINESTYLE[1];
             LINESTYLE lineStyle = shapeNum <= 3 ? new LINESTYLE() : new LINESTYLE2();
-            lineStyle.color = shapeNum >= 3 ? new RGBA(lineColor) : new RGB(lineColor);
+            lineStyle.color = getRGB(shapeNum, lineColor);
             lineStyle.width = (int) Math.round(style.strokeWidth * SWF.unitDivisor);
             SvgLineCap lineCap = style.strokeLineCap;
             SvgLineJoin lineJoin = style.strokeLineJoin;
@@ -1304,6 +1321,14 @@ public class ShapeImporter {
         }
 
         return scr;
+    }
+
+    private RGB getRGB(int shapeNum, Color color) {
+        if (shapeNum < 3 && color.getAlpha() != 0xff) {
+            showWarning("transparentColorNotSupported", "Transparent color is not supported in shape " + shapeNum);
+        }
+
+        return shapeNum >= 3 ? new RGBA(color) : new RGB(color);
     }
 
     private class SvgStop implements Comparable<SvgStop> {
@@ -1467,10 +1492,6 @@ public class ShapeImporter {
         }
         if (spreadMethod == null) {
             spreadMethod = SvgSpreadMethod.PAD;
-        }
-
-        if (gradientTransform == null) {
-            gradientTransform = "";
         }
 
         if (x1 == null) {
@@ -1884,12 +1905,50 @@ public class ShapeImporter {
                 String tagName = e.getTagName();
                 if ("linearGradient".equals(tagName)) {
                     return parseGradient(idMap, e, new SvgStyle()); //? new style
-                } else if ("radialGradient".equals(tagName)) {
-                    return parseGradient(idMap, e, new SvgStyle()); //? new style
-                } else {
-                    showWarning("fillNotSupported", "Unknown fill style. Random color assigned.");
-                    return new SvgColor(random.nextInt(256), random.nextInt(256), random.nextInt(256));
                 }
+
+                if ("radialGradient".equals(tagName)) {
+                    return parseGradient(idMap, e, new SvgStyle()); //? new style
+                }
+
+                if ("pattern".equals(tagName)) {
+                    Element element = null;
+                    NodeList childNodes = e.getChildNodes();
+                    for (int i = 0; i < childNodes.getLength(); i++) {
+                        if (childNodes.item(i) instanceof Element) {
+                            if (element != null) {
+                                element = null;
+                                break;
+                            }
+
+                            element = (Element) childNodes.item(i);
+                        }
+                    }
+
+                    if (element != null && "image".equals(element.getTagName())) {
+                        String attr = element.getAttribute("xlink:href").trim();
+                        // this is ugly, but supports the format which is exported by FFDec
+                        if (attr.startsWith("data:image/") && attr.contains("base64,")) {
+                            String base64 = attr.substring(attr.indexOf("base64,") + 7);
+                            byte[] data = Helper.base64StringToByteArray(base64);
+                            try {
+                                ImageTag imageTag = addImage(shapeTag, data, 0);
+                                SvgBitmapFill bitmapFill = new SvgBitmapFill();
+                                bitmapFill.characterId = imageTag.characterID;
+                                if (e.hasAttribute("patternTransform")) {
+                                    bitmapFill.patternTransform = e.getAttribute("patternTransform");
+                                }
+
+                                return bitmapFill;
+                            } catch (IOException ex) {
+                                Logger.getLogger(ShapeImporter.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    }
+                }
+
+                showWarning("fillNotSupported", "Unknown fill style. Random color assigned.");
+                return new SvgColor(random.nextInt(256), random.nextInt(256), random.nextInt(256));
             }
 
             rgbStr = rgbStr.substring(elementId.length() + 6).trim(); // remove url(#...)
@@ -2016,6 +2075,18 @@ public class ShapeImporter {
 
         public String fy;
         //xlink?
+    }
+
+    class SvgBitmapFill extends SvgFill {
+
+        public String patternTransform;
+
+        private int characterId;
+
+        @Override
+        public Color toColor() {
+            return Color.BLACK;
+        }
     }
 
     class SvgColor extends SvgFill {

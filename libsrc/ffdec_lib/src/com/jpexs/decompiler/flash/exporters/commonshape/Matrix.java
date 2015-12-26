@@ -242,7 +242,7 @@ public final class Matrix implements Cloneable {
 
     public static Matrix parseSvgMatrix(String transformStr, double translateDivisor, double unitDivisor) {
         Matrix ret = new Matrix();
-        while (transformStr.length() > 0) {
+        while (transformStr != null && transformStr.length() > 0) {
             String funcName = transformStr.split("\\(")[0];
             transformStr = transformStr.substring(funcName.length() + 1);
             String params = transformStr.split("\\)")[0];

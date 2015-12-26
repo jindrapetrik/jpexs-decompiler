@@ -1349,6 +1349,10 @@ public class Helper {
         return DatatypeConverter.printBase64Binary(data);
     }
 
+    public static byte[] base64StringToByteArray(String base64) {
+        return DatatypeConverter.parseBase64Binary(base64);
+    }
+
     /**
      * Formats double value (removes .0 from end)
      *
