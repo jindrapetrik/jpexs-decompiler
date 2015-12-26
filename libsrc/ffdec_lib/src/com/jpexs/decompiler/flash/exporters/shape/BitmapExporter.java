@@ -69,13 +69,9 @@ public class BitmapExporter extends ShapeExporterBase {
 
     private final GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);  //For correct intersections display;
 
-    private Paint fillPathPaint;
-
     private Paint fillPaint;
 
     private AffineTransform fillTransform;
-
-    private Paint linePathPaint;
 
     private Paint linePaint;
 
@@ -236,7 +232,6 @@ public class BitmapExporter extends ShapeExporterBase {
                     cm = MultipleGradientPaint.CycleMethod.REPEAT;
                 }
 
-                fillPathPaint = null;
                 fillPaint = new LinearGradientPaint(POINT_NEG16384_0, POINT_16384_0, ratiosArr, colorsArr, cm, cstype, IDENTITY_TRANSFORM);
                 fillTransform = matrix.toTransform();
             }
@@ -267,8 +262,6 @@ public class BitmapExporter extends ShapeExporterBase {
                     cm = MultipleGradientPaint.CycleMethod.REPEAT;
                 }
 
-                Color endColor = gradientRecords[gradientRecords.length - 1].color.toColor();
-                fillPathPaint = endColor;
                 fillPaint = new RadialGradientPaint(new java.awt.Point(0, 0), 16384, ratiosArr, colorsArr, cm);
                 fillTransform = matrix.toTransform();
             }
@@ -299,8 +292,6 @@ public class BitmapExporter extends ShapeExporterBase {
                     cm = MultipleGradientPaint.CycleMethod.REPEAT;
                 }
 
-                Color endColor = gradientRecords[gradientRecords.length - 1].color.toColor();
-                fillPathPaint = endColor;
                 fillPaint = new RadialGradientPaint(new java.awt.Point(0, 0), 16384, new java.awt.Point((int) (focalPointRatio * 16384), 0), ratiosArr, colorsArr, cm, cstype, AffineTransform.getTranslateInstance(0, 0));
                 fillTransform = matrix.toTransform();
             }
@@ -331,7 +322,6 @@ public class BitmapExporter extends ShapeExporterBase {
     @Override
     public void lineStyle(double thickness, RGB color, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, int miterLimit) {
         finalizePath();
-        linePathPaint = null;
         linePaint = null;
         lineTransform = null;
         lineColor = color == null ? null : color.toColor();
@@ -422,7 +412,6 @@ public class BitmapExporter extends ShapeExporterBase {
                     cm = MultipleGradientPaint.CycleMethod.REPEAT;
                 }
 
-                linePathPaint = null;
                 linePaint = new LinearGradientPaint(POINT_NEG16384_0, POINT_16384_0, ratiosArr, colorsArr, cm, cstype, IDENTITY_TRANSFORM);
                 lineTransform = matrix.toTransform();
             }
@@ -445,16 +434,18 @@ public class BitmapExporter extends ShapeExporterBase {
                 Color[] colorsArr = colors.toArray(new Color[colors.size()]);
 
                 MultipleGradientPaint.CycleMethod cm = MultipleGradientPaint.CycleMethod.NO_CYCLE;
-                if (spreadMethod == GRADIENT.SPREAD_PAD_MODE) {
-                    cm = MultipleGradientPaint.CycleMethod.NO_CYCLE;
-                } else if (spreadMethod == GRADIENT.SPREAD_REFLECT_MODE) {
-                    cm = MultipleGradientPaint.CycleMethod.REFLECT;
-                } else if (spreadMethod == GRADIENT.SPREAD_REPEAT_MODE) {
-                    cm = MultipleGradientPaint.CycleMethod.REPEAT;
+                switch (spreadMethod) {
+                    case GRADIENT.SPREAD_PAD_MODE:
+                        cm = MultipleGradientPaint.CycleMethod.NO_CYCLE;
+                        break;
+                    case GRADIENT.SPREAD_REFLECT_MODE:
+                        cm = MultipleGradientPaint.CycleMethod.REFLECT;
+                        break;
+                    case GRADIENT.SPREAD_REPEAT_MODE:
+                        cm = MultipleGradientPaint.CycleMethod.REPEAT;
+                        break;
                 }
 
-                Color endColor = gradientRecords[gradientRecords.length - 1].color.toColor();
-                linePathPaint = endColor;
                 linePaint = new RadialGradientPaint(new java.awt.Point(0, 0), 16384, ratiosArr, colorsArr, cm);
                 lineTransform = matrix.toTransform();
             }
@@ -485,8 +476,6 @@ public class BitmapExporter extends ShapeExporterBase {
                     cm = MultipleGradientPaint.CycleMethod.REPEAT;
                 }
 
-                Color endColor = gradientRecords[gradientRecords.length - 1].color.toColor();
-                linePathPaint = endColor;
                 linePaint = new RadialGradientPaint(new java.awt.Point(0, 0), 16384, new java.awt.Point((int) (focalPointRatio * 16384), 0), ratiosArr, colorsArr, cm, cstype, AffineTransform.getTranslateInstance(0, 0));
                 lineTransform = matrix.toTransform();
             }
@@ -514,10 +503,6 @@ public class BitmapExporter extends ShapeExporterBase {
             graphics.setComposite(AlphaComposite.SrcOver);
             if (fillPaint instanceof MultipleGradientPaint) {
                 AffineTransform oldAf = graphics.getTransform();
-                if (fillPathPaint != null) {
-                    graphics.setPaint(fillPathPaint);
-                }
-                graphics.fill(path);
                 graphics.setClip(path);
                 Matrix inverse = null;
                 try {
@@ -595,10 +580,6 @@ public class BitmapExporter extends ShapeExporterBase {
             graphics.setComposite(AlphaComposite.SrcOver);
             if (linePaint instanceof MultipleGradientPaint) {
                 AffineTransform oldAf = graphics.getTransform();
-                if (linePathPaint != null) {
-                    graphics.setPaint(linePathPaint);
-                }
-                graphics.fill(strokedShape);
                 graphics.setClip(strokedShape);
                 Matrix inverse = null;
                 try {
