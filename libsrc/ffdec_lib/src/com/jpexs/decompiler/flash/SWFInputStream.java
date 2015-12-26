@@ -2718,7 +2718,7 @@ public class SWFInputStream implements AutoCloseable {
         ret.noClose = (int) readUB(1, "noClose") == 1;
         ret.endCapStyle = (int) readUB(2, "endCapStyle");
         if (ret.joinStyle == LINESTYLE2.MITER_JOIN) {
-            ret.miterLimitFactor = readUI16("miterLimitFactor");
+            ret.miterLimitFactor = readFIXED8("miterLimitFactor");
         }
         if (!ret.hasFillFlag) {
             ret.color = readRGBA("color");

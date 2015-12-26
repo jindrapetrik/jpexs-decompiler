@@ -46,7 +46,7 @@ public class LineStyle {
 
     public boolean noClose;
 
-    public int miterLimitFactor;
+    public float miterLimitFactor;
 
     public boolean hasFillFlag;
 

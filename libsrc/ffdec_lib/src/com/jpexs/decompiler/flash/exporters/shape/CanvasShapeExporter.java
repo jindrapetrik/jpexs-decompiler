@@ -279,7 +279,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
     }
 
     @Override
-    public void lineStyle(double thickness, RGB color, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, int miterLimit) {
+    public void lineStyle(double thickness, RGB color, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, float miterLimit) {
         finalizePath();
         thickness /= SWF.unitDivisor;
         strokeData.append("\tvar scaleMode = \"").append(scaleMode).append("\";\r\n");

@@ -1317,7 +1317,7 @@ public class SWFOutputStream extends OutputStream {
         writeUB(1, value.noClose ? 1 : 0);
         writeUB(2, value.endCapStyle);
         if (value.joinStyle == LINESTYLE2.MITER_JOIN) {
-            writeUI16(value.miterLimitFactor);
+            writeFIXED8(value.miterLimitFactor);
         }
         if (!value.hasFillFlag) {
             writeRGBA((RGBA) value.color);

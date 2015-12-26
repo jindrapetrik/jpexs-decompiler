@@ -190,12 +190,10 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                 if (straightEdgeRecord.generalLineFlag) {
                     xPos += straightEdgeRecord.deltaX;
                     yPos += straightEdgeRecord.deltaY;
+                } else if (straightEdgeRecord.vertLineFlag) {
+                    yPos += straightEdgeRecord.deltaY;
                 } else {
-                    if (straightEdgeRecord.vertLineFlag) {
-                        yPos += straightEdgeRecord.deltaY;
-                    } else {
-                        xPos += straightEdgeRecord.deltaX;
-                    }
+                    xPos += straightEdgeRecord.deltaX;
                 }
                 subPath.add(new StraightEdge(xPosFrom, yPosFrom, xPos, yPos, currentLineStyleIdx, currentFillStyleIdx1));
             } else if (shapeRecord instanceof CurvedEdgeRecord) {
@@ -347,7 +345,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                         int startCapStyle = LINESTYLE2.ROUND_CAP;
                         int endCapStyle = LINESTYLE2.ROUND_CAP;
                         int joinStyle = LINESTYLE2.ROUND_JOIN;
-                        int miterLimitFactor = 3;
+                        float miterLimitFactor = 3f;
                         boolean hasFillFlag = false;
                         autoClose = true;
                         if (lineStyle.isLineStyle2) {
