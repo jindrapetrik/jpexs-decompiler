@@ -99,6 +99,7 @@ import com.jpexs.decompiler.flash.importers.ShapeImporter;
 import com.jpexs.decompiler.flash.importers.SwfXmlImporter;
 import com.jpexs.decompiler.flash.importers.SymbolClassImporter;
 import com.jpexs.decompiler.flash.importers.TextImporter;
+import com.jpexs.decompiler.flash.importers.svg.SvgImporter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
@@ -2632,8 +2633,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     data = Helper.readFile(selfile.getAbsolutePath());
                 }
                 try {
-                    ShapeImporter shapeImporter = new ShapeImporter();
-                    Tag newTag = svgText != null ? shapeImporter.importSvg(st, svgText) : shapeImporter.importImage(st, data);
+                    Tag newTag = svgText != null ? new SvgImporter().importSvg(st, svgText) : new ShapeImporter().importImage(st, data);
                     SWF swf = st.getSwf();
                     if (newTag != null) {
                         refreshTree(swf);
@@ -2682,8 +2682,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     data = Helper.readFile(selfile.getAbsolutePath());
                 }
                 try {
-                    ShapeImporter shapeImporter = new ShapeImporter();
-                    Tag newTag = svgText != null ? shapeImporter.importSvg(st, svgText, false) : shapeImporter.importImage(st, data, 0, false);
+                    Tag newTag = svgText != null ? new SvgImporter().importSvg(st, svgText, false) : new ShapeImporter().importImage(st, data, 0, false);
                     SWF swf = st.getSwf();
                     if (newTag != null) {
                         refreshTree(swf);
