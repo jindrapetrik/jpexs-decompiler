@@ -386,86 +386,24 @@ public class SvgImporter {
 
         List<PathCommand> pathCommands = new ArrayList<>();
         SvgPathReader pathReader = new SvgPathReader(data);
-        while (pathReader.hasNext()) {
-            char newCommand;
-            if ((newCommand = pathReader.readCommand()) != 0) {
-                command = newCommand;
-            }
+        try {
+            while (pathReader.hasNext()) {
+                char newCommand;
+                if ((newCommand = pathReader.readCommand()) != 0) {
+                    command = newCommand;
+                }
 
-            boolean isRelative = Character.isLowerCase(command);
+                boolean isRelative = Character.isLowerCase(command);
 
-            double x = x0;
-            double y = y0;
+                double x = x0;
+                double y = y0;
 
-            char cmd = Character.toUpperCase(command);
-            switch (cmd) {
-                case 'M':
-                    PathCommand scr = new PathCommand();
-                    scr.command = 'M';
+                char cmd = Character.toUpperCase(command);
+                switch (cmd) {
+                    case 'M':
+                        PathCommand scr = new PathCommand();
+                        scr.command = 'M';
 
-                    x = pathReader.readDouble();
-                    y = pathReader.readDouble();
-                    if (isRelative) {
-                        x += x0;
-                        y += y0;
-                    }
-
-                    scr.params = new double[]{x, y};
-
-                    pathCommands.add(scr);
-                    startPoint = new Point(x, y);
-
-                    command = isRelative ? 'l' : 'L';
-                    break;
-                case 'Z':
-                    PathCommand serz = new PathCommand();
-                    serz.command = 'Z';
-                    x = startPoint.x;
-                    y = startPoint.y;
-                    pathCommands.add(serz);
-                    break;
-                case 'L':
-                    PathCommand serl = new PathCommand();
-                    serl.command = 'L';
-                    x = pathReader.readDouble();
-                    y = pathReader.readDouble();
-                    if (isRelative) {
-                        x += x0;
-                        y += y0;
-                    }
-
-                    serl.params = new double[]{x, y};
-                    pathCommands.add(serl);
-                    break;
-                case 'H':
-                    PathCommand serh = new PathCommand();
-                    serh.command = 'H';
-                    x = pathReader.readDouble();
-                    if (isRelative) {
-                        x += x0;
-                    }
-
-                    serh.params = new double[]{x};
-                    pathCommands.add(serh);
-                    break;
-                case 'V':
-                    PathCommand serv = new PathCommand();
-                    serv.command = 'V';
-                    y = pathReader.readDouble();
-                    if (isRelative) {
-                        y += y0;
-                    }
-
-                    serv.params = new double[]{y};
-                    pathCommands.add(serv);
-                    break;
-                case 'Q':
-                case 'T':
-                    PathCommand cer = new PathCommand();
-                    cer.command = 'Q';
-
-                    Point pControl;
-                    if (cmd == 'Q') {
                         x = pathReader.readDouble();
                         y = pathReader.readDouble();
                         if (isRelative) {
@@ -473,31 +411,23 @@ public class SvgImporter {
                             y += y0;
                         }
 
-                        pControl = new Point(x, y);
-                    } else if (prevQControlPoint != null) {
-                        pControl = new Point(2 * x0 - prevQControlPoint.x, 2 * y0 - prevQControlPoint.y);
-                    } else {
-                        pControl = new Point(x0, y0);
-                    }
+                        scr.params = new double[]{x, y};
 
-                    prevQControlPoint = pControl;
-                    x = pathReader.readDouble();
-                    y = pathReader.readDouble();
-                    if (isRelative) {
-                        x += x0;
-                        y += y0;
-                    }
+                        pathCommands.add(scr);
+                        startPoint = new Point(x, y);
 
-                    cer.params = new double[]{pControl.x, pControl.y, x, y};
-                    pathCommands.add(cer);
-                    break;
-                case 'C':
-                case 'S':
-                    showWarning("cubicCurvesNotSupported", "Cubic curves are not supported by Flash.");
-
-                    // create at least something...
-                    Point pControl1;
-                    if (cmd == 'C') {
+                        command = isRelative ? 'l' : 'L';
+                        break;
+                    case 'Z':
+                        PathCommand serz = new PathCommand();
+                        serz.command = 'Z';
+                        x = startPoint.x;
+                        y = startPoint.y;
+                        pathCommands.add(serz);
+                        break;
+                    case 'L':
+                        PathCommand serl = new PathCommand();
+                        serl.command = 'L';
                         x = pathReader.readDouble();
                         y = pathReader.readDouble();
                         if (isRelative) {
@@ -505,174 +435,248 @@ public class SvgImporter {
                             y += y0;
                         }
 
-                        pControl1 = new Point(x, y);
-                    } else if (prevCControlPoint != null) {
-                        pControl1 = new Point(2 * x0 - prevCControlPoint.x, 2 * y0 - prevCControlPoint.y);
-                    } else {
-                        pControl1 = new Point(x0, y0);
-                    }
-
-                    x = pathReader.readDouble();
-                    y = pathReader.readDouble();
-                    if (isRelative) {
-                        x += x0;
-                        y += y0;
-                    }
-
-                    Point pControl2 = new Point(x, y);
-                    prevCControlPoint = pControl2;
-
-                    x = pathReader.readDouble();
-                    y = pathReader.readDouble();
-                    if (isRelative) {
-                        x += x0;
-                        y += y0;
-                    }
-
-                    PathCommand cerc = new PathCommand();
-                    cerc.command = 'C';
-                    cerc.params = new double[]{pControl1.x, pControl1.y, pControl2.x, pControl2.y, x, y};
-                    pathCommands.add(cerc);
-                    break;
-                case 'A':
-                    double rx = pathReader.readDouble();
-                    double ry = pathReader.readDouble();
-                    double fi = pathReader.readDouble() * Math.PI / 180;
-                    boolean largeFlag = (int) pathReader.readDouble() != 0;
-                    boolean sweepFlag = (int) pathReader.readDouble() != 0;
-
-                    x = pathReader.readDouble();
-                    y = pathReader.readDouble();
-                    if (isRelative) {
-                        x += x0;
-                        y += y0;
-                    }
-
-                    if (rx == 0 || ry == 0) {
-                        // straight line to (x, y)
-                        PathCommand sera = new PathCommand();
-                        sera.command = 'L';
-                        sera.params = new double[]{x, y};
-                        pathCommands.add(sera);
-                    } else {
-                        rx = Math.abs(rx);
-                        ry = Math.abs(ry);
-
-                        double x1 = x0;
-                        double y1 = y0;
-                        double x2 = x;
-                        double y2 = y;
-
-                        double d1 = (x1 - x2) / 2;
-                        double d2 = (y1 - y2) / 2;
-                        double x1Comma = Math.cos(fi) * d1 + Math.sin(fi) * d2;
-                        double y1Comma = -Math.sin(fi) * d1 + Math.cos(fi) * d2;
-
-                        // Correction of out-of-range radii
-                        double lambda = x1Comma * x1Comma / (rx * rx) + y1Comma * y1Comma / (ry * ry);
-                        if (lambda > 1) {
-                            double sqrtLambda = Math.sqrt(lambda);
-                            rx = sqrtLambda * rx;
-                            ry = sqrtLambda * ry;
+                        serl.params = new double[]{x, y};
+                        pathCommands.add(serl);
+                        break;
+                    case 'H':
+                        PathCommand serh = new PathCommand();
+                        serh.command = 'H';
+                        x = pathReader.readDouble();
+                        if (isRelative) {
+                            x += x0;
                         }
 
-                        double c = Math.sqrt((rx * rx * ry * ry - rx * rx * y1Comma * y1Comma - ry * ry * x1Comma * x1Comma) / (rx * rx * y1Comma * y1Comma + ry * ry * x1Comma * x1Comma));
-                        double cxComma = c * rx * y1Comma / ry;
-                        double cyComma = c * -ry * x1Comma / rx;
-
-                        if (largeFlag == sweepFlag) {
-                            cxComma = -cxComma;
-                            cyComma = -cyComma;
+                        serh.params = new double[]{x};
+                        pathCommands.add(serh);
+                        break;
+                    case 'V':
+                        PathCommand serv = new PathCommand();
+                        serv.command = 'V';
+                        y = pathReader.readDouble();
+                        if (isRelative) {
+                            y += y0;
                         }
 
-                        double cx = Math.cos(fi) * cxComma - Math.sin(fi) * cyComma + (x1 + x2) / 2;
-                        double cy = Math.sin(fi) * cxComma + Math.cos(fi) * cyComma + (y1 + y2) / 2;
+                        serv.params = new double[]{y};
+                        pathCommands.add(serv);
+                        break;
+                    case 'Q':
+                    case 'T':
+                        PathCommand cer = new PathCommand();
+                        cer.command = 'Q';
 
-                        double px1 = (x1Comma - cxComma) / rx;
-                        double py1 = (y1Comma - cyComma) / ry;
-                        double theta1 = calcAngle(1, 0, px1, py1);
-
-                        double px2 = (-x1Comma - cxComma) / rx;
-                        double py2 = (-y1Comma - cyComma) / ry;
-                        double deltaTheta = calcAngle(px1, py1, px2, py2);
-                        if (sweepFlag) {
-                            if (deltaTheta < 0) {
-                                deltaTheta += 2 * Math.PI;
+                        Point pControl;
+                        if (cmd == 'Q') {
+                            x = pathReader.readDouble();
+                            y = pathReader.readDouble();
+                            if (isRelative) {
+                                x += x0;
+                                y += y0;
                             }
-                        } else if (deltaTheta > 0) {
-                            deltaTheta -= 2 * Math.PI;
+
+                            pControl = new Point(x, y);
+                        } else if (prevQControlPoint != null) {
+                            pControl = new Point(2 * x0 - prevQControlPoint.x, 2 * y0 - prevQControlPoint.y);
+                        } else {
+                            pControl = new Point(x0, y0);
                         }
 
-                        double rcp = Math.sqrt(4 - 2 * Math.sqrt(2));
-                        double delta = Math.signum(deltaTheta) * Math.PI / 4;
+                        prevQControlPoint = pControl;
+                        x = pathReader.readDouble();
+                        y = pathReader.readDouble();
+                        if (isRelative) {
+                            x += x0;
+                            y += y0;
+                        }
 
-                        int segmentCount = (int) Math.ceil(deltaTheta / delta);
-                        double theta = theta1;
+                        cer.params = new double[]{pControl.x, pControl.y, x, y};
+                        pathCommands.add(cer);
+                        break;
+                    case 'C':
+                    case 'S':
+                        showWarning("cubicCurvesNotSupported", "Cubic curves are not supported by Flash.");
 
-                        PathCommand sera;
-                        for (int i = 0; i < segmentCount - 1; i++) {
-                            theta += delta;
-                            /*sera = new PathCommand();
-                             sera.command = 'L';
-                             double x12 = Math.cos(theta) * rx;
-                             double y12 = Math.sin(theta) * ry;
-                             x1Comma = Math.cos(fi) * x12 - Math.sin(fi) * y12;
-                             y1Comma = Math.sin(fi) * x12 + Math.cos(fi) * y12;
-                             sera.params = new double[]{cx + x1Comma, cy + y1Comma};
-                             pathCommands.add(sera);*/
+                        // create at least something...
+                        Point pControl1;
+                        if (cmd == 'C') {
+                            x = pathReader.readDouble();
+                            y = pathReader.readDouble();
+                            if (isRelative) {
+                                x += x0;
+                                y += y0;
+                            }
+
+                            pControl1 = new Point(x, y);
+                        } else if (prevCControlPoint != null) {
+                            pControl1 = new Point(2 * x0 - prevCControlPoint.x, 2 * y0 - prevCControlPoint.y);
+                        } else {
+                            pControl1 = new Point(x0, y0);
+                        }
+
+                        x = pathReader.readDouble();
+                        y = pathReader.readDouble();
+                        if (isRelative) {
+                            x += x0;
+                            y += y0;
+                        }
+
+                        Point pControl2 = new Point(x, y);
+                        prevCControlPoint = pControl2;
+
+                        x = pathReader.readDouble();
+                        y = pathReader.readDouble();
+                        if (isRelative) {
+                            x += x0;
+                            y += y0;
+                        }
+
+                        PathCommand cerc = new PathCommand();
+                        cerc.command = 'C';
+                        cerc.params = new double[]{pControl1.x, pControl1.y, pControl2.x, pControl2.y, x, y};
+                        pathCommands.add(cerc);
+                        break;
+                    case 'A':
+                        double rx = pathReader.readDouble();
+                        double ry = pathReader.readDouble();
+                        double fi = pathReader.readDouble() * Math.PI / 180;
+                        boolean largeFlag = (int) pathReader.readDouble() != 0;
+                        boolean sweepFlag = (int) pathReader.readDouble() != 0;
+
+                        x = pathReader.readDouble();
+                        y = pathReader.readDouble();
+                        if (isRelative) {
+                            x += x0;
+                            y += y0;
+                        }
+
+                        if (rx == 0 || ry == 0) {
+                            // straight line to (x, y)
+                            PathCommand sera = new PathCommand();
+                            sera.command = 'L';
+                            sera.params = new double[]{x, y};
+                            pathCommands.add(sera);
+                        } else {
+                            rx = Math.abs(rx);
+                            ry = Math.abs(ry);
+
+                            double x1 = x0;
+                            double y1 = y0;
+                            double x2 = x;
+                            double y2 = y;
+
+                            double d1 = (x1 - x2) / 2;
+                            double d2 = (y1 - y2) / 2;
+                            double x1Comma = Math.cos(fi) * d1 + Math.sin(fi) * d2;
+                            double y1Comma = -Math.sin(fi) * d1 + Math.cos(fi) * d2;
+
+                            // Correction of out-of-range radii
+                            double lambda = x1Comma * x1Comma / (rx * rx) + y1Comma * y1Comma / (ry * ry);
+                            if (lambda > 1) {
+                                double sqrtLambda = Math.sqrt(lambda);
+                                rx = sqrtLambda * rx;
+                                ry = sqrtLambda * ry;
+                            }
+
+                            double c = Math.sqrt((rx * rx * ry * ry - rx * rx * y1Comma * y1Comma - ry * ry * x1Comma * x1Comma) / (rx * rx * y1Comma * y1Comma + ry * ry * x1Comma * x1Comma));
+                            double cxComma = c * rx * y1Comma / ry;
+                            double cyComma = c * -ry * x1Comma / rx;
+
+                            if (largeFlag == sweepFlag) {
+                                cxComma = -cxComma;
+                                cyComma = -cyComma;
+                            }
+
+                            double cx = Math.cos(fi) * cxComma - Math.sin(fi) * cyComma + (x1 + x2) / 2;
+                            double cy = Math.sin(fi) * cxComma + Math.cos(fi) * cyComma + (y1 + y2) / 2;
+
+                            double px1 = (x1Comma - cxComma) / rx;
+                            double py1 = (y1Comma - cyComma) / ry;
+                            double theta1 = calcAngle(1, 0, px1, py1);
+
+                            double px2 = (-x1Comma - cxComma) / rx;
+                            double py2 = (-y1Comma - cyComma) / ry;
+                            double deltaTheta = calcAngle(px1, py1, px2, py2);
+                            if (sweepFlag) {
+                                if (deltaTheta < 0) {
+                                    deltaTheta += 2 * Math.PI;
+                                }
+                            } else if (deltaTheta > 0) {
+                                deltaTheta -= 2 * Math.PI;
+                            }
+
+                            double rcp = Math.sqrt(4 - 2 * Math.sqrt(2));
+                            double delta = Math.signum(deltaTheta) * Math.PI / 4;
+
+                            int segmentCount = (int) Math.ceil(deltaTheta / delta);
+                            double theta = theta1;
+
+                            PathCommand sera;
+                            for (int i = 0; i < segmentCount - 1; i++) {
+                                theta += delta;
+                                /*sera = new PathCommand();
+                                 sera.command = 'L';
+                                 double x12 = Math.cos(theta) * rx;
+                                 double y12 = Math.sin(theta) * ry;
+                                 x1Comma = Math.cos(fi) * x12 - Math.sin(fi) * y12;
+                                 y1Comma = Math.sin(fi) * x12 + Math.cos(fi) * y12;
+                                 sera.params = new double[]{cx + x1Comma, cy + y1Comma};
+                                 pathCommands.add(sera);*/
+
+                                sera = new PathCommand();
+                                sera.command = 'Q';
+                                double x12 = Math.cos(theta) * rx;
+                                double y12 = Math.sin(theta) * ry;
+                                x1Comma = Math.cos(fi) * x12 - Math.sin(fi) * y12;
+                                y1Comma = Math.sin(fi) * x12 + Math.cos(fi) * y12;
+
+                                double theta2 = theta - delta / 2;
+                                x12 = Math.cos(theta2) * rx * rcp;
+                                y12 = Math.sin(theta2) * ry * rcp;
+                                double x1Comma2 = Math.cos(fi) * x12 - Math.sin(fi) * y12;
+                                double y1Comma2 = Math.sin(fi) * x12 + Math.cos(fi) * y12;
+                                sera.params = new double[]{cx + x1Comma2, cy + y1Comma2, cx + x1Comma, cy + y1Comma};
+                                pathCommands.add(sera);
+                            }
 
                             sera = new PathCommand();
                             sera.command = 'Q';
-                            double x12 = Math.cos(theta) * rx;
-                            double y12 = Math.sin(theta) * ry;
+
+                            theta += delta;
+                            double diff = theta1 + deltaTheta - theta;
+                            diff = -delta - diff;
+                            theta = theta - delta - diff / 2;
+
+                            double rcpm = 1 + (rcp - 1) * (diff / delta) * (diff / delta);
+                            double x12 = Math.cos(theta) * rx * rcpm;
+                            double y12 = Math.sin(theta) * ry * rcpm;
                             x1Comma = Math.cos(fi) * x12 - Math.sin(fi) * y12;
                             y1Comma = Math.sin(fi) * x12 + Math.cos(fi) * y12;
-
-                            double theta2 = theta - delta / 2;
-                            x12 = Math.cos(theta2) * rx * rcp;
-                            y12 = Math.sin(theta2) * ry * rcp;
-                            double x1Comma2 = Math.cos(fi) * x12 - Math.sin(fi) * y12;
-                            double y1Comma2 = Math.sin(fi) * x12 + Math.cos(fi) * y12;
-                            sera.params = new double[]{cx + x1Comma2, cy + y1Comma2, cx + x1Comma, cy + y1Comma};
+                            sera.params = new double[]{cx + x1Comma, cy + y1Comma, x, y};
                             pathCommands.add(sera);
+                            /*sera = new PathCommand();
+                             sera.command = 'L';
+                             sera.params = new double[]{x, y};
+                             pathCommands.add(sera);*/
                         }
+                        break;
+                    default:
+                        Logger.getLogger(ShapeImporter.class.getName()).log(Level.WARNING, "Unknown command: {0}", command);
+                        return;
+                }
 
-                        sera = new PathCommand();
-                        sera.command = 'Q';
+                if (cmd != 'C' && cmd != 'S') {
+                    prevCControlPoint = null;
+                }
 
-                        theta += delta;
-                        double diff = theta1 + deltaTheta - theta;
-                        diff = -delta - diff;
-                        theta = theta - delta - diff / 2;
+                if (cmd != 'Q' && cmd != 'T') {
+                    prevQControlPoint = null;
+                }
 
-                        double rcpm = 1 + (rcp - 1) * (diff / delta) * (diff / delta);
-                        double x12 = Math.cos(theta) * rx * rcpm;
-                        double y12 = Math.sin(theta) * ry * rcpm;
-                        x1Comma = Math.cos(fi) * x12 - Math.sin(fi) * y12;
-                        y1Comma = Math.sin(fi) * x12 + Math.cos(fi) * y12;
-                        sera.params = new double[]{cx + x1Comma, cy + y1Comma, x, y};
-                        pathCommands.add(sera);
-                        /*sera = new PathCommand();
-                         sera.command = 'L';
-                         sera.params = new double[]{x, y};
-                         pathCommands.add(sera);*/
-                    }
-                    break;
-                default:
-                    Logger.getLogger(ShapeImporter.class.getName()).log(Level.WARNING, "Unknown command: {0}", command);
-                    return;
+                x0 = x;
+                y0 = y;
             }
-
-            if (cmd != 'C' && cmd != 'S') {
-                prevCControlPoint = null;
-            }
-
-            if (cmd != 'Q' && cmd != 'T') {
-                prevQControlPoint = null;
-            }
-
-            x0 = x;
-            y0 = y;
+        } catch (NumberFormatException e) {
+            // ignore remaining data as specified in SVG Specification F.2 Error processing
         }
 
         processCommands(shapeNum, shapes, pathCommands, transform, style);
@@ -932,35 +936,39 @@ public class SvgImporter {
 
         List<PathCommand> pathCommands = new ArrayList<>();
         SvgPathReader pathReader = new SvgPathReader(data);
-        while (pathReader.hasNext()) {
-            double x = x0;
-            double y = y0;
+        try {
+            while (pathReader.hasNext()) {
+                double x = x0;
+                double y = y0;
 
-            Point p = null;
-            switch (command) {
-                case 'M':
-                    PathCommand scr = new PathCommand();
-                    scr.command = 'M';
+                Point p = null;
+                switch (command) {
+                    case 'M':
+                        PathCommand scr = new PathCommand();
+                        scr.command = 'M';
 
-                    x = pathReader.readDouble();
-                    y = pathReader.readDouble();
-                    scr.params = new double[]{x, y};
+                        x = pathReader.readDouble();
+                        y = pathReader.readDouble();
+                        scr.params = new double[]{x, y};
 
-                    pathCommands.add(scr);
-                    break;
-                case 'L':
-                    PathCommand serl = new PathCommand();
-                    serl.command = 'L';
-                    x = pathReader.readDouble();
-                    y = pathReader.readDouble();
-                    serl.params = new double[]{x, y};
-                    pathCommands.add(serl);
-                    break;
+                        pathCommands.add(scr);
+                        break;
+                    case 'L':
+                        PathCommand serl = new PathCommand();
+                        serl.command = 'L';
+                        x = pathReader.readDouble();
+                        y = pathReader.readDouble();
+                        serl.params = new double[]{x, y};
+                        pathCommands.add(serl);
+                        break;
+                }
+
+                x0 = x;
+                y0 = y;
+                command = 'L';
             }
-
-            x0 = x;
-            y0 = y;
-            command = 'L';
+        } catch (NumberFormatException e) {
+            // ignore remaining data as specified in SVG Specification F.2 Error processing
         }
 
         if (close) {
@@ -983,7 +991,6 @@ public class SvgImporter {
             byte[] pngData = Helper.readStream(pngUrl.openStream());
             Helper.writeFile(name + ".original.png", pngData);
         }
-        //String svgDataS = new String(svgData);
 
         String svgDataS = Helper.readTextFile(name + ".original.svg");
         SWF swf = new SWF();

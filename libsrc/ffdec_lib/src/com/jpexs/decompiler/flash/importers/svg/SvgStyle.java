@@ -22,7 +22,6 @@ import com.jpexs.helpers.Helper;
 import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -388,18 +387,17 @@ class SvgStyle implements Cloneable {
         }
     }
 
-    private Color parseColor(String rgbStr) {
-        SvgFill fill = parseFill(new HashMap<>(), rgbStr, null);
-        return fill.toColor();
-    }
-
-    private SvgFill parseFill(Map<String, Element> idMap, String rgbStr, SvgStyle style) {
-        if (rgbStr == null) {
+    private SvgFill parseFill(Map<String, Element> idMap, String fillStr, SvgStyle style) {
+        if (fillStr == null) {
             return null;
         }
 
+        if (fillStr.equals("none")) {
+            return SvgTransparentFill.INSTANCE;
+        }
+
         Pattern idPat = Pattern.compile("url\\(#([^)]+)\\).*");
-        java.util.regex.Matcher mPat = idPat.matcher(rgbStr);
+        java.util.regex.Matcher mPat = idPat.matcher(fillStr);
 
         if (mPat.matches()) {
             String elementId = mPat.group(1);
@@ -454,10 +452,10 @@ class SvgStyle implements Cloneable {
                 return new SvgColor(random.nextInt(256), random.nextInt(256), random.nextInt(256));
             }
 
-            rgbStr = rgbStr.substring(elementId.length() + 6).trim(); // remove url(#...)
+            fillStr = fillStr.substring(elementId.length() + 6).trim(); // remove url(#...)
         }
 
-        SvgColor result = SvgColor.parse(rgbStr);
+        SvgColor result = SvgColor.parse(fillStr);
         if (result == null) {
             importer.showWarning("fillNotSupported", "Unknown fill style. Random color assigned.");
             return new SvgColor(random.nextInt(256), random.nextInt(256), random.nextInt(256));
@@ -466,122 +464,183 @@ class SvgStyle implements Cloneable {
         return result;
     }
 
-    private void applyStyle(Map<String, Element> idMap, SvgStyle style, String name, String value) {
-        if (value == null || value.length() == 0) {
-            return;
+    private void applyStyle(Map<String, Element> idMap, SvgStyle style, SvgStyle parentStyle, SvgStyleProperty styleProperty, String value) {
+        boolean inherit = styleProperty.isInherited();
+        if ("inherit".equals(value)) {
+            value = "";
+            inherit = true;
         }
 
-        switch (name) {
-            case "color": {
-                Color color = parseColor(value);
-                if (color != null) {
-                    style.color = color == SvgColor.TRANSPARENT ? null : color;
-                }
-            }
-            break;
-            case "fill": {
-                SvgFill fill = parseFill(idMap, value, style);
-                if (fill != null) {
-                    style.fill = fill == SvgColor.SVG_TRANSPARENT ? null : fill;
-                }
-            }
-            break;
-            case "stop-color": {
-                if ("currentColor".equals(value)) {
-                    if (style.parentStyle != null) {
-                        style.stopColor = style.parentStyle.color;
+        boolean ok = value != null && value.length() != 0;
+
+        String name = styleProperty.name();
+        try {
+            if (ok) {
+                ok = false;
+                switch (name) {
+                    case "color": {
+                        Color color = SvgColor.parse(value).toColor();
+                        if (color != null) {
+                            style.color = color;
+                            ok = true;
+                        }
                     }
-                } else if ("inherit".equals(value)) {
-                    importer.showWarning(value + "StopColorNotSupported", "The stop color value '" + value + "' is not supported.");
-                } else {
-                    style.stopColor = parseColor(value);
+                    break;
+                    case "fill": {
+                        SvgFill fill = parseFill(idMap, value, style);
+                        if (fill != null) {
+                            style.fill = fill == SvgTransparentFill.INSTANCE ? null : fill;
+                            ok = true;
+                        }
+                    }
+                    break;
+                    case "fill-opacity": {
+                        double opacity = Double.parseDouble(value);
+                        style.fillOpacity = opacity;
+                        ok = true;
+                    }
+                    break;
+                    case "stroke": {
+                        SvgFill strokeFill = parseFill(idMap, value, style);
+                        if (strokeFill != null) {
+                            style.strokeFill = strokeFill == SvgTransparentFill.INSTANCE ? null : strokeFill;
+                            ok = true;
+                        }
+                    }
+                    break;
+                    case "stroke-width": {
+                        double strokeWidth = Double.parseDouble(value);
+                        style.strokeWidth = strokeWidth;
+                        ok = true;
+                    }
+                    break;
+                    case "stroke-opacity": {
+                        double opacity = Double.parseDouble(value);
+                        style.strokeOpacity = opacity;
+                        ok = true;
+                    }
+                    break;
+                    case "stroke-linecap": {
+                        switch (value) {
+                            case "butt":
+                                style.strokeLineCap = SvgLineCap.BUTT;
+                                ok = true;
+                                break;
+                            case "round":
+                                style.strokeLineCap = SvgLineCap.ROUND;
+                                ok = true;
+                                break;
+                            case "square":
+                                style.strokeLineCap = SvgLineCap.SQUARE;
+                                ok = true;
+                                break;
+                        }
+                    }
+                    break;
+                    case "stroke-linejoin": {
+                        switch (value) {
+                            case "miter":
+                                style.strokeLineJoin = SvgLineJoin.MITER;
+                                ok = true;
+                                break;
+                            case "round":
+                                style.strokeLineJoin = SvgLineJoin.ROUND;
+                                ok = true;
+                                break;
+                            case "bevel":
+                                style.strokeLineJoin = SvgLineJoin.BEVEL;
+                                ok = true;
+                                break;
+                        }
+                    }
+                    break;
+                    case "stroke-miterlimit": {
+                        double strokeMiterLimit = Double.parseDouble(value);
+                        style.strokeMiterLimit = strokeMiterLimit;
+                        ok = true;
+                    }
+                    break;
+                    case "opacity": {
+                        double opacity = Double.parseDouble(value);
+                        style.opacity = opacity;
+                        ok = true;
+                    }
+                    break;
+                    case "stop-color": {
+                        if ("currentColor".equals(value)) {
+                            if (style.parentStyle != null) {
+                                style.stopColor = style.parentStyle.color;
+                            }
+                        } else {
+                            //importer.showWarning(value + "StopColorNotSupported", "The stop color value '" + value + "' is not supported.");
+                            style.stopColor = SvgColor.parse(value).toColor();
+                            ok = true;
+                        }
+                    }
+                    break;
+                    case "stop-opacity": {
+                        //importer.showWarning(value + "StopOpacityNotSupported", "The stop opacity value '" + value + "' is not supported.");
+                        double stopOpacity = Double.parseDouble(value);
+                        style.stopOpacity = stopOpacity;
+                        ok = true;
+                    }
+                    break;
                 }
             }
-            break;
-            case "fill-opacity": {
-                double opacity = Double.parseDouble(value);
-                style.fillOpacity = opacity;
+        } catch (NumberFormatException ex) {
+            ok = false;
+        }
+
+        if (!ok && inherit) {
+            switch (name) {
+                case "color":
+                    style.color = parentStyle.color;
+                    break;
+                case "fill":
+                    style.fill = parentStyle.fill;
+                    break;
+                case "fill-opacity":
+                    style.fillOpacity = parentStyle.opacity;
+                    break;
+                case "stroke":
+                    style.strokeFill = parentStyle.strokeFill;
+                    break;
+                case "stroke-width":
+                    style.strokeWidth = parentStyle.strokeWidth;
+                    break;
+                case "stroke-opacity":
+                    style.strokeOpacity = parentStyle.opacity;
+                    break;
+                case "stroke-linecap":
+                    style.strokeLineCap = parentStyle.strokeLineCap;
+                    break;
+                case "stroke-linejoin":
+                    style.strokeLineJoin = parentStyle.strokeLineJoin;
+                    break;
+                case "stroke-miterlimit":
+                    style.strokeMiterLimit = parentStyle.strokeMiterLimit;
+                    break;
+                case "opacity":
+                    style.opacity = parentStyle.opacity;
+                    break;
+                case "stop-color":
+                    style.stopColor = parentStyle.stopColor;
+                    break;
+                case "stop-opacity":
+                    style.stopOpacity = parentStyle.stopOpacity;
+                    break;
             }
-            break;
-            case "stop-opacity": {
-                if ("inherit".equals(value)) {
-                    importer.showWarning(value + "StopOpacityNotSupported", "The stop opacity value '" + value + "' is not supported.");
-                } else {
-                    double stopOpacity = Double.parseDouble(value);
-                    style.stopOpacity = stopOpacity;
-                }
-            }
-            break;
-            case "stroke": {
-                SvgFill strokeFill = parseFill(idMap, value, style);
-                if (strokeFill != null) {
-                    style.strokeFill = strokeFill == SvgColor.SVG_TRANSPARENT ? null : strokeFill;
-                }
-            }
-            break;
-            case "stroke-width": {
-                double strokeWidth = Double.parseDouble(value);
-                style.strokeWidth = strokeWidth;
-            }
-            break;
-            case "stroke-opacity": {
-                double opacity = Double.parseDouble(value);
-                style.strokeOpacity = opacity;
-            }
-            break;
-            case "stroke-linecap": {
-                switch (value) {
-                    case "butt":
-                        style.strokeLineCap = SvgLineCap.BUTT;
-                        break;
-                    case "round":
-                        style.strokeLineCap = SvgLineCap.ROUND;
-                        break;
-                    case "square":
-                        style.strokeLineCap = SvgLineCap.SQUARE;
-                        break;
-                }
-            }
-            break;
-            case "stroke-linejoin": {
-                switch (value) {
-                    case "miter":
-                        style.strokeLineJoin = SvgLineJoin.MITER;
-                        break;
-                    case "round":
-                        style.strokeLineJoin = SvgLineJoin.ROUND;
-                        break;
-                    case "bevel":
-                        style.strokeLineJoin = SvgLineJoin.BEVEL;
-                        break;
-                }
-            }
-            break;
-            case "stroke-miterlimit": {
-                double strokeMiterLimit = Double.parseDouble(value);
-                style.strokeMiterLimit = strokeMiterLimit;
-            }
-            case "opacity": {
-                double opacity = Double.parseDouble(value);
-                style.opacity = opacity;
-            }
-            break;
         }
     }
 
     public SvgStyle apply(Element element, Map<String, Element> idMap) {
-        SvgStyle result = clone();
+        SvgStyle result = new SvgStyle(importer);
 
-        String[] styles = new String[]{
-            "color", "fill", "fill-opacity",
-            "stroke", "stroke-width", "stroke-opacity", "stroke-linecap", "stroke-linejoin", "stroke-miterlimit",
-            "opacity", "stop-color", "stop-opacity"
-        };
-
-        for (String style : styles) {
-            if (element.hasAttribute(style)) {
-                String attr = element.getAttribute(style).trim();
-                applyStyle(idMap, result, style, attr);
+        for (SvgStyleProperty styleProperty : SvgStyleProperty.getProperties()) {
+            String name = styleProperty.name();
+            if (element.hasAttribute(name)) {
+                String attr = element.getAttribute(name).trim();
+                applyStyle(idMap, result, this, styleProperty, attr);
             }
         }
 
@@ -589,7 +648,13 @@ class SvgStyle implements Cloneable {
             String[] styleDefs = element.getAttribute("style").split(";");
             for (String styleDef : styleDefs) {
                 String[] parts = styleDef.split(":", 2);
-                applyStyle(idMap, result, parts[0].trim(), parts[1].trim());
+                String name = parts[0].trim();
+                SvgStyleProperty styleProperty = SvgStyleProperty.getByName(name);
+                if (styleProperty == null) {
+                    importer.showWarning(name + "StyleNotSupported", "The style '" + name + "' is not supported.");
+                }
+
+                applyStyle(idMap, result, this, styleProperty, parts[1].trim());
             }
         }
 

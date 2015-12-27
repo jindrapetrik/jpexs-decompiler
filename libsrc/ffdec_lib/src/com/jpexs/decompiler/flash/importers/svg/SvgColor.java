@@ -24,10 +24,6 @@ import java.awt.Color;
  */
 class SvgColor extends SvgFill {
 
-    public static final Color TRANSPARENT = new Color(0, true);
-
-    public static final SvgColor SVG_TRANSPARENT = new SvgColor(TRANSPARENT);
-
     public Color color;
 
     public SvgColor(int r, int g, int b, int opacity) {
@@ -54,8 +50,6 @@ class SvgColor extends SvgFill {
 
         // named colors from: http://www.w3.org/TR/SVG/types.html#ColorKeywords
         switch (colorString) {
-            case "none":
-                return SVG_TRANSPARENT;
             case "aliceblue":
                 return new SvgColor(240, 248, 255);
             case "antiquewhite":
