@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.exporters;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.EventListener;
+import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
@@ -51,7 +52,7 @@ import java.util.Set;
 public class MorphShapeExporter {
 
     //TODO: implement morphshape export. How to handle 65536 frames?
-    public List<File> exportMorphShapes(AbortRetryIgnoreHandler handler, final String outdir, List<Tag> tags, final MorphShapeExportSettings settings, EventListener evl) throws IOException, InterruptedException {
+    public List<File> exportMorphShapes(AbortRetryIgnoreHandler handler, final String outdir, ReadOnlyTagList tags, final MorphShapeExportSettings settings, EventListener evl) throws IOException, InterruptedException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;

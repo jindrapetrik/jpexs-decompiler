@@ -172,7 +172,7 @@ public class TagTreeModel implements TreeModel {
 
     private List<SoundStreamHeadTypeTag> getSoundStreams(DefineSpriteTag sprite) {
         List<SoundStreamHeadTypeTag> ret = new ArrayList<>();
-        for (Tag t : sprite.subTags) {
+        for (Tag t : sprite.getTags()) {
             if (t instanceof SoundStreamHeadTypeTag) {
                 ret.add((SoundStreamHeadTypeTag) t);
             }
@@ -196,7 +196,7 @@ public class TagTreeModel implements TreeModel {
         List<TreeItem> others = new ArrayList<>();
         List<FolderItem> emptyFolders = new ArrayList<>();
         Map<Integer, List<TreeItem>> mappedTags = new HashMap<>();
-        for (Tag t : swf.tags) {
+        for (Tag t : swf.getTags()) {
             TreeNodeType ttype = TagTree.getTreeNodeType(t);
             switch (ttype) {
                 case SHAPE:

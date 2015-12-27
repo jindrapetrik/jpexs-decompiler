@@ -466,7 +466,7 @@ public class DefineFont2Tag extends FontTag {
     }
 
     @Override
-    public String getCharacters(List<Tag> tags) {
+    public String getCharacters() {
         StringBuilder ret = new StringBuilder();
         for (int i : codeTable) {
             ret.append((char) i);

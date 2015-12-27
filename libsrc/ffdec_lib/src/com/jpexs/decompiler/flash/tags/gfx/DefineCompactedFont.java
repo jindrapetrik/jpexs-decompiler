@@ -21,7 +21,6 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.helpers.FontHelper;
 import com.jpexs.decompiler.flash.tags.DefineFont2Tag;
-import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.types.KERNINGRECORD;
 import com.jpexs.decompiler.flash.types.LANGCODE;
@@ -316,7 +315,7 @@ public final class DefineCompactedFont extends FontTag {
     }
 
     @Override
-    public String getCharacters(List<Tag> tags) {
+    public String getCharacters() {
         FontType ft = fonts.get(0);
         StringBuilder ret = new StringBuilder(ft.glyphInfo.size());
         for (GlyphInfoType gi : ft.glyphInfo) {

@@ -16,23 +16,47 @@
  */
 package com.jpexs.decompiler.flash;
 
-import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  *
  * @author JPEXS
  */
-public class ActionScript2TestBase extends ActionScriptTestBase {
+public class ReadOnlyTagList implements Iterable<Tag> {
 
-    protected SWF swf;
+    public static final ReadOnlyTagList EMPTY = new ReadOnlyTagList(new ArrayList<>());
 
-    protected DoActionTag getFirstActionTag() {
-        for (Tag t : swf.getTags()) {
-            if (t instanceof DoActionTag) {
-                return (DoActionTag) t;
-            }
-        }
-        return null;
+    private final List<Tag> list;
+
+    public ReadOnlyTagList(List<Tag> list) {
+        this.list = list;
+    }
+
+    @Override
+    public Iterator<Tag> iterator() {
+        return list.iterator();
+    }
+
+    public int size() {
+        return list.size();
+    }
+
+    public boolean isEmpty() {
+        return list.isEmpty();
+    }
+
+    public Tag get(int index) {
+        return list.get(index);
+    }
+
+    public int indexOf(Tag tag) {
+        return list.indexOf(tag);
+    }
+
+    public ArrayList<Tag> toArrayList() {
+        return new ArrayList<>(list);
     }
 }

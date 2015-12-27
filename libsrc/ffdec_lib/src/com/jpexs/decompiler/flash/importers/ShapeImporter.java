@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.importers;
 
+import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.ShapeExporter;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
@@ -95,7 +96,9 @@ public class ShapeImporter {
 
     private final Set<String> shownWarnings = new HashSet<>();
 
-    private final SvgColor TRANSPARENT = new SvgColor(new Color(0, true));
+    private final Color TRANSPARENT = new Color(0, true);
+
+    private final SvgColor SVG_TRANSPARENT = new SvgColor(TRANSPARENT);
 
     private ShapeTag shapeTag;
 
@@ -169,13 +172,7 @@ public class ShapeImporter {
                 throw new Error("Unsupported image type tag.");
         }
 
-        int idx = swf.tags.indexOf(st);
-        if (idx != -1) {
-            swf.tags.add(idx, imageTag);
-        } else {
-            swf.tags.add(imageTag);
-        }
-
+        swf.addTag(imageTag, st);
         swf.updateCharacters();
         return imageTag;
     }
@@ -518,7 +515,6 @@ public class ShapeImporter {
                     serz.command = 'Z';
                     x = startPoint.x;
                     y = startPoint.y;
-                    serz.params = new double[]{x, y};
                     pathCommands.add(serz);
                     break;
                 case 'L':
@@ -821,13 +817,10 @@ public class ShapeImporter {
         double sqrt2RYHalf = Math.sqrt(2) * ry / 2;
         double sqrt2Minus1RY = (Math.sqrt(2) - 1) * ry;
 
-        Point startPoint = new Point(0, 0);
         List<PathCommand> pathCommands = new ArrayList<>();
         PathCommand scr = new PathCommand();
         scr.command = 'M';
         scr.params = new double[]{cx + rx, cy};
-        startPoint.x = cx + rx;
-        startPoint.y = cy;
         pathCommands.add(scr);
 
         double[] points = new double[]{
@@ -871,16 +864,12 @@ public class ShapeImporter {
 
         PathCommand serz = new PathCommand();
         serz.command = 'Z';
-        serz.params = new double[]{startPoint.x, startPoint.y};
         pathCommands.add(serz);
 
         processCommands(shapeNum, shapes, pathCommands, transform, style);
     }
 
     private void processRect(int shapeNum, SHAPEWITHSTYLE shapes, Element childElement, Matrix transform, SvgStyle style) {
-
-        Point startPoint = new Point(0, 0);
-
         String attr = childElement.getAttribute("x");
         double x = attr.length() > 0 ? Double.parseDouble(attr) : 0;
 
@@ -920,8 +909,6 @@ public class ShapeImporter {
             scr.command = 'M';
             scr.params = new double[]{x + width, y + ry};
             pathCommands.add(scr);
-            startPoint.x = x + width;
-            startPoint.y = y + ry;
 
             double sqrt2RXHalf = Math.sqrt(2) * rx / 2;
             double sqrt2Minus1RX = (Math.sqrt(2) - 1) * rx;
@@ -969,8 +956,6 @@ public class ShapeImporter {
             PathCommand scr = new PathCommand();
             scr.command = 'M';
             scr.params = new double[]{x, y};
-            startPoint.x = x;
-            startPoint.y = y;
             pathCommands.add(scr);
 
             double[] points = new double[]{
@@ -990,7 +975,6 @@ public class ShapeImporter {
 
         PathCommand serz = new PathCommand();
         serz.command = 'Z';
-        serz.params = new double[]{startPoint.x, startPoint.y};
         pathCommands.add(serz);
 
         processCommands(shapeNum, shapes, pathCommands, transform, style);
@@ -1036,7 +1020,6 @@ public class ShapeImporter {
         String data = childElement.getAttribute("points");
 
         char command = 'M';
-        Point startPoint = new Point(0, 0);
         double x0 = 0;
         double y0 = 0;
 
@@ -1057,7 +1040,6 @@ public class ShapeImporter {
                     scr.params = new double[]{x, y};
 
                     pathCommands.add(scr);
-                    startPoint = new Point(x, y);
                     break;
                 case 'L':
                     PathCommand serl = new PathCommand();
@@ -1077,7 +1059,6 @@ public class ShapeImporter {
         if (close) {
             PathCommand serz = new PathCommand();
             serz.command = 'Z';
-            serz.params = new double[]{startPoint.x, startPoint.y};
             pathCommands.add(serz);
         }
 
@@ -1101,13 +1082,13 @@ public class ShapeImporter {
         SWF swf = new SWF();
         DefineShape4Tag st = new DefineShape4Tag(swf);
         st = (DefineShape4Tag) (new ShapeImporter().importSvg(st, svgDataS));
-        swf.tags.add(st);
+        swf.addTag(st);
         SerializableImage si = new SerializableImage(800, 600, BufferedImage.TYPE_4BYTE_ABGR);
         BitmapExporter.export(swf, st.shapes, Color.yellow, si, new Matrix(), new ColorTransform());
         List<Tag> li = new ArrayList<>();
         li.add(st);
         ImageIO.write(si.getBufferedImage(), "PNG", new File(name + ".imported.png"));
-        new ShapeExporter().exportShapes(null, "./outex/", li, new ShapeExportSettings(ShapeExportMode.SVG, 1), null);
+        new ShapeExporter().exportShapes(null, "./outex/", new ReadOnlyTagList(li), new ShapeExportSettings(ShapeExportMode.SVG, 1), null);
     }
 
     //Test for SVG
@@ -1641,11 +1622,11 @@ public class ShapeImporter {
     }
 
     private Color parseColor(String rgbStr) {
-        SvgFill fill = parseFill(new HashMap<>(), rgbStr);
+        SvgFill fill = parseFill(new HashMap<>(), rgbStr, null);
         return fill.toColor();
     }
 
-    private SvgFill parseFill(Map<String, Element> idMap, String rgbStr) {
+    private SvgFill parseFill(Map<String, Element> idMap, String rgbStr, SvgStyle style) {
         if (rgbStr == null) {
             return null;
         }
@@ -1653,7 +1634,7 @@ public class ShapeImporter {
         // named colors from: http://www.w3.org/TR/SVG/types.html#ColorKeywords
         switch (rgbStr) {
             case "none":
-                return TRANSPARENT;
+                return SVG_TRANSPARENT;
             case "aliceblue":
                 return new SvgColor(240, 248, 255);
             case "antiquewhite":
@@ -1959,11 +1940,11 @@ public class ShapeImporter {
             if (e != null) {
                 String tagName = e.getTagName();
                 if ("linearGradient".equals(tagName)) {
-                    return parseGradient(idMap, e, new SvgStyle()); //? new style
+                    return parseGradient(idMap, e, new SvgStyle(style)); //? new style
                 }
 
                 if ("radialGradient".equals(tagName)) {
-                    return parseGradient(idMap, e, new SvgStyle()); //? new style
+                    return parseGradient(idMap, e, new SvgStyle(style)); //? new style
                 }
 
                 if ("pattern".equals(tagName)) {
@@ -2168,6 +2149,8 @@ public class ShapeImporter {
 
     class SvgStyle implements Cloneable {
 
+        public Color color;
+
         public SvgFill fill;
 
         public double opacity;
@@ -2190,6 +2173,8 @@ public class ShapeImporter {
 
         public double strokeMiterLimit;
 
+        public SvgStyle parentStyle;
+
         public SvgStyle() {
             fill = new SvgColor(Color.black);
             fillOpacity = 1;
@@ -2202,6 +2187,11 @@ public class ShapeImporter {
             strokeLineCap = SvgLineCap.BUTT;
             strokeLineJoin = SvgLineJoin.MITER;
             strokeMiterLimit = 4;
+        }
+
+        public SvgStyle(SvgStyle parentStyle) {
+            this();
+            this.parentStyle = parentStyle;
         }
 
         public SvgFill getFillWithOpacity() {
@@ -2272,15 +2262,26 @@ public class ShapeImporter {
             }
 
             switch (name) {
+                case "color": {
+                    Color color = parseColor(value);
+                    if (color != null) {
+                        style.color = color == TRANSPARENT ? null : color;
+                    }
+                }
+                break;
                 case "fill": {
-                    SvgFill fill = parseFill(idMap, value);
+                    SvgFill fill = parseFill(idMap, value, style);
                     if (fill != null) {
-                        style.fill = fill == TRANSPARENT ? null : fill;
+                        style.fill = fill == SVG_TRANSPARENT ? null : fill;
                     }
                 }
                 break;
                 case "stop-color": {
-                    if ("inherit".equals(value) || "currentColor".equals(value)) {
+                    if ("currentColor".equals(value)) {
+                        if (style.parentStyle != null) {
+                            style.stopColor = style.parentStyle.color;
+                        }
+                    } else if ("inherit".equals(value)) {
                         showWarning(value + "StopColorNotSupported", "The stop color value '" + value + "' is not supported.");
                     } else {
                         style.stopColor = parseColor(value);
@@ -2302,9 +2303,9 @@ public class ShapeImporter {
                 }
                 break;
                 case "stroke": {
-                    SvgFill strokeFill = parseFill(idMap, value);
+                    SvgFill strokeFill = parseFill(idMap, value, style);
                     if (strokeFill != null) {
-                        style.strokeFill = strokeFill == TRANSPARENT ? null : strokeFill;
+                        style.strokeFill = strokeFill == SVG_TRANSPARENT ? null : strokeFill;
                     }
                 }
                 break;
@@ -2362,7 +2363,7 @@ public class ShapeImporter {
             SvgStyle result = clone();
 
             String[] styles = new String[]{
-                "fill", "fill-opacity",
+                "color", "fill", "fill-opacity",
                 "stroke", "stroke-width", "stroke-opacity", "stroke-linecap", "stroke-linejoin", "stroke-miterlimit",
                 "opacity", "stop-color", "stop-opacity"
             };

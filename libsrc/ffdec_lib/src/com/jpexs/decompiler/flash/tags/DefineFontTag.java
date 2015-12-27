@@ -139,7 +139,7 @@ public class DefineFontTag extends FontTag {
 
     private void ensureFontInfo() {
         if (fontInfoTag == null) {
-            for (Tag t : swf.tags) {
+            for (Tag t : swf.getTags()) {
                 if (t instanceof DefineFontInfoTag) {
                     if (((DefineFontInfoTag) t).fontId == fontId) {
                         fontInfoTag = (DefineFontInfoTag) t;
@@ -331,7 +331,7 @@ public class DefineFontTag extends FontTag {
     }
 
     @Override
-    public String getCharacters(List<Tag> tags) {
+    public String getCharacters() {
         StringBuilder ret = new StringBuilder();
         ensureFontInfo();
         if (fontInfoTag != null) {

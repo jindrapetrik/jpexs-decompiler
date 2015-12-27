@@ -129,7 +129,7 @@ public class DebuggerTools {
         ScriptPack found = getDebuggerScriptPack(swf);
         if (found != null) {
             ABCContainerTag tag = found.abc.parentTag;
-            swf.tags.remove((Tag) tag);
+            swf.removeTag((Tag) tag);
             swf.getAbcList().remove(tag);
 
             //Change all debugger calls to normal trace / Loader
@@ -188,7 +188,7 @@ public class DebuggerTools {
                     }
                     //Add to target SWF
                     ((Tag) ds).setSwf(swf);
-                    swf.tags.add(swf.tags.indexOf(firstAbc), (Tag) ds);
+                    swf.addTag((Tag) ds, (Tag) firstAbc);
                     swf.getAbcList().add(swf.getAbcList().indexOf(firstAbc), ds);
                     ((Tag) ds).setModified(true);
                 }

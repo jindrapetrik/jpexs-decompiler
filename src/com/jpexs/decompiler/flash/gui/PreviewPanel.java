@@ -624,7 +624,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             HashMap<Integer, VideoFrameTag> videoFrames = new HashMap<>();
             if (treeItem instanceof DefineVideoStreamTag) {
                 DefineVideoStreamTag vs = (DefineVideoStreamTag) treeItem;
-                SWF.populateVideoFrames(vs.getCharacterId(), swf.tags, videoFrames);
+                SWF.populateVideoFrames(vs.getCharacterId(), swf.getTags(), videoFrames);
                 frameCount = videoFrames.size();
             }
 
@@ -697,7 +697,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                     Frame fn = (Frame) treeItem;
                     Timelined parent = fn.timeline.timelined;
                     List<Integer> doneCharacters = new ArrayList<>();
-                    for (Tag t : fn.timeline.tags) {
+                    for (Tag t : parent.getTags()) {
                         if (t instanceof FileAttributesTag || t instanceof SetBackgroundColorTag) {
                             continue;
                         }
@@ -1028,7 +1028,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                     } else if (treeItem instanceof DefineSpriteTag) {
                         DefineSpriteTag s = (DefineSpriteTag) treeItem;
                         Tag lastTag = null;
-                        for (Tag t : s.subTags) {
+                        for (Tag t : s.getTags()) {
                             if (t instanceof EndTag) {
                                 break;
                             } else if (t instanceof PlaceObjectTypeTag) {
@@ -1042,7 +1042,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                                 lastTag = t;
                             }
                         }
-                        if (!s.subTags.isEmpty() && (lastTag != null) && (!(lastTag instanceof ShowFrameTag))) {
+                        if (!s.getTags().isEmpty() && (lastTag != null) && (!(lastTag instanceof ShowFrameTag))) {
                             new ShowFrameTag(swf).writeTag(sos2);
                         }
                     } else {

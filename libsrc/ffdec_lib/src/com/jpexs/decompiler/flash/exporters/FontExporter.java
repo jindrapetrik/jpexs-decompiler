@@ -23,6 +23,7 @@ import com.google.typography.font.tools.conversion.woff.WoffWriter;
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.EventListener;
+import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
@@ -57,7 +58,7 @@ import java.util.logging.Logger;
  */
 public class FontExporter {
 
-    public List<File> exportFonts(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final FontExportSettings settings, EventListener evl) throws IOException, InterruptedException {
+    public List<File> exportFonts(AbortRetryIgnoreHandler handler, String outdir, ReadOnlyTagList tags, final FontExportSettings settings, EventListener evl) throws IOException, InterruptedException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;
