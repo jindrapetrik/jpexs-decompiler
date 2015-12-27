@@ -821,6 +821,7 @@ public class ShapeImporter {
         double sqrt2RYHalf = Math.sqrt(2) * ry / 2;
         double sqrt2Minus1RY = (Math.sqrt(2) - 1) * ry;
 
+        Point startPoint = new Point(0, 0);
         List<PathCommand> pathCommands = new ArrayList<>();
         PathCommand scr = new PathCommand();
         scr.command = 'M';
@@ -865,6 +866,11 @@ public class ShapeImporter {
              cer.params = new double[]{cx + x1Comma, cy + y1Comma, cx + x2Comma, cy + y2Comma};*/
             pathCommands.add(cer);
         }
+
+        PathCommand serz = new PathCommand();
+        serz.command = 'Z';
+        serz.params = new double[]{startPoint.x, startPoint.y};
+        pathCommands.add(serz);
 
         processCommands(shapeNum, shapes, pathCommands, transform, style);
     }
