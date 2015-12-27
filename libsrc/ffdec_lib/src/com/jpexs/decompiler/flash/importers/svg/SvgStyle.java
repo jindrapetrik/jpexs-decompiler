@@ -700,9 +700,9 @@ class SvgStyle implements Cloneable {
                 SvgStyleProperty styleProperty = SvgStyleProperty.getByName(name);
                 if (styleProperty == null) {
                     importer.showWarning(name + "StyleNotSupported", "The style '" + name + "' is not supported.");
+                } else {
+                    applyStyle(idMap, result, this, styleProperty, parts[1].trim());
                 }
-
-                applyStyle(idMap, result, this, styleProperty, parts[1].trim());
             }
         }
 
