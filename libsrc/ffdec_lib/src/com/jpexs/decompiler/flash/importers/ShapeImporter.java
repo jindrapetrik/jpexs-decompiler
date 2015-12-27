@@ -826,6 +826,8 @@ public class ShapeImporter {
         PathCommand scr = new PathCommand();
         scr.command = 'M';
         scr.params = new double[]{cx + rx, cy};
+        startPoint.x = cx + rx;
+        startPoint.y = cy;
         pathCommands.add(scr);
 
         double[] points = new double[]{
