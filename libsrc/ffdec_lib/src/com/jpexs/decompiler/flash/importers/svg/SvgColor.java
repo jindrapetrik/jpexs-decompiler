@@ -364,9 +364,9 @@ class SvgColor extends SvgFill {
                     String a1 = args[1].trim();
                     String a2 = args[2].trim();
                     if (a0.endsWith("%") && a1.endsWith("%") && a2.endsWith("%")) {
-                        int r = (int) Math.round(Integer.parseInt(a0.substring(0, a0.length() - 1)) * 255.0 / 100);
-                        int g = (int) Math.round(Integer.parseInt(a1.substring(0, a1.length() - 1)) * 255.0 / 100);
-                        int b = (int) Math.round(Integer.parseInt(a2.substring(0, a2.length() - 1)) * 255.0 / 100);
+                        int r = (int) Math.round(Double.parseDouble(a0.substring(0, a0.length() - 1)) * 255.0 / 100);
+                        int g = (int) Math.round(Double.parseDouble(a1.substring(0, a1.length() - 1)) * 255.0 / 100);
+                        int b = (int) Math.round(Double.parseDouble(a2.substring(0, a2.length() - 1)) * 255.0 / 100);
                         return new SvgColor(r, g, b);
                     } else {
                         int r = Integer.parseInt(a0);

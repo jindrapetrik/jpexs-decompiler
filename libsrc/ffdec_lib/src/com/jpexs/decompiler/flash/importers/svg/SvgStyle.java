@@ -22,6 +22,7 @@ import com.jpexs.helpers.Helper;
 import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -512,8 +513,8 @@ class SvgStyle implements Cloneable {
         return result;
     }
 
-    private void applyStyle(Map<String, Element> idMap, SvgStyle style, SvgStyle parentStyle, SvgStyleProperty styleProperty, String value) {
-        boolean inherit = styleProperty.isInherited();
+    private boolean applyStyle(Map<String, Element> idMap, SvgStyle style, SvgStyle parentStyle, SvgStyleProperty styleProperty, String value) {
+        boolean inherit = false;
         if ("inherit".equals(value)) {
             value = "";
             inherit = true;
@@ -639,70 +640,93 @@ class SvgStyle implements Cloneable {
             ok = false;
         }
 
-        if (!ok && inherit) {
-            switch (name) {
-                case "color":
-                    style.color = parentStyle.color;
-                    break;
-                case "fill":
-                    style.fill = parentStyle.fill;
-                    break;
-                case "fill-opacity":
-                    style.fillOpacity = parentStyle.opacity;
-                    break;
-                case "stroke":
-                    style.strokeFill = parentStyle.strokeFill;
-                    break;
-                case "stroke-width":
-                    style.strokeWidth = parentStyle.strokeWidth;
-                    break;
-                case "stroke-opacity":
-                    style.strokeOpacity = parentStyle.opacity;
-                    break;
-                case "stroke-linecap":
-                    style.strokeLineCap = parentStyle.strokeLineCap;
-                    break;
-                case "stroke-linejoin":
-                    style.strokeLineJoin = parentStyle.strokeLineJoin;
-                    break;
-                case "stroke-miterlimit":
-                    style.strokeMiterLimit = parentStyle.strokeMiterLimit;
-                    break;
-                case "opacity":
-                    style.opacity = parentStyle.opacity;
-                    break;
-                case "stop-color":
-                    style.stopColor = parentStyle.stopColor;
-                    break;
-                case "stop-opacity":
-                    style.stopOpacity = parentStyle.stopOpacity;
-                    break;
-            }
+        if (inherit) {
+            applyInheritedStyle(style, parentStyle, styleProperty);
+            ok = true;
+        }
+
+        return ok;
+    }
+
+    private void applyInheritedStyle(SvgStyle style, SvgStyle parentStyle, SvgStyleProperty styleProperty) {
+        String name = styleProperty.name();
+        switch (name) {
+            case "color":
+                style.color = parentStyle.color;
+                break;
+            case "fill":
+                style.fill = parentStyle.fill;
+                break;
+            case "fill-opacity":
+                style.fillOpacity = parentStyle.opacity;
+                break;
+            case "stroke":
+                style.strokeFill = parentStyle.strokeFill;
+                break;
+            case "stroke-width":
+                style.strokeWidth = parentStyle.strokeWidth;
+                break;
+            case "stroke-opacity":
+                style.strokeOpacity = parentStyle.opacity;
+                break;
+            case "stroke-linecap":
+                style.strokeLineCap = parentStyle.strokeLineCap;
+                break;
+            case "stroke-linejoin":
+                style.strokeLineJoin = parentStyle.strokeLineJoin;
+                break;
+            case "stroke-miterlimit":
+                style.strokeMiterLimit = parentStyle.strokeMiterLimit;
+                break;
+            case "opacity":
+                style.opacity = parentStyle.opacity;
+                break;
+            case "stop-color":
+                style.stopColor = parentStyle.stopColor;
+                break;
+            case "stop-opacity":
+                style.stopOpacity = parentStyle.stopOpacity;
+                break;
         }
     }
 
     public SvgStyle apply(Element element, Map<String, Element> idMap) {
         SvgStyle result = new SvgStyle(importer);
 
-        for (SvgStyleProperty styleProperty : SvgStyleProperty.getProperties()) {
-            String name = styleProperty.name();
-            if (element.hasAttribute(name)) {
-                String attr = element.getAttribute(name).trim();
-                applyStyle(idMap, result, this, styleProperty, attr);
-            }
-        }
-
+        Map<String, String> styleValues = new HashMap<>();
         if (element.hasAttribute("style")) {
             String[] styleDefs = element.getAttribute("style").split(";");
             for (String styleDef : styleDefs) {
+                if (!styleDef.contains(":")) {
+                    continue;
+                }
+
                 String[] parts = styleDef.split(":", 2);
                 String name = parts[0].trim();
+                String value = parts[1].trim();
                 SvgStyleProperty styleProperty = SvgStyleProperty.getByName(name);
                 if (styleProperty == null) {
                     importer.showWarning(name + "StyleNotSupported", "The style '" + name + "' is not supported.");
                 } else {
-                    applyStyle(idMap, result, this, styleProperty, parts[1].trim());
+                    styleValues.put(name, value);
                 }
+            }
+        }
+
+        for (SvgStyleProperty styleProperty : SvgStyleProperty.getProperties()) {
+            String name = styleProperty.name();
+            boolean ok = false;
+            if (styleValues.containsKey(name)) {
+                ok = applyStyle(idMap, result, this, styleProperty, styleValues.get(name));
+            }
+
+            if (!ok && element.hasAttribute(name)) {
+                String attr = element.getAttribute(name).trim();
+                ok = applyStyle(idMap, result, this, styleProperty, attr);
+            }
+
+            if (!ok && styleProperty.isInherited()) {
+                applyInheritedStyle(result, this, styleProperty);
             }
         }
 

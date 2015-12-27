@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.exporters.shape.BitmapExporter;
 import com.jpexs.decompiler.flash.importers.ShapeImporter;
 import com.jpexs.decompiler.flash.importers.SvgPathReader;
 import com.jpexs.decompiler.flash.tags.DefineShape4Tag;
+import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.ColorTransform;
@@ -985,14 +986,14 @@ public class SvgImporter {
         if (!new File(name + ".original.svg").exists()) {
             URL svgUrl = new URL("http://www.w3.org/Graphics/SVG/Test/20061213/svggen/" + name + ".svg");
             byte[] svgData = Helper.readStream(svgUrl.openStream());
-            Helper.writeFile(name + ".original.svg", svgData);
+            Helper.writeFile(name + ".orig.svg", svgData);
 
             URL pngUrl = new URL("http://www.w3.org/Graphics/SVG/Test/20061213/png/full-" + name + ".png");
             byte[] pngData = Helper.readStream(pngUrl.openStream());
-            Helper.writeFile(name + ".original.png", pngData);
+            Helper.writeFile(name + ".orig.png", pngData);
         }
 
-        String svgDataS = Helper.readTextFile(name + ".original.svg");
+        String svgDataS = Helper.readTextFile(name + ".orig.svg");
         SWF swf = new SWF();
         DefineShape4Tag st = new DefineShape4Tag(swf);
         st = (DefineShape4Tag) (new SvgImporter().importSvg(st, svgDataS));
@@ -1002,6 +1003,11 @@ public class SvgImporter {
         List<Tag> li = new ArrayList<>();
         li.add(st);
         ImageIO.write(si.getBufferedImage(), "PNG", new File(name + ".imported.png"));
+        ExportAssetsTag eat = new ExportAssetsTag(swf);
+        eat.tags.add(st.getCharacterId());
+        eat.names.add(name);
+        swf.addTag(eat);
+        swf.assignExportNamesToSymbols();
         new ShapeExporter().exportShapes(null, "./outex/", new ReadOnlyTagList(li), new ShapeExportSettings(ShapeExportMode.SVG, 1), null);
     }
 

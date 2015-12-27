@@ -30,7 +30,6 @@ import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
 import com.jpexs.decompiler.flash.helpers.BMPFile;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.Tag;
-import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.RenderContext;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
@@ -81,28 +80,25 @@ public class ShapeExporter {
         int currentIndex = 1;
         for (final Tag t : tags) {
             if (t instanceof ShapeTag) {
+                final ShapeTag st = (ShapeTag) t;
                 if (evl != null) {
                     evl.handleExportingEvent("shape", currentIndex, count, t.getName());
                 }
 
-                int characterID = 0;
-                if (t instanceof CharacterTag) {
-                    characterID = ((CharacterTag) t).getCharacterId();
-                }
-                String ext = "svg";
+                int characterID = st.getCharacterId();
+                String ext = ".svg";
                 if (settings.mode == ShapeExportMode.PNG) {
-                    ext = "png";
+                    ext = ".png";
                 }
                 if (settings.mode == ShapeExportMode.BMP) {
-                    ext = "bmp";
+                    ext = ".bmp";
                 }
                 if (settings.mode == ShapeExportMode.CANVAS) {
-                    ext = "html";
+                    ext = ".html";
                 }
 
-                final File file = new File(outdir + File.separator + characterID + "." + ext);
+                final File file = new File(outdir + File.separator + Helper.makeFileName(st.getCharacterExportFileName() + ext));
                 new RetryTask(() -> {
-                    ShapeTag st = (ShapeTag) t;
                     switch (settings.mode) {
                         case SVG:
                             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
