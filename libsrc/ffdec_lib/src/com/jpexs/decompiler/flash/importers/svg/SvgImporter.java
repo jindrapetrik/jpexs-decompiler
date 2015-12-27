@@ -695,29 +695,29 @@ public class SvgImporter {
 
     private void processCircle(int shapeNum, SHAPEWITHSTYLE shapes, Element childElement, Matrix transform, SvgStyle style) {
         String attr = childElement.getAttribute("cx");
-        double cx = attr.length() > 0 ? Double.parseDouble(attr) : 0;
+        double cx = attr.length() > 0 ? parseCoordinate(attr, 100/* todo: how much is 100%? */) : 0;
 
         attr = childElement.getAttribute("cy");
-        double cy = attr.length() > 0 ? Double.parseDouble(attr) : 0;
+        double cy = attr.length() > 0 ? parseCoordinate(attr, 100/* todo: how much is 100%? */) : 0;
 
         attr = childElement.getAttribute("r");
-        double r = attr.length() > 0 ? Double.parseDouble(attr) : 0;
+        double r = attr.length() > 0 ? parseLength(attr, 100/* todo: how much is 100%? */) : 0;
 
         processEllipse(shapeNum, shapes, transform, style, cx, cy, r, r);
     }
 
     private void processEllipse(int shapeNum, SHAPEWITHSTYLE shapes, Element childElement, Matrix transform, SvgStyle style) {
         String attr = childElement.getAttribute("cx");
-        double cx = attr.length() > 0 ? Double.parseDouble(attr) : 0;
+        double cx = attr.length() > 0 ? parseCoordinate(attr, 100/* todo: how much is 100%? */) : 0;
 
         attr = childElement.getAttribute("cy");
-        double cy = attr.length() > 0 ? Double.parseDouble(attr) : 0;
+        double cy = attr.length() > 0 ? parseCoordinate(attr, 100/* todo: how much is 100%? */) : 0;
 
         attr = childElement.getAttribute("rx");
-        double rx = attr.length() > 0 ? Double.parseDouble(attr) : 0;
+        double rx = attr.length() > 0 ? parseLength(attr, 100/* todo: how much is 100%? */) : 0;
 
         attr = childElement.getAttribute("ry");
-        double ry = attr.length() > 0 ? Double.parseDouble(attr) : 0;
+        double ry = attr.length() > 0 ? parseLength(attr, 100/* todo: how much is 100%? */) : 0;
 
         processEllipse(shapeNum, shapes, transform, style, cx, cy, rx, ry);
     }
@@ -782,22 +782,22 @@ public class SvgImporter {
 
     private void processRect(int shapeNum, SHAPEWITHSTYLE shapes, Element childElement, Matrix transform, SvgStyle style) {
         String attr = childElement.getAttribute("x");
-        double x = attr.length() > 0 ? Double.parseDouble(attr) : 0;
+        double x = attr.length() > 0 ? parseCoordinate(attr, 100/* todo: how much is 100%? */) : 0;
 
         attr = childElement.getAttribute("y");
-        double y = attr.length() > 0 ? Double.parseDouble(attr) : 0;
+        double y = attr.length() > 0 ? parseCoordinate(attr, 100/* todo: how much is 100%? */) : 0;
 
         attr = childElement.getAttribute("width");
-        double width = attr.length() > 0 ? Double.parseDouble(attr) : 0;
+        double width = attr.length() > 0 ? parseLength(attr, 100/* todo: how much is 100%? */) : 0;
 
         attr = childElement.getAttribute("height");
-        double height = attr.length() > 0 ? Double.parseDouble(attr) : 0;
+        double height = attr.length() > 0 ? parseLength(attr, 100/* todo: how much is 100%? */) : 0;
 
         attr = childElement.getAttribute("rx");
-        double rx = attr.length() > 0 ? Double.parseDouble(attr) : 0;
+        double rx = attr.length() > 0 ? parseLength(attr, 100/* todo: how much is 100%? */) : 0;
 
         attr = childElement.getAttribute("ry");
-        double ry = attr.length() > 0 ? Double.parseDouble(attr) : 0;
+        double ry = attr.length() > 0 ? parseLength(attr, 100/* todo: how much is 100%? */) : 0;
 
         if (rx == 0 && ry != 0) {
             rx = ry;
@@ -893,16 +893,16 @@ public class SvgImporter {
 
     private void processLine(int shapeNum, SHAPEWITHSTYLE shapes, Element childElement, Matrix transform, SvgStyle style) {
         String attr = childElement.getAttribute("x1");
-        double x1 = attr.length() > 0 ? Double.parseDouble(attr) : 0;
+        double x1 = attr.length() > 0 ? parseCoordinate(attr, 100/* todo: how much is 100%? */) : 0;
 
         attr = childElement.getAttribute("y1");
-        double y1 = attr.length() > 0 ? Double.parseDouble(attr) : 0;
+        double y1 = attr.length() > 0 ? parseCoordinate(attr, 100/* todo: how much is 100%? */) : 0;
 
         attr = childElement.getAttribute("x2");
-        double x2 = attr.length() > 0 ? Double.parseDouble(attr) : 0;
+        double x2 = attr.length() > 0 ? parseCoordinate(attr, 100/* todo: how much is 100%? */) : 0;
 
         attr = childElement.getAttribute("y2");
-        double y2 = attr.length() > 0 ? Double.parseDouble(attr) : 0;
+        double y2 = attr.length() > 0 ? parseCoordinate(attr, 100/* todo: how much is 100%? */) : 0;
 
         List<PathCommand> pathCommands = new ArrayList<>();
         PathCommand scr = new PathCommand();
@@ -997,7 +997,7 @@ public class SvgImporter {
         DefineShape4Tag st = new DefineShape4Tag(swf);
         st = (DefineShape4Tag) (new SvgImporter().importSvg(st, svgDataS));
         swf.addTag(st);
-        SerializableImage si = new SerializableImage(800, 600, BufferedImage.TYPE_4BYTE_ABGR);
+        SerializableImage si = new SerializableImage(480, 360, BufferedImage.TYPE_4BYTE_ABGR);
         BitmapExporter.export(swf, st.shapes, Color.yellow, si, new Matrix(), new ColorTransform());
         List<Tag> li = new ArrayList<>();
         li.add(st);
@@ -1007,8 +1007,281 @@ public class SvgImporter {
 
     //Test for SVG
     public static void main(String[] args) throws IOException, InterruptedException {
-        //svgTest("pservers-grad-01-b");
+        svgTest("animate-elem-02-t");
+        svgTest("animate-elem-03-t");
+        svgTest("animate-elem-04-t");
+        svgTest("animate-elem-05-t");
+        svgTest("animate-elem-06-t");
+        svgTest("animate-elem-07-t");
+        svgTest("animate-elem-08-t");
+        svgTest("animate-elem-09-t");
+        svgTest("animate-elem-10-t");
+        svgTest("animate-elem-11-t");
+        svgTest("animate-elem-12-t");
+        svgTest("animate-elem-13-t");
+        svgTest("animate-elem-14-t");
+        svgTest("animate-elem-15-t");
+        svgTest("animate-elem-17-t");
+        svgTest("animate-elem-19-t");
+        svgTest("animate-elem-20-t");
+        svgTest("animate-elem-21-t");
+        svgTest("animate-elem-22-b");
+        svgTest("animate-elem-23-t");
+        svgTest("animate-elem-24-t");
+        svgTest("animate-elem-25-t");
+        svgTest("animate-elem-26-t");
+        svgTest("animate-elem-27-t");
+        svgTest("animate-elem-28-t");
+        svgTest("animate-elem-29-b");
+        svgTest("animate-elem-30-t");
+        svgTest("animate-elem-31-t");
+        svgTest("animate-elem-32-t");
+        svgTest("animate-elem-33-t");
+        svgTest("animate-elem-34-t");
+        svgTest("animate-elem-36-t");
+        svgTest("animate-elem-37-t");
+        svgTest("animate-elem-39-t");
+        svgTest("animate-elem-40-t");
+        svgTest("animate-elem-41-t");
+        svgTest("animate-elem-44-t");
+        svgTest("animate-elem-46-t");
+        svgTest("animate-elem-52-t");
+        svgTest("animate-elem-60-t");
+        svgTest("animate-elem-61-t");
+        svgTest("animate-elem-62-t");
+        svgTest("animate-elem-63-t");
+        svgTest("animate-elem-64-t");
+        svgTest("animate-elem-65-t");
+        svgTest("animate-elem-66-t");
+        svgTest("animate-elem-67-t");
+        svgTest("animate-elem-68-t");
+        svgTest("animate-elem-69-t");
+        svgTest("animate-elem-70-t");
+        svgTest("animate-elem-77-t");
+        svgTest("animate-elem-78-t");
+        svgTest("animate-elem-80-t");
+        svgTest("animate-elem-81-t");
+        svgTest("animate-elem-82-t");
+        svgTest("animate-elem-83-t");
+        svgTest("animate-elem-84-t");
+        svgTest("animate-elem-85-t");
+        svgTest("color-prof-01-f");
+        svgTest("color-prop-01-b");
+        svgTest("color-prop-02-f");
+        svgTest("color-prop-03-t");
+        svgTest("coords-coord-01-t");
+        svgTest("coords-coord-02-t");
+        svgTest("coords-trans-01-b");
+        svgTest("coords-trans-02-t");
+        svgTest("coords-trans-03-t");
+        svgTest("coords-trans-04-t");
+        svgTest("coords-trans-05-t");
+        svgTest("coords-trans-06-t");
+        svgTest("coords-units-01-b");
+        svgTest("coords-units-02-b");
+        svgTest("coords-units-03-b");
+        svgTest("coords-viewattr-01-b");
+        svgTest("coords-viewattr-02-b");
+        svgTest("coords-viewattr-03-b");
+        svgTest("extend-namespace-01-f");
+        svgTest("filters-blend-01-b");
+        svgTest("filters-color-01-b");
+        svgTest("filters-composite-02-b");
+        svgTest("filters-comptran-01-b");
+        svgTest("filters-conv-01-f");
+        svgTest("filters-diffuse-01-f");
+        svgTest("filters-displace-01-f");
+        svgTest("filters-example-01-b");
+        svgTest("filters-felem-01-b");
+        svgTest("filters-gauss-01-b");
+        svgTest("filters-image-01-b");
+        svgTest("filters-light-01-f");
+        svgTest("filters-morph-01-f");
+        svgTest("filters-offset-01-b");
+        svgTest("filters-specular-01-f");
+        svgTest("filters-tile-01-b");
+        svgTest("filters-turb-01-f");
+        svgTest("fonts-desc-02-t");
+        svgTest("fonts-elem-01-t");
+        svgTest("fonts-elem-02-t");
+        svgTest("fonts-elem-03-b");
+        svgTest("fonts-elem-04-b");
+        svgTest("fonts-elem-05-t");
+        svgTest("fonts-elem-06-t");
+        svgTest("fonts-elem-07-b");
+        svgTest("fonts-glyph-02-t");
+        svgTest("fonts-glyph-03-t");
+        svgTest("fonts-glyph-04-t");
+        svgTest("fonts-kern-01-t");
+        svgTest("interact-cursor-01-f");
+        svgTest("interact-dom-01-b");
+        svgTest("interact-events-01-b");
+        svgTest("interact-order-01-b");
+        svgTest("interact-order-02-b");
+        svgTest("interact-order-03-b");
+        svgTest("interact-zoom-01-t");
+        svgTest("linking-a-01-b");
+        svgTest("linking-a-02-b");
+        svgTest("linking-a-03-b");
+        svgTest("linking-a-04-t");
+        svgTest("linking-a-05-t");
+        svgTest("linking-a-07-t");
+        svgTest("linking-uri-01-b");
+        svgTest("linking-uri-02-b");
+        svgTest("linking-uri-03-t");
+        svgTest("masking-intro-01-f");
+        svgTest("masking-mask-01-b");
+        svgTest("masking-opacity-01-b");
+        svgTest("masking-path-01-b");
+        svgTest("masking-path-02-b");
+        svgTest("masking-path-03-b");
+        svgTest("masking-path-04-b");
+        svgTest("masking-path-05-f");
+        svgTest("metadata-example-01-b");
+        svgTest("painting-fill-01-t");
+        svgTest("painting-fill-02-t");
+        svgTest("painting-fill-03-t");
+        svgTest("painting-fill-04-t");
+        svgTest("painting-fill-05-b");
+        svgTest("painting-marker-01-f");
+        svgTest("painting-marker-02-f");
+        svgTest("painting-marker-03-f");
+        svgTest("painting-render-01-b");
+        svgTest("painting-stroke-01-t");
+        svgTest("painting-stroke-02-t");
+        svgTest("painting-stroke-03-t");
+        svgTest("painting-stroke-04-t");
+        svgTest("painting-stroke-07-t");
+        svgTest("paths-data-01-t");
+        svgTest("paths-data-02-t");
+        svgTest("paths-data-03-f");
+        svgTest("paths-data-04-t");
+        svgTest("paths-data-05-t");
+        svgTest("paths-data-06-t");
+        svgTest("paths-data-07-t");
+        svgTest("paths-data-08-t");
+        svgTest("paths-data-09-t");
+        svgTest("paths-data-10-t");
+        svgTest("paths-data-12-t");
+        svgTest("paths-data-13-t");
+        svgTest("paths-data-14-t");
+        svgTest("paths-data-15-t");
+        svgTest("pservers-grad-01-b");
+        svgTest("pservers-grad-02-b");
+        svgTest("pservers-grad-03-b");
+        svgTest("pservers-grad-04-b");
+        svgTest("pservers-grad-05-b");
+        svgTest("pservers-grad-06-b");
         svgTest("pservers-grad-07-b");
+        svgTest("pservers-grad-08-b");
+        svgTest("pservers-grad-09-b");
+        svgTest("pservers-grad-10-b");
+        svgTest("pservers-grad-11-b");
+        svgTest("pservers-grad-12-b");
+        svgTest("pservers-grad-13-b");
+        svgTest("pservers-grad-14-b");
+        svgTest("pservers-grad-15-b");
+        svgTest("pservers-grad-16-b");
+        svgTest("pservers-grad-17-b");
+        svgTest("pservers-grad-18-b");
+        svgTest("pservers-grad-19-b");
+        svgTest("pservers-pattern-01-b");
+        svgTest("render-elems-01-t");
+        svgTest("render-elems-02-t");
+        svgTest("render-elems-03-t");
+        svgTest("render-elems-06-t");
+        svgTest("render-elems-07-t");
+        svgTest("render-elems-08-t");
+        svgTest("render-groups-01-b");
+        svgTest("render-groups-03-t");
+        svgTest("script-handle-01-b");
+        svgTest("script-handle-02-b");
+        svgTest("script-handle-03-b");
+        svgTest("script-handle-04-b");
+        svgTest("shapes-circle-01-t");
+        svgTest("shapes-circle-02-t");
+        svgTest("shapes-ellipse-01-t");
+        svgTest("shapes-ellipse-02-t");
+        svgTest("shapes-intro-01-t");
+        svgTest("shapes-line-01-t");
+        svgTest("shapes-polygon-01-t");
+        svgTest("shapes-polyline-01-t");
+        svgTest("shapes-rect-01-t");
+        svgTest("shapes-rect-02-t");
+        svgTest("struct-cond-01-t");
+        svgTest("struct-cond-02-t");
+        svgTest("struct-cond-03-t");
+        svgTest("struct-defs-01-t");
+        svgTest("struct-dom-01-b");
+        svgTest("struct-dom-02-b");
+        svgTest("struct-dom-03-b");
+        svgTest("struct-dom-04-b");
+        svgTest("struct-dom-05-b");
+        svgTest("struct-dom-06-b");
+        svgTest("struct-frag-01-t");
+        svgTest("struct-frag-02-t");
+        svgTest("struct-frag-03-t");
+        svgTest("struct-frag-04-t");
+        svgTest("struct-frag-05-t");
+        svgTest("struct-frag-06-t");
+        svgTest("struct-group-01-t");
+        svgTest("struct-group-02-b");
+        svgTest("struct-group-03-t");
+        svgTest("struct-image-01-t");
+        svgTest("struct-image-02-b");
+        svgTest("struct-image-03-t");
+        svgTest("struct-image-04-t");
+        svgTest("struct-image-05-b");
+        svgTest("struct-image-06-t");
+        svgTest("struct-image-07-t");
+        svgTest("struct-image-08-t");
+        svgTest("struct-image-09-t");
+        svgTest("struct-image-10-t");
+        svgTest("struct-symbol-01-b");
+        svgTest("struct-use-01-t");
+        svgTest("struct-use-03-t");
+        svgTest("struct-use-05-b");
+        svgTest("styling-css-01-b");
+        svgTest("styling-css-02-b");
+        svgTest("styling-css-03-b");
+        svgTest("styling-css-04-f");
+        svgTest("styling-css-05-b");
+        svgTest("styling-css-06-b");
+        svgTest("styling-inherit-01-b");
+        svgTest("styling-pres-01-t");
+        svgTest("text-align-01-b");
+        svgTest("text-align-02-b");
+        svgTest("text-align-03-b");
+        svgTest("text-align-04-b");
+        svgTest("text-align-05-b");
+        svgTest("text-align-06-b");
+        svgTest("text-align-08-b");
+        svgTest("text-altglyph-01-b");
+        svgTest("text-deco-01-b");
+        svgTest("text-fonts-01-t");
+        svgTest("text-fonts-02-t");
+        svgTest("text-fonts-03-t");
+        svgTest("text-intro-01-t");
+        svgTest("text-intro-02-b");
+        svgTest("text-intro-03-b");
+        svgTest("text-intro-04-t");
+        svgTest("text-intro-05-t");
+        svgTest("text-path-01-b");
+        svgTest("text-spacing-01-b");
+        svgTest("text-text-01-b");
+        svgTest("text-text-03-b");
+        svgTest("text-text-04-t");
+        svgTest("text-text-05-t");
+        svgTest("text-text-06-t");
+        svgTest("text-text-07-t");
+        svgTest("text-text-08-b");
+        svgTest("text-tref-01-b");
+        svgTest("text-tselect-01-b");
+        svgTest("text-tselect-02-f");
+        svgTest("text-tspan-01-b");
+        svgTest("text-ws-01-t");
+        svgTest("text-ws-02-t");
+        svgTest("types-basicDOM-01-b");
     }
 
     private void applyFillGradients(SvgFill fill, FILLSTYLE fillStyle, RECT bounds, StyleChangeRecord scr, Matrix transform, int shapeNum, SvgStyle style) {
@@ -1168,6 +1441,7 @@ public class SvgImporter {
             }
 
             fillStyle.gradient.gradientRecords = new GRADRECORD[gfill.stops.size()];
+            int prevRatio = -1;
             for (int i = 0; i < gfill.stops.size(); i++) {
                 SvgStop stop = gfill.stops.get(i);
                 Color color = stop.color;
@@ -1175,7 +1449,12 @@ public class SvgImporter {
                 fillStyle.gradient.gradientRecords[i] = new GRADRECORD();
                 fillStyle.gradient.gradientRecords[i].inShape3 = shapeNum >= 3;
                 fillStyle.gradient.gradientRecords[i].color = getRGB(shapeNum, color);
-                fillStyle.gradient.gradientRecords[i].ratio = (int) Math.round(stop.offset * 255);
+                int ratio = Math.max((int) Math.round(stop.offset * 255), prevRatio + 1);
+                fillStyle.gradient.gradientRecords[i].ratio = ratio;
+                prevRatio = ratio;
+                if (prevRatio == 255) {
+                    break;
+                }
             }
         } else if (fill instanceof SvgBitmapFill) {
             SvgBitmapFill bfill = (SvgBitmapFill) fill;
@@ -1279,6 +1558,68 @@ public class SvgImporter {
         }
 
         return shapeNum >= 3 ? new RGBA(color) : new RGB(color);
+    }
+
+    private double parseCoordinate(String value, double relativeTo) {
+        return parseLength(value, relativeTo);
+    }
+
+    private double parseLength(String value, double relativeTo) {
+        if (value == null) {
+            throw new NumberFormatException();
+        }
+
+        value = value.toLowerCase();
+        String unit = null;
+        if (value.endsWith("em")
+                || value.endsWith("ex")
+                || value.endsWith("px")
+                || value.endsWith("in")
+                || value.endsWith("cm")
+                || value.endsWith("mm")
+                || value.endsWith("pt")
+                || value.endsWith("pc")) {
+            unit = value.substring(value.length() - 2);
+            value = value.substring(0, value.length() - 2);
+        } else if (value.endsWith("%")) {
+            unit = "%";
+            value = value.substring(0, value.length() - 1);
+        }
+
+        double result = Double.parseDouble(value);
+        if (unit != null) {
+            switch (unit) {
+                case "em":
+                case "ex":
+                    // todo: font things
+                    break;
+                case "in":
+                    result *= getDpi();
+                    break;
+                case "pt":
+                    result *= getDpi() / 72;
+                    break;
+                case "pc":
+                    result *= getDpi() / 6;
+                    break;
+                case "cm":
+                    result *= getDpi() / 2.54;
+                    break;
+                case "mm":
+                    result *= getDpi() / 25.4;
+                    break;
+                case "%":
+                    result = relativeTo * result / 100;
+                    break;
+            }
+        }
+
+        return result;
+    }
+
+    private double getDpi() {
+        return 96;
+
     }
 
     class PathCommand {

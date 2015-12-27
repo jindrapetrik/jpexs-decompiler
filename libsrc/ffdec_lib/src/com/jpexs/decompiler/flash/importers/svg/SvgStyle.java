@@ -66,6 +66,8 @@ class SvgStyle implements Cloneable {
 
     private final SvgImporter importer;
 
+    private final double epsilon = 0.001;
+
     private final Random random = new Random();
 
     public SvgStyle(SvgImporter importer) {
@@ -98,6 +100,14 @@ class SvgStyle implements Cloneable {
         Color fillColor = ((SvgColor) fill).color;
 
         int opacity = (int) Math.round(this.opacity * fillOpacity * 255);
+        if (opacity > 255) {
+            opacity = 255;
+        }
+
+        if (opacity < 0) {
+            opacity = 0;
+        }
+
         if (opacity == 255) {
             return fill;
         }
@@ -115,6 +125,14 @@ class SvgStyle implements Cloneable {
         Color strokeFillColor = ((SvgColor) strokeFill).color;
 
         int opacity = (int) Math.round(this.opacity * strokeOpacity * 255);
+        if (opacity > 255) {
+            opacity = 255;
+        }
+
+        if (opacity < 0) {
+            opacity = 0;
+        }
+
         if (opacity == 255) {
             return strokeFill;
         }
@@ -366,7 +384,7 @@ class SvgStyle implements Cloneable {
             ret.spreadMethod = spreadMethod;
             ret.gradientTransform = gradientTransform;
             ret.gradientUnits = gradientUnits;
-            ret.stops = stops;
+            ret.stops = fixStops(stops);
             ret.interpolation = interpolation;
             return ret;
         } else if ("radialGradient".equals(el.getTagName())) {
@@ -379,12 +397,42 @@ class SvgStyle implements Cloneable {
             ret.spreadMethod = spreadMethod;
             ret.gradientTransform = gradientTransform;
             ret.gradientUnits = gradientUnits;
-            ret.stops = stops;
+            ret.stops = fixStops(stops);
             ret.interpolation = interpolation;
             return ret;
         } else {
             return null;
         }
+    }
+
+    private List<SvgStop> fixStops(List<SvgStop> stops) {
+        if (stops.isEmpty()) {
+            stops.add(new SvgStop(SvgTransparentFill.INSTANCE.toColor(), 0));
+            stops.add(new SvgStop(SvgTransparentFill.INSTANCE.toColor(), 1));
+        } else if (stops.size() == 1) {
+            SvgStop stop0 = stops.get(0);
+            stop0.offset = 0;
+            stops.add(new SvgStop(stop0.color, 1));
+        }
+
+        double offset = 0;
+        for (SvgStop stop : stops) {
+            if (stop.offset < offset) {
+                stop.offset = offset;
+            }
+
+            if (stop.offset > 1) {
+                stop.offset = 1;
+            }
+
+            offset = stop.offset;
+        }
+
+        if (Math.abs(offset - 1) > epsilon) {
+            stops.add(new SvgStop(stops.get(stops.size() - 1).color, 1));
+        }
+
+        return stops;
     }
 
     private SvgFill parseFill(Map<String, Element> idMap, String fillStr, SvgStyle style) {
