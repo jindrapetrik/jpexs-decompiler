@@ -1966,8 +1966,16 @@ public class XFLConverter {
                     continue;
                 }
                 String embeddedCharacters = fontChars;
-                embeddedCharacters = embeddedCharacters.replace("\u00A0", ""); //nonbreak space
-                embeddedCharacters = embeddedCharacters.replace(".", "");
+                embeddedCharacters = embeddedCharacters.replace("\u00A0", ""); // nonbreak space
+                embeddedCharacters = embeddedCharacters.replace(".", ""); // todo: honfika: why?
+                for (char i = 0; i < 32; i++) {
+                    if (i == 9 || i == 10 || i == 13) {
+                        continue;
+                    }
+
+                    embeddedCharacters = embeddedCharacters.replace("" + i, ""); // not supported in xml
+                }
+
                 boolean hasAllRanges = false;
                 for (int r = 0; r < CharacterRanges.rangeCount(); r++) {
                     int[] codes = CharacterRanges.rangeCodes(r);
