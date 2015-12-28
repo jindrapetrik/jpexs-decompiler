@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.importers.svg;
 
-import com.sun.prism.paint.Color;
+import java.awt.Color;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,12 +47,16 @@ public class SvgStyleProperty {
         return inherited;
     }
 
+    public Object getInitialValue() {
+        return initial;
+    }
+
     private static final Map<String, SvgStyleProperty> properties;
 
     static {
         Map<String, SvgStyleProperty> p = new HashMap<>();
-        p.put("color", new SvgStyleProperty("color", true, null /* depends on user agent */));
-        p.put("fill", new SvgStyleProperty("fill", true, Color.BLACK));
+        p.put("color", new SvgStyleProperty("color", true, Color.BLACK /* depends on user agent */));
+        p.put("fill", new SvgStyleProperty("fill", true, new SvgColor(Color.BLACK)));
         p.put("fill-opacity", new SvgStyleProperty("fill-opacity", true, 1.0));
         p.put("stroke", new SvgStyleProperty("stroke", true, null));
         p.put("stroke-width", new SvgStyleProperty("stroke-width", true, 1.0));
