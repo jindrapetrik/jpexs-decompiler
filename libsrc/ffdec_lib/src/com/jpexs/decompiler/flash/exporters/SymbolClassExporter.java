@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.exporters;
 
 import com.jpexs.decompiler.flash.EventListener;
+import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.SymbolClassTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -39,7 +40,7 @@ public class SymbolClassExporter {
 
     public static final String SYMBOL_CLASS_EXPORT_FILENAME = "symbols.csv";
 
-    public List<File> exportNames(final String outdir, List<Tag> tags, EventListener evl) throws IOException {
+    public List<File> exportNames(final String outdir, ReadOnlyTagList tags, EventListener evl) throws IOException {
         List<File> ret = new ArrayList<>();
         int count = 0;
         for (Tag t : tags) {

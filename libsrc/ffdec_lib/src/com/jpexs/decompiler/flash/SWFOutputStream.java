@@ -506,7 +506,7 @@ public class SWFOutputStream extends OutputStream {
      * @param tags List of tag values
      * @throws IOException
      */
-    public void writeTags(List<Tag> tags) throws IOException {
+    public void writeTags(Iterable<Tag> tags) throws IOException {
         for (Tag tag : tags) {
             tag.writeTag(this);
         }

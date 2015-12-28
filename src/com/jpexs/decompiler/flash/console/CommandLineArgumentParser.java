@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
+import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFBundle;
 import com.jpexs.decompiler.flash.SWFCompression;
@@ -80,6 +81,7 @@ import com.jpexs.decompiler.flash.exporters.swf.SwfXmlExporter;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.helpers.CheckResources;
 import com.jpexs.decompiler.flash.helpers.FileTextWriter;
+import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.importers.AS2ScriptImporter;
 import com.jpexs.decompiler.flash.importers.AS3ScriptImporter;
 import com.jpexs.decompiler.flash.importers.BinaryDataImporter;
@@ -467,6 +469,11 @@ public class CommandLineArgumentParser {
             out.println("  ...WARNING: Injected/SWD script filenames may be different than from standard compiler");
         }
 
+        if (filter == null || filter.equals("custom")) {
+            out.println(" " + (cnt++) + ") -custom <customparameter1> [<customparameter2>]...");
+            out.println("  ...Forwards all parameters after the -custom parameter to the plugins");
+        }
+
         printCmdLineUsageExamples(out, filter);
     }
 
@@ -700,6 +707,8 @@ public class CommandLineArgumentParser {
             parseRemoveCharacter(args, true);
         } else if (command.equals("importscript")) {
             parseImportScript(args);
+        } else if (command.equals("importscript")) {
+            parseCustom(args);
         } else if (command.equals("as3compiler")) {
             ActionScript3Parser.compile(null /*?*/, args.pop(), args.pop(), 0, 0);
         } else if (nextParam.equals("--debugtool")) {
@@ -1098,7 +1107,7 @@ public class CommandLineArgumentParser {
                         swf.swfList = new SWFList();
                         swf.swfList.sourceInfo = sourceInfo;
                         boolean found = false;
-                        for (Tag tag : swf.tags) {
+                        for (Tag tag : swf.getTags()) {
                             if (tag.getId() == tagId) {
                                 found = true;
                                 break;
@@ -1140,7 +1149,7 @@ public class CommandLineArgumentParser {
                         swf.swfList = new SWFList();
                         swf.swfList.sourceInfo = sourceInfo;
                         boolean found = false;
-                        for (Tag tag : swf.tags) {
+                        for (Tag tag : swf.getTags()) {
                             if (tag instanceof JPEGTablesTag) {
                                 JPEGTablesTag jtt = (JPEGTablesTag) tag;
                                 if (ImageTag.hasErrorHeader(jtt.jpegData)) {
@@ -1326,7 +1335,7 @@ public class CommandLineArgumentParser {
                 }
 
                 List<Tag> extags = new ArrayList<>();
-                for (Tag t : swf.tags) {
+                for (Tag t : swf.getTags()) {
                     if (t instanceof CharacterIdTag) {
                         CharacterIdTag c = (CharacterIdTag) t;
                         if (selectionIds.contains(c.getCharacterId())) {
@@ -1385,37 +1394,37 @@ public class CommandLineArgumentParser {
 
                 if (exportAll || exportFormats.contains("image")) {
                     System.out.println("Exporting images...");
-                    new ImageExporter().exportImages(handler, outDir + (multipleExportTypes ? File.separator + ImageExportSettings.EXPORT_FOLDER_NAME : ""), extags, new ImageExportSettings(enumFromStr(formats.get("image"), ImageExportMode.class)), evl);
+                    new ImageExporter().exportImages(handler, outDir + (multipleExportTypes ? File.separator + ImageExportSettings.EXPORT_FOLDER_NAME : ""), new ReadOnlyTagList(extags), new ImageExportSettings(enumFromStr(formats.get("image"), ImageExportMode.class)), evl);
                 }
 
                 if (exportAll || exportFormats.contains("shape")) {
                     System.out.println("Exporting shapes...");
-                    new ShapeExporter().exportShapes(handler, outDir + (multipleExportTypes ? File.separator + ShapeExportSettings.EXPORT_FOLDER_NAME : ""), extags, new ShapeExportSettings(enumFromStr(formats.get("shape"), ShapeExportMode.class), zoom), evl);
+                    new ShapeExporter().exportShapes(handler, outDir + (multipleExportTypes ? File.separator + ShapeExportSettings.EXPORT_FOLDER_NAME : ""), new ReadOnlyTagList(extags), new ShapeExportSettings(enumFromStr(formats.get("shape"), ShapeExportMode.class), zoom), evl);
                 }
 
                 if (exportAll || exportFormats.contains("morphshape")) {
                     System.out.println("Exporting morphshapes...");
-                    new MorphShapeExporter().exportMorphShapes(handler, outDir + (multipleExportTypes ? File.separator + MorphShapeExportSettings.EXPORT_FOLDER_NAME : ""), extags, new MorphShapeExportSettings(enumFromStr(formats.get("morphshape"), MorphShapeExportMode.class), zoom), evl);
+                    new MorphShapeExporter().exportMorphShapes(handler, outDir + (multipleExportTypes ? File.separator + MorphShapeExportSettings.EXPORT_FOLDER_NAME : ""), new ReadOnlyTagList(extags), new MorphShapeExportSettings(enumFromStr(formats.get("morphshape"), MorphShapeExportMode.class), zoom), evl);
                 }
 
                 if (exportAll || exportFormats.contains("movie")) {
                     System.out.println("Exporting movies...");
-                    new MovieExporter().exportMovies(handler, outDir + (multipleExportTypes ? File.separator + MovieExportSettings.EXPORT_FOLDER_NAME : ""), extags, new MovieExportSettings(enumFromStr(formats.get("movie"), MovieExportMode.class)), evl);
+                    new MovieExporter().exportMovies(handler, outDir + (multipleExportTypes ? File.separator + MovieExportSettings.EXPORT_FOLDER_NAME : ""), new ReadOnlyTagList(extags), new MovieExportSettings(enumFromStr(formats.get("movie"), MovieExportMode.class)), evl);
                 }
 
                 if (exportAll || exportFormats.contains("font")) {
                     System.out.println("Exporting fonts...");
-                    new FontExporter().exportFonts(handler, outDir + (multipleExportTypes ? File.separator + FontExportSettings.EXPORT_FOLDER_NAME : ""), extags, new FontExportSettings(enumFromStr(formats.get("font"), FontExportMode.class)), evl);
+                    new FontExporter().exportFonts(handler, outDir + (multipleExportTypes ? File.separator + FontExportSettings.EXPORT_FOLDER_NAME : ""), new ReadOnlyTagList(extags), new FontExportSettings(enumFromStr(formats.get("font"), FontExportMode.class)), evl);
                 }
 
                 if (exportAll || exportFormats.contains("sound")) {
                     System.out.println("Exporting sounds...");
-                    new SoundExporter().exportSounds(handler, outDir + (multipleExportTypes ? File.separator + SoundExportSettings.EXPORT_FOLDER_NAME : ""), extags, new SoundExportSettings(enumFromStr(formats.get("sound"), SoundExportMode.class)), evl);
+                    new SoundExporter().exportSounds(handler, outDir + (multipleExportTypes ? File.separator + SoundExportSettings.EXPORT_FOLDER_NAME : ""), new ReadOnlyTagList(extags), new SoundExportSettings(enumFromStr(formats.get("sound"), SoundExportMode.class)), evl);
                 }
 
                 if (exportAll || exportFormats.contains("binarydata")) {
                     System.out.println("Exporting binaryData...");
-                    new BinaryDataExporter().exportBinaryData(handler, outDir + (multipleExportTypes ? File.separator + BinaryDataExportSettings.EXPORT_FOLDER_NAME : ""), extags, new BinaryDataExportSettings(enumFromStr(formats.get("binarydata"), BinaryDataExportMode.class)), evl);
+                    new BinaryDataExporter().exportBinaryData(handler, outDir + (multipleExportTypes ? File.separator + BinaryDataExportSettings.EXPORT_FOLDER_NAME : ""), new ReadOnlyTagList(extags), new BinaryDataExportSettings(enumFromStr(formats.get("binarydata"), BinaryDataExportMode.class)), evl);
                 }
 
                 if (exportAll || exportFormats.contains("text")) {
@@ -1424,7 +1433,7 @@ public class CommandLineArgumentParser {
                     if (singleTextFile == null) {
                         singleTextFile = Configuration.textExportSingleFile.get();
                     }
-                    new TextExporter().exportTexts(handler, outDir + (multipleExportTypes ? File.separator + TextExportSettings.EXPORT_FOLDER_NAME : ""), extags, new TextExportSettings(enumFromStr(formats.get("text"), TextExportMode.class), singleTextFile, zoom), evl);
+                    new TextExporter().exportTexts(handler, outDir + (multipleExportTypes ? File.separator + TextExportSettings.EXPORT_FOLDER_NAME : ""), new ReadOnlyTagList(extags), new TextExportSettings(enumFromStr(formats.get("text"), TextExportMode.class), singleTextFile, zoom), evl);
                 }
 
                 FrameExporter frameExporter = new FrameExporter();
@@ -1883,7 +1892,7 @@ public class CommandLineArgumentParser {
             SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
             int totalPages = 0;
 
-            for (Tag t : swf.tags) {
+            for (Tag t : swf.getTags()) {
                 if (t instanceof DefineSpriteTag) {
                     DefineSpriteTag ds = (DefineSpriteTag) t;
                     if ("page1".equals(ds.getExportName())) {
@@ -1898,7 +1907,7 @@ public class CommandLineArgumentParser {
 
             int page = 0;
 
-            for (Tag t : swf.tags) {
+            for (Tag t : swf.getTags()) {
                 if (t instanceof DefineSpriteTag) {
                     DefineSpriteTag ds = (DefineSpriteTag) t;
                     if ("page1".equals(ds.getExportName())) {
@@ -2378,8 +2387,8 @@ public class CommandLineArgumentParser {
                         System.err.println("Tag number should be integer");
                         System.exit(1);
                     }
-                    if (tagNo < 0 || tagNo >= swf.tags.size()) {
-                        System.err.println("Tag number does not exist. Tag number should be between 0 and " + (swf.tags.size() - 1));
+                    if (tagNo < 0 || tagNo >= swf.getTags().size()) {
+                        System.err.println("Tag number does not exist. Tag number should be between 0 and " + (swf.getTags().size() - 1));
                         System.exit(1);
                     }
 
@@ -2394,7 +2403,7 @@ public class CommandLineArgumentParser {
 
                 Collections.sort(tagNumbersToRemove);
                 for (int i = tagNumbersToRemove.size() - 1; i >= 0; i--) {
-                    swf.tags.remove((int) tagNumbersToRemove.get(i));
+                    swf.removeTag((int) tagNumbersToRemove.get(i));
                 }
 
                 try {
@@ -2487,6 +2496,15 @@ public class CommandLineArgumentParser {
             System.err.println("I/O error during reading");
             System.exit(2);
         }
+    }
+
+    private static void parseCustom(Stack<String> args) {
+        String[] customParameters = new String[args.size()];
+        for (int i = 0; i < customParameters.length; i++) {
+            customParameters[i] = args.pop();
+        }
+
+        SWFDecompilerPlugin.customParameters = customParameters;
     }
 
     private static void replaceAS2PCode(String text, ASMSource src) throws IOException, InterruptedException {
@@ -2705,7 +2723,7 @@ public class CommandLineArgumentParser {
         pw.println("height=" + doubleToString(swf.displayRect.getHeight() / SWF.unitDivisor));
         pw.println("frameCount=" + swf.frameCount);
         pw.println("frameRate=" + doubleToString(swf.frameRate));
-        for (Tag t : swf.tags) {
+        for (Tag t : swf.getTags()) {
             if (t instanceof SetBackgroundColorTag) {
                 pw.println("backgroundColor=" + ((SetBackgroundColorTag) t).backgroundColor.toHexRGB());
             }
@@ -2717,7 +2735,7 @@ public class CommandLineArgumentParser {
         pw.println();
 
         pw.println("[tags]");
-        pw.println("tagCount=" + swf.tags.size());
+        pw.println("tagCount=" + swf.getTags().size());
         pw.println("hasEndTag=" + swf.hasEndTag);
         pw.println("characterCount=" + (swf.getCharacters().size()));
         pw.println("maxCharacterId=" + (swf.getNextCharacterId() - 1));

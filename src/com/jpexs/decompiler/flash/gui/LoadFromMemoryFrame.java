@@ -140,7 +140,7 @@ public class LoadFromMemoryFrame extends AppFrame {
                         long limit = pmi.getPos();
                         is.seek(0);
                         is = new ReReadableInputStream(new LimitedInputStream(is, limit));
-                        if (swf.fileSize > 0 && swf.version > 0 && !swf.tags.isEmpty() && swf.version < 25/*Needs to be fixed when SWF versions reaches this value*/) {
+                        if (swf.fileSize > 0 && swf.version > 0 && !swf.getTags().isEmpty() && swf.version < 25/*Needs to be fixed when SWF versions reaches this value*/) {
                             SwfInMemory s = new SwfInMemory(is, swf.version, swf.fileSize, proc);
                             String p = translate("swfitem").replace("%version%", Integer.toString(swf.version)).replace("%size%", Long.toString(swf.fileSize));
                             publish(s);

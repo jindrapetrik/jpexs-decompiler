@@ -34,6 +34,7 @@ import com.jpexs.decompiler.flash.helpers.BMPFile;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
+import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.timeline.DepthState;
@@ -144,7 +145,7 @@ public class FrameExporter {
 
     public List<File> exportFrames(AbortRetryIgnoreHandler handler, String outdir, final SWF swf, int containerId, List<Integer> frames, final FrameExportSettings settings, final EventListener evl) throws IOException, InterruptedException {
         final List<File> ret = new ArrayList<>();
-        if (swf.tags.isEmpty()) {
+        if (swf.getTags().isEmpty()) {
             return ret;
         }
         Timeline tim0;
@@ -180,7 +181,8 @@ public class FrameExporter {
         if (settings.mode == FrameExportMode.SVG) {
             for (int i = 0; i < frames.size(); i++) {
                 if (evl != null) {
-                    evl.handleExportingEvent("frame", i + 1, frames.size(), tim.parentTag == null ? "" : tim.parentTag.getName());
+                    Tag parentTag = tim.getParentTag();
+                    evl.handleExportingEvent("frame", i + 1, frames.size(), parentTag == null ? "" : parentTag.getName());
                 }
 
                 final int fi = i;
@@ -205,7 +207,8 @@ public class FrameExporter {
                 }, handler).run();
 
                 if (evl != null) {
-                    evl.handleExportedEvent("frame", i + 1, frames.size(), tim.parentTag == null ? "" : tim.parentTag.getName());
+                    Tag parentTag = tim.getParentTag();
+                    evl.handleExportedEvent("frame", i + 1, frames.size(), parentTag == null ? "" : parentTag.getName());
                 }
             }
 
@@ -214,7 +217,8 @@ public class FrameExporter {
 
         if (settings.mode == FrameExportMode.CANVAS) {
             if (evl != null) {
-                evl.handleExportingEvent("canvas", 1, 1, tim.parentTag == null ? "" : tim.parentTag.getName());
+                Tag parentTag = tim.getParentTag();
+                evl.handleExportingEvent("canvas", 1, 1, parentTag == null ? "" : parentTag.getName());
             }
 
             final Timeline ftim = tim;
@@ -319,7 +323,8 @@ public class FrameExporter {
             }, handler).run();
 
             if (evl != null) {
-                evl.handleExportedEvent("canvas", 1, 1, tim.parentTag == null ? "" : tim.parentTag.getName());
+                Tag parentTag = tim.getParentTag();
+                evl.handleExportedEvent("canvas", 1, 1, parentTag == null ? "" : parentTag.getName());
             }
             return ret;
         }
@@ -346,14 +351,17 @@ public class FrameExporter {
                     return null;
                 }
 
+                Tag parentTag = tim.getParentTag();
+                String tagName = parentTag == null ? "" : parentTag.getName();
+
                 if (evl != null) {
-                    evl.handleExportingEvent("frame", pos + 1, fframes.size(), tim.parentTag == null ? "" : tim.parentTag.getName());
+                    evl.handleExportingEvent("frame", pos + 1, fframes.size(), tagName);
                 }
 
                 BufferedImage result = SWF.frameToImageGet(ftim, fframes.get(pos++), 0, null, 0, ftim.displayRect, new Matrix(), new ColorTransform(), fbackgroundColor, false, settings.zoom).getBufferedImage();
 
                 if (evl != null) {
-                    evl.handleExportedEvent("frame", pos, fframes.size(), tim.parentTag == null ? "" : tim.parentTag.getName());
+                    evl.handleExportedEvent("frame", pos, fframes.size(), tagName);
                 }
 
                 return result;

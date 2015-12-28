@@ -56,7 +56,7 @@ public class ActionScript3ExecuteTest {
          swf = new SWF(is, false);
          }*/
         DoABC2Tag tag = null;
-        for (Tag t : swf.tags) {
+        for (Tag t : swf.getTags()) {
             if (t instanceof DoABC2Tag) {
                 tag = (DoABC2Tag) t;
                 break;

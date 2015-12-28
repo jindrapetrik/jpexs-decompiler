@@ -142,6 +142,7 @@ public class SwfXmlImporter {
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
             Document doc = docBuilder.parse(new InputSource(new StringReader(xml)));
             processElement(doc.getDocumentElement(), swf, swf, null);
+            swf.clearAllCache();
         } catch (ParserConfigurationException | SAXException ex) {
             logger.log(Level.SEVERE, null, ex);
         }

@@ -85,7 +85,7 @@ public class RecompileTest extends FileTestBase {
         try {
             Configuration.debugCopy.set(false);
             SWF swf = new SWF(new BufferedInputStream(new FileInputStream(filePath)), false, false);
-            for (Tag tag : swf.tags) {
+            for (Tag tag : swf.getTags()) {
                 if (!(tag instanceof TagStub)) {
                     Tag tag2 = tag.cloneTag();
                     if (tag2 instanceof TagStub) {

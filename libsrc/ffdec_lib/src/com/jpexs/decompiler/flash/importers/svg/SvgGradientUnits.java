@@ -14,25 +14,13 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash;
-
-import com.jpexs.decompiler.flash.tags.DoActionTag;
-import com.jpexs.decompiler.flash.tags.Tag;
+package com.jpexs.decompiler.flash.importers.svg;
 
 /**
  *
  * @author JPEXS
  */
-public class ActionScript2TestBase extends ActionScriptTestBase {
+enum SvgGradientUnits {
 
-    protected SWF swf;
-
-    protected DoActionTag getFirstActionTag() {
-        for (Tag t : swf.getTags()) {
-            if (t instanceof DoActionTag) {
-                return (DoActionTag) t;
-            }
-        }
-        return null;
-    }
+    USER_SPACE_ON_USE, OBJECT_BOUNDING_BOX
 }

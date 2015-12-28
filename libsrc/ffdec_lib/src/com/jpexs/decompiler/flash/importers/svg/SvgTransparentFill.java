@@ -14,25 +14,25 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash;
+package com.jpexs.decompiler.flash.importers.svg;
 
-import com.jpexs.decompiler.flash.tags.DoActionTag;
-import com.jpexs.decompiler.flash.tags.Tag;
+import java.awt.Color;
 
 /**
  *
  * @author JPEXS
  */
-public class ActionScript2TestBase extends ActionScriptTestBase {
+class SvgTransparentFill extends SvgFill {
 
-    protected SWF swf;
+    private static final Color TRANSPARENT = new Color(0, true);
 
-    protected DoActionTag getFirstActionTag() {
-        for (Tag t : swf.getTags()) {
-            if (t instanceof DoActionTag) {
-                return (DoActionTag) t;
-            }
-        }
-        return null;
+    public static SvgTransparentFill INSTANCE = new SvgTransparentFill();
+
+    private SvgTransparentFill() {
+    }
+
+    @Override
+    public Color toColor() {
+        return TRANSPARENT;
     }
 }

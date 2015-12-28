@@ -396,12 +396,12 @@ public class DefineFont3Tag extends FontTag {
     public void addCharacter(char character, Font font) {
 
         //Font Align Zones will be removed as adding new character zones is not supported:-(
-        for (int i = 0; i < swf.tags.size(); i++) {
-            Tag t = swf.tags.get(i);
+        for (int i = 0; i < swf.getTags().size(); i++) {
+            Tag t = swf.getTags().get(i);
             if (t instanceof DefineFontAlignZonesTag) {
                 DefineFontAlignZonesTag fa = (DefineFontAlignZonesTag) t;
                 if (fa.fontID == fontId) {
-                    swf.tags.remove(i);
+                    swf.removeTag(t);
                     i--;
                 }
             }
@@ -467,7 +467,7 @@ public class DefineFont3Tag extends FontTag {
     }
 
     @Override
-    public String getCharacters(List<Tag> tags) {
+    public String getCharacters() {
         StringBuilder ret = new StringBuilder();
         for (int i : codeTable) {
             ret.append((char) i);

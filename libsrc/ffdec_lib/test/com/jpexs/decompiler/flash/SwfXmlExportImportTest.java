@@ -99,13 +99,13 @@ public class SwfXmlExportImportTest extends FileTestBase {
             SWF swf2 = new SWF();
             new SwfXmlImporter().importSwf(swf2, xml);
 
-            if (swf.tags.size() != swf2.tags.size()) {
+            if (swf.getTags().size() != swf2.getTags().size()) {
                 throw new NotSameException(0);
             }
 
-            for (int i = 0; i < swf.tags.size(); i++) {
-                Tag oldTag = swf.tags.get(i);
-                Tag newTag = swf2.tags.get(i);
+            for (int i = 0; i < swf.getTags().size(); i++) {
+                Tag oldTag = swf.getTags().get(i);
+                Tag newTag = swf2.getTags().get(i);
                 if (oldTag.getClass() != newTag.getClass()) {
                     throw new NotSameException(0);
                 }
@@ -113,12 +113,12 @@ public class SwfXmlExportImportTest extends FileTestBase {
                 if (oldTag instanceof DefineSpriteTag) {
                     DefineSpriteTag oldSprite = (DefineSpriteTag) oldTag;
                     DefineSpriteTag newSprite = (DefineSpriteTag) newTag;
-                    if (oldSprite.subTags.size() != newSprite.subTags.size()) {
+                    if (oldSprite.getTags().size() != newSprite.getTags().size()) {
                         throw new NotSameException(0);
                     }
 
-                    for (int k = 0; k < oldSprite.subTags.size(); k++) {
-                        compareTags(oldSprite.subTags.get(k), newSprite.subTags.get(k));
+                    for (int k = 0; k < oldSprite.getTags().size(); k++) {
+                        compareTags(oldSprite.getTags().get(k), newSprite.getTags().get(k));
                     }
                 } else if (!(oldTag instanceof FontTag)) {
                     compareTags(oldTag, newTag);

@@ -52,6 +52,8 @@ public class SWFDecompilerPlugin {
 
     private static final List<SWFDecompilerListener> listeners = new ArrayList<>();
 
+    public static String[] customParameters = new String[0];
+
     public static File getPluginsDir() {
         File pluginPath = null;
 

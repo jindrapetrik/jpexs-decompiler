@@ -42,7 +42,7 @@ public class SymbolClassImporter {
             nameMap.put(characterId, name);
         }
 
-        for (Tag tag : swf.tags) {
+        for (Tag tag : swf.getTags()) {
             if (tag instanceof ExportAssetsTag) {
                 ExportAssetsTag eat = (ExportAssetsTag) tag;
                 for (int i = 0; i < eat.tags.size(); i++) {

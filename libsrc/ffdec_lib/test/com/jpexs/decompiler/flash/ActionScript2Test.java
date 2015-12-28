@@ -66,7 +66,7 @@ public class ActionScript2Test extends ActionScript2TestBase {
         int f = 0;
         DoActionTag lastDoa = null;
 
-        for (Tag t : swf.tags) {
+        for (Tag t : swf.getTags()) {
             if (t instanceof DoActionTag) {
                 lastDoa = (DoActionTag) t;
             }

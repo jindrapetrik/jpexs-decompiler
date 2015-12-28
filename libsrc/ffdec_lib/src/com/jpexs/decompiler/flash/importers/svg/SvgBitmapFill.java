@@ -14,25 +14,22 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash;
+package com.jpexs.decompiler.flash.importers.svg;
 
-import com.jpexs.decompiler.flash.tags.DoActionTag;
-import com.jpexs.decompiler.flash.tags.Tag;
+import java.awt.Color;
 
 /**
  *
  * @author JPEXS
  */
-public class ActionScript2TestBase extends ActionScriptTestBase {
+class SvgBitmapFill extends SvgFill {
 
-    protected SWF swf;
+    public String patternTransform;
 
-    protected DoActionTag getFirstActionTag() {
-        for (Tag t : swf.getTags()) {
-            if (t instanceof DoActionTag) {
-                return (DoActionTag) t;
-            }
-        }
-        return null;
+    public int characterId;
+
+    @Override
+    public Color toColor() {
+        return Color.BLACK;
     }
 }

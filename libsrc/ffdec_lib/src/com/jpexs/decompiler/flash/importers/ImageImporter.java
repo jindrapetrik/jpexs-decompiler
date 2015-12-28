@@ -96,7 +96,7 @@ public class ImageImporter extends TagImporter {
             }
 
             imageTag.setModified(true);
-            swf.tags.set(swf.tags.indexOf(it), imageTag);
+            swf.replaceTag(it, imageTag);
             swf.updateCharacters();
             return imageTag;
         }

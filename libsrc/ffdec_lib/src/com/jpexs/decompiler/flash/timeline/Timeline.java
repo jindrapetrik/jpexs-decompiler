@@ -70,13 +70,9 @@ public class Timeline {
 
     public Timelined timelined;
 
-    public Tag parentTag;
-
     public int maxDepth;
 
     public int fontFrameNum = -1;
-
-    public List<Tag> tags;
 
     private final List<Frame> frames = new ArrayList<>();
 
@@ -135,11 +131,15 @@ public class Timeline {
         return soundStramBlocks.get(head);
     }
 
-    public void reset(SWF swf) {
-        reset(swf, null, swf.tags, 0, swf.displayRect);
+    public Tag getParentTag() {
+        return timelined instanceof Tag ? (Tag) timelined : null;
     }
 
-    public void reset(SWF swf, Tag parentTag, List<Tag> tags, int id, RECT displayRect) {
+    public void reset(SWF swf) {
+        reset(swf, swf, 0, swf.displayRect);
+    }
+
+    public void reset(SWF swf, Timelined timelined, int id, RECT displayRect) {
         initialized = false;
         frames.clear();
         depthMaxFrame.clear();
@@ -152,9 +152,7 @@ public class Timeline {
         this.swf = swf;
         this.displayRect = displayRect;
         this.frameRate = swf.frameRate;
-        this.timelined = parentTag == null ? swf : (Timelined) parentTag;
-        this.parentTag = parentTag;
-        this.tags = tags;
+        this.timelined = timelined;
         as2RootPackage = new AS2Package(null, null, swf);
     }
 
@@ -207,17 +205,15 @@ public class Timeline {
     }
 
     public Timeline(SWF swf) {
-        this(swf, null, swf.tags, 0, swf.displayRect);
+        this(swf, swf, 0, swf.displayRect);
     }
 
-    public Timeline(SWF swf, Tag parentTag, List<Tag> tags, int id, RECT displayRect) {
+    public Timeline(SWF swf, Timelined timelined, int id, RECT displayRect) {
         this.id = id;
         this.swf = swf;
         this.displayRect = displayRect;
         this.frameRate = swf.frameRate;
-        this.timelined = parentTag == null ? swf : (Timelined) parentTag;
-        this.parentTag = parentTag;
-        this.tags = tags;
+        this.timelined = timelined;
         as2RootPackage = new AS2Package(null, null, swf);
     }
 
@@ -226,7 +222,7 @@ public class Timeline {
         Frame frame = new Frame(this, frameIdx++);
         frame.layersChanged = true;
         boolean newFrameNeeded = false;
-        for (Tag t : tags) {
+        for (Tag t : timelined.getTags()) {
             boolean isNested = ShowFrameTag.isNestedTagType(t.getId());
             if (isNested) {
                 newFrameNeeded = true;
@@ -348,9 +344,9 @@ public class Timeline {
         calculateMaxDepthFrames();
 
         createASPackages();
-        if (parentTag == null) {
+        if (timelined instanceof SWF) {
             // popuplate only for main timeline
-            populateSoundStreamBlocks(0, tags);
+            populateSoundStreamBlocks(0, timelined.getTags());
         }
 
         initialized = true;
@@ -433,7 +429,7 @@ public class Timeline {
         }
     }
 
-    private void populateSoundStreamBlocks(int containerId, List<Tag> tags) {
+    private void populateSoundStreamBlocks(int containerId, Iterable<Tag> tags) {
         List<SoundStreamBlockTag> blocks = null;
         for (Tag t : tags) {
             if (t instanceof SoundStreamHeadTypeTag) {
@@ -446,7 +442,7 @@ public class Timeline {
 
             if (t instanceof DefineSpriteTag) {
                 DefineSpriteTag sprite = (DefineSpriteTag) t;
-                populateSoundStreamBlocks(sprite.getCharacterId(), sprite.getSubTags());
+                populateSoundStreamBlocks(sprite.getCharacterId(), sprite.getTags());
             }
 
             if (blocks == null) {
@@ -487,8 +483,8 @@ public class Timeline {
 
     public boolean replaceCharacter(int oldCharacterId, int newCharacterId) {
         boolean modified = false;
-        for (int i = 0; i < tags.size(); i++) {
-            Tag t = tags.get(i);
+        for (int i = 0; i < timelined.getTags().size(); i++) {
+            Tag t = timelined.getTags().get(i);
             if (t instanceof CharacterIdTag && ((CharacterIdTag) t).getCharacterId() == oldCharacterId) {
                 ((CharacterIdTag) t).setCharacterId(newCharacterId);
                 ((Tag) t).setModified(true);
@@ -500,10 +496,10 @@ public class Timeline {
 
     public boolean removeCharacter(int characterId) {
         boolean modified = false;
-        for (int i = 0; i < tags.size(); i++) {
-            Tag t = tags.get(i);
+        for (int i = 0; i < timelined.getTags().size(); i++) {
+            Tag t = timelined.getTags().get(i);
             if (t instanceof CharacterIdTag && ((CharacterIdTag) t).getCharacterId() == characterId) {
-                tags.remove(i);
+                timelined.removeTag(i);
                 i--;
                 modified = true;
             }
@@ -726,7 +722,7 @@ public class Timeline {
     public boolean equals(Object obj) {
         if (obj instanceof Timeline) {
             Timeline timelineObj = (Timeline) obj;
-            return timelined.equals(timelineObj.timelined) && parentTag == timelineObj.parentTag;
+            return timelined.equals(timelineObj.timelined);
         }
 
         return false;

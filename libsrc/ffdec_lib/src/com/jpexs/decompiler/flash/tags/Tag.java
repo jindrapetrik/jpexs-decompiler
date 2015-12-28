@@ -152,7 +152,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         if (deep) {
             if (this instanceof DefineSpriteTag) {
                 DefineSpriteTag sprite = (DefineSpriteTag) this;
-                for (Tag subTag : sprite.subTags) {
+                for (Tag subTag : sprite.getTags()) {
                     subTag.setSwf(swf);
                 }
             }
@@ -426,6 +426,10 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         return SWFInputStream.resolveTag(copy, 0, false, true, false);
     }
 
+    public boolean canUndo() {
+        return originalRange != null && isModified();
+    }
+
     public void undo() throws InterruptedException, IOException {
         byte[] data = getOriginalData();
         if (data == null) { //If the tag is newly created in GUI it has no original data
@@ -534,8 +538,9 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
     }
 
     public void setModified(boolean value) {
+        boolean oldValue = modified;
         modified = value;
-        if (value) {
+        if (value && oldValue != value) {
             informListeners();
         }
     }
@@ -607,7 +612,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
     }
 
     public void getDependentCharacters(Set<Integer> dependent) {
-        for (Tag tag : swf.tags) {
+        for (Tag tag : swf.getTags()) {
             if (tag instanceof CharacterTag) {
                 Set<Integer> needed = new HashSet<>();
                 tag.getNeededCharactersDeep(needed);

@@ -478,9 +478,9 @@ public class TagTreeContextMenu extends JPopupMenu {
         SWF sourceSwf = items.get(0).getSwf();
         for (TreeItem item : items) {
             Tag tag = (Tag) item;
-            sourceSwf.tags.remove(tag);
+            sourceSwf.removeTag(tag);
             tag.setSwf(targetSwf, true);
-            targetSwf.tags.add(tag);
+            targetSwf.addTag(tag);
             chechUniqueCharacterId(tag);
             targetSwf.updateCharacters();
             tag.setModified(true);
@@ -505,7 +505,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 Tag tag = (Tag) item;
                 Tag copyTag = tag.cloneTag();
                 copyTag.setSwf(targetSwf, true);
-                targetSwf.tags.add(copyTag);
+                targetSwf.addTag(copyTag);
                 chechUniqueCharacterId(copyTag);
                 targetSwf.updateCharacters();
                 copyTag.setModified(true);
@@ -546,7 +546,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                     if (!copiedTags.contains(neededTag)) {
                         copyTag = neededTag.cloneTag();
                         copyTag.setSwf(targetSwf, true);
-                        targetSwf.tags.add(copyTag);
+                        targetSwf.addTag(copyTag);
                         int oldCharacterId = neededTag.getCharacterId();
                         int newCharacterId = chechUniqueCharacterId(copyTag);
                         changedCharacterIds.put(oldCharacterId, newCharacterId);
@@ -561,7 +561,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
                 copyTag = tag.cloneTag();
                 copyTag.setSwf(targetSwf, true);
-                targetSwf.tags.add(copyTag);
+                targetSwf.addTag(copyTag);
                 if (tag instanceof CharacterTag) {
                     CharacterTag characterTag = (CharacterTag) copyTag;
                     int oldCharacterId = characterTag.getCharacterId();

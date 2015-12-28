@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.exporters;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.EventListener;
+import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
@@ -48,7 +49,7 @@ public class TextExporter {
 
     public static final String TEXT_EXPORT_FILENAME_PLAIN = "textsplain.txt";
 
-    public List<File> exportTexts(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final TextExportSettings settings, EventListener evl) throws IOException, InterruptedException {
+    public List<File> exportTexts(AbortRetryIgnoreHandler handler, String outdir, ReadOnlyTagList tags, final TextExportSettings settings, EventListener evl) throws IOException, InterruptedException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;

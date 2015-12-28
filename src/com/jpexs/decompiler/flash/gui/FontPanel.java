@@ -134,8 +134,7 @@ public class FontPanel extends JPanel {
 
     private void fontAddChars(FontTag ft, Set<Integer> selChars, Font font) {
         FontTag f = (FontTag) mainPanel.tagTree.getCurrentTreeItem();
-        SWF swf = ft.getSwf();
-        String oldchars = f.getCharacters(swf.tags);
+        String oldchars = f.getCharacters();
         for (int ic : selChars) {
             char c = (char) ic;
             if (oldchars.indexOf((int) c) == -1) {
@@ -182,7 +181,8 @@ public class FontPanel extends JPanel {
 
         int fontId = ft.getFontId();
         if (updateTextsCheckBox.isSelected()) {
-            for (Tag tag : swf.tags) {
+            SWF swf = ft.getSwf();
+            for (Tag tag : swf.getTags()) {
                 if (tag instanceof TextTag) {
                     TextTag textTag = (TextTag) tag;
                     if (textTag.getFontIds().contains(fontId)) {
@@ -208,7 +208,7 @@ public class FontPanel extends JPanel {
         fontDescentLabel.setText(ft.getDescent() == -1 ? translate("value.unknown") : Integer.toString(ft.getDescent()));
         fontAscentLabel.setText(ft.getAscent() == -1 ? translate("value.unknown") : Integer.toString(ft.getAscent()));
         fontLeadingLabel.setText(ft.getLeading() == -1 ? translate("value.unknown") : Integer.toString(ft.getLeading()));
-        String chars = ft.getCharacters(swf.tags);
+        String chars = ft.getCharacters();
         fontCharactersTextArea.setText(chars);
         fontCharactersScrollPane.getVerticalScrollBar().scrollRectToVisible(new Rectangle(0, 0, 1, 1));
         setAllowSave(false);

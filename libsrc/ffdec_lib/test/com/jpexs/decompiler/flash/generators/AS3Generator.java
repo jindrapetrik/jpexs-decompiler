@@ -49,7 +49,7 @@ public class AS3Generator {
         Configuration.autoDeobfuscate.set(false);
         SWF swf = new SWF(new BufferedInputStream(new FileInputStream("testdata/as3/as3.swf")), false);
         DoABC2Tag tag = null;
-        for (Tag t : swf.tags) {
+        for (Tag t : swf.getTags()) {
             if (t instanceof DoABC2Tag) {
                 tag = (DoABC2Tag) t;
                 break;

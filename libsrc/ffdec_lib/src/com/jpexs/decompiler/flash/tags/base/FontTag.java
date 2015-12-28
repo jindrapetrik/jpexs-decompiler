@@ -153,7 +153,7 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
         return fontStyle;
     }
 
-    public abstract String getCharacters(List<Tag> tags);
+    public abstract String getCharacters();
 
     @Override
     public String getName() {
@@ -209,7 +209,7 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
     }
 
     protected void shiftGlyphIndices(int fontId, int startIndex) {
-        for (Tag t : swf.tags) {
+        for (Tag t : swf.getTags()) {
             List<TEXTRECORD> textRecords = null;
             if (t instanceof StaticTextTag) {
                 textRecords = ((StaticTextTag) t).textRecords;
@@ -379,7 +379,7 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
     }
 
     public DefineFontNameTag getFontNameTag() {
-        for (Tag t : swf.tags) {
+        for (Tag t : swf.getTags()) {
             if (t instanceof DefineFontNameTag) {
                 DefineFontNameTag dfn = (DefineFontNameTag) t;
                 if (dfn.fontId == getFontId()) {

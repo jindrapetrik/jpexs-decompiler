@@ -80,12 +80,6 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
      */
     public List<BUTTONCONDACTION> actions = new ArrayList<>();
 
-    private Timeline timeline;
-
-    private boolean isSingleFrameInitialized;
-
-    private boolean isSingleFrame;
-
     /**
      * Constructor
      *
@@ -258,40 +252,7 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
     }
 
     @Override
-    public boolean isSingleFrame() {
-        if (!isSingleFrameInitialized) {
-            initialiteIsSingleFrame();
-        }
-        return isSingleFrame;
-    }
-
-    private synchronized void initialiteIsSingleFrame() {
-        if (!isSingleFrameInitialized) {
-            isSingleFrame = getTimeline().isSingleFrame();
-            isSingleFrameInitialized = true;
-        }
-    }
-
-    @Override
-    public Timeline getTimeline() {
-        if (timeline != null) {
-            return timeline;
-        }
-
-        timeline = new Timeline(swf, this, new ArrayList<>(), buttonId, getRect());
-        initTimeline(timeline);
-        return timeline;
-    }
-
-    @Override
-    public void resetTimeline() {
-        if (timeline != null) {
-            timeline.reset(swf, this, new ArrayList<>(), buttonId, getRect());
-            initTimeline(timeline);
-        }
-    }
-
-    private void initTimeline(Timeline timeline) {
+    protected void initTimeline(Timeline timeline) {
         int maxDepth = 0;
         Frame frameUp = new Frame(timeline, 0);
         Frame frameDown = new Frame(timeline, 0);

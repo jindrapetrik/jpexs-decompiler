@@ -14,25 +14,27 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash;
+package com.jpexs.decompiler.flash.importers.svg;
 
-import com.jpexs.decompiler.flash.tags.DoActionTag;
-import com.jpexs.decompiler.flash.tags.Tag;
+import java.awt.Color;
 
 /**
  *
  * @author JPEXS
  */
-public class ActionScript2TestBase extends ActionScriptTestBase {
+class SvgStop implements Comparable<SvgStop> {
 
-    protected SWF swf;
+    public Color color;
 
-    protected DoActionTag getFirstActionTag() {
-        for (Tag t : swf.getTags()) {
-            if (t instanceof DoActionTag) {
-                return (DoActionTag) t;
-            }
-        }
-        return null;
+    public double offset;
+
+    public SvgStop(Color color, double offset) {
+        this.color = color;
+        this.offset = offset;
+    }
+
+    @Override
+    public int compareTo(SvgStop o) {
+        return (int) Math.signum(offset - o.offset);
     }
 }

@@ -16,11 +16,13 @@
  */
 package com.jpexs.decompiler.flash.tags.base;
 
+import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.tags.DefineButtonSoundTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import com.jpexs.decompiler.flash.types.ColorTransform;
@@ -46,6 +48,12 @@ public abstract class ButtonTag extends CharacterTag implements DrawableTag, Tim
     public static int FRAME_DOWN = 2;
 
     public static int FRAME_HITTEST = 3;
+
+    private Timeline timeline;
+
+    private boolean isSingleFrameInitialized;
+
+    private boolean isSingleFrame;
 
     public ButtonTag(SWF swf, int id, String name, ByteArrayRange data) {
         super(swf, id, name, data);
@@ -81,7 +89,7 @@ public abstract class ButtonTag extends CharacterTag implements DrawableTag, Tim
     }
 
     public DefineButtonSoundTag getSounds() {
-        for (Tag t : swf.tags) {
+        for (Tag t : swf.getTags()) {
             if (t instanceof DefineButtonSoundTag) {
                 DefineButtonSoundTag st = (DefineButtonSoundTag) t;
                 if (st.buttonId == getCharacterId()) {
@@ -95,5 +103,62 @@ public abstract class ButtonTag extends CharacterTag implements DrawableTag, Tim
     @Override
     public void toHtmlCanvas(StringBuilder result, double unitDivisor) {
         getTimeline().toHtmlCanvas(result, unitDivisor, Arrays.asList(0)); //TODO: handle states?
+    }
+
+    @Override
+    public boolean isSingleFrame() {
+        if (!isSingleFrameInitialized) {
+            initialiteIsSingleFrame();
+        }
+        return isSingleFrame;
+    }
+
+    private synchronized void initialiteIsSingleFrame() {
+        if (!isSingleFrameInitialized) {
+            isSingleFrame = getTimeline().isSingleFrame();
+            isSingleFrameInitialized = true;
+        }
+    }
+
+    @Override
+    public Timeline getTimeline() {
+        if (timeline != null) {
+            return timeline;
+        }
+
+        timeline = new Timeline(swf, this, getCharacterId(), getRect());
+        initTimeline(timeline);
+        return timeline;
+    }
+
+    @Override
+    public void resetTimeline() {
+        if (timeline != null) {
+            timeline.reset(swf, this, getCharacterId(), getRect());
+            initTimeline(timeline);
+        }
+    }
+
+    protected abstract void initTimeline(Timeline timeline);
+
+    @Override
+    public ReadOnlyTagList getTags() {
+        return ReadOnlyTagList.EMPTY;
+    }
+
+    @Override
+    public void removeTag(int index) {
+    }
+
+    @Override
+    public void removeTag(Tag tag) {
+    }
+
+    @Override
+    public void addTag(Tag tag) {
+    }
+
+    @Override
+    public void addTag(int index, Tag tag) {
     }
 }
