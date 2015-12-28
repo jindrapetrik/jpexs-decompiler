@@ -81,6 +81,7 @@ import com.jpexs.decompiler.flash.exporters.swf.SwfXmlExporter;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.helpers.CheckResources;
 import com.jpexs.decompiler.flash.helpers.FileTextWriter;
+import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.importers.AS2ScriptImporter;
 import com.jpexs.decompiler.flash.importers.AS3ScriptImporter;
 import com.jpexs.decompiler.flash.importers.BinaryDataImporter;
@@ -468,6 +469,11 @@ public class CommandLineArgumentParser {
             out.println("  ...WARNING: Injected/SWD script filenames may be different than from standard compiler");
         }
 
+        if (filter == null || filter.equals("custom")) {
+            out.println(" " + (cnt++) + ") -custom <customparameter1> [<customparameter2>]...");
+            out.println("  ...Forwards all parameters after the -custom parameter to the plugins");
+        }
+
         printCmdLineUsageExamples(out, filter);
     }
 
@@ -701,6 +707,8 @@ public class CommandLineArgumentParser {
             parseRemoveCharacter(args, true);
         } else if (command.equals("importscript")) {
             parseImportScript(args);
+        } else if (command.equals("importscript")) {
+            parseCustom(args);
         } else if (command.equals("as3compiler")) {
             ActionScript3Parser.compile(null /*?*/, args.pop(), args.pop(), 0, 0);
         } else if (nextParam.equals("--debugtool")) {
@@ -2488,6 +2496,15 @@ public class CommandLineArgumentParser {
             System.err.println("I/O error during reading");
             System.exit(2);
         }
+    }
+
+    private static void parseCustom(Stack<String> args) {
+        String[] customParameters = new String[args.size()];
+        for (int i = 0; i < customParameters.length; i++) {
+            customParameters[i] = args.pop();
+        }
+
+        SWFDecompilerPlugin.customParameters = customParameters;
     }
 
     private static void replaceAS2PCode(String text, ASMSource src) throws IOException, InterruptedException {
