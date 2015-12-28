@@ -1508,7 +1508,7 @@ public class SvgImporter {
 
         scr.lineStyles = new LINESTYLEARRAY();
         SvgFill strokeFill = style.getStrokeFillWithOpacity();
-        if (strokeFill != null) {
+        if (strokeFill != null && strokeFill != SvgTransparentFill.INSTANCE) {
             Color lineColor = strokeFill.toColor();
 
             scr.lineStyles.lineStyles = new LINESTYLE[1];
