@@ -367,6 +367,13 @@ public class ActionPush extends Action {
                 ConstantIndex constantIndex = (ConstantIndex) value;
                 List<String> cPool = lda.constantPool != null ? lda.constantPool : constantPool;
                 lda.stack.push(constantIndex.toStringNoQ(cPool, true));
+            } else if (value instanceof RegisterNumber) {
+                int rn = ((RegisterNumber) value).number;
+                if (lda.localRegisters.containsKey(rn)) {
+                    lda.stack.push(lda.localRegisters.get(rn));
+                } else {
+                    lda.stack.push(Undefined.INSTANCE);
+                }
             } else {
                 lda.stack.push(value);
             }

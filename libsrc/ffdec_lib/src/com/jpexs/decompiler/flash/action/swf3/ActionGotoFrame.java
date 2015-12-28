@@ -19,6 +19,8 @@ package com.jpexs.decompiler.flash.action.swf3;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.DisplayObject;
+import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.GotoFrameActionItem;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
@@ -42,6 +44,12 @@ public class ActionGotoFrame extends Action {
     public ActionGotoFrame(int frame) {
         super(0x81, 2);
         this.frame = frame;
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda) {
+        ((DisplayObject) lda.target).gotoFrame(frame);
+        return true;
     }
 
     public ActionGotoFrame(int actionLength, SWFInputStream sis) throws IOException {

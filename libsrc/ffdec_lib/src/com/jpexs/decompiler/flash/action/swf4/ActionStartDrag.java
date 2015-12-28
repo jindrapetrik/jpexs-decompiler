@@ -18,6 +18,8 @@ package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.DisplayObject;
+import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.StartDragActionItem;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
@@ -41,6 +43,14 @@ public class ActionStartDrag extends Action {
     @Override
     public String toString() {
         return "StartDrag";
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda) {
+        if (lda.target instanceof DisplayObject) {
+            ((DisplayObject) lda.target).startDrag();
+        }
+        return true;
     }
 
     @Override

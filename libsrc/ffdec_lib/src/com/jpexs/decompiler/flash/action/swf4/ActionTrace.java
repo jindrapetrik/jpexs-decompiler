@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.TraceActionItem;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -40,6 +41,12 @@ public class ActionTrace extends Action {
     @Override
     public String toString() {
         return "Trace";
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda) {
+        lda.stage.trace(lda.pop());
+        return true;
     }
 
     @Override

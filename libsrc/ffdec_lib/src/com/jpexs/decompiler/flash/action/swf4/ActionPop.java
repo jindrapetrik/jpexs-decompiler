@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -34,6 +35,15 @@ public class ActionPop extends Action {
 
     public ActionPop() {
         super(0x17, 0);
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda) {
+        if (lda.stack.isEmpty()) {
+            return false;
+        }
+        lda.stack.pop();
+        return true;
     }
 
     @Override

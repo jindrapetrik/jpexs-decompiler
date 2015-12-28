@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.swf3;
 
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.ToggleHighQualityActionItem;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -39,6 +40,12 @@ public class ActionToggleQuality extends Action {
     @Override
     public String toString() {
         return "ToggleQuality";
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda) {
+        lda.stage.toggleQuality();
+        return true;
     }
 
     @Override

@@ -18,7 +18,11 @@ package com.jpexs.decompiler.flash.action.swf7;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.ActionScriptObject;
+import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.CastOpActionItem;
+import com.jpexs.decompiler.flash.action.swf6.ActionInstanceOf;
+import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -40,6 +44,21 @@ public class ActionCastOp extends Action {
     @Override
     public String toString() {
         return "CastOp";
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda) {
+        if (lda.stack.size() < 2) {
+            return false;
+        }
+        ActionScriptObject obj = (ActionScriptObject) lda.pop();
+        ActionScriptObject constr = (ActionScriptObject) lda.pop();
+        if (ActionInstanceOf.getInstanceOfResult(obj, constr)) {
+            lda.stack.push(obj);
+        } else {
+            lda.stack.push(Null.INSTANCE);
+        }
+        return true;
     }
 
     @Override

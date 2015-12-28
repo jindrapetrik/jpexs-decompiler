@@ -18,7 +18,10 @@ package com.jpexs.decompiler.flash.action.swf6;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.ActionScriptObject;
+import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.EnumerateActionItem;
+import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -51,5 +54,22 @@ public class ActionEnumerate2 extends Action {
     @Override
     public int getStackPopCount(BaseLocalData localData, TranslateStack stack) {
         return 1;
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda) {
+        if (lda.stack.isEmpty()) {
+            return false;
+        }
+        Object o = lda.pop();
+        lda.stack.push(Null.INSTANCE);
+
+        if (o instanceof ActionScriptObject) {
+            List<String> members = ((ActionScriptObject) o).enumerate();
+            for (String m : members) {
+                lda.stack.push(m);
+            }
+        }
+        return true;
     }
 }

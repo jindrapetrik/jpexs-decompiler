@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.GetTimeActionItem;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -40,6 +41,12 @@ public class ActionGetTime extends Action {
     @Override
     public String toString() {
         return "GetTime";
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda) {
+        lda.stack.push(lda.stage.getTime());
+        return true;
     }
 
     @Override

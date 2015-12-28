@@ -19,6 +19,8 @@ package com.jpexs.decompiler.flash.action.swf3;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.DisplayObject;
+import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.GotoLabelActionItem;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
@@ -51,6 +53,12 @@ public class ActionGoToLabel extends Action {
         //byte[] data = sis.readBytes(actionLength);
         //sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         label = sis.readString("label");
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda) {
+        ((DisplayObject) lda.target).gotoLabel(label);
+        return true;
     }
 
     @Override

@@ -18,7 +18,10 @@ package com.jpexs.decompiler.flash.action.swf5;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.ActionScriptObject;
+import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.DeleteActionItem;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -40,6 +43,16 @@ public class ActionDelete extends Action {
     @Override
     public String toString() {
         return "Delete";
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda) {
+        String memberName = lda.popAsString();
+        Object o = lda.pop();
+        if (o instanceof ActionScriptObject) {
+            ((ActionScriptObject) o).setMember(memberName, Undefined.INSTANCE);
+        }
+        return true;
     }
 
     @Override

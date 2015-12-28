@@ -18,6 +18,9 @@ package com.jpexs.decompiler.flash.action.swf5;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.ActionScriptFunction;
+import com.jpexs.decompiler.flash.action.ActionScriptObject;
+import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.NewMethodActionItem;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -41,6 +44,28 @@ public class ActionNewMethod extends Action {
     @Override
     public String toString() {
         return "NewMethod";
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda) {
+        if (lda.stack.size() < 3) {
+            return false;
+        }
+        String methodName = lda.popAsString();
+        ActionScriptObject obj = (ActionScriptObject) lda.pop();
+        int numArgs = (int) (double) lda.popAsNumber();
+        if (lda.stack.size() < numArgs) {
+            return false;
+        }
+        List<Object> args = new ArrayList<>();
+        for (int i = 0; i < numArgs; i++) {
+            args.add(lda.pop());
+        }
+        ActionScriptObject nobj = new ActionScriptObject();
+
+        ((ActionScriptFunction) obj.getMember(methodName)).execute(nobj, args);
+        lda.stack.push(nobj);
+        return true;
     }
 
     @Override

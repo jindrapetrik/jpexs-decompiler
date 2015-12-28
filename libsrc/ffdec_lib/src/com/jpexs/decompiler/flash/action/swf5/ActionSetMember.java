@@ -18,6 +18,8 @@ package com.jpexs.decompiler.flash.action.swf5;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.ActionScriptObject;
+import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.DecrementActionItem;
 import com.jpexs.decompiler.flash.action.model.GetMemberActionItem;
 import com.jpexs.decompiler.flash.action.model.IncrementActionItem;
@@ -49,6 +51,20 @@ public class ActionSetMember extends Action {
     @Override
     public String toString() {
         return "SetMember";
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda) {
+        if (lda.stack.size() < 3) {
+            return false;
+        }
+        Object value = lda.pop();
+        String memberName = lda.popAsString();
+        Object obj = lda.pop();
+        if (obj instanceof ActionScriptObject) {
+            ((ActionScriptObject) obj).setMember(memberName, value);
+        }
+        return true;
     }
 
     @Override

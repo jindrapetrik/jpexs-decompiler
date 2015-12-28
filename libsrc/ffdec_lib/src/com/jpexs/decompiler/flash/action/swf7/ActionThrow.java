@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.swf7;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.ThrowActionItem;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -40,6 +41,12 @@ public class ActionThrow extends Action {
     @Override
     public String toString() {
         return "Throw";
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda) {
+        //FIXME!!!
+        return false;
     }
 
     @Override

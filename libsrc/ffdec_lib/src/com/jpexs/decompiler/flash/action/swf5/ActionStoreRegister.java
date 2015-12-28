@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.StoreTypeAction;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.model.DecrementActionItem;
@@ -32,6 +33,7 @@ import com.jpexs.decompiler.flash.action.model.TemporaryRegister;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
@@ -49,6 +51,17 @@ import java.util.List;
 public class ActionStoreRegister extends Action implements StoreTypeAction {
 
     public int registerNumber;
+
+    @Override
+    public boolean execute(LocalDataArea lda) {
+        if (lda.stack.size() < 1) {
+            return false;
+        }
+
+        Object value = lda.pop();
+        lda.localRegisters.put(registerNumber, value);
+        return true;
+    }
 
     public ActionStoreRegister(int registerNumber) {
         super(0x87, 1);

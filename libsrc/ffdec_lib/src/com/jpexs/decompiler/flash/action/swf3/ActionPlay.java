@@ -17,6 +17,8 @@
 package com.jpexs.decompiler.flash.action.swf3;
 
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.DisplayObject;
+import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.GotoFrame2ActionItem;
 import com.jpexs.decompiler.flash.action.model.GotoFrameActionItem;
@@ -42,6 +44,12 @@ public class ActionPlay extends Action {
     @Override
     public String toString() {
         return "Play";
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda) {
+        ((DisplayObject) lda.target).play();
+        return true;
     }
 
     @Override

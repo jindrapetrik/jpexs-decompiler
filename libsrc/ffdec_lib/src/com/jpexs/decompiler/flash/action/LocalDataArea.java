@@ -17,9 +17,12 @@
 package com.jpexs.decompiler.flash.action;
 
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.flash.ecma.Undefined;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 /**
@@ -32,7 +35,17 @@ public class LocalDataArea {
 
     public Stack<Object> stack = new Stack<>();
 
-    public HashMap<String, Object> localVariables = new HashMap<>();
+    public List<Object> functions = new ArrayList<>();
+
+    public Map<String, Object> localVariables = new HashMap<>();
+
+    public List<ActionScriptWith> withs = new ArrayList<>();
+
+    public Map<Integer, Object> localRegisters = new HashMap<>();
+
+    public Object target;
+
+    public Stage stage;
 
     public Long jump;
 
@@ -40,10 +53,14 @@ public class LocalDataArea {
 
     public String executionException;
 
-    public LocalDataArea() {
+    public LocalDataArea(Stage stage) {
+        this.stage = stage;
+        this.target = this.stage;
     }
 
-    public LocalDataArea(boolean preserveVariableOrder) {
+    public LocalDataArea(Stage stage, boolean preserveVariableOrder) {
+        this.stage = stage;
+        target = this.stage;
         if (preserveVariableOrder) {
             localVariables = new LinkedHashMap<>();
         }
@@ -56,6 +73,7 @@ public class LocalDataArea {
         jump = null;
         returnValue = null;
         executionException = null;
+        target = stage;
     }
 
     public Object pop() {
@@ -64,5 +82,9 @@ public class LocalDataArea {
 
     public Double popAsNumber() {
         return EcmaScript.toNumberAs2(stack.pop());
+    }
+
+    public String popAsString() {
+        return EcmaScript.toString(stack.pop());
     }
 }

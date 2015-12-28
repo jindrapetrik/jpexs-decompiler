@@ -18,6 +18,8 @@ package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.ActionScriptObject;
+import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.DecrementActionItem;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.GetPropertyActionItem;
@@ -29,6 +31,7 @@ import com.jpexs.decompiler.flash.action.model.StoreRegisterActionItem;
 import com.jpexs.decompiler.flash.action.model.TemporaryRegister;
 import com.jpexs.decompiler.flash.action.model.operations.PreDecrementActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.PreIncrementActionItem;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -50,6 +53,21 @@ public class ActionSetProperty extends Action {
     @Override
     public String toString() {
         return "SetProperty";
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda) {
+        if (lda.stack.size() < 3) {
+            return false;
+        }
+        Object value = lda.pop();
+        int index = (int) (double) lda.popAsNumber();
+        String target = lda.popAsString();
+        Object member = lda.stage.getMember(target);
+        if (member instanceof ActionScriptObject) {
+            ((ActionScriptObject) member).setProperty(index, value);
+        }
+        return true;
     }
 
     @Override

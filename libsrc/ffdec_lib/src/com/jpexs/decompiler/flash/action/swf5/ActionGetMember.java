@@ -18,7 +18,10 @@ package com.jpexs.decompiler.flash.action.swf5;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.ActionScriptObject;
+import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.GetMemberActionItem;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -43,10 +46,25 @@ public class ActionGetMember extends Action {
     }
 
     @Override
+    public boolean execute(LocalDataArea lda) {
+        if (lda.stack.size() < 2) {
+            return false;
+        }
+        String membername = lda.popAsString();
+        Object obj = lda.pop();
+        if (obj instanceof ActionScriptObject) {
+            lda.stack.push(((ActionScriptObject) obj).getMember(membername));
+        } else {
+            lda.stack.push(Undefined.INSTANCE);
+        }
+        return true;
+    }
+
+    @Override
     public void translate(GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
-        GraphTargetItem functionName = stack.pop();
+        GraphTargetItem memberName = stack.pop();
         GraphTargetItem object = stack.pop();
-        stack.push(new GetMemberActionItem(this, lineStartAction, object, functionName));
+        stack.push(new GetMemberActionItem(this, lineStartAction, object, memberName));
     }
 
     @Override

@@ -20,6 +20,9 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
+import com.jpexs.decompiler.flash.action.ActionScriptObject;
+import com.jpexs.decompiler.flash.action.ActionScriptWith;
+import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.clauses.WithActionItem;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
@@ -49,6 +52,17 @@ public class ActionWith extends Action implements GraphSourceItemContainer {
     public ActionWith(int codeSize) {
         super(0x94, 2);
         this.codeSize = codeSize;
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda) {
+        if (lda.stack.isEmpty()) {
+            return false;
+        }
+        ActionScriptObject obj = (ActionScriptObject) lda.pop();
+        ActionScriptWith w = new ActionScriptWith(obj, fileOffset, codeSize);
+        lda.withs.add(w);
+        return true;
     }
 
     @Override

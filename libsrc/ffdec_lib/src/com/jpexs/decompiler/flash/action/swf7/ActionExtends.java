@@ -18,6 +18,8 @@ package com.jpexs.decompiler.flash.action.swf7;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.ActionScriptObject;
+import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.ExtendsActionItem;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -40,6 +42,24 @@ public class ActionExtends extends Action {
     @Override
     public String toString() {
         return "Extends";
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda) {
+        if (lda.stack.size() < 2) {
+            return false;
+        }
+        //TODO: check if its really ActionScriptObject ?
+        ActionScriptObject superClass = (ActionScriptObject) lda.pop();
+        ActionScriptObject subClass = (ActionScriptObject) lda.pop();
+        ActionScriptObject newClass = new ActionScriptObject();
+        newClass.setMember("proto", superClass.getMember("prototype"));
+        newClass.setMember("constructor", superClass);
+        subClass.setMember("prototype", newClass);
+
+        subClass.setExtendsObj(superClass);
+
+        return true;
     }
 
     @Override

@@ -17,6 +17,8 @@
 package com.jpexs.decompiler.flash.action.swf3;
 
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.DisplayObject;
+import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.StopActionItem;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -39,6 +41,12 @@ public class ActionStop extends Action {
     @Override
     public String toString() {
         return "Stop";
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda) {
+        ((DisplayObject) lda.target).pause();
+        return true;
     }
 
     @Override

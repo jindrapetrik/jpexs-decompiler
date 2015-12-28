@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.ActionListReader;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
+import com.jpexs.decompiler.flash.action.Stage;
 import com.jpexs.decompiler.flash.action.fastactionlist.ActionItem;
 import com.jpexs.decompiler.flash.action.fastactionlist.FastActionList;
 import com.jpexs.decompiler.flash.action.fastactionlist.FastActionListIterator;
@@ -195,7 +196,7 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
         actions.removeZeroJumps();
 
         ActionConstantPool cPool = getConstantPool(actions);
-        LocalDataArea localData = new LocalDataArea(true);
+        LocalDataArea localData = new LocalDataArea(new Stage(), true);
         localData.stack = new FixItemCounterStack();
         ExecutionResult result = new ExecutionResult();
         FastActionListIterator iterator = actions.iterator();
@@ -222,7 +223,8 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
                     newIstructionCount++;
                 }
 
-                newIstructionCount += 3 * result.variables.size(); /* 2x Push + Set or Define */
+                newIstructionCount += 3 * result.variables.size();
+                /* 2x Push + Set or Define */
 
                 boolean allValueValid = true;
                 for (Object value : result.variables.values()) {
@@ -381,7 +383,7 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
 
         Map<String, Object> results = new HashMap<>();
 
-        LocalDataArea localData = new LocalDataArea();
+        LocalDataArea localData = new LocalDataArea(new Stage());
         localData.stack = new FixItemCounterStack();
         ExecutionResult result = new ExecutionResult();
         for (ActionItem actionItem : actions) {
@@ -505,10 +507,8 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
                 } else {
                     break;
                 }
-            } else {
-                if (!action.execute(localData)) {
-                    break;
-                }
+            } else if (!action.execute(localData)) {
+                break;
             }
 
             if (!useVariables && (action instanceof ActionDefineLocal

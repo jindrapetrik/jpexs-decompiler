@@ -18,7 +18,9 @@ package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.CallActionItem;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -44,6 +46,12 @@ public class ActionCall extends Action {
     @Override
     public String toString() {
         return "Call";
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda) {
+        lda.stage.callFrame(EcmaScript.toInt32(lda.stack.pop()));
+        return true;
     }
 
     @Override

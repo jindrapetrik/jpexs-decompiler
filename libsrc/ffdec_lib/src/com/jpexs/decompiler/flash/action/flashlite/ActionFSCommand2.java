@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.flashlite;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.FSCommand2ActionItem;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -66,4 +67,10 @@ public class ActionFSCommand2 extends Action {
     public int getStackPushCount(BaseLocalData localData, TranslateStack stack) {
         return 1;
     }
+
+    @Override
+    public boolean execute(LocalDataArea lda) {
+        return true; //TODO?
+    }
+
 }

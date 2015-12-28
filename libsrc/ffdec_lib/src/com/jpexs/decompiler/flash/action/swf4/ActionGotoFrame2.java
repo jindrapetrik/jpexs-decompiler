@@ -20,9 +20,12 @@ import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.DisplayObject;
+import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.GotoFrame2ActionItem;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -102,6 +105,41 @@ public class ActionGotoFrame2 extends Action {
         if (sceneBiasFlag) {
             sceneBias = (int) lexLong(lexer);
         }
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda) {
+        if (lda.stack.size() < 1) {
+            return false;
+        }
+        String frame = EcmaScript.toString(lda.stack.pop());
+        String target = "/";
+        if (frame.contains(":")) {
+            target = frame.substring(0, frame.indexOf(":"));
+            frame = frame.substring(frame.indexOf(":") + 1);
+        }
+        if (frame.matches("[1-9][0-9]*|0")) {
+            int frameNum = Integer.parseInt(frame);
+            if (target.equals("/")) {
+                lda.stage.gotoFrame(frameNum);
+            } else {
+                Object member = lda.stage.getMember(target);
+                if (member instanceof DisplayObject) {
+                    ((DisplayObject) member).gotoFrame(frameNum);
+                }
+            }
+        } else {
+            String frameLabel = frame;
+            if (target.equals("/")) {
+                lda.stage.gotoLabel(frameLabel);
+            } else {
+                Object member = lda.stage.getMember(target);
+                if (member instanceof DisplayObject) {
+                    ((DisplayObject) member).gotoLabel(frameLabel);
+                }
+            }
+        }
+        return true;
     }
 
     @Override

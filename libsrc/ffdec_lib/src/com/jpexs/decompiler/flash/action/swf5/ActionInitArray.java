@@ -18,6 +18,8 @@ package com.jpexs.decompiler.flash.action.swf5;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.ActionScriptArray;
+import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.InitArrayActionItem;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -36,6 +38,23 @@ public class ActionInitArray extends Action {
 
     public ActionInitArray() {
         super(0x42, 0);
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda) {
+        if (lda.stack.isEmpty()) {
+            return false;
+        }
+        int num = (int) (double) lda.popAsNumber();
+        if (lda.stack.size() < num) {
+            return false;
+        }
+        ActionScriptArray arr = new ActionScriptArray();
+        for (int i = 0; i < num; i++) {
+            arr.setValueAtIndex(i, lda.stack.pop());
+        }
+        lda.stack.push(arr);
+        return true;
     }
 
     @Override

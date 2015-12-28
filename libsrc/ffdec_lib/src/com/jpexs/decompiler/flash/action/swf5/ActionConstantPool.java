@@ -113,6 +113,7 @@ public class ActionConstantPool extends Action {
 
     @Override
     public boolean execute(LocalDataArea lda) {
+        lda.constantPool = constantPool;
         return true;
     }
 

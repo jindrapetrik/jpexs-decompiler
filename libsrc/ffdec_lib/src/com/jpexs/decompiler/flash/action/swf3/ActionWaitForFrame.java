@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraph;
 import com.jpexs.decompiler.flash.action.ActionList;
+import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.clauses.IfFrameLoadedActionItem;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
@@ -50,6 +51,12 @@ public class ActionWaitForFrame extends Action implements ActionStore {
     public int skipCount;
 
     public List<Action> skipped;
+
+    @Override
+    public boolean execute(LocalDataArea lda) {
+        //it's already loaded. TODO: check real loaded?
+        return true;
+    }
 
     public ActionWaitForFrame(int actionLength, SWFInputStream sis) throws IOException {
         super(0x8A, actionLength);

@@ -17,6 +17,8 @@
 package com.jpexs.decompiler.flash.action.swf3;
 
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.DisplayObject;
+import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.PrevFrameActionItem;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -39,6 +41,15 @@ public class ActionPrevFrame extends Action {
     @Override
     public String toString() {
         return "PrevFrame";
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda) {
+        int f = ((DisplayObject) lda.target).getCurrentFrame();
+        if (f > 1) {
+            ((DisplayObject) lda.target).gotoFrame(f - 1);
+        }
+        return true;
     }
 
     @Override

@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.swf4.ActionRandomNumber;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -26,6 +27,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
+import java.util.Random;
 
 /**
  *
@@ -33,8 +35,14 @@ import java.util.List;
  */
 public class RandomNumberActionItem extends ActionItem {
 
+    private static Random rnd = new Random();
+
     public RandomNumberActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem maximum) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY, maximum);
+    }
+
+    public static Integer getResult(Object maximum) {
+        return rnd.nextInt(EcmaScript.toInt32(maximum));
     }
 
     @Override

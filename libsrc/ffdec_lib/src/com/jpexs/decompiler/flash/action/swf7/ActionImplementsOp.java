@@ -18,6 +18,8 @@ package com.jpexs.decompiler.flash.action.swf7;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.ActionScriptObject;
+import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.ImplementsOpActionItem;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -41,6 +43,25 @@ public class ActionImplementsOp extends Action {
     @Override
     public String toString() {
         return "ImplementsOp";
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda) {
+        if (lda.stack.size() < 2) {
+            return false;
+        }
+        //TODO: check if its really scriptobject?
+        ActionScriptObject obj = (ActionScriptObject) lda.pop();
+        int num = (int) (double) lda.popAsNumber();
+        List<Object> interfaces = new ArrayList<>();
+        if (lda.stack.size() < num) {
+            return false;
+        }
+        for (int i = 0; i < num; i++) {
+            interfaces.add(lda.stack.pop());
+        }
+        obj.setImplementsObjs(interfaces);
+        return true;
     }
 
     @Override
