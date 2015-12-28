@@ -240,6 +240,18 @@ public final class Matrix implements Cloneable {
                 + rotateSkew1 + ", " + scaleY + ", " + translateX + ", " + translateY + ")";
     }
 
+    public static String[] parseSvgNumberList(String params) {
+        while (params.contains("  ")) {
+            params = params.replaceAll("  ", " ");
+        }
+
+        params = params.trim();
+        params = params.replace(", ", ",");
+        params = params.replace(" ", ",");
+        String[] args = params.split(",");
+        return args;
+    }
+
     public static Matrix parseSvgMatrix(String transformStr, double translateDivisor, double unitDivisor) {
         Matrix ret = new Matrix();
         while (transformStr != null && transformStr.length() > 0) {
@@ -247,14 +259,7 @@ public final class Matrix implements Cloneable {
             transformStr = transformStr.substring(funcName.length() + 1);
             String params = transformStr.split("\\)")[0];
             transformStr = transformStr.substring(params.length() + 1).trim();
-            while (params.contains("  ")) {
-                params = params.replaceAll("  ", " ");
-            }
-
-            params = params.trim();
-            params = params.replace(", ", ",");
-            params = params.replace(" ", ",");
-            String[] args = params.split(",");
+            String[] args = parseSvgNumberList(params);
             funcName = funcName.trim();
             switch (funcName) {
                 case "matrix":

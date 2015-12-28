@@ -50,6 +50,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -84,6 +85,8 @@ public class SvgImporter {
 
     ShapeTag shapeTag;
 
+    private Rectangle2D.Double viewBox;
+
     public Tag importSvg(ShapeTag st, String svgXml) {
         return importSvg(st, svgXml, true);
     }
@@ -100,6 +103,7 @@ public class SvgImporter {
         int shapeNum = st.getShapeNum();
         shapes.shapeRecords = new ArrayList<>();
 
+        Rectangle2D.Double viewBox = null;
         try {
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
             /*docFactory.setValidating(false);
@@ -120,6 +124,46 @@ public class SvgImporter {
                 throw new IOException("SVG root element should be 'svg'");
             }
 
+            double width = 800;
+            double height = 600;
+
+            if (rootElement.hasAttribute("viewBox")) {
+                String params = rootElement.getAttribute("viewBox");
+                String[] args = Matrix.parseSvgNumberList(params);
+                viewBox = new Rectangle2D.Double();
+                if (args.length > 0) {
+                    viewBox.x = parseNumber(args[0]);
+                }
+                if (args.length > 1) {
+                    viewBox.y = parseNumber(args[1]);
+                }
+                if (args.length > 2) {
+                    viewBox.width = parseNumber(args[2]);
+                }
+                if (args.length > 3) {
+                    viewBox.height = parseNumber(args[3]);
+                }
+
+                width = viewBox.width;
+                height = viewBox.height;
+            }
+
+            if (rootElement.hasAttribute("width")) {
+                width = parseLength(rootElement.getAttribute("width"), width);
+            }
+
+            if (rootElement.hasAttribute("height")) {
+                height = parseLength(rootElement.getAttribute("height"), height);
+            }
+
+            if (viewBox == null) {
+                viewBox = new Rectangle2D.Double();
+                viewBox.width = width;
+                viewBox.height = height;
+            }
+
+            this.viewBox = viewBox;
+
             SvgStyle style = new SvgStyle(this, idMap, rootElement);
             Matrix transform = new Matrix();
             processSvgObject(idMap, shapeNum, shapes, rootElement, transform, style);
@@ -137,11 +181,11 @@ public class SvgImporter {
         rect.Ymin -= origYmin;
         rect.Ymax -= origYmin;
 
-        if (!fill) {
-            // todo: how to calulate the real SVG size?
-            RECT bounds = shapes.getBounds();
-            rect.Xmax = rect.Xmin + bounds.Xmax - Math.min(0, bounds.Xmin);
-            rect.Ymax = rect.Ymin + bounds.Ymax - Math.min(0, bounds.Ymin);
+        if (!fill && viewBox != null) {
+            rect.Xmin = (int) Math.round(viewBox.x * SWF.unitDivisor);
+            rect.Ymin = (int) Math.round(viewBox.y * SWF.unitDivisor);
+            rect.Xmax = (int) Math.round((viewBox.x + viewBox.width) * SWF.unitDivisor);
+            rect.Ymax = (int) Math.round((viewBox.y + viewBox.height) * SWF.unitDivisor);
         }
 
         st.shapes = shapes;
@@ -694,29 +738,29 @@ public class SvgImporter {
 
     private void processCircle(int shapeNum, SHAPEWITHSTYLE shapes, Element childElement, Matrix transform, SvgStyle style) {
         String attr = childElement.getAttribute("cx");
-        double cx = attr.length() > 0 ? parseCoordinate(attr, 100/* todo: how much is 100%? */) : 0;
+        double cx = attr.length() > 0 ? parseCoordinate(attr, viewBox.width) : 0;
 
         attr = childElement.getAttribute("cy");
-        double cy = attr.length() > 0 ? parseCoordinate(attr, 100/* todo: how much is 100%? */) : 0;
+        double cy = attr.length() > 0 ? parseCoordinate(attr, viewBox.height) : 0;
 
         attr = childElement.getAttribute("r");
-        double r = attr.length() > 0 ? parseLength(attr, 100/* todo: how much is 100%? */) : 0;
+        double r = attr.length() > 0 ? parseLength(attr, viewBox.width/* todo: how much is 100%? */) : 0;
 
         processEllipse(shapeNum, shapes, transform, style, cx, cy, r, r);
     }
 
     private void processEllipse(int shapeNum, SHAPEWITHSTYLE shapes, Element childElement, Matrix transform, SvgStyle style) {
         String attr = childElement.getAttribute("cx");
-        double cx = attr.length() > 0 ? parseCoordinate(attr, 100/* todo: how much is 100%? */) : 0;
+        double cx = attr.length() > 0 ? parseCoordinate(attr, viewBox.width) : 0;
 
         attr = childElement.getAttribute("cy");
-        double cy = attr.length() > 0 ? parseCoordinate(attr, 100/* todo: how much is 100%? */) : 0;
+        double cy = attr.length() > 0 ? parseCoordinate(attr, viewBox.height) : 0;
 
         attr = childElement.getAttribute("rx");
-        double rx = attr.length() > 0 ? parseLength(attr, 100/* todo: how much is 100%? */) : 0;
+        double rx = attr.length() > 0 ? parseLength(attr, viewBox.width) : 0;
 
         attr = childElement.getAttribute("ry");
-        double ry = attr.length() > 0 ? parseLength(attr, 100/* todo: how much is 100%? */) : 0;
+        double ry = attr.length() > 0 ? parseLength(attr, viewBox.height) : 0;
 
         processEllipse(shapeNum, shapes, transform, style, cx, cy, rx, ry);
     }
@@ -781,22 +825,22 @@ public class SvgImporter {
 
     private void processRect(int shapeNum, SHAPEWITHSTYLE shapes, Element childElement, Matrix transform, SvgStyle style) {
         String attr = childElement.getAttribute("x");
-        double x = attr.length() > 0 ? parseCoordinate(attr, 100/* todo: how much is 100%? */) : 0;
+        double x = attr.length() > 0 ? parseCoordinate(attr, viewBox.width) : 0;
 
         attr = childElement.getAttribute("y");
-        double y = attr.length() > 0 ? parseCoordinate(attr, 100/* todo: how much is 100%? */) : 0;
+        double y = attr.length() > 0 ? parseCoordinate(attr, viewBox.height) : 0;
 
         attr = childElement.getAttribute("width");
-        double width = attr.length() > 0 ? parseLength(attr, 100/* todo: how much is 100%? */) : 0;
+        double width = attr.length() > 0 ? parseLength(attr, viewBox.width) : 0;
 
         attr = childElement.getAttribute("height");
-        double height = attr.length() > 0 ? parseLength(attr, 100/* todo: how much is 100%? */) : 0;
+        double height = attr.length() > 0 ? parseLength(attr, viewBox.height) : 0;
 
         attr = childElement.getAttribute("rx");
-        double rx = attr.length() > 0 ? parseLength(attr, 100/* todo: how much is 100%? */) : 0;
+        double rx = attr.length() > 0 ? parseLength(attr, viewBox.width) : 0;
 
         attr = childElement.getAttribute("ry");
-        double ry = attr.length() > 0 ? parseLength(attr, 100/* todo: how much is 100%? */) : 0;
+        double ry = attr.length() > 0 ? parseLength(attr, viewBox.height) : 0;
 
         if (rx == 0 && ry != 0) {
             rx = ry;
@@ -892,16 +936,16 @@ public class SvgImporter {
 
     private void processLine(int shapeNum, SHAPEWITHSTYLE shapes, Element childElement, Matrix transform, SvgStyle style) {
         String attr = childElement.getAttribute("x1");
-        double x1 = attr.length() > 0 ? parseCoordinate(attr, 100/* todo: how much is 100%? */) : 0;
+        double x1 = attr.length() > 0 ? parseCoordinate(attr, viewBox.width) : 0;
 
         attr = childElement.getAttribute("y1");
-        double y1 = attr.length() > 0 ? parseCoordinate(attr, 100/* todo: how much is 100%? */) : 0;
+        double y1 = attr.length() > 0 ? parseCoordinate(attr, viewBox.height) : 0;
 
         attr = childElement.getAttribute("x2");
-        double x2 = attr.length() > 0 ? parseCoordinate(attr, 100/* todo: how much is 100%? */) : 0;
+        double x2 = attr.length() > 0 ? parseCoordinate(attr, viewBox.width) : 0;
 
         attr = childElement.getAttribute("y2");
-        double y2 = attr.length() > 0 ? parseCoordinate(attr, 100/* todo: how much is 100%? */) : 0;
+        double y2 = attr.length() > 0 ? parseCoordinate(attr, viewBox.height) : 0;
 
         List<PathCommand> pathCommands = new ArrayList<>();
         PathCommand scr = new PathCommand();
@@ -1572,6 +1616,15 @@ public class SvgImporter {
             }
         }
 
+        return result;
+    }
+
+    public double parseNumber(String value) {
+        if (value == null) {
+            throw new NumberFormatException();
+        }
+
+        double result = Double.parseDouble(value);
         return result;
     }
 
