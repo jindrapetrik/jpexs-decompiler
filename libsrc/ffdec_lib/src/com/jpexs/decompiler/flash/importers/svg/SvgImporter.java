@@ -1303,33 +1303,11 @@ public class SvgImporter {
                 SvgLinearGradient lgfill = (SvgLinearGradient) fill;
                 fillStyle.fillStyleType = FILLSTYLE.LINEAR_GRADIENT;
                 fillStyle.gradient = new GRADIENT();
-                double x1;
-                if (lgfill.x1.endsWith("%")) {
-                    x1 = Double.parseDouble(lgfill.x1.substring(0, lgfill.x1.length() - 1)) / 100;
-                } else {
-                    x1 = Double.parseDouble(lgfill.x1);
-                }
-                //x1 = x1 - (-819.2);
+                double x1 = parseCoordinate(lgfill.x1, 1/* todo: how much is 100%? */);
+                double y1 = parseCoordinate(lgfill.y1, 1/* todo: how much is 100%? */);
+                double x2 = parseCoordinate(lgfill.x2, 1/* todo: how much is 100%? */);
+                double y2 = parseCoordinate(lgfill.y2, 1/* todo: how much is 100%? */);
 
-                double y1;
-                if (lgfill.y1.endsWith("%")) {
-                    y1 = Double.parseDouble(lgfill.y1.substring(0, lgfill.y1.length() - 1)) / 100;
-                } else {
-                    y1 = Double.parseDouble(lgfill.y1);
-                }
-                double x2;
-                if (lgfill.x2.endsWith("%")) {
-                    x2 = Double.parseDouble(lgfill.x2.substring(0, lgfill.x2.length() - 1)) / 100;
-                } else {
-                    x2 = Double.parseDouble(lgfill.x2);
-                }
-                //x2 = x2 - 819.2;
-                double y2;
-                if (lgfill.y2.endsWith("%")) {
-                    y2 = Double.parseDouble(lgfill.y2.substring(0, lgfill.y2.length() - 1)) / 100;
-                } else {
-                    y2 = Double.parseDouble(lgfill.y2);
-                }
                 x1 = x1 * SWF.unitDivisor;
                 y1 = y1 * SWF.unitDivisor;
                 x2 = x2 * SWF.unitDivisor;
@@ -1371,25 +1349,9 @@ public class SvgImporter {
                 fillStyle.gradientMatrix = tMatrix.toMATRIX();
             } else if (fill instanceof SvgRadialGradient) {
                 SvgRadialGradient rgfill = (SvgRadialGradient) fill;
-                double cx;
-                if (rgfill.cx.endsWith("%")) {
-                    cx = Double.parseDouble(rgfill.cx.substring(0, rgfill.cx.length() - 1)) / 100;
-                } else {
-                    cx = Double.parseDouble(rgfill.cx);
-                }
-                double cy;
-                if (rgfill.cy.endsWith("%")) {
-                    cy = Double.parseDouble(rgfill.cy.substring(0, rgfill.cy.length() - 1)) / 100;
-                } else {
-                    cy = Double.parseDouble(rgfill.cy);
-                }
-
-                double r;
-                if (rgfill.r.endsWith("%")) {
-                    r = Double.parseDouble(rgfill.r.substring(0, rgfill.r.length() - 1)) / 100;
-                } else {
-                    r = Double.parseDouble(rgfill.r);
-                }
+                double cx = parseCoordinate(rgfill.cx, 1/* todo: how much is 100%? */);
+                double cy = parseCoordinate(rgfill.cy, 1/* todo: how much is 100%? */);
+                double r = parseLength(rgfill.r, 1/* todo: how much is 100%? */);
 
                 Matrix boundingBoxMatrix = new Matrix();
                 if (rgfill.gradientUnits == SvgGradientUnits.OBJECT_BOUNDING_BOX) {
@@ -1403,18 +1365,8 @@ public class SvgImporter {
 
                 fillStyle.gradientMatrix = Matrix.getTranslateInstance(SWF.unitDivisor * cx, SWF.unitDivisor * cy).concatenate(new Matrix(fillStyle.gradientMatrix)).concatenate(Matrix.getScaleInstance(r / 819.2)).preConcatenate(boundingBoxMatrix).toMATRIX();
 
-                double fx;
-                if (rgfill.fx.endsWith("%")) {
-                    fx = Double.parseDouble(rgfill.fx.substring(0, rgfill.fx.length() - 1)) / 100;
-                } else {
-                    fx = Double.parseDouble(rgfill.fx);
-                }
-                double fy;
-                if (rgfill.fy.endsWith("%")) {
-                    fy = Double.parseDouble(rgfill.fy.substring(0, rgfill.fy.length() - 1)) / 100;
-                } else {
-                    fy = Double.parseDouble(rgfill.fy);
-                }
+                double fx = parseCoordinate(rgfill.fx, 1/* todo: how much is 100%? */);
+                double fy = parseCoordinate(rgfill.fy, 1/* todo: how much is 100%? */);
                 if (!rgfill.fx.equals(rgfill.cx) || !rgfill.fy.equals(rgfill.cy)) {
                     fillStyle.fillStyleType = FILLSTYLE.FOCAL_RADIAL_GRADIENT;
                     fillStyle.gradient = new FOCALGRADIENT();
@@ -1618,6 +1570,24 @@ public class SvgImporter {
                     result = relativeTo * result / 100;
                     break;
             }
+        }
+
+        return result;
+    }
+
+    public double parseNumberOrPercent(String value) {
+        if (value == null) {
+            throw new NumberFormatException();
+        }
+
+        boolean percent = value.endsWith("%");
+        if (percent) {
+            value = value.substring(0, value.length() - 1);
+        }
+
+        double result = Double.parseDouble(value);
+        if (percent) {
+            result /= 100;
         }
 
         return result;

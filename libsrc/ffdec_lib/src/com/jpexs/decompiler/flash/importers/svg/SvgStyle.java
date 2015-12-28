@@ -428,12 +428,7 @@ class SvgStyle {
                 SvgStyle newStyle = new SvgStyle(importer, idMap, stopEl);
 
                 String offsetStr = stopEl.getAttribute("offset");
-                double offset;
-                if (offsetStr.endsWith("%")) {
-                    offset = Double.parseDouble(offsetStr.substring(0, offsetStr.length() - 1)) / 100;
-                } else {
-                    offset = Double.parseDouble(offsetStr);
-                }
+                double offset = importer.parseNumberOrPercent(offsetStr);
                 Color color = newStyle.getStopColor();
                 if (color == null) {
                     color = Color.BLACK;
