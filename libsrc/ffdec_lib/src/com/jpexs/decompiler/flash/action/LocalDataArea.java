@@ -35,7 +35,7 @@ public class LocalDataArea {
 
     public Stack<Object> stack = new Stack<>();
 
-    public List<Object> functions = new ArrayList<>();
+    public List<ActionScriptFunction> functions = new ArrayList<>();
 
     public Map<String, Object> localVariables = new HashMap<>();
 
@@ -70,6 +70,9 @@ public class LocalDataArea {
         constantPool = null;
         stack.clear();
         localVariables.clear();
+        localRegisters.clear();
+        withs.clear();
+        functions.clear();
         jump = null;
         returnValue = null;
         executionException = null;

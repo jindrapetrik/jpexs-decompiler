@@ -62,8 +62,8 @@ public class ActionNewMethod extends Action {
             args.add(lda.pop());
         }
         ActionScriptObject nobj = new ActionScriptObject();
-
-        ((ActionScriptFunction) obj.getMember(methodName)).execute(nobj, args);
+        ActionScriptFunction f = (ActionScriptFunction) obj.getMember(methodName);
+        lda.stage.callFunction(f.getFunctionOffset(), f.getFunctionLength(), args, f.getFuncRegNames(), nobj);
         lda.stack.push(nobj);
         return true;
     }

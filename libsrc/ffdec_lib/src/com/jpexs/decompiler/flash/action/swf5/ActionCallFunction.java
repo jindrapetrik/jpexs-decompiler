@@ -18,8 +18,11 @@ package com.jpexs.decompiler.flash.action.swf5;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.ActionScriptFunction;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.CallFunctionActionItem;
+import com.jpexs.decompiler.flash.ecma.Null;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -47,6 +50,19 @@ public class ActionCallFunction extends Action {
 
     @Override
     public boolean execute(LocalDataArea lda) {
+
+        String functionName = lda.popAsString();
+        int numArgs = (int) (double) lda.popAsNumber();
+        List<Object> args = new ArrayList<>();
+        for (int i = 0; i < numArgs; i++) {
+            args.add(lda.pop());
+        }
+        for (ActionScriptFunction f : lda.functions) {
+            if (functionName.equals(f.getFunctionName())) {
+                lda.stack.push(lda.stage.callFunction(f.getFunctionOffset(), f.getFunctionLength(), args, f.getFuncRegNames(), Undefined.INSTANCE /*?*/));
+                return true;
+            }
+        }
         return true;
     }
 

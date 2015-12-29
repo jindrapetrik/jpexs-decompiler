@@ -17,11 +17,18 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.LocalDataArea;
+import com.jpexs.decompiler.flash.action.Stage;
+import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.gui.player.MediaDisplay;
 import com.jpexs.decompiler.flash.gui.player.MediaDisplayListener;
 import com.jpexs.decompiler.flash.gui.player.Zoom;
 import com.jpexs.decompiler.flash.tags.DefineButtonSoundTag;
+import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
@@ -36,6 +43,7 @@ import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.ConstantColorColorTransform;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
+import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
@@ -57,6 +65,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
@@ -85,6 +94,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private int frame = -1;
 
     private boolean loop;
+
+    private LocalDataArea lda;
 
     private boolean zoomAvailable = false;
 
@@ -522,6 +533,61 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     public void setTimelined(final Timelined drawable, final SWF swf, int frame) {
+        Stage stage = new Stage() {
+            @Override
+            public void callFrame(int frame) {
+                executeFrame(frame);
+            }
+
+            @Override
+            public Object callFunction(long functionAddress, long functionLength, List<Object> args, Map<Integer, String> regNames, Object thisObj) {
+                try {
+                    SWFInputStream sis = new SWFInputStream(swf, swf.uncompressedData, functionAddress, (int) (functionAddress + functionLength));
+                    return execute(sis);
+                } catch (IOException ex) {
+                    Logger.getLogger(ImagePanel.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                return Undefined.INSTANCE;
+            }
+
+            @Override
+            public int getCurrentFrame() {
+                return ImagePanel.this.getCurrentFrame();
+            }
+
+            @Override
+            public int getTotalFrames() {
+                return ImagePanel.this.getTotalFrames();
+            }
+
+            @Override
+            public void gotoFrame(int frame) {
+                ImagePanel.this.pause();
+                ImagePanel.this.gotoFrame(frame);
+            }
+
+            @Override
+            public void gotoLabel(String label) {
+                //TODO
+            }
+
+            @Override
+            public void pause() {
+                ImagePanel.this.pause();
+            }
+
+            @Override
+            public void play() {
+                ImagePanel.this.play();
+            }
+
+            @Override
+            public void trace(Object... val) {
+                //TODO
+            }
+
+        };
+        lda = new LocalDataArea(stage);
         synchronized (ImagePanel.class) {
             stopInternal();
             if (drawable instanceof ButtonTag) {
@@ -571,6 +637,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     public synchronized void setImage(SerializableImage image) {
+        lda = null;
         setBackground(View.getSwfBackgroundColor());
         clear();
 
@@ -589,6 +656,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         setBackground(View.getSwfBackgroundColor());
         clear();
 
+        lda = null;
         timelined = null;
         loaded = true;
         stillFrame = true;
@@ -783,6 +851,54 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         return img;
     }
 
+    private Object execute(SWFInputStream sis) throws IOException {
+        if (!Configuration.internalFlashViewerExecuteAs12.get()) {
+            return Undefined.INSTANCE;
+        }
+        if (lda == null) {
+            return Undefined.INSTANCE;
+        }
+        Action a;
+        while ((a = sis.readAction()) != null) {
+            a.setAddress(sis.getPos());
+            a.execute(lda);
+            if (lda.returnValue != null) {
+                return lda.returnValue;
+            }
+            if (lda.jump != null) {
+                sis.seek(lda.jump);
+            }
+        }
+        return Undefined.INSTANCE;
+    }
+
+    private void executeFrame(int frame) {
+        if (!Configuration.internalFlashViewerExecuteAs12.get()) {
+            return;
+        }
+        if (timelined == null) {
+            return;
+        }
+        List<DoActionTag> actions = timelined.getTimeline().getFrame(frame).actions;
+        if (lda != null) {
+            lda.clear();
+        }
+        for (DoActionTag src : actions) {
+            try {
+                ByteArrayRange actionBytes = src.getActionBytes();
+                int prevLength = actionBytes.getPos();
+                SWFInputStream rri = new SWFInputStream(swf, actionBytes.getArray());
+                if (prevLength != 0) {
+                    rri.seek(prevLength);
+                }
+                execute(rri);
+            } catch (IOException ex) {
+                Logger.getLogger(ImagePanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        }
+    }
+
     private void drawFrame(Timer thisTimer) {
         Timelined timelined;
         MouseEvent lastMouseEvent;
@@ -849,6 +965,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     playSound(st, thisTimer);
                 }
             }
+            executeFrame(frame);
         } catch (Throwable ex) {
             // swf was closed during the rendering probably
             return;

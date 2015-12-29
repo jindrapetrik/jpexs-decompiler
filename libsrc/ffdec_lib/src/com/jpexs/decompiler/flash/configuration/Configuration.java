@@ -543,6 +543,11 @@ public class Configuration {
     @ConfigurationCategory("import")
     public static final ConfigurationItem<Boolean> shapeImportUseNonSmoothedFill = null;
 
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("display")
+    @ConfigurationName("internalFlashViewer.execute.as12")
+    public static final ConfigurationItem<Boolean> internalFlashViewerExecuteAs12 = null;
+
     private enum OSId {
 
         WINDOWS, OSX, UNIX

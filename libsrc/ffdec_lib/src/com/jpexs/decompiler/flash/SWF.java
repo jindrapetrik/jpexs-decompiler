@@ -794,12 +794,10 @@ public final class SWF implements SWFContainerItem, Timelined {
             ret[0] = 'Z';
         } else if (compression == SWFCompression.ZLIB) {
             ret[0] = 'C';
+        } else if (gfx) {
+            ret[0] = 'G';
         } else {
-            if (gfx) {
-                ret[0] = 'G';
-            } else {
-                ret[0] = 'F';
-            }
+            ret[0] = 'F';
         }
 
         if (gfx) {
@@ -1480,10 +1478,8 @@ public final class SWF implements SWFContainerItem, Timelined {
             if (as3) {
                 ret.addAll(new AS3ScriptExporter().exportActionScript3(this, handler, outdir, as3scripts, exportSettings, parallel, evl));
             }
-        } else {
-            if (as2) {
-                ret.addAll(new AS2ScriptExporter().exportAS2Scripts(handler, outdir, getASMs(true), exportSettings, parallel, evl));
-            }
+        } else if (as2) {
+            ret.addAll(new AS2ScriptExporter().exportAS2Scripts(handler, outdir, getASMs(true), exportSettings, parallel, evl));
         }
         return ret;
     }
@@ -1902,10 +1898,8 @@ public final class SWF implements SWFContainerItem, Timelined {
                     TranslateStack brStack = (TranslateStack) stack.clone();
                     if (b >= 0) {
                         getVariables(constantPool, localData, brStack, output, code, b, variables, functions, strings, visited, usageTypes, path);
-                    } else {
-                        if (debugMode) {
-                            System.out.println("Negative branch:" + b);
-                        }
+                    } else if (debugMode) {
+                        System.out.println("Negative branch:" + b);
                     }
                 }
                 // }
@@ -2020,12 +2014,10 @@ public final class SWF implements SWFContainerItem, Timelined {
             cnt += deobfuscateAS2Identifiers(renameType);
             cnt += deobfuscateAS3Identifiers(renameType);
             return cnt;
+        } else if (fileAttributes.actionScript3) {
+            return deobfuscateAS3Identifiers(renameType);
         } else {
-            if (fileAttributes.actionScript3) {
-                return deobfuscateAS3Identifiers(renameType);
-            } else {
-                return deobfuscateAS2Identifiers(renameType);
-            }
+            return deobfuscateAS2Identifiers(renameType);
         }
     }
 
@@ -3060,16 +3052,14 @@ public final class SWF implements SWFContainerItem, Timelined {
             timelined.removeTag(tag);
             timelined.setModified(true);
             timelined.resetTimeline();
+        } else // timeline should be always the swf here
+        if (removeDependencies) {
+            removeTagWithDependenciesFromTimeline(tag, timelined.getTimeline());
+            timelined.setModified(true);
         } else {
-            // timeline should be always the swf here
-            if (removeDependencies) {
-                removeTagWithDependenciesFromTimeline(tag, timelined.getTimeline());
+            boolean modified = removeTagFromTimeline(tag, timelined.getTimeline());
+            if (modified) {
                 timelined.setModified(true);
-            } else {
-                boolean modified = removeTagFromTimeline(tag, timelined.getTimeline());
-                if (modified) {
-                    timelined.setModified(true);
-                }
             }
         }
     }
@@ -3121,14 +3111,11 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     /**
-     * Adds a tag to the SWF
-     * If targetTreeItem is:
-     * - Frame: adds the tag to the Frame. Frame can be a frame of the main
-     * timeline or a DefineSprite frame
-     * - DefineSprite: adds the tag to the end of the DefineSprite's tag list
-     * - Any other tag in the SWF: adds the new tag exactly before the specified
-     * tag
-     * - Other: adds the tag to the end of the SWF's tag list
+     * Adds a tag to the SWF If targetTreeItem is: - Frame: adds the tag to the
+     * Frame. Frame can be a frame of the main timeline or a DefineSprite frame
+     * - DefineSprite: adds the tag to the end of the DefineSprite's tag list -
+     * Any other tag in the SWF: adds the new tag exactly before the specified
+     * tag - Other: adds the tag to the end of the SWF's tag list
      *
      * @param tag
      * @param targetTreeItem

@@ -62,7 +62,9 @@ public class ActionCallMethod extends Action {
             args.add(lda.pop());
         }
 
-        lda.stack.push(((ActionScriptFunction) obj.getMember(methodName)).execute(obj, args));
+        ActionScriptFunction f = (ActionScriptFunction) obj.getMember(methodName);
+
+        lda.stack.push(lda.stage.callFunction(f.getFunctionOffset(), f.getFunctionLength(), args, f.getFuncRegNames(), obj));
         return true;
     }
 

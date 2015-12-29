@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionLocalData;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
+import com.jpexs.decompiler.flash.action.Stage;
 import com.jpexs.decompiler.flash.action.swf4.ActionAdd;
 import com.jpexs.decompiler.flash.action.swf4.ActionAnd;
 import com.jpexs.decompiler.flash.action.swf4.ActionAsciiToChar;
@@ -488,7 +489,7 @@ public class FlashPlayerTest {
 
                     String ffdecExecuteResult;
                     try {
-                        LocalDataArea lda = new LocalDataArea();
+                        LocalDataArea lda = new LocalDataArea(new Stage());
                         for (Action a : newActions) {
                             if (!a.execute(lda)) {
                                 fail();
@@ -538,7 +539,7 @@ public class FlashPlayerTest {
              }
              }*/
 
-            /*if (!ffdecResult.equals(flashResult)) {
+ /*if (!ffdecResult.equals(flashResult)) {
              LocalDataArea lda = new LocalDataArea();
              for (Action a : task.actions) {
              if (!a.execute(lda)) {

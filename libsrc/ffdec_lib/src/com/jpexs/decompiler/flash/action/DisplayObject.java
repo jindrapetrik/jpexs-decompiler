@@ -1,6 +1,8 @@
 package com.jpexs.decompiler.flash.action;
 
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -52,6 +54,11 @@ public class DisplayObject extends ActionScriptObject {
 
     public void play() {
         paused = false;
+    }
+
+    public Object callFunction(long functionAddress, long functionLength, List<Object> args, Map<Integer, String> regNames, Object thisObj) {
+        //TODO
+        return Undefined.INSTANCE;
     }
 
     public void callFrame(int frame) {
