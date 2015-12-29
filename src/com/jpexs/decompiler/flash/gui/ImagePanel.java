@@ -583,7 +583,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
             @Override
             public void trace(Object... val) {
-                //TODO
+                for (Object o : val) {
+                    System.out.println("trace:" + o.toString());
+                }
             }
 
         };
@@ -858,16 +860,22 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         if (lda == null) {
             return Undefined.INSTANCE;
         }
+        long ip = sis.getPos();
+
         Action a;
         while ((a = sis.readAction()) != null) {
+            int actionLengthWithHeader = a.getTotalActionLength();
             a.setAddress(sis.getPos());
             a.execute(lda);
             if (lda.returnValue != null) {
                 return lda.returnValue;
             }
             if (lda.jump != null) {
-                sis.seek(lda.jump);
+                ip = lda.jump;
+            } else {
+                ip += actionLengthWithHeader;
             }
+            sis.seek(ip);
         }
         return Undefined.INSTANCE;
     }
@@ -887,7 +895,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             try {
                 ByteArrayRange actionBytes = src.getActionBytes();
                 int prevLength = actionBytes.getPos();
-                SWFInputStream rri = new SWFInputStream(swf, actionBytes.getArray());
+                SWFInputStream rri = new SWFInputStream(swf, actionBytes.getArray(), 0, prevLength + actionBytes.getLength());
                 if (prevLength != 0) {
                     rri.seek(prevLength);
                 }

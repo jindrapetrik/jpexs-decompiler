@@ -187,6 +187,10 @@ public class Timeline {
 
         int cnt = 1;
         for (int i = 1; i < frames.size(); i++) {
+            if (!frames.get(i).actions.isEmpty()) {
+                cnt++;
+                continue;
+            }
             if (frames.get(i).layersChanged) {
                 cnt++;
             }
