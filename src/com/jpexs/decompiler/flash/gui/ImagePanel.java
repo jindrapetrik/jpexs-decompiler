@@ -861,17 +861,23 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             return Undefined.INSTANCE;
         }
         long ip = sis.getPos();
-
+        //System.err.println("=============");
         Action a;
         while ((a = sis.readAction()) != null) {
             int actionLengthWithHeader = a.getTotalActionLength();
-            a.setAddress(sis.getPos());
+            a.setAddress(ip);
             a.execute(lda);
+            /*System.err.print("" + a + ", stack: [");
+            for (Object o : lda.stack) {
+                System.err.print("" + o + ",");
+            }
+            System.err.println("]");*/
             if (lda.returnValue != null) {
                 return lda.returnValue;
             }
             if (lda.jump != null) {
                 ip = lda.jump;
+                lda.jump = null;
             } else {
                 ip += actionLengthWithHeader;
             }
