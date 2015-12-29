@@ -86,7 +86,7 @@ public class TryActionItem extends ActionItem implements Block {
             List<GraphTargetItem> commands = catchCommands.get(e);
             appendBlock(null, writer, localData, commands);
         }
-        if (finallyCommands.size() > 0) {
+        if (catchExceptions.isEmpty() || finallyCommands.size() > 0) {
             writer.newLine();
             writer.append("finally");
             appendBlock(null, writer, localData, finallyCommands);

@@ -438,6 +438,17 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "trace(\"end\");\r\n", false);
     }
 
+    //@Test //todo: enable test
+    public void testTryShouldHaveCatchOrFinally() {
+        decompileMethod("testTryShouldHaveCatchOrFinally", "try\r\n"
+                + "{\r\n"
+                + "trace(\"try body\");\r\n"
+                + "}\r\n"
+                + "finally\n\n"
+                + "{\r\n"
+                + "}\r\n", false);
+    }
+
     @Test
     public void testSwitch() {
         decompileMethod("testSwitch", "var a:* = 5;\r\n"

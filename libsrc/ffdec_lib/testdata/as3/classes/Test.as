@@ -345,6 +345,16 @@ import classes.TestNs;
 			trace("end");
 		}
 
+		public function testTryShouldHaveCatchOrFinally() {
+			try
+			{
+				trace("try body");
+			}
+			finally
+			{
+			}
+		}
+
 		public function testSwitch()
 		{
 			var a=5;
