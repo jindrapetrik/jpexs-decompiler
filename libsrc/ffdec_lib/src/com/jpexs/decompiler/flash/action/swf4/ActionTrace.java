@@ -45,6 +45,9 @@ public class ActionTrace extends Action {
 
     @Override
     public boolean execute(LocalDataArea lda) {
+        if (lda.stack.isEmpty()) {
+            return false;
+        }
         lda.stage.trace(lda.pop());
         return true;
     }
