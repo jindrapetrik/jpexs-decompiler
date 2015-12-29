@@ -250,6 +250,7 @@ public abstract class StaticTextTag extends TextTag {
             writer.append("rotateskew1 ").append(textMatrix.rotateSkew1).newLine();
         }
         writer.append("]");
+        int textHeight = 12;
         for (TEXTRECORD rec : textRecords) {
             if (rec.styleFlagsHasFont || rec.styleFlagsHasColor || rec.styleFlagsHasXOffset || rec.styleFlagsHasYOffset) {
                 writer.append("[").newLine();
@@ -260,9 +261,10 @@ public abstract class StaticTextTag extends TextTag {
                     }
                     writer.append("font ").append(rec.fontId).newLine();
                     writer.append("height ").append(rec.textHeight).newLine();
+                    textHeight = rec.textHeight;
                 }
                 if (fnt != null) {
-                    int letterSpacing = detectLetterSpacing(rec, fnt, rec.textHeight);
+                    int letterSpacing = detectLetterSpacing(rec, fnt, textHeight);
                     if (letterSpacing != 0) {
                         writer.append("letterspacing ").append(letterSpacing).newLine();
                     }
