@@ -313,6 +313,21 @@ public class TagTreeContextMenu extends JPopupMenu {
         copyTagWithDependenciesMenu.setVisible(false);
         openSWFInsideTagMenuItem.setVisible(false);
 
+        if (allSelectedIsTag) {
+            boolean canUndo = false;
+            for (TreeItem item : items) {
+                if (item instanceof Tag) {
+                    Tag tag = (Tag) item;
+                    if (tag.canUndo()) {
+                        canUndo = true;
+                        break;
+                    }
+                }
+            }
+
+            undoTagMenuItem.setEnabled(canUndo);
+        }
+
         boolean singleSelect = items.size() == 1;
 
         if (singleSelect) {
