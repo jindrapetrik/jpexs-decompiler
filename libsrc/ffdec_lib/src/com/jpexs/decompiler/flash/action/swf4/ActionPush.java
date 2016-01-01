@@ -388,7 +388,7 @@ public class ActionPush extends Action {
         for (Object o : values) {
             if (o instanceof ConstantIndex) {
                 if ((constantPool == null) || (((ConstantIndex) o).index >= constantPool.size())) {
-                    o = "????constant" + ((ConstantIndex) o).index;
+                    o = "\u00A7\u00A7constant" + ((ConstantIndex) o).index;
                 } else {
                     o = constantPool.get(((ConstantIndex) o).index);
                 }
