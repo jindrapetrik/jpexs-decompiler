@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2015 JPEXS
+ *  Copyright (C) 2010-2016 JPEXS
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -447,7 +447,7 @@ public class FlashPlayerTest {
                     Action opAction = getOpAction(i);
 
                     if (i >= 13 + 23) {
-                        newActions.add(new ActionPush("mystring_árvíztűrő_tükörfúrógép"));
+                        newActions.add(new ActionPush("mystring_??rv??zt??r??_t??k??rf??r??g??p"));
                     }
 
                     Object p1o = pushes[p1];

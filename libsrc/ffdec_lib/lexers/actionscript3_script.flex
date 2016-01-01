@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2016 JPEXS, All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -587,7 +587,7 @@ Preprocessor = \u00A7\u00A7 {Identifier}
   "\\t"                          { string.append('\t'); }
   "\\n"                          { string.append('\n'); }
   "\\f"                          { string.append('\f'); }
-  "\\§"                          { string.append('\u00A7'); }
+  "\\??"                          { string.append('\u00A7'); }
   "\\r"                          { string.append('\r'); }
   "\\\\"                         { string.append('\\'); }
   \\x{HexDigit}{2}        { char val = (char) Integer.parseInt(yytext().substring(2), 16);
