@@ -43,6 +43,10 @@ import org.monte.media.jpeg.CMYKJPEGImageReaderSpi;
  */
 public class ImageHelper {
 
+    static {
+        ImageIO.setUseCache(false);
+    }
+
     public static BufferedImage read(byte[] data) throws IOException {
         return read(new ByteArrayInputStream(data));
     }
