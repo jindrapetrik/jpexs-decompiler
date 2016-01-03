@@ -17,7 +17,7 @@
    version="1.1"
    inkscape:version="0.48.5 r10040"
    sodipodi:docname="installer2_150x57.svg"
-   inkscape:export-filename="installer2_164x314.png"
+   inkscape:export-filename="installer2_150x57.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90">
   <defs
@@ -170,16 +170,6 @@
        id="radialGradient5862"
        xlink:href="#linearGradient3223"
        inkscape:collect="always" />
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient6683"
-       id="linearGradient6691"
-       x1="1024.2947"
-       y1="1041.4436"
-       x2="566.75861"
-       y2="616.56152"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.09926403,0,0,0.11167942,0.65669004,934.17842)" />
     <filter
        color-interpolation-filters="sRGB"
        inkscape:collect="always"
@@ -237,16 +227,6 @@
        id="radialGradient9888"
        xlink:href="#linearGradient3223-1"
        inkscape:collect="always" />
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient10739"
-       id="linearGradient10737"
-       x1="358.78299"
-       y1="1038.6146"
-       x2="-1.8106551"
-       y2="742.47198"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.37171657,0,0,0.18562208,0.65669004,856.36391)" />
     <filter
        color-interpolation-filters="sRGB"
        inkscape:collect="always"
@@ -510,7 +490,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -520,13 +500,6 @@
      id="layer1"
      transform="translate(0,-995.3622)"
      style="display:inline">
-    <rect
-       style="fill:url(#linearGradient6691);fill-opacity:1;stroke:url(#linearGradient10737);stroke-width:1.3133812;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       id="rect2815"
-       width="148.68661"
-       height="55.686619"
-       x="0.6566906"
-       y="996.01892" />
     <text
        xml:space="preserve"
        style="font-size:39.56486893px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
@@ -638,7 +611,7 @@
      style="opacity:0.53472218">
     <g
        id="g3216"
-       transform="matrix(0.09500707,0,0,0.09601177,-14.850156,252.86423)">
+       transform="matrix(0.10638866,0,0,0.10751372,-3.7134769,265.13976)">
       <path
          sodipodi:type="arc"
          style="fill:url(#linearGradient3242);fill-opacity:1;stroke:none"
@@ -750,7 +723,7 @@
        x="7.5546227"
        y="37.095638"
        id="text3597-2-5"
-       transform="matrix(0.7317965,0,0,0.74850296,60.844232,-13.592565)"><tspan
+       transform="matrix(0.66286392,0,0,0.72222972,74.899816,-12.754696)"><tspan
          sodipodi:role="line"
          id="tspan3599-45-1"
          x="7.5546227"
@@ -758,7 +731,7 @@
          style="font-size:28.17983055px;font-style:oblique;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#ffffff;fill-opacity:1;font-family:Neris;-inkscape-font-specification:Neris Bold Oblique">JPEXS</tspan></text>
     <g
        id="g3027"
-       transform="matrix(0.62999887,0,0,0.62999882,30.996095,8.0553908)">
+       transform="matrix(0.57065525,0,0,0.6078852,47.863266,8.1333941)">
       <text
          transform="matrix(0.83039113,0,0,0.96470084,78.866062,0.31214013)"
          id="text3597-9"
@@ -786,7 +759,7 @@
     </g>
     <g
        id="g3805"
-       transform="matrix(0.42672905,0,0,0.4957493,-6.2132034,25.673389)">
+       transform="matrix(0.38653272,0,0,0.47834798,14.158948,25.132982)">
       <text
          id="text3597-4-8"
          y="36.500076"
@@ -812,15 +785,15 @@
     </g>
     <text
        xml:space="preserve"
-       style="font-size:34.75993729px;font-style:normal;font-weight:normal;fill:#0069d6;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
-       x="66.9739"
-       y="13.535429"
+       style="font-size:32.49652481px;font-style:normal;font-weight:normal;fill:#0069d6;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="83.266808"
+       y="12.999673"
        id="text3597-2"
-       transform="scale(0.98877709,1.0113503)"><tspan
+       transform="scale(0.95801985,1.0438197)"><tspan
          sodipodi:role="line"
          id="tspan3599-45"
-         x="66.9739"
-         y="13.535429"
-         style="font-size:20.85596275px;font-style:oblique;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#0069d6;fill-opacity:1;font-family:Neris;-inkscape-font-specification:Neris Bold Oblique">JPEXS</tspan></text>
+         x="83.266808"
+         y="12.999673"
+         style="font-size:19.49791527px;font-style:oblique;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#0069d6;fill-opacity:1;font-family:Neris;-inkscape-font-specification:Neris Bold Oblique">JPEXS</tspan></text>
   </g>
 </svg>
