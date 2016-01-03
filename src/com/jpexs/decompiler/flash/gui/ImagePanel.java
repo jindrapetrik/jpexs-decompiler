@@ -37,6 +37,7 @@ import com.jpexs.decompiler.flash.tags.base.RenderContext;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.timeline.DepthState;
+import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.ColorTransform;
@@ -533,7 +534,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     public void setTimelined(final Timelined drawable, final SWF swf, int frame) {
-        Stage stage = new Stage() {
+        Stage stage = new Stage(drawable) {
             @Override
             public void callFrame(int frame) {
                 executeFrame(frame);
@@ -893,7 +894,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         if (timelined == null) {
             return;
         }
-        List<DoActionTag> actions = timelined.getTimeline().getFrame(frame).actions;
+        Frame f = timelined.getTimeline().getFrame(frame);
+        List<DoActionTag> actions = f.actions;
         if (lda != null) {
             lda.clear();
         }

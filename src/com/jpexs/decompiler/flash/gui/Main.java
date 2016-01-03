@@ -319,8 +319,10 @@ public class Main {
                     Logger.getLogger(MainFrameMenu.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 if (instrSWF != null) {
+                    if (!DebuggerTools.hasDebugger(instrSWF)) {
+                        DebuggerTools.switchDebugger(instrSWF);
+                    }
                     DebuggerTools.injectDebugLoader(instrSWF);
-                    instrSWF.enableDebugging(true, new File("."));
                     try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
                         instrSWF.saveTo(fos);
                     }
@@ -376,6 +378,9 @@ public class Main {
                     }
                     if (instrSWF != null) {
                         if (instrSWF.isAS3() && Configuration.autoOpenLoadedSWFs.get()) {
+                            if (!DebuggerTools.hasDebugger(instrSWF)) {
+                                DebuggerTools.switchDebugger(instrSWF);
+                            }
                             DebuggerTools.injectDebugLoader(instrSWF);
                         }
                         instrSWF.enableDebugging(true, new File("."), true, doPCode);
@@ -1117,14 +1122,12 @@ public class Main {
                 }
             };
             fc.setFileFilter(exeFilter);
+        } else if (swf.gfx) {
+            fc.addChoosableFileFilter(swfFilter);
+            fc.setFileFilter(gfxFilter);
         } else {
-            if (swf.gfx) {
-                fc.addChoosableFileFilter(swfFilter);
-                fc.setFileFilter(gfxFilter);
-            } else {
-                fc.setFileFilter(swfFilter);
-                fc.addChoosableFileFilter(gfxFilter);
-            }
+            fc.setFileFilter(swfFilter);
+            fc.addChoosableFileFilter(gfxFilter);
         }
         final String extension = ext;
         fc.setAcceptAllFileFilterUsed(false);
@@ -1906,70 +1909,68 @@ public class Main {
                     if (header.equals("noversion")) {
                         break;
                     }
-                } else {
-                    if (s.contains("=")) {
-                        String key = s.substring(0, s.indexOf('='));
-                        String val = s.substring(s.indexOf('=') + 1);
-                        if ("updateSystem".equals(header)) {
-                            if (key.equals("majorVersion")) {
-                                updateMajor = Integer.parseInt(val);
-                                if (updateMajor > UPDATE_SYSTEM_MAJOR) {
-                                    break;
-                                }
-                            }
-                            if (key.equals("minorVersion")) {
-                                updateMinor = Integer.parseInt(val);
+                } else if (s.contains("=")) {
+                    String key = s.substring(0, s.indexOf('='));
+                    String val = s.substring(s.indexOf('=') + 1);
+                    if ("updateSystem".equals(header)) {
+                        if (key.equals("majorVersion")) {
+                            updateMajor = Integer.parseInt(val);
+                            if (updateMajor > UPDATE_SYSTEM_MAJOR) {
+                                break;
                             }
                         }
-                        if ("version".equals(header) && (ver != null)) {
-                            if (key.equals("versionId")) {
-                                ver.versionId = Integer.parseInt(val);
+                        if (key.equals("minorVersion")) {
+                            updateMinor = Integer.parseInt(val);
+                        }
+                    }
+                    if ("version".equals(header) && (ver != null)) {
+                        if (key.equals("versionId")) {
+                            ver.versionId = Integer.parseInt(val);
+                        }
+                        if (key.equals("versionName")) {
+                            ver.versionName = val;
+                        }
+                        if (key.equals("nightly")) {
+                            ver.nightly = val.equals("true");
+                        }
+                        if (key.equals("revision")) {
+                            ver.revision = val;
+                        }
+                        if (key.equals("build")) {
+                            ver.build = Integer.parseInt(val);
+                        }
+                        if (key.equals("major")) {
+                            ver.major = Integer.parseInt(val);
+                        }
+                        if (key.equals("minor")) {
+                            ver.minor = Integer.parseInt(val);
+                        }
+                        if (key.equals("release")) {
+                            ver.release = Integer.parseInt(val);
+                        }
+                        if (key.equals("longVersionName")) {
+                            ver.longVersionName = val;
+                        }
+                        if (key.equals("releaseDate")) {
+                            ver.releaseDate = val;
+                        }
+                        if (key.equals("appName")) {
+                            ver.appName = val;
+                        }
+                        if (key.equals("appFullName")) {
+                            ver.appFullName = val;
+                        }
+                        if (key.equals("updateLink")) {
+                            ver.updateLink = val;
+                        }
+                        if (key.equals("change[]")) {
+                            String changeType = val.substring(0, val.indexOf('|'));
+                            String change = val.substring(val.indexOf('|') + 1);
+                            if (!ver.changes.containsKey(changeType)) {
+                                ver.changes.put(changeType, new ArrayList<>());
                             }
-                            if (key.equals("versionName")) {
-                                ver.versionName = val;
-                            }
-                            if (key.equals("nightly")) {
-                                ver.nightly = val.equals("true");
-                            }
-                            if (key.equals("revision")) {
-                                ver.revision = val;
-                            }
-                            if (key.equals("build")) {
-                                ver.build = Integer.parseInt(val);
-                            }
-                            if (key.equals("major")) {
-                                ver.major = Integer.parseInt(val);
-                            }
-                            if (key.equals("minor")) {
-                                ver.minor = Integer.parseInt(val);
-                            }
-                            if (key.equals("release")) {
-                                ver.release = Integer.parseInt(val);
-                            }
-                            if (key.equals("longVersionName")) {
-                                ver.longVersionName = val;
-                            }
-                            if (key.equals("releaseDate")) {
-                                ver.releaseDate = val;
-                            }
-                            if (key.equals("appName")) {
-                                ver.appName = val;
-                            }
-                            if (key.equals("appFullName")) {
-                                ver.appFullName = val;
-                            }
-                            if (key.equals("updateLink")) {
-                                ver.updateLink = val;
-                            }
-                            if (key.equals("change[]")) {
-                                String changeType = val.substring(0, val.indexOf('|'));
-                                String change = val.substring(val.indexOf('|') + 1);
-                                if (!ver.changes.containsKey(changeType)) {
-                                    ver.changes.put(changeType, new ArrayList<>());
-                                }
-                                List<String> chlist = ver.changes.get(changeType);
-                                chlist.add(change);
-                            }
+                            List<String> chlist = ver.changes.get(changeType);
+                            chlist.add(change);
                         }
                     }
                 }
