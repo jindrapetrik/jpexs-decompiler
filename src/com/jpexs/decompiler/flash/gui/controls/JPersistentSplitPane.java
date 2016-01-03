@@ -133,7 +133,7 @@ public class JPersistentSplitPane extends JSplitPane {
                 return;
             }
 
-            if (getLeftComponent().isVisible() && getRightComponent().isVisible()) {
+            if (getLeftComponent() != null && getRightComponent() != null && getLeftComponent().isVisible() && getRightComponent().isVisible()) {
                 JPersistentSplitPane pane = (JPersistentSplitPane) pce.getSource();
                 double size = (getOrientation() == JSplitPane.HORIZONTAL_SPLIT
                         ? pane.getWidth() : pane.getHeight()) - pane.getDividerSize();
