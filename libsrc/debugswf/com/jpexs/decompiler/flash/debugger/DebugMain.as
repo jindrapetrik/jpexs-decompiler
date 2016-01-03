@@ -12,6 +12,10 @@
 			debugSocket("test proxy");
 			debugTrace("test trace");
 			var loader:DebugLoader = new DebugLoader();
+			var ldr = debugGetDefinitionByName("flash.display.Loader");
+			debugDescribeType(ldr);
+			var name = debugGetQualifiedClassName(ldr);
+			var par = debugGetQualifiedSuperclassName(ldr);
 		}
 	}		
 	
