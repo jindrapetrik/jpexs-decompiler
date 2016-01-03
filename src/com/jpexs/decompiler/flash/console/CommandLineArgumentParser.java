@@ -187,7 +187,8 @@ public class CommandLineArgumentParser {
         Configuration.internalFlashViewer,
         Configuration.autoDeobfuscate,
         Configuration.cacheOnDisk,
-        Configuration.overwriteExistingFiles
+        Configuration.overwriteExistingFiles,
+        Configuration.autoRenameIdentifiers
     };
 
     public static boolean isCommandLineMode() {
@@ -1325,6 +1326,16 @@ public class CommandLineArgumentParser {
                     // FileNotFoundException when anti virus software blocks to open the file
                     logger.log(Level.SEVERE, "Failed to open swf: " + inFile.getName(), ex);
                     continue;
+                }
+
+                if (Configuration.autoRenameIdentifiers.get()) {
+                    try {
+                        swf.deobfuscateIdentifiers(RenameType.TYPENUMBER);
+                        swf.assignClassesToSymbols();
+                        swf.clearScriptCache();
+                    } catch (InterruptedException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    }
                 }
 
                 swf.swfList = new SWFList();
