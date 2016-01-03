@@ -58,6 +58,9 @@ public class Frame implements TreeItem, Exportable {
 
     public boolean layersChanged;
 
+    public String label = null;
+    public boolean namedAnchor = false;
+
     public Frame(Timeline timeline, int frame) {
         this.timeline = timeline;
         this.frame = frame;

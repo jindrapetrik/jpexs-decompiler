@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
+import com.jpexs.decompiler.flash.tags.FrameLabelTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
@@ -91,6 +92,8 @@ public class Timeline {
     public final List<Tag> otherTags = new ArrayList<>();
 
     private boolean initialized = false;
+
+    private Map<String, Integer> labelToFrame = new HashMap<>();
 
     private void ensureInitialized() {
         if (!initialized) {
@@ -221,6 +224,13 @@ public class Timeline {
         as2RootPackage = new AS2Package(null, null, swf);
     }
 
+    public int getFrameWithLabel(String label) {
+        if (labelToFrame.containsKey(label)) {
+            return labelToFrame.get(label);
+        }
+        return -1;
+    }
+
     private void initialize() {
         int frameIdx = 0;
         Frame frame = new Frame(this, frameIdx++);
@@ -244,7 +254,12 @@ public class Timeline {
                 }
             }
 
-            if (t instanceof StartSoundTag) {
+            if (t instanceof FrameLabelTag) {
+                newFrameNeeded = true;
+                frame.label = ((FrameLabelTag) t).getLabelName();
+                frame.namedAnchor = ((FrameLabelTag) t).isNamedAnchor();
+                labelToFrame.put(frame.label, frames.size());
+            } else if (t instanceof StartSoundTag) {
                 newFrameNeeded = true;
                 frame.sounds.add(((StartSoundTag) t).soundId);
             } else if (t instanceof StartSound2Tag) {
