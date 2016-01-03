@@ -18,6 +18,24 @@ public class ActionScriptObject implements Cloneable {
     protected Object extendsObj;
     protected List<Object> implementsObjs = new ArrayList<>();
 
+    public void clearMembers() {
+        for (Object o : members.values()) {
+            if (o instanceof ActionScriptObject) {
+                ((ActionScriptObject) o).clear();
+            }
+        }
+        members.clear();
+    }
+
+    public void clearProperties() {
+        properties.clear();
+    }
+
+    public void clear() {
+        clearMembers();
+        clearProperties();
+    }
+
     public List<Object> getImplementsObjs() {
         return implementsObjs;
     }
@@ -121,6 +139,10 @@ public class ActionScriptObject implements Cloneable {
         return null;
     }
 
+    protected Object getThisMember(String name) {
+        return members.get(name);
+    }
+
     public Object getMember(String path) {
         String pathParts[];
         if (path.startsWith("/")) {
@@ -131,13 +153,15 @@ public class ActionScriptObject implements Cloneable {
         ActionScriptObject obj = this;
         for (int i = 0; i < pathParts.length; i++) {
             String part = pathParts[i];
-            Object member = obj.getMember(part);
             if (i == pathParts.length - 1) {
-                return member;
-            } else if (member instanceof ActionScriptObject) {
-                obj = (ActionScriptObject) member;
+                return obj.getThisMember(part);
             } else {
-                break;
+                Object member = obj.getMember(part);
+                if (member instanceof ActionScriptObject) {
+                    obj = (ActionScriptObject) member;
+                } else {
+                    break;
+                }
             }
         }
         return null;

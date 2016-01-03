@@ -73,6 +73,7 @@ public class LocalDataArea {
         localRegisters.clear();
         withs.clear();
         functions.clear();
+        stage.clear();
         jump = null;
         returnValue = null;
         executionException = null;
