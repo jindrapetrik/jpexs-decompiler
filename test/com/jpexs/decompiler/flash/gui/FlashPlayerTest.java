@@ -489,7 +489,7 @@ public class FlashPlayerTest {
 
                     String ffdecExecuteResult;
                     try {
-                        LocalDataArea lda = new LocalDataArea(new Stage());
+                        LocalDataArea lda = new LocalDataArea(new Stage(null));
                         for (Action a : newActions) {
                             if (!a.execute(lda)) {
                                 fail();
