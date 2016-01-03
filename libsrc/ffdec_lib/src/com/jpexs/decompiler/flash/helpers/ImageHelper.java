@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2016 JPEXS, All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -42,6 +42,10 @@ import org.monte.media.jpeg.CMYKJPEGImageReaderSpi;
  * @author JPEXS
  */
 public class ImageHelper {
+
+    static {
+        ImageIO.setUseCache(false);
+    }
 
     public static BufferedImage read(byte[] data) throws IOException {
         return read(new ByteArrayInputStream(data));

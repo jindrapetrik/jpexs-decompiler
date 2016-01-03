@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2015 JPEXS
+ *  Copyright (C) 2010-2016 JPEXS
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -447,7 +447,7 @@ public class FlashPlayerTest {
                     Action opAction = getOpAction(i);
 
                     if (i >= 13 + 23) {
-                        newActions.add(new ActionPush("mystring_árvíztűrő_tükörfúrógép"));
+                        newActions.add(new ActionPush("mystring_\u00E1rv\u00EDzt\u0171r\u0151_t\u00FCk\u00F6rf\u00FAr\u00F3g\u00E9p"));
                     }
 
                     Object p1o = pushes[p1];
@@ -539,7 +539,7 @@ public class FlashPlayerTest {
              }
              }*/
 
- /*if (!ffdecResult.equals(flashResult)) {
+            /*if (!ffdecResult.equals(flashResult)) {
              LocalDataArea lda = new LocalDataArea();
              for (Action a : task.actions) {
              if (!a.execute(lda)) {

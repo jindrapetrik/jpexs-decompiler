@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2016 JPEXS, All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -388,7 +388,7 @@ public class ActionPush extends Action {
         for (Object o : values) {
             if (o instanceof ConstantIndex) {
                 if ((constantPool == null) || (((ConstantIndex) o).index >= constantPool.size())) {
-                    o = "§§constant" + ((ConstantIndex) o).index;
+                    o = "\u00A7\u00A7constant" + ((ConstantIndex) o).index;
                 } else {
                     o = constantPool.get(((ConstantIndex) o).index);
                 }

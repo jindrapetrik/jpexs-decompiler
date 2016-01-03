@@ -1058,6 +1058,7 @@ function drawPath(ctx, p, doStroke, scaleMode) {
                 case 'L':
                 case 'M':
                 case 'Q':
+                case 'Z':
                     break;
                 default:
                     var k = ctx.applyTransformToPoint({x: parts[i], y: parts[i + 1]});
@@ -1092,6 +1093,9 @@ function drawPath(ctx, p, doStroke, scaleMode) {
             case 'M':
             case 'Q':
                 drawCommand = parts[i];
+                break;
+            case 'Z':
+                ctx.closePath();
                 break;
             default:
                 switch (drawCommand) {

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2015 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2016 JPEXS, All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -1128,6 +1128,12 @@ public final class SWF implements SWFContainerItem, Timelined {
             if (!hasNonUnknownTag) {
                 throw new IOException("Invalid SWF file. No known tag found.");
             }
+        }
+
+        if (Configuration.autoRenameIdentifiers.get()) {
+            deobfuscateIdentifiers(RenameType.TYPENUMBER);
+            assignClassesToSymbols();
+            clearScriptCache();
         }
 
         getASMs(true); // Add scriptNames to ASMs
