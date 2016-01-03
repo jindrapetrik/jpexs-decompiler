@@ -196,7 +196,7 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
         actions.removeZeroJumps();
 
         ActionConstantPool cPool = getConstantPool(actions);
-        LocalDataArea localData = new LocalDataArea(new Stage(), true);
+        LocalDataArea localData = new LocalDataArea(new Stage(null), true);
         localData.stack = new FixItemCounterStack();
         ExecutionResult result = new ExecutionResult();
         FastActionListIterator iterator = actions.iterator();
@@ -383,7 +383,7 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
 
         Map<String, Object> results = new HashMap<>();
 
-        LocalDataArea localData = new LocalDataArea(new Stage());
+        LocalDataArea localData = new LocalDataArea(new Stage(null));
         localData.stack = new FixItemCounterStack();
         ExecutionResult result = new ExecutionResult();
         for (ActionItem actionItem : actions) {
