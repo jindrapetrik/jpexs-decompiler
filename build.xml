@@ -397,7 +397,7 @@
                     <opt>-Djna.nosys=true</opt>
                 </jre>
                 <splash>
-                    <file>graphics/splash.bmp</file>
+                    <file>graphics/splash2.bmp</file>
                     <waitForWindow>true</waitForWindow>
                     <timeout>60</timeout>
                     <timeoutErr>true</timeoutErr>

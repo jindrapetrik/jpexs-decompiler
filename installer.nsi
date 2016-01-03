@@ -40,9 +40,9 @@ SetCompressor /SOLID lzma
 !define APP_SHORTVERNAME "JPEXS FFDec v. ${APP_VER}"
 
 !define APP_VERNAME "${APP_NAME} v. ${APP_VER}"
-!define MUI_WELCOMEFINISHPAGE_BITMAP "graphics\installer_164x314.bmp" 
+!define MUI_WELCOMEFINISHPAGE_BITMAP "graphics\installer2_164x314.bmp" 
 !define MUI_HEADERIMAGE 
-!define MUI_HEADERIMAGE_BITMAP "graphics\installer_150x57.bmp"
+!define MUI_HEADERIMAGE_BITMAP "graphics\installer2_150x57.bmp"
 
 !define APP_UNINSTKEY "{E618D276-6596-41F4-8A98-447D442A77DB}_is1"
 
