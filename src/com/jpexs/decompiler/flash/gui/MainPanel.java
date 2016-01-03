@@ -764,24 +764,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         previewPanel.clear();
 
-        for (SWF swf : newSwfs) {
-
-            if (Configuration.autoRenameIdentifiers.get()) {
-                try {
-                    swf.deobfuscateIdentifiers(RenameType.TYPENUMBER);
-                    swf.assignClassesToSymbols();
-                    swf.clearScriptCache();
-                    if (abcPanel != null) {
-                        abcPanel.reload();
-                    }
-
-                    updateClassesList();
-                } catch (InterruptedException ex) {
-                    logger.log(Level.SEVERE, null, ex);
-                }
-            }
-        }
-
         swfs.add(newSwfs);
         SWF swf = newSwfs.size() > 0 ? newSwfs.get(0) : null;
         if (swf != null) {

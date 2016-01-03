@@ -1130,6 +1130,12 @@ public final class SWF implements SWFContainerItem, Timelined {
             }
         }
 
+        if (Configuration.autoRenameIdentifiers.get()) {
+            deobfuscateIdentifiers(RenameType.TYPENUMBER);
+            assignClassesToSymbols();
+            clearScriptCache();
+        }
+
         getASMs(true); // Add scriptNames to ASMs
     }
 

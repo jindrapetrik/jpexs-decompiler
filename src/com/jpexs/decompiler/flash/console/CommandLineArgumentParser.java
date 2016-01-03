@@ -187,7 +187,21 @@ public class CommandLineArgumentParser {
         Configuration.internalFlashViewer,
         Configuration.autoDeobfuscate,
         Configuration.cacheOnDisk,
-        Configuration.overwriteExistingFiles
+        Configuration.cacheImages,
+        Configuration.overwriteExistingFiles,
+        Configuration.autoRenameIdentifiers,
+        Configuration.decimalAddress,
+        Configuration.showAllAddresses,
+        Configuration.smartNumberFormatting,
+        Configuration.enableScriptInitializerDisplay,
+        Configuration.resolveConstants,
+        Configuration.textExportSingleFile,
+        Configuration.scriptExportSingleFile,
+        Configuration.packJavaScripts,
+        Configuration.showMethodBodyId,
+        Configuration.getLocalNamesFromDebugInfo,
+        Configuration.ignoreCLikePackages,
+        Configuration.shapeImportUseNonSmoothedFill
     };
 
     public static boolean isCommandLineMode() {
