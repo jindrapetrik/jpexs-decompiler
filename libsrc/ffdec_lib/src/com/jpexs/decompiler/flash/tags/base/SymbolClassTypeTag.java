@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags.base;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.helpers.ByteArrayRange;
+import java.util.Map;
 
 /**
  *
@@ -29,4 +30,6 @@ public abstract class SymbolClassTypeTag extends Tag {
     public SymbolClassTypeTag(SWF swf, int id, String name, ByteArrayRange data) {
         super(swf, id, name, data);
     }
+
+    public abstract Map<Integer, String> getTagToNameMap();
 }

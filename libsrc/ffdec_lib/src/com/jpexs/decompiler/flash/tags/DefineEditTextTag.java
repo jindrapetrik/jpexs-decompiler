@@ -359,7 +359,11 @@ public class DefineEditTextTag extends TextTag {
     private List<CharacterWithStyle> getTextWithStyle() {
         String str = "";
         TextStyle style = new TextStyle();
-        style.font = swf.getFont(fontId);
+        if (fontClass != null) {
+            style.font = swf.getFontByClass(fontClass);
+        } else {
+            style.font = swf.getFont(fontId);
+        }
         style.fontHeight = fontHeight;
         style.fontLeading = leading;
         if (hasTextColor) {
@@ -991,10 +995,8 @@ public class DefineEditTextTag extends TextTag {
                     if (Character.isWhitespace(c)) {
                         lastWasWhiteSpace = true;
                     }
-                } else {
-                    if (multiline) {
-                        textModel.newParagraph();
-                    }
+                } else if (multiline) {
+                    textModel.newParagraph();
                 }
                 prevChar = c;
             }
@@ -1096,8 +1098,15 @@ public class DefineEditTextTag extends TextTag {
                 }
                 for (SameStyleTextRecord tr : line) {
                     TEXTRECORD tr2 = new TEXTRECORD();
-                    tr2.styleFlagsHasFont = fontId != 0;
-                    tr2.fontId = fontId;
+                    int fid = fontId;
+                    if (fontClass != null) {
+                        FontTag ft = swf.getFontByClass(fontClass);
+                        if (ft != null) {
+                            fid = ft.getFontId();
+                        }
+                    }
+                    tr2.styleFlagsHasFont = fid != 0;
+                    tr2.fontId = fid;
                     tr2.textHeight = tr.style.fontHeight;
                     if (tr.style.textColor != null) {
                         tr2.styleFlagsHasColor = true;

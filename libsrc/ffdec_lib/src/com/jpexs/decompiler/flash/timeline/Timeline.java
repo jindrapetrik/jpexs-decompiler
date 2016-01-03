@@ -109,6 +109,9 @@ public class Timeline {
 
     public Frame getFrame(int index) {
         ensureInitialized();
+        if (index >= frames.size()) {
+            return null;
+        }
         return frames.get(index);
     }
 

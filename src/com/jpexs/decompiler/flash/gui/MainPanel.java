@@ -833,10 +833,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             if (View.showConfirmDialog(this, translate("message.confirm.closeAll"), translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, Configuration.showCloseConfirmation, JOptionPane.OK_OPTION) != JOptionPane.OK_OPTION) {
                 return false;
             }
-        } else {
-            if (View.showConfirmDialog(this, translate("message.confirm.close").replace("{swfName}", swfList.toString()), translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, Configuration.showCloseConfirmation, JOptionPane.OK_OPTION) != JOptionPane.OK_OPTION) {
-                return false;
-            }
+        } else if (View.showConfirmDialog(this, translate("message.confirm.close").replace("{swfName}", swfList.toString()), translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, Configuration.showCloseConfirmation, JOptionPane.OK_OPTION) != JOptionPane.OK_OPTION) {
+            return false;
         }
 
         return true;
@@ -1556,6 +1554,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             actionPanel.editor.refreshMarkers();
         }
     }
+
     /*
      public void debuggerBreakAt(SWF swf, String cls, int line) {
      View.execInEventDispatchLater(new Runnable() {
@@ -1570,7 +1569,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
      });
 
      }*/
-
     public void gotoScriptName(SWF swf, String scriptName) {
         if (swf == null) {
             return;
@@ -2166,10 +2164,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         List<TreeItem> sel = tagTree.getAllSelected();
         if (!onlySel) {
             sel = null;
-        } else {
-            if (sel.isEmpty()) {
-                return;
-            }
+        } else if (sel.isEmpty()) {
+            return;
         }
         final ExportDialog export = new ExportDialog(sel);
         if (export.showExportDialog() == AppDialog.OK_OPTION) {
@@ -2818,10 +2814,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             if (detailPanel.isVisible()) {
                 detailPanel.setVisible(false);
             }
-        } else {
-            if (!detailPanel.isVisible()) {
-                detailPanel.setVisible(true);
-            }
+        } else if (!detailPanel.isVisible()) {
+            detailPanel.setVisible(true);
         }
     }
 
@@ -3194,7 +3188,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             showCard(CARDACTIONSCRIPTPANEL);
         } else if (treeItem instanceof ImageTag) {
             ImageTag imageTag = (ImageTag) treeItem;
-            previewPanel.setImageReplaceButtonVisible(imageTag.importSupported(), imageTag instanceof DefineBitsJPEG3Tag || imageTag instanceof DefineBitsJPEG4Tag);
+            previewPanel.setImageReplaceButtonVisible(!((Tag) imageTag).isReadOnly() && imageTag.importSupported(), imageTag instanceof DefineBitsJPEG3Tag || imageTag instanceof DefineBitsJPEG4Tag);
             previewPanel.showImagePanel(imageTag.getImage());
             showCard(CARDPREVIEWPANEL);
         } else if ((treeItem instanceof DrawableTag) && (!(treeItem instanceof TextTag)) && (!(treeItem instanceof FontTag)) && internalViewer) {
@@ -3227,7 +3221,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             showCard(CARDPREVIEWPANEL);
         } else if ((treeItem instanceof SoundTag)) { //&& isInternalFlashViewerSelected() && (Arrays.asList("mp3", "wav").contains(((SoundTag) tagObj).getExportFormat())))) {
             previewPanel.showImagePanel(new SerializableImage(View.loadImage("sound32")));
-            previewPanel.setImageReplaceButtonVisible(treeItem instanceof DefineSoundTag, false);
+            previewPanel.setImageReplaceButtonVisible(((Tag) treeItem).isReadOnly() && (treeItem instanceof DefineSoundTag), false);
             try {
                 SoundTagPlayer soundThread = new SoundTagPlayer((SoundTag) treeItem, Configuration.loopMedia.get() ? Integer.MAX_VALUE : 1, true);
                 previewPanel.setMedia(soundThread);

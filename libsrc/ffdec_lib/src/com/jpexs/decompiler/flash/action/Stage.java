@@ -27,7 +27,7 @@ public class Stage extends DisplayObject {
         startTime = System.currentTimeMillis();
         this.timelined = timelined;
         this.timeline = timelined != null ? timelined.getTimeline() : null;
-        this.frame = timelined != null ? this.timeline.getFrame(0) : null;
+        this.frame = timelined != null && this.timeline.getFrameCount() > 0 ? this.timeline.getFrame(0) : null;
     }
 
     @Override

@@ -107,12 +107,14 @@ import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.Exportable;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
+import com.jpexs.decompiler.flash.tags.base.ImportTag;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.tags.base.RenderContext;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
+import com.jpexs.decompiler.flash.tags.base.SymbolClassTypeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.timeline.AS2Package;
@@ -161,6 +163,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -213,6 +216,9 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     @Internal
     public ReadOnlyTagList readOnlyTags;
+
+    @Internal
+    public ReadOnlyTagList readOnlyLocalTags;
 
     public boolean hasEndTag = true;
 
@@ -494,6 +500,20 @@ public final class SWF implements SWFContainerItem, Timelined {
         return exportName;
     }
 
+    public FontTag getFontByClass(String fontClass) {
+        if (fontClass == null) {
+            return null;
+        }
+        for (Tag t : getTags()) {
+            if (t instanceof FontTag) {
+                if (fontClass.equals(((FontTag) t).getClassName())) {
+                    return (FontTag) t;
+                }
+            }
+        }
+        return null;
+    }
+
     public FontTag getFont(int fontId) {
         CharacterTag characterTag = getCharacters().get(fontId);
         if (characterTag instanceof FontTag) {
@@ -593,7 +613,13 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     public int getNextCharacterId() {
         int max = 0;
-        for (int characterId : getCharacters().keySet()) {
+        Set<Integer> ids = new HashSet<>(getCharacters().keySet());
+        for (Tag t : tags) {
+            if (t instanceof ImportTag) {
+                ids.addAll(((ImportTag) t).getAssets().keySet());
+            }
+        }
+        for (int characterId : ids) {
             if (characterId > max) {
                 max = characterId;
             }
@@ -824,7 +850,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             sos.writeFIXED8(frameRate);
             sos.writeUI16(frameCount);
 
-            sos.writeTags(getTags());
+            sos.writeTags(getLocalTags());
             if (hasEndTag) {
                 sos.writeUI16(0);
             }
@@ -1066,6 +1092,10 @@ public final class SWF implements SWFContainerItem, Timelined {
         decompress(is, new NulStream(), true);
     }
 
+    public SWF(InputStream is, String file, String fileTitle, ProgressListener listener, boolean parallelRead, boolean checkOnly, boolean lazy) throws IOException, InterruptedException {
+        this(is, file, fileTitle, listener, parallelRead, checkOnly, lazy, null);
+    }
+
     /**
      * Construct SWF from stream
      *
@@ -1076,10 +1106,11 @@ public final class SWF implements SWFContainerItem, Timelined {
      * @param parallelRead Use parallel threads?
      * @param checkOnly Check only file validity
      * @param lazy
+     * @param resolver Resolver for imported tags
      * @throws IOException
      * @throws java.lang.InterruptedException
      */
-    public SWF(InputStream is, String file, String fileTitle, ProgressListener listener, boolean parallelRead, boolean checkOnly, boolean lazy) throws IOException, InterruptedException {
+    public SWF(InputStream is, String file, String fileTitle, ProgressListener listener, boolean parallelRead, boolean checkOnly, boolean lazy, UrlResolver resolver) throws IOException, InterruptedException {
         this.file = file;
         this.fileTitle = fileTitle;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -1112,11 +1143,15 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
         this.tags = tags;
         readOnlyTags = null;
+        readOnlyLocalTags = null;
         if (!checkOnly) {
             checkInvalidSprites();
             updateCharacters();
             assignExportNamesToSymbols();
             assignClassesToSymbols();
+            if (resolver != null) {
+                resolveImported(resolver);
+            }
             SWFDecompilerPlugin.fireSwfParsed(this);
         } else {
             boolean hasNonUnknownTag = false;
@@ -1137,6 +1172,94 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
 
         getASMs(true); // Add scriptNames to ASMs
+    }
+
+    private void resolveImported(UrlResolver resolver) {
+        for (int p = 0; p < tags.size(); p++) {
+            Tag t = tags.get(p);
+            if (t instanceof ImportTag) {
+                ImportTag importTag = (ImportTag) t;
+
+                SWF iSwf = resolver.resolveUrl(importTag.getUrl());
+                if (iSwf != null) {
+                    Map<Integer, String> exportedMap1 = new HashMap<>();
+                    Map<Integer, String> classesMap1 = new HashMap<>();
+
+                    for (Tag t2 : iSwf.tags) {
+                        if (t2 instanceof ExportAssetsTag) {
+                            ExportAssetsTag sc = (ExportAssetsTag) t2;
+                            Map<Integer, String> m2 = sc.getTagToNameMap();
+                            for (int key : m2.keySet()) {
+                                if (!exportedMap1.containsKey(key)) {
+                                    exportedMap1.put(key, m2.get(key));
+                                }
+                            }
+                        }
+                        if (t2 instanceof SymbolClassTag) {
+                            SymbolClassTag sc = (SymbolClassTag) t2;
+                            Map<Integer, String> m2 = sc.getTagToNameMap();
+                            for (int key : m2.keySet()) {
+                                if (!classesMap1.containsKey(key)) {
+                                    classesMap1.put(key, m2.get(key));
+                                }
+                            }
+                        }
+                    }
+                    Map<String, Integer> exportedMap2 = new HashMap<>();
+                    for (int k : exportedMap1.keySet()) {
+                        exportedMap2.put(exportedMap1.get(k), k);
+                    }
+
+                    Map<String, Integer> classesMap2 = new HashMap<>();
+                    for (int k : classesMap1.keySet()) {
+                        classesMap2.put(classesMap1.get(k), k);
+                    }
+
+                    Map<Integer, String> importedMap1 = importTag.getAssets();
+                    Map<String, Integer> importedMap2 = new HashMap<>();
+                    for (int k : importedMap1.keySet()) {
+                        importedMap2.put(importedMap1.get(k), k);
+                    }
+
+                    int pos = 0;
+                    for (String key : importedMap2.keySet()) {
+                        if (!exportedMap2.containsKey(key)) {
+                            continue; //?
+                        }
+                        int exportedId = exportedMap2.get(key);
+                        int importedId = importedMap2.get(key);
+                        for (Tag cht : iSwf.tags) {
+                            if ((cht instanceof CharacterIdTag) && (((CharacterIdTag) cht).getCharacterId() == exportedId) && !(cht instanceof PlaceObjectTypeTag) && !(cht instanceof RemoveTag)) {
+                                CharacterIdTag ch = (CharacterIdTag) cht;
+                                cht.setSwf(this);
+                                ch.setCharacterId(importedId);
+                                cht.setImported(true);
+                                tags.add(p + 1 + pos, cht);
+                                pos++;
+                            }
+                        }
+                    }
+
+                    int newId = getNextCharacterId();
+                    pos = 0;
+                    for (String key : classesMap2.keySet()) {
+                        int exportedId = classesMap2.get(key);
+                        int importedId = newId++;
+                        for (Tag cht : iSwf.tags) {
+                            if ((cht instanceof CharacterIdTag) && (((CharacterIdTag) cht).getCharacterId() == exportedId) && !(cht instanceof PlaceObjectTypeTag) && !(cht instanceof RemoveTag)) {
+                                CharacterIdTag ch = (CharacterIdTag) cht;
+                                cht.setSwf(this);
+                                ch.setCharacterId(importedId);
+                                cht.setImported(true);
+                                tags.add(p + 1 + pos, cht);
+                                pos++;
+                            }
+                        }
+                    }
+                    updateCharacters();
+                }
+            }
+        }
     }
 
     @Override
@@ -2338,6 +2461,7 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     public void clearReadOnlyListCache() {
         readOnlyTags = null;
+        readOnlyLocalTags = null;
         for (Tag tag : tags) {
             if (tag instanceof DefineSpriteTag) {
                 ((DefineSpriteTag) tag).clearReadOnlyListCache();
@@ -3059,13 +3183,15 @@ public final class SWF implements SWFContainerItem, Timelined {
             timelined.setModified(true);
             timelined.resetTimeline();
         } else // timeline should be always the swf here
-        if (removeDependencies) {
-            removeTagWithDependenciesFromTimeline(tag, timelined.getTimeline());
-            timelined.setModified(true);
-        } else {
-            boolean modified = removeTagFromTimeline(tag, timelined.getTimeline());
-            if (modified) {
+        {
+            if (removeDependencies) {
+                removeTagWithDependenciesFromTimeline(tag, timelined.getTimeline());
                 timelined.setModified(true);
+            } else {
+                boolean modified = removeTagFromTimeline(tag, timelined.getTimeline());
+                if (modified) {
+                    timelined.setModified(true);
+                }
             }
         }
     }
@@ -3077,6 +3203,20 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
 
         return readOnlyTags;
+    }
+
+    public ReadOnlyTagList getLocalTags() {
+        if (readOnlyLocalTags == null) {
+            List<Tag> localTags = new ArrayList<>();
+            for (Tag t : tags) {
+                if (!t.isImported()) {
+                    localTags.add(t);
+                }
+            }
+            readOnlyLocalTags = new ReadOnlyTagList(localTags);
+        }
+
+        return readOnlyLocalTags;
     }
 
     /**

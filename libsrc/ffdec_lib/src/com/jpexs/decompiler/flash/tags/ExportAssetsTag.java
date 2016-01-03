@@ -28,7 +28,9 @@ import com.jpexs.decompiler.flash.types.annotations.Table;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Makes portions of a SWF file available for import by other SWF files
@@ -63,6 +65,19 @@ public class ExportAssetsTag extends SymbolClassTypeTag {
         super(swf, ID, NAME, null);
         tags = new ArrayList<>();
         names = new ArrayList<>();
+    }
+
+    @Override
+    public Map<Integer, String> getTagToNameMap() {
+        Map<Integer, String> exportNames = new HashMap<>();
+        for (int i = 0; i < tags.size(); i++) {
+            int tagId = tags.get(i);
+            String name = names.get(i);
+            if ((!exportNames.containsKey(tagId)) && (!exportNames.containsValue(name))) {
+                exportNames.put(tagId, name);
+            }
+        }
+        return exportNames;
     }
 
     /**

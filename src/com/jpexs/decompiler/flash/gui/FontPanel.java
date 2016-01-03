@@ -219,6 +219,9 @@ public class FontPanel extends JPanel {
 
         setAllowSave(true);
         setEditable(false);
+        boolean readOnly = ((Tag) ft).isReadOnly();
+        addCharsPanel.setVisible(!readOnly);
+        buttonEdit.setVisible(!readOnly);
     }
 
     private void initComponents() {

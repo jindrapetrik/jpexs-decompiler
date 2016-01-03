@@ -206,19 +206,27 @@ public class TagTree extends JTree {
              isModified = true;
              }
              }*/
+            boolean isReadOnly = false;
+            if (val instanceof Tag) {
+                isReadOnly = ((Tag) val).isReadOnly();
+            }
+
             boolean isModified = val.isModified();
             if (isModified) {
                 if (boldFont == null) {
                     Font font = getFont();
                     boldFont = font.deriveFont(Font.BOLD);
                 }
-            } else {
-                if (plainFont == null) {
-                    Font font = getFont();
-                    plainFont = font.deriveFont(Font.PLAIN);
-                }
+            } else if (plainFont == null) {
+                Font font = getFont();
+                plainFont = font.deriveFont(Font.PLAIN);
             }
             setFont(isModified ? boldFont : plainFont);
+            if (isReadOnly) {
+                setForeground(new Color(0xcc, 0xcc, 0xcc));
+            } else {
+                setForeground(Color.BLACK);
+            }
 
             return this;
         }

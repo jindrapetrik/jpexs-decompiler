@@ -84,6 +84,17 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
     @Internal
     private boolean modified;
 
+    @Internal
+    protected boolean imported = false;
+
+    public void setImported(boolean imported) {
+        this.imported = imported;
+    }
+
+    public boolean isImported() {
+        return imported;
+    }
+
     /**
      * Original tag data
      */
@@ -571,6 +582,10 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
     @Override
     public boolean isModified() {
         return modified;
+    }
+
+    public boolean isReadOnly() {
+        return isImported();
     }
 
     @Override

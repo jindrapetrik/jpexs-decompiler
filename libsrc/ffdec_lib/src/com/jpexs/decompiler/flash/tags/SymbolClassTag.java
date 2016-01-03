@@ -28,7 +28,9 @@ import com.jpexs.decompiler.flash.types.annotations.Table;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -49,6 +51,19 @@ public class SymbolClassTag extends SymbolClassTypeTag {
     @SWFArray(value = "name", countField = "numSymbols")
     @Table(value = "symbols", itemName = "symbol")
     public List<String> names;
+
+    @Override
+    public Map<Integer, String> getTagToNameMap() {
+        Map<Integer, String> exportNames = new HashMap<>();
+        for (int i = 0; i < tags.size(); i++) {
+            int tagId = tags.get(i);
+            String name = names.get(i);
+            if ((!exportNames.containsKey(tagId)) && (!exportNames.containsValue(name))) {
+                exportNames.put(tagId, name);
+            }
+        }
+        return exportNames;
+    }
 
     /**
      * Constructor

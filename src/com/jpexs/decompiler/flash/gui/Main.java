@@ -26,8 +26,10 @@ import com.jpexs.decompiler.flash.SWFBundle;
 import com.jpexs.decompiler.flash.SWFSourceInfo;
 import com.jpexs.decompiler.flash.SearchMode;
 import com.jpexs.decompiler.flash.SwfOpenException;
+import com.jpexs.decompiler.flash.UrlResolver;
 import com.jpexs.decompiler.flash.Version;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.Reference;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.SwfSpecificConfiguration;
 import com.jpexs.decompiler.flash.console.CommandLineArgumentParser;
@@ -653,17 +655,148 @@ public class Main {
             }
         } else {
             InputStream fInputStream = inputStream;
+
+            final String[] yesno = new String[]{AppStrings.translate("button.yes"), AppStrings.translate("button.no"), AppStrings.translate("button.yes.all"), AppStrings.translate("button.no.all")};
+
             CancellableWorker<SWF> worker = new CancellableWorker<SWF>() {
-                @Override
-                public SWF doInBackground() throws Exception {
+
+                private boolean yestoall = false;
+                private boolean notoall = false;
+
+                private SWF open(InputStream is, String file, String fileTitle) throws IOException, InterruptedException {
                     final CancellableWorker worker = this;
-                    SWF swf = new SWF(fInputStream, sourceInfo.getFile(), sourceInfo.getFileTitle(), new ProgressListener() {
+
+                    SWF swf = new SWF(is, file, fileTitle, new ProgressListener() {
                         @Override
                         public void progress(int p) {
                             startWork(AppStrings.translate("work.reading.swf"), p, worker);
                         }
-                    }, Configuration.parallelSpeedUp.get());
+                    }, Configuration.parallelSpeedUp.get(), false, true, new UrlResolver() {
+                        @Override
+                        public SWF resolveUrl(final String url) {
+                            int opt = -1;
+                            if (!(yestoall || notoall)) {
+                                opt = View.showOptionDialog(null, AppStrings.translate("message.imported.swf").replace("%url%", url), AppStrings.translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, yesno, AppStrings.translate("button.yes"));
+                                if (opt == 2) {
+                                    yestoall = true;
+                                }
+                                if (opt == 3) {
+                                    notoall = true;
+                                }
+                            }
+
+                            if (yestoall) {
+                                opt = 0; // yes
+                            } else if (notoall) {
+                                opt = 1; // no
+                            }
+
+                            if (opt == 1) //no
+                            {
+                                return null;
+                            }
+
+                            if (url.startsWith("http://") || url.startsWith("https://")) {
+                                try {
+                                    URL u = new URL(url);
+                                    return open(u.openStream(), null, url); //?
+                                } catch (Exception ex) {
+                                    //ignore
+                                }
+                            } else {
+                                File f = new File(new File(file).getParentFile(), url);
+                                if (f.exists()) {
+                                    try {
+                                        return open(new FileInputStream(f), f.getAbsolutePath(), f.getName());
+                                    } catch (Exception ex) {
+                                        //ignore
+                                    }
+                                }
+                            }
+                            Reference<SWF> ret = new Reference<>(null);
+                            View.execInEventDispatch(new Runnable() {
+                                @Override
+                                public void run() {
+
+                                    while (JOptionPane.YES_OPTION == View.showConfirmDialog(null, AppStrings.translate("message.imported.swf.manually").replace("%url%", url), AppStrings.translate("error"), JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE)) {
+
+                                        JFileChooser fc = new JFileChooser();
+                                        fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
+                                        FileFilter allSupportedFilter = new FileFilter() {
+                                            private final String[] supportedExtensions = new String[]{".swf", ".gfx"};
+
+                                            @Override
+                                            public boolean accept(File f) {
+                                                String name = f.getName().toLowerCase();
+                                                for (String ext : supportedExtensions) {
+                                                    if (name.endsWith(ext)) {
+                                                        return true;
+                                                    }
+                                                }
+                                                return f.isDirectory();
+                                            }
+
+                                            @Override
+                                            public String getDescription() {
+                                                String exts = Helper.joinStrings(supportedExtensions, "*%s", "; ");
+                                                return AppStrings.translate("filter.supported") + " (" + exts + ")";
+                                            }
+                                        };
+                                        fc.setFileFilter(allSupportedFilter);
+                                        FileFilter swfFilter = new FileFilter() {
+                                            @Override
+                                            public boolean accept(File f) {
+                                                return (f.getName().toLowerCase().endsWith(".swf")) || (f.isDirectory());
+                                            }
+
+                                            @Override
+                                            public String getDescription() {
+                                                return AppStrings.translate("filter.swf");
+                                            }
+                                        };
+                                        fc.addChoosableFileFilter(swfFilter);
+
+                                        FileFilter gfxFilter = new FileFilter() {
+                                            @Override
+                                            public boolean accept(File f) {
+                                                return (f.getName().toLowerCase().endsWith(".gfx")) || (f.isDirectory());
+                                            }
+
+                                            @Override
+                                            public String getDescription() {
+                                                return AppStrings.translate("filter.gfx");
+                                            }
+                                        };
+                                        fc.addChoosableFileFilter(gfxFilter);
+                                        fc.setAcceptAllFileFilterUsed(false);
+                                        JFrame f = new JFrame();
+                                        View.setWindowIcon(f);
+                                        int returnVal = fc.showOpenDialog(f);
+                                        if (returnVal == JFileChooser.APPROVE_OPTION) {
+                                            Configuration.lastOpenDir.set(Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
+                                            File selFile = Helper.fixDialogFile(fc.getSelectedFile());
+                                            try {
+                                                ret.setVal(open(new FileInputStream(selFile), selFile.getAbsolutePath(), selFile.getName()));
+                                                break;
+                                            } catch (Exception ex) {
+                                                //ignore;
+                                            }
+                                        } else {
+                                            break;
+                                        }
+                                    }
+                                }
+                            });
+                            return ret.getVal();
+                        }
+                    });
                     return swf;
+                }
+
+                @Override
+
+                public SWF doInBackground() throws Exception {
+                    return open(fInputStream, sourceInfo.getFile(), sourceInfo.getFileTitle());
                 }
             };
             if (loadingDialog != null) {
