@@ -40,7 +40,9 @@ import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.decompiler.flash.gui.pipes.FirstInstance;
 import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
+import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
+import com.jpexs.decompiler.flash.tags.base.ImportTag;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.CancellableWorker;
@@ -80,6 +82,8 @@ import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -160,6 +164,7 @@ public class Main {
     private static boolean inited = false;
 
     private static File runTempFile;
+    private static List<File> runTempFiles = new ArrayList<>();
 
     public static void freeRun() {
         synchronized (Main.class) {
@@ -167,6 +172,10 @@ public class Main {
                 runTempFile.delete();
                 runTempFile = null;
             }
+            for (File f : runTempFiles) {
+                f.delete();
+            }
+            runTempFiles.clear();
 
             runProcess = null;
         }
@@ -204,13 +213,12 @@ public class Main {
     }
 
     public static void runPlayer(String title, final String exePath, String file, String flashVars) {
-        if (flashVars != null && !flashVars.isEmpty()) {
-            file += "?" + flashVars;
-        }
         if (!new File(file).exists()) {
             return;
         }
-
+        if (flashVars != null && !flashVars.isEmpty()) {
+            file += "?" + flashVars;
+        }
         final String ffile = file;
 
         CancellableWorker runWorker = new CancellableWorker() {
@@ -218,8 +226,9 @@ public class Main {
             @Override
             protected Object doInBackground() throws Exception {
                 Process proc;
+                String runStr = "\"" + exePath + "\" \"" + ffile + "\"";
                 try {
-                    proc = Runtime.getRuntime().exec("\"" + exePath + "\" \"file://" + ffile + "\"");
+                    proc = Runtime.getRuntime().exec(runStr);
                 } catch (IOException ex) {
                     Logger.getLogger(MainFrameMenu.class.getName()).log(Level.SEVERE, null, ex);
 
@@ -294,6 +303,40 @@ public class Main {
         mainFrame.getMenu().updateComponents();
     }
 
+    private static void prepareFile(File toPrepareFile, File origFile, List<File> tempFiles) throws IOException {
+        SWF instrSWF = null;
+        try (FileInputStream fis = new FileInputStream(toPrepareFile)) {
+            instrSWF = new SWF(fis, false, false);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(MainFrameMenu.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        if (instrSWF != null) {
+            for (Tag t : instrSWF.getLocalTags()) {
+                if (t instanceof ImportTag) {
+                    ImportTag it = (ImportTag) t;
+                    String url = it.getUrl();
+                    File importedFile = new File(origFile.getParentFile(), url);
+                    if (importedFile.exists()) {
+                        File newTempFile = File.createTempFile("ffdec_run_import_", ".swf");
+                        it.setUrl("./" + newTempFile.getName());
+                        byte[] impData = Helper.readFile(importedFile.getAbsolutePath());
+                        Helper.writeFile(newTempFile.getAbsolutePath(), impData);
+                        tempFiles.add(newTempFile);
+                    }
+                }
+            }
+            if (Configuration.autoOpenLoadedSWFs.get()) {
+                if (!DebuggerTools.hasDebugger(instrSWF)) {
+                    DebuggerTools.switchDebugger(instrSWF);
+                }
+                DebuggerTools.injectDebugLoader(instrSWF);
+            }
+            try (FileOutputStream fos = new FileOutputStream(toPrepareFile)) {
+                instrSWF.saveTo(fos);
+            }
+        }
+    }
+
     public static void run(SWF swf) {
         String flashVars = "";//key=val&key2=val2
         String playerLocation = Configuration.playerLocation.get();
@@ -306,30 +349,16 @@ public class Main {
             return;
         }
         File tempFile;
+        List<File> tempFiles = new ArrayList<>();
         try {
             tempFile = File.createTempFile("ffdec_run_", ".swf");
 
-            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
+            try (FileOutputStream fos = new FileOutputStream(tempFile)) {
                 swf.saveTo(fos);
             }
 
-            if (swf.isAS3() && Configuration.autoOpenLoadedSWFs.get()) {
-                SWF instrSWF = null;
-                try (FileInputStream fis = new FileInputStream(tempFile)) {
-                    instrSWF = new SWF(fis, false, false);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(MainFrameMenu.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                if (instrSWF != null) {
-                    if (!DebuggerTools.hasDebugger(instrSWF)) {
-                        DebuggerTools.switchDebugger(instrSWF);
-                    }
-                    DebuggerTools.injectDebugLoader(instrSWF);
-                    try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
-                        instrSWF.saveTo(fos);
-                    }
-                }
-            }
+            prepareFile(tempFile, new File(swf.getFile()), tempFiles);
+
         } catch (IOException ex) {
             return;
 
@@ -337,6 +366,7 @@ public class Main {
         if (tempFile != null) {
             synchronized (Main.class) {
                 runTempFile = tempFile;
+                runTempFiles = tempFiles;
                 runProcessDebug = false;
             }
             runPlayer(AppStrings.translate("work.running"), playerLocation, tempFile.getAbsolutePath(), flashVars);
@@ -364,6 +394,7 @@ public class Main {
 
         if (tempFile != null) {
             final File fTempFile = tempFile;
+            final List<File> tempFiles = new ArrayList<>();
             CancellableWorker instrumentWorker = new CancellableWorker() {
 
                 @Override
@@ -372,6 +403,7 @@ public class Main {
                     try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(fTempFile))) {
                         swf.saveTo(fos);
                     }
+                    prepareFile(fTempFile, new File(swf.getFile()), tempFiles);
                     SWF instrSWF = null;
                     try (FileInputStream fis = new FileInputStream(fTempFile)) {
                         instrSWF = new SWF(fis, false, false);
@@ -379,12 +411,6 @@ public class Main {
                         Logger.getLogger(MainFrameMenu.class.getName()).log(Level.SEVERE, null, ex);
                     }
                     if (instrSWF != null) {
-                        if (instrSWF.isAS3() && Configuration.autoOpenLoadedSWFs.get()) {
-                            if (!DebuggerTools.hasDebugger(instrSWF)) {
-                                DebuggerTools.switchDebugger(instrSWF);
-                            }
-                            DebuggerTools.injectDebugLoader(instrSWF);
-                        }
                         instrSWF.enableDebugging(true, new File("."), true, doPCode);
                         try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(fTempFile))) {
                             instrSWF.saveTo(fos);
@@ -428,6 +454,7 @@ public class Main {
                         runTempFile = fTempFile;
                         runProcessDebug = true;
                         runProcessDebugPCode = doPCode;
+                        runTempFiles = tempFiles;
                     }
                     Main.stopWork();
                     Main.startDebugger();

@@ -57,6 +57,12 @@ public class ImportAssets2Tag extends Tag implements ImportTag {
     @Conditional(value = "hasDigest", options = {1})
     String sha1 = "";
 
+    @Override
+    public void setUrl(String url) {
+        this.url = url;
+        setModified(true);
+    }
+
     /**
      * HashMap with assets
      */

@@ -87,6 +87,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
     private ConfigurationItemChangeListener<Boolean> configListenerAutoRenameIdentifiers;
 
+    private ConfigurationItemChangeListener<Boolean> configListenerAutoOpenLoadedSWFs;
+
     protected final Map<String, HotKey> menuHotkeys = new HashMap<>();
 
     @Override
@@ -944,6 +946,11 @@ public abstract class MainFrameMenu implements MenuBuilder {
             setMenuChecked("/settings/autoRenameIdentifiers", newValue);
         });
 
+        setMenuChecked("/settings/autoOpenLoadedSWFs", Configuration.autoOpenLoadedSWFs.get());
+        Configuration.autoOpenLoadedSWFs.addListener(configListenerAutoOpenLoadedSWFs = (Boolean newValue) -> {
+            setMenuChecked("/settings/autoOpenLoadedSWFs", newValue);
+        });
+
         if (externalFlashPlayerUnavailable) {
             setMenuEnabled("/settings/internalViewer", false);
             setMenuEnabled("/settings/autoOpenLoadedSWFs", false);
@@ -1064,14 +1071,12 @@ public abstract class MainFrameMenu implements MenuBuilder {
             } else {
                 setGroupSelection("view", null);
             }
+        } else if (Configuration.dumpView.get()) {
+            setGroupSelection("view", "/file/view/viewHex");
+            mainFrame.getPanel().showView(MainPanel.VIEW_DUMP);
         } else {
-            if (Configuration.dumpView.get()) {
-                setGroupSelection("view", "/file/view/viewHex");
-                mainFrame.getPanel().showView(MainPanel.VIEW_DUMP);
-            } else {
-                setGroupSelection("view", "/file/view/viewResources");
-                mainFrame.getPanel().showView(MainPanel.VIEW_RESOURCES);
-            }
+            setGroupSelection("view", "/file/view/viewResources");
+            mainFrame.getPanel().showView(MainPanel.VIEW_RESOURCES);
         }
     }
 
@@ -1108,6 +1113,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         Configuration.cacheOnDisk.removeListener(configListenerCacheOnDisk);
         Configuration.gotoMainClassOnStartup.removeListener(configListenerGotoMainClassOnStartup);
         Configuration.autoRenameIdentifiers.removeListener(configListenerAutoRenameIdentifiers);
+        Configuration.autoOpenLoadedSWFs.removeListener(configListenerAutoOpenLoadedSWFs);
 
         Main.stopRun();
     }

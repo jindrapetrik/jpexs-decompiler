@@ -69,6 +69,12 @@ public class ImportAssetsTag extends Tag implements ImportTag {
         tags = new ArrayList<>();
     }
 
+    @Override
+    public void setUrl(String url) {
+        this.url = url;
+        setModified(true);
+    }
+
     /**
      * Constructor
      *

@@ -26,5 +26,7 @@ public interface ImportTag {
 
     public String getUrl();
 
+    public void setUrl(String url);
+
     public Map<Integer, String> getAssets();
 }

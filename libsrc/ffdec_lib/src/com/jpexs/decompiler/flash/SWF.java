@@ -3228,6 +3228,8 @@ public final class SWF implements SWFContainerItem, Timelined {
     public void addTag(Tag tag) {
         setModified(true);
         tags.add(tag);
+        readOnlyTags = null;
+        readOnlyLocalTags = null;
     }
 
     /**
@@ -3240,6 +3242,8 @@ public final class SWF implements SWFContainerItem, Timelined {
     public void addTag(int index, Tag tag) {
         setModified(true);
         tags.add(index, tag);
+        readOnlyTags = null;
+        readOnlyLocalTags = null;
     }
 
     /**
