@@ -1040,7 +1040,12 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
     private void viewHexActionPerformed(ActionEvent evt) {
         Configuration.dumpView.set(true);
-        mainFrame.getPanel().showView(MainPanel.VIEW_DUMP);
+        MainPanel mainPanel = mainFrame.getPanel();
+        if (mainPanel.isModified()) {
+            View.showMessageDialog(null, translate("message.warning.hexViewNotUpToDate"), translate("message.warning"), JOptionPane.WARNING_MESSAGE, Configuration.warningHexViewNotUpToDate);
+        }
+
+        mainPanel.showView(MainPanel.VIEW_DUMP);
         setGroupSelection("view", "/file/view/viewHex");
         setMenuChecked("/tools/timeline", false);
     }
