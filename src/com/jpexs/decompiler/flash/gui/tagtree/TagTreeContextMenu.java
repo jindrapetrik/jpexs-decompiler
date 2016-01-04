@@ -285,11 +285,9 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
             if (singleSwf == null) {
                 singleSwf = item.getSwf();
-            } else {
-                if (singleSwf != item.getSwf()) {
-                    allSelectedIsInTheSameSwf = false;
-                    break;
-                }
+            } else if (singleSwf != item.getSwf()) {
+                allSelectedIsInTheSameSwf = false;
+                break;
             }
         }
 
@@ -441,6 +439,25 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
 
             openSWFInsideTagMenuItem.setVisible(anyInnerSwf);
+        }
+
+        for (TreeItem item : items) {
+            if (item instanceof Tag) {
+                if (((Tag) item).isReadOnly()) {
+                    removeMenuItem.setVisible(false);
+                    removeWithDependenciesMenuItem.setVisible(false);
+                    undoTagMenuItem.setVisible(false);
+                    replaceMenuItem.setVisible(false);
+                    replaceNoFillMenuItem.setVisible(false);
+                    replaceWithTagMenuItem.setVisible(false);
+                    rawEditMenuItem.setVisible(false);
+                    jumpToCharacterMenuItem.setVisible(false);
+                    importSwfXmlMenuItem.setVisible(false);
+                    addTagMenu.setVisible(false);
+                    moveTagMenu.setVisible(false);
+                    openSWFInsideTagMenuItem.setVisible(false);
+                }
+            }
         }
     }
 
