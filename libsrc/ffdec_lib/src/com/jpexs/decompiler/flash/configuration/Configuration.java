@@ -538,6 +538,11 @@ public class Configuration {
     @ConfigurationCategory("import")
     public static final ConfigurationItem<Boolean> warningSvgImport = null;
 
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationName("warning.hexViewNotUpToDate")
+    @ConfigurationCategory("import")
+    public static final ConfigurationItem<Boolean> warningHexViewNotUpToDate = null;
+
     @ConfigurationDefaultBoolean(false)
     @ConfigurationName("shapeImport.useNonSmoothedFill")
     @ConfigurationCategory("import")
