@@ -114,7 +114,6 @@ import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.tags.base.RenderContext;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
-import com.jpexs.decompiler.flash.tags.base.SymbolClassTypeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.timeline.AS2Package;
@@ -163,7 +162,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -216,9 +214,6 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     @Internal
     public ReadOnlyTagList readOnlyTags;
-
-    @Internal
-    public ReadOnlyTagList readOnlyLocalTags;
 
     public boolean hasEndTag = true;
 
@@ -1143,7 +1138,6 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
         this.tags = tags;
         readOnlyTags = null;
-        readOnlyLocalTags = null;
         if (!checkOnly) {
             checkInvalidSprites();
             updateCharacters();
@@ -2461,7 +2455,6 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     public void clearReadOnlyListCache() {
         readOnlyTags = null;
-        readOnlyLocalTags = null;
         for (Tag tag : tags) {
             if (tag instanceof DefineSpriteTag) {
                 ((DefineSpriteTag) tag).clearReadOnlyListCache();
@@ -3206,17 +3199,13 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     public ReadOnlyTagList getLocalTags() {
-        if (readOnlyLocalTags == null) {
-            List<Tag> localTags = new ArrayList<>();
-            for (Tag t : tags) {
-                if (!t.isImported()) {
-                    localTags.add(t);
-                }
+        List<Tag> localTags = new ArrayList<>();
+        for (Tag t : tags) {
+            if (!t.isImported()) {
+                localTags.add(t);
             }
-            readOnlyLocalTags = new ReadOnlyTagList(localTags);
         }
-
-        return readOnlyLocalTags;
+        return new ReadOnlyTagList(localTags);
     }
 
     /**
@@ -3228,8 +3217,6 @@ public final class SWF implements SWFContainerItem, Timelined {
     public void addTag(Tag tag) {
         setModified(true);
         tags.add(tag);
-        readOnlyTags = null;
-        readOnlyLocalTags = null;
     }
 
     /**
@@ -3242,8 +3229,6 @@ public final class SWF implements SWFContainerItem, Timelined {
     public void addTag(int index, Tag tag) {
         setModified(true);
         tags.add(index, tag);
-        readOnlyTags = null;
-        readOnlyLocalTags = null;
     }
 
     /**
