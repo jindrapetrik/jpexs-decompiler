@@ -829,11 +829,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     private boolean closeConfirmation(SWFList swfList) {
-        if (swfList == null) {
-            if (View.showConfirmDialog(this, translate("message.confirm.closeAll"), translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, Configuration.showCloseConfirmation, JOptionPane.OK_OPTION) != JOptionPane.OK_OPTION) {
-                return false;
-            }
-        } else if (View.showConfirmDialog(this, translate("message.confirm.close").replace("{swfName}", swfList.toString()), translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, Configuration.showCloseConfirmation, JOptionPane.OK_OPTION) != JOptionPane.OK_OPTION) {
+        String message = swfList == null
+                ? translate("message.confirm.closeAll")
+                : translate("message.confirm.close").replace("{swfName}", swfList.toString());
+
+        if (View.showConfirmDialog(this, message, translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, Configuration.showCloseConfirmation, JOptionPane.OK_OPTION) != JOptionPane.OK_OPTION) {
             return false;
         }
 
@@ -1787,10 +1787,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                                 }
                                 if (found) {
                                     String[] textArray = texts.toArray(new String[texts.size()]);
-                                    textTag.setFormattedText(getMissingCharacterHandler(), textTag.getFormattedText().text, textArray);
+                                    textTag.setFormattedText(getMissingCharacterHandler(), textTag.getFormattedText(false).text, textArray);
                                 }
                             } else {
-                                String text = textTag.getFormattedText().text;
+                                String text = textTag.getFormattedText(false).text;
                                 if (pat.matcher(text).find()) {
                                     textTag.setFormattedText(getMissingCharacterHandler(), text.replaceAll(txt, replacement), null);
                                     findCount++;
@@ -1822,7 +1822,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             for (Tag tag : swf.getTags()) {
                 if (tag instanceof TextTag) {
                     TextTag textTag = (TextTag) tag;
-                    if (pat.matcher(textTag.getFormattedText().text).find()) {
+                    if (pat.matcher(textTag.getFormattedText(false).text).find()) {
                         found.add(textTag);
                     }
                 }

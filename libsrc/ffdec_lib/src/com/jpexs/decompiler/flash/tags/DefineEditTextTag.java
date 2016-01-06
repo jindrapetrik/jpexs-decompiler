@@ -501,7 +501,7 @@ public class DefineEditTextTag extends TextTag {
     }
 
     @Override
-    public HighlightedText getFormattedText() {
+    public HighlightedText getFormattedText(boolean ignoreLetterSpacing) {
         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
         writer.append("[");
         String[] alignNames = {"left", "right", "center", "justify"};

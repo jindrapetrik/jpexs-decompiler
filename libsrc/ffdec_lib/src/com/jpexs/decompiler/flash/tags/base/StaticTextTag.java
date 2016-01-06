@@ -227,7 +227,7 @@ public abstract class StaticTextTag extends TextTag {
     }
 
     @Override
-    public HighlightedText getFormattedText() {
+    public HighlightedText getFormattedText(boolean ignoreLetterSpacing) {
         FontTag fnt = null;
         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
         writer.append("[").newLine();
@@ -263,7 +263,7 @@ public abstract class StaticTextTag extends TextTag {
                     writer.append("height ").append(rec.textHeight).newLine();
                     textHeight = rec.textHeight;
                 }
-                if (fnt != null) {
+                if (fnt != null && !ignoreLetterSpacing) {
                     int letterSpacing = detectLetterSpacing(rec, fnt, textHeight);
                     if (letterSpacing != 0) {
                         writer.append("letterspacing ").append(letterSpacing).newLine();

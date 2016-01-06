@@ -173,7 +173,7 @@ public class TextPanel extends JPanel implements TagEditorPanel {
 
     public void setText(TextTag textTag) {
         this.textTag = textTag;
-        textValue.setText(textTag.getFormattedText().text);
+        textValue.setText(textTag.getFormattedText(false).text);
         textValue.setCaretPosition(0);
         setModified(false);
         setEditText(false);
@@ -202,7 +202,7 @@ public class TextPanel extends JPanel implements TagEditorPanel {
     public void focusTextValue() {
         textValue.requestFocusInWindow();
         if (textTag != null && !isModified()) {
-            HighlightedText text = textTag.getFormattedText();
+            HighlightedText text = textTag.getFormattedText(false);
             for (Highlighting highlight : text.specialHilights) {
                 if (highlight.getProperties().subtype == HighlightSpecialType.TEXT) {
                     textValue.select(highlight.startPos, highlight.startPos + highlight.len);
@@ -219,7 +219,7 @@ public class TextPanel extends JPanel implements TagEditorPanel {
         if (selEnd > selStart) {
             StringBuilder selected = new StringBuilder(textValue.getSelectedText());
 
-            HighlightedText text = textTag.getFormattedText();
+            HighlightedText text = textTag.getFormattedText(false);
             boolean allUpper = true;
             for (Highlighting highlight : text.specialHilights) {
                 if (highlight.getProperties().subtype == HighlightSpecialType.TEXT) {

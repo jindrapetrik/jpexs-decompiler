@@ -77,7 +77,7 @@ public class TextImporter {
                 TextTag textTag = swf.getText(characterId);
                 if (textTag != null) {
                     String[] currentRecords = records.get(characterId);
-                    String text = textTag.getFormattedText().text;
+                    String text = textTag.getFormattedText(false).text;
                     if (!saveText(textTag, text, currentRecords)) {
                         return;
                     }
@@ -135,7 +135,7 @@ public class TextImporter {
         if (!formatted) {
             String[] records = newText.split(recordSeparator);
             if (textTag != null) {
-                String text = textTag.getFormattedText().text;
+                String text = textTag.getFormattedText(false).text;
                 if (!saveText(textTag, text, records)) {
                     return false;
                 }

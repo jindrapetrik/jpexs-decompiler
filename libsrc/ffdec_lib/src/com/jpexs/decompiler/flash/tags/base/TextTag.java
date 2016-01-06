@@ -83,7 +83,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
 
     public abstract List<Integer> getFontIds();
 
-    public abstract HighlightedText getFormattedText();
+    public abstract HighlightedText getFormattedText(boolean ignoreLetterSpacing);
 
     // use the texts from the "texts" argument when it is not null
     public abstract boolean setFormattedText(MissingCharacterHandler missingCharHandler, String formattedText, String[] texts) throws TextParseException;
