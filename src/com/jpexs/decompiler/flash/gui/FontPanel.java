@@ -151,6 +151,7 @@ public class FontPanel extends JPanel {
         String[] yesno = new String[]{translate("button.yes"), translate("button.no"), translate("button.yes.all"), translate("button.no.all")};
         boolean yestoall = false;
         boolean notoall = false;
+        boolean replaced = false;
         for (int ic : selChars) {
             char c = (char) ic;
             if (oldchars.indexOf((int) c) > -1) {
@@ -174,24 +175,30 @@ public class FontPanel extends JPanel {
                 if (opt == 1) {
                     continue;
                 }
+
+                replaced = true;
             }
+
             f.addCharacter(c, font);
             oldchars += c;
         }
 
-        int fontId = ft.getFontId();
-        if (updateTextsCheckBox.isSelected()) {
-            SWF swf = ft.getSwf();
-            for (Tag tag : swf.getTags()) {
-                if (tag instanceof TextTag) {
-                    TextTag textTag = (TextTag) tag;
-                    if (textTag.getFontIds().contains(fontId)) {
-                        String text = textTag.getFormattedText(true).text;
-                        mainPanel.saveText(textTag, text, null);
+        if (replaced) {
+            if (View.showConfirmDialog(null, translate("message.font.replace.updateTexts"), translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE) == JOptionPane.YES_OPTION) {
+                int fontId = ft.getFontId();
+                SWF swf = ft.getSwf();
+                for (Tag tag : swf.getTags()) {
+                    if (tag instanceof TextTag) {
+                        TextTag textTag = (TextTag) tag;
+                        if (textTag.getFontIds().contains(fontId)) {
+                            String text = textTag.getFormattedText(true).text;
+                            mainPanel.saveText(textTag, text, null);
+                        }
                     }
                 }
             }
         }
+
         ft.setModified(true);
         ft.getSwf().clearImageCache();
     }
@@ -251,7 +258,6 @@ public class FontPanel extends JPanel {
         JLabel fontCharsAddLabel = new JLabel();
         fontAddCharactersField = new JTextField();
         fontAddCharsButton = new JButton();
-        updateTextsCheckBox = new JCheckBox();
         fontSourceLabel = new JLabel();
         fontFamilyNameSelection = new JComboBox<>();
         fontFaceSelection = new JComboBox<>();
@@ -381,8 +387,6 @@ public class FontPanel extends JPanel {
         fontAddCharsButton.setText(AppStrings.translate("button.ok"));
         fontAddCharsButton.addActionListener(this::fontAddCharsButtonActionPerformed);
 
-        updateTextsCheckBox.setText(AppStrings.translate("font.updateTexts"));
-
         fontSourceLabel.setText(AppStrings.translate("font.source"));
 
         fontFamilyNameSelection.setPreferredSize(new Dimension(100, fontFamilyNameSelection.getMinimumSize().height));
@@ -443,8 +447,6 @@ public class FontPanel extends JPanel {
         addCharsPanel.add(buttonPreviewFont, "3,1");
         addCharsPanel.add(buttonSetAdvanceValues, "4,1");
 
-        addCharsPanel.add(updateTextsCheckBox, "0,2,2,2");
-
         JPanel buttonsPanel = new JPanel(new FlowLayout());
         buttonsPanel.add(buttonEdit);
         buttonsPanel.add(buttonSave);
@@ -484,13 +486,17 @@ public class FontPanel extends JPanel {
 
         TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
         if (item instanceof FontTag) {
+            FontTag ft = (FontTag) item;
             Set<Integer> selChars = new TreeSet<>();
             for (int c = 0; c < newchars.length(); c++) {
                 selChars.add(newchars.codePointAt(c));
             }
-            fontAddChars((FontTag) item, selChars, ((FontFace) fontFaceSelection.getSelectedItem()).font);
-            fontAddCharactersField.setText("");
-            mainPanel.reload(true);
+
+            if (!selChars.isEmpty()) {
+                fontAddChars(ft, selChars, ((FontFace) fontFaceSelection.getSelectedItem()).font);
+                fontAddCharactersField.setText("");
+                mainPanel.reload(true);
+            }
         }
     }
 
@@ -503,7 +509,6 @@ public class FontPanel extends JPanel {
                 Set<Integer> selChars = fed.getSelectedChars();
                 if (!selChars.isEmpty()) {
                     Font selFont = fed.getSelectedFont();
-                    updateTextsCheckBox.setSelected(fed.hasUpdateTexts());
                     fontFamilyNameSelection.setSelectedItem(new FontFamily(selFont));
                     fontFaceSelection.setSelectedItem(new FontFace(selFont));
                     fontAddChars(ft, selChars, selFont);
@@ -673,8 +678,6 @@ public class FontPanel extends JPanel {
     private JPanel fontParamsPanel;
 
     private JPanel addCharsPanel;
-
-    private JCheckBox updateTextsCheckBox;
 
     private JPanel contentPanel;
 

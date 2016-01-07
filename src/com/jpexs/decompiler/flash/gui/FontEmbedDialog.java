@@ -79,17 +79,11 @@ public class FontEmbedDialog extends AppDialog {
 
     private final JCheckBox allCheckbox;
 
-    private final JCheckBox updateTextsCheckbox;
-
     public Font getSelectedFont() {
         if (ttfFileRadio.isSelected() && customFont != null) {
             return customFont;
         }
         return ((FontFace) faceSelection.getSelectedItem()).font;
-    }
-
-    public boolean hasUpdateTexts() {
-        return updateTextsCheckbox.isSelected();
     }
 
     public Set<Integer> getSelectedChars() {
@@ -250,13 +244,8 @@ public class FontEmbedDialog extends AppDialog {
         individialSample = new JLabel();
         specialPanel.add(individualCharsField);
 
-        updateTextsCheckbox = new JCheckBox(AppStrings.translate("font.updateTexts"));
-
-        JPanel utPanel = new JPanel(new FlowLayout());
-        utPanel.add(updateTextsCheckbox);
         cnt.add(specialPanel);
         cnt.add(individialSample);
-        cnt.add(utPanel);
 
         JPanel buttonsPanel = new JPanel(new FlowLayout());
         JButton okButton = new JButton(AppStrings.translate("button.ok"));
