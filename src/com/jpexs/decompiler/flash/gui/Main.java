@@ -303,10 +303,77 @@ public class Main {
         mainFrame.getMenu().updateComponents();
     }
 
-    private static void prepareFile(File toPrepareFile, File origFile, List<File> tempFiles) throws IOException {
+    private static interface SwfPreparation {
+
+        public SWF prepare(SWF swf);
+    }
+
+    private static class SwfRunPrepare implements SwfPreparation {
+
+        @Override
+        public SWF prepare(SWF swf) {
+            if (Configuration.autoOpenLoadedSWFs.get()) {
+                if (!DebuggerTools.hasDebugger(swf)) {
+                    DebuggerTools.switchDebugger(swf);
+                }
+                DebuggerTools.injectDebugLoader(swf);
+            }
+            return swf;
+        }
+    }
+
+    private static class SwfDebugPrepare extends SwfRunPrepare {
+
+        private boolean doPCode;
+
+        public SwfDebugPrepare(boolean doPCode) {
+            this.doPCode = doPCode;
+        }
+
+        @Override
+        public SWF prepare(SWF instrSWF) {
+            instrSWF = super.prepare(instrSWF);
+            try {
+                File fTempFile = new File(instrSWF.getFile());
+                instrSWF.enableDebugging(true, new File("."), true, doPCode);
+                FileOutputStream fos = new FileOutputStream(fTempFile);
+                instrSWF.saveTo(fos);
+                fos.close();
+                if (!instrSWF.isAS3()) {
+                    //Read again, because line file offsets changed with adding debug tags
+                    //TODO: handle somehow without rereading?
+                    instrSWF = null;
+                    try (FileInputStream fis = new FileInputStream(fTempFile)) {
+                        instrSWF = new SWF(fis, false, false);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(MainFrameMenu.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    if (instrSWF != null) {
+                        String swfFileName = fTempFile.getAbsolutePath();
+                        if (swfFileName.toLowerCase().endsWith(".swf")) {
+                            swfFileName = swfFileName.substring(0, swfFileName.length() - 4) + ".swd";
+                        } else {
+                            swfFileName = swfFileName + ".swd";
+                        }
+                        File swdFile = new File(swfFileName);
+                        if (doPCode) {
+                            instrSWF.generatePCodeSwdFile(swdFile, getPackBreakPoints(true));
+                        } else {
+                            instrSWF.generateSwdFile(swdFile, getPackBreakPoints(true));
+                        }
+                    }
+                }
+            } catch (IOException ex) {
+                //ignore, return instrSWF
+            }
+            return instrSWF;
+        }
+    }
+
+    private static void prepareSwf(SwfPreparation prep, File toPrepareFile, File origFile, List<File> tempFiles) throws IOException {
         SWF instrSWF = null;
         try (FileInputStream fis = new FileInputStream(toPrepareFile)) {
-            instrSWF = new SWF(fis, false, false);
+            instrSWF = new SWF(fis, toPrepareFile.getAbsolutePath(), origFile.getName(), false);
         } catch (InterruptedException ex) {
             Logger.getLogger(MainFrameMenu.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -322,14 +389,12 @@ public class Main {
                         byte[] impData = Helper.readFile(importedFile.getAbsolutePath());
                         Helper.writeFile(newTempFile.getAbsolutePath(), impData);
                         tempFiles.add(newTempFile);
+                        prepareSwf(prep, newTempFile, importedFile, tempFiles);
                     }
                 }
             }
-            if (Configuration.autoOpenLoadedSWFs.get()) {
-                if (!DebuggerTools.hasDebugger(instrSWF)) {
-                    DebuggerTools.switchDebugger(instrSWF);
-                }
-                DebuggerTools.injectDebugLoader(instrSWF);
+            if (prep != null) {
+                instrSWF = prep.prepare(instrSWF);
             }
             try (FileOutputStream fos = new FileOutputStream(toPrepareFile)) {
                 instrSWF.saveTo(fos);
@@ -357,7 +422,7 @@ public class Main {
                 swf.saveTo(fos);
             }
 
-            prepareFile(tempFile, new File(swf.getFile()), tempFiles);
+            prepareSwf(new SwfRunPrepare(), tempFile, new File(swf.getFile()), tempFiles);
 
         } catch (IOException ex) {
             return;
@@ -403,43 +468,7 @@ public class Main {
                     try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(fTempFile))) {
                         swf.saveTo(fos);
                     }
-                    prepareFile(fTempFile, new File(swf.getFile()), tempFiles);
-                    SWF instrSWF = null;
-                    try (FileInputStream fis = new FileInputStream(fTempFile)) {
-                        instrSWF = new SWF(fis, false, false);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(MainFrameMenu.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    if (instrSWF != null) {
-                        instrSWF.enableDebugging(true, new File("."), true, doPCode);
-                        try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(fTempFile))) {
-                            instrSWF.saveTo(fos);
-                        }
-                        if (!instrSWF.isAS3()) {
-                            //Read again, because line file offsets changed with adding debug tags
-                            //TODO: handle somehow without rereading?
-                            instrSWF = null;
-                            try (FileInputStream fis = new FileInputStream(fTempFile)) {
-                                instrSWF = new SWF(fis, false, false);
-                            } catch (InterruptedException ex) {
-                                Logger.getLogger(MainFrameMenu.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-                            if (instrSWF != null) {
-                                String swfFileName = fTempFile.getAbsolutePath();
-                                if (swfFileName.toLowerCase().endsWith(".swf")) {
-                                    swfFileName = swfFileName.substring(0, swfFileName.length() - 4) + ".swd";
-                                } else {
-                                    swfFileName = swfFileName + ".swd";
-                                }
-                                File swdFile = new File(swfFileName);
-                                if (doPCode) {
-                                    instrSWF.generatePCodeSwdFile(swdFile, getPackBreakPoints(true));
-                                } else {
-                                    instrSWF.generateSwdFile(swdFile, getPackBreakPoints(true));
-                                }
-                            }
-                        }
-                    }
+                    prepareSwf(new SwfDebugPrepare(doPCode), fTempFile, new File(swf.getFile()), tempFiles);
                     return null;
                 }
 
