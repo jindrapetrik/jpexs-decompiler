@@ -82,8 +82,6 @@ import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -164,6 +162,7 @@ public class Main {
     private static boolean inited = false;
 
     private static File runTempFile;
+
     private static List<File> runTempFiles = new ArrayList<>();
 
     public static void freeRun() {
@@ -717,6 +716,7 @@ public class Main {
             CancellableWorker<SWF> worker = new CancellableWorker<SWF>() {
 
                 private boolean yestoall = false;
+
                 private boolean notoall = false;
 
                 private SWF open(InputStream is, String file, String fileTitle) throws IOException, InterruptedException {
