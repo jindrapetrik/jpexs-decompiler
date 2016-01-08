@@ -852,8 +852,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         return false;
     }
 
-    public boolean closeAll() {
-        if (isModified()) {
+    public boolean closeAll(boolean showCloseConfirmation) {
+        if (showCloseConfirmation && isModified()) {
             boolean closeConfirmResult = closeConfirmation(swfs.size() == 1 ? swfs.get(0) : null);
             if (!closeConfirmResult) {
                 return false;

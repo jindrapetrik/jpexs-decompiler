@@ -474,22 +474,30 @@ public class View {
 
     public static int showConfirmDialog(final Component parentComponent, String message, final String title, final int optionType, final int messageType, ConfigurationItem<Boolean> showAgainConfig, int defaultOption) {
 
-        JLabel warLabel = new JLabel("<html>" + message.replace("\r\n", "<br>") + "</html>");
-        final JPanel warPanel = new JPanel(new BorderLayout());
-        warPanel.add(warLabel, BorderLayout.CENTER);
-        JCheckBox donotShowAgainCheckBox = new JCheckBox(AppStrings.translate("message.confirm.donotshowagain"));
-        donotShowAgainCheckBox.setSelected(!showAgainConfig.get());
-        warPanel.add(donotShowAgainCheckBox, BorderLayout.SOUTH);
+        JCheckBox donotShowAgainCheckBox = null;
+        JPanel warPanel = null;
+        if (showAgainConfig != null) {
+            if (!showAgainConfig.get()) {
+                return defaultOption;
+            }
 
-        if (donotShowAgainCheckBox.isSelected()) {
-            return defaultOption;
+            JLabel warLabel = new JLabel("<html>" + message.replace("\r\n", "<br>") + "</html>");
+            warPanel = new JPanel(new BorderLayout());
+            warPanel.add(warLabel, BorderLayout.CENTER);
+            donotShowAgainCheckBox = new JCheckBox(AppStrings.translate("message.confirm.donotshowagain"));
+            warPanel.add(donotShowAgainCheckBox, BorderLayout.SOUTH);
         }
 
         final int ret[] = new int[1];
+        final Object messageObj = warPanel == null ? message : warPanel;
         execInEventDispatch(() -> {
-            ret[0] = JOptionPane.showConfirmDialog(parentComponent, warPanel, title, optionType, messageType);
+            ret[0] = JOptionPane.showConfirmDialog(parentComponent, messageObj, title, optionType, messageType);
         });
-        showAgainConfig.set(!donotShowAgainCheckBox.isSelected());
+
+        if (donotShowAgainCheckBox != null) {
+            showAgainConfig.set(!donotShowAgainCheckBox.isSelected());
+        }
+
         return ret[0];
     }
 
@@ -501,22 +509,23 @@ public class View {
 
         execInEventDispatch(() -> {
             Object msg = message;
-            JCheckBox donotShowAgainCheckBox = new JCheckBox(AppStrings.translate("message.confirm.donotshowagain"));
+            JCheckBox donotShowAgainCheckBox = null;
             if (showAgainConfig != null) {
+                if (!showAgainConfig.get()) {
+                    return;
+                }
+
                 JLabel warLabel = new JLabel("<html>" + message.replace("\r\n", "<br>") + "</html>");
                 final JPanel warPanel = new JPanel(new BorderLayout());
                 warPanel.add(warLabel, BorderLayout.CENTER);
-                donotShowAgainCheckBox.setSelected(!showAgainConfig.get());
+                donotShowAgainCheckBox = new JCheckBox(AppStrings.translate("message.confirm.donotshowagain"));
                 warPanel.add(donotShowAgainCheckBox, BorderLayout.SOUTH);
                 msg = warPanel;
-                if (donotShowAgainCheckBox.isSelected()) {
-                    return;
-                }
             }
             final Object fmsg = msg;
 
             JOptionPane.showMessageDialog(parentComponent, fmsg, title, messageType);
-            if (showAgainConfig != null) {
+            if (donotShowAgainCheckBox != null) {
                 showAgainConfig.set(!donotShowAgainCheckBox.isSelected());
             }
         });
