@@ -33,7 +33,6 @@ import com.jpexs.debugger.flash.messages.in.InFrame;
 import com.jpexs.debugger.flash.messages.in.InGetSwd;
 import com.jpexs.debugger.flash.messages.in.InGetSwf;
 import com.jpexs.debugger.flash.messages.in.InGetVariable;
-import com.jpexs.debugger.flash.messages.in.InIsolate;
 import com.jpexs.debugger.flash.messages.in.InNumScript;
 import com.jpexs.debugger.flash.messages.in.InProcessTag;
 import com.jpexs.debugger.flash.messages.in.InScript;

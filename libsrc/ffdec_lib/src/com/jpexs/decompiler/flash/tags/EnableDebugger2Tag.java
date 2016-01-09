@@ -36,7 +36,7 @@ import java.io.IOException;
  * @author JPEXS
  */
 @SWFVersion(from = 6)
-public class EnableDebugger2Tag extends Tag implements PasswordTag {
+public final class EnableDebugger2Tag extends Tag implements PasswordTag {
 
     public static final int ID = 64;
 
