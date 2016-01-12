@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.action;
 
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
-import com.jpexs.decompiler.flash.ecma.Undefined;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;

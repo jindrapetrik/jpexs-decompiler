@@ -1,16 +1,11 @@
 package com.jpexs.decompiler.flash.action;
 
-import com.jpexs.decompiler.flash.ReadOnlyTagList;
-import com.jpexs.decompiler.flash.tags.Tag;
-import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
-import com.jpexs.decompiler.flash.types.RECT;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  *

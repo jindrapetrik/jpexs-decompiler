@@ -226,8 +226,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         }
 
         if (swf != null) {
-            Main.closeAll();
-            return true;
+            return Main.closeAll();
         }
 
         return false;

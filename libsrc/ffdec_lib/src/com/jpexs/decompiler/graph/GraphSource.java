@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
-import com.jpexs.decompiler.flash.abc.avm2.parser.script.Reference;
 import com.jpexs.decompiler.flash.action.Action;
 import java.io.Serializable;
 import java.util.ArrayList;

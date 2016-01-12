@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
-import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.List;
 import java.util.Map;

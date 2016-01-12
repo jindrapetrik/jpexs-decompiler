@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
-import com.jpexs.decompiler.flash.SWFSourceInfo;
 import com.jpexs.decompiler.flash.gui.debugger.DebugListener;
 import com.jpexs.decompiler.flash.gui.debugger.Debugger;
 import java.awt.BorderLayout;
@@ -25,7 +24,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.io.ByteArrayInputStream;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;

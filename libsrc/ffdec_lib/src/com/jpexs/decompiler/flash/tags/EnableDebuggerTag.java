@@ -36,7 +36,7 @@ import java.io.IOException;
  * @author JPEXS
  */
 @SWFVersion(from = 5, to = 5)
-public class EnableDebuggerTag extends Tag implements PasswordTag {
+public final class EnableDebuggerTag extends Tag implements PasswordTag {
 
     public static final int ID = 58;
 
@@ -112,5 +112,4 @@ public class EnableDebuggerTag extends Tag implements PasswordTag {
     public boolean hasPassword(String password) {
         return this.passwordHash.equals(MD5Crypt.crypt(password, 2));
     }
-
 }

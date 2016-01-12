@@ -1163,7 +1163,7 @@ public class Main {
         }
         if (mainFrame != null) {
             mainFrame.setVisible(false);
-            mainFrame.getPanel().closeAll();
+            mainFrame.getPanel().closeAll(false);
             mainFrame.dispose();
             mainFrame = null;
         }
@@ -1210,7 +1210,7 @@ public class Main {
     public static OpenFileResult openFile(SWFSourceInfo[] newSourceInfos, Runnable executeAfterOpen) {
         if (mainFrame != null && !Configuration.openMultipleFiles.get()) {
             sourceInfos.clear();
-            mainFrame.getPanel().closeAll();
+            mainFrame.getPanel().closeAll(false);
             mainFrame.setVisible(false);
             Helper.freeMem();
         }
@@ -1227,9 +1227,13 @@ public class Main {
         mainFrame.getPanel().close(swf);
     }
 
-    public static void closeAll() {
-        sourceInfos.clear();
-        mainFrame.getPanel().closeAll();
+    public static boolean closeAll() {
+        boolean closeResult = mainFrame.getPanel().closeAll(true);
+        if (closeResult) {
+            sourceInfos.clear();
+        }
+
+        return closeResult;
     }
 
     public static boolean saveFileDialog(SWF swf, final SaveFileMode mode) {
