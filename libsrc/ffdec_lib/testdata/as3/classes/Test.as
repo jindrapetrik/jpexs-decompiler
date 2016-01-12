@@ -934,5 +934,13 @@ import classes.TestNs;
 		public function other(){
 			var n:TestNs = new TestNs();
 		}
+		
+		public function testRegExp() {
+			var a1 = new RegExp("[a-z\r\n0-9\\\\]+","i");
+			var a2 = /[a-z\r\n0-9\\]+/i;
+			
+			var b1 = new RegExp("[0-9AB]+");
+			var b2 = /[0-9AB]+/;
+		}
 	}
 }
