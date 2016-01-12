@@ -203,6 +203,8 @@ SingleCharacter = [^\r\n\'\\]
 OIdentifierCharacter = [^\r\n\u00A7\\]
 Preprocessor = \u00A7\u00A7 {Identifier}
 
+RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
+
 %state STRING, CHARLITERAL,XMLOPENTAG,XMLOPENTAGATTRIB,XMLINSTROPENTAG,XMLINSTRATTRIB,XMLCDATA,XMLCOMMENT,XML,OIDENTIFIER
 
 %%
@@ -367,7 +369,8 @@ Preprocessor = \u00A7\u00A7 {Identifier}
   "<{"                           {  return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_STARTVARTAG_BEGIN, yytext()); }
   /* identifiers */
   {Identifier}                   { return new ParsedSymbol(SymbolGroup.IDENTIFIER, SymbolType.IDENTIFIER, yytext()); }
-
+  /* regexp */
+  {RegExp}                       { return new ParsedSymbol(SymbolGroup.REGEXP, SymbolType.REGEXP, yytext()); }
 }
 
 <XMLOPENTAG> {

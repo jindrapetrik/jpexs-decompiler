@@ -1136,4 +1136,13 @@ public class ActionScript3Test extends ActionScriptTestBase {
         expectedResult = expectedResult.replaceAll("[ \r\n]", "");
         assertEquals(actualResult, expectedResult);
     }
+
+    @Test
+    public void testRegExp() {
+        decompileMethod("testRegExp", "var a1:* = /[a-z\\r\\n0-9\\\\]+/i;\r\n"
+                + "var a2:* = /[a-z\\r\\n0-9\\\\]+/i;\r\n"
+                + "var b1:* = /[0-9AB]+/;\r\n"
+                + "var b2:* = /[0-9AB]+/;\r\n", false);
+    }
+
 }

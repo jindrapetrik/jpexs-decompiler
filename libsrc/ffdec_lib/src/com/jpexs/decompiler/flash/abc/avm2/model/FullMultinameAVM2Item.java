@@ -70,7 +70,7 @@ public class FullMultinameAVM2Item extends AVM2Item {
         return (name != null) || (namespace != null);
     }
 
-    public boolean isXML(AVM2ConstantPool constants, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
+    public boolean isTopLevel(String tname, AVM2ConstantPool constants, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
         String cname;
         if (name != null) {
             cname = name.toString(LocalData.create(constants, localRegNames, fullyQualifiedNames));
@@ -86,7 +86,11 @@ public class FullMultinameAVM2Item extends AVM2Item {
                 cns = ns.getName(constants).toPrintableString(true);
             }
         }
-        return cname.equals("XML") && cns.isEmpty();
+        return cname.equals(tname) && cns.isEmpty();
+    }
+
+    public boolean isXML(AVM2ConstantPool constants, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
+        return isTopLevel("XML", constants, localRegNames, fullyQualifiedNames);
     }
 
     @Override

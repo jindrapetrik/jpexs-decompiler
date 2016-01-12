@@ -206,7 +206,8 @@ public enum SymbolType {
     FILTER(GraphTargetItem.PRECEDENCE_PRIMARY, false),
     DESCENDANTS(GraphTargetItem.PRECEDENCE_PRIMARY, false),
     NATIVE,
-    PREPROCESSOR(GraphTargetItem.PRECEDENCE_PRIMARY, false);
+    PREPROCESSOR(GraphTargetItem.PRECEDENCE_PRIMARY, false),
+    REGEXP(GraphTargetItem.PRECEDENCE_PRIMARY, false);
 
     private int precedence = GraphTargetItem.NOPRECEDENCE;
 

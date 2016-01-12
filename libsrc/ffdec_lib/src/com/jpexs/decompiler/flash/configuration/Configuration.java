@@ -553,6 +553,14 @@ public class Configuration {
     @ConfigurationName("internalFlashViewer.execute.as12")
     public static final ConfigurationItem<Boolean> internalFlashViewerExecuteAs12 = null;
 
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("script")
+    public static final ConfigurationItem<Boolean> displayDupInstructions = null;
+
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("script")
+    public static final ConfigurationItem<Boolean> useRegExprLiteral = null;
+
     private enum OSId {
 
         WINDOWS, OSX, UNIX

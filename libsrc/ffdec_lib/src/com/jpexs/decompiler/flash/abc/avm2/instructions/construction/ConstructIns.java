@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.FindPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetLexAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.RegExpAvm2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.StringAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.XMLAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.AddAVM2Item;
@@ -112,6 +113,33 @@ public class ConstructIns extends InstructionDefinition {
                     return;
                 }
             }
+        }
+
+        boolean isRegExp = false;
+        if (obj instanceof GetPropertyAVM2Item) {
+            GetPropertyAVM2Item gpt = (GetPropertyAVM2Item) obj;
+            if (gpt.object instanceof FindPropertyAVM2Item) {
+                FindPropertyAVM2Item fpt = (FindPropertyAVM2Item) gpt.object;
+                FullMultinameAVM2Item fptRegExpMult = (FullMultinameAVM2Item) fpt.propertyName;
+                FullMultinameAVM2Item gptRegExpMult = (FullMultinameAVM2Item) gpt.propertyName;
+
+                isRegExp = fptRegExpMult.isTopLevel("RegExp", localData.getConstants(), localData.localRegNames, localData.fullyQualifiedNames)
+                        && gptRegExpMult.isTopLevel("RegExp", localData.getConstants(), localData.localRegNames, localData.fullyQualifiedNames);
+            }
+        }
+        if (obj instanceof GetLexAVM2Item) {
+            GetLexAVM2Item glt = (GetLexAVM2Item) obj;
+            isRegExp = glt.propertyName.getName(localData.getConstants(), localData.fullyQualifiedNames, true).equals("RegExp");
+        }
+
+        if (isRegExp && (args.size() >= 1) && (args.get(0) instanceof StringAVM2Item) && (args.size() == 1 || (args.size() == 2 && args.get(1) instanceof StringAVM2Item))) {
+            String pattern = ((StringAVM2Item) args.get(0)).getValue();
+            String modifiers = "";
+            if (args.size() == 2) {
+                modifiers = ((StringAVM2Item) args.get(1)).getValue();
+            }
+            stack.push(new RegExpAvm2Item(pattern, modifiers, ins, localData.lineStartInstruction));
+            return;
         }
 
         stack.push(new ConstructAVM2Item(ins, localData.lineStartInstruction, obj, args));

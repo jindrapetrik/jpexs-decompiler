@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.graph.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -49,7 +50,7 @@ public class DuplicateItem extends GraphTargetItem implements SimpleValue {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        if ((value instanceof SimpleValue) && (((SimpleValue) value).isSimpleValue())) {
+        if (((value instanceof SimpleValue) && (((SimpleValue) value).isSimpleValue())) || !Configuration.displayDupInstructions.get()) {
             return value.appendTo(writer, localData);
         }
         writer.append("§§dup(");

@@ -34,5 +34,6 @@ public enum SymbolGroup {
     EOF,
     //GLOBALFUNC,
     GLOBALCONST,
-    PREPROCESSOR
+    PREPROCESSOR,
+    REGEXP
 }

@@ -26,6 +26,8 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.ConstructPropAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FindPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.RegExpAvm2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.StringAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.XMLAVM2Item;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
@@ -81,6 +83,19 @@ public class ConstructPropIns extends InstructionDefinition {
                     return;
                 }
             }
+        }//
+        boolean isRegExp = false;
+        if (multiname.isTopLevel("RegExp", localData.getConstants(), localData.localRegNames, localData.fullyQualifiedNames)) {
+            isRegExp = true;
+        }
+        if (isRegExp && (args.size() >= 1) && (args.get(0) instanceof StringAVM2Item) && (args.size() == 1 || (args.size() == 2 && args.get(1) instanceof StringAVM2Item))) {
+            String pattern = ((StringAVM2Item) args.get(0)).getValue();
+            String modifiers = "";
+            if (args.size() == 2) {
+                modifiers = ((StringAVM2Item) args.get(1)).getValue();
+            }
+            stack.push(new RegExpAvm2Item(pattern, modifiers, ins, localData.lineStartInstruction));
+            return;
         }
 
         stack.push(new ConstructPropAVM2Item(ins, localData.lineStartInstruction, obj, multiname, args));

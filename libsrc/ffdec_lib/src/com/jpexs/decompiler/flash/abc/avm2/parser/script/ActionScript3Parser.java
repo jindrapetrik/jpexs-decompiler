@@ -41,6 +41,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.NewObjectAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.PostDecrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.PostIncrementAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.RegExpAvm2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ReturnValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ReturnVoidAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.StringAVM2Item;
@@ -504,10 +505,8 @@ public class ActionScript3Parser {
                 if (s.type == SymbolType.ASSIGN) {
                     paramValues.add(expression(allOpenedNamespaces, thisType, pkg, new Reference<>(false), importedClasses, openedNamespaces, null, isMethod, isMethod, isMethod, variables));
                     s = lex();
-                } else {
-                    if (!paramValues.isEmpty()) {
-                        throw new AVM2ParseException("Some of parameters do not have default values", lexer.yyline());
-                    }
+                } else if (!paramValues.isEmpty()) {
+                    throw new AVM2ParseException("Some of parameters do not have default values", lexer.yyline());
                 }
             }
 
@@ -661,10 +660,8 @@ public class ActionScript3Parser {
                     throw new AVM2ParseException("Cannot compile native code", lexer.yyline());
                 } else if (s.group == SymbolGroup.IDENTIFIER) {
                     customNs = s.value.toString();
-                } else {
-                    if (namespace != null) {
-                        throw new AVM2ParseException("Only one access identifier allowed", lexer.yyline());
-                    }
+                } else if (namespace != null) {
+                    throw new AVM2ParseException("Only one access identifier allowed", lexer.yyline());
                 }
                 switch (s.type) {
                     case PUBLIC:
@@ -1378,16 +1375,14 @@ public class ActionScript3Parser {
             ParsedSymbol sx = lex();
             if (sx.group != SymbolGroup.IDENTIFIER) {
                 lexer.pushback(sx);
+            } else if (!sx.value.equals("xml")) {
+                lexer.pushback(sx);
             } else {
-                if (!sx.value.equals("xml")) {
-                    lexer.pushback(sx);
-                } else {
-                    expectedType(SymbolType.NAMESPACE);
-                    expectedType(SymbolType.ASSIGN);
-                    GraphTargetItem ns = expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
-                    ret = new DefaultXMLNamespace(null, null, ns);
-                    //TODO: use dxns for attribute namespaces instead of dxnslate
-                }
+                expectedType(SymbolType.NAMESPACE);
+                expectedType(SymbolType.ASSIGN);
+                GraphTargetItem ns = expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
+                ret = new DefaultXMLNamespace(null, null, ns);
+                //TODO: use dxns for attribute namespaces instead of dxnslate
             }
         }
         if (ret == null) {
@@ -1557,10 +1552,8 @@ public class ActionScript3Parser {
                     if (firstCommand instanceof InAVM2Item) {
                         forin = true;
                         inexpr = (InAVM2Item) firstCommand;
-                    } else {
-                        if (forin) {
-                            throw new AVM2ParseException("In expression required", lexer.yyline());
-                        }
+                    } else if (forin) {
+                        throw new AVM2ParseException("In expression required", lexer.yyline());
                     }
 
                     Loop floop = new Loop(uniqId(), null, null);
@@ -1910,10 +1903,8 @@ public class ActionScript3Parser {
         lexer.pushback(s);
         if (cmd == null) {
             expr.add(expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables));
-        } else {
-            if (!cmd.hasReturnValue()) {
-                throw new AVM2ParseException("Expression expected", lexer.yyline());
-            }
+        } else if (!cmd.hasReturnValue()) {
+            throw new AVM2ParseException("Expression expected", lexer.yyline());
         }
         return new CommaExpressionItem(null, null, expr);
     }
@@ -1932,17 +1923,42 @@ public class ActionScript3Parser {
      *
      * @param symb
      */
-    private void xmlToGreaterFix(ParsedSymbol symb) {
+    private void xmlToLowerThanFix(ParsedSymbol symb) {
         if (symb.isType(SymbolType.XML_STARTVARTAG_BEGIN, SymbolType.XML_STARTTAG_BEGIN)) {
-            lexer.yypushbackstr(symb.value.toString().substring(1)); //parse again as GREATER_THAN
-            symb.type = SymbolType.GREATER_THAN;
+            lexer.yypushbackstr(symb.value.toString().substring(1)); //parse again as LOWER_THAN
+            String pb = symb.value.toString().substring(1);
+            symb.type = SymbolType.LOWER_THAN;
             symb.group = SymbolGroup.OPERATOR;
+            symb.value = "<";
+            if (pb.charAt(0) == '=') {
+                symb.type = SymbolType.LOWER_EQUAL;
+                symb.value = "<=";
+                pb = pb.substring(1);
+            }
+            lexer.yypushbackstr(pb); //parse again as LOWER_THAN
+        }
+    }
+
+    private void regexpToDivideFix(ParsedSymbol symb) {
+        if (symb.isType(SymbolType.REGEXP)) {
+            String pb = symb.value.toString().substring(1);
+            symb.type = SymbolType.DIVIDE;
+            symb.group = SymbolGroup.OPERATOR;
+            symb.value = "/";
+            if (pb.charAt(0) == '=') {
+                symb.type = SymbolType.ASSIGN_DIVIDE;
+                symb.value = "/=";
+                pb = pb.substring(1);
+            }
+            lexer.yypushbackstr(pb); //parse again as DIVIDE
+
         }
     }
 
     private ParsedSymbol peekExprToken() throws IOException, AVM2ParseException {
         ParsedSymbol lookahead = lex();
-        xmlToGreaterFix(lookahead);
+        xmlToLowerThanFix(lookahead);
+        regexpToDivideFix(lookahead);
 
         lexer.pushback(lookahead);
         return lookahead;
@@ -2169,6 +2185,17 @@ public class ActionScript3Parser {
         ParsedSymbol s = lex();
         boolean allowMemberOrCall = false;
         switch (s.type) {
+            case REGEXP:
+                String p = (String) s.value;
+                p = p.substring(1);
+                int spos = p.lastIndexOf("/");
+                String mod = p.substring(spos + 1);
+                p = p.substring(0, spos);
+                p = p.replace("\\/", "/");
+                ret = new RegExpAvm2Item(p, mod, null, null);
+                allowMemberOrCall = true;
+
+                break;
             case XML_STARTTAG_BEGIN:
                 lexer.pushback(s);
                 ret = xml(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, variables);
@@ -2430,13 +2457,11 @@ public class ActionScript3Parser {
 
             if (isStar) {
                 openedNamespaces.add(new NamespaceItem(fullName, Namespace.KIND_PACKAGE));
+            } else if (isUse) {
+                //Note: in this case, fullName attribute will be changed to real NS insude NamespaceItem
+                openedNamespaces.add(new NamespaceItem(fullName, Namespace.KIND_NAMESPACE));
             } else {
-                if (isUse) {
-                    //Note: in this case, fullName attribute will be changed to real NS insude NamespaceItem
-                    openedNamespaces.add(new NamespaceItem(fullName, Namespace.KIND_NAMESPACE));
-                } else {
-                    importedClasses.add(fullName);
-                }
+                importedClasses.add(fullName);
             }
 
             expected(s, lexer.yyline(), SymbolType.SEMICOLON);
