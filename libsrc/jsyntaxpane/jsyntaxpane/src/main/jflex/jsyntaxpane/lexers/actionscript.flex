@@ -110,6 +110,8 @@ SingleCharacter = [^\r\n\'\\]
 OIdentifierCharacter = [^\r\n\u00A7\\]
 Preprocessor = \u00A7\u00A7 {Identifier}
 
+RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
+
 %state STRING, CHARLITERAL, XMLSTARTTAG, XML, OIDENTIFIER
 
 %%
@@ -166,6 +168,8 @@ Preprocessor = \u00A7\u00A7 {Identifier}
   "this"                         |
   "true"                         { return token(TokenType.KEYWORD); }
 
+
+  {RegExp}                       { return token(TokenType.REGEX); }
 
   /* operators */
 
