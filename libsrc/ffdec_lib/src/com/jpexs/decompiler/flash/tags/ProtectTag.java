@@ -111,5 +111,4 @@ public class ProtectTag extends Tag implements PasswordTag {
     public boolean hasPassword(String password) {
         return this.passwordHash.equals(MD5Crypt.crypt(password, 2));
     }
-
 }

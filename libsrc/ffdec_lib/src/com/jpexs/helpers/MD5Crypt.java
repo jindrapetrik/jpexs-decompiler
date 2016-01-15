@@ -33,6 +33,7 @@ public class MD5Crypt {
     private static final String HASH64_CHARS = "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
     public static final String MAGIC = "$1$";
+
     public static final String MAGIC_APACHE = "$apr1$";
 
     public static boolean checkPassword(String password, String hash) {
@@ -124,11 +125,11 @@ public class MD5Crypt {
         a.update(constBytes);  //Add the constant string $1$ to digest A
         a.update(saltBytes);   //Add the salt to digest A
 
-        //For each block of 16 bytes in the password string, add digest B to digest A        
+        //For each block of 16 bytes in the password string, add digest B to digest A
         for (int i = passwordBytes.length; i > 0; i -= 16) {
             if (i >= 16) {
                 a.update(digest_b);
-            } else { //For the remaining N bytes of the password string, add the first N bytes of digest B to digest A        
+            } else { //For the remaining N bytes of the password string, add the first N bytes of digest B to digest A
                 a.update(digest_b, 0, i);
             }
         }
@@ -242,5 +243,4 @@ public class MD5Crypt {
         }
         return magic + salt + "$" + result.toString();
     }
-
 }

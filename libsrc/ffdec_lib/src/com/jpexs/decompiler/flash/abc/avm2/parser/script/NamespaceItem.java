@@ -34,7 +34,9 @@ import java.util.Objects;
 public class NamespaceItem {
 
     public DottedChain name;
+
     public int kind;
+
     private int nsIndex = -1;
 
     public void forceResolve(AbcIndexing abcIndex) {
@@ -148,5 +150,4 @@ public class NamespaceItem {
 
         return abcIndex.getSelectedAbc().constants.getNamespaceSetId(nssa, true);
     }
-
 }

@@ -7,7 +7,9 @@ package com.jpexs.decompiler.flash.action;
 public class ActionScriptWith {
 
     protected ActionScriptObject obj;
+
     protected long startAddr;
+
     protected long length;
 
     public ActionScriptWith(ActionScriptObject obj, long startAddr, long length) {
@@ -15,5 +17,4 @@ public class ActionScriptWith {
         this.startAddr = startAddr;
         this.length = length;
     }
-
 }

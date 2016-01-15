@@ -33,5 +33,4 @@ public enum ImageFormat {
     public String getExtension() {
         return extension;
     }
-
 }

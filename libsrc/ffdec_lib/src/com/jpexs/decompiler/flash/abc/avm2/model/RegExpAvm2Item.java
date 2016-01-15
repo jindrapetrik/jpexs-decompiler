@@ -4,7 +4,6 @@ import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetLexIns;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -25,6 +24,7 @@ import java.util.List;
 public class RegExpAvm2Item extends AVM2Item {
 
     public String pattern;
+
     public String modifier;
 
     public RegExpAvm2Item(String pattern, String modifier, GraphSourceItem instruction, GraphSourceItem lineStartIns) {
@@ -101,5 +101,4 @@ public class RegExpAvm2Item extends AVM2Item {
                 ins(AVM2Instructions.Construct, hasModifier ? 2 : 1)
         );
     }
-
 }

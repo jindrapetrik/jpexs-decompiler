@@ -33,5 +33,4 @@ public @interface SWFVersion {
     int from() default 1;
 
     int to() default Integer.MAX_VALUE;
-
 }

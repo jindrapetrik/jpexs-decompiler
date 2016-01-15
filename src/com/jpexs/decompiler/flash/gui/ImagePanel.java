@@ -869,10 +869,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             a.setAddress(ip);
             a.execute(lda);
             /*System.err.print("" + a + ", stack: [");
-            for (Object o : lda.stack) {
-                System.err.print("" + o + ",");
-            }
-            System.err.println("]");*/
+             for (Object o : lda.stack) {
+             System.err.print("" + o + ",");
+             }
+             System.err.println("]");*/
             if (lda.returnValue != null) {
                 return lda.returnValue;
             }

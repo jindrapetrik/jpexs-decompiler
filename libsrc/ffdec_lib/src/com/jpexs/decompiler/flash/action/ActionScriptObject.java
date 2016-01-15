@@ -13,9 +13,11 @@ import java.util.Map;
 public class ActionScriptObject implements Cloneable {
 
     protected Map<Integer, Object> properties = new HashMap<>();
+
     protected Map<String, Object> members = new HashMap<>();
 
     protected Object extendsObj;
+
     protected List<Object> implementsObjs = new ArrayList<>();
 
     public void clearMembers() {

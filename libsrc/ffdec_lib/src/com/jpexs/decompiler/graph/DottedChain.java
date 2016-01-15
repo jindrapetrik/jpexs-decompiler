@@ -67,6 +67,7 @@ public class DottedChain implements Serializable {
     private final int length;
 
     private final int hash;
+
     private boolean isNull = false;
 
     public static final DottedChain parse(String name) {

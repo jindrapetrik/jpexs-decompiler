@@ -48,7 +48,7 @@ public class LoadVariablesActionItem extends ActionItem {
     }
 
     public LoadVariablesActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem urlString, GraphTargetItem targetString, int method) {
-        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY);
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.urlString = urlString;
         this.targetString = targetString;
         this.method = method;

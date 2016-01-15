@@ -10,9 +10,13 @@ import java.util.Map;
 public class ActionScriptFunction extends ActionScriptObject {
 
     protected long functionOffset;
+
     protected long functionLength;
+
     protected String functionName;
+
     protected List<String> paramNames;
+
     protected Map<Integer, String> funcRegNames;
 
     public String getFunctionName() {
@@ -38,5 +42,4 @@ public class ActionScriptFunction extends ActionScriptObject {
     public long getFunctionOffset() {
         return functionOffset;
     }
-
 }

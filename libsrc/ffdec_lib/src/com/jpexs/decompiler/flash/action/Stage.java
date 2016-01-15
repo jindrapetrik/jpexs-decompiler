@@ -14,8 +14,11 @@ import java.util.List;
 public class Stage extends DisplayObject {
 
     protected long startTime;
+
     protected Timelined timelined;
+
     protected Timeline timeline;
+
     protected Frame frame;
 
     public Stage(Timelined timelined) {

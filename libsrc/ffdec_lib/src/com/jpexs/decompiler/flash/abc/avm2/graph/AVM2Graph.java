@@ -735,5 +735,4 @@ public class AVM2Graph extends Graph {
     protected List<GraphTargetItem> filter(List<GraphTargetItem> list) {
         return avm2code.clearTemporaryRegisters(list);
     }
-
 }

@@ -53,6 +53,7 @@ public class SourceGeneratorLocalData implements Serializable {
     public String currentClass;
 
     public String superClass = null;
+
     public DottedChain superPkg = null;
 
     public int activationReg = 0;
@@ -72,6 +73,7 @@ public class SourceGeneratorLocalData implements Serializable {
     public boolean subMethod = false;
 
     public int privateNs = 0;
+
     public int protectedNs = 0;
 
     public boolean isStatic = false;

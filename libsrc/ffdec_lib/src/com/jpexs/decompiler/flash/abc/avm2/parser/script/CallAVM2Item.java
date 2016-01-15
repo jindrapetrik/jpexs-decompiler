@@ -45,6 +45,7 @@ public class CallAVM2Item extends AVM2Item {
     public List<GraphTargetItem> arguments;
 
     public int line;
+
     public List<NamespaceItem> openedNamespaces;
 
     public CallAVM2Item(List<NamespaceItem> openedNamespaces, int line, GraphTargetItem name, List<GraphTargetItem> arguments) {
