@@ -78,7 +78,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
     @Override
     public GraphTextWriter toString(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
         writeImportsUsages(abc, writer, getPackage(abc), fullyQualifiedNames);
-        getMetaData(abc, writer);
+        getMetaData(parent, convertData, abc, writer);
         writer.startMethod(method_info);
         toStringHeader(parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
 

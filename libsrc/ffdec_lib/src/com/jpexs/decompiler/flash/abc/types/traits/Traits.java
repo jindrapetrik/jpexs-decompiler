@@ -165,6 +165,9 @@ public class Traits implements Cloneable, Serializable {
                     continue;
                 }
             }
+            if (!trait.isVisible(isStatic, abc)) {
+                continue;
+            }
             writer.newLine();
             int h = t;
             if (classIndex != -1) {

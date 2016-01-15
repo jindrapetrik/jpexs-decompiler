@@ -30,6 +30,9 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetLexIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.AsTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.InitVectorAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.NameValuePair;
+import com.jpexs.decompiler.flash.abc.avm2.model.NewObjectAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.StringAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
@@ -37,6 +40,7 @@ import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
@@ -97,7 +101,7 @@ public abstract class Trait implements Cloneable, Serializable {
 
     public abstract void delete(ABC abc, boolean d);
 
-    public final List<Entry<String, Map<String, String>>> getMetaDataTable(ABC abc) {
+    public final List<Entry<String, Map<String, String>>> getMetaDataTable(Trait parent, ConvertData convertData, ABC abc) {
         List<Entry<String, Map<String, String>>> ret = new ArrayList<>();
         for (int m : metadata) {
             if (m >= 0 && m < abc.metadata_info.size()) {
@@ -108,6 +112,58 @@ public abstract class Trait implements Cloneable, Serializable {
                             abc.constants.getString(abc.metadata_info.get(m).values[i]));
                 }
                 ret.add(new SimpleEntry<>(name, data));
+            }
+        }
+        if (Configuration.handleSkinPartsAutomatically.get()) {
+            /*
+            private static var _skinParts:Object = {"attr":false,"attr2":true};  
+               => 
+            [SkinPart required="false"]
+            public var attr;
+            [SkinPart required="true"]
+            public var attr2;
+             */
+            if (parent instanceof TraitClass) {
+                String thisName = getName(abc).getName(abc.constants, new ArrayList<>(), true);
+                List<Trait> classTraits = abc.class_info.get(((TraitClass) parent).class_info).static_traits.traits;
+                for (Trait t : classTraits) {
+                    if (t.kindType == Trait.TRAIT_SLOT) {
+                        if ("_skinParts".equals(t.getName(abc).getName(abc.constants, new ArrayList<>(), true))) {
+                            if (t.getName(abc).getNamespace(abc.constants).kind == Namespace.KIND_PRIVATE) {
+                                if (convertData.assignedValues.containsKey(t)) {
+                                    if (convertData.assignedValues.get(t).value instanceof NewObjectAVM2Item) {
+                                        NewObjectAVM2Item no = (NewObjectAVM2Item) convertData.assignedValues.get(t).value;
+                                        for (NameValuePair nvp : no.pairs) {
+                                            if (nvp.name instanceof StringAVM2Item) {
+                                                if (thisName.equals(((StringAVM2Item) nvp.name).getValue())) {
+                                                    String newReq = "" + nvp.value.getResult();
+                                                    boolean found = false;
+                                                    //if already has SkinPart metadata, change required value only
+                                                    for (int i = 0; i < ret.size(); i++) {
+                                                        Entry<String, Map<String, String>> e = ret.get(i);
+                                                        if ("SkinPart".equals(e.getKey())) {
+                                                            e.getValue().put("required", newReq);
+                                                            found = true;
+                                                            break;
+                                                        }
+                                                    }
+
+                                                    //add new metadata if not found
+                                                    if (!found) {
+                                                        Map<String, String> data = new HashMap<>();
+                                                        data.put("required", newReq);
+
+                                                        ret.add(new SimpleEntry<>("SkinPart", data));
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
         return ret;
@@ -377,8 +433,8 @@ public abstract class Trait implements Cloneable, Serializable {
         }
     }
 
-    public final GraphTextWriter getMetaData(ABC abc, GraphTextWriter writer) {
-        List<Entry<String, Map<String, String>>> md = getMetaDataTable(abc);
+    public final GraphTextWriter getMetaData(Trait parent, ConvertData convertData, ABC abc, GraphTextWriter writer) {
+        List<Entry<String, Map<String, String>>> md = getMetaDataTable(parent, convertData, abc);
         for (Entry<String, Map<String, String>> en : md) {
             String name = en.getKey();
             if (METADATA_DEFINITION.equals(name) || METADATA_CTOR_DEFINITION.equals(name)) {
@@ -548,5 +604,9 @@ public abstract class Trait implements Cloneable, Serializable {
         } catch (CloneNotSupportedException ex) {
             throw new RuntimeException();
         }
+    }
+
+    public boolean isVisible(boolean isStatic, ABC abc) {
+        return true;
     }
 }

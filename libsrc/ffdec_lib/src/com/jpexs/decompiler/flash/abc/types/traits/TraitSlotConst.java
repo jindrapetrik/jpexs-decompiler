@@ -21,9 +21,11 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewFunctionAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.AssignedValue;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
+import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.ValueKind;
+import static com.jpexs.decompiler.flash.abc.types.traits.Trait.TRAIT_GETTER;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -33,6 +35,7 @@ import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -138,17 +141,15 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
 
     @Override
     public GraphTextWriter toString(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
-        getMetaData(abc, writer);
+        getMetaData(parent, convertData, abc, writer);
         Multiname n = getName(abc);
         boolean showModifier = true;
         if ((classIndex == -1) && (n != null)) {
             Namespace ns = n.getNamespace(abc.constants);
             if (ns == null) {
                 showModifier = false;
-            } else {
-                if ((ns.kind != Namespace.KIND_PACKAGE) && (ns.kind != Namespace.KIND_PACKAGE_INTERNAL)) {
-                    showModifier = false;
-                }
+            } else if ((ns.kind != Namespace.KIND_PACKAGE) && (ns.kind != Namespace.KIND_PACKAGE_INTERNAL)) {
+                showModifier = false;
             }
         }
         if (showModifier) {
@@ -204,4 +205,26 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         super.getImportsUsages(customNs, abc, imports, uses, ignorePackage, fullyQualifiedNames);
         parseImportsUsagesFromMultiname(customNs, abc, imports, uses, abc.constants.getMultiname(type_index), getPackage(abc), fullyQualifiedNames);
     }
+
+    @Override
+    public boolean isVisible(boolean isStatic, ABC abc) {
+
+        if (Configuration.handleSkinPartsAutomatically.get()) {
+            /*
+                Hide: private static var _skinParts
+                (part of [SkinPart] compilations)
+             */
+            if (isStatic && "_skinParts".equals(getName(abc).getName(abc.constants, new ArrayList<>(), true))) {
+                if (kindType == Trait.TRAIT_SLOT) {
+                    if ("_skinParts".equals(getName(abc).getName(abc.constants, new ArrayList<>(), true))) {
+                        if (getName(abc).getNamespace(abc.constants).kind == Namespace.KIND_PRIVATE) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
 }
