@@ -19,7 +19,9 @@ package com.jpexs.decompiler.flash.abc.types.traits;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
+import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
@@ -122,7 +124,7 @@ public class TraitMethodGetterSetter extends Trait {
         if (classIndex < 0) {
             writeImportsUsages(abc, writer, getPackage(abc), fullyQualifiedNames);
         }
-        getMetaData(abc, writer);
+        getMetaData(parent, convertData, abc, writer);
         writer.startMethod(method_info);
         path = path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames, false);
         toStringHeader(parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
@@ -155,4 +157,23 @@ public class TraitMethodGetterSetter extends Trait {
         TraitMethodGetterSetter ret = (TraitMethodGetterSetter) super.clone();
         return ret;
     }
+
+    @Override
+    public boolean isVisible(boolean isStatic, ABC abc) {
+        if (Configuration.handleSkinPartsAutomatically.get()) {
+            if ("skinParts".equals(getName(abc).getName(abc.constants, new ArrayList<>(), true))) {
+                if (kindType == TRAIT_GETTER) {
+                    MethodInfo mi = abc.method_info.get(method_info);
+                    if (mi.param_types.length == 0 && "Object".equals(abc.constants.getMultiname(mi.ret_type).getNameWithNamespace(abc.constants).toRawString())) {
+                        if (abc.constants.getNamespace(abc.constants.getMultiname(name_index).namespace_index).kind == Namespace.KIND_PROTECTED) {
+                            return false;
+                        }
+                    }
+                }
+            }
+
+        }
+        return true;
+    }
+
 }

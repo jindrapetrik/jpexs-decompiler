@@ -14,6 +14,7 @@ package
     private var e:TestDefaultProperty;
     private var f:TestDeprecated;
     private var g:TestEffect_Event;
+    private var h:TestSkinParts;
   
   
   

@@ -128,7 +128,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
         writer.startClass(class_info);
 
-        getMetaData(abc, writer);
+        getMetaData(parent, convertData, abc, writer);
         //class header
         instanceInfo.getClassHeaderStr(writer, abc, fullyQualifiedNames, false);
         writer.startBlock();

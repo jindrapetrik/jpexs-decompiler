@@ -561,6 +561,10 @@ public class Configuration {
     @ConfigurationCategory("script")
     public static final ConfigurationItem<Boolean> useRegExprLiteral = null;
 
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("script")
+    public static final ConfigurationItem<Boolean> handleSkinPartsAutomatically = null;
+
     private enum OSId {
 
         WINDOWS, OSX, UNIX
