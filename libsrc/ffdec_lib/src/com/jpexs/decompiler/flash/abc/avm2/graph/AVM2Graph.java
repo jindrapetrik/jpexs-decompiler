@@ -521,8 +521,8 @@ public class AVM2Graph extends Graph {
 
             if ((!w.expression.isEmpty()) && (w.expression.get(w.expression.size() - 1) instanceof HasNextAVM2Item)) {
                 HasNextAVM2Item hn = (HasNextAVM2Item) w.expression.get(w.expression.size() - 1);
-                if (((HasNextAVM2Item) w.expression.get(w.expression.size() - 1)).collection != null) {
-                    if (((HasNextAVM2Item) w.expression.get(w.expression.size() - 1)).collection.getNotCoerced().getThroughRegister() instanceof FilteredCheckAVM2Item) {
+                if (((HasNextAVM2Item) w.expression.get(w.expression.size() - 1)).obj != null) {
+                    if (((HasNextAVM2Item) w.expression.get(w.expression.size() - 1)).obj.getNotCoerced().getThroughRegister() instanceof FilteredCheckAVM2Item) {
                         if (w.commands.size() >= 3) {
                             int pos = 0;
                             while (w.commands.get(pos) instanceof SetLocalAVM2Item) {
@@ -545,7 +545,7 @@ public class AVM2Graph extends Graph {
                                                 int regIndex = ((LocalRegAVM2Item) spt.object).regIndex;
                                                 HasNextAVM2Item iti = (HasNextAVM2Item) w.expression.get(w.expression.size() - 1);
                                                 HashMap<Integer, GraphTargetItem> localRegs = aLocalData.localRegs;
-                                                localRegs.put(regIndex, new FilterAVM2Item(null, null, iti.collection.getThroughRegister(), ift.expression));
+                                                localRegs.put(regIndex, new FilterAVM2Item(null, null, iti.obj.getThroughRegister(), ift.expression));
                                                 return null;
                                             }
                                         }
@@ -558,9 +558,9 @@ public class AVM2Graph extends Graph {
                             SetTypeAVM2Item sti = (SetTypeAVM2Item) w.commands.remove(0);
                             GraphTargetItem gti = sti.getValue().getNotCoerced();
                             if (gti instanceof NextValueAVM2Item) {
-                                return new ForEachInAVM2Item(w.getSrc(), w.getLineStartItem(), w.loop, new InAVM2Item(hn.getInstruction(), hn.getLineStartIns(), sti.getObject(), ((HasNextAVM2Item) w.expression.get(w.expression.size() - 1)).collection), w.commands);
+                                return new ForEachInAVM2Item(w.getSrc(), w.getLineStartItem(), w.loop, new InAVM2Item(hn.getInstruction(), hn.getLineStartIns(), sti.getObject(), ((HasNextAVM2Item) w.expression.get(w.expression.size() - 1)).obj), w.commands);
                             } else if (gti instanceof NextNameAVM2Item) {
-                                return new ForInAVM2Item(w.getSrc(), w.getLineStartItem(), w.loop, new InAVM2Item(hn.getInstruction(), hn.getLineStartIns(), sti.getObject(), ((HasNextAVM2Item) w.expression.get(w.expression.size() - 1)).collection), w.commands);
+                                return new ForInAVM2Item(w.getSrc(), w.getLineStartItem(), w.loop, new InAVM2Item(hn.getInstruction(), hn.getLineStartIns(), sti.getObject(), ((HasNextAVM2Item) w.expression.get(w.expression.size() - 1)).obj), w.commands);
                             }
                         }
                     }
@@ -687,9 +687,9 @@ public class AVM2Graph extends Graph {
                             GraphTargetItem repl = null;
 
                             if (gti instanceof NextValueAVM2Item) {
-                                repl = new ForEachInAVM2Item(ifi.getSrc(), ifi.getLineStartItem(), new Loop(0, null, null), new InAVM2Item(null, null, sti.getObject(), hnt.collection), body);
+                                repl = new ForEachInAVM2Item(ifi.getSrc(), ifi.getLineStartItem(), new Loop(0, null, null), new InAVM2Item(null, null, sti.getObject(), hnt.obj), body);
                             } else if (gti instanceof NextNameAVM2Item) {
-                                repl = new ForInAVM2Item(ifi.getSrc(), ifi.getLineStartItem(), new Loop(0, null, null), new InAVM2Item(null, null, sti.getObject(), hnt.collection), body);
+                                repl = new ForInAVM2Item(ifi.getSrc(), ifi.getLineStartItem(), new Loop(0, null, null), new InAVM2Item(null, null, sti.getObject(), hnt.obj), body);
                             }
                             if (repl != null) {
                                 list.remove(i);

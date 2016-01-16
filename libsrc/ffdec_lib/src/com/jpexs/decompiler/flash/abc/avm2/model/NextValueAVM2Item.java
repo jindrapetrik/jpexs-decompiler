@@ -16,11 +16,16 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import java.util.List;
 
 /**
  *
@@ -36,6 +41,11 @@ public class NextValueAVM2Item extends AVM2Item {
         super(instruction, lineStartIns, NOPRECEDENCE);
         this.index = index;
         this.obj = obj;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        return toSourceMerge(localData, generator, obj, index, ins(AVM2Instructions.NextValue));
     }
 
     @Override

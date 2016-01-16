@@ -16,8 +16,14 @@
  */
 package com.jpexs.decompiler.graph.model;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.CompilationException;
+import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.TypeItem;
+import java.util.List;
 
 /**
  *
@@ -40,12 +46,17 @@ public class PushItem extends GraphTargetItem {
 
     @Override
     public boolean hasReturnValue() {
-        return true;
+        return false;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        return generator.generate(localData, this);
     }
 
     @Override
     public GraphTargetItem returnType() {
-        return value.returnType();
+        return TypeItem.UNBOUNDED;
     }
 
     @Override
