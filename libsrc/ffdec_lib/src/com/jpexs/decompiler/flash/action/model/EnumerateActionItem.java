@@ -16,10 +16,15 @@
  */
 package com.jpexs.decompiler.flash.action.model;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.action.swf5.ActionEnumerate;
+import com.jpexs.decompiler.flash.action.swf6.ActionEnumerate2;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +64,15 @@ public class EnumerateActionItem extends ActionItem {
     }
 
     @Override
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        if ((object instanceof DirectValueActionItem) && (((DirectValueActionItem) object).isString())) {
+            return toSourceMerge(localData, generator, value, new ActionEnumerate());
+        }
+        return toSourceMerge(localData, generator, value, new ActionEnumerate2());
+    }
+
+    @Override
     public boolean hasReturnValue() {
-        return true;
+        return false;
     }
 }

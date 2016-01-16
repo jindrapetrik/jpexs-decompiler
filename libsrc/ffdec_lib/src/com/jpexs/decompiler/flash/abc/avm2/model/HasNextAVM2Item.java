@@ -16,11 +16,16 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import java.util.List;
 
 /**
  *
@@ -28,28 +33,38 @@ import com.jpexs.decompiler.graph.model.LocalData;
  */
 public class HasNextAVM2Item extends AVM2Item {
 
-    public GraphTargetItem object;
+    public GraphTargetItem index;
 
-    public GraphTargetItem collection;
+    public GraphTargetItem obj;
 
-    public HasNextAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, GraphTargetItem collection) {
+    public HasNextAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem index, GraphTargetItem obj) {
         super(instruction, lineStartIns, NOPRECEDENCE);
-        this.object = object;
-        this.collection = collection;
+        this.index = index;
+        this.obj = obj;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        if ((index instanceof LocalRegAVM2Item) && (obj instanceof LocalRegAVM2Item)) {
+            int indexReg = ((LocalRegAVM2Item) index).regIndex;
+            int objectReg = ((LocalRegAVM2Item) obj).regIndex;
+            return toSourceMerge(localData, generator, ins(AVM2Instructions.HasNext2, objectReg, indexReg));
+        }
+        return toSourceMerge(localData, generator, obj, index, ins(AVM2Instructions.HasNext));
     }
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
 
         writer.append("§§hasnext(");
-        if (collection != null) {
-            collection.appendTo(writer, localData);
+        if (obj != null) {
+            obj.appendTo(writer, localData);
         } else {
             writer.append("null");
         }
         writer.append(",");
-        if (object != null) {
-            object.appendTo(writer, localData);
+        if (index != null) {
+            index.appendTo(writer, localData);
         } else {
             writer.append("null");
         }

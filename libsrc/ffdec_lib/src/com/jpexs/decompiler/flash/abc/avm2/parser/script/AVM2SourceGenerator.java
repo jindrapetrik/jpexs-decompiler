@@ -94,6 +94,8 @@ import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.NotItem;
 import com.jpexs.decompiler.graph.model.OrItem;
+import com.jpexs.decompiler.graph.model.PopItem;
+import com.jpexs.decompiler.graph.model.PushItem;
 import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.TernarOpItem;
 import com.jpexs.decompiler.graph.model.TrueItem;
@@ -2639,4 +2641,16 @@ public class AVM2SourceGenerator implements SourceGenerator {
         ret.add(ins(AVM2Instructions.Pop));
         return ret;
     }
+
+    @Override
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, PushItem item) throws CompilationException {
+        return item.value.toSource(localData, this);
+    }
+
+    @Override
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, PopItem item) throws CompilationException {
+        List<GraphSourceItem> ret = new ArrayList<>();
+        return ret;
+    }
+
 }

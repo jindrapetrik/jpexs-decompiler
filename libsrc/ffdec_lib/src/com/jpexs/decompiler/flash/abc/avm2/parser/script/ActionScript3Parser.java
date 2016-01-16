@@ -30,14 +30,17 @@ import com.jpexs.decompiler.flash.abc.avm2.model.EscapeXElemAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FloatValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetDescendantsAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.HasNextAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.InAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.InitVectorAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NameValuePair;
 import com.jpexs.decompiler.flash.abc.avm2.model.NanAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.NewActivationAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewArrayAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewObjectAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.NextNameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.PostDecrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.PostIncrementAVM2Item;
@@ -96,11 +99,14 @@ import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.CommaExpressionItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.DoWhileItem;
+import com.jpexs.decompiler.graph.model.DuplicateItem;
 import com.jpexs.decompiler.graph.model.ForItem;
 import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.NotItem;
 import com.jpexs.decompiler.graph.model.OrItem;
 import com.jpexs.decompiler.graph.model.ParenthesisItem;
+import com.jpexs.decompiler.graph.model.PopItem;
+import com.jpexs.decompiler.graph.model.PushItem;
 import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.TernarOpItem;
 import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
@@ -2185,6 +2191,53 @@ public class ActionScript3Parser {
         ParsedSymbol s = lex();
         boolean allowMemberOrCall = false;
         switch (s.type) {
+            case PREPROCESSOR:
+                expectedType(SymbolType.PARENT_OPEN);
+                switch ("" + s.value) {
+                    //AS3
+                    case "hasnext":
+                        GraphTargetItem hnIndex = expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
+                        expectedType(SymbolType.COMMA);
+                        GraphTargetItem hnObject = expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
+                        ret = new HasNextAVM2Item(null, null, hnIndex, hnObject);
+                        break;
+                    case "newactivation":
+                        ret = new NewActivationAVM2Item(null, null);
+                        break;
+                    case "nextname":
+                        GraphTargetItem nnIndex = expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
+                        expectedType(SymbolType.COMMA);
+                        GraphTargetItem nnObject = expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
+
+                        ret = new NextNameAVM2Item(null, null, nnIndex, nnObject);
+                        allowMemberOrCall = true;
+                        break;
+                    case "nextvalue":
+                        GraphTargetItem nvIndex = expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
+                        expectedType(SymbolType.COMMA);
+                        GraphTargetItem nvObject = expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
+
+                        ret = new NextNameAVM2Item(null, null, nvIndex, nvObject);
+                        allowMemberOrCall = true;
+                        break;
+                    //Both ASs
+                    case "dup":
+                        ret = new DuplicateItem(null, null, expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables));
+                        break;
+                    case "push":
+                        ret = new PushItem(expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables));
+                        break;
+                    case "pop":
+                        ret = new PopItem(null, null);
+                        break;
+                    case "goto": //TODO
+                    case "multiname":
+                        throw new AVM2ParseException("Compiling §§" + s.value + " is not available, sorry", lexer.yyline());
+                    default:
+                        throw new AVM2ParseException("Unknown preprocessor instruction: §§" + s.value, lexer.yyline());
+                }
+                expectedType(SymbolType.PARENT_CLOSE);
+                break;
             case REGEXP:
                 String p = (String) s.value;
                 p = p.substring(1);

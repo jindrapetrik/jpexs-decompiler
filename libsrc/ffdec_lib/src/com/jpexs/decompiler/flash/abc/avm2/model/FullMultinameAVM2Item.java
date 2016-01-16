@@ -114,7 +114,7 @@ public class FullMultinameAVM2Item extends AVM2Item {
             if (multinameIndex > 0 && multinameIndex < constants.getMultinameCount()) {
                 writer.append(constants.getMultiname(multinameIndex).getName(constants, fullyQualifiedNames, false));
             } else {
-                writer.append("§§unknown_multiname");
+                writer.append("§§multiname(").append(multinameIndex).append(")");
             }
         }
         return writer;

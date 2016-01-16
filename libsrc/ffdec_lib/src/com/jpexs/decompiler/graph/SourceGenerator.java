@@ -28,6 +28,8 @@ import com.jpexs.decompiler.graph.model.ForItem;
 import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.NotItem;
 import com.jpexs.decompiler.graph.model.OrItem;
+import com.jpexs.decompiler.graph.model.PopItem;
+import com.jpexs.decompiler.graph.model.PushItem;
 import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.TernarOpItem;
 import com.jpexs.decompiler.graph.model.TrueItem;
@@ -39,6 +41,10 @@ import java.util.List;
  * @author JPEXS
  */
 public interface SourceGenerator {
+
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, PushItem item) throws CompilationException;
+
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, PopItem item) throws CompilationException;
 
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, TrueItem item) throws CompilationException;
 
