@@ -34,7 +34,9 @@ public abstract class GraphTextWriter {
     protected CodeFormatting formatting;
 
     public static final int TRAIT_INSTANCE_INITIALIZER = -1;
+
     public static final int TRAIT_CLASS_INITIALIZER = -2;
+
     public static final int TRAIT_SCRIPT_INITIALIZER = -3;
 
     public CodeFormatting getFormatting() {

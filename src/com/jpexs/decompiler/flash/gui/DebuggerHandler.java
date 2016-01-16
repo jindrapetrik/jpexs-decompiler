@@ -74,15 +74,19 @@ public class DebuggerHandler implements DebugConnectionListener {
     private DebuggerCommands commands = null;
 
     private List<InSwfInfo.SwfInfo> swfs = new ArrayList<>();
+
     private boolean paused = true;
 
     private Map<Integer, String> modulePaths = new HashMap<>();
+
     private Map<Integer, Integer> moduleToSwfIndex = new HashMap<>();
 
     private Map<String, Integer> scriptToModule = new HashMap<>();
 
     private Map<Integer, Integer> moduleToTraitIndex = new HashMap<>();
+
     private Map<Integer, Integer> moduleToClassIndex = new HashMap<>();
+
     private Map<Integer, Integer> moduleToMethodIndex = new HashMap<>();
 
     private Map<String, Set<Integer>> toAddBPointMap = new HashMap<>();
@@ -294,6 +298,7 @@ public class DebuggerHandler implements DebugConnectionListener {
     }
 
     private InFrame frame;
+
     private InConstantPool pool;
 
     private InBreakAtExt breakInfo;
@@ -562,10 +567,10 @@ public class DebuggerHandler implements DebugConnectionListener {
             });
 
             /*int numScript = con.getMessage(InNumScript.class).num;
-            for (int i = 0; i < numScript; i++) {
-                InScript sc = con.getMessage(InScript.class);
-                moduleNames.put(sc.module, sc.name);
-            }*/
+             for (int i = 0; i < numScript; i++) {
+             InScript sc = con.getMessage(InScript.class);
+             moduleNames.put(sc.module, sc.name);
+             }*/
             //Pattern patMainFrame = Pattern.compile("^Actions for Scene ([0-9]+): Frame ([0-9]+) of Layer Name .*$");
             //Pattern patSymbol = Pattern.compile("^Actions for Symbol ([0-9]+): Frame ([0-9]+) of Layer Name .*$");
             //Pattern patAS2 = Pattern.compile("^([^:]+): .*\\.as$");

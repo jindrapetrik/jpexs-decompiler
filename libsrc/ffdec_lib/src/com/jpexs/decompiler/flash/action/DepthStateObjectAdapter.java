@@ -13,6 +13,5 @@ public class DepthStateObjectAdapter extends ActionScriptObject {
     public DepthStateObjectAdapter(DepthState ds) {
         this.ds = ds;
     }
-
     //TODO
 }

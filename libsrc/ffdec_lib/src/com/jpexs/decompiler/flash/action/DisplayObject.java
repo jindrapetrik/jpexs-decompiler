@@ -14,8 +14,11 @@ public class DisplayObject extends ActionScriptObject {
     protected Map<Integer, Object> displayList = new HashMap<>();
 
     protected int totalFrames = 1;
+
     protected int currentFrame = 1;
+
     protected boolean paused = false;
+
     protected boolean dragging = false;
 
     public void startDrag() {

@@ -31,6 +31,7 @@ public abstract class FileTestBase {
     protected abstract String[] getTestDataDirs();
 
     protected static final String FREE_ACTIONSCRIPT_AS2 = "testdata/freeactionscript.com/as2";
+
     protected static final String FREE_ACTIONSCRIPT_AS3 = "testdata/freeactionscript.com/as3";
 
     @DataProvider(name = "provideFiles")

@@ -128,8 +128,8 @@ public class DebugPanel extends JPanel {
          debug.watch.add.readwrite = Read+Write
 
          error.debug.watch.add = Cannot add watch to this variable.
-        
-        
+
+
          MouseAdapter watchHandler = new MouseAdapter() {
 
          @Override
@@ -311,12 +311,12 @@ public class DebugPanel extends JPanel {
                         safeSetTreeModel(debugScopeTable, new ABCPanel.VariablesTableModel(debugScopeTable, f.scopeChain, f.scopeChainFrameIds));
 
                         /*TableModelListener refreshListener = new TableModelListener() {
-                            @Override
-                            public void tableChanged(TableModelEvent e) {
-                                Main.getDebugHandler().refreshFrame();
-                                refresh();
-                            }
-                        };*/
+                         @Override
+                         public void tableChanged(TableModelEvent e) {
+                         Main.getDebugHandler().refreshFrame();
+                         refresh();
+                         }
+                         };*/
                         TreeModelListener refreshListener = new TreeModelListener() {
                             @Override
                             public void treeNodesChanged(TreeModelEvent e) {

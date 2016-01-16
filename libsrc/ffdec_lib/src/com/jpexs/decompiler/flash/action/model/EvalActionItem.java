@@ -33,7 +33,7 @@ import java.util.List;
 public class EvalActionItem extends ActionItem {
 
     public EvalActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value) {
-        super(instruction, lineStartIns,  PRECEDENCE_PRIMARY, value);
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY, value);
     }
 
     @Override

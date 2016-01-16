@@ -25,5 +25,4 @@ public interface PasswordTag {
     public void setPassword(String password);
 
     public boolean hasPassword(String password);
-
 }

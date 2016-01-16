@@ -1144,5 +1144,4 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "var b1:* = /[0-9AB]+/;\r\n"
                 + "var b2:* = /[0-9AB]+/;\r\n", false);
     }
-
 }

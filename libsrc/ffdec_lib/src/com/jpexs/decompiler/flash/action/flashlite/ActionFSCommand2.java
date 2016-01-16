@@ -72,5 +72,4 @@ public class ActionFSCommand2 extends Action {
     public boolean execute(LocalDataArea lda) {
         return true; //TODO?
     }
-
 }

@@ -713,10 +713,9 @@ public abstract class Action implements GraphSourceItem {
     public abstract boolean execute(LocalDataArea lda);
 
     /* {
-        //throw new UnsupportedOperationException("Action " + toString() + " not implemented");
-        return false;
-    }*/
-
+     //throw new UnsupportedOperationException("Action " + toString() + " not implemented");
+     return false;
+     }*/
     /**
      * Translates this function to stack and output.
      *
@@ -1063,7 +1062,7 @@ public abstract class Action implements GraphSourceItem {
             }
 
             /*ActionJump && ActionIf removed*/
- /*if ((action instanceof ActionEnumerate2) || (action instanceof ActionEnumerate)) {
+            /*if ((action instanceof ActionEnumerate2) || (action instanceof ActionEnumerate)) {
              loopStart = ip + 1;
              isForIn = true;
              ip += 4;

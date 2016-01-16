@@ -29,8 +29,11 @@ public class CachedScript implements Serializable {
     public String text;
 
     public List<Highlighting> hilights;
+
     public List<Highlighting> methodHilights;
+
     public List<Highlighting> classHilights;
+
     public List<Highlighting> specialHilights;
 
     public CachedScript(String text, List<Highlighting> hilights, List<Highlighting> methodHilights, List<Highlighting> classHilights, List<Highlighting> specialHilights) {
