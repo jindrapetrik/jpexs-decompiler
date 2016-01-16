@@ -2715,7 +2715,7 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     public static SerializableImage frameToImageGet(Timeline timeline, int frame, int time, DepthState stateUnderCursor, int mouseButton, RECT displayRect, Matrix transformation, ColorTransform colorTransform, Color backGroundColor, boolean useCache, double zoom) {
         SWF swf = timeline.swf;
-        String key = "frame_" + frame + "_" + timeline.id + "_" + swf.hashCode() + "_" + zoom;
+        String key = "frame_" + frame + "_" + time + "_" + timeline.id + "_" + swf.hashCode() + "_" + zoom;
         SerializableImage image;
         if (useCache) {
             image = swf.getFromCache(key);
