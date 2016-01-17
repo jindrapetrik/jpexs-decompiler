@@ -186,33 +186,31 @@ public class Graph {
                 //case (A), new
                 GraphPart nh = trav_loops_DFS(localData, loopHeaders, b, DFSP_pos + 1);
                 tag_lhead(b0, nh);
+            } else if (b.DFSP_pos > 0) {  // b in DFSP(b0)
+                //case (B)
+                if (b.type != GraphPart.TYPE_LOOP_HEADER) {
+                    b.type = GraphPart.TYPE_LOOP_HEADER;
+                    loopHeaders.add(b);
+                }
+                tag_lhead(b0, b);
+            } else if (b.iloop_header == null) {
+                //case (C), do nothing
             } else {
-                if (b.DFSP_pos > 0) {  // b in DFSP(b0)
-                    //case (B)
-                    if (b.type != GraphPart.TYPE_LOOP_HEADER) {
-                        b.type = GraphPart.TYPE_LOOP_HEADER;
-                        loopHeaders.add(b);
-                    }
-                    tag_lhead(b0, b);
-                } else if (b.iloop_header == null) {
-                    //case (C), do nothing
-                } else {
-                    GraphPart h = b.iloop_header;
-                    if (h.DFSP_pos > 0) {  // h in DFSP(b0)
-                        //case (D)
-                        tag_lhead(b0, h);
-                    } else { // h not in DFSP(b0)
-                        //case (E), reentry
-                        b.type = GraphPart.TYPE_REENTRY; //TODO:and b0,b ?
-                        h.irreducible = true;
-                        while (h.iloop_header != null) {
-                            h = h.iloop_header;
-                            if (h.DFSP_pos > 0) { //h in DFSP(b0)
-                                tag_lhead(b0, h);
-                                break;
-                            }
-                            h.irreducible = true;
+                GraphPart h = b.iloop_header;
+                if (h.DFSP_pos > 0) {  // h in DFSP(b0)
+                    //case (D)
+                    tag_lhead(b0, h);
+                } else { // h not in DFSP(b0)
+                    //case (E), reentry
+                    b.type = GraphPart.TYPE_REENTRY; //TODO:and b0,b ?
+                    h.irreducible = true;
+                    while (h.iloop_header != null) {
+                        h = h.iloop_header;
+                        if (h.DFSP_pos > 0) { //h in DFSP(b0)
+                            tag_lhead(b0, h);
+                            break;
                         }
+                        h.irreducible = true;
                     }
                 }
             }
@@ -1753,6 +1751,10 @@ public class Graph {
                         } else {
                             break;
                         }
+                    } else if (to.expression instanceof FalseItem) {
+                        it = to.onFalse;
+                    } else if (to.expression instanceof TrueItem) {
+                        it = to.onTrue;
                     } else {
                         break;
                     }
@@ -1801,10 +1803,6 @@ public class Graph {
                 GraphPart defaultPart = hasExpr ? part.nextParts.get(1 + defaultBranch) : part.nextParts.get(0);
 
                 for (int i = 1; i < part.nextParts.size(); i++) {
-                    if (hasExpr && i == 1 + defaultBranch) {
-                        continue;
-                    }
-
                     if (part.nextParts.get(i) != defaultPart) {
                         if (caseExpressions.containsKey(pos)) {
                             caseValues.add(caseExpressions.get(pos));
@@ -1812,7 +1810,6 @@ public class Graph {
                             caseValues.add(new IntegerValueItem(null, localData.lineStartInstruction, pos));
                         }
                     }
-
                     pos++;
                 }
 
@@ -1862,12 +1859,10 @@ public class Graph {
                             }
                             vis.add(p);
                         }
+                    } else if (p == defaultPart) {
+                        defaultCommands = nextCommands;
                     } else {
-                        if (p == defaultPart) {
-                            defaultCommands = nextCommands;
-                        } else {
-                            caseCommands.add(nextCommands);
-                        }
+                        caseCommands.add(nextCommands);
                     }
                     first = false;
                     pos++;
