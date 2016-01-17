@@ -2826,7 +2826,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 if (timeline.fontFrameNum != -1) {
                     dframe = timeline.fontFrameNum;
                 } else {
-                    dframe = (time + layer.time) % drawableFrameCount;
+                    dframe = time % drawableFrameCount;
                 }
 
                 if (character instanceof ButtonTag) {
@@ -2890,7 +2890,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                     img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB);
                     img.fillTransparent();
 
-                    drawable.toImage(dframe, layer.time + time, layer.ratio, renderContext, img, m, clrTrans);
+                    drawable.toImage(dframe, time, layer.ratio, renderContext, img, m, clrTrans);
 
                     if (cacheKey != null) {
                         renderContext.shapeCache.put(cacheKey, img);

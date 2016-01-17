@@ -308,7 +308,7 @@ public class FolderPreviewPanel extends JPanel {
                     zoom = ratio;
                 }
             }
-            imgSrc = SWF.frameToImageGet(swf.getTimeline(), fn.frame, 0, null, 0, rect, new Matrix(), new ColorTransform(), null, true, zoom);
+            imgSrc = SWF.frameToImageGet(swf.getTimeline(), fn.frame, fn.frame, null, 0, rect, new Matrix(), new ColorTransform(), null, true, zoom);
             width = imgSrc.getWidth();
             height = imgSrc.getHeight();
         } else if (treeItem instanceof ImageTag) {
