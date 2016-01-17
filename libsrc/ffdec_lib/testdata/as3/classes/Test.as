@@ -942,5 +942,36 @@ import classes.TestNs;
 			var b1 = new RegExp("[0-9AB]+");
 			var b2 = /[0-9AB]+/;
 		}
+			
+		public function testDefaultNotLast() {
+			var k = 10;
+			switch(k){
+				default:
+					trace("def");
+				case 5:
+					trace("def and 5");
+					break;
+				case 4:
+					trace("4");
+					break;					
+			}
+			trace("after switch");
+		}
+		
+		public function testDefaultNotLastGrouped() {
+			var k = 10;
+			switch(k){
+				default:
+				case "six":
+					trace("def and 6");
+				case "five":
+					trace("def and 6 and 5");
+					break;
+				case "four":
+					trace("4");
+					break;					
+			}
+			trace("after switch");
+		}
 	}
 }
