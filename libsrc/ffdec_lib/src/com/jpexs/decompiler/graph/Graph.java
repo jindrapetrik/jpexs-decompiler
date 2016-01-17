@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.model.AndItem;
 import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
+import com.jpexs.decompiler.graph.model.DefaultItem;
 import com.jpexs.decompiler.graph.model.DoWhileItem;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
 import com.jpexs.decompiler.graph.model.ExitItem;
@@ -1725,7 +1726,6 @@ public class Graph {
 
                 List<GraphTargetItem> caseValues = new ArrayList<>();
                 List<List<GraphTargetItem>> caseCommands = new ArrayList<>();
-                List<GraphTargetItem> defaultCommands = new ArrayList<>();
                 List<Integer> valueMappings = new ArrayList<>();
                 Loop swLoop = new Loop(loops.size(), null, next);
                 swLoop.phase = 1;
@@ -1800,15 +1800,17 @@ public class Graph {
                 first = true;
                 pos = 0;
                 //This is tied to AS3 switch implementation which has nextparts switched from index 1. TODO: Make more universal
+
                 GraphPart defaultPart = hasExpr ? part.nextParts.get(1 + defaultBranch) : part.nextParts.get(0);
+                //int defaultNum = hasExpr ? 1 + defaultBranch : 0;
 
                 for (int i = 1; i < part.nextParts.size(); i++) {
-                    if (part.nextParts.get(i) != defaultPart) {
-                        if (caseExpressions.containsKey(pos)) {
-                            caseValues.add(caseExpressions.get(pos));
-                        } else {
-                            caseValues.add(new IntegerValueItem(null, localData.lineStartInstruction, pos));
-                        }
+                    if (caseExpressions.containsKey(pos)) {
+                        caseValues.add(caseExpressions.get(pos));
+                    } else if (part.nextParts.get(i) == defaultPart) {
+                        caseValues.add(new DefaultItem());
+                    } else {
+                        caseValues.add(new IntegerValueItem(null, localData.lineStartInstruction, pos));
                     }
                     pos++;
                 }
@@ -1816,13 +1818,14 @@ public class Graph {
                 first = true;
                 pos = 0;
                 List<GraphTargetItem> nextCommands = new ArrayList<>();
-                for (GraphPart p : part.nextParts) {
-
+                for (int i = 1; i < part.nextParts.size(); i++) {
+                    GraphPart p = part.nextParts.get(i);
                     /*if (pos == ignoredBranch) {
                      pos++;
                      continue;
                      }*/
-                    if (p != defaultPart) {
+                    //if (p != defaultPart) 
+                    {
                         if (vis.contains(p)) {
                             valueMappings.add(caseCommands.size() - 1);
                             continue;
@@ -1844,37 +1847,60 @@ public class Graph {
                         }
                     }
                     if (next != p) {
-
-                        if (p == defaultPart && !defaultCommands.isEmpty()) {
-                            //ignore
-                        } else {
+                        //if (p == defaultPart && !defaultCommands.isEmpty()) {
+                        //ignore
+                        //} else 
+                        {
                             TranslateStack s2 = (TranslateStack) stack.clone();
                             s2.clear();
                             nextCommands = printGraph(partCodes, partCodePos, visited, prepareBranchLocalData(localData), s2, allParts, part, p, stopPart2, loops, null, staticOperation, path, recursionLevel + 1);
                             makeAllCommands(nextCommands, s2);
-                            if (p == defaultPart) {
-                                defaultCommands = nextCommands;
-                            } else {
-                                caseCommands.add(nextCommands);
-                            }
+                            caseCommands.add(nextCommands);
                             vis.add(p);
                         }
-                    } else if (p == defaultPart) {
-                        defaultCommands = nextCommands;
                     } else {
                         caseCommands.add(nextCommands);
                     }
                     first = false;
                     pos++;
                 }
-                //remove last break from default clause
-                if (!defaultCommands.isEmpty() && (defaultCommands.get(defaultCommands.size() - 1) instanceof BreakItem)) {
-                    BreakItem bi = (BreakItem) defaultCommands.get(defaultCommands.size() - 1);
-                    if (bi.loopId == swLoop.id) {
-                        defaultCommands.remove(defaultCommands.size() - 1);
+
+                //If the lastone is default empty and alone, remove it
+                if (!caseCommands.isEmpty()) {
+                    List<GraphTargetItem> lastc = caseCommands.get(caseCommands.size() - 1);
+                    if (!lastc.isEmpty() && (lastc.get(lastc.size() - 1) instanceof BreakItem)) {
+                        BreakItem bi = (BreakItem) lastc.get(lastc.size() - 1);
+                        if (bi.loopId == swLoop.id) {
+                            lastc.remove(lastc.size() - 1);
+                        }
+                    }
+                    if (lastc.isEmpty()) {
+                        int cnt = 0;
+                        if (caseValues.get(caseValues.size() - 1) instanceof DefaultItem) {
+                            for (int i = valueMappings.size() - 1; i >= 0; i--) {
+                                if (valueMappings.get(i) == caseCommands.size() - 1) {
+                                    cnt++;
+                                }
+                            }
+                            if (cnt == 1) {
+                                caseValues.remove(caseValues.size() - 1);
+                                valueMappings.remove(valueMappings.size() - 1);
+                                caseCommands.remove(lastc);
+                            }
+                        }
                     }
                 }
-                SwitchItem sw = new SwitchItem(null, localData.lineStartInstruction, swLoop, switchedItem, caseValues, caseCommands, defaultCommands, valueMappings);
+                //remove last break from last section                
+                if (!caseCommands.isEmpty()) {
+                    List<GraphTargetItem> lastc = caseCommands.get(caseCommands.size() - 1);
+                    if (!lastc.isEmpty() && (lastc.get(lastc.size() - 1) instanceof BreakItem)) {
+                        BreakItem bi = (BreakItem) lastc.get(lastc.size() - 1);
+                        if (bi.loopId == swLoop.id) {
+                            lastc.remove(lastc.size() - 1);
+                        }
+                    }
+                }
+                SwitchItem sw = new SwitchItem(null, localData.lineStartInstruction, swLoop, switchedItem, caseValues, caseCommands, valueMappings);
                 currentRet.add(sw);
                 swLoop.phase = 2;
                 if (next != null) {

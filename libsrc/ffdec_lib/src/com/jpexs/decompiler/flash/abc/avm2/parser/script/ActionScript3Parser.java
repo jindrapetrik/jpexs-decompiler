@@ -98,6 +98,7 @@ import com.jpexs.decompiler.graph.model.BlockItem;
 import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.CommaExpressionItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
+import com.jpexs.decompiler.graph.model.DefaultItem;
 import com.jpexs.decompiler.graph.model.DoWhileItem;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
 import com.jpexs.decompiler.graph.model.ForItem;
@@ -1627,9 +1628,9 @@ public class ActionScript3Parser {
                     List<GraphTargetItem> caseExprsAll = new ArrayList<>();
                     List<Integer> valueMapping = new ArrayList<>();
                     int pos = 0;
-                    while (s.type == SymbolType.CASE) {
-                        while (s.type == SymbolType.CASE) {
-                            GraphTargetItem curCaseExpr = expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
+                    while (s.type == SymbolType.CASE || s.type == SymbolType.DEFAULT) {
+                        while (s.type == SymbolType.CASE || s.type == SymbolType.DEFAULT) {
+                            GraphTargetItem curCaseExpr = s.type == SymbolType.DEFAULT ? new DefaultItem() : expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables);
                             expectedType(SymbolType.COLON);
                             s = lex();
                             caseExprsAll.add(curCaseExpr);
@@ -1641,14 +1642,8 @@ public class ActionScript3Parser {
                         caseCmds.add(caseCmd);
                         s = lex();
                     }
-                    List<GraphTargetItem> defCmd = new ArrayList<>();
-                    if (s.type == SymbolType.DEFAULT) {
-                        expectedType(SymbolType.COLON);
-                        defCmd = commands(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, loops, loopLabels, registerVars, inFunction, inMethod, forinlevel, variables);
-                        s = lexer.lex();
-                    }
                     expected(s, lexer.yyline(), SymbolType.CURLY_CLOSE);
-                    ret = new SwitchItem(null, null, sloop, switchExpr, caseExprsAll, caseCmds, defCmd, valueMapping);
+                    ret = new SwitchItem(null, null, sloop, switchExpr, caseExprsAll, caseCmds, valueMapping);
                     break;
                 case BREAK:
                     s = lex();

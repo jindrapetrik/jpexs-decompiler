@@ -804,4 +804,44 @@ public class ActionScript2Test extends ActionScript2TestBase {
                 + "var e = - c;\r\n"
         );
     }
+
+    @Test
+    public void frame61_switchDefaultTest() {
+        compareSrc(61, "trace(\"switchDefaultTest\");\r\n"
+                + "var k = 5;\r\n"
+                + "switch(k)\r\n"
+                + "{\r\n"
+                + "case 5:\r\n"
+                + "default:\r\n"
+                + "trace(\"default 5\");\r\n"
+                + "case 6:\r\n"
+                + "trace(\"default 5,6\");\r\n"
+                + "break;\r\n"
+                + "case 7:\r\n"
+                + "trace(\"7\");\r\n"
+                + "}\r\n"
+                + "trace(\"afterSwitch\");\r\n"
+        );
+    }
+
+    @Test
+    public void frame62_Test() {
+        compareSrc(62, "trace(\"switchDefaultTest2\");\r\n"
+                + "var k = 5;\r\n"
+                + "switch(k)\r\n"
+                + "{\r\n"
+                + "case 5:\r\n"
+                + "trace(\"5\");\r\n"
+                + "break;\r\n"
+                + "default:\r\n"
+                + "trace(\"default\");\r\n"
+                + "case 6:\r\n"
+                + "trace(\"default, 6\");\r\n"
+                + "break;\r\n"
+                + "case 7:\r\n"
+                + "trace(\"7\");\r\n"
+                + "}\r\n"
+                + "trace(\"afterSwitch\");\r\n"
+        );
+    }
 }

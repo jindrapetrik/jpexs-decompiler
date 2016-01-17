@@ -464,7 +464,6 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "break;\r\n"
                 + "case 89:\r\n"
                 + "trace(\"eightynine\");\r\n"
-                + "break;\r\n"
                 + "}\r\n", false);
     }
 
@@ -1144,4 +1143,37 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "var b1:* = /[0-9AB]+/;\r\n"
                 + "var b2:* = /[0-9AB]+/;\r\n", false);
     }
+
+    public void testDefaultNotLast() {
+        decompileMethod("testDefaultNotLast", "var k:* = 10;\r\n"
+                + "switch(k)\r\n"
+                + "{\r\n"
+                + "default:\r\n"
+                + "trace(\"def\");\r\n"
+                + "case 5:\r\n"
+                + "trace(\"def and 5\");\r\n"
+                + "break;\r\n"
+                + "case 4:\r\n"
+                + "trace(\"4\");\r\n"
+                + "}\r\n"
+                + "trace(\"after switch\");\r\n", false);
+    }
+
+    @Test
+    public void testDefaultNotLastGrouped() {
+        decompileMethod("testDefaultNotLastGrouped", "var k:* = 10;\r\n"
+                + "switch(k)\r\n"
+                + "{\r\n"
+                + "default:\r\n"
+                + "case \"six\":\r\n"
+                + "trace(\"def and 6\");\r\n"
+                + "case \"five\":\r\n"
+                + "trace(\"def and 6 and 5\");\r\n"
+                + "break;\r\n"
+                + "case \"four\":\r\n"
+                + "trace(\"4\");\r\n"
+                + "}\r\n"
+                + "trace(\"after switch\");\r\n", false);
+    }
+
 }

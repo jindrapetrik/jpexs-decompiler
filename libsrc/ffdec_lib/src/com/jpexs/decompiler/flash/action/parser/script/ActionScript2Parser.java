@@ -135,6 +135,7 @@ import com.jpexs.decompiler.graph.model.BlockItem;
 import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.CommaExpressionItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
+import com.jpexs.decompiler.graph.model.DefaultItem;
 import com.jpexs.decompiler.graph.model.DoWhileItem;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
 import com.jpexs.decompiler.graph.model.ForItem;
@@ -1110,10 +1111,10 @@ public class ActionScript2Parser {
                 List<GraphTargetItem> caseExprsAll = new ArrayList<>();
                 List<Integer> valueMapping = new ArrayList<>();
                 int pos = 0;
-                while (s.type == SymbolType.CASE) {
+                while (s.type == SymbolType.CASE || s.type == SymbolType.DEFAULT) {
                     //List<GraphTargetItem> caseExprs; = new ArrayList<>();
-                    while (s.type == SymbolType.CASE) {
-                        GraphTargetItem curCaseExpr = expression(inFunction, inMethod, true, variables);
+                    while (s.type == SymbolType.CASE || s.type == SymbolType.DEFAULT) {
+                        GraphTargetItem curCaseExpr = s.type == SymbolType.DEFAULT ? new DefaultItem() : expression(inFunction, inMethod, true, variables);
                         //caseExprs.add(curCaseExpr);
                         expectedType(SymbolType.COLON);
                         s = lex();
@@ -1126,14 +1127,8 @@ public class ActionScript2Parser {
                     caseCmds.add(caseCmd);
                     s = lex();
                 }
-                List<GraphTargetItem> defCmd = new ArrayList<>();
-                if (s.type == SymbolType.DEFAULT) {
-                    expectedType(SymbolType.COLON);
-                    defCmd = commands(inFunction, inMethod, forinlevel, variables);
-                    s = lexer.lex();
-                }
                 expected(s, lexer.yyline(), SymbolType.CURLY_CLOSE);
-                ret = new SwitchItem(null, null, null, switchExpr, caseExprsAll, caseCmds, defCmd, valueMapping);
+                ret = new SwitchItem(null, null, null, switchExpr, caseExprsAll, caseCmds, valueMapping);
                 break;
             case BREAK:
                 ret = new BreakItem(null, null, 0); //? There is no more than 1 level continue/break in AS1/2

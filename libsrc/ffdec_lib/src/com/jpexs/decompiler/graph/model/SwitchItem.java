@@ -42,8 +42,6 @@ public class SwitchItem extends LoopItem implements Block {
 
     public List<List<GraphTargetItem>> caseCommands;
 
-    public List<GraphTargetItem> defaultCommands;
-
     public List<Integer> valuesMapping;
 
     private boolean labelUsed;
@@ -52,18 +50,14 @@ public class SwitchItem extends LoopItem implements Block {
     public List<List<GraphTargetItem>> getSubs() {
         List<List<GraphTargetItem>> ret = new ArrayList<>();
         ret.addAll(caseCommands);
-        if (defaultCommands != null) {
-            ret.add(defaultCommands);
-        }
         return ret;
     }
 
-    public SwitchItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, Loop loop, GraphTargetItem switchedObject, List<GraphTargetItem> caseValues, List<List<GraphTargetItem>> caseCommands, List<GraphTargetItem> defaultCommands, List<Integer> valuesMapping) {
+    public SwitchItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, Loop loop, GraphTargetItem switchedObject, List<GraphTargetItem> caseValues, List<List<GraphTargetItem>> caseCommands, List<Integer> valuesMapping) {
         super(instruction, lineStartIns, loop);
         this.switchedObject = switchedObject;
         this.caseValues = caseValues;
         this.caseCommands = caseCommands;
-        this.defaultCommands = defaultCommands;
         this.valuesMapping = valuesMapping;
     }
 
@@ -90,7 +84,9 @@ public class SwitchItem extends LoopItem implements Block {
         for (int i = 0; i < caseCommands.size(); i++) {
             for (int k = 0; k < valuesMapping.size(); k++) {
                 if (valuesMapping.get(k) == i) {
-                    writer.append("case ");
+                    if (!(caseValues.get(k) instanceof DefaultItem)) {
+                        writer.append("case ");
+                    }
                     caseValues.get(k).toString(writer, localData);
                     writer.append(":").newLine();
                 }
@@ -102,19 +98,6 @@ public class SwitchItem extends LoopItem implements Block {
                 }
             }
             writer.unindent();
-        }
-        if (defaultCommands != null) {
-            if (defaultCommands.size() > 0) {
-                writer.append("default");
-                writer.append(":").newLine();
-                writer.indent();
-                for (int j = 0; j < defaultCommands.size(); j++) {
-                    if (!defaultCommands.get(j).isEmpty()) {
-                        defaultCommands.get(j).toStringSemicoloned(writer, localData).newLine();
-                    }
-                }
-                writer.unindent();
-            }
         }
         writer.endBlock();
         if (writer instanceof NulWriter) {
@@ -130,16 +113,6 @@ public class SwitchItem extends LoopItem implements Block {
 
         for (List<GraphTargetItem> onecase : caseCommands) {
             for (GraphTargetItem ti : onecase) {
-                if (ti instanceof ContinueItem) {
-                    ret.add((ContinueItem) ti);
-                }
-                if (ti instanceof Block) {
-                    ret.addAll(((Block) ti).getContinues());
-                }
-            }
-        }
-        if (defaultCommands != null) {
-            for (GraphTargetItem ti : defaultCommands) {
                 if (ti instanceof ContinueItem) {
                     ret.add((ContinueItem) ti);
                 }

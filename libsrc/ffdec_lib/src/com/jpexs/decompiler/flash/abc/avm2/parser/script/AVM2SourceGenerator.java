@@ -86,6 +86,7 @@ import com.jpexs.decompiler.graph.model.AndItem;
 import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.CommaExpressionItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
+import com.jpexs.decompiler.graph.model.DefaultItem;
 import com.jpexs.decompiler.graph.model.DoWhileItem;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
 import com.jpexs.decompiler.graph.model.FalseItem;
@@ -606,12 +607,21 @@ public class AVM2SourceGenerator implements SourceGenerator {
         AVM2Instruction forwardJump = ins(AVM2Instructions.Jump, 0);
         ret.add(forwardJump);
 
+        int defIndex = -1;
+
+        for (int i = item.caseValues.size() - 1; i >= 0; i--) {
+            if (item.caseValues.get(i) instanceof DefaultItem) {
+                defIndex = i;
+                break;
+            }
+        }
+
         List<AVM2Instruction> cases = new ArrayList<>();
-        cases.addAll(toInsList(new IntegerValueAVM2Item(null, null, (long) item.caseValues.size()).toSource(localData, this)));
+        cases.addAll(toInsList(new IntegerValueAVM2Item(null, null, (long) defIndex).toSource(localData, this)));
         int cLen = insToBytes(cases).length;
         List<AVM2Instruction> caseLast = new ArrayList<>();
         caseLast.add(0, ins(AVM2Instructions.Jump, cLen));
-        caseLast.addAll(0, toInsList(new IntegerValueAVM2Item(null, null, (long) item.caseValues.size()).toSource(localData, this)));
+        caseLast.addAll(0, toInsList(new IntegerValueAVM2Item(null, null, (long) defIndex).toSource(localData, this)));
         int cLastLen = insToBytes(caseLast).length;
         caseLast.add(0, ins(AVM2Instructions.Jump, cLastLen));
         cases.addAll(0, caseLast);
@@ -621,6 +631,9 @@ public class AVM2SourceGenerator implements SourceGenerator {
         preCases.addAll(toInsList(AssignableAVM2Item.setTemp(localData, this, switchedReg)));
 
         for (int i = item.caseValues.size() - 1; i >= 0; i--) {
+            if (item.caseValues.get(i) instanceof DefaultItem) {
+                continue;
+            }
             List<AVM2Instruction> sub = new ArrayList<>();
             sub.addAll(toInsList(new IntegerValueAVM2Item(null, null, (long) i).toSource(localData, this)));
             sub.add(ins(AVM2Instructions.Jump, insToBytes(cases).length));
@@ -633,13 +646,12 @@ public class AVM2SourceGenerator implements SourceGenerator {
         }
         cases.addAll(0, preCases);
 
-        AVM2Instruction lookupOp = new AVM2Instruction(0, AVM2Instructions.LookupSwitch, new int[item.caseValues.size() + 1 + 1 + 1]);
+        AVM2Instruction lookupOp = new AVM2Instruction(0, AVM2Instructions.LookupSwitch, new int[item.caseValues.size() + 1 + 1]);
         cases.addAll(toInsList(AssignableAVM2Item.killTemp(localData, this, Arrays.asList(switchedReg))));
         List<AVM2Instruction> bodies = new ArrayList<>();
         List<Integer> bodiesOffsets = new ArrayList<>();
         int defOffset;
         int casesLen = insToBytes(cases).length;
-        bodies.addAll(generateToInsList(localData, item.defaultCommands));
         bodies.add(0, ins(AVM2Instructions.Label));
         bodies.add(ins(new BreakJumpIns(item.loop.id), 0));  //There could be two breaks when default clause ends with break, but official compiler does this too, so who cares...
         defOffset = -(insToBytes(bodies).length + casesLen);
@@ -650,7 +662,6 @@ public class AVM2SourceGenerator implements SourceGenerator {
         }
         lookupOp.operands[0] = defOffset;
         lookupOp.operands[1] = item.valuesMapping.size();
-        lookupOp.operands[2 + item.caseValues.size()] = defOffset;
         for (int i = 0; i < item.valuesMapping.size(); i++) {
             lookupOp.operands[2 + i] = bodiesOffsets.get(item.valuesMapping.get(i));
         }

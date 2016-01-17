@@ -31,6 +31,7 @@ import com.jpexs.decompiler.flash.action.model.operations.NeqActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.StrictEqActionItem;
 import com.jpexs.decompiler.flash.action.swf4.ActionEquals;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
+import com.jpexs.decompiler.flash.action.swf4.ActionJump;
 import com.jpexs.decompiler.flash.action.swf4.ActionNot;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
@@ -47,6 +48,7 @@ import com.jpexs.decompiler.graph.Loop;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
+import com.jpexs.decompiler.graph.model.DefaultItem;
 import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
 import java.util.ArrayList;
@@ -64,7 +66,7 @@ public class ActionGraph extends Graph {
     public ActionGraph(List<Action> code, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int version) {
         super(new ActionGraphSource(code, version, registerNames, variables, functions), new ArrayList<>());
         //this.version = version;
-      /*heads = makeGraph(code, new ArrayList<GraphPart>());
+        /*heads = makeGraph(code, new ArrayList<GraphPart>());
          for (GraphPart head : heads) {
          fixGraph(head);
          makeMulti(head, new ArrayList<GraphPart>());
@@ -271,11 +273,11 @@ public class ActionGraph extends Graph {
             if (switchedObject == null) {
                 switchedObject = new DirectValueActionItem(null, null, -1, Null.INSTANCE, null);
             }
-            HashMap<Integer, GraphTargetItem> caseValuesMap = new HashMap<>();
+            List<GraphTargetItem> caseValuesMap = new ArrayList<>();
 
-            int pos = 0;
+            //int pos = 0;
             StrictEqActionItem set = (StrictEqActionItem) stack.pop();
-            caseValuesMap.put(pos, set.rightSide);
+            caseValuesMap.add(set.rightSide);
             if (set.leftSide instanceof StoreRegisterActionItem) {
                 switchedObject = ((StoreRegisterActionItem) set.leftSide).value;
             }
@@ -290,72 +292,53 @@ public class ActionGraph extends Graph {
                     && ((top = translatePartGetStack(localData, part.nextParts.get(1), stack, staticOperation)) instanceof StrictEqActionItem)) {
                 cnt++;
                 part = part.nextParts.get(1);
-                pos++;
                 caseBodyParts.add(part.nextParts.get(0));
 
                 set = (StrictEqActionItem) top;
-                caseValuesMap.put(pos, set.rightSide);
+                caseValuesMap.add(set.rightSide);
             }
             if (cnt == 1) {
                 stack.push(set);
             } else {
                 part = part.nextParts.get(1);
-
-                GraphPart defaultPart = part; //21-21
-                //caseBodyParts.add(defaultPart);
-
-                List<GraphPart> defaultAndLastPart = new ArrayList<>();
-                defaultAndLastPart.add(defaultPart);
-                defaultAndLastPart.add(caseBodyParts.get(caseBodyParts.size() - 1));
-
-                GraphPart defaultPart2 = getCommonPart(localData, defaultAndLastPart, loops);//34-37
-
-                List<GraphTargetItem> defaultCommands;//= new ArrayList<>();
-                List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
-                stopPart2.add(defaultPart2);
-                defaultCommands = printGraph(partCodes, partCodePos, localData, stack, allParts, null, defaultPart, stopPart2, loops, staticOperation, path);
-
-                /*List<GraphPart> loopContinues = new ArrayList<>();
-                 for (Loop l : loops) {
-                 if (l.loopContinue != null) {
-                 loopContinues.add(l.loopContinue);
-                 }
-                 }*/
-                List<GraphPart> breakParts = new ArrayList<>();
-                /*for (int g = 0; g < caseBodyParts.size(); g++) {
-                 if (g < caseBodyParts.size() - 1) {
-                 if (caseBodyParts.get(g).leadsTo(code, caseBodyParts.get(g + 1), loops)) {
-                 continue;
-                 }
-                 }
-                 GraphPart nsp = caseBodyParts.get(g).getNextSuperPartPath(loopContinues);
-                 if (nsp != null) {
-                 breakParts.add(nsp);
-                 }
-                 }
-                 Collections.sort(breakParts, new Comparator<GraphPart>() {
-                 @Override
-                 public int compare(GraphPart o1, GraphPart o2) {
-                 return o2.path.length() - o1.path.length();
-                 }
-                 });*/
-
-                //GraphPart breakPart = breakParts.isEmpty() ? null : breakParts.get(0);
-                List<GraphPart> mcp = new ArrayList<>();
-                mcp.addAll(caseBodyParts);
-                if (defaultPart2 != null) {
-                    mcp.add(defaultPart2);
+                //caseBodyParts.add(part);
+                GraphPart defaultPart = part;
+                if (code.get(defaultPart.start) instanceof ActionJump) {
+                    defaultPart = defaultPart.nextParts.get(0);
                 }
-                GraphPart breakPart = getMostCommonPart(localData, mcp, loops);
-                if ((defaultPart2 != breakPart) && (defaultCommands.isEmpty())) {
-                    defaultPart = defaultPart2;
-                }
+
+                GraphPart breakPart = getMostCommonPart(localData, caseBodyParts, loops);
 
                 List<GraphTargetItem> caseValues = new ArrayList<>();
+                boolean hasDefault = false;
                 for (int i = 0; i < caseBodyParts.size(); i++) {
-                    if (caseValuesMap.containsKey(i)) {
+                    caseValues.add(caseValuesMap.get(i));
+                    if (caseBodyParts.get(i) == defaultPart) {
+                        i++;
+                        caseValuesMap.add(i, new DefaultItem());
+                        caseBodyParts.add(i, defaultPart);
                         caseValues.add(caseValuesMap.get(i));
+                        hasDefault = true;
                     }
+                }
+
+                if (!hasDefault) {
+                    //List<GraphPart> stops = new ArrayList<>();                   
+                    //stops.addAll(caseBodyParts);
+                    for (int i = 0; i < caseBodyParts.size(); i++) {
+                        if (defaultPart.leadsTo(localData, this, code, caseBodyParts.get(i), loops)) {
+                            caseValuesMap.add(i, new DefaultItem());
+                            caseBodyParts.add(i, defaultPart);
+                            caseValues.add(i, caseValuesMap.get(i));
+                            hasDefault = true;
+                            break;
+                        }
+                    }
+                }
+                if (!hasDefault) {
+                    caseValuesMap.add(new DefaultItem());
+                    caseBodyParts.add(defaultPart);
+                    caseValues.add(caseValuesMap.get(caseValuesMap.size() - 1));
                 }
 
                 List<List<GraphTargetItem>> caseCommands = new ArrayList<>();
@@ -378,24 +361,6 @@ public class ActionGraph extends Graph {
                     valuesMapping.add(caseBodies.indexOf(cur));
                 }
 
-                if (defaultPart == breakPart) {
-                    defaultPart = null;
-                }
-                if ((defaultPart != null) && (defaultCommands.isEmpty())) {
-                    List<GraphPart> stopPart2x = new ArrayList<>(stopPart);
-                    stopPart2x.add(next);
-                    defaultCommands = printGraph(partCodes, partCodePos, localData, stack, allParts, null, defaultPart, stopPart2x, loops, staticOperation, path);
-                }
-
-                if (!defaultCommands.isEmpty()) {
-                    if (defaultCommands.get(defaultCommands.size() - 1) instanceof BreakItem) {
-                        BreakItem bi = (BreakItem) defaultCommands.get(defaultCommands.size() - 1);
-                        if (bi.loopId == currentLoop.id) {
-                            defaultCommands.remove(defaultCommands.size() - 1);
-                        }
-                    }
-                }
-
                 /*List<GraphPart> ignored = new ArrayList<>();
                  for (Loop l : loops) {
                  ignored.add(l.loopContinue);
@@ -411,12 +376,6 @@ public class ActionGraph extends Graph {
                             } else {
                                 nextCase = caseBodies.get(i + 1);
                             }
-                        } else if (!defaultCommands.isEmpty()) {
-                            if (!caseBodies.get(i).leadsTo(localData, this, code, defaultPart, loops)) {
-                                cc.add(new BreakItem(null, localData.lineStartInstruction, currentLoop.id));
-                            } else {
-                                nextCase = defaultPart;
-                            }
                         }
                     }
                     List<GraphPart> stopPart2x = new ArrayList<>(stopPart);
@@ -426,9 +385,9 @@ public class ActionGraph extends Graph {
                             stopPart2x.add(b);
                         }
                     }
-                    if (defaultPart != null) {
+                    /*if (defaultPart != null) {
                         stopPart2x.add(defaultPart);
-                    }
+                    }*/
                     if (breakPart != null) {
                         stopPart2x.add(breakPart);
                     }
@@ -442,9 +401,43 @@ public class ActionGraph extends Graph {
                     }
                     caseCommands.add(cc);
                 }
+
+                //If the lastone is default empty and alone, remove it
+                if (!caseCommands.isEmpty()) {
+                    List<GraphTargetItem> lastc = caseCommands.get(caseCommands.size() - 1);
+                    if (!lastc.isEmpty() && (lastc.get(lastc.size() - 1) instanceof BreakItem)) {
+                        BreakItem bi = (BreakItem) lastc.get(lastc.size() - 1);
+                        lastc.remove(lastc.size() - 1);
+                    }
+                    if (lastc.isEmpty()) {
+                        int cnt2 = 0;
+                        if (caseValues.get(caseValues.size() - 1) instanceof DefaultItem) {
+                            for (int i = valuesMapping.size() - 1; i >= 0; i--) {
+                                if (valuesMapping.get(i) == caseCommands.size() - 1) {
+                                    cnt2++;
+                                }
+                            }
+                            if (cnt2 == 1) {
+                                caseValues.remove(caseValues.size() - 1);
+                                valuesMapping.remove(valuesMapping.size() - 1);
+                                caseCommands.remove(lastc);
+                            }
+                        }
+                    }
+                }
+                //remove last break from last section                
+                if (!caseCommands.isEmpty()) {
+                    List<GraphTargetItem> lastc = caseCommands.get(caseCommands.size() - 1);
+                    if (!lastc.isEmpty() && (lastc.get(lastc.size() - 1) instanceof BreakItem)) {
+                        BreakItem bi = (BreakItem) lastc.get(lastc.size() - 1);
+                        lastc.remove(lastc.size() - 1);
+
+                    }
+                }
+
                 ret = new ArrayList<>();
                 ret.addAll(output);
-                SwitchItem sti = new SwitchItem(null, switchStartItem, currentLoop, switchedObject, caseValues, caseCommands, defaultCommands, valuesMapping);
+                SwitchItem sti = new SwitchItem(null, switchStartItem, currentLoop, switchedObject, caseValues, caseCommands, valuesMapping);
                 ret.add(sti);
                 currentLoop.phase = 2;
                 if (next != null) {
