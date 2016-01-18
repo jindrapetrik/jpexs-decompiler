@@ -185,6 +185,48 @@ public class DefineFont3Tag extends FontTag {
         }
     }
 
+    private void checkWideParameters() {
+        int numGlyphs = glyphShapeTable.size();
+
+        if (!fontFlagsWideOffsets) {
+            ByteArrayOutputStream baosGlyphShapes = new ByteArrayOutputStream();
+            SWFOutputStream sos3 = new SWFOutputStream(baosGlyphShapes, getVersion());
+            for (int i = 0; i < numGlyphs; i++) {
+                long offset = (glyphShapeTable.size()) * 2 + sos3.getPos();
+                if (offset > 0xffff) {
+                    fontFlagsWideOffsets = true;
+                    checkWideParameters();
+                    return;
+                }
+                try {
+                    sos3.writeSHAPE(glyphShapeTable.get(i), 1);
+                } catch (IOException ex) {
+                    //should not happen
+                    return;
+                }
+            }
+            byte[] baGlyphShapes = baosGlyphShapes.toByteArray();
+
+            if (numGlyphs > 0) {
+                long maxOffset = (glyphShapeTable.size() + 1/*CodeTableOffset*/) * 2 + baGlyphShapes.length;
+                if (maxOffset > 0xffff) {
+                    fontFlagsWideOffsets = true;
+                    checkWideParameters();
+                    return;
+                }
+            }
+        }
+
+        if (!fontFlagsWideCodes) {
+            for (int i = 0; i < numGlyphs; i++) {
+                long code = codeTable.get(i);
+                if (code > 0xffff) {
+                    fontFlagsWideCodes = true;
+                }
+            }
+        }
+    }
+
     /**
      * Gets data bytes
      *
@@ -193,6 +235,7 @@ public class DefineFont3Tag extends FontTag {
      */
     @Override
     public void getData(SWFOutputStream sos) throws IOException {
+        checkWideParameters();
         List<Long> offsetTable = new ArrayList<>();
         ByteArrayOutputStream baosGlyphShapes = new ByteArrayOutputStream();
         SWFOutputStream sos3 = new SWFOutputStream(baosGlyphShapes, getVersion());
@@ -202,14 +245,6 @@ public class DefineFont3Tag extends FontTag {
             sos3.writeSHAPE(glyphShapeTable.get(i), 1);
         }
         byte[] baGlyphShapes = baosGlyphShapes.toByteArray();
-
-        if (!fontFlagsWideOffsets && numGlyphs > 0) {
-            // Set wide offsets when necessary
-            long maxOffset = (glyphShapeTable.size() + 1/*CodeTableOffset*/) * 2 + baGlyphShapes.length;
-            if (maxOffset > 65535) {
-                fontFlagsWideOffsets = true;
-            }
-        }
 
         sos.writeUI16(fontId);
         sos.writeUB(1, fontFlagsHasLayout ? 1 : 0);
@@ -443,6 +478,7 @@ public class DefineFont3Tag extends FontTag {
             }
         }
 
+        checkWideParameters();
         setModified(true);
     }
 

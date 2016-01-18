@@ -195,6 +195,48 @@ public class DefineFont2Tag extends FontTag {
         }
     }
 
+    private void checkWideParameters() {
+        int numGlyphs = glyphShapeTable.size();
+
+        if (!fontFlagsWideOffsets) {
+            ByteArrayOutputStream baosGlyphShapes = new ByteArrayOutputStream();
+            SWFOutputStream sos3 = new SWFOutputStream(baosGlyphShapes, getVersion());
+            for (int i = 0; i < numGlyphs; i++) {
+                long offset = ((glyphShapeTable.size() + 1/*CodeTableOffset*/) * (fontFlagsWideOffsets ? 4 : 2) + sos3.getPos());
+                if (offset > 0xffff) {
+                    fontFlagsWideOffsets = true;
+                    checkWideParameters();
+                    return;
+                }
+                try {
+                    sos3.writeSHAPE(glyphShapeTable.get(i), 1);
+                } catch (IOException ex) {
+                    //should not happen
+                    return;
+                }
+            }
+            byte[] baGlyphShapes = baosGlyphShapes.toByteArray();
+
+            if (numGlyphs > 0) {
+                long offset = (glyphShapeTable.size() + 1/*CodeTableOffset*/) * (fontFlagsWideOffsets ? 4 : 2) + baGlyphShapes.length;
+                if (offset > 0xffff) {
+                    fontFlagsWideOffsets = true;
+                    checkWideParameters();
+                    return;
+                }
+            }
+        }
+
+        if (!fontFlagsWideCodes) {
+            for (int i = 0; i < numGlyphs; i++) {
+                long code = codeTable.get(i);
+                if (code > 0xffff) {
+                    fontFlagsWideCodes = true;
+                }
+            }
+        }
+    }
+
     /**
      * Gets data bytes
      *
@@ -203,6 +245,7 @@ public class DefineFont2Tag extends FontTag {
      */
     @Override
     public void getData(SWFOutputStream sos) throws IOException {
+        checkWideParameters();
         sos.writeUI16(fontId);
         sos.writeUB(1, fontFlagsHasLayout ? 1 : 0);
         sos.writeUB(1, fontFlagsShiftJIS ? 1 : 0);
@@ -442,6 +485,7 @@ public class DefineFont2Tag extends FontTag {
             }
         }
 
+        checkWideParameters();
         setModified(true);
     }
 

@@ -161,7 +161,7 @@ public class SWFOutputStream extends OutputStream {
      */
     public void writeUI8(int value) throws IOException {
         if (value > 0xff) {
-            throw new Error("Value is too large for UI8: " + value);
+            throw new IllegalArgumentException("Value is too large for UI8: " + value);
         }
 
         write(value);
@@ -218,7 +218,7 @@ public class SWFOutputStream extends OutputStream {
      */
     public void writeUI32(long value) throws IOException {
         if (value > 0xffffffffL) {
-            throw new Error("Value is too large for UI32: " + value);
+            throw new IllegalArgumentException("Value is too large for UI32: " + value);
         }
 
         write((int) (value & 0xff));
@@ -235,7 +235,7 @@ public class SWFOutputStream extends OutputStream {
      */
     public void writeUI16(int value) throws IOException {
         if (value > 0xffff) {
-            throw new Error("Value is too large for UI16: " + value);
+            throw new IllegalArgumentException("Value is too large for UI16: " + value);
         }
 
         write((int) (value & 0xff));
@@ -250,7 +250,7 @@ public class SWFOutputStream extends OutputStream {
      */
     public void writeSI32(long value) throws IOException {
         if (value > 0x7fffffffL) {
-            throw new Error("Value is too large for SI32: " + value);
+            throw new IllegalArgumentException("Value is too large for SI32: " + value);
         }
 
         writeUI32(value);
@@ -280,7 +280,7 @@ public class SWFOutputStream extends OutputStream {
      */
     public void writeSI8(int value) throws IOException {
         if (value > 0x7ff) {
-            throw new Error("Value is too large for SI8: " + value);
+            throw new IllegalArgumentException("Value is too large for SI8: " + value);
         }
 
         writeUI8(value);
