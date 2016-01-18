@@ -776,10 +776,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         stopAllSounds();
                     }
                     frame = newframe;
-                    time = 0;
-                } else {
-                    time++;
                 }
+
+                time++;
             }
         }
 
