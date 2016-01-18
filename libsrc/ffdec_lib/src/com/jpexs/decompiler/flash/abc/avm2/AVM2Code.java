@@ -897,27 +897,25 @@ public class AVM2Code implements Cloneable {
                                         actualOperands[2 + c] = ais.readS24("actualOperand");
                                     }
                                 }
-                            } else {
-                                if (instr.operands.length > 0) {
-                                    actualOperands = new int[instr.operands.length];
-                                    for (int op = 0; op < instr.operands.length; op++) {
-                                        switch (instr.operands[op] & 0xff00) {
-                                            case OPT_U30:
-                                                actualOperands[op] = ais.readU30("operand");
-                                                break;
-                                            case OPT_U30_SHORT:
-                                                actualOperands[op] = (short) ais.readU30("operand");
-                                                break;
-                                            case OPT_U8:
-                                                actualOperands[op] = ais.read("operand");
-                                                break;
-                                            case OPT_BYTE:
-                                                actualOperands[op] = (byte) ais.read("operand");
-                                                break;
-                                            case OPT_S24:
-                                                actualOperands[op] = ais.readS24("operand");
-                                                break;
-                                        }
+                            } else if (instr.operands.length > 0) {
+                                actualOperands = new int[instr.operands.length];
+                                for (int op = 0; op < instr.operands.length; op++) {
+                                    switch (instr.operands[op] & 0xff00) {
+                                        case OPT_U30:
+                                            actualOperands[op] = ais.readU30("operand");
+                                            break;
+                                        case OPT_U30_SHORT:
+                                            actualOperands[op] = (short) ais.readU30("operand");
+                                            break;
+                                        case OPT_U8:
+                                            actualOperands[op] = ais.read("operand");
+                                            break;
+                                        case OPT_BYTE:
+                                            actualOperands[op] = (byte) ais.read("operand");
+                                            break;
+                                        case OPT_S24:
+                                            actualOperands[op] = ais.readS24("operand");
+                                            break;
                                     }
                                 }
                             }
@@ -1188,7 +1186,7 @@ public class AVM2Code implements Cloneable {
         }
         writer.newLine();
 
-        Set<Long> importantOffsets = getImportantOffsets(body);
+        Set<Long> importantOffsets = getImportantOffsets(body, true);
         if (body != null) {
             writer.appendNoHilight("body").newLine();
 
@@ -1284,12 +1282,14 @@ public class AVM2Code implements Cloneable {
         return writer;
     }
 
-    public Set<Long> getImportantOffsets(MethodBody body) {
+    public Set<Long> getImportantOffsets(MethodBody body, boolean tryEnds) {
         Set<Long> ret = new HashSet<>();
         if (body != null) {
             for (ABCException exception : body.exceptions) {
                 ret.add((long) exception.start);
-                // ret.add((long) exception.end); // end is not important
+                if (tryEnds) {
+                    ret.add((long) exception.end);
+                }
                 ret.add((long) exception.target);
             }
         }
@@ -1556,7 +1556,7 @@ public class AVM2Code implements Cloneable {
              }
              }//*/
 
-            /*if ((ip + 2 < code.size()) && (ins.definition instanceof NewCatchIns)) { // Filling local register in catch clause
+ /*if ((ip + 2 < code.size()) && (ins.definition instanceof NewCatchIns)) { // Filling local register in catch clause
              if (code.get(ip + 1).definition instanceof DupIns) {
              if (code.get(ip + 2).definition instanceof SetLocalTypeIns) {
              ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames);
@@ -1984,14 +1984,13 @@ public class AVM2Code implements Cloneable {
                     target = ins.getAddress() + ins.operands[k];
                     ins.operands[k] = updater.updateOperandOffset(ins.getAddress(), target, ins.operands[k]);
                 }
-            } else {
-                /*for (int j = 0; j < ins.definition.operands.length; j++) {
+            } else /*for (int j = 0; j < ins.definition.operands.length; j++) {
                  if (ins.definition.operands[j] == AVM2Code.DAT_OFFSET) {
                  long target = ins.offset + ins.getBytes().length + ins.operands[j];
                  ins.operands[j] = updater.updateOperandOffset(target, ins.operands[j]);
                  }
-                 }*/
-                //Faster, but not so universal
+                 }*/ //Faster, but not so universal
+            {
                 if (ins.definition instanceof IfTypeIns) {
                     long target = ins.getTargetAddress();
                     try {

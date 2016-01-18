@@ -158,7 +158,7 @@ public class AVM2DeobfuscatorSimple extends SWFDecompilerAdapter {
         int instructionsProcessed = 0;
 
         FixItemCounterStack stack = (FixItemCounterStack) localData.operandStack;
-        Set<Long> refs = code.getImportantOffsets(body);
+        Set<Long> refs = code.getImportantOffsets(body, false);
         boolean modified = false;
         while (true) {
             if (idx > endIdx) {
