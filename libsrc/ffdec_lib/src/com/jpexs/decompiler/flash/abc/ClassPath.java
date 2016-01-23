@@ -39,6 +39,10 @@ public class ClassPath {
         return packageStr.add(className).toPrintableString(true);
     }
 
+    public String toRawString() {
+        return packageStr.add(className).toRawString();
+    }
+
     @Override
     public int hashCode() {
         int hash = 7;
