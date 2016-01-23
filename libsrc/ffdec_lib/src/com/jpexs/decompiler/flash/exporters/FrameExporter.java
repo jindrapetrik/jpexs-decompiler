@@ -358,7 +358,8 @@ public class FrameExporter {
                     evl.handleExportingEvent("frame", pos + 1, fframes.size(), tagName);
                 }
 
-                BufferedImage result = SWF.frameToImageGet(ftim, fframes.get(pos++), 0, null, 0, ftim.displayRect, new Matrix(), new ColorTransform(), fbackgroundColor, false, settings.zoom).getBufferedImage();
+                int fframe = fframes.get(pos++);
+                BufferedImage result = SWF.frameToImageGet(ftim, fframe, fframe, null, 0, ftim.displayRect, new Matrix(), new ColorTransform(), fbackgroundColor, false, settings.zoom).getBufferedImage();
 
                 if (evl != null) {
                     evl.handleExportedEvent("frame", pos, fframes.size(), tagName);

@@ -1788,7 +1788,10 @@ public final class SWF implements SWFContainerItem, Timelined {
     public static void populateVideoFrames(int streamId, Iterable<Tag> tags, HashMap<Integer, VideoFrameTag> output) {
         for (Tag t : tags) {
             if (t instanceof VideoFrameTag) {
-                output.put(((VideoFrameTag) t).frameNum, (VideoFrameTag) t);
+                VideoFrameTag videoFrameTag = (VideoFrameTag) t;
+                if (videoFrameTag.streamID == streamId) {
+                    output.put(videoFrameTag.frameNum, (VideoFrameTag) t);
+                }
             }
             if (t instanceof DefineSpriteTag) {
                 populateVideoFrames(streamId, ((DefineSpriteTag) t).getTags(), output);
