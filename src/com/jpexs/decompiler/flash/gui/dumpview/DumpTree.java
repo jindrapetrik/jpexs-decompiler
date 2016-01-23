@@ -28,10 +28,55 @@ import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSwfNode;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainPanel;
+import com.jpexs.decompiler.flash.gui.TreeNodeType;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.gui.tagtree.TagTree;
+import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
+import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
+import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
+import com.jpexs.decompiler.flash.tags.DefineBitsJPEG4Tag;
+import com.jpexs.decompiler.flash.tags.DefineBitsLossless2Tag;
+import com.jpexs.decompiler.flash.tags.DefineBitsLosslessTag;
+import com.jpexs.decompiler.flash.tags.DefineBitsTag;
+import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
+import com.jpexs.decompiler.flash.tags.DefineButtonTag;
+import com.jpexs.decompiler.flash.tags.DefineEditTextTag;
+import com.jpexs.decompiler.flash.tags.DefineFont2Tag;
+import com.jpexs.decompiler.flash.tags.DefineFont3Tag;
+import com.jpexs.decompiler.flash.tags.DefineFont4Tag;
+import com.jpexs.decompiler.flash.tags.DefineFontTag;
+import com.jpexs.decompiler.flash.tags.DefineMorphShape2Tag;
+import com.jpexs.decompiler.flash.tags.DefineMorphShapeTag;
+import com.jpexs.decompiler.flash.tags.DefineShape2Tag;
+import com.jpexs.decompiler.flash.tags.DefineShape3Tag;
+import com.jpexs.decompiler.flash.tags.DefineShape4Tag;
+import com.jpexs.decompiler.flash.tags.DefineShapeTag;
+import com.jpexs.decompiler.flash.tags.DefineSoundTag;
+import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
+import com.jpexs.decompiler.flash.tags.DefineText2Tag;
+import com.jpexs.decompiler.flash.tags.DefineTextTag;
+import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
+import com.jpexs.decompiler.flash.tags.DoABC2Tag;
+import com.jpexs.decompiler.flash.tags.DoABCTag;
+import com.jpexs.decompiler.flash.tags.DoActionTag;
+import com.jpexs.decompiler.flash.tags.DoInitActionTag;
+import com.jpexs.decompiler.flash.tags.FileAttributesTag;
+import com.jpexs.decompiler.flash.tags.MetadataTag;
+import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
+import com.jpexs.decompiler.flash.tags.PlaceObject3Tag;
+import com.jpexs.decompiler.flash.tags.PlaceObject4Tag;
+import com.jpexs.decompiler.flash.tags.PlaceObjectTag;
+import com.jpexs.decompiler.flash.tags.RemoveObject2Tag;
+import com.jpexs.decompiler.flash.tags.RemoveObjectTag;
+import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
+import com.jpexs.decompiler.flash.tags.ShowFrameTag;
+import com.jpexs.decompiler.flash.tags.SoundStreamHead2Tag;
+import com.jpexs.decompiler.flash.tags.SoundStreamHeadTag;
+import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -45,6 +90,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
@@ -72,6 +118,113 @@ public class DumpTree extends JTree {
             setOpaque(false);
             setBackgroundNonSelectionColor(Color.white);
         }
+
+        @Override
+        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+            Component ret = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+            if (ret instanceof JLabel) {
+                JLabel lab = (JLabel) ret;
+                if (value instanceof DumpInfo) {
+                    DumpInfo di = (DumpInfo) value;
+                    TreeNodeType nodeType = null;
+                    if ("".equals(di.type)) {
+                        nodeType = TreeNodeType.FLASH;
+                    } else if ("TAG".equals(di.type)) {
+                        String name = di.name;
+                        if (name.contains(" ")) {
+                            name = name.substring(0, name.indexOf(" ")).trim();
+                        }
+                        switch (name) {
+                            case DefineFontTag.NAME:
+                            case DefineFont2Tag.NAME:
+                            case DefineFont3Tag.NAME:
+                            case DefineFont4Tag.NAME:
+                            case DefineCompactedFont.NAME:
+                                nodeType = TreeNodeType.FONT;
+                                break;
+                            case DefineTextTag.NAME:
+                            case DefineText2Tag.NAME:
+                            case DefineEditTextTag.NAME:
+                                nodeType = TreeNodeType.TEXT;
+                                break;
+                            case DefineBitsTag.NAME:
+                            case DefineBitsJPEG2Tag.NAME:
+                            case DefineBitsJPEG3Tag.NAME:
+                            case DefineBitsJPEG4Tag.NAME:
+                            case DefineBitsLosslessTag.NAME:
+                            case DefineBitsLossless2Tag.NAME:
+                                nodeType = TreeNodeType.IMAGE;
+                                break;
+                            case DefineShapeTag.NAME:
+                            case DefineShape2Tag.NAME:
+                            case DefineShape3Tag.NAME:
+                            case DefineShape4Tag.NAME:
+                                nodeType = TreeNodeType.SHAPE;
+                                break;
+                            case DefineMorphShapeTag.NAME:
+                            case DefineMorphShape2Tag.NAME:
+                                nodeType = TreeNodeType.MORPH_SHAPE;
+                                break;
+                            case DefineSpriteTag.NAME:
+                                nodeType = TreeNodeType.SPRITE;
+                                break;
+                            case DefineButtonTag.NAME:
+                            case DefineButton2Tag.NAME:
+                                nodeType = TreeNodeType.BUTTON;
+                                break;
+                            case DefineVideoStreamTag.NAME:
+                                nodeType = TreeNodeType.MOVIE;
+                                break;
+
+                            case DefineSoundTag.NAME:
+                            case SoundStreamHeadTag.NAME:
+                            case SoundStreamHead2Tag.NAME:
+                                nodeType = TreeNodeType.SOUND;
+                                break;
+                            case DefineBinaryDataTag.NAME:
+                                nodeType = TreeNodeType.BINARY_DATA;
+                                break;
+                            case DoActionTag.NAME:
+                            case DoInitActionTag.NAME:
+                            case DoABCTag.NAME:
+                            case DoABC2Tag.NAME:
+                                nodeType = TreeNodeType.AS;
+                                break;
+                            case ShowFrameTag.NAME:
+                                nodeType = TreeNodeType.FRAME; //show_frame?
+                                break;
+                            case SetBackgroundColorTag.NAME:
+                                nodeType = TreeNodeType.SET_BACKGROUNDCOLOR;
+                                break;
+                            case FileAttributesTag.NAME:
+                                nodeType = TreeNodeType.FILE_ATTRIBUTES;
+                                break;
+                            case MetadataTag.NAME:
+                                nodeType = TreeNodeType.METADATA;
+                                break;
+                            case PlaceObjectTag.NAME:
+                            case PlaceObject2Tag.NAME:
+                            case PlaceObject3Tag.NAME:
+                            case PlaceObject4Tag.NAME:
+                                nodeType = TreeNodeType.PLACE_OBJECT;
+                                break;
+                            case RemoveObjectTag.NAME:
+                            case RemoveObject2Tag.NAME:
+                                nodeType = TreeNodeType.REMOVE_OBJECT;
+                                break;
+                            default:
+                                nodeType = TreeNodeType.OTHER_TAG;
+                        }
+                    }
+                    if (nodeType != null) {
+                        lab.setIcon(TagTree.getIconForType(nodeType));
+                    }
+                }
+            }
+            return ret;
+
+        }
+
     }
 
     public DumpTree(DumpTreeModel treeModel, MainPanel mainPanel) {

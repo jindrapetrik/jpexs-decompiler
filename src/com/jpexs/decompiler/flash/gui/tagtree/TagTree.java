@@ -139,13 +139,27 @@ public class TagTree extends JTree {
 
     private final MainPanel mainPanel;
 
-    public class TagTreeCellRenderer extends DefaultTreeCellRenderer {
+    private static final Map<TreeNodeType, Icon> ICONS;
+
+    static {
+        ICONS = new HashMap<>();
+        for (TreeNodeType treeNodeType : TreeNodeType.values()) {
+            if (treeNodeType != TreeNodeType.UNKNOWN && treeNodeType != TreeNodeType.SHOW_FRAME) {
+                String tagTypeStr = treeNodeType.toString().toLowerCase().replace("_", "");
+                ICONS.put(treeNodeType, View.getIcon(tagTypeStr + "16"));
+            }
+        }
+    }
+
+    public static Icon getIconForType(TreeNodeType t) {
+        return ICONS.get(t);
+    }
+
+    public static class TagTreeCellRenderer extends DefaultTreeCellRenderer {
 
         private Font plainFont;
 
         private Font boldFont;
-
-        private final Map<TreeNodeType, Icon> icons;
 
         public TagTreeCellRenderer() {
             setUI(new BasicLabelUI());
@@ -154,13 +168,6 @@ public class TagTree extends JTree {
             setBackgroundNonSelectionColor(Color.white);
             //setBackgroundSelectionColor(Color.ORANGE);
 
-            icons = new HashMap<>();
-            for (TreeNodeType treeNodeType : TreeNodeType.values()) {
-                if (treeNodeType != TreeNodeType.UNKNOWN && treeNodeType != TreeNodeType.SHOW_FRAME) {
-                    String tagTypeStr = treeNodeType.toString().toLowerCase().replace("_", "");
-                    icons.put(treeNodeType, View.getIcon(tagTypeStr + "16"));
-                }
-            }
         }
 
         @Override
@@ -196,7 +203,7 @@ public class TagTree extends JTree {
                     setIcon(View.getIcon(itemName.toLowerCase() + "16"));
                 }
             } else {
-                setIcon(icons.get(type));
+                setIcon(ICONS.get(type));
             }
 
             /* boolean isModified = val instanceof Tag && ((Tag) val).isModified();
