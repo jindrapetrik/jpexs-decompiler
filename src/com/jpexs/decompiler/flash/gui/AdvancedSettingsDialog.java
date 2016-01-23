@@ -330,16 +330,29 @@ public class AdvancedSettingsDialog extends AppDialog {
             JPanel configPanel = new JPanel(new SpringLayout());
             int itemCount = 0;
             List<String> names = new ArrayList<>(categorized.get(cat).keySet());
+
+            final Map<String, String> locNames = new HashMap<>();
+            for (String name : names) {
+                String locName = "(Internal) " + name;
+
+                if (resourceBundle.containsKey("config.name." + name)) {
+                    locName = resourceBundle.getString("config.name." + name);
+                } else if (!name.startsWith("_")) { //must have _ prefix to be undocumented
+                    throw new RuntimeException("Missing configuration name: " + name);
+                }
+                locNames.put(name, locName);
+            }
+
             Collections.sort(names, new Comparator<String>() {
                 @Override
                 public int compare(String name1, String name2) {
-                    return resourceBundle.getString("config.name." + name1).compareTo(resourceBundle.getString("config.name." + name2));
+                    return locNames.get(name1).compareTo(locNames.get(name2));
                 }
             });
             for (String name : names) {
                 Field field = categorized.get(cat).get(name);
 
-                String locName = resourceBundle.getString("config.name." + name);
+                String locName = locNames.get(name);
 
                 try {
                     ConfigurationItem item = (ConfigurationItem) field.get(null);
@@ -352,7 +365,10 @@ public class AdvancedSettingsDialog extends AppDialog {
 
                     Class itemType = (Class<?>) itemType2;
 
-                    String description = resourceBundle.getString("config.description." + name);
+                    String description = "";
+                    if (resourceBundle.containsKey("config.description." + name)) {
+                        description = resourceBundle.getString("config.description." + name);
+                    }
 
                     Object defaultValue = Configuration.getDefaultValue(field);
                     if (name.equals("gui.skin")) {

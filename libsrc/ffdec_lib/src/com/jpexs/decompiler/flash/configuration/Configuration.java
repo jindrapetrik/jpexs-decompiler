@@ -565,6 +565,14 @@ public class Configuration {
     @ConfigurationCategory("script")
     public static final ConfigurationItem<Boolean> handleSkinPartsAutomatically = null;
 
+    @ConfigurationDefaultBoolean(false)
+    //@ConfigurationCategory("script")
+    public static final ConfigurationItem<Boolean> _ignoreAdditionalFlexClasses = null;
+
+    @ConfigurationDefaultBoolean(false)
+    //@ConfigurationCategory("script")
+    public static final ConfigurationItem<Boolean> _enableFlexExport = null;
+
     private enum OSId {
 
         WINDOWS, OSX, UNIX

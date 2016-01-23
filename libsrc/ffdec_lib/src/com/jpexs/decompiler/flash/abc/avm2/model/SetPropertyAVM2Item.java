@@ -41,8 +41,6 @@ public class SetPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, As
 
     public GraphTargetItem propertyName;
 
-    public GraphTargetItem value;
-
     @Override
     public GraphPart getFirstPart() {
         return value.getFirstPart();
