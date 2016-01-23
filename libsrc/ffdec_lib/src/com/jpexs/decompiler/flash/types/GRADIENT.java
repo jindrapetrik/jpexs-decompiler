@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.Serializable;
 
@@ -53,5 +54,6 @@ public class GRADIENT implements Serializable {
 
     public static final int INTERPOLATION_RESERVED2 = 3;
 
+    @SWFArray(value = "record")
     public GRADRECORD[] gradientRecords = new GRADRECORD[0];
 }

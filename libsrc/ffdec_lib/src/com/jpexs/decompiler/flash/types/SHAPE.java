@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.types;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.shape.PathExporter;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
+import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
@@ -42,6 +43,7 @@ public class SHAPE implements NeedsCharacters, Serializable {
     @SWFType(value = BasicType.UB, count = 4)
     public int numLineBits;
 
+    @SWFArray(value = "record")
     public List<SHAPERECORD> shapeRecords;
 
     private Shape cachedOutline;

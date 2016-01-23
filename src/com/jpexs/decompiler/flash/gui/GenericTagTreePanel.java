@@ -553,15 +553,66 @@ public class GenericTagTreePanel extends GenericTagPanel {
         public String getType(int fieldIndex) {
             SWFType swfType = fieldSet.get(fieldIndex).getAnnotation(SWFType.class);
             SWFArray swfArray = fieldSet.get(fieldIndex).getAnnotation(SWFArray.class);
-            String typeStr = null;
-            if ((swfType != null || swfArray != null) && !(ReflectionTools.needsIndex(fieldSet.get(fieldIndex)) && (index > -1))) {
-                Class<?> type = fieldSet.get(fieldIndex).getType();
-                if (ReflectionTools.needsIndex(fieldSet.get(fieldIndex))) {
-                    type = ReflectionTools.getFieldSubType(obj, fieldSet.get(fieldIndex));
-                }
-                typeStr = swfTypeToString(type, swfType, swfArray);
+            Class<?> declaredType = fieldSet.get(fieldIndex).getType();
+            boolean isArray = ReflectionTools.needsIndex(fieldSet.get(fieldIndex)) || swfArray != null;
+            boolean isArrayParent = isArray && index == -1;
+
+            Class<?> declaredSubType = isArray ? ReflectionTools.getFieldSubType(obj, fieldSet.get(fieldIndex)) : null;
+
+            Class<?> type = declaredType;
+            if (declaredSubType != null) {
+                type = declaredSubType;
             }
+
+            if (isArray && !isArrayParent) {
+                //get real value object type
+                try {
+                    Object val = ReflectionTools.getValue(obj, fieldSet.get(fieldIndex), index);
+                    if (val != null) {
+                        type = val.getClass();
+                    }
+                } catch (IllegalArgumentException | IllegalAccessException ex) {
+                    //ignore
+                }
+            }
+
+            String typeStr = type.getSimpleName();
+
+            if (swfType != null && swfType.value() != BasicType.OTHER) {
+                typeStr = "" + swfType.value();
+                if (swfType.count() > 0) {
+                    typeStr += "[" + swfType.count();
+                    if (swfType.countAdd() > 0) {
+                        typeStr += " + " + swfType.countAdd();
+                    }
+                    typeStr += "]";
+                } else if (!swfType.countField().isEmpty()) {
+                    typeStr += "[" + swfType.countField();
+                    if (swfType.countAdd() > 0) {
+                        typeStr += " + " + swfType.countAdd();
+                    }
+                    typeStr += "]";
+                }
+            }
+
+            String arrayBrackets = "";
+            if (isArrayParent) {
+                if (swfArray != null) {
+                    if (swfArray.count() > 0) {
+                        arrayBrackets = "[" + swfArray.count() + "]";
+                    } else if (!swfArray.countField().isEmpty()) {
+                        arrayBrackets = "[" + swfArray.countField() + "]";
+                    } else {
+                        arrayBrackets = "[]";
+                    }
+                } else {
+                    arrayBrackets = "[]";
+                }
+            }
+            typeStr += arrayBrackets;
+
             return typeStr;
+
         }
 
         public String getNameType(int fieldIndex) {
@@ -570,26 +621,25 @@ public class GenericTagTreePanel extends GenericTagPanel {
         }
 
         public String getName(int fieldIndex) {
+
             SWFArray swfArray = fieldSet.get(fieldIndex).getAnnotation(SWFArray.class);
+
+            boolean isArray = ReflectionTools.needsIndex(fieldSet.get(fieldIndex)) || swfArray != null;
+            boolean isArrayParent = isArray && index == -1;
+
             String name = "";
-            if (swfArray != null) {
+
+            if (!isArray || isArrayParent) {
+                name = fieldSet.get(fieldIndex).getName();
+            } else if (swfArray != null && !isArrayParent) {
                 name = swfArray.value();
             }
 
-            Object val = null;
-            try {
-                if (index > -1) {
-                    val = ReflectionTools.getValue(obj, fieldSet.get(fieldIndex), index);
-                }
-            } catch (IllegalArgumentException | IllegalAccessException ex) {
-                //ignore
-            }
-            String typeAdd = "";
-            if (val != null) {
-                typeAdd = " : " + val.getClass().getSimpleName();
+            if (!isArrayParent && isArray) {
+                name += "[" + index + "]";
             }
 
-            return (index > -1 ? name + "[" + index + "]" + typeAdd : fieldSet.get(fieldIndex).getName());
+            return name;
         }
 
         public Object getValue(int fieldIndex) {
@@ -861,44 +911,9 @@ public class GenericTagTreePanel extends GenericTagPanel {
         return tag;
     }
 
-    public static String swfArrayToString(SWFArray swfArray) {
-        String result = "";
-        if (swfArray == null) {
-            return result;
-        }
-        if (swfArray.count() > 0) {
-            result += "[" + swfArray.count() + "]";
-        } else if (!swfArray.countField().isEmpty()) {
-            result += "[" + swfArray.countField() + "]";
-        }
-        return result;
-    }
-
-    public static String swfTypeToString(Class<?> type, SWFType swfType, SWFArray swfArray) {
-        String stype = type.getSimpleName();
-        if (swfType == null) {
-            return stype + swfArrayToString(swfArray);
-        }
-        String result = swfType.value().toString();
-        if (swfType.value() == BasicType.OTHER) {
-            result = stype;
-        }
-        if (swfType.count() > 0) {
-            result += "[" + swfType.count();
-            if (swfType.countAdd() > 0) {
-                result += " + " + swfType.countAdd();
-            }
-            result += "]";
-        } else if (!swfType.countField().isEmpty()) {
-            result += "[" + swfType.countField();
-            if (swfType.countAdd() > 0) {
-                result += " + " + swfType.countAdd();
-            }
-            result += "]";
-        }
-        return result + swfArrayToString(swfArray);
-    }
-
+    /*public static String swfTypeToString(Class<?> type, SWFType swfType, SWFArray swfArray, boolean arrayHeader) {
+        S
+    }*/
     private static boolean hasEditor(Object obj, Field field, int index) {
         boolean isByteArray = field.getType().equals(byte[].class);
         if (!isByteArray && ReflectionTools.needsIndex(field) && index == -1) {
