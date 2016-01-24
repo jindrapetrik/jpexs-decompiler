@@ -57,6 +57,8 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
 
     private boolean stopped = true;
 
+    private boolean closed = false;
+
     private float frameRate;
 
     @Override
@@ -197,7 +199,9 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
 
             @Override
             public void run() {
-
+                if (closed) {
+                    return;
+                }
                 try {
                     ShockwaveFlash flash1 = flash;
 
@@ -308,8 +312,9 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
     }
 
     @Override
-    public void close() throws IOException {
+    public synchronized void close() throws IOException {
         timer.cancel();
+        closed = true;
     }
 
     @Override

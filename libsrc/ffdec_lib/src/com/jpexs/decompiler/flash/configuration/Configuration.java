@@ -305,6 +305,10 @@ public class Configuration {
     @ConfigurationName("gui.timeLineSplitPane.dividerLocationPercent")
     public static final ConfigurationItem<Double> guiTimeLineSplitPaneDividerLocationPercent = null;
 
+    @ConfigurationDefaultDouble(0.6)
+    @ConfigurationName("gui.dump.splitPane.dividerLocationPercent")
+    public static final ConfigurationItem<Double> guiDumpSplitPaneDividerLocationPercent = null;
+
     @ConfigurationDefaultString("com.jpexs.decompiler.flash.gui.OceanicSkin")
     @ConfigurationName("gui.skin")
     @ConfigurationCategory("ui")

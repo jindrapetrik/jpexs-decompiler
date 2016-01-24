@@ -128,6 +128,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     private static final String METADATA_TAG_CARD = "METADATATAG";
 
+    private static final String EMPTY_CARD = "EMPTY";
+
     private static final String CARDTEXTPANEL = "Text card";
 
     private static final String CARDFONTPANEL = "Font card";
@@ -190,6 +192,15 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     private MetadataTag metadataTag;
 
+    private boolean readOnly = false;
+
+    public void setReadOnly(boolean readOnly) {
+        this.readOnly = readOnly;
+        if (readOnly) {
+            parametersPanel.setVisible(false);
+        }
+    }
+
     public PreviewPanel(MainPanel mainPanel, FlashPlayerPanel flashPanel) {
         super(JSplitPane.HORIZONTAL_SPLIT, Configuration.guiPreviewSplitPaneDividerLocationPercent);
         this.mainPanel = mainPanel;
@@ -203,11 +214,18 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         viewerCards.add(createBinaryCard(), BINARY_TAG_CARD);
         viewerCards.add(createMetadataCard(), METADATA_TAG_CARD);
         viewerCards.add(createGenericTagCard(), GENERIC_TAG_CARD);
+        viewerCards.add(createEmptyCard(), EMPTY_CARD);
         setLeftComponent(viewerCards);
 
         createParametersPanel();
 
         showCardLeft(FLASH_VIEWER_CARD);
+    }
+
+    private JPanel createEmptyCard() {
+        JPanel ret = new JPanel();
+        ret.add(new JLabel("-"));
+        return ret;
     }
 
     private void createParametersPanel() {
@@ -398,10 +416,10 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     private void updateMetadataButtonsVisibility() {
         boolean edit = metadataEditor.isEditable();
         boolean editorMode = Configuration.editorMode.get();
-        metadataEditButton.setVisible(!edit);
-        metadataSaveButton.setVisible(edit);
+        metadataEditButton.setVisible(!readOnly && !edit);
+        metadataSaveButton.setVisible(!readOnly && edit);
         boolean metadataModified = isMetadataModified();
-        metadataCancelButton.setVisible(edit);
+        metadataCancelButton.setVisible(!readOnly && edit);
         metadataCancelButton.setEnabled(metadataModified || !editorMode);
     }
 
@@ -472,7 +490,9 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         showFontPage(fontTag);
 
         showCardRight(CARDFONTPANEL);
-        parametersPanel.setVisible(true);
+        if (!readOnly) {
+            parametersPanel.setVisible(true);
+        }
         fontPanel.showFontTag(fontTag);
 
         int pageCount = getFontPageCount(fontTag);
@@ -496,13 +516,19 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         return pageCount;
     }
 
+    public void showEmpty() {
+        showCardLeft(EMPTY_CARD);
+    }
+
     public void showTextPanel(TextTag textTag) {
         if (mainPanel.isInternalFlashViewerSelected() /*|| ft instanceof GFxDefineCompactedFont*/) {
             showImagePanel(MainPanel.makeTimelined(textTag), textTag.getSwf(), 0);
         }
 
         showCardRight(CARDTEXTPANEL);
-        parametersPanel.setVisible(true);
+        if (!readOnly) {
+            parametersPanel.setVisible(true);
+        }
         textPanel.setText(textTag);
     }
 
@@ -554,7 +580,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     public void showMetaDataPanel(MetadataTag metadataTag) {
         showCardLeft(METADATA_TAG_CARD);
         this.metadataTag = metadataTag;
-        metadataEditor.setEditable(Configuration.editorMode.get());
+        metadataEditor.setEditable(!readOnly && !metadataTag.isReadOnly() && Configuration.editorMode.get());
         metadataEditor.setText(formatMetadata(metadataTag.xmlMetadata, 4));
         setMetadataModified(false);
         updateMetadataButtonsVisibility();
@@ -577,6 +603,10 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     }
 
     public void setImageReplaceButtonVisible(boolean show, boolean showAlpha) {
+        if (readOnly) {
+            show = false;
+            showAlpha = false;
+        }
         replaceImageButton.setVisible(show);
         replaceImageAlphaButton.setVisible(showAlpha);
         prevFontsButton.setVisible(false);
