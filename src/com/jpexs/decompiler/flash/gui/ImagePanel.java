@@ -166,6 +166,56 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
         private List<Shape> outlines;
 
+        private boolean autoFit = false;
+
+        private boolean allowMove = true;
+
+        private Point dragStart = null;
+
+        private Point offsetPoint = new Point(0, 0);
+
+        public boolean hasAllowMove() {
+            return allowMove;
+        }
+
+        public IconPanel() {
+            addMouseListener(new MouseAdapter() {
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    if (e.getButton() == MouseEvent.BUTTON1) {
+                        dragStart = e.getPoint();
+                    }
+                }
+
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    if (e.getButton() == MouseEvent.BUTTON1) {
+                        dragStart = null;
+                    }
+                }
+
+            });
+            addMouseMotionListener(new MouseMotionAdapter() {
+                @Override
+                public void mouseDragged(MouseEvent e) {
+                    if (dragStart != null && allowMove) {
+                        Point dragEnd = e.getPoint();
+                        Point delta = new Point(dragEnd.x - dragStart.x, dragEnd.y - dragStart.y);
+                        offsetPoint.x += delta.x;
+                        offsetPoint.y += delta.y;
+                        dragStart = dragEnd;
+                        repaint();
+                    }
+                }
+
+            });
+        }
+
+        public void setAutoFit(boolean autoFit) {
+            this.autoFit = autoFit;
+            repaint();
+        }
+
         public BufferedImage getLastImage() {
             return img.getBufferedImage();
         }
@@ -202,6 +252,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             return new Point((p.x - rect.x) * img.getWidth() / rect.width, (p.y - rect.y) * img.getHeight() / rect.height);
         }
 
+        private void setAllowMove(boolean allowMove) {
+            this.allowMove = allowMove;
+            if (!allowMove) {
+                offsetPoint = new Point();
+            }
+        }
+
         private void calcRect() {
             if (img != null) {
                 int w1 = img.getWidth();
@@ -212,21 +269,27 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                 int w;
                 int h;
-                if (w1 <= w2 && h1 <= h2) {
+                if (autoFit) {
+                    if (w1 <= w2 && h1 <= h2) {
+                        w = w1;
+                        h = h1;
+                    } else {
+
+                        h = h1 * w2 / w1;
+                        if (h > h2) {
+                            w = w1 * h2 / h1;
+                            h = h2;
+                        } else {
+                            w = w2;
+                        }
+                    }
+                } else {
                     w = w1;
                     h = h1;
-                } else {
-
-                    h = h1 * w2 / w1;
-                    if (h > h2) {
-                        w = w1 * h2 / h1;
-                        h = h2;
-                    } else {
-                        w = w2;
-                    }
                 }
 
-                rect = new Rectangle(getWidth() / 2 - w / 2, getHeight() / 2 - h / 2, w, h);
+                setAllowMove(h > h2 || w > w2);
+                rect = new Rectangle(getWidth() / 2 - w / 2 + offsetPoint.x, getHeight() / 2 - h / 2 + offsetPoint.y, w, h);
             } else {
                 rect = null;
             }
@@ -338,6 +401,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                     if (handCursor) {
                         iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    } else if (iconPanel.hasAllowMove()) {
+                        iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
                     } else {
                         iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                     }
