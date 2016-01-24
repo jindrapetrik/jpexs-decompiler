@@ -157,7 +157,7 @@ public class PlaceObject2Tag extends PlaceObjectTypeTag implements ASMSourceCont
         this.placeFlagHasRatio = ratio >= 0;
         this.placeFlagHasColorTransform = colorTransform != null;
         this.placeFlagHasMatrix = matrix != null;
-        this.placeFlagHasCharacter = characterId >= 0;
+        this.placeFlagHasCharacter = characterId > 0;
         this.placeFlagMove = placeFlagMove;
         this.depth = depth;
         this.characterId = characterId;
