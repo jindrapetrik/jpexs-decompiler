@@ -283,30 +283,37 @@ public class Configuration {
 
     @ConfigurationDefaultDouble(0.5)
     @ConfigurationName("gui.avm2.splitPane.dividerLocationPercent")
+    @ConfigurationInternal
     public static final ConfigurationItem<Double> guiAvm2SplitPaneDividerLocationPercent = null;
 
     @ConfigurationDefaultDouble(0.5)
     @ConfigurationName("gui.actionSplitPane.dividerLocationPercent")
+    @ConfigurationInternal
     public static final ConfigurationItem<Double> guiActionSplitPaneDividerLocationPercent = null;
 
     @ConfigurationDefaultDouble(0.5)
     @ConfigurationName("gui.previewSplitPane.dividerLocationPercent")
+    @ConfigurationInternal
     public static final ConfigurationItem<Double> guiPreviewSplitPaneDividerLocationPercent = null;
 
     @ConfigurationDefaultDouble(0.3333333333)
     @ConfigurationName("gui.splitPane1.dividerLocationPercent")
+    @ConfigurationInternal
     public static final ConfigurationItem<Double> guiSplitPane1DividerLocationPercent = null;
 
     @ConfigurationDefaultDouble(0.6)
     @ConfigurationName("gui.splitPane2.dividerLocationPercent")
+    @ConfigurationInternal
     public static final ConfigurationItem<Double> guiSplitPane2DividerLocationPercent = null;
 
     @ConfigurationDefaultDouble(0.5)
     @ConfigurationName("gui.timeLineSplitPane.dividerLocationPercent")
+    @ConfigurationInternal
     public static final ConfigurationItem<Double> guiTimeLineSplitPaneDividerLocationPercent = null;
 
     @ConfigurationDefaultDouble(0.6)
     @ConfigurationName("gui.dump.splitPane.dividerLocationPercent")
+    @ConfigurationInternal
     public static final ConfigurationItem<Double> guiDumpSplitPaneDividerLocationPercent = null;
 
     @ConfigurationDefaultString("com.jpexs.decompiler.flash.gui.OceanicSkin")
@@ -527,10 +534,12 @@ public class Configuration {
 
     @ConfigurationDefaultDouble(0.7)
     @ConfigurationName("gui.avm2.splitPane.vars.dividerLocationPercent")
+    @ConfigurationInternal
     public static final ConfigurationItem<Double> guiAvm2VarsSplitPaneDividerLocationPercent = null;
 
     @ConfigurationDefaultDouble(0.7)
     @ConfigurationName("gui.action.splitPane.vars.dividerLocationPercent")
+    @ConfigurationInternal
     public static final ConfigurationItem<Double> guiActionVarsSplitPaneDividerLocationPercent = null;
 
     @ConfigurationDefaultBoolean(true)
@@ -571,10 +580,12 @@ public class Configuration {
 
     @ConfigurationDefaultBoolean(false)
     //@ConfigurationCategory("script")
+    @ConfigurationInternal
     public static final ConfigurationItem<Boolean> _ignoreAdditionalFlexClasses = null;
 
     @ConfigurationDefaultBoolean(false)
     //@ConfigurationCategory("script")
+    @ConfigurationInternal
     public static final ConfigurationItem<Boolean> _enableFlexExport = null;
 
     private enum OSId {
