@@ -200,7 +200,6 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
-import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -249,6 +248,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public DumpTree dumpTree;
 
     private final FlashPlayerPanel flashPanel;
+
     private final FlashPlayerPanel flashPanel2;
 
     private final JPanel contentPanel;
@@ -286,7 +286,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     private static final String TIMELINE_PANEL = "TIMELINEPANEL";
 
     private static final String RESOURCES_VIEW = "RESOURCES";
+
     private static final String DUMP_VIEW = "DUMP";
+
     private static final String TIMELINE_VIEW = "TIMELINE";
 
     private final JPersistentSplitPane splitPane1;
@@ -310,6 +312,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     private DumpViewPanel dumpViewPanel;
 
     private final JPanel treePanel;
+
     private final PreviewPanel dumpPreviewPanel;
 
     private final TagInfoPanel tagInfoPanel;
@@ -3316,7 +3319,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         } else if (treeItem instanceof Frame && internalViewer) {
             showPreview(treeItem, previewPanel);
             showCard(CARDPREVIEWPANEL);
-        } else if ((treeItem instanceof SoundTag)) { //&& isInternalFlashViewerSelected() && (Arrays.asList("mp3", "wav").contains(((SoundTag) tagObj).getExportFormat())))) {           
+        } else if ((treeItem instanceof SoundTag)) { //&& isInternalFlashViewerSelected() && (Arrays.asList("mp3", "wav").contains(((SoundTag) tagObj).getExportFormat())))) {
             showPreview(treeItem, previewPanel);
             showCard(CARDPREVIEWPANEL);
         } else if ((treeItem instanceof Frame) || (treeItem instanceof CharacterTag) || (treeItem instanceof FontTag) || (treeItem instanceof SoundStreamHeadTypeTag)) {

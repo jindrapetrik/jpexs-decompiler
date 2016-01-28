@@ -18,8 +18,6 @@ package com.jpexs.decompiler.flash.gui.dumpview;
 
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSwfNode;
-import com.jpexs.decompiler.flash.gui.Main;
-import com.jpexs.decompiler.flash.gui.PreviewPanel;
 import com.jpexs.decompiler.flash.gui.hexview.HexView;
 import com.jpexs.decompiler.flash.gui.hexview.HexViewListener;
 import com.jpexs.helpers.Helper;
