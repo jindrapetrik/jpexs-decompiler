@@ -3092,6 +3092,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void showPreview(TreeItem treeItem, PreviewPanel previewPanel) {
+        previewPanel.clear();
         if (treeItem == null) {
             previewPanel.showEmpty();
             return;
