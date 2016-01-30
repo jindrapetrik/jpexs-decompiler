@@ -17,16 +17,10 @@
 package com.jpexs.decompiler.flash.gui.dumpview;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
-import com.jpexs.decompiler.flash.tags.Tag;
-import com.jpexs.decompiler.flash.tags.TagStub;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;

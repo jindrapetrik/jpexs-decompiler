@@ -852,69 +852,69 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private static SerializableImage getFrame(SWF swf, int frame, int time, Timelined drawable, DepthState stateUnderCursor, int mouseButton, int selectedDepth, double zoom) {
         Timeline timeline = drawable.getTimeline();
-        String key = "drawable_" + frame + "_" + drawable.hashCode() + "_" + mouseButton + "_depth" + selectedDepth + "_" + (stateUnderCursor == null ? "out" : stateUnderCursor.hashCode()) + "_" + zoom + "_" + timeline.fontFrameNum;
-        SerializableImage img = swf.getFromCache(key);
-        if (img == null) {
-            boolean shouldCache = timeline.isSingleFrame(frame);
-            RECT rect = drawable.getRect();
+        //String key = "drawable_" + frame + "_" + drawable.hashCode() + "_" + mouseButton + "_depth" + selectedDepth + "_" + (stateUnderCursor == null ? "out" : stateUnderCursor.hashCode()) + "_" + zoom + "_" + timeline.fontFrameNum;
+        SerializableImage img;// = swf.getFromCache(key);
+        //if (img == null) {
+        //boolean shouldCache = timeline.isSingleFrame(frame);
+        RECT rect = drawable.getRect();
 
-            int width = (int) (rect.getWidth() * zoom);
-            int height = (int) (rect.getHeight() * zoom);
-            SerializableImage image = new SerializableImage((int) Math.ceil(width / SWF.unitDivisor),
-                    (int) Math.ceil(height / SWF.unitDivisor), SerializableImage.TYPE_INT_ARGB);
-            image.fillTransparent();
-            Matrix m = new Matrix();
-            m.translate(-rect.Xmin * zoom, -rect.Ymin * zoom);
-            m.scale(zoom);
-            RenderContext renderContext = new RenderContext();
-            renderContext.stateUnderCursor = stateUnderCursor;
-            renderContext.mouseButton = mouseButton;
-            timeline.toImage(frame, time, frame, renderContext, image, m, new ColorTransform());
+        int width = (int) (rect.getWidth() * zoom);
+        int height = (int) (rect.getHeight() * zoom);
+        SerializableImage image = new SerializableImage((int) Math.ceil(width / SWF.unitDivisor),
+                (int) Math.ceil(height / SWF.unitDivisor), SerializableImage.TYPE_INT_ARGB);
+        image.fillTransparent();
+        Matrix m = new Matrix();
+        m.translate(-rect.Xmin * zoom, -rect.Ymin * zoom);
+        m.scale(zoom);
+        RenderContext renderContext = new RenderContext();
+        renderContext.stateUnderCursor = stateUnderCursor;
+        renderContext.mouseButton = mouseButton;
+        timeline.toImage(frame, time, frame, renderContext, image, m, new ColorTransform());
 
-            Graphics2D gg = (Graphics2D) image.getGraphics();
-            gg.setStroke(new BasicStroke(3));
-            gg.setPaint(Color.green);
-            gg.setTransform(AffineTransform.getTranslateInstance(0, 0));
-            List<DepthState> dss = new ArrayList<>();
-            List<Shape> os = new ArrayList<>();
-            DepthState ds = null;
-            if (timeline.getFrameCount() > frame) {
-                ds = timeline.getFrame(frame).layers.get(selectedDepth);
-            }
+        Graphics2D gg = (Graphics2D) image.getGraphics();
+        gg.setStroke(new BasicStroke(3));
+        gg.setPaint(Color.green);
+        gg.setTransform(AffineTransform.getTranslateInstance(0, 0));
+        List<DepthState> dss = new ArrayList<>();
+        List<Shape> os = new ArrayList<>();
+        DepthState ds = null;
+        if (timeline.getFrameCount() > frame) {
+            ds = timeline.getFrame(frame).layers.get(selectedDepth);
+        }
 
-            if (ds != null) {
-                CharacterTag cht = swf.getCharacter(ds.characterId);
-                if (cht != null) {
-                    if (cht instanceof DrawableTag) {
-                        DrawableTag dt = (DrawableTag) cht;
-                        Shape outline = dt.getOutline(0, ds.time, ds.ratio, renderContext, new Matrix(ds.matrix));
-                        Rectangle bounds = outline.getBounds();
-                        bounds.x *= zoom;
-                        bounds.y *= zoom;
-                        bounds.width *= zoom;
-                        bounds.height *= zoom;
-                        bounds.x /= 20;
-                        bounds.y /= 20;
-                        bounds.width /= 20;
-                        bounds.height /= 20;
-                        bounds.x -= rect.Xmin / 20;
-                        bounds.y -= rect.Ymin / 20;
-                        gg.setStroke(new BasicStroke(2.0f,
-                                BasicStroke.CAP_BUTT,
-                                BasicStroke.JOIN_MITER,
-                                10.0f, new float[]{10.0f}, 0.0f));
-                        gg.setPaint(Color.red);
-                        gg.draw(bounds);
-                    }
+        if (ds != null) {
+            CharacterTag cht = swf.getCharacter(ds.characterId);
+            if (cht != null) {
+                if (cht instanceof DrawableTag) {
+                    DrawableTag dt = (DrawableTag) cht;
+                    Shape outline = dt.getOutline(0, ds.time, ds.ratio, renderContext, new Matrix(ds.matrix));
+                    Rectangle bounds = outline.getBounds();
+                    bounds.x *= zoom;
+                    bounds.y *= zoom;
+                    bounds.width *= zoom;
+                    bounds.height *= zoom;
+                    bounds.x /= 20;
+                    bounds.y /= 20;
+                    bounds.width /= 20;
+                    bounds.height /= 20;
+                    bounds.x -= rect.Xmin / 20;
+                    bounds.y -= rect.Ymin / 20;
+                    gg.setStroke(new BasicStroke(2.0f,
+                            BasicStroke.CAP_BUTT,
+                            BasicStroke.JOIN_MITER,
+                            10.0f, new float[]{10.0f}, 0.0f));
+                    gg.setPaint(Color.red);
+                    gg.draw(bounds);
                 }
             }
-
-            img = image;
-
-            if (shouldCache) {
-                swf.putToCache(key, img);
-            }
         }
+
+        img = image;
+
+        /*if (shouldCache) {
+         swf.putToCache(key, img);
+         }*/
+        //}
         return img;
     }
 
