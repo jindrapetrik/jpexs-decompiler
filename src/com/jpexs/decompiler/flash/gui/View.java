@@ -306,7 +306,7 @@ public class View {
             List<Image> images = new ArrayList<>();
             MyResizableIcon[] icons = MyRibbonApplicationMenuButtonUI.getIcons();
             MyResizableIcon icon = icons[1];
-            int sizes[] = new int[]{16, 32, 48, 256};
+            int sizes[] = new int[]{256, 128, 64, 42, 40, 32, 20, 16};
             for (int size : sizes) {
                 icon.setIconSize(size, size);
                 BufferedImage bi = new BufferedImage(size, size, BufferedImage.TYPE_4BYTE_ABGR);
