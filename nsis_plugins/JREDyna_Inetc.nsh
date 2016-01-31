@@ -1,6 +1,7 @@
 ; Version 1.0.1
 
 ;JPEXS : Added 64 bit support
+;JPEXS : Added getting latest JRE from java web
 
 
   !ifndef JRE_DECLARES
@@ -17,13 +18,17 @@
   !ifndef JRE_VERSION
     !error "JRE_VERSION must be defined"
   !endif
-
-  !ifndef JRE_URL_64
-    !error "JRE_URL_64 must be defined"
+ 
+  !ifndef JRE_DOWNLOAD_PAGE_URL
+    !define JRE_DOWNLOAD_PAGE_URL "https://java.com/en/download/manual.jsp" 
   !endif
-  
-  !ifndef JRE_URL_32
-    !error "JRE_URL_32 must be defined"
+
+  !ifndef JRE_DOWNLOAD_ANCHOR_32  
+    !define JRE_DOWNLOAD_ANCHOR_32 "Windows Offline" 
+  !endif
+
+  !ifndef JRE_DOWNLOAD_ANCHOR_64
+    !define JRE_DOWNLOAD_ANCHOR_64 "Windows Offline (64-bit)" 
   !endif
 
 
@@ -77,6 +82,39 @@ exit:
 FunctionEnd
 
 
+Function Trim
+    Exch $R1 ; Original string
+    Push $R2
+Loop:
+    StrCpy $R2 "$R1" 1
+    StrCmp "$R2" " " TrimLeft
+    StrCmp "$R2" "$\r" TrimLeft
+    StrCmp "$R2" "$\n" TrimLeft
+    StrCmp "$R2" "$\t" TrimLeft
+    GoTo Loop2
+TrimLeft:
+    StrCpy $R1 "$R1" "" 1
+    Goto Loop
+Loop2:
+    StrCpy $R2 "$R1" 1 -1
+    StrCmp "$R2" " " TrimRight
+    StrCmp "$R2" "$\r" TrimRight
+    StrCmp "$R2" "$\n" TrimRight
+    StrCmp "$R2" "$\t" TrimRight
+    GoTo Done
+TrimRight:
+    StrCpy $R1 "$R1" -1
+    Goto Loop2
+Done:
+    Pop $R2
+    Exch $R1
+FunctionEnd
+!define Trim "!insertmacro Trim"
+ !macro Trim ResultVar String
+  Push "${String}"
+  Call Trim
+  Pop "${ResultVar}"
+!macroend
 
 
 
@@ -86,6 +124,14 @@ FunctionEnd
 
 
 var JRE_URL
+var JRE_ANCHOR
+var jpghtml
+var aurl
+var astate
+var atext
+var jf
+var jtxt
+var jpos
 
 Function DownloadAndInstallJREIfNecessary
   Push $0
@@ -104,12 +150,79 @@ Function DownloadAndInstallJREIfNecessary
 downloadJRE:
 
   ${If} ${RunningX64}
-    Push ${JRE_URL_64} 
+    Push "${JRE_DOWNLOAD_ANCHOR_64}"
   ${Else}
-    Push ${JRE_URL_32}
+    Push "${JRE_DOWNLOAD_ANCHOR_32}"
   ${EndIf}
-  Pop $JRE_URL
+  Pop $JRE_ANCHOR
+  
+  GetTempFileName $jpghtml
+  inetc::get /SILENT /USERAGENT "${APP_NAME} Setup" "${JRE_DOWNLOAD_PAGE_URL}" "$jpghtml" /END
+Pop $0
+StrCmp $0 "OK" 0 urlcheckfailed
 
+StrCpy $astate 0
+
+FileOpen $jf "$jpghtml" r
+jloop:
+  FileRead $jf $jtxt
+  IfErrors jdone      
+      ${Trim} $jtxt $jtxt
+      ;MessageBox MB_OK $jtxt 
+      StrCmp $astate 0 astate0
+      StrCmp $astate 1 astate1
+      StrCmp $astate 2 astate2
+      StrCmp $astate 3 astate3
+      
+      astate0:
+      ${StrLoc} $jpos $jtxt "<a " ">"
+      StrCmp $jpos "" jloop
+      IntOp $jpos $jpos + 3 ;<a  len
+      StrCpy $jtxt $jtxt "" $jpos      
+
+      astate1:
+      StrCpy $astate 1      
+      ${StrLoc} $jpos $jtxt "href=$\"" ">"
+      StrCmp $jpos "" jloop
+      IntOp $jpos $jpos + 6 ;href=" len
+      StrCpy $jtxt $jtxt "" $jpos
+      ${StrLoc} $jpos $jtxt "$\"" ">"
+      StrCmp $jpos "" jloop 
+      StrCpy $aurl $jtxt $jpos
+      IntOp $jpos $jpos + 1 ;" len      
+      StrCpy $jtxt $jtxt "" $jpos        
+    
+      astate2:
+      StrCpy $astate 2
+      ${StrLoc} $jpos $jtxt ">" ">"
+      StrCmp $jpos "" jloop 
+      IntOp $jpos $jpos + 1 ;> len            
+      StrCpy $jtxt $jtxt "" $jpos      
+      
+      StrCpy $atext ""
+
+      astate3:
+      StrCpy $astate 3      
+      ${StrLoc} $jpos $jtxt "</a>" ">"
+      StrCmp $jpos "" 0 telse      
+        StrCpy $atext "$atext$jtxt"
+        Goto jloop
+      telse:
+        StrCpy $jtxt $jtxt $jpos   
+        StrCpy $atext "$atext$jtxt"        
+        StrCpy $astate 0
+
+        StrCmp $atext $JRE_ANCHOR 0 jloop
+        StrCpy $JRE_URL $aurl               
+jdone:
+  FileClose $jf
+
+  StrCmp $JRE_URL "" urlcheckfailed urlgetsuccessfull
+  urlcheckfailed:
+  MessageBox MB_ABORTRETRYIGNORE|MB_ICONSTOP "$(STRING_JRE_CANNOTDOWNLOAD)" /SD IDIGNORE IDRETRY downloadJRE IDIGNORE End
+  Abort
+  urlgetsuccessfull:
+  
   DetailPrint "$(STRING_JRE_WILLDOWNLOAD)$JRE_URL"
   Inetc::get "$JRE_URL" "$TEMP\jre_Setup.exe" /END
   Pop $0 # return value = exit code, "OK" if OK
@@ -121,14 +234,13 @@ downloadJRE:
  
 downloadsuccessful:
 
-
   DetailPrint "$(STRING_JRE_LAUNCHSETUP)"
   
   IfSilent doSilent
-  ExecWait '"$TEMP\jre_setup.exe" REBOOT=Suppress /L \"$TEMP\jre_setup.log\"' $0
+  ExecWait '"$TEMP\jre_setup.exe" REBOOT=Suppress SPONSORS=0 /L "$TEMP\jre_setup.log"' $0
   goto jreSetupfinished
 doSilent:
-  ExecWait '"$TEMP\jre_setup.exe" /S REBOOT=Suppress /L \"$TEMP\jre_setup.log\"' $0
+  ExecWait '"$TEMP\jre_setup.exe" /S REBOOT=Suppress SPONSORS=0 /L "$TEMP\jre_setup.log"' $0
   
 
 jreSetupFinished:

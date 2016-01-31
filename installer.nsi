@@ -17,7 +17,7 @@
   !define JRE_VERSION "1.8"
 !endif
 
-  Unicode true
+Unicode true
 
 
 !define APP_EXENAME "ffdec.exe"
@@ -27,12 +27,15 @@
 
 
 SetCompressor /SOLID lzma
-;Java 8 Update 31 JRE
-!define JRE_URL_32 "http://javadl.sun.com/webapps/download/AutoDL?BundleId=101406"
-!define JRE_URL_64 "http://javadl.sun.com/webapps/download/AutoDL?BundleId=101408"
+!include "StrFunc.nsh"
+${StrLoc}
 !include "nsis_plugins\JREDyna_Inetc.nsh"
 
-!define FLASH_URL "http://download.macromedia.com/pub/flashplayer/current/support/install_flash_player_ax.exe"
+;Old not working
+;!define FLASH_URL "http://download.macromedia.com/pub/flashplayer/current/support/install_flash_player_ax.exe"
+
+!define FLASH_URL "http://fpdownload.macromedia.com/pub/flashplayer/latest/help/install_flash_player_ax.exe"
+
 !include "nsis_plugins\Flash_Inetc.nsh"
 !include x64.nsh
 
@@ -104,81 +107,6 @@ Function GetInstalledSize
 	Pop $0
 	IntFmt $GetInstalledSize.total "0x%08X" $GetInstalledSize.total
 	Push $GetInstalledSize.total
-FunctionEnd
-
- 
-
-!define StrLoc "!insertmacro StrLoc"
- 
-!macro StrLoc ResultVar String SubString StartPoint
-  Push "${String}"
-  Push "${SubString}"
-  Push "${StartPoint}"
-  Call StrLoc
-  Pop "${ResultVar}"
-!macroend
- 
-Function StrLoc
-/*After this point:
-  ------------------------------------------
-   $R0 = StartPoint (input)
-   $R1 = SubString (input)
-   $R2 = String (input)
-   $R3 = SubStringLen (temp)
-   $R4 = StrLen (temp)
-   $R5 = StartCharPos (temp)
-   $R6 = TempStr (temp)*/
- 
-  ;Get input from user
-  Exch $R0                         
-  Exch
-  Exch $R1
-  Exch 2
-  Exch $R2
-  Push $R3
-  Push $R4
-  Push $R5
-  Push $R6
- 
-  ;Get "String" and "SubString" length
-  StrLen $R3 $R1
-  StrLen $R4 $R2
-  ;Start "StartCharPos" counter
-  StrCpy $R5 0
- 
-  ;Loop until "SubString" is found or "String" reaches its end
-  ${Do}
-    ;Remove everything before and after the searched part ("TempStr")
-    StrCpy $R6 $R2 $R3 $R5
- 
-    ;Compare "TempStr" with "SubString"
-    ${If} $R6 == $R1
-      ${If} $R0 == `<`
-        IntOp $R6 $R3 + $R5
-        IntOp $R0 $R4 - $R6
-      ${Else}
-        StrCpy $R0 $R5
-      ${EndIf}
-      ${ExitDo}
-    ${EndIf}
-    ;If not "SubString", this could be "String"'s end
-    ${If} $R5 >= $R4
-      StrCpy $R0 ``
-      ${ExitDo}
-    ${EndIf}
-    ;If not, continue the loop
-    IntOp $R5 $R5 + 1
-  ${Loop}
- 
-  ;Return output to user
-  Pop $R6
-  Pop $R5
-  Pop $R4
-  Pop $R3
-  Pop $R2
-  Exch
-  Pop $R1
-  Exch $R0
 FunctionEnd
 
 Function GetTime
@@ -411,7 +339,7 @@ var SMDir
   !insertmacro MUI_LANGUAGE "${LANGLOAD}"
   !verbose push
   !verbose 0
-  !include "nsis_locales/${LANGLOAD}.nsh"
+  !include "nsis_locales\${LANGLOAD}.nsh"
   !verbose pop
   !undef LANG
 !macroend
@@ -738,14 +666,6 @@ Section "FFDec" SecDummy
   SetOutPath "$INSTDIR"  
   File /r "dist\lib"
 
-/*
-  ${If} $AddToContextMenu == 1
-
-
-
-  ${EndIf}
-
- */
  ;create start-menu items
 !insertmacro MUI_STARTMENU_WRITE_BEGIN 0 ;This macro sets $SMDir and skips to MUI_STARTMENU_WRITE_END if the "Don't create shortcuts" checkbox is checked... 
 
@@ -803,7 +723,7 @@ Section "$(STRING_SWC)" SecPlayerGlobal
 ;checkadobe:
 DetailPrint "$(STRING_SWC_CHECK)"
 GetTempFileName $pghtml
-inetc::get /SILENT /USERAGENT "${APP_NAME} Setup" "https://www.adobe.com/support/flashplayer/downloads.html" "$pghtml"
+inetc::get /SILENT /USERAGENT "${APP_NAME} Setup" "https://www.adobe.com/support/flashplayer/downloads.html" "$pghtml" /END
 Pop $0
 StrCmp $0 "OK" dlok
 MessageBox MB_OK "$(STRING_SWC_NOTFOUND)"
@@ -843,7 +763,7 @@ done:
   IfFileExists "$APPDATA\JPEXS\FFDec\flashlib\$pgname" swcexists
     CreateDirectory "$APPDATA\JPEXS\FFDec\flashlib"
     DetailPrint "$(STRING_STARTING_DOWNLOAD) PlayerGlobal.swc"
-    inetc::get /USERAGENT "${APP_NAME} Setup" $txt "$APPDATA\JPEXS\FFDec\flashlib\$pgname"
+    inetc::get /USERAGENT "${APP_NAME} Setup" $txt "$APPDATA\JPEXS\FFDec\flashlib\$pgname" /END
     Pop $0
     StrCmp $0 "OK" saved
     MessageBox MB_OK "$(STRING_SWC_NOTFOUND)"
