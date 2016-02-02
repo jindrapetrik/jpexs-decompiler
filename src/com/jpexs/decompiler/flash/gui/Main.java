@@ -225,9 +225,8 @@ public class Main {
             @Override
             protected Object doInBackground() throws Exception {
                 Process proc;
-                String runStr = "\"" + exePath + "\" \"" + ffile + "\"";
                 try {
-                    proc = Runtime.getRuntime().exec(runStr);
+                    proc = Runtime.getRuntime().exec(new String[]{exePath, ffile});
                 } catch (IOException ex) {
                     Logger.getLogger(MainFrameMenu.class.getName()).log(Level.SEVERE, null, ex);
 
