@@ -52,6 +52,7 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.VideoFrameTag;
 import com.jpexs.decompiler.flash.tags.base.AloneTag;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
+import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
@@ -620,6 +621,22 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         return t;
     }
 
+    private static void writeTag(Tag t, SWFOutputStream sos) throws IOException {
+        t = classicTag(t);
+
+        t.writeTag(sos);
+        if (t instanceof CharacterIdTag) {
+            List<CharacterIdTag> chIdTags = t.getSwf().getCharacterIdTags(((CharacterIdTag) t).getCharacterId());
+            if (chIdTags != null) {
+                for (CharacterIdTag chIdTag : chIdTags) {
+                    if (!(chIdTag instanceof PlaceObjectTypeTag || chIdTag instanceof RemoveTag)) {
+                        ((Tag) chIdTag).writeTag(sos);
+                    }
+                }
+            }
+        }
+    }
+
     public void createAndShowTempSwf(TreeItem treeItem) {
         SWF swf = null;
         try {
@@ -741,7 +758,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                         t.getNeededCharactersDeep(needed);
                         for (int n : needed) {
                             if (!doneCharacters.contains(n)) {
-                                classicTag(swf.getCharacter(n)).writeTag(sos2);
+                                writeTag(swf.getCharacter(n), sos2);
                                 doneCharacters.add(n);
                             }
                         }
@@ -757,7 +774,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                             }
                         }
 
-                        classicTag(t).writeTag(sos2);
+                        writeTag(t, sos2);
                     }
 
                     RECT r = parent.getRect();
@@ -772,7 +789,6 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
                     new ShowFrameTag(swf).writeTag(sos2);
                 } else {
-
                     boolean isSprite = false;
                     if (treeItem instanceof DefineSpriteTag) {
                         isSprite = true;
@@ -804,11 +820,11 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                                 }
                             }
 
-                            classicTag(characterTag).writeTag(sos2);
+                            writeTag(characterTag, sos2);
                         }
                     }
 
-                    classicTag((Tag) treeItem).writeTag(sos2);
+                    writeTag((Tag) treeItem, sos2);
 
                     MATRIX mat = new MATRIX();
                     mat.hasRotate = false;

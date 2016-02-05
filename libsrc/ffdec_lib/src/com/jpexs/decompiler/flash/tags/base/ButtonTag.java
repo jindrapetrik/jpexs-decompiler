@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -64,6 +65,18 @@ public abstract class ButtonTag extends CharacterTag implements DrawableTag, Tim
     public abstract boolean trackAsMenu();
 
     @Override
+    public void getNeededCharacters(Set<Integer> needed) {
+        for (BUTTONRECORD r : getRecords()) {
+            needed.add(r.characterId);
+        }
+
+        DefineButtonSoundTag sounds = getSounds();
+        if (sounds != null) {
+            sounds.getNeededCharacters(needed);
+        }
+    }
+
+    @Override
     public RECT getRect() {
         return getRect(new HashSet<>());
     }
@@ -89,7 +102,7 @@ public abstract class ButtonTag extends CharacterTag implements DrawableTag, Tim
     }
 
     public DefineButtonSoundTag getSounds() {
-        for (Tag t : swf.getTags()) {
+        for (CharacterIdTag t : swf.getCharacterIdTags(getCharacterId())) {
             if (t instanceof DefineButtonSoundTag) {
                 DefineButtonSoundTag st = (DefineButtonSoundTag) t;
                 if (st.buttonId == getCharacterId()) {
