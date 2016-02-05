@@ -167,13 +167,6 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
     }
 
     @Override
-    public void getNeededCharacters(Set<Integer> needed) {
-        for (BUTTONRECORD r : characters) {
-            needed.add(r.characterId);
-        }
-    }
-
-    @Override
     public boolean replaceCharacter(int oldCharacterId, int newCharacterId) {
         boolean modified = false;
         for (int i = 0; i < characters.size(); i++) {
@@ -282,7 +275,6 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
             if (r.buttonStateHitTest) {
                 frameHit.layers.put(r.placeDepth, new DepthState(layer, frameHit, false));
             }
-
         }
 
         timeline.addFrame(frameUp);

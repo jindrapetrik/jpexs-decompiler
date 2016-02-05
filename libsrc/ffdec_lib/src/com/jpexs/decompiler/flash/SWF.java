@@ -40,7 +40,6 @@ import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
-import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraphSource;
 import com.jpexs.decompiler.flash.action.ActionList;
@@ -298,6 +297,9 @@ public final class SWF implements SWFContainerItem, Timelined {
     private volatile Map<Integer, CharacterTag> characters;
 
     @Internal
+    private volatile Map<Integer, List<CharacterIdTag>> characterIdTags;
+
+    @Internal
     private volatile Map<Integer, Set<Integer>> dependentCharacters;
 
     @Internal
@@ -363,6 +365,7 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     public void updateCharacters() {
         characters = null;
+        characterIdTags = null;
     }
 
     public void clearTagSwfs() {
@@ -426,13 +429,23 @@ public final class SWF implements SWFContainerItem, Timelined {
             synchronized (this) {
                 if (characters == null) {
                     Map<Integer, CharacterTag> chars = new HashMap<>();
-                    parseCharacters(getTags(), chars);
+                    Map<Integer, List<CharacterIdTag>> charIdtags = new HashMap<>();
+                    parseCharacters(getTags(), chars, charIdtags);
                     characters = Collections.unmodifiableMap(chars);
+                    characterIdTags = Collections.unmodifiableMap(charIdtags);
                 }
             }
         }
 
         return characters;
+    }
+
+    public List<CharacterIdTag> getCharacterIdTags(int characterId) {
+        if (characterIdTags == null) {
+            getCharacters();
+        }
+
+        return characterIdTags.get(characterId);
     }
 
     public Map<Integer, Set<Integer>> getDependentCharacters() {
@@ -725,20 +738,28 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
     }
 
-    private void parseCharacters(Iterable<Tag> list, Map<Integer, CharacterTag> characters) {
+    private void parseCharacters(Iterable<Tag> list, Map<Integer, CharacterTag> characters, Map<Integer, List<CharacterIdTag>> characterIdTags) {
         for (Tag t : list) {
-            if (t instanceof CharacterTag) {
-                int characterId = ((CharacterTag) t).getCharacterId();
-                if (characters.containsKey(characterId)) {
-                    logger.log(Level.SEVERE, "SWF already contains characterId={0}", characterId);
-                }
+            if (t instanceof CharacterIdTag) {
+                int characterId = ((CharacterIdTag) t).getCharacterId();
+                if (t instanceof CharacterTag) {
+                    if (characters.containsKey(characterId)) {
+                        logger.log(Level.SEVERE, "SWF already contains characterId={0}", characterId);
+                    }
 
-                if (characterId != 0) {
-                    characters.put(characterId, (CharacterTag) t);
+                    if (characterId != 0) {
+                        characters.put(characterId, (CharacterTag) t);
+                        characterIdTags.put(characterId, new ArrayList<>());
+                    }
+                } else {
+                    if (characterIdTags.containsKey(characterId)) {
+                        characterIdTags.get(characterId).add((CharacterIdTag) t);
+                    }
                 }
             }
+
             if (t instanceof DefineSpriteTag) {
-                parseCharacters(((DefineSpriteTag) t).getTags(), characters);
+                parseCharacters(((DefineSpriteTag) t).getTags(), characters, characterIdTags);
             }
         }
     }
@@ -2482,6 +2503,7 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     public void clearAllCache() {
         characters = null;
+        characterIdTags = null;
         abcList = null;
         timeline = null;
         clearReadOnlyListCache();
@@ -3194,15 +3216,15 @@ public final class SWF implements SWFContainerItem, Timelined {
             timelined.setModified(true);
             timelined.resetTimeline();
         } else // timeline should be always the swf here
-         if (removeDependencies) {
-                removeTagWithDependenciesFromTimeline(tag, timelined.getTimeline());
+        if (removeDependencies) {
+            removeTagWithDependenciesFromTimeline(tag, timelined.getTimeline());
+            timelined.setModified(true);
+        } else {
+            boolean modified = removeTagFromTimeline(tag, timelined.getTimeline());
+            if (modified) {
                 timelined.setModified(true);
-            } else {
-                boolean modified = removeTagFromTimeline(tag, timelined.getTimeline());
-                if (modified) {
-                    timelined.setModified(true);
-                }
             }
+        }
     }
 
     @Override
@@ -3852,7 +3874,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                                                         String mainClassName = null;
                                                         //currentDomain,preloader
                                                         /*double width = 0;
-                                                        double height = 0;
+                                                         double height = 0;
                                                          */
                                                         for (NameValuePair nvp : no.pairs) {
                                                             if (nvp.name instanceof StringAVM2Item) {
@@ -3883,11 +3905,11 @@ public final class SWF implements SWFContainerItem, Timelined {
                                                                         }
                                                                         break;
                                                                     /*case "width":
-                                                                        width = Double.parseDouble("" + nvp.value.getResult());
-                                                                        break;
-                                                                    case "height":
-                                                                        height = Double.parseDouble("" + nvp.value.getResult());
-                                                                        break;*/
+                                                                     width = Double.parseDouble("" + nvp.value.getResult());
+                                                                     break;
+                                                                     case "height":
+                                                                     height = Double.parseDouble("" + nvp.value.getResult());
+                                                                     break;*/
                                                                     case "mainClassName":
                                                                         mainClassName = "" + nvp.value.getResult();
                                                                         break;

@@ -1560,13 +1560,8 @@ public class CommandLineArgumentParser {
         long stopTime = System.currentTimeMillis();
         long time = stopTime - startTime;
         System.out.println("Export finished. Total export time: " + Helper.formatTimeSec(time));
-        if (exportOK) {
-            System.out.println("OK");
-            System.exit(0);
-        } else {
-            System.err.println("FAIL");
-            System.exit(1);
-        }
+        System.out.println(exportOK ? "OK" : "FAIL");
+        System.exit(exportOK ? 0 : 1);
     }
 
     private static void parseDeobfuscate(Stack<String> args) {
@@ -1643,39 +1638,38 @@ public class CommandLineArgumentParser {
             badArguments("compress");
         }
 
+        boolean result = false;
         try {
+            SWFCompression compression = SWFCompression.ZLIB;
+            String compressionString = !args.isEmpty() ? args.pop() : null;
+            if (compressionString != null) {
+                switch (compressionString.toLowerCase()) {
+                    case "zlib":
+                        compression = SWFCompression.ZLIB;
+                        break;
+                    case "lzma":
+                        compression = SWFCompression.LZMA;
+                        break;
+                    default:
+                        System.out.println("Unsupported compression method: " + compressionString);
+                        System.exit(0);
+                        break;
+                }
+            }
+
             try (InputStream fis = new BufferedInputStream(new FileInputStream(args.pop()));
                     OutputStream fos = new BufferedOutputStream(new FileOutputStream(args.pop()))) {
-                SWFCompression compression = SWFCompression.ZLIB;
-                String compressionString = !args.isEmpty() ? args.pop() : null;
-                if (compressionString != null) {
-                    switch (compressionString.toLowerCase()) {
-                        case "zlib":
-                            compression = SWFCompression.ZLIB;
-                            break;
-                        case "lzma":
-                            compression = SWFCompression.LZMA;
-                            break;
-                        default:
-                            System.out.println("Unsupported compression method: " + compressionString);
-                            System.exit(0);
-                            break;
-                    }
-                }
-
-                if (SWF.compress(fis, fos, compression)) {
-                    System.out.println("OK");
-                } else {
-                    System.err.println("FAIL");
-                }
+                result = SWF.compress(fis, fos, compression);
+                System.out.println(result ? "OK" : "FAIL");
             } catch (FileNotFoundException ex) {
                 System.err.println("File not found.");
+                System.exit(1);
             }
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
 
-        System.exit(0);
+        System.exit(result ? 0 : 1);
     }
 
     private static void parseDecompress(Stack<String> args) {
@@ -1683,24 +1677,21 @@ public class CommandLineArgumentParser {
             badArguments("decompress");
         }
 
+        boolean result = false;
         try {
             try (InputStream fis = new BufferedInputStream(new FileInputStream(args.pop()));
                     OutputStream fos = new BufferedOutputStream(new FileOutputStream(args.pop()))) {
-                if (SWF.decompress(fis, fos)) {
-                    System.out.println("OK");
-                    System.exit(0);
-                } else {
-                    System.err.println("FAIL");
-                    System.exit(1);
-                }
+                result = SWF.decompress(fis, fos);
+                System.out.println(result ? "OK" : "FAIL");
             } catch (FileNotFoundException ex) {
                 System.err.println("File not found.");
+                System.exit(1);
             }
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
 
-        System.exit(0);
+        System.exit(result ? 0 : 1);
     }
 
     private static void parseSwf2Xml(Stack<String> args) {
@@ -1714,6 +1705,7 @@ public class CommandLineArgumentParser {
                 new SwfXmlExporter().exportXml(swf, new File(args.pop()));
             } catch (FileNotFoundException ex) {
                 System.err.println("File not found.");
+                System.exit(1);
             } catch (InterruptedException ex) {
                 logger.log(Level.SEVERE, null, ex);
             }
@@ -1849,24 +1841,21 @@ public class CommandLineArgumentParser {
                 return;
         }
 
+        boolean result = false;
         try {
             try (InputStream fis = new BufferedInputStream(new FileInputStream(args.pop()));
                     OutputStream fos = new BufferedOutputStream(new FileOutputStream(args.pop()))) {
-                if (SWF.renameInvalidIdentifiers(renameType, fis, fos)) {
-                    System.out.println("OK");
-                    System.exit(0);
-                } else {
-                    System.err.println("FAIL");
-                    System.exit(1);
-                }
+                result = SWF.renameInvalidIdentifiers(renameType, fis, fos);
+                System.out.println(result ? "OK" : "FAIL");
             } catch (FileNotFoundException ex) {
                 System.err.println("File not found.");
+                System.exit(1);
             }
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
 
-        System.exit(0);
+        System.exit(result ? 0 : 1);
     }
 
     private static Map<String, String> parseFormat(Stack<String> args) {

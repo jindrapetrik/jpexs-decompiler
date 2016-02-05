@@ -220,13 +220,6 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
     }
 
     @Override
-    public void getNeededCharacters(Set<Integer> needed) {
-        for (BUTTONRECORD r : characters) {
-            needed.add(r.characterId);
-        }
-    }
-
-    @Override
     public boolean replaceCharacter(int oldCharacterId, int newCharacterId) {
         boolean modified = false;
         for (int i = 0; i < characters.size(); i++) {
