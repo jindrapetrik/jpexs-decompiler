@@ -18,7 +18,9 @@ package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.helpers.SerializableImage;
+import java.awt.Point;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,9 +29,15 @@ import java.util.Map;
  */
 public class RenderContext {
 
-    public DepthState stateUnderCursor;
+    public Point cursorPosition;
+
+    public List<DepthState> stateUnderCursor;
 
     public int mouseButton;
 
+    public ButtonTag mouseOverButton;
+
     public Map<String, SerializableImage> shapeCache = new HashMap<>();
+
+    public SerializableImage borderImage;
 }

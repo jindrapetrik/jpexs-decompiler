@@ -279,7 +279,7 @@ public abstract class MorphShapeTag extends CharacterTag implements DrawableTag 
     }
 
     @Override
-    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, boolean isClip, Matrix transformation, Matrix absoluteTransformation, ColorTransform colorTransform) {
         SHAPEWITHSTYLE shape = getShapeAtRatio(ratio);
         // morphShape using shapeNum=3, morphShape2 using shapeNum=4
         // todo: Currently the generated image is not cached, because the cache

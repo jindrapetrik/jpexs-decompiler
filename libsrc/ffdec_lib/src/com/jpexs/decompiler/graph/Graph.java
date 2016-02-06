@@ -1824,7 +1824,7 @@ public class Graph {
                      pos++;
                      continue;
                      }*/
-                    //if (p != defaultPart) 
+                    //if (p != defaultPart)
                     {
                         if (vis.contains(p)) {
                             valueMappings.add(caseCommands.size() - 1);
@@ -1849,7 +1849,7 @@ public class Graph {
                     if (next != p) {
                         //if (p == defaultPart && !defaultCommands.isEmpty()) {
                         //ignore
-                        //} else 
+                        //} else
                         {
                             TranslateStack s2 = (TranslateStack) stack.clone();
                             s2.clear();
@@ -1890,7 +1890,7 @@ public class Graph {
                         }
                     }
                 }
-                //remove last break from last section                
+                //remove last break from last section
                 if (!caseCommands.isEmpty()) {
                     List<GraphTargetItem> lastc = caseCommands.get(caseCommands.size() - 1);
                     if (!lastc.isEmpty() && (lastc.get(lastc.size() - 1) instanceof BreakItem)) {

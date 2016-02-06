@@ -308,7 +308,7 @@ public class FolderPreviewPanel extends JPanel {
                     zoom = ratio;
                 }
             }
-            imgSrc = SWF.frameToImageGet(swf.getTimeline(), fn.frame, fn.frame, null, 0, rect, new Matrix(), new ColorTransform(), null, true, zoom);
+            imgSrc = SWF.frameToImageGet(swf.getTimeline(), fn.frame, fn.frame, null, 0, rect, new Matrix(), new Matrix(), new ColorTransform(), null, true, zoom);
             width = imgSrc.getWidth();
             height = imgSrc.getHeight();
         } else if (treeItem instanceof ImageTag) {
@@ -356,7 +356,7 @@ public class FolderPreviewPanel extends JPanel {
         image.fillTransparent();
         if (imgSrc == null) {
             DrawableTag drawable = (DrawableTag) treeItem;
-            drawable.toImage(0, 0, 0, new RenderContext(), image, m, new ColorTransform());
+            drawable.toImage(0, 0, 0, new RenderContext(), image, false, m, m, new ColorTransform());
         } else {
             Graphics2D g = (Graphics2D) image.getGraphics();
             g.setTransform(m.toTransform());

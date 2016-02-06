@@ -1931,7 +1931,7 @@ public class CommandLineArgumentParser {
                         //displayRect.Ymax *= zoom;
                         Matrix m = new Matrix();
                         //m.scale(zoom);
-                        BufferedImage img = SWF.frameToImageGet(ds.getTimeline(), 0, 0, null, 0, displayRect, m, new ColorTransform(), Color.white, false, zoom).getBufferedImage();
+                        BufferedImage img = SWF.frameToImageGet(ds.getTimeline(), 0, 0, null, 0, displayRect, m, m, new ColorTransform(), Color.white, false, zoom).getBufferedImage();
                         PageFormat pf = new PageFormat();
                         pf.setOrientation(PageFormat.PORTRAIT);
                         Paper p = new Paper();

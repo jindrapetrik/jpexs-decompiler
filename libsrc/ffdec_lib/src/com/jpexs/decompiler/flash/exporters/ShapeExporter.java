@@ -122,7 +122,7 @@ public class ShapeExporter {
                             Matrix m = new Matrix();
                             m.translate(-rect.Xmin, -rect.Ymin);
                             m.scale(settings.zoom);
-                            st.toImage(0, 0, 0, new RenderContext(), img, m, new CXFORMWITHALPHA());
+                            st.toImage(0, 0, 0, new RenderContext(), img, false, m, m, new CXFORMWITHALPHA());
                             if (settings.mode == ShapeExportMode.PNG) {
                                 ImageHelper.write(img.getBufferedImage(), ImageFormat.PNG, file);
                             } else {

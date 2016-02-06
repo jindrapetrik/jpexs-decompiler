@@ -92,8 +92,8 @@ public abstract class ButtonTag extends CharacterTag implements DrawableTag, Tim
     }
 
     @Override
-    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
-        SWF.frameToImage(getTimeline(), frame, time, renderContext, image, transformation, colorTransform);
+    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, boolean isClip, Matrix transformation, Matrix absoluteTransformation, ColorTransform colorTransform) {
+        SWF.frameToImage(getTimeline(), frame, time, renderContext, image, isClip, transformation, absoluteTransformation, colorTransform);
     }
 
     @Override
