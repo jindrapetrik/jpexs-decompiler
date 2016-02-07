@@ -927,7 +927,7 @@ public class DefineEditTextTag extends TextTag {
 
     @Override
     public void toHtmlCanvas(StringBuilder result, double unitDivisor) {
-        render(TextRenderMode.HTML5_CANVAS, null, null, result, new Matrix(), new ColorTransform(), unitDivisor);
+        render(TextRenderMode.HTML5_CANVAS, null, null, result, new Matrix(), null, unitDivisor);
     }
 
     private void render(TextRenderMode renderMode, SerializableImage image, SVGExporter svgExporter, StringBuilder htmlCanvasBuilder, Matrix transformation, ColorTransform colorTransform, double zoom) {

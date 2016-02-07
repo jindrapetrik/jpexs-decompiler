@@ -295,7 +295,7 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
 
     @Override
     public void toHtmlCanvas(StringBuilder result, double unitDivisor) {
-        CanvasShapeExporter cse = new CanvasShapeExporter(null, unitDivisor, swf, getShape(), new ColorTransform(), 0, 0);
+        CanvasShapeExporter cse = new CanvasShapeExporter(null, unitDivisor, swf, getShape(), null, 0, 0);
         cse.export();
         result.append(cse.getShapeData());
     }

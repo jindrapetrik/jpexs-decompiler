@@ -226,7 +226,10 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
             if (img != null) {
                 fillWidth = img.getWidth();
                 fillHeight = img.getHeight();
-                colorTransform.apply(img);
+                if (colorTransform != null) {
+                    colorTransform.apply(img);
+                }
+
                 if (matrix != null) {
                     fillMatrix = matrix;
                     fillMatrixEnd = matrixEnd;

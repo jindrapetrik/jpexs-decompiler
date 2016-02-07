@@ -535,7 +535,7 @@ public class Timeline {
     }
 
     public void toHtmlCanvas(StringBuilder result, double unitDivisor, List<Integer> frames) {
-        FrameExporter.framesToHtmlCanvas(result, unitDivisor, this, frames, 0, null, 0, displayRect, new ColorTransform(), null);
+        FrameExporter.framesToHtmlCanvas(result, unitDivisor, this, frames, 0, null, 0, displayRect, null, null);
     }
 
     public void getSounds(int frame, int time, DepthState stateUnderCursor, int mouseButton, List<Integer> sounds, List<String> soundClasses) {

@@ -424,9 +424,13 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
         for (TEXTRECORD rec : textRecords) {
             if (rec.styleFlagsHasColor) {
                 if (numText == 2) {
-                    textColor = colorTransform.apply(rec.textColorA.toInt());
+                    textColor = rec.textColorA.toInt();
                 } else {
-                    textColor = colorTransform.apply(rec.textColor.toInt());
+                    textColor = rec.textColor.toInt();
+                }
+
+                if (colorTransform != null) {
+                    textColor = colorTransform.apply(textColor);
                 }
             }
             if (rec.styleFlagsHasFont) {
@@ -574,9 +578,13 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
         for (TEXTRECORD rec : textRecords) {
             if (rec.styleFlagsHasColor) {
                 if (numText == 2) {
-                    textColor = colorTransform.apply(rec.textColorA.toInt());
+                    textColor = rec.textColorA.toInt();
                 } else {
-                    textColor = colorTransform.apply(rec.textColor.toInt());
+                    textColor = rec.textColor.toInt();
+                }
+
+                if (colorTransform != null) {
+                    textColor = colorTransform.apply(textColor);
                 }
             }
             if (rec.styleFlagsHasFont) {
@@ -619,9 +627,13 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
         for (TEXTRECORD rec : textRecords) {
             if (rec.styleFlagsHasColor) {
                 if (numText == 2) {
-                    textColor = colorTransform.apply(rec.textColorA.toInt());
+                    textColor = rec.textColorA.toInt();
                 } else {
-                    textColor = colorTransform.apply(rec.textColor.toInt());
+                    textColor = rec.textColor.toInt();
+                }
+
+                if (colorTransform != null) {
+                    textColor = colorTransform.apply(textColor);
                 }
             }
             if (rec.styleFlagsHasFont) {

@@ -200,7 +200,7 @@ public class FrameExporter {
                         if (fbackgroundColor != null) {
                             exporter.setBackGroundColor(fbackgroundColor);
                         }
-                        SWF.frameToSvg(tim, frame, 0, null, 0, exporter, new ColorTransform(), 0, settings.zoom);
+                        SWF.frameToSvg(tim, frame, 0, null, 0, exporter, null, 0, settings.zoom);
                         fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                     }
                     ret.add(f);
@@ -246,7 +246,7 @@ public class FrameExporter {
                     sb.append("function ").append(currentName).append("(ctx,ctrans,frame,ratio,time){\r\n");
                     sb.append("\tctx.save();\r\n");
                     sb.append("\tctx.transform(1,0,0,1,").append(-ftim.displayRect.Xmin * settings.zoom / SWF.unitDivisor).append(",").append(-ftim.displayRect.Ymin * settings.zoom / SWF.unitDivisor).append(");\r\n");
-                    framesToHtmlCanvas(sb, SWF.unitDivisor / settings.zoom, ftim, fframes, 0, null, 0, ftim.displayRect, new ColorTransform(), fbackgroundColor);
+                    framesToHtmlCanvas(sb, SWF.unitDivisor / settings.zoom, ftim, fframes, 0, null, 0, ftim.displayRect, null, fbackgroundColor);
                     sb.append("\tctx.restore();\r\n");
                     sb.append("}\r\n\r\n");
 
@@ -359,7 +359,7 @@ public class FrameExporter {
                 }
 
                 int fframe = fframes.get(pos++);
-                BufferedImage result = SWF.frameToImageGet(ftim, fframe, fframe, null, 0, ftim.displayRect, new Matrix(), new Matrix(), new ColorTransform(), fbackgroundColor, false, settings.zoom).getBufferedImage();
+                BufferedImage result = SWF.frameToImageGet(ftim, fframe, fframe, null, 0, ftim.displayRect, new Matrix(), new Matrix(), null, fbackgroundColor, false, settings.zoom).getBufferedImage();
 
                 if (evl != null) {
                     evl.handleExportedEvent("frame", pos, fframes.size(), tagName);
@@ -535,9 +535,6 @@ public class FrameExporter {
                 }
 
                 CharacterTag character = timeline.swf.getCharacter(layer.characterId);
-                if (colorTransform == null) {
-                    colorTransform = new ColorTransform();
-                }
 
                 Matrix placeMatrix = new Matrix(layer.matrix);
                 placeMatrix.scaleX /= unitDivisor;
@@ -578,11 +575,9 @@ public class FrameExporter {
                     result.append("\t\t\tctx = fctx;\r\n");
                 }
 
-                ColorTransform ctrans = layer.colorTransForm;
+                ColorTransform ctrans = layer.colorTransForm; // todo: colorTransform from parameter is not used? why?
                 String ctrans_str = "ctrans";
-                if (ctrans == null) {
-                    ctrans = new ColorTransform();
-                } else {
+                if (ctrans != null) {
                     ctrans_str = "ctrans.merge(new cxform("
                             + ctrans.getRedAdd() + "," + ctrans.getGreenAdd() + "," + ctrans.getBlueAdd() + "," + ctrans.getAlphaAdd() + ","
                             + ctrans.getRedMulti() + "," + ctrans.getGreenMulti() + "," + ctrans.getBlueMulti() + "," + ctrans.getAlphaMulti()

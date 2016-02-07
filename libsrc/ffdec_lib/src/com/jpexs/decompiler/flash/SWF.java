@@ -2690,13 +2690,10 @@ public final class SWF implements SWFContainerItem, Timelined {
             }
 
             CharacterTag character = timeline.swf.getCharacter(layer.characterId);
-            if (colorTransform == null) {
-                colorTransform = new ColorTransform();
-            }
 
-            ColorTransform clrTrans = colorTransform.clone();
+            ColorTransform clrTrans = colorTransform;
             if (layer.colorTransForm != null && layer.blendMode <= 1) { // Normal blend mode
-                clrTrans = colorTransform.merge(layer.colorTransForm);
+                clrTrans = clrTrans == null ? layer.colorTransForm : colorTransform.merge(layer.colorTransForm);
             }
 
             if (character instanceof DrawableTag) {
@@ -2847,13 +2844,9 @@ public final class SWF implements SWFContainerItem, Timelined {
             Matrix mat = transformation.concatenate(layerMatrix);
             Matrix absMat = absoluteTransformation.concatenate(layerMatrix);
 
-            if (colorTransform == null) {
-                colorTransform = new ColorTransform();
-            }
-
-            ColorTransform clrTrans = colorTransform.clone();
+            ColorTransform clrTrans = colorTransform;
             if (layer.colorTransForm != null && layer.blendMode <= 1) { // Normal blend mode
-                clrTrans = colorTransform.merge(layer.colorTransForm);
+                clrTrans = clrTrans == null ? layer.colorTransForm : colorTransform.merge(layer.colorTransForm);
             }
 
             boolean showPlaceholder = false;
@@ -2907,7 +2900,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 SerializableImage img = null;
                 String cacheKey = null;
                 if (drawable instanceof ShapeTag) {
-                    cacheKey = ((ShapeTag) drawable).getCharacterId() + m.toString() + clrTrans.toString();
+                    cacheKey = ((ShapeTag) drawable).getCharacterId() + m.toString() + (clrTrans == null ? "" : clrTrans.toString());
                     img = renderContext.shapeCache.get(cacheKey);
                 }
 

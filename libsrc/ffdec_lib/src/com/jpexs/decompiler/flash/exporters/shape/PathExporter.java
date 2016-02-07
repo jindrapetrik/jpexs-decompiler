@@ -37,7 +37,7 @@ public class PathExporter extends ShapeExporterBase {
     private GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
 
     public static List<GeneralPath> export(SWF swf, SHAPE shape) {
-        PathExporter exporter = new PathExporter(swf, shape, new ColorTransform());
+        PathExporter exporter = new PathExporter(swf, shape, null);
         exporter.export();
         return exporter.paths;
     }
