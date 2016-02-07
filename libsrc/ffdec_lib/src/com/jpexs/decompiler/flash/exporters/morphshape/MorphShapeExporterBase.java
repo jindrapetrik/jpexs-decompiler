@@ -305,7 +305,11 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
                         switch (fillStyle.fillStyleType) {
                             case FILLSTYLE.SOLID:
                                 // Solid fill
-                                beginFill(colorTransform.apply(fillStyle.color), colorTransform.apply(fillStyleEnd.color));
+                                if (colorTransform == null) {
+                                    beginFill(fillStyle.color, fillStyleEnd.color);
+                                } else {
+                                    beginFill(colorTransform.apply(fillStyle.color), colorTransform.apply(fillStyleEnd.color));
+                                }
                                 break;
                             case FILLSTYLE.LINEAR_GRADIENT:
                             case FILLSTYLE.RADIAL_GRADIENT:
@@ -315,8 +319,8 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
                                 matrixEnd = new Matrix(fillStyleEnd.gradientMatrix);
                                 beginGradientFill(
                                         fillStyle.fillStyleType,
-                                        colorTransform.apply(fillStyle.gradient.gradientRecords),
-                                        colorTransform.apply(fillStyleEnd.gradient.gradientRecords),
+                                        colorTransform == null ? fillStyle.gradient.gradientRecords : colorTransform.apply(fillStyle.gradient.gradientRecords),
+                                        colorTransform == null ? fillStyleEnd.gradient.gradientRecords : colorTransform.apply(fillStyleEnd.gradient.gradientRecords),
                                         matrix,
                                         matrixEnd,
                                         fillStyle.gradient.spreadMode,
@@ -414,8 +418,8 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
                         lineStyle(
                                 lineStyle.width,
                                 lineStyleEnd.width,
-                                colorTransform.apply(lineStyle.color),
-                                colorTransform.apply(lineStyleEnd.color),
+                                colorTransform == null ? lineStyle.color : colorTransform.apply(lineStyle.color),
+                                colorTransform == null ? lineStyleEnd.color : colorTransform.apply(lineStyleEnd.color),
                                 pixelHintingFlag,
                                 scaleMode,
                                 startCapStyle,

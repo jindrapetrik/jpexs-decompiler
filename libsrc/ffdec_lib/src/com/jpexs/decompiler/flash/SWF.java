@@ -166,8 +166,10 @@ import com.jpexs.helpers.ProgressListener;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
@@ -2688,13 +2690,10 @@ public final class SWF implements SWFContainerItem, Timelined {
             }
 
             CharacterTag character = timeline.swf.getCharacter(layer.characterId);
-            if (colorTransform == null) {
-                colorTransform = new ColorTransform();
-            }
 
-            ColorTransform clrTrans = colorTransform.clone();
+            ColorTransform clrTrans = colorTransform;
             if (layer.colorTransForm != null && layer.blendMode <= 1) { // Normal blend mode
-                clrTrans = colorTransform.merge(layer.colorTransForm);
+                clrTrans = clrTrans == null ? layer.colorTransForm : colorTransform.merge(layer.colorTransForm);
             }
 
             if (character instanceof DrawableTag) {
@@ -2753,7 +2752,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         return exporter.getUniqueId("tag");
     }
 
-    public static SerializableImage frameToImageGet(Timeline timeline, int frame, int time, DepthState stateUnderCursor, int mouseButton, RECT displayRect, Matrix transformation, ColorTransform colorTransform, Color backGroundColor, boolean useCache, double zoom) {
+    public static SerializableImage frameToImageGet(Timeline timeline, int frame, int time, Point cursorPosition, int mouseButton, RECT displayRect, Matrix transformation, Matrix absoluteTransformation, ColorTransform colorTransform, Color backGroundColor, boolean useCache, double zoom) {
         SWF swf = timeline.swf;
         String key = "frame_" + frame + "_" + time + "_" + timeline.id + "_" + swf.hashCode() + "_" + zoom;
         SerializableImage image;
@@ -2784,9 +2783,9 @@ public final class SWF implements SWFContainerItem, Timelined {
         m.translate(-rect.Xmin * zoom, -rect.Ymin * zoom);
         m.scale(zoom);
         RenderContext renderContext = new RenderContext();
-        renderContext.stateUnderCursor = stateUnderCursor;
+        renderContext.cursorPosition = cursorPosition;
         renderContext.mouseButton = mouseButton;
-        frameToImage(timeline, frame, time, renderContext, image, m, colorTransform);
+        frameToImage(timeline, frame, time, renderContext, image, false, m, absoluteTransformation, colorTransform);
         if (useCache) {
             swf.putToCache(key, image);
         }
@@ -2794,7 +2793,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         return image;
     }
 
-    public static void framesToImage(Timeline timeline, List<SerializableImage> ret, int startFrame, int stopFrame, RenderContext renderContext, RECT displayRect, int totalFrameCount, Stack<Integer> visited, Matrix transformation, ColorTransform colorTransform, double zoom) {
+    public static void framesToImage(Timeline timeline, List<SerializableImage> ret, int startFrame, int stopFrame, RenderContext renderContext, RECT displayRect, int totalFrameCount, Stack<Integer> visited, Matrix transformation, Matrix absoluteTransformation, ColorTransform colorTransform, double zoom) {
         RECT rect = displayRect;
         for (int f = 0; f < timeline.getFrameCount(); f++) {
             SerializableImage image = new SerializableImage((int) (rect.getWidth() / SWF.unitDivisor) + 1,
@@ -2802,12 +2801,12 @@ public final class SWF implements SWFContainerItem, Timelined {
             image.fillTransparent();
             Matrix m = new Matrix();
             m.translate(-rect.Xmin, -rect.Ymin);
-            frameToImage(timeline, f, 0, renderContext, image, m, colorTransform);
+            frameToImage(timeline, f, 0, renderContext, image, false, m, absoluteTransformation, colorTransform);
             ret.add(image);
         }
     }
 
-    public static void frameToImage(Timeline timeline, int frame, int time, RenderContext renderContext, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+    public static void frameToImage(Timeline timeline, int frame, int time, RenderContext renderContext, SerializableImage image, boolean isClip, Matrix transformation, Matrix absoluteTransformation, ColorTransform colorTransform) {
         double unzoom = SWF.unitDivisor;
         if (timeline.getFrameCount() <= frame) {
             return;
@@ -2841,16 +2840,13 @@ public final class SWF implements SWFContainerItem, Timelined {
             }
 
             CharacterTag character = timeline.swf.getCharacter(layer.characterId);
-            Matrix mat = new Matrix(layer.matrix);
-            mat = mat.preConcatenate(transformation);
+            Matrix layerMatrix = new Matrix(layer.matrix);
+            Matrix mat = transformation.concatenate(layerMatrix);
+            Matrix absMat = absoluteTransformation.concatenate(layerMatrix);
 
-            if (colorTransform == null) {
-                colorTransform = new ColorTransform();
-            }
-
-            ColorTransform clrTrans = colorTransform.clone();
+            ColorTransform clrTrans = colorTransform;
             if (layer.colorTransForm != null && layer.blendMode <= 1) { // Normal blend mode
-                clrTrans = colorTransform.merge(layer.colorTransForm);
+                clrTrans = clrTrans == null ? layer.colorTransForm : colorTransform.merge(layer.colorTransForm);
             }
 
             boolean showPlaceholder = false;
@@ -2860,24 +2856,6 @@ public final class SWF implements SWFContainerItem, Timelined {
                 int drawableFrameCount = drawable.getNumFrames();
                 if (drawableFrameCount == 0) {
                     drawableFrameCount = 1;
-                }
-
-                int dframe;
-                if (timeline.fontFrameNum != -1) {
-                    dframe = timeline.fontFrameNum;
-                } else {
-                    dframe = time % drawableFrameCount;
-                }
-
-                if (character instanceof ButtonTag) {
-                    dframe = ButtonTag.FRAME_UP;
-                    if (renderContext.stateUnderCursor == layer) {
-                        if (renderContext.mouseButton > 0) {
-                            dframe = ButtonTag.FRAME_DOWN;
-                        } else {
-                            dframe = ButtonTag.FRAME_OVER;
-                        }
-                    }
                 }
 
                 RECT boundRect = drawable.getRect();
@@ -2922,15 +2900,38 @@ public final class SWF implements SWFContainerItem, Timelined {
                 SerializableImage img = null;
                 String cacheKey = null;
                 if (drawable instanceof ShapeTag) {
-                    cacheKey = ((ShapeTag) drawable).getCharacterId() + m.toString() + clrTrans.toString();
+                    cacheKey = ((ShapeTag) drawable).getCharacterId() + m.toString() + (clrTrans == null ? "" : clrTrans.toString());
                     img = renderContext.shapeCache.get(cacheKey);
                 }
 
+                int dframe;
+                if (timeline.fontFrameNum != -1) {
+                    dframe = timeline.fontFrameNum;
+                } else {
+                    dframe = time % drawableFrameCount;
+                }
+
+                if (character instanceof ButtonTag) {
+                    dframe = ButtonTag.FRAME_UP;
+                    if (renderContext.cursorPosition != null) {
+                        Shape buttonShape = drawable.getOutline(ButtonTag.FRAME_HITTEST, time, layer.ratio, renderContext, absMat);
+                        if (buttonShape.contains(renderContext.cursorPosition)) {
+                            renderContext.mouseOverButton = (ButtonTag) character;
+                            if (renderContext.mouseButton > 0) {
+                                dframe = ButtonTag.FRAME_DOWN;
+                            } else {
+                                dframe = ButtonTag.FRAME_OVER;
+                            }
+                        }
+                    }
+                }
+
+                int stateCount = renderContext.stateUnderCursor == null ? 0 : renderContext.stateUnderCursor.size();
                 if (img == null) {
                     img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB);
                     img.fillTransparent();
 
-                    drawable.toImage(dframe, time, layer.ratio, renderContext, img, m, clrTrans);
+                    drawable.toImage(dframe, time, layer.ratio, renderContext, img, isClip || layer.clipDepth > -1, m, absMat, clrTrans);
 
                     if (cacheKey != null) {
                         renderContext.shapeCache.put(cacheKey, img);
@@ -3031,6 +3032,27 @@ public final class SWF implements SWFContainerItem, Timelined {
                     g.setTransform(AffineTransform.getTranslateInstance(0, 0));
                     g.setClip(clip.shape);
                 } else {
+                    if (renderContext.cursorPosition != null) {
+                        if (drawable instanceof DefineSpriteTag) {
+                            if (renderContext.stateUnderCursor.size() > stateCount) {
+                                renderContext.stateUnderCursor.add(layer);
+                            }
+                        } else if (absMat.transform(new ExportRectangle(boundRect)).contains(renderContext.cursorPosition)) {
+                            Shape shape = drawable.getOutline(dframe, time, layer.ratio, renderContext, absMat);
+                            if (shape.contains(renderContext.cursorPosition)) {
+                                renderContext.stateUnderCursor.add(layer);
+                            }
+                        }
+                    }
+
+                    if (renderContext.borderImage != null) {
+                        Graphics2D g2 = (Graphics2D) renderContext.borderImage.getGraphics();
+                        g2.setPaint(Color.red);
+                        g2.setStroke(new BasicStroke(2));
+                        Shape shape = drawable.getOutline(dframe, time, layer.ratio, renderContext, absMat.preConcatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor)));
+                        g2.draw(shape);
+                    }
+
                     g.setTransform(trans);
                     g.drawImage(img.getBufferedImage(), 0, 0, null);
                 }
@@ -3039,9 +3061,10 @@ public final class SWF implements SWFContainerItem, Timelined {
             }
 
             if (showPlaceholder) {
-                mat.translateX /= unzoom;
-                mat.translateY /= unzoom;
-                AffineTransform trans = mat.toTransform();
+                Matrix mat2 = mat.clone();
+                mat2.translateX /= unzoom;
+                mat2.translateY /= unzoom;
+                AffineTransform trans = mat2.toTransform();
                 g.setTransform(trans);
                 BoundedTag b = (BoundedTag) character;
                 g.setPaint(new Color(255, 255, 255, 128));

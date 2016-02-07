@@ -267,7 +267,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                         switch (fillStyle.fillStyleType) {
                             case FILLSTYLE.SOLID:
                                 // Solid fill
-                                beginFill(colorTransform.apply(fillStyle.color));
+                                beginFill(colorTransform == null ? fillStyle.color : colorTransform.apply(fillStyle.color));
                                 break;
                             case FILLSTYLE.LINEAR_GRADIENT:
                             case FILLSTYLE.RADIAL_GRADIENT:
@@ -275,7 +275,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                                 // Gradient fill
                                 beginGradientFill(
                                         fillStyle.fillStyleType,
-                                        colorTransform.apply(fillStyle.gradient.gradientRecords),
+                                        colorTransform == null ? fillStyle.gradient.gradientRecords : colorTransform.apply(fillStyle.gradient.gradientRecords),
                                         fillStyle.gradientMatrix,
                                         fillStyle.gradient.spreadMode,
                                         fillStyle.gradient.interpolationMode,
@@ -368,7 +368,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                         }
                         lineStyle(
                                 lineStyle.width,
-                                colorTransform.apply(lineStyle.color),
+                                colorTransform == null ? lineStyle.color : colorTransform.apply(lineStyle.color),
                                 pixelHintingFlag,
                                 scaleMode,
                                 startCapStyle,

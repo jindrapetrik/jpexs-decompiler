@@ -306,7 +306,10 @@ public class BitmapExporter extends ShapeExporterBase {
         if (imageTag != null) {
             SerializableImage img = imageTag.getImage();
             if (img != null) {
-                img = colorTransform.apply(img);
+                if (colorTransform != null) {
+                    img = colorTransform.apply(img);
+                }
+
                 fillPaint = new TexturePaint(img.getBufferedImage(), new java.awt.Rectangle(img.getWidth(), img.getHeight()));
                 fillTransform = matrix.toTransform();
             }

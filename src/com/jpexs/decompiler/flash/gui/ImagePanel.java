@@ -40,10 +40,8 @@ import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
-import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.ConstantColorColorTransform;
 import com.jpexs.decompiler.flash.types.RECT;
-import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.AlphaComposite;
@@ -108,7 +106,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private final JLabel debugLabel = new JLabel("-");
 
-    private DepthState stateUnderCursor = null;
+    private Point cursorPosition = null;
 
     private MouseEvent lastMouseEvent = null;
 
@@ -162,9 +160,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
         private Rectangle rect = null;
 
-        private List<DepthState> dss;
-
-        private List<Shape> outlines;
+        private ButtonTag mouseOverButton = null;
 
         private boolean autoFit = false;
 
@@ -220,25 +216,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             return img.getBufferedImage();
         }
 
-        public synchronized void setOutlines(List<DepthState> dss, List<Shape> outlines) {
-            this.outlines = outlines;
-            this.dss = dss;
-        }
-
         public void setImg(SerializableImage img) {
             this.img = img;
             calcRect();
             repaint();
-        }
-
-        public synchronized List<DepthState> getObjectsUnderPoint(Point p) {
-            List<DepthState> ret = new ArrayList<>();
-            for (int i = 0; i < outlines.size(); i++) {
-                if (outlines.get(i).contains(p)) {
-                    ret.add(dss.get(i));
-                }
-            }
-            return ret;
         }
 
         public Rectangle getRect() {
@@ -249,6 +230,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             if (img == null) {
                 return null;
             }
+
             return new Point((p.x - rect.x) * img.getWidth() / rect.width, (p.y - rect.y) * img.getHeight() / rect.height);
         }
 
@@ -341,11 +323,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     private void updatePos(Timelined timelined, MouseEvent lastMouseEvent, Timer thisTimer) {
-        boolean handCursor = false;
-        DepthState newStateUnderCursor = null;
         if (timelined != null) {
 
-            Timeline tim = ((Timelined) timelined).getTimeline();
             BoundedTag bounded = (BoundedTag) timelined;
             RECT rect = bounded.getRect();
             int width = rect.getWidth();
@@ -358,57 +337,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             m.scale(scale);
 
             Point p = lastMouseEvent == null ? null : lastMouseEvent.getPoint();
-            List<DepthState> objs = new ArrayList<>();
-            StringBuilder ret = new StringBuilder();
 
             synchronized (ImagePanel.class) {
                 if (timer == thisTimer) {
-                    p = p == null ? null : iconPanel.toImagePoint(p);
-                    if (p != null) {
-                        int x = p.x;
-                        int y = p.y;
-                        objs = iconPanel.getObjectsUnderPoint(p);
-
-                        ret.append(" [").append(x).append(",").append(y).append("] : ");
-                    }
-                }
-            }
-
-            boolean first = true;
-            for (int i = 0; i < objs.size(); i++) {
-                DepthState ds = objs.get(i);
-                if (!first) {
-                    ret.append(", ");
-                }
-                first = false;
-                CharacterTag c = tim.swf.getCharacter(ds.characterId);
-                if (c instanceof ButtonTag) {
-                    newStateUnderCursor = ds;
-                    handCursor = true;
-                }
-                ret.append(c.toString());
-                if (timelined instanceof ButtonTag) {
-                    handCursor = true;
-                }
-            }
-            if (first) {
-                ret.append(" - ");
-            }
-
-            synchronized (ImagePanel.class) {
-                if (timer == thisTimer) {
-                    debugLabel.setText(ret.toString());
-
-                    if (handCursor) {
-                        iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                    } else if (iconPanel.hasAllowMove()) {
-                        iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
-                    } else {
-                        iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-                    }
-                    if (newStateUnderCursor != stateUnderCursor) {
-                        stateUnderCursor = newStateUnderCursor;
-                    }
+                    cursorPosition = p;
                 }
             }
         }
@@ -458,7 +390,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             @Override
             public void mouseExited(MouseEvent e) {
                 synchronized (ImagePanel.class) {
-                    stateUnderCursor = null;
                     lastMouseEvent = null;
                     hideMouseSelection();
                     redraw();
@@ -471,9 +402,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     mouseButton = e.getButton();
                     lastMouseEvent = e;
                     redraw();
-                    if (stateUnderCursor != null) {
-                        ButtonTag b = (ButtonTag) swf.getCharacter(stateUnderCursor.characterId);
-                        DefineButtonSoundTag sounds = b.getSounds();
+                    ButtonTag button = iconPanel.mouseOverButton;
+                    if (button != null) {
+                        DefineButtonSoundTag sounds = button.getSounds();
                         if (sounds != null && sounds.buttonSoundChar2 != 0) { //OverUpToOverDown
                             playSound((SoundTag) swf.getCharacter(sounds.buttonSoundChar2), timer);
                         }
@@ -487,9 +418,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     mouseButton = 0;
                     lastMouseEvent = e;
                     redraw();
-                    if (stateUnderCursor != null) {
-                        ButtonTag b = (ButtonTag) swf.getCharacter(stateUnderCursor.characterId);
-                        DefineButtonSoundTag sounds = b.getSounds();
+                    ButtonTag button = iconPanel.mouseOverButton;
+                    if (button != null) {
+                        DefineButtonSoundTag sounds = button.getSounds();
                         if (sounds != null && sounds.buttonSoundChar3 != 0) { //OverDownToOverUp
                             playSound((SoundTag) swf.getCharacter(sounds.buttonSoundChar3), timer);
                         }
@@ -504,27 +435,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 synchronized (ImagePanel.class) {
                     lastMouseEvent = e;
                     redraw();
-                    DepthState lastUnderCur = stateUnderCursor;
-                    if (stateUnderCursor != null) {
-                        if (lastUnderCur == null || lastUnderCur.instanceId != stateUnderCursor.instanceId) {
-                            // New mouse entered
-                            ButtonTag b = (ButtonTag) swf.getCharacter(stateUnderCursor.characterId);
-                            DefineButtonSoundTag sounds = b.getSounds();
-                            if (sounds != null && sounds.buttonSoundChar1 != 0) { //IddleToOverUp
-                                playSound((SoundTag) swf.getCharacter(sounds.buttonSoundChar1), timer);
-                            }
-                        }
-                    }
-                    if (lastUnderCur != null) {
-                        if (stateUnderCursor == null || stateUnderCursor.instanceId != lastUnderCur.instanceId) {
-                            // Old mouse leave
-                            ButtonTag b = (ButtonTag) swf.getCharacter(lastUnderCur.characterId);
-                            DefineButtonSoundTag sounds = b.getSounds();
-                            if (sounds != null && sounds.buttonSoundChar0 != 0) { //OverUpToIddle
-                                playSound((SoundTag) swf.getCharacter(sounds.buttonSoundChar0), timer);
-                            }
-                        }
-                    }
                 }
             }
 
@@ -714,7 +624,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         stillFrame = true;
         zoomAvailable = false;
         iconPanel.setImg(image);
-        iconPanel.setOutlines(new ArrayList<>(), new ArrayList<>());
         drawReady = true;
 
         fireMediaDisplayStateChanged();
@@ -744,14 +653,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         Matrix m = new Matrix();
         m.translate(-rect.Xmin * zoomDouble, -rect.Ymin * zoomDouble);
         m.scale(zoomDouble);
-        textTag.toImage(0, 0, 0, new RenderContext(), image, m, new ConstantColorColorTransform(0xFFC0C0C0));
+        textTag.toImage(0, 0, 0, new RenderContext(), image, false, m, m, new ConstantColorColorTransform(0xFFC0C0C0));
 
         if (newTextTag != null) {
-            newTextTag.toImage(0, 0, 0, new RenderContext(), image, m, new ConstantColorColorTransform(0xFF000000));
+            newTextTag.toImage(0, 0, 0, new RenderContext(), image, false, m, m, new ConstantColorColorTransform(0xFF000000));
         }
 
         iconPanel.setImg(image);
-        iconPanel.setOutlines(new ArrayList<>(), new ArrayList<>());
         drawReady = true;
 
         fireMediaDisplayStateChanged();
@@ -759,7 +667,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private synchronized void clearImagePanel() {
         iconPanel.setImg(null);
-        iconPanel.setOutlines(new ArrayList<>(), new ArrayList<>());
     }
 
     @Override
@@ -850,10 +757,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         fireMediaDisplayStateChanged();
     }
 
-    private static SerializableImage getFrame(SWF swf, int frame, int time, Timelined drawable, DepthState stateUnderCursor, int mouseButton, int selectedDepth, double zoom) {
+    private static SerializableImage getFrame(SWF swf, int frame, int time, Timelined drawable, RenderContext renderContext, int selectedDepth, double zoom) {
         Timeline timeline = drawable.getTimeline();
-        //String key = "drawable_" + frame + "_" + drawable.hashCode() + "_" + mouseButton + "_depth" + selectedDepth + "_" + (stateUnderCursor == null ? "out" : stateUnderCursor.hashCode()) + "_" + zoom + "_" + timeline.fontFrameNum;
-        SerializableImage img;// = swf.getFromCache(key);
+        //int mouseButton = renderContext.mouseButton;
+        //Point cursorPosition = renderContext.cursorPosition;
+        //String key = "drawable_" + frame + "_" + drawable.hashCode() + "_" + mouseButton + "_depth" + selectedDepth + "_" + (cursorPosition == null ? "out" : cursorPosition.hashCode()) + "_" + zoom + "_" + timeline.fontFrameNum;
+        SerializableImage img;
+        //SerializableImage img = swf.getFromCache(key);
         //if (img == null) {
         //boolean shouldCache = timeline.isSingleFrame(frame);
         RECT rect = drawable.getRect();
@@ -862,21 +772,17 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         int height = (int) (rect.getHeight() * zoom);
         SerializableImage image = new SerializableImage((int) Math.ceil(width / SWF.unitDivisor),
                 (int) Math.ceil(height / SWF.unitDivisor), SerializableImage.TYPE_INT_ARGB);
+        //renderContext.borderImage = new SerializableImage(image.getWidth(), image.getHeight(), SerializableImage.TYPE_INT_ARGB);
         image.fillTransparent();
         Matrix m = new Matrix();
         m.translate(-rect.Xmin * zoom, -rect.Ymin * zoom);
         m.scale(zoom);
-        RenderContext renderContext = new RenderContext();
-        renderContext.stateUnderCursor = stateUnderCursor;
-        renderContext.mouseButton = mouseButton;
-        timeline.toImage(frame, time, frame, renderContext, image, m, new ColorTransform());
+        timeline.toImage(frame, time, frame, renderContext, image, false, m, m, null);
 
         Graphics2D gg = (Graphics2D) image.getGraphics();
         gg.setStroke(new BasicStroke(3));
         gg.setPaint(Color.green);
         gg.setTransform(AffineTransform.getTranslateInstance(0, 0));
-        List<DepthState> dss = new ArrayList<>();
-        List<Shape> os = new ArrayList<>();
         DepthState ds = null;
         if (timeline.getFrameCount() > frame) {
             ds = timeline.getFrame(frame).layers.get(selectedDepth);
@@ -984,7 +890,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         MouseEvent lastMouseEvent;
         int frame;
         int time;
-        DepthState stateUnderCursor;
+        Point cursorPosition;
         int mouseButton;
         int selectedDepth;
         Zoom zoom;
@@ -998,7 +904,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         synchronized (ImagePanel.class) {
             frame = this.frame;
             time = this.time;
-            stateUnderCursor = this.stateUnderCursor;
+            cursorPosition = this.cursorPosition;
+            if (cursorPosition != null) {
+                cursorPosition = iconPanel.toImagePoint(cursorPosition);
+            }
+
             mouseButton = this.mouseButton;
             selectedDepth = this.selectedDepth;
             zoom = this.zoom;
@@ -1009,6 +919,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             return;
         }
 
+        RenderContext renderContext = new RenderContext();
+        if (cursorPosition != null) {
+            renderContext.cursorPosition = new Point((int) (cursorPosition.x * SWF.unitDivisor), (int) (cursorPosition.y * SWF.unitDivisor));
+        }
+
+        renderContext.mouseButton = mouseButton;
+        renderContext.stateUnderCursor = new ArrayList<>();
+
         SerializableImage img;
         try {
             Timeline timeline = timelined.getTimeline();
@@ -1017,18 +935,20 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             }
 
             double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
-            getOutlines(timelined, frame, time, zoomDouble, stateUnderCursor, mouseButton, thisTimer);
             updatePos(timelined, lastMouseEvent, thisTimer);
 
             Matrix mat = new Matrix();
             mat.translateX = swf.displayRect.Xmin;
             mat.translateY = swf.displayRect.Ymin;
 
-            img = getFrame(swf, frame, time, timelined, stateUnderCursor, mouseButton, selectedDepth, zoomDouble);
+            img = getFrame(swf, frame, time, timelined, renderContext, selectedDepth, zoomDouble);
+            if (renderContext.borderImage != null) {
+                img = renderContext.borderImage;
+            }
 
             List<Integer> sounds = new ArrayList<>();
             List<String> soundClasses = new ArrayList<>();
-            timeline.getSounds(frame, time, stateUnderCursor, mouseButton, sounds, soundClasses);
+            timeline.getSounds(frame, time, null/*stateUnderCursor*/, mouseButton, sounds, soundClasses);
             for (int cid : swf.getCharacters().keySet()) {
                 CharacterTag c = swf.getCharacter(cid);
                 for (String cls : soundClasses) {
@@ -1051,12 +971,67 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             return;
         }
 
+        StringBuilder ret = new StringBuilder();
+
+        if (cursorPosition != null) {
+            ret.append(" [").append(cursorPosition.x).append(",").append(cursorPosition.y).append("] : ");
+        }
+
+        boolean handCursor = renderContext.mouseOverButton != null;
+        boolean first = true;
+        for (int i = renderContext.stateUnderCursor.size() - 1; i >= 0; i--) {
+            DepthState ds = renderContext.stateUnderCursor.get(i);
+            if (!first) {
+                ret.append(", ");
+            }
+
+            first = false;
+            CharacterTag c = swf.getCharacter(ds.characterId);
+            ret.append(c.toString());
+        }
+
+        if (first) {
+            ret.append(" - ");
+        }
+
+        ButtonTag lastMouseOverButton = null;
         synchronized (ImagePanel.class) {
             if (timer == thisTimer) {
                 iconPanel.setImg(img);
+                lastMouseOverButton = iconPanel.mouseOverButton;
+                iconPanel.mouseOverButton = renderContext.mouseOverButton;
+                debugLabel.setText(ret.toString());
+                if (handCursor) {
+                    iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                } else if (iconPanel.hasAllowMove()) {
+                    iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+                } else {
+                    iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                }
+
                 drawReady = true;
                 synchronized (delayObject) {
                     delayObject.notify();
+                }
+            }
+        }
+
+        if (lastMouseOverButton != renderContext.mouseOverButton) {
+            ButtonTag b = renderContext.mouseOverButton;
+            if (b != null) {
+                // New mouse entered
+                DefineButtonSoundTag sounds = b.getSounds();
+                if (sounds != null && sounds.buttonSoundChar1 != 0) { // IdleToOverUp
+                    playSound((SoundTag) swf.getCharacter(sounds.buttonSoundChar1), timer);
+                }
+            }
+
+            b = lastMouseOverButton;
+            if (b != null) {
+                // Old mouse leave
+                DefineButtonSoundTag sounds = b.getSounds();
+                if (sounds != null && sounds.buttonSoundChar0 != 0) { // OverUpToIdle
+                    playSound((SoundTag) swf.getCharacter(sounds.buttonSoundChar0), timer);
                 }
             }
         }
@@ -1092,29 +1067,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         } catch (LineUnavailableException | IOException | UnsupportedAudioFileException ex) {
             logger.log(Level.SEVERE, "Error during playing sound", ex);
         }
-    }
-
-    private List<Shape> getOutlines(Timelined timelined, int frame, int time, double zoom, DepthState stateUnderCursor, int mouseButton, Timer thisTimer) {
-        List<DepthState> objs = new ArrayList<>();
-        List<Shape> outlines = new ArrayList<>();
-        Matrix m = new Matrix();
-        Timeline timeline = timelined.getTimeline();
-        RECT rect = timeline.displayRect;
-        m.translate(-rect.Xmin * zoom, -rect.Ymin * zoom);
-        m.scale(zoom);
-
-        timeline.getObjectsOutlines(frame, time, frame, stateUnderCursor, mouseButton, m, objs, outlines);
-        for (int i = 0; i < outlines.size(); i++) {
-            outlines.set(i, SHAPERECORD.twipToPixelShape(outlines.get(i)));
-        }
-
-        synchronized (ImagePanel.class) {
-            if (timer == thisTimer) {
-                iconPanel.setOutlines(objs, outlines);
-            }
-        }
-
-        return outlines;
     }
 
     public synchronized void clearAll() {
