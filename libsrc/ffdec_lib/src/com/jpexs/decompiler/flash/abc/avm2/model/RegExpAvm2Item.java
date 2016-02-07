@@ -9,6 +9,7 @@ import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.ecma.ArrayType;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -143,15 +144,18 @@ public class RegExpAvm2Item extends AVM2Item implements Callable {
             case "exec":
                 String estr = EcmaScript.toString(args.get(0));
                 Matcher m = p.matcher(estr);
-                m.find();
-                List<Object> avals = new ArrayList<>();
-                for (int i = 0; i <= m.groupCount(); i++) {
-                    avals.add(m.group(i));
+                if (m.find()) {
+                    List<Object> avals = new ArrayList<>();
+                    for (int i = 0; i <= m.groupCount(); i++) {
+                        avals.add(m.group(i));
+                    }
+                    ArrayType a = new ArrayType(avals);
+                    a.setAttribute("input", estr);
+                    a.setAttribute("index", m.start());
+                    return a;
+                } else {
+                    return Null.INSTANCE;
                 }
-                ArrayType a = new ArrayType(avals);
-                a.setAttribute("input", estr);
-                a.setAttribute("index", m.start());
-                return a;
             case "test":
                 String tstr = EcmaScript.toString(args.get(0));
                 return p.matcher(tstr).find(); //boolean
