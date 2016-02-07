@@ -47,7 +47,7 @@ public class FSCommandActionItem extends ActionItem {
         writer.append("fscommand");
         writer.spaceBeforeCallParenthesies(1);
         writer.append("(");
-        command.appendTo(writer, localData);
+        command.appendTry(writer, localData);
         return writer.append(")");
     }
 

@@ -26,10 +26,15 @@ import com.jpexs.decompiler.flash.abc.avm2.model.ClassAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ScriptAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ThisAVM2Item;
+import com.jpexs.decompiler.flash.abc.types.Multiname;
+import com.jpexs.decompiler.flash.abc.types.traits.Trait;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.ecma.Undefined;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.NotCompileTimeItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -62,7 +67,26 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
             if (localData.isStatic) {
                 stack.push(new ClassAVM2Item(localData.getInstanceInfo().get(localData.classIndex).getName(localData.getConstants())));
             } else {
-                stack.push(new ThisAVM2Item(ins, localData.lineStartInstruction, localData.getInstanceInfo().get(localData.classIndex).getName(localData.getConstants())));
+
+                List<Trait> ts = localData.getInstanceInfo().get(localData.classIndex).instance_traits.traits;
+                boolean isBasicObject = true;
+                if (!"Object".equals(localData.getConstants().getMultiname(localData.getInstanceInfo().get(localData.classIndex).super_index).getNameWithNamespace(localData.getConstants()).toRawString())) {
+                    //TODO: check for toString and valueOf in parent object
+                    isBasicObject = false;
+                } else {
+                    for (Trait t : ts) {
+                        if (t instanceof TraitMethodGetterSetter) {
+                            if ("toString".equals(t.getName(localData.abc).getName(localData.getConstants(), new ArrayList<>(), true))) {
+                                isBasicObject = false;
+                            }
+                            if ("valueOf".equals(t.getName(localData.abc).getName(localData.getConstants(), new ArrayList<>(), true))) {
+                                isBasicObject = false;
+                            }
+                        }
+                    }
+                }
+                Multiname m = localData.getInstanceInfo().get(localData.classIndex).getName(localData.getConstants());
+                stack.push(new ThisAVM2Item(ins, localData.lineStartInstruction, m, m.getNameWithNamespace(localData.getConstants()), isBasicObject));
             }
             return;
         }

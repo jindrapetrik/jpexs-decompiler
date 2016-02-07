@@ -39,7 +39,7 @@ import java.util.List;
 public class GtActionItem extends BinaryOpItem implements LogicalOpItem {
 
     public GtActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, lineStartIns, PRECEDENCE_RELATIONAL, leftSide, rightSide, ">");
+        super(instruction, lineStartIns, PRECEDENCE_RELATIONAL, leftSide, rightSide, ">", "", "");
     }
 
     @Override

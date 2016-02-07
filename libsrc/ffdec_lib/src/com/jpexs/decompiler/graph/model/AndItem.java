@@ -40,7 +40,7 @@ public class AndItem extends BinaryOpItem {
     }
 
     public AndItem(GraphSourceItem src, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(src, lineStartIns, PRECEDENCE_LOGICALAND, leftSide, rightSide, "&&");
+        super(src, lineStartIns, PRECEDENCE_LOGICALAND, leftSide, rightSide, "&&", "Boolean", "Boolean");
         this.leftSide = leftSide;
         this.rightSide = rightSide;
     }

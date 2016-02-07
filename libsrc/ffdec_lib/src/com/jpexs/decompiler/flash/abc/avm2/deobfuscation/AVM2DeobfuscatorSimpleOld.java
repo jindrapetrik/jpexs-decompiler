@@ -42,6 +42,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.NotIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.SubtractIIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.SubtractIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.bitwise.BitAndIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.bitwise.BitNotIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.bitwise.BitOrIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.bitwise.BitXorIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.bitwise.LShiftIns;
@@ -53,10 +54,15 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.GreaterThanIn
 import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.LessEqualsIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.LessThanIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.StrictEqualsIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.ConstructIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewArrayIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewFunctionIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewObjectIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocalTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalTypeIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.DupIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushByteIns;
@@ -71,7 +77,9 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushUndefinedIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.SwapIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceOrConvertTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.FloatValueAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.NewArrayAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.StringAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.UndefinedAVM2Item;
@@ -314,12 +322,30 @@ public class AVM2DeobfuscatorSimpleOld extends SWFDecompilerAdapter {
                     || def instanceof GreaterEqualsIns
                     || def instanceof GreaterThanIns
                     || def instanceof LessThanIns
+                    || def instanceof BitNotIns
                     || def instanceof StrictEqualsIns
                     || def instanceof PopIns
                     || def instanceof GetLocalTypeIns
                     || def instanceof NewFunctionIns
-                    || def instanceof CoerceOrConvertTypeIns) {
+                    || def instanceof NewArrayIns
+                    || def instanceof NewObjectIns
+                    || def instanceof GetPropertyIns
+                    || def instanceof CoerceOrConvertTypeIns
+                    || def instanceof ConstructIns
+                    || def instanceof CallIns) {
                 ok = true;
+            }
+
+            if (def instanceof GetPropertyIns) {
+                GetPropertyAVM2Item avi = (GetPropertyAVM2Item) stack.peek();
+                ok = false;
+                if (avi.object instanceof NewArrayAVM2Item) {
+                    if (((NewArrayAVM2Item) avi.object).values.isEmpty()) {
+                        stack.pop();
+                        stack.push(new UndefinedAVM2Item(null, null));
+                        ok = true;
+                    }
+                }
             }
 
             if (!ok) {

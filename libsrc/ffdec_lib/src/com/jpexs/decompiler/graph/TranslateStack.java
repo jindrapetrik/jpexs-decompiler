@@ -31,6 +31,12 @@ public class TranslateStack extends Stack<GraphTargetItem> {
 
     private final String path;
 
+    public void simplify() {
+        for (int i = 0; i < size(); i++) {
+            set(i, get(i).simplify(""));
+        }
+    }
+
     public TranslateStack(String path) {
         this.path = path;
     }

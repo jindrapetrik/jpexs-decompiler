@@ -33,7 +33,7 @@ import java.util.List;
 public class AsTypeAVM2Item extends BinaryOpItem {
 
     public AsTypeAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value, GraphTargetItem type) {
-        super(instruction, lineStartIns, PRECEDENCE_RELATIONAL, value, type, "as");
+        super(instruction, lineStartIns, PRECEDENCE_RELATIONAL, value, type, "as", "", "");
     }
 
     @Override

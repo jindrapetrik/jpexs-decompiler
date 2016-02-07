@@ -35,7 +35,7 @@ import java.util.Set;
 public class StringLtActionItem extends BinaryOpItem implements Inverted {
 
     public StringLtActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, lineStartIns, PRECEDENCE_RELATIONAL, leftSide, rightSide, "lt");
+        super(instruction, lineStartIns, PRECEDENCE_RELATIONAL, leftSide, rightSide, "lt", "String", "String");
     }
 
     @Override

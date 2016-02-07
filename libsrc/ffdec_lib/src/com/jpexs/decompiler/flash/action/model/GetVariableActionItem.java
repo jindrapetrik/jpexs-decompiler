@@ -76,7 +76,7 @@ public class GetVariableActionItem extends ActionItem {
             return IdentifiersDeobfuscation.appendObfuscatedIdentifier(((DirectValueActionItem) name).toStringNoQuotes(localData), writer);
         } else if ((!(name instanceof DirectValueActionItem)) || (!((DirectValueActionItem) name).isString())) {
             writer.append("eval(");
-            name.appendTo(writer, localData);
+            name.appendTry(writer, localData);
             return writer.append(")");
         }
         HighlightData srcData = getSrcData();

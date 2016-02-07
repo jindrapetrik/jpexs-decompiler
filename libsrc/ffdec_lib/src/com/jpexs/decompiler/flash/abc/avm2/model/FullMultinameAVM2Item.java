@@ -106,7 +106,11 @@ public class FullMultinameAVM2Item extends AVM2Item {
         }
         if (name != null) {
             writer.append("[");
-            name.toString(writer, localData);
+            if (name instanceof IntegerValueAVM2Item) {
+                name.toString(writer, localData);
+            } else {
+                name.toStringString(writer, localData);
+            }
             writer.append("]");
         } else {
             AVM2ConstantPool constants = localData.constantsAvm2;

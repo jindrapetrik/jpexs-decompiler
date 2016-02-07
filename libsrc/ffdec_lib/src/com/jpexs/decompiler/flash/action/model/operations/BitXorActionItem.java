@@ -37,7 +37,7 @@ import java.util.List;
 public class BitXorActionItem extends BinaryOpItem {
 
     public BitXorActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, lineStartIns, PRECEDENCE_BITWISEXOR, leftSide, rightSide, "^");
+        super(instruction, lineStartIns, PRECEDENCE_BITWISEXOR, leftSide, rightSide, "^", "int", "int");
     }
 
     @Override
@@ -56,7 +56,7 @@ public class BitXorActionItem extends BinaryOpItem {
             if (leftSide.getPrecedence() > PRECEDENCE_UNARY) {
                 writer.append("(");
             }
-            leftSide.appendTo(writer, localData);
+            leftSide.appendTry(writer, localData);
             if (leftSide.getPrecedence() > PRECEDENCE_UNARY) {
                 writer.append(")");
             }

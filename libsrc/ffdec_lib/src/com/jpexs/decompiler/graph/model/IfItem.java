@@ -89,7 +89,7 @@ public class IfItem extends GraphTargetItem implements Block {
             writer.append(" ");
         }
         writer.append("(");
-        expr.toString(writer, localData);
+        expr.toStringBoolean(writer, localData);
         writer.append(")");
         appendBlock(expr, writer, localData, ifBranch);
         if (elseBranch.size() > 0) {

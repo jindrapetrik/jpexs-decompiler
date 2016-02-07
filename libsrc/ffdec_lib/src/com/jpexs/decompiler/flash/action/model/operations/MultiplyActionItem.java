@@ -33,7 +33,7 @@ import java.util.List;
 public class MultiplyActionItem extends BinaryOpItem {
 
     public MultiplyActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, lineStartIns, PRECEDENCE_MULTIPLICATIVE, leftSide, rightSide, "*");
+        super(instruction, lineStartIns, PRECEDENCE_MULTIPLICATIVE, leftSide, rightSide, "*", "Number", "Number");
     }
 
     @Override

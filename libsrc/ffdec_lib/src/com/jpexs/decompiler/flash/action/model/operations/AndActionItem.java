@@ -34,7 +34,7 @@ import java.util.List;
 public class AndActionItem extends BinaryOpItem {
 
     public AndActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, lineStartIns, PRECEDENCE_LOGICALAND, leftSide, rightSide, "and");
+        super(instruction, lineStartIns, PRECEDENCE_LOGICALAND, leftSide, rightSide, "and", "Boolean", "Boolean");
     }
 
     @Override

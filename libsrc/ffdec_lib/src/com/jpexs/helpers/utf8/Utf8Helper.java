@@ -18,6 +18,7 @@ package com.jpexs.helpers.utf8;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
 
 /**
@@ -31,6 +32,14 @@ public class Utf8Helper {
     public static String urlDecode(String s) {
         try {
             return URLDecoder.decode(s, "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            throw new Error(ex);
+        }
+    }
+
+    public static String urlEncode(String s) {
+        try {
+            return URLEncoder.encode(s, "UTF-8");
         } catch (UnsupportedEncodingException ex) {
             throw new Error(ex);
         }

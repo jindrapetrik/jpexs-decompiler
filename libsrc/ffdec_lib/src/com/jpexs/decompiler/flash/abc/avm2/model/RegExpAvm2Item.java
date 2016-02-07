@@ -7,6 +7,9 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.ecma.ArrayType;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -15,13 +18,16 @@ import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
  * @author JPEXS
  */
-public class RegExpAvm2Item extends AVM2Item {
+public class RegExpAvm2Item extends AVM2Item implements Callable {
 
     public String pattern;
 
@@ -31,6 +37,11 @@ public class RegExpAvm2Item extends AVM2Item {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.pattern = pattern;
         this.modifier = modifier;
+    }
+
+    @Override
+    public boolean isCompileTime() {
+        return true;
     }
 
     public static String escapeRegExpString(String s) {
@@ -100,5 +111,56 @@ public class RegExpAvm2Item extends AVM2Item {
                 hasModifier ? new StringAVM2Item(null, null, modifier) : null,
                 ins(AVM2Instructions.Construct, hasModifier ? 2 : 1)
         );
+    }
+
+    @Override
+    public Object call(String methodName, List<Object> args) {
+        int flags = 0;
+        for (char c : modifier.toCharArray()) {
+            switch (c) {
+                case 'g':
+                    //global (??)
+                    break;
+                case 'i':
+                    flags |= Pattern.CASE_INSENSITIVE;
+                    break;
+                case 's':
+                    flags |= Pattern.DOTALL;
+                    break;
+                case 'm':
+                    flags |= Pattern.MULTILINE;
+                    break;
+                case 'x':
+                    flags |= Pattern.COMMENTS; //?
+                    break;
+                default:
+                    //?
+                    break;
+            }
+        }
+        Pattern p = Pattern.compile(pattern, flags);
+        switch (methodName) {
+            case "exec":
+                String estr = EcmaScript.toString(args.get(0));
+                Matcher m = p.matcher(estr);
+                m.find();
+                List<Object> avals = new ArrayList<>();
+                for (int i = 0; i <= m.groupCount(); i++) {
+                    avals.add(m.group(i));
+                }
+                ArrayType a = new ArrayType(avals);
+                a.setAttribute("input", estr);
+                a.setAttribute("index", m.start());
+                return a;
+            case "test":
+                String tstr = EcmaScript.toString(args.get(0));
+                return p.matcher(tstr).find(); //boolean
+        }
+        return Undefined.INSTANCE; //?
+    }
+
+    @Override
+    public Object call(List<Object> args) {
+        return call("exec", args);
     }
 }

@@ -19,10 +19,18 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions.other;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
+import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2ExecutionException;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
+import com.jpexs.decompiler.flash.abc.types.Multiname;
+import com.jpexs.decompiler.flash.ecma.ArrayType;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.flash.ecma.ObjectType;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
@@ -35,6 +43,28 @@ public class GetPropertyIns extends InstructionDefinition {
 
     public GetPropertyIns() {
         super(0x66, "getproperty", new int[]{AVM2Code.DAT_MULTINAME_INDEX}, true);
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) throws AVM2ExecutionException {
+        if (constants.getMultiname(ins.operands[0]).kind == Multiname.MULTINAMEL) {
+            String name = EcmaScript.toString(lda.operandStack.pop());
+            Object obj = lda.operandStack.pop();
+            if (obj == ArrayType.EMPTY_ARRAY) {
+                if ("length".equals(name)) {
+                    lda.operandStack.push(0L);
+                } else {
+                    lda.operandStack.push(Undefined.INSTANCE);
+                }
+                return true;
+            }
+            if (obj == ObjectType.EMPTY_OBJECT) {
+                lda.operandStack.push(Undefined.INSTANCE);
+                return true;
+            }
+            return true;
+        }
+        return false;
     }
 
     @Override

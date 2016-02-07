@@ -37,7 +37,7 @@ import java.util.List;
 public class SubtractAVM2Item extends BinaryOpItem {
 
     public SubtractAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, lineStartIns, PRECEDENCE_ADDITIVE, leftSide, rightSide, "-");
+        super(instruction, lineStartIns, PRECEDENCE_ADDITIVE, leftSide, rightSide, "-", "Number", "Number");
     }
 
     @Override

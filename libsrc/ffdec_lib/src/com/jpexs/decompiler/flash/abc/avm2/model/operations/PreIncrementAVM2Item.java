@@ -33,7 +33,7 @@ import java.util.List;
 public class PreIncrementAVM2Item extends UnaryOpItem {
 
     public PreIncrementAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object) {
-        super(instruction, lineStartIns, PRECEDENCE_UNARY, object, "++");
+        super(instruction, lineStartIns, PRECEDENCE_UNARY, object, "++", "Number");
     }
 
     @Override

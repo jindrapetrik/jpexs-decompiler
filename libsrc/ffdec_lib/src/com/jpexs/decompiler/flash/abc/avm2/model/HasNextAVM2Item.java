@@ -58,13 +58,13 @@ public class HasNextAVM2Item extends AVM2Item {
 
         writer.append("§§hasnext(");
         if (obj != null) {
-            obj.appendTo(writer, localData);
+            obj.appendTry(writer, localData);
         } else {
             writer.append("null");
         }
         writer.append(",");
         if (index != null) {
-            index.appendTo(writer, localData);
+            index.appendTry(writer, localData);
         } else {
             writer.append("null");
         }
@@ -74,7 +74,7 @@ public class HasNextAVM2Item extends AVM2Item {
 
     @Override
     public GraphTargetItem returnType() {
-        return TypeItem.UNBOUNDED;
+        return TypeItem.BOOLEAN;
     }
 
     @Override

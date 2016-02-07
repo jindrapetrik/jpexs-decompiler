@@ -1507,6 +1507,9 @@ public class AVM2Code implements Cloneable {
                 break;
             }
 
+            if (Configuration.autoDeobfuscate.get()) {
+                stack.simplify();
+            }
             visited[ip] = true;
             AVM2Instruction ins = code.get(ip);
             if (stack.isEmpty()) {

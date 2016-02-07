@@ -41,7 +41,7 @@ public class GetLexIns extends InstructionDefinition {
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         int multinameIndex = ins.operands[0];
         Multiname multiname = localData.getConstants().getMultiname(multinameIndex);
-        stack.push(new GetLexAVM2Item(ins, localData.lineStartInstruction, multiname));
+        stack.push(new GetLexAVM2Item(ins, localData.lineStartInstruction, multiname, localData.getConstants()));
     }
 
     @Override

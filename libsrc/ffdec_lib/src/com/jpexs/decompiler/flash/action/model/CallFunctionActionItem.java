@@ -63,7 +63,7 @@ public class CallFunctionActionItem extends ActionItem {
         if (functionName instanceof DirectValueActionItem) {
             writer.append(IdentifiersDeobfuscation.printIdentifier(false, (functionName).toStringNoQuotes(localData)));
         } else {
-            functionName.appendTo(writer, localData);
+            functionName.appendTry(writer, localData);
         }
         writer.spaceBeforeCallParenthesies(arguments.size());
         writer.append("(");

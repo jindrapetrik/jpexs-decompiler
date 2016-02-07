@@ -19,10 +19,14 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions.construction;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
+import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2ExecutionException;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewArrayAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
+import com.jpexs.decompiler.flash.ecma.ArrayType;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.PopItem;
@@ -37,6 +41,16 @@ public class NewArrayIns extends InstructionDefinition {
 
     public NewArrayIns() {
         super(0x56, "newarray", new int[]{AVM2Code.DAT_ARG_COUNT}, true);
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) throws AVM2ExecutionException {
+        //TODO: moar
+        if (ins.operands[0] == 0) {
+            lda.operandStack.push(ArrayType.EMPTY_ARRAY);
+            return true;
+        }
+        return false;
     }
 
     @Override

@@ -33,7 +33,7 @@ import java.util.List;
 public class URShiftActionItem extends BinaryOpItem {
 
     public URShiftActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, lineStartIns, PRECEDENCE_BITWISESHIFT, leftSide, rightSide, ">>>");
+        super(instruction, lineStartIns, PRECEDENCE_BITWISESHIFT, leftSide, rightSide, ">>>", "Number", "Number");
     }
 
     @Override

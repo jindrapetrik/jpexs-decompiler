@@ -19,6 +19,8 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.flash.ecma.ObjectType;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.DottedChain;
@@ -28,7 +30,10 @@ import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -86,5 +91,33 @@ public class NewObjectAVM2Item extends AVM2Item {
         return toSourceMerge(localData, generator, args,
                 new AVM2Instruction(0, AVM2Instructions.NewObject, new int[]{pairs.size()})
         );
+    }
+
+    @Override
+    public Object getResult() {
+        Map<String, Object> props = new HashMap<>();
+        for (NameValuePair v : pairs) {
+            props.put(EcmaScript.toString(v.name.getResult()), v.value.getResult());
+        }
+        return new ObjectType(props);
+    }
+
+    @Override
+    public GraphTargetItem simplify(String implicitCoerce) {
+        if (implicitCoerce.isEmpty()) {
+            return this;
+        } else {
+            return super.simplify(implicitCoerce);
+        }
+    }
+
+    @Override
+    public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
+        for (NameValuePair v : pairs) {
+            if (!v.name.isCompileTime() || !v.value.isCompileTime()) {
+                return false;
+            }
+        }
+        return true;
     }
 }

@@ -83,7 +83,7 @@ public class VariableActionItem extends ActionItem {
         if (it == null) {
             return writer;
         }
-        return it.appendTo(writer, localData);
+        return it.appendTry(writer, localData);
     }
 
     @Override

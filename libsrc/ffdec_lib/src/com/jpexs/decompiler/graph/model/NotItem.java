@@ -19,6 +19,7 @@ package com.jpexs.decompiler.graph.model;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.model.operations.Inverted;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -34,7 +35,7 @@ import java.util.Set;
 public class NotItem extends UnaryOpItem implements LogicalOpItem, Inverted {
 
     public NotItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value) {
-        super(instruction, lineStartIns, PRECEDENCE_UNARY, value, "!");
+        super(instruction, lineStartIns, PRECEDENCE_UNARY, value, "!", "Boolean");
     }
 
     @Override
@@ -80,7 +81,29 @@ public class NotItem extends UnaryOpItem implements LogicalOpItem, Inverted {
     }
 
     @Override
+    public GraphTextWriter toStringBoolean(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        //Skip explicit conversion to boolean, it is not needed, it is done implicitly
+        if (value instanceof NotItem) {
+            return value.value.toStringBoolean(writer, localData);
+        }
+        return super.toStringBoolean(writer, localData);
+    }
+
+    @Override
     public GraphTargetItem invert(GraphSourceItem src) {
+        if (true) {
+            return value;
+        }
+        //if this is already !!val, convert to !val
+        if (value instanceof NotItem) {
+            return value;
+        }
+        //If it is not a boolean, put !! there for toBoolean conversion
+        if (!TypeItem.BOOLEAN.equals(value.returnType()) && !(value instanceof DuplicateItem)) {
+            return new NotItem(null, null, this);
+        }
+
+        //can be inverted
         return value;
     }
 }

@@ -17,15 +17,30 @@
 package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.abc.avm2.model.FloatValueAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.NameValuePair;
+import com.jpexs.decompiler.flash.abc.avm2.model.NewArrayAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.NewObjectAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.StringAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.ThisAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.UndefinedAVM2Item;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.ecma.ArrayType;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.flash.ecma.Null;
+import com.jpexs.decompiler.flash.ecma.ObjectType;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
 import com.jpexs.decompiler.graph.model.BinaryOp;
+import com.jpexs.decompiler.graph.model.FalseItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.NotItem;
+import com.jpexs.decompiler.graph.model.TrueItem;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -88,6 +103,92 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     public GraphSourceItem getLineStartItem() {
         return lineStartItem;
+    }
+
+    protected static GraphTargetItem valToItem(Object r) {
+        if (r == null) {
+            return null;
+        }
+        if (r instanceof Boolean) {
+            if ((Boolean) r) {
+                return new TrueItem(null, null);
+            } else {
+                return new FalseItem(null, null);
+            }
+        }
+        if (r instanceof String) {
+            return new StringAVM2Item(null, null, (String) r);
+        }
+        if (r instanceof Long) {
+            return new IntegerValueAVM2Item(null, null, (Long) r);
+        }
+        if (r instanceof Integer) {
+            return new IntegerValueAVM2Item(null, null, (long) (int) (Integer) r);
+        }
+
+        if (r instanceof Double) {
+            return new FloatValueAVM2Item(null, null, (Double) r);
+        }
+        if (r instanceof Null) {
+            return new NullAVM2Item(null, null);
+        }
+        if (r instanceof Undefined) {
+            return new UndefinedAVM2Item(null, null);
+        }
+        if (r instanceof ArrayType) {
+            List<GraphTargetItem> vals = new ArrayList<>();
+            ArrayType at = (ArrayType) r;
+            for (Object v : at.values) {
+                vals.add(valToItem(v));
+            }
+            return new NewArrayAVM2Item(null, null, vals);
+        }
+        if (r instanceof ObjectType) {
+            List<NameValuePair> props = new ArrayList<>();
+            ObjectType ot = (ObjectType) r;
+            for (String k : ot.getAttributeNames()) {
+                props.add(new NameValuePair(valToItem(k), valToItem(ot.getAttribute(k))));
+            }
+            return new NewObjectAVM2Item(null, null, props);
+        }
+        return null;
+    }
+
+    public static GraphTargetItem simplifySomething(GraphTargetItem it, String implicitCoerce) {
+        if ((it instanceof SimpleValue) && implicitCoerce.isEmpty()) {
+            if (((SimpleValue) it).isSimpleValue()) {
+                return it;
+            }
+        }
+
+        if (!it.isCompileTime() && !(!implicitCoerce.isEmpty() && it.isConvertedCompileTime(new HashSet<>()))) {
+            return it;
+        }
+        Object r = it.getResult();
+        switch (implicitCoerce) {
+            case "String":
+                r = EcmaScript.toString(r);
+                break;
+            case "Number":
+                r = EcmaScript.toNumber(r);
+                break;
+            case "int":
+                r = EcmaScript.toInt32(r);
+                break;
+            case "Boolean":
+                r = EcmaScript.toBoolean(r);
+                break;
+        }
+
+        GraphTargetItem it2 = valToItem(r);
+        if (it2 == null) {
+            return it;
+        }
+        return it2;
+    }
+
+    public GraphTargetItem simplify(String implicitCoerce) {
+        return simplifySomething(this, implicitCoerce);
     }
 
     public int getLine() {
@@ -174,7 +275,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
         }
 
         writer.startOffset(src, getLineStartItem(), getPos(), srcData);
-        appendTo(writer, localData);
+        appendTry(writer, localData);
         if (needsSemicolon()) {
             writer.appendNoHilight(";");
         }
@@ -191,18 +292,51 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
         return getClass().getName();
     }
 
-    public GraphTextWriter toString(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+    public GraphTextWriter toStringBoolean(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        return toString(writer, localData, "Boolean");
+    }
+
+    public GraphTextWriter toStringString(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        return toString(writer, localData, "String");
+    }
+
+    public GraphTextWriter toStringInt(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        return toString(writer, localData, "int");
+    }
+
+    public GraphTextWriter toStringNumber(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        return toString(writer, localData, "Number");
+    }
+
+    public GraphTextWriter toString(GraphTextWriter writer, LocalData localData, String implicitCoerce) throws InterruptedException {
         if (Thread.currentThread().isInterrupted()) {
             throw new InterruptedException();
         }
 
         writer.startOffset(src, getLineStartItem(), getPos(), srcData);
-        appendTo(writer, localData);
+        appendTry(writer, localData, implicitCoerce);
         writer.endOffset();
         return writer;
     }
 
+    public GraphTextWriter toString(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        return toString(writer, localData, "");
+    }
+
     public abstract GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException;
+
+    public GraphTextWriter appendTry(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        return appendTry(writer, localData, "");
+    }
+
+    public GraphTextWriter appendTry(GraphTextWriter writer, LocalData localData, String implicitCoerce) throws InterruptedException {
+        GraphTargetItem t = this;
+        if (!implicitCoerce.isEmpty() && Configuration.autoDeobfuscate.get()) {
+            t = t.simplify(implicitCoerce);
+        }
+        return t.appendTo(writer, localData);
+
+    }
 
     public String toString(LocalData localData) throws InterruptedException {
         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
@@ -222,6 +356,10 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
         return false;
+    }
+
+    public boolean isConvertedCompileTime(Set<GraphTargetItem> dependencies) {
+        return isCompileTime();
     }
 
     public boolean hasSideEffect() {
@@ -274,7 +412,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     public GraphTextWriter toStringNL(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.startOffset(src, getLineStartItem(), getPos(), srcData);
-        appendTo(writer, localData);
+        appendTry(writer, localData);
         if (needsNewLine()) {
             writer.newLine();
         }

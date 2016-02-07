@@ -86,7 +86,12 @@ public class DoWhileItem extends LoopItem implements Block {
             if (i != 0) {
                 writer.append(", ");
             }
-            expression.get(i).toString(writer, localData);
+            if (i == expression.size() - 1) {
+                expression.get(i).toStringBoolean(writer, localData);
+            } else {
+                expression.get(i).toString(writer, localData);
+            }
+
         }
 
         writer.append(");").newLine();

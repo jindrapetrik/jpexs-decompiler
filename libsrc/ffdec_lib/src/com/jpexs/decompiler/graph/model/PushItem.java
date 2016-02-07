@@ -39,7 +39,7 @@ public class PushItem extends GraphTargetItem {
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         //Logger.getLogger(PushItem.class.getName()).log(Level.WARNING, "Push item left in the source code");
         writer.append("§§push(");
-        value.appendTo(writer, localData);
+        value.appendTry(writer, localData);
         writer.append(")");
         return writer;
     }

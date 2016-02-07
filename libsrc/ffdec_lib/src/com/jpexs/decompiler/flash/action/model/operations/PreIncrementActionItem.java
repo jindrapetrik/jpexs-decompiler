@@ -45,7 +45,7 @@ import java.util.List;
 public class PreIncrementActionItem extends UnaryOpItem {
 
     public PreIncrementActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object) {
-        super(instruction, lineStartIns, PRECEDENCE_UNARY, object, "++");
+        super(instruction, lineStartIns, PRECEDENCE_UNARY, object, "++", "Number");
     }
 
     @Override

@@ -38,7 +38,7 @@ import java.util.List;
 public class LtAVM2Item extends BinaryOpItem implements LogicalOpItem, IfCondition {
 
     public LtAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, lineStartIns, PRECEDENCE_RELATIONAL, leftSide, rightSide, "<");
+        super(instruction, lineStartIns, PRECEDENCE_RELATIONAL, leftSide, rightSide, "<", "", "");
     }
 
     @Override

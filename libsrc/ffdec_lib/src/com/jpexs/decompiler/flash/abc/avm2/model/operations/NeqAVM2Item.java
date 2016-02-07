@@ -37,7 +37,7 @@ import java.util.List;
 public class NeqAVM2Item extends BinaryOpItem implements LogicalOpItem, IfCondition {
 
     public NeqAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, lineStartIns, PRECEDENCE_EQUALITY, leftSide, rightSide, "!=");
+        super(instruction, lineStartIns, PRECEDENCE_EQUALITY, leftSide, rightSide, "!=", "", "");
     }
 
     @Override

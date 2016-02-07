@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -28,6 +29,7 @@ import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -38,6 +40,36 @@ public class GetPropertyAVM2Item extends AVM2Item {
     public GraphTargetItem object;
 
     public GraphTargetItem propertyName;
+
+    @Override
+    public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
+        if (object instanceof NewArrayAVM2Item) {
+            if (((NewArrayAVM2Item) object).values.isEmpty()) {
+                return true;
+            }
+        }
+        if (object instanceof NewObjectAVM2Item) {
+            if (((NewObjectAVM2Item) object).pairs.isEmpty()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public Object getResult() {
+        if (object instanceof NewArrayAVM2Item) {
+            if (((NewArrayAVM2Item) object).values.isEmpty()) {
+                return Undefined.INSTANCE;
+            }
+        }
+        if (object instanceof NewObjectAVM2Item) {
+            if (((NewObjectAVM2Item) object).pairs.isEmpty()) {
+                return Undefined.INSTANCE;
+            }
+        }
+        return null;
+    }
 
     public GetPropertyAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, GraphTargetItem propertyName) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);

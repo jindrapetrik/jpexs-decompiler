@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
+import com.jpexs.decompiler.flash.ecma.ArrayType;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -26,7 +27,9 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -56,6 +59,37 @@ public class NewArrayAVM2Item extends AVM2Item {
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.ARRAY;
+    }
+
+    @Override
+    public Object getResult() {
+        List<Object> ovalues = new ArrayList<>();
+        for (GraphTargetItem it : values) {
+            Object o = it.getResult();
+            if (o == null) {
+                return null;
+            }
+            ovalues.add(o);
+        }
+        return new ArrayType(ovalues);
+    }
+
+    @Override
+    public GraphTargetItem simplify(String implicitCoerce) {
+        if (implicitCoerce.isEmpty()) {
+            return this;
+        }
+        return super.simplify(implicitCoerce);
+    }
+
+    @Override
+    public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
+        for (GraphTargetItem v : values) {
+            if (!v.isCompileTime()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override

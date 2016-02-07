@@ -34,7 +34,7 @@ import java.util.List;
 public class RShiftActionItem extends BinaryOpItem {
 
     public RShiftActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, lineStartIns, PRECEDENCE_BITWISESHIFT, leftSide, rightSide, ">>");
+        super(instruction, lineStartIns, PRECEDENCE_BITWISESHIFT, leftSide, rightSide, ">>", "int", "int");
     }
 
     @Override

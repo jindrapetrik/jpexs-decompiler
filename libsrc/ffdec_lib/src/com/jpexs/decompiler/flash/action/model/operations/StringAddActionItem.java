@@ -35,7 +35,7 @@ import java.util.Set;
 public class StringAddActionItem extends BinaryOpItem {
 
     public StringAddActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, lineStartIns, PRECEDENCE_ADDITIVE, leftSide, rightSide, "add");
+        super(instruction, lineStartIns, PRECEDENCE_ADDITIVE, leftSide, rightSide, "add", "String", "String");
     }
 
     @Override

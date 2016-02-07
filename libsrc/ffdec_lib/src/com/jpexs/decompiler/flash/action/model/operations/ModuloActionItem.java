@@ -33,7 +33,7 @@ import java.util.List;
 public class ModuloActionItem extends BinaryOpItem {
 
     public ModuloActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, lineStartIns, PRECEDENCE_MULTIPLICATIVE, leftSide, rightSide, "%");
+        super(instruction, lineStartIns, PRECEDENCE_MULTIPLICATIVE, leftSide, rightSide, "%", "Number", "Number");
     }
 
     @Override

@@ -52,10 +52,13 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.GreaterThanIn
 import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.LessEqualsIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.LessThanIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.StrictEqualsIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewArrayIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewFunctionIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewObjectIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocalTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalTypeIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.DupIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushByteIns;
@@ -255,6 +258,9 @@ public class AVM2DeobfuscatorSimple extends SWFDecompilerAdapter {
                     || def instanceof GetLocalTypeIns
                     || def instanceof SetLocalTypeIns
                     || def instanceof NewFunctionIns
+                    || def instanceof NewArrayIns
+                    || def instanceof NewObjectIns
+                    || def instanceof GetPropertyIns
                     || def instanceof CoerceOrConvertTypeIns) {
                 ok = true;
             }

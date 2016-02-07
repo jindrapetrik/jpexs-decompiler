@@ -36,7 +36,7 @@ import java.util.List;
 public class StrictNeqActionItem extends BinaryOpItem implements LogicalOpItem, Inverted {
 
     public StrictNeqActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, lineStartIns, PRECEDENCE_EQUALITY, leftSide, rightSide, "!==");
+        super(instruction, lineStartIns, PRECEDENCE_EQUALITY, leftSide, rightSide, "!==", "", "");
     }
 
     @Override

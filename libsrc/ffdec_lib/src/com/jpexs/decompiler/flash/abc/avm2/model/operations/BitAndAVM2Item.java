@@ -34,7 +34,7 @@ import java.util.List;
 public class BitAndAVM2Item extends BinaryOpItem {
 
     public BitAndAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, lineStartIns, PRECEDENCE_BITWISEAND, leftSide, rightSide, "&");
+        super(instruction, lineStartIns, PRECEDENCE_BITWISEAND, leftSide, rightSide, "&", "Number", "Number");
     }
 
     @Override

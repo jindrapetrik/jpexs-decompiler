@@ -40,7 +40,7 @@ import java.util.List;
 public class LeActionItem extends BinaryOpItem implements LogicalOpItem, Inverted {
 
     public LeActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, lineStartIns, PRECEDENCE_RELATIONAL, leftSide, rightSide, "<=");
+        super(instruction, lineStartIns, PRECEDENCE_RELATIONAL, leftSide, rightSide, "<=", "", "");
     }
 
     @Override

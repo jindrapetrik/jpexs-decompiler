@@ -39,7 +39,7 @@ import java.util.List;
 public class AddAVM2Item extends BinaryOpItem {
 
     public AddAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, lineStartIns, PRECEDENCE_ADDITIVE, leftSide, rightSide, "+");
+        super(instruction, lineStartIns, PRECEDENCE_ADDITIVE, leftSide, rightSide, "+", "", ""); //?
     }
 
     @Override

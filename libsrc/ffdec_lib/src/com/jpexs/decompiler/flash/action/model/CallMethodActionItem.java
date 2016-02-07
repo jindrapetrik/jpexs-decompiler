@@ -86,7 +86,7 @@ public class CallMethodActionItem extends ActionItem {
             }
         } else {
             writer.append("this[");
-            methodName.appendTo(writer, localData);
+            methodName.appendTry(writer, localData);
             writer.append("].call");
         }
 

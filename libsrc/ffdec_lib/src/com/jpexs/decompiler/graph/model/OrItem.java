@@ -32,7 +32,7 @@ import java.util.List;
 public class OrItem extends BinaryOpItem {
 
     public OrItem(GraphSourceItem src, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(src, lineStartIns, PRECEDENCE_LOGICALOR, leftSide, rightSide, "||");
+        super(src, lineStartIns, PRECEDENCE_LOGICALOR, leftSide, rightSide, "||", "Boolean", "Boolean");
         this.leftSide = leftSide;
         this.rightSide = rightSide;
     }

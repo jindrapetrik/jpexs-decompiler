@@ -38,7 +38,7 @@ import java.util.List;
 public class LeAVM2Item extends BinaryOpItem implements LogicalOpItem, IfCondition {
 
     public LeAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, lineStartIns, PRECEDENCE_RELATIONAL, leftSide, rightSide, "<=");
+        super(instruction, lineStartIns, PRECEDENCE_RELATIONAL, leftSide, rightSide, "<=", "", "");
     }
 
     @Override
@@ -76,6 +76,6 @@ public class LeAVM2Item extends BinaryOpItem implements LogicalOpItem, IfConditi
 
     @Override
     public GraphTargetItem returnType() {
-        return new TypeItem(DottedChain.BOOLEAN);
+        return TypeItem.BOOLEAN;
     }
 }

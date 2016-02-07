@@ -34,7 +34,7 @@ import java.util.List;
 public class BitXorAVM2Item extends BinaryOpItem {
 
     public BitXorAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, lineStartIns, PRECEDENCE_BITWISEXOR, leftSide, rightSide, "^");
+        super(instruction, lineStartIns, PRECEDENCE_BITWISEXOR, leftSide, rightSide, "^", "Number", "Number");
     }
 
     @Override

@@ -17,7 +17,14 @@
 package com.jpexs.decompiler.flash.ecma;
 
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
+import com.jpexs.helpers.utf8.Utf8Helper;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -60,8 +67,56 @@ public class EcmaScript {
             }
         }
 
-        // todo: ToPrimitive
-        return 0.0;
+        return toNumber(toPrimitive(o, "Number"));
+    }
+
+    public static Object toPrimitive(Object o, String prefferedType) {
+        if (o == Undefined.INSTANCE) {
+            return o;
+        }
+        if (o == Null.INSTANCE) {
+            return o;
+        }
+        if (o == Boolean.TRUE || o == Boolean.FALSE) {
+            return o;
+        }
+        if (o instanceof Number) {
+            return o;
+        }
+        if (o instanceof String) {
+            return o;
+        }
+        if (o instanceof ObjectType) {
+            return object_defaultValue((ObjectType) o, prefferedType);
+        }
+        return Undefined.INSTANCE; //??
+    }
+
+    public static Object object_defaultValue(ObjectType o) {
+        return object_defaultValue(o, "Number");
+    }
+
+    public static Object object_get(ObjectType o, String p) {
+        //TODO: isDataDesciptor, etc. ECMA 8.12.3
+        return object_getProperty(o, p);
+    }
+
+    public static Object object_getProperty(ObjectType o, String p) {
+        //TODO: getownproperty, etc... ECMA 8.12.2
+        return o.getAttribute(p);
+    }
+
+    public static Object object_defaultValue(ObjectType o, String hint) {
+        switch (hint) {
+            case "String":
+                //TODO: logic similar to 8.12.8
+                return o.call("toString", new ArrayList<>());
+            case "Number":
+            default:
+                //TODO: logic similar to 8.12.8                
+                return o.call("valueOf", new ArrayList<>());
+        }
+
     }
 
     public static Double toNumberAs2(Object o) {
@@ -407,5 +462,190 @@ public class EcmaScript {
         }
 
         return o.toString();
+    }
+
+    public static Double parseFloat(Object string) {
+        String inputString = toString(string);
+        int startPos = 0;
+        String trimmedString = "";
+        for (; startPos < inputString.length(); startPos++) {
+            char c = inputString.charAt(startPos);
+            if (!Character.isWhitespace(c)) {
+                trimmedString = inputString.substring(startPos);
+                break;
+            }
+        }
+        try {
+            return Double.parseDouble(trimmedString); //Is this the same?
+        } catch (NumberFormatException nfe) {
+            return Double.NaN;
+        }
+
+    }
+
+    public static Boolean isNaN(Object number) {
+        return Double.isNaN(toNumber(number));
+    }
+
+    public static Boolean isFinite(Object number) {
+        return Double.isFinite(toNumber(number));
+    }
+
+    public static Object parseInt(Object string, Object radix) {
+        String inputString = toString(string);
+        int startPos = 0;
+        String s = "";
+        for (; startPos < inputString.length(); startPos++) {
+            char c = inputString.charAt(startPos);
+            if (!Character.isWhitespace(c)) {
+                s = inputString.substring(startPos);
+                break;
+            }
+        }
+        int sign = 1;
+        if (!s.isEmpty() && s.charAt(0) == '-') {
+            sign = -1;
+        }
+        if (!s.isEmpty() && (s.charAt(0) == '+' || s.charAt(0) == '-')) {
+            s = s.substring(1);
+        }
+        int r = toInt32(radix);
+        boolean stripPrefix = true;
+        if (r != 0) {
+            if (r < 2 || r > 36) {
+                return Double.NaN;
+            }
+            if (r != 16) {
+                stripPrefix = false;
+            }
+        } else {
+            r = 10;
+        }
+        if (stripPrefix) {
+            if (s.length() >= 2) {
+                if (s.substring(0, 2).toLowerCase().equals("0x")) {
+                    s = s.substring(2);
+                    r = 16;
+                }
+            }
+        }
+
+        String allDigits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String allowedDigits = allDigits.substring(0, r);
+        String z = s;
+        for (int i = 0; i < s.length(); i++) {
+            if (("" + s.charAt(i)).matches("[" + allowedDigits + "]")) {
+                if (i == 0) {
+                    z = "";
+                    break;
+                }
+                z = s.substring(0, i);
+                break;
+            }
+        }
+        if (z.isEmpty()) {
+            return Double.NaN;
+        }
+        Long number = Long.parseLong(z, r);
+        return sign * number;
+    }
+
+    private static char toHex(int ch) {
+        return (char) (ch < 10 ? '0' + ch : 'A' + ch - 10);
+    }
+
+    private static String simpleCustomEncode(String input, String additionalValidChars) {
+        String alphas = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String num = "0123456789";
+        String alphaCases = alphas + alphas.toLowerCase();
+        String alphanum = alphaCases + num;
+        return customEncode(input, alphanum + additionalValidChars);
+    }
+
+    private static String simpleCustomDecode(String input, String additionalValidChars) {
+        String alphas = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String num = "0123456789";
+        String alphaCases = alphas + alphas.toLowerCase();
+        String alphanum = alphaCases + num;
+        return customDecode(input, alphanum + additionalValidChars);
+    }
+
+    private static String customEncode(String input, String validChars) {
+        StringBuilder resultStr = new StringBuilder();
+        for (char ch : input.toCharArray()) {
+            if (!validChars.contains("" + ch)) {
+                resultStr.append('%');
+                resultStr.append(toHex(ch / 16));
+                resultStr.append(toHex(ch % 16));
+            } else {
+                resultStr.append(ch);
+            }
+        }
+        return resultStr.toString();
+    }
+
+    private static String customDecode(String input, String reservedSet) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        for (int i = 0; i < input.length(); i++) {
+            char ch = input.charAt(i);
+            String s;
+            if (ch == '%' && i + 2 < input.length()) {
+                try {
+                    int k = i;
+                    int b = Integer.parseInt(input.substring(k + 1, k + 2 + 1), 16);
+                    int msb = (b >> 15) & 1;
+                    if (msb == 0) {
+                        char c = (char) b;
+                        if (!reservedSet.contains("" + c)) {
+                            baos.write(c);
+                        } else {
+                            baos.write(Utf8Helper.getBytes(input.substring(k, k + 3)));
+                        }
+                    } else {
+                        //here continues some multibyte character
+                        //FIXME: is this working?
+                        for (; msb == 1 && k < input.length() && input.charAt(k) == '%'; k += 3) {
+                            b = Integer.parseInt(input.substring(k + 1, k + 2 + 1), 16);
+                            msb = (b >> 15) & 1;
+                            baos.write(b);
+                        }
+                        //throw error is msb=1
+                    }
+                } catch (NumberFormatException nfe) {
+                    //throw URIEx
+                } catch (IOException ex) {
+
+                }
+            }
+        }
+        try {
+            return baos.toString("UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            return null;
+        }
+    }
+
+    public static String encodeUriComponent(Object s) {
+        return simpleCustomEncode(toString(s), "-_.!~*'()");
+    }
+
+    public static String encodeUri(Object s) {
+        return simpleCustomEncode(toString(s), ";/?:@&=+$,#-_.!~*'()");
+    }
+
+    public static String escape(Object s) {
+        return simpleCustomEncode(toString(s), "@-_.*+/");
+    }
+
+    public static String decodeUriComponent(Object s) {
+        return simpleCustomDecode(toString(s), "-_.!~*'()");
+    }
+
+    public static String decodeUri(Object s) {
+        return simpleCustomDecode(toString(s), ";/?:@&=+$,#-_.!~*'()");
+    }
+
+    public static String unescape(Object s) {
+        return simpleCustomDecode(toString(s), "@-_.*+/");
     }
 }

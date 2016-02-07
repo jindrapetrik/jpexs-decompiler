@@ -76,7 +76,7 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
         } else if (obj instanceof ClassAVM2Item) {
             slotname = ((ClassAVM2Item) obj).className;
         } else if (obj instanceof ThisAVM2Item) {
-            slotname = ((ThisAVM2Item) obj).className;
+            slotname = ((ThisAVM2Item) obj).classMultiname;
         } else if (obj instanceof ScriptAVM2Item) {
             List<Trait> traits = localData.getScriptInfo().get(((ScriptAVM2Item) obj).scriptIndex).traits.traits;
             for (int t = 0; t < traits.size(); t++) {

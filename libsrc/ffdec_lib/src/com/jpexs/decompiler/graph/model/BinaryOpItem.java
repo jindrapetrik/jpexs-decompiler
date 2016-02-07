@@ -38,6 +38,9 @@ public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
 
     protected final String operator;
 
+    protected String coerceLeft;
+    protected String coerceRight;
+
     @Override
     public GraphPart getFirstPart() {
         GraphPart fp = leftSide.getFirstPart();
@@ -47,11 +50,21 @@ public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
         return fp;
     }
 
-    public BinaryOpItem(GraphSourceItem instruction, GraphSourceItem lineStartItem, int precedence, GraphTargetItem leftSide, GraphTargetItem rightSide, String operator) {
+    public BinaryOpItem(GraphSourceItem instruction, GraphSourceItem lineStartItem, int precedence, GraphTargetItem leftSide, GraphTargetItem rightSide, String operator, String coerceLeft, String coerceRight) {
         super(instruction, lineStartItem, precedence);
         this.leftSide = leftSide;
         this.rightSide = rightSide;
         this.operator = operator;
+        this.coerceLeft = coerceLeft;
+        this.coerceRight = coerceRight;
+    }
+
+    @Override
+    public GraphTargetItem simplify(String implicitCoerce) {
+        BinaryOpItem r = (BinaryOpItem) clone();
+        r.leftSide = r.leftSide.simplify(coerceLeft);
+        r.rightSide = r.rightSide.simplify(coerceRight);
+        return simplifySomething(r, implicitCoerce);
     }
 
     @Override
@@ -98,7 +111,7 @@ public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
             return false;
         }
         dependencies.add(rightSide);
-        return leftSide.isCompileTime(dependencies) && rightSide.isCompileTime(dependencies);
+        return leftSide.isConvertedCompileTime(dependencies) && rightSide.isConvertedCompileTime(dependencies);
     }
 
     @Override

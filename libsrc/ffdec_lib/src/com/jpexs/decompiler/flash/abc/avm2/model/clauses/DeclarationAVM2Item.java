@@ -96,7 +96,7 @@ public class DeclarationAVM2Item extends AVM2Item {
             writer.append("var ");
             writer.append(localName);
             writer.append(":");
-            coerType.appendTo(writer, localData);
+            coerType.appendTry(writer, localData);
             writer.append(" = ");
             return lti.value.toString(writer, localData);
         }
@@ -110,7 +110,7 @@ public class DeclarationAVM2Item extends AVM2Item {
             ssti.getName(writer, localData);
             writer.append(":");
 
-            type.appendTo(writer, localData);
+            type.appendTry(writer, localData);
             writer.append(" = ");
             return ssti.value.toString(writer, localData);
         }

@@ -34,7 +34,7 @@ import java.util.List;
 public class BitOrActionItem extends BinaryOpItem {
 
     public BitOrActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, lineStartIns, PRECEDENCE_BITWISEOR, leftSide, rightSide, "|");
+        super(instruction, lineStartIns, PRECEDENCE_BITWISEOR, leftSide, rightSide, "|", "int", "int");
     }
 
     @Override

@@ -80,14 +80,14 @@ public class InitVectorAVM2Item extends AVM2Item {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("<");
-        subtype.appendTo(writer, localData);
+        subtype.appendTry(writer, localData);
         writer.append(">");
         writer.append("[");
         for (int i = 0; i < arguments.size(); i++) {
             if (i > 0) {
                 writer.append(",");
             }
-            arguments.get(i).appendTo(writer, localData);
+            arguments.get(i).appendTry(writer, localData);
         }
         writer.append("]");
         return writer;

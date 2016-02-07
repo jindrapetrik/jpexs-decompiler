@@ -51,10 +51,10 @@ public class DuplicateItem extends GraphTargetItem implements SimpleValue {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         if (((value instanceof SimpleValue) && (((SimpleValue) value).isSimpleValue())) || !Configuration.displayDupInstructions.get()) {
-            return value.appendTo(writer, localData);
+            return value.appendTry(writer, localData);
         }
         writer.append("§§dup(");
-        value.appendTo(writer, localData);
+        value.appendTry(writer, localData);
         return writer.append(")");
     }
 
@@ -103,8 +103,13 @@ public class DuplicateItem extends GraphTargetItem implements SimpleValue {
     }
 
     @Override
+    public GraphTargetItem simplify(String implicitCoerce) {
+        return this;
+    }
+
+    @Override
     public GraphTargetItem returnType() {
-        return TypeItem.UNBOUNDED;
+        return value.returnType();
     }
 
     /*@Override

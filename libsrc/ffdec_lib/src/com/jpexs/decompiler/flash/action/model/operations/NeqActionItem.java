@@ -39,7 +39,7 @@ public class NeqActionItem extends BinaryOpItem implements LogicalOpItem, Invert
     boolean version2;
 
     public NeqActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide, boolean version2) {
-        super(instruction, lineStartIns, PRECEDENCE_EQUALITY, leftSide, rightSide, "!=");
+        super(instruction, lineStartIns, PRECEDENCE_EQUALITY, leftSide, rightSide, "!=", "", "");
         this.version2 = version2;
     }
 

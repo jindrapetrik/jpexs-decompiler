@@ -44,7 +44,7 @@ public class XMLAVM2Item extends AVM2Item {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        return value.appendTo(writer, localData);
+        return value.appendTry(writer, localData);
     }
 
     @Override

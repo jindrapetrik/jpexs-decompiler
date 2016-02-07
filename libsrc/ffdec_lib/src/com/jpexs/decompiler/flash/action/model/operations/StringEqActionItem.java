@@ -35,7 +35,7 @@ import java.util.Set;
 public class StringEqActionItem extends BinaryOpItem implements Inverted {
 
     public StringEqActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, lineStartIns, PRECEDENCE_EQUALITY, leftSide, rightSide, "eq");
+        super(instruction, lineStartIns, PRECEDENCE_EQUALITY, leftSide, rightSide, "eq", "String", "String");
     }
 
     @Override

@@ -35,7 +35,7 @@ import java.util.List;
 public class InstanceOfAVM2Item extends BinaryOpItem {
 
     public InstanceOfAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value, GraphTargetItem type) {
-        super(instruction, lineStartIns, PRECEDENCE_RELATIONAL, value, type, "instanceof");
+        super(instruction, lineStartIns, PRECEDENCE_RELATIONAL, value, type, "instanceof", "", "");
     }
 
     @Override

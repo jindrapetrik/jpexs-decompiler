@@ -95,7 +95,7 @@ public class ForItem extends LoopItem implements Block {
             p++;
         }
         writer.append("; ");
-        expression.toString(writer, localData);
+        expression.toStringBoolean(writer, localData);
         writer.append("; ");
         p = 0;
         for (int i = 0; i < finalCommands.size(); i++) {

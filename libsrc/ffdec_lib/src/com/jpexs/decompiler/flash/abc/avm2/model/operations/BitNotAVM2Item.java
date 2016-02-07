@@ -34,7 +34,7 @@ import java.util.List;
 public class BitNotAVM2Item extends UnaryOpItem {
 
     public BitNotAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value) {
-        super(instruction, lineStartIns, PRECEDENCE_UNARY, value, "~");
+        super(instruction, lineStartIns, PRECEDENCE_UNARY, value, "~", "int");
     }
 
     @Override

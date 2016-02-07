@@ -19,11 +19,16 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions.construction;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
+import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2ExecutionException;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.NameValuePair;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewObjectAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
+import com.jpexs.decompiler.flash.ecma.ArrayType;
+import com.jpexs.decompiler.flash.ecma.ObjectType;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.PopItem;
@@ -38,6 +43,16 @@ public class NewObjectIns extends InstructionDefinition {
 
     public NewObjectIns() {
         super(0x55, "newobject", new int[]{AVM2Code.DAT_ARG_COUNT}, true);
+    }
+
+    @Override
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) throws AVM2ExecutionException {
+        //TODO: moar
+        if (ins.operands[0] == 0) {
+            lda.operandStack.push(ObjectType.EMPTY_OBJECT);
+            return true;
+        }
+        return false;
     }
 
     @Override

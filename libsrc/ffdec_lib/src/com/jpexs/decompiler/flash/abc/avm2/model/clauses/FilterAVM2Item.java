@@ -43,7 +43,7 @@ public class FilterAVM2Item extends AVM2Item {
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         collection.toString(writer, localData);
         writer.append(".(");
-        expression.toString(writer, localData);
+        expression.toStringBoolean(writer, localData);
         return writer.append(")");
     }
 

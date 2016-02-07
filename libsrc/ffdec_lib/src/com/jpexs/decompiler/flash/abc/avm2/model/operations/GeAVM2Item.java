@@ -38,7 +38,7 @@ import java.util.List;
 public class GeAVM2Item extends BinaryOpItem implements LogicalOpItem, IfCondition {
 
     public GeAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-        super(instruction, lineStartIns, PRECEDENCE_RELATIONAL, leftSide, rightSide, ">=");
+        super(instruction, lineStartIns, PRECEDENCE_RELATIONAL, leftSide, rightSide, ">=", "", "");
     }
 
     @Override
