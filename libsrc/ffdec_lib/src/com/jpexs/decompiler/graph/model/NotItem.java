@@ -91,9 +91,6 @@ public class NotItem extends UnaryOpItem implements LogicalOpItem, Inverted {
 
     @Override
     public GraphTargetItem invert(GraphSourceItem src) {
-        if (true) {
-            return value;
-        }
         //if this is already !!val, convert to !val
         if (value instanceof NotItem) {
             return value;
