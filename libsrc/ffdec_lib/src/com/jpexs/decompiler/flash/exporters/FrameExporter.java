@@ -200,7 +200,8 @@ public class FrameExporter {
                         if (fbackgroundColor != null) {
                             exporter.setBackGroundColor(fbackgroundColor);
                         }
-                        SWF.frameToSvg(tim, frame, 0, null, 0, exporter, null, 0, settings.zoom);
+
+                        tim.toSVG(frame, 0, null, 0, exporter, null, 0, settings.zoom);
                         fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                     }
                     ret.add(f);

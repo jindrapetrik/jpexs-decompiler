@@ -367,12 +367,12 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
 
     @Override
     public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, boolean isClip, Matrix transformation, Matrix absoluteTransformation, ColorTransform colorTransform) {
-        SWF.frameToImage(getTimeline(), frame, time, renderContext, image, isClip, transformation, absoluteTransformation, colorTransform);
+        getTimeline().toImage(frame, time, ratio, renderContext, image, isClip, transformation, absoluteTransformation, colorTransform);
     }
 
     @Override
     public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level, double zoom) throws IOException {
-        SWF.frameToSvg(getTimeline(), 0, 0, null, 0, exporter, colorTransform, level + 1, zoom);
+        getTimeline().toSVG(0, 0, null, 0, exporter, colorTransform, level + 1, zoom);
     }
 
     @Override
