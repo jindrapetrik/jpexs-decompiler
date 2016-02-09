@@ -571,7 +571,9 @@ public class ABC {
                 bodies.add(mb);
                 ais.endDumpLevel();
             } catch (EndOfStreamException ex) {
+                logger.log(Level.SEVERE, "MethodBody reading: End of stream", ex);
                 ais.endDumpLevelUntil(di);
+                break;
             }
 
             SWFDecompilerPlugin.fireMethodBodyParsed(mb, swf);
