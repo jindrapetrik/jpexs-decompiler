@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc;
 
+import com.jpexs.decompiler.flash.EndOfStreamException;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
@@ -54,6 +55,7 @@ import com.jpexs.decompiler.flash.abc.usages.MethodParamsMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.MethodReturnTypeMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.MultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.TypeNameMultinameUsage;
+import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -543,29 +545,34 @@ public class ABC {
         int bodies_count = ais.readU30("bodies_count");
         bodies = new ArrayList<>(bodies_count);
         for (int i = 0; i < bodies_count; i++) {
+            DumpInfo di = ais.dumpInfo;
             ais.newDumpLevel("method_body", "method_body_info");
             MethodBody mb = new MethodBody(this, null, null, null); // do not create Traits in constructor
-            mb.method_info = ais.readU30("method_info");
-            mb.max_stack = ais.readU30("max_stack");
-            mb.max_regs = ais.readU30("max_regs");
-            mb.init_scope_depth = ais.readU30("init_scope_depth");
-            mb.max_scope_depth = ais.readU30("max_scope_depth");
-            int code_length = ais.readU30("code_length");
-            mb.setCodeBytes(ais.readBytes(code_length, "code"));
-            int ex_count = ais.readU30("ex_count");
-            mb.exceptions = new ABCException[ex_count];
-            for (int j = 0; j < ex_count; j++) {
-                ABCException abce = new ABCException();
-                abce.start = ais.readU30("start");
-                abce.end = ais.readU30("end");
-                abce.target = ais.readU30("target");
-                abce.type_index = ais.readU30("type_index");
-                abce.name_index = ais.readU30("name_index");
-                mb.exceptions[j] = abce;
+            try {
+                mb.method_info = ais.readU30("method_info");
+                mb.max_stack = ais.readU30("max_stack");
+                mb.max_regs = ais.readU30("max_regs");
+                mb.init_scope_depth = ais.readU30("init_scope_depth");
+                mb.max_scope_depth = ais.readU30("max_scope_depth");
+                int code_length = ais.readU30("code_length");
+                mb.setCodeBytes(ais.readBytes(code_length, "code"));
+                int ex_count = ais.readU30("ex_count");
+                mb.exceptions = new ABCException[ex_count];
+                for (int j = 0; j < ex_count; j++) {
+                    ABCException abce = new ABCException();
+                    abce.start = ais.readU30("start");
+                    abce.end = ais.readU30("end");
+                    abce.target = ais.readU30("target");
+                    abce.type_index = ais.readU30("type_index");
+                    abce.name_index = ais.readU30("name_index");
+                    mb.exceptions[j] = abce;
+                }
+                mb.traits = ais.readTraits("traits");
+                bodies.add(mb);
+                ais.endDumpLevel();
+            } catch (EndOfStreamException ex) {
+                ais.endDumpLevelUntil(di);
             }
-            mb.traits = ais.readTraits("traits");
-            bodies.add(mb);
-            ais.endDumpLevel();
 
             SWFDecompilerPlugin.fireMethodBodyParsed(mb, swf);
         }
