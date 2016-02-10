@@ -2649,23 +2649,13 @@ public final class SWF implements SWFContainerItem, Timelined {
         return ret;
     }
 
-    public static SerializableImage frameToImageGet(Timeline timeline, int frame, int time, Point cursorPosition, int mouseButton, RECT displayRect, Matrix transformation, Matrix absoluteTransformation, ColorTransform colorTransform, Color backGroundColor, boolean useCache, double zoom) {
-        SWF swf = timeline.swf;
-        String key = "frame_" + frame + "_" + time + "_" + timeline.id + "_" + swf.hashCode() + "_" + zoom;
-        SerializableImage image;
-        if (useCache) {
-            image = swf.getFromCache(key);
-            if (image != null) {
-                return image;
-            }
-        }
-
+    public static SerializableImage frameToImageGet(Timeline timeline, int frame, int time, Point cursorPosition, int mouseButton, RECT displayRect, Matrix transformation, Matrix absoluteTransformation, ColorTransform colorTransform, Color backGroundColor, double zoom) {
         if (timeline.getFrameCount() == 0) {
             return new SerializableImage(1, 1, SerializableImage.TYPE_INT_ARGB);
         }
 
         RECT rect = displayRect;
-        image = new SerializableImage((int) (rect.getWidth() * zoom / SWF.unitDivisor) + 1,
+        SerializableImage image = new SerializableImage((int) (rect.getWidth() * zoom / SWF.unitDivisor) + 1,
                 (int) (rect.getHeight() * zoom / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
         if (backGroundColor == null) {
             image.fillTransparent();
@@ -2682,10 +2672,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         RenderContext renderContext = new RenderContext();
         renderContext.cursorPosition = cursorPosition;
         renderContext.mouseButton = mouseButton;
-        timeline.toImage(frame, time, 0, renderContext, image, false, m, absoluteTransformation, colorTransform);
-        if (useCache) {
-            swf.putToCache(key, image);
-        }
+        timeline.toImage(frame, time, renderContext, image, false, m, absoluteTransformation, colorTransform);
 
         return image;
     }
