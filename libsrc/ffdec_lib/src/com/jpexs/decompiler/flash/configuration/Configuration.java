@@ -588,6 +588,11 @@ public class Configuration {
     @ConfigurationInternal
     public static final ConfigurationItem<Boolean> _enableFlexExport = null;
 
+    @ConfigurationDefaultBoolean(false)
+    //@ConfigurationCategory("script")
+    @ConfigurationInternal
+    public static final ConfigurationItem<Boolean> _simplifyExpressions = null;
+
     private enum OSId {
 
         WINDOWS, OSX, UNIX
