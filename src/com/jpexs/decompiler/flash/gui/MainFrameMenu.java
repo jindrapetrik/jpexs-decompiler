@@ -414,6 +414,10 @@ public abstract class MainFrameMenu implements MenuBuilder {
         mainFrame.getPanel().removeNonScripts(swf);
     }
 
+    protected void removeExceptSelected() {
+        mainFrame.getPanel().removeExceptSelected(swf);
+    }
+
     protected void refreshDecompiled() {
         mainFrame.getPanel().refreshDecompiled();
     }
@@ -981,6 +985,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
             addMenuItem("/debug", "Debug", null, null, 0, null, false, null, false);
             addMenuItem("/debug/removeNonScripts", "Remove non scripts", "update16", e -> removeNonScripts(), PRIORITY_MEDIUM, null, true, null, false);
+            addMenuItem("/debug/removeExceptSelected", "Remove except selected", "update16", e -> removeExceptSelected(), PRIORITY_MEDIUM, null, true, null, false);
             addMenuItem("/debug/refreshDecompiled", "Refresh decompiled script", "update16", e -> refreshDecompiled(), PRIORITY_MEDIUM, null, true, null, false);
             addMenuItem("/debug/checkResources", "Check resources", "update16", e -> checkResources(), PRIORITY_MEDIUM, null, true, null, false);
             addMenuItem("/debug/callGc", "Call System.gc()", "update16", e -> System.gc(), PRIORITY_MEDIUM, null, true, null, false);

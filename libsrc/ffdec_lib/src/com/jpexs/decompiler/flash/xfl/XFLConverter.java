@@ -418,8 +418,10 @@ public class XFLConverter {
     private static String convertShape(HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStyles, boolean morphshape, boolean useLayers) {
         StringBuilder ret = new StringBuilder();
         List<String> layers = getShapeLayers(characters, mat, shapeNum, shapeRecords, fillStyles, lineStyles, morphshape);
-        if (layers.size() == 1 && !useLayers) {
-            ret.append(layers.get(0));
+        if (!useLayers) {
+            for (int l = layers.size() - 1; l >= 0; l--) {
+                ret.append(layers.get(l));
+            }
         } else {
             int layer = 1;
             for (int l = layers.size() - 1; l >= 0; l--) {

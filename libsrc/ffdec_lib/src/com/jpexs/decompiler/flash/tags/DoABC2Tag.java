@@ -92,6 +92,7 @@ public class DoABC2Tag extends Tag implements ABCContainerTag {
         name = sis.readString("name");
 
         ABCInputStream ais = new ABCInputStream(sis.getBaseStream());
+
         // put it to the dumpview:
         sis.readByteRangeEx(sis.available(), "abcBytes");
         abc = new ABC(ais, swf, this);

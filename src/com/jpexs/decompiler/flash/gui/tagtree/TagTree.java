@@ -181,7 +181,7 @@ public class TagTree extends JTree {
                 boolean hasFocus) {
 
             TreeItem val = (TreeItem) value;
-            if (!(val instanceof SWFList) && val.getSwf() == null) {
+            if (val != null && !(val instanceof SWFList) && val.getSwf() == null) {
                 // SWF was closed
                 value = null;
             }
@@ -190,6 +190,11 @@ public class TagTree extends JTree {
                     tree, value, sel,
                     expanded, leaf, row,
                     hasFocus);
+
+            if (val == null) {
+                return this;
+            }
+
             TreeNodeType type = getTreeNodeType(val);
 
             if (type == TreeNodeType.FOLDER && expanded) {

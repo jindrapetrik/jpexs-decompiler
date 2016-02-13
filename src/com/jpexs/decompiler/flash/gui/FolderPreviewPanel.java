@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.RenderContext;
 import com.jpexs.decompiler.flash.timeline.Frame;
+import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.helpers.Cache;
@@ -307,7 +308,15 @@ public class FolderPreviewPanel extends JPanel {
                     zoom = ratio;
                 }
             }
-            imgSrc = SWF.frameToImageGet(swf.getTimeline(), fn.frame, fn.frame, null, 0, rect, new Matrix(), new Matrix(), null, null, true, zoom);
+
+            Timeline timeline = swf.getTimeline();
+            String key = "frame_" + fn.frame + "_" + timeline.id + "_" + zoom;
+            imgSrc = swf.getFromCache(key);
+            if (imgSrc == null) {
+                imgSrc = SWF.frameToImageGet(timeline, fn.frame, fn.frame, null, 0, rect, new Matrix(), new Matrix(), null, null, zoom);
+                swf.putToCache(key, imgSrc);
+            }
+
             width = imgSrc.getWidth();
             height = imgSrc.getHeight();
         } else if (treeItem instanceof ImageTag) {

@@ -75,9 +75,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSwfNode;
 import com.jpexs.decompiler.flash.ecma.Null;
-import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
-import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.script.AS2ScriptExporter;
 import com.jpexs.decompiler.flash.exporters.script.AS3ScriptExporter;
@@ -129,11 +127,8 @@ import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.timeline.AS2Package;
-import com.jpexs.decompiler.flash.timeline.Clip;
-import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.FrameScript;
-import com.jpexs.decompiler.flash.timeline.SvgClip;
 import com.jpexs.decompiler.flash.timeline.TagScript;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
@@ -145,8 +140,6 @@ import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFField;
-import com.jpexs.decompiler.flash.types.filters.BlendComposite;
-import com.jpexs.decompiler.flash.types.filters.FILTER;
 import com.jpexs.decompiler.flash.xfl.FLAVersion;
 import com.jpexs.decompiler.flash.xfl.XFLConverter;
 import com.jpexs.decompiler.graph.DottedChain;
@@ -166,15 +159,11 @@ import com.jpexs.helpers.ProgressListener;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.Shape;
 import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -195,7 +184,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import java.util.Stack;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -2661,114 +2649,13 @@ public final class SWF implements SWFContainerItem, Timelined {
         return ret;
     }
 
-    public static void frameToSvg(Timeline timeline, int frame, int time, DepthState stateUnderCursor, int mouseButton, SVGExporter exporter, ColorTransform colorTransform, int level, double zoom) throws IOException {
-        if (timeline.getFrameCount() <= frame) {
-            return;
-        }
-        Frame frameObj = timeline.getFrame(frame);
-        List<SvgClip> clips = new ArrayList<>();
-        List<String> prevClips = new ArrayList<>();
-
-        int maxDepth = timeline.getMaxDepth();
-        for (int i = 1; i <= maxDepth; i++) {
-            for (int c = 0; c < clips.size(); c++) {
-                if (clips.get(c).depth == i) {
-                    exporter.setClip(prevClips.get(c));
-                    prevClips.remove(c);
-                    clips.remove(c);
-                }
-            }
-            if (!frameObj.layers.containsKey(i)) {
-                continue;
-            }
-            DepthState layer = frameObj.layers.get(i);
-            if (!timeline.swf.getCharacters().containsKey(layer.characterId)) {
-                continue;
-            }
-            if (!layer.isVisible) {
-                continue;
-            }
-
-            CharacterTag character = timeline.swf.getCharacter(layer.characterId);
-
-            ColorTransform clrTrans = colorTransform;
-            if (layer.colorTransForm != null && layer.blendMode <= 1) { // Normal blend mode
-                clrTrans = clrTrans == null ? layer.colorTransForm : colorTransform.merge(layer.colorTransForm);
-            }
-
-            if (character instanceof DrawableTag) {
-                DrawableTag drawable = (DrawableTag) character;
-
-                String assetName;
-                Tag drawableTag = (Tag) drawable;
-                RECT boundRect = drawable.getRect();
-                if (exporter.exportedTags.containsKey(drawableTag)) {
-                    assetName = exporter.exportedTags.get(drawableTag);
-                } else {
-                    assetName = getTagIdPrefix(drawableTag, exporter);
-                    exporter.exportedTags.put(drawableTag, assetName);
-                    exporter.createDefGroup(new ExportRectangle(boundRect), assetName);
-                    drawable.toSVG(exporter, layer.ratio, clrTrans, level + 1, zoom);
-                    exporter.endGroup();
-                }
-                ExportRectangle rect = new ExportRectangle(boundRect);
-
-                // TODO: if (layer.filters != null)
-                // TODO: if (layer.blendMode > 1)
-                if (layer.clipDepth > -1) {
-                    String clipName = exporter.getUniqueId("clipPath");
-                    exporter.createClipPath(new Matrix(), clipName);
-                    SvgClip clip = new SvgClip(clipName, layer.clipDepth);
-                    clips.add(clip);
-                    prevClips.add(exporter.getClip());
-                    Matrix mat = Matrix.getTranslateInstance(rect.xMin, rect.yMin).preConcatenate(new Matrix(layer.matrix));
-                    exporter.addUse(mat, boundRect, assetName, layer.instanceName);
-                    exporter.setClip(clip.shape);
-                    exporter.endGroup();
-                } else {
-                    Matrix mat = Matrix.getTranslateInstance(rect.xMin, rect.yMin).preConcatenate(new Matrix(layer.matrix));
-                    exporter.addUse(mat, boundRect, assetName, layer.instanceName);
-                }
-            }
-        }
-    }
-
-    private static String getTagIdPrefix(Tag tag, SVGExporter exporter) {
-        if (tag instanceof ShapeTag) {
-            return exporter.getUniqueId("shape");
-        }
-        if (tag instanceof MorphShapeTag) {
-            return exporter.getUniqueId("morphshape");
-        }
-        if (tag instanceof DefineSpriteTag) {
-            return exporter.getUniqueId("sprite");
-        }
-        if (tag instanceof TextTag) {
-            return exporter.getUniqueId("text");
-        }
-        if (tag instanceof ButtonTag) {
-            return exporter.getUniqueId("button");
-        }
-        return exporter.getUniqueId("tag");
-    }
-
-    public static SerializableImage frameToImageGet(Timeline timeline, int frame, int time, Point cursorPosition, int mouseButton, RECT displayRect, Matrix transformation, Matrix absoluteTransformation, ColorTransform colorTransform, Color backGroundColor, boolean useCache, double zoom) {
-        SWF swf = timeline.swf;
-        String key = "frame_" + frame + "_" + time + "_" + timeline.id + "_" + swf.hashCode() + "_" + zoom;
-        SerializableImage image;
-        if (useCache) {
-            image = swf.getFromCache(key);
-            if (image != null) {
-                return image;
-            }
-        }
-
+    public static SerializableImage frameToImageGet(Timeline timeline, int frame, int time, Point cursorPosition, int mouseButton, RECT displayRect, Matrix transformation, Matrix absoluteTransformation, ColorTransform colorTransform, Color backGroundColor, double zoom) {
         if (timeline.getFrameCount() == 0) {
             return new SerializableImage(1, 1, SerializableImage.TYPE_INT_ARGB);
         }
 
         RECT rect = displayRect;
-        image = new SerializableImage((int) (rect.getWidth() * zoom / SWF.unitDivisor) + 1,
+        SerializableImage image = new SerializableImage((int) (rect.getWidth() * zoom / SWF.unitDivisor) + 1,
                 (int) (rect.getHeight() * zoom / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
         if (backGroundColor == null) {
             image.fillTransparent();
@@ -2785,301 +2672,9 @@ public final class SWF implements SWFContainerItem, Timelined {
         RenderContext renderContext = new RenderContext();
         renderContext.cursorPosition = cursorPosition;
         renderContext.mouseButton = mouseButton;
-        frameToImage(timeline, frame, time, renderContext, image, false, m, absoluteTransformation, colorTransform);
-        if (useCache) {
-            swf.putToCache(key, image);
-        }
+        timeline.toImage(frame, time, 0, renderContext, image, false, m, absoluteTransformation, colorTransform);
 
         return image;
-    }
-
-    public static void framesToImage(Timeline timeline, List<SerializableImage> ret, int startFrame, int stopFrame, RenderContext renderContext, RECT displayRect, int totalFrameCount, Stack<Integer> visited, Matrix transformation, Matrix absoluteTransformation, ColorTransform colorTransform, double zoom) {
-        RECT rect = displayRect;
-        for (int f = 0; f < timeline.getFrameCount(); f++) {
-            SerializableImage image = new SerializableImage((int) (rect.getWidth() / SWF.unitDivisor) + 1,
-                    (int) (rect.getHeight() / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
-            image.fillTransparent();
-            Matrix m = new Matrix();
-            m.translate(-rect.Xmin, -rect.Ymin);
-            frameToImage(timeline, f, 0, renderContext, image, false, m, absoluteTransformation, colorTransform);
-            ret.add(image);
-        }
-    }
-
-    public static void frameToImage(Timeline timeline, int frame, int time, RenderContext renderContext, SerializableImage image, boolean isClip, Matrix transformation, Matrix absoluteTransformation, ColorTransform colorTransform) {
-        double unzoom = SWF.unitDivisor;
-        if (timeline.getFrameCount() <= frame) {
-            return;
-        }
-        Frame frameObj = timeline.getFrame(frame);
-        Graphics2D g = (Graphics2D) image.getGraphics();
-        g.setPaint(frameObj.backgroundColor.toColor());
-        g.fill(new Rectangle(image.getWidth(), image.getHeight()));
-        g.setTransform(transformation.toTransform());
-        List<Clip> clips = new ArrayList<>();
-        List<Shape> prevClips = new ArrayList<>();
-
-        int maxDepth = timeline.getMaxDepth();
-        for (int i = 1; i <= maxDepth; i++) {
-            for (int c = 0; c < clips.size(); c++) {
-                if (clips.get(c).depth == i) {
-                    g.setClip(prevClips.get(c));
-                    prevClips.remove(c);
-                    clips.remove(c);
-                }
-            }
-            if (!frameObj.layers.containsKey(i)) {
-                continue;
-            }
-            DepthState layer = frameObj.layers.get(i);
-            if (!timeline.swf.getCharacters().containsKey(layer.characterId)) {
-                continue;
-            }
-            if (!layer.isVisible) {
-                continue;
-            }
-
-            CharacterTag character = timeline.swf.getCharacter(layer.characterId);
-            Matrix layerMatrix = new Matrix(layer.matrix);
-            Matrix mat = transformation.concatenate(layerMatrix);
-            Matrix absMat = absoluteTransformation.concatenate(layerMatrix);
-
-            ColorTransform clrTrans = colorTransform;
-            if (layer.colorTransForm != null && layer.blendMode <= 1) { // Normal blend mode
-                clrTrans = clrTrans == null ? layer.colorTransForm : colorTransform.merge(layer.colorTransForm);
-            }
-
-            boolean showPlaceholder = false;
-            if (character instanceof DrawableTag) {
-                DrawableTag drawable = (DrawableTag) character;
-                Matrix drawMatrix = new Matrix();
-                int drawableFrameCount = drawable.getNumFrames();
-                if (drawableFrameCount == 0) {
-                    drawableFrameCount = 1;
-                }
-
-                RECT boundRect = drawable.getRect();
-                ExportRectangle rect = new ExportRectangle(boundRect);
-                rect = mat.transform(rect);
-                Matrix m = mat.clone();
-                if (layer.filters != null && layer.filters.size() > 0) {
-                    // calculate size after applying the filters
-                    double deltaXMax = 0;
-                    double deltaYMax = 0;
-                    for (FILTER filter : layer.filters) {
-                        double x = filter.getDeltaX();
-                        double y = filter.getDeltaY();
-                        deltaXMax = Math.max(x, deltaXMax);
-                        deltaYMax = Math.max(y, deltaYMax);
-                    }
-                    rect.xMin -= deltaXMax * unzoom;
-                    rect.xMax += deltaXMax * unzoom;
-                    rect.yMin -= deltaYMax * unzoom;
-                    rect.yMax += deltaYMax * unzoom;
-                }
-
-                rect.xMin -= 1 * unzoom;
-                rect.yMin -= 1 * unzoom;
-                rect.xMin = Math.max(0, rect.xMin);
-                rect.yMin = Math.max(0, rect.yMin);
-
-                int newWidth = (int) (rect.getWidth() / unzoom);
-                int newHeight = (int) (rect.getHeight() / unzoom);
-                int deltaX = (int) (rect.xMin / unzoom);
-                int deltaY = (int) (rect.yMin / unzoom);
-                newWidth = Math.min(image.getWidth() - deltaX, newWidth) + 1;
-                newHeight = Math.min(image.getHeight() - deltaY, newHeight) + 1;
-
-                if (newWidth <= 0 || newHeight <= 0) {
-                    continue;
-                }
-
-                m.translate(-rect.xMin, -rect.yMin);
-                drawMatrix.translate(rect.xMin, rect.yMin);
-
-                SerializableImage img = null;
-                String cacheKey = null;
-                if (drawable instanceof ShapeTag) {
-                    cacheKey = ((ShapeTag) drawable).getCharacterId() + m.toString() + (clrTrans == null ? "" : clrTrans.toString());
-                    img = renderContext.shapeCache.get(cacheKey);
-                }
-
-                int dframe;
-                if (timeline.fontFrameNum != -1) {
-                    dframe = timeline.fontFrameNum;
-                } else {
-                    dframe = time % drawableFrameCount;
-                }
-
-                if (character instanceof ButtonTag) {
-                    dframe = ButtonTag.FRAME_UP;
-                    if (renderContext.cursorPosition != null) {
-                        Shape buttonShape = drawable.getOutline(ButtonTag.FRAME_HITTEST, time, layer.ratio, renderContext, absMat);
-                        if (buttonShape.contains(renderContext.cursorPosition)) {
-                            renderContext.mouseOverButton = (ButtonTag) character;
-                            if (renderContext.mouseButton > 0) {
-                                dframe = ButtonTag.FRAME_DOWN;
-                            } else {
-                                dframe = ButtonTag.FRAME_OVER;
-                            }
-                        }
-                    }
-                }
-
-                int stateCount = renderContext.stateUnderCursor == null ? 0 : renderContext.stateUnderCursor.size();
-                if (img == null) {
-                    img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB);
-                    img.fillTransparent();
-
-                    drawable.toImage(dframe, time, layer.ratio, renderContext, img, isClip || layer.clipDepth > -1, m, absMat, clrTrans);
-
-                    if (cacheKey != null) {
-                        renderContext.shapeCache.put(cacheKey, img);
-                    }
-                }
-
-                /*//if (renderContext.stateUnderCursor == layer) {
-                 if (true) {
-                 BufferedImage bi = img.getBufferedImage();
-                 ColorModel cm = bi.getColorModel();
-                 boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
-                 WritableRaster raster = bi.copyData(null);
-                 img = new SerializableImage(new BufferedImage(cm, raster, isAlphaPremultiplied, null));
-                 Graphics2D gg = (Graphics2D) img.getGraphics();
-                 gg.setStroke(new BasicStroke(3));
-                 gg.setPaint(Color.red);
-                 gg.setTransform(AffineTransform.getTranslateInstance(0, 0));
-                 gg.draw(SHAPERECORD.twipToPixelShape(drawable.getOutline(dframe, layer.time + time, layer.ratio, renderContext, m)));
-                 }*/
-                if (layer.filters != null) {
-                    for (FILTER filter : layer.filters) {
-                        img = filter.apply(img);
-                    }
-                }
-                if (layer.blendMode > 1) {
-                    if (layer.colorTransForm != null) {
-                        img = layer.colorTransForm.apply(img);
-                    }
-                }
-
-                drawMatrix.translateX /= unzoom;
-                drawMatrix.translateY /= unzoom;
-                AffineTransform trans = drawMatrix.toTransform();
-
-                switch (layer.blendMode) {
-                    case 0:
-                    case 1:
-                        g.setComposite(AlphaComposite.SrcOver);
-                        break;
-                    case 2: // Layer
-                        g.setComposite(AlphaComposite.SrcOver);
-                        break;
-                    case 3:
-                        g.setComposite(BlendComposite.Multiply);
-                        break;
-                    case 4:
-                        g.setComposite(BlendComposite.Screen);
-                        break;
-                    case 5:
-                        g.setComposite(BlendComposite.Lighten);
-                        break;
-                    case 6:
-                        g.setComposite(BlendComposite.Darken);
-                        break;
-                    case 7:
-                        g.setComposite(BlendComposite.Difference);
-                        break;
-                    case 8:
-                        g.setComposite(BlendComposite.Add);
-                        break;
-                    case 9:
-                        g.setComposite(BlendComposite.Subtract);
-                        break;
-                    case 10:
-                        g.setComposite(BlendComposite.Invert);
-                        break;
-                    case 11:
-                        g.setComposite(BlendComposite.Alpha);
-                        break;
-                    case 12:
-                        g.setComposite(BlendComposite.Erase);
-                        break;
-                    case 13:
-                        g.setComposite(BlendComposite.Overlay);
-                        break;
-                    case 14:
-                        g.setComposite(BlendComposite.HardLight);
-                        break;
-                    default: // Not implemented
-                        g.setComposite(AlphaComposite.SrcOver);
-                        break;
-                }
-
-                if (layer.clipDepth > -1) {
-                    BufferedImage mask = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
-                    Graphics2D gm = (Graphics2D) mask.getGraphics();
-                    gm.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-                    gm.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-                    gm.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                    gm.setComposite(AlphaComposite.Src);
-                    gm.setColor(new Color(0, 0, 0, 0f));
-                    gm.fillRect(0, 0, image.getWidth(), image.getHeight());
-                    gm.setTransform(trans);
-                    gm.drawImage(img.getBufferedImage(), 0, 0, null);
-                    Clip clip = new Clip(Helper.imageToShape(mask), layer.clipDepth); // Maybe we can get current outline instead converting from image (?)
-                    clips.add(clip);
-                    prevClips.add(g.getClip());
-                    g.setTransform(AffineTransform.getTranslateInstance(0, 0));
-                    g.setClip(clip.shape);
-                } else {
-                    if (renderContext.cursorPosition != null) {
-                        if (drawable instanceof DefineSpriteTag) {
-                            if (renderContext.stateUnderCursor.size() > stateCount) {
-                                renderContext.stateUnderCursor.add(layer);
-                            }
-                        } else if (absMat.transform(new ExportRectangle(boundRect)).contains(renderContext.cursorPosition)) {
-                            Shape shape = drawable.getOutline(dframe, time, layer.ratio, renderContext, absMat);
-                            if (shape.contains(renderContext.cursorPosition)) {
-                                renderContext.stateUnderCursor.add(layer);
-                            }
-                        }
-                    }
-
-                    if (renderContext.borderImage != null) {
-                        Graphics2D g2 = (Graphics2D) renderContext.borderImage.getGraphics();
-                        g2.setPaint(Color.red);
-                        g2.setStroke(new BasicStroke(2));
-                        Shape shape = drawable.getOutline(dframe, time, layer.ratio, renderContext, absMat.preConcatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor)));
-                        g2.draw(shape);
-                    }
-
-                    g.setTransform(trans);
-                    g.drawImage(img.getBufferedImage(), 0, 0, null);
-                }
-            } else if (character instanceof BoundedTag) {
-                showPlaceholder = true;
-            }
-
-            if (showPlaceholder) {
-                Matrix mat2 = mat.clone();
-                mat2.translateX /= unzoom;
-                mat2.translateY /= unzoom;
-                AffineTransform trans = mat2.toTransform();
-                g.setTransform(trans);
-                BoundedTag b = (BoundedTag) character;
-                g.setPaint(new Color(255, 255, 255, 128));
-                g.setComposite(BlendComposite.Invert);
-                RECT r = b.getRect();
-                int div = (int) unzoom;
-                g.drawString(character.toString(), r.Xmin / div + 3, r.Ymin / div + 15);
-                g.draw(new Rectangle(r.Xmin / div, r.Ymin / div, r.getWidth() / div, r.getHeight() / div));
-                g.drawLine(r.Xmin / div, r.Ymin / div, r.Xmax / div, r.Ymax / div);
-                g.drawLine(r.Xmax / div, r.Ymin / div, r.Xmin / div, r.Ymax / div);
-                g.setComposite(AlphaComposite.Dst);
-            }
-        }
-
-        g.setTransform(AffineTransform.getScaleInstance(1, 1));
     }
 
     private void removeTagWithDependenciesFromTimeline(Tag toRemove, Timeline timeline) {

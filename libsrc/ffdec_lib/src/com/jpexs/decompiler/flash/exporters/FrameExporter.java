@@ -200,7 +200,8 @@ public class FrameExporter {
                         if (fbackgroundColor != null) {
                             exporter.setBackGroundColor(fbackgroundColor);
                         }
-                        SWF.frameToSvg(tim, frame, 0, null, 0, exporter, null, 0, settings.zoom);
+
+                        tim.toSVG(frame, 0, null, 0, exporter, null, 0, settings.zoom);
                         fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                     }
                     ret.add(f);
@@ -359,7 +360,7 @@ public class FrameExporter {
                 }
 
                 int fframe = fframes.get(pos++);
-                BufferedImage result = SWF.frameToImageGet(ftim, fframe, fframe, null, 0, ftim.displayRect, new Matrix(), new Matrix(), null, fbackgroundColor, false, settings.zoom).getBufferedImage();
+                BufferedImage result = SWF.frameToImageGet(ftim, fframe, fframe, null, 0, ftim.displayRect, new Matrix(), new Matrix(), null, fbackgroundColor, settings.zoom).getBufferedImage();
 
                 if (evl != null) {
                     evl.handleExportedEvent("frame", pos, fframes.size(), tagName);

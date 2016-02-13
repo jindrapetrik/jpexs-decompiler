@@ -2414,6 +2414,35 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         refreshTree(swf);
     }
 
+    public void removeExceptSelected(SWF swf) {
+        if (swf == null) {
+            return;
+        }
+
+        List<TreeItem> sel = tagTree.getAllSelected();
+        Set<Integer> needed = new HashSet<>();
+        for (TreeItem item : sel) {
+            if (item instanceof CharacterTag) {
+                CharacterTag characterTag = (CharacterTag) item;
+                characterTag.getNeededCharactersDeep(needed);
+                needed.add(characterTag.getCharacterId());
+            }
+        }
+
+        List<Tag> tagsToRemove = new ArrayList<>();
+        for (Tag tag : swf.getTags()) {
+            if (tag instanceof CharacterTag) {
+                CharacterTag characterTag = (CharacterTag) tag;
+                if (!needed.contains(characterTag.getCharacterId())) {
+                    tagsToRemove.add(tag);
+                }
+            }
+        }
+
+        swf.removeTags(tagsToRemove, true);
+        refreshTree(swf);
+    }
+
     private void clear() {
         dumpViewPanel.clear();
         previewPanel.clear();

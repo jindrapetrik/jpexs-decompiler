@@ -50,7 +50,7 @@ public class DefineFont3Tag extends FontTag {
     public static final String NAME = "DefineFont3";
 
     @SWFType(BasicType.UI16)
-    public int fontId;
+    public int fontID;
 
     public boolean fontFlagsHasLayout;
 
@@ -106,7 +106,7 @@ public class DefineFont3Tag extends FontTag {
      */
     public DefineFont3Tag(SWF swf) {
         super(swf, ID, NAME, null);
-        fontId = swf.getNextCharacterId();
+        fontID = swf.getNextCharacterId();
         languageCode = new LANGCODE();
         fontName = "New font";
         glyphShapeTable = new ArrayList<>();
@@ -120,7 +120,7 @@ public class DefineFont3Tag extends FontTag {
 
     @Override
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
-        fontId = sis.readUI16("fontId");
+        fontID = sis.readUI16("fontId");
         fontFlagsHasLayout = sis.readUB(1, "fontFlagsHasLayout") == 1;
         fontFlagsShiftJIS = sis.readUB(1, "fontFlagsShiftJIS") == 1;
         fontFlagsSmallText = sis.readUB(1, "fontFlagsSmallText") == 1;
@@ -246,7 +246,7 @@ public class DefineFont3Tag extends FontTag {
         }
         byte[] baGlyphShapes = baosGlyphShapes.toByteArray();
 
-        sos.writeUI16(fontId);
+        sos.writeUI16(fontID);
         sos.writeUB(1, fontFlagsHasLayout ? 1 : 0);
         sos.writeUB(1, fontFlagsShiftJIS ? 1 : 0);
         sos.writeUB(1, fontFlagsSmallText ? 1 : 0);
@@ -341,12 +341,12 @@ public class DefineFont3Tag extends FontTag {
 
     @Override
     public int getCharacterId() {
-        return fontId;
+        return fontID;
     }
 
     @Override
     public void setCharacterId(int characterId) {
-        this.fontId = characterId;
+        this.fontID = characterId;
     }
 
     @Override
@@ -435,7 +435,7 @@ public class DefineFont3Tag extends FontTag {
             Tag t = swf.getTags().get(i);
             if (t instanceof DefineFontAlignZonesTag) {
                 DefineFontAlignZonesTag fa = (DefineFontAlignZonesTag) t;
-                if (fa.fontID == fontId) {
+                if (fa.fontID == fontID) {
                     swf.removeTag(t);
                     i--;
                 }
@@ -460,7 +460,7 @@ public class DefineFont3Tag extends FontTag {
         }
 
         if (!exists) {
-            shiftGlyphIndices(fontId, pos);
+            shiftGlyphIndices(fontID, pos);
             glyphShapeTable.add(pos, shp);
             codeTable.add(pos, (int) character);
         } else {
