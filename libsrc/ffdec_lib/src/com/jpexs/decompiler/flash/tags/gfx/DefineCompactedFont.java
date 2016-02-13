@@ -371,7 +371,7 @@ public final class DefineCompactedFont extends FontTag {
     @Override
     public FontTag toClassicFont() {
         DefineFont2Tag ret = new DefineFont2Tag(swf);
-        ret.fontId = getFontId();
+        ret.fontID = getFontId();
         ret.fontFlagsBold = isBold();
         ret.fontFlagsItalic = isItalic();
         ret.fontFlagsWideOffsets = true;

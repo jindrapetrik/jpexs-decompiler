@@ -19,6 +19,8 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
+import com.jpexs.decompiler.flash.tags.base.FontInfoTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.SHAPE;
@@ -50,10 +52,7 @@ public class DefineFontTag extends FontTag {
     public List<SHAPE> glyphShapeTable;
 
     @Internal
-    private DefineFontInfoTag fontInfoTag = null;
-
-    @Internal
-    private DefineFontInfo2Tag fontInfo2Tag = null;
+    private FontInfoTag fontInfoTag = null;
 
     /**
      * Constructor
@@ -139,17 +138,14 @@ public class DefineFontTag extends FontTag {
 
     private void ensureFontInfo() {
         if (fontInfoTag == null) {
-            for (Tag t : swf.getTags()) {
-                if (t instanceof DefineFontInfoTag) {
-                    if (((DefineFontInfoTag) t).fontId == fontId) {
-                        fontInfoTag = (DefineFontInfoTag) t;
-                        break;
-                    }
-                }
-                if (t instanceof DefineFontInfo2Tag) {
-                    if (((DefineFontInfo2Tag) t).fontID == fontId) {
-                        fontInfo2Tag = (DefineFontInfo2Tag) t;
-                        break;
+            List<CharacterIdTag> characterIdTags = swf.getCharacterIdTags(fontId);
+            if (characterIdTags != null) {
+                for (CharacterIdTag t : characterIdTags) {
+                    if (t instanceof FontInfoTag) {
+                        if (((FontInfoTag) t).fontID == fontId) {
+                            fontInfoTag = (FontInfoTag) t;
+                            break;
+                        }
                     }
                 }
             }
@@ -159,10 +155,8 @@ public class DefineFontTag extends FontTag {
     @Override
     public char glyphToChar(int glyphIndex) {
         ensureFontInfo();
-        if (fontInfo2Tag != null) {
-            return (char) (int) fontInfo2Tag.codeTable.get(glyphIndex);
-        } else if (fontInfoTag != null) {
-            return (char) (int) fontInfoTag.codeTable.get(glyphIndex);
+        if (fontInfoTag != null) {
+            return (char) (int) fontInfoTag.getCodeTable().get(glyphIndex);
         } else {
             return '?';
         }
@@ -171,10 +165,8 @@ public class DefineFontTag extends FontTag {
     @Override
     public int charToGlyph(char c) {
         ensureFontInfo();
-        if (fontInfo2Tag != null) {
-            return fontInfo2Tag.codeTable.indexOf((int) c);
-        } else if (fontInfoTag != null) {
-            return fontInfoTag.codeTable.indexOf((int) c);
+        if (fontInfoTag != null) {
+            return fontInfoTag.getCodeTable().indexOf((int) c);
         }
         return -1;
 
@@ -198,33 +190,24 @@ public class DefineFontTag extends FontTag {
     @Override
     public String getFontNameIntag() {
         ensureFontInfo();
-        if (fontInfo2Tag != null) {
-            return fontInfo2Tag.fontName;
-        }
         if (fontInfoTag != null) {
-            return fontInfoTag.fontName;
+            return fontInfoTag.getFontName();
         }
         return null;
     }
 
     @Override
     public boolean isBold() {
-        if (fontInfo2Tag != null) {
-            return fontInfo2Tag.fontFlagsBold;
-        }
         if (fontInfoTag != null) {
-            return fontInfoTag.fontFlagsBold;
+            return fontInfoTag.getFontFlagsBold();
         }
         return false;
     }
 
     @Override
     public boolean isItalic() {
-        if (fontInfo2Tag != null) {
-            return fontInfo2Tag.fontFlagsItalic;
-        }
         if (fontInfoTag != null) {
-            return fontInfoTag.fontFlagsItalic;
+            return fontInfoTag.getFontFlagsItalic();
         }
         return false;
     }
@@ -236,12 +219,12 @@ public class DefineFontTag extends FontTag {
 
     @Override
     public boolean isBoldEditable() {
-        return fontInfo2Tag != null || fontInfoTag != null;
+        return fontInfoTag != null;
     }
 
     @Override
     public boolean isItalicEditable() {
-        return fontInfo2Tag != null || fontInfoTag != null;
+        return fontInfoTag != null;
     }
 
     @Override
@@ -250,21 +233,15 @@ public class DefineFontTag extends FontTag {
 
     @Override
     public void setBold(boolean value) {
-        if (fontInfo2Tag != null) {
-            fontInfo2Tag.fontFlagsBold = value;
-        }
         if (fontInfoTag != null) {
-            fontInfoTag.fontFlagsBold = value;
+            fontInfoTag.setFontFlagsBold(value);
         }
     }
 
     @Override
     public void setItalic(boolean value) {
-        if (fontInfo2Tag != null) {
-            fontInfo2Tag.fontFlagsItalic = value;
-        }
         if (fontInfoTag != null) {
-            fontInfoTag.fontFlagsItalic = value;
+            fontInfoTag.setFontFlagsItalic(value);
         }
     }
 
@@ -291,33 +268,36 @@ public class DefineFontTag extends FontTag {
     @Override
     public void addCharacter(char character, Font font) {
         SHAPE shp = SHAPERECORD.fontCharacterToSHAPE(font, (int) Math.round(getDivider() * 1024), character);
-        List<Integer> codeTable = new ArrayList<>();
         ensureFontInfo();
-        if (fontInfoTag != null) {
-            codeTable = fontInfoTag.codeTable;
-        }
-        if (fontInfo2Tag != null) {
-            codeTable = fontInfo2Tag.codeTable;
-        }
         int code = (int) character;
         int pos = -1;
         boolean exists = false;
-        for (int i = 0; i < codeTable.size(); i++) {
-            if (codeTable.get(i) >= code) {
-                if (codeTable.get(i) == code) {
-                    exists = true;
+        if (fontInfoTag != null) {
+            List<Integer> codeTable = fontInfoTag.getCodeTable();
+            for (int i = 0; i < codeTable.size(); i++) {
+                if (codeTable.get(i) >= code) {
+                    if (codeTable.get(i) == code) {
+                        exists = true;
+                    }
+
+                    pos = i;
+                    break;
                 }
-                pos = i;
-                break;
             }
+
+            if (pos == -1) {
+                pos = codeTable.size();
+            }
+        } else {
+            pos = 0;
         }
-        if (pos == -1) {
-            pos = codeTable.size();
-        }
+
         if (!exists) {
             shiftGlyphIndices(fontId, pos);
             glyphShapeTable.add(pos, shp);
-            codeTable.add(pos, (int) character);
+            if (fontInfoTag != null) {
+                fontInfoTag.addCharacter(pos, (int) character);
+            }
         } else {
             glyphShapeTable.set(pos, shp);
         }
@@ -335,12 +315,7 @@ public class DefineFontTag extends FontTag {
         StringBuilder ret = new StringBuilder();
         ensureFontInfo();
         if (fontInfoTag != null) {
-            for (int i : fontInfoTag.codeTable) {
-                ret.append((char) i);
-            }
-        }
-        if (fontInfo2Tag != null) {
-            for (int i : fontInfo2Tag.codeTable) {
+            for (int i : fontInfoTag.getCodeTable()) {
                 ret.append((char) i);
             }
         }

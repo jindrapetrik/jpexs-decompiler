@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
+import com.jpexs.decompiler.flash.tags.base.FontInfoTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
@@ -35,14 +35,11 @@ import java.util.List;
  * @author JPEXS
  */
 @SWFVersion(from = 1)
-public class DefineFontInfoTag extends Tag implements CharacterIdTag {
+public class DefineFontInfoTag extends FontInfoTag {
 
     public static final int ID = 13;
 
     public static final String NAME = "DefineFontInfo";
-
-    @SWFType(BasicType.UI16)
-    public int fontId;
 
     public String fontName;
 
@@ -90,7 +87,7 @@ public class DefineFontInfoTag extends Tag implements CharacterIdTag {
 
     @Override
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
-        fontId = sis.readUI16("fontId");
+        fontID = sis.readUI16("fontId");
         if (swf.version >= 6) {
             fontName = sis.readNetString("fontName", Utf8Helper.charset);
         } else {
@@ -121,7 +118,7 @@ public class DefineFontInfoTag extends Tag implements CharacterIdTag {
      */
     @Override
     public void getData(SWFOutputStream sos) throws IOException {
-        sos.writeUI16(fontId);
+        sos.writeUI16(fontID);
         if (swf.version >= 6) {
             sos.writeNetString(fontName, Utf8Helper.charset);
         } else {
@@ -144,12 +141,38 @@ public class DefineFontInfoTag extends Tag implements CharacterIdTag {
     }
 
     @Override
-    public int getCharacterId() {
-        return fontId;
+    public List<Integer> getCodeTable() {
+        return codeTable;
     }
 
     @Override
-    public void setCharacterId(int characterId) {
-        this.fontId = characterId;
+    public void addCharacter(int index, int character) {
+        codeTable.add(index, character);
+        setModified(true);
+    }
+
+    @Override
+    public String getFontName() {
+        return fontName;
+    }
+
+    @Override
+    public boolean getFontFlagsBold() {
+        return fontFlagsBold;
+    }
+
+    @Override
+    public void setFontFlagsBold(boolean value) {
+        fontFlagsBold = value;
+    }
+
+    @Override
+    public boolean getFontFlagsItalic() {
+        return fontFlagsItalic;
+    }
+
+    @Override
+    public void setFontFlagsItalic(boolean value) {
+        fontFlagsItalic = value;
     }
 }

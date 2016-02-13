@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
+import com.jpexs.decompiler.flash.tags.base.FontInfoTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.LANGCODE;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
@@ -36,14 +36,11 @@ import java.util.List;
  * @author JPEXS
  */
 @SWFVersion(from = 6)
-public class DefineFontInfo2Tag extends Tag implements CharacterIdTag {
+public class DefineFontInfo2Tag extends FontInfoTag {
 
     public static final int ID = 62;
 
     public static final String NAME = "DefineFontInfo2";
-
-    @SWFType(BasicType.UI16)
-    public int fontID;
 
     public String fontName;
 
@@ -143,12 +140,38 @@ public class DefineFontInfo2Tag extends Tag implements CharacterIdTag {
     }
 
     @Override
-    public int getCharacterId() {
-        return fontID;
+    public List<Integer> getCodeTable() {
+        return codeTable;
     }
 
     @Override
-    public void setCharacterId(int characterId) {
-        this.fontID = characterId;
+    public void addCharacter(int index, int character) {
+        codeTable.add(index, character);
+        setModified(true);
+    }
+
+    @Override
+    public String getFontName() {
+        return fontName;
+    }
+
+    @Override
+    public boolean getFontFlagsBold() {
+        return fontFlagsBold;
+    }
+
+    @Override
+    public void setFontFlagsBold(boolean value) {
+        fontFlagsBold = value;
+    }
+
+    @Override
+    public boolean getFontFlagsItalic() {
+        return fontFlagsItalic;
+    }
+
+    @Override
+    public void setFontFlagsItalic(boolean value) {
+        fontFlagsItalic = value;
     }
 }
