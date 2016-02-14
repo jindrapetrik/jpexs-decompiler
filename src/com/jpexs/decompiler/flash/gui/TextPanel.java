@@ -173,7 +173,14 @@ public class TextPanel extends JPanel implements TagEditorPanel {
 
     public void setText(TextTag textTag) {
         this.textTag = textTag;
-        textValue.setText(textTag.getFormattedText(false).text);
+        String formattedText;
+        try {
+            formattedText = textTag.getFormattedText(false).text;
+        } catch (IndexOutOfBoundsException ex) {
+            formattedText = "Invalid text tag";
+        }
+
+        textValue.setText(formattedText);
         textValue.setCaretPosition(0);
         setModified(false);
         setEditText(false);
