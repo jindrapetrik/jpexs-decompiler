@@ -1798,11 +1798,14 @@ public class Main {
                 return name.matches("ffdec_cache.*\\.tmp") || name.matches("javactivex_.*\\.exe") || name.matches("temp[0-9]+\\.swf") || name.matches("ffdec_view_.*\\.swf");
             }
         });
-        for (File f : delFiles) {
-            try {
-                f.delete();
-            } catch (Exception ex) {
-                //ignore
+
+        if (delFiles != null) {
+            for (File f : delFiles) {
+                try {
+                    f.delete();
+                } catch (Exception ex) {
+                    //ignore
+                }
             }
         }
     }
