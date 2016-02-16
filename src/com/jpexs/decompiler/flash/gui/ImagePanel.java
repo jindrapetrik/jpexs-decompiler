@@ -1010,29 +1010,29 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                 }
 
+                if (lastMouseOverButton != renderContext.mouseOverButton) {
+                    ButtonTag b = renderContext.mouseOverButton;
+                    if (b != null) {
+                        // New mouse entered
+                        DefineButtonSoundTag sounds = b.getSounds();
+                        if (sounds != null && sounds.buttonSoundChar1 != 0) { // IdleToOverUp
+                            playSound((SoundTag) swf.getCharacter(sounds.buttonSoundChar1), sounds.buttonSoundInfo1, timer);
+                        }
+                    }
+
+                    b = lastMouseOverButton;
+                    if (b != null) {
+                        // Old mouse leave
+                        DefineButtonSoundTag sounds = b.getSounds();
+                        if (sounds != null && sounds.buttonSoundChar0 != 0) { // OverUpToIdle
+                            playSound((SoundTag) swf.getCharacter(sounds.buttonSoundChar0), sounds.buttonSoundInfo0, timer);
+                        }
+                    }
+                }
+
                 drawReady = true;
                 synchronized (delayObject) {
                     delayObject.notify();
-                }
-            }
-        }
-
-        if (lastMouseOverButton != renderContext.mouseOverButton) {
-            ButtonTag b = renderContext.mouseOverButton;
-            if (b != null) {
-                // New mouse entered
-                DefineButtonSoundTag sounds = b.getSounds();
-                if (sounds != null && sounds.buttonSoundChar1 != 0) { // IdleToOverUp
-                    playSound((SoundTag) swf.getCharacter(sounds.buttonSoundChar1), sounds.buttonSoundInfo1, timer);
-                }
-            }
-
-            b = lastMouseOverButton;
-            if (b != null) {
-                // Old mouse leave
-                DefineButtonSoundTag sounds = b.getSounds();
-                if (sounds != null && sounds.buttonSoundChar0 != 0) { // OverUpToIdle
-                    playSound((SoundTag) swf.getCharacter(sounds.buttonSoundChar0), sounds.buttonSoundInfo0, timer);
                 }
             }
         }
