@@ -42,6 +42,7 @@ import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.ConstantColorColorTransform;
 import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.SOUNDINFO;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.AlphaComposite;
@@ -406,7 +407,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     if (button != null) {
                         DefineButtonSoundTag sounds = button.getSounds();
                         if (sounds != null && sounds.buttonSoundChar2 != 0) { //OverUpToOverDown
-                            playSound((SoundTag) swf.getCharacter(sounds.buttonSoundChar2), timer);
+                            playSound((SoundTag) swf.getCharacter(sounds.buttonSoundChar2), sounds.buttonSoundInfo2, timer);
                         }
                     }
                 }
@@ -422,7 +423,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     if (button != null) {
                         DefineButtonSoundTag sounds = button.getSounds();
                         if (sounds != null && sounds.buttonSoundChar3 != 0) { //OverDownToOverUp
-                            playSound((SoundTag) swf.getCharacter(sounds.buttonSoundChar3), timer);
+                            playSound((SoundTag) swf.getCharacter(sounds.buttonSoundChar3), sounds.buttonSoundInfo3, timer);
                         }
                     }
                 }
@@ -962,7 +963,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 CharacterTag c = swf.getCharacter(sndId);
                 if (c instanceof SoundTag) {
                     SoundTag st = (SoundTag) c;
-                    playSound(st, thisTimer);
+                    playSound(st, null, thisTimer);
                 }
             }
             executeFrame(frame);
@@ -1022,7 +1023,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 // New mouse entered
                 DefineButtonSoundTag sounds = b.getSounds();
                 if (sounds != null && sounds.buttonSoundChar1 != 0) { // IdleToOverUp
-                    playSound((SoundTag) swf.getCharacter(sounds.buttonSoundChar1), timer);
+                    playSound((SoundTag) swf.getCharacter(sounds.buttonSoundChar1), sounds.buttonSoundInfo1, timer);
                 }
             }
 
@@ -1031,16 +1032,21 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 // Old mouse leave
                 DefineButtonSoundTag sounds = b.getSounds();
                 if (sounds != null && sounds.buttonSoundChar0 != 0) { // OverUpToIdle
-                    playSound((SoundTag) swf.getCharacter(sounds.buttonSoundChar0), timer);
+                    playSound((SoundTag) swf.getCharacter(sounds.buttonSoundChar0), sounds.buttonSoundInfo0, timer);
                 }
             }
         }
     }
 
-    private void playSound(SoundTag st, Timer thisTimer) {
+    private void playSound(SoundTag st, SOUNDINFO soundInfo, Timer thisTimer) {
         final SoundTagPlayer sp;
         try {
-            sp = new SoundTagPlayer(st, 1, false);
+            int loopCount = 1;
+            if (soundInfo != null && soundInfo.hasLoops) {
+                loopCount = Math.max(1, soundInfo.loopCount);
+            }
+
+            sp = new SoundTagPlayer(st, loopCount, false);
             sp.addEventListener(new MediaDisplayListener() {
 
                 @Override
