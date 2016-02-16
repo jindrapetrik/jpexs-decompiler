@@ -973,5 +973,10 @@ import classes.TestNs;
 			}
 			trace("after switch");
 		}
+		
+		public function testManualConvert(){
+			trace("String(this).length");
+			trace(String(this).length);
+		}
 	}
 }
