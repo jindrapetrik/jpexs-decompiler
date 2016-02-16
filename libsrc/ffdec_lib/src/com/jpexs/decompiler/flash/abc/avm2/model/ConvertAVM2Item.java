@@ -38,7 +38,10 @@ public class ConvertAVM2Item extends AVM2Item {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        return value.toString(writer, localData);
+        type.toString(writer, localData).append("(");
+        value.toString(writer, localData);
+        writer.append(")");
+        return writer;
     }
 
     @Override

@@ -45,6 +45,9 @@ public class WhileItem extends LoopItem implements Block {
     @Override
     public List<List<GraphTargetItem>> getSubs() {
         List<List<GraphTargetItem>> ret = new ArrayList<>();
+        if (expression != null) {
+            ret.add(expression);
+        }
         if (commands != null) {
             ret.add(commands);
         }

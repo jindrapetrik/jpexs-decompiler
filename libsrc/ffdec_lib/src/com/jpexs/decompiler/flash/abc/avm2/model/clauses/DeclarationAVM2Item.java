@@ -85,6 +85,7 @@ public class DeclarationAVM2Item extends AVM2Item {
             srcData.declaration = true;
             srcData.regIndex = lti.regIndex;
 
+            GraphTargetItem val = lti.value;
             GraphTargetItem coerType = TypeItem.UNBOUNDED;
             if (lti.value instanceof CoerceAVM2Item) {
                 coerType = ((CoerceAVM2Item) lti.value).typeObj;
@@ -92,13 +93,17 @@ public class DeclarationAVM2Item extends AVM2Item {
             if (lti.value instanceof ConvertAVM2Item) {
                 coerType = ((ConvertAVM2Item) lti.value).type;
             }
+            //strip coerce if its declared as this type
+            if (coerType.equals(type) && !coerType.equals(TypeItem.UNBOUNDED)) {
+                val = val.value;
+            }
             srcData.declaredType = (coerType instanceof TypeItem) ? ((TypeItem) coerType).fullTypeName : DottedChain.ALL;
             writer.append("var ");
             writer.append(localName);
             writer.append(":");
-            coerType.appendTry(writer, localData);
+            type.appendTry(writer, localData);
             writer.append(" = ");
-            return lti.value.toString(writer, localData);
+            return val.toString(writer, localData);
         }
         if (assignment instanceof SetSlotAVM2Item) {
             SetSlotAVM2Item ssti = (SetSlotAVM2Item) assignment;

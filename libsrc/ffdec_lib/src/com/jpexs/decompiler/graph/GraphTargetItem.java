@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FloatValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NameValuePair;
@@ -331,7 +332,14 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     public GraphTextWriter appendTry(GraphTextWriter writer, LocalData localData, String implicitCoerce) throws InterruptedException {
         GraphTargetItem t = this;
-        if (!implicitCoerce.isEmpty() && Configuration.autoDeobfuscate.get()) {
+        if (!implicitCoerce.isEmpty()) {    //if implicit coerce equals explicit
+            if (t instanceof ConvertAVM2Item) {
+                if (implicitCoerce.equals((((ConvertAVM2Item) t).type.toString()))) {
+                    t = t.value;
+                }
+            }
+        }
+        if (!implicitCoerce.isEmpty() && Configuration._simplifyExpressions.get()) {
             t = t.simplify(implicitCoerce);
         }
         return t.appendTo(writer, localData);

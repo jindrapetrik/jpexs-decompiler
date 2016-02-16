@@ -303,6 +303,10 @@ public class MethodInfo {
         return constants.getString(name_index);
     }
 
+    public int getMaxReservedReg() {
+        return param_types.length + (flagNeed_rest() ? 1 : 0) + (flagNeed_arguments() ? 1 : 0);
+    }
+
     public GraphTextWriter getParamStr(GraphTextWriter writer, AVM2ConstantPool constants, MethodBody body, ABC abc, List<DottedChain> fullyQualifiedNames) {
         Map<Integer, String> localRegNames = new HashMap<>();
         if (body != null && Configuration.getLocalNamesFromDebugInfo.get()) {

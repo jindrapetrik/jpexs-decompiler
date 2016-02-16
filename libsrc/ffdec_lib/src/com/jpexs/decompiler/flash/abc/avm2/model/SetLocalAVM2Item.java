@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.AssignmentAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.clauses.DeclarationAVM2Item;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -37,6 +38,17 @@ public class SetLocalAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assig
 
     public int regIndex;
 
+    public DeclarationAVM2Item declaration;
+
+    @Override
+    public DeclarationAVM2Item getDeclaration() {
+        return declaration;
+    }
+
+    public void setDeclaration(DeclarationAVM2Item declaration) {
+        this.declaration = declaration;
+    }
+
     public SetLocalAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, int regIndex, GraphTargetItem value) {
         super(instruction, lineStartIns, PRECEDENCE_ASSIGMENT, value);
         this.regIndex = regIndex;
@@ -47,6 +59,9 @@ public class SetLocalAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assig
         String localName = localRegName(localData.localRegNames, regIndex);
         getSrcData().localName = localName;
         writer.append(localName).append(" = ");
+        if (declaration != null && !declaration.type.equals(TypeItem.UNBOUNDED) && (value instanceof ConvertAVM2Item)) {
+            return value.value.toString(writer, localData);
+        }
         return value.toString(writer, localData);
     }
 

@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.AssignmentAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.clauses.DeclarationAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -41,6 +42,17 @@ public class SetPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, As
 
     public GraphTargetItem propertyName;
 
+    public DeclarationAVM2Item declaration;
+
+    @Override
+    public DeclarationAVM2Item getDeclaration() {
+        return declaration;
+    }
+
+    public void setDeclaration(DeclarationAVM2Item declaration) {
+        this.declaration = declaration;
+    }
+
     @Override
     public GraphPart getFirstPart() {
         return value.getFirstPart();
@@ -57,6 +69,9 @@ public class SetPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, As
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         formatProperty(writer, object, propertyName, localData);
         writer.append(" = ");
+        if (declaration != null && !declaration.type.equals(TypeItem.UNBOUNDED) && (value instanceof ConvertAVM2Item)) {
+            return value.value.toString(writer, localData);
+        }
         return value.toString(writer, localData);
     }
 

@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
+import com.jpexs.decompiler.flash.abc.avm2.model.clauses.DeclarationAVM2Item;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 
 /**
@@ -27,4 +28,8 @@ public interface SetTypeAVM2Item {
     public GraphTargetItem getObject();
 
     public GraphTargetItem getValue();
+
+    public DeclarationAVM2Item getDeclaration();
+
+    public void setDeclaration(DeclarationAVM2Item dec);
 }

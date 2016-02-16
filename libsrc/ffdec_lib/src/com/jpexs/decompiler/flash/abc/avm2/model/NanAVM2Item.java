@@ -24,6 +24,7 @@ import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.SimpleValue;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -33,7 +34,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class NanAVM2Item extends AVM2Item {
+public class NanAVM2Item extends AVM2Item implements SimpleValue {
 
     public NanAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns) {
         super(instruction, lineStartIns, NOPRECEDENCE);
@@ -58,6 +59,11 @@ public class NanAVM2Item extends AVM2Item {
 
     @Override
     public boolean hasReturnValue() {
+        return true;
+    }
+
+    @Override
+    public boolean isSimpleValue() {
         return true;
     }
 }

@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.AssignmentAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.clauses.DeclarationAVM2Item;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -32,6 +33,17 @@ public class InitPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, A
     public GraphTargetItem object;
 
     public FullMultinameAVM2Item propertyName;
+
+    public DeclarationAVM2Item declaration;
+
+    @Override
+    public DeclarationAVM2Item getDeclaration() {
+        return declaration;
+    }
+
+    public void setDeclaration(DeclarationAVM2Item declaration) {
+        this.declaration = declaration;
+    }
 
     public InitPropertyAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, FullMultinameAVM2Item propertyName, GraphTargetItem value) {
         super(instruction, lineStartIns, PRECEDENCE_ASSIGMENT, value);

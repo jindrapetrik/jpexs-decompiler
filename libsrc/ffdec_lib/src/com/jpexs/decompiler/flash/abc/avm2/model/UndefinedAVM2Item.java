@@ -25,6 +25,7 @@ import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.SimpleValue;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -35,7 +36,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
-public class UndefinedAVM2Item extends AVM2Item {
+public class UndefinedAVM2Item extends AVM2Item implements SimpleValue {
 
     public UndefinedAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
@@ -58,7 +59,7 @@ public class UndefinedAVM2Item extends AVM2Item {
 
     @Override
     public GraphTargetItem returnType() {
-        return new TypeItem(DottedChain.UNDEFINED);
+        return TypeItem.UNBOUNDED;
     }
 
     @Override
@@ -71,5 +72,10 @@ public class UndefinedAVM2Item extends AVM2Item {
         return toSourceMerge(localData, generator,
                 new AVM2Instruction(0, AVM2Instructions.PushUndefined, null)
         );
+    }
+
+    @Override
+    public boolean isSimpleValue() {
+        return true;
     }
 }
