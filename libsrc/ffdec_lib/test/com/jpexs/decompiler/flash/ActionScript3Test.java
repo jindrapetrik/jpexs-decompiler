@@ -1186,4 +1186,13 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "trace(String(this).length);\r\n", false);
     }
 
+    @Test
+    public void testPrecedenceX() {
+        decompileMethod("testPrecedenceX", "var a:* = 5;\r\n"
+                + "var b:* = 2;\r\n"
+                + "var c:* = 3;\r\n"
+                + "var d:* = a << (b >>> c);\r\n"
+                + "var e:* = a << b >>> c;\r\n", false);
+    }
+
 }

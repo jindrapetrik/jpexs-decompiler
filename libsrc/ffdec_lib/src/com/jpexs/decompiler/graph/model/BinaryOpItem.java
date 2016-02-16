@@ -83,7 +83,7 @@ public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
         writer.append(" ");
 
         int rightPrecedence = rightSide.getPrecedence();
-        if (rightPrecedence > precedence && rightPrecedence != GraphTargetItem.NOPRECEDENCE) {
+        if (rightPrecedence >= precedence && rightPrecedence != GraphTargetItem.NOPRECEDENCE) {
             writer.append("(");
             rightSide.toString(writer, localData);
             writer.append(")");
