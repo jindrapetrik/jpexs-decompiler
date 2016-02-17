@@ -339,7 +339,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
                 }
             }
         }
-        if (!implicitCoerce.isEmpty() && Configuration._simplifyExpressions.get()) {
+        if (!implicitCoerce.isEmpty() && Configuration.simplifyExpressions.get()) {
             t = t.simplify(implicitCoerce);
         }
         return t.appendTo(writer, localData);

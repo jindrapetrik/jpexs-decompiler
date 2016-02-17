@@ -70,7 +70,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
         assertTrue(clsIndex > -1);
         this.abc = tag.getABC();
         Configuration.autoDeobfuscate.set(false);
-        Configuration._simplifyExpressions.set(false);
+        Configuration.simplifyExpressions.set(false);
 
         Configuration.decompile.set(true);
         Configuration.registerNameFormat.set("_loc%d_");
@@ -80,7 +80,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
     private void decompileMethod(String methodName, String expectedResult, boolean isStatic) {
         int bodyIndex = abc.findMethodBodyByName(clsIndex, methodName);
         assertTrue(bodyIndex > -1);
-        HighlightedTextWriter writer = null;
+        HighlightedTextWriter writer;
         try {
             List<Traits> ts = new ArrayList<>();
             ts.add(abc.instance_info.get(clsIndex).instance_traits);
@@ -89,6 +89,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
             abc.bodies.get(bodyIndex).toString(methodName, ScriptExportMode.AS, abc, null, writer, new ArrayList<>());
         } catch (InterruptedException ex) {
             fail();
+            return;
         }
         String actualResult = cleanPCode(writer.toString());
         expectedResult = cleanPCode(expectedResult);

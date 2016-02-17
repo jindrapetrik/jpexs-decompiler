@@ -42,6 +42,7 @@ public class ActionScript2Test extends ActionScript2TestBase {
     public void init() throws IOException, InterruptedException {
         //Main.initLogging(false);
         Configuration.autoDeobfuscate.set(false);
+        Configuration.simplifyExpressions.set(false);
         Configuration.decompile.set(true);
         Configuration.registerNameFormat.set("_loc%d_");
         swf = new SWF(new BufferedInputStream(new FileInputStream("testdata/as2/as2.swf")), false);

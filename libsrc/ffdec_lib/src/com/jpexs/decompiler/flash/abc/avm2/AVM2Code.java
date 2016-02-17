@@ -1516,7 +1516,7 @@ public class AVM2Code implements Cloneable {
                 break;
             }
 
-            if (Configuration._simplifyExpressions.get()) {
+            if (Configuration.simplifyExpressions.get()) {
                 stack.simplify();
             }
             visited[ip] = true;
@@ -2086,8 +2086,7 @@ public class AVM2Code implements Cloneable {
                  ins.operands[j] = updater.updateOperandOffset(target, ins.operands[j]);
                  }
                  }*/ //Faster, but not so universal
-            {
-                if (ins.definition instanceof IfTypeIns) {
+             if (ins.definition instanceof IfTypeIns) {
                     long target = ins.getTargetAddress();
                     try {
                         ins.operands[0] = updater.updateOperandOffset(ins.getAddress(), target, ins.operands[0]);
@@ -2095,7 +2094,6 @@ public class AVM2Code implements Cloneable {
                         throw new ConvertException("Invalid offset (" + ins + ")", i);
                     }
                 }
-            }
             ins.setAddress(updater.updateInstructionOffset(ins.getAddress()));
         }
 

@@ -589,9 +589,8 @@ public class Configuration {
     public static final ConfigurationItem<Boolean> _enableFlexExport = null;
 
     @ConfigurationDefaultBoolean(false)
-    //@ConfigurationCategory("script")
-    @ConfigurationInternal
-    public static final ConfigurationItem<Boolean> _simplifyExpressions = null;
+    @ConfigurationCategory("script")
+    public static final ConfigurationItem<Boolean> simplifyExpressions = null;
 
     private enum OSId {
 

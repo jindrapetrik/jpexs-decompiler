@@ -971,6 +971,9 @@ public abstract class Action implements GraphSourceItem {
                 output.add(new ScriptEndItem());
                 break;
             }
+            if (Configuration.simplifyExpressions.get()) {
+                stack.simplify();
+            }
             Action action = actions.get(ip);
             if (action.isIgnored()) {
                 ip++;
@@ -1062,7 +1065,7 @@ public abstract class Action implements GraphSourceItem {
             }
 
             /*ActionJump && ActionIf removed*/
-            /*if ((action instanceof ActionEnumerate2) || (action instanceof ActionEnumerate)) {
+ /*if ((action instanceof ActionEnumerate2) || (action instanceof ActionEnumerate)) {
              loopStart = ip + 1;
              isForIn = true;
              ip += 4;
