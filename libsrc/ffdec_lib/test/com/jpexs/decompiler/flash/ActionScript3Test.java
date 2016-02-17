@@ -70,6 +70,8 @@ public class ActionScript3Test extends ActionScriptTestBase {
         assertTrue(clsIndex > -1);
         this.abc = tag.getABC();
         Configuration.autoDeobfuscate.set(false);
+        Configuration._simplifyExpressions.set(false);
+
         Configuration.decompile.set(true);
         Configuration.registerNameFormat.set("_loc%d_");
         Configuration.showMethodBodyId.set(false);
@@ -1188,9 +1190,9 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testPrecedenceX() {
-        decompileMethod("testPrecedenceX", "var a:* = 5;\r\n"
-                + "var b:* = 2;\r\n"
-                + "var c:* = 3;\r\n"
+        decompileMethod("testPrecedenceX", "var a:int = 5;\r\n"
+                + "var b:int = 2;\r\n"
+                + "var c:int = 3;\r\n"
                 + "var d:* = a << (b >>> c);\r\n"
                 + "var e:* = a << b >>> c;\r\n", false);
     }
