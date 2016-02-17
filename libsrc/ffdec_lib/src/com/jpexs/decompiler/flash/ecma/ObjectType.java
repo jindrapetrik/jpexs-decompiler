@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.ecma;
 
-import com.jpexs.decompiler.flash.abc.avm2.model.Callable;
+import com.jpexs.decompiler.graph.model.Callable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,7 +57,15 @@ public class ObjectType implements Callable {
 
     @Override
     public String toString() {
-        return "[object Object]";
+        return "[object " + getTypeName() + "]";
+    }
+
+    public String getTypeName() {
+        return "Object";
+    }
+
+    public Object toPrimitive() {
+        return toString();
     }
 
     @Override

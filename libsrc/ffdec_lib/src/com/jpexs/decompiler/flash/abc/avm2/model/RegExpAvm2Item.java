@@ -1,5 +1,6 @@
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
+import com.jpexs.decompiler.graph.model.Callable;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;

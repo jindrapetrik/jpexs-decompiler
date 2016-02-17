@@ -72,6 +72,8 @@ public class AVM2LocalData extends BaseLocalData {
 
     public AVM2Code code;
 
+    public boolean thisHasDefaultToPrimitive;
+
     public AVM2LocalData() {
 
     }
@@ -94,6 +96,7 @@ public class AVM2LocalData extends BaseLocalData {
         ip = localData.ip;
         refs = localData.refs;
         code = localData.code;
+        thisHasDefaultToPrimitive = localData.thisHasDefaultToPrimitive;
     }
 
     public AVM2ConstantPool getConstants() {

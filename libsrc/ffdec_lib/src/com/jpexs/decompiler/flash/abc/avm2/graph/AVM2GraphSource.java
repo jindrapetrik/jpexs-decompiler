@@ -105,7 +105,7 @@ public class AVM2GraphSource extends GraphSource {
         List<GraphTargetItem> ret = new ArrayList<>();
         ScopeStack newstack = ((AVM2LocalData) localData).scopeStack;
         Reference<GraphSourceItem> lineStartItem = new Reference<>(localData.lineStartInstruction);
-        ConvertOutput co = code.toSourceOutput(lineStartItem, path, part, false, isStatic, scriptIndex, classIndex, localRegs, stack, newstack, abc, body, start, end, localRegNames, fullyQualifiedNames, new boolean[size()], localRegAssigmentIps, refs);
+        ConvertOutput co = code.toSourceOutput(((AVM2LocalData) localData).thisHasDefaultToPrimitive, lineStartItem, path, part, false, isStatic, scriptIndex, classIndex, localRegs, stack, newstack, abc, body, start, end, localRegNames, fullyQualifiedNames, new boolean[size()], localRegAssigmentIps, refs);
         localData.lineStartInstruction = lineStartItem.getVal();
         ret.addAll(co.output);
         return ret;

@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.ecma.ArrayType;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.flash.ecma.EcmaType;
 import com.jpexs.decompiler.flash.ecma.ObjectType;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -50,6 +51,7 @@ public class GetPropertyIns extends InstructionDefinition {
         if (constants.getMultiname(ins.operands[0]).kind == Multiname.MULTINAMEL) {
             String name = EcmaScript.toString(lda.operandStack.pop());
             Object obj = lda.operandStack.pop();
+
             if (obj == ArrayType.EMPTY_ARRAY) {
                 if ("length".equals(name)) {
                     lda.operandStack.push(0L);

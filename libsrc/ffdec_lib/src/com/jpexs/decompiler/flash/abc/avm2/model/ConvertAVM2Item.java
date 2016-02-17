@@ -66,7 +66,7 @@ public class ConvertAVM2Item extends AVM2Item {
             case "uint":
                 return EcmaScript.toUint32(value.getResult());
             case "String":
-                return value.getResult().toString();
+                return value.getResultAsString();
             case "Object":
                 return value.getResult(); //if not object throw TypeError
             default:
@@ -80,7 +80,7 @@ public class ConvertAVM2Item extends AVM2Item {
             return false;
         }
         dependencies.add(value);
-        return value.isCompileTime(dependencies);
+        return value.isConvertedCompileTime(dependencies);
     }
 
     @Override

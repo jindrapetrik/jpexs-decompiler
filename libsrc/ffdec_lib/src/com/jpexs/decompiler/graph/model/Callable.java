@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.abc.avm2.model;
+package com.jpexs.decompiler.graph.model;
 
 import java.util.List;
 

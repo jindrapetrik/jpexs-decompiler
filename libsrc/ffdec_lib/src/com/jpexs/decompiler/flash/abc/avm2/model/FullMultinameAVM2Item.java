@@ -42,28 +42,33 @@ public class FullMultinameAVM2Item extends AVM2Item {
 
     public boolean property;
 
-    public FullMultinameAVM2Item(boolean property, GraphSourceItem instruction, GraphSourceItem lineStartIns, int multinameIndex, GraphTargetItem name) {
+    public String resolvedMultinameName;
+
+    public FullMultinameAVM2Item(boolean property, GraphSourceItem instruction, GraphSourceItem lineStartIns, int multinameIndex, String resolvedMultinameName, GraphTargetItem name) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.multinameIndex = multinameIndex;
         this.name = name;
         this.namespace = null;
         this.property = property;
+        this.resolvedMultinameName = resolvedMultinameName;
     }
 
-    public FullMultinameAVM2Item(boolean property, GraphSourceItem instruction, GraphSourceItem lineStartIns, int multinameIndex) {
+    public FullMultinameAVM2Item(boolean property, GraphSourceItem instruction, GraphSourceItem lineStartIns, int multinameIndex, String resolvedMultinameName) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.multinameIndex = multinameIndex;
+        this.resolvedMultinameName = resolvedMultinameName;
         this.name = null;
         this.namespace = null;
         this.property = property;
     }
 
-    public FullMultinameAVM2Item(boolean property, GraphSourceItem instruction, GraphSourceItem lineStartIns, int multinameIndex, GraphTargetItem name, GraphTargetItem namespace) {
+    public FullMultinameAVM2Item(boolean property, GraphSourceItem instruction, GraphSourceItem lineStartIns, int multinameIndex, String resolvedMultinameName, GraphTargetItem name, GraphTargetItem namespace) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.multinameIndex = multinameIndex;
         this.name = name;
         this.namespace = namespace;
         this.property = property;
+        this.resolvedMultinameName = resolvedMultinameName;
     }
 
     public boolean isRuntime() {

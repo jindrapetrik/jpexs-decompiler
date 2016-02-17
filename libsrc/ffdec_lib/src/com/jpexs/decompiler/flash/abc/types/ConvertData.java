@@ -31,6 +31,8 @@ public class ConvertData {
 
     public Map<TraitSlotConst, AssignedValue> assignedValues = new HashMap<>();
 
+    public boolean thisHasDefaultToPrimitive;
+
     public ConvertData() {
         deobfuscationMode = Configuration.autoDeobfuscate.get() ? 1 : 0;
     }

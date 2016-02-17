@@ -112,9 +112,10 @@ public class EcmaScript {
                 //TODO: logic similar to 8.12.8
                 return o.call("toString", new ArrayList<>());
             case "Number":
-            default:
                 //TODO: logic similar to 8.12.8                
                 return o.call("valueOf", new ArrayList<>());
+            default:
+                return o.toPrimitive();
         }
 
     }

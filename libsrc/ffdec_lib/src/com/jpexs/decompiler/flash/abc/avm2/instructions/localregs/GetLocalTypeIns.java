@@ -69,22 +69,7 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
             } else {
 
                 List<Trait> ts = localData.getInstanceInfo().get(localData.classIndex).instance_traits.traits;
-                boolean isBasicObject = true;
-                if (!"Object".equals(localData.getConstants().getMultiname(localData.getInstanceInfo().get(localData.classIndex).super_index).getNameWithNamespace(localData.getConstants()).toRawString())) {
-                    //TODO: check for toString and valueOf in parent object
-                    isBasicObject = false;
-                } else {
-                    for (Trait t : ts) {
-                        if (t instanceof TraitMethodGetterSetter) {
-                            if ("toString".equals(t.getName(localData.abc).getName(localData.getConstants(), new ArrayList<>(), true))) {
-                                isBasicObject = false;
-                            }
-                            if ("valueOf".equals(t.getName(localData.abc).getName(localData.getConstants(), new ArrayList<>(), true))) {
-                                isBasicObject = false;
-                            }
-                        }
-                    }
-                }
+                boolean isBasicObject = localData.thisHasDefaultToPrimitive;
                 Multiname m = localData.getInstanceInfo().get(localData.classIndex).getName(localData.getConstants());
                 stack.push(new ThisAVM2Item(ins, localData.lineStartInstruction, m, m.getNameWithNamespace(localData.getConstants()), isBasicObject));
             }

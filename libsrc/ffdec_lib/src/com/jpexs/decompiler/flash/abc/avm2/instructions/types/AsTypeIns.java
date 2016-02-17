@@ -26,8 +26,10 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.AsTypeAVM2Item;
 import com.jpexs.decompiler.flash.ecma.NotCompileTime;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -55,7 +57,7 @@ public class AsTypeIns extends InstructionDefinition {
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         GraphTargetItem val = stack.pop();
 
-        stack.push(new AsTypeAVM2Item(ins, localData.lineStartInstruction, val, new FullMultinameAVM2Item(false, ins, localData.lineStartInstruction, ins.operands[0])));
+        stack.push(new AsTypeAVM2Item(ins, localData.lineStartInstruction, val, new FullMultinameAVM2Item(false, ins, localData.lineStartInstruction, ins.operands[0], localData.abc.constants.getMultiname(ins.operands[0]).getName(localData.getConstants(), new ArrayList<>(), true))));
     }
 
     @Override

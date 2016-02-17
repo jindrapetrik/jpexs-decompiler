@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.types.traits;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.types.ClassInfo;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
@@ -28,6 +29,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.ScopeStack;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.List;
@@ -218,6 +220,10 @@ public class TraitClass extends Trait implements TraitWithSlot {
         InstanceInfo instanceInfo = abc.instance_info.get(class_info);
         String instanceInfoName = instanceInfo.getName(abc.constants).getName(abc.constants, fullyQualifiedNames, false);
         ClassInfo classInfo = abc.class_info.get(class_info);
+
+        AbcIndexing index = new AbcIndexing(abc.getSwf());
+        //for simplification of String(this)
+        convertData.thisHasDefaultToPrimitive = null == index.findProperty(new AbcIndexing.PropertyDef("toString", new TypeItem(instanceInfo.getName(abc.constants).getNameWithNamespace(abc.constants)), abc, abc.constants.getNamespaceId(Namespace.KIND_PACKAGE, DottedChain.TOPLEVEL, abc.constants.getStringId("", true), true)), false, true);
 
         //class initializer
         int bodyIndex = abc.findBodyIndex(classInfo.cinit_index);
