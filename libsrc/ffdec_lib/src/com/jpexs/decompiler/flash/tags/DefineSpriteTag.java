@@ -362,12 +362,12 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
 
     @Override
     public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation) {
-        return getTimeline().getOutline(frame, time, ratio, renderContext, transformation);
+        return getTimeline().getOutline(frame, time, renderContext, transformation);
     }
 
     @Override
     public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, boolean isClip, Matrix transformation, Matrix absoluteTransformation, ColorTransform colorTransform) {
-        getTimeline().toImage(frame, time, ratio, renderContext, image, isClip, transformation, absoluteTransformation, colorTransform);
+        getTimeline().toImage(frame, time, renderContext, image, isClip, transformation, absoluteTransformation, colorTransform);
     }
 
     @Override

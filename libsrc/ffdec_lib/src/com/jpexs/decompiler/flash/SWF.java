@@ -2672,7 +2672,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         RenderContext renderContext = new RenderContext();
         renderContext.cursorPosition = cursorPosition;
         renderContext.mouseButton = mouseButton;
-        timeline.toImage(frame, time, 0, renderContext, image, false, m, absoluteTransformation, colorTransform);
+        timeline.toImage(frame, time, renderContext, image, false, m, absoluteTransformation, colorTransform);
 
         return image;
     }

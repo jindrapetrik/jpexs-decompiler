@@ -546,7 +546,7 @@ public class Timeline {
         return modified;
     }
 
-    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, boolean isClip, Matrix transformation, Matrix absoluteTransformation, ColorTransform colorTransform) {
+    public void toImage(int frame, int time, RenderContext renderContext, SerializableImage image, boolean isClip, Matrix transformation, Matrix absoluteTransformation, ColorTransform colorTransform) {
         double unzoom = SWF.unitDivisor;
         if (getFrameCount() <= frame) {
             return;
@@ -1034,7 +1034,7 @@ public class Timeline {
         }
     }
 
-    public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation) {
+    public Shape getOutline(int frame, int time, RenderContext renderContext, Matrix transformation) {
         Frame fr = getFrame(frame);
         Area area = new Area();
         Stack<Clip> clips = new Stack<>();
