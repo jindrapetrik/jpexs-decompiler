@@ -978,5 +978,13 @@ import classes.TestNs;
 			trace("String(this).length");
 			trace(String(this).length);
 		}
+		
+		public function testPrecedenceX(){		
+			var a = 5;
+			var b = 2;
+			var c = 3;
+			var d = a << (b >>> c);
+			var e = a << b >>> c;
+		}
 	}
 }
