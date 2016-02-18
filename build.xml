@@ -620,9 +620,13 @@
         <copy todir="${locales.target.dir}/lib">
             <fileset dir="${locales.lib.dir}" includes="**/*.*"/>
         </copy>
+        <mkdir dir="${locales.target.dir}/nsis"/>
+        <copy todir="${locales.target.dir}/nsis">
+            <fileset dir="nsis_locales" includes="**/*.*"/>
+        </copy>                                
         <echo file="${locales.target.dir}/readme.txt">${project.name} ${version}${version.suffix} localization pack
             -------------------------------------------------------------------            
-            Please follow instructions on http://www.free-decompiler.com/flash/translations.html
+            Please follow instructions on https://www.free-decompiler.com/flash/translations/
         </echo>
         <property name="lang.file" value="${releases.dir}/${prefix.filename}_${version}${version.suffix}_lang.zip" />
         <zip destfile="${lang.file}" basedir="${locales.target.dir}"/>
