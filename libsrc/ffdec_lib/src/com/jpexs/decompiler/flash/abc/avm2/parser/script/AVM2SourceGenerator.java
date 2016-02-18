@@ -1571,21 +1571,29 @@ public class AVM2SourceGenerator implements SourceGenerator {
         slotNames.add("--first");
         slotTypes.add("-");
 
+        int paramLine = 0; //?
+
         List<String> registerNames = new ArrayList<>();
+        List<Integer> registerLines = new ArrayList<>();
         List<String> registerTypes = new ArrayList<>();
         if (className != null) {
             String fullClassName = pkg.add(className).toRawString();
             registerTypes.add(fullClassName);
             localData.scopeStack.add(new LocalRegAVM2Item(null, null, registerNames.size(), null));
             registerNames.add("this");
+            registerLines.add(0); //?
 
         } else {
             registerTypes.add("global");
             registerNames.add("this");
+            registerLines.add(0); //?
         }
         for (GraphTargetItem t : paramTypes) {
             registerTypes.add(t.toString());
             slotTypes.add(t.toString());
+        }
+        for (int i = 0; i < paramNames.size(); i++) {
+            registerLines.add(paramLine);
         }
         registerNames.addAll(paramNames);
         slotNames.addAll(paramNames);
@@ -1603,6 +1611,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 if (n.getVariableName().equals("arguments") & !n.isDefinition()) {
                     registerNames.add("arguments");
                     registerTypes.add("Object");
+                    registerLines.add(0); //?
                     hasArguments = true;
                     break;
                 }
@@ -1612,6 +1621,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
         if (needsActivation) {
             registerNames.add("+$activation");
+            registerLines.add(0); //?
             localData.activationReg = registerNames.size() - 1;
             registerTypes.add("Object");
             localData.scopeStack.add(new LocalRegAVM2Item(null, null, localData.activationReg, null));
@@ -1645,13 +1655,14 @@ public class AVM2SourceGenerator implements SourceGenerator {
                                 registerTypes.set(regIndex, varName);
                                 slotNames.set(regIndex, varName);
                                 slotTypes.set(regIndex, varName);
+                                registerLines.set(regIndex, n.line);
                             } //in second round the rest
                             else if (round == 2 && !m.matches()) {
                                 registerNames.add(n.getVariableName());
                                 registerTypes.add(n.type.toString());
                                 slotNames.add(n.getVariableName());
                                 slotTypes.add(n.type.toString());
-
+                                registerLines.add(n.line);
                             }
                         }
                     }
@@ -1873,6 +1884,9 @@ public class AVM2SourceGenerator implements SourceGenerator {
                         throw new CompilationException("Parent constructor must be called", line);
                     }
                 }
+            }
+            for (int i = 1; i < registerNames.size(); i++) {
+                mbodyCode.add(i - 1, ins(AVM2Instructions.Debug, 1, str(registerNames.get(i)), i - 1, (int) registerLines.get(i)));
             }
             if (!subMethod) {
                 mbodyCode.add(0, new AVM2Instruction(0, AVM2Instructions.GetLocal0, null));
