@@ -183,7 +183,7 @@ public class FolderPreviewPanel extends JPanel {
         int cols = width / CELL_WIDTH;
         int rows = (int) Math.ceil(items.size() / (float) cols);
         int height = rows * CELL_HEIGHT;
-        return (new Dimension(width, height));
+        return new Dimension(width, height);
     }
 
     @Override
