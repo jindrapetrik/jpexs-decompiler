@@ -1164,31 +1164,15 @@ public class SWFInputStream implements AutoCloseable {
             long pos = getPos();
             newDumpLevel(null, "TAG");
             try {
-                tag = readTag(timelined, level, pos, parseTags && !parallel1, parallel1, skipUnusualTags, lazy);
+                tag = readTag(timelined, level, pos, false, parallel1, skipUnusualTags, lazy);
             } catch (EOFException | EndOfStreamException ex) {
                 tag = null;
             }
-            DumpInfo di = dumpInfo;
-            if (di != null && tag != null) {
-                di.name = tag.getName();
-            }
-            endDumpLevel(tag == null ? null : tag.getId());
-            if (tag == null) {
-                break;
-            }
 
-            tag.setTimelined(timelined);
-            if (!parallel1) {
-                tags.add(tag);
-            }
-            if (Configuration.dumpTags.get() && level == 0) {
-                dumpTag(System.out, tag, tags.size() - 1, level);
-            }
-
-            boolean doParse;
+            boolean doParse = true;
             if (!skipUnusualTags) {
                 doParse = true;
-            } else {
+            } else if (tag != null) {
                 switch (tag.getId()) {
                     case FileAttributesTag.ID: // FileAttributes
                         if (tag instanceof TagStub) {
@@ -1229,6 +1213,27 @@ public class SWFInputStream implements AutoCloseable {
 
                 }
             }
+
+            if (parseTags && !parallel1 && doParse && (tag instanceof TagStub)) {
+                tag = resolveTag((TagStub) tag, level, parallel, skipUnusualTags, lazy);
+            }
+            DumpInfo di = dumpInfo;
+            if (di != null && tag != null) {
+                di.name = tag.getName();
+            }
+            endDumpLevel(tag == null ? null : tag.getId());
+            if (tag == null) {
+                break;
+            }
+
+            tag.setTimelined(timelined);
+            if (!parallel1) {
+                tags.add(tag);
+            }
+            if (Configuration.dumpTags.get() && level == 0) {
+                dumpTag(System.out, tag, tags.size() - 1, level);
+            }
+
             if (parseTags && doParse && parallel1 && tag instanceof TagStub && executor != null) {
                 Future<Tag> future = executor.submit(new TagResolutionTask((TagStub) tag, di, level, parallel1, skipUnusualTags, lazy));
                 futureResults.add(future);

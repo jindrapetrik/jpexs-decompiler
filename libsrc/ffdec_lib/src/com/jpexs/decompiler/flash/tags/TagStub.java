@@ -21,6 +21,8 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -55,7 +57,11 @@ public class TagStub extends Tag {
      */
     @Override
     public void getData(SWFOutputStream sos) {
-        throw new Error("TagStub.getData call is not supported.");
+        try {
+            sos.write(getOriginalData());
+        } catch (IOException ex) {
+            Logger.getLogger(TagStub.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public SWFInputStream getDataStream() {

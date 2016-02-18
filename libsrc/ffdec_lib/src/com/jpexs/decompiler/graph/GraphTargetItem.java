@@ -390,6 +390,10 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
         return EcmaScript.toString(getResult());
     }
 
+    public Boolean getResultAsBoolean() {
+        return EcmaScript.toBoolean(getResult());
+    }
+
     public String toStringNoQuotes(LocalData localData) {
         // todo: honfika: this method should not be called, maybe we should throw an exception
         return toString();

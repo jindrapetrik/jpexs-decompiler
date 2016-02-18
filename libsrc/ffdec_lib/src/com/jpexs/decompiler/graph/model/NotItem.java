@@ -40,7 +40,7 @@ public class NotItem extends UnaryOpItem implements LogicalOpItem, Inverted {
 
     @Override
     public Object getResult() {
-        return getResult(value.getResult());
+        return !value.getResultAsBoolean();
     }
 
     public static Boolean getResult(Object obj) {

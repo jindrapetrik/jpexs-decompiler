@@ -69,6 +69,7 @@ public final class MethodBody implements Cloneable {
     @Internal
     public boolean deleted;
 
+    @Internal
     boolean debugMode = false;
 
     public int method_info;

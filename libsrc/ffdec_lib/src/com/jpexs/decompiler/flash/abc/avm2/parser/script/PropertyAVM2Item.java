@@ -42,7 +42,9 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -92,21 +94,37 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
         return abc.getSelectedAbc().constants.getNamespaceSetId(nssa, true);
     }
 
-    public static GraphTargetItem multinameToType(int m_index, AVM2ConstantPool constants) {
+    private static GraphTargetItem multinameToType(Set<Integer> visited, int m_index, AVM2ConstantPool constants) {
+        if (visited.contains(m_index)) {
+            Logger.getLogger(PropertyAVM2Item.class.getName()).log(Level.WARNING, "Recursive typename detected");
+            return null;
+        }
         if (m_index == 0) {
             return TypeItem.UNBOUNDED;
         }
         Multiname m = constants.getMultiname(m_index);
         if (m.kind == Multiname.TYPENAME) {
-            GraphTargetItem obj = multinameToType(m.qname_index, constants);
+            visited.add(m_index);
+            GraphTargetItem obj = multinameToType(visited, m.qname_index, constants);
+            if (obj == null) {
+                return null;
+            }
             List<GraphTargetItem> params = new ArrayList<>();
             for (int pm : m.params) {
-                params.add(multinameToType(pm, constants));
+                GraphTargetItem r = multinameToType(visited, pm, constants);
+                if (r == null) {
+                    return null;
+                }
+                params.add(r);
             }
             return new ApplyTypeAVM2Item(null, null, obj, params);
         } else {
             return new TypeItem(m.getNameWithNamespace(constants));
         }
+    }
+
+    public static GraphTargetItem multinameToType(int m_index, AVM2ConstantPool constants) {
+        return multinameToType(new HashSet<>(), m_index, constants);
     }
 
     public void resolve(boolean mustExist, SourceGeneratorLocalData localData, Reference<GraphTargetItem> objectType, Reference<GraphTargetItem> propertyType, Reference<Integer> propertyIndex, Reference<ValueKind> propertyValue, Reference<ABC> propertyValueABC) throws CompilationException {
@@ -474,7 +492,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
      return objType;
      }*/
 
-    /*
+ /*
      public GraphTargetItem resolvePropertyType() {
      if (index != null) {
      return TypeItem.UNBOUNDED;
@@ -515,7 +533,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
      return TypeItem.UNBOUNDED;
      }
      */
-    /* public int resolveProperty() {
+ /* public int resolveProperty() {
      if (index != null) {
      return abc.constants.getMultinameId(new Multiname(Multiname.MULTINAMEL,
      abc.constants.getStringId(propertyName, true), 0,

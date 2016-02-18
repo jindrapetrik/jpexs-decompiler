@@ -76,6 +76,11 @@ public class ThisAVM2Item extends AVM2Item {
     }
 
     @Override
+    public Boolean getResultAsBoolean() {
+        return true;
+    }
+
+    @Override
     public String toString() {
         return "this";
     }
