@@ -57,7 +57,6 @@ import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
@@ -958,77 +957,6 @@ public class Timeline {
                         }
                     }
                     ((Timelined) c).getTimeline().getSounds(dframe, time + ds.time, stateUnderCursor, mouseButton, sounds, soundClasses);
-                }
-            }
-        }
-    }
-
-    public void getObjectsOutlines(int frame, int time, int ratio, Point cursorPosition, int mouseButton, Matrix transformation, List<DepthState> objs, List<Shape> outlines) {
-        Frame fr = getFrame(frame);
-        Stack<Clip> clips = new Stack<>();
-        for (int d = maxDepth; d >= 0; d--) {
-            Clip currentClip = null;
-            for (int i = clips.size() - 1; i >= 0; i--) {
-                Clip cl = clips.get(i);
-                if (cl.depth <= d) {
-                    clips.remove(i);
-                }
-            }
-            if (!clips.isEmpty()) {
-                currentClip = clips.peek();
-            }
-            DepthState layer = fr.layers.get(d);
-            if (layer == null) {
-                continue;
-            }
-            if (!layer.isVisible) {
-                continue;
-            }
-            CharacterTag character = swf.getCharacter(layer.characterId);
-            if (character instanceof DrawableTag) {
-                DrawableTag drawable = (DrawableTag) character;
-                Matrix m = transformation.concatenate(new Matrix(layer.matrix));
-
-                int drawableFrameCount = drawable.getNumFrames();
-                if (drawableFrameCount == 0) {
-                    drawableFrameCount = 1;
-                }
-                int dframe = (time + layer.time) % drawableFrameCount;
-                if (character instanceof Timelined) {
-                    if (character instanceof ButtonTag) {
-                        ButtonTag bt = (ButtonTag) character;
-                        dframe = ButtonTag.FRAME_HITTEST;
-                        /*dframe = ButtonTag.FRAME_UP;
-                         if (stateUnderCursor == ds) {
-                         if (mouseButton > 0) {
-                         dframe = ButtonTag.FRAME_DOWN;
-                         } else {
-                         dframe = ButtonTag.FRAME_OVER;
-                         }
-                         }*/
-                    }
-                }
-
-                RenderContext renderContext = new RenderContext();
-                renderContext.cursorPosition = cursorPosition;
-                renderContext.mouseButton = mouseButton;
-                Shape cshape = ((DrawableTag) character).getOutline(dframe, layer.time + time, layer.ratio, renderContext, m);
-
-                Area addArea = new Area(cshape);
-                if (currentClip != null) {
-                    Area a = new Area(new Rectangle(displayRect.Xmin, displayRect.Ymin, displayRect.getWidth(), displayRect.getHeight()));
-                    a.subtract(new Area(currentClip.shape));
-                    addArea.subtract(a);
-                }
-                if (layer.clipDepth > -1) {
-                    Clip clip = new Clip(addArea, layer.clipDepth);
-                    clips.push(clip);
-                } else {
-                    objs.add(layer);
-                    outlines.add(addArea);
-                }
-                if (character instanceof Timelined) {
-                    ((Timelined) character).getTimeline().getObjectsOutlines(dframe, time + layer.time, layer.ratio, cursorPosition, mouseButton, m, objs, outlines);
                 }
             }
         }
