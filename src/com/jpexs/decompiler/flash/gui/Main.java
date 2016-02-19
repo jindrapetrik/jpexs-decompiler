@@ -1825,7 +1825,7 @@ public class Main {
         }
 
         AppStrings.setResourceClass(MainFrame.class);
-        initLogging(Configuration.debugMode.get());
+        initLogging(Configuration._debugMode.get());
         initLang();
 
         if (Configuration.cacheOnDisk.get()) {

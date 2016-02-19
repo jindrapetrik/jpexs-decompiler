@@ -647,7 +647,7 @@ public class CommandLineArgumentParser {
                     for (int i = 0; i < arguments.length; i++) {
                         System.out.println(i + ".:" + arguments[i]);
                     }
-                    Configuration.debugMode.set(true);
+                    Configuration._debugMode.set(true);
                     break;
                 default:
                     break OUTER;
@@ -1110,7 +1110,7 @@ public class CommandLineArgumentParser {
                 });
                 System.setOut(nullStream);
                 System.setErr(nullStream);
-                Main.initLogging(Configuration.debugMode.get());
+                Main.initLogging(Configuration._debugMode.get());
 
                 File[] files = new File(folder).listFiles(getSwfFilter());
                 for (File file : files) {
@@ -1137,7 +1137,7 @@ public class CommandLineArgumentParser {
 
                 System.setOut(oldOut);
                 System.setErr(oldErr);
-                Main.initLogging(Configuration.debugMode.get());
+                Main.initLogging(Configuration._debugMode.get());
                 break;
             }
             case "finderrorheader": {
@@ -1152,7 +1152,7 @@ public class CommandLineArgumentParser {
                 });
                 System.setOut(nullStream);
                 System.setErr(nullStream);
-                Main.initLogging(Configuration.debugMode.get());
+                Main.initLogging(Configuration._debugMode.get());
 
                 File[] files = new File(folder).listFiles(getSwfFilter());
                 for (File file : files) {
@@ -1194,7 +1194,7 @@ public class CommandLineArgumentParser {
 
                 System.setOut(oldOut);
                 System.setErr(oldErr);
-                Main.initLogging(Configuration.debugMode.get());
+                Main.initLogging(Configuration._debugMode.get());
                 break;
             }
         }
@@ -1321,7 +1321,7 @@ public class CommandLineArgumentParser {
                     String errFilePath = stdErr.replace("{swfFile}", inFileName);
                     Path.createDirectorySafe(new File(errFilePath).getParentFile());
                     System.setErr(new PrintStream(new FileOutputStream(errFilePath, true)));
-                    Main.initLogging(Configuration.debugMode.get());
+                    Main.initLogging(Configuration._debugMode.get());
                 }
 
                 long startTimeSwf = 0;
@@ -1354,10 +1354,8 @@ public class CommandLineArgumentParser {
                         if (selectionIds.contains(c.getCharacterId())) {
                             extags.add(t);
                         }
-                    } else {
-                        if (selectionIds.contains(0)) {
-                            extags.add(t);
-                        }
+                    } else if (selectionIds.contains(0)) {
+                        extags.add(t);
                     }
                 }
 
@@ -1899,10 +1897,8 @@ public class CommandLineArgumentParser {
                     DefineSpriteTag ds = (DefineSpriteTag) t;
                     if ("page1".equals(ds.getExportName())) {
                         totalPages = 1;
-                    } else {
-                        if (totalPages > 0) {
-                            totalPages++;
-                        }
+                    } else if (totalPages > 0) {
+                        totalPages++;
                     }
                 }
             }
@@ -1915,10 +1911,8 @@ public class CommandLineArgumentParser {
                     if ("page1".equals(ds.getExportName())) {
                         page = 1;
                         job = new PDFJob(new BufferedOutputStream(new FileOutputStream(outFile)));
-                    } else {
-                        if (page > 0) {
-                            page++;
-                        }
+                    } else if (page > 0) {
+                        page++;
                     }
                     if (("page" + page).equals(ds.getExportName())) {
                         if (!selection.contains(page)) {
@@ -2872,16 +2866,12 @@ public class CommandLineArgumentParser {
                         if (!swf.generatePCodeSwdFile(new File(outSwd), new HashMap<>())) {
                             System.err.println("Generating SWD failed");
                         }
-                    } else {
-                        if (!swf.generateSwdFile(new File(outSwd), new HashMap<>())) {
-                            System.err.println("Generating SWD failed");
-                        }
+                    } else if (!swf.generateSwdFile(new File(outSwd), new HashMap<>())) {
+                        System.err.println("Generating SWD failed");
                     }
                 }
-            } else {
-                if (generateSwd) {
-                    System.err.println("WARNING: Cannot generate SWD for AS3 file");
-                }
+            } else if (generateSwd) {
+                System.err.println("WARNING: Cannot generate SWD for AS3 file");
             }
             System.out.println("OK");
         } catch (FileNotFoundException ex) {

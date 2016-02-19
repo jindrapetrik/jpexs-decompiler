@@ -186,12 +186,10 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
     public void toggleColorMarker(int line, LineMarker lm) {
         if (!lineMarkers.containsKey(line - firstLineOffset())) {
             addColorMarker(line, lm);
+        } else if (lineMarkers.get(line - firstLineOffset()).contains(lm)) {
+            removeColorMarker(line, lm);
         } else {
-            if (lineMarkers.get(line - firstLineOffset()).contains(lm)) {
-                removeColorMarker(line, lm);
-            } else {
-                addColorMarker(line, lm);
-            }
+            addColorMarker(line, lm);
         }
         getParent().repaint();
     }
@@ -442,7 +440,7 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
         this.lineMarkers = new HashMap<>();
         lastLine = -1;
         error = false;
-        if (Configuration.debugMode.get() && t != null && t.length() > truncateLimit) {
+        if (Configuration._debugMode.get() && t != null && t.length() > truncateLimit) {
             t = t.substring(0, truncateLimit) + "\r\n" + AppStrings.translate("editorTruncateWarning").replace("%chars%", Integer.toString(truncateLimit));
         }
         super.setText(t);

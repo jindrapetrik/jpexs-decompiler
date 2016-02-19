@@ -159,7 +159,6 @@ public class Configuration {
     public static final ConfigurationItem<String> overrideTextExportFileName = null;
 
     @ConfigurationDefaultBoolean(false)
-    @ConfigurationCategory("debug")
     public static final ConfigurationItem<Boolean> useDetailedLogging = null;
 
     /**
@@ -167,12 +166,12 @@ public class Configuration {
      * recompiled
      */
     @ConfigurationDefaultBoolean(false)
-    @ConfigurationCategory("debug")
-    public static final ConfigurationItem<Boolean> debugMode = null;
+    @ConfigurationInternal
+    public static final ConfigurationItem<Boolean> _debugMode = null;
 
     @ConfigurationDefaultBoolean(false)
-    @ConfigurationCategory("debug")
-    public static final ConfigurationItem<Boolean> showDebugMenu = null;
+    @ConfigurationInternal
+    public static final ConfigurationItem<Boolean> _showDebugMenu = null;
 
     /**
      * Turn off resolving constants in ActionScript 2
@@ -215,15 +214,14 @@ public class Configuration {
     public static final ConfigurationItem<Boolean> displayFileName = null;
 
     @ConfigurationDefaultBoolean(false)
-    @ConfigurationCategory("debug")
-    public static final ConfigurationItem<Boolean> debugCopy = null;
+    @ConfigurationInternal
+    public static final ConfigurationItem<Boolean> _debugCopy = null;
 
     @ConfigurationDefaultBoolean(false)
-    @ConfigurationCategory("debug")
     public static final ConfigurationItem<Boolean> dumpTags = null;
 
     @ConfigurationDefaultBoolean(true)
-    @ConfigurationCategory("debug")
+    @ConfigurationCategory("export")
     public static final ConfigurationItem<Boolean> setFFDecVersionInExportedFont = null;
 
     @ConfigurationDefaultInt(60)
@@ -436,7 +434,7 @@ public class Configuration {
     public static final ConfigurationItem<Integer> lzmaFastBytes = null;
 
     @ConfigurationDefaultBoolean(false)
-    @ConfigurationCategory("debug")
+    @ConfigurationCategory("script")
     public static final ConfigurationItem<Boolean> showMethodBodyId = null;
 
     @ConfigurationDefaultDouble(1.0)
@@ -794,7 +792,7 @@ public class Configuration {
         setConfigurationFields();
         if (useDetailedLogging.get()) {
             logLevel = Level.FINEST;
-        } else if (debugMode.get()) {
+        } else if (_debugMode.get()) {
             logLevel = Level.INFO;
         } else {
             logLevel = Level.WARNING;

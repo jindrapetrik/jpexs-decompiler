@@ -117,7 +117,7 @@ public class TagInfoPanel extends JPanel {
                         try {
                             name = mainPanel.translate(key);
                         } catch (MissingResourceException mes) {
-                            if (Configuration.debugMode.get()) {
+                            if (Configuration._debugMode.get()) {
                                 Logger.getLogger(TagInfoPanel.class.getName()).log(Level.WARNING, "Resource not found: {0}", key);
                             }
                         }

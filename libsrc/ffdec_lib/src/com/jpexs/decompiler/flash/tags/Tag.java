@@ -411,7 +411,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
      * @throws IOException
      */
     public void writeTag(SWFOutputStream sos) throws IOException {
-        if (Configuration.debugCopy.get() || isModified()) {
+        if (Configuration._debugCopy.get() || isModified()) {
             byte[] newData = getData();
             byte[] newHeaderData = getHeader(newData.length);
             sos.write(newHeaderData);
@@ -477,7 +477,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
     public byte[] getData() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
-        if (Configuration.debugCopy.get()) {
+        if (Configuration._debugCopy.get()) {
             byte[] originalData = getOriginalData();
             if (originalData != null) {
                 os = new CopyOutputStream(os, new ByteArrayInputStream(getOriginalData()));

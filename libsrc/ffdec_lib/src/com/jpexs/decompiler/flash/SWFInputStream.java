@@ -1628,7 +1628,7 @@ public class SWFInputStream implements AutoCloseable {
                 logger.log(Level.SEVERE, "Problem in " + timelined.toString(), ex);
             }
 
-            if (Configuration.debugMode.get()) {
+            if (Configuration._debugMode.get()) {
                 byte[] data = ret.getOriginalData();
                 byte[] dataNew = ret.getData();
                 int ignoreFirst = 0;

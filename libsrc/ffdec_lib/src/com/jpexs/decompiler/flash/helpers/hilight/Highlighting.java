@@ -221,7 +221,7 @@ public class Highlighting implements Serializable {
     public Highlighting(int startPos, HighlightData data, HighlightType type, String text) {
         this.startPos = startPos;
         this.type = type;
-        if (Configuration.debugMode.get()) {
+        if (Configuration._debugMode.get()) {
             this.HighlightedText = text;
         }
         this.properties = data;

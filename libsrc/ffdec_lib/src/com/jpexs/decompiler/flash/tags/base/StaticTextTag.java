@@ -111,7 +111,7 @@ public abstract class StaticTextTag extends TextTag {
             }
         }
 
-        if (Configuration.debugCopy.get()) {
+        if (Configuration._debugCopy.get()) {
             glyphBits = Math.max(glyphBits, this.glyphBits);
             advanceBits = Math.max(advanceBits, this.advanceBits);
         }
@@ -513,12 +513,10 @@ public abstract class StaticTextTag extends TextTag {
                                 tr.styleFlagsHasColor = true;
                                 color = null;
                             }
-                        } else {
-                            if (colorA != null) {
-                                tr.textColorA = colorA;
-                                tr.styleFlagsHasColor = true;
-                                colorA = null;
-                            }
+                        } else if (colorA != null) {
+                            tr.textColorA = colorA;
+                            tr.styleFlagsHasColor = true;
+                            colorA = null;
                         }
                         if (x != null) {
                             tr.xOffset = x;

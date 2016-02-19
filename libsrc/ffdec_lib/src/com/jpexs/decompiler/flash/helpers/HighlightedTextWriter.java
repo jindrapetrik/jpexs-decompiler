@@ -281,7 +281,7 @@ public class HighlightedTextWriter extends GraphTextWriter {
         if (toStringCalled) {
             throw new Error("HighlightedTextWriter.toString() was already called.");
         }
-        if (Configuration.debugMode.get()) {
+        if (Configuration._debugMode.get()) {
             long stopTime = System.currentTimeMillis();
             long time = stopTime - startTime;
             if (time > 500) {

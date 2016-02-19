@@ -994,21 +994,21 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addMenuItem("/help/about", translate("menu.help.about"), "about32", this::aboutActionPerformed, PRIORITY_TOP, null, true, null, false);
         finishMenu("/help");
 
-        if (Configuration.showDebugMenu.get() || Configuration.debugMode.get()) {
+        if (Configuration._showDebugMenu.get() || Configuration._debugMode.get()) {
 
-            addMenuItem("/debug", "Debug", null, null, 0, null, false, null, false);
-            addMenuItem("/debug/removeNonScripts", "Remove non scripts", "update16", e -> removeNonScripts(), PRIORITY_MEDIUM, null, true, null, false);
-            addMenuItem("/debug/removeExceptSelected", "Remove except selected", "update16", e -> removeExceptSelected(), PRIORITY_MEDIUM, null, true, null, false);
-            addMenuItem("/debug/refreshDecompiled", "Refresh decompiled script", "update16", e -> refreshDecompiled(), PRIORITY_MEDIUM, null, true, null, false);
-            addMenuItem("/debug/checkResources", "Check resources", "update16", e -> checkResources(), PRIORITY_MEDIUM, null, true, null, false);
-            addMenuItem("/debug/callGc", "Call System.gc()", "update16", e -> System.gc(), PRIORITY_MEDIUM, null, true, null, false);
-            addMenuItem("/debug/emptyCache", "Empty cache", "update16", e -> {
+            addMenuItem("/debug", "# FFDec Debug #", null, null, 0, null, false, null, false);
+            addMenuItem("/debug/removeNonScripts", "Remove non scripts", "continue16", e -> removeNonScripts(), PRIORITY_MEDIUM, null, true, null, false);
+            addMenuItem("/debug/removeExceptSelected", "Remove except selected", "continue16", e -> removeExceptSelected(), PRIORITY_MEDIUM, null, true, null, false);
+            addMenuItem("/debug/refreshDecompiled", "Refresh decompiled script", "continue16", e -> refreshDecompiled(), PRIORITY_MEDIUM, null, true, null, false);
+            addMenuItem("/debug/checkResources", "Check resources", "continue16", e -> checkResources(), PRIORITY_MEDIUM, null, true, null, false);
+            addMenuItem("/debug/callGc", "Call System.gc()", "continue16", e -> System.gc(), PRIORITY_MEDIUM, null, true, null, false);
+            addMenuItem("/debug/emptyCache", "Empty cache", "continue16", e -> {
                 SWF nswf = mainFrame.getPanel().getCurrentSwf();
                 if (nswf != null) {
                     nswf.clearAllCache();
                 }
             }, PRIORITY_MEDIUM, null, true, null, false);
-            addMenuItem("/debug/memoryInformation", "Memory information", "update16", e -> {
+            addMenuItem("/debug/memoryInformation", "Memory information", "continue16", e -> {
                 String architecture = System.getProperty("sun.arch.data.model");
                 Runtime runtime = Runtime.getRuntime();
                 String info = "Architecture: " + architecture + Helper.newLine
@@ -1021,13 +1021,13 @@ public abstract class MainFrameMenu implements MenuBuilder {
                     nswf.clearAllCache();
                 }
             }, PRIORITY_MEDIUM, null, true, null, false);
-            addMenuItem("/debug/fixAs3Code", "Fix AS3 code", "update16", e -> {
+            addMenuItem("/debug/fixAs3Code", "Fix AS3 code", "continue16", e -> {
                 SWF nswf = mainFrame.getPanel().getCurrentSwf();
                 if (nswf != null) {
                     nswf.fixAS3Code();
                 }
             }, PRIORITY_MEDIUM, null, true, null, false);
-            addMenuItem("/debug/openTestSwfs", "Open test SWFs", "update16", e -> {
+            addMenuItem("/debug/openTestSwfs", "Open test SWFs", "continue16", e -> {
                 String path;
 
                 SWFSourceInfo[] sourceInfos = new SWFSourceInfo[2];
@@ -1038,7 +1038,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
                 sourceInfos[1] = new SWFSourceInfo(null, path, null);
                 Main.openFile(sourceInfos);
             }, PRIORITY_MEDIUM, null, true, null, false);
-            addMenuItem("/debug/createNewSwf", "Create new SWF", "update16", e -> {
+            addMenuItem("/debug/createNewSwf", "Create new SWF", "continue16", e -> {
                 SWF swf = new SWF();
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 try {

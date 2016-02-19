@@ -507,7 +507,7 @@ public class ASM3Parser {
                 value_index = parseNamespace(constants, lexer);
                 break;
             default:
-                if (Configuration.debugMode.get()) {
+                if (Configuration._debugMode.get()) {
                     throw new AVM2ParseException("Not supported valueType.", lexer.yyline());
                 }
         }
@@ -773,88 +773,80 @@ public class ASM3Parser {
                                 case AVM2Code.DAT_STRING_INDEX:
                                     if (parsedOperand.type == ParsedSymbol.TYPE_KEYWORD_NULL) {
                                         operandsList.add(0);
-                                    } else {
-                                        if (parsedOperand.type == ParsedSymbol.TYPE_STRING) {
-                                            int sid = constants.getStringId((String) parsedOperand.value, false);
-                                            if (sid == -1) {
-                                                if ((missingHandler != null) && (missingHandler.missingString((String) parsedOperand.value))) {
-                                                    sid = constants.addString((String) parsedOperand.value);
-                                                } else {
-                                                    throw new AVM2ParseException("Unknown String", lexer.yyline());
-                                                }
+                                    } else if (parsedOperand.type == ParsedSymbol.TYPE_STRING) {
+                                        int sid = constants.getStringId((String) parsedOperand.value, false);
+                                        if (sid == -1) {
+                                            if ((missingHandler != null) && (missingHandler.missingString((String) parsedOperand.value))) {
+                                                sid = constants.addString((String) parsedOperand.value);
+                                            } else {
+                                                throw new AVM2ParseException("Unknown String", lexer.yyline());
                                             }
-                                            operandsList.add(sid);
-                                        } else {
-                                            throw new AVM2ParseException("String or null expected", lexer.yyline());
                                         }
+                                        operandsList.add(sid);
+                                    } else {
+                                        throw new AVM2ParseException("String or null expected", lexer.yyline());
                                     }
                                     break;
                                 case AVM2Code.DAT_INT_INDEX:
 
                                     if (parsedOperand.type == ParsedSymbol.TYPE_KEYWORD_NULL) {
                                         operandsList.add(0);
-                                    } else {
-                                        if (parsedOperand.type == ParsedSymbol.TYPE_INTEGER) {
-                                            long intVal = (Long) parsedOperand.value;
-                                            int iid = constants.getIntId(intVal, false);
-                                            if (iid == -1) {
-                                                if ((missingHandler != null) && (missingHandler.missingInt(intVal))) {
-                                                    iid = constants.addInt(intVal);
-                                                } else {
-                                                    throw new AVM2ParseException("Unknown int", lexer.yyline());
-                                                }
+                                    } else if (parsedOperand.type == ParsedSymbol.TYPE_INTEGER) {
+                                        long intVal = (Long) parsedOperand.value;
+                                        int iid = constants.getIntId(intVal, false);
+                                        if (iid == -1) {
+                                            if ((missingHandler != null) && (missingHandler.missingInt(intVal))) {
+                                                iid = constants.addInt(intVal);
+                                            } else {
+                                                throw new AVM2ParseException("Unknown int", lexer.yyline());
                                             }
-                                            operandsList.add(iid);
-                                        } else {
-                                            throw new AVM2ParseException("Integer or null expected", lexer.yyline());
                                         }
+                                        operandsList.add(iid);
+                                    } else {
+                                        throw new AVM2ParseException("Integer or null expected", lexer.yyline());
                                     }
                                     break;
                                 case AVM2Code.DAT_UINT_INDEX:
                                     if (parsedOperand.type == ParsedSymbol.TYPE_KEYWORD_NULL) {
                                         operandsList.add(0);
-                                    } else {
-                                        if (parsedOperand.type == ParsedSymbol.TYPE_INTEGER) {
-                                            long intVal = (Long) parsedOperand.value;
-                                            int iid = constants.getUIntId(intVal, false);
-                                            if (iid == -1) {
-                                                if ((missingHandler != null) && (missingHandler.missingUInt(intVal))) {
-                                                    iid = constants.addUInt(intVal);
-                                                } else {
-                                                    throw new AVM2ParseException("Unknown uint", lexer.yyline());
-                                                }
+                                    } else if (parsedOperand.type == ParsedSymbol.TYPE_INTEGER) {
+                                        long intVal = (Long) parsedOperand.value;
+                                        int iid = constants.getUIntId(intVal, false);
+                                        if (iid == -1) {
+                                            if ((missingHandler != null) && (missingHandler.missingUInt(intVal))) {
+                                                iid = constants.addUInt(intVal);
+                                            } else {
+                                                throw new AVM2ParseException("Unknown uint", lexer.yyline());
                                             }
-                                            operandsList.add(iid);
-                                        } else {
-                                            throw new AVM2ParseException("Integer or null expected", lexer.yyline());
                                         }
+                                        operandsList.add(iid);
+                                    } else {
+                                        throw new AVM2ParseException("Integer or null expected", lexer.yyline());
                                     }
                                     break;
                                 case AVM2Code.DAT_DOUBLE_INDEX:
                                     if (parsedOperand.type == ParsedSymbol.TYPE_KEYWORD_NULL) {
                                         operandsList.add(0);
-                                    } else {
-                                        if ((parsedOperand.type == ParsedSymbol.TYPE_INTEGER) || (parsedOperand.type == ParsedSymbol.TYPE_FLOAT)) {
+                                    } else if ((parsedOperand.type == ParsedSymbol.TYPE_INTEGER) || (parsedOperand.type == ParsedSymbol.TYPE_FLOAT)) {
 
-                                            double doubleVal = 0;
-                                            if (parsedOperand.type == ParsedSymbol.TYPE_INTEGER) {
-                                                doubleVal = (Long) parsedOperand.value;
-                                            }
-                                            if (parsedOperand.type == ParsedSymbol.TYPE_FLOAT) {
-                                                doubleVal = (Double) parsedOperand.value;
-                                            }
-                                            int did = constants.getDoubleId(doubleVal, false);
-                                            if (did == -1) {
-                                                if ((missingHandler != null) && (missingHandler.missingDouble(doubleVal))) {
-                                                    did = constants.addDouble(doubleVal);
-                                                } else {
-                                                    throw new AVM2ParseException("Unknown double", lexer.yyline());
-                                                }
-                                            }
-                                            operandsList.add(did);
-                                        } else {
-                                            throw new AVM2ParseException("Float or null expected", lexer.yyline());
+                                        double doubleVal = 0;
+                                        if (parsedOperand.type == ParsedSymbol.TYPE_INTEGER) {
+                                            doubleVal = (Long) parsedOperand.value;
                                         }
+                                        if (parsedOperand.type == ParsedSymbol.TYPE_FLOAT) {
+                                            doubleVal = (Double) parsedOperand.value;
+                                        }
+                                        int did = constants.getDoubleId(doubleVal, false);
+                                        if (did == -1) {
+                                            if ((missingHandler != null) && (missingHandler.missingDouble(doubleVal))) {
+                                                did = constants.addDouble(doubleVal);
+                                            } else {
+                                                throw new AVM2ParseException("Unknown double", lexer.yyline());
+                                            }
+                                        }
+                                        operandsList.add(did);
+                                    } else {
+                                        throw new AVM2ParseException("Float or null expected", lexer.yyline());
                                     }
                                     break;
                                 case AVM2Code.DAT_OFFSET:
