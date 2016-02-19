@@ -52,7 +52,8 @@ public class DirectEditingTest extends FileTestBase {
     @BeforeClass
     public void init() {
         Configuration.autoDeobfuscate.set(false);
-        Configuration.debugCopy.set(false);
+        Configuration.simplifyExpressions.set(false);
+        Configuration._debugCopy.set(false);
     }
 
     public static final String TESTDATADIR = "testdata/directediting";
