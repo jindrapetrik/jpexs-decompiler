@@ -1821,7 +1821,7 @@ public class AVM2Code implements Cloneable {
         toSourceCount = 0;
     }
 
-    private GraphTargetItem handleDeclareReg(int minreg, GraphTargetItem assignment, DeclarationAVM2Item[] declaredRegisters, int reg) {
+    private GraphTargetItem handleDeclareReg(int minreg, GraphTargetItem assignment, DeclarationAVM2Item[] declaredRegisters, List<Slot> declaredSlots, int reg) {
 
         //do not add declarations for reserved local registers like function arguments
         if (reg < minreg) {
@@ -1860,24 +1860,24 @@ public class AVM2Code implements Cloneable {
         return assignment;
     }
 
-    private GraphTargetItem injectDeclarations(int minreg, GraphTargetItem ti, DeclarationAVM2Item[] declaredRegisters, List<Slot> declaredSlots, ABC abc, MethodBody body) {
+    private GraphTargetItem injectDeclarations(int minreg, GraphTargetItem ti, DeclarationAVM2Item[] declaredRegisters, List<Slot> declaredSlots, List<DeclarationAVM2Item> declaredSlotsDec, ABC abc, MethodBody body) {
         if (ti.value != null) {
-            ti.value = injectDeclarations(minreg, ti.value, declaredRegisters, declaredSlots, abc, body);
+            ti.value = injectDeclarations(minreg, ti.value, declaredRegisters, declaredSlots, declaredSlotsDec, abc, body);
         }
         //TODO: walk whole tree... some walker?
         if (ti instanceof IfItem) {
-            ((IfItem) ti).expression = injectDeclarations(minreg, ((IfItem) ti).expression, declaredRegisters, declaredSlots, abc, body);
+            ((IfItem) ti).expression = injectDeclarations(minreg, ((IfItem) ti).expression, declaredRegisters, declaredSlots, declaredSlotsDec, abc, body);
         }
         if (ti instanceof BinaryOpItem) {
-            ((BinaryOpItem) ti).leftSide = injectDeclarations(minreg, ((BinaryOpItem) ti).leftSide, declaredRegisters, declaredSlots, abc, body);
-            ((BinaryOpItem) ti).rightSide = injectDeclarations(minreg, ((BinaryOpItem) ti).rightSide, declaredRegisters, declaredSlots, abc, body);
+            ((BinaryOpItem) ti).leftSide = injectDeclarations(minreg, ((BinaryOpItem) ti).leftSide, declaredRegisters, declaredSlots, declaredSlotsDec, abc, body);
+            ((BinaryOpItem) ti).rightSide = injectDeclarations(minreg, ((BinaryOpItem) ti).rightSide, declaredRegisters, declaredSlots, declaredSlotsDec, abc, body);
         }
         if (ti instanceof ForEachInAVM2Item) {
             ForEachInAVM2Item fei = (ForEachInAVM2Item) ti;
             if (fei.expression.object instanceof LocalRegAVM2Item) {
                 int reg = ((LocalRegAVM2Item) fei.expression.object).regIndex;
                 if (declaredRegisters[reg] == null) {
-                    fei.expression.object = handleDeclareReg(minreg, fei.expression.object, declaredRegisters, reg);
+                    fei.expression.object = handleDeclareReg(minreg, fei.expression.object, declaredRegisters, declaredSlots, reg);
                 }
             }
         }
@@ -1885,7 +1885,7 @@ public class AVM2Code implements Cloneable {
             ForInAVM2Item fi = (ForInAVM2Item) ti;
             if (fi.expression.object instanceof LocalRegAVM2Item) {
                 int reg = ((LocalRegAVM2Item) fi.expression.object).regIndex;
-                fi.expression.object = handleDeclareReg(minreg, fi.expression.object, declaredRegisters, reg);
+                fi.expression.object = handleDeclareReg(minreg, fi.expression.object, declaredRegisters, declaredSlots, reg);
                 //nowdeclaredRegs.add(reg);
 
             }
@@ -1893,12 +1893,12 @@ public class AVM2Code implements Cloneable {
         if (ti instanceof Block) {
             Block bl = (Block) ti;
             for (List<GraphTargetItem> s : bl.getSubs()) {
-                injectDeclarations(minreg, s, declaredRegisters, declaredSlots, abc, body);
+                injectDeclarations(minreg, s, declaredRegisters, declaredSlots, declaredSlotsDec, abc, body);
             }
         }
         if (ti instanceof SetLocalAVM2Item) {
             int reg = ((SetLocalAVM2Item) ti).regIndex;
-            ti = handleDeclareReg(minreg, ti, declaredRegisters, reg);
+            ti = handleDeclareReg(minreg, ti, declaredRegisters, declaredSlots, reg);
             return ti;
         }
         if (ti instanceof SetSlotAVM2Item) {
@@ -1913,21 +1913,26 @@ public class AVM2Code implements Cloneable {
                         }
                     }
                 }
-                ti = new DeclarationAVM2Item(ti, type);
+                DeclarationAVM2Item d = new DeclarationAVM2Item(ti, type);
+                ssti.setDeclaration(d);
+                declaredSlotsDec.add(d);
                 declaredSlots.add(sl);
-                return ti;
+                return d;
                 //nowdeclaredSlots.add(sl);
+            } else {
+                int idx = declaredSlots.indexOf(sl);
+                ssti.setDeclaration(declaredSlotsDec.get(idx));
             }
         }
         return ti;
     }
 
-    private void injectDeclarations(int minreg, List<GraphTargetItem> list, DeclarationAVM2Item[] declaredRegisters, List<Slot> declaredSlots, ABC abc, MethodBody body) {
+    private void injectDeclarations(int minreg, List<GraphTargetItem> list, DeclarationAVM2Item[] declaredRegisters, List<Slot> declaredSlots, List<DeclarationAVM2Item> declaredSlotsDec, ABC abc, MethodBody body) {
         //List<Integer> nowdeclaredRegs=new ArrayList<>();
         //List<Slot> nowdeclaredSlots=new ArrayList<>();
         for (int i = 0; i < list.size(); i++) {
             GraphTargetItem ti = list.get(i);
-            GraphTargetItem ti2 = injectDeclarations(minreg, ti, declaredRegisters, declaredSlots, abc, body);
+            GraphTargetItem ti2 = injectDeclarations(minreg, ti, declaredRegisters, declaredSlots, declaredSlotsDec, abc, body);
             if (ti != ti2) {
                 list.set(i, ti2);
             }
@@ -2051,7 +2056,7 @@ public class AVM2Code implements Cloneable {
         //
 
         //int minreg = abc.method_info.get(body.method_info).getMaxReservedReg() + 1;
-        injectDeclarations(1, list, d, new ArrayList<>(), abc, body);
+        injectDeclarations(1, list, d, new ArrayList<>(), new ArrayList<>(), abc, body);
 
         int lastPos = list.size() - 1;
         if (lastPos < 0) {

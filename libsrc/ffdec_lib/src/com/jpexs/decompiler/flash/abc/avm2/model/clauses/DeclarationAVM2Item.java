@@ -110,6 +110,20 @@ public class DeclarationAVM2Item extends AVM2Item {
             HighlightData srcData = getSrcData();
             srcData.localName = ssti.getNameAsStr(localData);
             srcData.declaration = true;
+
+            GraphTargetItem val = ssti.value;
+            GraphTargetItem coerType = TypeItem.UNBOUNDED;
+            if (ssti.value instanceof CoerceAVM2Item) {
+                coerType = ((CoerceAVM2Item) ssti.value).typeObj;
+            }
+            if (ssti.value instanceof ConvertAVM2Item) {
+                coerType = ((ConvertAVM2Item) ssti.value).type;
+            }
+            //strip coerce if its declared as this type
+            if (coerType.equals(type) && !coerType.equals(TypeItem.UNBOUNDED)) {
+                val = val.value;
+            }
+
             srcData.declaredType = (type instanceof TypeItem) ? ((TypeItem) type).fullTypeName : DottedChain.ALL;
             writer.append("var ");
             ssti.getName(writer, localData);
@@ -117,7 +131,7 @@ public class DeclarationAVM2Item extends AVM2Item {
 
             type.appendTry(writer, localData);
             writer.append(" = ");
-            return ssti.value.toString(writer, localData);
+            return val.toString(writer, localData);
         }
         writer.append("var ");
         return assignment.toString(writer, localData);
