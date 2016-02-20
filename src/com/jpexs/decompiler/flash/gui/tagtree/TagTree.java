@@ -457,8 +457,7 @@ public class TagTree extends JTree {
         return Arrays.asList(PlaceObjectTag.ID, PlaceObject2Tag.ID, PlaceObject3Tag.ID, PlaceObject4Tag.ID,
                 RemoveObjectTag.ID, RemoveObject2Tag.ID, FrameLabelTag.ID,
                 StartSoundTag.ID, StartSound2Tag.ID, VideoFrameTag.ID,
-                SoundStreamBlockTag.ID, SoundStreamHeadTag.ID, SoundStreamHead2Tag.ID,
-                DefineScalingGridTag.ID);
+                SoundStreamBlockTag.ID, SoundStreamHeadTag.ID, SoundStreamHead2Tag.ID);
     }
 
     public List<Integer> getNestedTagIds(Tag obj) {

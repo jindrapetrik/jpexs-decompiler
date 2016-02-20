@@ -562,6 +562,15 @@ public class TagTreeModel implements TreeModel {
     @Override
     public TreeItem getChild(Object parent, int index) {
         TreeItem parentNode = (TreeItem) parent;
+
+        if (parentNode instanceof CharacterTag) {
+            List<TreeItem> mapped = getMappedCharacters(((CharacterTag) parentNode).getSwf(), (CharacterTag) parentNode);
+            if (index < mapped.size()) {
+                return mapped.get(index);
+            }
+            index -= mapped.size();
+        }
+
         if (parentNode == root) {
             SWFList swfList = swfs.get(index);
             if (!swfList.isBundle()) {
@@ -615,8 +624,6 @@ public class TagTreeModel implements TreeModel {
             return clt.getChild(clt.getRoot(), index);
         } else if (parentNode instanceof AS3ClassTreeItem) {
             return ((AS3Package) parentNode).getChild(index);
-        } else if (parentNode instanceof CharacterTag) {
-            return getMappedCharacters(((CharacterTag) parentNode).getSwf(), (CharacterTag) parentNode).get(index);
         }
 
         throw new Error("Unsupported parent type: " + parentNode.getClass().getName());
@@ -625,37 +632,40 @@ public class TagTreeModel implements TreeModel {
     @Override
     public int getChildCount(Object parent) {
         TreeItem parentNode = (TreeItem) parent;
+        int mappedSize = 0;
+        if (parentNode instanceof CharacterTag) {
+            mappedSize = getMappedCharacters(((CharacterTag) parentNode).getSwf(), (CharacterTag) parentNode).size();
+        }
         if (parentNode == root) {
-            return swfs.size();
+            return mappedSize + swfs.size();
         } else if (parentNode instanceof SWFList) {
-            return ((SWFList) parentNode).swfs.size();
+            return mappedSize + ((SWFList) parentNode).swfs.size();
         } else if (parentNode instanceof SWF) {
-            return getSwfFolders((SWF) parentNode).size();
+            return mappedSize + getSwfFolders((SWF) parentNode).size();
         } else if (parentNode instanceof HeaderItem) {
-            return 0;
+            return mappedSize + 0;
         } else if (parentNode instanceof FolderItem) {
-            return ((FolderItem) parentNode).subItems.size();
+            return mappedSize + ((FolderItem) parentNode).subItems.size();
         } else if (parentNode instanceof Frame) {
-            return ((Frame) parentNode).innerTags.size();
+            return mappedSize + ((Frame) parentNode).innerTags.size();
         } else if (parentNode instanceof DefineSpriteTag) {
-            return ((DefineSpriteTag) parentNode).getTimeline().getFrameCount();
+            return mappedSize + ((DefineSpriteTag) parentNode).getTimeline().getFrameCount();
         } else if (parentNode instanceof DefineBinaryDataTag) {
-            return ((DefineBinaryDataTag) parentNode).innerSwf == null ? 0 : 1;
+            return mappedSize + (((DefineBinaryDataTag) parentNode).innerSwf == null ? 0 : 1);
         } else if (parentNode instanceof AS2Package) {
-            return ((AS2Package) parentNode).getChildCount();
+            return mappedSize + ((AS2Package) parentNode).getChildCount();
         } else if (parentNode instanceof FrameScript) {
             Frame parentFrame = ((FrameScript) parentNode).getFrame();
-            return parentFrame.actionContainers.size() + parentFrame.actions.size();
+            return mappedSize + parentFrame.actionContainers.size() + parentFrame.actions.size();
         } else if (parentNode instanceof TagScript) {
-            return ((TagScript) parentNode).getFrames().size();
+            return mappedSize + ((TagScript) parentNode).getFrames().size();
         } else if (parentNode instanceof ClassesListTreeModel) {
             ClassesListTreeModel clt = (ClassesListTreeModel) parentNode;
-            return clt.getChildCount(clt.getRoot());
+            return mappedSize + clt.getChildCount(clt.getRoot());
         } else if (parentNode instanceof AS3Package) {
-            return ((AS3Package) parentNode).getChildCount();
+            return mappedSize + ((AS3Package) parentNode).getChildCount();
         } else if (parentNode instanceof CharacterTag) {
-            SWF swf = ((CharacterTag) parentNode).getSwf();
-            return swf == null ? 0 : getMappedCharacters(swf, (CharacterTag) parentNode).size();
+            return mappedSize;
         }
 
         return 0;
@@ -670,48 +680,65 @@ public class TagTreeModel implements TreeModel {
     public void valueForPathChanged(TreePath path, Object newValue) {
     }
 
+    private int indexOfAdd(int prevSize, int index) {
+        if (index == -1) {
+            return -1;
+        }
+        return prevSize + index;
+    }
+
     @Override
     public int getIndexOfChild(Object parent, Object child) {
         TreeItem parentNode = (TreeItem) parent;
         TreeItem childNode = (TreeItem) child;
+        int baseIndex = 0;
+        if (parentNode instanceof CharacterTag) {
+            List<TreeItem> mapped = getMappedCharacters(((CharacterTag) parentNode).getSwf(), (CharacterTag) parentNode);
+
+            int mindex = mapped.indexOf(child);
+            if (mindex > -1) {
+                return mindex;
+            }
+            baseIndex = mapped.size();
+        }
         if (parentNode == root) {
             SWFList swfList = child instanceof SWFList
                     ? (SWFList) child
                     : ((SWF) child).swfList;
-            return swfs.indexOf(swfList);
+            return indexOfAdd(baseIndex, swfs.indexOf(swfList));
         } else if (parentNode instanceof SWFList) {
-            return ((SWFList) parentNode).swfs.indexOf(childNode);
+            return indexOfAdd(baseIndex, ((SWFList) parentNode).swfs.indexOf(childNode));
         } else if (parentNode instanceof SWF) {
-            return getSwfFolders((SWF) parentNode).indexOf(childNode);
+            return indexOfAdd(baseIndex, getSwfFolders((SWF) parentNode).indexOf(childNode));
         } else if (parentNode instanceof FolderItem) {
-            return ((FolderItem) parentNode).subItems.indexOf(childNode);
+            return indexOfAdd(baseIndex, ((FolderItem) parentNode).subItems.indexOf(childNode));
         } else if (parentNode instanceof Frame) {
-            return ((Frame) parentNode).innerTags.indexOf(childNode);
+            return indexOfAdd(baseIndex, ((Frame) parentNode).innerTags.indexOf(childNode));
         } else if (parentNode instanceof DefineSpriteTag) {
-            return ((Frame) childNode).frame;
+            return indexOfAdd(baseIndex, ((Frame) childNode).frame);
         } else if (parentNode instanceof DefineBinaryDataTag) {
-            return 0; // binary data tag can have only 1 child
+            return indexOfAdd(baseIndex, 0); // binary data tag can have only 1 child
         } else if (parentNode instanceof AS2Package) {
-            return ((AS2Package) parentNode).getIndexOfChild(childNode);
+            return indexOfAdd(baseIndex, ((AS2Package) parentNode).getIndexOfChild(childNode));
         } else if (parentNode instanceof FrameScript) {
             Frame parentFrame = ((FrameScript) parentNode).getFrame();
             if (childNode instanceof TagScript) {
                 childNode = ((TagScript) childNode).getTag();
             }
             if (childNode instanceof ASMSourceContainer) {
-                return parentFrame.actionContainers.indexOf(childNode);
+                return indexOfAdd(baseIndex, parentFrame.actionContainers.indexOf(childNode));
             } else {
-                return parentFrame.actionContainers.size() + parentFrame.actions.indexOf(childNode);
+                return indexOfAdd(baseIndex, parentFrame.actionContainers.size() + parentFrame.actions.indexOf(childNode));
             }
         } else if (parentNode instanceof TagScript) {
-            return ((TagScript) parentNode).getFrames().indexOf(childNode);
+            return indexOfAdd(baseIndex, ((TagScript) parentNode).getFrames().indexOf(childNode));
         } else if (parentNode instanceof ClassesListTreeModel) {
             ClassesListTreeModel clt = (ClassesListTreeModel) parentNode;
-            return clt.getIndexOfChild(clt.getRoot(), childNode);
+            return indexOfAdd(baseIndex, clt.getIndexOfChild(clt.getRoot(), childNode));
         } else if (parentNode instanceof AS3ClassTreeItem) {
-            return ((AS3Package) parentNode).getIndexOfChild((AS3ClassTreeItem) childNode);
+            return indexOfAdd(baseIndex, ((AS3Package) parentNode).getIndexOfChild((AS3ClassTreeItem) childNode));
         } else if (parentNode instanceof CharacterTag) {
-            return getMappedCharacters(((CharacterTag) parentNode).getSwf(), (CharacterTag) parentNode).indexOf(childNode);
+            return indexOfAdd(baseIndex, getMappedCharacters(((CharacterTag) parentNode).getSwf(), (CharacterTag) parentNode).indexOf(childNode));
         }
 
         throw new Error("Unsupported parent type: " + parentNode.getClass().getName());
