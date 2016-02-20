@@ -17,6 +17,10 @@
 			DebugConnection.writeLoaderBytes(bytes);
 			super.loadBytes(bytes,context);
 		}
+		
+		public override function toString():String {
+			return "[object Loader]";
+		}
 	}
 	
 }

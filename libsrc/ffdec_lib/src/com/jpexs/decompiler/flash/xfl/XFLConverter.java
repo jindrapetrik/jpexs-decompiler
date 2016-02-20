@@ -12,7 +12,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
+* License along with this library.
  */
 package com.jpexs.decompiler.flash.xfl;
 
@@ -217,8 +217,8 @@ public class XFLConverter {
                         + "<SolidColor color=\"")
                 .append(ls.color.toHexRGB()).append("\"")
                 .append(shapeNum == 3 ? " alpha=\"" + ((RGBA) ls.color).getAlphaFloat() + "\"" : "").append(" />"
-                        + "</fill>"
-                        + "</SolidStroke>");
+                + "</fill>"
+                + "</SolidStroke>");
     }
 
     private static void convertLineStyle(HashMap<Integer, CharacterTag> characters, LINESTYLE2 ls, int shapeNum, StringBuilder ret) {
@@ -2190,7 +2190,7 @@ public class XFLConverter {
         if (ret2.length() > 0) {
             ret.append("<DOMLayer name=\"Layer ").append(layerIndex).append("\" color=\"").append(randomOutlineColor()).append("\">"
                     + "<frames>").append(ret2).append("</frames>"
-                            + "</DOMLayer>");
+                    + "</DOMLayer>");
         }
     }
 
@@ -2342,7 +2342,7 @@ public class XFLConverter {
         if (filters != null) {
             filterStr.append("<filters>");
             for (FILTER f : filters) {
-                convertFilter(f, ret);
+                convertFilter(f, filterStr);
             }
             filterStr.append("</filters>");
         }
