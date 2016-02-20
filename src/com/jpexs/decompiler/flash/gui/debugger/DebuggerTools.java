@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.DebugLogDialog;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.flash.tags.FileAttributesTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
@@ -207,6 +208,11 @@ public class DebuggerTools {
                     swf.addTag((Tag) ds, (Tag) firstAbc);
                     swf.getAbcList().add(swf.getAbcList().indexOf(firstAbc), ds);
                     ((Tag) ds).setModified(true);
+
+                    //To allow socket connection to FFDec. Is this safe?
+                    FileAttributesTag ft = swf.getFileAttributes();
+                    ft.useNetwork = true;
+                    ft.setModified(true);
                 }
 
             } catch (Exception ex) {
