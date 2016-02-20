@@ -13,11 +13,14 @@
 		private static var inited:Boolean = false;
 		private static var name:String;
 		public static const DEBUG_VERSION_MAJOR = 1;
-		public static const DEBUG_VERSION_MINOR = 1;
+		public static const DEBUG_VERSION_MINOR = 2;
 		
 		public static const MSG_STRING = 0;
 		public static const MSG_LOADER_URL = 1;
 		public static const MSG_LOADER_BYTES = 2;
+		public static const MSG_LONGSTRING = 3;		
+		public static const MSG_LOADER_URL_GETBYTES = 4;
+		public static const MSG_LOADER_BYTES_GETBYTES = 5;
 						
 				
 		
@@ -38,10 +41,16 @@
 		
 		private static function writeString(msg){
 			var b:ByteArray = new ByteArray();			
-   			b.writeUTFBytes(msg);						
+   			b.writeUTFBytes(msg);				
 			s.writeByte((b.length>>8) & 0xff);
 			s.writeByte(b.length & 0xff);
 			s.writeBytes(b,0,b.length);						
+		}
+		
+		private static function writeLongString(msg){
+			var b:ByteArray = new ByteArray();			
+   			b.writeUTFBytes(msg);				
+			writeBytes(b);				
 		}
 		
 		private static function writeBytes(b:ByteArray){
@@ -50,6 +59,32 @@
 			s.writeByte((b.length>>8) & 0xff);
 			s.writeByte(b.length & 0xff);
 			s.writeBytes(b,0,b.length);						
+		}
+		
+		private static function readBytes():ByteArray {
+			var b:ByteArray = new ByteArray();						
+			var a1 = s.readUnsignedByte();
+			var a2 = s.readUnsignedByte();
+			var a3 = s.readUnsignedByte();
+			var a4 = s.readUnsignedByte();
+			var len = (a1<<24)+(a2<<16)+(a3<<8)+a4;
+			
+   			s.readBytes(b,0,len);
+			return b;
+		}
+		
+		private static function readString():String {
+			var b:ByteArray = new ByteArray();						
+			var a1 = s.readUnsignedByte();
+			var a2 = s.readUnsignedByte();
+			var len = (a1<<8)+a2;
+			
+   			return s.readUTFBytes(len);			
+		}
+		
+		private static function readLongString():String {
+			var b:ByteArray = readBytes();
+			return b.readUTFBytes(b.length);
 		}
 		
 		public static function initClient(sname){
@@ -101,6 +136,12 @@
 						break;
 					case MSG_LOADER_BYTES:
 						writeBytes(msg);
+						break;
+					case MSG_LOADER_URL_GETBYTES:
+						writeString(msg);						
+						break;
+					case MSG_LOADER_BYTES_GETBYTES:
+						writeBytes(msg);						
 						break;
 				}				
 			}else{
