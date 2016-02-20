@@ -466,9 +466,9 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
             Action action = item.action;
 
             /*System.out.print(action.getASMSource(actions, new ArrayList<Long>(), ScriptExportMode.PCODE));
-             for (int j = 0; j < stack.size(); j++) {
+            for (int j = 0; j < stack.size(); j++) {
              System.out.print(" '" + stack.get(j).getResult() + "'");
-             }
+            }
              System.out.println();*/
             if (action instanceof ActionConstantPool) {
                 lastConstantPool = (ActionConstantPool) action;

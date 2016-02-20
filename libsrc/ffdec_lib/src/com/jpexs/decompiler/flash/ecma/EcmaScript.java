@@ -45,9 +45,13 @@ public class EcmaScript {
         if (o instanceof Boolean) {
             return (Boolean) o ? 1.0 : 0.0;
         }
+        if (o instanceof Float) {
+            o = (double) (float) (Float) o;
+        }
         if (o instanceof Double) {
             return (Double) o;
         }
+
         if (o instanceof Long) {
             return (double) (long) (Long) o;
         }
@@ -397,6 +401,10 @@ public class EcmaScript {
         if (o instanceof Integer) {
             return ((Integer) o) != 0;
         }
+        if (o instanceof Float) {
+            o = (double) (float) (Float) o;
+        }
+
         if (o instanceof Double) {
             Double d = (Double) o;
             if (d.isNaN()) {

@@ -98,18 +98,12 @@ public class GetVariableActionItem extends ActionItem {
 
     @Override
     public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
-        if (computedValue == null) {
-            return false;
-        }
-        return computedCompiletime;
+        return false; //?
     }
 
     @Override
     public Object getResult() {
-        if (computedValue == null) {
-            return Undefined.INSTANCE;
-        }
-        return computedResult;
+        return null;
     }
 
     public void setComputedValue(GraphTargetItem computedValue) {

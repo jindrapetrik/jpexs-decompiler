@@ -62,8 +62,9 @@ public class ActionNewObject extends Action {
         }
         ActionScriptObject obj = new ActionScriptObject();
         //TODO:check type        
-        ActionScriptFunction constructor = (ActionScriptFunction) lda.stage.getMember(objectName);
+        /*ActionScriptFunction constructor = (ActionScriptFunction) lda.stage.getMember(objectName);
         lda.stage.callFunction(constructor.getFunctionOffset(), constructor.getFunctionLength(), args, constructor.getFuncRegNames(), obj);
+         */
         lda.stack.push(obj);
         return true;
     }

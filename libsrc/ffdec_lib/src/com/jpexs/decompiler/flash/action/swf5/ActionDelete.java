@@ -47,12 +47,13 @@ public class ActionDelete extends Action {
 
     @Override
     public boolean execute(LocalDataArea lda) {
-        String memberName = lda.popAsString();
+        /*        String memberName = lda.popAsString();
         Object o = lda.pop();
         if (o instanceof ActionScriptObject) {
             ((ActionScriptObject) o).setMember(memberName, Undefined.INSTANCE);
         }
-        return true;
+        return true;*/
+        return false;
     }
 
     @Override
