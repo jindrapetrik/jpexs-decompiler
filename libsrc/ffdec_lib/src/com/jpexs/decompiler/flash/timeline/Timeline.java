@@ -931,7 +931,7 @@ public class Timeline {
         FrameExporter.framesToHtmlCanvas(result, unitDivisor, this, frames, 0, null, 0, displayRect, null, null);
     }
 
-    public void getSounds(int frame, int time, DepthState stateUnderCursor, int mouseButton, List<Integer> sounds, List<String> soundClasses) {
+    public void getSounds(int frame, int time, ButtonTag mouseOverButton, int mouseButton, List<Integer> sounds, List<String> soundClasses) {
         Frame fr = getFrame(frame);
         sounds.addAll(fr.sounds);
         soundClasses.addAll(fr.soundClasses);
@@ -944,11 +944,10 @@ public class Timeline {
                     if (frameCount == 0) {
                         continue;
                     }
-                    int dframe = (time + ds.time) % frameCount;
+                    int dframe = time % frameCount;
                     if (c instanceof ButtonTag) {
-                        ButtonTag bt = (ButtonTag) c;
                         dframe = ButtonTag.FRAME_UP;
-                        if (stateUnderCursor == ds) {
+                        if (mouseOverButton == c) {
                             if (mouseButton > 0) {
                                 dframe = ButtonTag.FRAME_DOWN;
                             } else {
@@ -956,7 +955,7 @@ public class Timeline {
                             }
                         }
                     }
-                    ((Timelined) c).getTimeline().getSounds(dframe, time + ds.time, stateUnderCursor, mouseButton, sounds, soundClasses);
+                    ((Timelined) c).getTimeline().getSounds(dframe, time, mouseOverButton, mouseButton, sounds, soundClasses);
                 }
             }
         }
@@ -994,7 +993,7 @@ public class Timeline {
                     drawableFrameCount = 1;
                 }
 
-                int dframe = (time + layer.time) % drawableFrameCount;
+                int dframe = time % drawableFrameCount;
                 if (character instanceof ButtonTag) {
                     dframe = ButtonTag.FRAME_UP;
                     if (renderContext.cursorPosition != null) {
@@ -1010,7 +1009,7 @@ public class Timeline {
                     }
                 }
 
-                Shape cshape = ((DrawableTag) character).getOutline(dframe, time + layer.time, layer.ratio, renderContext, m);
+                Shape cshape = ((DrawableTag) character).getOutline(dframe, time, layer.ratio, renderContext, m);
                 Area addArea = new Area(cshape);
                 if (currentClip != null) {
                     Area a = new Area(new Rectangle(displayRect.Xmin, displayRect.Ymin, displayRect.getWidth(), displayRect.getHeight()));
