@@ -2808,14 +2808,18 @@ public final class SWF implements SWFContainerItem, Timelined {
         clearImageCache();
     }
 
+    @Override
     public void removeTag(int index) {
         setModified(true);
         tags.remove(index);
+        updateCharacters();
     }
 
+    @Override
     public void removeTag(Tag tag) {
         setModified(true);
         tags.remove(tag);
+        updateCharacters();
     }
 
     public void removeTag(Tag tag, boolean removeDependencies) {
@@ -2832,8 +2836,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             timelined.setModified(true);
             timelined.resetTimeline();
         } else // timeline should be always the swf here
-        {
-            if (removeDependencies) {
+         if (removeDependencies) {
                 removeTagWithDependenciesFromTimeline(tag, timelined.getTimeline());
                 timelined.setModified(true);
             } else {
@@ -2842,7 +2845,6 @@ public final class SWF implements SWFContainerItem, Timelined {
                     timelined.setModified(true);
                 }
             }
-        }
     }
 
     @Override
