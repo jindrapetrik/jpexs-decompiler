@@ -364,7 +364,7 @@ public class FolderPreviewPanel extends JPanel {
         image.fillTransparent();
         if (imgSrc == null) {
             DrawableTag drawable = (DrawableTag) treeItem;
-            drawable.toImage(0, 0, 0, new RenderContext(), image, false, m, m, null);
+            drawable.toImage(0, 0, 0, new RenderContext(), image, false, m, new Matrix(), m, null);
         } else {
             Graphics2D g = (Graphics2D) image.getGraphics();
             g.setTransform(m.toTransform());

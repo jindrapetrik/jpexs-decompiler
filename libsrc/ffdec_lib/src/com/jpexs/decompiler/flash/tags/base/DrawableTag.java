@@ -39,7 +39,7 @@ public interface DrawableTag extends BoundedTag {
 
     public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation);
 
-    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, boolean isClip, Matrix transformation, Matrix absoluteTransformation, ColorTransform colorTransform);
+    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, boolean isClip, Matrix transformation, Matrix prevTransformation, Matrix absoluteTransformation, ColorTransform colorTransform);
 
     public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level, double zoom) throws IOException;
 

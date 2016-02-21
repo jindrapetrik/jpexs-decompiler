@@ -132,7 +132,7 @@ public abstract class ShapeTag extends CharacterTag implements DrawableTag, Lazy
     }
 
     @Override
-    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, boolean isClip, Matrix transformation, Matrix absoluteTransformation, ColorTransform colorTransform) {
+    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, boolean isClip, Matrix transformation, Matrix prevTransformation, Matrix absoluteTransformation, ColorTransform colorTransform) {
         BitmapExporter.export(swf, getShapes(), null, image, transformation, colorTransform);
         if (Configuration._debugMode.get()) { // show control points
             List<GeneralPath> paths = PathExporter.export(swf, getShapes());

@@ -92,8 +92,8 @@ public abstract class ButtonTag extends CharacterTag implements DrawableTag, Tim
     }
 
     @Override
-    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, boolean isClip, Matrix transformation, Matrix absoluteTransformation, ColorTransform colorTransform) {
-        getTimeline().toImage(frame, time, renderContext, image, isClip, transformation, absoluteTransformation, colorTransform);
+    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, boolean isClip, Matrix transformation, Matrix prevTransformation, Matrix absoluteTransformation, ColorTransform colorTransform) {
+        getTimeline().toImage(frame, time, renderContext, image, isClip, transformation, prevTransformation, absoluteTransformation, colorTransform);
     }
 
     @Override

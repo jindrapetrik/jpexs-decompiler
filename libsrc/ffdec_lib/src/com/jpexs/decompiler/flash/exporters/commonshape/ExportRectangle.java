@@ -86,4 +86,10 @@ public class ExportRectangle {
         }
         return false;
     }
+
+    @Override
+    public String toString() {
+        return "[ExportRectangle x=" + xMin + ",y=" + yMin + ", w=" + getWidth() + ", h=" + getHeight() + "]";
+    }
+
 }

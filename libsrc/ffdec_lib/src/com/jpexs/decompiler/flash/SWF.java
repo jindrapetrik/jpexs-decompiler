@@ -741,10 +741,8 @@ public final class SWF implements SWFContainerItem, Timelined {
                         characters.put(characterId, (CharacterTag) t);
                         characterIdTags.put(characterId, new ArrayList<>());
                     }
-                } else {
-                    if (characterIdTags.containsKey(characterId)) {
-                        characterIdTags.get(characterId).add((CharacterIdTag) t);
-                    }
+                } else if (characterIdTags.containsKey(characterId)) {
+                    characterIdTags.get(characterId).add((CharacterIdTag) t);
                 }
             }
 
@@ -2672,7 +2670,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         RenderContext renderContext = new RenderContext();
         renderContext.cursorPosition = cursorPosition;
         renderContext.mouseButton = mouseButton;
-        timeline.toImage(frame, time, renderContext, image, false, m, absoluteTransformation, colorTransform);
+        timeline.toImage(frame, time, renderContext, image, false, m, transformation, absoluteTransformation, colorTransform);
 
         return image;
     }
@@ -2834,13 +2832,15 @@ public final class SWF implements SWFContainerItem, Timelined {
             timelined.setModified(true);
             timelined.resetTimeline();
         } else // timeline should be always the swf here
-        if (removeDependencies) {
-            removeTagWithDependenciesFromTimeline(tag, timelined.getTimeline());
-            timelined.setModified(true);
-        } else {
-            boolean modified = removeTagFromTimeline(tag, timelined.getTimeline());
-            if (modified) {
+        {
+            if (removeDependencies) {
+                removeTagWithDependenciesFromTimeline(tag, timelined.getTimeline());
                 timelined.setModified(true);
+            } else {
+                boolean modified = removeTagFromTimeline(tag, timelined.getTimeline());
+                if (modified) {
+                    timelined.setModified(true);
+                }
             }
         }
     }

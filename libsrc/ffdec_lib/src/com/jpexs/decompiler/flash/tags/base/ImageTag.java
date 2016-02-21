@@ -283,7 +283,7 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
     }
 
     @Override
-    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, boolean isClip, Matrix transformation, Matrix absoluteTransformation, ColorTransform colorTransform) {
+    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, boolean isClip, Matrix transformation, Matrix prevTransformation, Matrix absoluteTransformation, ColorTransform colorTransform) {
         BitmapExporter.export(swf, getShape(), null, image, transformation, colorTransform);
     }
 

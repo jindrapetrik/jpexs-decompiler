@@ -20,7 +20,9 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.FrameExporter;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
+import com.jpexs.decompiler.flash.exporters.commonshape.Point;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
+import com.jpexs.decompiler.flash.tags.DefineScalingGridTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
@@ -62,6 +64,8 @@ import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -545,7 +549,110 @@ public class Timeline {
         return modified;
     }
 
-    public void toImage(int frame, int time, RenderContext renderContext, SerializableImage image, boolean isClip, Matrix transformation, Matrix absoluteTransformation, ColorTransform colorTransform) {
+    private Matrix rectToRectMatrix(ExportRectangle fromRect, ExportRectangle toRect) {
+        Matrix toOrigin = Matrix.getTranslateInstance(-fromRect.xMin, -fromRect.yMin);
+        Matrix scale = new Matrix();
+        scale.scaleX = toRect.getWidth() / fromRect.getWidth();
+        scale.scaleY = toRect.getHeight() / fromRect.getHeight();
+        Matrix toDest = Matrix.getTranslateInstance(toRect.xMin, toRect.yMin);
+        return toOrigin.preConcatenate(scale).preConcatenate(toDest);
+    }
+
+    public double roundToPixel(double val) {
+        return Math.rint(val / SWF.unitDivisor) * SWF.unitDivisor;
+    }
+
+    public void toImage(int frame, int time, RenderContext renderContext, SerializableImage image, boolean isClip, Matrix transformation, Matrix prevTransformation, Matrix absoluteTransformation, ColorTransform colorTransform) {
+        ExportRectangle scalingGrid = null;
+        if (timelined instanceof CharacterTag) {
+            List<CharacterIdTag> mtags = swf.getCharacterIdTags(((CharacterTag) timelined).getCharacterId());
+            for (CharacterIdTag ct : mtags) {
+                if (ct instanceof DefineScalingGridTag) {
+                    scalingGrid = new ExportRectangle(((DefineScalingGridTag) ct).splitter);
+                }
+            }
+        }
+
+        if (scalingGrid == null || transformation.rotateSkew0 != 0 || transformation.rotateSkew1 != 0) {
+            toImage(frame, time, renderContext, image, isClip, transformation, absoluteTransformation, colorTransform, null);
+            return;
+        }
+
+        //9-slice scaling using DefineScalingGrid
+        Matrix diffTransform = prevTransformation.inverse().preConcatenate(transformation);
+        transformation = diffTransform;
+
+        Matrix prevScale = new Matrix();
+        prevScale.scaleX = prevTransformation.scaleX;
+        prevScale.scaleY = prevTransformation.scaleY;
+
+        ExportRectangle boundsRect = new ExportRectangle(timelined.getRect());
+
+        /*
+         0 |  1  | 2
+        ------------
+         3 |  4  | 5
+        ------------
+         6 |  7  | 8
+         */
+        ExportRectangle[] targetRect = new ExportRectangle[9];
+        ExportRectangle[] sourceRect = new ExportRectangle[9];
+        Matrix[] transforms = new Matrix[9];
+
+        sourceRect[0] = new ExportRectangle(0, 0, scalingGrid.xMin, scalingGrid.yMin);
+        targetRect[0] = new ExportRectangle(0, 0, scalingGrid.xMin, scalingGrid.yMin);
+
+        sourceRect[1] = new ExportRectangle(scalingGrid.xMin, 0, scalingGrid.xMax, scalingGrid.yMin);
+        targetRect[1] = new ExportRectangle(scalingGrid.xMin, 0, boundsRect.xMax * transformation.scaleX - (boundsRect.xMax - scalingGrid.xMax), scalingGrid.yMin);
+
+        sourceRect[2] = new ExportRectangle(scalingGrid.xMax, 0, boundsRect.xMax, scalingGrid.yMin);
+        targetRect[2] = new ExportRectangle(
+                boundsRect.xMax * transformation.scaleX - (boundsRect.xMax - scalingGrid.xMax),
+                0,
+                boundsRect.xMax * transformation.scaleX, scalingGrid.yMin);
+
+        sourceRect[3] = new ExportRectangle(0, scalingGrid.yMin, scalingGrid.xMin, scalingGrid.yMax);
+        targetRect[3] = new ExportRectangle(0, scalingGrid.yMin, scalingGrid.xMin, boundsRect.yMax * transformation.scaleY - (boundsRect.yMax - scalingGrid.yMax));
+
+        sourceRect[4] = new ExportRectangle(scalingGrid.xMin, scalingGrid.yMin, scalingGrid.xMax, scalingGrid.yMax);
+        targetRect[4] = new ExportRectangle(scalingGrid.xMin, scalingGrid.yMin, boundsRect.xMax * transformation.scaleX - (boundsRect.xMax - scalingGrid.xMax), boundsRect.yMax * transformation.scaleY - (boundsRect.yMax - scalingGrid.yMax));
+
+        sourceRect[5] = new ExportRectangle(scalingGrid.xMax, scalingGrid.yMin, boundsRect.xMax, scalingGrid.yMax);
+        targetRect[5] = new ExportRectangle(
+                boundsRect.xMax * transformation.scaleX - (boundsRect.xMax - scalingGrid.xMax),
+                scalingGrid.yMin,
+                boundsRect.xMax * transformation.scaleX,
+                boundsRect.yMax * transformation.scaleY - (boundsRect.yMax - scalingGrid.yMax)
+        );
+
+        sourceRect[6] = new ExportRectangle(0, scalingGrid.yMax, scalingGrid.xMin, boundsRect.yMax);
+        targetRect[6] = new ExportRectangle(0, boundsRect.yMax * transformation.scaleY - (boundsRect.yMax - scalingGrid.yMax), scalingGrid.xMin, boundsRect.yMax * transformation.scaleY);
+
+        sourceRect[7] = new ExportRectangle(scalingGrid.xMin, scalingGrid.yMax, scalingGrid.xMax, boundsRect.yMax);
+        targetRect[7] = new ExportRectangle(scalingGrid.xMin, boundsRect.yMax * transformation.scaleY - (boundsRect.yMax - scalingGrid.yMax), boundsRect.xMax * transformation.scaleX - (boundsRect.xMax - scalingGrid.xMax), boundsRect.yMax * transformation.scaleY);
+
+        sourceRect[8] = new ExportRectangle(scalingGrid.xMax, scalingGrid.yMax, boundsRect.xMax, boundsRect.yMax);
+        targetRect[8] = new ExportRectangle(
+                boundsRect.xMax * transformation.scaleX - (boundsRect.xMax - scalingGrid.xMax),
+                boundsRect.yMax * transformation.scaleY - (boundsRect.yMax - scalingGrid.yMax),
+                boundsRect.xMax * transformation.scaleX,
+                boundsRect.yMax * transformation.scaleY);
+        for (int i = 0; i < targetRect.length; i++) {
+            targetRect[i] = prevScale.transform(targetRect[i]);
+            //targetRect[i] = absDiffTransform.transform(targetRect[i]);
+            transforms[i] = rectToRectMatrix(sourceRect[i], targetRect[i]);
+            //Round to pixel boundary
+            targetRect[i].xMax = Math.rint(targetRect[i].xMax / SWF.unitDivisor);
+            targetRect[i].yMax = Math.rint(targetRect[i].yMax / SWF.unitDivisor);
+            targetRect[i].xMin = Math.rint(targetRect[i].xMin / SWF.unitDivisor);
+            targetRect[i].yMin = Math.rint(targetRect[i].yMin / SWF.unitDivisor);
+        }
+        for (int i = 0; i < targetRect.length; i++) {
+            toImage(frame, time, renderContext, image, isClip, transforms[i], absoluteTransformation, colorTransform, targetRect[i]);
+        }
+    }
+
+    public void toImage(int frame, int time, RenderContext renderContext, SerializableImage image, boolean isClip, Matrix transformation, Matrix absoluteTransformation, ColorTransform colorTransform, ExportRectangle clipRect) {
         double unzoom = SWF.unitDivisor;
         if (getFrameCount() <= frame) {
             return;
@@ -555,6 +662,11 @@ public class Timeline {
         Graphics2D g = (Graphics2D) image.getGraphics();
         g.setPaint(frameObj.backgroundColor.toColor());
         g.fill(new Rectangle(image.getWidth(), image.getHeight()));
+
+        Shape prevClip = g.getClip();
+        if (clipRect != null) {
+            g.setClip(new Rectangle2D.Double(clipRect.xMin, clipRect.yMin, clipRect.getWidth(), clipRect.getHeight()));
+        }
         g.setTransform(transformation.toTransform());
         List<Clip> clips = new ArrayList<>();
         List<Shape> prevClips = new ArrayList<>();
@@ -671,7 +783,7 @@ public class Timeline {
                     img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB);
                     img.fillTransparent();
 
-                    drawable.toImage(dframe, time, layer.ratio, renderContext, img, isClip || layer.clipDepth > -1, m, absMat, clrTrans);
+                    drawable.toImage(dframe, time, layer.ratio, renderContext, img, isClip || layer.clipDepth > -1, m, transformation, absMat, clrTrans);
 
                     if (cacheKey != null) {
                         renderContext.shapeCache.put(cacheKey, img);
@@ -833,6 +945,7 @@ public class Timeline {
         }
 
         g.setTransform(AffineTransform.getScaleInstance(1, 1));
+        g.setClip(prevClip);
     }
 
     public void toSVG(int frame, int time, DepthState stateUnderCursor, int mouseButton, SVGExporter exporter, ColorTransform colorTransform, int level, double zoom) throws IOException {
@@ -906,6 +1019,7 @@ public class Timeline {
                 }
             }
         }
+
     }
 
     private static String getTagIdPrefix(Tag tag, SVGExporter exporter) {
