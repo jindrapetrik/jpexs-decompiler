@@ -404,6 +404,10 @@ public class Configuration {
     @ConfigurationCategory("import")
     public static final ConfigurationItem<TextImportResizeTextBoundsMode> textImportResizeTextBoundsMode = null;
 
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("import")
+    public static final ConfigurationItem<Boolean> resetLetterSpacingOnTextImport = null;
+
     @ConfigurationDefaultBoolean(true)
     @ConfigurationName("warning.experimental.as12edit")
     @ConfigurationCategory("script")

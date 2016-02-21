@@ -794,18 +794,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             if (cht != null) {
                 if (cht instanceof DrawableTag) {
                     DrawableTag dt = (DrawableTag) cht;
-                    Shape outline = dt.getOutline(0, ds.time, ds.ratio, renderContext, new Matrix(ds.matrix));
+                    int drawableFrameCount = dt.getNumFrames();
+                    if (drawableFrameCount == 0) {
+                        drawableFrameCount = 1;
+                    }
+
+                    int dframe = time % drawableFrameCount;
+                    Shape outline = dt.getOutline(dframe, time, ds.ratio, renderContext, Matrix.getScaleInstance(1 / SWF.unitDivisor).concatenate(m.concatenate(new Matrix(ds.matrix))));
                     Rectangle bounds = outline.getBounds();
-                    bounds.x *= zoom;
-                    bounds.y *= zoom;
-                    bounds.width *= zoom;
-                    bounds.height *= zoom;
-                    bounds.x /= 20;
-                    bounds.y /= 20;
-                    bounds.width /= 20;
-                    bounds.height /= 20;
-                    bounds.x -= rect.Xmin / 20;
-                    bounds.y -= rect.Ymin / 20;
                     gg.setStroke(new BasicStroke(2.0f,
                             BasicStroke.CAP_BUTT,
                             BasicStroke.JOIN_MITER,
