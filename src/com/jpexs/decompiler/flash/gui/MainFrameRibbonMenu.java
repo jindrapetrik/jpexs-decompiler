@@ -178,6 +178,14 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
                 historyButton.setHorizontalAlignment(SwingUtilities.LEFT);
                 openHistoryPanel.addButtonToLastGroup(historyButton);
             }
+
+            if (recentFiles.isEmpty()) {
+                JCommandButton emptyLabel = new JCommandButton(translate("menu.recentFiles.empty"));
+                emptyLabel.setHorizontalAlignment(SwingUtilities.LEFT);
+                emptyLabel.setEnabled(false);
+                openHistoryPanel.addButtonToLastGroup(emptyLabel);
+            }
+
             openHistoryPanel.setMaxButtonColumns(1);
             targetPanel.setLayout(new BorderLayout());
             targetPanel.add(openHistoryPanel, BorderLayout.CENTER);
