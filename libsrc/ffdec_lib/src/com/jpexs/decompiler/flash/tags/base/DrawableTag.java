@@ -37,7 +37,7 @@ public interface DrawableTag extends BoundedTag {
 
     public int getUsedParameters();
 
-    public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation);
+    public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation, boolean stroked);
 
     public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, boolean isClip, Matrix transformation, Matrix prevTransformation, Matrix absoluteTransformation, ColorTransform colorTransform);
 

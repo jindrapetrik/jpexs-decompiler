@@ -22,6 +22,8 @@ import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.GRADRECORD;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.SHAPE;
+import java.awt.BasicStroke;
+import java.awt.Shape;
 import java.awt.geom.GeneralPath;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,12 +35,19 @@ import java.util.List;
 public class PathExporter extends ShapeExporterBase {
 
     private final List<GeneralPath> paths = new ArrayList<>();
+    private final List<GeneralPath> strokes = new ArrayList<>();
+    private double thickness = 0;
 
     private GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
 
     public static List<GeneralPath> export(SWF swf, SHAPE shape) {
+        return export(swf, shape, new ArrayList<>());
+    }
+
+    public static List<GeneralPath> export(SWF swf, SHAPE shape, List<GeneralPath> strokes) {
         PathExporter exporter = new PathExporter(swf, shape, null);
         exporter.export();
+        strokes.addAll(exporter.strokes);
         return exporter.paths;
     }
 
@@ -104,6 +113,7 @@ public class PathExporter extends ShapeExporterBase {
     @Override
     public void lineStyle(double thickness, RGB color, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, float miterLimit) {
         finalizePath();
+        this.thickness = thickness;
     }
 
     @Override
@@ -127,6 +137,11 @@ public class PathExporter extends ShapeExporterBase {
     }
 
     protected void finalizePath() {
+        if (thickness == 0) {
+            strokes.add(new GeneralPath());
+        } else {
+            strokes.add(new GeneralPath(new BasicStroke((float) (thickness)).createStrokedShape(path)));
+        }
         paths.add(path);
         path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);  //For correct intersections display
     }

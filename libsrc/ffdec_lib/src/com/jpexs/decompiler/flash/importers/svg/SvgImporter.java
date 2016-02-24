@@ -1040,7 +1040,7 @@ public class SvgImporter {
         st = (DefineShape4Tag) (new SvgImporter().importSvg(st, svgDataS));
         swf.addTag(st);
         SerializableImage si = new SerializableImage(480, 360, BufferedImage.TYPE_4BYTE_ABGR);
-        BitmapExporter.export(swf, st.shapes, Color.yellow, si, new Matrix(), null);
+        BitmapExporter.export(swf, st.shapes, Color.yellow, si, new Matrix(), new Matrix(), null);
         List<Tag> li = new ArrayList<>();
         li.add(st);
         ImageIO.write(si.getBufferedImage(), "PNG", new File(name + ".imported.png"));

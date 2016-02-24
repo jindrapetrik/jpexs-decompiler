@@ -654,10 +654,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         Matrix m = new Matrix();
         m.translate(-rect.Xmin * zoomDouble, -rect.Ymin * zoomDouble);
         m.scale(zoomDouble);
-        textTag.toImage(0, 0, 0, new RenderContext(), image, false, m, new Matrix(), m, new ConstantColorColorTransform(0xFFC0C0C0));
+        textTag.toImage(0, 0, 0, new RenderContext(), image, false, m, m, m, new ConstantColorColorTransform(0xFFC0C0C0));
 
         if (newTextTag != null) {
-            newTextTag.toImage(0, 0, 0, new RenderContext(), image, false, m, new Matrix(), m, new ConstantColorColorTransform(0xFF000000));
+            newTextTag.toImage(0, 0, 0, new RenderContext(), image, false, m, m, m, new ConstantColorColorTransform(0xFF000000));
         }
 
         iconPanel.setImg(image);
@@ -800,7 +800,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     }
 
                     int dframe = time % drawableFrameCount;
-                    Shape outline = dt.getOutline(dframe, time, ds.ratio, renderContext, Matrix.getScaleInstance(1 / SWF.unitDivisor).concatenate(m.concatenate(new Matrix(ds.matrix))));
+                    Shape outline = dt.getOutline(dframe, time, ds.ratio, renderContext, Matrix.getScaleInstance(1 / SWF.unitDivisor).concatenate(m.concatenate(new Matrix(ds.matrix))), true);
                     Rectangle bounds = outline.getBounds();
                     gg.setStroke(new BasicStroke(2.0f,
                             BasicStroke.CAP_BUTT,
@@ -991,7 +991,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             ret.append(" - ");
         }
 
-        ButtonTag lastMouseOverButton = null;
+        ButtonTag lastMouseOverButton;
         synchronized (ImagePanel.class) {
             if (timer == thisTimer) {
                 iconPanel.setImg(img);

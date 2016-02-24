@@ -77,15 +77,22 @@ public class SHAPE implements NeedsCharacters, Serializable {
         return SHAPERECORD.getBounds(shapeRecords);
     }
 
-    public Shape getOutline(SWF swf) {
+    public Shape getOutline(SWF swf, boolean stroked) {
         if (cachedOutline != null) {
             return cachedOutline;
         }
 
-        List<GeneralPath> paths = PathExporter.export(swf, this);
+        List<GeneralPath> strokes = new ArrayList<>();
+        List<GeneralPath> paths = PathExporter.export(swf, this, strokes);
+
         Area area = new Area();
         for (GeneralPath path : paths) {
             area.add(new Area(path));
+        }
+        if (stroked) {
+            for (GeneralPath path : strokes) {
+                area.add(new Area(path));
+            }
         }
 
         cachedOutline = area;

@@ -392,7 +392,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
         Graphics2D g = (Graphics2D) image.getGraphics();
         Matrix mat = transformation.clone();
         mat = mat.concatenate(new Matrix(textMatrix));
-        BitmapExporter.export(swf, getBorderShape(borderColor, fillColor, rect), null, image, mat, colorTransform);
+        BitmapExporter.export(swf, getBorderShape(borderColor, fillColor, rect), null, image, mat, mat, colorTransform);
     }
 
     public static void drawBorderHtmlCanvas(SWF swf, StringBuilder result, RGB borderColor, RGB fillColor, RECT rect, MATRIX textMatrix, ColorTransform colorTransform, double unitDivisor) {
@@ -470,7 +470,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
                 }
 
                 if (shape != null) {
-                    BitmapExporter.export(swf, shape, textColor2, image, mat, colorTransform);
+                    BitmapExporter.export(swf, shape, textColor2, image, mat, mat, colorTransform);
                     if (SHAPERECORD.DRAW_BOUNDING_BOX) {
                         RGB borderColor = new RGBA(Color.black);
                         RGB fillColor = new RGBA(new Color(255, 255, 255, 0));
@@ -736,7 +736,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
     }
 
     @Override
-    public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation) {
+    public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation, boolean stroked) {
         RECT r = getBounds();
         Shape shp = new Rectangle.Double(r.Xmin, r.Ymin, r.getWidth(), r.getHeight());
         return transformation.toTransform().createTransformedShape(shp); //TODO: match character shapes (?)

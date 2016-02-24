@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.exporters.commonshape;
 
 import com.jpexs.decompiler.flash.types.RECT;
-import java.awt.Point;
 import java.awt.geom.Rectangle2D;
 
 /**
@@ -64,8 +63,14 @@ public class ExportRectangle {
     }
 
     public boolean contains(Point point) {
-        int x = point.x;
-        int y = point.y;
+        double x = point.x;
+        double y = point.y;
+        return xMin <= x && xMax >= x && yMin <= y && yMax >= y;
+    }
+
+    public boolean contains(java.awt.Point point) {
+        double x = point.x;
+        double y = point.y;
         return xMin <= x && xMax >= x && yMin <= y && yMax >= y;
     }
 

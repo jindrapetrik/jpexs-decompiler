@@ -83,6 +83,8 @@ public class BitmapExporter extends ShapeExporterBase {
 
     private Stroke defaultStroke;
 
+    private Matrix strokeTransformation;
+
     private class TransformedStroke implements Stroke {
 
         /**
@@ -134,9 +136,9 @@ public class BitmapExporter extends ShapeExporterBase {
         }
     }
 
-    public static void export(SWF swf, SHAPE shape, Color defaultColor, SerializableImage image, Matrix transformation, ColorTransform colorTransform) {
+    public static void export(SWF swf, SHAPE shape, Color defaultColor, SerializableImage image, Matrix transformation, Matrix strokeTransformation, ColorTransform colorTransform) {
         BitmapExporter exporter = new BitmapExporter(swf, shape, defaultColor, colorTransform);
-        exporter.exportTo(image, transformation);
+        exporter.exportTo(image, transformation, strokeTransformation);
     }
 
     private BitmapExporter(SWF swf, SHAPE shape, Color defaultColor, ColorTransform colorTransform) {
@@ -145,8 +147,12 @@ public class BitmapExporter extends ShapeExporterBase {
         this.defaultColor = defaultColor;
     }
 
-    private void exportTo(SerializableImage image, Matrix transformation) {
+    private void exportTo(SerializableImage image, Matrix transformation, Matrix strokeTransformation) {
         this.image = image;
+        this.strokeTransformation = strokeTransformation.clone();
+        this.strokeTransformation.scaleX /= SWF.unitDivisor;
+        this.strokeTransformation.scaleY /= SWF.unitDivisor;
+
         graphics = (Graphics2D) image.getGraphics();
         AffineTransform at = transformation.toTransform();
         at.preConcatenate(AffineTransform.getScaleInstance(1 / SWF.unitDivisor, 1 / SWF.unitDivisor));
@@ -354,13 +360,13 @@ public class BitmapExporter extends ShapeExporterBase {
         }
         switch (scaleMode) {
             case "VERTICAL":
-                thickness *= graphics.getTransform().getScaleY();
+                thickness *= strokeTransformation.scaleY;
                 break;
             case "HORIZONTAL":
-                thickness *= graphics.getTransform().getScaleX();
+                thickness *= strokeTransformation.scaleX;
                 break;
             case "NORMAL":
-                thickness *= Math.max(graphics.getTransform().getScaleX(), graphics.getTransform().getScaleY());
+                thickness *= Math.max(strokeTransformation.scaleX, strokeTransformation.scaleY);
                 break;
         }
 
@@ -376,7 +382,9 @@ public class BitmapExporter extends ShapeExporterBase {
 
         // Do not scale strokes automatically:
         try {
-            lineStroke = new TransformedStroke(lineStroke, graphics.getTransform());
+            AffineTransform t = (AffineTransform) graphics.getTransform().clone();
+            t.translate(-0.5, -0.5);
+            lineStroke = new TransformedStroke(lineStroke, t);
         } catch (NoninvertibleTransformException net) {
             // ignore
         }

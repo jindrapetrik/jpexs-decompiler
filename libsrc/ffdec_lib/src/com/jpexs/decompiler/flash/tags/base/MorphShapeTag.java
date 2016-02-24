@@ -279,13 +279,13 @@ public abstract class MorphShapeTag extends CharacterTag implements DrawableTag 
     }
 
     @Override
-    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, boolean isClip, Matrix transformation, Matrix prevTransformation, Matrix absoluteTransformation, ColorTransform colorTransform) {
+    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, ColorTransform colorTransform) {
         SHAPEWITHSTYLE shape = getShapeAtRatio(ratio);
         // morphShape using shapeNum=3, morphShape2 using shapeNum=4
         // todo: Currently the generated image is not cached, because the cache
         // key contains the hashCode of the finalRecord object, and it is always
         // recreated
-        BitmapExporter.export(swf, shape, null, image, transformation, colorTransform);
+        BitmapExporter.export(swf, shape, null, image, transformation, strokeTransformation, colorTransform);
     }
 
     @Override
@@ -314,8 +314,8 @@ public abstract class MorphShapeTag extends CharacterTag implements DrawableTag 
     }
 
     @Override
-    public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation) {
-        return transformation.toTransform().createTransformedShape(getShapeAtRatio(ratio).getOutline(swf));
+    public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation, boolean stroked) {
+        return transformation.toTransform().createTransformedShape(getShapeAtRatio(ratio).getOutline(swf, stroked));
     }
 
     @Override
