@@ -1484,6 +1484,16 @@ public class Main {
             System.err.println("Error: Your system does not support Graphic User Interface");
             exit();
         }
+
+        System.setProperty("sun.java2d.d3d", "false");
+        System.setProperty("sun.java2d.noddraw", "true");
+
+        if (Configuration.hwAcceleratedGraphics.get()) {
+            System.setProperty("sun.java2d.opengl", Configuration._debugMode.get() ? "True" : "true");
+        } else {
+            System.setProperty("sun.java2d.opengl", "false");
+        }
+
         if (Configuration.useRibbonInterface.get()) {
             View.setLookAndFeel();
         } else {

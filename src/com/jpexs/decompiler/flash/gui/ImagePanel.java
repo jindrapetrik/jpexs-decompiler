@@ -55,6 +55,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Shape;
+import java.awt.Transparency;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -62,7 +63,9 @@ import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.awt.image.VolatileImage;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -131,6 +134,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private TextTag newTextTag;
 
+    private int msPerFrame;
+
     public synchronized void selectDepth(int depth) {
         if (depth != selectedDepth) {
             this.selectedDepth = depth;
@@ -173,6 +178,42 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
         public boolean hasAllowMove() {
             return allowMove;
+        }
+
+        VolatileImage renderImage;
+
+        public void render() {
+            if (img == null) {
+                return;
+            }
+            Graphics2D g2 = null;
+            do {
+
+                int valid = renderImage.validate(View.conf);
+
+                if (valid == VolatileImage.IMAGE_INCOMPATIBLE) {
+                    renderImage = View.createRenderImage(getWidth(), getHeight(), Transparency.TRANSLUCENT);
+                }
+
+                try {
+                    g2 = renderImage.createGraphics();
+                    g2.setPaint(View.transparentPaint);
+                    g2.fill(new Rectangle(0, 0, getWidth(), getHeight()));
+                    g2.setComposite(AlphaComposite.SrcOver);
+                    g2.setPaint(View.getSwfBackgroundColor());
+                    g2.fill(new Rectangle(0, 0, getWidth(), getHeight()));
+
+                    g2.setComposite(AlphaComposite.SrcOver);
+                    if (img != null && rect != null) {
+                        g2.drawImage(img.getBufferedImage(), rect.x, rect.y, rect.x + rect.width, rect.y + rect.height, 0, 0, img.getWidth(), img.getHeight(), null);
+                    }
+                } finally {
+                    if (g2 != null) {
+                        g2.dispose();
+                    }
+                }
+
+            } while (renderImage.contentsLost());
         }
 
         public IconPanel() {
@@ -218,8 +259,19 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
 
         public void setImg(SerializableImage img) {
+
             this.img = img;
+            if (img != null) {
+                if (renderImage == null || renderImage.getWidth() != getWidth() || renderImage.getHeight() != getHeight()) {
+                    renderImage = View.createRenderImage(getWidth(), getHeight(), Transparency.TRANSLUCENT);
+                }
+            }
             calcRect();
+
+            if (img != null) {
+                render();
+            }
+
             repaint();
         }
 
@@ -281,18 +333,33 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         @Override
         protected void paintComponent(Graphics g) {
             Graphics2D g2d = (Graphics2D) g;
-            g2d.setPaint(View.transparentPaint);
-            g2d.fill(new Rectangle(0, 0, getWidth(), getHeight()));
-            g2d.setComposite(AlphaComposite.SrcOver);
-            g2d.setPaint(View.getSwfBackgroundColor());
-            g2d.fill(new Rectangle(0, 0, getWidth(), getHeight()));
-            if (img != null) {
-                calcRect();
-                g2d.setComposite(AlphaComposite.SrcOver);
-                g2d.drawImage(img.getBufferedImage(), rect.x, rect.y, rect.x + rect.width, rect.y + rect.height, 0, 0, img.getWidth(), img.getHeight(), null);
+            calcRect();
+
+            if (renderImage != null) {
+                if (renderImage.validate(View.conf) != VolatileImage.IMAGE_OK) {
+                    renderImage = View.createRenderImage(getWidth(), getHeight(), Transparency.TRANSLUCENT);
+                    render();
+                }
+
+                if (renderImage != null) {
+                    g2d.drawImage(renderImage, 0, 0, getWidth(), getHeight(), null);
+                }
+            }
+            g2d.setColor(Color.red);
+
+            DecimalFormat df = new DecimalFormat();
+            df.setMaximumFractionDigits(2);
+            df.setMinimumFractionDigits(0);
+            df.setGroupingUsed(false);
+
+            float frameLoss = 100 - (getFpsIs() / fpsShouldBe * 100);
+
+            if (Configuration._debugMode.get()) {
+                g2d.drawString("frameLoss:" + df.format(frameLoss) + "%", 20, 20);
             }
 
         }
+
     }
 
     @Override
@@ -723,32 +790,32 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         newTextTag = null;
     }
 
-    private void nextFrame(Timer thisTimer) {
-        drawFrame(thisTimer);
+    private void nextFrame(Timer thisTimer, final int cnt) {
+        drawFrame(thisTimer, true);
+
         synchronized (ImagePanel.class) {
             if (timelined != null && timer == thisTimer) {
                 int frameCount = timelined.getTimeline().getFrameCount();
 
-                if (!stillFrame && frame == frameCount - 1 && !loop) {
-                    stopInternal();
-                    return;
-                }
+                int oldFrame = frame;
+                for (int i = 0; i < cnt; i++) {
+                    if (!stillFrame && frameCount > 0) {
+                        frame = (frame + 1) % frameCount;
+                    }
 
-                int newframe;
-                if (frameCount > 0) {
-                    newframe = (frame + 1) % frameCount;
-                } else {
-                    newframe = frame;
-                }
+                    if (!stillFrame && frame == frameCount - 1 && !loop) {
+                        stopInternal();
+                        return;
+                    }
 
-                if (stillFrame) {
-                    newframe = frame;
+                    if (i < cnt - 1) {                 //skip not displayed frames, do not display, only play sounds, etc.
+                        drawFrame(thisTimer, false);
+                    }
                 }
-                if (newframe != frame) {
-                    if (newframe == 0) {
+                if (frame != oldFrame) {
+                    if (frame == 0) {
                         stopAllSounds();
                     }
-                    frame = newframe;
                 }
 
                 time++;
@@ -882,7 +949,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
     }
 
-    private void drawFrame(Timer thisTimer) {
+    private void drawFrame(Timer thisTimer, boolean display) {
         Timelined timelined;
         MouseEvent lastMouseEvent;
         int frame;
@@ -938,9 +1005,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             mat.translateX = swf.displayRect.Xmin;
             mat.translateY = swf.displayRect.Ymin;
 
-            img = getFrame(swf, frame, time, timelined, renderContext, selectedDepth, zoomDouble);
-            if (renderContext.borderImage != null) {
-                img = renderContext.borderImage;
+            img = null;
+            if (display) {
+                img = getFrame(swf, frame, time, timelined, renderContext, selectedDepth, zoomDouble);
+                if (renderContext.borderImage != null) {
+                    img = renderContext.borderImage;
+                }
             }
 
             List<Integer> sounds = new ArrayList<>();
@@ -967,68 +1037,70 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             // swf was closed during the rendering probably
             return;
         }
+        if (display) {
 
-        StringBuilder ret = new StringBuilder();
+            StringBuilder ret = new StringBuilder();
 
-        if (cursorPosition != null) {
-            ret.append(" [").append(cursorPosition.x).append(",").append(cursorPosition.y).append("] : ");
-        }
-
-        boolean handCursor = renderContext.mouseOverButton != null;
-        boolean first = true;
-        for (int i = renderContext.stateUnderCursor.size() - 1; i >= 0; i--) {
-            DepthState ds = renderContext.stateUnderCursor.get(i);
-            if (!first) {
-                ret.append(", ");
+            if (cursorPosition != null) {
+                ret.append(" [").append(cursorPosition.x).append(",").append(cursorPosition.y).append("] : ");
             }
 
-            first = false;
-            CharacterTag c = swf.getCharacter(ds.characterId);
-            ret.append(c.toString());
-        }
-
-        if (first) {
-            ret.append(" - ");
-        }
-
-        ButtonTag lastMouseOverButton;
-        synchronized (ImagePanel.class) {
-            if (timer == thisTimer) {
-                iconPanel.setImg(img);
-                lastMouseOverButton = iconPanel.mouseOverButton;
-                iconPanel.mouseOverButton = renderContext.mouseOverButton;
-                debugLabel.setText(ret.toString());
-                if (handCursor) {
-                    iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                } else if (iconPanel.hasAllowMove()) {
-                    iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
-                } else {
-                    iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            boolean handCursor = renderContext.mouseOverButton != null;
+            boolean first = true;
+            for (int i = renderContext.stateUnderCursor.size() - 1; i >= 0; i--) {
+                DepthState ds = renderContext.stateUnderCursor.get(i);
+                if (!first) {
+                    ret.append(", ");
                 }
 
-                if (lastMouseOverButton != renderContext.mouseOverButton) {
-                    ButtonTag b = renderContext.mouseOverButton;
-                    if (b != null) {
-                        // New mouse entered
-                        DefineButtonSoundTag sounds = b.getSounds();
-                        if (sounds != null && sounds.buttonSoundChar1 != 0) { // IdleToOverUp
-                            playSound((SoundTag) swf.getCharacter(sounds.buttonSoundChar1), sounds.buttonSoundInfo1, timer);
+                first = false;
+                CharacterTag c = swf.getCharacter(ds.characterId);
+                ret.append(c.toString());
+            }
+
+            if (first) {
+                ret.append(" - ");
+            }
+
+            ButtonTag lastMouseOverButton;
+            synchronized (ImagePanel.class) {
+                if (timer == thisTimer) {
+                    iconPanel.setImg(img);
+                    lastMouseOverButton = iconPanel.mouseOverButton;
+                    iconPanel.mouseOverButton = renderContext.mouseOverButton;
+                    debugLabel.setText(ret.toString());
+                    if (handCursor) {
+                        iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    } else if (iconPanel.hasAllowMove()) {
+                        iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+                    } else {
+                        iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                    }
+
+                    if (lastMouseOverButton != renderContext.mouseOverButton) {
+                        ButtonTag b = renderContext.mouseOverButton;
+                        if (b != null) {
+                            // New mouse entered
+                            DefineButtonSoundTag sounds = b.getSounds();
+                            if (sounds != null && sounds.buttonSoundChar1 != 0) { // IdleToOverUp
+                                playSound((SoundTag) swf.getCharacter(sounds.buttonSoundChar1), sounds.buttonSoundInfo1, timer);
+                            }
+                        }
+
+                        b = lastMouseOverButton;
+                        if (b != null) {
+                            // Old mouse leave
+                            DefineButtonSoundTag sounds = b.getSounds();
+                            if (sounds != null && sounds.buttonSoundChar0 != 0) { // OverUpToIdle
+                                playSound((SoundTag) swf.getCharacter(sounds.buttonSoundChar0), sounds.buttonSoundInfo0, timer);
+                            }
                         }
                     }
 
-                    b = lastMouseOverButton;
-                    if (b != null) {
-                        // Old mouse leave
-                        DefineButtonSoundTag sounds = b.getSounds();
-                        if (sounds != null && sounds.buttonSoundChar0 != 0) { // OverUpToIdle
-                            playSound((SoundTag) swf.getCharacter(sounds.buttonSoundChar0), sounds.buttonSoundInfo0, timer);
-                        }
+                    drawReady = true;
+                    synchronized (delayObject) {
+                        delayObject.notify();
                     }
-                }
-
-                drawReady = true;
-                synchronized (delayObject) {
-                    delayObject.notify();
                 }
             }
         }
@@ -1098,19 +1170,53 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
     }
 
-    private void startTimer(Timeline timeline, boolean playing) {
+    private synchronized void setMsPerFrame(int val) {
+        this.msPerFrame = val;
+    }
 
-        float frameRate = timeline.frameRate;
-        int msPerFrame = frameRate == 0 ? 1000 : (int) (1000.0 / frameRate);
-        final boolean singleFrame = !playing
-                || (stillFrame && timeline.isSingleFrame(frame))
-                || (!stillFrame && timeline.getRealFrameCount() <= 1 && timeline.isSingleFrame());
+    private synchronized int getMsPerFrame() {
+        return this.msPerFrame;
+    }
 
-        timer = new Timer();
+    private long startRun = 0L;
+    private long startDrop = 0L;
+    private int skippedFrames = 0;
+    private float fpsShouldBe = 0;
+    private float fpsIs = 0;
+    private Timer fpsTimer;
+
+    private synchronized void setFpsIs(float val) {
+        fpsIs = val;
+    }
+
+    private synchronized float getFpsIs() {
+        return fpsIs;
+    }
+
+    private synchronized void setSkippedFrames(int val) {
+        skippedFrames = val;
+    }
+
+    private synchronized void addSkippedFrames(int val) {
+        skippedFrames += val;
+    }
+
+    private synchronized int getSkippedFrames() {
+        return skippedFrames;
+    }
+
+    private synchronized int getAndResetSkippedFrames() {
+        int ret = skippedFrames;
+        skippedFrames = 0;
+        return ret;
+    }
+
+    private void scheduleTask(boolean singleFrame, long msDelay) {
         TimerTask task = new TimerTask() {
             public final Timer thisTimer = timer;
 
             public final boolean isSingleFrame = singleFrame;
+            private long lastRun = 0L;
 
             @Override
             public void run() {
@@ -1120,9 +1226,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             return;
                         }
                     }
-
+                    lastRun = System.currentTimeMillis();
+                    int curFrame = frame;
+                    long delay = getMsPerFrame();
                     if (isSingleFrame) {
-                        drawFrame(thisTimer);
+                        drawFrame(thisTimer, true);
                         synchronized (ImagePanel.class) {
                             thisTimer.cancel();
                             if (timer == thisTimer) {
@@ -1132,19 +1240,65 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                         fireMediaDisplayStateChanged();
                     } else {
-                        nextFrame(thisTimer);
+                        long frameTimeIs = System.currentTimeMillis();
+
+                        int frameShouldBeNow = (int) Math.floor((frameTimeIs - startRun) / (double) getMsPerFrame()) + 1;
+                        int frameCount = timelined.getTimeline().getFrameCount();
+                        frameShouldBeNow = frameShouldBeNow % frameCount;
+                        int skipFrames = frameShouldBeNow - curFrame;
+                        if (skipFrames < 0) {
+                            skipFrames += frameCount;
+                        }
+                        if (skipFrames > 1) {
+                            addSkippedFrames(skipFrames - 1);
+                        }
+                        nextFrame(thisTimer, skipFrames);
+
+                        long afterDrawFrameTimeIs = System.currentTimeMillis();
+
+                        int nextFrame = frameShouldBeNow;
+                        while (delay < 0) {
+                            nextFrame++;
+                            long nextFrameTimeShouldBe = startRun + getMsPerFrame() * nextFrame;
+                            delay = nextFrameTimeShouldBe - afterDrawFrameTimeIs;
+                        }
                     }
+                    scheduleTask(isSingleFrame, delay);
+
                 } catch (Exception ex) {
                     logger.log(Level.SEVERE, null, ex);
                 }
             }
         };
-
-        if (singleFrame) {
-            timer.schedule(task, 0);
-        } else {
-            timer.schedule(task, 0, msPerFrame);
+        if (timer != null) {
+            timer.schedule(task, msDelay);
         }
+    }
+
+    private synchronized void startTimer(Timeline timeline, boolean playing) {
+
+        startRun = System.currentTimeMillis();
+        float frameRate = timeline.frameRate;
+        setMsPerFrame(frameRate == 0 ? 1000 : (int) (1000.0 / frameRate));
+        final boolean singleFrame = !playing
+                || (stillFrame && timeline.isSingleFrame(frame))
+                || (!stillFrame && timeline.getRealFrameCount() <= 1 && timeline.isSingleFrame());
+
+        if (fpsTimer == null) {
+            fpsTimer = new Timer();
+            fpsTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    float skipped = getAndResetSkippedFrames();
+                    setFpsIs(fpsShouldBe - skipped);
+                }
+            }, 1000, 1000);
+        }
+        timer = new Timer();
+        fpsShouldBe = timeline.frameRate;
+        fpsIs = fpsShouldBe;
+        scheduleTask(singleFrame, 0);
+
     }
 
     @Override

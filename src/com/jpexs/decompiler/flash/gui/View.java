@@ -25,6 +25,7 @@ import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
@@ -36,6 +37,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
+import java.awt.image.VolatileImage;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
@@ -724,5 +726,29 @@ public class View {
         });
 
         return table;
+    }
+
+    public static GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+    public static GraphicsConfiguration conf = env.getDefaultScreenDevice().getDefaultConfiguration();
+
+    public static BufferedImage toCompatibleImage(BufferedImage image) {
+        if (image.getColorModel().equals(conf.getColorModel())) {
+            return image;
+        }
+
+        return conf.createCompatibleImage(image.getWidth(), image.getHeight(), image.getTransparency());
+    }
+
+    public static VolatileImage createRenderImage(int width, int height, int transparency) {
+        VolatileImage image = conf.createCompatibleVolatileImage(width, height, transparency);
+
+        int valid = image.validate(conf);
+
+        if (valid == VolatileImage.IMAGE_INCOMPATIBLE) {
+            image = createRenderImage(width, height, transparency);
+            return image;
+        }
+
+        return image;
     }
 }

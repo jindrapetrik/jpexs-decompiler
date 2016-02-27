@@ -594,6 +594,10 @@ public class Configuration {
     @ConfigurationCategory("script")
     public static final ConfigurationItem<Boolean> simplifyExpressions = null;
 
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationInternal
+    public static final ConfigurationItem<Boolean> hwAcceleratedGraphics = null;
+
     private enum OSId {
 
         WINDOWS, OSX, UNIX
