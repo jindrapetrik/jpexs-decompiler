@@ -28,7 +28,6 @@ import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.decompiler.flash.gui.helpers.CheckResources;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.helpers.ByteArrayRange;
-import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import com.sun.jna.Platform;
@@ -559,16 +558,16 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     /*protected void cacheOnDiskActionPerformed(ActionEvent evt) {
-        AbstractButton button = (AbstractButton) evt.getSource();
-        boolean selected = button.isSelected();
+     AbstractButton button = (AbstractButton) evt.getSource();
+     boolean selected = button.isSelected();
 
-        Configuration.cacheOnDisk.set(selected);
-        if (selected) {
-            Cache.setStorageType(Cache.STORAGE_FILES);
-        } else {
-            Cache.setStorageType(Cache.STORAGE_MEMORY);
-        }
-    }*/
+     Configuration.cacheOnDisk.set(selected);
+     if (selected) {
+     Cache.setStorageType(Cache.STORAGE_FILES);
+     } else {
+     Cache.setStorageType(Cache.STORAGE_MEMORY);
+     }
+     }*/
     protected void setLanguageActionPerformed(ActionEvent evt) {
         new SelectLanguageDialog().display();
     }
@@ -949,9 +948,9 @@ public abstract class MainFrameMenu implements MenuBuilder {
         });
 
         /*setMenuChecked("/settings/cacheOnDisk", Configuration.cacheOnDisk.get());
-        Configuration.cacheOnDisk.addListener(configListenerCacheOnDisk = (Boolean newValue) -> {
-            setMenuChecked("/settings/cacheOnDisk", newValue);
-        });*/
+         Configuration.cacheOnDisk.addListener(configListenerCacheOnDisk = (Boolean newValue) -> {
+         setMenuChecked("/settings/cacheOnDisk", newValue);
+         });*/
         setMenuChecked("/settings/gotoMainClassOnStartup", Configuration.gotoMainClassOnStartup.get());
         Configuration.gotoMainClassOnStartup.addListener(configListenerGotoMainClassOnStartup = (Boolean newValue) -> {
             setMenuChecked("/settings/gotoMainClassOnStartup", newValue);
@@ -1012,6 +1011,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
                 String architecture = System.getProperty("sun.arch.data.model");
                 Runtime runtime = Runtime.getRuntime();
                 String info = "Architecture: " + architecture + Helper.newLine
+                        + "Jre 64bit: " + Helper.is64BitJre() + Helper.newLine
+                        + "Os 64bit: " + Helper.is64BitOs() + Helper.newLine
                         + "Max: " + (runtime.maxMemory() / 1024 / 1024) + "MB" + Helper.newLine
                         + "Used: " + (runtime.totalMemory() / 1024 / 1024) + "MB" + Helper.newLine
                         + "Free: " + (runtime.freeMemory() / 1024 / 1024) + "MB";

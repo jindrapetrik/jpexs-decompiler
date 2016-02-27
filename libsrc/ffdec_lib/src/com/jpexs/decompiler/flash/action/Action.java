@@ -863,6 +863,7 @@ public abstract class Action implements GraphSourceItem {
             } else {
                 logger.log(Level.SEVERE, "Decompilation error in: " + path, ex);
             }
+
             convertException = ex;
             Throwable cause = ex.getCause();
             if (ex instanceof ExecutionException && cause instanceof Exception) {
@@ -1023,11 +1024,12 @@ public abstract class Action implements GraphSourceItem {
                             }
                         }
                         out = ActionGraph.translateViaGraph(regNames, variables2, functions, actions.subList(adr2ip(actions, endAddr), adr2ip(actions, endAddr + size)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName));
-                    } catch (OutOfMemoryError | TranslateException | StackOverflowError ex2) {
-                        logger.log(Level.SEVERE, "Decompilation error in: " + path, ex2);
-                        if (ex2 instanceof OutOfMemoryError) {
+                    } catch (OutOfMemoryError | TranslateException | StackOverflowError ex) {
+                        logger.log(Level.SEVERE, "Decompilation error in: " + path, ex);
+                        if (ex instanceof OutOfMemoryError) {
                             Helper.freeMem();
                         }
+
                         out = new ArrayList<>();
                         out.add(new CommentItem(new String[]{
                             "",
@@ -1035,7 +1037,7 @@ public abstract class Action implements GraphSourceItem {
                             " * " + AppResources.translate("decompilationError.obfuscated"),
                             Helper.decompilationErrorAdd == null ? null : " * " + Helper.decompilationErrorAdd,
                             " * " + AppResources.translate("decompilationError.errorType") + ": "
-                            + ex2.getClass().getSimpleName(),
+                            + ex.getClass().getSimpleName(),
                             ""}));
                     }
                     outs.add(out);
@@ -1065,7 +1067,7 @@ public abstract class Action implements GraphSourceItem {
             }
 
             /*ActionJump && ActionIf removed*/
- /*if ((action instanceof ActionEnumerate2) || (action instanceof ActionEnumerate)) {
+            /*if ((action instanceof ActionEnumerate2) || (action instanceof ActionEnumerate)) {
              loopStart = ip + 1;
              isForIn = true;
              ip += 4;
