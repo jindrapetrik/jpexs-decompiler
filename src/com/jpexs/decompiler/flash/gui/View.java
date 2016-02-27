@@ -337,8 +337,7 @@ public class View {
 
     public static void centerScreen(Window f, int screen) {
 
-        GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        GraphicsDevice[] allDevices = env.getScreenDevices();
+        GraphicsDevice[] allDevices = getEnv().getScreenDevices();
         int topLeftX, topLeftY, screenX, screenY, windowPosX, windowPosY;
 
         if (screen < allDevices.length && screen > -1) {
@@ -747,17 +746,17 @@ public class View {
     }
 
     public static BufferedImage toCompatibleImage(BufferedImage image) {
-        if (image.getColorModel().equals(conf.getColorModel())) {
+        if (image.getColorModel().equals(getDefaultConfiguration().getColorModel())) {
             return image;
         }
 
-        return conf.createCompatibleImage(image.getWidth(), image.getHeight(), image.getTransparency());
+        return getDefaultConfiguration().createCompatibleImage(image.getWidth(), image.getHeight(), image.getTransparency());
     }
 
     public static VolatileImage createRenderImage(int width, int height, int transparency) {
-        VolatileImage image = conf.createCompatibleVolatileImage(width, height, transparency);
+        VolatileImage image = getDefaultConfiguration().createCompatibleVolatileImage(width, height, transparency);
 
-        int valid = image.validate(conf);
+        int valid = image.validate(getDefaultConfiguration());
 
         if (valid == VolatileImage.IMAGE_INCOMPATIBLE) {
             image = createRenderImage(width, height, transparency);
