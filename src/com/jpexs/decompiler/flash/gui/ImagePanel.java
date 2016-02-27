@@ -189,7 +189,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             Graphics2D g2 = null;
             do {
 
-                int valid = renderImage.validate(View.conf);
+                int valid = renderImage.validate(View.getDefaultConfiguration());
 
                 if (valid == VolatileImage.IMAGE_INCOMPATIBLE) {
                     renderImage = View.createRenderImage(getWidth(), getHeight(), Transparency.TRANSLUCENT);
@@ -336,7 +336,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             calcRect();
 
             if (renderImage != null) {
-                if (renderImage.validate(View.conf) != VolatileImage.IMAGE_OK) {
+                if (renderImage.validate(View.getDefaultConfiguration()) != VolatileImage.IMAGE_OK) {
                     renderImage = View.createRenderImage(getWidth(), getHeight(), Transparency.TRANSLUCENT);
                     render();
                 }

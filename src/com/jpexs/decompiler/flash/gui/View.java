@@ -728,8 +728,23 @@ public class View {
         return table;
     }
 
-    public static GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
-    public static GraphicsConfiguration conf = env.getDefaultScreenDevice().getDefaultConfiguration();
+    private static GraphicsEnvironment env;
+
+    public static GraphicsEnvironment getEnv() {
+        if (env == null) {
+            env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        }
+        return env;
+    }
+
+    private static GraphicsConfiguration conf;
+
+    public static GraphicsConfiguration getDefaultConfiguration() {
+        if (conf == null) {
+            conf = getEnv().getDefaultScreenDevice().getDefaultConfiguration();
+        }
+        return conf;
+    }
 
     public static BufferedImage toCompatibleImage(BufferedImage image) {
         if (image.getColorModel().equals(conf.getColorModel())) {
