@@ -2245,6 +2245,14 @@ public class Main {
             }
         }
 
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+
+            @Override
+            public void uncaughtException(Thread t, Throwable e) {
+                logger.log(Level.SEVERE, "Uncaught exception in thread: " + t.getName(), e);
+            }
+        });
+
         Formatter formatterTxt = new LogFormatter();
         if (fileTxt != null) {
             fileTxt.setFormatter(formatterTxt);
