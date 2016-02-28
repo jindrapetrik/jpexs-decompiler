@@ -136,6 +136,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private int msPerFrame;
 
+    private boolean lowQuality = false;
+
+    private final double LQ_FACTOR = 2;
+
     public synchronized void selectDepth(int depth) {
         if (depth != selectedDepth) {
             this.selectedDepth = depth;
@@ -162,9 +166,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private class IconPanel extends JPanel {
 
-        private SerializableImage img;
+        private SerializableImage _img;
 
-        private Rectangle rect = null;
+        private Rectangle _rect = null;
 
         private ButtonTag mouseOverButton = null;
 
@@ -176,6 +180,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
         private Point offsetPoint = new Point(0, 0);
 
+        private synchronized SerializableImage getImg() {
+            return _img;
+        }
+
+        public synchronized Rectangle getRect() {
+            return _rect;
+        }
+
         public boolean hasAllowMove() {
             return allowMove;
         }
@@ -183,6 +195,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         VolatileImage renderImage;
 
         public void render() {
+            SerializableImage img = getImg();
+            Rectangle rect = getRect();
             if (img == null) {
                 return;
             }
@@ -204,7 +218,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     g2.fill(new Rectangle(0, 0, getWidth(), getHeight()));
 
                     g2.setComposite(AlphaComposite.SrcOver);
-                    if (img != null && rect != null) {
+                    if (rect != null) {
                         g2.drawImage(img.getBufferedImage(), rect.x, rect.y, rect.x + rect.width, rect.y + rect.height, 0, 0, img.getWidth(), img.getHeight(), null);
                     }
                 } finally {
@@ -254,13 +268,16 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             repaint();
         }
 
-        public BufferedImage getLastImage() {
-            return img.getBufferedImage();
+        public synchronized BufferedImage getLastImage() {
+            if (_img == null) {
+                return null;
+            }
+            return _img.getBufferedImage();
         }
 
-        public void setImg(SerializableImage img) {
+        public synchronized void setImg(SerializableImage img) {
 
-            this.img = img;
+            this._img = img;
             if (img != null) {
                 if (renderImage == null || renderImage.getWidth() != getWidth() || renderImage.getHeight() != getHeight()) {
                     renderImage = View.createRenderImage(getWidth(), getHeight(), Transparency.TRANSLUCENT);
@@ -275,16 +292,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             repaint();
         }
 
-        public Rectangle getRect() {
-            return rect;
-        }
-
-        public Point toImagePoint(Point p) {
-            if (img == null) {
+        public synchronized Point toImagePoint(Point p) {
+            if (_img == null) {
                 return null;
             }
 
-            return new Point((p.x - rect.x) * img.getWidth() / rect.width, (p.y - rect.y) * img.getHeight() / rect.height);
+            return new Point((p.x - _rect.x) * _img.getWidth() / _rect.width, (p.y - _rect.y) * _img.getHeight() / _rect.height);
         }
 
         private void setAllowMove(boolean allowMove) {
@@ -294,10 +307,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             }
         }
 
-        private void calcRect() {
-            if (img != null) {
-                int w1 = img.getWidth();
-                int h1 = img.getHeight();
+        private synchronized void calcRect() {
+            if (_img != null) {
+                int w1 = (int) (_img.getWidth() * (lowQuality ? LQ_FACTOR : 1));
+                int h1 = (int) (_img.getHeight() * (lowQuality ? LQ_FACTOR : 1));
 
                 int w2 = getWidth();
                 int h2 = getHeight();
@@ -324,9 +337,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 }
 
                 setAllowMove(h > h2 || w > w2);
-                rect = new Rectangle(getWidth() / 2 - w / 2 + offsetPoint.x, getHeight() / 2 - h / 2 + offsetPoint.y, w, h);
+                _rect = new Rectangle(getWidth() / 2 - w / 2 + offsetPoint.x, getHeight() / 2 - h / 2 + offsetPoint.y, w, h);
             } else {
-                rect = null;
+                _rect = null;
             }
         }
 
@@ -790,7 +803,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         newTextTag = null;
     }
 
-    private void nextFrame(Timer thisTimer, final int cnt) {
+    private void nextFrame(Timer thisTimer, final int cnt, final int timeShouldBe) {
         drawFrame(thisTimer, true);
 
         synchronized (ImagePanel.class) {
@@ -816,9 +829,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     if (frame == 0) {
                         stopAllSounds();
                     }
+                    time = 0;
+                } else {
+                    time = timeShouldBe;
                 }
-
-                time++;
             }
         }
 
@@ -999,6 +1013,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             }
 
             double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
+            if (lowQuality) {
+                zoomDouble /= LQ_FACTOR;
+            }
             updatePos(timelined, lastMouseEvent, thisTimer);
 
             Matrix mat = new Matrix();
@@ -1184,6 +1201,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private float fpsShouldBe = 0;
     private float fpsIs = 0;
     private Timer fpsTimer;
+    private int startFrame = 0;
 
     private synchronized void setFpsIs(float val) {
         fpsIs = val;
@@ -1240,33 +1258,48 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                         fireMediaDisplayStateChanged();
                     } else {
-                        long frameTimeIs = System.currentTimeMillis();
-
-                        int frameShouldBeNow = (int) Math.floor((frameTimeIs - startRun) / (double) getMsPerFrame()) + 1;
+                        //Time before drawing current frame
+                        long frameTimeMsIs = System.currentTimeMillis();
+                        //Total number of frames in this timeline
                         int frameCount = timelined.getTimeline().getFrameCount();
-                        frameShouldBeNow = frameShouldBeNow % frameCount;
+                        //How many ticks (= times where frame should be displayed in framerate) are there from hitting play button
+                        int ticksFromStart = (int) Math.floor((frameTimeMsIs - startRun) / (double) getMsPerFrame()) + 1;
+                        //Add ticks to first frame when hitting play button, ignoring total framecount => this value can be larger than number of frames in timeline                       
+                        int frameOverMaxShouldBeNow = startFrame + ticksFromStart;
+                        //Apply maximum frames repating, this is actual frame which should be drawed now
+                        int frameShouldBeNow = frameOverMaxShouldBeNow % frameCount;
+
+                        //How many frames are there between last displayed frame and now. For perfect display(=no framedrop), value should be 1
                         int skipFrames = frameShouldBeNow - curFrame;
+                        //It is negative for some reason, this will display older frames. Add frameCount to stay in modulu framecount.
                         if (skipFrames < 0) {
                             skipFrames += frameCount;
                         }
+                        //Change for more than 1 frame
                         if (skipFrames > 1) {
-                            addSkippedFrames(skipFrames - 1);
+                            addSkippedFrames(skipFrames - 1); //drop those frames, draw only last one
                         }
-                        nextFrame(thisTimer, skipFrames);
+                        //Frame "time" - ticks in current frame
+                        int currentFrameTicks = 0;
+                        if (frameCount == 1) { //We have only one frame, so the ticks on that frame equal ticks on whole timeline
+                            currentFrameTicks = ticksFromStart;
+                        }
+                        nextFrame(thisTimer, skipFrames, currentFrameTicks);
 
-                        long afterDrawFrameTimeIs = System.currentTimeMillis();
+                        long afterDrawFrameTimeMsIs = System.currentTimeMillis();
 
-                        int nextFrame = frameShouldBeNow;
-                        while (delay < 0) {
-                            nextFrame++;
-                            long nextFrameTimeShouldBe = startRun + getMsPerFrame() * nextFrame;
-                            delay = nextFrameTimeShouldBe - afterDrawFrameTimeIs;
+                        int nextFrameOverMax = frameOverMaxShouldBeNow;
+                        while (delay < 0) { //while the frame time already passed
+                            nextFrameOverMax++;
+                            long nextFrameOverMaxTimeMsShouldBe = startRun + getMsPerFrame() * nextFrameOverMax;
+                            delay = nextFrameOverMaxTimeMsShouldBe - afterDrawFrameTimeMsIs;
                         }
                     }
+                    //schedule next run of the task
                     scheduleTask(isSingleFrame, delay);
 
                 } catch (Exception ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, "Frame drawing error", ex);
                 }
             }
         };
@@ -1278,6 +1311,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private synchronized void startTimer(Timeline timeline, boolean playing) {
 
         startRun = System.currentTimeMillis();
+        startFrame = frame;
         float frameRate = timeline.frameRate;
         setMsPerFrame(frameRate == 0 ? 1000 : (int) (1000.0 / frameRate));
         final boolean singleFrame = !playing
