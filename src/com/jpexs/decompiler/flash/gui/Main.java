@@ -1006,6 +1006,8 @@ public class Main {
             } else {
                 throw new IOException("Output is empty");
             }
+        } else {
+            throw new IOException("Output not found");
         }
     }
 
@@ -2250,6 +2252,9 @@ public class Main {
             @Override
             public void uncaughtException(Thread t, Throwable e) {
                 logger.log(Level.SEVERE, "Uncaught exception in thread: " + t.getName(), e);
+                if (e instanceof OutOfMemoryError || !Helper.is64BitJre() && Helper.is64BitOs()) {
+                    View.showMessageDialog(null, AppStrings.translate("message.warning.outOfMemeory32BitJre"), AppStrings.translate("message.warning"), JOptionPane.WARNING_MESSAGE);
+                }
             }
         });
 

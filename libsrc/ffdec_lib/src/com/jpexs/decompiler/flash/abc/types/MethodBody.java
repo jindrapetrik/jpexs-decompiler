@@ -334,6 +334,7 @@ public final class MethodBody implements Cloneable {
                 } else {
                     logger.log(Level.SEVERE, "Decompilation error in: " + path, ex);
                 }
+
                 convertException = ex;
                 Throwable cause = ex.getCause();
                 if (ex instanceof ExecutionException && cause instanceof Exception) {

@@ -1406,4 +1406,26 @@ public class Helper {
         lastIds.put(str, a);
         return str + "_" + a;
     }
+
+    public static boolean is64BitJre() {
+        String prop = System.getProperty("sun.arch.data.model");
+        return prop != null && prop.contains("64");
+
+    }
+
+    public static boolean is64BitOs() {
+        String arch = System.getenv("PROCESSOR_ARCHITECTURE");
+        String wow64Arch = System.getenv("PROCESSOR_ARCHITEW6432");
+
+        if (arch == null) {
+            return false;
+        }
+
+        return arch.endsWith("64")
+                || wow64Arch != null && wow64Arch.endsWith("64");
+    }
+
+    public static void showOutOfMemoryWarning() {
+
+    }
 }

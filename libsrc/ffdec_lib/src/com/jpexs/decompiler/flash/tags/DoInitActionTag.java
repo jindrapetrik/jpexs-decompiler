@@ -58,7 +58,6 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
     /**
      * List of actions to perform
      */
-    //public List<Action> actions = new ArrayList<Action>();
     @HideInRawEdit
     public ByteArrayRange actionBytes;
 
