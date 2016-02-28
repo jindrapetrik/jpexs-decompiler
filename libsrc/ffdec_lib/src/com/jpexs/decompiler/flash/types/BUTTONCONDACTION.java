@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
+import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
@@ -154,7 +155,7 @@ public class BUTTONCONDACTION implements ASMSource, Serializable {
     /**
      * Actions to perform in byte array
      */
-    @Internal
+    @HideInRawEdit
     public ByteArrayRange actionBytes;
 
     /**
