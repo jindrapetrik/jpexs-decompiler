@@ -1494,6 +1494,8 @@ public class Main {
             System.setProperty("sun.java2d.opengl", "false");
         }
 
+        initUiLang();
+
         if (Configuration.useRibbonInterface.get()) {
             View.setLookAndFeel();
         } else {
@@ -1516,102 +1518,96 @@ public class Main {
             }
         }
 
-        ErrorLogFrame.createNewInstance();
+        View.execInEventDispatch(() -> {
+            ErrorLogFrame.createNewInstance();
 
-        autoCheckForUpdates();
-        offerAssociation();
-        loadingDialog = new LoadingDialog();
+            autoCheckForUpdates();
+            offerAssociation();
+            loadingDialog = new LoadingDialog();
 
-        DebuggerTools.initDebugger().addMessageListener(new DebugListener() {
+            DebuggerTools.initDebugger().addMessageListener(new DebugListener() {
 
-            @Override
-            public void onMessage(String clientId, String msg) {
-            }
+                @Override
+                public void onMessage(String clientId, String msg) {
+                }
 
-            @Override
-            public void onLoaderURL(String clientId, String url) {
-            }
+                @Override
+                public void onLoaderURL(String clientId, String url) {
+                }
 
-            @Override
-            public void onLoaderBytes(String clientId, byte[] data) {
-                String hash = md5(data);
-                for (SWFList sl : Main.getMainFrame().getPanel().getSwfs()) {
-                    for (int s = 0; s < sl.size(); s++) {
-                        String t = sl.get(s).getFileTitle();
-                        if (t == null) {
-                            t = "";
-                        }
-                        if (t.endsWith(":" + hash)) { //this one is already opened
-                            return;
+                @Override
+                public void onLoaderBytes(String clientId, byte[] data) {
+                    String hash = md5(data);
+                    for (SWFList sl : Main.getMainFrame().getPanel().getSwfs()) {
+                        for (int s = 0; s < sl.size(); s++) {
+                            String t = sl.get(s).getFileTitle();
+                            if (t == null) {
+                                t = "";
+                            }
+                            if (t.endsWith(":" + hash)) { //this one is already opened
+                                return;
+                            }
                         }
                     }
-                }
-                SWF swf = Main.getMainFrame().getPanel().getCurrentSwf();
+                    SWF swf = Main.getMainFrame().getPanel().getCurrentSwf();
 
-                String title = swf == null ? "?" : swf.getFileTitle();
-                title = title + ":" + hash;
-                String tfile;
-                try {
-                    tfile = tempFile(title);
-                    Helper.writeFile(tfile, data);
-                    openFile(new SWFSourceInfo(null, tfile, title));
-                } catch (IOException ex) {
-                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, "Cannot create tempfile");
+                    String title = swf == null ? "?" : swf.getFileTitle();
+                    title = title + ":" + hash;
+                    String tfile;
+                    try {
+                        tfile = tempFile(title);
+                        Helper.writeFile(tfile, data);
+                        openFile(new SWFSourceInfo(null, tfile, title));
+                    } catch (IOException ex) {
+                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, "Cannot create tempfile");
+                    }
                 }
-            }
 
-            @Override
-            public void onFinish(String clientId) {
+                @Override
+                public void onFinish(String clientId) {
+                }
+            });
+
+            try {
+                flashDebugger = new Debugger();
+                debugHandler = new DebuggerHandler();
+                debugHandler.addBreakListener(new DebuggerHandler.BreakListener() {
+
+                    @Override
+                    public void doContinue() {
+                        mainFrame.getPanel().clearDebuggerColors();
+                    }
+
+                    @Override
+                    public void breakAt(String scriptName, int line, final int classIndex, final int traitIndex, final int methodIndex) {
+                        View.execInEventDispatch(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                mainFrame.getPanel().gotoScriptLine(getMainFrame().getPanel().getCurrentSwf(), scriptName, line, classIndex, traitIndex, methodIndex);
+                            }
+                        });
+                    }
+                });
+                debugHandler.addConnectionListener(new DebuggerHandler.ConnectionListener() {
+
+                    @Override
+                    public void connected() {
+                        Main.mainFrame.getMenu().updateComponents();
+                    }
+
+                    @Override
+                    public void disconnected() {
+                        if (Main.mainFrame != null && Main.mainFrame.getPanel() != null) {
+                            Main.mainFrame.getPanel().refreshBreakPoints();
+                        }
+                    }
+                });
+                flashDebugger.addConnectionListener(debugHandler);
+            } catch (IOException ex) {
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, "eeex", ex);
             }
         });
-
-        try {
-
-            /*Level level = Level.FINE;
-
-             Logger rootLog = Logger.getLogger("");
-             rootLog.setLevel(level);
-             rootLog.getHandlers()[0].setLevel(level);
-             */
-            flashDebugger = new Debugger();
-            debugHandler = new DebuggerHandler();
-            debugHandler.addBreakListener(new DebuggerHandler.BreakListener() {
-
-                @Override
-                public void doContinue() {
-                    mainFrame.getPanel().clearDebuggerColors();
-                }
-
-                @Override
-                public void breakAt(String scriptName, int line, final int classIndex, final int traitIndex, final int methodIndex) {
-                    View.execInEventDispatch(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            mainFrame.getPanel().gotoScriptLine(getMainFrame().getPanel().getCurrentSwf(), scriptName, line, classIndex, traitIndex, methodIndex);
-                        }
-                    });
-                }
-            });
-            debugHandler.addConnectionListener(new DebuggerHandler.ConnectionListener() {
-
-                @Override
-                public void connected() {
-                    Main.mainFrame.getMenu().updateComponents();
-                }
-
-                @Override
-                public void disconnected() {
-                    if (Main.mainFrame != null && Main.mainFrame.getPanel() != null) {
-                        Main.mainFrame.getPanel().refreshBreakPoints();
-                    }
-                }
-            });
-            flashDebugger.addConnectionListener(debugHandler);
-        } catch (IOException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, "eeex", ex);
-        }
-
     }
 
     public static void startDebugger() {
@@ -1640,52 +1636,10 @@ public class Main {
         }
     }
 
-    public static void initLang() {
+    public static void initUiLang() {
         if (GraphicsEnvironment.isHeadless()) { //No GUI in OS
             return;
         }
-        if (!Configuration.locale.hasValue()) {
-            if (Platform.isWindows()) {
-                //Load from Installer
-                String uninstKey = "{E618D276-6596-41F4-8A98-447D442A77DB}_is1";
-                uninstKey = "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\" + uninstKey;
-                try {
-                    if (Advapi32Util.registryKeyExists(WinReg.HKEY_LOCAL_MACHINE, uninstKey)) {
-                        if (Advapi32Util.registryValueExists(WinReg.HKEY_LOCAL_MACHINE, uninstKey, "NSIS: Language")) {
-                            String installedLoc = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, uninstKey, "NSIS: Language");
-                            int lcid = Integer.parseInt(installedLoc);
-                            char buf[] = new char[9];
-                            int cnt = Kernel32.INSTANCE.GetLocaleInfo(lcid, Kernel32.LOCALE_SISO639LANGNAME, buf, 9);
-                            String langCode = new String(buf, 0, cnt).trim().toLowerCase();
-
-                            cnt = Kernel32.INSTANCE.GetLocaleInfo(lcid, Kernel32.LOCALE_SISO3166CTRYNAME, buf, 9);
-                            String countryCode = new String(buf, 0, cnt).trim().toLowerCase();
-
-                            List<String> langs = Arrays.asList(SelectLanguageDialog.getAvailableLanguages());
-                            for (int i = 0; i < langs.size(); i++) {
-                                langs.set(i, langs.get(i).toLowerCase());
-                            }
-
-                            String selectedLang = null;
-
-                            if (langs.contains(langCode + "-" + countryCode)) {
-                                selectedLang = SelectLanguageDialog.getAvailableLanguages()[langs.indexOf(langCode + "-" + countryCode)];
-                            } else if (langs.contains(langCode)) {
-                                selectedLang = SelectLanguageDialog.getAvailableLanguages()[langs.indexOf(langCode)];
-                            }
-                            if (selectedLang != null) {
-                                Configuration.locale.set(selectedLang);
-                            }
-                        }
-                    }
-                } catch (Exception ex) {
-                    //ignore
-                }
-            }
-        }
-        Locale.setDefault(Locale.forLanguageTag(Configuration.locale.get()));
-        AppStrings.updateLanguage();
-
         try {
             Class<?> cl = Class.forName("org.pushingpixels.substance.api.SubstanceLookAndFeel");
             Field field = cl.getDeclaredField("LABEL_BUNDLE");
@@ -1694,7 +1648,6 @@ public class Main {
         } catch (Throwable ex) {
             logger.log(Level.SEVERE, null, ex);
         }
-
         UIManager.put("OptionPane.okButtonText", AppStrings.translate("button.ok"));
         UIManager.put("OptionPane.yesButtonText", AppStrings.translate("button.yes"));
         UIManager.put("OptionPane.noButtonText", AppStrings.translate("button.no"));
@@ -1786,7 +1739,53 @@ public class Main {
         UIManager.put("ColorChooser.swatchesRecentText", AppStrings.translate("ColorChooser.swatchesRecentText"));
         UIManager.put("ColorChooser.sampleText", AppStrings.translate("ColorChooser.sampleText"));
 
+    }
+
+    public static void initLang() {
+        if (!Configuration.locale.hasValue()) {
+            if (Platform.isWindows()) {
+                //Load from Installer
+                String uninstKey = "{E618D276-6596-41F4-8A98-447D442A77DB}_is1";
+                uninstKey = "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\" + uninstKey;
+                try {
+                    if (Advapi32Util.registryKeyExists(WinReg.HKEY_LOCAL_MACHINE, uninstKey)) {
+                        if (Advapi32Util.registryValueExists(WinReg.HKEY_LOCAL_MACHINE, uninstKey, "NSIS: Language")) {
+                            String installedLoc = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, uninstKey, "NSIS: Language");
+                            int lcid = Integer.parseInt(installedLoc);
+                            char buf[] = new char[9];
+                            int cnt = Kernel32.INSTANCE.GetLocaleInfo(lcid, Kernel32.LOCALE_SISO639LANGNAME, buf, 9);
+                            String langCode = new String(buf, 0, cnt).trim().toLowerCase();
+
+                            cnt = Kernel32.INSTANCE.GetLocaleInfo(lcid, Kernel32.LOCALE_SISO3166CTRYNAME, buf, 9);
+                            String countryCode = new String(buf, 0, cnt).trim().toLowerCase();
+
+                            List<String> langs = Arrays.asList(SelectLanguageDialog.getAvailableLanguages());
+                            for (int i = 0; i < langs.size(); i++) {
+                                langs.set(i, langs.get(i).toLowerCase());
+                            }
+
+                            String selectedLang = null;
+
+                            if (langs.contains(langCode + "-" + countryCode)) {
+                                selectedLang = SelectLanguageDialog.getAvailableLanguages()[langs.indexOf(langCode + "-" + countryCode)];
+                            } else if (langs.contains(langCode)) {
+                                selectedLang = SelectLanguageDialog.getAvailableLanguages()[langs.indexOf(langCode)];
+                            }
+                            if (selectedLang != null) {
+                                Configuration.locale.set(selectedLang);
+                            }
+                        }
+                    }
+                } catch (Exception ex) {
+                    //ignore
+                }
+            }
+        }
+        Locale.setDefault(Locale.forLanguageTag(Configuration.locale.get()));
+        AppStrings.updateLanguage();
+
         Helper.decompilationErrorAdd = AppStrings.translate(Configuration.autoDeobfuscate.get() ? "deobfuscation.comment.failed" : "deobfuscation.comment.tryenable");
+
     }
 
     /**
@@ -1836,6 +1835,7 @@ public class Main {
 
         AppStrings.setResourceClass(MainFrame.class);
         initLogging(Configuration._debugMode.get());
+
         initLang();
 
         if (Configuration.cacheOnDisk.get()) {
@@ -1845,8 +1845,8 @@ public class Main {
         }
 
         if (args.length == 0) {
+            initGui();
             View.execInEventDispatch(() -> {
-                initGui();
                 if (Configuration.allowOnlyOneInstance.get() && FirstInstance.focus()) { //Try to focus first instance
                     Main.exit();
                 } else {
