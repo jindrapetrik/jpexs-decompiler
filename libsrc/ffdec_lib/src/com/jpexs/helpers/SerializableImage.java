@@ -22,16 +22,23 @@ import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsEnvironment;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.IndexColorModel;
+import java.awt.image.VolatileImage;
 import java.awt.image.WritableRaster;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Hashtable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 
 /**
  *
@@ -79,8 +86,25 @@ public class SerializableImage implements Serializable {
         image = new BufferedImage(width, height, imageType, cm);
     }
 
-    public BufferedImage getBufferedImage() {
+    public BufferedImage getRawBufferedImage() {
         return image;
+    }
+
+    public BufferedImage getBufferedImage() {
+        BufferedImage img = getRawBufferedImage();
+
+        if (GraphicsEnvironment.isHeadless()) { //No GUI, no compatible image
+            return img;
+        }
+        GraphicsConfiguration conf = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+
+        if (img.getColorModel().equals(conf.getColorModel())) {
+            return img;
+        }
+        BufferedImage img2 = conf.createCompatibleImage(img.getWidth(), img.getHeight(), img.getTransparency());
+        Graphics2D g2d = img2.createGraphics();
+        g2d.drawImage(img, 0, 0, null);
+        return img2;
     }
 
     public void fillTransparent() {
