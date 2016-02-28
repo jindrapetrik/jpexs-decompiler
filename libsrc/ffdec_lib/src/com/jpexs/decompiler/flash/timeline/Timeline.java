@@ -873,7 +873,7 @@ public class Timeline {
 
                         Rectangle2D r = new Rectangle2D.Double(p1.xMin, p1.yMin, p1.getWidth(), p1.getHeight());
                         g.setClip(r);
-                        drawDrawable(strokeTransformation.preConcatenate(layerMatrix), layer, transforms[s], g, colorTransform, layer.blendMode, clips, prevClips, transformation.clone(), isClip, layer.clipDepth, absMat, layer.time, layer.ratio, renderContext, image, (DrawableTag) character, layer.filters, unzoom, clrTrans);
+                        drawDrawable(strokeTransformation.preConcatenate(layerMatrix), layer, transforms[s], g, colorTransform, layer.blendMode, clips, prevClips, transformation.clone(), isClip, layer.clipDepth, absMat, time, layer.ratio, renderContext, image, (DrawableTag) character, layer.filters, unzoom, clrTrans);
 
                     }
                     g.setClip(c);
@@ -891,7 +891,7 @@ public class Timeline {
                     }*/
                     g.setTransform(origTransform);
                 } else {
-                    drawDrawable(strokeTransformation, layer, layerMatrix, g, colorTransform, layer.blendMode, clips, prevClips, transformation.clone(), isClip, layer.clipDepth, absMat, layer.time, layer.ratio, renderContext, image, (DrawableTag) character, layer.filters, unzoom, clrTrans);
+                    drawDrawable(strokeTransformation, layer, layerMatrix, g, colorTransform, layer.blendMode, clips, prevClips, transformation.clone(), isClip, layer.clipDepth, absMat, time, layer.ratio, renderContext, image, (DrawableTag) character, layer.filters, unzoom, clrTrans);
                 }
             } else if (character instanceof BoundedTag) {
                 showPlaceholder = true;
