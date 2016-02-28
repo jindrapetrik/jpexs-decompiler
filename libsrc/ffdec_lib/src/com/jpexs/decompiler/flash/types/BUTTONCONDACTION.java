@@ -149,10 +149,6 @@ public class BUTTONCONDACTION implements ASMSource, Serializable {
     public boolean condOverDownToIdle;
 
     /**
-     * Actions to perform
-     */
-    //public List<Action> actions;
-    /**
      * Actions to perform in byte array
      */
     @HideInRawEdit

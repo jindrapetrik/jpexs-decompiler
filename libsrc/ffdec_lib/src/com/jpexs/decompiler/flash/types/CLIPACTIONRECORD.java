@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
+import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
@@ -146,8 +147,7 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable {
     /**
      * Actions to perform
      */
-    //public List<Action> actions;
-    @Internal
+    @HideInRawEdit
     public ByteArrayRange actionBytes;
 
     /**

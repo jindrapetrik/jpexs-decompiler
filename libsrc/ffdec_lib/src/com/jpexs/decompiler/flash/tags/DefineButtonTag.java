@@ -74,7 +74,6 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
     /**
      * Actions to perform
      */
-    //public List<Action> actions;
     @HideInRawEdit
     public ByteArrayRange actionBytes;
 

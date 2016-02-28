@@ -51,7 +51,6 @@ public class DoActionTag extends Tag implements ASMSource {
     /**
      * List of actions to perform
      */
-    //public List<Action> actions = new ArrayList<Action>();
     @HideInRawEdit
     public ByteArrayRange actionBytes;
 
