@@ -12,7 +12,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
-* License along with this library.
+ * License along with this library.
  */
 package com.jpexs.decompiler.flash.xfl;
 
@@ -104,6 +104,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.decompiler.flash.types.sound.MP3FRAME;
 import com.jpexs.decompiler.flash.types.sound.MP3SOUNDDATA;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
+import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.utf8.Utf8Helper;
@@ -217,8 +218,8 @@ public class XFLConverter {
                         + "<SolidColor color=\"")
                 .append(ls.color.toHexRGB()).append("\"")
                 .append(shapeNum == 3 ? " alpha=\"" + ((RGBA) ls.color).getAlphaFloat() + "\"" : "").append(" />"
-                + "</fill>"
-                + "</SolidStroke>");
+                        + "</fill>"
+                        + "</SolidStroke>");
     }
 
     private static void convertLineStyle(HashMap<Integer, CharacterTag> characters, LINESTYLE2 ls, int shapeNum, StringBuilder ret) {
@@ -1051,7 +1052,7 @@ public class XFLConverter {
 
         ret.append("<DOMSymbolInstance libraryItemName=\"" + "Symbol ").append(tag.getCharacterId()).append("\"");
         if (name != null) {
-            ret.append(" name=\"").append(xmlString(name)).append("\"");
+            ret.append(" name=\"").append(Helper.escapeHTML(name)).append("\"");
         }
         String blendModeStr = null;
         if (blendMode < BLENDMODES.length) {
@@ -1196,11 +1197,11 @@ public class XFLConverter {
                 boolean linkageExportForAS = false;
                 if (characterClasses.containsKey(symbol.getCharacterId())) {
                     linkageExportForAS = true;
-                    symbolStr.append(" linkageClassName=\"").append(xmlString(characterClasses.get(symbol.getCharacterId()))).append("\"");
+                    symbolStr.append(" linkageClassName=\"").append(Helper.escapeHTML(characterClasses.get(symbol.getCharacterId()))).append("\"");
                 }
                 if (characterVariables.containsKey(symbol.getCharacterId())) {
                     linkageExportForAS = true;
-                    symbolStr.append(" linkageIdentifier=\"").append(xmlString(characterVariables.get(symbol.getCharacterId()))).append("\"");
+                    symbolStr.append(" linkageIdentifier=\"").append(Helper.escapeHTML(characterVariables.get(symbol.getCharacterId()))).append("\"");
                 }
                 if (linkageExportForAS) {
                     symbolStr.append(" linkageExportForAS=\"true\"");
@@ -1517,7 +1518,7 @@ public class XFLConverter {
 
                 if (characterVariables.containsKey(symbol.getCharacterId())) {
                     linkageExportForAS = true;
-                    mediaLinkStr += " linkageIdentifier=\"" + xmlString(characterVariables.get(symbol.getCharacterId())) + "\"";
+                    mediaLinkStr += " linkageIdentifier=\"" + Helper.escapeHTML(characterVariables.get(symbol.getCharacterId())) + "\"";
                 }
                 if (linkageExportForAS) {
                     mediaLinkStr += " linkageExportForAS=\"true\"";
@@ -1589,7 +1590,7 @@ public class XFLConverter {
                     }
                     if (characterVariables.containsKey(symbol.getCharacterId())) {
                         linkageExportForAS = true;
-                        mediaLinkStr += " linkageIdentifier=\"" + xmlString(characterVariables.get(symbol.getCharacterId())) + "\"";
+                        mediaLinkStr += " linkageIdentifier=\"" + Helper.escapeHTML(characterVariables.get(symbol.getCharacterId())) + "\"";
                     }
                     if (linkageExportForAS) {
                         mediaLinkStr += " linkageExportForAS=\"true\"";
@@ -1749,7 +1750,7 @@ public class XFLConverter {
         StringBuilder ret = new StringBuilder();
         ret.append("<DOMVideoInstance libraryItemName=\"movie").append(video.characterID).append(".flv\" frameRight=\"").append(20 * video.width).append("\" frameBottom=\"").append(20 * video.height).append("\"");
         if (instanceName != null) {
-            ret.append(" name=\"").append(xmlString(instanceName)).append("\"");
+            ret.append(" name=\"").append(Helper.escapeHTML(instanceName)).append("\"");
         }
         ret.append(">");
         ret.append("<matrix>");
@@ -2004,7 +2005,7 @@ public class XFLConverter {
                 if (hasAllRanges) {
                     embedRanges = "9999";
                 }
-                ret2.append("<DOMFontItem name=\"Font ").append(fontId).append("\" font=\"").append(xmlString(fontName)).append("\" size=\"0\" id=\"").append(fontId).append("\" embedRanges=\"").append(embedRanges).append("\"").append(!"".equals(embeddedCharacters) ? " embeddedCharacters=\"" + xmlString(embeddedCharacters) + "\"" : "").append(" />");
+                ret2.append("<DOMFontItem name=\"Font ").append(fontId).append("\" font=\"").append(Helper.escapeHTML(fontName)).append("\" size=\"0\" id=\"").append(fontId).append("\" embedRanges=\"").append(embedRanges).append("\"").append(!"".equals(embeddedCharacters) ? " embeddedCharacters=\"" + Helper.escapeHTML(embeddedCharacters) + "\"" : "").append(" />");
             }
 
         }
@@ -2190,7 +2191,7 @@ public class XFLConverter {
         if (ret2.length() > 0) {
             ret.append("<DOMLayer name=\"Layer ").append(layerIndex).append("\" color=\"").append(randomOutlineColor()).append("\">"
                     + "<frames>").append(ret2).append("</frames>"
-                    + "</DOMLayer>");
+                            + "</DOMLayer>");
         }
     }
 
@@ -2402,7 +2403,7 @@ public class XFLConverter {
                 ret.append(" fontRenderingMode=\"").append(fontRenderingMode).append("\"");
             }
             if (instanceName != null) {
-                ret.append(" instanceName=\"").append(xmlString(instanceName)).append("\"");
+                ret.append(" instanceName=\"").append(Helper.escapeHTML(instanceName)).append("\"");
             }
             ret.append(antiAlias);
             Map<String, Object> attrs = TextTag.getTextRecordsAttributes(textRecords, swf);
@@ -2469,7 +2470,7 @@ public class XFLConverter {
                 firstRun = false;
                 if (font != null) {
                     ret.append("<DOMTextRun>");
-                    ret.append("<characters>").append(xmlString((newline ? "\r" : "") + rec.getText(font))).append("</characters>");
+                    ret.append("<characters>").append(Helper.escapeHTML((newline ? "\r" : "") + rec.getText(font))).append("</characters>");
                     ret.append("<textAttrs>");
 
                     ret.append("<DOMTextAttrs aliasText=\"false\" rotation=\"true\" size=\"").append(twipToPixel(textHeight)).append("\" bitmapSize=\"").append(textHeight).append("\"");
@@ -2516,7 +2517,7 @@ public class XFLConverter {
                 ret.append(" fontRenderingMode=\"").append(fontRenderingMode).append("\"");
             }
             if (instanceName != null) {
-                ret.append(" name=\"").append(xmlString(instanceName)).append("\"");
+                ret.append(" name=\"").append(Helper.escapeHTML(instanceName)).append("\"");
             }
             ret.append(antiAlias);
             double width = twipToPixel(bounds.getWidth());
@@ -2566,7 +2567,7 @@ public class XFLConverter {
                 ret.append(convertHTMLText(swf.getTags(), det, txt));
             } else {
                 ret.append("<DOMTextRun>");
-                ret.append("<characters>").append(xmlString(txt)).append("</characters>");
+                ret.append("<characters>").append(Helper.escapeHTML(txt)).append("</characters>");
                 int leftMargin = -1;
                 int rightMargin = -1;
                 int indent = -1;
@@ -2844,7 +2845,7 @@ public class XFLConverter {
         publishSettings.append("    <StreamUse8kSampleRate>0</StreamUse8kSampleRate>\n");
         publishSettings.append("    <EventUse8kSampleRate>0</EventUse8kSampleRate>\n");
         publishSettings.append("    <UseNetwork>").append(useNetwork ? 1 : 0).append("</UseNetwork>\n");
-        publishSettings.append("    <DocumentClass>").append(xmlString(characterClasses.containsKey(0) ? characterClasses.get(0) : "")).append("</DocumentClass>\n");
+        publishSettings.append("    <DocumentClass>").append(Helper.escapeHTML(characterClasses.containsKey(0) ? characterClasses.get(0) : "")).append("</DocumentClass>\n");
         publishSettings.append("    <AS3Strict>2</AS3Strict>\n");
         publishSettings.append("    <AS3Coach>4</AS3Coach>\n");
         publishSettings.append("    <AS3AutoDeclare>4096</AS3AutoDeclare>\n");
@@ -3171,10 +3172,6 @@ public class XFLConverter {
         return tparser.result;
     }
 
-    private static String xmlString(String s) {
-        return s.replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("&", "&amp;").replace("\r\n", "&#xD;").replace("\r", "&#xD;").replace("\n", "&#xD;");
-    }
-
     private static double twipToPixel(double tw) {
         return tw / SWF.unitDivisor;
     }
@@ -3383,7 +3380,7 @@ public class XFLConverter {
         private void putText(String txt) {
 
             result += "<DOMTextRun>";
-            result += "<characters>" + xmlString(txt) + "</characters>";
+            result += "<characters>" + Helper.escapeHTML(txt) + "</characters>";
             result += "<textAttrs>";
             result += "<DOMTextAttrs";
             if (alignment != null) {
