@@ -52,11 +52,11 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
 
     public SlotConstTraitDetailPanel slotConstTraitPanel;
 
-    public static final String METHOD_TRAIT_CARD = AppStrings.translate("abc.detail.methodtrait");
+    public static final String METHOD_TRAIT_CARD = "abc.detail.methodtrait";
 
-    public static final String UNSUPPORTED_TRAIT_CARD = AppStrings.translate("abc.detail.unsupported");
+    public static final String UNSUPPORTED_TRAIT_CARD = "abc.detail.unsupported";
 
-    public static final String SLOT_CONST_TRAIT_CARD = AppStrings.translate("abc.detail.slotconsttrait");
+    public static final String SLOT_CONST_TRAIT_CARD = "abc.detail.slotconsttrait";
 
     private final JPanel innerPanel;
 
@@ -222,7 +222,7 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
             }
 
             selectedCard = name;
-            selectedLabel.setText(selectedCard);
+            selectedLabel.setText(AppStrings.translate(name));
             if (trait == null) {
                 traitNameLabel.setText("-");
             } else {
