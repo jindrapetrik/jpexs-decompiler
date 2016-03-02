@@ -6,7 +6,7 @@
 !insertmacro LANG_STRING STRING_DESKTOP_SHORTCUT "Raccourci Bureau"
 !insertmacro LANG_STRING STRING_ADD_CONTEXT_MENU "Ajout au menu contextuel"
 !insertmacro LANG_STRING STRING_SECTION_APP "Application GUI et librairies"
-!insertmacro LANG_STRING STRING_SECTION_SWC "Téléchargement de la libriarie FlashPlayer à partir du site web d'Adobe - Toutes les fonctionnalités d'édition et modification de codes ActionScript sont opérationnelles"
+!insertmacro LANG_STRING STRING_SECTION_SWC "Téléchargement de la librairie FlashPlayer depuis le site web d'Adobe - Toutes les fonctionnalités d'édition et de modification du code ActionScript seront disponibles"
 !insertmacro LANG_STRING STRING_SECTION_CONTEXT_MENU "Ajout de FFDec au menu contextuel des fichiers SWF et GFX dans l'explorateur Windows."
 !insertmacro LANG_STRING STRING_SECTION_SHORTCUT "Création d'un raccourci vers le Bureau"
 !insertmacro LANG_STRING STRING_UNINST_USER "Suppression de la configuration de l'utilisateur"
