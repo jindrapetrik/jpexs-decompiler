@@ -17,7 +17,7 @@
 !insertmacro LANG_STRING STRING_HELP_US_DOYOU "Souhaitez-vous savoir comment nous aider ?"
 !insertmacro LANG_STRING STRING_HELP_US_BUTTON "Aidez-nous !"
 !insertmacro LANG_STRING STRING_SWC "Téléchargement du PlayerGlobal.swc"
-!insertmacro LANG_STRING STRING_SWC_CHECK "Checking Adobe site for newest PlayerGlobal.swc file"
+!insertmacro LANG_STRING STRING_SWC_CHECK "Vérification d'une version plus récente de PlayerGlobal.swc"
 
 ;Flash ActiveX:
 !insertmacro LANG_STRING STRING_FLASH_AX_REQUIRED_TITLE "Le contrôle ActiveX Flash Player est nécessaire"
