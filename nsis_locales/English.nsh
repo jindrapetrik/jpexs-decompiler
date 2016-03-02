@@ -61,7 +61,3 @@
 !insertmacro LANG_STRING STRING_JRE_UNABLEINSTALL "Unable to install Java. You can install it later manually."
 
 ;!insertmacro LANG_STRING STRING_ ""
-
-
-
-

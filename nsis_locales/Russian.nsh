@@ -7,7 +7,7 @@
 !insertmacro LANG_STRING STRING_ADD_CONTEXT_MENU "Add to context menu"
 !insertmacro LANG_STRING STRING_SECTION_APP "Application GUI and Libraries"
 !insertmacro LANG_STRING STRING_SECTION_SWC "Download FlashPlayer library from Adobe site - useful for ActionScript direct editation and other features"
-!insertmacro LANG_STRING STRING_SECTION_CONTEXT_MENU "Adds FFDec to context menu of SWF and GFX files in windows explorer."
+!insertmacro LANG_STRING STRING_SECTION_CONTEXT_MENU "Adds FFDec to context menu of SWF and GFX files in Windows Explorer."
 !insertmacro LANG_STRING STRING_SECTION_SHORTCUT "Creates shortcut link on desktop"
 !insertmacro LANG_STRING STRING_UNINST_USER "Remove user configuration"
 !insertmacro LANG_STRING STRING_HELP_US "Help us"
@@ -18,12 +18,13 @@
 !insertmacro LANG_STRING STRING_HELP_US_BUTTON "Help us!"
 !insertmacro LANG_STRING STRING_SWC "Download PlayerGlobal.swc"
 !insertmacro LANG_STRING STRING_SWC_CHECK "Checking Adobe site for newest PlayerGlobal.swc file"
+
 ;Flash ActiveX:
 !insertmacro LANG_STRING STRING_FLASH_AX_REQUIRED_TITLE "Flash Player ActiveX control required"
 !insertmacro LANG_STRING STRING_FLASH_AX_REQUIRED "This application requires Flash ActiveX control"
 !insertmacro LANG_STRING STRING_FLASH_AX_WILLINSTALL "This application requires installation of the Flash ActiveX control. This will be downloaded and installed as part of the installation."
 !insertmacro LANG_STRING STRING_FLASH_AX_ALREADYINSTALLED "Flash ActiveX already installed"
-!insertmacro LANG_STRING STRING_FLASH_AX_MISSING "Result: Flash Active X is missing."
+!insertmacro LANG_STRING STRING_FLASH_AX_MISSING "Result: Flash ActiveX is missing."
 !insertmacro LANG_STRING STRING_FLASH_AX_WILLDOWNLOAD "About to download Flash from "
 !insertmacro LANG_STRING STRING_FLASH_AX_DOWNRESULT "Download result = "
 !insertmacro LANG_STRING STRING_FLASH_AX_CANNOTDOWNLOAD "Cannot download Flash ActiveX. You can download it later manually or use our own flash viewer."
