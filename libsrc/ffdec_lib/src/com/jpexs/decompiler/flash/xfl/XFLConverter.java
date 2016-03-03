@@ -218,7 +218,7 @@ public class XFLConverter {
                 return "none";
             } else if (ls2.noHScaleFlag) {
                 return "vertical";
-            } else if (ls2.noHScaleFlag) {
+            } else if (ls2.noVScaleFlag) {
                 return "horizontal";
             } else {
                 return "normal";
@@ -229,7 +229,7 @@ public class XFLConverter {
     }
 
     private static void convertLineStyle(LINESTYLE ls, int shapeNum, StringBuilder ret) {
-        ret.append("<SolidStroke scaleMode=\"" + getScaleMode(ls) + "\" weight=\"").append(((float) ls.width) / SWF.unitDivisor)
+        ret.append("<SolidStroke scaleMode=\"").append(getScaleMode(ls)).append("\" weight=\"").append(((float) ls.width) / SWF.unitDivisor)
                 .append("\">"
                         + "<fill>"
                         + "<SolidColor color=\"")
@@ -276,7 +276,7 @@ public class XFLConverter {
                 break;
         }
 
-        ret.append("<SolidStroke scaleMode=\"" + getScaleMode(ls) + "\" weight=\"").append(((float) ls.width) / SWF.unitDivisor).append("\"");
+        ret.append("<SolidStroke scaleMode=\"").append(getScaleMode(ls)).append("\" weight=\"").append(((float) ls.width) / SWF.unitDivisor).append("\"");
         ret.append(params);
         ret.append(">");
         ret.append("<fill>");
