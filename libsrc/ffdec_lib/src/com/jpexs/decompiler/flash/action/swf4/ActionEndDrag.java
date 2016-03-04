@@ -48,6 +48,7 @@ public class ActionEndDrag extends Action {
         if (lda.target instanceof DisplayObject) {
             ((DisplayObject) lda.target).stopDrag();
         }
+
         return true;
     }
 

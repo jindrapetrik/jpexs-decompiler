@@ -50,6 +50,7 @@ public class ActionStartDrag extends Action {
         if (lda.target instanceof DisplayObject) {
             ((DisplayObject) lda.target).startDrag();
         }
+
         return true;
     }
 

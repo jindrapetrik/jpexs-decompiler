@@ -52,6 +52,7 @@ public class ActionGetProperty extends Action {
         if (lda.stack.size() < 2) {
             return false;
         }
+
         int index = EcmaScript.toInt32(lda.stack.pop());
         String target = EcmaScript.toString(lda.stack.pop());
         Object movieClip = lda.stage.getMember(target);

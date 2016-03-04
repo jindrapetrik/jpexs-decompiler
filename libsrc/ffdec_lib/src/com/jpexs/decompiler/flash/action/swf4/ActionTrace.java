@@ -48,6 +48,7 @@ public class ActionTrace extends Action {
         if (lda.stack.isEmpty()) {
             return false;
         }
+
         lda.stage.trace(lda.pop());
         return true;
     }

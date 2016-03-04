@@ -45,14 +45,17 @@ public class ActionInitArray extends Action {
         if (lda.stack.isEmpty()) {
             return false;
         }
+
         int num = (int) (double) lda.popAsNumber();
         if (lda.stack.size() < num) {
             return false;
         }
+
         ActionScriptArray arr = new ActionScriptArray();
         for (int i = 0; i < num; i++) {
             arr.setValueAtIndex(i, lda.stack.pop());
         }
+
         lda.stack.push(arr);
         return true;
     }

@@ -49,6 +49,7 @@ public class ActionPrevFrame extends Action {
         if (f > 1) {
             ((DisplayObject) lda.target).gotoFrame(f - 1);
         }
+
         return true;
     }
 

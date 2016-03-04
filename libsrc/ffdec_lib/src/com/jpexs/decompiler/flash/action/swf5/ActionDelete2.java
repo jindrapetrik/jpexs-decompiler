@@ -47,11 +47,16 @@ public class ActionDelete2 extends Action {
 
     @Override
     public boolean execute(LocalDataArea lda) {
+        if (lda.stack.isEmpty()) {
+            return false;
+        }
+
         String memberName = lda.popAsString();
         Object o = lda.target; //should be current scope
         if (o instanceof ActionScriptObject) {
             ((ActionScriptObject) o).setMember(memberName, Undefined.INSTANCE);
         }
+
         return true;
     }
 

@@ -49,19 +49,20 @@ public class ActionCallFunction extends Action {
 
     @Override
     public boolean execute(LocalDataArea lda) {
-
         String functionName = lda.popAsString();
         int numArgs = (int) (double) lda.popAsNumber();
         List<Object> args = new ArrayList<>();
         for (int i = 0; i < numArgs; i++) {
             args.add(lda.pop());
         }
+
         for (ActionScriptFunction f : lda.functions) {
             if (functionName.equals(f.getFunctionName())) {
                 lda.stack.push(lda.stage.callFunction(f.getFunctionOffset(), f.getFunctionLength(), args, f.getFuncRegNames(), Undefined.INSTANCE /*?*/));
                 return true;
             }
         }
+
         return true;
     }
 

@@ -49,6 +49,7 @@ public class ActionTargetPath extends Action {
         if (lda.stack.isEmpty()) {
             return false;
         }
+
         Object obj = lda.pop();
 
         String path = lda.stage.getMemberPath(obj);
@@ -57,6 +58,7 @@ public class ActionTargetPath extends Action {
         } else {
             lda.stack.push(path);
         }
+
         return true;
     }
 

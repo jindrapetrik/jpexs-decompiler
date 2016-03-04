@@ -45,9 +45,10 @@ public class ActionRandomNumber extends Action {
 
     @Override
     public boolean execute(LocalDataArea lda) {
-        if (lda.stack.size() < 1) {
+        if (lda.stack.isEmpty()) {
             return false;
         }
+
         lda.stack.push(RandomNumberActionItem.getResult(lda.pop()));
         return true;
     }

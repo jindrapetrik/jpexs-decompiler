@@ -50,6 +50,7 @@ public class ActionImplementsOp extends Action {
         if (lda.stack.size() < 2) {
             return false;
         }
+
         //TODO: check if its really scriptobject?
         ActionScriptObject obj = (ActionScriptObject) lda.pop();
         int num = (int) (double) lda.popAsNumber();
@@ -57,9 +58,11 @@ public class ActionImplementsOp extends Action {
         if (lda.stack.size() < num) {
             return false;
         }
+
         for (int i = 0; i < num; i++) {
             interfaces.add(lda.stack.pop());
         }
+
         obj.setImplementsObjs(interfaces);
         return true;
     }

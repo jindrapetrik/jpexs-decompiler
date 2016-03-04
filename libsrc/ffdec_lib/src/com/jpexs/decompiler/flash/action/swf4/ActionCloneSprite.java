@@ -50,6 +50,7 @@ public class ActionCloneSprite extends Action {
         if (lda.stack.size() < 3) {
             return false;
         }
+
         int depth = EcmaScript.toInt32(lda.stack.pop());
         String source = EcmaScript.toString(lda.stack.pop());
         String target = EcmaScript.toString(lda.stack.pop());

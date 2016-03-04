@@ -51,16 +51,19 @@ public class ActionNewMethod extends Action {
         if (lda.stack.size() < 3) {
             return false;
         }
+
         String methodName = lda.popAsString();
         ActionScriptObject obj = (ActionScriptObject) lda.pop();
         int numArgs = (int) (double) lda.popAsNumber();
         if (lda.stack.size() < numArgs) {
             return false;
         }
+
         List<Object> args = new ArrayList<>();
         for (int i = 0; i < numArgs; i++) {
             args.add(lda.pop());
         }
+
         ActionScriptObject nobj = new ActionScriptObject();
         ActionScriptFunction f = (ActionScriptFunction) obj.getMember(methodName);
         lda.stage.callFunction(f.getFunctionOffset(), f.getFunctionLength(), args, f.getFuncRegNames(), nobj);

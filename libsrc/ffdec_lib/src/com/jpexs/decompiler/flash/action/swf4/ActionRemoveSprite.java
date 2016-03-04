@@ -49,6 +49,7 @@ public class ActionRemoveSprite extends Action {
         if (lda.stack.isEmpty()) {
             return false;
         }
+
         String target = EcmaScript.toString(lda.stack.pop());
         lda.stage.removeMember(target);
         return true;

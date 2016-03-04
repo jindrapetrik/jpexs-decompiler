@@ -53,6 +53,7 @@ public class ActionSetTarget extends Action {
             lda.target = lda.stage;
             return true;
         }
+
         lda.target = lda.stage.getMember(targetName);
         return true;
     }

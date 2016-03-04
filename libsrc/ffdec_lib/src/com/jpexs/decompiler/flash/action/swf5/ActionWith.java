@@ -59,6 +59,7 @@ public class ActionWith extends Action implements GraphSourceItemContainer {
         if (lda.stack.isEmpty()) {
             return false;
         }
+
         ActionScriptObject obj = (ActionScriptObject) lda.pop();
         ActionScriptWith w = new ActionScriptWith(obj, fileOffset, codeSize);
         lda.withs.add(w);

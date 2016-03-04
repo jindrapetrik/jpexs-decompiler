@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.action.swf5;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.ActionScriptFunction;
 import com.jpexs.decompiler.flash.action.ActionScriptObject;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.NewObjectActionItem;
@@ -51,19 +50,22 @@ public class ActionNewObject extends Action {
         if (lda.stack.size() < 2) {
             return false;
         }
+
         String objectName = lda.popAsString();
         int numArgs = (int) (double) (Double) lda.popAsNumber();
         if (lda.stack.size() < numArgs) {
             return false;
         }
+
         List<Object> args = new ArrayList<>();
         for (int i = 0; i < numArgs; i++) {
             args.add(lda.stack.pop());
         }
+
         ActionScriptObject obj = new ActionScriptObject();
-        //TODO:check type        
+        //TODO:check type
         /*ActionScriptFunction constructor = (ActionScriptFunction) lda.stage.getMember(objectName);
-        lda.stage.callFunction(constructor.getFunctionOffset(), constructor.getFunctionLength(), args, constructor.getFuncRegNames(), obj);
+         lda.stage.callFunction(constructor.getFunctionOffset(), constructor.getFunctionLength(), args, constructor.getFuncRegNames(), obj);
          */
         lda.stack.push(obj);
         return true;

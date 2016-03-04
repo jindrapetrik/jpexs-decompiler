@@ -49,6 +49,7 @@ public class ActionExtends extends Action {
         if (lda.stack.size() < 2) {
             return false;
         }
+
         //TODO: check if its really ActionScriptObject ?
         ActionScriptObject superClass = (ActionScriptObject) lda.pop();
         ActionScriptObject subClass = (ActionScriptObject) lda.pop();
