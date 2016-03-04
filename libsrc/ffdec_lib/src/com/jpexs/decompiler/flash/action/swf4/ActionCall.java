@@ -50,6 +50,10 @@ public class ActionCall extends Action {
 
     @Override
     public boolean execute(LocalDataArea lda) {
+        if (lda.stack.size() == 0) {
+            return false;
+        }
+
         lda.stage.callFrame(EcmaScript.toInt32(lda.stack.pop()));
         return true;
     }

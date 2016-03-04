@@ -52,7 +52,12 @@ public class ActionCallMethod extends Action {
             return false;
         }
         String methodName = lda.popAsString();
-        ActionScriptObject obj = (ActionScriptObject) lda.pop();
+        Object obj0 = lda.pop();
+        if (!(obj0 instanceof ActionScriptObject)) {
+            return false;
+        }
+
+        ActionScriptObject obj = (ActionScriptObject) obj0;
         int numArgs = (int) (double) lda.popAsNumber();
         if (lda.stack.size() < numArgs) {
             return false;
