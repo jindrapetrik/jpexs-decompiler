@@ -303,7 +303,7 @@ public class ActionGraph extends Graph {
                 part = part.nextParts.get(1);
                 //caseBodyParts.add(part);
                 GraphPart defaultPart = part;
-                if (code.get(defaultPart.start) instanceof ActionJump) {
+                if (code.size() > defaultPart.start && code.get(defaultPart.start) instanceof ActionJump) {
                     defaultPart = defaultPart.nextParts.get(0);
                 }
 
