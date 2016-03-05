@@ -72,10 +72,10 @@ public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
         int leftPrecedence = leftSide.getPrecedence();
         if (leftPrecedence > precedence && leftPrecedence != GraphTargetItem.NOPRECEDENCE) {
             writer.append("(");
-            leftSide.toString(writer, localData);
+            leftSide.toString(writer, localData, coerceLeft);
             writer.append(")");
         } else {
-            leftSide.toString(writer, localData);
+            leftSide.toString(writer, localData, coerceLeft);
         }
 
         writer.append(" ");
@@ -85,10 +85,10 @@ public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
         int rightPrecedence = rightSide.getPrecedence();
         if (rightPrecedence >= precedence && rightPrecedence != GraphTargetItem.NOPRECEDENCE) {
             writer.append("(");
-            rightSide.toString(writer, localData);
+            rightSide.toString(writer, localData, coerceRight);
             writer.append(")");
         } else {
-            rightSide.toString(writer, localData);
+            rightSide.toString(writer, localData, coerceRight);
         }
         return writer;
     }
