@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.debugger.flash.Variable;
+import com.jpexs.debugger.flash.VariableFlags;
 import com.jpexs.debugger.flash.VariableType;
 import com.jpexs.debugger.flash.messages.in.InGetVariable;
 import com.jpexs.decompiler.flash.SWF;
@@ -379,7 +380,9 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
             InGetVariable igv = Main.getDebugHandler().getVariable(parentId, thisVar.name, true);
             childs = new ArrayList<>();
             childTraits = new ArrayList<>();
-
+            if (thisVar.vType != VariableType.FUNCTION || ((thisVar.flags & VariableFlags.HAS_GETTER) > 0)) {
+                thisVar = igv.parent;
+            }
             Variable curTrait = null;
 
             for (int i = 0; i < igv.childs.size(); i++) {
