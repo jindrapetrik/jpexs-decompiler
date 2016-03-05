@@ -858,17 +858,18 @@ public abstract class Action implements GraphSourceItem {
         } catch (InterruptedException ex) {
             throw ex;
         } catch (Exception | OutOfMemoryError | StackOverflowError ex) {
-            if (ex instanceof TimeoutException) {
-                logger.log(Level.SEVERE, "Decompilation timeout in: " + path, ex);
-            } else {
-                logger.log(Level.SEVERE, "Decompilation error in: " + path, ex);
-            }
 
             convertException = ex;
             Throwable cause = ex.getCause();
             if (ex instanceof ExecutionException && cause instanceof Exception) {
                 convertException = cause;
             }
+            if (convertException instanceof TimeoutException) {
+                logger.log(Level.SEVERE, "Decompilation timeout in: " + path, convertException);
+            } else {
+                logger.log(Level.SEVERE, "Decompilation error in: " + path, convertException);
+            }
+
         }
         writer.continueMeasure();
 
@@ -1067,7 +1068,7 @@ public abstract class Action implements GraphSourceItem {
             }
 
             /*ActionJump && ActionIf removed*/
-            /*if ((action instanceof ActionEnumerate2) || (action instanceof ActionEnumerate)) {
+ /*if ((action instanceof ActionEnumerate2) || (action instanceof ActionEnumerate)) {
              loopStart = ip + 1;
              isForIn = true;
              ip += 4;
