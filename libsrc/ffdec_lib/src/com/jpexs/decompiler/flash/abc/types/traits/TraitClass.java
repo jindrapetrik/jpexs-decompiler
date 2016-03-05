@@ -151,7 +151,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
             } else {
                 //Note: There must be trait/method highlight even if the initializer is empty to TraitList in GUI to work correctly
                 //TODO: handle this better in GUI(?)
-                writer.append(" ");
+                writer.append(" ").newLine();
             }
             writer.endMethod();
             writer.endTrait();
