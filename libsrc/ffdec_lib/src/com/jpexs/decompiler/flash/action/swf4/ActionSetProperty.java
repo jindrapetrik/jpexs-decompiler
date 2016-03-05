@@ -59,6 +59,7 @@ public class ActionSetProperty extends Action {
         if (lda.stack.size() < 3) {
             return false;
         }
+
         Object value = lda.pop();
         int index = (int) (double) lda.popAsNumber();
         String target = lda.popAsString();

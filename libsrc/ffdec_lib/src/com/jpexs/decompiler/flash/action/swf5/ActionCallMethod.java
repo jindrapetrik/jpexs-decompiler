@@ -51,12 +51,19 @@ public class ActionCallMethod extends Action {
         if (lda.stack.size() < 3) {
             return false;
         }
+
         String methodName = lda.popAsString();
-        ActionScriptObject obj = (ActionScriptObject) lda.pop();
+        Object obj0 = lda.pop();
+        if (!(obj0 instanceof ActionScriptObject)) {
+            return false;
+        }
+
+        ActionScriptObject obj = (ActionScriptObject) obj0;
         int numArgs = (int) (double) lda.popAsNumber();
         if (lda.stack.size() < numArgs) {
             return false;
         }
+
         List<Object> args = new ArrayList<>();
         for (int i = 0; i < numArgs; i++) {
             args.add(lda.pop());

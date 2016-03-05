@@ -116,6 +116,7 @@ public class ActionGetURL2 extends Action {
         if (lda.stack.size() < 2) {
             return false;
         }
+
         String target = EcmaScript.toString(lda.stack.pop());
         String urlString = EcmaScript.toString(lda.stack.pop());
 

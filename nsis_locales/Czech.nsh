@@ -19,13 +19,12 @@
 !insertmacro LANG_STRING STRING_SWC "Stáhnout PlayerGlobal.swc"
 !insertmacro LANG_STRING STRING_SWC_CHECK "Kontroluji stránky Adobe pro nejnovější soubor PlayerGlobal.swc"
 
-
 ;Flash ActiveX:
 !insertmacro LANG_STRING STRING_FLASH_AX_REQUIRED_TITLE "Vyžadován ovládací prvek Flash Player ActiveX"
 !insertmacro LANG_STRING STRING_FLASH_AX_REQUIRED "Tato aplikace vyžaduje ovládací prvek Flash ActiveX"
 !insertmacro LANG_STRING STRING_FLASH_AX_WILLINSTALL "Tato aplikace vyžaduje instalaci ovládacího prvku Flash ActiveX. Ten bude stažen a nainstalován jako součást instalace."
 !insertmacro LANG_STRING STRING_FLASH_AX_ALREADYINSTALLED "Ovládací prvek Flash ActiveX je již nainstalován"
-!insertmacro LANG_STRING STRING_FLASH_AX_MISSING "Výsledek: Flash Active X chybí."
+!insertmacro LANG_STRING STRING_FLASH_AX_MISSING "Výsledek: Flash ActiveX chybí."
 !insertmacro LANG_STRING STRING_FLASH_AX_WILLDOWNLOAD "Následuje stažení Flashe z "
 !insertmacro LANG_STRING STRING_FLASH_AX_DOWNRESULT "Výsledek stažení = "
 !insertmacro LANG_STRING STRING_FLASH_AX_CANNOTDOWNLOAD "Nelze stáhnout Flash ActiveX. Můžete ho stáhnout později ručně nebo použít náš vlastní zobrazovač flashe."

@@ -58,12 +58,14 @@ public class ActionSetMember extends Action {
         if (lda.stack.size() < 3) {
             return false;
         }
+
         Object value = lda.pop();
         String memberName = lda.popAsString();
         Object obj = lda.pop();
         if (obj instanceof ActionScriptObject) {
             ((ActionScriptObject) obj).setMember(memberName, value);
         }
+
         return true;
     }
 

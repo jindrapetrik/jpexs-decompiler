@@ -61,6 +61,7 @@ public class ActionEnumerate2 extends Action {
         if (lda.stack.isEmpty()) {
             return false;
         }
+
         Object o = lda.pop();
         lda.stack.push(Null.INSTANCE);
 
@@ -70,6 +71,7 @@ public class ActionEnumerate2 extends Action {
                 lda.stack.push(m);
             }
         }
+
         return true;
     }
 }

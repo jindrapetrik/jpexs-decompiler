@@ -50,6 +50,7 @@ public class ActionGetMember extends Action {
         if (lda.stack.size() < 2) {
             return false;
         }
+
         String membername = lda.popAsString();
         Object obj = lda.pop();
         if (obj instanceof ActionScriptObject) {
@@ -57,6 +58,7 @@ public class ActionGetMember extends Action {
         } else {
             lda.stack.push(Undefined.INSTANCE);
         }
+
         return true;
     }
 

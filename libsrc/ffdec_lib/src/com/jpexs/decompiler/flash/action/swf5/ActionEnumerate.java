@@ -50,6 +50,7 @@ public class ActionEnumerate extends Action {
         if (lda.stack.isEmpty()) {
             return false;
         }
+
         String objectName = lda.popAsString();
         lda.stack.push(Null.INSTANCE);
 

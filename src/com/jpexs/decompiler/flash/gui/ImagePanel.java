@@ -370,9 +370,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             if (Configuration._debugMode.get()) {
                 g2d.drawString("frameLoss:" + df.format(frameLoss) + "%", 20, 20);
             }
-
         }
-
     }
 
     @Override
@@ -1196,11 +1194,17 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     private long startRun = 0L;
+
     private long startDrop = 0L;
+
     private int skippedFrames = 0;
+
     private float fpsShouldBe = 0;
+
     private float fpsIs = 0;
+
     private Timer fpsTimer;
+
     private int startFrame = 0;
 
     private synchronized void setFpsIs(float val) {
@@ -1234,6 +1238,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             public final Timer thisTimer = timer;
 
             public final boolean isSingleFrame = singleFrame;
+
             private long lastRun = 0L;
 
             @Override
@@ -1264,7 +1269,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         int frameCount = timelined.getTimeline().getFrameCount();
                         //How many ticks (= times where frame should be displayed in framerate) are there from hitting play button
                         int ticksFromStart = (int) Math.floor((frameTimeMsIs - startRun) / (double) getMsPerFrame()) + 1;
-                        //Add ticks to first frame when hitting play button, ignoring total framecount => this value can be larger than number of frames in timeline                       
+                        //Add ticks to first frame when hitting play button, ignoring total framecount => this value can be larger than number of frames in timeline
                         int frameOverMaxShouldBeNow = startFrame + ticksFromStart;
                         //Apply maximum frames repating, this is actual frame which should be drawed now
                         int frameShouldBeNow = frameOverMaxShouldBeNow % frameCount;

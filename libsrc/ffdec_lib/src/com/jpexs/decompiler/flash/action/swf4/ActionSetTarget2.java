@@ -48,6 +48,7 @@ public class ActionSetTarget2 extends Action {
         if (lda.stack.isEmpty()) {
             return false;
         }
+
         String target = lda.popAsString();
         lda.target = lda.stage.getMember(target);
         return true;

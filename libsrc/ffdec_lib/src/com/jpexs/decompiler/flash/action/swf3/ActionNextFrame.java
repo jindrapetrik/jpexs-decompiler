@@ -49,6 +49,7 @@ public class ActionNextFrame extends Action {
         if (f < ((DisplayObject) lda.target).getTotalFrames()) {
             ((DisplayObject) lda.target).gotoFrame(f + 1);
         }
+
         return true;
     }
 

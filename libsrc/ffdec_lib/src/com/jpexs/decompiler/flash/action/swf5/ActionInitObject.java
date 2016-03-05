@@ -50,16 +50,19 @@ public class ActionInitObject extends Action {
         if (lda.stack.isEmpty()) {
             return false;
         }
+
         int num = (int) (double) (Double) lda.popAsNumber();
         if (lda.stack.size() < 2 * num) {
             return false;
         }
+
         ActionScriptObject obj = new ActionScriptObject();
         for (int i = 0; i < num; i++) {
             Object val = lda.pop();
             String name = lda.popAsString();
             obj.setMember(name, val);
         }
+
         lda.stack.push(obj);
         return true;
     }

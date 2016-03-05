@@ -72,6 +72,7 @@ public class ActionInstanceOf extends Action {
         if (lda.stack.size() < 2) {
             return false;
         }
+
         Object type = lda.stack.pop();
         Object obj = lda.stack.pop();
         if (getInstanceOfResult(obj, type)) {

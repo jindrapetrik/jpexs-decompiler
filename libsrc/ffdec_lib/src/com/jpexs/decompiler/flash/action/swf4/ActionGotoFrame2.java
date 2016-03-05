@@ -109,9 +109,10 @@ public class ActionGotoFrame2 extends Action {
 
     @Override
     public boolean execute(LocalDataArea lda) {
-        if (lda.stack.size() < 1) {
+        if (lda.stack.isEmpty()) {
             return false;
         }
+
         String frame = EcmaScript.toString(lda.stack.pop());
         String target = "/";
         if (frame.contains(":")) {

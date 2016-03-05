@@ -46,7 +46,7 @@ public class ActionPushDuplicate extends Action {
 
     @Override
     public boolean execute(LocalDataArea lda) {
-        if (lda.stack.size() == 0) {
+        if (lda.stack.isEmpty()) {
             return false;
         }
 

@@ -51,6 +51,7 @@ public class ActionCastOp extends Action {
         if (lda.stack.size() < 2) {
             return false;
         }
+
         ActionScriptObject obj = (ActionScriptObject) lda.pop();
         ActionScriptObject constr = (ActionScriptObject) lda.pop();
         if (ActionInstanceOf.getInstanceOfResult(obj, constr)) {
@@ -58,6 +59,7 @@ public class ActionCastOp extends Action {
         } else {
             lda.stack.push(Null.INSTANCE);
         }
+
         return true;
     }
 

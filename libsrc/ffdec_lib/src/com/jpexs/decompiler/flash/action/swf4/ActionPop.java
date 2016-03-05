@@ -42,6 +42,7 @@ public class ActionPop extends Action {
         if (lda.stack.isEmpty()) {
             return false;
         }
+
         lda.stack.pop();
         return true;
     }
