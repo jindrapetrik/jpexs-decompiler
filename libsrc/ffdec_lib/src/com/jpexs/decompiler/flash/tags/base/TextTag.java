@@ -298,8 +298,14 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
                 }
                 y = rec.yOffset;
             }
+
             firstLine = false;
             allLeftMargins.add(currentLeftMargin);
+
+            if (glyphs == null) {
+                continue;
+            }
+
             int letterSpacing = 0;
             for (int e = 0; e < rec.glyphEntries.size(); e++) {
                 GLYPHENTRY entry = rec.glyphEntries.get(e);
