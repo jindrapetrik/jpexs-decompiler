@@ -233,12 +233,16 @@ public class XFLConverter {
     private static void convertLineStyle(LINESTYLE ls, int shapeNum, StringBuilder ret) {
         ret.append("<SolidStroke scaleMode=\"").append(getScaleMode(ls)).append("\" weight=\"").append(((float) ls.width) / SWF.unitDivisor)
                 .append("\">"
-                        + "<fill>"
-                        + "<SolidColor color=\"")
-                .append(ls.color.toHexRGB()).append("\"")
-                .append(shapeNum == 3 ? " alpha=\"" + ((RGBA) ls.color).getAlphaFloat() + "\"" : "").append(" />"
-                        + "</fill>"
-                        + "</SolidStroke>");
+                        + "<fill>");
+        if (!(ls instanceof LINESTYLE2) || !((LINESTYLE2) ls).hasFillFlag) {
+            ret.append("<SolidColor color=\"")
+                    .append(ls.color.toHexRGB()).append("\"")
+                    .append(shapeNum == 3 ? " alpha=\"" + ((RGBA) ls.color).getAlphaFloat() + "\"" : "").append(" />");
+        } else {
+            // todo: line fill
+        }
+        ret.append("</fill>"
+                + "</SolidStroke>");
     }
 
     private static void convertLineStyle(HashMap<Integer, CharacterTag> characters, LINESTYLE2 ls, int shapeNum, StringBuilder ret) {
