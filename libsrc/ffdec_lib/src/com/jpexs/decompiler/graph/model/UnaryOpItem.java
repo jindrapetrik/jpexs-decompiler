@@ -52,10 +52,10 @@ public abstract class UnaryOpItem extends GraphTargetItem implements UnaryOp {
         if (value != null) {
             if (value.getPrecedence() > precedence) {
                 writer.append("(");
-                value.toString(writer, localData);
+                value.toString(writer, localData, coerce);
                 writer.append(")");
             } else {
-                value.toString(writer, localData);
+                value.toString(writer, localData, coerce);
             }
         } else {
             writer.append("null");

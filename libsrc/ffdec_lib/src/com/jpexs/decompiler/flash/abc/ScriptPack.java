@@ -248,13 +248,19 @@ public class ScriptPack extends AS3ClassTreeItem {
             }, timeout, TimeUnit.SECONDS);
         } catch (TimeoutException ex) {
             writer.continueMeasure();
-            logger.log(Level.SEVERE, "Decompilation error", ex);
+            logger.log(Level.SEVERE, "Decompilation timeout", ex);
             Helper.appendTimeoutCommentAs3(writer, timeout, 0);
             return;
         } catch (ExecutionException ex) {
             writer.continueMeasure();
-            logger.log(Level.SEVERE, "Decompilation error", ex);
-            Helper.appendErrorComment(writer, ex);
+            Exception convertException = ex;
+            Throwable cause = ex.getCause();
+            if (ex instanceof ExecutionException && cause instanceof Exception) {
+                convertException = (Exception) cause;
+            }
+
+            logger.log(Level.SEVERE, "Decompilation error", convertException);
+            Helper.appendErrorComment(writer, convertException);
             return;
         }
         writer.continueMeasure();
