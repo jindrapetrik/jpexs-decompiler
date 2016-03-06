@@ -2738,31 +2738,33 @@ public class XFLConverter {
         domDocument.append("</DOMDocument>");
         String domDocumentStr = prettyFormatXML(domDocument.toString());
 
-        for (Tag t : swf.getTags()) {
-            if (t instanceof DoInitActionTag) {
-                DoInitActionTag dia = (DoInitActionTag) t;
-                int chid = dia.getCharacterId();
-                if (characters.containsKey(chid)) {
-                    if (characters.get(chid) instanceof DefineSpriteTag) {
-                        DefineSpriteTag sprite = (DefineSpriteTag) characters.get(chid);
-                        if (sprite.getTags().isEmpty()) {
-                            String data = settings.exportScript ? convertActionScript(dia) : "";
-                            String expName = dia.getSwf().getExportName(dia.spriteId);
-                            expName = expName != null ? expName : "_unk_";
-                            String expPath = expName;
-                            final String prefix = "__Packages.";
-                            if (expPath.startsWith(prefix)) {
-                                expPath = expPath.substring(prefix.length());
+        if (settings.exportScript) {
+            for (Tag t : swf.getTags()) {
+                if (t instanceof DoInitActionTag) {
+                    DoInitActionTag dia = (DoInitActionTag) t;
+                    int chid = dia.getCharacterId();
+                    if (characters.containsKey(chid)) {
+                        if (characters.get(chid) instanceof DefineSpriteTag) {
+                            DefineSpriteTag sprite = (DefineSpriteTag) characters.get(chid);
+                            if (sprite.getTags().isEmpty()) {
+                                String data = convertActionScript(dia);
+                                String expName = dia.getSwf().getExportName(dia.spriteId);
+                                expName = expName != null ? expName : "_unk_";
+                                String expPath = expName;
+                                final String prefix = "__Packages.";
+                                if (expPath.startsWith(prefix)) {
+                                    expPath = expPath.substring(prefix.length());
+                                }
+                                String expDir = "";
+                                if (expPath.contains(".")) {
+                                    expDir = expPath.substring(0, expPath.lastIndexOf('.'));
+                                    expDir = expDir.replace(".", File.separator);
+                                }
+                                expPath = expPath.replace(".", File.separator);
+                                File cdir = new File(outDir.getAbsolutePath() + File.separator + expDir);
+                                Path.createDirectorySafe(cdir);
+                                writeFile(handler, Utf8Helper.getBytes(data), outDir.getAbsolutePath() + File.separator + expPath + ".as");
                             }
-                            String expDir = "";
-                            if (expPath.contains(".")) {
-                                expDir = expPath.substring(0, expPath.lastIndexOf('.'));
-                                expDir = expDir.replace(".", File.separator);
-                            }
-                            expPath = expPath.replace(".", File.separator);
-                            File cdir = new File(outDir.getAbsolutePath() + File.separator + expDir);
-                            Path.createDirectorySafe(cdir);
-                            writeFile(handler, Utf8Helper.getBytes(data), outDir.getAbsolutePath() + File.separator + expPath + ".as");
                         }
                     }
                 }
