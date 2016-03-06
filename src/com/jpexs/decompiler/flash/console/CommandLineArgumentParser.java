@@ -1523,7 +1523,13 @@ public class CommandLineArgumentParser {
                     if (flaVersion == null) {
                         flaVersion = FLAVersion.CS6; //Defaults to CS6
                     }
-                    swf.exportFla(handler, outDir + (multipleExportTypes ? File.separator + "fla" : ""), inFile.getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), flaVersion);
+                    String outFile = outDir;
+                    if (multipleExportTypes) {
+                        outFile = Path.combine(outFile, "fla");
+                    };
+
+                    outFile = Path.combine(outFile, inFile.getName());
+                    swf.exportFla(handler, outFile, inFile.getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), flaVersion);
                 }
 
                 if (exportFormats.contains("xfl")) {
@@ -1532,7 +1538,14 @@ public class CommandLineArgumentParser {
                     if (xflVersion == null) {
                         xflVersion = FLAVersion.CS6; //Defaults to CS6
                     }
-                    swf.exportXfl(handler, outDir + (multipleExportTypes ? File.separator + "xfl" : ""), inFile.getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), xflVersion);
+
+                    String outFile = outDir;
+                    if (multipleExportTypes) {
+                        outFile = Path.combine(outFile, "xfl");
+                    };
+
+                    outFile = Path.combine(outFile, inFile.getName());
+                    swf.exportXfl(handler, outFile, inFile.getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), xflVersion);
                 }
 
                 if (!singleFile) {

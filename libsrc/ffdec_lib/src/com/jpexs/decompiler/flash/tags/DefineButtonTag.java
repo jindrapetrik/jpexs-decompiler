@@ -16,17 +16,13 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
-import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.ActionList;
-import com.jpexs.decompiler.flash.action.ConstantPoolTooBigException;
-import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
-import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
-import com.jpexs.decompiler.flash.tags.base.ASMSource;
+import com.jpexs.decompiler.flash.tags.base.ASMSourceContainer;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
+import com.jpexs.decompiler.flash.tags.base.ButtonAction;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.timeline.DepthState;
@@ -42,9 +38,9 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Cache;
-import com.jpexs.helpers.Helper;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -54,7 +50,7 @@ import java.util.Set;
  * @author JPEXS
  */
 @SWFVersion(from = 1)
-public class DefineButtonTag extends ButtonTag implements ASMSource {
+public class DefineButtonTag extends ButtonTag implements ASMSourceContainer {
 
     public static final int ID = 7;
 
@@ -76,13 +72,6 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
      */
     @HideInRawEdit
     public ByteArrayRange actionBytes;
-
-    private String scriptName = "-";
-
-    @Override
-    public String getScriptName() {
-        return scriptName;
-    }
 
     /**
      * Constructor
@@ -109,11 +98,6 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
     }
 
     @Override
-    public void setScriptName(String scriptName) {
-        this.scriptName = scriptName;
-    }
-
-    @Override
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         buttonId = sis.readUI16("buttonId");
         characters = sis.readBUTTONRECORDList(false, "characters");
@@ -131,7 +115,6 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
         sos.writeUI16(buttonId);
         sos.writeBUTTONRECORDList(characters, false);
         sos.write(getActionBytes());
-        //sos.write(Action.actionsToBytes(actions, true, version));
     }
 
     @Override
@@ -149,73 +132,25 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
         return characters;
     }
 
-    /**
-     * Converts actions to ASM source
-     *
-     * @param exportMode PCode or hex?
-     * @param writer
-     * @param actions
-     * @return ASM source
-     * @throws java.lang.InterruptedException
-     */
     @Override
-    public GraphTextWriter getASMSource(ScriptExportMode exportMode, GraphTextWriter writer, ActionList actions) throws InterruptedException {
-        if (actions == null) {
-            actions = getActions();
-        }
-        return Action.actionsToString(listeners, 0, actions, swf.version, exportMode, writer);
+    public List<ButtonAction> getSubItems() {
+        return Arrays.asList(new ButtonAction(this));
     }
 
-    /**
-     * Whether or not this object contains ASM source
-     *
-     * @return True when contains
-     */
-    @Override
-    public boolean containsSource() {
-        return true;
-    }
-
-    /**
-     * Returns actions associated with this object
-     *
-     * @return List of actions
-     * @throws java.lang.InterruptedException
-     */
-    @Override
-    public ActionList getActions() throws InterruptedException {
-        return SWF.getCachedActionList(this, listeners);
-    }
-
-    @Override
     public void setActions(List<Action> actions) {
         actionBytes = Action.actionsToByteArrayRange(actions, true, swf.version);
     }
 
-    @Override
     public ByteArrayRange getActionBytes() {
         return actionBytes;
     }
 
-    @Override
     public void setActionBytes(byte[] actionBytes) {
         this.actionBytes = new ByteArrayRange(actionBytes);
-        SWF.uncache(this);
     }
 
-    @Override
-    public void setConstantPools(List<List<String>> constantPools) throws ConstantPoolTooBigException {
-        Action.setConstantPools(this, constantPools, false);
-    }
-
-    @Override
     public void setModified() {
         setModified(true);
-    }
-
-    @Override
-    public GraphTextWriter getActionBytesAsHex(GraphTextWriter writer) {
-        return Helper.byteArrayToHexWithHeader(writer, actionBytes.getRangeData());
     }
 
     @Override
@@ -286,18 +221,6 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
         return rect;
     }
 
-    List<DisassemblyListener> listeners = new ArrayList<>();
-
-    @Override
-    public void addDisassemblyListener(DisassemblyListener listener) {
-        listeners.add(listener);
-    }
-
-    @Override
-    public void removeDisassemblyListener(DisassemblyListener listener) {
-        listeners.remove(listener);
-    }
-
     @Override
     public boolean trackAsMenu() {
         return false;
@@ -306,26 +229,6 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
     @Override
     public int getNumFrames() {
         return 1;
-    }
-
-    @Override
-    public GraphTextWriter getActionSourcePrefix(GraphTextWriter writer) {
-        return writer;
-    }
-
-    @Override
-    public GraphTextWriter getActionSourceSuffix(GraphTextWriter writer) {
-        return writer;
-    }
-
-    @Override
-    public int getPrefixLineCount() {
-        return 0;
-    }
-
-    @Override
-    public String removePrefixAndSuffix(String source) {
-        return source;
     }
 
     @Override
@@ -388,15 +291,5 @@ public class DefineButtonTag extends ButtonTag implements ASMSource {
         }
 
         timeline.addFrame(frameHit);
-    }
-
-    @Override
-    public Tag getSourceTag() {
-        return this;
-    }
-
-    @Override
-    public void setSourceTag(Tag t) {
-        //nothing
     }
 }

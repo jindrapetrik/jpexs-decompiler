@@ -334,7 +334,7 @@ public class AdvancedSettingsDialog extends AppDialog {
 
             final Map<String, String> locNames = new HashMap<>();
             for (String name : names) {
-                String locName = "(Internal) " + name;
+                String locName;
 
                 if (resourceBundle.containsKey("config.name." + name)) {
                     locName = resourceBundle.getString("config.name." + name);
@@ -344,7 +344,10 @@ public class AdvancedSettingsDialog extends AppDialog {
                     if (cint == null) {
                         throw new RuntimeException("Missing configuration name: " + name);
                     }
+
+                    locName = "(Internal) " + name;
                 }
+
                 locNames.put(name, locName);
             }
 

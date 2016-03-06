@@ -56,6 +56,7 @@ import com.jpexs.decompiler.flash.tags.StartSoundTag;
 import com.jpexs.decompiler.flash.tags.SymbolClassTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
+import com.jpexs.decompiler.flash.tags.base.ButtonAction;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
@@ -247,13 +248,7 @@ public class XFLConverter {
         if (ls.width == 1) {
             params.append(" solidStyle=\"hairline\"");
         }
-        if ((!ls.noHScaleFlag) && (!ls.noVScaleFlag)) {
-            params.append(" scaleMode=\"normal\"");
-        } else if ((!ls.noHScaleFlag) && ls.noVScaleFlag) {
-            params.append(" scaleMode=\"horizontal\"");
-        } else if (ls.noHScaleFlag && (!ls.noVScaleFlag)) {
-            params.append(" scaleMode=\"vertical\"");
-        }
+        params.append(" scaleMode=\"").append(getScaleMode(ls)).append("\"");
 
         switch (ls.endCapStyle) {  //What about endCapStyle?
             case LINESTYLE2.NO_CAP:
@@ -276,7 +271,7 @@ public class XFLConverter {
                 break;
         }
 
-        ret.append("<SolidStroke scaleMode=\"").append(getScaleMode(ls)).append("\" weight=\"").append(((float) ls.width) / SWF.unitDivisor).append("\"");
+        ret.append("<SolidStroke weight=\"").append(((float) ls.width) / SWF.unitDivisor).append("\"");
         ret.append(params);
         ret.append(">");
         ret.append("<fill>");
@@ -1148,7 +1143,7 @@ public class XFLConverter {
         if (tag instanceof DefineButtonTag) {
             ret.append("<Actionscript><script><![CDATA[");
             ret.append("on(press){\r\n");
-            ret.append(convertActionScript(((DefineButtonTag) tag)));
+            ret.append(convertActionScript(new ButtonAction((DefineButtonTag) tag)));
             ret.append("}");
             ret.append("]]></script></Actionscript>");
         }

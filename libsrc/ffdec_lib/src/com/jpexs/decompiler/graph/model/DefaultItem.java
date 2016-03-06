@@ -20,5 +20,4 @@ public class DefaultItem extends GraphTargetItem {
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
     }
-
 }

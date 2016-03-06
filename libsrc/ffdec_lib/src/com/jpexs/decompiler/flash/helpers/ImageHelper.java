@@ -58,7 +58,7 @@ public class ImageHelper {
             CMYKJPEGImageReader r = new CMYKJPEGImageReader(new CMYKJPEGImageReaderSpi());
             r.setInput(iis);
             in = r.read(0);
-        } catch (IOException ex) {
+        } catch (IOException | ArrayIndexOutOfBoundsException ex) {
             try {
                 in = ImageIO.read(ImageIO.createImageInputStream(new ByteArrayInputStream(data)));
             } catch (IOException ex1) {
