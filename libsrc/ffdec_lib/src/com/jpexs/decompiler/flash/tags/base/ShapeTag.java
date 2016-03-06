@@ -90,7 +90,10 @@ public abstract class ShapeTag extends CharacterTag implements DrawableTag, Lazy
 
     @Override
     public void getNeededCharacters(Set<Integer> needed) {
-        getShapes().getNeededCharacters(needed);
+        SHAPEWITHSTYLE shapes = getShapes();
+        if (shapes != null) {
+            getShapes().getNeededCharacters(needed);
+        }
     }
 
     @Override

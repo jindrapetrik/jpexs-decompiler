@@ -88,6 +88,7 @@ import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
+import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.decompiler.flash.types.SOUNDENVELOPE;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.flash.types.filters.BEVELFILTER;
@@ -1328,7 +1329,11 @@ public class XFLConverter {
                     ShapeTag shape = (ShapeTag) symbol;
                     symbolStr.append("<DOMTimeline name=\"Symbol ").append(symbol.getCharacterId()).append("\" currentFrame=\"0\">");
                     symbolStr.append("<layers>");
-                    symbolStr.append(convertShape(characters, null, shape.getShapeNum(), shape.getShapes().shapeRecords, shape.getShapes().fillStyles, shape.getShapes().lineStyles, false, true));
+                    SHAPEWITHSTYLE shapeWithStyle = shape.getShapes();
+                    if (shapeWithStyle != null) {
+                        symbolStr.append(convertShape(characters, null, shape.getShapeNum(), shapeWithStyle.shapeRecords, shapeWithStyle.fillStyles, shapeWithStyle.lineStyles, false, true));
+                    }
+
                     symbolStr.append("</layers>");
                     symbolStr.append("</DOMTimeline>");
                 }
