@@ -1577,10 +1577,15 @@ public class CommandLineArgumentParser {
         XFLExportSettings settings = new XFLExportSettings();
         settings.compressed = compressed;
         settings.exportScript = exportScript;
-        if (Configuration.setFFDecVersionInExportedFont.get()) {
-            swf.exportXfl(handler, outFile, inFile.getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), flaVersion, settings);
-        } else {
-            swf.exportXfl(handler, outFile, inFile.getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.APPLICATION_NAME, "1.0.0", Configuration.parallelSpeedUp.get(), flaVersion, settings);
+
+        try {
+            if (Configuration.setFFDecVersionInExportedFont.get()) {
+                swf.exportXfl(handler, outFile, inFile.getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), flaVersion, settings);
+            } else {
+                swf.exportXfl(handler, outFile, inFile.getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.APPLICATION_NAME, "1.0.0", Configuration.parallelSpeedUp.get(), flaVersion, settings);
+            }
+        } catch (Exception ex) {
+            logger.log(Level.SEVERE, "Error during XFL/FLA export", ex);
         }
     }
 

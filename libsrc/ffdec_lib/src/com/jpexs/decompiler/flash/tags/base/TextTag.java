@@ -303,6 +303,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
             allLeftMargins.add(currentLeftMargin);
 
             if (glyphs == null) {
+                // todo: ???
                 continue;
             }
 
