@@ -1575,7 +1575,7 @@ public class CommandLineArgumentParser {
 
         outFile = Path.combine(outFile, inFile.getName());
         XFLExportSettings settings = new XFLExportSettings();
-        settings.compressed = true;
+        settings.compressed = compressed;
         settings.exportScript = exportScript;
         swf.exportXfl(handler, outFile, inFile.getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), flaVersion, settings);
     }
