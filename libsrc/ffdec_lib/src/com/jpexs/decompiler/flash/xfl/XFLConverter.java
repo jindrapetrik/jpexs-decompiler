@@ -2746,7 +2746,7 @@ public class XFLConverter {
                     if (characters.get(chid) instanceof DefineSpriteTag) {
                         DefineSpriteTag sprite = (DefineSpriteTag) characters.get(chid);
                         if (sprite.getTags().isEmpty()) {
-                            String data = convertActionScript(dia);
+                            String data = settings.exportScript ? convertActionScript(dia) : "";
                             String expName = dia.getSwf().getExportName(dia.spriteId);
                             expName = expName != null ? expName : "_unk_";
                             String expPath = expName;
@@ -3040,7 +3040,7 @@ public class XFLConverter {
             }
             writeFile(handler, Utf8Helper.getBytes("PROXY-CS5"), outfile);
         }
-        if (useAS3) {
+        if (useAS3 && settings.exportScript) {
             try {
                 ScriptExportSettings scriptExportSettings = new ScriptExportSettings(ScriptExportMode.AS, false);
                 swf.exportActionScript(handler, Path.combine(outDir.getAbsolutePath(), "scripts"), scriptExportSettings, parallel, null);
