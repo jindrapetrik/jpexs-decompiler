@@ -142,6 +142,7 @@ import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFField;
 import com.jpexs.decompiler.flash.xfl.FLAVersion;
 import com.jpexs.decompiler.flash.xfl.XFLConverter;
+import com.jpexs.decompiler.flash.xfl.XFLExportSettings;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -2424,12 +2425,19 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     public void exportFla(AbortRetryIgnoreHandler handler, String outfile, String swfName, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion version) throws IOException, InterruptedException {
-        XFLConverter.convertSWF(handler, this, swfName, outfile, true, generator, generatorVerName, generatorVersion, parallel, version);
-        clearAllCache();
+        XFLExportSettings settings = new XFLExportSettings();
+        settings.compressed = true;
+        exportXfl(handler, outfile, swfName, generator, generatorVerName, generatorVersion, parallel, version, settings);
     }
 
     public void exportXfl(AbortRetryIgnoreHandler handler, String outfile, String swfName, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion version) throws IOException, InterruptedException {
-        XFLConverter.convertSWF(handler, this, swfName, outfile, false, generator, generatorVerName, generatorVersion, parallel, version);
+        XFLExportSettings settings = new XFLExportSettings();
+        settings.compressed = false;
+        exportXfl(handler, outfile, swfName, generator, generatorVerName, generatorVersion, parallel, version, settings);
+    }
+
+    public void exportXfl(AbortRetryIgnoreHandler handler, String outfile, String swfName, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion version, XFLExportSettings settings) throws IOException, InterruptedException {
+        XFLConverter.convertSWF(handler, this, swfName, outfile, settings, generator, generatorVerName, generatorVersion, parallel, version);
         clearAllCache();
     }
 

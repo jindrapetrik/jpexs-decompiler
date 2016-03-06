@@ -2675,7 +2675,7 @@ public class XFLConverter {
         return ret.toString();
     }
 
-    public static void convertSWF(AbortRetryIgnoreHandler handler, SWF swf, String swfFileName, String outfile, boolean compressed, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion flaVersion) throws IOException, InterruptedException {
+    public static void convertSWF(AbortRetryIgnoreHandler handler, SWF swf, String swfFileName, String outfile, XFLExportSettings settings, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion flaVersion) throws IOException, InterruptedException {
 
         FileAttributesTag fa = swf.getFileAttributes();
 
@@ -2998,7 +2998,7 @@ public class XFLConverter {
         publishSettings.append("</flash_profiles>");
         String publishSettingsStr = publishSettings.toString();
 
-        if (compressed) {
+        if (settings.compressed) {
             final String domDocumentF = domDocumentStr;
             final String publishSettingsF = publishSettingsStr;
             final String outfileF = outfile;

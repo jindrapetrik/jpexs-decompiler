@@ -117,6 +117,7 @@ import com.jpexs.decompiler.flash.treeitems.SWFList;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.decompiler.flash.xfl.FLAVersion;
+import com.jpexs.decompiler.flash.xfl.XFLExportSettings;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.CancellableWorker;
@@ -1519,33 +1520,12 @@ public class CommandLineArgumentParser {
 
                 if (exportFormats.contains("fla")) {
                     System.out.println("Exporting FLA...");
-                    FLAVersion flaVersion = FLAVersion.fromString(formats.get("fla"));
-                    if (flaVersion == null) {
-                        flaVersion = FLAVersion.CS6; //Defaults to CS6
-                    }
-                    String outFile = outDir;
-                    if (multipleExportTypes) {
-                        outFile = Path.combine(outFile, "fla");
-                    };
-
-                    outFile = Path.combine(outFile, inFile.getName());
-                    swf.exportFla(handler, outFile, inFile.getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), flaVersion);
+                    exportFla(true, outDir, inFile, swf, multipleExportTypes, formats, handler);
                 }
 
                 if (exportFormats.contains("xfl")) {
                     System.out.println("Exporting XFL...");
-                    FLAVersion xflVersion = FLAVersion.fromString(formats.get("xfl"));
-                    if (xflVersion == null) {
-                        xflVersion = FLAVersion.CS6; //Defaults to CS6
-                    }
-
-                    String outFile = outDir;
-                    if (multipleExportTypes) {
-                        outFile = Path.combine(outFile, "xfl");
-                    };
-
-                    outFile = Path.combine(outFile, inFile.getName());
-                    swf.exportXfl(handler, outFile, inFile.getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), xflVersion);
+                    exportFla(false, outDir, inFile, swf, multipleExportTypes, formats, handler);
                 }
 
                 if (!singleFile) {
@@ -1572,6 +1552,32 @@ public class CommandLineArgumentParser {
         System.out.println("Export finished. Total export time: " + Helper.formatTimeSec(time));
         System.out.println(exportOK ? "OK" : "FAIL");
         System.exit(exportOK ? 0 : 1);
+    }
+
+    private static void exportFla(boolean compressed, String outDir, File inFile, SWF swf, boolean multipleExportTypes, Map<String, String> formats, AbortRetryIgnoreHandler handler) throws IOException, InterruptedException {
+        String exportFormat = compressed ? "fla" : "xfl";
+        String format = formats.get(exportFormat);
+        boolean exportScript = true;
+        if (format != null && format.endsWith("_noscript")) {
+            format = format.substring(0, format.length() - 9);
+            exportScript = false;
+        }
+
+        FLAVersion flaVersion = FLAVersion.fromString(format);
+        if (flaVersion == null) {
+            flaVersion = FLAVersion.CS6; //Defaults to CS6
+        }
+
+        String outFile = outDir;
+        if (multipleExportTypes) {
+            outFile = Path.combine(outFile, exportFormat);
+        };
+
+        outFile = Path.combine(outFile, inFile.getName());
+        XFLExportSettings settings = new XFLExportSettings();
+        settings.compressed = true;
+        settings.exportScript = exportScript;
+        swf.exportXfl(handler, outFile, inFile.getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), flaVersion, settings);
     }
 
     private static void parseDeobfuscate(Stack<String> args) {
