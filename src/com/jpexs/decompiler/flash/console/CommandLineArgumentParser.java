@@ -1577,7 +1577,11 @@ public class CommandLineArgumentParser {
         XFLExportSettings settings = new XFLExportSettings();
         settings.compressed = compressed;
         settings.exportScript = exportScript;
-        swf.exportXfl(handler, outFile, inFile.getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), flaVersion, settings);
+        if (Configuration.setFFDecVersionInExportedFont.get()) {
+            swf.exportXfl(handler, outFile, inFile.getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), flaVersion, settings);
+        } else {
+            swf.exportXfl(handler, outFile, inFile.getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.APPLICATION_NAME, "1.0.0", Configuration.parallelSpeedUp.get(), flaVersion, settings);
+        }
     }
 
     private static void parseDeobfuscate(Stack<String> args) {
