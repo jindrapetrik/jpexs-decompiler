@@ -1507,7 +1507,7 @@ public class XFLConverter {
                                 break;
 
                         }
-                    } catch (IOException ex) {
+                    } catch (IOException | ArrayIndexOutOfBoundsException ex) {
                         logger.log(Level.SEVERE, null, ex);
                     }
                 }

@@ -65,6 +65,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.w3c.dom.Element;
 
 /**
@@ -264,6 +266,11 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
                     font = font2;
                 }
                 textHeight = rec.textHeight;
+                if (font == null) {
+                    Logger.getLogger(TextTag.class.getName()).log(Level.SEVERE, "Font with id=" + rec.fontId + " was not found.");
+                    continue;
+                }
+
                 glyphs = font.getGlyphShapeTable();
 
                 if (!font.hasLayout()) {
@@ -303,7 +310,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
             allLeftMargins.add(currentLeftMargin);
 
             if (glyphs == null) {
-                // todo: ???
+                Logger.getLogger(TextTag.class.getName()).log(Level.SEVERE, "Glyphs not found.");
                 continue;
             }
 
