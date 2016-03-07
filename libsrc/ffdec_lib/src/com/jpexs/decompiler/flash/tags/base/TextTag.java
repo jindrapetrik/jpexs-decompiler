@@ -336,11 +336,12 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
                     if (nextEntry != null) {
                         kerningAdjustment = font.getGlyphKerningAdjustment(entry.glyphIndex, nextEntry.glyphIndex);
                     }
-                    defaultAdvance = (int) Math.round(textHeight * (font.getGlyphAdvance(entry.glyphIndex) + kerningAdjustment) / 1024.0);
+                    defaultAdvance = (int) (Math.round(textHeight * (font.getGlyphAdvance(entry.glyphIndex) + kerningAdjustment) / 1024.0) / font.getDivider());
                 } else {
                     defaultAdvance = (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(aFont, font.glyphToChar(entry.glyphIndex), nextEntry == null ? null : font.glyphToChar(nextEntry.glyphIndex)));
                 }
                 letterSpacing = adv - defaultAdvance;
+
                 x += adv / (font.getDivider());
             }
             allLetterSpacings.add(letterSpacing);
