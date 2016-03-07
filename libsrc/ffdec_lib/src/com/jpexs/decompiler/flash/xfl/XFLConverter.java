@@ -1285,7 +1285,12 @@ public class XFLConverter {
                                     CharacterTag character = characters.get(rec.characterId);
                                     MATRIX matrix = rec.placeMatrix;
                                     String recCharStr;
-                                    if (character instanceof TextTag) {
+
+                                    int characterId = character.getCharacterId();
+                                    if ((character instanceof ShapeTag) && (nonLibraryShapes.contains(characterId))) {
+                                        ShapeTag shape = (ShapeTag) character;
+                                        recCharStr = convertShape(characters, matrix, shape.getShapeNum(), shape.getShapes().shapeRecords, shape.getShapes().fillStyles, shape.getShapes().lineStyles, false, false);
+                                    } else if (character instanceof TextTag) {
                                         recCharStr = convertText(null, (TextTag) character, matrix, filters, null);
                                     } else if (character instanceof DefineVideoStreamTag) {
                                         recCharStr = convertVideoInstance(null, matrix, (DefineVideoStreamTag) character, null);
@@ -2212,7 +2217,7 @@ public class XFLConverter {
         if (ret2.length() > 0) {
             ret.append("<DOMLayer name=\"Layer ").append(layerIndex).append("\" color=\"").append(randomOutlineColor()).append("\">"
                     + "<frames>").append(ret2).append("</frames>"
-                            + "</DOMLayer>");
+                    + "</DOMLayer>");
         }
     }
 
