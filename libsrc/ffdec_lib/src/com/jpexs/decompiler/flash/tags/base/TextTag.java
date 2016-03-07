@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
 import com.jpexs.decompiler.flash.exporters.shape.BitmapExporter;
 import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
 import com.jpexs.decompiler.flash.exporters.shape.SVGShapeExporter;
+import com.jpexs.decompiler.flash.helpers.FontHelper;
 import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.importers.TextImportResizeTextBoundsMode;
 import com.jpexs.decompiler.flash.tags.text.JustifyAlignGlyphEntry;
@@ -60,6 +61,7 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.font.LineMetrics;
+import java.awt.font.TextAttribute;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -276,6 +278,13 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
                 if (!font.hasLayout()) {
                     String fontName = FontTag.getFontNameWithFallback(font.getFontNameIntag());
                     aFont = new Font(fontName, font.getFontStyle(), (int) (textHeight / SWF.unitDivisor));
+
+                    Map<TextAttribute, Integer> attr = new HashMap<>();
+
+                    attr.put(TextAttribute.KERNING, TextAttribute.KERNING_ON);
+                    attr.put(TextAttribute.LIGATURES, TextAttribute.LIGATURES_ON);
+                    aFont = aFont.deriveFont(attr);
+
                     fontMetrics = graphics.getFontMetrics(aFont);
                     LineMetrics lm = fontMetrics.getLineMetrics("A", graphics);
                     ascent = lm.getAscent();
@@ -314,7 +323,7 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
                 continue;
             }
 
-            int letterSpacing = 0;
+            int letterSpacing = Integer.MAX_VALUE;
             for (int e = 0; e < rec.glyphEntries.size(); e++) {
                 GLYPHENTRY entry = rec.glyphEntries.get(e);
                 GLYPHENTRY nextEntry = null;
@@ -336,13 +345,19 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
                     if (nextEntry != null) {
                         kerningAdjustment = font.getGlyphKerningAdjustment(entry.glyphIndex, nextEntry.glyphIndex);
                     }
-                    defaultAdvance = (int) (Math.round(textHeight * (font.getGlyphAdvance(entry.glyphIndex) + kerningAdjustment) / 1024.0) / font.getDivider());
+                    defaultAdvance = (int) (Math.round(textHeight * (font.getGlyphAdvance(entry.glyphIndex) + kerningAdjustment) / (1024.0 * font.getDivider())));
                 } else {
                     defaultAdvance = (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(aFont, font.glyphToChar(entry.glyphIndex), nextEntry == null ? null : font.glyphToChar(nextEntry.glyphIndex)));
                 }
-                letterSpacing = adv - defaultAdvance;
-
-                x += adv / (font.getDivider());
+                int newLetterSpacing = adv - defaultAdvance;
+                if (e == 0 || e == rec.glyphEntries.size() - 1) {
+                    if (rec.glyphEntries.size() == 1) {
+                        letterSpacing = 0;
+                    }
+                } else if (newLetterSpacing < letterSpacing) {
+                    letterSpacing = newLetterSpacing;
+                }
+                x += adv;
             }
             allLetterSpacings.add(letterSpacing);
         }

@@ -2473,8 +2473,11 @@ public class XFLConverter {
                 ret.append(" instanceName=\"").append(Helper.escapeHTML(instanceName)).append("\"");
             }
             ret.append(antiAlias);
+            if (((CharacterTag) tag).getCharacterId() == 650) {
+                System.err.println("=========================AAAAAAAAAAA");
+            }
             Map<String, Object> attrs = TextTag.getTextRecordsAttributes(textRecords, swf);
-
+            System.err.println("///////////=============");
             ret.append(" width=\"").append(tag.getBounds().getWidth() / 2).append("\" height=\"").append(tag.getBounds().getHeight()).append("\" autoExpand=\"true\" isSelectable=\"false\">");
             ret.append(matStr);
 

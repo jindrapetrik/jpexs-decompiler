@@ -246,7 +246,8 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
     }
 
     public static float getSystemFontAdvance(Font aFont, Character character, Character nextCharacter) {
-        GlyphVector gv = aFont.createGlyphVector(new FontRenderContext(aFont.getTransform(), true, true), "" + character + (nextCharacter == null ? "" : nextCharacter));
+        String chars = "" + character + (nextCharacter == null ? "" : nextCharacter);
+        GlyphVector gv = aFont.layoutGlyphVector(new FontRenderContext(aFont.getTransform(), true, true), chars.toCharArray(), 0, chars.length(), Font.LAYOUT_LEFT_TO_RIGHT);
         GlyphMetrics gm = gv.getGlyphMetrics(0);
         return gm.getAdvanceX();
     }
