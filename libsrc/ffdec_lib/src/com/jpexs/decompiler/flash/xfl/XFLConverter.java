@@ -116,14 +116,18 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -1365,13 +1369,50 @@ public class XFLConverter {
                 symbols.add(symbLinkStr);
             } else if (symbol instanceof ImageTag) {
                 ImageTag imageTag = (ImageTag) symbol;
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                boolean allowSmoothing = false;
+
+                //find if smoothed - a bitmap is smoothed when there is a shape with fillstyle smoothed bitmap
+                looptags:
+                for (Tag tag : swf.getTags()) {
+                    if (tag instanceof ShapeTag) {
+                        Set<Integer> needed = new HashSet<>();
+                        tag.getNeededCharacters(needed);
+                        ShapeTag sht = (ShapeTag) tag;
+                        if (needed.contains(imageTag.getCharacterId())) {
+                            List<FILLSTYLE> fs = new ArrayList<>();
+                            SHAPEWITHSTYLE s = sht.getShapes();
+                            for (FILLSTYLE f : s.fillStyles.fillStyles) {
+                                fs.add(f);
+                            }
+                            for (SHAPERECORD r : s.shapeRecords) {
+                                if (r instanceof StyleChangeRecord) {
+                                    StyleChangeRecord scr = (StyleChangeRecord) r;
+                                    if (scr.stateNewStyles) {
+                                        for (FILLSTYLE f : scr.fillStyles.fillStyles) {
+                                            fs.add(f);
+                                        }
+                                    }
+                                }
+                            }
+                            for (FILLSTYLE f : fs) {
+                                if (Arrays.asList(FILLSTYLE.REPEATING_BITMAP, FILLSTYLE.CLIPPED_BITMAP, FILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP, FILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP).contains(f.fillStyleType) && f.bitmapId == imageTag.getCharacterId()) {
+                                    allowSmoothing = f.fillStyleType == FILLSTYLE.CLIPPED_BITMAP || f.fillStyleType == FILLSTYLE.REPEATING_BITMAP;
+                                    break looptags;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                byte imageBytes[] = Helper.readStream(imageTag.getImageData());
                 SerializableImage image = imageTag.getImage(false);
                 ImageFormat format = imageTag.getImageFormat();
-                ImageHelper.write(image.getBufferedImage(), format, baos);
                 String symbolFile = "bitmap" + symbol.getCharacterId() + imageTag.getImageFormat().getExtension();
-                files.put(symbolFile, baos.toByteArray());
-                String mediaLinkStr = "<DOMBitmapItem name=\"" + symbolFile + "\" sourceLastImported=\"" + getTimestamp(swf) + "\" externalFileSize=\"" + baos.toByteArray().length + "\"";
+                files.put(symbolFile, imageBytes);
+                String mediaLinkStr = "<DOMBitmapItem name=\"" + symbolFile + "\" sourceLastImported=\"" + getTimestamp(swf) + "\" externalFileSize=\"" + imageBytes.length + "\"";
+                if (allowSmoothing) {
+                    mediaLinkStr += " allowSmoothing=\"true\"";
+                }
                 switch (format) {
                     case PNG:
                     case GIF:
