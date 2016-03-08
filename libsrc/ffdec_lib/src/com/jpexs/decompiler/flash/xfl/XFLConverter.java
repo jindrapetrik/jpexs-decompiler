@@ -2964,11 +2964,6 @@ public class XFLConverter {
                 psXml.writeElementValue("policy-file-url", "http://fpdownload.adobe.com/pub/swz/crossdomain.xml");
                 psXml.writeElementValue("rsl-url", "textLayout_2.0.0.232.swz");
                 psXml.writeEndElement();
-                psXml.writeStartElement("library-path-entry");
-                psXml.writeElementValue("swc-path", "$(FlexSDK)/frameworks/libs/core.swc");
-                psXml.writeElementValue("linkage", "merge");
-                psXml.writeElementValue("rsl-url", "textLayout_2.0.0.232.swz");
-                psXml.writeEndElement();
                 psXml.writeEndElement();
 
                 psXml.writeStartElement("LibraryVersions");
