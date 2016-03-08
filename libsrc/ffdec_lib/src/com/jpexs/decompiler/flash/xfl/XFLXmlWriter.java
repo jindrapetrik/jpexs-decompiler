@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.xfl;
 
-import com.jpexs.helpers.Helper;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
@@ -29,6 +28,8 @@ import javax.xml.stream.XMLStreamWriter;
  * @author JPEXS
  */
 public class XFLXmlWriter implements XMLStreamWriter {
+
+    private String newLineCharacters = "\n"; //Helper.newLine;
 
     private boolean newLine = true;
 
@@ -61,7 +62,7 @@ public class XFLXmlWriter implements XMLStreamWriter {
 
     private void makeNewLine() {
         if (!newLine) {
-            sb.append(Helper.newLine);
+            sb.append(newLineCharacters);
             newLine = true;
             for (int i = 0; i < tagsStack.size(); i++) {
                 sb.append("  ");
@@ -212,7 +213,7 @@ public class XFLXmlWriter implements XMLStreamWriter {
     @Override
     public void writeAttribute(String localName, String value) throws XMLStreamException {
         ensureStartElementOpen();
-        append(' ').append(localName).append("=\"").append(Helper.escapeHTML(value)).append('"');
+        append(' ').append(localName).append("=\"").append(escapeAttribute(value)).append('"');
     }
 
     @Override
@@ -228,7 +229,7 @@ public class XFLXmlWriter implements XMLStreamWriter {
 
     private void writeAttributeInternal(String prefix, String localName, String value) throws XMLStreamException {
         ensureStartElementOpen();
-        append(' ').append(prefix).append(':').append(localName).append("=\"").append(Helper.escapeHTML(value)).append('"');
+        append(' ').append(prefix).append(':').append(localName).append("=\"").append(escapeAttribute(value)).append('"');
     }
 
     @Override
@@ -283,7 +284,7 @@ public class XFLXmlWriter implements XMLStreamWriter {
     @Override
     public void writeCharacters(String text) throws XMLStreamException {
         closeStartElement();
-        append(Helper.escapeHTML(text));
+        append(escapeText(text));
     }
 
     public void writeCharactersRaw(String text) throws XMLStreamException {
@@ -323,5 +324,23 @@ public class XFLXmlWriter implements XMLStreamWriter {
     @Override
     public Object getProperty(String name) throws IllegalArgumentException {
         return null;
+    }
+
+    public static String escapeText(String text) {
+        String[] from = new String[]{"&", "<"};
+        String[] to = new String[]{"&amp;", "&lt;"};
+        for (int i = 0; i < from.length; i++) {
+            text = text.replace(from[i], to[i]);
+        }
+        return text;
+    }
+
+    public static String escapeAttribute(String text) {
+        String[] from = new String[]{"&", "<", "\"", "'", "\r", "\n"};
+        String[] to = new String[]{"&amp;", "&lt;", "&quot;", "&#x27;", "&#xD;", "&#xD;"};
+        for (int i = 0; i < from.length; i++) {
+            text = text.replace(from[i], to[i]);
+        }
+        return text;
     }
 }
