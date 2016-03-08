@@ -166,10 +166,7 @@ public class XFLConverter {
 
     public static final int KEY_MODE_SHAPE_LAYERS = 8192;
 
-    private static final Random random = new Random(123); // predictable random
-
-    private XFLConverter() {
-    }
+    private final Random random = new Random(123); // predictable random
 
     private static void convertShapeEdge(MATRIX mat, SHAPERECORD record, int x, int y, StringBuilder ret) {
         if (record instanceof StyleChangeRecord) {
@@ -1190,7 +1187,7 @@ public class XFLConverter {
         return date.getTime() / 1000;
     }
 
-    private static void convertLibrary(SWF swf, Map<Integer, String> characterVariables, Map<Integer, String> characterClasses, List<Integer> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, HashMap<Integer, CharacterTag> characters, HashMap<String, byte[]> files, HashMap<String, byte[]> datfiles, FLAVersion flaVersion, StringBuilder ret) {
+    private void convertLibrary(SWF swf, Map<Integer, String> characterVariables, Map<Integer, String> characterClasses, List<Integer> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, HashMap<Integer, CharacterTag> characters, HashMap<String, byte[]> files, HashMap<String, byte[]> datfiles, FLAVersion flaVersion, StringBuilder ret) {
 
         //TODO: Imported assets
         //linkageImportForRS="true" linkageIdentifier="xxx" linkageURL="yyy.swf"
@@ -2080,7 +2077,7 @@ public class XFLConverter {
         }
     }
 
-    private static String convertActionScriptLayer(int spriteId, ReadOnlyTagList tags, ReadOnlyTagList timeLineTags, String backgroundColor) {
+    private String convertActionScriptLayer(int spriteId, ReadOnlyTagList tags, ReadOnlyTagList timeLineTags, String backgroundColor) {
         StringBuilder ret = new StringBuilder();
 
         String script = "";
@@ -2142,7 +2139,7 @@ public class XFLConverter {
         return retStr;
     }
 
-    private static String convertLabelsLayer(int spriteId, ReadOnlyTagList tags, ReadOnlyTagList timeLineTags, String backgroundColor) {
+    private String convertLabelsLayer(int spriteId, ReadOnlyTagList tags, ReadOnlyTagList timeLineTags, String backgroundColor) {
         StringBuilder ret = new StringBuilder();
         int duration = 0;
         int frame = 0;
@@ -2198,7 +2195,7 @@ public class XFLConverter {
         return retStr;
     }
 
-    private static void convertSoundLayer(int layerIndex, String backgroundColor, HashMap<Integer, CharacterTag> characters, ReadOnlyTagList tags, ReadOnlyTagList timeLineTags, HashMap<String, byte[]> files, StringBuilder ret) {
+    private void convertSoundLayer(int layerIndex, String backgroundColor, HashMap<Integer, CharacterTag> characters, ReadOnlyTagList tags, ReadOnlyTagList timeLineTags, HashMap<String, byte[]> files, StringBuilder ret) {
         StringBuilder ret2 = new StringBuilder();
         StartSoundTag lastStartSound = null;
         SoundStreamHeadTypeTag lastSoundStreamHead = null;
@@ -2260,7 +2257,7 @@ public class XFLConverter {
         }
     }
 
-    private static String randomOutlineColor() {
+    private String randomOutlineColor() {
         RGB outlineColor = new RGB();
         do {
             outlineColor.red = random.nextInt(256);
@@ -2270,7 +2267,7 @@ public class XFLConverter {
         return outlineColor.toHexRGB();
     }
 
-    private static String convertTimeline(int spriteId, List<Integer> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, HashMap<Integer, CharacterTag> characters, String name, FLAVersion flaVersion, HashMap<String, byte[]> files) {
+    private String convertTimeline(int spriteId, List<Integer> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, HashMap<Integer, CharacterTag> characters, String name, FLAVersion flaVersion, HashMap<String, byte[]> files) {
         StringBuilder ret = new StringBuilder();
         ret.append("<DOMTimeline name=\"").append(name).append("\">");
         ret.append("<layers>");
@@ -2733,7 +2730,7 @@ public class XFLConverter {
         return ret.toString();
     }
 
-    public static void convertSWF(AbortRetryIgnoreHandler handler, SWF swf, String swfFileName, String outfile, XFLExportSettings settings, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion flaVersion) throws IOException, InterruptedException {
+    public void convertSWF(AbortRetryIgnoreHandler handler, SWF swf, String swfFileName, String outfile, XFLExportSettings settings, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion flaVersion) throws IOException, InterruptedException {
 
         FileAttributesTag fa = swf.getFileAttributes();
 

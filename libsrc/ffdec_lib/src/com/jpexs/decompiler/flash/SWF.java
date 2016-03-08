@@ -2437,7 +2437,7 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     public void exportXfl(AbortRetryIgnoreHandler handler, String outfile, String swfName, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion version, XFLExportSettings settings) throws IOException, InterruptedException {
-        XFLConverter.convertSWF(handler, this, swfName, outfile, settings, generator, generatorVerName, generatorVersion, parallel, version);
+        new XFLConverter().convertSWF(handler, this, swfName, outfile, settings, generator, generatorVerName, generatorVersion, parallel, version);
         clearAllCache();
     }
 
