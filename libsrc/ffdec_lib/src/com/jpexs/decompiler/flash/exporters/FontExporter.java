@@ -223,21 +223,6 @@ public class FontExporter {
             };
             seb.export();
             char c = t.glyphToChar(i);
-            if (contours.isEmpty()) {
-                continue;
-            }
-
-            boolean hasContour = false;
-            for (FPoint[] cnt : contours) {
-                if (cnt.length > 0) {
-                    hasContour = true;
-                    break;
-                }
-            }
-
-            if (!hasContour) {
-                continue;
-            }
 
             FGlyph g = f.addGlyph(c);
             glyphCount++;
