@@ -2974,7 +2974,6 @@ public class XFLConverter {
                 psXml.writeElementValue("rsl-url", "textLayout_2.0.0.232.swz");
                 psXml.writeEndElement();
                 psXml.writeEndElement();
-                psXml.writeEndElement();
 
                 psXml.writeStartElement("LibraryVersions");
                 psXml.writeStartElement("library-version");
