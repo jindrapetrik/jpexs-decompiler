@@ -2954,7 +2954,6 @@ public class XFLConverter {
                 psXml.writeEndElement();
                 psXml.writeEndElement();
                 psXml.writeElementValueRaw("LibraryVersions", Helper.newLine + "      "); // todo: is this really needed or an empty tag is ok?
-                psXml.writeEndElement();
             } else {
                 psXml.writeStartElement("LibraryPath");
                 psXml.writeStartElement("library-path-entry");
