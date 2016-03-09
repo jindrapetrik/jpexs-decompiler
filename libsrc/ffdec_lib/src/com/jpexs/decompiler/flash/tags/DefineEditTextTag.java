@@ -801,6 +801,7 @@ public class DefineEditTextTag extends TextTag {
             } else {
                 this.hasText = false;
             }
+
             this.wordWrap = wordWrap;
             this.multiline = multiline;
             this.password = password;
@@ -810,36 +811,48 @@ public class DefineEditTextTag extends TextTag {
             this.wasStatic = wasStatic;
             this.html = html;
             this.useOutlines = useOutlines;
+
             if (textColor != null) {
                 hasTextColor = true;
                 this.textColor = textColor;
+            } else {
+                hasTextColor = false;
             }
+
             if (maxLength > -1) {
                 this.maxLength = maxLength;
                 hasMaxLength = true;
+            } else {
+                hasMaxLength = false;
             }
+
             if (fontId > -1) {
                 this.fontId = fontId;
             }
+
             if (fontHeight > -1) {
                 this.fontHeight = fontHeight;
             }
+
             if (fontClass != null) {
                 this.fontClass = fontClass;
                 hasFontClass = true;
+            } else {
+                hasFontClass = false;
             }
+
             this.autoSize = autoSize;
             this.align = align;
-            if ((leftMargin > -1)
-                    || (rightMargin > -1)
-                    || (indent > -1)
-                    || (leading > -1)) {
+            if (leftMargin > -1 || rightMargin > -1 || indent > -1 || leading > -1) {
                 this.leftMargin = leftMargin;
                 this.rightMargin = rightMargin;
                 this.indent = indent;
                 this.leading = leading;
                 hasLayout = true;
+            } else {
+                hasLayout = false;
             }
+
             if (variableName == null) {
                 variableName = "";
             }
