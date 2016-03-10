@@ -285,6 +285,7 @@ public class XFLXmlWriter implements XMLStreamWriter {
 
     @Override
     public void writeCData(String data) throws XMLStreamException {
+        closeStartElement();
         // todo: split when data cintains "]]>"
         append("<![CDATA[").append(data).append("]]>");
     }
