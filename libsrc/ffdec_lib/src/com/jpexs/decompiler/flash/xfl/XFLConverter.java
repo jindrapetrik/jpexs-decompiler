@@ -229,22 +229,22 @@ public class XFLConverter {
         return "normal";
     }
 
-    private static void convertLineStyle(LINESTYLE ls, int shapeNum, StringBuilder ret) {
-        ret.append("<SolidStroke scaleMode=\"").append(getScaleMode(ls)).append("\" weight=\"").append(((float) ls.width) / SWF.unitDivisor)
+    private static void convertLineStyle(LINESTYLE ls, int shapeNum, XFLXmlWriter writer) {
+        writer.append("<SolidStroke scaleMode=\"").append(getScaleMode(ls)).append("\" weight=\"").append(((float) ls.width) / SWF.unitDivisor)
                 .append("\">"
                         + "<fill>");
         if (!(ls instanceof LINESTYLE2) || !((LINESTYLE2) ls).hasFillFlag) {
-            ret.append("<SolidColor color=\"")
+            writer.append("<SolidColor color=\"")
                     .append(ls.color.toHexRGB()).append("\"")
                     .append(shapeNum == 3 ? " alpha=\"" + ((RGBA) ls.color).getAlphaFloat() + "\"" : "").append(" />");
         } else {
             // todo: line fill
         }
-        ret.append("</fill>"
+        writer.append("</fill>"
                 + "</SolidStroke>");
     }
 
-    private static void convertLineStyle(HashMap<Integer, CharacterTag> characters, LINESTYLE2 ls, int shapeNum, StringBuilder ret) {
+    private static void convertLineStyle(HashMap<Integer, CharacterTag> characters, LINESTYLE2 ls, int shapeNum, XFLXmlWriter writer) throws XMLStreamException {
         StringBuilder params = new StringBuilder();
         if (ls.pixelHintingFlag) {
             params.append(" pixelHinting=\"true\"");
@@ -275,24 +275,24 @@ public class XFLConverter {
                 break;
         }
 
-        ret.append("<SolidStroke weight=\"").append(((float) ls.width) / SWF.unitDivisor).append("\"");
-        ret.append(params);
-        ret.append(">");
-        ret.append("<fill>");
+        writer.append("<SolidStroke weight=\"").append(((float) ls.width) / SWF.unitDivisor).append("\"");
+        writer.append(params);
+        writer.append(">");
+        writer.append("<fill>");
 
         if (!ls.hasFillFlag) {
             RGBA color = (RGBA) ls.color;
-            ret.append("<SolidColor color=\"").append(color.toHexRGB()).append("\"").
+            writer.append("<SolidColor color=\"").append(color.toHexRGB()).append("\"").
                     append(color.getAlphaFloat() != 1 ? " alpha=\"" + color.getAlphaFloat() + "\"" : "").
                     append(" />");
         } else {
-            convertFillStyle(null/* FIXME */, characters, ls.fillType, shapeNum, ret);
+            convertFillStyle(null/* FIXME */, characters, ls.fillType, shapeNum, writer);
         }
-        ret.append("</fill>");
-        ret.append("</SolidStroke>");
+        writer.append("</fill>");
+        writer.append("</SolidStroke>");
     }
 
-    private static void convertFillStyle(MATRIX mat, HashMap<Integer, CharacterTag> characters, FILLSTYLE fs, int shapeNum, StringBuilder ret) {
+    private static void convertFillStyle(MATRIX mat, HashMap<Integer, CharacterTag> characters, FILLSTYLE fs, int shapeNum, XFLXmlWriter writer) throws XMLStreamException {
         /* todo: use matrix
          if (mat == null) {
          mat = new MATRIX();
@@ -300,13 +300,13 @@ public class XFLConverter {
         //ret.append("<FillStyle index=\"").append(index).append("\">");
         switch (fs.fillStyleType) {
             case FILLSTYLE.SOLID:
-                ret.append("<SolidColor color=\"");
-                ret.append(fs.color.toHexRGB());
-                ret.append("\"");
+                writer.append("<SolidColor color=\"");
+                writer.append(fs.color.toHexRGB());
+                writer.append("\"");
                 if (shapeNum >= 3) {
-                    ret.append(" alpha=\"").append(((RGBA) fs.color).getAlphaFloat()).append("\"");
+                    writer.append(" alpha=\"").append(((RGBA) fs.color).getAlphaFloat()).append("\"");
                 }
-                ret.append(" />");
+                writer.append(" />");
                 break;
             case FILLSTYLE.REPEATING_BITMAP:
             case FILLSTYLE.CLIPPED_BITMAP:
@@ -315,43 +315,43 @@ public class XFLConverter {
                 CharacterTag bitmapCh = characters.get(fs.bitmapId);
                 if (bitmapCh instanceof ImageTag) {
                     ImageTag it = (ImageTag) bitmapCh;
-                    ret.append("<BitmapFill");
-                    ret.append(" bitmapPath=\"");
-                    ret.append("bitmap").append(bitmapCh.getCharacterId()).append(it.getImageFormat().getExtension());
+                    writer.append("<BitmapFill");
+                    writer.append(" bitmapPath=\"");
+                    writer.append("bitmap").append(bitmapCh.getCharacterId()).append(it.getImageFormat().getExtension());
                 } else {
                     if (bitmapCh != null) {
                         logger.log(Level.SEVERE, "Suspicious bitmapfill:{0}", bitmapCh.getClass().getSimpleName());
                     }
-                    ret.append("<SolidColor color=\"#ffffff\" />");
+                    writer.append("<SolidColor color=\"#ffffff\" />");
                     return;
                 }
-                ret.append("\"");
+                writer.append("\"");
 
                 if ((fs.fillStyleType == FILLSTYLE.CLIPPED_BITMAP) || (fs.fillStyleType == FILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP)) {
-                    ret.append(" bitmapIsClipped=\"true\"");
+                    writer.append(" bitmapIsClipped=\"true\"");
                 }
 
-                ret.append(">");
-                ret.append("<matrix>");
-                convertMatrix(fs.bitmapMatrix, ret);
-                ret.append("</matrix>");
-                ret.append("</BitmapFill>");
+                writer.append(">");
+                writer.append("<matrix>");
+                convertMatrix(fs.bitmapMatrix, writer);
+                writer.append("</matrix>");
+                writer.append("</BitmapFill>");
                 break;
             case FILLSTYLE.LINEAR_GRADIENT:
             case FILLSTYLE.RADIAL_GRADIENT:
             case FILLSTYLE.FOCAL_RADIAL_GRADIENT:
 
                 if (fs.fillStyleType == FILLSTYLE.LINEAR_GRADIENT) {
-                    ret.append("<LinearGradient");
+                    writer.append("<LinearGradient");
                 } else {
-                    ret.append("<RadialGradient");
-                    ret.append(" focalPointRatio=\"");
+                    writer.append("<RadialGradient");
+                    writer.append(" focalPointRatio=\"");
                     if (fs.fillStyleType == FILLSTYLE.FOCAL_RADIAL_GRADIENT) {
-                        ret.append(((FOCALGRADIENT) fs.gradient).focalPoint);
+                        writer.append(((FOCALGRADIENT) fs.gradient).focalPoint);
                     } else {
-                        ret.append("0");
+                        writer.append("0");
                     }
-                    ret.append("\"");
+                    writer.append("\"");
                 }
 
                 int interpolationMode;
@@ -367,25 +367,25 @@ public class XFLConverter {
                     spreadMode = fs.gradient.spreadMode;
                 }
                 if (interpolationMode == GRADIENT.INTERPOLATION_LINEAR_RGB_MODE) {
-                    ret.append(" interpolationMethod=\"linearRGB\"");
+                    writer.append(" interpolationMethod=\"linearRGB\"");
                 }
                 switch (spreadMode) {
                     case GRADIENT.SPREAD_PAD_MODE:
 
                         break;
                     case GRADIENT.SPREAD_REFLECT_MODE:
-                        ret.append(" spreadMethod=\"reflect\"");
+                        writer.append(" spreadMethod=\"reflect\"");
                         break;
                     case GRADIENT.SPREAD_REPEAT_MODE:
-                        ret.append(" spreadMethod=\"repeat\"");
+                        writer.append(" spreadMethod=\"repeat\"");
                         break;
                 }
 
-                ret.append(">");
+                writer.append(">");
 
-                ret.append("<matrix>");
-                convertMatrix(fs.gradientMatrix, ret);
-                ret.append("</matrix>");
+                writer.append("<matrix>");
+                convertMatrix(fs.gradientMatrix, writer);
+                writer.append("</matrix>");
                 GRADRECORD[] records;
                 if (fs.fillStyleType == FILLSTYLE.FOCAL_RADIAL_GRADIENT) {
                     records = fs.gradient.gradientRecords;
@@ -393,67 +393,65 @@ public class XFLConverter {
                     records = fs.gradient.gradientRecords;
                 }
                 for (GRADRECORD rec : records) {
-                    ret.append("<GradientEntry");
-                    ret.append(" color=\"").append(rec.color.toHexRGB()).append("\"");
+                    writer.append("<GradientEntry");
+                    writer.append(" color=\"").append(rec.color.toHexRGB()).append("\"");
                     if (shapeNum >= 3) {
-                        ret.append(" alpha=\"").append(((RGBA) rec.color).getAlphaFloat()).append("\"");
+                        writer.append(" alpha=\"").append(((RGBA) rec.color).getAlphaFloat()).append("\"");
                     }
-                    ret.append(" ratio=\"").append(rec.getRatioFloat()).append("\"");
-                    ret.append(" />");
+                    writer.append(" ratio=\"").append(rec.getRatioFloat()).append("\"");
+                    writer.append(" />");
                 }
                 if (fs.fillStyleType == FILLSTYLE.LINEAR_GRADIENT) {
-                    ret.append("</LinearGradient>");
+                    writer.append("</LinearGradient>");
                 } else {
-                    ret.append("</RadialGradient>");
+                    writer.append("</RadialGradient>");
                 }
                 break;
         }
         //ret.append("</FillStyle>");
     }
 
-    private static void convertMatrix(MATRIX matrix, StringBuilder ret) {
+    private static void convertMatrix(MATRIX matrix, XFLXmlWriter writer) throws XMLStreamException {
         Matrix m = new Matrix(matrix);
-        ret.append("<Matrix ");
-        ret.append("tx=\"").append(((float) m.translateX) / SWF.unitDivisor).append("\" ");
-        ret.append("ty=\"").append(((float) m.translateY) / SWF.unitDivisor).append("\" ");
+        writer.writeStartElement("Matrix");
+        writer.writeAttribute("tx", ((float) m.translateX) / SWF.unitDivisor);
+        writer.writeAttribute("ty", ((float) m.translateY) / SWF.unitDivisor);
         if (m.scaleX != 1.0 || m.scaleY != 1.0) {
-            ret.append("a=\"").append(m.scaleX).append("\" ");
-            ret.append("d=\"").append(m.scaleY).append("\" ");
+            writer.writeAttribute("a", m.scaleX);
+            writer.writeAttribute("d", m.scaleY);
         }
         if (m.rotateSkew0 != 0.0 || m.rotateSkew1 != 0.0) {
-            ret.append("b=\"").append(m.rotateSkew0).append("\" ");
-            ret.append("c=\"").append(m.rotateSkew1).append("\" ");
+            writer.writeAttribute("b", m.rotateSkew0);
+            writer.writeAttribute("c", m.rotateSkew1);
         }
-        ret.append("/>");
+        writer.writeEndElement();
     }
 
-    private static boolean shapeHasMultiLayers(HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStyles) {
+    private static boolean shapeHasMultiLayers(HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStyles) throws XMLStreamException {
         List<String> layers = getShapeLayers(characters, mat, shapeNum, shapeRecords, fillStyles, lineStyles, false);
         return layers.size() > 1;
     }
 
-    private static String convertShape(HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStyles, boolean morphshape, boolean useLayers) {
-        StringBuilder ret = new StringBuilder();
+    private static void convertShape(HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStyles, boolean morphshape, boolean useLayers, XFLXmlWriter writer) throws XMLStreamException {
         List<String> layers = getShapeLayers(characters, mat, shapeNum, shapeRecords, fillStyles, lineStyles, morphshape);
         if (!useLayers) {
             for (int l = layers.size() - 1; l >= 0; l--) {
-                ret.append(layers.get(l));
+                writer.append(layers.get(l));
             }
         } else {
             int layer = 1;
             for (int l = layers.size() - 1; l >= 0; l--) {
-                ret.append("<DOMLayer name=\"Layer ").append(layer++).append("\">"); //color=\"#4FFF4F\"
-                ret.append("<frames>");
-                ret.append("<DOMFrame index=\"0\" motionTweenScale=\"false\" keyMode=\"").append(KEY_MODE_SHAPE_LAYERS).append("\">");
-                ret.append("<elements>");
-                ret.append(layers.get(l));
-                ret.append("</elements>");
-                ret.append("</DOMFrame>");
-                ret.append("</frames>");
-                ret.append("</DOMLayer>");
+                writer.append("<DOMLayer name=\"Layer ").append(layer++).append("\">"); //color=\"#4FFF4F\"
+                writer.append("<frames>");
+                writer.append("<DOMFrame index=\"0\" motionTweenScale=\"false\" keyMode=\"").append(KEY_MODE_SHAPE_LAYERS).append("\">");
+                writer.append("<elements>");
+                writer.append(layers.get(l));
+                writer.append("</elements>");
+                writer.append("</DOMFrame>");
+                writer.append("</frames>");
+                writer.append("</DOMLayer>");
             }
         }
-        return ret.toString();
     }
 
     /**
@@ -516,7 +514,7 @@ public class XFLConverter {
         return ret;
     }
 
-    private static List<String> getShapeLayers(HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStyles, boolean morphshape) {
+    private static List<String> getShapeLayers(HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStyles, boolean morphshape) throws XMLStreamException {
         if (mat == null) {
             mat = new MATRIX();
         }
@@ -526,8 +524,8 @@ public class XFLConverter {
         int fillStyle0 = -1;
         int fillStyle1 = -1;
         int strokeStyle = -1;
-        StringBuilder fillsStr = new StringBuilder();
-        StringBuilder strokesStr = new StringBuilder();
+        XFLXmlWriter fillsStr = new XFLXmlWriter();
+        XFLXmlWriter strokesStr = new XFLXmlWriter();
         fillsStr.append("<fills>");
         strokesStr.append("<strokes>");
         List<String> layers = new ArrayList<>();
@@ -835,17 +833,22 @@ public class XFLConverter {
         HashMap<Integer, Integer> usages = new HashMap<>();
         walkShapeUsages(tags, characters, usages);
         List<Integer> ret = new ArrayList<>();
-        for (int ch : usages.keySet()) {
-            if (usages.get(ch) < 2) {
-                if (characters.get(ch) instanceof ShapeTag) {
-                    ShapeTag shp = (ShapeTag) characters.get(ch);
-                    if (!shapeHasMultiLayers(characters, null, shp.getShapeNum(), shp.getShapes().shapeRecords, shp.getShapes().fillStyles, shp.getShapes().lineStyles)) {
-                        ret.add(ch);
+        try {
+            for (int ch : usages.keySet()) {
+                if (usages.get(ch) < 2) {
+                    if (characters.get(ch) instanceof ShapeTag) {
+                        ShapeTag shp = (ShapeTag) characters.get(ch);
+                        if (!shapeHasMultiLayers(characters, null, shp.getShapeNum(), shp.getShapes().shapeRecords, shp.getShapes().fillStyles, shp.getShapes().lineStyles)) {
+                            ret.add(ch);
+                        }
                     }
-                }
 
+                }
             }
+        } catch (XMLStreamException ex) {
+            Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
         }
+
         return ret;
     }
 
@@ -909,148 +912,147 @@ public class XFLConverter {
         return ds;
     }
 
-    private static void convertFilter(FILTER filter, StringBuilder ret) {
+    private static void convertFilter(FILTER filter, XFLXmlWriter writer) {
         if (filter instanceof DROPSHADOWFILTER) {
             DROPSHADOWFILTER dsf = (DROPSHADOWFILTER) filter;
-            ret.append("<DropShadowFilter");
+            writer.append("<DropShadowFilter");
             if (dsf.dropShadowColor.alpha != 255) {
-                ret.append(" alpha=\"").append(doubleToString(dsf.dropShadowColor.getAlphaFloat())).append("\"");
+                writer.append(" alpha=\"").append(doubleToString(dsf.dropShadowColor.getAlphaFloat())).append("\"");
             }
-            ret.append(" angle=\"").append(doubleToString(radToDeg(dsf.angle))).append("\"");
-            ret.append(" blurX=\"").append(doubleToString(dsf.blurX)).append("\"");
-            ret.append(" blurY=\"").append(doubleToString(dsf.blurY)).append("\"");
-            ret.append(" color=\"").append(dsf.dropShadowColor.toHexRGB()).append("\"");
-            ret.append(" distance=\"").append(doubleToString(dsf.distance)).append("\"");
+            writer.append(" angle=\"").append(doubleToString(radToDeg(dsf.angle))).append("\"");
+            writer.append(" blurX=\"").append(doubleToString(dsf.blurX)).append("\"");
+            writer.append(" blurY=\"").append(doubleToString(dsf.blurY)).append("\"");
+            writer.append(" color=\"").append(dsf.dropShadowColor.toHexRGB()).append("\"");
+            writer.append(" distance=\"").append(doubleToString(dsf.distance)).append("\"");
             if (!dsf.compositeSource) {
-                ret.append(" hideObject=\"true\"");
+                writer.append(" hideObject=\"true\"");
             }
             if (dsf.innerShadow) {
-                ret.append(" inner=\"true\"");
+                writer.append(" inner=\"true\"");
             }
             if (dsf.knockout) {
-                ret.append(" knockout=\"true\"");
+                writer.append(" knockout=\"true\"");
             }
-            ret.append(" quality=\"").append(dsf.passes).append("\"");
-            ret.append(" strength=\"").append(doubleToString(dsf.strength, 2)).append("\"");
-            ret.append(" />");
+            writer.append(" quality=\"").append(dsf.passes).append("\"");
+            writer.append(" strength=\"").append(doubleToString(dsf.strength, 2)).append("\"");
+            writer.append(" />");
         } else if (filter instanceof BLURFILTER) {
             BLURFILTER bf = (BLURFILTER) filter;
-            ret.append("<BlurFilter");
-            ret.append(" blurX=\"").append(doubleToString(bf.blurX)).append("\"");
-            ret.append(" blurY=\"").append(doubleToString(bf.blurY)).append("\"");
-            ret.append(" quality=\"").append(bf.passes).append("\"");
-            ret.append(" />");
+            writer.append("<BlurFilter");
+            writer.append(" blurX=\"").append(doubleToString(bf.blurX)).append("\"");
+            writer.append(" blurY=\"").append(doubleToString(bf.blurY)).append("\"");
+            writer.append(" quality=\"").append(bf.passes).append("\"");
+            writer.append(" />");
         } else if (filter instanceof GLOWFILTER) {
             GLOWFILTER gf = (GLOWFILTER) filter;
-            ret.append("<GlowFilter");
+            writer.append("<GlowFilter");
             if (gf.glowColor.alpha != 255) {
-                ret.append(" alpha=\"").append(gf.glowColor.getAlphaFloat()).append("\"");
+                writer.append(" alpha=\"").append(gf.glowColor.getAlphaFloat()).append("\"");
             }
-            ret.append(" blurX=\"").append(doubleToString(gf.blurX)).append("\"");
-            ret.append(" blurY=\"").append(doubleToString(gf.blurY)).append("\"");
-            ret.append(" color=\"").append(gf.glowColor.toHexRGB()).append("\"");
+            writer.append(" blurX=\"").append(doubleToString(gf.blurX)).append("\"");
+            writer.append(" blurY=\"").append(doubleToString(gf.blurY)).append("\"");
+            writer.append(" color=\"").append(gf.glowColor.toHexRGB()).append("\"");
 
             if (gf.innerGlow) {
-                ret.append(" inner=\"true\"");
+                writer.append(" inner=\"true\"");
             }
             if (gf.knockout) {
-                ret.append(" knockout=\"true\"");
+                writer.append(" knockout=\"true\"");
             }
-            ret.append(" quality=\"").append(gf.passes).append("\"");
-            ret.append(" strength=\"").append(doubleToString(gf.strength, 2)).append("\"");
-            ret.append(" />");
+            writer.append(" quality=\"").append(gf.passes).append("\"");
+            writer.append(" strength=\"").append(doubleToString(gf.strength, 2)).append("\"");
+            writer.append(" />");
         } else if (filter instanceof BEVELFILTER) {
             BEVELFILTER bf = (BEVELFILTER) filter;
-            ret.append("<BevelFilter");
-            ret.append(" blurX=\"").append(doubleToString(bf.blurX)).append("\"");
-            ret.append(" blurY=\"").append(doubleToString(bf.blurY)).append("\"");
-            ret.append(" quality=\"").append(bf.passes).append("\"");
-            ret.append(" angle=\"").append(doubleToString(radToDeg(bf.angle))).append("\"");
-            ret.append(" distance=\"").append(bf.distance).append("\"");
+            writer.append("<BevelFilter");
+            writer.append(" blurX=\"").append(doubleToString(bf.blurX)).append("\"");
+            writer.append(" blurY=\"").append(doubleToString(bf.blurY)).append("\"");
+            writer.append(" quality=\"").append(bf.passes).append("\"");
+            writer.append(" angle=\"").append(doubleToString(radToDeg(bf.angle))).append("\"");
+            writer.append(" distance=\"").append(bf.distance).append("\"");
             if (bf.highlightColor.alpha != 255) {
-                ret.append(" highlightAlpha=\"").append(bf.highlightColor.getAlphaFloat()).append("\"");
+                writer.append(" highlightAlpha=\"").append(bf.highlightColor.getAlphaFloat()).append("\"");
             }
-            ret.append(" highlightColor=\"").append(bf.highlightColor.toHexRGB()).append("\"");
+            writer.append(" highlightColor=\"").append(bf.highlightColor.toHexRGB()).append("\"");
             if (bf.knockout) {
-                ret.append(" knockout=\"true\"");
+                writer.append(" knockout=\"true\"");
             }
             if (bf.shadowColor.alpha != 255) {
-                ret.append(" shadowAlpha=\"").append(bf.shadowColor.getAlphaFloat()).append("\"");
+                writer.append(" shadowAlpha=\"").append(bf.shadowColor.getAlphaFloat()).append("\"");
             }
-            ret.append(" shadowColor=\"").append(bf.shadowColor.toHexRGB()).append("\"");
-            ret.append(" strength=\"").append(doubleToString(bf.strength, 2)).append("\"");
+            writer.append(" shadowColor=\"").append(bf.shadowColor.toHexRGB()).append("\"");
+            writer.append(" strength=\"").append(doubleToString(bf.strength, 2)).append("\"");
             if (bf.onTop && !bf.innerShadow) {
-                ret.append(" type=\"full\"");
+                writer.append(" type=\"full\"");
             } else if (!bf.innerShadow) {
-                ret.append(" type=\"outer\"");
+                writer.append(" type=\"outer\"");
             }
-            ret.append(" />");
+            writer.append(" />");
         } else if (filter instanceof GRADIENTGLOWFILTER) {
             GRADIENTGLOWFILTER ggf = (GRADIENTGLOWFILTER) filter;
-            ret.append("<GradientGlowFilter");
-            ret.append(" angle=\"").append(doubleToString(radToDeg(ggf.angle))).append("\"");
+            writer.append("<GradientGlowFilter");
+            writer.append(" angle=\"").append(doubleToString(radToDeg(ggf.angle))).append("\"");
 
-            ret.append(" blurX=\"").append(doubleToString(ggf.blurX)).append("\"");
-            ret.append(" blurY=\"").append(doubleToString(ggf.blurY)).append("\"");
-            ret.append(" quality=\"").append(ggf.passes).append("\"");
-            ret.append(" distance=\"").append(doubleToString(ggf.distance)).append("\"");
+            writer.append(" blurX=\"").append(doubleToString(ggf.blurX)).append("\"");
+            writer.append(" blurY=\"").append(doubleToString(ggf.blurY)).append("\"");
+            writer.append(" quality=\"").append(ggf.passes).append("\"");
+            writer.append(" distance=\"").append(doubleToString(ggf.distance)).append("\"");
             if (ggf.knockout) {
-                ret.append(" knockout=\"true\"");
+                writer.append(" knockout=\"true\"");
             }
-            ret.append(" strength=\"").append(doubleToString(ggf.strength, 2)).append("\"");
+            writer.append(" strength=\"").append(doubleToString(ggf.strength, 2)).append("\"");
             if (ggf.onTop && !ggf.innerShadow) {
-                ret.append(" type=\"full\"");
+                writer.append(" type=\"full\"");
             } else if (!ggf.innerShadow) {
-                ret.append(" type=\"outer\"");
+                writer.append(" type=\"outer\"");
             }
-            ret.append(">");
+            writer.append(">");
             for (int g = 0; g < ggf.gradientColors.length; g++) {
                 RGBA gc = ggf.gradientColors[g];
-                ret.append("<GradientEntry color=\"").append(gc.toHexRGB()).append("\"");
+                writer.append("<GradientEntry color=\"").append(gc.toHexRGB()).append("\"");
                 if (gc.alpha != 255) {
-                    ret.append(" alpha=\"").append(gc.getAlphaFloat()).append("\"");
+                    writer.append(" alpha=\"").append(gc.getAlphaFloat()).append("\"");
                 }
-                ret.append(" ratio=\"").append(doubleToString(((float) ggf.gradientRatio[g]) / 255.0)).append("\"");
-                ret.append("/>");
+                writer.append(" ratio=\"").append(doubleToString(((float) ggf.gradientRatio[g]) / 255.0)).append("\"");
+                writer.append("/>");
             }
-            ret.append("</GradientGlowFilter>");
+            writer.append("</GradientGlowFilter>");
         } else if (filter instanceof GRADIENTBEVELFILTER) {
             GRADIENTBEVELFILTER gbf = (GRADIENTBEVELFILTER) filter;
-            ret.append("<GradientBevelFilter");
-            ret.append(" angle=\"").append(doubleToString(radToDeg(gbf.angle))).append("\"");
+            writer.append("<GradientBevelFilter");
+            writer.append(" angle=\"").append(doubleToString(radToDeg(gbf.angle))).append("\"");
 
-            ret.append(" blurX=\"").append(doubleToString(gbf.blurX)).append("\"");
-            ret.append(" blurY=\"").append(doubleToString(gbf.blurY)).append("\"");
-            ret.append(" quality=\"").append(gbf.passes).append("\"");
-            ret.append(" distance=\"").append(doubleToString(gbf.distance)).append("\"");
+            writer.append(" blurX=\"").append(doubleToString(gbf.blurX)).append("\"");
+            writer.append(" blurY=\"").append(doubleToString(gbf.blurY)).append("\"");
+            writer.append(" quality=\"").append(gbf.passes).append("\"");
+            writer.append(" distance=\"").append(doubleToString(gbf.distance)).append("\"");
             if (gbf.knockout) {
-                ret.append(" knockout=\"true\"");
+                writer.append(" knockout=\"true\"");
             }
-            ret.append(" strength=\"").append(doubleToString(gbf.strength, 2)).append("\"");
+            writer.append(" strength=\"").append(doubleToString(gbf.strength, 2)).append("\"");
             if (gbf.onTop && !gbf.innerShadow) {
-                ret.append(" type=\"full\"");
+                writer.append(" type=\"full\"");
             } else if (!gbf.innerShadow) {
-                ret.append(" type=\"outer\"");
+                writer.append(" type=\"outer\"");
             }
-            ret.append(">");
+            writer.append(">");
             for (int g = 0; g < gbf.gradientColors.length; g++) {
                 RGBA gc = gbf.gradientColors[g];
-                ret.append("<GradientEntry color=\"").append(gc.toHexRGB()).append("\"");
+                writer.append("<GradientEntry color=\"").append(gc.toHexRGB()).append("\"");
                 if (gc.alpha != 255) {
-                    ret.append(" alpha=\"").append(gc.getAlphaFloat()).append("\"");
+                    writer.append(" alpha=\"").append(gc.getAlphaFloat()).append("\"");
                 }
-                ret.append(" ratio=\"").append(doubleToString(((float) gbf.gradientRatio[g]) / 255.0)).append("\"");
-                ret.append("/>");
+                writer.append(" ratio=\"").append(doubleToString(((float) gbf.gradientRatio[g]) / 255.0)).append("\"");
+                writer.append("/>");
             }
-            ret.append("</GradientBevelFilter>");
+            writer.append("</GradientBevelFilter>");
         } else if (filter instanceof COLORMATRIXFILTER) {
             COLORMATRIXFILTER cmf = (COLORMATRIXFILTER) filter;
-            convertAdjustColorFilter(cmf, ret);
+            convertAdjustColorFilter(cmf, writer);
         }
     }
 
-    private static String convertSymbolInstance(String name, MATRIX matrix, ColorTransform colorTransform, boolean cacheAsBitmap, int blendMode, List<FILTER> filters, boolean isVisible, RGBA backgroundColor, CLIPACTIONS clipActions, CharacterTag tag, HashMap<Integer, CharacterTag> characters, ReadOnlyTagList tags, FLAVersion flaVersion) {
-        StringBuilder ret = new StringBuilder();
+    private static void convertSymbolInstance(String name, MATRIX matrix, ColorTransform colorTransform, boolean cacheAsBitmap, int blendMode, List<FILTER> filters, boolean isVisible, RGBA backgroundColor, CLIPACTIONS clipActions, CharacterTag tag, HashMap<Integer, CharacterTag> characters, ReadOnlyTagList tags, FLAVersion flaVersion, XFLXmlWriter writer) throws XMLStreamException {
         if (matrix == null) {
             matrix = new MATRIX();
         }
@@ -1066,110 +1068,109 @@ public class XFLConverter {
             }
         }
 
-        ret.append("<DOMSymbolInstance libraryItemName=\"" + "Symbol ").append(tag.getCharacterId()).append("\"");
+        writer.append("<DOMSymbolInstance libraryItemName=\"" + "Symbol ").append(tag.getCharacterId()).append("\"");
         if (name != null) {
-            ret.append(" name=\"").append(Helper.escapeHTML(name)).append("\"");
+            writer.append(" name=\"").append(Helper.escapeHTML(name)).append("\"");
         }
         String blendModeStr = null;
         if (blendMode < BLENDMODES.length) {
             blendModeStr = BLENDMODES[blendMode];
         }
         if (blendModeStr != null) {
-            ret.append(" blendMode=\"").append(blendModeStr).append("\"");
+            writer.append(" blendMode=\"").append(blendModeStr).append("\"");
         }
         if (tag instanceof ShapeTag) {
-            ret.append(" symbolType=\"graphic\" loop=\"loop\"");
+            writer.append(" symbolType=\"graphic\" loop=\"loop\"");
         } else if (tag instanceof DefineSpriteTag) {
             DefineSpriteTag sprite = (DefineSpriteTag) tag;
             RECT spriteRect = sprite.getRect();
             double centerPoint3DX = twipToPixel(matrix.translateX + spriteRect.getWidth() / 2);
             double centerPoint3DY = twipToPixel(matrix.translateY + spriteRect.getHeight() / 2);
-            ret.append(" centerPoint3DX=\"").append(centerPoint3DX).append("\" centerPoint3DY=\"").append(centerPoint3DY).append("\"");
+            writer.append(" centerPoint3DX=\"").append(centerPoint3DX).append("\" centerPoint3DY=\"").append(centerPoint3DY).append("\"");
         } else if (tag instanceof ButtonTag) {
-            ret.append(" symbolType=\"button\"");
+            writer.append(" symbolType=\"button\"");
         }
         if (cacheAsBitmap) {
-            ret.append(" cacheAsBitmap=\"true\"");
+            writer.append(" cacheAsBitmap=\"true\"");
         }
         if (!isVisible && flaVersion.ordinal() >= FLAVersion.CS5_5.ordinal()) {
-            ret.append(" isVisible=\"false\"");
+            writer.append(" isVisible=\"false\"");
         }
-        ret.append(">");
-        ret.append("<matrix>");
-        convertMatrix(matrix, ret);
-        ret.append("</matrix>");
-        ret.append("<transformationPoint><Point/></transformationPoint>");
+        writer.append(">");
+        writer.append("<matrix>");
+        convertMatrix(matrix, writer);
+        writer.append("</matrix>");
+        writer.append("<transformationPoint><Point/></transformationPoint>");
 
         if (backgroundColor != null) {
-            ret.append("<MatteColor color=\"").append(backgroundColor.toHexRGB()).append("\"");
+            writer.append("<MatteColor color=\"").append(backgroundColor.toHexRGB()).append("\"");
             if (backgroundColor.alpha != 255) {
-                ret.append(" alpha=\"").append(doubleToString(backgroundColor.getAlphaFloat())).append("\"");
+                writer.append(" alpha=\"").append(doubleToString(backgroundColor.getAlphaFloat())).append("\"");
             }
-            ret.append("/>");
+            writer.append("/>");
         }
         if (colorTransform != null) {
-            ret.append("<color><Color");
+            writer.append("<color><Color");
             if (colorTransform.getRedMulti() != 255) {
-                ret.append(" redMultiplier=\"").append(((float) colorTransform.getRedMulti()) / 255.0f).append("\"");
+                writer.append(" redMultiplier=\"").append(((float) colorTransform.getRedMulti()) / 255.0f).append("\"");
             }
             if (colorTransform.getGreenMulti() != 255) {
-                ret.append(" greenMultiplier=\"").append(((float) colorTransform.getGreenMulti()) / 255.0f).append("\"");
+                writer.append(" greenMultiplier=\"").append(((float) colorTransform.getGreenMulti()) / 255.0f).append("\"");
             }
             if (colorTransform.getBlueMulti() != 255) {
-                ret.append(" blueMultiplier=\"").append(((float) colorTransform.getBlueMulti()) / 255.0f).append("\"");
+                writer.append(" blueMultiplier=\"").append(((float) colorTransform.getBlueMulti()) / 255.0f).append("\"");
             }
             if (colorTransform.getAlphaMulti() != 255) {
-                ret.append(" alphaMultiplier=\"").append(((float) colorTransform.getAlphaMulti()) / 255.0f).append("\"");
+                writer.append(" alphaMultiplier=\"").append(((float) colorTransform.getAlphaMulti()) / 255.0f).append("\"");
             }
 
             if (colorTransform.getRedAdd() != 0) {
-                ret.append(" redOffset=\"").append(colorTransform.getRedAdd()).append("\"");
+                writer.append(" redOffset=\"").append(colorTransform.getRedAdd()).append("\"");
             }
             if (colorTransform.getGreenAdd() != 0) {
-                ret.append(" greenOffset=\"").append(colorTransform.getGreenAdd()).append("\"");
+                writer.append(" greenOffset=\"").append(colorTransform.getGreenAdd()).append("\"");
             }
             if (colorTransform.getBlueAdd() != 0) {
-                ret.append(" blueOffset=\"").append(colorTransform.getBlueAdd()).append("\"");
+                writer.append(" blueOffset=\"").append(colorTransform.getBlueAdd()).append("\"");
             }
             if (colorTransform.getAlphaAdd() != 0) {
-                ret.append(" alphaOffset=\"").append(colorTransform.getAlphaAdd()).append("\"");
+                writer.append(" alphaOffset=\"").append(colorTransform.getAlphaAdd()).append("\"");
             }
 
-            ret.append("/></color>");
+            writer.append("/></color>");
         }
         if (filters != null) {
-            ret.append("<filters>");
+            writer.append("<filters>");
             for (FILTER f : filters) {
-                convertFilter(f, ret);
+                convertFilter(f, writer);
             }
-            ret.append("</filters>");
+            writer.append("</filters>");
         }
         if (tag instanceof DefineButtonTag) {
-            ret.append("<Actionscript><script><![CDATA[");
-            ret.append("on(press){\r\n");
-            ret.append(convertActionScript(new ButtonAction((DefineButtonTag) tag)));
-            ret.append("}");
-            ret.append("]]></script></Actionscript>");
+            writer.append("<Actionscript><script><![CDATA[");
+            writer.append("on(press){\r\n");
+            writer.append(convertActionScript(new ButtonAction((DefineButtonTag) tag)));
+            writer.append("}");
+            writer.append("]]></script></Actionscript>");
         }
         if (tag instanceof DefineButton2Tag) {
             DefineButton2Tag db2 = (DefineButton2Tag) tag;
             if (!db2.actions.isEmpty()) {
-                ret.append("<Actionscript><script><![CDATA[");
+                writer.append("<Actionscript><script><![CDATA[");
                 for (BUTTONCONDACTION bca : db2.actions) {
-                    ret.append(convertActionScript(bca));
+                    writer.append(convertActionScript(bca));
                 }
-                ret.append("]]></script></Actionscript>");
+                writer.append("]]></script></Actionscript>");
             }
         }
         if (clipActions != null) {
-            ret.append("<Actionscript><script><![CDATA[");
+            writer.append("<Actionscript><script><![CDATA[");
             for (CLIPACTIONRECORD rec : clipActions.clipActionRecords) {
-                ret.append(convertActionScript(rec));
+                writer.append(convertActionScript(rec));
             }
-            ret.append("]]></script></Actionscript>");
+            writer.append("]]></script></Actionscript>");
         }
-        ret.append("</DOMSymbolInstance>");
-        return ret.toString();
+        writer.append("</DOMSymbolInstance>");
     }
 
     private static String convertActionScript(ASMSource as) {
@@ -1288,19 +1289,20 @@ public class XFLConverter {
                                     }
                                     CharacterTag character = characters.get(rec.characterId);
                                     MATRIX matrix = rec.placeMatrix;
-                                    String recCharStr;
+                                    XFLXmlWriter recCharWriter = new XFLXmlWriter();
 
                                     int characterId = character.getCharacterId();
                                     if ((character instanceof ShapeTag) && (nonLibraryShapes.contains(characterId))) {
                                         ShapeTag shape = (ShapeTag) character;
-                                        recCharStr = convertShape(characters, matrix, shape.getShapeNum(), shape.getShapes().shapeRecords, shape.getShapes().fillStyles, shape.getShapes().lineStyles, false, false);
+                                        convertShape(characters, matrix, shape.getShapeNum(), shape.getShapes().shapeRecords, shape.getShapes().fillStyles, shape.getShapes().lineStyles, false, false, recCharWriter);
                                     } else if (character instanceof TextTag) {
-                                        recCharStr = convertText(null, (TextTag) character, matrix, filters, null);
+                                        convertText(null, (TextTag) character, matrix, filters, null, recCharWriter);
                                     } else if (character instanceof DefineVideoStreamTag) {
-                                        recCharStr = convertVideoInstance(null, matrix, (DefineVideoStreamTag) character, null);
+                                        convertVideoInstance(null, matrix, (DefineVideoStreamTag) character, null, recCharWriter);
                                     } else {
-                                        recCharStr = convertSymbolInstance(null, matrix, colorTransformAlpha, false, blendMode, filters, true, null, null, characters.get(rec.characterId), characters, tags, flaVersion);
+                                        convertSymbolInstance(null, matrix, colorTransformAlpha, false, blendMode, filters, true, null, null, characters.get(rec.characterId), characters, tags, flaVersion, recCharWriter);
                                     }
+
                                     int duration = frame - lastFrame;
                                     lastFrame = frame;
                                     if (duration > 0) {
@@ -1319,7 +1321,7 @@ public class XFLConverter {
                                         symbolStr.append("\"");
                                         symbolStr.append(" keyMode=\"").append(KEY_MODE_NORMAL).append("\">");
                                         symbolStr.append("<elements>");
-                                        symbolStr.append(recCharStr);
+                                        symbolStr.append(recCharWriter);
                                         symbolStr.append("</elements>");
                                         symbolStr.append("</DOMFrame>");
                                     }
@@ -1346,7 +1348,9 @@ public class XFLConverter {
                     symbolStr.append("<layers>");
                     SHAPEWITHSTYLE shapeWithStyle = shape.getShapes();
                     if (shapeWithStyle != null) {
-                        symbolStr.append(convertShape(characters, null, shape.getShapeNum(), shapeWithStyle.shapeRecords, shapeWithStyle.fillStyles, shapeWithStyle.lineStyles, false, true));
+                        XFLXmlWriter writer2 = new XFLXmlWriter();
+                        convertShape(characters, null, shape.getShapeNum(), shapeWithStyle.shapeRecords, shapeWithStyle.fillStyles, shapeWithStyle.lineStyles, false, true, writer2);
+                        symbolStr.append(writer2.toString());
                     }
 
                     symbolStr.append("</layers>");
@@ -1719,7 +1723,7 @@ public class XFLConverter {
         }
     }
 
-    private static void convertFrame(boolean shapeTween, HashMap<Integer, CharacterTag> characters, ReadOnlyTagList tags, SoundStreamHeadTypeTag soundStreamHead, StartSoundTag startSound, int frame, int duration, String actionScript, String elements, HashMap<String, byte[]> files, StringBuilder ret) {
+    private static void convertFrame(boolean shapeTween, HashMap<Integer, CharacterTag> characters, ReadOnlyTagList tags, SoundStreamHeadTypeTag soundStreamHead, StartSoundTag startSound, int frame, int duration, String actionScript, String elements, HashMap<String, byte[]> files, XFLXmlWriter writer) throws XMLStreamException {
         DefineSoundTag sound = null;
         if (startSound != null) {
             for (Tag t : tags) {
@@ -1733,44 +1737,46 @@ public class XFLConverter {
             }
         }
 
-        ret.append("<DOMFrame index=\"").append(frame).append("\"");
+        writer.writeStartElement("DOMFrame");
+        writer.writeAttribute("index", frame);
         if (duration > 1) {
-            ret.append(" duration=\"").append(duration).append("\"");
+            writer.writeAttribute("duration", duration);
         }
         if (shapeTween) {
-            ret.append(" tweenType=\"shape\" keyMode=\"").append(KEY_MODE_SHAPE_TWEEN).append("\"");
+            writer.writeAttribute("tweenType", "shape");
+            writer.writeAttribute("keyMode", KEY_MODE_SHAPE_TWEEN);
         } else {
-            ret.append(" keyMode=\"").append(KEY_MODE_NORMAL).append("\"");
+            writer.writeAttribute("keyMode", KEY_MODE_NORMAL);
         }
         String soundEnvelopeStr = "";
         if (soundStreamHead != null && startSound == null) {
             String soundName = "sound" + soundStreamHead.getCharacterId() + "." + soundStreamHead.getExportFormat().toString().toLowerCase();
-            ret.append(" soundName=\"").append(soundName).append("\"");
-            ret.append(" soundSync=\"stream\"");
+            writer.writeAttribute("soundName", soundName);
+            writer.writeAttribute("soundSync", "stream");
             soundEnvelopeStr += "<SoundEnvelope>";
             soundEnvelopeStr += "<SoundEnvelopePoint level0=\"32768\" level1=\"32768\"/>";
             soundEnvelopeStr += "</SoundEnvelope>";
         }
         if (startSound != null && sound != null) {
             String soundName = "sound" + sound.soundId + "." + sound.getExportFormat().toString().toLowerCase();
-            ret.append(" soundName=\"").append(soundName).append("\"");
+            writer.writeAttribute("soundName", soundName);
             if (startSound.soundInfo.hasInPoint) {
-                ret.append(" inPoint44=\"").append(startSound.soundInfo.inPoint).append("\"");
+                writer.writeAttribute("inPoint44", startSound.soundInfo.inPoint);
             }
             if (startSound.soundInfo.hasOutPoint) {
-                ret.append(" outPoint44=\"").append(startSound.soundInfo.outPoint).append("\"");
+                writer.writeAttribute("outPoint44", startSound.soundInfo.outPoint);
             }
             if (startSound.soundInfo.hasLoops) {
                 if (startSound.soundInfo.loopCount == 32767) {
-                    ret.append(" soundLoopMode=\"loop\"");
+                    writer.writeAttribute("soundLoopMode", "loop");
                 }
-                ret.append(" soundLoop=\"").append(startSound.soundInfo.loopCount).append("\"");
+                writer.writeAttribute("soundLoop", startSound.soundInfo.loopCount);
             }
 
             if (startSound.soundInfo.syncStop) {
-                ret.append(" soundSync=\"stop\"");
+                writer.writeAttribute("soundSync", "stop");
             } else if (startSound.soundInfo.syncNoMultiple) {
-                ret.append(" soundSync=\"start\"");
+                writer.writeAttribute("soundSync", "start");
             }
             soundEnvelopeStr += "<SoundEnvelope>";
             if (startSound.soundInfo.hasEnvelope) {
@@ -1783,12 +1789,12 @@ public class XFLConverter {
                         && envelopeRecords[0].leftLevel == 32768
                         && envelopeRecords[0].pos44 == 0
                         && envelopeRecords[0].rightLevel == 0) {
-                    ret.append(" soundEffect=\"left channel\"");
+                    writer.writeAttribute("soundEffect", "left channel");
                 } else if (envelopeRecords.length == 1
                         && envelopeRecords[0].leftLevel == 0
                         && envelopeRecords[0].pos44 == 0
                         && envelopeRecords[0].rightLevel == 32768) {
-                    ret.append(" soundEffect=\"right channel\"");
+                    writer.writeAttribute("soundEffect", "right channel");
                 } else if (envelopeRecords.length == 2
                         && envelopeRecords[0].leftLevel == 32768
                         && envelopeRecords[0].pos44 == 0
@@ -1796,7 +1802,7 @@ public class XFLConverter {
                         && envelopeRecords[1].leftLevel == 0
                         && envelopeRecords[1].pos44 == sound.soundSampleCount
                         && envelopeRecords[1].rightLevel == 32768) {
-                    ret.append(" soundEffect=\"fade left to right\"");
+                    writer.writeAttribute("soundEffect", "fade left to right");
                 } else if (envelopeRecords.length == 2
                         && envelopeRecords[0].leftLevel == 0
                         && envelopeRecords[0].pos44 == 0
@@ -1804,9 +1810,9 @@ public class XFLConverter {
                         && envelopeRecords[1].leftLevel == 32768
                         && envelopeRecords[1].pos44 == sound.soundSampleCount
                         && envelopeRecords[1].rightLevel == 0) {
-                    ret.append(" soundEffect=\"fade right to left\"");
+                    writer.writeAttribute("soundEffect", "fade right to left");
                 } else {
-                    ret.append(" soundEffect=\"custom\"");
+                    writer.writeAttribute("soundEffect", "custom");
                 }
                 //TODO: fade in, fade out
 
@@ -1815,42 +1821,43 @@ public class XFLConverter {
             }
             soundEnvelopeStr += "</SoundEnvelope>";
         }
-        ret.append(">");
 
-        ret.append(soundEnvelopeStr);
+        writer.writeCharactersRaw(soundEnvelopeStr);
         if (!actionScript.isEmpty()) {
-            ret.append("<Actionscript><script><![CDATA[");
-            ret.append(actionScript);
-            ret.append("]]></script></Actionscript>");
+            writer.writeStartElement("Actionscript");
+            writer.writeStartElement("script");
+            writer.writeCData(actionScript);
+            writer.writeEndElement();
+            writer.writeEndElement();
         }
-        ret.append("<elements>");
-        ret.append(elements);
-        ret.append("</elements>");
-        ret.append("</DOMFrame>");
+        writer.writeStartElement("elements");
+        writer.writeCharactersRaw(elements);
+        writer.writeEndElement();
+        writer.writeEndElement();
     }
 
-    private static String convertVideoInstance(String instanceName, MATRIX matrix, DefineVideoStreamTag video, CLIPACTIONS clipActions) {
-        StringBuilder ret = new StringBuilder();
-        ret.append("<DOMVideoInstance libraryItemName=\"movie").append(video.characterID).append(".flv\" frameRight=\"").append(20 * video.width).append("\" frameBottom=\"").append(20 * video.height).append("\"");
+    private static void convertVideoInstance(String instanceName, MATRIX matrix, DefineVideoStreamTag video, CLIPACTIONS clipActions, XFLXmlWriter writer) throws XMLStreamException {
+        writer.writeStartElement("DOMVideoInstance", new String[]{
+            "libraryItemName", "movie" + video.characterID + ".flv",
+            "frameRight", Integer.toString((int) (SWF.unitDivisor * video.width)),
+            "frameBottom", Integer.toString((int) (SWF.unitDivisor * video.height)),});
         if (instanceName != null) {
-            ret.append(" name=\"").append(Helper.escapeHTML(instanceName)).append("\"");
+            writer.writeAttribute("name", instanceName);
         }
-        ret.append(">");
-        ret.append("<matrix>");
-        convertMatrix(matrix, ret);
-        ret.append("</matrix>");
-        ret.append("<transformationPoint>");
-        ret.append("<Point />");
-        ret.append("</transformationPoint>");
-        ret.append("</DOMVideoInstance>");
-        return ret.toString();
+
+        writer.writeStartElement("matrix");
+        convertMatrix(matrix, writer);
+        writer.writeEndElement();
+        writer.writeStartElement("transformationPoint");
+        writer.writeEmptyElement("Point");
+        writer.writeEndElement();
+        writer.writeEndElement();
     }
 
     private static void convertFrames(String prevStr, String afterStr, List<Integer> nonLibraryShapes, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, HashMap<Integer, CharacterTag> characters, int depth, FLAVersion flaVersion, HashMap<String, byte[]> files, XFLXmlWriter writer) throws XMLStreamException {
-        StringBuilder ret2 = new StringBuilder();
+        XFLXmlWriter writer2 = new XFLXmlWriter();
         prevStr += "<frames>";
         int frame = -1;
-        String elements;
         String lastElements = "";
 
         int duration = 1;
@@ -1971,33 +1978,33 @@ public class XFLConverter {
             }
 
             if (t instanceof ShowFrameTag) {
+                XFLXmlWriter elementsWriter = new XFLXmlWriter();
                 if ((character instanceof ShapeTag) && (nonLibraryShapes.contains(characterId) || shapeTweener != null)) {
                     ShapeTag shape = (ShapeTag) character;
-                    elements = convertShape(characters, matrix, shape.getShapeNum(), shape.getShapes().shapeRecords, shape.getShapes().fillStyles, shape.getShapes().lineStyles, false, false);
+                    convertShape(characters, matrix, shape.getShapeNum(), shape.getShapes().shapeRecords, shape.getShapes().fillStyles, shape.getShapes().lineStyles, false, false, elementsWriter);
                     shapeTween = false;
                     shapeTweener = null;
                 } else if (character != null) {
                     if (character instanceof MorphShapeTag) {
                         MorphShapeTag m = (MorphShapeTag) character;
-                        elements = convertShape(characters, matrix, 3, m.getStartEdges().shapeRecords, m.getFillStyles().getStartFillStyles(), m.getLineStyles().getStartLineStyles(m.getShapeNum()), true, false);
+                        convertShape(characters, matrix, 3, m.getStartEdges().shapeRecords, m.getFillStyles().getStartFillStyles(), m.getLineStyles().getStartLineStyles(m.getShapeNum()), true, false, elementsWriter);
                         shapeTween = true;
                     } else {
                         shapeTween = false;
                         if (character instanceof TextTag) {
-                            elements = convertText(instanceName, (TextTag) character, matrix, filters, clipActions);
+                            convertText(instanceName, (TextTag) character, matrix, filters, clipActions, elementsWriter);
                         } else if (character instanceof DefineVideoStreamTag) {
-                            elements = convertVideoInstance(instanceName, matrix, (DefineVideoStreamTag) character, clipActions);
+                            convertVideoInstance(instanceName, matrix, (DefineVideoStreamTag) character, clipActions, elementsWriter);
                         } else {
-                            elements = convertSymbolInstance(instanceName, matrix, colorTransForm, cacheAsBitmap, blendMode, filters, isVisible, backGroundColor, clipActions, character, characters, tags, flaVersion);
+                            convertSymbolInstance(instanceName, matrix, colorTransForm, cacheAsBitmap, blendMode, filters, isVisible, backGroundColor, clipActions, character, characters, tags, flaVersion, elementsWriter);
                         }
                     }
-                } else {
-                    elements = "";
                 }
 
                 frame++;
+                String elements = elementsWriter.toString();
                 if (!elements.equals(lastElements) && frame > 0) {
-                    convertFrame(lastShapeTween, characters, tags, null, null, frame - duration, duration, "", lastElements, files, ret2);
+                    convertFrame(lastShapeTween, characters, tags, null, null, frame - duration, duration, "", lastElements, files, writer2);
                     duration = 1;
                 } else if (frame == 0) {
                     duration = 1;
@@ -2011,13 +2018,13 @@ public class XFLConverter {
         }
         if (!lastElements.isEmpty()) {
             frame++;
-            convertFrame(lastShapeTween, characters, tags, null, null, (frame - duration < 0 ? 0 : frame - duration), duration, "", lastElements, files, ret2);
+            convertFrame(lastShapeTween, characters, tags, null, null, (frame - duration < 0 ? 0 : frame - duration), duration, "", lastElements, files, writer2);
         }
         afterStr = "</frames>" + afterStr;
 
-        if (ret2.length() > 0) {
+        if (writer2.length() > 0) {
             writer.writeCharactersRaw(prevStr);
-            writer.writeCharactersRaw(ret2.toString());
+            writer.writeCharactersRaw(writer2.toString());
             writer.writeCharactersRaw(afterStr);
         }
     }
@@ -2242,7 +2249,7 @@ public class XFLConverter {
     }
 
     private void convertSoundLayer(int layerIndex, String backgroundColor, HashMap<Integer, CharacterTag> characters, ReadOnlyTagList tags, ReadOnlyTagList timeLineTags, HashMap<String, byte[]> files, XFLXmlWriter writer) throws XMLStreamException {
-        StringBuilder ret2 = new StringBuilder();
+        XFLXmlWriter writer2 = new XFLXmlWriter();
         StartSoundTag lastStartSound = null;
         SoundStreamHeadTypeTag lastSoundStreamHead = null;
         StartSoundTag startSound = null;
@@ -2275,7 +2282,7 @@ public class XFLConverter {
             if (t instanceof ShowFrameTag) {
                 if (soundStreamHead != null || startSound != null) {
                     if (lastSoundStreamHead != null || lastStartSound != null) {
-                        convertFrame(false, characters, tags, lastSoundStreamHead, lastStartSound, frame, duration, "", "", files, ret2);
+                        convertFrame(false, characters, tags, lastSoundStreamHead, lastStartSound, frame, duration, "", "", files, writer2);
                     }
                     frame += duration;
                     duration = 1;
@@ -2293,13 +2300,13 @@ public class XFLConverter {
                 frame = 0;
                 duration = 1;
             }
-            convertFrame(false, characters, tags, lastSoundStreamHead, lastStartSound, frame, duration, "", "", files, ret2);
+            convertFrame(false, characters, tags, lastSoundStreamHead, lastStartSound, frame, duration, "", "", files, writer2);
         }
 
-        if (ret2.length() > 0) {
+        if (writer2.length() > 0) {
             writer.writeStartElement("DOMLayer", new String[]{"name", "Layer " + layerIndex, "color", randomOutlineColor()});
             writer.writeStartElement("frames");
-            writer.writeCharactersRaw(ret2.toString());
+            writer.writeCharactersRaw(writer2.toString());
             writer.writeEndElement();
             writer.writeEndElement();
         }
@@ -2444,12 +2451,10 @@ public class XFLConverter {
         return ret;
     }
 
-    private static String convertText(String instanceName, TextTag tag, MATRIX m, List<FILTER> filters, CLIPACTIONS clipActions) {
-        StringBuilder ret = new StringBuilder();
-
+    private static void convertText(String instanceName, TextTag tag, MATRIX m, List<FILTER> filters, CLIPACTIONS clipActions, XFLXmlWriter writer) throws XMLStreamException {
         MATRIX matrix = new MATRIX(m);
         CSMTextSettingsTag csmts = null;
-        StringBuilder filterStr = new StringBuilder();
+        XFLXmlWriter filterStr = new XFLXmlWriter();
         if (filters != null) {
             filterStr.append("<filters>");
             for (FILTER f : filters) {
@@ -2485,7 +2490,7 @@ public class XFLConverter {
             MATRIX textMatrix = tag.getTextMatrix();
             left = " left=\"" + doubleToString((textMatrix.translateX) / SWF.unitDivisor) + "\"";
         }
-        StringBuilder matStr = new StringBuilder();
+        XFLXmlWriter matStr = new XFLXmlWriter();
         matStr.append("<matrix>");
         convertMatrix(matrix, matStr);
         matStr.append("</matrix>");
@@ -2507,15 +2512,15 @@ public class XFLConverter {
                 }
             }
 
-            ret.append("<DOMStaticText");
-            ret.append(left);
+            writer.append("<DOMStaticText");
+            writer.append(left);
             if (fontRenderingMode != null) {
-                ret.append(" fontRenderingMode=\"").append(fontRenderingMode).append("\"");
+                writer.append(" fontRenderingMode=\"").append(fontRenderingMode).append("\"");
             }
             if (instanceName != null) {
-                ret.append(" instanceName=\"").append(Helper.escapeHTML(instanceName)).append("\"");
+                writer.append(" instanceName=\"").append(Helper.escapeHTML(instanceName)).append("\"");
             }
-            ret.append(antiAlias);
+            writer.append(antiAlias);
             if (((CharacterTag) tag).getCharacterId() == 650) {
                 // todo: remove
                 System.err.println("=========================AAAAAAAAAAA");
@@ -2523,10 +2528,10 @@ public class XFLConverter {
             Map<String, Object> attrs = TextTag.getTextRecordsAttributes(textRecords, swf);
             // todo: remove
             System.err.println("///////////=============");
-            ret.append(" width=\"").append(tag.getBounds().getWidth() / 2).append("\" height=\"").append(tag.getBounds().getHeight()).append("\" autoExpand=\"true\" isSelectable=\"false\">");
-            ret.append(matStr);
+            writer.append(" width=\"").append(tag.getBounds().getWidth() / 2).append("\" height=\"").append(tag.getBounds().getHeight()).append("\" autoExpand=\"true\" isSelectable=\"false\">");
+            writer.append(matStr.toString());
 
-            ret.append("<textRuns>");
+            writer.append("<textRuns>");
             int fontId = -1;
             FontTag font = null;
             String fontName = null;
@@ -2584,32 +2589,32 @@ public class XFLConverter {
                 }
                 firstRun = false;
                 if (font != null) {
-                    ret.append("<DOMTextRun>");
-                    ret.append("<characters>").append(Helper.escapeHTML((newline ? "\r" : "") + rec.getText(font))).append("</characters>");
-                    ret.append("<textAttrs>");
+                    writer.append("<DOMTextRun>");
+                    writer.append("<characters>").append(Helper.escapeHTML((newline ? "\r" : "") + rec.getText(font))).append("</characters>");
+                    writer.append("<textAttrs>");
 
-                    ret.append("<DOMTextAttrs aliasText=\"false\" rotation=\"true\" size=\"").append(twipToPixel(textHeight)).append("\" bitmapSize=\"").append(textHeight).append("\"");
-                    ret.append(" letterSpacing=\"").append(doubleToString(twipToPixel(letterSpacings.get(r)))).append("\"");
-                    ret.append(" indent=\"").append(doubleToString(twipToPixel((int) attrs.get("indent")))).append("\"");
-                    ret.append(" leftMargin=\"").append(doubleToString(twipToPixel(leftMargins.get(r)))).append("\"");
-                    ret.append(" lineSpacing=\"").append(doubleToString(twipToPixel((int) attrs.get("lineSpacing")))).append("\"");
-                    ret.append(" rightMargin=\"").append(doubleToString(twipToPixel((int) attrs.get("rightMargin")))).append("\"");
+                    writer.append("<DOMTextAttrs aliasText=\"false\" rotation=\"true\" size=\"").append(twipToPixel(textHeight)).append("\" bitmapSize=\"").append(textHeight).append("\"");
+                    writer.append(" letterSpacing=\"").append(doubleToString(twipToPixel(letterSpacings.get(r)))).append("\"");
+                    writer.append(" indent=\"").append(doubleToString(twipToPixel((int) attrs.get("indent")))).append("\"");
+                    writer.append(" leftMargin=\"").append(doubleToString(twipToPixel(leftMargins.get(r)))).append("\"");
+                    writer.append(" lineSpacing=\"").append(doubleToString(twipToPixel((int) attrs.get("lineSpacing")))).append("\"");
+                    writer.append(" rightMargin=\"").append(doubleToString(twipToPixel((int) attrs.get("rightMargin")))).append("\"");
 
                     if (textColor != null) {
-                        ret.append(" fillColor=\"").append(textColor.toHexRGB()).append("\"");
+                        writer.append(" fillColor=\"").append(textColor.toHexRGB()).append("\"");
                     } else if (textColorA != null) {
-                        ret.append(" fillColor=\"").append(textColorA.toHexRGB()).append("\" alpha=\"").append(textColorA.getAlphaFloat()).append("\"");
+                        writer.append(" fillColor=\"").append(textColorA.toHexRGB()).append("\" alpha=\"").append(textColorA.getAlphaFloat()).append("\"");
                     }
-                    ret.append(" face=\"").append(psFontName).append("\"");
-                    ret.append("/>");
+                    writer.append(" face=\"").append(psFontName).append("\"");
+                    writer.append("/>");
 
-                    ret.append("</textAttrs>");
-                    ret.append("</DOMTextRun>");
+                    writer.append("</textAttrs>");
+                    writer.append("</DOMTextRun>");
                 }
             }
-            ret.append("</textRuns>");
-            ret.append(filterStr);
-            ret.append("</DOMStaticText>");
+            writer.append("</textRuns>");
+            writer.append(filterStr.toString());
+            writer.append("</DOMStaticText>");
         } else if (tag instanceof DefineEditTextTag) {
             DefineEditTextTag det = (DefineEditTextTag) tag;
             String tagName;
@@ -2627,14 +2632,14 @@ public class XFLConverter {
             } else {
                 tagName = "DOMInputText";
             }
-            ret.append("<").append(tagName);
+            writer.append("<").append(tagName);
             if (fontRenderingMode != null) {
-                ret.append(" fontRenderingMode=\"").append(fontRenderingMode).append("\"");
+                writer.append(" fontRenderingMode=\"").append(fontRenderingMode).append("\"");
             }
             if (instanceName != null) {
-                ret.append(" name=\"").append(Helper.escapeHTML(instanceName)).append("\"");
+                writer.append(" name=\"").append(Helper.escapeHTML(instanceName)).append("\"");
             }
-            ret.append(antiAlias);
+            writer.append(antiAlias);
             double width = twipToPixel(bounds.getWidth());
             double height = twipToPixel(bounds.getHeight());
             //There is usually 4px difference between width/height and XML width/height
@@ -2646,43 +2651,43 @@ public class XFLConverter {
                 width -= twipToPixel(det.rightMargin);
                 width -= twipToPixel(det.leftMargin);
             }
-            ret.append(" width=\"").append(width).append("\"");
-            ret.append(" height=\"").append(height).append("\"");
+            writer.append(" width=\"").append(width).append("\"");
+            writer.append(" height=\"").append(height).append("\"");
             if (det.border) {
-                ret.append("  border=\"true\"");
+                writer.append("  border=\"true\"");
             }
             if (det.html) {
-                ret.append(" renderAsHTML=\"true\"");
+                writer.append(" renderAsHTML=\"true\"");
             }
             if (det.noSelect) {
-                ret.append(" isSelectable=\"false\"");
+                writer.append(" isSelectable=\"false\"");
             }
             if (det.multiline && det.wordWrap) {
-                ret.append(" lineType=\"multiline\"");
+                writer.append(" lineType=\"multiline\"");
             } else if (det.multiline && (!det.wordWrap)) {
-                ret.append(" lineType=\"multiline no wrap\"");
+                writer.append(" lineType=\"multiline no wrap\"");
             } else if (det.password) {
-                ret.append(" lineType=\"password\"");
+                writer.append(" lineType=\"password\"");
             }
             if (det.hasMaxLength) {
-                ret.append(" maxCharacters=\"").append(det.maxLength).append("\"");
+                writer.append(" maxCharacters=\"").append(det.maxLength).append("\"");
             }
             if (!det.variableName.isEmpty()) {
-                ret.append(" variableName=\"").append(det.variableName).append("\"");
+                writer.append(" variableName=\"").append(det.variableName).append("\"");
             }
-            ret.append(">");
-            ret.append(matStr);
-            ret.append("<textRuns>");
+            writer.append(">");
+            writer.append(matStr.toString());
+            writer.append("<textRuns>");
             String txt = "";
             if (det.hasText) {
                 txt = det.initialText;
             }
 
             if (det.html) {
-                ret.append(convertHTMLText(swf.getTags(), det, txt));
+                writer.append(convertHTMLText(swf.getTags(), det, txt));
             } else {
-                ret.append("<DOMTextRun>");
-                ret.append("<characters>").append(Helper.escapeHTML(txt)).append("</characters>");
+                writer.append("<DOMTextRun>");
+                writer.append("<characters>").append(Helper.escapeHTML(txt)).append("</characters>");
                 int leftMargin = -1;
                 int rightMargin = -1;
                 int indent = -1;
@@ -2739,43 +2744,42 @@ public class XFLConverter {
                         alignment = "unknown";
                     }
                 }
-                ret.append("<textAttrs>");
-                ret.append("<DOMTextAttrs");
+                writer.append("<textAttrs>");
+                writer.append("<DOMTextAttrs");
                 if (alignment != null) {
-                    ret.append(" alignment=\"").append(alignment).append("\"");
+                    writer.append(" alignment=\"").append(alignment).append("\"");
                 }
-                ret.append(" rotation=\"true\""); //?
+                writer.append(" rotation=\"true\""); //?
                 if (indent > -1) {
-                    ret.append(" indent=\"").append(twipToPixel(indent)).append("\"");
+                    writer.append(" indent=\"").append(twipToPixel(indent)).append("\"");
                 }
                 if (leftMargin > -1) {
-                    ret.append(" leftMargin=\"").append(twipToPixel(leftMargin)).append("\"");
+                    writer.append(" leftMargin=\"").append(twipToPixel(leftMargin)).append("\"");
                 }
                 if (lineSpacing > -1) {
-                    ret.append(" lineSpacing=\"").append(twipToPixel(lineSpacing)).append("\"");
+                    writer.append(" lineSpacing=\"").append(twipToPixel(lineSpacing)).append("\"");
                 }
                 if (rightMargin > -1) {
-                    ret.append(" rightMargin=\"").append(twipToPixel(rightMargin)).append("\"");
+                    writer.append(" rightMargin=\"").append(twipToPixel(rightMargin)).append("\"");
                 }
                 if (size > -1) {
-                    ret.append(" size=\"").append(twipToPixel(size)).append("\"");
-                    ret.append(" bitmapSize=\"").append(size).append("\"");
+                    writer.append(" size=\"").append(twipToPixel(size)).append("\"");
+                    writer.append(" bitmapSize=\"").append(size).append("\"");
                 }
                 if (fontFace != null) {
-                    ret.append(" face=\"").append(fontFace).append("\"");
+                    writer.append(" face=\"").append(fontFace).append("\"");
                 }
                 if (textColor != null) {
-                    ret.append(" fillColor=\"").append(textColor.toHexRGB()).append("\" alpha=\"").append(textColor.getAlphaFloat()).append("\"");
+                    writer.append(" fillColor=\"").append(textColor.toHexRGB()).append("\" alpha=\"").append(textColor.getAlphaFloat()).append("\"");
                 }
-                ret.append("/>");
-                ret.append("</textAttrs>");
-                ret.append("</DOMTextRun>");
+                writer.append("/>");
+                writer.append("</textAttrs>");
+                writer.append("</DOMTextRun>");
             }
-            ret.append("</textRuns>");
-            ret.append(filterStr);
-            ret.append("</").append(tagName).append(">");
+            writer.append("</textRuns>");
+            writer.append(filterStr.toString());
+            writer.append("</").append(tagName).append(">");
         }
-        return ret.toString();
     }
 
     public void convertSWF(AbortRetryIgnoreHandler handler, SWF swf, String swfFileName, String outfile, XFLExportSettings settings, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion flaVersion) throws IOException, InterruptedException {
@@ -3257,7 +3261,7 @@ public class XFLConverter {
         return a == b ? true : Math.abs(a - b) < EPSILON;
     }
 
-    private static void convertAdjustColorFilter(COLORMATRIXFILTER filter, StringBuilder ret) {
+    private static void convertAdjustColorFilter(COLORMATRIXFILTER filter, XFLXmlWriter writer) {
         float[][] matrix = new float[5][5];
         int index = 0;
         for (int i = 0; i < 4; i++) {
@@ -3301,7 +3305,7 @@ public class XFLConverter {
             h = 0;
         }
 
-        ret.append("<AdjustColorFilter brightness=\"").append(normBrightness(b)).append("\" contrast=\"").append(normContrast(c)).append("\" saturation=\"").append(normSaturation(s)).append("\" hue=\"").append(normHue(h)).append("\"/>");
+        writer.append("<AdjustColorFilter brightness=\"").append(normBrightness(b)).append("\" contrast=\"").append(normContrast(c)).append("\" saturation=\"").append(normSaturation(s)).append("\" hue=\"").append(normHue(h)).append("\"/>");
     }
 
     private static String convertHTMLText(ReadOnlyTagList tags, DefineEditTextTag det, String html) {

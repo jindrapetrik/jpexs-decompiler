@@ -54,7 +54,36 @@ public class XFLXmlWriter implements XMLStreamWriter {
         return this;
     }
 
-    private XFLXmlWriter append(String text) {
+    // todo: remove
+    public XFLXmlWriter append(StringBuilder stringBuilder) {
+        sb.append(stringBuilder);
+        newLine = false;
+        return this;
+    }
+
+    // todo: remove
+    public XFLXmlWriter append(int value) {
+        sb.append(value);
+        newLine = false;
+        return this;
+    }
+
+    // todo: remove
+    public XFLXmlWriter append(float value) {
+        sb.append(value);
+        newLine = false;
+        return this;
+    }
+
+    // todo: remove
+    public XFLXmlWriter append(double value) {
+        sb.append(value);
+        newLine = false;
+        return this;
+    }
+
+    // todo: make this private
+    public XFLXmlWriter append(String text) {
         sb.append(text);
         newLine = false;
         return this;
@@ -216,6 +245,14 @@ public class XFLXmlWriter implements XMLStreamWriter {
         append(' ').append(localName).append("=\"").append(escapeAttribute(value)).append('"');
     }
 
+    public void writeAttribute(String localName, double value) throws XMLStreamException {
+        writeAttribute(localName, Double.toString(value));
+    }
+
+    public void writeAttribute(String localName, int value) throws XMLStreamException {
+        writeAttribute(localName, Integer.toString(value));
+    }
+
     @Override
     public void writeAttribute(String prefix, String namespaceURI, String localName, String value) throws XMLStreamException {
         setPrefix(prefix, namespaceURI);
@@ -349,5 +386,10 @@ public class XFLXmlWriter implements XMLStreamWriter {
 
     public int length() {
         return sb.length();
+    }
+
+    // todo: remove
+    void setLength(int newLength) {
+        sb.setLength(newLength);
     }
 }
