@@ -360,7 +360,7 @@ public class XFLXmlWriter implements XMLStreamWriter {
         //String[] to = new String[]{"&amp;", "&lt;"};
         // temporary escape everything to make easier to compare the export with the old export
         String[] from = new String[]{"&", "<", "\"", "'", "\r", "\n"};
-        String[] to = new String[]{"&amp;", "&lt;", "&quot;", "&#x27;", "&#xD;", "&#xD;"};
+        String[] to = new String[]{"&amp;", "&lt;", "&quot;", "&#x27;", "&#xD;", "&#xA;"};
         for (int i = 0; i < from.length; i++) {
             text = text.replace(from[i], to[i]);
         }
@@ -369,7 +369,7 @@ public class XFLXmlWriter implements XMLStreamWriter {
 
     public static String escapeAttribute(String text) {
         String[] from = new String[]{"&", "<", "\"", "'", "\r", "\n"};
-        String[] to = new String[]{"&amp;", "&lt;", "&quot;", "&#x27;", "&#xD;", "&#xD;"};
+        String[] to = new String[]{"&amp;", "&lt;", "&quot;", "&#x27;", "&#xD;", "&#xA;"};
         for (int i = 0; i < from.length; i++) {
             text = text.replace(from[i], to[i]);
         }
