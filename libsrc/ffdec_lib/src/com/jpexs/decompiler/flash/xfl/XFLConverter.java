@@ -3261,7 +3261,7 @@ public class XFLConverter {
         return a == b ? true : Math.abs(a - b) < EPSILON;
     }
 
-    private static void convertAdjustColorFilter(COLORMATRIXFILTER filter, XFLXmlWriter writer) {
+    private static void convertAdjustColorFilter(COLORMATRIXFILTER filter, XFLXmlWriter writer) throws XMLStreamException {
         float[][] matrix = new float[5][5];
         int index = 0;
         for (int i = 0; i < 4; i++) {
@@ -3305,7 +3305,11 @@ public class XFLConverter {
             h = 0;
         }
 
-        writer.append("<AdjustColorFilter brightness=\"").append(normBrightness(b)).append("\" contrast=\"").append(normContrast(c)).append("\" saturation=\"").append(normSaturation(s)).append("\" hue=\"").append(normHue(h)).append("\"/>");
+        writer.writeEmptyElement("AdjustColorFilter", new String[]{
+            "brightness", Integer.toString(normBrightness(b)),
+            "contrast", Integer.toString(normContrast(c)),
+            "saturation", Integer.toString(normSaturation(s)),
+            "hue", Integer.toString(normHue(h)),});
     }
 
     private static String convertHTMLText(ReadOnlyTagList tags, DefineEditTextTag det, String html) {
