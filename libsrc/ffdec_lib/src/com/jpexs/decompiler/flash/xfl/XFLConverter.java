@@ -1187,7 +1187,7 @@ public class XFLConverter {
         return date.getTime() / 1000;
     }
 
-    private void convertLibrary(SWF swf, Map<Integer, String> characterVariables, Map<Integer, String> characterClasses, List<Integer> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, HashMap<Integer, CharacterTag> characters, HashMap<String, byte[]> files, HashMap<String, byte[]> datfiles, FLAVersion flaVersion, StringBuilder ret) {
+    private void convertLibrary(SWF swf, Map<Integer, String> characterVariables, Map<Integer, String> characterClasses, List<Integer> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, HashMap<Integer, CharacterTag> characters, HashMap<String, byte[]> files, HashMap<String, byte[]> datfiles, FLAVersion flaVersion, XFLXmlWriter writer) throws XMLStreamException {
 
         //TODO: Imported assets
         //linkageImportForRS="true" linkageIdentifier="xxx" linkageURL="yyy.swf"
@@ -1664,18 +1664,20 @@ public class XFLConverter {
 
         }
         if (!media.isEmpty()) {
-            ret.append("<media>");
+            writer.writeStartElement("media");
             for (String m : media) {
-                ret.append(m);
+                writer.writeCharactersRaw(m);
             }
-            ret.append("</media>");
+
+            writer.writeEndElement();
         }
         if (!symbols.isEmpty()) {
-            ret.append("<symbols>");
+            writer.writeStartElement("symbols");
             for (String s : symbols) {
-                ret.append(s);
+                writer.writeCharactersRaw(s);
             }
-            ret.append("</symbols>");
+
+            writer.writeEndElement();
         }
     }
 
@@ -1999,7 +2001,7 @@ public class XFLConverter {
         }
     }
 
-    private static void convertFonts(ReadOnlyTagList tags, StringBuilder ret) {
+    private static void convertFonts(ReadOnlyTagList tags, XFLXmlWriter writer) throws XMLStreamException {
         StringBuilder ret2 = new StringBuilder();
         for (Tag t : tags) {
             if (t instanceof FontTag) {
@@ -2073,7 +2075,9 @@ public class XFLConverter {
         }
 
         if (ret2.length() > 0) {
-            ret.append("<fonts>").append(ret2).append("</fonts>");
+            writer.writeStartElement("fonts");
+            writer.writeCharactersRaw(ret2.toString());
+            writer.writeEndElement();
         }
     }
 
@@ -2747,7 +2751,6 @@ public class XFLConverter {
         File file = new File(outfile);
         File outDir = file.getParentFile();
         Path.createDirectorySafe(outDir);
-        StringBuilder domDocument = new StringBuilder();
         String baseName = swfFileName;
         File f = new File(baseName);
         baseName = f.getName();
@@ -2767,25 +2770,50 @@ public class XFLConverter {
             backgroundColor = setBgColorTag.backgroundColor.toHexRGB();
         }
 
-        domDocument.append("<DOMDocument xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://ns.adobe.com/xfl/2008/\" currentTimeline=\"1\" xflVersion=\"").append(flaVersion.xflVersion()).append("\" creatorInfo=\"").append(generator).append("\" platform=\"Windows\" versionInfo=\"Saved by ").append(generatorVerName).append("\" majorVersion=\"").append(generatorVersion).append("\" buildNumber=\"\" nextSceneIdentifier=\"2\" playOptionsPlayLoop=\"false\" playOptionsPlayPages=\"false\" playOptionsPlayFrameActions=\"false\" autoSaveHasPrompted=\"true\"");
-        domDocument.append(" backgroundColor=\"").append(backgroundColor).append("\"");
-        domDocument.append(" frameRate=\"").append((int) swf.frameRate).append("\""); // todo: is the cast to int needed?
-
         double width = twipToPixel(swf.displayRect.getWidth());
         double height = twipToPixel(swf.displayRect.getHeight());
-        if (Double.compare(width, 550) != 0) {
-            domDocument.append(" width=\"").append(doubleToString(width)).append("\"");
+
+        XFLXmlWriter domDocument = new XFLXmlWriter();
+        try {
+            domDocument.writeStartElement("DOMDocument", new String[]{
+                "xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance",
+                "xmlns", "http://ns.adobe.com/xfl/2008/",
+                "currentTimeline", "1",
+                "xflVersion", flaVersion.xflVersion(),
+                "creatorInfo", generator,
+                "platform", "Windows",
+                "versionInfo", "Saved by " + generatorVerName,
+                "majorVersion", generatorVersion,
+                "buildNumber", "",
+                "nextSceneIdentifier", "2",
+                "playOptionsPlayLoop", "false",
+                "playOptionsPlayPages", "false",
+                "playOptionsPlayFrameActions", "false",
+                "autoSaveHasPrompted", "true",
+                "backgroundColor", backgroundColor,
+                "frameRate", Integer.toString((int) swf.frameRate) // todo: is the cast to int needed?
+            });
+
+            if (Double.compare(width, 550) != 0) {
+                domDocument.writeAttribute("width", doubleToString(width));
+
+            }
+            if (Double.compare(height, 400) != 0) {
+                domDocument.writeAttribute("height", doubleToString(height));
+            }
+
+            convertFonts(swf.getTags(), domDocument);
+            convertLibrary(swf, characterVariables, characterClasses, nonLibraryShapes, backgroundColor, swf.getTags(), characters, files, datfiles, flaVersion, domDocument);
+
+            domDocument.writeStartElement("timelines");
+            domDocument.writeCharactersRaw(convertTimeline(0, nonLibraryShapes, backgroundColor, swf.getTags(), swf.getTags(), characters, "Scene 1", flaVersion, files));
+            domDocument.writeEndElement();
+
+            domDocument.writeEndElement();
+        } catch (XMLStreamException ex) {
+            logger.log(Level.SEVERE, null, ex);
         }
-        if (Double.compare(height, 400) != 0) {
-            domDocument.append(" height=\"").append(doubleToString(height)).append("\"");
-        }
-        domDocument.append(">");
-        convertFonts(swf.getTags(), domDocument);
-        convertLibrary(swf, characterVariables, characterClasses, nonLibraryShapes, backgroundColor, swf.getTags(), characters, files, datfiles, flaVersion, domDocument);
-        domDocument.append("<timelines>");
-        domDocument.append(convertTimeline(0, nonLibraryShapes, backgroundColor, swf.getTags(), swf.getTags(), characters, "Scene 1", flaVersion, files));
-        domDocument.append("</timelines>");
-        domDocument.append("</DOMDocument>");
+
         String domDocumentStr = prettyFormatXML(domDocument.toString());
 
         if (settings.exportScript) {
@@ -2823,252 +2851,252 @@ public class XFLConverter {
 
         int flaSwfVersion = swf.version > flaVersion.maxSwfVersion() ? flaVersion.maxSwfVersion() : swf.version;
         boolean greaterThanCC = flaVersion.ordinal() >= FLAVersion.CC.ordinal();
-        XFLXmlWriter psXml = new XFLXmlWriter();
+        XFLXmlWriter publishSettings = new XFLXmlWriter();
         try {
-            psXml.writeStartElement("flash_profiles");
-            psXml.writeStartElement("flash_profile", new String[]{"version", "1.0", "name", "Default", "current", "true"});
+            publishSettings.writeStartElement("flash_profiles");
+            publishSettings.writeStartElement("flash_profile", new String[]{"version", "1.0", "name", "Default", "current", "true"});
 
-            psXml.writeStartElement("PublishFormatProperties", new String[]{"enabled", "true"});
-            psXml.writeElementValue("defaultNames", "1");
-            psXml.writeElementValue("flash", "1");
-            psXml.writeElementValue("projectorWin", "0");
-            psXml.writeElementValue("projectorMac", "0");
-            psXml.writeElementValue("html", "1");
-            psXml.writeElementValue("gif", "0");
-            psXml.writeElementValue("jpeg", "0");
-            psXml.writeElementValue("png", "0");
-            psXml.writeElementValue(greaterThanCC ? "svg" : "qt", "0");
-            psXml.writeElementValue("rnwk", "0");
-            psXml.writeElementValue("swc", "0");
-            psXml.writeElementValue("flashDefaultName", "1");
-            psXml.writeElementValue("projectorWinDefaultName", "1");
-            psXml.writeElementValue("projectorMacDefaultName", "1");
-            psXml.writeElementValue("htmlDefaultName", "1");
-            psXml.writeElementValue("gifDefaultName", "1");
-            psXml.writeElementValue("jpegDefaultName", "1");
-            psXml.writeElementValue("pngDefaultName", "1");
-            psXml.writeElementValue(greaterThanCC ? "svgDefaultName" : "qtDefaultName", "1");
-            psXml.writeElementValue("rnwkDefaultName", "1");
-            psXml.writeElementValue("swcDefaultName", "1");
-            psXml.writeElementValue("flashFileName", baseName + ".swf");
-            psXml.writeElementValue("projectorWinFileName", baseName + ".exe");
-            psXml.writeElementValue("projectorMacFileName", baseName + ".app");
-            psXml.writeElementValue("htmlFileName", baseName + ".html");
-            psXml.writeElementValue("gifFileName", baseName + ".gif");
-            psXml.writeElementValue("jpegFileName", baseName + ".jpg");
-            psXml.writeElementValue("pngFileName", baseName + ".png");
-            psXml.writeElementValue(greaterThanCC ? "svgFileName" : "qtFileName", "1");
-            psXml.writeElementValue("rnwkFileName", baseName + ".smil");
-            psXml.writeElementValue("swcFileName", baseName + ".swc");
-            psXml.writeEndElement();
+            publishSettings.writeStartElement("PublishFormatProperties", new String[]{"enabled", "true"});
+            publishSettings.writeElementValue("defaultNames", "1");
+            publishSettings.writeElementValue("flash", "1");
+            publishSettings.writeElementValue("projectorWin", "0");
+            publishSettings.writeElementValue("projectorMac", "0");
+            publishSettings.writeElementValue("html", "1");
+            publishSettings.writeElementValue("gif", "0");
+            publishSettings.writeElementValue("jpeg", "0");
+            publishSettings.writeElementValue("png", "0");
+            publishSettings.writeElementValue(greaterThanCC ? "svg" : "qt", "0");
+            publishSettings.writeElementValue("rnwk", "0");
+            publishSettings.writeElementValue("swc", "0");
+            publishSettings.writeElementValue("flashDefaultName", "1");
+            publishSettings.writeElementValue("projectorWinDefaultName", "1");
+            publishSettings.writeElementValue("projectorMacDefaultName", "1");
+            publishSettings.writeElementValue("htmlDefaultName", "1");
+            publishSettings.writeElementValue("gifDefaultName", "1");
+            publishSettings.writeElementValue("jpegDefaultName", "1");
+            publishSettings.writeElementValue("pngDefaultName", "1");
+            publishSettings.writeElementValue(greaterThanCC ? "svgDefaultName" : "qtDefaultName", "1");
+            publishSettings.writeElementValue("rnwkDefaultName", "1");
+            publishSettings.writeElementValue("swcDefaultName", "1");
+            publishSettings.writeElementValue("flashFileName", baseName + ".swf");
+            publishSettings.writeElementValue("projectorWinFileName", baseName + ".exe");
+            publishSettings.writeElementValue("projectorMacFileName", baseName + ".app");
+            publishSettings.writeElementValue("htmlFileName", baseName + ".html");
+            publishSettings.writeElementValue("gifFileName", baseName + ".gif");
+            publishSettings.writeElementValue("jpegFileName", baseName + ".jpg");
+            publishSettings.writeElementValue("pngFileName", baseName + ".png");
+            publishSettings.writeElementValue(greaterThanCC ? "svgFileName" : "qtFileName", "1");
+            publishSettings.writeElementValue("rnwkFileName", baseName + ".smil");
+            publishSettings.writeElementValue("swcFileName", baseName + ".swc");
+            publishSettings.writeEndElement();
 
-            psXml.writeStartElement("PublishHtmlProperties", new String[]{"enabled", "true"});
-            psXml.writeElementValue("VersionDetectionIfAvailable", "0");
-            psXml.writeElementValue("VersionInfo", "12,0,0,0;11,2,0,0;11,1,0,0;10,3,0,0;10,2,153,0;10,1,52,0;9,0,124,0;8,0,24,0;7,0,14,0;6,0,79,0;5,0,58,0;4,0,32,0;3,0,8,0;2,0,1,12;1,0,0,1;");
-            psXml.writeElementValue("UsingDefaultContentFilename", "1");
-            psXml.writeElementValue("UsingDefaultAlternateFilename", "1");
-            psXml.writeElementValue("ContentFilename", baseName + "_content.html");
-            psXml.writeElementValue("AlternateFilename", baseName + "_alternate.html");
-            psXml.writeElementValue("UsingOwnAlternateFile", "0");
-            psXml.writeElementValue("OwnAlternateFilename", "");
-            psXml.writeElementValue("Width", width);
-            psXml.writeElementValue("Height", height);
-            psXml.writeElementValue("Align", "0");
-            psXml.writeElementValue("Units", "0");
-            psXml.writeElementValue("Loop", "1");
-            psXml.writeElementValue("StartPaused", "0");
-            psXml.writeElementValue("Scale", "0");
-            psXml.writeElementValue("HorizontalAlignment", "1");
-            psXml.writeElementValue("VerticalAlignment", "1");
-            psXml.writeElementValue("Quality", "4");
-            psXml.writeElementValue("DeblockingFilter", "0");
-            psXml.writeElementValue("WindowMode", "0");
-            psXml.writeElementValue("DisplayMenu", "1");
-            psXml.writeElementValue("DeviceFont", "0");
-            psXml.writeElementValue("TemplateFileName", "");
-            psXml.writeElementValue("showTagWarnMsg", "1");
-            psXml.writeEndElement();
+            publishSettings.writeStartElement("PublishHtmlProperties", new String[]{"enabled", "true"});
+            publishSettings.writeElementValue("VersionDetectionIfAvailable", "0");
+            publishSettings.writeElementValue("VersionInfo", "12,0,0,0;11,2,0,0;11,1,0,0;10,3,0,0;10,2,153,0;10,1,52,0;9,0,124,0;8,0,24,0;7,0,14,0;6,0,79,0;5,0,58,0;4,0,32,0;3,0,8,0;2,0,1,12;1,0,0,1;");
+            publishSettings.writeElementValue("UsingDefaultContentFilename", "1");
+            publishSettings.writeElementValue("UsingDefaultAlternateFilename", "1");
+            publishSettings.writeElementValue("ContentFilename", baseName + "_content.html");
+            publishSettings.writeElementValue("AlternateFilename", baseName + "_alternate.html");
+            publishSettings.writeElementValue("UsingOwnAlternateFile", "0");
+            publishSettings.writeElementValue("OwnAlternateFilename", "");
+            publishSettings.writeElementValue("Width", width);
+            publishSettings.writeElementValue("Height", height);
+            publishSettings.writeElementValue("Align", "0");
+            publishSettings.writeElementValue("Units", "0");
+            publishSettings.writeElementValue("Loop", "1");
+            publishSettings.writeElementValue("StartPaused", "0");
+            publishSettings.writeElementValue("Scale", "0");
+            publishSettings.writeElementValue("HorizontalAlignment", "1");
+            publishSettings.writeElementValue("VerticalAlignment", "1");
+            publishSettings.writeElementValue("Quality", "4");
+            publishSettings.writeElementValue("DeblockingFilter", "0");
+            publishSettings.writeElementValue("WindowMode", "0");
+            publishSettings.writeElementValue("DisplayMenu", "1");
+            publishSettings.writeElementValue("DeviceFont", "0");
+            publishSettings.writeElementValue("TemplateFileName", "");
+            publishSettings.writeElementValue("showTagWarnMsg", "1");
+            publishSettings.writeEndElement();
 
-            psXml.writeStartElement("PublishFlashProperties", new String[]{"enabled", "true"});
-            psXml.writeElementValue("TopDown", "");
-            psXml.writeElementValue("FireFox", "");
-            psXml.writeElementValue("Report", "0");
-            psXml.writeElementValue("Protect", "0");
-            psXml.writeElementValue("OmitTraceActions", "0");
-            psXml.writeElementValue("Quality", "80");
-            psXml.writeElementValue("DeblockingFilter", "0");
-            psXml.writeElementValue("StreamFormat", "0");
-            psXml.writeElementValue("StreamCompress", "7");
-            psXml.writeElementValue("EventFormat", "0");
-            psXml.writeElementValue("EventCompress", "7");
-            psXml.writeElementValue("OverrideSounds", "0");
-            psXml.writeElementValue("Version", flaSwfVersion);
-            psXml.writeElementValue("ExternalPlayer", FLAVersion.swfVersionToPlayer(flaSwfVersion));
-            psXml.writeElementValue("ActionScriptVersion", useAS3 ? "3" : "2");
-            psXml.writeElementValue("PackageExportFrame", "1");
-            psXml.writeElementValue("PackagePaths", "");
-            psXml.writeElementValue("AS3PackagePaths", ".");
-            psXml.writeElementValue("AS3ConfigConst", "CONFIG::FLASH_AUTHORING=\"true\";");
-            psXml.writeElementValue("DebuggingPermitted", "0");
-            psXml.writeElementValue("DebuggingPassword", "");
-            psXml.writeElementValue("CompressMovie", swf.compression == SWFCompression.NONE ? "0" : "1");
-            psXml.writeElementValue("CompressionType", swf.compression == SWFCompression.LZMA ? "1" : "0");
-            psXml.writeElementValue("InvisibleLayer", "1");
-            psXml.writeElementValue("DeviceSound", "0");
-            psXml.writeElementValue("StreamUse8kSampleRate", "0");
-            psXml.writeElementValue("EventUse8kSampleRate", "0");
-            psXml.writeElementValue("UseNetwork", useNetwork ? 1 : 0);
-            psXml.writeElementValue("DocumentClass", characterClasses.containsKey(0) ? characterClasses.get(0) : "");
-            psXml.writeElementValue("AS3Strict", "2");
-            psXml.writeElementValue("AS3Coach", "4");
-            psXml.writeElementValue("AS3AutoDeclare", "4096");
-            psXml.writeElementValue("AS3Dialect", "AS3");
-            psXml.writeElementValue("AS3ExportFrame", "1");
-            psXml.writeElementValue("AS3Optimize", "1");
-            psXml.writeElementValue("ExportSwc", "0");
-            psXml.writeElementValue("ScriptStuckDelay", "15");
-            psXml.writeElementValue("IncludeXMP", "1");
-            psXml.writeElementValue("HardwareAcceleration", "0");
-            psXml.writeElementValue("AS3Flags", "4102");
-            psXml.writeElementValue("DefaultLibraryLinkage", "rsl");
-            psXml.writeElementValue("RSLPreloaderMethod", "wrap");
-            psXml.writeElementValue("RSLPreloaderSWF", "$(AppConfig)/ActionScript 3.0/rsls/loader_animation.swf");
+            publishSettings.writeStartElement("PublishFlashProperties", new String[]{"enabled", "true"});
+            publishSettings.writeElementValue("TopDown", "");
+            publishSettings.writeElementValue("FireFox", "");
+            publishSettings.writeElementValue("Report", "0");
+            publishSettings.writeElementValue("Protect", "0");
+            publishSettings.writeElementValue("OmitTraceActions", "0");
+            publishSettings.writeElementValue("Quality", "80");
+            publishSettings.writeElementValue("DeblockingFilter", "0");
+            publishSettings.writeElementValue("StreamFormat", "0");
+            publishSettings.writeElementValue("StreamCompress", "7");
+            publishSettings.writeElementValue("EventFormat", "0");
+            publishSettings.writeElementValue("EventCompress", "7");
+            publishSettings.writeElementValue("OverrideSounds", "0");
+            publishSettings.writeElementValue("Version", flaSwfVersion);
+            publishSettings.writeElementValue("ExternalPlayer", FLAVersion.swfVersionToPlayer(flaSwfVersion));
+            publishSettings.writeElementValue("ActionScriptVersion", useAS3 ? "3" : "2");
+            publishSettings.writeElementValue("PackageExportFrame", "1");
+            publishSettings.writeElementValue("PackagePaths", "");
+            publishSettings.writeElementValue("AS3PackagePaths", ".");
+            publishSettings.writeElementValue("AS3ConfigConst", "CONFIG::FLASH_AUTHORING=\"true\";");
+            publishSettings.writeElementValue("DebuggingPermitted", "0");
+            publishSettings.writeElementValue("DebuggingPassword", "");
+            publishSettings.writeElementValue("CompressMovie", swf.compression == SWFCompression.NONE ? "0" : "1");
+            publishSettings.writeElementValue("CompressionType", swf.compression == SWFCompression.LZMA ? "1" : "0");
+            publishSettings.writeElementValue("InvisibleLayer", "1");
+            publishSettings.writeElementValue("DeviceSound", "0");
+            publishSettings.writeElementValue("StreamUse8kSampleRate", "0");
+            publishSettings.writeElementValue("EventUse8kSampleRate", "0");
+            publishSettings.writeElementValue("UseNetwork", useNetwork ? 1 : 0);
+            publishSettings.writeElementValue("DocumentClass", characterClasses.containsKey(0) ? characterClasses.get(0) : "");
+            publishSettings.writeElementValue("AS3Strict", "2");
+            publishSettings.writeElementValue("AS3Coach", "4");
+            publishSettings.writeElementValue("AS3AutoDeclare", "4096");
+            publishSettings.writeElementValue("AS3Dialect", "AS3");
+            publishSettings.writeElementValue("AS3ExportFrame", "1");
+            publishSettings.writeElementValue("AS3Optimize", "1");
+            publishSettings.writeElementValue("ExportSwc", "0");
+            publishSettings.writeElementValue("ScriptStuckDelay", "15");
+            publishSettings.writeElementValue("IncludeXMP", "1");
+            publishSettings.writeElementValue("HardwareAcceleration", "0");
+            publishSettings.writeElementValue("AS3Flags", "4102");
+            publishSettings.writeElementValue("DefaultLibraryLinkage", "rsl");
+            publishSettings.writeElementValue("RSLPreloaderMethod", "wrap");
+            publishSettings.writeElementValue("RSLPreloaderSWF", "$(AppConfig)/ActionScript 3.0/rsls/loader_animation.swf");
             if (greaterThanCC) {
-                psXml.writeStartElement("LibraryPath");
-                psXml.writeStartElement("library-path-entry");
-                psXml.writeElementValue("swc-path", "$(AppConfig)/ActionScript 3.0/libs");
-                psXml.writeElementValue("linkage", "merge");
-                psXml.writeEndElement();
-                psXml.writeStartElement("library-path-entry");
-                psXml.writeElementValue("swc-path", "$(FlexSDK)/frameworks/libs/flex.swc");
-                psXml.writeElementValue("linkage", "merge");
-                psXml.writeElementValue("rsl-url", "textLayout_2.0.0.232.swz");
-                psXml.writeEndElement();
-                psXml.writeStartElement("library-path-entry");
-                psXml.writeElementValue("swc-path", "$(FlexSDK)/frameworks/libs/core.swc");
-                psXml.writeElementValue("linkage", "merge");
-                psXml.writeElementValue("rsl-url", "textLayout_2.0.0.232.swz");
-                psXml.writeEndElement();
-                psXml.writeEndElement();
-                psXml.writeElementValueRaw("LibraryVersions", Helper.newLine + "      "); // todo: is this really needed or an empty tag is ok?
+                publishSettings.writeStartElement("LibraryPath");
+                publishSettings.writeStartElement("library-path-entry");
+                publishSettings.writeElementValue("swc-path", "$(AppConfig)/ActionScript 3.0/libs");
+                publishSettings.writeElementValue("linkage", "merge");
+                publishSettings.writeEndElement();
+                publishSettings.writeStartElement("library-path-entry");
+                publishSettings.writeElementValue("swc-path", "$(FlexSDK)/frameworks/libs/flex.swc");
+                publishSettings.writeElementValue("linkage", "merge");
+                publishSettings.writeElementValue("rsl-url", "textLayout_2.0.0.232.swz");
+                publishSettings.writeEndElement();
+                publishSettings.writeStartElement("library-path-entry");
+                publishSettings.writeElementValue("swc-path", "$(FlexSDK)/frameworks/libs/core.swc");
+                publishSettings.writeElementValue("linkage", "merge");
+                publishSettings.writeElementValue("rsl-url", "textLayout_2.0.0.232.swz");
+                publishSettings.writeEndElement();
+                publishSettings.writeEndElement();
+                publishSettings.writeElementValueRaw("LibraryVersions", Helper.newLine + "      "); // todo: is this really needed or an empty tag is ok?
             } else {
-                psXml.writeStartElement("LibraryPath");
-                psXml.writeStartElement("library-path-entry");
-                psXml.writeElementValue("swc-path", "$(AppConfig)/ActionScript 3.0/libs");
-                psXml.writeElementValue("linkage", "merge");
-                psXml.writeEndElement();
-                psXml.writeStartElement("library-path-entry");
-                psXml.writeElementValue("swc-path", "$(AppConfig)/ActionScript 3.0/libs/11.0/textLayout.swc");
-                psXml.writeElementValue("linkage", "rsl", new String[]{"usesDefault", "true"});
-                psXml.writeElementValue("rsl-url", "http://fpdownload.adobe.com/pub/swz/tlf/2.0.0.232/textLayout_2.0.0.232.swz");
-                psXml.writeElementValue("policy-file-url", "http://fpdownload.adobe.com/pub/swz/crossdomain.xml");
-                psXml.writeElementValue("rsl-url", "textLayout_2.0.0.232.swz");
-                psXml.writeEndElement();
-                psXml.writeEndElement();
+                publishSettings.writeStartElement("LibraryPath");
+                publishSettings.writeStartElement("library-path-entry");
+                publishSettings.writeElementValue("swc-path", "$(AppConfig)/ActionScript 3.0/libs");
+                publishSettings.writeElementValue("linkage", "merge");
+                publishSettings.writeEndElement();
+                publishSettings.writeStartElement("library-path-entry");
+                publishSettings.writeElementValue("swc-path", "$(AppConfig)/ActionScript 3.0/libs/11.0/textLayout.swc");
+                publishSettings.writeElementValue("linkage", "rsl", new String[]{"usesDefault", "true"});
+                publishSettings.writeElementValue("rsl-url", "http://fpdownload.adobe.com/pub/swz/tlf/2.0.0.232/textLayout_2.0.0.232.swz");
+                publishSettings.writeElementValue("policy-file-url", "http://fpdownload.adobe.com/pub/swz/crossdomain.xml");
+                publishSettings.writeElementValue("rsl-url", "textLayout_2.0.0.232.swz");
+                publishSettings.writeEndElement();
+                publishSettings.writeEndElement();
 
-                psXml.writeStartElement("LibraryVersions");
-                psXml.writeStartElement("library-version");
-                psXml.writeElementValue("swc-path", "$(AppConfig)/ActionScript 3.0/libs/11.0/textLayout.swc");
-                psXml.writeEmptyElement("feature", new String[]{"name", "tlfText", "majorVersion", "2", "minorVersion", "0", "build", "232"});
-                psXml.writeElementValue("rsl-url", "http://fpdownload.adobe.com/pub/swz/tlf/2.0.0.232/textLayout_2.0.0.232.swz");
-                psXml.writeElementValue("policy-file-url", "http://fpdownload.adobe.com/pub/swz/crossdomain.xml");
-                psXml.writeElementValue("rsl-url", "textLayout_2.0.0.232.swz");
-                psXml.writeEndElement();
-                psXml.writeEndElement();
+                publishSettings.writeStartElement("LibraryVersions");
+                publishSettings.writeStartElement("library-version");
+                publishSettings.writeElementValue("swc-path", "$(AppConfig)/ActionScript 3.0/libs/11.0/textLayout.swc");
+                publishSettings.writeEmptyElement("feature", new String[]{"name", "tlfText", "majorVersion", "2", "minorVersion", "0", "build", "232"});
+                publishSettings.writeElementValue("rsl-url", "http://fpdownload.adobe.com/pub/swz/tlf/2.0.0.232/textLayout_2.0.0.232.swz");
+                publishSettings.writeElementValue("policy-file-url", "http://fpdownload.adobe.com/pub/swz/crossdomain.xml");
+                publishSettings.writeElementValue("rsl-url", "textLayout_2.0.0.232.swz");
+                publishSettings.writeEndElement();
+                publishSettings.writeEndElement();
             }
 
-            psXml.writeEndElement();
+            publishSettings.writeEndElement();
 
-            psXml.writeStartElement("PublishJpegProperties", new String[]{"enabled", "true"});
-            psXml.writeElementValue("Width", width);
-            psXml.writeElementValue("Height", height);
-            psXml.writeElementValue("Progressive", "0");
-            psXml.writeElementValue("DPI", "4718592");
-            psXml.writeElementValue("Size", "0");
-            psXml.writeElementValue("Quality", "80");
-            psXml.writeElementValue("MatchMovieDim", "1");
-            psXml.writeEndElement();
+            publishSettings.writeStartElement("PublishJpegProperties", new String[]{"enabled", "true"});
+            publishSettings.writeElementValue("Width", width);
+            publishSettings.writeElementValue("Height", height);
+            publishSettings.writeElementValue("Progressive", "0");
+            publishSettings.writeElementValue("DPI", "4718592");
+            publishSettings.writeElementValue("Size", "0");
+            publishSettings.writeElementValue("Quality", "80");
+            publishSettings.writeElementValue("MatchMovieDim", "1");
+            publishSettings.writeEndElement();
 
-            psXml.writeStartElement("PublishRNWKProperties", new String[]{"enabled", "true"});
-            psXml.writeElementValue("exportFlash", "1");
-            psXml.writeElementValue("flashBitRate", "0");
-            psXml.writeElementValue("exportAudio", "1");
-            psXml.writeElementValue("audioFormat", "0");
-            psXml.writeElementValue("singleRateAudio", "0");
-            psXml.writeElementValue("realVideoRate", "100000");
-            psXml.writeElementValue("speed28K", "1");
-            psXml.writeElementValue("speed56K", "1");
-            psXml.writeElementValue("speedSingleISDN", "0");
-            psXml.writeElementValue("speedDualISDN", "0");
-            psXml.writeElementValue("speedCorporateLAN", "0");
-            psXml.writeElementValue("speed256K", "0");
-            psXml.writeElementValue("speed384K", "0");
-            psXml.writeElementValue("speed512K", "0");
-            psXml.writeElementValue("exportSMIL", "1");
-            psXml.writeEndElement();
+            publishSettings.writeStartElement("PublishRNWKProperties", new String[]{"enabled", "true"});
+            publishSettings.writeElementValue("exportFlash", "1");
+            publishSettings.writeElementValue("flashBitRate", "0");
+            publishSettings.writeElementValue("exportAudio", "1");
+            publishSettings.writeElementValue("audioFormat", "0");
+            publishSettings.writeElementValue("singleRateAudio", "0");
+            publishSettings.writeElementValue("realVideoRate", "100000");
+            publishSettings.writeElementValue("speed28K", "1");
+            publishSettings.writeElementValue("speed56K", "1");
+            publishSettings.writeElementValue("speedSingleISDN", "0");
+            publishSettings.writeElementValue("speedDualISDN", "0");
+            publishSettings.writeElementValue("speedCorporateLAN", "0");
+            publishSettings.writeElementValue("speed256K", "0");
+            publishSettings.writeElementValue("speed384K", "0");
+            publishSettings.writeElementValue("speed512K", "0");
+            publishSettings.writeElementValue("exportSMIL", "1");
+            publishSettings.writeEndElement();
 
-            psXml.writeStartElement("PublishGifProperties", new String[]{"enabled", "true"});
-            psXml.writeElementValue("Width", width);
-            psXml.writeElementValue("Height", height);
-            psXml.writeElementValue("Animated", "0");
-            psXml.writeElementValue("MatchMovieDim", "1");
-            psXml.writeElementValue("Loop", "1");
-            psXml.writeElementValue("LoopCount", "");
-            psXml.writeElementValue("OptimizeColors", "1");
-            psXml.writeElementValue("Interlace", "0");
-            psXml.writeElementValue("Smooth", "1");
-            psXml.writeElementValue("DitherSolids", "0");
-            psXml.writeElementValue("RemoveGradients", "0");
-            psXml.writeElementValue("TransparentOption", "");
-            psXml.writeElementValue("TransparentAlpha", "128");
-            psXml.writeElementValue("DitherOption", "");
-            psXml.writeElementValue("PaletteOption", "");
-            psXml.writeElementValue("MaxColors", "255");
-            psXml.writeElementValue("PaletteName", "");
-            psXml.writeEndElement();
+            publishSettings.writeStartElement("PublishGifProperties", new String[]{"enabled", "true"});
+            publishSettings.writeElementValue("Width", width);
+            publishSettings.writeElementValue("Height", height);
+            publishSettings.writeElementValue("Animated", "0");
+            publishSettings.writeElementValue("MatchMovieDim", "1");
+            publishSettings.writeElementValue("Loop", "1");
+            publishSettings.writeElementValue("LoopCount", "");
+            publishSettings.writeElementValue("OptimizeColors", "1");
+            publishSettings.writeElementValue("Interlace", "0");
+            publishSettings.writeElementValue("Smooth", "1");
+            publishSettings.writeElementValue("DitherSolids", "0");
+            publishSettings.writeElementValue("RemoveGradients", "0");
+            publishSettings.writeElementValue("TransparentOption", "");
+            publishSettings.writeElementValue("TransparentAlpha", "128");
+            publishSettings.writeElementValue("DitherOption", "");
+            publishSettings.writeElementValue("PaletteOption", "");
+            publishSettings.writeElementValue("MaxColors", "255");
+            publishSettings.writeElementValue("PaletteName", "");
+            publishSettings.writeEndElement();
 
-            psXml.writeStartElement("PublishPNGProperties", new String[]{"enabled", "true"});
-            psXml.writeElementValue("Width", width);
-            psXml.writeElementValue("Height", height);
-            psXml.writeElementValue("OptimizeColors", "1");
-            psXml.writeElementValue("Interlace", "0");
-            psXml.writeElementValue("Transparent", "0");
-            psXml.writeElementValue("Smooth", "1");
-            psXml.writeElementValue("DitherSolids", "0");
-            psXml.writeElementValue("RemoveGradients", "0");
-            psXml.writeElementValue("MatchMovieDim", "1");
-            psXml.writeElementValue("DitherOption", "");
-            psXml.writeElementValue("FilterOption", "");
-            psXml.writeElementValue("PaletteOption", "");
-            psXml.writeElementValue("BitDepth", "24-bit with Alpha");
-            psXml.writeElementValue("MaxColors", "255");
-            psXml.writeElementValue("PaletteName", "");
-            psXml.writeEndElement();
+            publishSettings.writeStartElement("PublishPNGProperties", new String[]{"enabled", "true"});
+            publishSettings.writeElementValue("Width", width);
+            publishSettings.writeElementValue("Height", height);
+            publishSettings.writeElementValue("OptimizeColors", "1");
+            publishSettings.writeElementValue("Interlace", "0");
+            publishSettings.writeElementValue("Transparent", "0");
+            publishSettings.writeElementValue("Smooth", "1");
+            publishSettings.writeElementValue("DitherSolids", "0");
+            publishSettings.writeElementValue("RemoveGradients", "0");
+            publishSettings.writeElementValue("MatchMovieDim", "1");
+            publishSettings.writeElementValue("DitherOption", "");
+            publishSettings.writeElementValue("FilterOption", "");
+            publishSettings.writeElementValue("PaletteOption", "");
+            publishSettings.writeElementValue("BitDepth", "24-bit with Alpha");
+            publishSettings.writeElementValue("MaxColors", "255");
+            publishSettings.writeElementValue("PaletteName", "");
+            publishSettings.writeEndElement();
 
             if (!greaterThanCC) {
-                psXml.writeStartElement("PublishQTProperties", new String[]{"enabled", "true"});
-                psXml.writeElementValue("Width", width);
-                psXml.writeElementValue("Height", height);
-                psXml.writeElementValue("MatchMovieDim", "1");
-                psXml.writeElementValue("UseQTSoundCompression", "0");
-                psXml.writeElementValue("AlphaOption", "");
-                psXml.writeElementValue("LayerOption", "");
-                psXml.writeElementValue("QTSndSettings", "00000000");
-                psXml.writeElementValue("ControllerOption", "0");
-                psXml.writeElementValue("Looping", "0");
-                psXml.writeElementValue("PausedAtStart", "0");
-                psXml.writeElementValue("PlayEveryFrame", "0");
-                psXml.writeElementValue("Flatten", "1");
-                psXml.writeEndElement();
+                publishSettings.writeStartElement("PublishQTProperties", new String[]{"enabled", "true"});
+                publishSettings.writeElementValue("Width", width);
+                publishSettings.writeElementValue("Height", height);
+                publishSettings.writeElementValue("MatchMovieDim", "1");
+                publishSettings.writeElementValue("UseQTSoundCompression", "0");
+                publishSettings.writeElementValue("AlphaOption", "");
+                publishSettings.writeElementValue("LayerOption", "");
+                publishSettings.writeElementValue("QTSndSettings", "00000000");
+                publishSettings.writeElementValue("ControllerOption", "0");
+                publishSettings.writeElementValue("Looping", "0");
+                publishSettings.writeElementValue("PausedAtStart", "0");
+                publishSettings.writeElementValue("PlayEveryFrame", "0");
+                publishSettings.writeElementValue("Flatten", "1");
+                publishSettings.writeEndElement();
             }
 
-            psXml.writeEndElement();
-            psXml.writeEndElement();
+            publishSettings.writeEndElement();
+            publishSettings.writeEndElement();
         } catch (XMLStreamException ex) {
             Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        String publishSettingsStr = psXml.toString();
+        String publishSettingsStr = publishSettings.toString();
 
         if (settings.compressed) {
             final String domDocumentF = domDocumentStr;
