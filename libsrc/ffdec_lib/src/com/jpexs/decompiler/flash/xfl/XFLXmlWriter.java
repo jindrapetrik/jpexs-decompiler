@@ -54,36 +54,7 @@ public class XFLXmlWriter implements XMLStreamWriter {
         return this;
     }
 
-    // todo: remove
-    public XFLXmlWriter append(StringBuilder stringBuilder) {
-        sb.append(stringBuilder);
-        newLine = false;
-        return this;
-    }
-
-    // todo: remove
-    public XFLXmlWriter append(int value) {
-        sb.append(value);
-        newLine = false;
-        return this;
-    }
-
-    // todo: remove
-    public XFLXmlWriter append(float value) {
-        sb.append(value);
-        newLine = false;
-        return this;
-    }
-
-    // todo: remove
-    public XFLXmlWriter append(double value) {
-        sb.append(value);
-        newLine = false;
-        return this;
-    }
-
-    // todo: make this private
-    public XFLXmlWriter append(String text) {
+    private XFLXmlWriter append(String text) {
         sb.append(text);
         newLine = false;
         return this;
@@ -207,12 +178,20 @@ public class XFLXmlWriter implements XMLStreamWriter {
         writeEndElement();
     }
 
+    public void writeElementValue(String localName, float value) throws XMLStreamException {
+        writeElementValue(localName, Float.toString(value));
+    }
+
     public void writeElementValue(String localName, double value) throws XMLStreamException {
         writeElementValue(localName, Double.toString(value));
     }
 
     public void writeElementValue(String localName, int value) throws XMLStreamException {
         writeElementValue(localName, Integer.toString(value));
+    }
+
+    public void writeElementValue(String localName, long value) throws XMLStreamException {
+        writeElementValue(localName, Long.toString(value));
     }
 
     public void writeElementValueRaw(String localName, String value) throws XMLStreamException {
@@ -245,12 +224,24 @@ public class XFLXmlWriter implements XMLStreamWriter {
         append(' ').append(localName).append("=\"").append(escapeAttribute(value)).append('"');
     }
 
+    public void writeAttribute(String localName, float value) throws XMLStreamException {
+        writeAttribute(localName, Float.toString(value));
+    }
+
     public void writeAttribute(String localName, double value) throws XMLStreamException {
         writeAttribute(localName, Double.toString(value));
     }
 
     public void writeAttribute(String localName, int value) throws XMLStreamException {
         writeAttribute(localName, Integer.toString(value));
+    }
+
+    public void writeAttribute(String localName, long value) throws XMLStreamException {
+        writeAttribute(localName, Long.toString(value));
+    }
+
+    public void writeAttribute(String localName, boolean value) throws XMLStreamException {
+        writeAttribute(localName, value ? "true" : "false");
     }
 
     @Override
@@ -389,7 +380,11 @@ public class XFLXmlWriter implements XMLStreamWriter {
     }
 
     // todo: remove
-    void setLength(int newLength) {
+    public void setLength(int newLength) {
         sb.setLength(newLength);
+    }
+
+    public boolean isEmpty() {
+        return sb.length() == 0;
     }
 }

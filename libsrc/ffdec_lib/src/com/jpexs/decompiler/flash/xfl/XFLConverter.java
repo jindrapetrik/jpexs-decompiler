@@ -229,67 +229,74 @@ public class XFLConverter {
         return "normal";
     }
 
-    private static void convertLineStyle(LINESTYLE ls, int shapeNum, XFLXmlWriter writer) {
-        writer.append("<SolidStroke scaleMode=\"").append(getScaleMode(ls)).append("\" weight=\"").append(((float) ls.width) / SWF.unitDivisor)
-                .append("\">"
-                        + "<fill>");
+    private static void convertLineStyle(LINESTYLE ls, int shapeNum, XFLXmlWriter writer) throws XMLStreamException {
+        writer.writeStartElement("SolidStroke", new String[]{
+            "scaleMode", getScaleMode(ls),
+            "weight", Double.toString(((float) ls.width) / SWF.unitDivisor),});
+
+        writer.writeStartElement("fill");
         if (!(ls instanceof LINESTYLE2) || !((LINESTYLE2) ls).hasFillFlag) {
-            writer.append("<SolidColor color=\"")
-                    .append(ls.color.toHexRGB()).append("\"")
-                    .append(shapeNum == 3 ? " alpha=\"" + ((RGBA) ls.color).getAlphaFloat() + "\"" : "").append(" />");
+            writer.writeStartElement("SolidColor", new String[]{"color", ls.color.toHexRGB()});
+            if (shapeNum >= 3) {
+                writer.writeAttribute("alpha", ((RGBA) ls.color).getAlphaFloat());
+            }
+
+            writer.writeEndElement();
         } else {
             // todo: line fill
         }
-        writer.append("</fill>"
-                + "</SolidStroke>");
+
+        writer.writeEndElement();
+        writer.writeEndElement();
     }
 
     private static void convertLineStyle(HashMap<Integer, CharacterTag> characters, LINESTYLE2 ls, int shapeNum, XFLXmlWriter writer) throws XMLStreamException {
-        StringBuilder params = new StringBuilder();
+        writer.writeStartElement("SolidStroke", new String[]{"weight", Double.toString(((float) ls.width) / SWF.unitDivisor)});
         if (ls.pixelHintingFlag) {
-            params.append(" pixelHinting=\"true\"");
+            writer.writeAttribute("pixelHinting", true);
         }
         if (ls.width == 1) {
-            params.append(" solidStyle=\"hairline\"");
+            writer.writeAttribute("solidStyle", "hairline");
         }
-        params.append(" scaleMode=\"").append(getScaleMode(ls)).append("\"");
+        writer.writeAttribute("scaleMode", getScaleMode(ls));
 
         switch (ls.endCapStyle) {  //What about endCapStyle?
             case LINESTYLE2.NO_CAP:
-                params.append(" caps=\"none\"");
+                writer.writeAttribute("caps", "none");
                 break;
             case LINESTYLE2.SQUARE_CAP:
-                params.append(" caps=\"square\"");
+                writer.writeAttribute("caps", "square");
                 break;
         }
         switch (ls.joinStyle) {
             case LINESTYLE2.BEVEL_JOIN:
-                params.append(" joints=\"bevel\"");
+                writer.writeAttribute("joints", "bevel");
                 break;
             case LINESTYLE2.MITER_JOIN:
-                params.append(" joints=\"miter\"");
+                writer.writeAttribute("joints", "miter");
                 float miterLimitFactor = ls.miterLimitFactor;
                 if (miterLimitFactor != 3.0f) {
-                    params.append(" miterLimit=\"").append(miterLimitFactor).append("\"");
+                    writer.writeAttribute("miterLimit", miterLimitFactor);
                 }
                 break;
         }
 
-        writer.append("<SolidStroke weight=\"").append(((float) ls.width) / SWF.unitDivisor).append("\"");
-        writer.append(params);
-        writer.append(">");
-        writer.append("<fill>");
+        writer.writeStartElement("fill");
 
         if (!ls.hasFillFlag) {
             RGBA color = (RGBA) ls.color;
-            writer.append("<SolidColor color=\"").append(color.toHexRGB()).append("\"").
-                    append(color.getAlphaFloat() != 1 ? " alpha=\"" + color.getAlphaFloat() + "\"" : "").
-                    append(" />");
+            writer.writeStartElement("SolidColor", new String[]{"color", color.toHexRGB()});
+            if (color.getAlphaFloat() != 1) {
+                writer.writeAttribute("alpha", Float.toString(color.getAlphaFloat()));
+            }
+
+            writer.writeEndElement();
         } else {
             convertFillStyle(null/* FIXME */, characters, ls.fillType, shapeNum, writer);
         }
-        writer.append("</fill>");
-        writer.append("</SolidStroke>");
+
+        writer.writeEndElement();
+        writer.writeEndElement();
     }
 
     private static void convertFillStyle(MATRIX mat, HashMap<Integer, CharacterTag> characters, FILLSTYLE fs, int shapeNum, XFLXmlWriter writer) throws XMLStreamException {
@@ -300,58 +307,55 @@ public class XFLConverter {
         //ret.append("<FillStyle index=\"").append(index).append("\">");
         switch (fs.fillStyleType) {
             case FILLSTYLE.SOLID:
-                writer.append("<SolidColor color=\"");
-                writer.append(fs.color.toHexRGB());
-                writer.append("\"");
+                writer.writeStartElement("SolidColor", new String[]{"color", fs.color.toHexRGB()});
                 if (shapeNum >= 3) {
-                    writer.append(" alpha=\"").append(((RGBA) fs.color).getAlphaFloat()).append("\"");
+                    writer.writeAttribute("alpha", ((RGBA) fs.color).getAlphaFloat());
                 }
-                writer.append(" />");
+
+                writer.writeEndElement();
                 break;
             case FILLSTYLE.REPEATING_BITMAP:
             case FILLSTYLE.CLIPPED_BITMAP:
             case FILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP:
             case FILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP:
                 CharacterTag bitmapCh = characters.get(fs.bitmapId);
-                if (bitmapCh instanceof ImageTag) {
-                    ImageTag it = (ImageTag) bitmapCh;
-                    writer.append("<BitmapFill");
-                    writer.append(" bitmapPath=\"");
-                    writer.append("bitmap").append(bitmapCh.getCharacterId()).append(it.getImageFormat().getExtension());
-                } else {
+                if (!(bitmapCh instanceof ImageTag)) {
                     if (bitmapCh != null) {
                         logger.log(Level.SEVERE, "Suspicious bitmapfill:{0}", bitmapCh.getClass().getSimpleName());
                     }
-                    writer.append("<SolidColor color=\"#ffffff\" />");
+                    writer.writeEmptyElement("SolidColor", new String[]{"color", "#ffffff"});
                     return;
                 }
-                writer.append("\"");
+
+                ImageTag it = (ImageTag) bitmapCh;
+                writer.writeStartElement("BitmapFill");
+                writer.writeAttribute("bitmapPath", "bitmap" + bitmapCh.getCharacterId() + it.getImageFormat().getExtension());
 
                 if ((fs.fillStyleType == FILLSTYLE.CLIPPED_BITMAP) || (fs.fillStyleType == FILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP)) {
-                    writer.append(" bitmapIsClipped=\"true\"");
+                    writer.writeAttribute("bitmapIsClipped", true);
                 }
 
-                writer.append(">");
-                writer.append("<matrix>");
+                writer.writeStartElement("matrix");
                 convertMatrix(fs.bitmapMatrix, writer);
-                writer.append("</matrix>");
-                writer.append("</BitmapFill>");
+                writer.writeEndElement();
+                writer.writeEndElement();
                 break;
             case FILLSTYLE.LINEAR_GRADIENT:
             case FILLSTYLE.RADIAL_GRADIENT:
             case FILLSTYLE.FOCAL_RADIAL_GRADIENT:
 
                 if (fs.fillStyleType == FILLSTYLE.LINEAR_GRADIENT) {
-                    writer.append("<LinearGradient");
+                    writer.writeStartElement("LinearGradient");
                 } else {
-                    writer.append("<RadialGradient");
-                    writer.append(" focalPointRatio=\"");
+                    writer.writeStartElement("RadialGradient");
+                    String focalPointRatioStr;
                     if (fs.fillStyleType == FILLSTYLE.FOCAL_RADIAL_GRADIENT) {
-                        writer.append(((FOCALGRADIENT) fs.gradient).focalPoint);
+                        focalPointRatioStr = Float.toString(((FOCALGRADIENT) fs.gradient).focalPoint);
                     } else {
-                        writer.append("0");
+                        focalPointRatioStr = "0";
                     }
-                    writer.append("\"");
+
+                    writer.writeAttribute("focalPointRatio", focalPointRatioStr);
                 }
 
                 int interpolationMode;
@@ -367,25 +371,23 @@ public class XFLConverter {
                     spreadMode = fs.gradient.spreadMode;
                 }
                 if (interpolationMode == GRADIENT.INTERPOLATION_LINEAR_RGB_MODE) {
-                    writer.append(" interpolationMethod=\"linearRGB\"");
+                    writer.writeAttribute("interpolationMethod", "linearRGB");
                 }
                 switch (spreadMode) {
                     case GRADIENT.SPREAD_PAD_MODE:
 
                         break;
                     case GRADIENT.SPREAD_REFLECT_MODE:
-                        writer.append(" spreadMethod=\"reflect\"");
+                        writer.writeAttribute("spreadMethod", "reflect");
                         break;
                     case GRADIENT.SPREAD_REPEAT_MODE:
-                        writer.append(" spreadMethod=\"repeat\"");
+                        writer.writeAttribute("spreadMethod", "repeat");
                         break;
                 }
 
-                writer.append(">");
-
-                writer.append("<matrix>");
+                writer.writeStartElement("matrix");
                 convertMatrix(fs.gradientMatrix, writer);
-                writer.append("</matrix>");
+                writer.writeEndElement();
                 GRADRECORD[] records;
                 if (fs.fillStyleType == FILLSTYLE.FOCAL_RADIAL_GRADIENT) {
                     records = fs.gradient.gradientRecords;
@@ -393,18 +395,18 @@ public class XFLConverter {
                     records = fs.gradient.gradientRecords;
                 }
                 for (GRADRECORD rec : records) {
-                    writer.append("<GradientEntry");
-                    writer.append(" color=\"").append(rec.color.toHexRGB()).append("\"");
+                    writer.writeStartElement("GradientEntry");
+                    writer.writeAttribute("color", rec.color.toHexRGB());
                     if (shapeNum >= 3) {
-                        writer.append(" alpha=\"").append(((RGBA) rec.color).getAlphaFloat()).append("\"");
+                        writer.writeAttribute("alpha", ((RGBA) rec.color).getAlphaFloat());
                     }
-                    writer.append(" ratio=\"").append(rec.getRatioFloat()).append("\"");
-                    writer.append(" />");
+                    writer.writeAttribute("ratio", rec.getRatioFloat());
+                    writer.writeEndElement();
                 }
                 if (fs.fillStyleType == FILLSTYLE.LINEAR_GRADIENT) {
-                    writer.append("</LinearGradient>");
+                    writer.writeEndElement(); // LinearGradient
                 } else {
-                    writer.append("</RadialGradient>");
+                    writer.writeEndElement(); //RadialGradient
                 }
                 break;
         }
@@ -436,20 +438,20 @@ public class XFLConverter {
         List<String> layers = getShapeLayers(characters, mat, shapeNum, shapeRecords, fillStyles, lineStyles, morphshape);
         if (!useLayers) {
             for (int l = layers.size() - 1; l >= 0; l--) {
-                writer.append(layers.get(l));
+                writer.writeCharactersRaw(layers.get(l));
             }
         } else {
             int layer = 1;
             for (int l = layers.size() - 1; l >= 0; l--) {
-                writer.append("<DOMLayer name=\"Layer ").append(layer++).append("\">"); //color=\"#4FFF4F\"
-                writer.append("<frames>");
-                writer.append("<DOMFrame index=\"0\" motionTweenScale=\"false\" keyMode=\"").append(KEY_MODE_SHAPE_LAYERS).append("\">");
-                writer.append("<elements>");
-                writer.append(layers.get(l));
-                writer.append("</elements>");
-                writer.append("</DOMFrame>");
-                writer.append("</frames>");
-                writer.append("</DOMLayer>");
+                writer.writeStartElement("DOMLayer", new String[]{"name", "Layer " + layer++}); //color="#4FFF4F"
+                writer.writeStartElement("frames");
+                writer.writeStartElement("DOMFrame", new String[]{"index", "0", "motionTweenScale", "false", "keyMode", Integer.toString(KEY_MODE_SHAPE_LAYERS)});
+                writer.writeStartElement("elements");
+                writer.writeCharactersRaw(layers.get(l));
+                writer.writeEndElement();
+                writer.writeEndElement();
+                writer.writeEndElement();
+                writer.writeEndElement();
             }
         }
     }
@@ -526,49 +528,50 @@ public class XFLConverter {
         int strokeStyle = -1;
         XFLXmlWriter fillsStr = new XFLXmlWriter();
         XFLXmlWriter strokesStr = new XFLXmlWriter();
-        fillsStr.append("<fills>");
-        strokesStr.append("<strokes>");
+        fillsStr.writeStartElement("fills");
+        strokesStr.writeStartElement("strokes");
         List<String> layers = new ArrayList<>();
-        StringBuilder currentLayer = new StringBuilder();
 
         int fillStyleCount = 0;
         if (fillStyles != null) {
             for (FILLSTYLE fs : fillStyles.fillStyles) {
-                fillsStr.append("<FillStyle index=\"").append(fillStyleCount + 1).append("\">");
+                fillsStr.writeStartElement("FillStyle", new String[]{"index", Integer.toString(fillStyleCount + 1)});
                 convertFillStyle(mat, characters, fs, shapeNum, fillsStr);
-                fillsStr.append("</FillStyle>");
+                fillsStr.writeEndElement();
                 fillStyleCount++;
             }
         }
         if (lineStyles != null) {
             if (shapeNum <= 3 && lineStyles.lineStyles != null) {
                 for (int l = 0; l < lineStyles.lineStyles.length; l++) {
-                    strokesStr.append("<StrokeStyle index=\"").append(lineStyleCount + 1).append("\">");
+                    strokesStr.writeStartElement("StrokeStyle", new String[]{"index", Integer.toString(lineStyleCount + 1)});
                     convertLineStyle(lineStyles.lineStyles[l], shapeNum, strokesStr);
-                    strokesStr.append("</StrokeStyle>");
+                    strokesStr.writeEndElement();
                     lineStyleCount++;
                 }
             } else if (lineStyles.lineStyles != null) {
                 for (int l = 0; l < lineStyles.lineStyles.length; l++) {
-                    strokesStr.append("<StrokeStyle index=\"").append(lineStyleCount + 1).append("\">");
+                    strokesStr.writeStartElement("StrokeStyle", new String[]{"index", Integer.toString(lineStyleCount + 1)});
                     convertLineStyle(characters, (LINESTYLE2) lineStyles.lineStyles[l], shapeNum, strokesStr);
-                    strokesStr.append("</StrokeStyle>");
+                    strokesStr.writeEndElement();
                     lineStyleCount++;
                 }
             }
         }
 
-        fillsStr.append("</fills>");
-        strokesStr.append("</strokes>");
+        fillsStr.writeEndElement();
+        strokesStr.writeEndElement();
 
         int layer = 1;
 
-        if ((fillStyleCount > 0) || (lineStyleCount > 0)) {
-            currentLayer.append("<DOMShape isFloating=\"true\">");
-            currentLayer.append(fillsStr);
-            currentLayer.append(strokesStr);
-            currentLayer.append("<edges>");
+        XFLXmlWriter currentLayer = new XFLXmlWriter();
+        if (fillStyleCount > 0 || lineStyleCount > 0) {
+            currentLayer.writeStartElement("DOMShape", new String[]{"isFloating", "true"});
+            currentLayer.writeCharactersRaw(fillsStr.toString());
+            currentLayer.writeCharactersRaw(strokesStr.toString());
+            currentLayer.writeStartElement("edges");
         }
+
         int x = 0;
         int y = 0;
         int startEdgeX = 0;
@@ -585,10 +588,10 @@ public class XFLConverter {
                 int lastFillStyle0 = fillStyle0;
                 int lastStrokeStyle = strokeStyle;
                 if (scr.stateNewStyles) {
-                    fillsStr.setLength(0);
-                    strokesStr.setLength(0);
-                    fillsStr.append("<fills>");
-                    strokesStr.append("<strokes>");
+                    XFLXmlWriter fillsNewStr = new XFLXmlWriter();
+                    XFLXmlWriter strokesNewStr = new XFLXmlWriter();
+                    fillsNewStr.writeStartElement("fills");
+                    strokesNewStr.writeStartElement("strokes");
                     if (fillStyleCount > 0 || lineStyleCount > 0) {
 
                         if ((fillStyle0 > 0) || (fillStyle1 > 0) || (strokeStyle > 0)) {
@@ -607,62 +610,63 @@ public class XFLConverter {
                                 }
                             }
                             if (!empty) {
-                                currentLayer.append("<Edge");
+                                currentLayer.writeStartElement("Edge");
                                 if (fillStyle0 > -1) {
-                                    currentLayer.append(" fillStyle0=\"").append(fillStyle0).append("\"");
+                                    currentLayer.writeAttribute("fillStyle0", fillStyle0);
                                 }
                                 if (fillStyle1 > -1) {
-                                    currentLayer.append(" fillStyle1=\"").append(fillStyle1).append("\"");
+                                    currentLayer.writeAttribute("fillStyle1", fillStyle1);
                                 }
                                 if (strokeStyle > -1) {
-                                    currentLayer.append(" strokeStyle=\"").append(strokeStyle).append("\"");
+                                    currentLayer.writeAttribute("strokeStyle", strokeStyle);
                                 }
-                                currentLayer.append(" edges=\"");
-                                convertShapeEdges(startEdgeX, startEdgeY, mat, edges, currentLayer);
-                                currentLayer.append("\" />");
+                                StringBuilder edgesSb = new StringBuilder();
+                                convertShapeEdges(startEdgeX, startEdgeY, mat, edges, edgesSb);
+                                currentLayer.writeAttribute("edges", edgesSb.toString());
+                                currentLayer.writeEndElement();
                             }
                         }
 
                     }
                     if (currentLayer.length() > 0) {
-                        currentLayer.append("</edges>");
-                        currentLayer.append("</DOMShape>");
+                        currentLayer.writeEndElement(); // edges
+                        currentLayer.writeEndElement(); // DOMShape
                     }
                     String currentLayerString = currentLayer.toString();
                     if (!currentLayerString.contains("<edges></edges>")) { //no empty layers,  TODO:handle this better
                         layers.add(currentLayerString);
                     }
                     currentLayer.setLength(0);
-                    currentLayer.append("<DOMShape isFloating=\"true\">");
+                    currentLayer.writeStartElement("DOMShape", new String[]{"isFloating", "true"});
                     //ret += convertShape(characters, null, shape);
                     for (int f = 0; f < scr.fillStyles.fillStyles.length; f++) {
-                        fillsStr.append("<FillStyle index=\"").append(f + 1).append("\">");
-                        convertFillStyle(mat, characters, scr.fillStyles.fillStyles[f], shapeNum, fillsStr);
-                        fillsStr.append("</FillStyle>");
+                        fillsNewStr.writeStartElement("FillStyle", new String[]{"index", Integer.toString(f + 1)});
+                        convertFillStyle(mat, characters, scr.fillStyles.fillStyles[f], shapeNum, fillsNewStr);
+                        fillsNewStr.writeEndElement();
                         fillStyleCount++;
                     }
 
                     lineStyleCount = 0;
                     if (shapeNum <= 3) {
                         for (int l = 0; l < scr.lineStyles.lineStyles.length; l++) {
-                            strokesStr.append("<StrokeStyle index=\"").append(lineStyleCount + 1).append("\">");
-                            convertLineStyle(scr.lineStyles.lineStyles[l], shapeNum, strokesStr);
-                            strokesStr.append("</StrokeStyle>");
+                            strokesNewStr.writeStartElement("StrokeStyle", new String[]{"index", Integer.toString(lineStyleCount + 1)});
+                            convertLineStyle(scr.lineStyles.lineStyles[l], shapeNum, strokesNewStr);
+                            strokesNewStr.writeEndElement();
                             lineStyleCount++;
                         }
                     } else {
                         for (int l = 0; l < scr.lineStyles.lineStyles.length; l++) {
-                            strokesStr.append("<StrokeStyle index=\"").append(lineStyleCount + 1).append("\">");
-                            convertLineStyle(characters, (LINESTYLE2) scr.lineStyles.lineStyles[l], shapeNum, strokesStr);
-                            strokesStr.append("</StrokeStyle>");
+                            strokesNewStr.writeStartElement("StrokeStyle", new String[]{"index", Integer.toString(lineStyleCount + 1)});
+                            convertLineStyle(characters, (LINESTYLE2) scr.lineStyles.lineStyles[l], shapeNum, strokesNewStr);
+                            strokesNewStr.writeEndElement();
                             lineStyleCount++;
                         }
                     }
-                    fillsStr.append("</fills>");
-                    strokesStr.append("</strokes>");
-                    currentLayer.append(fillsStr);
-                    currentLayer.append(strokesStr);
-                    currentLayer.append("<edges>");
+                    fillsNewStr.writeEndElement(); // fills
+                    strokesNewStr.writeEndElement(); // strokes
+                    currentLayer.writeCharactersRaw(fillsNewStr.toString());
+                    currentLayer.writeCharactersRaw(strokesNewStr.toString());
+                    currentLayer.writeStartElement("edges");
                     actualLinestyles = scr.lineStyles;
                 }
                 if (scr.stateFillStyle0) {
@@ -704,19 +708,20 @@ public class XFLConverter {
                             }
                         }
                         if (!empty) {
-                            currentLayer.append("<Edge");
+                            currentLayer.writeStartElement("Edge");
                             if (fillStyle0 > -1) {
-                                currentLayer.append(" fillStyle0=\"").append(lastFillStyle0).append("\"");
+                                currentLayer.writeAttribute("fillStyle0", lastFillStyle0);
                             }
                             if (fillStyle1 > -1) {
-                                currentLayer.append(" fillStyle1=\"").append(lastFillStyle1).append("\"");
+                                currentLayer.writeAttribute("fillStyle1", lastFillStyle1);
                             }
                             if (strokeStyle > -1) {
-                                currentLayer.append(" strokeStyle=\"").append(lastStrokeStyle).append("\"");
+                                currentLayer.writeAttribute("strokeStyle", lastStrokeStyle);
                             }
-                            currentLayer.append(" edges=\"");
-                            convertShapeEdges(startEdgeX, startEdgeY, mat, edges, currentLayer);
-                            currentLayer.append("\" />");
+                            StringBuilder edgesSb = new StringBuilder();
+                            convertShapeEdges(startEdgeX, startEdgeY, mat, edges, edgesSb);
+                            currentLayer.writeAttribute("edges", edgesSb.toString());
+                            currentLayer.writeEndElement();
                         }
 
                         startEdgeX = x;
@@ -746,28 +751,27 @@ public class XFLConverter {
                     }
                 }
                 if (!empty) {
-                    currentLayer.append("<Edge");
+                    currentLayer.writeStartElement("Edge");
                     if (fillStyle0 > -1) {
-                        currentLayer.append(" fillStyle0=\"").append(fillStyle0).append("\"");
+                        currentLayer.writeAttribute("fillStyle0", fillStyle0);
                     }
                     if (fillStyle1 > -1) {
-                        currentLayer.append(" fillStyle1=\"").append(fillStyle1).append("\"");
+                        currentLayer.writeAttribute("fillStyle1", fillStyle1);
                     }
                     if (strokeStyle > -1) {
-                        currentLayer.append(" strokeStyle=\"").append(strokeStyle).append("\"");
+                        currentLayer.writeAttribute("strokeStyle", strokeStyle);
                     }
-                    currentLayer.append(" edges=\"");
-                    convertShapeEdges(startEdgeX, startEdgeY, mat, edges, currentLayer);
-                    currentLayer.append("\" />");
+                    StringBuilder edgesSb = new StringBuilder();
+                    convertShapeEdges(startEdgeX, startEdgeY, mat, edges, edgesSb);
+                    currentLayer.writeAttribute("edges", edgesSb.toString());
+                    currentLayer.writeEndElement();
                 }
             }
         }
         edges.clear();
-        fillsStr.append("</fills>");
-        strokesStr.append("</strokes>"); // todo: these fillsStr and strokeStr are not used, why?
         if (currentLayer.length() > 0) {
-            currentLayer.append("</edges>");
-            currentLayer.append("</DOMShape>");
+            currentLayer.writeEndElement(); // edges
+            currentLayer.writeEndElement(); // DOMShape
 
             String currentLayerString = currentLayer.toString();
             if (!currentLayerString.contains("<edges></edges>")) { //no empty layers, TODO:handle this better
@@ -915,137 +919,135 @@ public class XFLConverter {
     private static void convertFilter(FILTER filter, XFLXmlWriter writer) throws XMLStreamException {
         if (filter instanceof DROPSHADOWFILTER) {
             DROPSHADOWFILTER dsf = (DROPSHADOWFILTER) filter;
-            writer.append("<DropShadowFilter");
+            writer.writeStartElement("DropShadowFilter");
             if (dsf.dropShadowColor.alpha != 255) {
-                writer.append(" alpha=\"").append(doubleToString(dsf.dropShadowColor.getAlphaFloat())).append("\"");
+                writer.writeAttribute("alpha", doubleToString(dsf.dropShadowColor.getAlphaFloat()));
             }
-            writer.append(" angle=\"").append(doubleToString(radToDeg(dsf.angle))).append("\"");
-            writer.append(" blurX=\"").append(doubleToString(dsf.blurX)).append("\"");
-            writer.append(" blurY=\"").append(doubleToString(dsf.blurY)).append("\"");
-            writer.append(" color=\"").append(dsf.dropShadowColor.toHexRGB()).append("\"");
-            writer.append(" distance=\"").append(doubleToString(dsf.distance)).append("\"");
+            writer.writeAttribute("angle", doubleToString(radToDeg(dsf.angle)));
+            writer.writeAttribute("blurX", doubleToString(dsf.blurX));
+            writer.writeAttribute("blurY", doubleToString(dsf.blurY));
+            writer.writeAttribute("color", dsf.dropShadowColor.toHexRGB());
+            writer.writeAttribute("distance", doubleToString(dsf.distance));
             if (!dsf.compositeSource) {
-                writer.append(" hideObject=\"true\"");
+                writer.writeAttribute("hideObject", true);
             }
             if (dsf.innerShadow) {
-                writer.append(" inner=\"true\"");
+                writer.writeAttribute("inner", true);
             }
             if (dsf.knockout) {
-                writer.append(" knockout=\"true\"");
+                writer.writeAttribute("knockout", true);
             }
-            writer.append(" quality=\"").append(dsf.passes).append("\"");
-            writer.append(" strength=\"").append(doubleToString(dsf.strength, 2)).append("\"");
-            writer.append(" />");
+            writer.writeAttribute("quality", dsf.passes);
+            writer.writeAttribute("strength", doubleToString(dsf.strength, 2));
+            writer.writeEndElement();
         } else if (filter instanceof BLURFILTER) {
             BLURFILTER bf = (BLURFILTER) filter;
-            writer.append("<BlurFilter");
-            writer.append(" blurX=\"").append(doubleToString(bf.blurX)).append("\"");
-            writer.append(" blurY=\"").append(doubleToString(bf.blurY)).append("\"");
-            writer.append(" quality=\"").append(bf.passes).append("\"");
-            writer.append(" />");
+            writer.writeStartElement("BlurFilter");
+            writer.writeAttribute("blurX", doubleToString(bf.blurX));
+            writer.writeAttribute("blurY", doubleToString(bf.blurY));
+            writer.writeAttribute("quality", bf.passes);
+            writer.writeEndElement();
         } else if (filter instanceof GLOWFILTER) {
             GLOWFILTER gf = (GLOWFILTER) filter;
-            writer.append("<GlowFilter");
+            writer.writeStartElement("GlowFilter");
             if (gf.glowColor.alpha != 255) {
-                writer.append(" alpha=\"").append(gf.glowColor.getAlphaFloat()).append("\"");
+                writer.writeAttribute("alpha", doubleToString(gf.glowColor.getAlphaFloat()));
             }
-            writer.append(" blurX=\"").append(doubleToString(gf.blurX)).append("\"");
-            writer.append(" blurY=\"").append(doubleToString(gf.blurY)).append("\"");
-            writer.append(" color=\"").append(gf.glowColor.toHexRGB()).append("\"");
+            writer.writeAttribute("blurX", doubleToString(gf.blurX));
+            writer.writeAttribute("blurY", doubleToString(gf.blurY));
+            writer.writeAttribute("color", gf.glowColor.toHexRGB());
 
             if (gf.innerGlow) {
-                writer.append(" inner=\"true\"");
+                writer.writeAttribute("inner", true);
             }
             if (gf.knockout) {
-                writer.append(" knockout=\"true\"");
+                writer.writeAttribute("knockout", true);
             }
-            writer.append(" quality=\"").append(gf.passes).append("\"");
-            writer.append(" strength=\"").append(doubleToString(gf.strength, 2)).append("\"");
-            writer.append(" />");
+            writer.writeAttribute("quality", gf.passes);
+            writer.writeAttribute("strength", doubleToString(gf.strength, 2));
+            writer.writeEndElement();
         } else if (filter instanceof BEVELFILTER) {
             BEVELFILTER bf = (BEVELFILTER) filter;
-            writer.append("<BevelFilter");
-            writer.append(" blurX=\"").append(doubleToString(bf.blurX)).append("\"");
-            writer.append(" blurY=\"").append(doubleToString(bf.blurY)).append("\"");
-            writer.append(" quality=\"").append(bf.passes).append("\"");
-            writer.append(" angle=\"").append(doubleToString(radToDeg(bf.angle))).append("\"");
-            writer.append(" distance=\"").append(bf.distance).append("\"");
+            writer.writeStartElement("BevelFilter");
+            writer.writeAttribute("blurX", doubleToString(bf.blurX));
+            writer.writeAttribute("blurY", doubleToString(bf.blurY));
+            writer.writeAttribute("quality", bf.passes);
+            writer.writeAttribute("angle", doubleToString(radToDeg(bf.angle)));
+            writer.writeAttribute("distance", bf.distance);
             if (bf.highlightColor.alpha != 255) {
-                writer.append(" highlightAlpha=\"").append(bf.highlightColor.getAlphaFloat()).append("\"");
+                writer.writeAttribute("highlightAlpha", bf.highlightColor.getAlphaFloat());
             }
-            writer.append(" highlightColor=\"").append(bf.highlightColor.toHexRGB()).append("\"");
+            writer.writeAttribute("highlightColor", bf.highlightColor.toHexRGB());
             if (bf.knockout) {
-                writer.append(" knockout=\"true\"");
+                writer.writeAttribute("knockout", true);
             }
             if (bf.shadowColor.alpha != 255) {
-                writer.append(" shadowAlpha=\"").append(bf.shadowColor.getAlphaFloat()).append("\"");
+                writer.writeAttribute("shadowAlpha", bf.shadowColor.getAlphaFloat());
             }
-            writer.append(" shadowColor=\"").append(bf.shadowColor.toHexRGB()).append("\"");
-            writer.append(" strength=\"").append(doubleToString(bf.strength, 2)).append("\"");
+            writer.writeAttribute("shadowColor", bf.shadowColor.toHexRGB());
+            writer.writeAttribute("strength", doubleToString(bf.strength, 2));
             if (bf.onTop && !bf.innerShadow) {
-                writer.append(" type=\"full\"");
+                writer.writeAttribute("type", "full");
             } else if (!bf.innerShadow) {
-                writer.append(" type=\"outer\"");
+                writer.writeAttribute("type", "outer");
             }
-            writer.append(" />");
+            writer.writeEndElement();
         } else if (filter instanceof GRADIENTGLOWFILTER) {
             GRADIENTGLOWFILTER ggf = (GRADIENTGLOWFILTER) filter;
-            writer.append("<GradientGlowFilter");
-            writer.append(" angle=\"").append(doubleToString(radToDeg(ggf.angle))).append("\"");
+            writer.writeStartElement("GradientGlowFilter");
+            writer.writeAttribute("angle", doubleToString(radToDeg(ggf.angle)));
 
-            writer.append(" blurX=\"").append(doubleToString(ggf.blurX)).append("\"");
-            writer.append(" blurY=\"").append(doubleToString(ggf.blurY)).append("\"");
-            writer.append(" quality=\"").append(ggf.passes).append("\"");
-            writer.append(" distance=\"").append(doubleToString(ggf.distance)).append("\"");
+            writer.writeAttribute("blurX", doubleToString(ggf.blurX));
+            writer.writeAttribute("blurY", doubleToString(ggf.blurY));
+            writer.writeAttribute("quality", ggf.passes);
+            writer.writeAttribute("distance", doubleToString(ggf.distance));
             if (ggf.knockout) {
-                writer.append(" knockout=\"true\"");
+                writer.writeAttribute("knockout", true);
             }
-            writer.append(" strength=\"").append(doubleToString(ggf.strength, 2)).append("\"");
+            writer.writeAttribute("strength", doubleToString(ggf.strength, 2));
             if (ggf.onTop && !ggf.innerShadow) {
-                writer.append(" type=\"full\"");
+                writer.writeAttribute("type", "full");
             } else if (!ggf.innerShadow) {
-                writer.append(" type=\"outer\"");
+                writer.writeAttribute("type", "outer");
             }
-            writer.append(">");
             for (int g = 0; g < ggf.gradientColors.length; g++) {
                 RGBA gc = ggf.gradientColors[g];
-                writer.append("<GradientEntry color=\"").append(gc.toHexRGB()).append("\"");
+                writer.writeStartElement("GradientEntry", new String[]{"color", gc.toHexRGB()});
                 if (gc.alpha != 255) {
-                    writer.append(" alpha=\"").append(gc.getAlphaFloat()).append("\"");
+                    writer.writeAttribute("alpha", gc.getAlphaFloat());
                 }
-                writer.append(" ratio=\"").append(doubleToString(((float) ggf.gradientRatio[g]) / 255.0)).append("\"");
-                writer.append("/>");
+                writer.writeAttribute("ratio", doubleToString(((float) ggf.gradientRatio[g]) / 255.0));
+                writer.writeEndElement();
             }
-            writer.append("</GradientGlowFilter>");
+            writer.writeEndElement();
         } else if (filter instanceof GRADIENTBEVELFILTER) {
             GRADIENTBEVELFILTER gbf = (GRADIENTBEVELFILTER) filter;
-            writer.append("<GradientBevelFilter");
-            writer.append(" angle=\"").append(doubleToString(radToDeg(gbf.angle))).append("\"");
+            writer.writeStartElement("GradientBevelFilter");
+            writer.writeAttribute("angle", doubleToString(radToDeg(gbf.angle)));
 
-            writer.append(" blurX=\"").append(doubleToString(gbf.blurX)).append("\"");
-            writer.append(" blurY=\"").append(doubleToString(gbf.blurY)).append("\"");
-            writer.append(" quality=\"").append(gbf.passes).append("\"");
-            writer.append(" distance=\"").append(doubleToString(gbf.distance)).append("\"");
+            writer.writeAttribute("blurX", doubleToString(gbf.blurX));
+            writer.writeAttribute("blurY", doubleToString(gbf.blurY));
+            writer.writeAttribute("quality", gbf.passes);
+            writer.writeAttribute("distance", doubleToString(gbf.distance));
             if (gbf.knockout) {
-                writer.append(" knockout=\"true\"");
+                writer.writeAttribute("knockout", true);
             }
-            writer.append(" strength=\"").append(doubleToString(gbf.strength, 2)).append("\"");
+            writer.writeAttribute("strength", doubleToString(gbf.strength, 2));
             if (gbf.onTop && !gbf.innerShadow) {
-                writer.append(" type=\"full\"");
+                writer.writeAttribute("type", "full");
             } else if (!gbf.innerShadow) {
-                writer.append(" type=\"outer\"");
+                writer.writeAttribute("type", "outer");
             }
-            writer.append(">");
             for (int g = 0; g < gbf.gradientColors.length; g++) {
                 RGBA gc = gbf.gradientColors[g];
-                writer.append("<GradientEntry color=\"").append(gc.toHexRGB()).append("\"");
+                writer.writeStartElement("GradientEntry", new String[]{"color", gc.toHexRGB()});
                 if (gc.alpha != 255) {
-                    writer.append(" alpha=\"").append(gc.getAlphaFloat()).append("\"");
+                    writer.writeAttribute("alpha", gc.getAlphaFloat());
                 }
-                writer.append(" ratio=\"").append(doubleToString(((float) gbf.gradientRatio[g]) / 255.0)).append("\"");
-                writer.append("/>");
+                writer.writeAttribute("ratio", doubleToString(((float) gbf.gradientRatio[g]) / 255.0));
+                writer.writeEndElement();
             }
-            writer.append("</GradientBevelFilter>");
+            writer.writeEndElement();
         } else if (filter instanceof COLORMATRIXFILTER) {
             COLORMATRIXFILTER cmf = (COLORMATRIXFILTER) filter;
             convertAdjustColorFilter(cmf, writer);
@@ -1068,109 +1070,122 @@ public class XFLConverter {
             }
         }
 
-        writer.append("<DOMSymbolInstance libraryItemName=\"" + "Symbol ").append(tag.getCharacterId()).append("\"");
+        writer.writeStartElement("DOMSymbolInstance", new String[]{"libraryItemName", "Symbol " + tag.getCharacterId()});
         if (name != null) {
-            writer.append(" name=\"").append(Helper.escapeHTML(name)).append("\"");
+            writer.writeAttribute("name", name);
         }
         String blendModeStr = null;
         if (blendMode < BLENDMODES.length) {
             blendModeStr = BLENDMODES[blendMode];
         }
         if (blendModeStr != null) {
-            writer.append(" blendMode=\"").append(blendModeStr).append("\"");
+            writer.writeAttribute("blendMode", blendModeStr);
         }
         if (tag instanceof ShapeTag) {
-            writer.append(" symbolType=\"graphic\" loop=\"loop\"");
+            writer.writeAttribute("symbolType", "graphic");
+            writer.writeAttribute("loop", "loop");
         } else if (tag instanceof DefineSpriteTag) {
             DefineSpriteTag sprite = (DefineSpriteTag) tag;
             RECT spriteRect = sprite.getRect();
             double centerPoint3DX = twipToPixel(matrix.translateX + spriteRect.getWidth() / 2);
             double centerPoint3DY = twipToPixel(matrix.translateY + spriteRect.getHeight() / 2);
-            writer.append(" centerPoint3DX=\"").append(centerPoint3DX).append("\" centerPoint3DY=\"").append(centerPoint3DY).append("\"");
+            writer.writeAttribute("centerPoint3DX", centerPoint3DX);
+            writer.writeAttribute("centerPoint3DY", centerPoint3DY);
         } else if (tag instanceof ButtonTag) {
-            writer.append(" symbolType=\"button\"");
+            writer.writeAttribute("symbolType", "button");
         }
         if (cacheAsBitmap) {
-            writer.append(" cacheAsBitmap=\"true\"");
+            writer.writeAttribute("cacheAsBitmap", true);
         }
         if (!isVisible && flaVersion.ordinal() >= FLAVersion.CS5_5.ordinal()) {
-            writer.append(" isVisible=\"false\"");
+            writer.writeAttribute("isVisible", false);
         }
-        writer.append(">");
-        writer.append("<matrix>");
+        writer.writeStartElement("matrix");
         convertMatrix(matrix, writer);
-        writer.append("</matrix>");
-        writer.append("<transformationPoint><Point/></transformationPoint>");
+        writer.writeEndElement();
+        writer.writeStartElement("transformationPoint");
+        writer.writeEmptyElement("Point");
+        writer.writeEndElement();
 
         if (backgroundColor != null) {
-            writer.append("<MatteColor color=\"").append(backgroundColor.toHexRGB()).append("\"");
+            writer.writeStartElement("MatteColor", new String[]{"color", backgroundColor.toHexRGB()});
             if (backgroundColor.alpha != 255) {
-                writer.append(" alpha=\"").append(doubleToString(backgroundColor.getAlphaFloat())).append("\"");
+                writer.writeAttribute("alpha", doubleToString(backgroundColor.getAlphaFloat()));
             }
-            writer.append("/>");
+            writer.writeEndElement();
         }
         if (colorTransform != null) {
-            writer.append("<color><Color");
+            writer.writeStartElement("color");
+            writer.writeStartElement("Color");
             if (colorTransform.getRedMulti() != 255) {
-                writer.append(" redMultiplier=\"").append(((float) colorTransform.getRedMulti()) / 255.0f).append("\"");
+                writer.writeAttribute("redMultiplier", ((float) colorTransform.getRedMulti()) / 255.0f);
             }
             if (colorTransform.getGreenMulti() != 255) {
-                writer.append(" greenMultiplier=\"").append(((float) colorTransform.getGreenMulti()) / 255.0f).append("\"");
+                writer.writeAttribute("greenMultiplier", ((float) colorTransform.getGreenMulti()) / 255.0f);
             }
             if (colorTransform.getBlueMulti() != 255) {
-                writer.append(" blueMultiplier=\"").append(((float) colorTransform.getBlueMulti()) / 255.0f).append("\"");
+                writer.writeAttribute("blueMultiplier", ((float) colorTransform.getBlueMulti()) / 255.0f);
             }
             if (colorTransform.getAlphaMulti() != 255) {
-                writer.append(" alphaMultiplier=\"").append(((float) colorTransform.getAlphaMulti()) / 255.0f).append("\"");
+                writer.writeAttribute("alphaMultiplier", ((float) colorTransform.getAlphaMulti()) / 255.0f);
             }
 
             if (colorTransform.getRedAdd() != 0) {
-                writer.append(" redOffset=\"").append(colorTransform.getRedAdd()).append("\"");
+                writer.writeAttribute("redOffset", colorTransform.getRedAdd());
             }
             if (colorTransform.getGreenAdd() != 0) {
-                writer.append(" greenOffset=\"").append(colorTransform.getGreenAdd()).append("\"");
+                writer.writeAttribute("greenOffset", colorTransform.getGreenAdd());
             }
             if (colorTransform.getBlueAdd() != 0) {
-                writer.append(" blueOffset=\"").append(colorTransform.getBlueAdd()).append("\"");
+                writer.writeAttribute("blueOffset", colorTransform.getBlueAdd());
             }
             if (colorTransform.getAlphaAdd() != 0) {
-                writer.append(" alphaOffset=\"").append(colorTransform.getAlphaAdd()).append("\"");
+                writer.writeAttribute("alphaOffset", colorTransform.getAlphaAdd());
             }
 
-            writer.append("/></color>");
+            writer.writeEndElement();
+            writer.writeEndElement(); // color
         }
         if (filters != null) {
-            writer.append("<filters>");
+            writer.writeStartElement("filters");
             for (FILTER f : filters) {
                 convertFilter(f, writer);
             }
-            writer.append("</filters>");
+            writer.writeEndElement();
         }
         if (tag instanceof DefineButtonTag) {
-            writer.append("<Actionscript><script><![CDATA[");
-            writer.append("on(press){\r\n");
-            writer.append(convertActionScript(new ButtonAction((DefineButtonTag) tag)));
-            writer.append("}");
-            writer.append("]]></script></Actionscript>");
+            writer.writeStartElement("Actionscript");
+            writer.writeStartElement("script");
+            writer.writeCData("on(press){\r\n" + convertActionScript(new ButtonAction((DefineButtonTag) tag)) + "}");
+            writer.writeEndElement();
+            writer.writeEndElement();
         }
         if (tag instanceof DefineButton2Tag) {
             DefineButton2Tag db2 = (DefineButton2Tag) tag;
             if (!db2.actions.isEmpty()) {
-                writer.append("<Actionscript><script><![CDATA[");
+                writer.writeStartElement("Actionscript");
+                writer.writeStartElement("script");
+                StringBuilder sbActions = new StringBuilder();
                 for (BUTTONCONDACTION bca : db2.actions) {
-                    writer.append(convertActionScript(bca));
+                    sbActions.append(convertActionScript(bca));
                 }
-                writer.append("]]></script></Actionscript>");
+                writer.writeCData(sbActions.toString());
+                writer.writeEndElement();
+                writer.writeEndElement();
             }
         }
         if (clipActions != null) {
-            writer.append("<Actionscript><script><![CDATA[");
+            writer.writeStartElement("Actionscript");
+            writer.writeStartElement("script");
+            StringBuilder sbActions = new StringBuilder();
             for (CLIPACTIONRECORD rec : clipActions.clipActionRecords) {
-                writer.append(convertActionScript(rec));
+                sbActions.append(convertActionScript(rec));
             }
-            writer.append("]]></script></Actionscript>");
+            writer.writeCData(sbActions.toString());
+            writer.writeEndElement();
+            writer.writeEndElement();
         }
-        writer.append("</DOMSymbolInstance>");
+        writer.writeEndElement();
     }
 
     private static String convertActionScript(ASMSource as) {
@@ -1205,36 +1220,39 @@ public class XFLConverter {
             }
 
             if ((symbol instanceof ShapeTag) || (symbol instanceof DefineSpriteTag) || (symbol instanceof ButtonTag)) {
-                StringBuilder symbolStr = new StringBuilder();
+                XFLXmlWriter symbolStr = new XFLXmlWriter();
 
-                symbolStr.append("<DOMSymbolItem xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://ns.adobe.com/xfl/2008/\" name=\"Symbol ").append(symbol.getCharacterId()).append("\" lastModified=\"").append(getTimestamp(swf)).append("\""); //TODO:itemID
+                symbolStr.writeStartElement("DOMSymbolItem", new String[]{
+                    "xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance",
+                    "xmlns", "http://ns.adobe.com/xfl/2008/",
+                    "name", "Symbol " + symbol.getCharacterId(),
+                    "lastModified", Long.toString(getTimestamp(swf))}); //TODO:itemID
                 if (symbol instanceof ShapeTag) {
-                    symbolStr.append(" symbolType=\"graphic\"");
+                    symbolStr.writeAttribute("symbolType", "graphic");
                 } else if (symbol instanceof ButtonTag) {
-                    symbolStr.append(" symbolType=\"button\"");
+                    symbolStr.writeAttribute("symbolType", "button");
                     if (((ButtonTag) symbol).trackAsMenu()) {
-                        symbolStr.append("  trackAsMenu=\"true\"");
+                        symbolStr.writeAttribute("trackAsMenu", true);
                     }
                 }
                 boolean linkageExportForAS = false;
                 if (characterClasses.containsKey(symbol.getCharacterId())) {
                     linkageExportForAS = true;
-                    symbolStr.append(" linkageClassName=\"").append(Helper.escapeHTML(characterClasses.get(symbol.getCharacterId()))).append("\"");
+                    symbolStr.writeAttribute("linkageClassName", characterClasses.get(symbol.getCharacterId()));
                 }
                 if (characterVariables.containsKey(symbol.getCharacterId())) {
                     linkageExportForAS = true;
-                    symbolStr.append(" linkageIdentifier=\"").append(Helper.escapeHTML(characterVariables.get(symbol.getCharacterId()))).append("\"");
+                    symbolStr.writeAttribute("linkageIdentifier", characterVariables.get(symbol.getCharacterId()));
                 }
                 if (linkageExportForAS) {
-                    symbolStr.append(" linkageExportForAS=\"true\"");
+                    symbolStr.writeAttribute("linkageExportForAS", true);
                 }
-                symbolStr.append(">");
-                symbolStr.append("<timeline>");
+                symbolStr.writeStartElement("timeline");
                 String itemIcon = null;
                 if (symbol instanceof ButtonTag) {
                     itemIcon = "0";
-                    symbolStr.append("<DOMTimeline name=\"Symbol ").append(symbol.getCharacterId()).append("\" currentFrame=\"0\">");
-                    symbolStr.append("<layers>");
+                    symbolStr.writeStartElement("DOMTimeline", new String[]{"name", "Symbol " + symbol.getCharacterId(), "currentFrame", "0"});
+                    symbolStr.writeStartElement("<layers>");
 
                     ButtonTag button = (ButtonTag) symbol;
                     List<BUTTONRECORD> records = button.getRecords();
@@ -1246,12 +1264,13 @@ public class XFLConverter {
                         }
                     }
                     for (int i = maxDepth; i >= 1; i--) {
-                        symbolStr.append("<DOMLayer name=\"Layer ").append(maxDepth - i + 1).append("\"");
+                        symbolStr.writeStartElement("DOMLayer", new String[]{"name", "Layer " + (maxDepth - i + 1)});
                         if (i == 1) {
-                            symbolStr.append(" current=\"true\" isSelected=\"true\"");
+                            symbolStr.writeStartElement("current", "true");
+                            symbolStr.writeStartElement("isSelected", "true");
                         }
-                        symbolStr.append(" color=\"").append(randomOutlineColor()).append("\">");
-                        symbolStr.append("<frames>");
+                        symbolStr.writeStartElement("color", randomOutlineColor());
+                        symbolStr.writeStartElement("<frames>");
                         int lastFrame = 0;
                         loopframes:
                         for (int frame = 1; frame <= 4; frame++) {
@@ -1307,77 +1326,67 @@ public class XFLConverter {
                                     lastFrame = frame;
                                     if (duration > 0) {
                                         if (duration > 1) {
-                                            symbolStr.append("<DOMFrame index=\"");
-                                            symbolStr.append((frame - duration));
-                                            symbolStr.append("\"");
-                                            symbolStr.append(" duration=\"").append(duration - 1).append("\"");
-                                            symbolStr.append(" keyMode=\"").append(KEY_MODE_NORMAL).append("\">");
-                                            symbolStr.append("<elements>");
-                                            symbolStr.append("</elements>");
-                                            symbolStr.append("</DOMFrame>");
+                                            symbolStr.writeStartElement("DOMFrame", new String[]{
+                                                "index", Integer.toString(frame - duration),
+                                                "duration", Integer.toString(duration - 1),
+                                                "keyMode", Integer.toString(KEY_MODE_NORMAL),});
+                                            symbolStr.writeElementValue("elements", "");
+                                            symbolStr.writeEndElement();
                                         }
-                                        symbolStr.append("<DOMFrame index=\"");
-                                        symbolStr.append((frame - 1));
-                                        symbolStr.append("\"");
-                                        symbolStr.append(" keyMode=\"").append(KEY_MODE_NORMAL).append("\">");
-                                        symbolStr.append("<elements>");
-                                        symbolStr.append(recCharWriter);
-                                        symbolStr.append("</elements>");
-                                        symbolStr.append("</DOMFrame>");
+                                        symbolStr.writeStartElement("DOMFrame", new String[]{
+                                            "index", Integer.toString(frame - 1),
+                                            "keyMode", Integer.toString(KEY_MODE_NORMAL),});
+                                        symbolStr.writeElementValue("elements", recCharWriter.toString());
+                                        symbolStr.writeEndElement();
                                     }
                                 }
                             }
                         }
-                        symbolStr.append("</frames>");
-                        symbolStr.append("</DOMLayer>");
+                        symbolStr.writeEndElement(); // frames
+                        symbolStr.writeEndElement(); // DOMLayer
                     }
-                    symbolStr.append("</layers>");
-                    symbolStr.append("</DOMTimeline>");
+                    symbolStr.writeEndElement(); // layers
+                    symbolStr.writeEndElement(); // DOMTimeline
                 } else if (symbol instanceof DefineSpriteTag) {
                     DefineSpriteTag sprite = (DefineSpriteTag) symbol;
                     if (sprite.getTags().isEmpty()) { //probably AS2 class
                         continue;
                     }
-                    XFLXmlWriter writer2 = new XFLXmlWriter(); // todo: remove
-                    convertTimeline(sprite.spriteId, nonLibraryShapes, backgroundColor, tags, sprite.getTags(), characters, "Symbol " + symbol.getCharacterId(), flaVersion, files, writer2);
-                    symbolStr.append(writer2.toString());
+                    convertTimeline(sprite.spriteId, nonLibraryShapes, backgroundColor, tags, sprite.getTags(), characters, "Symbol " + symbol.getCharacterId(), flaVersion, files, symbolStr);
                 } else if (symbol instanceof ShapeTag) {
                     itemIcon = "1";
                     ShapeTag shape = (ShapeTag) symbol;
-                    symbolStr.append("<DOMTimeline name=\"Symbol ").append(symbol.getCharacterId()).append("\" currentFrame=\"0\">");
-                    symbolStr.append("<layers>");
+                    symbolStr.writeStartElement("DOMTimeline", new String[]{"name", "Symbol " + symbol.getCharacterId(), "currentFrame", "0"});
+                    symbolStr.writeStartElement("layers");
                     SHAPEWITHSTYLE shapeWithStyle = shape.getShapes();
                     if (shapeWithStyle != null) {
-                        XFLXmlWriter writer2 = new XFLXmlWriter();
-                        convertShape(characters, null, shape.getShapeNum(), shapeWithStyle.shapeRecords, shapeWithStyle.fillStyles, shapeWithStyle.lineStyles, false, true, writer2);
-                        symbolStr.append(writer2.toString());
+                        convertShape(characters, null, shape.getShapeNum(), shapeWithStyle.shapeRecords, shapeWithStyle.fillStyles, shapeWithStyle.lineStyles, false, true, symbolStr);
                     }
 
-                    symbolStr.append("</layers>");
-                    symbolStr.append("</DOMTimeline>");
+                    symbolStr.writeEndElement(); // layers
+                    symbolStr.writeEndElement(); // DOMTimeline
                 }
-                symbolStr.append("</timeline>");
-                symbolStr.append("</DOMSymbolItem>");
+                symbolStr.writeEndElement(); // timeline
+                symbolStr.writeEndElement(); // DOMSymbolItem
                 String symbolStr2 = prettyFormatXML(symbolStr.toString());
                 String symbolFile = "Symbol " + symbol.getCharacterId() + ".xml";
                 files.put(symbolFile, Utf8Helper.getBytes(symbolStr2));
-                String symbLinkStr = "";
-                symbLinkStr += "<Include href=\"" + symbolFile + "\"";
-                if (itemIcon != null) {
-                    symbLinkStr += " itemIcon=\"" + itemIcon + "\"";
-                }
-                symbLinkStr += " loadImmediate=\"false\"";
-                if (flaVersion.ordinal() >= FLAVersion.CS5_5.ordinal()) {
-                    symbLinkStr += " lastModified=\"" + getTimestamp(swf) + "\"";
-                    //TODO: itemID=\"518de416-00000341\"
-                }
-                symbLinkStr += "/>";
 
                 if (!hasSymbol) {
                     writer.writeStartElement("symbols");
                 }
 
-                writer.writeCharactersRaw(symbLinkStr);
+                // write symbLink
+                writer.writeStartElement("Include", new String[]{"href", symbolFile});
+                if (itemIcon != null) {
+                    writer.writeAttribute("itemIcon", itemIcon);
+                }
+                writer.writeAttribute("loadImmediate", false);
+                if (flaVersion.ordinal() >= FLAVersion.CS5_5.ordinal()) {
+                    writer.writeAttribute("lastModified", getTimestamp(swf));
+                    //TODO: itemID="518de416-00000341"
+                }
+                writer.writeEndElement();
                 hasSymbol = true;
             }
         }
@@ -1388,10 +1397,25 @@ public class XFLConverter {
     }
 
     private void convertMedia(SWF swf, Map<Integer, String> characterVariables, Map<Integer, String> characterClasses, List<Integer> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, HashMap<Integer, CharacterTag> characters, HashMap<String, byte[]> files, HashMap<String, byte[]> datfiles, FLAVersion flaVersion, XFLXmlWriter writer) throws XMLStreamException {
-        int mediaCount = 0;
+        boolean hasMedia = false;
         for (int ch : characters.keySet()) {
             CharacterTag symbol = characters.get(ch);
-            String mediaLinkStr = null;
+            if (symbol instanceof ImageTag
+                    || symbol instanceof SoundStreamHeadTypeTag || symbol instanceof DefineSoundTag
+                    || symbol instanceof DefineVideoStreamTag) {
+                hasMedia = true;
+            }
+        }
+
+        if (!hasMedia) {
+            return;
+        }
+
+        int mediaCount = 0;
+        writer.writeStartElement("media");
+
+        for (int ch : characters.keySet()) {
+            CharacterTag symbol = characters.get(ch);
             if (symbol instanceof ImageTag) {
                 ImageTag imageTag = (ImageTag) symbol;
                 boolean allowSmoothing = false;
@@ -1434,24 +1458,35 @@ public class XFLConverter {
                 ImageFormat format = imageTag.getImageFormat();
                 String symbolFile = "bitmap" + symbol.getCharacterId() + imageTag.getImageFormat().getExtension();
                 files.put(symbolFile, imageBytes);
-                mediaLinkStr = "<DOMBitmapItem name=\"" + symbolFile + "\" sourceLastImported=\"" + getTimestamp(swf) + "\" externalFileSize=\"" + imageBytes.length + "\"";
+                writer.writeStartElement("DOMBitmapItem", new String[]{
+                    "name", symbolFile,
+                    "sourceLastImported", Long.toString(getTimestamp(swf)),
+                    "externalFileSize", Integer.toString(imageBytes.length),});
                 if (allowSmoothing) {
-                    mediaLinkStr += " allowSmoothing=\"true\"";
+                    writer.writeAttribute("allowSmoothing", true);
                 }
                 switch (format) {
                     case PNG:
                     case GIF:
-                        mediaLinkStr += " useImportedJPEGData=\"false\" compressionType=\"lossless\" originalCompressionType=\"lossless\"";
+                        writer.writeAttribute("useImportedJPEGData", false);
+                        writer.writeAttribute("compressionType", "lossless");
+                        writer.writeAttribute("originalCompressionType", "lossless");
                         break;
                     case JPEG:
-                        mediaLinkStr += " isJPEG=\"true\"";
+                        writer.writeAttribute("isJPEG", true);
                         break;
                 }
                 if (characterClasses.containsKey(symbol.getCharacterId())) {
-                    mediaLinkStr += " linkageExportForAS=\"true\" linkageClassName=\"" + characterClasses.get(symbol.getCharacterId()) + "\"";
+                    writer.writeAttribute("linkageExportForAS", true);
+                    writer.writeAttribute("linkageClassName", characterClasses.get(symbol.getCharacterId()));
                 }
-                mediaLinkStr += " quality=\"50\" href=\"" + symbolFile + "\" bitmapDataHRef=\"M " + (mediaCount + 1) + " " + getTimestamp(swf) + ".dat\" frameRight=\"" + image.getWidth() + "\" frameBottom=\"" + image.getHeight() + "\"/>\n";
-
+                writer.writeAttribute("quality", 50);
+                writer.writeAttribute("href", symbolFile);
+                writer.writeAttribute("bitmapDataHRef", "M " + (mediaCount + 1) + " " + getTimestamp(swf) + ".dat");
+                writer.writeAttribute("frameRight", image.getWidth());
+                writer.writeAttribute("frameBottom", image.getHeight());
+                writer.writeEndElement();
+                mediaCount++;
             } else if ((symbol instanceof SoundStreamHeadTypeTag) || (symbol instanceof DefineSoundTag)) {
                 int soundFormat = 0;
                 int soundRate = 0;
@@ -1592,31 +1627,32 @@ public class XFLConverter {
 
                 String symbolFile = "sound" + symbol.getCharacterId() + "." + exportFormat;
                 files.put(symbolFile, data);
-                mediaLinkStr = "<DOMSoundItem name=\"" + symbolFile + "\" sourceLastImported=\"" + getTimestamp(swf) + "\" externalFileSize=\"" + data.length + "\"";
-                mediaLinkStr += " href=\"" + symbolFile + "\"";
-                mediaLinkStr += " format=\"";
-                mediaLinkStr += rateMap[soundRate] + "kHz";
-                mediaLinkStr += " " + (soundSize ? "16bit" : "8bit");
-                mediaLinkStr += " " + (soundType ? "Stereo" : "Mono");
-                mediaLinkStr += "\"";
-                mediaLinkStr += " exportFormat=\"" + format + "\" exportBits=\"" + bits + "\" sampleCount=\"" + soundSampleCount + "\"";
+                writer.writeStartElement("DOMSoundItem", new String[]{
+                    "name", symbolFile,
+                    "sourceLastImported", Long.toString(getTimestamp(swf)),
+                    "externalFileSize", Integer.toString(data.length)});
+                writer.writeAttribute("href", symbolFile);
+                writer.writeAttribute("format", rateMap[soundRate] + "kHz" + " " + (soundSize ? "16bit" : "8bit") + " " + (soundType ? "Stereo" : "Mono"));
+                writer.writeAttribute("exportFormat", format);
+                writer.writeAttribute("exportBits", bits);
+                writer.writeAttribute("sampleCount", soundSampleCount);
 
                 boolean linkageExportForAS = false;
                 if (characterClasses.containsKey(symbol.getCharacterId())) {
                     linkageExportForAS = true;
-                    mediaLinkStr += " linkageClassName=\"" + characterClasses.get(symbol.getCharacterId()) + "\"";
+                    writer.writeAttribute("linkageClassName", characterClasses.get(symbol.getCharacterId()));
                 }
 
                 if (characterVariables.containsKey(symbol.getCharacterId())) {
                     linkageExportForAS = true;
-                    mediaLinkStr += " linkageIdentifier=\"" + Helper.escapeHTML(characterVariables.get(symbol.getCharacterId())) + "\"";
+                    writer.writeAttribute("linkageIdentifier", characterVariables.get(symbol.getCharacterId()));
                 }
                 if (linkageExportForAS) {
-                    mediaLinkStr += " linkageExportForAS=\"true\"";
+                    writer.writeAttribute("linkageExportForAS", true);
                 }
 
-                mediaLinkStr += "/>\n";
-
+                writer.writeEndElement();
+                mediaCount++;
             } else if (symbol instanceof DefineVideoStreamTag) {
                 DefineVideoStreamTag video = (DefineVideoStreamTag) symbol;
                 String videoType = "no media";
@@ -1645,7 +1681,13 @@ public class XFLConverter {
                 if (data.length == 0) { //Video has zero length, this probably means it is "Video - Actionscript-controlled"
                     long ts = getTimestamp(swf);
                     String datFileName = "M " + (datfiles.size() + 1) + " " + ts + ".dat";
-                    mediaLinkStr = "<DOMVideoItem name=\"" + symbolFile + "\" sourceExternalFilepath=\"./LIBRARY/" + symbolFile + "\" sourceLastImported=\"" + ts + "\" videoDataHRef=\"" + datFileName + "\" channels=\"0\" isSpecial=\"true\" />";
+                    writer.writeEmptyElement("DOMVideoItem", new String[]{
+                        "name", symbolFile,
+                        "sourceExternalFilepath", "./LIBRARY/" + symbolFile,
+                        "sourceLastImported", Long.toString(ts),
+                        "videoDataHRef", datFileName,
+                        "channels", "0",
+                        "isSpecial", "true"});
                     //Use the dat file, otherwise it does not work
                     datfiles.put(datFileName, new byte[]{ //Magic numbers, if anybody knows why, please tell me
                         (byte) 0x03, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
@@ -1664,44 +1706,37 @@ public class XFLConverter {
                     });
                 } else {
                     files.put(symbolFile, data);
-                    mediaLinkStr = "<DOMVideoItem name=\"" + symbolFile + "\" sourceLastImported=\"" + getTimestamp(swf) + "\" externalFileSize=\"" + data.length + "\"";
-                    mediaLinkStr += " href=\"" + symbolFile + "\"";
-                    mediaLinkStr += " videoType=\"" + videoType + "\"";
-                    mediaLinkStr += " fps=\"" + (int) swf.frameRate + "\""; // todo: is the cast to int needed?
-                    mediaLinkStr += " width=\"" + video.width + "\"";
-                    mediaLinkStr += " height=\"" + video.height + "\"";
+                    writer.writeStartElement("DOMVideoItem", new String[]{
+                        "name", symbolFile,
+                        "sourceLastImported", Long.toString(getTimestamp(swf)),
+                        "externalFileSize", Integer.toString(data.length)});
+                    writer.writeAttribute("href", symbolFile);
+                    writer.writeAttribute("videoType", videoType);
+                    writer.writeAttribute("fps", (int) swf.frameRate); // todo: is the cast to int needed?
+                    writer.writeAttribute("width", video.width);
+                    writer.writeAttribute("height", video.height);
                     double len = (double) video.numFrames / swf.frameRate;
-                    mediaLinkStr += " length=\"" + len + "\"";
+                    writer.writeAttribute("length", len);
                     boolean linkageExportForAS = false;
                     if (characterClasses.containsKey(symbol.getCharacterId())) {
                         linkageExportForAS = true;
-                        mediaLinkStr += " linkageClassName=\"" + characterClasses.get(symbol.getCharacterId()) + "\"";
+                        writer.writeAttribute("linkageClassName", characterClasses.get(symbol.getCharacterId()));
                     }
                     if (characterVariables.containsKey(symbol.getCharacterId())) {
                         linkageExportForAS = true;
-                        mediaLinkStr += " linkageIdentifier=\"" + Helper.escapeHTML(characterVariables.get(symbol.getCharacterId())) + "\"";
+                        writer.writeAttribute("linkageIdentifier", characterVariables.get(symbol.getCharacterId()));
                     }
                     if (linkageExportForAS) {
-                        mediaLinkStr += " linkageExportForAS=\"true\"";
+                        writer.writeAttribute("linkageExportForAS", true);
                     }
-                    mediaLinkStr += "/>\n";
+                    writer.writeEndElement();
                 }
-            }
-
-            if (mediaLinkStr != null) {
-                if (mediaCount == 0) {
-                    writer.writeStartElement("media");
-                }
-
-                writer.writeCharactersRaw(mediaLinkStr);
 
                 mediaCount++;
             }
         }
 
-        if (mediaCount > 0) {
-            writer.writeEndElement();
-        }
+        writer.writeEndElement();
     }
 
     private static String prettyFormatXML(String input) {
@@ -1748,14 +1783,14 @@ public class XFLConverter {
         } else {
             writer.writeAttribute("keyMode", KEY_MODE_NORMAL);
         }
-        String soundEnvelopeStr = "";
+        XFLXmlWriter soundEnvelopeStr = new XFLXmlWriter();
         if (soundStreamHead != null && startSound == null) {
             String soundName = "sound" + soundStreamHead.getCharacterId() + "." + soundStreamHead.getExportFormat().toString().toLowerCase();
             writer.writeAttribute("soundName", soundName);
             writer.writeAttribute("soundSync", "stream");
-            soundEnvelopeStr += "<SoundEnvelope>";
-            soundEnvelopeStr += "<SoundEnvelopePoint level0=\"32768\" level1=\"32768\"/>";
-            soundEnvelopeStr += "</SoundEnvelope>";
+            soundEnvelopeStr.writeStartElement("SoundEnvelope");
+            soundEnvelopeStr.writeEmptyElement("SoundEnvelopePoint", new String[]{"level0", "32768", "level1", "32768"});
+            soundEnvelopeStr.writeEndElement();
         }
         if (startSound != null && sound != null) {
             String soundName = "sound" + sound.soundId + "." + sound.getExportFormat().toString().toLowerCase();
@@ -1778,11 +1813,11 @@ public class XFLConverter {
             } else if (startSound.soundInfo.syncNoMultiple) {
                 writer.writeAttribute("soundSync", "start");
             }
-            soundEnvelopeStr += "<SoundEnvelope>";
+            soundEnvelopeStr.writeStartElement("SoundEnvelope");
             if (startSound.soundInfo.hasEnvelope) {
                 SOUNDENVELOPE[] envelopeRecords = startSound.soundInfo.envelopeRecords;
                 for (SOUNDENVELOPE env : envelopeRecords) {
-                    soundEnvelopeStr += "<SoundEnvelopePoint mark44=\"" + env.pos44 + "\" level0=\"" + env.leftLevel + "\" level1=\"" + env.rightLevel + "\"/>";
+                    soundEnvelopeStr.writeEmptyElement("SoundEnvelopePoint", new String[]{"mark44", Long.toString(env.pos44), "level0", Integer.toString(env.leftLevel), "level1", Integer.toString(env.rightLevel)});
                 }
 
                 if (envelopeRecords.length == 1
@@ -1817,12 +1852,12 @@ public class XFLConverter {
                 //TODO: fade in, fade out
 
             } else {
-                soundEnvelopeStr += "<SoundEnvelopePoint level0=\"32768\" level1=\"32768\"/>";
+                soundEnvelopeStr.writeEmptyElement("SoundEnvelopePoint", new String[]{"level0", "32768", "level1", "32768"});
             }
-            soundEnvelopeStr += "</SoundEnvelope>";
+            soundEnvelopeStr.writeEndElement(); // SoundEnvelope
         }
 
-        writer.writeCharactersRaw(soundEnvelopeStr);
+        writer.writeCharactersRaw(soundEnvelopeStr.toString());
         if (!actionScript.isEmpty()) {
             writer.writeStartElement("Actionscript");
             writer.writeStartElement("script");
@@ -2036,6 +2071,7 @@ public class XFLConverter {
                 FontTag font = (FontTag) t;
                 if (font.getCharacterCount() > 0) {
                     hasFont = true;
+                    break;
                 }
             }
         }
@@ -2130,8 +2166,8 @@ public class XFLConverter {
         writer.writeEndElement();
     }
 
-    private String convertActionScriptLayer(int spriteId, ReadOnlyTagList tags, ReadOnlyTagList timeLineTags, String backgroundColor) {
-        StringBuilder ret = new StringBuilder();
+    private boolean convertActionScriptLayer(int spriteId, ReadOnlyTagList tags, ReadOnlyTagList timeLineTags, String backgroundColor, XFLXmlWriter writer) throws XMLStreamException {
+        boolean hasScript = false;
 
         String script = "";
         int duration = 0;
@@ -2157,43 +2193,51 @@ public class XFLConverter {
                 if (script.isEmpty()) {
                     duration++;
                 } else {
-                    if (duration > 0) {
-                        ret.append("<DOMFrame index=\"").append(frame - duration).append("\"");
-                        if (duration > 1) {
-                            ret.append(" duration=\"").append(duration).append("\"");
-                        }
-                        ret.append(" keyMode=\"").append(KEY_MODE_NORMAL).append("\">");
-                        ret.append("<elements>");
-                        ret.append("</elements>");
-                        ret.append("</DOMFrame>");
+                    if (!hasScript) {
+                        writer.writeStartElement("DOMLayer", new String[]{"name", "Script Layer", "color", randomOutlineColor()});
+                        writer.writeStartElement("frames");
+                        hasScript = true;
                     }
-                    ret.append("<DOMFrame index=\"").append(frame).append("\"");
-                    ret.append(" keyMode=\"").append(KEY_MODE_NORMAL).append("\">");
-                    ret.append("<Actionscript><script><![CDATA[");
-                    ret.append(script);
-                    ret.append("]]></script></Actionscript>");
-                    ret.append("<elements>");
-                    ret.append("</elements>");
-                    ret.append("</DOMFrame>");
+
+                    if (duration > 0) {
+                        writer.writeStartElement("DOMFrame", new String[]{"index", Integer.toString(frame - duration)});
+                        if (duration > 1) {
+                            writer.writeAttribute("duration", duration);
+                        }
+                        writer.writeAttribute("keyMode", KEY_MODE_NORMAL);
+                        writer.writeElementValue("elements", "");
+                        writer.writeEndElement();
+                    }
+
+                    writer.writeStartElement("DOMFrame", new String[]{"index", Integer.toString(frame)});
+                    writer.writeAttribute("keyMode", KEY_MODE_NORMAL);
+
+                    writer.writeStartElement("Actionscript");
+                    writer.writeStartElement("script");
+                    writer.writeCData(script);
+                    writer.writeEndElement();
+                    writer.writeEndElement();
+
+                    writer.writeElementValue("elements", "");
+                    writer.writeEndElement();
                     script = "";
                     duration = 0;
                 }
                 frame++;
             }
         }
-        String retStr = ret.toString();
-        if (!retStr.isEmpty()) {
-            retStr = "<DOMLayer name=\"Script Layer\" color=\"" + randomOutlineColor() + "\">"
-                    + "<frames>"
-                    + retStr
-                    + "</frames>"
-                    + "</DOMLayer>";
+
+        if (hasScript) {
+            writer.writeEndElement(); // frames
+            writer.writeEndElement(); // DOMLayer
         }
-        return retStr;
+
+        return hasScript;
     }
 
-    private String convertLabelsLayer(int spriteId, ReadOnlyTagList tags, ReadOnlyTagList timeLineTags, String backgroundColor) {
-        StringBuilder ret = new StringBuilder();
+    private boolean convertLabelsLayer(int spriteId, ReadOnlyTagList tags, ReadOnlyTagList timeLineTags, String backgroundColor, XFLXmlWriter writer) throws XMLStreamException {
+        boolean hasLabel = false;
+
         int duration = 0;
         int frame = 0;
         String frameLabel = "";
@@ -2203,49 +2247,50 @@ public class XFLConverter {
                 FrameLabelTag fl = (FrameLabelTag) t;
                 frameLabel = fl.getLabelName();
                 isAnchor = fl.isNamedAnchor();
-            }
-            if (t instanceof ShowFrameTag) {
-
+            } else if (t instanceof ShowFrameTag) {
                 if (frameLabel.isEmpty()) {
                     duration++;
                 } else {
+                    if (!hasLabel) {
+                        writer.writeStartElement("DOMLayer", new String[]{"name", "Labels Layer", "color", randomOutlineColor()});
+                        writer.writeStartElement("frames");
+                        hasLabel = true;
+                    }
+
                     if (duration > 0) {
-                        ret.append("<DOMFrame index=\"").append(frame - duration).append("\"");
+                        writer.writeStartElement("DOMFrame", new String[]{"index", Integer.toString(frame - duration)});
                         if (duration > 1) {
-                            ret.append(" duration=\"").append(duration).append("\"");
+                            writer.writeAttribute("duration", duration);
                         }
-                        ret.append(" keyMode=\"").append(KEY_MODE_NORMAL).append("\">");
-                        ret.append("<elements>");
-                        ret.append("</elements>");
-                        ret.append("</DOMFrame>");
+                        writer.writeAttribute("keyMode", KEY_MODE_NORMAL);
+                        writer.writeElementValue("elements", "");
+                        writer.writeEndElement();
                     }
-                    ret.append("<DOMFrame index=\"").append(frame).append("\"");
-                    ret.append(" keyMode=\"").append(KEY_MODE_NORMAL).append("\"");
-                    ret.append(" name=\"").append(frameLabel).append("\"");
+
+                    writer.writeStartElement("DOMFrame", new String[]{"index", Integer.toString(frame)});
+                    writer.writeAttribute("keyMode", KEY_MODE_NORMAL);
+                    writer.writeAttribute("name", frameLabel);
                     if (isAnchor) {
-                        ret.append(" labelType=\"anchor\" bookmark=\"true\"");
+                        writer.writeAttribute("labelType", "anchor");
+                        writer.writeAttribute("bookmark", true);
                     } else {
-                        ret.append(" labelType=\"name\"");
+                        writer.writeAttribute("labelType", "name");
                     }
-                    ret.append(">");
-                    ret.append("<elements>");
-                    ret.append("</elements>");
-                    ret.append("</DOMFrame>");
+                    writer.writeElementValue("elements", "");
+                    writer.writeEndElement();
                     frameLabel = "";
                     duration = 0;
                 }
                 frame++;
             }
         }
-        String retStr = ret.toString();
-        if (!retStr.isEmpty()) {
-            retStr = "<DOMLayer name=\"Labels Layer\" color=\"" + randomOutlineColor() + "\">"
-                    + "<frames>"
-                    + retStr
-                    + "</frames>"
-                    + "</DOMLayer>";
+
+        if (hasLabel) {
+            writer.writeEndElement(); // frames
+            writer.writeEndElement(); // DOMLayer
         }
-        return retStr;
+
+        return hasLabel;
     }
 
     private void convertSoundLayer(int layerIndex, String backgroundColor, HashMap<Integer, CharacterTag> characters, ReadOnlyTagList tags, ReadOnlyTagList timeLineTags, HashMap<String, byte[]> files, XFLXmlWriter writer) throws XMLStreamException {
@@ -2326,18 +2371,16 @@ public class XFLConverter {
         writer.writeStartElement("DOMTimeline", new String[]{"name", name});
         writer.writeStartElement("layers");
 
-        String labelsLayer = convertLabelsLayer(spriteId, tags, timelineTags, backgroundColor);
-        writer.writeCharactersRaw(labelsLayer);
-        String scriptLayer = convertActionScriptLayer(spriteId, tags, timelineTags, backgroundColor);
-        writer.writeCharactersRaw(scriptLayer);
+        boolean hasLabel = convertLabelsLayer(spriteId, tags, timelineTags, backgroundColor, writer);
+        boolean hasScript = convertActionScriptLayer(spriteId, tags, timelineTags, backgroundColor, writer);
 
         int index = 0;
 
-        if (!labelsLayer.isEmpty()) {
+        if (hasLabel) {
             index++;
         }
 
-        if (!scriptLayer.isEmpty()) {
+        if (hasScript) {
             index++;
         }
 
@@ -2386,21 +2429,26 @@ public class XFLConverter {
             if (!parentLayers.isEmpty()) {
                 parentLayer = parentLayers.pop();
             }
-            String layerPrev = "";
 
-            layerPrev += "<DOMLayer name=\"Layer " + (index + 1) + "\" color=\"" + randomOutlineColor() + "\" ";
+            XFLXmlWriter layerPrev = new XFLXmlWriter();
+            layerPrev.writeStartElement("DOMLayer", new String[]{
+                "name", "Layer " + (index + 1),
+                "color", randomOutlineColor()
+            });
             if (d == 1) {
-                layerPrev += " current=\"true\" isSelected=\"true\"";
+                layerPrev.writeAttribute("current", true);
+                layerPrev.writeAttribute("isSelected", true);
             }
             if (parentLayer != -1) {
                 if (parentLayer != d) {
-                    layerPrev += " parentLayerIndex=\"" + (parentLayer) + "\" locked=\"true\"";
+                    layerPrev.writeAttribute("parentLayerIndex", parentLayer);
+                    layerPrev.writeAttribute("locked", true);
                 }
             }
-            layerPrev += ">";
+            layerPrev.writeCharacters(""); // todo honfika: hack to close start tag
             String layerAfter = "</DOMLayer>";
             int prevLength = writer.length();
-            convertFrames(layerPrev, layerAfter, nonLibraryShapes, tags, timelineTags, characters, d, flaVersion, files, writer);
+            convertFrames(layerPrev.toString(), layerAfter, nonLibraryShapes, tags, timelineTags, characters, d, flaVersion, files, writer);
             if (writer.length() == prevLength) {
                 index--;
             }
@@ -2456,11 +2504,11 @@ public class XFLConverter {
         CSMTextSettingsTag csmts = null;
         XFLXmlWriter filterStr = new XFLXmlWriter();
         if (filters != null) {
-            filterStr.append("<filters>");
+            filterStr.writeStartElement("filters");
             for (FILTER f : filters) {
                 convertFilter(f, filterStr);
             }
-            filterStr.append("</filters>");
+            filterStr.writeEndElement();
         }
 
         SWF swf = tag.getSwf();
@@ -2475,25 +2523,23 @@ public class XFLConverter {
         }
 
         String fontRenderingMode = "standard";
-        String antiAlias = "";
+        String antiAliasSharpness = null;
+        String antiAliasThickness = null;
         if (csmts != null) {
             if (csmts.thickness == 0 & csmts.sharpness == 0) {
                 fontRenderingMode = null;
             } else {
                 fontRenderingMode = "customThicknessSharpness";
             }
-            antiAlias = " antiAliasSharpness=\"" + doubleToString(csmts.sharpness) + "\" antiAliasThickness=\"" + doubleToString(csmts.thickness) + "\"";
+            antiAliasSharpness = doubleToString(csmts.sharpness);
+            antiAliasThickness = doubleToString(csmts.thickness);
         }
-        String left = "";
+        String left = null;
         RECT bounds = tag.getBounds();
         if ((tag instanceof DefineTextTag) || (tag instanceof DefineText2Tag)) {
             MATRIX textMatrix = tag.getTextMatrix();
-            left = " left=\"" + doubleToString((textMatrix.translateX) / SWF.unitDivisor) + "\"";
+            left = doubleToString((textMatrix.translateX) / SWF.unitDivisor);
         }
-        XFLXmlWriter matStr = new XFLXmlWriter();
-        matStr.append("<matrix>");
-        convertMatrix(matrix, matStr);
-        matStr.append("</matrix>");
         if ((tag instanceof DefineTextTag) || (tag instanceof DefineText2Tag)) {
             List<TEXTRECORD> textRecords = new ArrayList<>();
             if (tag instanceof DefineTextTag) {
@@ -2512,15 +2558,20 @@ public class XFLConverter {
                 }
             }
 
-            writer.append("<DOMStaticText");
-            writer.append(left);
+            writer.writeStartElement("DOMStaticText");
+            if (left != null) {
+                writer.writeAttribute("left", left);
+            }
             if (fontRenderingMode != null) {
-                writer.append(" fontRenderingMode=\"").append(fontRenderingMode).append("\"");
+                writer.writeAttribute("fontRenderingMode", fontRenderingMode);
             }
             if (instanceName != null) {
-                writer.append(" instanceName=\"").append(Helper.escapeHTML(instanceName)).append("\"");
+                writer.writeAttribute("instanceName", instanceName);
             }
-            writer.append(antiAlias);
+            if (antiAliasSharpness != null) {
+                writer.writeAttribute("antiAliasSharpness", antiAliasSharpness);
+                writer.writeAttribute("antiAliasThickness", antiAliasThickness);
+            }
             if (((CharacterTag) tag).getCharacterId() == 650) {
                 // todo: remove
                 System.err.println("=========================AAAAAAAAAAA");
@@ -2528,10 +2579,15 @@ public class XFLConverter {
             Map<String, Object> attrs = TextTag.getTextRecordsAttributes(textRecords, swf);
             // todo: remove
             System.err.println("///////////=============");
-            writer.append(" width=\"").append(tag.getBounds().getWidth() / 2).append("\" height=\"").append(tag.getBounds().getHeight()).append("\" autoExpand=\"true\" isSelectable=\"false\">");
-            writer.append(matStr.toString());
+            writer.writeAttribute("width", tag.getBounds().getWidth() / 2);
+            writer.writeAttribute("height", tag.getBounds().getHeight());
+            writer.writeAttribute("autoExpand", true);
+            writer.writeAttribute("isSelectable", false);
+            writer.writeStartElement("matrix");
+            convertMatrix(matrix, writer);
+            writer.writeEndElement();
 
-            writer.append("<textRuns>");
+            writer.writeStartElement("textRuns");
             int fontId = -1;
             FontTag font = null;
             String fontName = null;
@@ -2589,32 +2645,40 @@ public class XFLConverter {
                 }
                 firstRun = false;
                 if (font != null) {
-                    writer.append("<DOMTextRun>");
-                    writer.append("<characters>").append(Helper.escapeHTML((newline ? "\r" : "") + rec.getText(font))).append("</characters>");
-                    writer.append("<textAttrs>");
+                    writer.writeStartElement("DOMTextRun");
+                    writer.writeStartElement("characters");
+                    writer.writeCharacters((newline ? "\r" : "") + rec.getText(font));
+                    writer.writeEndElement();
+                    writer.writeStartElement("textAttrs");
 
-                    writer.append("<DOMTextAttrs aliasText=\"false\" rotation=\"true\" size=\"").append(twipToPixel(textHeight)).append("\" bitmapSize=\"").append(textHeight).append("\"");
-                    writer.append(" letterSpacing=\"").append(doubleToString(twipToPixel(letterSpacings.get(r)))).append("\"");
-                    writer.append(" indent=\"").append(doubleToString(twipToPixel((int) attrs.get("indent")))).append("\"");
-                    writer.append(" leftMargin=\"").append(doubleToString(twipToPixel(leftMargins.get(r)))).append("\"");
-                    writer.append(" lineSpacing=\"").append(doubleToString(twipToPixel((int) attrs.get("lineSpacing")))).append("\"");
-                    writer.append(" rightMargin=\"").append(doubleToString(twipToPixel((int) attrs.get("rightMargin")))).append("\"");
+                    writer.writeStartElement("DOMTextAttrs", new String[]{
+                        "aliasText", "false",
+                        "rotation", "true",
+                        "size", Double.toString(twipToPixel(textHeight)),
+                        "bitmapSize", Integer.toString(textHeight),
+                        "letterSpacing", doubleToString(twipToPixel(letterSpacings.get(r))),
+                        "indent", doubleToString(twipToPixel((int) attrs.get("indent"))),
+                        "leftMargin", doubleToString(twipToPixel(leftMargins.get(r))),
+                        "lineSpacing", doubleToString(twipToPixel((int) attrs.get("lineSpacing"))),
+                        "rightMargin", doubleToString(twipToPixel((int) attrs.get("rightMargin")))
+                    });
 
                     if (textColor != null) {
-                        writer.append(" fillColor=\"").append(textColor.toHexRGB()).append("\"");
+                        writer.writeAttribute("fillColor", textColor.toHexRGB());
                     } else if (textColorA != null) {
-                        writer.append(" fillColor=\"").append(textColorA.toHexRGB()).append("\" alpha=\"").append(textColorA.getAlphaFloat()).append("\"");
+                        writer.writeAttribute("fillColor", textColorA.toHexRGB());
+                        writer.writeAttribute("alpha", textColorA.getAlphaFloat());
                     }
-                    writer.append(" face=\"").append(psFontName).append("\"");
-                    writer.append("/>");
+                    writer.writeAttribute("face", psFontName);
+                    writer.writeEndElement();
 
-                    writer.append("</textAttrs>");
-                    writer.append("</DOMTextRun>");
+                    writer.writeEndElement(); // textAttrs
+                    writer.writeEndElement(); // DOMTextRun
                 }
             }
-            writer.append("</textRuns>");
-            writer.append(filterStr.toString());
-            writer.append("</DOMStaticText>");
+            writer.writeEndElement(); // textRuns
+            writer.writeCharactersRaw(filterStr.toString());
+            writer.writeEndElement(); // DOMStaticText
         } else if (tag instanceof DefineEditTextTag) {
             DefineEditTextTag det = (DefineEditTextTag) tag;
             String tagName;
@@ -2632,14 +2696,17 @@ public class XFLConverter {
             } else {
                 tagName = "DOMInputText";
             }
-            writer.append("<").append(tagName);
+            writer.writeStartElement(tagName);
             if (fontRenderingMode != null) {
-                writer.append(" fontRenderingMode=\"").append(fontRenderingMode).append("\"");
+                writer.writeAttribute("fontRenderingMode", fontRenderingMode);
             }
             if (instanceName != null) {
-                writer.append(" name=\"").append(Helper.escapeHTML(instanceName)).append("\"");
+                writer.writeAttribute("name", instanceName);
             }
-            writer.append(antiAlias);
+            if (antiAliasSharpness != null) {
+                writer.writeAttribute("antiAliasSharpness", antiAliasSharpness);
+                writer.writeAttribute("antiAliasThickness", antiAliasThickness);
+            }
             double width = twipToPixel(bounds.getWidth());
             double height = twipToPixel(bounds.getHeight());
             //There is usually 4px difference between width/height and XML width/height
@@ -2651,43 +2718,46 @@ public class XFLConverter {
                 width -= twipToPixel(det.rightMargin);
                 width -= twipToPixel(det.leftMargin);
             }
-            writer.append(" width=\"").append(width).append("\"");
-            writer.append(" height=\"").append(height).append("\"");
+            writer.writeAttribute("width", width);
+            writer.writeAttribute("height", height);
             if (det.border) {
-                writer.append("  border=\"true\"");
+                writer.writeAttribute("border", true);
             }
             if (det.html) {
-                writer.append(" renderAsHTML=\"true\"");
+                writer.writeAttribute("renderAsHTML", true);
             }
             if (det.noSelect) {
-                writer.append(" isSelectable=\"false\"");
+                writer.writeAttribute("isSelectable", false);
             }
             if (det.multiline && det.wordWrap) {
-                writer.append(" lineType=\"multiline\"");
+                writer.writeAttribute("lineType", "multiline");
             } else if (det.multiline && (!det.wordWrap)) {
-                writer.append(" lineType=\"multiline no wrap\"");
+                writer.writeAttribute("lineType", "multiline no wrap");
             } else if (det.password) {
-                writer.append(" lineType=\"password\"");
+                writer.writeAttribute("lineType", "password");
             }
             if (det.hasMaxLength) {
-                writer.append(" maxCharacters=\"").append(det.maxLength).append("\"");
+                writer.writeAttribute("maxCharacters", det.maxLength);
             }
             if (!det.variableName.isEmpty()) {
-                writer.append(" variableName=\"").append(det.variableName).append("\"");
+                writer.writeAttribute("variableName", det.variableName);
             }
-            writer.append(">");
-            writer.append(matStr.toString());
-            writer.append("<textRuns>");
+            writer.writeStartElement("matrix");
+            convertMatrix(matrix, writer);
+            writer.writeEndElement();
+            writer.writeStartElement("textRuns");
             String txt = "";
             if (det.hasText) {
                 txt = det.initialText;
             }
 
             if (det.html) {
-                writer.append(convertHTMLText(swf.getTags(), det, txt));
+                writer.writeCharactersRaw(convertHTMLText(swf.getTags(), det, txt));
             } else {
-                writer.append("<DOMTextRun>");
-                writer.append("<characters>").append(Helper.escapeHTML(txt)).append("</characters>");
+                writer.writeStartElement("DOMTextRun");
+                writer.writeStartElement("characters");
+                writer.writeCharacters(txt);
+                writer.writeEndElement();
                 int leftMargin = -1;
                 int rightMargin = -1;
                 int indent = -1;
@@ -2744,41 +2814,42 @@ public class XFLConverter {
                         alignment = "unknown";
                     }
                 }
-                writer.append("<textAttrs>");
-                writer.append("<DOMTextAttrs");
+                writer.writeStartElement("textAttrs");
+                writer.writeStartElement("DOMTextAttrs");
                 if (alignment != null) {
-                    writer.append(" alignment=\"").append(alignment).append("\"");
+                    writer.writeAttribute("alignment", alignment);
                 }
-                writer.append(" rotation=\"true\""); //?
+                writer.writeAttribute("rotation", true); //?
                 if (indent > -1) {
-                    writer.append(" indent=\"").append(twipToPixel(indent)).append("\"");
+                    writer.writeAttribute("indent", twipToPixel(indent));
                 }
                 if (leftMargin > -1) {
-                    writer.append(" leftMargin=\"").append(twipToPixel(leftMargin)).append("\"");
+                    writer.writeAttribute("leftMargin", twipToPixel(leftMargin));
                 }
                 if (lineSpacing > -1) {
-                    writer.append(" lineSpacing=\"").append(twipToPixel(lineSpacing)).append("\"");
+                    writer.writeAttribute("lineSpacing", twipToPixel(lineSpacing));
                 }
                 if (rightMargin > -1) {
-                    writer.append(" rightMargin=\"").append(twipToPixel(rightMargin)).append("\"");
+                    writer.writeAttribute("rightMargin", twipToPixel(rightMargin));
                 }
                 if (size > -1) {
-                    writer.append(" size=\"").append(twipToPixel(size)).append("\"");
-                    writer.append(" bitmapSize=\"").append(size).append("\"");
+                    writer.writeAttribute("size", twipToPixel(size));
+                    writer.writeAttribute("bitmapSize", size);
                 }
                 if (fontFace != null) {
-                    writer.append(" face=\"").append(fontFace).append("\"");
+                    writer.writeAttribute("face", fontFace);
                 }
                 if (textColor != null) {
-                    writer.append(" fillColor=\"").append(textColor.toHexRGB()).append("\" alpha=\"").append(textColor.getAlphaFloat()).append("\"");
+                    writer.writeAttribute("fillColor", textColor.toHexRGB());
+                    writer.writeAttribute("alpha", textColor.getAlphaFloat());
                 }
-                writer.append("/>");
-                writer.append("</textAttrs>");
-                writer.append("</DOMTextRun>");
+                writer.writeEndElement();
+                writer.writeEndElement(); // textAttrs
+                writer.writeEndElement(); // DOMTextRun
             }
-            writer.append("</textRuns>");
-            writer.append(filterStr.toString());
-            writer.append("</").append(tagName).append(">");
+            writer.writeEndElement(); // textRuns
+            writer.writeCharactersRaw(filterStr.toString());
+            writer.writeEndElement(); // tagName
         }
     }
 
@@ -2905,27 +2976,27 @@ public class XFLConverter {
             publishSettings.writeStartElement("flash_profile", new String[]{"version", "1.0", "name", "Default", "current", "true"});
 
             publishSettings.writeStartElement("PublishFormatProperties", new String[]{"enabled", "true"});
-            publishSettings.writeElementValue("defaultNames", "1");
-            publishSettings.writeElementValue("flash", "1");
-            publishSettings.writeElementValue("projectorWin", "0");
-            publishSettings.writeElementValue("projectorMac", "0");
-            publishSettings.writeElementValue("html", "1");
-            publishSettings.writeElementValue("gif", "0");
-            publishSettings.writeElementValue("jpeg", "0");
-            publishSettings.writeElementValue("png", "0");
-            publishSettings.writeElementValue(greaterThanCC ? "svg" : "qt", "0");
-            publishSettings.writeElementValue("rnwk", "0");
-            publishSettings.writeElementValue("swc", "0");
-            publishSettings.writeElementValue("flashDefaultName", "1");
-            publishSettings.writeElementValue("projectorWinDefaultName", "1");
-            publishSettings.writeElementValue("projectorMacDefaultName", "1");
-            publishSettings.writeElementValue("htmlDefaultName", "1");
-            publishSettings.writeElementValue("gifDefaultName", "1");
-            publishSettings.writeElementValue("jpegDefaultName", "1");
-            publishSettings.writeElementValue("pngDefaultName", "1");
-            publishSettings.writeElementValue(greaterThanCC ? "svgDefaultName" : "qtDefaultName", "1");
-            publishSettings.writeElementValue("rnwkDefaultName", "1");
-            publishSettings.writeElementValue("swcDefaultName", "1");
+            publishSettings.writeElementValue("defaultNames", 1);
+            publishSettings.writeElementValue("flash", 1);
+            publishSettings.writeElementValue("projectorWin", 0);
+            publishSettings.writeElementValue("projectorMac", 0);
+            publishSettings.writeElementValue("html", 1);
+            publishSettings.writeElementValue("gif", 0);
+            publishSettings.writeElementValue("jpeg", 0);
+            publishSettings.writeElementValue("png", 0);
+            publishSettings.writeElementValue(greaterThanCC ? "svg" : "qt", 0);
+            publishSettings.writeElementValue("rnwk", 0);
+            publishSettings.writeElementValue("swc", 0);
+            publishSettings.writeElementValue("flashDefaultName", 1);
+            publishSettings.writeElementValue("projectorWinDefaultName", 1);
+            publishSettings.writeElementValue("projectorMacDefaultName", 1);
+            publishSettings.writeElementValue("htmlDefaultName", 1);
+            publishSettings.writeElementValue("gifDefaultName", 1);
+            publishSettings.writeElementValue("jpegDefaultName", 1);
+            publishSettings.writeElementValue("pngDefaultName", 1);
+            publishSettings.writeElementValue(greaterThanCC ? "svgDefaultName" : "qtDefaultName", 1);
+            publishSettings.writeElementValue("rnwkDefaultName", 1);
+            publishSettings.writeElementValue("swcDefaultName", 1);
             publishSettings.writeElementValue("flashFileName", baseName + ".swf");
             publishSettings.writeElementValue("projectorWinFileName", baseName + ".exe");
             publishSettings.writeElementValue("projectorMacFileName", baseName + ".app");
@@ -2933,79 +3004,79 @@ public class XFLConverter {
             publishSettings.writeElementValue("gifFileName", baseName + ".gif");
             publishSettings.writeElementValue("jpegFileName", baseName + ".jpg");
             publishSettings.writeElementValue("pngFileName", baseName + ".png");
-            publishSettings.writeElementValue(greaterThanCC ? "svgFileName" : "qtFileName", "1");
+            publishSettings.writeElementValue(greaterThanCC ? "svgFileName" : "qtFileName", 1);
             publishSettings.writeElementValue("rnwkFileName", baseName + ".smil");
             publishSettings.writeElementValue("swcFileName", baseName + ".swc");
             publishSettings.writeEndElement();
 
             publishSettings.writeStartElement("PublishHtmlProperties", new String[]{"enabled", "true"});
-            publishSettings.writeElementValue("VersionDetectionIfAvailable", "0");
+            publishSettings.writeElementValue("VersionDetectionIfAvailable", 0);
             publishSettings.writeElementValue("VersionInfo", "12,0,0,0;11,2,0,0;11,1,0,0;10,3,0,0;10,2,153,0;10,1,52,0;9,0,124,0;8,0,24,0;7,0,14,0;6,0,79,0;5,0,58,0;4,0,32,0;3,0,8,0;2,0,1,12;1,0,0,1;");
-            publishSettings.writeElementValue("UsingDefaultContentFilename", "1");
-            publishSettings.writeElementValue("UsingDefaultAlternateFilename", "1");
+            publishSettings.writeElementValue("UsingDefaultContentFilename", 1);
+            publishSettings.writeElementValue("UsingDefaultAlternateFilename", 1);
             publishSettings.writeElementValue("ContentFilename", baseName + "_content.html");
             publishSettings.writeElementValue("AlternateFilename", baseName + "_alternate.html");
-            publishSettings.writeElementValue("UsingOwnAlternateFile", "0");
+            publishSettings.writeElementValue("UsingOwnAlternateFile", 0);
             publishSettings.writeElementValue("OwnAlternateFilename", "");
             publishSettings.writeElementValue("Width", width);
             publishSettings.writeElementValue("Height", height);
-            publishSettings.writeElementValue("Align", "0");
-            publishSettings.writeElementValue("Units", "0");
-            publishSettings.writeElementValue("Loop", "1");
-            publishSettings.writeElementValue("StartPaused", "0");
-            publishSettings.writeElementValue("Scale", "0");
-            publishSettings.writeElementValue("HorizontalAlignment", "1");
-            publishSettings.writeElementValue("VerticalAlignment", "1");
-            publishSettings.writeElementValue("Quality", "4");
-            publishSettings.writeElementValue("DeblockingFilter", "0");
-            publishSettings.writeElementValue("WindowMode", "0");
-            publishSettings.writeElementValue("DisplayMenu", "1");
-            publishSettings.writeElementValue("DeviceFont", "0");
+            publishSettings.writeElementValue("Align", 0);
+            publishSettings.writeElementValue("Units", 0);
+            publishSettings.writeElementValue("Loop", 1);
+            publishSettings.writeElementValue("StartPaused", 0);
+            publishSettings.writeElementValue("Scale", 0);
+            publishSettings.writeElementValue("HorizontalAlignment", 1);
+            publishSettings.writeElementValue("VerticalAlignment", 1);
+            publishSettings.writeElementValue("Quality", 4);
+            publishSettings.writeElementValue("DeblockingFilter", 0);
+            publishSettings.writeElementValue("WindowMode", 0);
+            publishSettings.writeElementValue("DisplayMenu", 1);
+            publishSettings.writeElementValue("DeviceFont", 0);
             publishSettings.writeElementValue("TemplateFileName", "");
-            publishSettings.writeElementValue("showTagWarnMsg", "1");
+            publishSettings.writeElementValue("showTagWarnMsg", 1);
             publishSettings.writeEndElement();
 
             publishSettings.writeStartElement("PublishFlashProperties", new String[]{"enabled", "true"});
             publishSettings.writeElementValue("TopDown", "");
             publishSettings.writeElementValue("FireFox", "");
-            publishSettings.writeElementValue("Report", "0");
-            publishSettings.writeElementValue("Protect", "0");
-            publishSettings.writeElementValue("OmitTraceActions", "0");
+            publishSettings.writeElementValue("Report", 0);
+            publishSettings.writeElementValue("Protect", 0);
+            publishSettings.writeElementValue("OmitTraceActions", 0);
             publishSettings.writeElementValue("Quality", "80");
-            publishSettings.writeElementValue("DeblockingFilter", "0");
-            publishSettings.writeElementValue("StreamFormat", "0");
-            publishSettings.writeElementValue("StreamCompress", "7");
-            publishSettings.writeElementValue("EventFormat", "0");
-            publishSettings.writeElementValue("EventCompress", "7");
-            publishSettings.writeElementValue("OverrideSounds", "0");
+            publishSettings.writeElementValue("DeblockingFilter", 0);
+            publishSettings.writeElementValue("StreamFormat", 0);
+            publishSettings.writeElementValue("StreamCompress", 7);
+            publishSettings.writeElementValue("EventFormat", 0);
+            publishSettings.writeElementValue("EventCompress", 7);
+            publishSettings.writeElementValue("OverrideSounds", 0);
             publishSettings.writeElementValue("Version", flaSwfVersion);
             publishSettings.writeElementValue("ExternalPlayer", FLAVersion.swfVersionToPlayer(flaSwfVersion));
-            publishSettings.writeElementValue("ActionScriptVersion", useAS3 ? "3" : "2");
-            publishSettings.writeElementValue("PackageExportFrame", "1");
+            publishSettings.writeElementValue("ActionScriptVersion", useAS3 ? 3 : 2);
+            publishSettings.writeElementValue("PackageExportFrame", 1);
             publishSettings.writeElementValue("PackagePaths", "");
             publishSettings.writeElementValue("AS3PackagePaths", ".");
             publishSettings.writeElementValue("AS3ConfigConst", "CONFIG::FLASH_AUTHORING=\"true\";");
-            publishSettings.writeElementValue("DebuggingPermitted", "0");
+            publishSettings.writeElementValue("DebuggingPermitted", 0);
             publishSettings.writeElementValue("DebuggingPassword", "");
-            publishSettings.writeElementValue("CompressMovie", swf.compression == SWFCompression.NONE ? "0" : "1");
-            publishSettings.writeElementValue("CompressionType", swf.compression == SWFCompression.LZMA ? "1" : "0");
-            publishSettings.writeElementValue("InvisibleLayer", "1");
-            publishSettings.writeElementValue("DeviceSound", "0");
-            publishSettings.writeElementValue("StreamUse8kSampleRate", "0");
-            publishSettings.writeElementValue("EventUse8kSampleRate", "0");
+            publishSettings.writeElementValue("CompressMovie", swf.compression == SWFCompression.NONE ? 0 : 1);
+            publishSettings.writeElementValue("CompressionType", swf.compression == SWFCompression.LZMA ? 1 : 0);
+            publishSettings.writeElementValue("InvisibleLayer", 1);
+            publishSettings.writeElementValue("DeviceSound", 0);
+            publishSettings.writeElementValue("StreamUse8kSampleRate", 0);
+            publishSettings.writeElementValue("EventUse8kSampleRate", 0);
             publishSettings.writeElementValue("UseNetwork", useNetwork ? 1 : 0);
             publishSettings.writeElementValue("DocumentClass", characterClasses.containsKey(0) ? characterClasses.get(0) : "");
-            publishSettings.writeElementValue("AS3Strict", "2");
-            publishSettings.writeElementValue("AS3Coach", "4");
-            publishSettings.writeElementValue("AS3AutoDeclare", "4096");
+            publishSettings.writeElementValue("AS3Strict", 2);
+            publishSettings.writeElementValue("AS3Coach", 4);
+            publishSettings.writeElementValue("AS3AutoDeclare", 4096);
             publishSettings.writeElementValue("AS3Dialect", "AS3");
-            publishSettings.writeElementValue("AS3ExportFrame", "1");
-            publishSettings.writeElementValue("AS3Optimize", "1");
-            publishSettings.writeElementValue("ExportSwc", "0");
-            publishSettings.writeElementValue("ScriptStuckDelay", "15");
-            publishSettings.writeElementValue("IncludeXMP", "1");
-            publishSettings.writeElementValue("HardwareAcceleration", "0");
-            publishSettings.writeElementValue("AS3Flags", "4102");
+            publishSettings.writeElementValue("AS3ExportFrame", 1);
+            publishSettings.writeElementValue("AS3Optimize", 1);
+            publishSettings.writeElementValue("ExportSwc", 0);
+            publishSettings.writeElementValue("ScriptStuckDelay", 15);
+            publishSettings.writeElementValue("IncludeXMP", 1);
+            publishSettings.writeElementValue("HardwareAcceleration", 0);
+            publishSettings.writeElementValue("AS3Flags", 4102);
             publishSettings.writeElementValue("DefaultLibraryLinkage", "rsl");
             publishSettings.writeElementValue("RSLPreloaderMethod", "wrap");
             publishSettings.writeElementValue("RSLPreloaderSWF", "$(AppConfig)/ActionScript 3.0/rsls/loader_animation.swf");
@@ -3058,66 +3129,66 @@ public class XFLConverter {
             publishSettings.writeStartElement("PublishJpegProperties", new String[]{"enabled", "true"});
             publishSettings.writeElementValue("Width", width);
             publishSettings.writeElementValue("Height", height);
-            publishSettings.writeElementValue("Progressive", "0");
-            publishSettings.writeElementValue("DPI", "4718592");
-            publishSettings.writeElementValue("Size", "0");
-            publishSettings.writeElementValue("Quality", "80");
-            publishSettings.writeElementValue("MatchMovieDim", "1");
+            publishSettings.writeElementValue("Progressive", 0);
+            publishSettings.writeElementValue("DPI", 4718592);
+            publishSettings.writeElementValue("Size", 0);
+            publishSettings.writeElementValue("Quality", 80);
+            publishSettings.writeElementValue("MatchMovieDim", 1);
             publishSettings.writeEndElement();
 
             publishSettings.writeStartElement("PublishRNWKProperties", new String[]{"enabled", "true"});
-            publishSettings.writeElementValue("exportFlash", "1");
-            publishSettings.writeElementValue("flashBitRate", "0");
-            publishSettings.writeElementValue("exportAudio", "1");
-            publishSettings.writeElementValue("audioFormat", "0");
-            publishSettings.writeElementValue("singleRateAudio", "0");
-            publishSettings.writeElementValue("realVideoRate", "100000");
-            publishSettings.writeElementValue("speed28K", "1");
-            publishSettings.writeElementValue("speed56K", "1");
-            publishSettings.writeElementValue("speedSingleISDN", "0");
-            publishSettings.writeElementValue("speedDualISDN", "0");
-            publishSettings.writeElementValue("speedCorporateLAN", "0");
-            publishSettings.writeElementValue("speed256K", "0");
-            publishSettings.writeElementValue("speed384K", "0");
-            publishSettings.writeElementValue("speed512K", "0");
-            publishSettings.writeElementValue("exportSMIL", "1");
+            publishSettings.writeElementValue("exportFlash", 1);
+            publishSettings.writeElementValue("flashBitRate", 0);
+            publishSettings.writeElementValue("exportAudio", 1);
+            publishSettings.writeElementValue("audioFormat", 0);
+            publishSettings.writeElementValue("singleRateAudio", 0);
+            publishSettings.writeElementValue("realVideoRate", 100000);
+            publishSettings.writeElementValue("speed28K", 1);
+            publishSettings.writeElementValue("speed56K", 1);
+            publishSettings.writeElementValue("speedSingleISDN", 0);
+            publishSettings.writeElementValue("speedDualISDN", 0);
+            publishSettings.writeElementValue("speedCorporateLAN", 0);
+            publishSettings.writeElementValue("speed256K", 0);
+            publishSettings.writeElementValue("speed384K", 0);
+            publishSettings.writeElementValue("speed512K", 0);
+            publishSettings.writeElementValue("exportSMIL", 1);
             publishSettings.writeEndElement();
 
             publishSettings.writeStartElement("PublishGifProperties", new String[]{"enabled", "true"});
             publishSettings.writeElementValue("Width", width);
             publishSettings.writeElementValue("Height", height);
-            publishSettings.writeElementValue("Animated", "0");
-            publishSettings.writeElementValue("MatchMovieDim", "1");
-            publishSettings.writeElementValue("Loop", "1");
+            publishSettings.writeElementValue("Animated", 0);
+            publishSettings.writeElementValue("MatchMovieDim", 1);
+            publishSettings.writeElementValue("Loop", 1);
             publishSettings.writeElementValue("LoopCount", "");
-            publishSettings.writeElementValue("OptimizeColors", "1");
-            publishSettings.writeElementValue("Interlace", "0");
-            publishSettings.writeElementValue("Smooth", "1");
-            publishSettings.writeElementValue("DitherSolids", "0");
-            publishSettings.writeElementValue("RemoveGradients", "0");
+            publishSettings.writeElementValue("OptimizeColors", 1);
+            publishSettings.writeElementValue("Interlace", 0);
+            publishSettings.writeElementValue("Smooth", 1);
+            publishSettings.writeElementValue("DitherSolids", 0);
+            publishSettings.writeElementValue("RemoveGradients", 0);
             publishSettings.writeElementValue("TransparentOption", "");
-            publishSettings.writeElementValue("TransparentAlpha", "128");
+            publishSettings.writeElementValue("TransparentAlpha", 128);
             publishSettings.writeElementValue("DitherOption", "");
             publishSettings.writeElementValue("PaletteOption", "");
-            publishSettings.writeElementValue("MaxColors", "255");
+            publishSettings.writeElementValue("MaxColors", 255);
             publishSettings.writeElementValue("PaletteName", "");
             publishSettings.writeEndElement();
 
             publishSettings.writeStartElement("PublishPNGProperties", new String[]{"enabled", "true"});
             publishSettings.writeElementValue("Width", width);
             publishSettings.writeElementValue("Height", height);
-            publishSettings.writeElementValue("OptimizeColors", "1");
-            publishSettings.writeElementValue("Interlace", "0");
-            publishSettings.writeElementValue("Transparent", "0");
-            publishSettings.writeElementValue("Smooth", "1");
-            publishSettings.writeElementValue("DitherSolids", "0");
-            publishSettings.writeElementValue("RemoveGradients", "0");
-            publishSettings.writeElementValue("MatchMovieDim", "1");
+            publishSettings.writeElementValue("OptimizeColors", 1);
+            publishSettings.writeElementValue("Interlace", 0);
+            publishSettings.writeElementValue("Transparent", 0);
+            publishSettings.writeElementValue("Smooth", 1);
+            publishSettings.writeElementValue("DitherSolids", 0);
+            publishSettings.writeElementValue("RemoveGradients", 0);
+            publishSettings.writeElementValue("MatchMovieDim", 1);
             publishSettings.writeElementValue("DitherOption", "");
             publishSettings.writeElementValue("FilterOption", "");
             publishSettings.writeElementValue("PaletteOption", "");
             publishSettings.writeElementValue("BitDepth", "24-bit with Alpha");
-            publishSettings.writeElementValue("MaxColors", "255");
+            publishSettings.writeElementValue("MaxColors", 255);
             publishSettings.writeElementValue("PaletteName", "");
             publishSettings.writeEndElement();
 
@@ -3125,16 +3196,16 @@ public class XFLConverter {
                 publishSettings.writeStartElement("PublishQTProperties", new String[]{"enabled", "true"});
                 publishSettings.writeElementValue("Width", width);
                 publishSettings.writeElementValue("Height", height);
-                publishSettings.writeElementValue("MatchMovieDim", "1");
-                publishSettings.writeElementValue("UseQTSoundCompression", "0");
+                publishSettings.writeElementValue("MatchMovieDim", 1);
+                publishSettings.writeElementValue("UseQTSoundCompression", 0);
                 publishSettings.writeElementValue("AlphaOption", "");
                 publishSettings.writeElementValue("LayerOption", "");
                 publishSettings.writeElementValue("QTSndSettings", "00000000");
-                publishSettings.writeElementValue("ControllerOption", "0");
-                publishSettings.writeElementValue("Looping", "0");
-                publishSettings.writeElementValue("PausedAtStart", "0");
-                publishSettings.writeElementValue("PlayEveryFrame", "0");
-                publishSettings.writeElementValue("Flatten", "1");
+                publishSettings.writeElementValue("ControllerOption", 0);
+                publishSettings.writeElementValue("Looping", 0);
+                publishSettings.writeElementValue("PausedAtStart", 0);
+                publishSettings.writeElementValue("PlayEveryFrame", 0);
+                publishSettings.writeElementValue("Flatten", 1);
                 publishSettings.writeEndElement();
             }
 
@@ -3333,7 +3404,7 @@ public class XFLConverter {
         } catch (SAXException | IOException e) {
             logger.log(Level.SEVERE, "Error while converting HTML", e);
         }
-        return tparser.result;
+        return tparser.result.toString();
     }
 
     private static double twipToPixel(double tw) {
@@ -3342,7 +3413,7 @@ public class XFLConverter {
 
     private static class HTMLTextParser extends DefaultHandler {
 
-        public String result = "";
+        public XFLXmlWriter result = new XFLXmlWriter();
 
         private String fontFace = "";
 
@@ -3542,56 +3613,58 @@ public class XFLConverter {
         }
 
         private void putText(String txt) {
-
-            result += "<DOMTextRun>";
-            result += "<characters>" + Helper.escapeHTML(txt) + "</characters>";
-            result += "<textAttrs>";
-            result += "<DOMTextAttrs";
-            if (alignment != null) {
-                result += " alignment=\"" + alignment + "\"";
+            try {
+                result.writeStartElement("DOMTextRun");
+                result.writeElementValue("characters>", txt);
+                result.writeStartElement("textAttrs");
+                result.writeStartElement("DOMTextAttrs");
+                if (alignment != null) {
+                    result.writeAttribute("alignment", alignment);
+                }
+                result.writeAttribute("rotation", true);
+                if (indent > -1) {
+                    result.writeAttribute("indent", twipToPixel(indent));
+                }
+                if (leftMargin > -1) {
+                    result.writeAttribute("leftMargin", twipToPixel(leftMargin));
+                }
+                if (letterSpacing > -1) {
+                    result.writeAttribute("letterSpacing", letterSpacing);
+                }
+                if (lineSpacing > -1) {
+                    result.writeAttribute("lineSpacing", twipToPixel(lineSpacing));
+                }
+                if (rightMargin > -1) {
+                    result.writeAttribute("rightMargin", twipToPixel(rightMargin));
+                }
+                if (size > -1) {
+                    result.writeAttribute("size", size);
+                    result.writeAttribute("bitmapSize", (int) (size * SWF.unitDivisor));
+                }
+                if (fontFace != null) {
+                    result.writeAttribute("face", fontFace);
+                }
+                if (color != null) {
+                    result.writeAttribute("fillColor", color);
+                }
+                if (url != null) {
+                    result.writeAttribute("url", url);
+                }
+                if (target != null) {
+                    result.writeAttribute("target", target);
+                }
+                result.writeEndElement();
+                result.writeEndElement();
+                result.writeEndElement();
+            } catch (XMLStreamException ex) {
+                Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
             }
-            result += " rotation=\"true\""; //?
-            if (indent > -1) {
-                result += " indent=\"" + twipToPixel(indent) + "\"";
-            }
-            if (leftMargin > -1) {
-                result += " leftMargin=\"" + twipToPixel(leftMargin) + "\"";
-            }
-            if (letterSpacing > -1) {
-                result += " letterSpacing=\"" + letterSpacing + "\"";
-            }
-            if (lineSpacing > -1) {
-                result += " lineSpacing=\"" + twipToPixel(lineSpacing) + "\"";
-            }
-            if (rightMargin > -1) {
-                result += " rightMargin=\"" + twipToPixel(rightMargin) + "\"";
-            }
-            if (size > -1) {
-                result += " size=\"" + size + "\"";
-                result += " bitmapSize=\"" + (size * 20) + "\"";
-            }
-            if (fontFace != null) {
-                result += " face=\"" + fontFace + "\"";
-            }
-            if (color != null) {
-                result += " fillColor=\"" + color + "\"";
-            }
-            if (url != null) {
-                result += " url=\"" + url + "\"";
-            }
-            if (target != null) {
-                result += " target=\"" + target + "\"";
-            }
-            result += "/>";
-            result += "</textAttrs>";
-            result += "</DOMTextRun>";
         }
 
         @Override
         public void characters(char[] ch, int start, int length)
                 throws SAXException {
             putText(new String(ch, start, length));
-
         }
 
         @Override
