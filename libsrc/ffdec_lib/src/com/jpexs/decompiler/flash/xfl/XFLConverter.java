@@ -2297,7 +2297,7 @@ public class XFLConverter {
         }
 
         if (ret2.length() > 0) {
-            writer.writeStartElement("DOMLayer", new String[]{"Layer " + layerIndex, "color", randomOutlineColor()});
+            writer.writeStartElement("DOMLayer", new String[]{"name", "Layer " + layerIndex, "color", randomOutlineColor()});
             writer.writeElementValue("frames", ret2.toString());
             writer.writeEndElement();
         }
