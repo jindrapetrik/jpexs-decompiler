@@ -1266,10 +1266,10 @@ public class XFLConverter {
                     for (int i = maxDepth; i >= 1; i--) {
                         symbolStr.writeStartElement("DOMLayer", new String[]{"name", "Layer " + (maxDepth - i + 1)});
                         if (i == 1) {
-                            symbolStr.writeStartElement("current", "true");
-                            symbolStr.writeStartElement("isSelected", "true");
+                            symbolStr.writeAttribute("current", true);
+                            symbolStr.writeAttribute("isSelected", true);
                         }
-                        symbolStr.writeStartElement("color", randomOutlineColor());
+                        symbolStr.writeAttribute("color", randomOutlineColor());
                         symbolStr.writeStartElement("frames");
                         int lastFrame = 0;
                         loopframes:
@@ -3615,7 +3615,7 @@ public class XFLConverter {
         private void putText(String txt) {
             try {
                 result.writeStartElement("DOMTextRun");
-                result.writeElementValue("characters>", txt);
+                result.writeElementValue("characters", txt);
                 result.writeStartElement("textAttrs");
                 result.writeStartElement("DOMTextAttrs");
                 if (alignment != null) {
