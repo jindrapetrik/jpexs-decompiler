@@ -1252,7 +1252,7 @@ public class XFLConverter {
                 if (symbol instanceof ButtonTag) {
                     itemIcon = "0";
                     symbolStr.writeStartElement("DOMTimeline", new String[]{"name", "Symbol " + symbol.getCharacterId(), "currentFrame", "0"});
-                    symbolStr.writeStartElement("<layers>");
+                    symbolStr.writeStartElement("layers");
 
                     ButtonTag button = (ButtonTag) symbol;
                     List<BUTTONRECORD> records = button.getRecords();
@@ -1270,7 +1270,7 @@ public class XFLConverter {
                             symbolStr.writeStartElement("isSelected", "true");
                         }
                         symbolStr.writeStartElement("color", randomOutlineColor());
-                        symbolStr.writeStartElement("<frames>");
+                        symbolStr.writeStartElement("frames");
                         int lastFrame = 0;
                         loopframes:
                         for (int frame = 1; frame <= 4; frame++) {
