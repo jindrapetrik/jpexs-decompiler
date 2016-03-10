@@ -2574,13 +2574,7 @@ public class XFLConverter {
                 writer.writeAttribute("antiAliasSharpness", antiAliasSharpness);
                 writer.writeAttribute("antiAliasThickness", antiAliasThickness);
             }
-            if (((CharacterTag) tag).getCharacterId() == 650) {
-                // todo: remove
-                System.err.println("=========================AAAAAAAAAAA");
-            }
             Map<String, Object> attrs = TextTag.getTextRecordsAttributes(textRecords, swf);
-            // todo: remove
-            System.err.println("///////////=============");
             writer.writeAttribute("width", tag.getBounds().getWidth() / 2);
             writer.writeAttribute("height", tag.getBounds().getHeight());
             writer.writeAttribute("autoExpand", true);
