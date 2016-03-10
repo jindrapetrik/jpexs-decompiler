@@ -1336,7 +1336,9 @@ public class XFLConverter {
                                         symbolStr.writeStartElement("DOMFrame", new String[]{
                                             "index", Integer.toString(frame - 1),
                                             "keyMode", Integer.toString(KEY_MODE_NORMAL),});
-                                        symbolStr.writeElementValue("elements", recCharWriter.toString());
+                                        symbolStr.writeStartElement("elements");
+                                        symbolStr.writeCharactersRaw(recCharWriter.toString());
+                                        symbolStr.writeEndElement();
                                         symbolStr.writeEndElement();
                                     }
                                 }
