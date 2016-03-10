@@ -3208,7 +3208,7 @@ public class XFLConverter {
             publishSettings.writeEndElement();
             publishSettings.writeEndElement();
         } catch (XMLStreamException ex) {
-            Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
 
         String publishSettingsStr = publishSettings.toString();
@@ -3653,7 +3653,7 @@ public class XFLConverter {
                 result.writeEndElement();
                 result.writeEndElement();
             } catch (XMLStreamException ex) {
-                Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         }
 

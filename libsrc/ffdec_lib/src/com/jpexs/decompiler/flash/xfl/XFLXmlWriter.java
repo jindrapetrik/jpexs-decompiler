@@ -16,9 +16,12 @@
  */
 package com.jpexs.decompiler.flash.xfl;
 
+import com.jpexs.helpers.Helper;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -28,6 +31,8 @@ import javax.xml.stream.XMLStreamWriter;
  * @author JPEXS
  */
 public class XFLXmlWriter implements XMLStreamWriter {
+
+    private static final Logger logger = Logger.getLogger(XFLXmlWriter.class.getName());
 
     private String newLineCharacters = "\n"; //Helper.newLine;
 
@@ -364,6 +369,12 @@ public class XFLXmlWriter implements XMLStreamWriter {
         for (int i = 0; i < from.length; i++) {
             text = text.replace(from[i], to[i]);
         }
+
+        if (Helper.containsInvalidXMLCharacter(text)) {
+            logger.log(Level.WARNING, "The following text contains a character which is invalid in XML: {0}", text);
+            return Helper.removeInvalidXMLCharacters(text);
+        }
+
         return text;
     }
 
@@ -373,6 +384,11 @@ public class XFLXmlWriter implements XMLStreamWriter {
         for (int i = 0; i < from.length; i++) {
             text = text.replace(from[i], to[i]);
         }
+        if (Helper.containsInvalidXMLCharacter(text)) {
+            logger.log(Level.WARNING, "The following text contains a character which is invalid in XML: {0}", text);
+            return Helper.removeInvalidXMLCharacters(text);
+        }
+
         return text;
     }
 

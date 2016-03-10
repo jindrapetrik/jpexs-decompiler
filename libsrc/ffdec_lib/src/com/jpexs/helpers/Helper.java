@@ -1117,6 +1117,17 @@ public class Helper {
         return text;
     }
 
+    public static boolean containsInvalidXMLCharacter(String text) {
+        for (int i = 0; i < text.length(); i++) {
+            char ch = text.charAt(i);
+            if (!(ch > 31 || ch == 9 || ch == 10 || ch == 13)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public static String removeInvalidXMLCharacters(String text) {
         StringBuilder sb = new StringBuilder(text.length());
         for (int i = 0; i < text.length(); i++) {
