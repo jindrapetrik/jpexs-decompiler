@@ -1650,6 +1650,7 @@ public class Main {
         } catch (Throwable ex) {
             logger.log(Level.SEVERE, null, ex);
         }
+
         UIManager.put("OptionPane.okButtonText", AppStrings.translate("button.ok"));
         UIManager.put("OptionPane.yesButtonText", AppStrings.translate("button.yes"));
         UIManager.put("OptionPane.noButtonText", AppStrings.translate("button.no"));
@@ -1787,7 +1788,6 @@ public class Main {
         AppStrings.updateLanguage();
 
         Helper.decompilationErrorAdd = AppStrings.translate(Configuration.autoDeobfuscate.get() ? "deobfuscation.comment.failed" : "deobfuscation.comment.tryenable");
-
     }
 
     /**
@@ -2253,7 +2253,7 @@ public class Main {
             public void uncaughtException(Thread t, Throwable e) {
                 logger.log(Level.SEVERE, "Uncaught exception in thread: " + t.getName(), e);
                 if (e instanceof OutOfMemoryError || !Helper.is64BitJre() && Helper.is64BitOs()) {
-                    View.showMessageDialog(null, AppStrings.translate("message.warning.outOfMemeory32BitJre"), AppStrings.translate("message.warning"), JOptionPane.WARNING_MESSAGE);
+                    View.showMessageDialog(null, AppStrings.translate("message.warning.outOfMemory32BitJre"), AppStrings.translate("message.warning"), JOptionPane.WARNING_MESSAGE);
                 }
             }
         });
