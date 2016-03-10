@@ -346,4 +346,8 @@ public class XFLXmlWriter implements XMLStreamWriter {
         }
         return text;
     }
+
+    public int length() {
+        return sb.length();
+    }
 }

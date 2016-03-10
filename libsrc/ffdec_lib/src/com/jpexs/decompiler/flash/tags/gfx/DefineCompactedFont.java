@@ -315,6 +315,12 @@ public final class DefineCompactedFont extends FontTag {
     }
 
     @Override
+    public int getCharacterCount() {
+        FontType ft = fonts.get(0);
+        return ft.glyphInfo.size();
+    }
+
+    @Override
     public String getCharacters() {
         FontType ft = fonts.get(0);
         StringBuilder ret = new StringBuilder(ft.glyphInfo.size());

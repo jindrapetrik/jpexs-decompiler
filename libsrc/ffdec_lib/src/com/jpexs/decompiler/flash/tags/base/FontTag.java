@@ -153,6 +153,8 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
         return fontStyle;
     }
 
+    public abstract int getCharacterCount();
+
     public abstract String getCharacters();
 
     @Override

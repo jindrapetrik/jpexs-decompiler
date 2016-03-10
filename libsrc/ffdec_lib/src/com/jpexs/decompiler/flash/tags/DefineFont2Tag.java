@@ -510,8 +510,13 @@ public class DefineFont2Tag extends FontTag {
     }
 
     @Override
+    public int getCharacterCount() {
+        return codeTable.size();
+    }
+
+    @Override
     public String getCharacters() {
-        StringBuilder ret = new StringBuilder();
+        StringBuilder ret = new StringBuilder(codeTable.size());
         for (int i : codeTable) {
             ret.append((char) i);
         }

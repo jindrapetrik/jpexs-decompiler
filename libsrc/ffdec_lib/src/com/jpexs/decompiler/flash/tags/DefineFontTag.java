@@ -311,15 +311,27 @@ public class DefineFontTag extends FontTag {
     }
 
     @Override
-    public String getCharacters() {
-        StringBuilder ret = new StringBuilder();
+    public int getCharacterCount() {
         ensureFontInfo();
         if (fontInfoTag != null) {
-            for (int i : fontInfoTag.getCodeTable()) {
+            List<Integer> codeTable = fontInfoTag.getCodeTable();
+            return codeTable.size();
+        }
+        return 0;
+    }
+
+    @Override
+    public String getCharacters() {
+        ensureFontInfo();
+        if (fontInfoTag != null) {
+            List<Integer> codeTable = fontInfoTag.getCodeTable();
+            StringBuilder ret = new StringBuilder(codeTable.size());
+            for (int i : codeTable) {
                 ret.append((char) i);
             }
+            return ret.toString();
         }
-        return ret.toString();
+        return "";
     }
 
     @Override

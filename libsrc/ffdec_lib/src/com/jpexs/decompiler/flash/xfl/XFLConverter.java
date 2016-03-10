@@ -1191,13 +1191,18 @@ public class XFLConverter {
 
         //TODO: Imported assets
         //linkageImportForRS="true" linkageIdentifier="xxx" linkageURL="yyy.swf"
-        List<String> media = new ArrayList<>();
-        List<String> symbols = new ArrayList<>();
+        convertMedia(swf, characterVariables, characterClasses, nonLibraryShapes, backgroundColor, tags, characters, files, datfiles, flaVersion, writer);
+        convertSymbols(swf, characterVariables, characterClasses, nonLibraryShapes, backgroundColor, tags, characters, files, datfiles, flaVersion, writer);
+    }
+
+    private void convertSymbols(SWF swf, Map<Integer, String> characterVariables, Map<Integer, String> characterClasses, List<Integer> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, HashMap<Integer, CharacterTag> characters, HashMap<String, byte[]> files, HashMap<String, byte[]> datfiles, FLAVersion flaVersion, XFLXmlWriter writer) throws XMLStreamException {
+        boolean hasSymbol = false;
         for (int ch : characters.keySet()) {
             CharacterTag symbol = characters.get(ch);
             if ((symbol instanceof ShapeTag) && nonLibraryShapes.contains(symbol.getCharacterId())) {
                 continue; //shapes with 1 ocurrence and single layer are not added to library
             }
+
             if ((symbol instanceof ShapeTag) || (symbol instanceof DefineSpriteTag) || (symbol instanceof ButtonTag)) {
                 StringBuilder symbolStr = new StringBuilder();
 
@@ -1331,7 +1336,9 @@ public class XFLConverter {
                     if (sprite.getTags().isEmpty()) { //probably AS2 class
                         continue;
                     }
-                    symbolStr.append(convertTimeline(sprite.spriteId, nonLibraryShapes, backgroundColor, tags, sprite.getTags(), characters, "Symbol " + symbol.getCharacterId(), flaVersion, files));
+                    XFLXmlWriter writer2 = new XFLXmlWriter(); // todo: remove
+                    convertTimeline(sprite.spriteId, nonLibraryShapes, backgroundColor, tags, sprite.getTags(), characters, "Symbol " + symbol.getCharacterId(), flaVersion, files, writer2);
+                    symbolStr.append(writer2.toString());
                 } else if (symbol instanceof ShapeTag) {
                     itemIcon = "1";
                     ShapeTag shape = (ShapeTag) symbol;
@@ -1361,8 +1368,27 @@ public class XFLConverter {
                     //TODO: itemID=\"518de416-00000341\"
                 }
                 symbLinkStr += "/>";
-                symbols.add(symbLinkStr);
-            } else if (symbol instanceof ImageTag) {
+
+                if (!hasSymbol) {
+                    writer.writeStartElement("symbols");
+                }
+
+                writer.writeCharactersRaw(symbLinkStr);
+                hasSymbol = true;
+            }
+        }
+
+        if (hasSymbol) {
+            writer.writeEndElement();
+        }
+    }
+
+    private void convertMedia(SWF swf, Map<Integer, String> characterVariables, Map<Integer, String> characterClasses, List<Integer> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, HashMap<Integer, CharacterTag> characters, HashMap<String, byte[]> files, HashMap<String, byte[]> datfiles, FLAVersion flaVersion, XFLXmlWriter writer) throws XMLStreamException {
+        int mediaCount = 0;
+        for (int ch : characters.keySet()) {
+            CharacterTag symbol = characters.get(ch);
+            String mediaLinkStr = null;
+            if (symbol instanceof ImageTag) {
                 ImageTag imageTag = (ImageTag) symbol;
                 boolean allowSmoothing = false;
 
@@ -1404,7 +1430,7 @@ public class XFLConverter {
                 ImageFormat format = imageTag.getImageFormat();
                 String symbolFile = "bitmap" + symbol.getCharacterId() + imageTag.getImageFormat().getExtension();
                 files.put(symbolFile, imageBytes);
-                String mediaLinkStr = "<DOMBitmapItem name=\"" + symbolFile + "\" sourceLastImported=\"" + getTimestamp(swf) + "\" externalFileSize=\"" + imageBytes.length + "\"";
+                mediaLinkStr = "<DOMBitmapItem name=\"" + symbolFile + "\" sourceLastImported=\"" + getTimestamp(swf) + "\" externalFileSize=\"" + imageBytes.length + "\"";
                 if (allowSmoothing) {
                     mediaLinkStr += " allowSmoothing=\"true\"";
                 }
@@ -1420,8 +1446,7 @@ public class XFLConverter {
                 if (characterClasses.containsKey(symbol.getCharacterId())) {
                     mediaLinkStr += " linkageExportForAS=\"true\" linkageClassName=\"" + characterClasses.get(symbol.getCharacterId()) + "\"";
                 }
-                mediaLinkStr += " quality=\"50\" href=\"" + symbolFile + "\" bitmapDataHRef=\"M " + (media.size() + 1) + " " + getTimestamp(swf) + ".dat\" frameRight=\"" + image.getWidth() + "\" frameBottom=\"" + image.getHeight() + "\"/>\n";
-                media.add(mediaLinkStr);
+                mediaLinkStr += " quality=\"50\" href=\"" + symbolFile + "\" bitmapDataHRef=\"M " + (mediaCount + 1) + " " + getTimestamp(swf) + ".dat\" frameRight=\"" + image.getWidth() + "\" frameBottom=\"" + image.getHeight() + "\"/>\n";
 
             } else if ((symbol instanceof SoundStreamHeadTypeTag) || (symbol instanceof DefineSoundTag)) {
                 int soundFormat = 0;
@@ -1563,7 +1588,7 @@ public class XFLConverter {
 
                 String symbolFile = "sound" + symbol.getCharacterId() + "." + exportFormat;
                 files.put(symbolFile, data);
-                String mediaLinkStr = "<DOMSoundItem name=\"" + symbolFile + "\" sourceLastImported=\"" + getTimestamp(swf) + "\" externalFileSize=\"" + data.length + "\"";
+                mediaLinkStr = "<DOMSoundItem name=\"" + symbolFile + "\" sourceLastImported=\"" + getTimestamp(swf) + "\" externalFileSize=\"" + data.length + "\"";
                 mediaLinkStr += " href=\"" + symbolFile + "\"";
                 mediaLinkStr += " format=\"";
                 mediaLinkStr += rateMap[soundRate] + "kHz";
@@ -1587,7 +1612,6 @@ public class XFLConverter {
                 }
 
                 mediaLinkStr += "/>\n";
-                media.add(mediaLinkStr);
 
             } else if (symbol instanceof DefineVideoStreamTag) {
                 DefineVideoStreamTag video = (DefineVideoStreamTag) symbol;
@@ -1614,7 +1638,6 @@ public class XFLConverter {
                     logger.log(Level.SEVERE, null, ex);
                 }
                 String symbolFile = "movie" + symbol.getCharacterId() + "." + "flv";
-                String mediaLinkStr = "";
                 if (data.length == 0) { //Video has zero length, this probably means it is "Video - Actionscript-controlled"
                     long ts = getTimestamp(swf);
                     String datFileName = "M " + (datfiles.size() + 1) + " " + ts + ".dat";
@@ -1659,24 +1682,20 @@ public class XFLConverter {
                     }
                     mediaLinkStr += "/>\n";
                 }
-                media.add(mediaLinkStr);
             }
 
+            if (mediaLinkStr != null) {
+                if (mediaCount == 0) {
+                    writer.writeStartElement("media");
+                }
+
+                writer.writeCharactersRaw(mediaLinkStr);
+
+                mediaCount++;
+            }
         }
-        if (!media.isEmpty()) {
-            writer.writeStartElement("media");
-            for (String m : media) {
-                writer.writeCharactersRaw(m);
-            }
 
-            writer.writeEndElement();
-        }
-        if (!symbols.isEmpty()) {
-            writer.writeStartElement("symbols");
-            for (String s : symbols) {
-                writer.writeCharactersRaw(s);
-            }
-
+        if (mediaCount > 0) {
             writer.writeEndElement();
         }
     }
@@ -1827,7 +1846,7 @@ public class XFLConverter {
         return ret.toString();
     }
 
-    private static void convertFrames(String prevStr, String afterStr, List<Integer> nonLibraryShapes, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, HashMap<Integer, CharacterTag> characters, int depth, FLAVersion flaVersion, HashMap<String, byte[]> files, StringBuilder ret) {
+    private static void convertFrames(String prevStr, String afterStr, List<Integer> nonLibraryShapes, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, HashMap<Integer, CharacterTag> characters, int depth, FLAVersion flaVersion, HashMap<String, byte[]> files, XFLXmlWriter writer) throws XMLStreamException {
         StringBuilder ret2 = new StringBuilder();
         prevStr += "<frames>";
         int frame = -1;
@@ -1997,12 +2016,29 @@ public class XFLConverter {
         afterStr = "</frames>" + afterStr;
 
         if (ret2.length() > 0) {
-            ret.append(prevStr).append(ret2).append(afterStr);
+            writer.writeCharactersRaw(prevStr);
+            writer.writeCharactersRaw(ret2.toString());
+            writer.writeCharactersRaw(afterStr);
         }
     }
 
     private static void convertFonts(ReadOnlyTagList tags, XFLXmlWriter writer) throws XMLStreamException {
-        StringBuilder ret2 = new StringBuilder();
+        boolean hasFont = false;
+        for (Tag t : tags) {
+            if (t instanceof FontTag) {
+                FontTag font = (FontTag) t;
+                if (font.getCharacterCount() > 0) {
+                    hasFont = true;
+                }
+            }
+        }
+
+        if (!hasFont) {
+            return;
+        }
+
+        writer.writeStartElement("fonts");
+
         for (Tag t : tags) {
             if (t instanceof FontTag) {
                 FontTag font = (FontTag) t;
@@ -2069,16 +2105,22 @@ public class XFLConverter {
                 if (hasAllRanges) {
                     embedRanges = "9999";
                 }
-                ret2.append("<DOMFontItem name=\"Font ").append(fontId).append("\" font=\"").append(Helper.escapeHTML(fontName)).append("\" size=\"0\" id=\"").append(fontId).append("\" embedRanges=\"").append(embedRanges).append("\"").append(!"".equals(embeddedCharacters) ? " embeddedCharacters=\"" + Helper.escapeHTML(embeddedCharacters) + "\"" : "").append(" />");
+
+                writer.writeStartElement("DOMFontItem", new String[]{
+                    "name", "Font " + fontId,
+                    "font", fontName,
+                    "size", "0",
+                    "id", Integer.toString(fontId),
+                    "embedRanges", embedRanges});
+                if (!"".equals(embeddedCharacters)) {
+                    writer.writeAttribute("embeddedCharacters", embeddedCharacters);
+                }
+
+                writer.writeEndElement();
             }
-
         }
 
-        if (ret2.length() > 0) {
-            writer.writeStartElement("fonts");
-            writer.writeCharactersRaw(ret2.toString());
-            writer.writeEndElement();
-        }
+        writer.writeEndElement();
     }
 
     private String convertActionScriptLayer(int spriteId, ReadOnlyTagList tags, ReadOnlyTagList timeLineTags, String backgroundColor) {
@@ -2199,7 +2241,7 @@ public class XFLConverter {
         return retStr;
     }
 
-    private void convertSoundLayer(int layerIndex, String backgroundColor, HashMap<Integer, CharacterTag> characters, ReadOnlyTagList tags, ReadOnlyTagList timeLineTags, HashMap<String, byte[]> files, StringBuilder ret) {
+    private void convertSoundLayer(int layerIndex, String backgroundColor, HashMap<Integer, CharacterTag> characters, ReadOnlyTagList tags, ReadOnlyTagList timeLineTags, HashMap<String, byte[]> files, XFLXmlWriter writer) throws XMLStreamException {
         StringBuilder ret2 = new StringBuilder();
         StartSoundTag lastStartSound = null;
         SoundStreamHeadTypeTag lastSoundStreamHead = null;
@@ -2255,9 +2297,9 @@ public class XFLConverter {
         }
 
         if (ret2.length() > 0) {
-            ret.append("<DOMLayer name=\"Layer ").append(layerIndex).append("\" color=\"").append(randomOutlineColor()).append("\">"
-                    + "<frames>").append(ret2).append("</frames>"
-                            + "</DOMLayer>");
+            writer.writeStartElement("DOMLayer", new String[]{"Layer " + layerIndex, "color", randomOutlineColor()});
+            writer.writeElementValue("frames", ret2.toString());
+            writer.writeEndElement();
         }
     }
 
@@ -2271,15 +2313,14 @@ public class XFLConverter {
         return outlineColor.toHexRGB();
     }
 
-    private String convertTimeline(int spriteId, List<Integer> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, HashMap<Integer, CharacterTag> characters, String name, FLAVersion flaVersion, HashMap<String, byte[]> files) {
-        StringBuilder ret = new StringBuilder();
-        ret.append("<DOMTimeline name=\"").append(name).append("\">");
-        ret.append("<layers>");
+    private void convertTimeline(int spriteId, List<Integer> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, HashMap<Integer, CharacterTag> characters, String name, FLAVersion flaVersion, HashMap<String, byte[]> files, XFLXmlWriter writer) throws XMLStreamException {
+        writer.writeStartElement("DOMTimeline", new String[]{"name", name});
+        writer.writeStartElement("layers");
 
         String labelsLayer = convertLabelsLayer(spriteId, tags, timelineTags, backgroundColor);
-        ret.append(labelsLayer);
+        writer.writeCharactersRaw(labelsLayer);
         String scriptLayer = convertActionScriptLayer(spriteId, tags, timelineTags, backgroundColor);
-        ret.append(scriptLayer);
+        writer.writeCharactersRaw(scriptLayer);
 
         int index = 0;
 
@@ -2303,11 +2344,13 @@ public class XFLConverter {
                             parentLayers.push(index);
                         }
 
-                        ret.append("<DOMLayer name=\"Layer ").append(index + 1).append("\" color=\"").append(randomOutlineColor()).append("\" ");
-                        ret.append(" layerType=\"mask\" locked=\"true\"");
-                        ret.append(">");
-                        convertFrames("", "", nonLibraryShapes, tags, timelineTags, characters, po.getDepth(), flaVersion, files, ret);
-                        ret.append("</DOMLayer>");
+                        writer.writeStartElement("DOMLayer", new String[]{
+                            "name", "Layer " + (index + 1),
+                            "color", randomOutlineColor(),
+                            "layerType", "mask",
+                            "locked", "true"});
+                        convertFrames("", "", nonLibraryShapes, tags, timelineTags, characters, po.getDepth(), flaVersion, files, writer);
+                        writer.writeEndElement();
                         index++;
                         break;
                     }
@@ -2347,19 +2390,18 @@ public class XFLConverter {
             }
             layerPrev += ">";
             String layerAfter = "</DOMLayer>";
-            int prevLength = ret.length();
-            convertFrames(layerPrev, layerAfter, nonLibraryShapes, tags, timelineTags, characters, d, flaVersion, files, ret);
-            if (ret.length() == prevLength) {
+            int prevLength = writer.length();
+            convertFrames(layerPrev, layerAfter, nonLibraryShapes, tags, timelineTags, characters, d, flaVersion, files, writer);
+            if (writer.length() == prevLength) {
                 index--;
             }
         }
 
         int soundLayerIndex = layerCount;
         layerCount++;
-        convertSoundLayer(soundLayerIndex, backgroundColor, characters, tags, timelineTags, files, ret);
-        ret.append("</layers>");
-        ret.append("</DOMTimeline>");
-        return ret.toString();
+        convertSoundLayer(soundLayerIndex, backgroundColor, characters, tags, timelineTags, files, writer);
+        writer.writeEndElement();
+        writer.writeEndElement();
     }
 
     private static void writeFile(AbortRetryIgnoreHandler handler, final byte[] data, final String file) throws IOException, InterruptedException {
@@ -2806,7 +2848,7 @@ public class XFLConverter {
             convertLibrary(swf, characterVariables, characterClasses, nonLibraryShapes, backgroundColor, swf.getTags(), characters, files, datfiles, flaVersion, domDocument);
 
             domDocument.writeStartElement("timelines");
-            domDocument.writeCharactersRaw(convertTimeline(0, nonLibraryShapes, backgroundColor, swf.getTags(), swf.getTags(), characters, "Scene 1", flaVersion, files));
+            convertTimeline(0, nonLibraryShapes, backgroundColor, swf.getTags(), swf.getTags(), characters, "Scene 1", flaVersion, files, domDocument);
             domDocument.writeEndElement();
 
             domDocument.writeEndElement();
