@@ -912,7 +912,7 @@ public class XFLConverter {
         return ds;
     }
 
-    private static void convertFilter(FILTER filter, XFLXmlWriter writer) {
+    private static void convertFilter(FILTER filter, XFLXmlWriter writer) throws XMLStreamException {
         if (filter instanceof DROPSHADOWFILTER) {
             DROPSHADOWFILTER dsf = (DROPSHADOWFILTER) filter;
             writer.append("<DropShadowFilter");
