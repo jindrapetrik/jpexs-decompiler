@@ -1120,7 +1120,7 @@ public class Helper {
     public static boolean containsInvalidXMLCharacter(String text) {
         for (int i = 0; i < text.length(); i++) {
             char ch = text.charAt(i);
-            if (!(ch > 31 || ch == 9 || ch == 10 || ch == 13)) {
+            if (!isCharacterValidInXml(ch)) {
                 return true;
             }
         }
@@ -1132,12 +1132,18 @@ public class Helper {
         StringBuilder sb = new StringBuilder(text.length());
         for (int i = 0; i < text.length(); i++) {
             char ch = text.charAt(i);
-            if (ch > 31 || ch == 9 || ch == 10 || ch == 13) {
+            if (isCharacterValidInXml(ch)) {
                 sb.append(ch);
             }
         }
 
         return sb.toString();
+    }
+
+    private static boolean isCharacterValidInXml(char ch) {
+        return (ch > 31 && ch < 0xd800)
+                || ch == 9 || ch == 10 || ch == 13
+                || (ch >= 0xe000 && ch <= 0xfffd);
     }
 
     public static Shape imageToShapeOld(BufferedImage image) {
