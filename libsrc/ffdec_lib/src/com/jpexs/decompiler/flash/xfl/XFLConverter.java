@@ -564,6 +564,7 @@ public class XFLConverter {
 
         int layer = 1;
 
+        boolean hasEdge = false;
         XFLXmlWriter currentLayer = new XFLXmlWriter();
         if (fillStyleCount > 0 || lineStyleCount > 0) {
             currentLayer.writeStartElement("DOMShape", new String[]{"isFloating", "true"});
@@ -624,6 +625,7 @@ public class XFLConverter {
                                 convertShapeEdges(startEdgeX, startEdgeY, mat, edges, edgesSb);
                                 currentLayer.writeAttribute("edges", edgesSb.toString());
                                 currentLayer.writeEndElement();
+                                hasEdge = true;
                             }
                         }
 
@@ -632,11 +634,11 @@ public class XFLConverter {
                         currentLayer.writeEndElement(); // edges
                         currentLayer.writeEndElement(); // DOMShape
                     }
-                    String currentLayerString = currentLayer.toString();
-                    if (!currentLayerString.contains("<edges></edges>")) { //no empty layers,  TODO:handle this better
-                        layers.add(currentLayerString);
+                    if (currentLayer.length() > 0 && hasEdge) { //no empty layers
+                        layers.add(currentLayer.toString());
                     }
                     currentLayer.setLength(0);
+                    hasEdge = false;
                     currentLayer.writeStartElement("DOMShape", new String[]{"isFloating", "true"});
                     //ret += convertShape(characters, null, shape);
                     for (int f = 0; f < scr.fillStyles.fillStyles.length; f++) {
@@ -722,6 +724,7 @@ public class XFLConverter {
                             convertShapeEdges(startEdgeX, startEdgeY, mat, edges, edgesSb);
                             currentLayer.writeAttribute("edges", edgesSb.toString());
                             currentLayer.writeEndElement();
+                            hasEdge = true;
                         }
 
                         startEdgeX = x;
@@ -765,6 +768,7 @@ public class XFLConverter {
                     convertShapeEdges(startEdgeX, startEdgeY, mat, edges, edgesSb);
                     currentLayer.writeAttribute("edges", edgesSb.toString());
                     currentLayer.writeEndElement();
+                    hasEdge = true;
                 }
             }
         }
@@ -773,9 +777,8 @@ public class XFLConverter {
             currentLayer.writeEndElement(); // edges
             currentLayer.writeEndElement(); // DOMShape
 
-            String currentLayerString = currentLayer.toString();
-            if (!currentLayerString.contains("<edges></edges>")) { //no empty layers, TODO:handle this better
-                layers.add(currentLayerString);
+            if (currentLayer.length() > 0 && hasEdge) { //no empty layers
+                layers.add(currentLayer.toString());
             }
         }
         return layers;
@@ -951,7 +954,7 @@ public class XFLConverter {
             GLOWFILTER gf = (GLOWFILTER) filter;
             writer.writeStartElement("GlowFilter");
             if (gf.glowColor.alpha != 255) {
-                writer.writeAttribute("alpha", doubleToString(gf.glowColor.getAlphaFloat()));
+                writer.writeAttribute("alpha", gf.glowColor.getAlphaFloat());
             }
             writer.writeAttribute("blurX", doubleToString(gf.blurX));
             writer.writeAttribute("blurY", doubleToString(gf.blurY));
