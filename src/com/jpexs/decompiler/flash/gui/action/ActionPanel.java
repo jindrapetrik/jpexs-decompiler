@@ -425,8 +425,37 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
             setSourceWorker = null;
         }
 
+        clearSource();
         this.src = src;
         final ASMSource asm = (ASMSource) src;
+
+        if (!useCache) {
+            SWF.uncache(asm);
+        }
+
+        boolean decompile = Configuration.decompile.get();
+        if (!decompile) {
+            lastDecompiled = Helper.getDecompilationSkippedComment();
+            setDecompiledText(asm.getScriptName(), lastDecompiled);
+        } else {
+            CachedScript sc = SWF.getFromCache(asm);
+            if (sc != null) {
+                decompile = false;
+                decompiledHilights = sc.hilights;
+                methodHighlights = sc.methodHilights;
+                classHighlights = sc.classHilights;
+                specialHighlights = sc.specialHilights;
+                lastDecompiled = sc.text;
+                lastASM = asm;
+                setDecompiledText(lastASM.getScriptName(), lastDecompiled);
+            }
+        }
+
+        if (!decompile) {
+            setDecompiledEditMode(false);
+        }
+
+        final boolean decompileNeeded = decompile;
 
         CancellableWorker worker = new CancellableWorker() {
 
@@ -434,27 +463,17 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
             protected Void doInBackground() throws Exception {
 
                 setEditorText(asm.getScriptName(), "; " + AppStrings.translate("work.disassembling") + "...", "text/flasm");
-                if (Configuration.decompile.get()) {
+                if (decompileNeeded) {
                     setDecompiledText("-", "// " + AppStrings.translate("work.waitingfordissasembly") + "...");
-                } else {
-                    lastDecompiled = Helper.getDecompilationSkippedComment();
-                    setDecompiledText(asm.getScriptName(), lastDecompiled);
                 }
                 DisassemblyListener listener = getDisassemblyListener();
                 asm.addDisassemblyListener(listener);
                 ActionList actions = asm.getActions();
                 lastCode = actions;
                 asm.removeDisassemblyListener(listener);
-                srcWithHex = null;
-                srcNoHex = null;
-                srcHexOnly = null;
-                srcConstants = null;
                 setHex(getExportMode(), asm.getScriptName());
-                if (Configuration.decompile.get()) {
+                if (decompileNeeded) {
                     setDecompiledText("-", "// " + AppStrings.translate("work.decompiling") + "...");
-                    if (!useCache) {
-                        SWF.uncache(asm);
-                    }
 
                     CachedScript sc = SWF.getCached(asm, actions);
                     decompiledHilights = sc.hilights;
@@ -464,9 +483,9 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
                     lastDecompiled = sc.text;
                     lastASM = asm;
                     setDecompiledText(lastASM.getScriptName(), lastDecompiled);
+                    setDecompiledEditMode(false);
                 }
                 setEditMode(false);
-                setDecompiledEditMode(false);
 
                 return null;
             }

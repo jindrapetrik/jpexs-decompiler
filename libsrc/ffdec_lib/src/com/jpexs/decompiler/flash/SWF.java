@@ -2568,6 +2568,15 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
     }
 
+    public static CachedScript getFromCache(ASMSource src) {
+        SWF swf = src.getSwf();
+        if (swf.as2Cache.contains(src)) {
+            return swf.as2Cache.get(src);
+        }
+
+        return null;
+    }
+
     public static CachedScript getCached(ASMSource src, ActionList actions) throws InterruptedException {
         SWF swf = src.getSwf();
         if (swf.as2Cache.contains(src)) {
