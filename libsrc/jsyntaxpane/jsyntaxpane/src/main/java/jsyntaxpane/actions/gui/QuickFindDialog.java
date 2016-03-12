@@ -122,15 +122,14 @@ public class QuickFindDialog extends javax.swing.JDialog
             }
         };
         addWindowListener(closeListener);
-        System.out.println("valami");
         this.target = new WeakReference<JTextComponent>(target);
         Pattern p = dsd.get().getPattern();
         if (p != null) {
             jTxtFind.setText(p.pattern());
-            jTxtFind.selectAll();
         }
         jChkWrap.setSelected(dsd.get().isWrap());
         setVisible(true);
+        jTxtFind.selectAll();
     }
 
     /**
