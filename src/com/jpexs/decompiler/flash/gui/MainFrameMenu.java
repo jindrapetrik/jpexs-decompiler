@@ -319,7 +319,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
     protected boolean search(ActionEvent evt, Boolean searchInText) {
         if (swf != null) {
-            mainFrame.getPanel().searchInActionScriptOrText(searchInText);
+            mainFrame.getPanel().searchInActionScriptOrText(searchInText, swf);
             return true;
         }
 

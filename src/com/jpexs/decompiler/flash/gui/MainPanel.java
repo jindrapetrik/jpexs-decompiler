@@ -769,7 +769,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         enableDrop(true);
     }
 
-    private void closeTagTreeSearch() {
+    public void closeTagTreeSearch() {
         filterField.setText("");
         doFilter();
         searchPanel.setVisible(false);
@@ -1494,11 +1494,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         if (treePanelMode == TreePanelMode.TAG_TREE) {
             TreeItem treeNode = (TreeItem) tagTree.getLastSelectedPathComponent();
-            if (treeNode == null) {
-                return swfs.get(0).get(0);
-            }
-
-            if (treeNode instanceof SWFList) {
+            if (treeNode == null || treeNode instanceof SWFList) {
                 return null;
             }
 
@@ -1651,7 +1647,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
     }
 
-    public void searchInActionScriptOrText(Boolean searchInText) {
+    public void searchInActionScriptOrText(Boolean searchInText, SWF swf) {
         SearchDialog searchDialog = new SearchDialog(getMainFrame().getWindow(), false);
         if (searchInText != null) {
             if (searchInText) {
@@ -1664,7 +1660,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (searchDialog.showDialog() == AppDialog.OK_OPTION) {
             final String txt = searchDialog.searchField.getText();
             if (!txt.isEmpty()) {
-                final SWF swf = getCurrentSwf();
                 if (swf.isAS3()) {
                     getABCPanel();
                 } else {
@@ -1681,7 +1676,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                             List<ABCPanelSearchResult> abcResult = null;
                             List<ActionSearchResult> actionResult = null;
                             if (swf.isAS3()) {
-                                abcResult = getABCPanel().search(txt, ignoreCase, regexp, this);
+                                abcResult = getABCPanel().search(swf, txt, ignoreCase, regexp, this);
                             } else {
                                 actionResult = getActionPanel().search(txt, ignoreCase, regexp, this);
                             }

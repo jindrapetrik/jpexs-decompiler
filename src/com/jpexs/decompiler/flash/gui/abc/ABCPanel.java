@@ -182,7 +182,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         return mainPanel;
     }
 
-    public List<ABCPanelSearchResult> search(final String txt, boolean ignoreCase, boolean regexp, CancellableWorker<Void> worker) {
+    public List<ABCPanelSearchResult> search(final SWF swf, final String txt, boolean ignoreCase, boolean regexp, CancellableWorker<Void> worker) {
         List<String> ignoredClasses = new ArrayList<>();
         List<String> ignoredNss = new ArrayList<>();
 
@@ -192,7 +192,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         if (txt != null && !txt.isEmpty()) {
             searchPanel.setOptions(ignoreCase, regexp);
             TagTreeModel ttm = (TagTreeModel) mainPanel.tagTree.getModel();
-            TreeItem scriptsNode = ttm.getScriptsNode(mainPanel.getCurrentSwf());
+            TreeItem scriptsNode = ttm.getScriptsNode(swf);
             final List<ABCPanelSearchResult> found = new ArrayList<>();
             if (scriptsNode instanceof ClassesListTreeModel) {
                 ClassesListTreeModel clModel = (ClassesListTreeModel) scriptsNode;
@@ -1088,7 +1088,12 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
     public void hilightScript(ScriptPack pack) {
         TagTreeModel ttm = (TagTreeModel) mainPanel.tagTree.getModel();
-        final TreePath tp = ttm.getTreePath(pack);
+        TreePath tp0 = ttm.getTreePath(pack);
+        if (tp0 == null) {
+            mainPanel.closeTagTreeSearch();
+            tp0 = ttm.getTreePath(pack);
+        }
+        final TreePath tp = tp0;
         View.execInEventDispatchLater(() -> {
             mainPanel.tagTree.setSelectionPath(tp);
             mainPanel.tagTree.scrollPathToVisible(tp);
