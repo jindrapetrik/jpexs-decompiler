@@ -78,6 +78,8 @@ public abstract class ImageTag extends CharacterTag implements DrawableTag {
 
     public abstract ImageFormat getImageFormat();
 
+    public abstract ImageFormat getOriginalImageFormat();
+
     public boolean importSupported() {
         return true;
     }

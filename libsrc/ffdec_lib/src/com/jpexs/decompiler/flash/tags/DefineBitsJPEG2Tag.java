@@ -115,6 +115,11 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
 
     @Override
     public ImageFormat getImageFormat() {
+        return getOriginalImageFormat();
+    }
+
+    @Override
+    public ImageFormat getOriginalImageFormat() {
         return ImageTag.getImageFormat(imageData);
     }
 

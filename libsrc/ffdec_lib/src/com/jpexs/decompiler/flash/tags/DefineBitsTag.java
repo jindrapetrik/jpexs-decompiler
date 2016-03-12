@@ -109,6 +109,11 @@ public class DefineBitsTag extends ImageTag implements TagChangedListener {
     }
 
     @Override
+    public ImageFormat getOriginalImageFormat() {
+        return ImageFormat.JPEG;
+    }
+
+    @Override
     public InputStream getOriginalImageData() {
         if (swf.getJtt() != null) {
             try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {

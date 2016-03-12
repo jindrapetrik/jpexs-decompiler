@@ -42,7 +42,7 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-@SWFVersion(from = 3) //Note: GIF and PNG since version 
+@SWFVersion(from = 3) //Note: GIF and PNG since version
 public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
 
     public static final int ID = 35;
@@ -158,11 +158,16 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
 
     @Override
     public ImageFormat getImageFormat() {
-        ImageFormat fmt = ImageTag.getImageFormat(imageData);
+        ImageFormat fmt = getOriginalImageFormat();
         if (fmt == ImageFormat.JPEG && bitmapAlphaData.getLength() > 0) {
             fmt = ImageFormat.PNG; //transparency
         }
         return fmt;
+    }
+
+    @Override
+    public ImageFormat getOriginalImageFormat() {
+        return ImageTag.getImageFormat(imageData);
     }
 
     @Override

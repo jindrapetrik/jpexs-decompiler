@@ -1473,8 +1473,10 @@ public class XFLConverter {
                 switch (format) {
                     case PNG:
                     case GIF:
-                        writer.writeAttribute("useImportedJPEGData", false);
-                        writer.writeAttribute("compressionType", "lossless");
+                        if (imageTag.getOriginalImageFormat() != ImageFormat.JPEG) {
+                            writer.writeAttribute("useImportedJPEGData", false);
+                            writer.writeAttribute("compressionType", "lossless");
+                        }
                         writer.writeAttribute("originalCompressionType", "lossless");
                         break;
                     case JPEG:

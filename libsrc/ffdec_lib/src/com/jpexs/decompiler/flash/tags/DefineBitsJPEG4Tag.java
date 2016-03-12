@@ -163,11 +163,16 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
 
     @Override
     public ImageFormat getImageFormat() {
-        ImageFormat fmt = ImageTag.getImageFormat(imageData);
+        ImageFormat fmt = getOriginalImageFormat();
         if (fmt == ImageFormat.JPEG && bitmapAlphaData.getLength() > 0) {
             fmt = ImageFormat.PNG; //transparency
         }
         return fmt;
+    }
+
+    @Override
+    public ImageFormat getOriginalImageFormat() {
+        return ImageTag.getImageFormat(imageData);
     }
 
     @Override

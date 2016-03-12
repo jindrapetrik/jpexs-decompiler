@@ -218,6 +218,11 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
     }
 
     @Override
+    public ImageFormat getOriginalImageFormat() {
+        return ImageFormat.PNG;
+    }
+
+    @Override
     public InputStream getOriginalImageData() {
         return null;
     }
