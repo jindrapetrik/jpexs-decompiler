@@ -26,7 +26,6 @@ import java.lang.ref.WeakReference;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import javax.swing.JCheckBox;
-import javax.swing.JComponent;
 import javax.swing.JRootPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
@@ -40,97 +39,107 @@ import jsyntaxpane.components.Markers.SimpleMarker;
 import jsyntaxpane.util.SwingUtils;
 
 /**
- * QuickFind Dialog.  Firefox like dialog shown at bottom of editor.
+ * QuickFind Dialog. Firefox like dialog shown at bottom of editor.
+ *
  * @author Ayman Al-Sairafi
  */
-public class QuickFindDialog extends javax.swing.JDialog 
-	implements DocumentListener, ActionListener, EscapeListener {
+public class QuickFindDialog extends javax.swing.JDialog
+        implements DocumentListener, ActionListener, EscapeListener {
 
-	private SimpleMarker marker = new SimpleMarker(Color.PINK);
-	private WeakReference<JTextComponent> target;
-	private WeakReference<DocumentSearchData> dsd;
-	private int oldCaretPosition;
-	/**
-	 * This will be set to true if ESC key is used to quit the form.
-	 * In that case, the caret will be restored to its old pos, otherwise
-	 * it will remain where the user probably clicked.
-	 */
-	private boolean escaped = false;
-                 
-        //JPEXS added
-        public void setIgnoreCase(boolean ignoreCase){
-            jChkIgnoreCase.setSelected(ignoreCase);
+    private SimpleMarker marker = new SimpleMarker(Color.PINK);
+
+    private WeakReference<JTextComponent> target;
+
+    private WeakReference<DocumentSearchData> dsd;
+
+    private int oldCaretPosition;
+
+    /**
+     * This will be set to true if ESC key is used to quit the form.
+     * In that case, the caret will be restored to its old pos, otherwise
+     * it will remain where the user probably clicked.
+     */
+    private boolean escaped = false;
+
+    //JPEXS added
+    public void setIgnoreCase(boolean ignoreCase) {
+        jChkIgnoreCase.setSelected(ignoreCase);
+    }
+
+    //JPEXS added
+    public void setRegularExpression(boolean regularExpresion) {
+        jChkRegExp.setSelected(regularExpresion);
+    }
+
+    //JPEXS added
+    public void setWrap(boolean wrap) {
+        jChkWrap.setSelected(wrap);
+    }
+
+    /**
+     * Creates new form QuickFindDialog
+     *
+     * @param target
+     * @param data search data
+     */
+    public QuickFindDialog(final JTextComponent target, DocumentSearchData data) {
+        super(ActionUtils.getFrameFor(target), false);
+        initComponents();
+        SwingUtils.addEscapeListener(this);
+        dsd = new WeakReference<DocumentSearchData>(data);
+        getRootPane().setWindowDecorationStyle(JRootPane.NONE);
+
+    }
+
+    public void showFor(final JTextComponent target) {
+        oldCaretPosition = target.getCaretPosition();
+        Container view = target.getParent();
+        Dimension wd = getPreferredSize();
+        //wd.width = target.getVisibleRect().width;
+        Point loc = new Point(0, view.getHeight());
+        setSize(wd);
+        setLocationRelativeTo(view);
+        SwingUtilities.convertPointToScreen(loc, view);
+        setLocation(loc);
+        jTxtFind.setFont(target.getFont());
+        jTxtFind.getDocument().addDocumentListener(this);
+        WindowAdapter closeListener = new WindowAdapter() {
+
+            @Override
+            public void windowDeactivated(WindowEvent e) {
+                target.getDocument().removeDocumentListener(QuickFindDialog.this);
+                Markers.removeMarkers(target, marker);
+                if (escaped) {
+                    Rectangle aRect;
+                    try {
+                        aRect = target.modelToView(oldCaretPosition);
+                        target.setCaretPosition(oldCaretPosition);
+                        target.scrollRectToVisible(aRect);
+                    } catch (BadLocationException ex) {
+                    }
+                }
+                dispose();
+            }
+        };
+        addWindowListener(closeListener);
+        System.out.println("valami");
+        this.target = new WeakReference<JTextComponent>(target);
+        Pattern p = dsd.get().getPattern();
+        if (p != null) {
+            jTxtFind.setText(p.pattern());
+            jTxtFind.selectAll();
         }
-        //JPEXS added
-        public void setRegularExpression(boolean regularExpresion){
-            jChkRegExp.setSelected(regularExpresion);
-        }
-        //JPEXS added
-        public void setWrap(boolean wrap){
-            jChkWrap.setSelected(wrap);        
-        }    
-	/**
-	 * Creates new form QuickFindDialog
-	 *
-	 * @param target
-	 * @param data search data
-	 */
-	public QuickFindDialog(final JTextComponent target, DocumentSearchData data) {
-		super(ActionUtils.getFrameFor(target), false);
-		initComponents();
-		SwingUtils.addEscapeListener(this);
-		dsd = new WeakReference<DocumentSearchData>(data);
-                getRootPane().setWindowDecorationStyle(JRootPane.NONE);
-                
-	}
+        jChkWrap.setSelected(dsd.get().isWrap());
+        setVisible(true);
+    }
 
-	public void showFor(final JTextComponent target) {
-		oldCaretPosition = target.getCaretPosition();
-		Container view = target.getParent();
-		Dimension wd = getPreferredSize();
-		//wd.width = target.getVisibleRect().width;
-		Point loc = new Point(0, view.getHeight());
-		setSize(wd);
-		setLocationRelativeTo(view);
-		SwingUtilities.convertPointToScreen(loc, view);
-		setLocation(loc);
-		jTxtFind.setFont(target.getFont());
-		jTxtFind.getDocument().addDocumentListener(this);
-		WindowAdapter closeListener = new WindowAdapter() {
-
-			@Override
-			public void windowDeactivated(WindowEvent e) {
-				target.getDocument().removeDocumentListener(QuickFindDialog.this);
-				Markers.removeMarkers(target, marker);
-				if (escaped) {
-					Rectangle aRect;
-					try {
-						aRect = target.modelToView(oldCaretPosition);
-						target.setCaretPosition(oldCaretPosition);
-						target.scrollRectToVisible(aRect);
-					} catch (BadLocationException ex) {
-					}
-				}
-				dispose();
-			}
-		};
-		addWindowListener(closeListener);
-		this.target = new WeakReference<JTextComponent>(target);
-		Pattern p = dsd.get().getPattern();
-		if (p != null) {
-			jTxtFind.setText(p.pattern());
-		}
-		jChkWrap.setSelected(dsd.get().isWrap());
-		setVisible(true);
-	}
-
-	/**
-	 * This method is called from within the constructor to
-	 * initialize the form.
-	 * WARNING: Do NOT modify this code. The content of this method is
-	 * always regenerated by the Form Editor.
-	 */
-	@SuppressWarnings("unchecked")
+    /**
+     * This method is called from within the constructor to
+     * initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is
+     * always regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -242,19 +251,19 @@ public class QuickFindDialog extends javax.swing.JDialog
     }// </editor-fold>//GEN-END:initComponents
 
 	private void jBtnNextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnNextActionPerformed
-		if (dsd.get().doFindNext(target.get())) {
-			jLblStatus.setText(null);
-		} else {
-			jLblStatus.setText(java.util.ResourceBundle.getBundle("jsyntaxpane/Bundle").getString("QuickFindDialog.NotFound"));
-		}
+        if (dsd.get().doFindNext(target.get())) {
+            jLblStatus.setText(null);
+        } else {
+            jLblStatus.setText(java.util.ResourceBundle.getBundle("jsyntaxpane/Bundle").getString("QuickFindDialog.NotFound"));
+        }
 }//GEN-LAST:event_jBtnNextActionPerformed
 
 	private void jBtnPrevActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnPrevActionPerformed
-		if (dsd.get().doFindPrev(target.get())) {
-			jLblStatus.setText(null);
-		} else {
-			jLblStatus.setText(java.util.ResourceBundle.getBundle("jsyntaxpane/Bundle").getString("QuickFindDialog.NotFound"));
-		}
+        if (dsd.get().doFindPrev(target.get())) {
+            jLblStatus.setText(null);
+        } else {
+            jLblStatus.setText(java.util.ResourceBundle.getBundle("jsyntaxpane/Bundle").getString("QuickFindDialog.NotFound"));
+        }
 }//GEN-LAST:event_jBtnPrevActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -273,60 +282,60 @@ public class QuickFindDialog extends javax.swing.JDialog
     private javax.swing.JTextField jTxtFind;
     // End of variables declaration//GEN-END:variables
 
-	@Override
-	public void insertUpdate(DocumentEvent e) {
-		updateFind();
-	}
+    @Override
+    public void insertUpdate(DocumentEvent e) {
+        updateFind();
+    }
 
-	@Override
-	public void removeUpdate(DocumentEvent e) {
-		updateFind();
-	}
+    @Override
+    public void removeUpdate(DocumentEvent e) {
+        updateFind();
+    }
 
-	@Override
-	public void changedUpdate(DocumentEvent e) {
-		updateFind();
-	}
+    @Override
+    public void changedUpdate(DocumentEvent e) {
+        updateFind();
+    }
 
-	private void updateFind() {
-		JTextComponent t = target.get();
-		DocumentSearchData d = dsd.get();
-		String toFind = jTxtFind.getText();
-		if (toFind == null || toFind.isEmpty()) {
-			jLblStatus.setText(null);
-			return;
-		}
-		try {
-			d.setWrap(jChkWrap.isSelected());
-			d.setPattern(toFind,
-				jChkRegExp.isSelected(),
-				jChkIgnoreCase.isSelected());
-			// The dsd doFindNext will always find from current pos,
-			// so we need to relocate to our saved pos before we call doFindNext
-			jLblStatus.setText(null);
-			t.setCaretPosition(oldCaretPosition);
-			if (!d.doFindNext(t)) {
-				jLblStatus.setText(java.util.ResourceBundle.getBundle("jsyntaxpane/Bundle").getString("QuickFindDialog.NotFound"));
-			} else {
-				jLblStatus.setText(null);                                
-			}
-                        setSize(getPreferredSize());
-                        pack();
-		} catch (PatternSyntaxException e) {
-			jLblStatus.setText(e.getDescription());
-		}
-	}
+    private void updateFind() {
+        JTextComponent t = target.get();
+        DocumentSearchData d = dsd.get();
+        String toFind = jTxtFind.getText();
+        if (toFind == null || toFind.isEmpty()) {
+            jLblStatus.setText(null);
+            return;
+        }
+        try {
+            d.setWrap(jChkWrap.isSelected());
+            d.setPattern(toFind,
+                    jChkRegExp.isSelected(),
+                    jChkIgnoreCase.isSelected());
+            // The dsd doFindNext will always find from current pos,
+            // so we need to relocate to our saved pos before we call doFindNext
+            jLblStatus.setText(null);
+            t.setCaretPosition(oldCaretPosition);
+            if (!d.doFindNext(t)) {
+                jLblStatus.setText(java.util.ResourceBundle.getBundle("jsyntaxpane/Bundle").getString("QuickFindDialog.NotFound"));
+            } else {
+                jLblStatus.setText(null);
+            }
+            setSize(getPreferredSize());
+            pack();
+        } catch (PatternSyntaxException e) {
+            jLblStatus.setText(e.getDescription());
+        }
+    }
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() instanceof JCheckBox) {
-			updateFind();
-		}
-	}
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() instanceof JCheckBox) {
+            updateFind();
+        }
+    }
 
-	@Override
-	public void escapePressed() {
-		escaped = true;
-		setVisible(false);
-	}
+    @Override
+    public void escapePressed() {
+        escaped = true;
+        setVisible(false);
+    }
 }
