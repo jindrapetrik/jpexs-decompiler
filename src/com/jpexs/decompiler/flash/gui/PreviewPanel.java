@@ -80,12 +80,14 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -1137,7 +1139,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             //Inject Loader
             if (swf.isAS3() && Configuration.autoOpenLoadedSWFs.get() && !Configuration.internalFlashViewer.get() && !DebuggerTools.hasDebugger(swf)) {
                 SWF instrSWF;
-                try (FileInputStream fis = new FileInputStream(tempFile)) {
+                try (InputStream fis = new BufferedInputStream(new FileInputStream(tempFile))) {
                     instrSWF = new SWF(fis, false, false);
                 }
 

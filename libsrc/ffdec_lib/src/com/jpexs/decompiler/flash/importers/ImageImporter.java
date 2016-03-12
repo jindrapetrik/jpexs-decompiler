@@ -106,6 +106,24 @@ public class ImageImporter extends TagImporter {
 
     public Tag importImageAlpha(ImageTag it, byte[] newData) throws IOException {
 
+        try {
+            BufferedImage img = ImageHelper.read(newData);
+            int width = img.getWidth();
+            int height = img.getHeight();
+            byte[] data = new byte[width * height];
+            int[] imgData = img.getRGB(0, 0, width, height, null, 0, width);
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    int alpha = (imgData[y * width + x] >> 24) & 0xff;
+                    data[y * width + x] = (byte) alpha;
+                }
+
+            }
+
+            newData = data;
+        } catch (IOException ex) {
+        }
+
         if (it instanceof DefineBitsJPEG3Tag) {
             ((DefineBitsJPEG3Tag) it).setImageAlpha(newData);
         } else if (it instanceof DefineBitsJPEG4Tag) {
