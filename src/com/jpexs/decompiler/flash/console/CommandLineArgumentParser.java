@@ -1861,7 +1861,7 @@ public class CommandLineArgumentParser {
 
     private static void parseMemorySearch(Stack<String> args) {
         if (args.size() < 1) {
-            badArguments("memorySearch");
+            badArguments("memorysearch");
         }
 
         AtomicInteger cnt = new AtomicInteger();
@@ -1875,7 +1875,7 @@ public class CommandLineArgumentParser {
                     processId = Integer.parseInt(arg);
                 } catch (NumberFormatException nfe) {
                     System.err.println("ProcessId should be integer");
-                    badArguments("memorySearch");
+                    badArguments("memorysearch");
                 }
 
                 boolean found = false;
