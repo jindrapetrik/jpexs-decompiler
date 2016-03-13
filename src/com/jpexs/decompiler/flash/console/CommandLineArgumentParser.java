@@ -131,6 +131,8 @@ import com.jpexs.helpers.stat.StatisticData;
 import com.jpexs.helpers.stat.Statistics;
 import com.jpexs.helpers.streams.SeekableInputStream;
 import com.jpexs.helpers.utf8.Utf8Helper;
+import com.jpexs.process.Process;
+import com.jpexs.process.ProcessTools;
 import com.sun.jna.Platform;
 import com.sun.jna.platform.win32.Kernel32;
 import gnu.jpdf.PDFJob;
@@ -1859,11 +1861,56 @@ public class CommandLineArgumentParser {
 
     private static void parseMemorySearch(Stack<String> args) {
         if (args.size() < 1) {
-            badArguments("memorSearch");
+            badArguments("memorySearch");
         }
 
         AtomicInteger cnt = new AtomicInteger();
-        List<com.jpexs.process.Process> procs = null;
+        List<com.jpexs.process.Process> procs = new ArrayList<>();
+        List<Process> processList = ProcessTools.listProcesses();
+        while (args.size() > 0) {
+            String arg = args.pop();
+            if (arg.matches("\\d+")) {
+                int processId = 0;
+                try {
+                    processId = Integer.parseInt(arg);
+                } catch (NumberFormatException nfe) {
+                    System.err.println("ProcessId should be integer");
+                    badArguments("memorySearch");
+                }
+
+                boolean found = false;
+                for (Process process : processList) {
+                    if (process.getPid() == processId) {
+                        if (!procs.contains(process)) {
+                            procs.add(process);
+                        }
+
+                        found = true;
+                        break; // only 1 process can have this process id
+                    }
+                }
+
+                if (!found) {
+                    System.out.println("Process id=" + processId + " was not found.");
+                }
+            } else {
+                boolean found = false;
+                for (Process process : processList) {
+                    if (process.getFileName().equals(arg)) {
+                        if (!procs.contains(process)) {
+                            procs.add(process);
+                        }
+
+                        found = true;
+                    }
+                }
+
+                if (!found) {
+                    System.out.println("Process name=" + arg + " was not found.");
+                }
+            }
+        }
+
         try {
             new SearchInMemory(new SearchInMemoryListener() {
 

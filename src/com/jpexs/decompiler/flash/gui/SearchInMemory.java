@@ -67,7 +67,7 @@ public class SearchInMemory {
                     is.seek(0);
                     is = new ReReadableInputStream(new LimitedInputStream(is, limit));
                     if (swf.fileSize > 0 && swf.version > 0 && !swf.getTags().isEmpty() && swf.version <= SWF.MAX_VERSION) {
-                        SwfInMemory s = new SwfInMemory(is, swf.version, swf.fileSize, proc);
+                        SwfInMemory s = new SwfInMemory(is, addr, swf.version, swf.fileSize, proc);
                         publish(s);
                         swfStreams.add(s);
                     }

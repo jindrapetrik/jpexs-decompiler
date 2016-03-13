@@ -39,8 +39,8 @@ public class Win32Process implements Process {
     public DWORD th32ProcessID;
 
     @Override
-    public String getPid() {
-        return Long.toString(th32ProcessID.longValue());
+    public long getPid() {
+        return th32ProcessID.longValue();
     }
 
     public Win32Process(String filePath, String fileName, BufferedImage icon, DWORD th32ProcessID) {

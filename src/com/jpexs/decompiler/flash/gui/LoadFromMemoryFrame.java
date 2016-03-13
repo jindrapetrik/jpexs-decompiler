@@ -71,7 +71,7 @@ public class LoadFromMemoryFrame extends AppFrame {
 
     private MainFrame mainFrame;
 
-    private List<com.jpexs.process.Process> processlist;
+    private List<com.jpexs.process.Process> processList;
 
     private List<SwfInMemory> foundIs;
 
@@ -132,18 +132,18 @@ public class LoadFromMemoryFrame extends AppFrame {
     private void addResultRow(SwfInMemory swf) {
         if (swf != null) {
             com.jpexs.process.Process process = swf.process;
-            resTableModel.addRow(new Object[]{swf.version, swf.fileSize, process.getPid(), process.getFileName()});
+            resTableModel.addRow(new Object[]{swf.version, swf.fileSize, process.getPid(), process.getFileName(), swf.address});
         } else {
             String notFound = translate("notfound");
-            resTableModel.addRow(new Object[]{notFound, 0, "", ""});
+            resTableModel.addRow(new Object[]{notFound, 0, "", "", 0});
         }
     }
 
     private void refreshList() {
         model.clear();
-        processlist = ProcessTools.listProcesses();
-        Collections.sort(processlist);
-        for (com.jpexs.process.Process p : processlist) {
+        processList = ProcessTools.listProcesses();
+        Collections.sort(processList);
+        for (com.jpexs.process.Process p : processList) {
             model.addElement(p);
         }
     }
@@ -172,6 +172,7 @@ public class LoadFromMemoryFrame extends AppFrame {
         if (processing) {
             return;
         }
+
         selProcesses = list.getSelectedValuesList();
         if (!selProcesses.isEmpty()) {
             processing = true;
@@ -240,6 +241,8 @@ public class LoadFromMemoryFrame extends AppFrame {
                         return String.class;
                     case 3:
                         return String.class;
+                    case 4:
+                        return Long.class;
                 }
                 return null;
             }
@@ -253,6 +256,7 @@ public class LoadFromMemoryFrame extends AppFrame {
         resTableModel.addColumn(translate("column.fileSize"));
         resTableModel.addColumn(translate("column.pid"));
         resTableModel.addColumn(translate("column.processName"));
+        resTableModel.addColumn(translate("column.address"));
         tableRes = new JTable(resTableModel);
         TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(resTableModel);
         tableRes.setRowSorter(sorter);

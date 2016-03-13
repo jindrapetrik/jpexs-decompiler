@@ -29,12 +29,15 @@ public class SwfInMemory {
 
     public int version;
 
+    public long address;
+
     public long fileSize;
 
     public com.jpexs.process.Process process;
 
-    public SwfInMemory(ReReadableInputStream is, int version, long fileSize, com.jpexs.process.Process process) {
+    public SwfInMemory(ReReadableInputStream is, long address, int version, long fileSize, com.jpexs.process.Process process) {
         this.is = is;
+        this.address = address;
         this.version = version;
         this.fileSize = fileSize;
         this.process = process;
