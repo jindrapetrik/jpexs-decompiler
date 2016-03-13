@@ -50,12 +50,15 @@ import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.Transparency;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -231,6 +234,18 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
 
         public IconPanel() {
+            addComponentListener(new ComponentAdapter() {
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    renderImage = View.createRenderImage(getWidth(), getHeight(), Transparency.TRANSLUCENT);
+                    if (_img != null) {
+                        calcRect();
+                        render();
+                    }
+                    repaint();
+                }
+
+            });
             addMouseListener(new MouseAdapter() {
                 @Override
                 public void mousePressed(MouseEvent e) {
@@ -276,19 +291,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
 
         public synchronized void setImg(SerializableImage img) {
-
             this._img = img;
             if (img != null) {
-                if (renderImage == null || renderImage.getWidth() != getWidth() || renderImage.getHeight() != getHeight()) {
-                    renderImage = View.createRenderImage(getWidth(), getHeight(), Transparency.TRANSLUCENT);
-                }
-            }
-            calcRect();
-
-            if (img != null) {
+                calcRect();
                 render();
             }
-
             repaint();
         }
 
@@ -346,16 +353,16 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         @Override
         protected void paintComponent(Graphics g) {
             Graphics2D g2d = (Graphics2D) g;
-            calcRect();
 
             if (renderImage != null) {
+                calcRect();
                 if (renderImage.validate(View.getDefaultConfiguration()) != VolatileImage.IMAGE_OK) {
                     renderImage = View.createRenderImage(getWidth(), getHeight(), Transparency.TRANSLUCENT);
                     render();
                 }
 
                 if (renderImage != null) {
-                    g2d.drawImage(renderImage, 0, 0, getWidth(), getHeight(), null);
+                    g2d.drawImage(renderImage, 0, 0, null);
                 }
             }
             g2d.setColor(Color.red);
