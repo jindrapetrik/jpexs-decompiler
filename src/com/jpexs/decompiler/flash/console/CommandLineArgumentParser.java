@@ -700,7 +700,7 @@ public class CommandLineArgumentParser {
             parseXml2Swf(args);
         } else if (command.equals("extract")) {
             parseExtract(args);
-        } else if (command.equals("memorySearch")) {
+        } else if (command.equals("memorysearch")) {
             parseMemorySearch(args);
         } else if (command.equals("deobfuscate")) {
             parseDeobfuscate(args);
