@@ -416,7 +416,7 @@ public final class MethodBody implements Cloneable {
             writer.unindent().unindent().unindent();
             return writer.toString();
         } catch (InterruptedException ex) {
-            Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
 
         return null;

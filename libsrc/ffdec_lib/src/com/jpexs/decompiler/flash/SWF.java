@@ -209,7 +209,7 @@ public final class SWF implements SWFContainerItem, Timelined {
      * Maximum SWF file format version Needs to be fixed when SWF versions
      * reaches this value
      */
-    public static final int MAX_VERSION = 30;
+    public static final int MAX_VERSION = 32;
 
     /**
      * Tags inside of file
@@ -2562,7 +2562,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             } catch (InterruptedException ex) {
                 throw ex;
             } catch (Exception ex) {
-                Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
                 return new ActionList();
             }
         }
@@ -3259,7 +3259,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             items.add(new SWD.DebugId(dit.debugId));
 
         } catch (Throwable t) {
-            Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, "message", t);
+            logger.log(Level.SEVERE, "message", t);
             return false;
         }
 
@@ -3309,7 +3309,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                             SWD.DebugBreakpoint dbp = new SWD.DebugBreakpoint(moduleId, bpline);
                             items.add(dbp);
                         } catch (IllegalArgumentException iex) {
-                            Logger.getLogger(SWF.class.getName()).log(Level.WARNING, "Cannot generate breakpoint to SWD: {0}", iex.getMessage());
+                            logger.log(Level.WARNING, "Cannot generate breakpoint to SWD: {0}", iex.getMessage());
                         }
                     }
                 }
@@ -3430,7 +3430,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                                 SWD.DebugBreakpoint dbp = new SWD.DebugBreakpoint(moduleId, bpline);
                                 items.add(dbp);
                             } catch (IllegalArgumentException iex) {
-                                Logger.getLogger(SWF.class.getName()).log(Level.WARNING, "Cannot generate breakpoint to SWD: {0}", iex.getMessage());
+                                logger.log(Level.WARNING, "Cannot generate breakpoint to SWD: {0}", iex.getMessage());
                             }
                         }
                     }
@@ -3442,7 +3442,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             //items.addAll(swfBps);
 
         } catch (Throwable t) {
-            Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, "message", t);
+            logger.log(Level.SEVERE, "message", t);
             return false;
         }
         SWD swd = new SWD(7, items);

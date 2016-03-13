@@ -19,9 +19,10 @@ package com.jpexs.decompiler.flash.gui;
 /**
  *
  * @author JPEXS
- * @param <E> Element to search
  */
-public interface SearchListener<E> {
+public interface SearchInMemoryListener {
 
-    public void updateSearchPos(E item);
+    public void publish(Object... chunks);
+
+    public void setProgress(int progress);
 }

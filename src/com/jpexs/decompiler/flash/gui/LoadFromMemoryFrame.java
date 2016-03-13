@@ -16,13 +16,9 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
-import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFSourceInfo;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.helpers.Helper;
-import com.jpexs.helpers.LimitedInputStream;
-import com.jpexs.helpers.PosMarkedInputStream;
-import com.jpexs.helpers.ProgressListener;
 import com.jpexs.helpers.ReReadableInputStream;
 import com.jpexs.process.ProcessTools;
 import java.awt.BorderLayout;
@@ -41,11 +37,9 @@ import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -120,45 +114,18 @@ public class LoadFromMemoryFrame extends AppFrame {
 
         @Override
         protected List<SwfInMemory> doInBackground() throws Exception {
-            List<SwfInMemory> swfStreams = new ArrayList<>();
-            for (com.jpexs.process.Process proc : procs) {
-                publish(proc);
-                Map<Long, InputStream> ret = proc.search(new ProgressListener() {
-                    @Override
-                    public void progress(int p) {
-                        setProgress(p);
-                    }
-                }, "CWS".getBytes(), "FWS".getBytes(), "ZWS".getBytes());
-                int pos = 0;
-                for (Long addr : ret.keySet()) {
-                    setProgress(pos * 100 / ret.size());
-                    pos++;
-                    try {
-                        PosMarkedInputStream pmi = new PosMarkedInputStream(ret.get(addr));
-                        ReReadableInputStream is = new ReReadableInputStream(pmi);
-                        SWF swf = new SWF(is, null, null, null, false, true, false);
-                        long limit = pmi.getPos();
-                        is.seek(0);
-                        is = new ReReadableInputStream(new LimitedInputStream(is, limit));
-                        if (swf.fileSize > 0 && swf.version > 0 && !swf.getTags().isEmpty() && swf.version < 25/*Needs to be fixed when SWF versions reaches this value*/) {
-                            SwfInMemory s = new SwfInMemory(is, swf.version, swf.fileSize, proc);
-                            String p = translate("swfitem").replace("%version%", Integer.toString(swf.version)).replace("%size%", Long.toString(swf.fileSize));
-                            publish(s);
-                            swfStreams.add(s);
-                        }
+            return new SearchInMemory(new SearchInMemoryListener() {
 
-                    } catch (OutOfMemoryError ome) {
-                        Helper.freeMem();
-                    } catch (Exception | Error ex) {
-                    }
-
+                @Override
+                public void publish(Object... chunks) {
+                    SelectProcessWorker.this.publish(chunks);
                 }
-                setProgress(100);
-            }
-            if (swfStreams.isEmpty()) {
-                return null;
-            }
-            return swfStreams;
+
+                @Override
+                public void setProgress(int progress) {
+                    SelectProcessWorker.this.setProgress(progress);
+                }
+            }).search(procs);
         }
     }
 
@@ -293,7 +260,7 @@ public class LoadFromMemoryFrame extends AppFrame {
         list.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == 10) { //Enter pressed
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) { //Enter pressed
                     selectProcess();
                 }
             }

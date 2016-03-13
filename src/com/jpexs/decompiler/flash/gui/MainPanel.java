@@ -590,7 +590,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                             try {
                                 files = exportSelection(new GuiAbortRetryIgnoreHandler(), tempDir, exd);
                             } catch (InterruptedException ex) {
-                                Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
+                                logger.log(Level.SEVERE, null, ex);
                                 return null;
                             }
 
@@ -2027,7 +2027,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                             swf.exportXfl(errorHandler, selfile.getAbsolutePath(), new File(swf.getFile()).getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), selectedVersion);
                         }
                     } catch (Exception ex) {
-                        Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, "FLA export error", ex);
+                        logger.log(Level.SEVERE, "FLA export error", ex);
                         View.showMessageDialog(null, translate("error.export") + ": " + ex.getClass().getName() + " " + ex.getLocalizedMessage(), translate("error"), JOptionPane.ERROR_MESSAGE);
                     }
                     Helper.freeMem();
@@ -3280,7 +3280,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                             } catch (CancellationException ex) {
                                 getABCPanel().decompiledTextArea.setText("// " + AppStrings.translate("work.canceled"));
                             } catch (Exception ex) {
-                                Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, "Error", ex);
+                                logger.log(Level.SEVERE, "Error", ex);
                                 getABCPanel().decompiledTextArea.setText("// " + AppStrings.translate("decompilationError") + ": " + ex);
                             }
 

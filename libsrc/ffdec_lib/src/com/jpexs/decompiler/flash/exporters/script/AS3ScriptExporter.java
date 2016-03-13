@@ -170,7 +170,7 @@ public class AS3ScriptExporter {
 
         } catch (InterruptedException ex) {
             //?
-            Logger.getLogger(AS3ScriptExporter.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
         return out.toString();
     }
@@ -208,7 +208,7 @@ public class AS3ScriptExporter {
             //declaration->setlocal->(coreceavm)->NewArray[ callpropertyav ->receiver this, propName  ]
         } catch (InterruptedException ex) {
             //?
-            Logger.getLogger(AS3ScriptExporter.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
         return out.toString();
     }
@@ -334,7 +334,7 @@ public class AS3ScriptExporter {
                     }
 
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(AS3ScriptExporter.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 }
 
             }

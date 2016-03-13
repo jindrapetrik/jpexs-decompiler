@@ -79,6 +79,9 @@ import com.jpexs.decompiler.flash.exporters.settings.SpriteExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
 import com.jpexs.decompiler.flash.exporters.swf.SwfXmlExporter;
 import com.jpexs.decompiler.flash.gui.Main;
+import com.jpexs.decompiler.flash.gui.SearchInMemory;
+import com.jpexs.decompiler.flash.gui.SearchInMemoryListener;
+import com.jpexs.decompiler.flash.gui.SwfInMemory;
 import com.jpexs.decompiler.flash.gui.helpers.CheckResources;
 import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
@@ -161,6 +164,7 @@ import java.util.Map.Entry;
 import java.util.Stack;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -366,6 +370,11 @@ public class CommandLineArgumentParser {
             out.println("  ...Extracts SWF files from ZIP or other binary files");
             out.println("  ...-o parameter should contain a file path when \"biggest\" or \"first\" parameter is specified");
             out.println("  ...-o parameter should contain a folder path when no extaction mode or \"all\" parameter is specified");
+        }
+
+        if (filter == null || filter.equals("memorysearch")) {
+            out.println(" " + (cnt++) + ") -memorySearch (<processName1>|<processId1>) (<processName2>|<processId2>)...");
+            out.println("  ...Search SWF files in the memory");
         }
 
         if (filter == null || filter.equals("renameinvalididentifiers")) {
@@ -689,6 +698,8 @@ public class CommandLineArgumentParser {
             parseXml2Swf(args);
         } else if (command.equals("extract")) {
             parseExtract(args);
+        } else if (command.equals("memorySearch")) {
+            parseMemorySearch(args);
         } else if (command.equals("deobfuscate")) {
             parseDeobfuscate(args);
         } else if (command.equals("renameinvalididentifiers")) {
@@ -1649,7 +1660,7 @@ public class CommandLineArgumentParser {
             logger.log(Level.SEVERE, null, ex);
             System.exit(1);
         } catch (IOException ex) {
-            Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, "Error", ex);
+            logger.log(Level.SEVERE, "Error", ex);
             System.exit(1);
         } finally {
             if (tmpFile != null && tmpFile.exists()) {
@@ -1840,6 +1851,39 @@ public class CommandLineArgumentParser {
                 }
             }
         } catch (IOException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+
+        System.exit(0);
+    }
+
+    private static void parseMemorySearch(Stack<String> args) {
+        if (args.size() < 1) {
+            badArguments("memorSearch");
+        }
+
+        AtomicInteger cnt = new AtomicInteger();
+        List<com.jpexs.process.Process> procs = null;
+        try {
+            new SearchInMemory(new SearchInMemoryListener() {
+
+                @Override
+                public void publish(Object... chunks) {
+                    for (Object s : chunks) {
+                        if (s instanceof SwfInMemory) {
+                            SwfInMemory swf = (SwfInMemory) s;
+                            String fileName = cnt.getAndIncrement() + ".swf";
+                            Helper.writeFile(fileName, swf.is);
+                        }
+                    }
+                }
+
+                @Override
+                public void setProgress(int progress) {
+                    // ignore
+                }
+            }).search(procs);
+        } catch (Exception ex) {
             logger.log(Level.SEVERE, null, ex);
         }
 
@@ -2639,7 +2683,7 @@ public class CommandLineArgumentParser {
                     }
                     out = new File(args.pop());
                     if (out.isDirectory()) {
-                        Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, "File is a directory");
+                        logger.log(Level.SEVERE, "File is a directory");
                         System.exit(1);
                     } else {
                         pw = new PrintWriter(out);
@@ -2903,13 +2947,13 @@ public class CommandLineArgumentParser {
             }
             System.out.println("OK");
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, "Cannot read " + file);
+            logger.log(Level.SEVERE, "Cannot read {0}", file);
             System.exit(1);
         } catch (IOException ex) {
-            Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, "Reading error " + file);
+            logger.log(Level.SEVERE, "Reading error {0}", file);
             System.exit(2);
         } catch (InterruptedException ex) {
-            Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, "Cancelled " + file);
+            logger.log(Level.SEVERE, "Cancelled {0}", file);
             System.exit(3);
         }
 

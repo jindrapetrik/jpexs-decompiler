@@ -853,7 +853,7 @@ public class XFLConverter {
                 }
             }
         } catch (XMLStreamException ex) {
-            Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
 
         return ret;

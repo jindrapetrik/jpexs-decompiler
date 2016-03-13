@@ -292,11 +292,9 @@ import com.jpexs.decompiler.graph.SimpleValue;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
-import com.jpexs.decompiler.graph.model.DoWhileItem;
 import com.jpexs.decompiler.graph.model.ExitItem;
 import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
-import com.jpexs.decompiler.graph.model.WhileItem;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.stat.Statistics;
 import java.io.ByteArrayInputStream;
@@ -1568,7 +1566,7 @@ public class AVM2Code implements Cloneable {
              }
              }//*/
 
- /*if ((ip + 2 < code.size()) && (ins.definition instanceof NewCatchIns)) { // Filling local register in catch clause
+            /*if ((ip + 2 < code.size()) && (ins.definition instanceof NewCatchIns)) { // Filling local register in catch clause
              if (code.get(ip + 1).definition instanceof DupIns) {
              if (code.get(ip + 2).definition instanceof SetLocalTypeIns) {
              ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames);
@@ -2086,19 +2084,19 @@ public class AVM2Code implements Cloneable {
                     ins.operands[k] = updater.updateOperandOffset(ins.getAddress(), target, ins.operands[k]);
                 }
             } else /*for (int j = 0; j < ins.definition.operands.length; j++) {
-                 if (ins.definition.operands[j] == AVM2Code.DAT_OFFSET) {
-                 long target = ins.offset + ins.getBytes().length + ins.operands[j];
-                 ins.operands[j] = updater.updateOperandOffset(target, ins.operands[j]);
-                 }
-                 }*/ //Faster, but not so universal
-             if (ins.definition instanceof IfTypeIns) {
-                    long target = ins.getTargetAddress();
-                    try {
-                        ins.operands[0] = updater.updateOperandOffset(ins.getAddress(), target, ins.operands[0]);
-                    } catch (ConvertException cex) {
-                        throw new ConvertException("Invalid offset (" + ins + ")", i);
-                    }
+             if (ins.definition.operands[j] == AVM2Code.DAT_OFFSET) {
+             long target = ins.offset + ins.getBytes().length + ins.operands[j];
+             ins.operands[j] = updater.updateOperandOffset(target, ins.operands[j]);
+             }
+             }*/ //Faster, but not so universal
+            if (ins.definition instanceof IfTypeIns) {
+                long target = ins.getTargetAddress();
+                try {
+                    ins.operands[0] = updater.updateOperandOffset(ins.getAddress(), target, ins.operands[0]);
+                } catch (ConvertException cex) {
+                    throw new ConvertException("Invalid offset (" + ins + ")", i);
                 }
+            }
             ins.setAddress(updater.updateInstructionOffset(ins.getAddress()));
         }
 
@@ -2141,7 +2139,7 @@ public class AVM2Code implements Cloneable {
             }
         }
         if (someIgnored) {
-            Logger.getLogger(AVM2Code.class.getName()).log(Level.WARNING, path + ": One or more invalid jump offsets found in the code. Those instructions were ignored.");
+            logger.log(Level.WARNING, path + ": One or more invalid jump offsets found in the code. Those instructions were ignored.");
         }
         removeIgnored(body);
     }

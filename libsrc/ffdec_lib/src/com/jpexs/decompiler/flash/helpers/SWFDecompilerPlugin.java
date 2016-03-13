@@ -69,7 +69,7 @@ public class SWFDecompilerPlugin {
                 pluginPath = new File(Path.combine(dir.getPath(), "plugins")).getCanonicalFile();
             }
         } catch (IOException | URISyntaxException ex) {
-            Logger.getLogger(SWFDecompilerPlugin.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
         return pluginPath;
     }
@@ -118,7 +118,7 @@ public class SWFDecompilerPlugin {
 
             System.out.println("Plugin loaded: " + pluginName);
         } catch (MalformedURLException | ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
-            Logger.getLogger(SWFDecompilerPlugin.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
     }
 

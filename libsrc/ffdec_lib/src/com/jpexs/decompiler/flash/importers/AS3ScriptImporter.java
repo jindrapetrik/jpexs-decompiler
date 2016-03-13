@@ -62,7 +62,7 @@ public class AS3ScriptImporter {
                     importCount++;
                 }
             } catch (IOException ex) {
-                Logger.getLogger(AS3ScriptImporter.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         }
 

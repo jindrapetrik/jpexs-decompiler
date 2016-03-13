@@ -430,7 +430,7 @@ public class ScriptPack extends AS3ClassTreeItem {
 
             }
         } catch (InterruptedException ex) {
-            Logger.getLogger(ScriptPack.class.getName()).log(Level.SEVERE, "Cannot decompile", ex);
+            logger.log(Level.SEVERE, "Cannot decompile", ex);
         }
         int scriptInitBody = abc.findBodyIndex(abc.script_info.get(scriptIndex).init_index);
         if (!bodyToRegToName.containsKey(scriptInitBody)) {
@@ -501,7 +501,7 @@ public class ScriptPack extends AS3ClassTreeItem {
                     continue;
                 }
                 addedLines.add(line);
-                Logger.getLogger(ScriptPack.class.getName()).log(Level.FINE, "Script " + path + ": Insert debugline(" + line + ") at pos " + i + " to body " + bodyIndex);
+                logger.log(Level.FINE, "Script " + path + ": Insert debugline(" + line + ") at pos " + i + " to body " + bodyIndex);
                 b.insertInstruction(i + dpos, new AVM2Instruction(0, AVM2Instructions.DebugLine, new int[]{line}));
             }
             //remove old debug instructions
@@ -565,7 +565,7 @@ public class ScriptPack extends AS3ClassTreeItem {
                 }
             }
         } catch (InterruptedException ex) {
-            Logger.getLogger(ScriptPack.class.getName()).log(Level.SEVERE, "Cannot decompile", ex);
+            logger.log(Level.SEVERE, "Cannot decompile", ex);
         }
 
         int scriptInitBody = abc.findBodyIndex(abc.script_info.get(scriptIndex).init_index);

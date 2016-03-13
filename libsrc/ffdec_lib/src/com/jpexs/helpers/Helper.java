@@ -707,6 +707,14 @@ public class Helper {
         }
     }
 
+    public static void writeFile(String file, InputStream stream) {
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            copyStream(stream, fos);
+        } catch (IOException ex) {
+            // ignore
+        }
+    }
+
     public static String stackToString(TranslateStack stack, LocalData localData) throws InterruptedException {
         String ret = "[";
         for (int i = stack.size() - 1; i >= 0; i--) {

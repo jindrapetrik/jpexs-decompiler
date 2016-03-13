@@ -559,7 +559,7 @@ class SvgStyle {
 
                                 return bitmapFill;
                             } catch (IOException ex) {
-                                Logger.getLogger(ShapeImporter.class.getName()).log(Level.SEVERE, null, ex);
+                                Logger.getLogger(SvgStyle.class.getName()).log(Level.SEVERE, null, ex);
                             }
                         }
                     }
