@@ -1017,29 +1017,50 @@ public class Main {
 
         private final Runnable executeAfterOpen;
 
+        private final int[] reloadIndices;
+
         public OpenFileWorker(SWFSourceInfo sourceInfo) {
-            this(sourceInfo, null);
+            this(sourceInfo, -1);
+        }
+
+        public OpenFileWorker(SWFSourceInfo sourceInfo, int reloadIndex) {
+            this(sourceInfo, null, reloadIndex);
         }
 
         public OpenFileWorker(SWFSourceInfo sourceInfo, Runnable executeAfterOpen) {
+            this(sourceInfo, executeAfterOpen, -1);
+        }
+
+        public OpenFileWorker(SWFSourceInfo sourceInfo, Runnable executeAfterOpen, int reloadIndex) {
             this.sourceInfos = new SWFSourceInfo[]{sourceInfo};
             this.executeAfterOpen = executeAfterOpen;
+            this.reloadIndices = new int[]{reloadIndex};
         }
 
         public OpenFileWorker(SWFSourceInfo[] sourceInfos) {
-            this(sourceInfos, null);
+            this(sourceInfos, null, null);
         }
 
         public OpenFileWorker(SWFSourceInfo[] sourceInfos, Runnable executeAfterOpen) {
+            this(sourceInfos, executeAfterOpen, null);
+        }
+
+        public OpenFileWorker(SWFSourceInfo[] sourceInfos, Runnable executeAfterOpen, int[] reloadIndices) {
             this.sourceInfos = sourceInfos;
             this.executeAfterOpen = executeAfterOpen;
+            int indices[] = new int[sourceInfos.length];
+            for (int i = 0; i < indices.length; i++) {
+                indices[i] = -1;
+            }
+            this.reloadIndices = reloadIndices == null ? indices : reloadIndices;
         }
 
         @Override
         protected Object doInBackground() throws Exception {
             boolean first = true;
             SWF firstSWF = null;
-            for (final SWFSourceInfo sourceInfo : sourceInfos) {
+            for (int index = 0; index < sourceInfos.length; index++) {
+                SWFSourceInfo sourceInfo = sourceInfos[index];
                 SWFList swfs = null;
                 try {
                     Main.startWork(AppStrings.translate("work.reading.swf") + "...", null);
@@ -1074,11 +1095,16 @@ public class Main {
                     firstSWF = swfs1.get(0);
                 }
 
+                final int findex = index;
                 try {
                     View.execInEventDispatch(() -> {
                         Main.startWork(AppStrings.translate("work.creatingwindow") + "...", null);
                         ensureMainFrame();
-                        mainFrame.getPanel().load(swfs1, first1);
+                        if (reloadIndices[findex] > -1) {
+                            mainFrame.getPanel().loadSwfAtPos(swfs1, reloadIndices[findex]);
+                        } else {
+                            mainFrame.getPanel().load(swfs1, first1);
+                        }
                     });
                 } catch (Exception ex) {
                     logger.log(Level.SEVERE, null, ex);
@@ -1204,28 +1230,49 @@ public class Main {
         return openFile(new SWFSourceInfo[]{sourceInfo}, executeAfterOpen);
     }
 
+    public static OpenFileResult openFile(SWFSourceInfo sourceInfo, Runnable executeAfterOpen, int reloadIndex) {
+        return openFile(new SWFSourceInfo[]{sourceInfo}, executeAfterOpen, new int[]{reloadIndex});
+    }
+
     public static OpenFileResult openFile(SWFSourceInfo[] newSourceInfos) {
         return openFile(newSourceInfos, null);
     }
 
     public static OpenFileResult openFile(SWFSourceInfo[] newSourceInfos, Runnable executeAfterOpen) {
+        return openFile(newSourceInfos, executeAfterOpen, null);
+    }
+
+    public static OpenFileResult openFile(SWFSourceInfo[] newSourceInfos, Runnable executeAfterOpen, int[] reloadIndices) {
         if (mainFrame != null && !Configuration.openMultipleFiles.get()) {
             sourceInfos.clear();
             mainFrame.getPanel().closeAll(false);
             mainFrame.setVisible(false);
             Helper.freeMem();
+            reloadIndices = null;
         }
 
         loadingDialog.setVisible(true);
-        OpenFileWorker wrk = new OpenFileWorker(newSourceInfos, executeAfterOpen);
+
+        OpenFileWorker wrk = new OpenFileWorker(newSourceInfos, executeAfterOpen, reloadIndices);
         wrk.execute();
-        sourceInfos.addAll(Arrays.asList(newSourceInfos));
+        if (reloadIndices == null) {
+            sourceInfos.addAll(Arrays.asList(newSourceInfos));
+        } else {
+            for (int i = 0; i < reloadIndices.length; i++) {
+                sourceInfos.set(reloadIndices[i], newSourceInfos[i]);
+            }
+        }
         return OpenFileResult.OK;
     }
 
     public static void closeFile(SWFList swf) {
         sourceInfos.remove(swf.sourceInfo);
         mainFrame.getPanel().close(swf);
+    }
+
+    public static void reloadFile(SWFList swf) {
+        //mainFrame.getPanel().close(swf);
+        openFile(swf.sourceInfo, null, sourceInfos.indexOf(swf.sourceInfo));
     }
 
     public static boolean closeAll() {

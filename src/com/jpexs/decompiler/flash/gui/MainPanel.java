@@ -775,6 +775,18 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         searchPanel.setVisible(false);
     }
 
+    public void loadSwfAtPos(SWFList newSwfs, int index) {
+        previewPanel.clear();
+        swfs.set(index, newSwfs);
+        SWF swf = newSwfs.size() > 0 ? newSwfs.get(0) : null;
+        if (swf != null) {
+            updateUi(swf);
+        }
+
+        doFilter();
+        reload(false);
+    }
+
     public void load(SWFList newSwfs, boolean first) {
 
         previewPanel.clear();
