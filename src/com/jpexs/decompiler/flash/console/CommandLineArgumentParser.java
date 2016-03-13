@@ -1920,6 +1920,7 @@ public class CommandLineArgumentParser {
                         if (s instanceof SwfInMemory) {
                             SwfInMemory swf = (SwfInMemory) s;
                             String fileName = cnt.getAndIncrement() + ".swf";
+                            System.out.println("SWF found (" + fileName + "). Version: " + swf.version + ", file size: " + swf.fileSize + ", address: " + swf.address);
                             Helper.writeFile(fileName, swf.is);
                         }
                     }
