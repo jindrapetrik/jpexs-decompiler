@@ -288,7 +288,7 @@ public class LoadFromMemoryFrame extends AppFrame {
         tableRes.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == 10) { //Enter pressed
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) { //Enter pressed
                     openSwf();
                 }
             }
