@@ -2497,6 +2497,12 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
     }
 
+    public static void clearAllStaticCache() {
+        Cache.clearAll();
+        Helper.clearShapeCache();
+        System.gc();
+    }
+
     public void clearAllCache() {
         characters = null;
         characterIdTags = null;
@@ -2505,9 +2511,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         clearReadOnlyListCache();
         clearImageCache();
         clearScriptCache();
-        Cache.clearAll();
-        Helper.clearShapeCache();
-        System.gc();
+        clearAllStaticCache();
     }
 
     public static void uncache(ASMSource src) {
