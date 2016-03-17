@@ -432,7 +432,7 @@ public class CommandLineArgumentParser {
 
         if (filter == null || filter.equals("zoom")) {
             out.println(" " + (cnt++) + ") -zoom <N>");
-            out.println(" ...apply zoom during export (currently for FlashPaper conversion only)");
+            out.println(" ...apply zoom during export");
         }
 
         if (filter == null || filter.equals("replace")) {
