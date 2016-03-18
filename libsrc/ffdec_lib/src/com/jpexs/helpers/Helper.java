@@ -1228,12 +1228,10 @@ public class Helper {
 
         BitSet bs = new BitSet(width * height);
         bs.set(type);
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                int idx = width * y + x;
-                if ((imgData[idx] >>> 24) > 0) {
-                    bs.set(idx);
-                }
+        int pixelCount = width * height;
+        for (int i = 0; i < pixelCount; i++) {
+            if ((imgData[i] >>> 24) > 0) {
+                bs.set(i);
             }
         }
 
