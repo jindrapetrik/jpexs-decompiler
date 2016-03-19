@@ -638,7 +638,7 @@ public class Timeline {
             return;
         }
 
-        m.translate(-rect.xMin, -rect.yMin);
+        m = m.preConcatenate(Matrix.getTranslateInstance(-rect.xMin, -rect.yMin));
         //strokeTransform = strokeTransform.clone();
         //strokeTransform.translate(-rect.xMin, -rect.yMin);
         drawMatrix.translate(rect.xMin, rect.yMin);
@@ -760,8 +760,6 @@ public class Timeline {
             gm.drawImage(img.getBufferedImage(), 0, 0, null);
             Clip clip = new Clip(Helper.imageToShape(mask), clipDepth); // Maybe we can get current outline instead converting from image (?)
             clips.add(clip);
-            g.setTransform(new AffineTransform());
-            g.setClip(clip.shape);
         } else {
             if (renderContext.cursorPosition != null) {
                 if (drawable instanceof DefineSpriteTag) {
@@ -784,20 +782,8 @@ public class Timeline {
                 g2.draw(shape);
             }
 
-            Shape prevClip = g.getClip();
-            if (prevClip != null) {
-                g.setTransform(new AffineTransform());
-                g.setClip(prevClip);
-
-                // draw clip border
-//                g.setPaint(Color.red);
-//                g.setStroke(new BasicStroke(2));
-//                g.draw(prevClip);
-            }
-
             g.setTransform(trans);
             g.drawImage(img.getBufferedImage(), 0, 0, null);
-            g.setClip(prevClip);
         }
     }
 
@@ -843,7 +829,13 @@ public class Timeline {
                         }
                     }
 
+                    g.setTransform(new AffineTransform());
                     g.setClip(clip);
+
+                    // draw clip border
+                    //g.setPaint(Color.red);
+                    //g.setStroke(new BasicStroke(2));
+                    //g.draw(clip);
                 } else {
                     g.setClip(null);
                 }
@@ -901,7 +893,7 @@ public class Timeline {
 
                         Rectangle2D r = new Rectangle2D.Double(p1.xMin, p1.yMin, p1.getWidth(), p1.getHeight());
                         g.setClip(r);
-                        drawDrawable(strokeTransformation.preConcatenate(layerMatrix), layer, transforms[s], g, colorTransform, layer.blendMode, clips, transformation.clone(), isClip, layer.clipDepth, absMat, time, layer.ratio, renderContext, image, (DrawableTag) character, layer.filters, unzoom, clrTrans);
+                        drawDrawable(strokeTransformation.preConcatenate(layerMatrix), layer, transforms[s], g, colorTransform, layer.blendMode, clips, transformation, isClip, layer.clipDepth, absMat, time, layer.ratio, renderContext, image, (DrawableTag) character, layer.filters, unzoom, clrTrans);
 
                     }
                     g.setClip(c);
@@ -919,7 +911,7 @@ public class Timeline {
                      }*/
                     g.setTransform(origTransform);
                 } else {
-                    drawDrawable(strokeTransformation, layer, layerMatrix, g, colorTransform, layer.blendMode, clips, transformation.clone(), isClip, layer.clipDepth, absMat, time, layer.ratio, renderContext, image, (DrawableTag) character, layer.filters, unzoom, clrTrans);
+                    drawDrawable(strokeTransformation, layer, layerMatrix, g, colorTransform, layer.blendMode, clips, transformation, isClip, layer.clipDepth, absMat, time, layer.ratio, renderContext, image, (DrawableTag) character, layer.filters, unzoom, clrTrans);
                 }
             } else if (character instanceof BoundedTag) {
                 showPlaceholder = true;
@@ -957,7 +949,7 @@ public class Timeline {
             }
         }
 
-        g.setTransform(AffineTransform.getScaleInstance(1, 1));
+        g.setTransform(new AffineTransform());
         g.setClip(prevClip);
     }
 
