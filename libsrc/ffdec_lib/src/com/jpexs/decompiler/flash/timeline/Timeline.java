@@ -72,6 +72,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import org.w3c.dom.Element;
 
 /**
  *
@@ -967,17 +968,33 @@ public class Timeline {
 
         Frame frameObj = getFrame(frame);
         List<SvgClip> clips = new ArrayList<>();
-        List<String> prevClips = new ArrayList<>();
 
         int maxDepth = getMaxDepth();
+        int clipCount = 0;
+        Element clipGroup = null;
         for (int i = 1; i <= maxDepth; i++) {
+            boolean clipChanged = clipCount != clips.size();
             for (int c = 0; c < clips.size(); c++) {
-                if (clips.get(c).depth == i) {
-                    exporter.setClip(prevClips.get(c));
-                    prevClips.remove(c);
+                if (clips.get(c).depth < i) {
                     clips.remove(c);
+                    clipChanged = true;
                 }
             }
+
+            if (clipChanged) {
+                if (clipGroup != null) {
+                    exporter.endGroup();
+                }
+
+                if (clips.size() > 0) {
+                    String clip = clips.get(clips.size() - 1).shape; // todo: merge clip areas
+                    clipGroup = exporter.createSubGroup(null, null);
+                    clipGroup.setAttribute("clip-path", "url(#" + clip + ")");
+                }
+
+                clipCount = clips.size();
+            }
+
             if (!frameObj.layers.containsKey(i)) {
                 continue;
             }
@@ -1020,10 +1037,8 @@ public class Timeline {
                     exporter.createClipPath(new Matrix(), clipName);
                     SvgClip clip = new SvgClip(clipName, layer.clipDepth);
                     clips.add(clip);
-                    prevClips.add(exporter.getClip());
                     Matrix mat = Matrix.getTranslateInstance(rect.xMin, rect.yMin).preConcatenate(new Matrix(layer.matrix));
                     exporter.addUse(mat, boundRect, assetName, layer.instanceName);
-                    exporter.setClip(clip.shape);
                     exporter.endGroup();
                 } else {
                     Matrix mat = Matrix.getTranslateInstance(rect.xMin, rect.yMin).preConcatenate(new Matrix(layer.matrix));
@@ -1032,6 +1047,9 @@ public class Timeline {
             }
         }
 
+        if (clipGroup != null) {
+            exporter.endGroup();
+        }
     }
 
     private static String getTagIdPrefix(Tag tag, SVGExporter exporter) {
