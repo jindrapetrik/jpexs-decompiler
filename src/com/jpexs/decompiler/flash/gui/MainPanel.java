@@ -3048,6 +3048,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     }
                     if (item instanceof Timelined) {
                         timelineViewPanel.setTimelined((Timelined) item);
+                    } else if (item instanceof Frame) {
+                        timelineViewPanel.setTimelined(((Frame) item).timeline.timelined);
                     } else {
                         timelineViewPanel.setTimelined(swf);
                     }
@@ -3172,13 +3174,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         } else if (treeItem instanceof Frame && internalViewer) {
             Frame fn = (Frame) treeItem;
             SWF swf = fn.getSwf();
-            Timelined timelined = swf;
-            if (fn.timeline.timelined instanceof DefineSpriteTag) {
-                DefineSpriteTag parentSprite = (DefineSpriteTag) fn.timeline.timelined;
-                timelined = parentSprite;
-            }
-
-            previewPanel.showImagePanel(timelined, swf, fn.frame);
+            previewPanel.showImagePanel(fn.timeline.timelined, swf, fn.frame);
         } else if ((treeItem instanceof SoundTag)) { //&& isInternalFlashViewerSelected() && (Arrays.asList("mp3", "wav").contains(((SoundTag) tagObj).getExportFormat())))) {
             previewPanel.showImagePanel(new SerializableImage(View.loadImage("sound32")));
             previewPanel.setImageReplaceButtonVisible(((Tag) treeItem).isReadOnly() && (treeItem instanceof DefineSoundTag), false);

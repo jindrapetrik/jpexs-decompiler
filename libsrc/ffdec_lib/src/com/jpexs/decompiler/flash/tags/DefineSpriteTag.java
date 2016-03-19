@@ -187,11 +187,13 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
                 }
             }
             if (r != null) {
-                foundSomething = true;
-                ret.Xmin = Math.min(r.Xmin, ret.Xmin);
-                ret.Ymin = Math.min(r.Ymin, ret.Ymin);
-                ret.Xmax = Math.max(r.Xmax, ret.Xmax);
-                ret.Ymax = Math.max(r.Ymax, ret.Ymax);
+                if (r.Xmin < r.Xmax && r.Ymin < r.Ymax) {
+                    foundSomething = true;
+                    ret.Xmin = Math.min(r.Xmin, ret.Xmin);
+                    ret.Ymin = Math.min(r.Ymin, ret.Ymin);
+                    ret.Xmax = Math.max(r.Xmax, ret.Xmax);
+                    ret.Ymax = Math.max(r.Ymax, ret.Ymax);
+                }
             }
         }
         if (!foundSomething) {
@@ -256,8 +258,8 @@ public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timeli
                 r.Ymin = (int) Math.min(Math.min(Math.min(topleft.y, topright.y), bottomleft.y), bottomright.y);
                 r.Xmax = (int) Math.max(Math.max(Math.max(topleft.x, topright.x), bottomleft.x), bottomright.x);
                 r.Ymax = (int) Math.max(Math.max(Math.max(topleft.y, topright.y), bottomleft.y), bottomright.y);
-
             }
+
             ret.Xmin = Math.min(r.Xmin, ret.Xmin);
             ret.Ymin = Math.min(r.Ymin, ret.Ymin);
             ret.Xmax = Math.max(r.Xmax, ret.Xmax);

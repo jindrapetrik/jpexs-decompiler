@@ -117,7 +117,6 @@ public class ImageImporter extends TagImporter {
                     int alpha = (imgData[y * width + x] >> 24) & 0xff;
                     data[y * width + x] = (byte) alpha;
                 }
-
             }
 
             newData = data;
