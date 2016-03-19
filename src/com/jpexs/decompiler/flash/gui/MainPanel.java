@@ -675,6 +675,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
         });
         searchPanel.add(closeSearchButton, BorderLayout.EAST);
+        searchPanel.setVisible(false);
         treePanel = new JPanel(new CardLayout());
         treePanel.add(createResourcesViewCard(), RESOURCES_VIEW);
         treePanel.add(createDumpViewCard(), DUMP_VIEW);
