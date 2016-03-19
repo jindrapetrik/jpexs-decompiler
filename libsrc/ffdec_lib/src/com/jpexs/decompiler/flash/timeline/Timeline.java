@@ -820,8 +820,9 @@ public class Timeline {
         List<Clip> clips = new ArrayList<>();
 
         int maxDepth = getMaxDepth();
+        int clipCount = 0;
         for (int i = 1; i <= maxDepth; i++) {
-            boolean clipChanged = false;
+            boolean clipChanged = clipCount != clips.size();
             for (int c = 0; c < clips.size(); c++) {
                 if (clips.get(c).depth < i) {
                     clips.remove(c);
@@ -831,10 +832,22 @@ public class Timeline {
 
             if (clipChanged) {
                 if (clips.size() > 0) {
-                    g.setClip(clips.get(clips.size() - 1).shape); // todo: merge clips?
+                    Area clip = null;
+                    for (Clip clip1 : clips) {
+                        Shape shape = clip1.shape;
+                        if (clip == null) {
+                            clip = new Area(shape);
+                        } else {
+                            clip.intersect(new Area(shape));
+                        }
+                    }
+
+                    g.setClip(clip);
                 } else {
                     g.setClip(null);
                 }
+
+                clipCount = clips.size();
             }
 
             if (!frameObj.layers.containsKey(i)) {
