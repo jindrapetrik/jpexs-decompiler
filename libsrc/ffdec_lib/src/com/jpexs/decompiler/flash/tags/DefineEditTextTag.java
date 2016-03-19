@@ -934,8 +934,8 @@ public class DefineEditTextTag extends TextTag {
     }
 
     @Override
-    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level, double zoom) {
-        render(TextRenderMode.SVG, null, exporter, null, new Matrix(), colorTransform, zoom);
+    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) {
+        render(TextRenderMode.SVG, null, exporter, null, new Matrix(), colorTransform, 1);
     }
 
     @Override

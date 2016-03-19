@@ -196,12 +196,12 @@ public class FrameExporter {
                         rect.yMax *= settings.zoom;
                         rect.xMin *= settings.zoom;
                         rect.yMin *= settings.zoom;
-                        SVGExporter exporter = new SVGExporter(rect);
+                        SVGExporter exporter = new SVGExporter(rect, settings.zoom);
                         if (fbackgroundColor != null) {
                             exporter.setBackGroundColor(fbackgroundColor);
                         }
 
-                        tim.toSVG(frame, 0, null, 0, exporter, null, 0, settings.zoom);
+                        tim.toSVG(frame, 0, null, 0, exporter, null, 0);
                         fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                     }
                     ret.add(f);

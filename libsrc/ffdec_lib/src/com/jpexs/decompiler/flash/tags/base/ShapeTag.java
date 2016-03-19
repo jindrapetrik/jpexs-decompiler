@@ -179,8 +179,8 @@ public abstract class ShapeTag extends CharacterTag implements DrawableTag, Lazy
     }
 
     @Override
-    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level, double zoom) throws IOException {
-        SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, getShapes(), exporter, null, colorTransform, zoom);
+    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) throws IOException {
+        SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, getShapes(), exporter, null, colorTransform, 1);
         shapeExporter.export();
     }
 

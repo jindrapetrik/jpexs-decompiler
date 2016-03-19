@@ -961,7 +961,7 @@ public class Timeline {
         g.setClip(prevClip);
     }
 
-    public void toSVG(int frame, int time, DepthState stateUnderCursor, int mouseButton, SVGExporter exporter, ColorTransform colorTransform, int level, double zoom) throws IOException {
+    public void toSVG(int frame, int time, DepthState stateUnderCursor, int mouseButton, SVGExporter exporter, ColorTransform colorTransform, int level) throws IOException {
         if (getFrameCount() <= frame) {
             return;
         }
@@ -1025,7 +1025,7 @@ public class Timeline {
                     assetName = getTagIdPrefix(drawableTag, exporter);
                     exporter.exportedTags.put(drawableTag, assetName);
                     exporter.createDefGroup(new ExportRectangle(boundRect), assetName);
-                    drawable.toSVG(exporter, layer.ratio, clrTrans, level + 1, zoom);
+                    drawable.toSVG(exporter, layer.ratio, clrTrans, level + 1);
                     exporter.endGroup();
                 }
                 ExportRectangle rect = new ExportRectangle(boundRect);

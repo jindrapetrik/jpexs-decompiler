@@ -82,7 +82,7 @@ public class SVGExporter {
 
     public boolean useTextTag = Configuration.textExportExportFontFace.get();
 
-    public SVGExporter(ExportRectangle bounds) {
+    public SVGExporter(ExportRectangle bounds, double zoom) {
 
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         try {
@@ -96,7 +96,7 @@ public class SVGExporter {
             if (bounds != null) {
                 svgRoot.setAttribute("width", (bounds.getWidth() / SWF.unitDivisor) + "px");
                 svgRoot.setAttribute("height", (bounds.getHeight() / SWF.unitDivisor) + "px");
-                createDefGroup(bounds, null);
+                createDefGroup(bounds, null, zoom);
             }
         } catch (ParserConfigurationException ex) {
             Logger.getLogger(SVGExporter.class.getName()).log(Level.SEVERE, null, ex);
@@ -123,10 +123,15 @@ public class SVGExporter {
     }
 
     public final void createDefGroup(ExportRectangle bounds, String id) {
+        createDefGroup(bounds, id, 1);
+    }
+
+    public final void createDefGroup(ExportRectangle bounds, String id, double zoom) {
         Element g = _svg.createElement("g");
         if (bounds != null) {
-            g.setAttribute("transform", "matrix(1, 0, 0, 1, "
-                    + roundPixels20(-bounds.xMin / (double) SWF.unitDivisor) + ", " + roundPixels20(-bounds.yMin / (double) SWF.unitDivisor) + ")");
+            Matrix mat = Matrix.getTranslateInstance(-bounds.xMin, -bounds.yMin);
+            mat.scale(zoom);
+            g.setAttribute("transform", mat.getSvgTransformationString(SWF.unitDivisor, 1));
         }
         if (id != null) {
             g.setAttribute("id", id);

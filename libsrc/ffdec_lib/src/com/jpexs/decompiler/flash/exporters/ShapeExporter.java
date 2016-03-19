@@ -107,8 +107,8 @@ public class ShapeExporter {
                                 rect.yMax *= settings.zoom;
                                 rect.xMin *= settings.zoom;
                                 rect.yMin *= settings.zoom;
-                                SVGExporter exporter = new SVGExporter(rect);
-                                st.toSVG(exporter, -2, new CXFORMWITHALPHA(), 0, settings.zoom);
+                                SVGExporter exporter = new SVGExporter(rect, settings.zoom);
+                                st.toSVG(exporter, -2, new CXFORMWITHALPHA(), 0);
                                 fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                             }
                             break;
@@ -119,8 +119,7 @@ public class ShapeExporter {
                             int newHeight = (int) (rect.getHeight() * settings.zoom / SWF.unitDivisor) + 1;
                             SerializableImage img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB);
                             img.fillTransparent();
-                            Matrix m = new Matrix();
-                            m.translate(-rect.Xmin, -rect.Ymin);
+                            Matrix m = Matrix.getTranslateInstance(-rect.Xmin, -rect.Ymin);
                             m.scale(settings.zoom);
                             st.toImage(0, 0, 0, new RenderContext(), img, false, m, m, m, new CXFORMWITHALPHA());
                             if (settings.mode == ShapeExportMode.PNG) {

@@ -189,8 +189,8 @@ public final class Matrix implements Cloneable {
     }
 
     public void translate(double x, double y) {
-        translateX += x;
-        translateY += y;
+        translateX = scaleX * x + rotateSkew1 * y + translateX;
+        translateY = rotateSkew0 * x + scaleY * y + translateY;
     }
 
     public void scale(double factor) {

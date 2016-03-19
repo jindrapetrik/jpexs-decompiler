@@ -217,9 +217,8 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                 double px = x * w2 + w2 / 2 - w / 2 - minXMin * ratio;
                 double py = y * h2 - minYMin * ratio;
 
-                Matrix transformation = new Matrix();
-                transformation.translate(px, py);
-                transformation = transformation.concatenate(Matrix.getScaleInstance(ratio));
+                Matrix transformation = Matrix.getTranslateInstance(px, py);
+                transformation.scale(ratio);
                 BitmapExporter.export(swf, shape, color, image, transformation, transformation, colorTransform);
 
                 // draw bounding boxes

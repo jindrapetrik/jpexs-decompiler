@@ -41,7 +41,7 @@ public interface DrawableTag extends BoundedTag {
 
     public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, boolean isClip, Matrix transformation, Matrix prevTransformation, Matrix absoluteTransformation, ColorTransform colorTransform);
 
-    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level, double zoom) throws IOException;
+    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) throws IOException;
 
     public void toHtmlCanvas(StringBuilder result, double unitDivisor);
 

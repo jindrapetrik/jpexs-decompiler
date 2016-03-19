@@ -666,8 +666,8 @@ public abstract class StaticTextTag extends TextTag {
     }
 
     @Override
-    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level, double zoom) {
-        staticTextToSVG(swf, textRecords, getTextNum(), exporter, getRect(), textMatrix, colorTransform, zoom);
+    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) {
+        staticTextToSVG(swf, textRecords, getTextNum(), exporter, getRect(), textMatrix, colorTransform, 1);
     }
 
     @Override

@@ -82,8 +82,8 @@ public class TextExporter {
                     new RetryTask(() -> {
                         try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
                             ExportRectangle rect = new ExportRectangle(textTag.getRect());
-                            SVGExporter exporter = new SVGExporter(rect);
-                            textTag.toSVG(exporter, -2, new CXFORMWITHALPHA(), 0, settings.zoom);
+                            SVGExporter exporter = new SVGExporter(rect, settings.zoom);
+                            textTag.toSVG(exporter, -2, new CXFORMWITHALPHA(), 0);
                             fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                         }
                     }, handler).run();
