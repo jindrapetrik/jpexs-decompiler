@@ -80,8 +80,6 @@ public class SVGExporter {
 
     private final HashSet<String> fontFaces = new HashSet<>();
 
-    private String clip;
-
     public boolean useTextTag = Configuration.textExportExportFontFace.get();
 
     public SVGExporter(ExportRectangle bounds) {
@@ -150,7 +148,10 @@ public class SVGExporter {
 
     public final Element createSubGroup(Matrix transform, String id) {
         Element group = createSubGroup(id, "g");
-        group.setAttribute("transform", transform.getSvgTransformationString(SWF.unitDivisor, 1));
+        if (transform != null) {
+            group.setAttribute("transform", transform.getSvgTransformationString(SWF.unitDivisor, 1));
+        }
+
         return group;
     }
 
@@ -218,9 +219,6 @@ public class SVGExporter {
             image.setAttribute("id", instanceName);
         }
         image.setAttribute("xlink:href", "#" + href);
-        if (clip != null) {
-            image.setAttribute("clip-path", "url(#" + clip + ")");
-        }
         _svgGs.peek().appendChild(image);
         return image;
     }
@@ -255,14 +253,6 @@ public class SVGExporter {
         }
         lastIds.put(prefix, lastId);
         return prefix + lastId;
-    }
-
-    public void setClip(String clip) {
-        this.clip = clip;
-    }
-
-    public String getClip() {
-        return clip;
     }
 
     protected static double roundPixels20(double pixels) {
