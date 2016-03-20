@@ -90,6 +90,7 @@ import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DebugIDTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
+import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.EnableDebugger2Tag;
@@ -549,6 +550,19 @@ public final class SWF implements SWFContainerItem, Timelined {
 
         if (characterTag != null) {
             logger.log(Level.SEVERE, "CharacterTag should be an ImageTag. characterId: {0}", imageId);
+        }
+
+        return null;
+    }
+
+    public DefineSoundTag getSound(int soundId) {
+        CharacterTag characterTag = getCharacters().get(soundId);
+        if (characterTag instanceof DefineSoundTag) {
+            return (DefineSoundTag) characterTag;
+        }
+
+        if (characterTag != null) {
+            logger.log(Level.SEVERE, "CharacterTag should be a DefineSoundTag. characterId: {0}", soundId);
         }
 
         return null;

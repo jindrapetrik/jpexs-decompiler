@@ -1765,18 +1765,11 @@ public class XFLConverter {
         }
     }
 
-    private static void convertFrame(boolean shapeTween, HashMap<Integer, CharacterTag> characters, ReadOnlyTagList tags, SoundStreamHeadTypeTag soundStreamHead, StartSoundTag startSound, int frame, int duration, String actionScript, String elements, HashMap<String, byte[]> files, XFLXmlWriter writer) throws XMLStreamException {
+    private static void convertFrame(boolean shapeTween, SoundStreamHeadTypeTag soundStreamHead, StartSoundTag startSound, int frame, int duration, String actionScript, String elements, HashMap<String, byte[]> files, XFLXmlWriter writer) throws XMLStreamException {
         DefineSoundTag sound = null;
         if (startSound != null) {
-            for (Tag t : tags) {
-                if (t instanceof DefineSoundTag) {
-                    DefineSoundTag s = (DefineSoundTag) t;
-                    if (s.soundId == startSound.soundId) {
-                        sound = s;
-                        break;
-                    }
-                }
-            }
+            SWF swf = startSound.getSwf();
+            sound = swf.getSound(startSound.soundId);
         }
 
         writer.writeStartElement("DOMFrame");
@@ -2046,7 +2039,7 @@ public class XFLConverter {
                 frame++;
                 String elements = elementsWriter.toString();
                 if (!elements.equals(lastElements) && frame > 0) {
-                    convertFrame(lastShapeTween, characters, tags, null, null, frame - duration, duration, "", lastElements, files, writer2);
+                    convertFrame(lastShapeTween, null, null, frame - duration, duration, "", lastElements, files, writer2);
                     duration = 1;
                 } else if (frame == 0) {
                     duration = 1;
@@ -2060,7 +2053,7 @@ public class XFLConverter {
         }
         if (!lastElements.isEmpty()) {
             frame++;
-            convertFrame(lastShapeTween, characters, tags, null, null, (frame - duration < 0 ? 0 : frame - duration), duration, "", lastElements, files, writer2);
+            convertFrame(lastShapeTween, null, null, (frame - duration < 0 ? 0 : frame - duration), duration, "", lastElements, files, writer2);
         }
         afterStr = "</frames>" + afterStr;
 
@@ -2300,65 +2293,74 @@ public class XFLConverter {
         return hasLabel;
     }
 
-    private void convertSoundLayer(int layerIndex, String backgroundColor, HashMap<Integer, CharacterTag> characters, ReadOnlyTagList tags, ReadOnlyTagList timeLineTags, HashMap<String, byte[]> files, XFLXmlWriter writer) throws XMLStreamException {
+    private void convertSoundLayer(int layerIndex, ReadOnlyTagList timeLineTags, HashMap<String, byte[]> files, XFLXmlWriter writer) throws XMLStreamException {
+        int soundLayerIndex = 0;
         XFLXmlWriter writer2 = new XFLXmlWriter();
-        StartSoundTag lastStartSound = null;
-        SoundStreamHeadTypeTag lastSoundStreamHead = null;
-        StartSoundTag startSound = null;
-        SoundStreamHeadTypeTag soundStreamHead = null;
-        int duration = 1;
+        List<StartSoundTag> startSounds = new ArrayList<>();
+        List<Integer> startSoundFrameNumbers = new ArrayList<>();
+        List<SoundStreamHeadTypeTag> soundStreamHeads = new ArrayList<>();
+        List<Integer> soundStreamHeadFrameNumbers = new ArrayList<>();
         int frame = 0;
         for (Tag t : timeLineTags) {
             if (t instanceof StartSoundTag) {
-                startSound = (StartSoundTag) t;
-
-                for (Tag ta : tags) {
-                    if (ta instanceof DefineSoundTag) {
-                        DefineSoundTag s = (DefineSoundTag) ta;
-                        if (s.soundId == startSound.soundId) {
-                            if (!files.containsKey("sound" + s.soundId + "." + s.getExportFormat().toString().toLowerCase())) { //Sound was not exported
-                                startSound = null; // ignore
-                            }
-                            break;
-                        }
-                    }
+                StartSoundTag startSound = (StartSoundTag) t;
+                SWF swf = startSound.getSwf();
+                DefineSoundTag s = swf.getSound(startSound.soundId);
+                if (!files.containsKey("sound" + s.soundId + "." + s.getExportFormat().toString().toLowerCase())) { //Sound was not exported
+                    startSound = null; // ignore
                 }
 
-            }
-            if (t instanceof SoundStreamHeadTypeTag) {
-                soundStreamHead = (SoundStreamHeadTypeTag) t;
+                if (startSound != null) {
+                    startSounds.add(startSound);
+                    startSoundFrameNumbers.add(frame);
+                }
+            } else if (t instanceof SoundStreamHeadTypeTag) {
+                SoundStreamHeadTypeTag soundStreamHead = (SoundStreamHeadTypeTag) t;
                 if (!files.containsKey("sound" + soundStreamHead.getCharacterId() + "." + soundStreamHead.getExportFormat().toString().toLowerCase())) { //Sound was not exported
                     soundStreamHead = null; // ignore
                 }
-            }
-            if (t instanceof ShowFrameTag) {
-                if (soundStreamHead != null || startSound != null) {
-                    if (lastSoundStreamHead != null || lastStartSound != null) {
-                        convertFrame(false, characters, tags, lastSoundStreamHead, lastStartSound, frame, duration, "", "", files, writer2);
-                    }
-                    frame += duration;
-                    duration = 1;
-                    lastSoundStreamHead = soundStreamHead;
-                    lastStartSound = startSound;
-                    soundStreamHead = null;
-                    startSound = null;
-                } else {
-                    duration++;
+
+                if (soundStreamHead != null) {
+                    soundStreamHeads.add(soundStreamHead);
+                    soundStreamHeadFrameNumbers.add(frame);
                 }
+            } else if (t instanceof ShowFrameTag) {
+                frame++;
             }
-        }
-        if (lastSoundStreamHead != null || lastStartSound != null) {
-            if (frame < 0) {
-                frame = 0;
-                duration = 1;
-            }
-            convertFrame(false, characters, tags, lastSoundStreamHead, lastStartSound, frame, duration, "", "", files, writer2);
         }
 
-        if (writer2.length() > 0) {
-            writer.writeStartElement("DOMLayer", new String[]{"name", "Layer " + layerIndex, "color", randomOutlineColor()});
+        for (int i = 0; i < soundStreamHeads.size(); i++) {
+            writer.writeStartElement("DOMLayer", new String[]{"name", "Sound Layer " + (soundLayerIndex++), "color", randomOutlineColor()});
             writer.writeStartElement("frames");
-            writer.writeCharactersRaw(writer2.toString());
+
+            int startFrame = soundStreamHeadFrameNumbers.get(i);
+            int duration = frame - startFrame;
+
+            if (startFrame != 0) {
+                // empty frames should be added
+                convertFrame(false, null, null, 0, startFrame, "", "", files, writer);
+            }
+
+            convertFrame(false, soundStreamHeads.get(i), null, startFrame, duration, "", "", files, writer);
+
+            writer.writeEndElement();
+            writer.writeEndElement();
+        }
+
+        for (int i = 0; i < startSounds.size(); i++) {
+            writer.writeStartElement("DOMLayer", new String[]{"name", "Sound Layer " + (soundLayerIndex++), "color", randomOutlineColor()});
+            writer.writeStartElement("frames");
+
+            int startFrame = startSoundFrameNumbers.get(i);
+            int duration = frame - startFrame;
+
+            if (startFrame != 0) {
+                // empty frames should be added
+                convertFrame(false, null, null, 0, startFrame, "", "", files, writer);
+            }
+
+            convertFrame(false, null, startSounds.get(i), startFrame, duration, "", "", files, writer);
+
             writer.writeEndElement();
             writer.writeEndElement();
         }
@@ -2463,7 +2465,7 @@ public class XFLConverter {
 
         int soundLayerIndex = layerCount;
         layerCount++;
-        convertSoundLayer(soundLayerIndex, backgroundColor, characters, tags, timelineTags, files, writer);
+        convertSoundLayer(soundLayerIndex, timelineTags, files, writer);
         writer.writeEndElement();
         writer.writeEndElement();
     }
