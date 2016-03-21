@@ -489,7 +489,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     ButtonTag button = iconPanel.mouseOverButton;
                     if (button != null) {
                         DefineButtonSoundTag sounds = button.getSounds();
-                        if (sounds != null && sounds.buttonSoundChar2 != 0) { //OverUpToOverDown
+                        if (sounds != null && sounds.buttonSoundChar2 != 0) { // OverUpToOverDown
                             playSound((SoundTag) swf.getCharacter(sounds.buttonSoundChar2), sounds.buttonSoundInfo2, timer);
                         }
                     }
@@ -505,7 +505,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     ButtonTag button = iconPanel.mouseOverButton;
                     if (button != null) {
                         DefineButtonSoundTag sounds = button.getSounds();
-                        if (sounds != null && sounds.buttonSoundChar3 != 0) { //OverDownToOverUp
+                        if (sounds != null && sounds.buttonSoundChar3 != 0) { // OverDownToOverUp
                             playSound((SoundTag) swf.getCharacter(sounds.buttonSoundChar3), sounds.buttonSoundInfo3, timer);
                         }
                     }

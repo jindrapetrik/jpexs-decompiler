@@ -35,6 +35,7 @@ import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.tags.CSMTextSettingsTag;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
 import com.jpexs.decompiler.flash.tags.DefineButtonCxformTag;
+import com.jpexs.decompiler.flash.tags.DefineButtonSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineButtonTag;
 import com.jpexs.decompiler.flash.tags.DefineEditTextTag;
 import com.jpexs.decompiler.flash.tags.DefineFontNameTag;
@@ -1120,17 +1121,17 @@ public class XFLConverter {
         if (colorTransform != null) {
             writer.writeStartElement("color");
             writer.writeStartElement("Color");
-            if (colorTransform.getRedMulti() != 255) {
-                writer.writeAttribute("redMultiplier", ((float) colorTransform.getRedMulti()) / 255.0f);
+            if (colorTransform.getRedMulti() != 256) {
+                writer.writeAttribute("redMultiplier", ((float) colorTransform.getRedMulti()) / 256.0f);
             }
-            if (colorTransform.getGreenMulti() != 255) {
-                writer.writeAttribute("greenMultiplier", ((float) colorTransform.getGreenMulti()) / 255.0f);
+            if (colorTransform.getGreenMulti() != 256) {
+                writer.writeAttribute("greenMultiplier", ((float) colorTransform.getGreenMulti()) / 256.0f);
             }
-            if (colorTransform.getBlueMulti() != 255) {
-                writer.writeAttribute("blueMultiplier", ((float) colorTransform.getBlueMulti()) / 255.0f);
+            if (colorTransform.getBlueMulti() != 256) {
+                writer.writeAttribute("blueMultiplier", ((float) colorTransform.getBlueMulti()) / 256.0f);
             }
-            if (colorTransform.getAlphaMulti() != 255) {
-                writer.writeAttribute("alphaMultiplier", ((float) colorTransform.getAlphaMulti()) / 255.0f);
+            if (colorTransform.getAlphaMulti() != 256) {
+                writer.writeAttribute("alphaMultiplier", ((float) colorTransform.getAlphaMulti()) / 256.0f);
             }
 
             if (colorTransform.getRedAdd() != 0) {
@@ -1275,8 +1276,21 @@ public class XFLConverter {
                         symbolStr.writeAttribute("color", randomOutlineColor());
                         symbolStr.writeStartElement("frames");
                         int lastFrame = 0;
+                        DefineButtonSoundTag sound = button.getSounds();
                         loopframes:
                         for (int frame = 1; frame <= 4; frame++) {
+                            if (sound != null) {
+                                switch (frame) {
+                                    case 1:
+                                        break;
+                                    case 2:
+                                        break;
+                                    case 3:
+                                        break;
+                                    case 4:
+                                        break;
+                                }
+                            }
                             for (BUTTONRECORD rec : records) {
                                 if (rec.placeDepth == i) {
                                     boolean ok = false;

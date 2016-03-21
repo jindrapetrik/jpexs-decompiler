@@ -43,22 +43,22 @@ public class DefineButtonSoundTag extends Tag implements CharacterIdTag {
     public int buttonId;
 
     @SWFType(BasicType.UI16)
-    public int buttonSoundChar0;
+    public int buttonSoundChar0; // OverUpToIdle
 
     public SOUNDINFO buttonSoundInfo0;
 
     @SWFType(BasicType.UI16)
-    public int buttonSoundChar1;
+    public int buttonSoundChar1; // IdleToOverUp
 
     public SOUNDINFO buttonSoundInfo1;
 
     @SWFType(BasicType.UI16)
-    public int buttonSoundChar2;
+    public int buttonSoundChar2; // OverUpToOverDown
 
     public SOUNDINFO buttonSoundInfo2;
 
     @SWFType(BasicType.UI16)
-    public int buttonSoundChar3;
+    public int buttonSoundChar3; // OverDownToOverUp
 
     public SOUNDINFO buttonSoundInfo3;
 
