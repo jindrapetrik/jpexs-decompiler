@@ -190,7 +190,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.ModuloPIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.MultiplyPIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.NegatePIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.PrologueIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.PushConstantIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.PushFloatIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.PushDNanIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.PushDecimalIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.PushFloat4Ins;
@@ -296,11 +296,13 @@ import com.jpexs.decompiler.graph.model.ExitItem;
 import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.ReflectionTools;
 import com.jpexs.helpers.stat.Statistics;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -335,9 +337,9 @@ public class AVM2Code implements Cloneable {
 
     public static final int OPT_CASE_OFFSETS = 0x400;
 
-    public static final int OPT_BYTE = 0x500;
+    public static final int OPT_S8 = 0x500;
 
-    public static final int OPT_U30_SHORT = 0x600;
+    public static final int OPT_S16 = 0x600;
 
     public static final int DAT_MULTINAME_INDEX = OPT_U30 + 0x01;
 
@@ -357,7 +359,7 @@ public class AVM2Code implements Cloneable {
 
     public static final int DAT_SLOT_INDEX = OPT_U30 + 0x09;
 
-    public static final int DAT_SLOT_SCOPE_INDEX = OPT_U30 + 0x0A;
+    public static final int DAT_SCOPE_INDEX = OPT_U30 + 0x0A;
 
     public static final int DAT_OFFSET = OPT_S24 + 0x0B;
 
@@ -375,10 +377,51 @@ public class AVM2Code implements Cloneable {
 
     public static final int DAT_CASE_BASEOFFSET = OPT_S24 + 0x12;
 
-    public static final int DAT_DECIMAL_PARAMS = OPT_U30 + 0x13;
+    public static final int DAT_NUMBER_CONTEXT = OPT_U30 + 0x13;
+
+    public static final int DAT_DISPATCH_ID = OPT_U30 + 0x14;
+
+    public static final int DAT_FLOAT_INDEX = OPT_U30 + 0x15;
+
+    public static final int DAT_FLOAT4_INDEX = OPT_U30 + 0x16;
+
+    public static String operandTypeSizeToString(int ot) {
+        int sizeType = ot & 0xff00;
+        switch (sizeType) {
+            case OPT_U30:
+                return "U30";
+            case OPT_S16:
+                return "S16";
+            case OPT_U8:
+                return "U8";
+            case OPT_S8:
+                return "S8";
+            case OPT_S24:
+                return "S24";
+            case OPT_CASE_OFFSETS:
+                return "S24(=n), S24[n]";
+        }
+        return "";
+    }
+
+    private static Map<Integer, String> operandDataTypeIdentifiers = ReflectionTools.getConstNamesMap(AVM2Code.class, Integer.class, "^DAT_(.*)$");
+
+    public static String operandTypeToString(int ot) {
+        String typeSize = operandTypeSizeToString(ot);
+        if (ot == OPT_CASE_OFFSETS) {
+            return "numOffsets (U30), offset1 (S24), offset2 (S24), ...";
+        }
+        if (operandDataTypeIdentifiers.containsKey(ot)) {
+            String dataType = operandDataTypeIdentifiers.get(ot);
+            return dataType + " (" + typeSize + ")";
+        } else {
+            return typeSize;
+        }
+
+    }
 
     public static final InstructionDefinition[] instructionSet = new InstructionDefinition[]{
-        /*0x00*/null,
+        /*0x00*//*0x00*/null,
         /*0x01*/ new BkptIns(),
         /*0x02*/ new NopIns(),
         /*0x03*/ new ThrowIns(),
@@ -412,7 +455,7 @@ public class AVM2Code implements Cloneable {
         /*0x1F*/ new HasNextIns(),
         /*0x20*/ new PushNullIns(),
         /*0x21*/ new PushUndefinedIns(),
-        /*0x22*/ new PushConstantIns(), // new PushUninitializedIns()
+        /*0x22*/ new PushFloatIns(), //major 47+, pushuninitialized(U30) before
         /*0x23*/ new NextValueIns(),
         /*0x24*/ new PushByteIns(),
         /*0x25*/ new PushShortIns(),
@@ -429,8 +472,8 @@ public class AVM2Code implements Cloneable {
         /*0x30*/ new PushScopeIns(),
         /*0x31*/ new PushNamespaceIns(),
         /*0x32*/ new HasNext2Ins(),
-        /*0x33*/ new PushDecimalIns(),
-        /*0x34*/ new PushDNanIns(),
+        /*0x33*/ new PushDecimalIns(), //pushdecimal(minor 17), lix8 (internal-only) according to Tamarin
+        /*0x34*/ new PushDNanIns(), //pushdnan according to Flex SDK, lix16 (internal-only) according to Tamarin
         /*0x35*/ new Li8Ins(),
         /*0x36*/ new Li16Ins(),
         /*0x37*/ new Li32Ins(),
@@ -462,17 +505,15 @@ public class AVM2Code implements Cloneable {
         /*0x51*/ new Sxi8Ins(),
         /*0x52*/ new Sxi16Ins(),
         /*0x53*/ new ApplyTypeIns(),
-        /*0x54*/ new PushFloat4Ins(),
+        /*0x54*/ new PushFloat4Ins(), //major 47+
         /*0x55*/ new NewObjectIns(),
         /*0x56*/ new NewArrayIns(),
         /*0x57*/ new NewActivationIns(),
         /*0x58*/ new NewClassIns(),
         /*0x59*/ new GetDescendantsIns(),
         /*0x5A*/ new NewCatchIns(),
-        /*0x5B*/ new DelDescendantsIns(),
-        /* // Duplicate OPCODE with deldescendants. Prefering deldescendants (found in FLEX compiler)
-         new FindPropGlobalStrictIns(),*/
-        /*0x5C*/ new FindPropGlobalIns(),
+        /*0x5B*/ new DelDescendantsIns(), //deldescendants according to Flex, findpropglobalstrict(internal-only) according to Tamarin
+        /*0x5C*/ new FindPropGlobalIns(), //Tamarin (internal-only)
         /*0x5D*/ new FindPropertyStrictIns(),
         /*0x5E*/ new FindPropertyIns(),
         /*0x5F*/ new FindDefIns(),
@@ -501,9 +542,9 @@ public class AVM2Code implements Cloneable {
         /*0x76*/ new ConvertBIns(),
         /*0x77*/ new ConvertOIns(),
         /*0x78*/ new CheckFilterIns(),
-        /*0x79*/ new ConvertMIns(),
-        /*0x7A*/ new ConvertMPIns(),
-        /*0x7B*/ new ConvertF4Ins(),
+        /*0x79*/ new ConvertMIns(), // convert_m according to Flex (minor 17), convert_f (major 47+)
+        /*0x7A*/ new ConvertMPIns(), //convert_m_p according to Flex (minor 17), unplus (major 47+)
+        /*0x7B*/ new ConvertF4Ins(), // (major 47+)
         /*0x7C*/ null,
         /*0x7D*/ null,
         /*0x7E*/ null,
@@ -642,10 +683,25 @@ public class AVM2Code implements Cloneable {
         for (int i = 0; i < instructionSet.length; i++) {
             if (instructionSet[i] == null) {
                 instructionSet[i] = new UnknownInstruction(i);
+            } else {
+                /*System.out.println("instruction." + instructionSet[i].instructionName + ".shortDescription = ");
+                System.out.println("instruction." + instructionSet[i].instructionName + ".description = ");
+                System.out.println("instruction." + instructionSet[i].instructionName + ".stackBefore = ");
+                System.out.println("instruction." + instructionSet[i].instructionName + ".stackAfter = ");
+
+                System.out.print("instruction." + instructionSet[i].instructionName + ".operands = ");
+                for (int j = 0; j < instructionSet[i].operands.length; j++) {
+                    if (j > 0) {
+                        System.out.print(" ");
+                    }
+                    System.out.print("operand" + (j + 1));
+                }
+                System.out.println("");
+                System.out.println("");*/
             }
         }
-    }
 
+    }
     public static final String IDENTOPEN = "/*IDENTOPEN*/";
 
     public static final String IDENTCLOSE = "/*IDENTCLOSE*/";
@@ -911,13 +967,13 @@ public class AVM2Code implements Cloneable {
                                         case OPT_U30:
                                             actualOperands[op] = ais.readU30("operand");
                                             break;
-                                        case OPT_U30_SHORT:
+                                        case OPT_S16:
                                             actualOperands[op] = (short) ais.readU30("operand");
                                             break;
                                         case OPT_U8:
                                             actualOperands[op] = ais.read("operand");
                                             break;
-                                        case OPT_BYTE:
+                                        case OPT_S8:
                                             actualOperands[op] = (byte) ais.read("operand");
                                             break;
                                         case OPT_S24:
@@ -1566,7 +1622,7 @@ public class AVM2Code implements Cloneable {
              }
              }//*/
 
-            /*if ((ip + 2 < code.size()) && (ins.definition instanceof NewCatchIns)) { // Filling local register in catch clause
+ /*if ((ip + 2 < code.size()) && (ins.definition instanceof NewCatchIns)) { // Filling local register in catch clause
              if (code.get(ip + 1).definition instanceof DupIns) {
              if (code.get(ip + 2).definition instanceof SetLocalTypeIns) {
              ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames);
@@ -2089,12 +2145,14 @@ public class AVM2Code implements Cloneable {
              ins.operands[j] = updater.updateOperandOffset(target, ins.operands[j]);
              }
              }*/ //Faster, but not so universal
-            if (ins.definition instanceof IfTypeIns) {
-                long target = ins.getTargetAddress();
-                try {
-                    ins.operands[0] = updater.updateOperandOffset(ins.getAddress(), target, ins.operands[0]);
-                } catch (ConvertException cex) {
-                    throw new ConvertException("Invalid offset (" + ins + ")", i);
+            {
+                if (ins.definition instanceof IfTypeIns) {
+                    long target = ins.getTargetAddress();
+                    try {
+                        ins.operands[0] = updater.updateOperandOffset(ins.getAddress(), target, ins.operands[0]);
+                    } catch (ConvertException cex) {
+                        throw new ConvertException("Invalid offset (" + ins + ")", i);
+                    }
                 }
             }
             ins.setAddress(updater.updateInstructionOffset(ins.getAddress()));

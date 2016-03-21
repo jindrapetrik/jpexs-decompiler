@@ -32,7 +32,7 @@ import java.util.List;
 public class GetScopeObjectIns extends InstructionDefinition {
 
     public GetScopeObjectIns() {
-        super(0x65, "getscopeobject", new int[]{AVM2Code.DAT_SLOT_SCOPE_INDEX}, false);
+        super(0x65, "getscopeobject", new int[]{AVM2Code.DAT_SCOPE_INDEX}, false);
     }
 
     @Override

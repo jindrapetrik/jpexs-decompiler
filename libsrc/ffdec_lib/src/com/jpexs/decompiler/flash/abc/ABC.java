@@ -81,9 +81,7 @@ import java.util.logging.Logger;
  */
 public class ABC {
 
-    public int major_version = 46;
-
-    public int minor_version = 16;
+    public ABCVersion version = new ABCVersion(47, 16);
 
     public AVM2ConstantPool constants = new AVM2ConstantPool();
 
@@ -349,7 +347,7 @@ public class ABC {
                     int mIndex = body.getCode().code.get(ip).operands[0];
                     if (mIndex > 0) {
                         Multiname m = constants.getMultiname(mIndex);
-                        if (m.getNameWithNamespace(constants).equals("flash.utils.getDefinitionByName")) {
+                        if (m.getNameWithNamespace(constants).toRawString().equals("flash.utils.getDefinitionByName")) {
                             if (ip > 0) {
                                 if (body.getCode().code.get(ip - 1).definition instanceof PushStringIns) {
                                     int strIndex = body.getCode().code.get(ip - 1).operands[0];
@@ -384,11 +382,52 @@ public class ABC {
         }
     }
 
+    public boolean hasDecimalSupport() {
+        return version.minor >= MINORwithDECIMAL;
+    }
+
+    public void setDecimalSupport(boolean val) {
+        if (val) {
+            if (version.minor != MINORwithDECIMAL) {
+                version.minor = MINORwithDECIMAL;
+                ((Tag) parentTag).setModified(true);
+            }
+        } else if (version.minor == MINORwithDECIMAL) {
+            version.minor = MINORwithDECIMAL - 1;
+            ((Tag) parentTag).setModified(true);
+        }
+    }
+
+    private boolean minVersionCheck(int minMajor, int minMinor) {
+        return version.compareTo(new ABCVersion(minMajor, minMinor)) >= 0;
+    }
+
+    public boolean hasFloatSupport() {
+        return minVersionCheck(47, 16);
+    }
+
+    public void setFloatSupport(boolean val) {
+        if (val) {
+            if (version.major < 47) {
+                version.major = 47;
+                ((Tag) parentTag).setModified(true);
+            }
+        } else if (version.major > 46) {
+            version.major = 46;
+            ((Tag) parentTag).setModified(true);
+        }
+    }
+
+    public boolean hasExceptionSupport() {
+        return version.compareTo(new ABCVersion(46, 15)) > 0;
+    }
+
     public ABC(ABCInputStream ais, SWF swf, ABCContainerTag tag) throws IOException {
         this.parentTag = tag;
-        minor_version = ais.readU16("minor_version");
-        major_version = ais.readU16("major_version");
-        logger.log(Level.FINE, "ABC minor_version: {0}, major_version: {1}", new Object[]{minor_version, major_version});
+        int minor_version = ais.readU16("minor_version");
+        int major_version = ais.readU16("major_version");
+        version = new ABCVersion(major_version, minor_version);
+        logger.log(Level.INFO, "ABC minor_version: {0}, major_version: {1}", new Object[]{minor_version, major_version});
 
         ais.newDumpLevel("constant_pool", "cpool_info");
 
@@ -426,13 +465,34 @@ public class ABC {
         }
 
         // constant decimal
-        if (minor_version >= MINORwithDECIMAL) {
+        if (hasDecimalSupport()) {
             int constant_decimal_pool_count = ais.readU30("decimal_count");
             constants.ensureDecimalCapacity(constant_decimal_pool_count);
             if (constant_decimal_pool_count > 1) {
                 ais.newDumpLevel("decimals", "decimal[]");
                 for (int i = 1; i < constant_decimal_pool_count; i++) { // index 0 not used. Values 1..n-1
                     constants.addDecimal(ais.readDecimal("decimal"));
+                }
+                ais.endDumpLevel();
+            }
+        }
+
+        if (hasFloatSupport()) {
+            // constant float
+            int constant_float_pool_count = ais.readU30("float_count");
+            if (constant_float_pool_count > 1) {
+                ais.newDumpLevel("floats", "float[]");
+                for (int i = 1; i < constant_float_pool_count; i++) { // index 0 not used. Values 1..n-1
+                    constants.addFloat(ais.readFloat("float"));
+                }
+                ais.endDumpLevel();
+            }
+            // constant float4        
+            int constant_float4_pool_count = ais.readU30("float4_count");
+            if (constant_float4_pool_count > 1) {
+                ais.newDumpLevel("floats4", "float4[]");
+                for (int i = 1; i < constant_float4_pool_count; i++) { // index 0 not used. Values 1..n-1
+                    constants.addFloat4(ais.readFloat4("float4"));
                 }
                 ais.endDumpLevel();
             }
@@ -564,7 +624,11 @@ public class ABC {
                     abce.end = ais.readU30("end");
                     abce.target = ais.readU30("target");
                     abce.type_index = ais.readU30("type_index");
-                    abce.name_index = ais.readU30("name_index");
+                    if (hasExceptionSupport()) {
+                        abce.name_index = ais.readU30("name_index");
+                    } else {
+                        abce.name_index = 0;
+                    }
                     mb.exceptions[j] = abce;
                 }
                 mb.traits = ais.readTraits("traits");
@@ -597,8 +661,8 @@ public class ABC {
 
     public void saveToStream(OutputStream os) throws IOException {
         ABCOutputStream aos = new ABCOutputStream(os);
-        aos.writeU16(minor_version);
-        aos.writeU16(major_version);
+        aos.writeU16(version.minor);
+        aos.writeU16(version.major);
 
         aos.writeU30(constants.getIntCount());
         for (int i = 1; i < constants.getIntCount(); i++) {
@@ -614,10 +678,20 @@ public class ABC {
             aos.writeDouble(constants.getDouble(i));
         }
 
-        if (minor_version >= MINORwithDECIMAL) {
+        if (hasDecimalSupport()) {
             aos.writeU30(constants.getDecimalCount());
             for (int i = 1; i < constants.getDecimalCount(); i++) {
                 aos.writeDecimal(constants.getDecimal(i));
+            }
+        }
+        if (hasFloatSupport()) {
+            aos.writeU30(constants.getFloatCount());
+            for (int i = 1; i < constants.getFloatCount(); i++) {
+                aos.writeFloat(constants.getFloat(i));
+            }
+            aos.writeU30(constants.getFloat4Count());
+            for (int i = 1; i < constants.getFloat4Count(); i++) {
+                aos.writeFloat4(constants.getFloat4(i));
             }
         }
 

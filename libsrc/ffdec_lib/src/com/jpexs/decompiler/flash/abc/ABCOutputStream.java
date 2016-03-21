@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc;
 
 import com.jpexs.decompiler.flash.abc.types.Decimal;
+import com.jpexs.decompiler.flash.abc.types.Float4;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
@@ -146,6 +147,17 @@ public class ABCOutputStream extends OutputStream {
 
     public void writeDouble(double value) throws IOException {
         writeLong(Double.doubleToLongBits(value));
+    }
+
+    public void writeFloat(float value) throws IOException {
+        writeU16(Float.floatToIntBits(value));
+    }
+
+    public void writeFloat4(Float4 value) throws IOException {
+        writeFloat(value.value1);
+        writeFloat(value.value2);
+        writeFloat(value.value3);
+        writeFloat(value.value4);
     }
 
     public void writeU8(int value) throws IOException {

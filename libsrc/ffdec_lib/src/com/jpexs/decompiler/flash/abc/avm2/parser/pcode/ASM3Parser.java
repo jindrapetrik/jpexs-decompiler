@@ -884,7 +884,7 @@ public class ASM3Parser {
                                         throw new AVM2ParseException("Case count expected", lexer.yyline());
                                     }
                                     break;
-                                case AVM2Code.OPT_BYTE:
+                                case AVM2Code.OPT_S8:
                                     if (parsedOperand.type == ParsedSymbol.TYPE_INTEGER) {
                                         long val = (long) (Long) parsedOperand.value;
                                         if (val < Byte.MIN_VALUE || val > Byte.MAX_VALUE) {

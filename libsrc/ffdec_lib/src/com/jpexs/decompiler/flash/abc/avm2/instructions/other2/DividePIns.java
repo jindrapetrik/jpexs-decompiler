@@ -32,7 +32,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class DividePIns extends InstructionDefinition {
 
     public DividePIns() {
-        super(0xB8, "divide_p", new int[]{AVM2Code.DAT_DECIMAL_PARAMS}, true /*?*/);
+        super(0xB8, "divide_p", new int[]{AVM2Code.DAT_NUMBER_CONTEXT}, true /*?*/);
     }
 
     @Override

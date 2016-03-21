@@ -37,7 +37,7 @@ import java.util.List;
 public class CallMethodIns extends InstructionDefinition {
 
     public CallMethodIns() {
-        super(0x43, "callmethod", new int[]{AVM2Code.DAT_METHOD_INDEX, AVM2Code.DAT_ARG_COUNT}, true);
+        super(0x43, "callmethod", new int[]{AVM2Code.DAT_DISPATCH_ID, AVM2Code.DAT_ARG_COUNT}, true);
     }
 
     @Override

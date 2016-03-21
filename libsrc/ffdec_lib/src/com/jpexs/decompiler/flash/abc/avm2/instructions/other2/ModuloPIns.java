@@ -32,7 +32,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class ModuloPIns extends InstructionDefinition {
 
     public ModuloPIns() {
-        super(0xB9, "modulo_p", new int[]{AVM2Code.DAT_DECIMAL_PARAMS}, true /*?*/);
+        super(0xB9, "modulo_p", new int[]{AVM2Code.DAT_NUMBER_CONTEXT}, true /*?*/);
     }
 
     @Override

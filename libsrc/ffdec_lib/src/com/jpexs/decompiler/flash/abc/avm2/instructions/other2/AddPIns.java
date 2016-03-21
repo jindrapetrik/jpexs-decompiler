@@ -31,7 +31,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class AddPIns extends InstructionDefinition {
 
     public AddPIns() {
-        super(0xB5, "add_p", new int[]{AVM2Code.DAT_DECIMAL_PARAMS}, true /*?*/);
+        super(0xB5, "add_p", new int[]{AVM2Code.DAT_NUMBER_CONTEXT}, true /*?*/);
     }
 
     @Override

@@ -98,13 +98,13 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
                         aos.writeS24(operands[i]);
                         break;
                     case AVM2Code.OPT_U30:
-                    case AVM2Code.OPT_U30_SHORT:
+                    case AVM2Code.OPT_S16:
                         aos.writeU30(operands[i]);
                         break;
                     case AVM2Code.OPT_U8:
                         aos.writeU8(operands[i]);
                         break;
-                    case AVM2Code.OPT_BYTE:
+                    case AVM2Code.OPT_S8:
                         aos.writeU8(0xff & operands[i]);
                         break;
                     case AVM2Code.OPT_CASE_OFFSETS:
@@ -131,13 +131,13 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
                     cnt += 3;
                     break;
                 case AVM2Code.OPT_U30:
-                case AVM2Code.OPT_U30_SHORT:
+                case AVM2Code.OPT_S16:
                     cnt += ABCOutputStream.getU30ByteLength(operands[i]);
                     break;
                 case AVM2Code.OPT_U8:
                     cnt++;
                     break;
-                case AVM2Code.OPT_BYTE:
+                case AVM2Code.OPT_S8:
                     cnt++;
                     break;
                 case AVM2Code.OPT_CASE_OFFSETS:

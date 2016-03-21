@@ -75,25 +75,7 @@ public abstract class InstructionDefinition implements Serializable {
         StringBuilder s = new StringBuilder();
         s.append(instructionName);
         for (int i = 0; i < operands.length; i++) {
-            int operand = operands[i];
-            if ((operand & 0xff00) == AVM2Code.OPT_U30) {
-                s.append(" U30");
-            }
-            if ((operand & 0xff00) == AVM2Code.OPT_U30_SHORT) {
-                s.append(" U30");
-            }
-            if ((operand & 0xff00) == AVM2Code.OPT_U8) {
-                s.append(" U8");
-            }
-            if ((operand & 0xff00) == AVM2Code.OPT_BYTE) {
-                s.append(" BYTE");
-            }
-            if ((operand & 0xff00) == AVM2Code.OPT_S24) {
-                s.append(" S24");
-            }
-            if ((operand & 0xff00) == AVM2Code.OPT_CASE_OFFSETS) {
-                s.append(" U30 S24,[S24]...");
-            }
+            s.append(AVM2Code.operandTypeToString(operands[i]));
         }
         return s.toString();
     }

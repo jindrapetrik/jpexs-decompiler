@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.other2;
 
+import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Runtime;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
@@ -30,7 +31,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class PushFloat4Ins extends InstructionDefinition {
 
     public PushFloat4Ins() {
-        super(0x54, "pushfloat4", new int[]{}, false);
+        super(0x54, "pushfloat4", new int[]{AVM2Code.DAT_FLOAT4_INDEX}, false);
     }
 
     @Override

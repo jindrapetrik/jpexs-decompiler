@@ -32,7 +32,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class ConvertMPIns extends InstructionDefinition {
 
     public ConvertMPIns() {
-        super(0x7A, "convert_m_p", new int[]{AVM2Code.DAT_DECIMAL_PARAMS}, true);
+        super(0x7A, "convert_m_p", new int[]{AVM2Code.DAT_NUMBER_CONTEXT}, true);
     }
 
     @Override

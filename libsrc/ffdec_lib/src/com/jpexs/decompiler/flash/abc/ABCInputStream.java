@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc;
 import com.jpexs.decompiler.flash.EndOfStreamException;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.abc.types.Decimal;
+import com.jpexs.decompiler.flash.abc.types.Float4;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
@@ -459,6 +460,25 @@ public class ABCInputStream implements AutoCloseable {
         byte[] data = readBytesInternal(16);
         endDumpLevel();
         return new Decimal(data);
+    }
+
+    public Float readFloat(String name) throws IOException {
+        newDumpLevel(name, "Float");
+        int intBits = (readInternal()) + (readInternal() << 8);
+        float ret = Float.intBitsToFloat(intBits);
+        endDumpLevel(ret);
+        return ret;
+    }
+
+    public Float4 readFloat4(String name) throws IOException {
+        newDumpLevel(name, "Float4");
+        float f1 = readFloat("value1");
+        float f2 = readFloat("value2");
+        float f3 = readFloat("value3");
+        float f4 = readFloat("value4");
+        Float4 ret = new Float4(f1, f2, f3, f4);
+        endDumpLevel(ret);
+        return ret;
     }
 
     public InstanceInfo readInstanceInfo(String name) throws IOException {

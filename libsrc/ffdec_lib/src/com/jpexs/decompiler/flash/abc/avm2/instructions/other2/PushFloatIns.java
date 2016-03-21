@@ -29,10 +29,10 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
  *
  * @author JPEXS
  */
-public class PushConstantIns extends InstructionDefinition {
+public class PushFloatIns extends InstructionDefinition {
 
-    public PushConstantIns() {
-        super(0x22, "pushconstant", new int[]{AVM2Code.DAT_STRING_INDEX}, false /*?*/);
+    public PushFloatIns() {
+        super(0x22, "pushfloat", new int[]{AVM2Code.DAT_FLOAT_INDEX}, false /*?*/);
     }
 
     @Override

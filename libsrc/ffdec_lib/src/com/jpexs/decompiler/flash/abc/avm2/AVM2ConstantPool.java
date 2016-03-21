@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.types.Decimal;
+import com.jpexs.decompiler.flash.abc.types.Float4;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
@@ -26,6 +27,7 @@ import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFField;
+import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.HashArrayList;
 import com.jpexs.helpers.utf8.Utf8PrintWriter;
@@ -35,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import com.jpexs.decompiler.flash.abc.ABCVersionRequirements;
 
 /**
  *
@@ -53,9 +56,20 @@ public class AVM2ConstantPool implements Cloneable {
     @SWFField
     private HashArrayList<Double> constant_double = new HashArrayList<>();
 
-    /* Only for some minor versions */
     @SWFField
+    @ABCVersionRequirements(exactMinor = 17)
     private HashArrayList<Decimal> constant_decimal = new HashArrayList<>();
+
+    @SWFField
+    @SWFVersion(from = 16)
+    @ABCVersionRequirements(minMajor = 47, minMinor = 16)
+    private HashArrayList<Float> constant_float = new HashArrayList<>();
+
+    /* Only for some versions */
+    @SWFField
+    @SWFVersion(from = 16)
+    @ABCVersionRequirements(minMajor = 47, minMinor = 16)
+    private HashArrayList<Float4> constant_float4 = new HashArrayList<>();
 
     @SWFField
     private HashArrayList<String> constant_string = new HashArrayList<>();
@@ -130,6 +144,20 @@ public class AVM2ConstantPool implements Cloneable {
         }
     }
 
+    public void ensureFloatCapacity(int capacity) {
+        constant_float.ensureCapacity(capacity);
+        if (capacity > 0) {
+            ensureDefault(constant_float);
+        }
+    }
+
+    public void ensureFloat4Capacity(int capacity) {
+        constant_float4.ensureCapacity(capacity);
+        if (capacity > 0) {
+            ensureDefault(constant_float4);
+        }
+    }
+
     public void ensureStringCapacity(int capacity) {
         constant_string.ensureCapacity(capacity);
         if (capacity > 0) {
@@ -185,6 +213,18 @@ public class AVM2ConstantPool implements Cloneable {
         return constant_decimal.size() - 1;
     }
 
+    public synchronized int addFloat(Float value) {
+        ensureDefault(constant_float);
+        constant_float.add(value);
+        return constant_float.size() - 1;
+    }
+
+    public synchronized int addFloat4(Float4 value) {
+        ensureDefault(constant_float4);
+        constant_float4.add(value);
+        return constant_float4.size() - 1;
+    }
+
     public synchronized int addString(String value) {
         ensureDefault(constant_string);
         constant_string.add(value);
@@ -223,6 +263,16 @@ public class AVM2ConstantPool implements Cloneable {
 
     public Decimal setDecimal(int index, Decimal value) {
         constant_decimal.set(index, value);
+        return value;
+    }
+
+    public float setFloat(int index, float value) {
+        constant_float.set(index, value);
+        return value;
+    }
+
+    public Float4 setFloat4(int index, Float4 value) {
+        constant_float4.set(index, value);
         return value;
     }
 
@@ -303,6 +353,24 @@ public class AVM2ConstantPool implements Cloneable {
         return null;
     }
 
+    public Float getFloat(int index) {
+        try {
+            return constant_float.get(index);
+        } catch (IndexOutOfBoundsException ex) {
+            logger.log(Level.SEVERE, "Float not found. Index: " + index, ex);
+        }
+        return null;
+    }
+
+    public Float4 getFloat4(int index) {
+        try {
+            return constant_float4.get(index);
+        } catch (IndexOutOfBoundsException ex) {
+            logger.log(Level.SEVERE, "Float4 not found. Index: " + index, ex);
+        }
+        return null;
+    }
+
     public String getString(int index) {
         try {
             return constant_string.get(index);
@@ -338,6 +406,14 @@ public class AVM2ConstantPool implements Cloneable {
 
     public int getDecimalCount() {
         return constant_decimal.size();
+    }
+
+    public int getFloatCount() {
+        return constant_float.size();
+    }
+
+    public int getFloat4Count() {
+        return constant_float4.size();
     }
 
     public int getStringCount() {
@@ -570,6 +646,8 @@ public class AVM2ConstantPool implements Cloneable {
             ret.constant_uint = new HashArrayList<>(constant_uint);
             ret.constant_double = new HashArrayList<>(constant_double);
             ret.constant_decimal = new HashArrayList<>(constant_decimal);
+            ret.constant_float = new HashArrayList<>(constant_float);
+            ret.constant_float4 = new HashArrayList<>(constant_float4);
             ret.constant_string = new HashArrayList<>(constant_string);
             ret.constant_namespace = new HashArrayList<>(constant_namespace);
             ret.constant_namespace_set = new HashArrayList<>(constant_namespace_set);

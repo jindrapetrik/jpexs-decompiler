@@ -31,7 +31,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class CallInterfaceIns extends InstructionDefinition {
 
     public CallInterfaceIns() {
-        super(0x4D, "callinterface", new int[]{AVM2Code.OPT_U30}, true);
+        super(0x4D, "callinterface", new int[]{AVM2Code.DAT_CLASS_INDEX}, true);
     }
 
     @Override
