@@ -22,11 +22,13 @@ import com.jpexs.debugger.flash.Debugger;
 import com.jpexs.debugger.flash.DebuggerCommands;
 import com.jpexs.debugger.flash.DebuggerConnection;
 import com.jpexs.debugger.flash.Variable;
+import com.jpexs.debugger.flash.VariableFlags;
 import com.jpexs.debugger.flash.VariableType;
 import com.jpexs.debugger.flash.messages.in.InAskBreakpoints;
 import com.jpexs.debugger.flash.messages.in.InBreakAt;
 import com.jpexs.debugger.flash.messages.in.InBreakAtExt;
 import com.jpexs.debugger.flash.messages.in.InBreakReason;
+import com.jpexs.debugger.flash.messages.in.InCallFunction;
 import com.jpexs.debugger.flash.messages.in.InConstantPool;
 import com.jpexs.debugger.flash.messages.in.InContinue;
 import com.jpexs.debugger.flash.messages.in.InFrame;
@@ -100,6 +102,24 @@ public class DebuggerHandler implements DebugConnectionListener {
     private int breakIp = -1;
 
     private String breakScriptName = null;
+
+    public static class ActionScriptException extends Exception {
+
+        private String errorClass;
+
+        public ActionScriptException(String errorClass, String message) {
+            super(message);
+            this.errorClass = errorClass;
+        }
+
+        public ActionScriptException(String errorClsMessage) {
+            this(errorClsMessage.substring(0, errorClsMessage.indexOf(": ")), errorClsMessage.substring(errorClsMessage.indexOf(": ") + 2));
+        }
+
+        public String getErrorClass() {
+            return errorClass;
+        }
+    }
 
     public int getBreakIp() {
         if (!isPaused()) {
@@ -243,17 +263,20 @@ public class DebuggerHandler implements DebugConnectionListener {
 
     public boolean addBreakPoint(String scriptName, int line) {
         synchronized (this) {
-            Logger.getLogger(DebuggerHandler.class.getName()).log(Level.FINE, "adding bp " + scriptName + ":" + line);
+            Logger.getLogger(DebuggerHandler.class
+                    .getName()).log(Level.FINE, "adding bp " + scriptName + ":" + line);
             if (isBreakpointToRemove(scriptName, line)) {
                 toRemoveBPointMap.get(scriptName).remove(line);
                 if (toRemoveBPointMap.get(scriptName).isEmpty()) {
                     toRemoveBPointMap.remove(scriptName);
+
                 }
             }
 
             if (isBreakpointConfirmed(scriptName, line)) {
                 Logger.getLogger(DebuggerHandler.class.getName()).log(Level.FINE, "bp " + scriptName + ":" + line + " already confirmed");
                 return true;
+
             }
             if (isBreakpointInvalid(scriptName, line)) {
                 Logger.getLogger(DebuggerHandler.class.getName()).log(Level.FINE, "bp " + scriptName + ":" + line + " already invalid");
@@ -263,7 +286,9 @@ public class DebuggerHandler implements DebugConnectionListener {
                 toAddBPointMap.put(scriptName, new TreeSet<>());
             }
             toAddBPointMap.get(scriptName).add(line);
-            Logger.getLogger(DebuggerHandler.class.getName()).log(Level.FINE, "bp " + scriptName + ":" + line + " added to todo");
+            Logger
+                    .getLogger(DebuggerHandler.class
+                            .getName()).log(Level.FINE, "bp " + scriptName + ":" + line + " added to todo");
         }
         try {
             sendBreakPoints(false);
@@ -668,6 +693,7 @@ public class DebuggerHandler implements DebugConnectionListener {
                     synchronized (DebuggerHandler.this) {
                         paused = true;
                         Logger.getLogger(DebuggerHandler.class.getName()).log(Level.FINE, "paused");
+
                     }
 
                     try {
@@ -677,6 +703,7 @@ public class DebuggerHandler implements DebugConnectionListener {
                         String newBreakScriptName = "unknown";
                         if (modulePaths.containsKey(message.file)) {
                             newBreakScriptName = modulePaths.get(message.file);
+
                         } else if (breakReason.reason != InBreakReason.REASON_SCRIPT_LOADED) {
                             Logger.getLogger(DebuggerCommands.class.getName()).log(Level.SEVERE, "Invalid file: " + message.file);
                             return;
@@ -805,5 +832,76 @@ public class DebuggerHandler implements DebugConnectionListener {
             return null;
         }
         return pool;
+    }
+
+    public synchronized InCallFunction callMethod(Variable object, String methodName, List<Object> args) throws ActionScriptException {
+        return callFunction(false, methodName, object, args);
+    }
+
+    public synchronized InCallFunction callMethod(String object, String methodName, List<Object> args) throws ActionScriptException {
+        InGetVariable igv = getVariable(0, object, false);
+        return callMethod(igv.parent, methodName, args);
+    }
+
+    private static String typeAsStr(Object value) {
+        if (value == null) {
+            return "null";
+        }
+        if ((value instanceof Long) || (value instanceof Integer)) {
+            return "int";
+        }
+        if (value instanceof Number) {
+            return "Number";
+        }
+        if (value instanceof String) {
+            return "String";
+        }
+        if (value instanceof Variable) {
+            Variable v = (Variable) value;
+            return v.getTypeAsStr();
+        }
+        return "String";
+    }
+
+    private static String valueAsStr(Object value) {
+        if (value == null) {
+            return "null";
+        }
+        if (value instanceof Double) {
+            double doubleValue = ((Double) value).doubleValue();
+            long longValue = (long) doubleValue;
+            if (doubleValue == longValue) {
+                return Long.toString(longValue);
+            }
+        }
+
+        if (value instanceof Variable) {
+            Variable v = (Variable) value;
+            return valueAsStr(v.value);
+        }
+        return "" + value;
+    }
+
+    public synchronized InCallFunction callFunction(boolean isConstructor, String funcName, Variable thisValue, List<Object> args) throws ActionScriptException {
+        List<String> argTypes = new ArrayList<>();
+        List<String> argValues = new ArrayList<>();
+        for (Object value : args) {
+            argTypes.add(typeAsStr(value));
+            argValues.add(valueAsStr(value));
+        }
+        String thisType = typeAsStr(thisValue);
+        String thisValueStr = valueAsStr(thisValue);
+        try {
+            InCallFunction icf = commands.callFunction(isConstructor, funcName, thisType, thisValueStr, argTypes, argValues);
+            if (!icf.variables.isEmpty()) {
+                if ((icf.variables.get(0).flags & VariableFlags.IS_EXCEPTION) > 0) {
+                    throw new ActionScriptException("" + icf.variables.get(0).value);
+                }
+            }
+            return icf;
+        } catch (IOException e) {
+
+        }
+        return null;
     }
 }
