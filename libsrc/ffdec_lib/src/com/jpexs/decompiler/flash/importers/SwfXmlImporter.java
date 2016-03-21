@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.importers;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.ABCVersion;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.ClassInfo;
@@ -303,7 +304,7 @@ public class SwfXmlImporter {
                 AVM2ConstantPool.class, Decimal.class, Namespace.class, NamespaceSet.class, Multiname.class, MethodInfo.class, MetadataInfo.class,
                 ValueKind.class, InstanceInfo.class, Traits.class, TraitClass.class, TraitFunction.class,
                 TraitMethodGetterSetter.class, TraitSlotConst.class, ClassInfo.class, ScriptInfo.class, MethodBody.class,
-                ABCException.class};
+                ABCException.class, ABCVersion.class};
             for (Class cls2 : knownObjects) {
                 if (!ReflectionTools.canInstantiateDefaultConstructor(cls2)) {
                     System.err.println("Can't instantiate: " + cls2.getName());
