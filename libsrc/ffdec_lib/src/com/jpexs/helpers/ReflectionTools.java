@@ -16,6 +16,7 @@
  */
 package com.jpexs.helpers;
 
+import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFField;
 import java.lang.reflect.Array;
@@ -23,9 +24,13 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -34,6 +39,42 @@ import java.util.logging.Logger;
 public class ReflectionTools {
 
     private static final Logger logger = Logger.getLogger(ReflectionTools.class.getName());
+
+    public static <E> Map<E, String> getConstNamesMap(Class<?> classWithConsts, Class<E> constsType, String matchRegexp) {
+        Map<E, String> ret = new HashMap<>();
+        Field[] fs = classWithConsts.getDeclaredFields();
+        Pattern p = Pattern.compile(matchRegexp);
+        for (Field f : fs) {
+            Matcher m = p.matcher(f.getName());
+            if (m.matches()) {
+                try {
+                    String name = m.groupCount() > 0 ? m.group(1) : m.group(0);
+                    @SuppressWarnings("unchecked")
+                    E val = (E) f.get(constsType);
+
+                    StringBuilder identName = new StringBuilder();
+                    boolean cap = false;
+                    for (int i = 0; i < name.length(); i++) {
+                        char c = name.charAt(i);
+                        if (c == '_') {
+                            cap = true;
+                            continue;
+                        }
+                        if (cap) {
+                            identName.append(c);
+                            cap = false;
+                        } else {
+                            identName.append(Character.toLowerCase(c));
+                        }
+                    }
+                    ret.put(val, identName.toString());
+                } catch (IllegalArgumentException | IllegalAccessException ex) {
+                    //ignore
+                }
+            }
+        }
+        return ret;
+    }
 
     public static Object getValue(Object obj, Field field) throws IllegalArgumentException, IllegalAccessException {
         Object value = field.get(obj);
