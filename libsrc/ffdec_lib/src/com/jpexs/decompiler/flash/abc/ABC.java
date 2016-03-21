@@ -427,7 +427,7 @@ public class ABC {
         int minor_version = ais.readU16("minor_version");
         int major_version = ais.readU16("major_version");
         version = new ABCVersion(major_version, minor_version);
-        logger.log(Level.INFO, "ABC minor_version: {0}, major_version: {1}", new Object[]{minor_version, major_version});
+        logger.log(Level.FINE, "ABC minor_version: {0}, major_version: {1}", new Object[]{minor_version, major_version});
 
         ais.newDumpLevel("constant_pool", "cpool_info");
 

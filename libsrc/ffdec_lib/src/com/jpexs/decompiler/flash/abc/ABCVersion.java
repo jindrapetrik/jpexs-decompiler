@@ -2,8 +2,12 @@ package com.jpexs.decompiler.flash.abc;
 
 public class ABCVersion implements Comparable<ABCVersion> {
 
-    public int major;
-    public int minor;
+    public int major = 46;
+    public int minor = 16;
+
+    public ABCVersion() {
+
+    }
 
     public ABCVersion(int major, int minor) {
         this.major = major;
