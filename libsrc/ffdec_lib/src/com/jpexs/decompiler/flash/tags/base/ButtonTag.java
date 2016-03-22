@@ -102,19 +102,7 @@ public abstract class ButtonTag extends CharacterTag implements DrawableTag, Tim
     }
 
     public DefineButtonSoundTag getSounds() {
-        List<CharacterIdTag> characterIdTags = swf.getCharacterIdTags(getCharacterId());
-        if (characterIdTags != null) {
-            for (CharacterIdTag t : characterIdTags) {
-                if (t instanceof DefineButtonSoundTag) {
-                    DefineButtonSoundTag st = (DefineButtonSoundTag) t;
-                    if (st.buttonId == getCharacterId()) {
-                        return st;
-                    }
-                }
-            }
-        }
-
-        return null;
+        return (DefineButtonSoundTag) swf.getCharacterIdTag(getCharacterId(), DefineButtonSoundTag.ID);
     }
 
     @Override

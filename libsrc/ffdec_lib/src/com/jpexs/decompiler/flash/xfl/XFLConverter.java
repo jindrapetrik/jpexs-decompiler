@@ -1064,13 +1064,9 @@ public class XFLConverter {
         }
         if (tag instanceof DefineButtonTag) {
             DefineButtonTag bt = (DefineButtonTag) tag;
-            for (Tag t : tags) {
-                if (t instanceof DefineButtonCxformTag) {
-                    DefineButtonCxformTag bcx = (DefineButtonCxformTag) t;
-                    if (bcx.buttonId == bt.buttonId) {
-                        colorTransform = bcx.buttonColorTransform;
-                    }
-                }
+            DefineButtonCxformTag bcx = (DefineButtonCxformTag) bt.getSwf().getCharacterIdTag(bt.buttonId, DefineButtonCxformTag.ID);
+            if (bcx != null) {
+                colorTransform = bcx.buttonColorTransform;
             }
         }
 
@@ -2098,16 +2094,11 @@ public class XFLConverter {
 
         for (Tag t : tags) {
             if (t instanceof FontTag) {
+                SWF swf = t.getSwf();
                 FontTag font = (FontTag) t;
                 int fontId = font.getFontId();
-                String fontName = null;
-                for (Tag t2 : tags) {
-                    if (t2 instanceof DefineFontNameTag) {
-                        if (((DefineFontNameTag) t2).fontId == fontId) {
-                            fontName = ((DefineFontNameTag) t2).fontName;
-                        }
-                    }
-                }
+                DefineFontNameTag fontNameTag = (DefineFontNameTag) swf.getCharacterIdTag(fontId, DefineFontNameTag.ID);
+                String fontName = fontNameTag == null ? null : fontNameTag.fontName;
                 if (fontName == null) {
                     fontName = font.getFontNameIntag();
                 }

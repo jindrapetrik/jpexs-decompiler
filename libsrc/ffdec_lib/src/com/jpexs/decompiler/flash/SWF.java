@@ -440,6 +440,21 @@ public final class SWF implements SWFContainerItem, Timelined {
         return characterIdTags.get(characterId);
     }
 
+    public CharacterIdTag getCharacterIdTag(int characterId, int tagId) {
+        List<CharacterIdTag> characterIdTags = getCharacterIdTags(characterId);
+        if (characterIdTags != null) {
+            for (CharacterIdTag t : characterIdTags) {
+                if (((Tag) t).getId() == tagId) {
+                    if (t.getCharacterId() == characterId) {
+                        return t;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
     public Map<Integer, Set<Integer>> getDependentCharacters() {
         if (dependentCharacters == null) {
             synchronized (this) {
