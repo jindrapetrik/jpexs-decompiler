@@ -16,9 +16,11 @@
  */
 package com.jpexs.decompiler.flash.dumpview;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.TagStub;
+import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,7 +33,7 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-public class DumpInfo {
+public class DumpInfo implements TreeItem {
 
     public String name;
 
@@ -145,4 +147,18 @@ public class DumpInfo {
         return resolvedTag;
     }
 
+    @Override
+    public SWF getSwf() {
+        Tag tag = getTag();
+        if (tag != null) {
+            return tag.getSwf();
+        }
+
+        return null;
+    }
+
+    @Override
+    public boolean isModified() {
+        return false;
+    }
 }

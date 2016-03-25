@@ -2879,23 +2879,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     @Override
     public void valueChanged(TreeSelectionEvent e) {
         Object source = e.getSource();
-        if (source == dumpTree) {
-            reload(false);
-            Object sel = e.getPath().getLastPathComponent();
-            if (sel instanceof DumpInfo) {
-                DumpInfo di = (DumpInfo) sel;
-                Tag t = di.getTag();
-                if (t != null) {
-                    showPreview(t, dumpPreviewPanel);
-                } else {
-                    showPreview(null, dumpPreviewPanel);
-                }
-            } else {
-                showPreview(null, dumpPreviewPanel);
-            }
-            return;
-        }
-
         TreeItem treeItem = (TreeItem) e.getPath().getLastPathComponent();
 
         if (!(treeItem instanceof SWFList)) {
@@ -2915,6 +2898,17 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
 
         reload(false);
+
+        if (source == dumpTree) {
+            Object sel = e.getPath().getLastPathComponent();
+            Tag t = null;
+            if (sel instanceof DumpInfo) {
+                DumpInfo di = (DumpInfo) sel;
+                t = di.getTag();
+            }
+
+            showPreview(t, dumpPreviewPanel);
+        }
     }
 
     public void unloadFlashPlayer() {
