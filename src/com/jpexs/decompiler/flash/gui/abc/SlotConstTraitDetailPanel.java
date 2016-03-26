@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.gui.editor.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
+import com.jpexs.decompiler.flash.tags.Tag;
 import java.awt.BorderLayout;
 import java.io.IOException;
 import java.io.StringReader;
@@ -129,6 +130,8 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
             Logger.getLogger(SlotConstTraitDetailPanel.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         }
+
+        ((Tag) abc.parentTag).setModified(true);
         return true;
     }
 

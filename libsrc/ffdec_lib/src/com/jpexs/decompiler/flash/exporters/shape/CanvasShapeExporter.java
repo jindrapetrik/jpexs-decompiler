@@ -429,12 +429,15 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                     preLineFillData.append("\tctx.fillStyle=").append(lineLastRadColor).append(";\r\n\tctx.fill(\"evenodd\");\r\n");
                 }
 
-                preLineFillData.append("\tctx.transform(").append(Helper.doubleStr(lineFillMatrix.scaleX / unitDivisor))
-                        .append(",").append(Helper.doubleStr(lineFillMatrix.rotateSkew0 / unitDivisor))
-                        .append(",").append(Helper.doubleStr(lineFillMatrix.rotateSkew1 / unitDivisor))
-                        .append(",").append(Helper.doubleStr(lineFillMatrix.scaleY / unitDivisor))
-                        .append(",").append(Helper.doubleStr((lineFillMatrix.translateX + deltaX) / unitDivisor))
-                        .append(",").append(Helper.doubleStr((lineFillMatrix.translateY + deltaY) / unitDivisor)).append(");\r\n");
+                if (lineFillMatrix != null) {
+                    preLineFillData.append("\tctx.transform(").append(Helper.doubleStr(lineFillMatrix.scaleX / unitDivisor))
+                            .append(",").append(Helper.doubleStr(lineFillMatrix.rotateSkew0 / unitDivisor))
+                            .append(",").append(Helper.doubleStr(lineFillMatrix.rotateSkew1 / unitDivisor))
+                            .append(",").append(Helper.doubleStr(lineFillMatrix.scaleY / unitDivisor))
+                            .append(",").append(Helper.doubleStr((lineFillMatrix.translateX + deltaX) / unitDivisor))
+                            .append(",").append(Helper.doubleStr((lineFillMatrix.translateY + deltaY) / unitDivisor)).append(");\r\n");
+                }
+
                 lineFillData.insert(0, preLineFillData);
                 lineFillData.append("\tctx.fillRect(").append(-16384 - 32768 * lineRepeatCnt).append(",").append(-16384 - 32768 * lineRepeatCnt).append(",").append(2 * 16384 + 32768 * 2 * lineRepeatCnt).append(",").append(2 * 16384 + 32768 * 2 * lineRepeatCnt).append(");\r\n");
 

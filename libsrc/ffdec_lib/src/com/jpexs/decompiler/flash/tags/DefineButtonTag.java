@@ -233,13 +233,8 @@ public class DefineButtonTag extends ButtonTag implements ASMSourceContainer {
 
     @Override
     protected void initTimeline(Timeline timeline) {
-        ColorTransform clrTrans = null;
-        for (Tag t : swf.getTags()) {
-            if (t instanceof DefineButtonCxformTag) {
-                DefineButtonCxformTag cx = (DefineButtonCxformTag) t;
-                clrTrans = cx.buttonColorTransform;
-            }
-        }
+        DefineButtonCxformTag cxformTag = (DefineButtonCxformTag) swf.getCharacterIdTag(buttonId, DefineButtonCxformTag.ID);
+        ColorTransform clrTrans = cxformTag == null ? null : cxformTag.buttonColorTransform;
         int maxDepth = 0;
         Frame frameUp = new Frame(timeline, 0);
         Frame frameDown = new Frame(timeline, 0);

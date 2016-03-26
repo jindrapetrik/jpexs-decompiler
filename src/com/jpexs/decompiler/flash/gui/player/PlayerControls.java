@@ -117,6 +117,8 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
 
     private static Font notUnderlinedFont = null;
 
+    private final int zeroCharacterWidth;
+
     static {
         Font font = new JLabel().getFont();
         notUnderlinedFont = font;
@@ -189,9 +191,7 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
 
         frameLabel.setVisible(false);
 
-        Dimension min = new Dimension(frameLabel.getFontMetrics(notUnderlinedFont).stringWidth("000"), frameLabel.getPreferredSize().height);
-        frameLabel.setMinimumSize(min);
-        frameLabel.setPreferredSize(min);
+        zeroCharacterWidth = frameLabel.getFontMetrics(notUnderlinedFont).stringWidth("0");
 
         frameLabel.addMouseListener(new MouseAdapter() {
 
@@ -333,6 +333,12 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
 
         View.execInEventDispatchLater(() -> {
             updateZoom();
+            int totalFrames = display.getTotalFrames();
+            int currentFrame = display.getCurrentFrame();
+            if (currentFrame >= totalFrames) {
+                currentFrame = totalFrames - 1;
+            }
+            float frameRate = display.getFrameRate();
             Zoom zoom = display.getZoom();
             zoomFitButton.setVisible(zoom != null);
             percentLabel.setVisible(zoom != null);
@@ -342,13 +348,14 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
             graphicControls.setVisible(screenAvailable);
             totalFrameLabel.setVisible(screenAvailable);
             frameLabel.setVisible(screenAvailable);
-            frameControls.setVisible(screenAvailable);
-            int totalFrames = display.getTotalFrames();
-            int currentFrame = display.getCurrentFrame();
-            if (currentFrame >= totalFrames) {
-                currentFrame = totalFrames - 1;
+            if (screenAvailable) {
+                int charCount = Math.max(Integer.toString(totalFrames).length(), 3);
+                Dimension min = new Dimension(zeroCharacterWidth * charCount, frameLabel.getPreferredSize().height);
+                frameLabel.setMinimumSize(min);
+                frameLabel.setPreferredSize(min);
             }
-            float frameRate = display.getFrameRate();
+
+            frameControls.setVisible(screenAvailable);
             if (totalFrames == 0) {
                 progress.setIndeterminate(true);
             } else {
@@ -357,8 +364,8 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
                 progress.setValue(currentFrame);
                 progress.setIndeterminate(false);
             }
-            frameLabel.setText(("" + (currentFrame + 1)));
-            totalFrameLabel.setText("" + totalFrames);
+            frameLabel.setText(Integer.toString(currentFrame + 1));
+            totalFrameLabel.setText(Integer.toString(totalFrames));
             if (frameRate != 0) {
                 timeLabel.setText("(" + formatMs((int) (currentFrame * 1000.0 / frameRate)) + ")");
                 totalTimeLabel.setText("(" + formatMs((int) (totalFrames * 1000.0 / frameRate)) + ")");

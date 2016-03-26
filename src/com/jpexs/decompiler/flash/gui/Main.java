@@ -228,8 +228,7 @@ public class Main {
                 try {
                     proc = Runtime.getRuntime().exec(new String[]{exePath, ffile});
                 } catch (IOException ex) {
-                    Logger.getLogger(MainFrameMenu.class.getName()).log(Level.SEVERE, null, ex);
-
+                    logger.log(Level.SEVERE, null, ex);
                     return null;
                 }
                 boolean isDebug;
@@ -344,7 +343,7 @@ public class Main {
                     try (FileInputStream fis = new FileInputStream(fTempFile)) {
                         instrSWF = new SWF(fis, false, false);
                     } catch (InterruptedException ex) {
-                        Logger.getLogger(MainFrameMenu.class.getName()).log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, null, ex);
                     }
                     if (instrSWF != null) {
                         String swfFileName = fTempFile.getAbsolutePath();
@@ -373,7 +372,7 @@ public class Main {
         try (FileInputStream fis = new FileInputStream(toPrepareFile)) {
             instrSWF = new SWF(fis, toPrepareFile.getAbsolutePath(), origFile.getName(), false);
         } catch (InterruptedException ex) {
-            Logger.getLogger(MainFrameMenu.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
         if (instrSWF != null) {
             for (Tag t : instrSWF.getLocalTags()) {
@@ -1608,7 +1607,7 @@ public class Main {
                         Helper.writeFile(tfile, data);
                         openFile(new SWFSourceInfo(null, tfile, title));
                     } catch (IOException ex) {
-                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, "Cannot create tempfile");
+                        logger.log(Level.SEVERE, "Cannot create tempfile");
                     }
                 }
 
@@ -1654,7 +1653,7 @@ public class Main {
                 });
                 flashDebugger.addConnectionListener(debugHandler);
             } catch (IOException ex) {
-                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, "eeex", ex);
+                logger.log(Level.SEVERE, "eeex", ex);
             }
         });
     }

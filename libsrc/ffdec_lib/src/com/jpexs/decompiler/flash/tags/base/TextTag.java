@@ -26,7 +26,6 @@ import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
 import com.jpexs.decompiler.flash.exporters.shape.BitmapExporter;
 import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
 import com.jpexs.decompiler.flash.exporters.shape.SVGShapeExporter;
-import com.jpexs.decompiler.flash.helpers.FontHelper;
 import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.importers.TextImportResizeTextBoundsMode;
 import com.jpexs.decompiler.flash.tags.text.JustifyAlignGlyphEntry;
@@ -451,6 +450,8 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
         int x = 0;
         int y = 0;
         List<SHAPE> glyphs = null;
+        Matrix mat0 = transformation.clone();
+        mat0 = mat0.concatenate(new Matrix(textMatrix));
         for (TEXTRECORD rec : textRecords) {
             if (rec.styleFlagsHasColor) {
                 if (numText == 2) {
@@ -481,13 +482,13 @@ public abstract class TextTag extends CharacterTag implements DrawableTag {
             double divider = font == null ? 1 : font.getDivider();
             double rat = textHeight / 1024.0 / divider;
 
+            Matrix matScale = Matrix.getScaleInstance(rat);
             Color textColor2 = new Color(textColor, true);
             for (GLYPHENTRY entry : rec.glyphEntries) {
-                Matrix mat = transformation.clone();
-                mat = mat.concatenate(new Matrix(textMatrix));
-                Matrix matTr = Matrix.getTranslateInstance(x, y);
-                mat = mat.concatenate(matTr);
-                mat = mat.concatenate(Matrix.getScaleInstance(rat));
+                matScale.translateX = x;
+                matScale.translateY = y;
+
+                Matrix mat = mat0.concatenate(matScale);
                 SHAPE shape = null;
                 if (entry.glyphIndex != -1 && glyphs != null) {
                     // shapeNum: 1

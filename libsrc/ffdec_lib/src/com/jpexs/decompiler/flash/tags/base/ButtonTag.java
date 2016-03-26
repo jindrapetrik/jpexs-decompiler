@@ -97,24 +97,12 @@ public abstract class ButtonTag extends CharacterTag implements DrawableTag, Tim
     }
 
     @Override
-    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level, double zoom) throws IOException {
-        getTimeline().toSVG(0, 0, null, 0, exporter, colorTransform, level + 1, zoom);
+    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) throws IOException {
+        getTimeline().toSVG(0, 0, null, 0, exporter, colorTransform, level + 1);
     }
 
     public DefineButtonSoundTag getSounds() {
-        List<CharacterIdTag> characterIdTags = swf.getCharacterIdTags(getCharacterId());
-        if (characterIdTags != null) {
-            for (CharacterIdTag t : characterIdTags) {
-                if (t instanceof DefineButtonSoundTag) {
-                    DefineButtonSoundTag st = (DefineButtonSoundTag) t;
-                    if (st.buttonId == getCharacterId()) {
-                        return st;
-                    }
-                }
-            }
-        }
-
-        return null;
+        return (DefineButtonSoundTag) swf.getCharacterIdTag(getCharacterId(), DefineButtonSoundTag.ID);
     }
 
     @Override

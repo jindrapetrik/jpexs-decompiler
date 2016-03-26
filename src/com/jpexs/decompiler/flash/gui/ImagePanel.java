@@ -50,7 +50,6 @@ import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -418,8 +417,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             /*if (width > swf.displayRect.getWidth()) {
              scale = (double) swf.displayRect.getWidth() / (double) width;
              }*/
-            Matrix m = new Matrix();
-            m.translate(-rect.Xmin, -rect.Ymin);
+            Matrix m = Matrix.getTranslateInstance(-rect.Xmin, -rect.Ymin);
             m.scale(scale);
 
             Point p = lastMouseEvent == null ? null : lastMouseEvent.getPoint();
@@ -491,7 +489,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     ButtonTag button = iconPanel.mouseOverButton;
                     if (button != null) {
                         DefineButtonSoundTag sounds = button.getSounds();
-                        if (sounds != null && sounds.buttonSoundChar2 != 0) { //OverUpToOverDown
+                        if (sounds != null && sounds.buttonSoundChar2 != 0) { // OverUpToOverDown
                             playSound((SoundTag) swf.getCharacter(sounds.buttonSoundChar2), sounds.buttonSoundInfo2, timer);
                         }
                     }
@@ -507,7 +505,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     ButtonTag button = iconPanel.mouseOverButton;
                     if (button != null) {
                         DefineButtonSoundTag sounds = button.getSounds();
-                        if (sounds != null && sounds.buttonSoundChar3 != 0) { //OverDownToOverUp
+                        if (sounds != null && sounds.buttonSoundChar3 != 0) { // OverDownToOverUp
                             playSound((SoundTag) swf.getCharacter(sounds.buttonSoundChar3), sounds.buttonSoundInfo3, timer);
                         }
                     }
@@ -736,8 +734,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         SerializableImage image = new SerializableImage((int) (width / SWF.unitDivisor) + 1,
                 (int) (height / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
         image.fillTransparent();
-        Matrix m = new Matrix();
-        m.translate(-rect.Xmin * zoomDouble, -rect.Ymin * zoomDouble);
+        Matrix m = Matrix.getTranslateInstance(-rect.Xmin * zoomDouble, -rect.Ymin * zoomDouble);
         m.scale(zoomDouble);
         textTag.toImage(0, 0, 0, new RenderContext(), image, false, m, m, m, new ConstantColorColorTransform(0xFFC0C0C0));
 
@@ -864,7 +861,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         Matrix m = new Matrix();
         m.translate(-rect.Xmin * zoom, -rect.Ymin * zoom);
         m.scale(zoom);
-        timeline.toImage(frame, time, renderContext, image, false, m, new Matrix(), m, null);
+        timeline.toImage(frame, time, renderContext, image, false, m, m, m, null);
 
         Graphics2D gg = (Graphics2D) image.getGraphics();
         gg.setStroke(new BasicStroke(3));

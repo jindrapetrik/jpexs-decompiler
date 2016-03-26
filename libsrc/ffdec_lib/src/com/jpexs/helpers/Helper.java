@@ -73,7 +73,7 @@ public class Helper {
 
     public static String decompilationErrorAdd = null;
 
-    private static final Map<String, Area> shapeCache = new HashMap<>();
+    private static final Map<BitSet, Area> shapeCache = new HashMap<>();
 
     private static final String[] hexStringCache;
 
@@ -1180,9 +1180,8 @@ public class Helper {
             }
         }
 
-        String key = byteArrayToBase64String(bs.toByteArray());
-        if (shapeCache.containsKey(key)) {
-            return shapeCache.get(key);
+        if (shapeCache.containsKey(bs)) {
+            return shapeCache.get(bs);
         }
 
         for (int x = 0; x < width; x++) {
@@ -1210,7 +1209,7 @@ public class Helper {
             }
         }
 
-        shapeCache.put(key, area);
+        shapeCache.put(bs, area);
         return area;
     }
 
@@ -1229,18 +1228,15 @@ public class Helper {
 
         BitSet bs = new BitSet(width * height);
         bs.set(type);
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                int idx = width * y + x;
-                if ((imgData[idx] >>> 24) > 0) {
-                    bs.set(idx);
-                }
+        int pixelCount = width * height;
+        for (int i = 0; i < pixelCount; i++) {
+            if ((imgData[i] >>> 24) > 0) {
+                bs.set(i);
             }
         }
 
-        String key = byteArrayToBase64String(bs.toByteArray());
-        if (shapeCache.containsKey(key)) {
-            return shapeCache.get(key);
+        if (shapeCache.containsKey(bs)) {
+            return shapeCache.get(bs);
         }
 
         BitSet bsArea = new BitSet(width * height);
@@ -1321,7 +1317,7 @@ public class Helper {
             }
         }
 
-        shapeCache.put(key, area);
+        shapeCache.put(bs, area);
         return area;
     }
 

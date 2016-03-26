@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.DefineScalingGridTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.helpers.ByteArrayRange;
-import java.util.List;
 
 /**
  *
@@ -78,12 +77,6 @@ public abstract class CharacterTag extends Tag implements CharacterIdTag {
     }
 
     public DefineScalingGridTag getScalingGridTag() {
-        List<CharacterIdTag> mtags = swf.getCharacterIdTags(getCharacterId());
-        for (CharacterIdTag ct : mtags) {
-            if (ct instanceof DefineScalingGridTag) {
-                return (DefineScalingGridTag) ct;
-            }
-        }
-        return null;
+        return (DefineScalingGridTag) swf.getCharacterIdTag(getCharacterId(), DefineScalingGridTag.ID);
     }
 }

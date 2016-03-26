@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.FrameExporter;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
-import com.jpexs.decompiler.flash.exporters.commonshape.Point;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.tags.DefineScalingGridTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
@@ -66,7 +65,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -74,9 +72,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.imageio.ImageIO;
+import org.w3c.dom.Element;
 
 /**
  *
@@ -557,47 +553,47 @@ public class Timeline {
     }
 
     /*public void toImage(int frame, int time, RenderContext renderContext, SerializableImage image, boolean isClip, Matrix transformation, Matrix prevTransformation, Matrix absoluteTransformation, ColorTransform colorTransform) {
-        ExportRectangle scalingGrid = null;
-        if (timelined instanceof CharacterTag) {
-            DefineScalingGridTag sgt = ((CharacterTag) timelined).getScalingGridTag();
-            if (sgt != null) {
-                scalingGrid = new ExportRectangle(sgt.splitter);
-            }
-        }
+     ExportRectangle scalingGrid = null;
+     if (timelined instanceof CharacterTag) {
+     DefineScalingGridTag sgt = ((CharacterTag) timelined).getScalingGridTag();
+     if (sgt != null) {
+     scalingGrid = new ExportRectangle(sgt.splitter);
+     }
+     }
 
-        if (scalingGrid == null || transformation.rotateSkew0 != 0 || transformation.rotateSkew1 != 0) {
-            toImage(frame, time, renderContext, image, isClip, transformation, absoluteTransformation, colorTransform, null);
-            return;
-        }
+     if (scalingGrid == null || transformation.rotateSkew0 != 0 || transformation.rotateSkew1 != 0) {
+     toImage(frame, time, renderContext, image, isClip, transformation, absoluteTransformation, colorTransform, null);
+     return;
+     }
 
-        //9-slice scaling using DefineScalingGrid
-        Matrix diffTransform = prevTransformation.inverse().preConcatenate(transformation);
-        transformation = diffTransform;
+     //9-slice scaling using DefineScalingGrid
+     Matrix diffTransform = prevTransformation.inverse().preConcatenate(transformation);
+     transformation = diffTransform;
 
-        Matrix prevScale = new Matrix();
-        prevScale.scaleX = prevTransformation.scaleX;
-        prevScale.scaleY = prevTransformation.scaleY;
+     Matrix prevScale = new Matrix();
+     prevScale.scaleX = prevTransformation.scaleX;
+     prevScale.scaleY = prevTransformation.scaleY;
 
-        ExportRectangle boundsRect = new ExportRectangle(timelined.getRect());
+     ExportRectangle boundsRect = new ExportRectangle(timelined.getRect());
 
 
-         0 |  1  | 2
-        ------------
-         3 |  4  | 5
-        ------------
-         6 |  7  | 8
+     0 |  1  | 2
+     ------------
+     3 |  4  | 5
+     ------------
+     6 |  7  | 8
 
-        ExportRectangle targetRect[] = new ExportRectangle[9];
-        ExportRectangle sourceRect[] = new ExportRectangle[9];
-        Matrix transforms[] = new Matrix[9];
+     ExportRectangle targetRect[] = new ExportRectangle[9];
+     ExportRectangle sourceRect[] = new ExportRectangle[9];
+     Matrix transforms[] = new Matrix[9];
 
-        DefineScalingGridTag.getSlices(transformation, prevScale, boundsRect, scalingGrid, sourceRect, targetRect, transforms);
+     DefineScalingGridTag.getSlices(transformation, prevScale, boundsRect, scalingGrid, sourceRect, targetRect, transforms);
 
-        for (int i = 0; i < targetRect.length; i++) {
-            toImage(frame, time, renderContext, image, isClip, transforms[i], absoluteTransformation, colorTransform, targetRect[i]);
-        }
-    }*/
-    private void drawDrawable(Matrix strokeTransform, DepthState layer, Matrix layerMatrix, Graphics2D g, ColorTransform colorTransForm, int blendMode, List<Clip> clips, List<Shape> prevClips, Matrix transformation, boolean isClip, int clipDepth, Matrix absMat, int time, int ratio, RenderContext renderContext, SerializableImage image, DrawableTag drawable, List<FILTER> filters, double unzoom, ColorTransform clrTrans) {
+     for (int i = 0; i < targetRect.length; i++) {
+     toImage(frame, time, renderContext, image, isClip, transforms[i], absoluteTransformation, colorTransform, targetRect[i]);
+     }
+     }*/
+    private void drawDrawable(Matrix strokeTransform, DepthState layer, Matrix layerMatrix, Graphics2D g, ColorTransform colorTransForm, int blendMode, List<Clip> clips, Matrix transformation, boolean isClip, int clipDepth, Matrix absMat, int time, int ratio, RenderContext renderContext, SerializableImage image, DrawableTag drawable, List<FILTER> filters, double unzoom, ColorTransform clrTrans) {
         Matrix drawMatrix = new Matrix();
         int drawableFrameCount = drawable.getNumFrames();
         if (drawableFrameCount == 0) {
@@ -642,7 +638,7 @@ public class Timeline {
             return;
         }
 
-        m.translate(-rect.xMin, -rect.yMin);
+        m = m.preConcatenate(Matrix.getTranslateInstance(-rect.xMin, -rect.yMin));
         //strokeTransform = strokeTransform.clone();
         //strokeTransform.translate(-rect.xMin, -rect.yMin);
         drawMatrix.translate(rect.xMin, rect.yMin);
@@ -764,9 +760,6 @@ public class Timeline {
             gm.drawImage(img.getBufferedImage(), 0, 0, null);
             Clip clip = new Clip(Helper.imageToShape(mask), clipDepth); // Maybe we can get current outline instead converting from image (?)
             clips.add(clip);
-            prevClips.add(g.getClip());
-            g.setTransform(AffineTransform.getTranslateInstance(0, 0));
-            g.setClip(clip.shape);
         } else {
             if (renderContext.cursorPosition != null) {
                 if (drawable instanceof DefineSpriteTag) {
@@ -812,17 +805,44 @@ public class Timeline {
 
         g.setTransform(transformation.toTransform());
         List<Clip> clips = new ArrayList<>();
-        List<Shape> prevClips = new ArrayList<>();
 
         int maxDepth = getMaxDepth();
+        int clipCount = 0;
         for (int i = 1; i <= maxDepth; i++) {
+            boolean clipChanged = clipCount != clips.size();
             for (int c = 0; c < clips.size(); c++) {
-                if (clips.get(c).depth == i) {
-                    g.setClip(prevClips.get(c));
-                    prevClips.remove(c);
+                if (clips.get(c).depth < i) {
                     clips.remove(c);
+                    clipChanged = true;
                 }
             }
+
+            if (clipChanged) {
+                if (clips.size() > 0) {
+                    Area clip = null;
+                    for (Clip clip1 : clips) {
+                        Shape shape = clip1.shape;
+                        if (clip == null) {
+                            clip = new Area(shape);
+                        } else {
+                            clip.intersect(new Area(shape));
+                        }
+                    }
+
+                    g.setTransform(new AffineTransform());
+                    g.setClip(clip);
+
+                    // draw clip border
+                    //g.setPaint(Color.red);
+                    //g.setStroke(new BasicStroke(2));
+                    //g.draw(clip);
+                } else {
+                    g.setClip(null);
+                }
+
+                clipCount = clips.size();
+            }
+
             if (!frameObj.layers.containsKey(i)) {
                 continue;
             }
@@ -873,25 +893,25 @@ public class Timeline {
 
                         Rectangle2D r = new Rectangle2D.Double(p1.xMin, p1.yMin, p1.getWidth(), p1.getHeight());
                         g.setClip(r);
-                        drawDrawable(strokeTransformation.preConcatenate(layerMatrix), layer, transforms[s], g, colorTransform, layer.blendMode, clips, prevClips, transformation.clone(), isClip, layer.clipDepth, absMat, time, layer.ratio, renderContext, image, (DrawableTag) character, layer.filters, unzoom, clrTrans);
+                        drawDrawable(strokeTransformation.preConcatenate(layerMatrix), layer, transforms[s], g, colorTransform, layer.blendMode, clips, transformation, isClip, layer.clipDepth, absMat, time, layer.ratio, renderContext, image, (DrawableTag) character, layer.filters, unzoom, clrTrans);
 
                     }
                     g.setClip(c);
 
                     /*
-                    for (int s = 0; s < 9; s++) {
-                        g.setTransform(new AffineTransform());
-                        ExportRectangle p1 = transformation.transform(targetRect[s]);
-                        g.setClip(c);
+                     for (int s = 0; s < 9; s++) {
+                     g.setTransform(new AffineTransform());
+                     ExportRectangle p1 = transformation.transform(targetRect[s]);
+                     g.setClip(c);
 
-                        Rectangle2D r = new Rectangle2D.Double(p1.xMin, p1.yMin, p1.getWidth(), p1.getHeight());
-                        g.setColor(Color.blue);
-                        g.draw(r);
+                     Rectangle2D r = new Rectangle2D.Double(p1.xMin, p1.yMin, p1.getWidth(), p1.getHeight());
+                     g.setColor(Color.blue);
+                     g.draw(r);
 
-                    }*/
+                     }*/
                     g.setTransform(origTransform);
                 } else {
-                    drawDrawable(strokeTransformation, layer, layerMatrix, g, colorTransform, layer.blendMode, clips, prevClips, transformation.clone(), isClip, layer.clipDepth, absMat, time, layer.ratio, renderContext, image, (DrawableTag) character, layer.filters, unzoom, clrTrans);
+                    drawDrawable(strokeTransformation, layer, layerMatrix, g, colorTransform, layer.blendMode, clips, transformation, isClip, layer.clipDepth, absMat, time, layer.ratio, renderContext, image, (DrawableTag) character, layer.filters, unzoom, clrTrans);
                 }
             } else if (character instanceof BoundedTag) {
                 showPlaceholder = true;
@@ -929,28 +949,44 @@ public class Timeline {
             }
         }
 
-        g.setTransform(AffineTransform.getScaleInstance(1, 1));
+        g.setTransform(new AffineTransform());
         g.setClip(prevClip);
     }
 
-    public void toSVG(int frame, int time, DepthState stateUnderCursor, int mouseButton, SVGExporter exporter, ColorTransform colorTransform, int level, double zoom) throws IOException {
+    public void toSVG(int frame, int time, DepthState stateUnderCursor, int mouseButton, SVGExporter exporter, ColorTransform colorTransform, int level) throws IOException {
         if (getFrameCount() <= frame) {
             return;
         }
 
         Frame frameObj = getFrame(frame);
         List<SvgClip> clips = new ArrayList<>();
-        List<String> prevClips = new ArrayList<>();
 
         int maxDepth = getMaxDepth();
+        int clipCount = 0;
+        Element clipGroup = null;
         for (int i = 1; i <= maxDepth; i++) {
+            boolean clipChanged = clipCount != clips.size();
             for (int c = 0; c < clips.size(); c++) {
-                if (clips.get(c).depth == i) {
-                    exporter.setClip(prevClips.get(c));
-                    prevClips.remove(c);
+                if (clips.get(c).depth < i) {
                     clips.remove(c);
+                    clipChanged = true;
                 }
             }
+
+            if (clipChanged) {
+                if (clipGroup != null) {
+                    exporter.endGroup();
+                }
+
+                if (clips.size() > 0) {
+                    String clip = clips.get(clips.size() - 1).shape; // todo: merge clip areas
+                    clipGroup = exporter.createSubGroup(null, null);
+                    clipGroup.setAttribute("clip-path", "url(#" + clip + ")");
+                }
+
+                clipCount = clips.size();
+            }
+
             if (!frameObj.layers.containsKey(i)) {
                 continue;
             }
@@ -981,7 +1017,7 @@ public class Timeline {
                     assetName = getTagIdPrefix(drawableTag, exporter);
                     exporter.exportedTags.put(drawableTag, assetName);
                     exporter.createDefGroup(new ExportRectangle(boundRect), assetName);
-                    drawable.toSVG(exporter, layer.ratio, clrTrans, level + 1, zoom);
+                    drawable.toSVG(exporter, layer.ratio, clrTrans, level + 1);
                     exporter.endGroup();
                 }
                 ExportRectangle rect = new ExportRectangle(boundRect);
@@ -993,10 +1029,8 @@ public class Timeline {
                     exporter.createClipPath(new Matrix(), clipName);
                     SvgClip clip = new SvgClip(clipName, layer.clipDepth);
                     clips.add(clip);
-                    prevClips.add(exporter.getClip());
                     Matrix mat = Matrix.getTranslateInstance(rect.xMin, rect.yMin).preConcatenate(new Matrix(layer.matrix));
                     exporter.addUse(mat, boundRect, assetName, layer.instanceName);
-                    exporter.setClip(clip.shape);
                     exporter.endGroup();
                 } else {
                     Matrix mat = Matrix.getTranslateInstance(rect.xMin, rect.yMin).preConcatenate(new Matrix(layer.matrix));
@@ -1005,6 +1039,9 @@ public class Timeline {
             }
         }
 
+        if (clipGroup != null) {
+            exporter.endGroup();
+        }
     }
 
     private static String getTagIdPrefix(Tag tag, SVGExporter exporter) {

@@ -196,12 +196,12 @@ public class FrameExporter {
                         rect.yMax *= settings.zoom;
                         rect.xMin *= settings.zoom;
                         rect.yMin *= settings.zoom;
-                        SVGExporter exporter = new SVGExporter(rect);
+                        SVGExporter exporter = new SVGExporter(rect, settings.zoom);
                         if (fbackgroundColor != null) {
                             exporter.setBackGroundColor(fbackgroundColor);
                         }
 
-                        tim.toSVG(frame, 0, null, 0, exporter, null, 0, settings.zoom);
+                        tim.toSVG(frame, 0, null, 0, exporter, null, 0);
                         fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                     }
                     ret.add(f);
@@ -360,7 +360,7 @@ public class FrameExporter {
                 }
 
                 int fframe = fframes.get(pos++);
-                BufferedImage result = SWF.frameToImageGet(ftim, fframe, fframe, null, 0, ftim.displayRect, new Matrix(), new Matrix(), null, fbackgroundColor, settings.zoom).getBufferedImage();
+                BufferedImage result = SWF.frameToImageGet(ftim, fframe, fframe, null, 0, ftim.displayRect, new Matrix(), null, fbackgroundColor, settings.zoom).getBufferedImage();
 
                 if (evl != null) {
                     evl.handleExportedEvent("frame", pos, fframes.size(), tagName);

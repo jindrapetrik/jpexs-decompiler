@@ -331,7 +331,7 @@ public abstract class FontTag extends CharacterTag implements AloneTag, Drawable
     }
 
     @Override
-    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level, double zoom) {
+    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) {
     }
 
     @Override

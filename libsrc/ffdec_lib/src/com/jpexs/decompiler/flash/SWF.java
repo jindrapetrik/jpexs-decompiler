@@ -90,6 +90,7 @@ import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DebugIDTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
+import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.EnableDebugger2Tag;
@@ -439,6 +440,21 @@ public final class SWF implements SWFContainerItem, Timelined {
         return characterIdTags.get(characterId);
     }
 
+    public CharacterIdTag getCharacterIdTag(int characterId, int tagId) {
+        List<CharacterIdTag> characterIdTags = getCharacterIdTags(characterId);
+        if (characterIdTags != null) {
+            for (CharacterIdTag t : characterIdTags) {
+                if (((Tag) t).getId() == tagId) {
+                    if (t.getCharacterId() == characterId) {
+                        return t;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
     public Map<Integer, Set<Integer>> getDependentCharacters() {
         if (dependentCharacters == null) {
             synchronized (this) {
@@ -549,6 +565,19 @@ public final class SWF implements SWFContainerItem, Timelined {
 
         if (characterTag != null) {
             logger.log(Level.SEVERE, "CharacterTag should be an ImageTag. characterId: {0}", imageId);
+        }
+
+        return null;
+    }
+
+    public DefineSoundTag getSound(int soundId) {
+        CharacterTag characterTag = getCharacters().get(soundId);
+        if (characterTag instanceof DefineSoundTag) {
+            return (DefineSoundTag) characterTag;
+        }
+
+        if (characterTag != null) {
+            logger.log(Level.SEVERE, "CharacterTag should be a DefineSoundTag. characterId: {0}", soundId);
         }
 
         return null;
@@ -2497,6 +2526,12 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
     }
 
+    public static void clearAllStaticCache() {
+        Cache.clearAll();
+        Helper.clearShapeCache();
+        System.gc();
+    }
+
     public void clearAllCache() {
         characters = null;
         characterIdTags = null;
@@ -2505,9 +2540,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         clearReadOnlyListCache();
         clearImageCache();
         clearScriptCache();
-        Cache.clearAll();
-        Helper.clearShapeCache();
-        System.gc();
+        clearAllStaticCache();
     }
 
     public static void uncache(ASMSource src) {
@@ -2664,7 +2697,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         return ret;
     }
 
-    public static SerializableImage frameToImageGet(Timeline timeline, int frame, int time, Point cursorPosition, int mouseButton, RECT displayRect, Matrix transformation, Matrix absoluteTransformation, ColorTransform colorTransform, Color backGroundColor, double zoom) {
+    public static SerializableImage frameToImageGet(Timeline timeline, int frame, int time, Point cursorPosition, int mouseButton, RECT displayRect, Matrix transformation, ColorTransform colorTransform, Color backGroundColor, double zoom) {
         if (timeline.getFrameCount() == 0) {
             return new SerializableImage(1, 1, SerializableImage.TYPE_INT_ARGB);
         }
@@ -2687,7 +2720,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         RenderContext renderContext = new RenderContext();
         renderContext.cursorPosition = cursorPosition;
         renderContext.mouseButton = mouseButton;
-        timeline.toImage(frame, time, renderContext, image, false, m, transformation, absoluteTransformation, colorTransform);
+        timeline.toImage(frame, time, renderContext, image, false, m, transformation, m, colorTransform);
 
         return image;
     }

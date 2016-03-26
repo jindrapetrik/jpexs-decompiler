@@ -28,7 +28,7 @@ import java.awt.image.RescaleOp;
 public class ColorTransform implements Cloneable {
 
     public RescaleOp toRescaleOp() {
-        return new RescaleOp(new float[]{getRedMulti() / 255f, getGreenMulti() / 255f, getBlueMulti() / 255f, getAlphaMulti() / 255f},
+        return new RescaleOp(new float[]{getRedMulti() / 256f, getGreenMulti() / 256f, getBlueMulti() / 256f, getAlphaMulti() / 256f},
                 new float[]{getRedAdd(), getGreenAdd(), getBlueAdd(), getAlphaAdd()}, null);
     }
 

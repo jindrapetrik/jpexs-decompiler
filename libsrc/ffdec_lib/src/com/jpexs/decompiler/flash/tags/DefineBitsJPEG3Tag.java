@@ -128,7 +128,7 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
 
             bitmapAlphaData = new ByteArrayRange(SWFOutputStream.compressByteArray(ba));
         } else {
-            bitmapAlphaData = ByteArrayRange.EMPTY;
+            bitmapAlphaData = new ByteArrayRange(SWFOutputStream.compressByteArray(new byte[0]));
         }
 
         imageData = new ByteArrayRange(data);
