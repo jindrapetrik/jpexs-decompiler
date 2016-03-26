@@ -79,9 +79,9 @@ public class TypeItem extends GraphTargetItem {
         boolean as3 = localData.constantsAvm2 != null;
 
         if (localData.fullyQualifiedNames.contains(new DottedChain(fullTypeName.getLast()))) {
-            writer.hilightSpecial(fullTypeName.toPrintableString(as3), HighlightSpecialType.TYPE_NAME, fullTypeName.toPrintableString(as3));
+            writer.hilightSpecial(fullTypeName.toPrintableString(as3), HighlightSpecialType.TYPE_NAME, fullTypeName.toRawString());
         } else {
-            writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(as3, fullTypeName.getLast()), HighlightSpecialType.TYPE_NAME, fullTypeName.toPrintableString(as3));
+            writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(as3, fullTypeName.getLast()), HighlightSpecialType.TYPE_NAME, fullTypeName.toRawString());
         }
 
         return writer;

@@ -1037,7 +1037,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 updateClassesList();
                 reload(true);
                 ABCPanel abcPanel = getABCPanel();
-                abcPanel.hilightScript(abcPanel.getSwf(), abcPanel.decompiledTextArea.getScriptLeaf().getClassPath().toString());
+                abcPanel.hilightScript(abcPanel.getSwf(), abcPanel.decompiledTextArea.getScriptLeaf().getClassPath().toRawString());
             }
         }
     }

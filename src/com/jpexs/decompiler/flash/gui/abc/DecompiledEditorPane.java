@@ -401,7 +401,16 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         return getMultinameAtPos(pos, false);
     }
 
-    public int getMultinameAtPos(int pos, boolean codeOnly) {
+    private int getMultinameAtPos(int pos, boolean codeOnly) {
+        int multinameIndex = _getMultinameAtPos(pos, codeOnly);
+        if (multinameIndex > -1) {
+            ABC abc = getABC();
+            multinameIndex = abc.constants.convertToQname(abc.constants, multinameIndex);
+        }
+        return multinameIndex;
+    }
+
+    public int _getMultinameAtPos(int pos, boolean codeOnly) {
         Highlighting tm = Highlighting.searchPos(methodHighlights, pos);
         Trait currentTrait = null;
         int currentMethod = -1;
@@ -472,7 +481,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                     for (int i = 1; i < abc.constants.getMultinameCount(); i++) {
                         Multiname m = abc.constants.getMultiname(i);
                         if (m != null) {
-                            if (typeName.equals(m.getNameWithNamespace(abc.constants).toString())) {
+                            if (typeName.equals(m.getNameWithNamespace(abc.constants).toRawString())) {
                                 return i;
                             }
                         }

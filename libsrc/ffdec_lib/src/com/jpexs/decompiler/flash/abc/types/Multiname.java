@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -416,6 +417,74 @@ public class Multiname {
         if (!Arrays.equals(params, other.params)) {
             return false;
         }
+        return true;
+    }
+
+    /**
+     * Is this MULTINAME kind with only one namespace. Hint: it is sometimes
+     * used for interfaces
+     *
+     * @param pool
+     * @return
+     */
+    public boolean isMULTINAMEwithOneNs(AVM2ConstantPool pool) {
+        return kind == MULTINAME && pool.getNamespaceSet(namespace_set_index).namespaces.length == 1;
+    }
+
+    /**
+     * Gets single namespace index. It can be the namespace index of QNAME or
+     * namespace index in namespace set of MULTINAME, if it has only one
+     * namespace in the set.
+     *
+     * @param pool
+     * @return
+     */
+    public int getSingleNamespaceIndex(AVM2ConstantPool pool) {
+        if (isMULTINAMEwithOneNs(pool)) {
+            return pool.getNamespaceSet(namespace_set_index).namespaces[0];
+        }
+        return namespace_index;
+    }
+
+    /**
+     * Gets single namespace. It can be the namespace of QNAME or namespace in
+     * namespace set of MULTINAME, if it has only one namespace in the set.
+     *
+     * @param pool
+     * @return
+     */
+    public Namespace getSingleNamespace(AVM2ConstantPool pool) {
+        int index = getSingleNamespaceIndex(pool);
+        if (index < 0) {
+            return null;
+        }
+        return pool.getNamespace(index);
+    }
+
+    private boolean isEfectivelyQname(AVM2ConstantPool thisCpool) {
+        return kind == QNAME || kind == QNAMEA || isMULTINAMEwithOneNs(thisCpool);
+    }
+
+    public boolean qnameEquals(AVM2ConstantPool thisCpool, Multiname other, AVM2ConstantPool otherCpool) {
+        if (!isEfectivelyQname(thisCpool) || !other.isEfectivelyQname(otherCpool)) {
+            return false;
+        }
+        Namespace otherNs = other.getSingleNamespace(otherCpool);
+        Namespace thisNs = getSingleNamespace(thisCpool);
+        if (otherNs.kind != thisNs.kind) {
+            return false;
+        }
+        if (otherNs.kind == Namespace.KIND_PRIVATE) {
+            return false;
+        }
+        if (!Objects.equals(otherNs.getName(otherCpool).toRawString(), thisNs.getName(thisCpool).toRawString())) {
+            return false;
+        }
+
+        if (!Objects.equals(other.getName(otherCpool, new ArrayList<>(), true), getName(thisCpool, new ArrayList<>(), true))) {
+            return false;
+        }
+
         return true;
     }
 }

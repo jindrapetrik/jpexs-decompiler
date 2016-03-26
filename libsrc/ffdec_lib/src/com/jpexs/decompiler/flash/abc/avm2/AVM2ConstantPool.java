@@ -311,6 +311,30 @@ public class AVM2ConstantPool implements Cloneable {
         return null;
     }
 
+    /**
+     * Converts kind MULTINAME with one namespace to QNAME with that namespace
+     * (must exist in the abc). Ignores others.
+     *
+     * @param cpool
+     * @param index MULTINAME index
+     * @return
+     */
+    public int convertToQname(AVM2ConstantPool cpool, int index) {
+        Multiname mx = cpool.getMultiname(index);
+        if (mx.isMULTINAMEwithOneNs(cpool)) {
+            Multiname mx2 = new Multiname();
+            mx2.kind = Multiname.QNAME;
+            mx2.name_index = mx.name_index;
+            mx2.namespace_index = mx.getSingleNamespaceIndex(cpool);
+            //and same QNAME exists within this ABC
+            int newMultinameIndex = cpool.getMultinameId(mx2, false);
+            if (newMultinameIndex > 0) {
+                index = newMultinameIndex; //use that QNAME
+            }
+        }
+        return index;
+    }
+
     public Multiname getMultiname(int index) {
         try {
             return constant_multiname.get(index);
@@ -512,6 +536,23 @@ public class AVM2ConstantPool implements Cloneable {
             id = addMultiname(val);
         }
         return id;
+    }
+
+    /**
+     * Finds multiname index based on multiname in other constant pool
+     *
+     * @param val
+     * @param origConst
+     * @return
+     */
+    public int getMultinameId(Multiname val, AVM2ConstantPool origConst) {
+
+        for (int i = 1; i < getMultinameCount(); i++) {
+            if (getMultiname(i).qnameEquals(this, val, origConst)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     public int getStringId(String val, boolean add) {

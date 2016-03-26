@@ -73,6 +73,7 @@ import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.graph.CompilationException;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import de.hameister.treetable.MyTreeTable;
@@ -97,6 +98,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -881,7 +883,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
             return false; //?
         }
         SyntaxDocument sd = (SyntaxDocument) decompiledTextArea.getDocument();
-        Token t = sd.getTokenAt(pos);
+        Token t = sd.getTokenAt(pos + 1);
         if (t == null || (t.type != TokenType.IDENTIFIER && t.type != TokenType.KEYWORD && t.type != TokenType.REGEX)) {
             return false;
         }
@@ -902,14 +904,16 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
             List<MultinameUsage> usages = abc.findMultinameDefinition(multinameIndex);
 
             Multiname m = abc.constants.getMultiname(multinameIndex);
+
             //search other ABC tags if this is not private multiname
-            if (m.namespace_index > 0 && abc.constants.getNamespace(m.namespace_index).kind != Namespace.KIND_PRIVATE) {
+            if (m.getSingleNamespaceIndex(abc.constants) > 0 && abc.constants.getNamespace(m.getSingleNamespaceIndex(abc.constants)).kind != Namespace.KIND_PRIVATE) {
                 for (ABCContainerTag at : getAbcList()) {
                     ABC a = at.getABC();
                     if (a == abc) {
                         continue;
                     }
-                    int mid = a.constants.getMultinameId(m, false);
+
+                    int mid = a.constants.getMultinameId(m, abc.constants);
                     if (mid > 0) {
                         usages.addAll(a.findMultinameDefinition(mid));
                     }
@@ -943,13 +947,13 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
             Multiname m = abc.constants.getMultiname(multinameIndex);
             //search other ABC tags if this is not private multiname
-            if (m.namespace_index > 0 && abc.constants.getNamespace(m.namespace_index).kind != Namespace.KIND_PRIVATE) {
+            if (m.getSingleNamespaceIndex(abc.constants) > 0 && m.getSingleNamespace(abc.constants).kind != Namespace.KIND_PRIVATE) {
                 for (ABCContainerTag at : getAbcList()) {
                     ABC a = at.getABC();
                     if (a == abc) {
                         continue;
                     }
-                    int mid = a.constants.getMultinameId(m, false);
+                    int mid = a.constants.getMultinameId(m, abc.constants);
                     if (mid > 0) {
                         usages.addAll(a.findMultinameDefinition(mid));
                     }
@@ -1075,7 +1079,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
                 ClassPath classPath = item.getClassPath();
 
                 // first check the className to avoid calling unnecessary toString
-                if (name.endsWith(classPath.className) && classPath.toString().equals(name)) {
+                if (name.endsWith(classPath.className) && classPath.toRawString().equals(name)) {
                     pack = item;
                     break;
                 }
@@ -1170,7 +1174,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         SWF.uncache(pack);
 
         try {
-            String oldSp = pack.getClassPath().toString();
+            String oldSp = pack.getClassPath().toRawString();
             /*List<ScriptPack> packs = abc.script_info.get(oldIndex).getPacks(abc, oldIndex, null, pack.allABCs);
              if (!packs.isEmpty()) {
 
