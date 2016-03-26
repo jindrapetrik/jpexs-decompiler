@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Runtime;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2VerifyErrorException;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2InstructionFlag;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
 /**
@@ -30,7 +31,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class CallSuperIdIns extends InstructionDefinition {
 
     public CallSuperIdIns() {
-        super(0x4B, "callsuperid", new int[]{}, true);
+        super(0x4B, "callsuperid", new int[]{}, true, AVM2InstructionFlag.NO_FLASH_PLAYER, AVM2InstructionFlag.UNDOCUMENTED, AVM2InstructionFlag.UNKNOWN_OPERANDS, AVM2InstructionFlag.UNKNOWN_STACK);
     }
 
     @Override

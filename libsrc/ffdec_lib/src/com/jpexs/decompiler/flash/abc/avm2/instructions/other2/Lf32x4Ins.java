@@ -16,12 +16,19 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.other2;
 
+import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Runtime;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2VerifyErrorException;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2InstructionFlag;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
+import com.jpexs.decompiler.flash.abc.avm2.model.AlchemyLoadAVM2Item;
+import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.TranslateStack;
+import java.util.List;
 
 /**
  *
@@ -30,7 +37,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class Lf32x4Ins extends InstructionDefinition {
 
     public Lf32x4Ins() {
-        super(0x0A, "lf32x4", new int[]{}, true);
+        super(0x0A, "lf32x4", new int[]{}, true, AVM2InstructionFlag.NO_FLASH_PLAYER, AVM2InstructionFlag.DOMAIN_MEMORY, AVM2InstructionFlag.FLOAT_MAJOR);
     }
 
     @Override
@@ -40,5 +47,21 @@ public class Lf32x4Ins extends InstructionDefinition {
         }
 
         super.verify(lda, constants, ins);
+    }
+
+    @Override
+    public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
+        GraphTargetItem ofs = stack.pop();
+        stack.push(new AlchemyLoadAVM2Item(ins, localData.lineStartInstruction, ofs, "f4", 32));
+    }
+
+    @Override
+    public int getStackPopCount(AVM2Instruction ins, ABC abc) {
+        return 1;
+    }
+
+    @Override
+    public int getStackPushCount(AVM2Instruction ins, ABC abc) {
+        return 1;
     }
 }

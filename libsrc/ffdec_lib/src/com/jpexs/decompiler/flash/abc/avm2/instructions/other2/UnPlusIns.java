@@ -17,27 +17,29 @@
 package com.jpexs.decompiler.flash.abc.avm2.instructions.other2;
 
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2InstructionFlag;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
 /**
  *
  * @author JPEXS
  */
-public class PushUninitializedIns extends InstructionDefinition {
+public class UnPlusIns extends InstructionDefinition {
 
-    public PushUninitializedIns() {
-        super(0x22, "pushuninitialized", new int[]{AVM2Code.OPT_U30}, false /*?*/);
+    public UnPlusIns() {
+        super(0x7A, "unplus", new int[]{}, true, AVM2InstructionFlag.FLOAT_MAJOR, AVM2InstructionFlag.NO_FLASH_PLAYER);
     }
 
     @Override
     public int getStackPopCount(AVM2Instruction ins, ABC abc) {
-        throw new UnsupportedOperationException();
+        return 1;
     }
 
     @Override
     public int getStackPushCount(AVM2Instruction ins, ABC abc) {
-        throw new UnsupportedOperationException();
+        return 1;
     }
 }

@@ -33,7 +33,7 @@ import java.util.List;
 public class PushNamespaceIns extends InstructionDefinition {
 
     public PushNamespaceIns() {
-        super(0x31, "pushnamespace", new int[]{AVM2Code.OPT_U30}, false);
+        super(0x31, "pushnamespace", new int[]{AVM2Code.DAT_NAMESPACE_INDEX}, false);
     }
 
     @Override

@@ -33,13 +33,13 @@ import java.util.List;
  */
 public class AlchemyStoreAVM2Item extends AVM2Item {
 
-    private final char type;
+    private final String type;
 
     private final int size;
 
     private final GraphTargetItem ofs;
 
-    public AlchemyStoreAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value, GraphTargetItem ofs, char type, int size) {
+    public AlchemyStoreAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value, GraphTargetItem ofs, String type, int size) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY, value);
         this.ofs = ofs;
         this.type = type;
@@ -68,6 +68,9 @@ public class AlchemyStoreAVM2Item extends AVM2Item {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         String ts = "" + type + size;
+        if (type.equals("f4")) {
+            ts = "f32x4";
+        }
         int code = 0;
         switch (ts) {
             case "i8":
@@ -81,6 +84,9 @@ public class AlchemyStoreAVM2Item extends AVM2Item {
                 break;
             case "f32":
                 code = AVM2Instructions.Sf32;
+                break;
+            case "f32x4":
+                code = AVM2Instructions.Sf32x4;
                 break;
             case "f64":
                 code = AVM2Instructions.Sf64;

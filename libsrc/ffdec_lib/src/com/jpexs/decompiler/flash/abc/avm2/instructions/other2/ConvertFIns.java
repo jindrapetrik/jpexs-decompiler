@@ -18,31 +18,30 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions.other2;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2Runtime;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
+import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2VerifyErrorException;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2InstructionFlag;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceOrConvertTypeIns;
-import com.jpexs.decompiler.flash.ecma.EcmaScript;
-import com.jpexs.decompiler.graph.DottedChain;
-import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.decompiler.graph.TypeItem;
 
 /**
  *
  * @author JPEXS
  */
-public class CoerceDIns extends InstructionDefinition implements CoerceOrConvertTypeIns {
+public class ConvertFIns extends InstructionDefinition {
 
-    public CoerceDIns() {
-        super(0x84, "coerce_d", new int[]{}, true, AVM2InstructionFlag.DEPRECATED); // stack: -1+1
+    public ConvertFIns() {
+        super(0x79, "convert_f", new int[]{}, true, AVM2InstructionFlag.FLOAT_MAJOR, AVM2InstructionFlag.NO_FLASH_PLAYER);
     }
 
     @Override
-    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
-        Object value = lda.operandStack.pop();
-        lda.operandStack.push(EcmaScript.toNumber(value));
-        return true;
+    public void verify(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) throws AVM2VerifyErrorException {
+        if (lda.getRuntime() == AVM2Runtime.ADOBE_FLASH) {
+            illegalOpCode(lda, ins);
+        }
+
+        super.verify(lda, constants, ins);
     }
 
     @Override
@@ -53,10 +52,5 @@ public class CoerceDIns extends InstructionDefinition implements CoerceOrConvert
     @Override
     public int getStackPushCount(AVM2Instruction ins, ABC abc) {
         return 1;
-    }
-
-    @Override
-    public GraphTargetItem getTargetType(AVM2ConstantPool constants, AVM2Instruction ins) {
-        return new TypeItem(DottedChain.NUMBER);
     }
 }

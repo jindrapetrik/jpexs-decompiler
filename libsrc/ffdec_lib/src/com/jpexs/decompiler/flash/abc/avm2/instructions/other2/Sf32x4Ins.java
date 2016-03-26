@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Runtime;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2VerifyErrorException;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2InstructionFlag;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
 /**
@@ -30,7 +31,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class Sf32x4Ins extends InstructionDefinition {
 
     public Sf32x4Ins() {
-        super(0x0B, "sf32x4", new int[]{}, true);
+        super(0x0B, "sf32x4", new int[]{}, true, AVM2InstructionFlag.NO_FLASH_PLAYER, AVM2InstructionFlag.DOMAIN_MEMORY, AVM2InstructionFlag.FLOAT_MAJOR);
     }
 
     @Override

@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions.other2;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2InstructionFlag;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
 /**
@@ -28,7 +29,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class FindPropGlobalStrictIns extends InstructionDefinition {
 
     public FindPropGlobalStrictIns() {
-        super(0x5B, "findpropglobalstrict", new int[]{AVM2Code.DAT_MULTINAME_INDEX}, true);
+        super(0x5B, "findpropglobalstrict", new int[]{AVM2Code.DAT_MULTINAME_INDEX}, true, AVM2InstructionFlag.NO_FLASH_PLAYER, AVM2InstructionFlag.UNKNOWN_STACK);
     }
 
     @Override

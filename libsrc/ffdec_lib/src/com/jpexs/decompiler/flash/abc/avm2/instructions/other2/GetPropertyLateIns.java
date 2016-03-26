@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions.other2;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2InstructionFlag;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
 /**
@@ -27,7 +28,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class GetPropertyLateIns extends InstructionDefinition {
 
     public GetPropertyLateIns() {
-        super(0x67, "getpropertylate", new int[]{}, true /*?*/);
+        super(0x67, "getpropertylate", new int[]{}, true /*?*/, AVM2InstructionFlag.UNDOCUMENTED, AVM2InstructionFlag.UNKNOWN_STACK, AVM2InstructionFlag.NO_FLASH_PLAYER);
     }
 
     @Override

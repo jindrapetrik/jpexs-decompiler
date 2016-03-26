@@ -26,7 +26,9 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.LookupSwitchIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnValueIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnVoidIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ThrowIns;
+import com.jpexs.decompiler.flash.abc.types.Float4;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
+import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSource;
@@ -223,6 +225,14 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
         StringBuilder s = new StringBuilder();
         for (int i = 0; i < definition.operands.length; i++) {
             switch (definition.operands[i]) {
+                case AVM2Code.DAT_NAMESPACE_INDEX:
+                    if (operands[i] == 0) {
+                        s.append(" null");
+                    } else {
+                        s.append(" ");
+                        s.append(Multiname.namespaceToString(constants, operands[i]));
+                    }
+                    break;
                 case AVM2Code.DAT_MULTINAME_INDEX:
                     if (operands[i] == 0) {
                         s.append(" null");
@@ -277,6 +287,33 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
                     } else {
                         s.append(" ");
                         s.append(constants.getDouble(operands[i]));
+                    }
+                    break;
+                case AVM2Code.DAT_FLOAT_INDEX:
+                    if (operands[i] == 0) {
+                        s.append(" null");
+                    } else {
+                        s.append(" ");
+                        s.append(constants.getFloat(operands[i]));
+                    }
+                    break;
+                case AVM2Code.DAT_FLOAT4_INDEX:
+                    if (operands[i] == 0) {
+                        s.append(" null");
+                    } else {
+                        Float4 f4 = constants.getFloat4(operands[i]);
+                        s.append(" ").append(f4.values[0]);
+                        s.append(" ").append(f4.values[1]);
+                        s.append(" ").append(f4.values[2]);
+                        s.append(" ").append(f4.values[3]);
+                    }
+                    break;
+                case AVM2Code.DAT_DECIMAL_INDEX:
+                    if (operands[i] == 0) {
+                        s.append(" null");
+                    } else {
+                        s.append(" ");
+                        s.append(constants.getDecimal(operands[i]));
                     }
                     break;
                 case AVM2Code.DAT_OFFSET:

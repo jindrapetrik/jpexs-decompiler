@@ -63,11 +63,23 @@ public abstract class InstructionDefinition implements Serializable {
 
     public boolean canThrow;
 
-    public InstructionDefinition(int instructionCode, String instructionName, int[] operands, boolean canThrow) {
+    public AVM2InstructionFlag[] flags;
+
+    public InstructionDefinition(int instructionCode, String instructionName, int[] operands, boolean canThrow, AVM2InstructionFlag... flags) {
         this.instructionCode = instructionCode;
         this.instructionName = instructionName;
         this.operands = operands;
         this.canThrow = canThrow;
+        this.flags = flags;
+    }
+
+    public boolean hasFlag(AVM2InstructionFlag flag) {
+        for (AVM2InstructionFlag f : flags) {
+            if (f == flag) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -75,7 +87,7 @@ public abstract class InstructionDefinition implements Serializable {
         StringBuilder s = new StringBuilder();
         s.append(instructionName);
         for (int i = 0; i < operands.length; i++) {
-            s.append(AVM2Code.operandTypeToString(operands[i]));
+            s.append(AVM2Code.operandTypeToString(operands[i], true));
         }
         return s.toString();
     }
@@ -106,6 +118,26 @@ public abstract class InstructionDefinition implements Serializable {
             } else if (operand == AVM2Code.DAT_STRING_INDEX) {
                 int idx = ins.operands[i];
                 if (idx <= 0 || idx >= constants.getStringCount()) {
+                    throw new AVM2VerifyErrorException(AVM2VerifyErrorException.CPOOL_INDEX_OUT_OF_RANGE, lda.isDebug(), new Object[]{idx, constants.getStringCount()});
+                }
+            } else if (operand == AVM2Code.DAT_NAMESPACE_INDEX) {
+                int idx = ins.operands[i];
+                if (idx <= 0 || idx >= constants.getNamespaceCount()) {
+                    throw new AVM2VerifyErrorException(AVM2VerifyErrorException.CPOOL_INDEX_OUT_OF_RANGE, lda.isDebug(), new Object[]{idx, constants.getStringCount()});
+                }
+            } else if (operand == AVM2Code.DAT_FLOAT_INDEX) {
+                int idx = ins.operands[i];
+                if (idx <= 0 || idx >= constants.getFloatCount()) {
+                    throw new AVM2VerifyErrorException(AVM2VerifyErrorException.CPOOL_INDEX_OUT_OF_RANGE, lda.isDebug(), new Object[]{idx, constants.getStringCount()});
+                }
+            } else if (operand == AVM2Code.DAT_FLOAT4_INDEX) {
+                int idx = ins.operands[i];
+                if (idx <= 0 || idx >= constants.getFloat4Count()) {
+                    throw new AVM2VerifyErrorException(AVM2VerifyErrorException.CPOOL_INDEX_OUT_OF_RANGE, lda.isDebug(), new Object[]{idx, constants.getStringCount()});
+                }
+            } else if (operand == AVM2Code.DAT_DECIMAL_INDEX) {
+                int idx = ins.operands[i];
+                if (idx <= 0 || idx >= constants.getDecimalCount()) {
                     throw new AVM2VerifyErrorException(AVM2VerifyErrorException.CPOOL_INDEX_OUT_OF_RANGE, lda.isDebug(), new Object[]{idx, constants.getStringCount()});
                 }
             }

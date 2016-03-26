@@ -482,6 +482,14 @@ public class AVM2ConstantPool implements Cloneable {
         return constant_double.indexOf(value);
     }
 
+    private int getFloatId(float value) {
+        return constant_float.indexOf(value);
+    }
+
+    private int getFloat4Id(Float4 value) {
+        return constant_float4.indexOf(value);
+    }
+
     private int getStringId(String value) {
         return constant_string.indexOf(value);
     }
@@ -577,6 +585,22 @@ public class AVM2ConstantPool implements Cloneable {
         int id = getDoubleId(val);
         if (add && id == -1) {
             id = addDouble(val);
+        }
+        return id;
+    }
+
+    public int getFloatId(float val, boolean add) {
+        int id = getFloatId(val);
+        if (add && id == -1) {
+            id = addFloat(val);
+        }
+        return id;
+    }
+
+    public int getFloat4Id(Float4 val, boolean add) {
+        int id = getFloat4Id(val);
+        if (add && id == -1) {
+            id = addFloat4(val);
         }
         return id;
     }

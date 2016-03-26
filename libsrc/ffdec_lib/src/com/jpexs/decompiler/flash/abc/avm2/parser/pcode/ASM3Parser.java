@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.UnknownInstruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushShortIns;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
+import com.jpexs.decompiler.flash.abc.types.Float4;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
@@ -764,11 +765,10 @@ public class ASM3Parser {
                                 case AVM2Code.DAT_MULTINAME_INDEX:
                                     lexer.pushback(parsedOperand);
                                     operandsList.add(parseMultiName(constants, lexer));
-                                    /*if (parsedOperand.type == ParsedSymbol.TYPE_MULTINAME) {
-                                     operandsList.add(checkMultinameIndex(constants, (int) (long) (Long) parsedOperand.value, lexer.yyline()));
-                                     } else {
-                                     throw new ParseException("Multiname expected", lexer.yyline());
-                                     }*/
+                                    break;
+                                case AVM2Code.DAT_NAMESPACE_INDEX:
+                                    lexer.pushback(parsedOperand);
+                                    operandsList.add(parseNamespace(constants, lexer));
                                     break;
                                 case AVM2Code.DAT_STRING_INDEX:
                                     if (parsedOperand.type == ParsedSymbol.TYPE_KEYWORD_NULL) {
@@ -846,7 +846,66 @@ public class ASM3Parser {
                                         }
                                         operandsList.add(did);
                                     } else {
+                                        throw new AVM2ParseException("Double or null expected", lexer.yyline());
+                                    }
+                                    break;
+                                case AVM2Code.DAT_FLOAT_INDEX:
+                                    if (parsedOperand.type == ParsedSymbol.TYPE_KEYWORD_NULL) {
+                                        operandsList.add(0);
+                                    } else if ((parsedOperand.type == ParsedSymbol.TYPE_INTEGER) || (parsedOperand.type == ParsedSymbol.TYPE_FLOAT)) {
+
+                                        float floatVal = 0;
+                                        if (parsedOperand.type == ParsedSymbol.TYPE_INTEGER) {
+                                            floatVal = (Long) parsedOperand.value;
+                                        }
+                                        if (parsedOperand.type == ParsedSymbol.TYPE_FLOAT) {
+                                            floatVal = (float) (double) (Double) parsedOperand.value;
+                                        }
+                                        int fid = constants.getFloatId(floatVal, false);
+                                        if (fid == -1) {
+                                            if ((missingHandler != null) && (missingHandler.missingFloat(floatVal))) {
+                                                fid = constants.addFloat(floatVal);
+                                            } else {
+                                                throw new AVM2ParseException("Unknown float", lexer.yyline());
+                                            }
+                                        }
+                                        operandsList.add(fid);
+                                    } else {
                                         throw new AVM2ParseException("Float or null expected", lexer.yyline());
+                                    }
+                                    break;
+                                case AVM2Code.DAT_FLOAT4_INDEX:
+                                    if (parsedOperand.type == ParsedSymbol.TYPE_KEYWORD_NULL) {
+                                        operandsList.add(0);
+                                    } else {
+                                        float[] float4Vals = new float[4];
+                                        for (int k = 0; k < 4; k++) {
+                                            if ((parsedOperand.type == ParsedSymbol.TYPE_INTEGER) || (parsedOperand.type == ParsedSymbol.TYPE_FLOAT)) {
+                                                float floatVal = 0;
+                                                if (parsedOperand.type == ParsedSymbol.TYPE_INTEGER) {
+                                                    floatVal = (Long) parsedOperand.value;
+                                                }
+                                                if (parsedOperand.type == ParsedSymbol.TYPE_FLOAT) {
+                                                    floatVal = (float) (double) (Double) parsedOperand.value;
+                                                }
+                                                float4Vals[k] = floatVal;
+                                            } else {
+                                                throw new AVM2ParseException("4 floats or null expected", lexer.yyline());
+                                            }
+                                            if (k + 1 < 4) { //not last one
+                                                parsedOperand = lexer.lex();
+                                            }
+                                        }
+                                        Float4 float4Val = new Float4(float4Vals);
+                                        int f4id = constants.getFloat4Id(float4Val, false);
+                                        if (f4id == -1) {
+                                            if ((missingHandler != null) && (missingHandler.missingFloat4(float4Val))) {
+                                                f4id = constants.addFloat4(float4Val);
+                                            } else {
+                                                throw new AVM2ParseException("Unknown float4", lexer.yyline());
+                                            }
+                                        }
+                                        operandsList.add(f4id);
                                     }
                                     break;
                                 case AVM2Code.DAT_OFFSET:

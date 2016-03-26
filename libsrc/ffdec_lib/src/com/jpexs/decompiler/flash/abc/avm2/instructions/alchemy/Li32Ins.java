@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2RangeErrorException;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2InstructionFlag;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.AlchemyLoadAVM2Item;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
@@ -36,7 +37,7 @@ import java.util.List;
 public class Li32Ins extends InstructionDefinition implements AlchemyTypeIns {
 
     public Li32Ins() {
-        super(0x37, "li32", new int[]{}, true);
+        super(0x37, "li32", new int[]{}, true, AVM2InstructionFlag.DOMAIN_MEMORY);
     }
 
     @Override
@@ -55,7 +56,7 @@ public class Li32Ins extends InstructionDefinition implements AlchemyTypeIns {
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         GraphTargetItem ofs = stack.pop();
-        stack.push(new AlchemyLoadAVM2Item(ins, localData.lineStartInstruction, ofs, 'i', 32));
+        stack.push(new AlchemyLoadAVM2Item(ins, localData.lineStartInstruction, ofs, "i", 32));
     }
 
     @Override

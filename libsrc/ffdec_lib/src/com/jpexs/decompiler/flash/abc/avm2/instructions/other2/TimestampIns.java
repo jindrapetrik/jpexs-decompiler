@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions.other2;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2InstructionFlag;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
 /**
@@ -28,7 +29,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class TimestampIns extends InstructionDefinition {
 
     public TimestampIns() {
-        super(0xF3, "timestamp", new int[]{}, false /*?*/);
+        super(0xF3, "timestamp", new int[]{}, false /*?*/, AVM2InstructionFlag.UNDOCUMENTED);
     }
 
     @Override

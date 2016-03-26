@@ -16,6 +16,9 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.parser.pcode;
 
+import com.jpexs.decompiler.flash.abc.types.Decimal;
+import com.jpexs.decompiler.flash.abc.types.Float4;
+
 /**
  *
  * @author JPEXS
@@ -29,4 +32,10 @@ public interface MissingSymbolHandler {
     public boolean missingUInt(long value);
 
     public boolean missingDouble(double value);
+
+    public boolean missingFloat(float value);
+
+    public boolean missingFloat4(Float4 value);
+
+    public boolean missingDecimal(Decimal value);
 }

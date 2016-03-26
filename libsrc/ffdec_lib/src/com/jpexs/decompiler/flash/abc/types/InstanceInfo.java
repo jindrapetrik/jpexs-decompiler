@@ -36,7 +36,7 @@ public class InstanceInfo {
 
     public int super_index;
 
-    public int flags; // 1 = sealed, 0 = dynamic, 2 = final, 4 = interface, 8 = ProtectedNs
+    public int flags; // 1 = sealed, 0 = dynamic, 2 = final, 4 = interface, 8 = ProtectedNs, 16 = non nullable
 
     public int protectedNS; //if flags & 8
 
@@ -53,6 +53,8 @@ public class InstanceInfo {
     public static final int CLASS_INTERFACE = 4;
 
     public static final int CLASS_PROTECTEDNS = 8;
+
+    public static final int CLASS_NON_NULLABLE = 16; //This is somehow used in Flex, propably through annotations or something with Vector datatype (?)
 
     @Internal
     public boolean deleted;
@@ -143,5 +145,9 @@ public class InstanceInfo {
 
     public boolean isFinal() {
         return (flags & CLASS_FINAL) == CLASS_FINAL;
+    }
+
+    public boolean isNullable() {
+        return (flags & CLASS_NON_NULLABLE) != CLASS_NON_NULLABLE;
     }
 }

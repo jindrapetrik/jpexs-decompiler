@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Runtime;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2VerifyErrorException;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2InstructionFlag;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
 /**
@@ -32,7 +33,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class PushFloatIns extends InstructionDefinition {
 
     public PushFloatIns() {
-        super(0x22, "pushfloat", new int[]{AVM2Code.DAT_FLOAT_INDEX}, false /*?*/);
+        super(0x22, "pushfloat", new int[]{AVM2Code.DAT_FLOAT_INDEX}, false /*?*/, AVM2InstructionFlag.NO_FLASH_PLAYER, AVM2InstructionFlag.FLOAT_MAJOR);
     }
 
     @Override

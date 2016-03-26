@@ -154,10 +154,10 @@ public class ABCOutputStream extends OutputStream {
     }
 
     public void writeFloat4(Float4 value) throws IOException {
-        writeFloat(value.value1);
-        writeFloat(value.value2);
-        writeFloat(value.value3);
-        writeFloat(value.value4);
+        writeFloat(value.values[0]);
+        writeFloat(value.values[1]);
+        writeFloat(value.values[2]);
+        writeFloat(value.values[3]);
     }
 
     public void writeU8(int value) throws IOException {

@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Runtime;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2VerifyErrorException;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2InstructionFlag;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
 /**
@@ -32,7 +33,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class ConvertMPIns extends InstructionDefinition {
 
     public ConvertMPIns() {
-        super(0x7A, "convert_m_p", new int[]{AVM2Code.DAT_NUMBER_CONTEXT}, true);
+        super(0x7A, "convert_m_p", new int[]{AVM2Code.DAT_NUMBER_CONTEXT}, true, AVM2InstructionFlag.ES4_NUMERICS_MINOR, AVM2InstructionFlag.NO_FLASH_PLAYER);
     }
 
     @Override

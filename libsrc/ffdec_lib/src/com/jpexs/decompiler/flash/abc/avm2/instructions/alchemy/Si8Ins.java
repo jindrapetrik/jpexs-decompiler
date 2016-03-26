@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2RangeErrorException;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2InstructionFlag;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.AlchemyStoreAVM2Item;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
@@ -36,7 +37,7 @@ import java.util.List;
 public class Si8Ins extends InstructionDefinition implements AlchemyTypeIns {
 
     public Si8Ins() {
-        super(0x3A, "si8", new int[]{}, true);
+        super(0x3A, "si8", new int[]{}, true, AVM2InstructionFlag.DOMAIN_MEMORY);
     }
 
     @Override
@@ -57,7 +58,7 @@ public class Si8Ins extends InstructionDefinition implements AlchemyTypeIns {
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         GraphTargetItem ofs = stack.pop();
         GraphTargetItem value = stack.pop();
-        output.add(new AlchemyStoreAVM2Item(ins, localData.lineStartInstruction, value, ofs, 'i', 8));
+        output.add(new AlchemyStoreAVM2Item(ins, localData.lineStartInstruction, value, ofs, "i", 8));
     }
 
     @Override

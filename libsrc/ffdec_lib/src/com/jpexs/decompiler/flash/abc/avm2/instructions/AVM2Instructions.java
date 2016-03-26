@@ -90,6 +90,8 @@ public class AVM2Instructions {
 
     public static final int PushConstant = 0x22;
 
+    public static final int PushFloat = 0x22;
+
     public static final int NextValue = 0x23;
 
     public static final int PushByte = 0x24;
@@ -264,8 +266,6 @@ public class AVM2Instructions {
 
     public static final int ConvertMP = 0x7A;
 
-    public static final int ConvertF4 = 0x7B;
-
     public static final int Coerce = 0x80;
 
     public static final int CoerceB = 0x81;
@@ -426,7 +426,11 @@ public class AVM2Instructions {
 
     public static final int SendEnter = 0xFA;
 
+    public static final int UnPlus = 0xFA;
+
     public static final int DoubleToAtom = 0xFB;
+
+    public static final int ConvertF4 = 0x7B;
 
     public static final int Sweep = 0xFC;
 

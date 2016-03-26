@@ -219,7 +219,7 @@ public class Multiname {
 
     }
 
-    private static String namespaceToString(AVM2ConstantPool constants, int index) {
+    public static String namespaceToString(AVM2ConstantPool constants, int index) {
         if (index == 0) {
             return "null";
         }

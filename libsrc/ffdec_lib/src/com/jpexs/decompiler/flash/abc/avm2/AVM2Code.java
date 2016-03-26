@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2VerifyErrorException;
 import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2Graph;
 import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2GraphSource;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2InstructionFlag;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.IfTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
@@ -170,6 +171,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.CoerceOIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.CoerceUIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.ConcatIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.ConvertF4Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.ConvertFIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.ConvertMIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.ConvertMPIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.DecLocalPIns;
@@ -190,6 +192,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.ModuloPIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.MultiplyPIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.NegatePIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.PrologueIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.PushConstantIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.PushFloatIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.PushDNanIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.PushDecimalIns;
@@ -200,6 +203,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.Sf32x4Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.SubtractPIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.SweepIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.TimestampIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.UnPlusIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.VerifyOpIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.VerifyPassIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.WbIns;
@@ -385,6 +389,8 @@ public class AVM2Code implements Cloneable {
 
     public static final int DAT_FLOAT4_INDEX = OPT_U30 + 0x16;
 
+    public static final int DAT_NAMESPACE_INDEX = OPT_U30 + 0x17;
+
     public static String operandTypeSizeToString(int ot) {
         int sizeType = ot & 0xff00;
         switch (sizeType) {
@@ -406,22 +412,23 @@ public class AVM2Code implements Cloneable {
 
     private static Map<Integer, String> operandDataTypeIdentifiers = ReflectionTools.getConstNamesMap(AVM2Code.class, Integer.class, "^DAT_(.*)$");
 
-    public static String operandTypeToString(int ot) {
+    public static String operandTypeToString(int ot, boolean withTypeSize) {
         String typeSize = operandTypeSizeToString(ot);
         if (ot == OPT_CASE_OFFSETS) {
-            return "numOffsets (U30), offset1 (S24), offset2 (S24), ...";
+            return "number" + (withTypeSize ? "(U30)" : "") + ", offset" + (withTypeSize ? "(S24)" : "") + ", offset" + (withTypeSize ? "(S24)" : "") + ", ...";
         }
         if (operandDataTypeIdentifiers.containsKey(ot)) {
             String dataType = operandDataTypeIdentifiers.get(ot);
-            return dataType + " (" + typeSize + ")";
+            return dataType + (withTypeSize ? "(" + typeSize + ")" : "");
         } else {
             return typeSize;
         }
 
     }
 
-    public static final InstructionDefinition[] instructionSet = new InstructionDefinition[]{
-        /*0x00*//*0x00*/null,
+    public static final InstructionDefinition[] instructionSet = new InstructionDefinition[256];
+    public static final InstructionDefinition[] allInstructionSet = new InstructionDefinition[]{
+        /*0x00*/null,
         /*0x01*/ new BkptIns(),
         /*0x02*/ new NopIns(),
         /*0x03*/ new ThrowIns(),
@@ -455,7 +462,8 @@ public class AVM2Code implements Cloneable {
         /*0x1F*/ new HasNextIns(),
         /*0x20*/ new PushNullIns(),
         /*0x21*/ new PushUndefinedIns(),
-        /*0x22*/ new PushFloatIns(), //major 47+, pushuninitialized(U30) before
+        /*0x22*/ new PushFloatIns(), //major 47+
+        /*0x22*/ new PushConstantIns(), //before major 47
         /*0x23*/ new NextValueIns(),
         /*0x24*/ new PushByteIns(),
         /*0x25*/ new PushShortIns(),
@@ -472,7 +480,7 @@ public class AVM2Code implements Cloneable {
         /*0x30*/ new PushScopeIns(),
         /*0x31*/ new PushNamespaceIns(),
         /*0x32*/ new HasNext2Ins(),
-        /*0x33*/ new PushDecimalIns(), //pushdecimal(minor 17), lix8 (internal-only) according to Tamarin
+        /*0x33*/ new PushDecimalIns(), //pushdecimal(minor 17), lix8 (internal-only) according to Tamarin        
         /*0x34*/ new PushDNanIns(), //pushdnan according to Flex SDK, lix16 (internal-only) according to Tamarin
         /*0x35*/ new Li8Ins(),
         /*0x36*/ new Li16Ins(),
@@ -542,9 +550,11 @@ public class AVM2Code implements Cloneable {
         /*0x76*/ new ConvertBIns(),
         /*0x77*/ new ConvertOIns(),
         /*0x78*/ new CheckFilterIns(),
-        /*0x79*/ new ConvertMIns(), // convert_m according to Flex (minor 17), convert_f (major 47+)
-        /*0x7A*/ new ConvertMPIns(), //convert_m_p according to Flex (minor 17), unplus (major 47+)
-        /*0x7B*/ new ConvertF4Ins(), // (major 47+)
+        /*0x79*/ new ConvertMIns(), //minor 17 (Flex)
+        /*0x79*/ new ConvertFIns(), //major 47+, SWF 15+
+        /*0x7A*/ new ConvertMPIns(), //minor 17 (Flex)
+        /*0x7A*/ new UnPlusIns(), //major 47+, SWF 15+
+        /*0x7B*/ new ConvertF4Ins(), //major 47+, SWF 15+
         /*0x7C*/ null,
         /*0x7D*/ null,
         /*0x7E*/ null,
@@ -680,24 +690,29 @@ public class AVM2Code implements Cloneable {
     // endoflist
 
     static {
-        for (int i = 0; i < instructionSet.length; i++) {
+
+        for (int i = 0; i < allInstructionSet.length; i++) {
+            if (allInstructionSet[i] != null) {
+                int opCode = allInstructionSet[i].instructionCode;
+                if (instructionSet[opCode] == null) {
+                    instructionSet[opCode] = allInstructionSet[i];
+                } else if (instructionSet[opCode].hasFlag(AVM2InstructionFlag.NO_FLASH_PLAYER) && !allInstructionSet[i].hasFlag(AVM2InstructionFlag.NO_FLASH_PLAYER)) {
+                    instructionSet[opCode] = allInstructionSet[i];
+                } //Prefer without decimal:
+                else if (instructionSet[opCode].hasFlag(AVM2InstructionFlag.ES4_NUMERICS_MINOR) && !allInstructionSet[i].hasFlag(AVM2InstructionFlag.ES4_NUMERICS_MINOR)) {
+                    instructionSet[opCode] = allInstructionSet[i];
+                } //Prefer without float:
+                else if (instructionSet[opCode].hasFlag(AVM2InstructionFlag.FLOAT_MAJOR) && !allInstructionSet[i].hasFlag(AVM2InstructionFlag.FLOAT_MAJOR)) {
+                    instructionSet[opCode] = allInstructionSet[i];
+                }
+            }
+        }
+
+        for (int i = 0;
+                i < instructionSet.length;
+                i++) {
             if (instructionSet[i] == null) {
                 instructionSet[i] = new UnknownInstruction(i);
-            } else {
-                /*System.out.println("instruction." + instructionSet[i].instructionName + ".shortDescription = ");
-                System.out.println("instruction." + instructionSet[i].instructionName + ".description = ");
-                System.out.println("instruction." + instructionSet[i].instructionName + ".stackBefore = ");
-                System.out.println("instruction." + instructionSet[i].instructionName + ".stackAfter = ");
-
-                System.out.print("instruction." + instructionSet[i].instructionName + ".operands = ");
-                for (int j = 0; j < instructionSet[i].operands.length; j++) {
-                    if (j > 0) {
-                        System.out.print(" ");
-                    }
-                    System.out.print("operand" + (j + 1));
-                }
-                System.out.println("");
-                System.out.println("");*/
             }
         }
 
@@ -2145,8 +2160,7 @@ public class AVM2Code implements Cloneable {
              ins.operands[j] = updater.updateOperandOffset(target, ins.operands[j]);
              }
              }*/ //Faster, but not so universal
-            {
-                if (ins.definition instanceof IfTypeIns) {
+             if (ins.definition instanceof IfTypeIns) {
                     long target = ins.getTargetAddress();
                     try {
                         ins.operands[0] = updater.updateOperandOffset(ins.getAddress(), target, ins.operands[0]);
@@ -2154,7 +2168,6 @@ public class AVM2Code implements Cloneable {
                         throw new ConvertException("Invalid offset (" + ins + ")", i);
                     }
                 }
-            }
             ins.setAddress(updater.updateInstructionOffset(ins.getAddress()));
         }
 

@@ -34,13 +34,13 @@ import java.util.List;
  */
 public class AlchemyLoadAVM2Item extends AVM2Item {
 
-    private final char type;
+    private final String type;
 
     private final int size;
 
     private final GraphTargetItem ofs;
 
-    public AlchemyLoadAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem ofs, char type, int size) {
+    public AlchemyLoadAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem ofs, String type, int size) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.ofs = ofs;
         this.type = type;
@@ -56,7 +56,11 @@ public class AlchemyLoadAVM2Item extends AVM2Item {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+
         String ts = "" + type + size;
+        if (type.equals("f4")) {
+            ts = "f32x4";
+        }
         int code = 0;
         switch (ts) {
             case "i8":
@@ -74,6 +78,9 @@ public class AlchemyLoadAVM2Item extends AVM2Item {
             case "f32":
                 code = AVM2Instructions.Lf64;
                 break;
+            case "f32x4":
+                code = AVM2Instructions.Lf32x4;
+                break;
         }
         return toSourceMerge(localData, generator, ofs, ins(code));
     }
@@ -81,10 +88,12 @@ public class AlchemyLoadAVM2Item extends AVM2Item {
     @Override
     public GraphTargetItem returnType() {
         switch (type) {
-            case 'i':
+            case "i":
                 return new TypeItem(DottedChain.INT);
-            case 'f':
+            case "f":
                 return new TypeItem(DottedChain.NUMBER);
+            case "f4":
+                return new TypeItem("float4");
         }
         return TypeItem.UNBOUNDED;
     }

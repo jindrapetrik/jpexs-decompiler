@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2InstructionFlag;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceOrConvertTypeIns;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
@@ -34,7 +35,7 @@ import com.jpexs.decompiler.graph.TypeItem;
 public class CoerceBIns extends InstructionDefinition implements CoerceOrConvertTypeIns {
 
     public CoerceBIns() {
-        super(0x81, "coerce_b", new int[]{}, true); // stack: -1+1
+        super(0x81, "coerce_b", new int[]{}, true, AVM2InstructionFlag.DEPRECATED); // stack: -1+1
     }
 
     @Override
