@@ -17,6 +17,8 @@
 package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.MissingSymbolHandler;
+import com.jpexs.decompiler.flash.abc.types.Decimal;
+import com.jpexs.decompiler.flash.abc.types.Float4;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.View;
 import javax.swing.JOptionPane;
@@ -46,4 +48,23 @@ public class DialogMissingSymbolHandler implements MissingSymbolHandler {
     public boolean missingDouble(double value) {
         return View.showConfirmDialog(null, AppStrings.translate("message.constant.new.double").replace("%value%", Double.toString(value)), AppStrings.translate("message.constant.new.double.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION;
     }
+
+    @Override
+    public boolean missingDecimal(Decimal value) {
+        //I don't want to create new localizable string - it is not used at all
+        return true;
+    }
+
+    @Override
+    public boolean missingFloat(float value) {
+        //I don't want to create new localizable string - it is not used at all        
+        return true;
+    }
+
+    @Override
+    public boolean missingFloat4(Float4 value) {
+        //I don't want to create new localizable string - it is not used at all        
+        return true;
+    }
+
 }

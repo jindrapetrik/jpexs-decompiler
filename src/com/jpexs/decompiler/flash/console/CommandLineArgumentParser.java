@@ -36,6 +36,8 @@ import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.ASM3Parser;
 import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.MissingSymbolHandler;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScript3Parser;
+import com.jpexs.decompiler.flash.abc.types.Decimal;
+import com.jpexs.decompiler.flash.abc.types.Float4;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
@@ -2683,6 +2685,22 @@ public class CommandLineArgumentParser {
                     public boolean missingDouble(double value) {
                         return true;
                     }
+
+                    @Override
+                    public boolean missingDecimal(Decimal value) {
+                        return true;
+                    }
+
+                    @Override
+                    public boolean missingFloat(float value) {
+                        return true;
+                    }
+
+                    @Override
+                    public boolean missingFloat4(Float4 value) {
+                        return true;
+                    }
+
                 }, abc.bodies.get(bodyIndex), abc.method_info.get(abc.bodies.get(bodyIndex).method_info));
                 //acode.getBytes(abc.bodies.get(bodyIndex).getCodeBytes());
                 abc.bodies.get(bodyIndex).setCode(acode);
