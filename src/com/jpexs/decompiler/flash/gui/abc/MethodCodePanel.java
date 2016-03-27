@@ -21,9 +21,10 @@ import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.gui.AppStrings;
-import com.jpexs.decompiler.flash.gui.DocsWindow;
+import com.jpexs.decompiler.flash.gui.DocsPanel;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
 import com.jpexs.decompiler.flash.gui.controls.NoneSelectedButtonGroup;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import java.awt.BorderLayout;
@@ -36,6 +37,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
 
 /**
@@ -51,7 +53,7 @@ public class MethodCodePanel extends JPanel {
     private final JToggleButton hexButton;
 
     private final JToggleButton hexOnlyButton;
-    private final DocsWindow docsWindow;
+    private final DocsPanel docsPanel;
 
     public void refreshMarkers() {
         sourceTextArea.refreshMarkers();
@@ -113,7 +115,10 @@ public class MethodCodePanel extends JPanel {
         sourceTextArea = new ASMSourceEditorPane(decompiledEditor);
 
         setLayout(new BorderLayout());
-        add(new JScrollPane(sourceTextArea), BorderLayout.CENTER);
+
+        docsPanel = new DocsPanel();
+        sourceTextArea.addDocsListener(docsPanel);
+        add(new JPersistentSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(sourceTextArea), new JScrollPane(docsPanel), Configuration.guiAvm2DocsSplitPaneDividerLocationPercent));
         sourceTextArea.changeContentType("text/flasm3");
         sourceTextArea.setFont(new Font("Monospaced", Font.PLAIN, sourceTextArea.getFont().getSize()));
 
@@ -146,11 +151,7 @@ public class MethodCodePanel extends JPanel {
         buttonsPanel.add(new JPanel());
 
         add(buttonsPanel, BorderLayout.NORTH);
-        docsWindow = new DocsWindow();
 
-        if (Configuration.as3pcodeDocWindow.get()) {
-            sourceTextArea.addDocsListener(docsWindow);
-        }
     }
 
     private void graphButtonActionPerformed(ActionEvent evt) {

@@ -38,7 +38,7 @@ import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
-import com.jpexs.decompiler.flash.locales.docs.pcode.As3Docs;
+import com.jpexs.decompiler.flash.docs.As3PCodeDocs;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.graph.ScopeStack;
@@ -158,7 +158,7 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
     public ASMSourceEditorPane(DecompiledEditorPane decompiledEditor) {
         this.decompiledEditor = decompiledEditor;
         addCaretListener(this);
-        for (InstructionDefinition def : AVM2Code.instructionSet) {
+        for (InstructionDefinition def : AVM2Code.allInstructionSet) {
             if (def != null) {
                 insNameToDef.put(def.instructionName, def);
             }
@@ -419,7 +419,7 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
         }
     }
 
-    public void caretUpdateEdit(CaretEvent e) {
+    public void updateDocs() {
         String curLine = getCurrentLineText();
 
         if (curLine == null) {
@@ -444,7 +444,7 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
             if (loc != null) {
                 SwingUtilities.convertPointToScreen(loc, this);
             }
-            fireDocs(insName, As3Docs.getDocsForIns(insName), loc);
+            fireDocs(insName, As3PCodeDocs.getDocsForIns(insName, false, true), loc);
         } else {
             fireNoDocs();
         }
@@ -452,11 +452,12 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
 
     @Override
     public void caretUpdate(CaretEvent e) {
-        if (isEditable()) {
-            caretUpdateEdit(e);
+        updateDocs();
+
+        if (ignoreCarret) {
             return;
         }
-        if (ignoreCarret) {
+        if (isEditable()) {
             return;
         }
         getCaret().setVisible(true);

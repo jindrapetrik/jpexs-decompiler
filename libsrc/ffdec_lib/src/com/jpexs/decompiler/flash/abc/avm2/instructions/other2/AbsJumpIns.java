@@ -32,7 +32,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class AbsJumpIns extends InstructionDefinition {
 
     public AbsJumpIns() {
-        super(0xEE, "abs_jump", new int[]{}, false /*?*/, AVM2InstructionFlag.UNDOCUMENTED, AVM2InstructionFlag.UNKNOWN_OPERANDS, AVM2InstructionFlag.NO_FLASH_PLAYER);
+        super(0xEE, "abs_jump", new int[]{}, false /*?*/, AVM2InstructionFlag.UNDOCUMENTED, AVM2InstructionFlag.UNKNOWN_OPERANDS, AVM2InstructionFlag.NO_FLASH_PLAYER, AVM2InstructionFlag.UNKNOWN_STACK);
     }
 
     @Override

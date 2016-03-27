@@ -25,6 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 
@@ -32,47 +33,27 @@ import javax.swing.JScrollPane;
  *
  * @author JPEXS
  */
-public class DocsWindow extends JFrame implements DocsListener {
+public class DocsPanel extends JPanel implements DocsListener {
 
     private JEditorPane textDisplay = new JEditorPane();
+    //TODO: Make this use skin somehow (?)
+    public static final Color HINT_COLOR = new Color(245, 245, 181);
 
-    public DocsWindow() {
-        setAlwaysOnTop(true);
-        setSize(500, 250);
-        setTitle("-");
-        getContentPane().setLayout(new BorderLayout());
-        getContentPane().add(new JScrollPane(textDisplay), BorderLayout.CENTER);
+    public DocsPanel() {
+        setLayout(new BorderLayout());
+        add(new JScrollPane(textDisplay), BorderLayout.CENTER);
         textDisplay.setContentType("text/html");
-        setAutoRequestFocus(false);
         textDisplay.setFocusable(false);
-        View.setWindowIcon(this);
-        this.getRootPane().setWindowDecorationStyle(JRootPane.PLAIN_DIALOG);
-        textDisplay.setBackground(Color.white);
+        textDisplay.setBackground(HINT_COLOR);
     }
 
     @Override
     public void docs(String identifier, String docs, Point screenLocation) {
-        setTitle(identifier);
         textDisplay.setText(docs.replace("\r\n", "<br />"));
-        if (screenLocation != null) {
-            setLocation(screenLocation);
-        }
-
-        setFocusableWindowState(false);
-        setVisible(true);
-        View.execInEventDispatchLater(new Runnable() {
-            @Override
-            public void run() {
-                setFocusableWindowState(true);
-            }
-        });
-
     }
 
     @Override
     public void noDocs() {
-        setVisible(false);
-        setTitle("-");
         textDisplay.setText("");
     }
 

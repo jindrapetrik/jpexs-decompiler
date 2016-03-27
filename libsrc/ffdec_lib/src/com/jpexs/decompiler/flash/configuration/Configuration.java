@@ -598,9 +598,10 @@ public class Configuration {
     @ConfigurationInternal
     public static final ConfigurationItem<Boolean> hwAcceleratedGraphics = null;
 
-    @ConfigurationDefaultBoolean(false)
+    @ConfigurationDefaultDouble(0.85)
+    @ConfigurationName("gui.avm2.splitPane.docs.dividerLocationPercent")
     @ConfigurationInternal
-    public static final ConfigurationItem<Boolean> as3pcodeDocWindow = null;
+    public static final ConfigurationItem<Double> guiAvm2DocsSplitPaneDividerLocationPercent = null;
 
     private enum OSId {
 
