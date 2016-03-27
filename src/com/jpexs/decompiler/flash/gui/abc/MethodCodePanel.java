@@ -18,8 +18,10 @@ package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.gui.DocsWindow;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.controls.NoneSelectedButtonGroup;
@@ -49,6 +51,7 @@ public class MethodCodePanel extends JPanel {
     private final JToggleButton hexButton;
 
     private final JToggleButton hexOnlyButton;
+    private final DocsWindow docsWindow;
 
     public void refreshMarkers() {
         sourceTextArea.refreshMarkers();
@@ -143,6 +146,11 @@ public class MethodCodePanel extends JPanel {
         buttonsPanel.add(new JPanel());
 
         add(buttonsPanel, BorderLayout.NORTH);
+        docsWindow = new DocsWindow();
+
+        if (Configuration.as3pcodeDocWindow.get()) {
+            sourceTextArea.addDocsListener(docsWindow);
+        }
     }
 
     private void graphButtonActionPerformed(ActionEvent evt) {
@@ -183,10 +191,8 @@ public class MethodCodePanel extends JPanel {
         ScriptExportMode exportMode = getExportMode();
         if (val) {
             sourceTextArea.setHex(exportMode == ScriptExportMode.HEX ? ScriptExportMode.HEX : ScriptExportMode.PCODE, false);
-        } else {
-            if (exportMode != ScriptExportMode.PCODE) {
-                sourceTextArea.setHex(exportMode, false);
-            }
+        } else if (exportMode != ScriptExportMode.PCODE) {
+            sourceTextArea.setHex(exportMode, false);
         }
 
         sourceTextArea.setEditable(val);

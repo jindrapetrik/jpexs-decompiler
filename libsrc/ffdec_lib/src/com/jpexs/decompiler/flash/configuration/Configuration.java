@@ -598,6 +598,10 @@ public class Configuration {
     @ConfigurationInternal
     public static final ConfigurationItem<Boolean> hwAcceleratedGraphics = null;
 
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationInternal
+    public static final ConfigurationItem<Boolean> as3pcodeDocWindow = null;
+
     private enum OSId {
 
         WINDOWS, OSX, UNIX

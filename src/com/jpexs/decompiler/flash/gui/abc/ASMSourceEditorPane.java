@@ -20,9 +20,11 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2ExecutionException;
 import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2Graph;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.ASM3Parser;
 import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.MissingSymbolHandler;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.Reference;
 import com.jpexs.decompiler.flash.abc.types.Decimal;
 import com.jpexs.decompiler.flash.abc.types.Float4;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
@@ -36,19 +38,24 @@ import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
+import com.jpexs.decompiler.flash.locales.docs.pcode.As3Docs;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.helpers.Helper;
+import java.awt.Point;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.SwingUtilities;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import jsyntaxpane.SyntaxDocument;
 
 /**
  *
@@ -70,6 +77,8 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
 
     private List<Highlighting> specialHilights = new ArrayList<>();
 
+    private List<DocsListener> docsListeners = new ArrayList<>();
+
     private final DecompiledEditorPane decompiledEditor;
 
     private boolean ignoreCarret = false;
@@ -87,6 +96,16 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
     private Trait trait;
 
     private int firstInstrLine = -1;
+
+    private Map<String, InstructionDefinition> insNameToDef = new HashMap<>();
+
+    public void addDocsListener(DocsListener l) {
+        docsListeners.add(l);
+    }
+
+    public void removeDocsListener(DocsListener l) {
+        docsListeners.remove(l);
+    }
 
     public ABCPanel getAbcPanel() {
         return decompiledEditor.getAbcPanel();
@@ -139,6 +158,11 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
     public ASMSourceEditorPane(DecompiledEditorPane decompiledEditor) {
         this.decompiledEditor = decompiledEditor;
         addCaretListener(this);
+        for (InstructionDefinition def : AVM2Code.instructionSet) {
+            if (def != null) {
+                insNameToDef.put(def.instructionName, def);
+            }
+        }
     }
 
     public void hilighSpecial(HighlightSpecialType type, String specialValue) {
@@ -383,9 +407,53 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
         return lastH == null ? 0 : lastH.getProperties().offset;
     }
 
+    private void fireDocs(String identifier, String value, Point screenLocation) {
+        for (DocsListener l : docsListeners) {
+            l.docs(identifier, value, screenLocation);
+        }
+    }
+
+    private void fireNoDocs() {
+        for (DocsListener l : docsListeners) {
+            l.noDocs();
+        }
+    }
+
+    public void caretUpdateEdit(CaretEvent e) {
+        String curLine = getCurrentLineText();
+
+        if (curLine == null) {
+            return;
+        }
+        //strip labels, e.g. ofs123:pushint 25
+        if (curLine.matches("^\\p{L}+:")) {
+            curLine = curLine.substring(curLine.indexOf(":") + 1).trim();
+        }
+
+        //strip instruction arguments, we want only its name
+        if (curLine.contains(" ")) {
+            curLine = curLine.substring(0, curLine.indexOf(" "));
+        }
+        //strip comments, e.g. pushnull;comment
+        if (curLine.contains(";")) {
+            curLine = curLine.substring(0, curLine.indexOf(";"));
+        }
+        String insName = curLine.toLowerCase();
+        if (insNameToDef.containsKey(insName)) {
+            Point loc = getLineLocation(getLine() + 1);
+            if (loc != null) {
+                SwingUtilities.convertPointToScreen(loc, this);
+            }
+            fireDocs(insName, As3Docs.getDocsForIns(insName), loc);
+        } else {
+            fireNoDocs();
+        }
+    }
+
     @Override
     public void caretUpdate(CaretEvent e) {
         if (isEditable()) {
+            caretUpdateEdit(e);
             return;
         }
         if (ignoreCarret) {

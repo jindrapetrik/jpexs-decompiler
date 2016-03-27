@@ -39,6 +39,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.plaf.TextUI;
@@ -204,7 +206,10 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
     }
 
     public int getLine() {
-        return lastLine;
+        int caretPosition = getCaretPosition();
+        Element root = getDocument().getDefaultRootElement();
+        int currentLine = root.getElementIndex(caretPosition);
+        return currentLine;
     }
 
     public void markError() {
@@ -212,7 +217,20 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
     }
 
     public void gotoLine(int line) {
-        setCaretPosition(ActionUtils.getDocumentPosition(this, line, 0));
+        setCaretPosition(ActionUtils.getDocumentPosition(this, line + 1, 0));
+    }
+
+    public Point getLineLocation(int line) {
+        int pos = ActionUtils.getDocumentPosition(this, line + 1, 0);
+        if (pos < 0) {
+            return null;
+        }
+        try {
+            Rectangle r = modelToView(pos);
+            return new Point(r.x, r.y);
+        } catch (BadLocationException ex) {
+            return null;
+        }
     }
 
     private void getLineBounds(int line, Reference<Integer> lineStart, Reference<Integer> lineEnd) {
@@ -223,7 +241,7 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
         } catch (BadLocationException ex) {
             //ignore
         }
-        int lineCnt = 1;
+        int lineCnt = 0;
         int lineStartVal = 0;
         int lineEndVal = -1;
         for (int i = 0; i < text.length(); i++) {
@@ -237,9 +255,9 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
                 }
             }
         }
-        if (lineCnt == 1) {
+        if (lineCnt == 0) {
             lineEndVal = text.length() - 1;
-            if (line > 1) {
+            if (line > 0) {
                 lineStartVal = text.length() - 1;
             }
         }
@@ -254,6 +272,21 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
 
         select(lineStart.getVal(), lineEnd.getVal());
         requestFocus();
+    }
+
+    public String getCurrentLineText() {
+        return getLineText(getLine());
+    }
+
+    public String getLineText(int line) {
+        Reference<Integer> lineStart = new Reference<>(0);
+        Reference<Integer> lineEnd = new Reference<>(0);
+        getLineBounds(line, lineStart, lineEnd);
+        try {
+            return getDocument().getText(lineStart.getVal(), lineEnd.getVal() - lineStart.getVal());
+        } catch (BadLocationException ex) {
+            return null;
+        }
     }
 
     public LineMarkedEditorPane() {
