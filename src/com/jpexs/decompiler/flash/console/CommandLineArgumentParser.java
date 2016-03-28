@@ -159,6 +159,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -2618,8 +2619,8 @@ public class CommandLineArgumentParser {
             outStream = System.out;
         } else {
             try {
-                outStream = new PrintStream(out);
-            } catch (FileNotFoundException ex) {
+                outStream = new PrintStream(out, "UTF-8");
+            } catch (UnsupportedEncodingException | FileNotFoundException ex) {
                 Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, ex.getLocalizedMessage());
                 System.exit(1);
                 return;
