@@ -2570,7 +2570,7 @@ public class CommandLineArgumentParser {
                     if (args.isEmpty() || out != null) {
                         badArguments("doc");
                     }
-                    out = arg;
+                    out = args.pop();
                     break;
                 case "-type":
                     if (args.isEmpty() || type != null) {
