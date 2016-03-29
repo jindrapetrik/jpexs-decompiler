@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.gui.abc.DocsListener;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.HeadlessException;
+import java.awt.Insets;
 import java.awt.Point;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,25 +37,31 @@ import javax.swing.JScrollPane;
 public class DocsPanel extends JPanel implements DocsListener {
 
     private JEditorPane textDisplay = new JEditorPane();
-    //TODO: Make this use skin somehow (?)
-    public static final Color HINT_COLOR = new Color(245, 245, 181);
 
     public DocsPanel() {
-        setLayout(new BorderLayout());
-        add(new JScrollPane(textDisplay), BorderLayout.CENTER);
+        setLayout(new BorderLayout(0, 0));
+        JScrollPane sp = new JScrollPane(textDisplay);
+
+        textDisplay.setMargin(new Insets(0, 0, 0, 0));
+        add(sp, BorderLayout.CENTER);
         textDisplay.setContentType("text/html");
         textDisplay.setFocusable(false);
-        textDisplay.setBackground(HINT_COLOR);
+        textDisplay.setBackground(Color.white);
+    }
+
+    @Override
+    public Insets getInsets() {
+        return new Insets(0, 0, 0, 0);
     }
 
     @Override
     public void docs(String identifier, String docs, Point screenLocation) {
-        textDisplay.setText(docs.replace("\r\n", "<br />"));
+        textDisplay.setText(docs);
     }
 
     @Override
     public void noDocs() {
-        textDisplay.setText("");
+        textDisplay.setText("<body></body>");
     }
 
 }

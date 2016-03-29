@@ -1,0 +1,15 @@
+html, body {margin:0px; padding: 0px;}
+.instruction {background-color: #f5f5b5; color:black;}
+li.instruction-item {list-style:none; padding:0px;border:1px solid black; border-bottom:none; border-collapse:collapse; }
+ul.instruction-list {padding-left:0; display:table; border-bottom:1px solid black;}
+strong.instruction-name {font-weight: bold; color: blue;}
+strong.stack-title {font-weight: bold;}
+strong.flags-title {font-weight: bold;}
+.hidden {display:none}
+.filter-flag-title {display:inline-block; width: 50ex;}
+.instruction {padding:5px;}
+.instruction.instruction-flag-noFlashPlayer {background-color: #ccc;}
+body {font-family: serif;}
+h1, h2, h3, h4, h5 {font-family: sans-serif;}
+.instruction-signature {font-family: "Courier New", monospace; font-size: 1.05em;}
+.filter {font-family: sans-serif; }

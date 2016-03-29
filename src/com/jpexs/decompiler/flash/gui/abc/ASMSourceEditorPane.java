@@ -444,7 +444,7 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
             if (loc != null) {
                 SwingUtilities.convertPointToScreen(loc, this);
             }
-            fireDocs(insName, As3PCodeDocs.getDocsForIns(insName, false, true), loc);
+            fireDocs(insName, As3PCodeDocs.getDocsForIns(insName, false, true, true), loc);
         } else {
             fireNoDocs();
         }

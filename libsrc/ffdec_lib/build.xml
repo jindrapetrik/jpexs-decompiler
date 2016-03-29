@@ -34,6 +34,7 @@
         <include name="**/?*.mid"/>
         <include name="**/?*.wav"/>
         <include name="**/?*.js"/>
+        <include name="**/?*.css"/>
     </patternset>
 
     

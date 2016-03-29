@@ -45,6 +45,7 @@ import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
+import com.jpexs.decompiler.flash.docs.As3PCodeDocs;
 import com.jpexs.decompiler.flash.exporters.BinaryDataExporter;
 import com.jpexs.decompiler.flash.exporters.FontExporter;
 import com.jpexs.decompiler.flash.exporters.FrameExporter;
@@ -158,11 +159,13 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Stack;
@@ -501,6 +504,19 @@ public class CommandLineArgumentParser {
             out.println("  ...Forwards all parameters after the -custom parameter to the plugins");
         }
 
+        if (filter == null || filter.equals("doc")) {
+            out.println(" " + (cnt++) + ") -doc -type <type> [-out <outfile>] [-format <format>] [-locale <locale>]");
+            out.println("  ...Generate documentation");
+            out.println("  ...-type <type> Selects documentation type");
+            out.println("  ...<type> can be currently only: as3.pcode.instructions for list of ActionScript3 AVM2 instructions");
+            out.println("  ...-out <outfile> (optional) If specified, output is written to <outfile> instead of stdout");
+            out.println("  ...-format <format> (optional, html is default) Selects output format");
+            out.println("  ...<format> is currently only html");
+            out.println("  ...-locale <locale> (optional) Override default locale");
+            out.println("  ...<locale> is localization identifier, en for english for example");
+            out.println("  ...<format> is currently only html");
+        }
+
         printCmdLineUsageExamples(out, filter);
     }
 
@@ -559,6 +575,12 @@ public class CommandLineArgumentParser {
         if (filter == null || filter.equals("enabledebugging")) {
             out.println("java -jar ffdec.jar -enabledebugging -injectas3 myas3file.swf myas3file_debug.swf");
             out.println("java -jar ffdec.jar -enabledebugging -generateswd myas2file.swf myas2file_debug.swf");
+            exampleFound = true;
+        }
+
+        if (filter == null || filter.equals("doc")) {
+            out.println("java -jar ffdec.jar -doc -type as3.pcode.instructions -format html");
+            out.println("java -jar ffdec.jar -doc -type as3.pcode.instructions -format html -locale en -out as3_docs_en.html");
             exampleFound = true;
         }
 
@@ -734,6 +756,8 @@ public class CommandLineArgumentParser {
             parseRemoveCharacter(args, false);
         } else if (command.equals("removecharacterwithdependencies")) {
             parseRemoveCharacter(args, true);
+        } else if (command.equals("doc")) {
+            parseDoc(args);
         } else if (command.equals("importscript")) {
             parseImportScript(args);
         } else if (command.equals("importscript")) {
@@ -2533,6 +2557,77 @@ public class CommandLineArgumentParser {
             System.err.println("I/O error during reading");
             System.exit(2);
         }
+    }
+
+    private static void parseDoc(Stack<String> args) {
+        String type = null;
+        String format = null;
+        String out = null;
+        String locale = null;
+        while (!args.isEmpty()) {
+            String arg = args.pop();
+            switch (arg) {
+                case "-out":
+                    if (args.isEmpty() || out != null) {
+                        badArguments("doc");
+                    }
+                    out = args.pop();
+                    break;
+                case "-type":
+                    if (args.isEmpty() || type != null) {
+                        badArguments("doc");
+                    }
+                    type = args.pop();
+                    break;
+                case "-format":
+                    if (args.isEmpty() || format != null) {
+                        badArguments("doc");
+                    }
+                    format = args.pop();
+                    break;
+                case "-locale":
+                    if (args.isEmpty() || locale != null) {
+                        badArguments("doc");
+                    }
+                    locale = args.pop();
+
+                    break;
+            }
+        }
+
+        if (format == null) {
+            format = "html";
+        }
+        if (type == null) {
+            badArguments("doc");
+        } else if (!type.equals("as3.pcode.instructions")) {
+            badArguments("doc");
+        }
+
+        if (!format.equals("html")) {
+            badArguments("doc");
+        }
+        if (locale != null) {
+            Locale.setDefault(Locale.forLanguageTag(locale));
+        }
+
+        String doc = As3PCodeDocs.getAllInstructionDocs();
+
+        PrintStream outStream;
+
+        if (out == null) {
+            outStream = System.out;
+        } else {
+            try {
+                outStream = new PrintStream(out, "UTF-8");
+            } catch (UnsupportedEncodingException | FileNotFoundException ex) {
+                Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, ex.getLocalizedMessage());
+                System.exit(1);
+                return;
+            }
+        }
+
+        outStream.print(doc);
     }
 
     private static void parseRemoveCharacter(Stack<String> args, boolean removeDependencies) {
