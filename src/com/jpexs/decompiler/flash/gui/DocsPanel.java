@@ -19,15 +19,10 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.gui.abc.DocsListener;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.HeadlessException;
 import java.awt.Insets;
 import java.awt.Point;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JEditorPane;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 
 /**
@@ -63,5 +58,4 @@ public class DocsPanel extends JPanel implements DocsListener {
     public void noDocs() {
         textDisplay.setText("<body></body>");
     }
-
 }

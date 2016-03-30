@@ -36,8 +36,6 @@ import org.pushingpixels.flamingo.api.common.model.PopupButtonModel;
 import org.pushingpixels.flamingo.internal.ui.ribbon.appmenu.BasicRibbonApplicationMenuButtonUI;
 import org.pushingpixels.flamingo.internal.ui.ribbon.appmenu.JRibbonApplicationMenuButton;
 import org.pushingpixels.lafwidget.animation.effects.GhostingListener;
-import org.pushingpixels.substance.api.ColorSchemeAssociationKind;
-import org.pushingpixels.substance.api.ComponentState;
 import org.pushingpixels.substance.api.DecorationAreaType;
 import org.pushingpixels.substance.api.SubstanceLookAndFeel;
 import org.pushingpixels.substance.api.SubstanceSkin;
@@ -128,9 +126,9 @@ public class MyRibbonApplicationMenuButtonUI extends BasicRibbonApplicationMenuB
                     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                     SubstanceSkin skin = SubstanceLookAndFeel.getCurrentSkin();
                     /*Color lightColor = skin.getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.HIGHLIGHT, ComponentState.ROLLOVER_UNSELECTED).
-                    getUltraLightColor();
-                    Color midColor = skin.getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.FILL, ComponentState.ROLLOVER_UNSELECTED).getMidColor();
-                    Color darkColor = skin.getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.BORDER, ComponentState.ROLLOVER_UNSELECTED).getUltraDarkColor();
+                     getUltraLightColor();
+                     Color midColor = skin.getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.FILL, ComponentState.ROLLOVER_UNSELECTED).getMidColor();
+                     Color darkColor = skin.getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.BORDER, ComponentState.ROLLOVER_UNSELECTED).getUltraDarkColor();
                      */
                     g2.setPaint(new LinearGradientPaint(0, 0, 0, getIconHeight(), new float[]{0f, 1f}, new Color[]{
                         Color.white,
@@ -171,8 +169,8 @@ public class MyRibbonApplicationMenuButtonUI extends BasicRibbonApplicationMenuB
                     SubstanceSkin skin = SubstanceLookAndFeel.getCurrentSkin();
 
                     /*Color lightColor = skin.getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.FILL, ComponentState.ROLLOVER_SELECTED).getUltraLightColor();
-                    Color midColor = skin.getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.FILL, ComponentState.ROLLOVER_SELECTED).getMidColor();
-                    Color darkColor = skin.getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.FILL, ComponentState.ROLLOVER_SELECTED).shiftBackground(Color.black, 0.7).getUltraDarkColor();
+                     Color midColor = skin.getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.FILL, ComponentState.ROLLOVER_SELECTED).getMidColor();
+                     Color darkColor = skin.getColorScheme(DecorationAreaType.SECONDARY_TITLE_PANE, ColorSchemeAssociationKind.FILL, ComponentState.ROLLOVER_SELECTED).shiftBackground(Color.black, 0.7).getUltraDarkColor();
                      */
                     g2.setPaint(new LinearGradientPaint(0, 0, 0, getIconHeight(), new float[]{0f, 1f}, new Color[]{
                         Color.white,

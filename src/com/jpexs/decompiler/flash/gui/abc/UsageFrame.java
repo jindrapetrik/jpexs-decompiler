@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.gui.abc;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
-import com.jpexs.decompiler.flash.abc.usages.ClassNameMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.InsideClassMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.MethodMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.MultinameUsage;
