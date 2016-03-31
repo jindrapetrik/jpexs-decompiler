@@ -605,7 +605,7 @@ public class Timeline {
         ExportRectangle rect = new ExportRectangle(boundRect);
         Matrix mat = transformation.concatenate(layerMatrix);
         rect = mat.transform(rect);
-        Matrix m = mat.clone();
+
         if (filters != null && filters.size() > 0) {
             // calculate size after applying the filters
             double deltaXMax = 0;
@@ -638,7 +638,7 @@ public class Timeline {
             return;
         }
 
-        m = m.preConcatenate(Matrix.getTranslateInstance(-rect.xMin, -rect.yMin));
+        Matrix m = mat.preConcatenate(Matrix.getTranslateInstance(-rect.xMin, -rect.yMin));
         //strokeTransform = strokeTransform.clone();
         //strokeTransform.translate(-rect.xMin, -rect.yMin);
         drawMatrix.translate(rect.xMin, rect.yMin);
