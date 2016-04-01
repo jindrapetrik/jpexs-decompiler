@@ -40,7 +40,7 @@ public interface SWFDecompilerListener {
 
     void abcParsed(ABC abc, SWF swf);
 
-    void methodBodyParsed(MethodBody body, SWF swf);
+    void methodBodyParsed(ABC abc, MethodBody body, SWF swf);
 
     /**
      * this method is only called when deobfuscation is enabled and new

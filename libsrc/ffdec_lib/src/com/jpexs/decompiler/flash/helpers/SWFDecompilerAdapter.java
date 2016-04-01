@@ -52,7 +52,7 @@ public class SWFDecompilerAdapter implements SWFDecompilerListener {
     }
 
     @Override
-    public void methodBodyParsed(MethodBody body, SWF swf) {
+    public void methodBodyParsed(ABC abc, MethodBody body, SWF swf) {
     }
 
     /**

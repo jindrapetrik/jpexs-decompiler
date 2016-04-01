@@ -612,6 +612,7 @@ public class CommandLineArgumentParser {
         AbortRetryIgnoreHandler handler = null;
         Map<String, String> format = new HashMap<>();
         double zoom = 1;
+        boolean cliMode = false;
         Selection selection = new Selection();
         Selection selectionIds = new Selection();
         List<String> selectionClasses = null;
@@ -623,6 +624,9 @@ public class CommandLineArgumentParser {
                 nextParam = nextParamOriginal.toLowerCase();
             }
             switch (nextParam) {
+                case "-cli":
+                    cliMode = true;
+                    break;
                 case "-selectid":
                     selectionIds = parseSelect(args);
                     break;
@@ -760,8 +764,6 @@ public class CommandLineArgumentParser {
             parseDoc(args);
         } else if (command.equals("importscript")) {
             parseImportScript(args);
-        } else if (command.equals("importscript")) {
-            parseCustom(args);
         } else if (command.equals("as3compiler")) {
             ActionScript3Parser.compile(null /*?*/, args.pop(), args.pop(), 0, 0);
         } else if (nextParam.equals("--debugtool")) {
@@ -780,17 +782,30 @@ public class CommandLineArgumentParser {
             System.out.println(wh);
         } else {
             args.push(nextParamOriginal); // file names should be the original one
-            String[] fileNames = args.toArray(new String[args.size()]);
+            List<String> fileNames = new ArrayList<>();
             boolean allParamIsAFile = true;
-            for (String fileName : fileNames) {
-                File file = new File(fileName);
+            while (!args.isEmpty()) {
+                String arg = args.pop();
+                if (arg.equals("-custom")) {
+                    parseCustom(args);
+                    break;
+                }
+
+                fileNames.add(arg);
+                File file = new File(arg);
                 if (!file.exists() || !file.isFile()) {
                     allParamIsAFile = false;
                 }
             }
 
             if (allParamIsAFile) {
-                return fileNames;
+                String[] fileNamesArray = fileNames.toArray(new String[fileNames.size()]);
+                if (cliMode) {
+                    loadFiles(fileNamesArray);
+                    return null;
+                } else {
+                    return fileNamesArray;
+                }
             } else {
                 badArguments();
             }
@@ -2714,6 +2729,21 @@ public class CommandLineArgumentParser {
         }
 
         SWFDecompilerPlugin.customParameters = customParameters;
+    }
+
+    private static void loadFiles(String[] fileNames) {
+        boolean result = true;
+        for (String fileName : fileNames) {
+            try {
+                SWFSourceInfo sourceInfo = new SWFSourceInfo(null, fileName, null);
+                Main.parseSWF(sourceInfo);
+            } catch (Exception ex) {
+                logger.log(Level.SEVERE, null, ex);
+                result = false;
+            }
+        }
+
+        System.exit(result ? 0 : 1);
     }
 
     private static void replaceAS2PCode(String text, ASMSource src) throws IOException, InterruptedException {

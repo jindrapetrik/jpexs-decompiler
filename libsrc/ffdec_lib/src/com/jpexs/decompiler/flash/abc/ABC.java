@@ -487,7 +487,7 @@ public class ABC {
                 }
                 ais.endDumpLevel();
             }
-            // constant float4        
+            // constant float4
             int constant_float4_pool_count = ais.readU30("float4_count");
             if (constant_float4_pool_count > 1) {
                 ais.newDumpLevel("floats4", "float4[]");
@@ -640,7 +640,7 @@ public class ABC {
                 break;
             }
 
-            SWFDecompilerPlugin.fireMethodBodyParsed(mb, swf);
+            SWFDecompilerPlugin.fireMethodBodyParsed(this, mb, swf);
         }
 
         getMethodIndexing();
@@ -787,6 +787,32 @@ public class ABC {
         return getMethodIndexing().findMethodBodyIndex(methodInfo);
     }
 
+    public MethodBody findBodyClassInitializerByClass(String className) {
+        for (int i = 0; i < instance_info.size(); i++) {
+            if (className.equals(constants.getMultiname(instance_info.get(i).name_index).getName(constants, null, true))) {
+                MethodBody body = findBody(class_info.get(i).cinit_index);
+                if (body != null) {
+                    return body;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public MethodBody findBodyInstanceInitializerByClass(String className) {
+        for (int i = 0; i < instance_info.size(); i++) {
+            if (className.equals(constants.getMultiname(instance_info.get(i).name_index).getName(constants, null, true))) {
+                MethodBody body = findBody(instance_info.get(i).iinit_index);
+                if (body != null) {
+                    return body;
+                }
+            }
+        }
+
+        return null;
+    }
+
     public MethodBody findBodyByClassAndName(String className, String methodName) {
         for (int i = 0; i < instance_info.size(); i++) {
             if (className.equals(constants.getMultiname(instance_info.get(i).name_index).getName(constants, null, true))) {
@@ -794,27 +820,21 @@ public class ABC {
                     if (t instanceof TraitMethodGetterSetter) {
                         TraitMethodGetterSetter t2 = (TraitMethodGetterSetter) t;
                         if (methodName.equals(t2.getName(this).getName(constants, null, true))) {
-                            for (MethodBody body : bodies) {
-                                if (body.method_info == t2.method_info) {
-                                    return body;
-                                }
+                            MethodBody body = findBody(t2.method_info);
+                            if (body != null) {
+                                return body;
                             }
                         }
                     }
                 }
-                //break;
-            }
-        }
-        for (int i = 0; i < class_info.size(); i++) {
-            if (className.equals(constants.getMultiname(instance_info.get(i).name_index).getName(constants, null, true))) {
+
                 for (Trait t : class_info.get(i).static_traits.traits) {
                     if (t instanceof TraitMethodGetterSetter) {
                         TraitMethodGetterSetter t2 = (TraitMethodGetterSetter) t;
                         if (methodName.equals(t2.getName(this).getName(constants, null, true))) {
-                            for (MethodBody body : bodies) {
-                                if (body.method_info == t2.method_info) {
-                                    return body;
-                                }
+                            MethodBody body = findBody(t2.method_info);
+                            if (body != null) {
+                                return body;
                             }
                         }
                     }

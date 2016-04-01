@@ -237,10 +237,10 @@ public class SWFDecompilerPlugin {
         return !listeners.isEmpty();
     }
 
-    public static boolean fireMethodBodyParsed(MethodBody body, SWF swf) {
+    public static boolean fireMethodBodyParsed(ABC abc, MethodBody body, SWF swf) {
         for (SWFDecompilerListener listener : listeners) {
             try {
-                listener.methodBodyParsed(body, swf);
+                listener.methodBodyParsed(abc, body, swf);
             } catch (ThreadDeath ex) {
                 throw ex;
             } catch (Throwable e) {
