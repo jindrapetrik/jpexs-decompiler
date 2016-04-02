@@ -314,6 +314,11 @@ public class CommandLineArgumentParser {
             out.println("      The prefix with colon (:) is neccessary.");
         }
 
+        if (filter == null || filter.equals("cli")) {
+            out.println(" " + (cnt++) + ") -cli");
+            out.println("  ...Command line mode. Parses the SWFs without opening the GUI");
+        }
+
         if (filter == null || filter.equals("select")) {
             out.println(" " + (cnt++) + ") -select <ranges>");
             out.println("  ...selects frames/pages for export");
@@ -544,6 +549,11 @@ public class CommandLineArgumentParser {
             out.println("java -jar ffdec.jar -format fla:cs5.5 -export fla \"C:\\sources\\myfile.fla\" myfile.swf");
             out.println("java -jar ffdec.jar -onerror ignore -export script \"C:\\decompiled\" myfile.swf");
             out.println("java -jar ffdec.jar -onerror retry 5 -export script \"C:\\decompiled\" myfile.swf");
+            exampleFound = true;
+        }
+
+        if (filter == null || filter.equals("cli")) {
+            out.println("java -jar ffdec.jar -cli myfile.swf");
             exampleFound = true;
         }
 
