@@ -40,6 +40,7 @@ import com.jpexs.decompiler.flash.gui.abc.DeobfuscationDialog;
 import com.jpexs.decompiler.flash.gui.abc.NewTraitDialog;
 import com.jpexs.decompiler.flash.gui.abc.UsageFrame;
 import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
+import com.jpexs.helpers.Helper;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -133,6 +134,22 @@ public class CheckResources {
             Logger.getLogger(CheckResources.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(CheckResources.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public static void checkTranslationDate(PrintStream stream) {
+        for (String lang : SelectLanguageDialog.getAvailableLanguages()) {
+            String lang2 = lang.equals("en") ? "" : "_" + lang.replace("-", "_");
+            //https://api.github.com/repositories/19647328/contents/src/com/jpexs/decompiler/flash/gui/locales
+            String url = "https://api.github.com/repos/jindrapetrik/jpexs-decompiler/commits?path=/src/com/jpexs/decompiler/flash/gui/locales/MainFrame" + lang2 + ".properties";
+            try {
+                String text = Helper.downloadUrlString(url);
+                text = text.substring(text.indexOf("\"date\":\"") + 8);
+                text = text.substring(0, text.indexOf("T"));
+                stream.println(lang + ": " + text);
+            } catch (IOException ex) {
+                Logger.getLogger(CheckResources.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
