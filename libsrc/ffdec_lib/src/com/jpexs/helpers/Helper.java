@@ -17,6 +17,7 @@
 package com.jpexs.helpers;
 
 import com.jpexs.decompiler.flash.AppResources;
+import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.Freed;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -43,6 +44,10 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.URL;
+import java.net.URLConnection;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1446,7 +1451,33 @@ public class Helper {
                 || wow64Arch != null && wow64Arch.endsWith("64");
     }
 
-    public static void showOutOfMemoryWarning() {
+    public static byte[] downloadUrl(String urlString) throws IOException {
+        String proxyAddress = Configuration.updateProxyAddress.get();
+        URL url = new URL(urlString);
 
+        URLConnection uc;
+        if (proxyAddress != null && !proxyAddress.isEmpty()) {
+            int port = 8080;
+            if (proxyAddress.contains(":")) {
+                String[] parts = proxyAddress.split(":");
+                port = Integer.parseInt(parts[1]);
+                proxyAddress = parts[0];
+            }
+
+            uc = url.openConnection(new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyAddress, port)));
+        } else {
+            uc = url.openConnection();
+        }
+        uc.setRequestProperty("User-Agent", ApplicationInfo.shortApplicationVerName);
+
+        uc.connect();
+
+        return Helper.readStream(uc.getInputStream());
+    }
+
+    public static String downloadUrlString(String url) throws IOException {
+        byte[] data = downloadUrl(url);
+        String text = new String(data, Utf8Helper.charset);
+        return text;
     }
 }

@@ -21,7 +21,6 @@ import com.jpexs.decompiler.flash.exporters.modes.ExeExportMode;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.importers.TextImportResizeTextBoundsMode;
 import com.jpexs.helpers.Helper;
-import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,10 +33,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.net.InetSocketAddress;
-import java.net.Proxy;
-import java.net.URL;
-import java.net.URLConnection;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -941,33 +936,8 @@ public class Configuration {
         return getPath("projector");
     }
 
-    private static byte[] downloadsUrl(String urlString) throws IOException {
-        String proxyAddress = Configuration.updateProxyAddress.get();
-        URL url = new URL(urlString);
-
-        URLConnection uc;
-        if (proxyAddress != null && !proxyAddress.isEmpty()) {
-            int port = 8080;
-            if (proxyAddress.contains(":")) {
-                String[] parts = proxyAddress.split(":");
-                port = Integer.parseInt(parts[1]);
-                proxyAddress = parts[0];
-            }
-
-            uc = url.openConnection(new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyAddress, port)));
-        } else {
-            uc = url.openConnection();
-        }
-        uc.setRequestProperty("User-Agent", ApplicationInfo.shortApplicationVerName);
-
-        uc.connect();
-
-        return Helper.readStream(uc.getInputStream());
-    }
-
     private static String getDownloadsHtml() throws IOException {
-        byte[] data = downloadsUrl("https://www.adobe.com/support/flashplayer/downloads.html");
-        String html = new String(data, Utf8Helper.charset);
+        String html = Helper.downloadUrlString("https://www.adobe.com/support/flashplayer/downloads.html");
         return html;
     }
 
