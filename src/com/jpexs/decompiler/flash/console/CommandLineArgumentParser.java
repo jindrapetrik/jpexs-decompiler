@@ -780,6 +780,8 @@ public class CommandLineArgumentParser {
             parseDebugTool(args);
         } else if (nextParam.equals("--compareresources")) {
             parseCompareResources(args);
+        } else if (nextParam.equals("--resourcedates")) {
+            parseResourceDates(args);
         } else if (nextParam.equals("-help") || nextParam.equals("--help") || nextParam.equals("/?") || nextParam.equals("\\_") /* /? translates as this on windows */) {
             printHeader();
             printCmdLineUsage(null);
@@ -1273,6 +1275,10 @@ public class CommandLineArgumentParser {
         }
 
         CheckResources.compareResources(System.out, revision, revision2);
+    }
+
+    private static void parseResourceDates(Stack<String> args) {
+        CheckResources.checkTranslationDate(System.out);
     }
 
     private static void parseProxy(Stack<String> args) {

@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui.helpers;
 
 import com.jpexs.decompiler.flash.gui.AboutDialog;
 import com.jpexs.decompiler.flash.gui.AdvancedSettingsDialog;
+import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.DebugLogDialog;
 import com.jpexs.decompiler.flash.gui.ErrorLogFrame;
 import com.jpexs.decompiler.flash.gui.ExportDialog;
@@ -50,13 +51,19 @@ import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -138,15 +145,37 @@ public class CheckResources {
     }
 
     public static void checkTranslationDate(PrintStream stream) {
-        for (String lang : SelectLanguageDialog.getAvailableLanguages()) {
-            String lang2 = lang.equals("en") ? "" : "_" + lang.replace("-", "_");
+        for (String code : SelectLanguageDialog.getAvailableLanguages()) {
+            String lang = code.equals("en") ? "" : "_" + code.replace("-", "_");
             //https://api.github.com/repositories/19647328/contents/src/com/jpexs/decompiler/flash/gui/locales
-            String url = "https://api.github.com/repos/jindrapetrik/jpexs-decompiler/commits?path=/src/com/jpexs/decompiler/flash/gui/locales/MainFrame" + lang2 + ".properties";
+            String url = "https://api.github.com/repos/jindrapetrik/jpexs-decompiler/commits?path=/src/com/jpexs/decompiler/flash/gui/locales/MainFrame" + lang + ".properties";
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy");
+            Date now = new Date();
+            Calendar c = Calendar.getInstance();
+            c.setTime(now);
+            c.add(Calendar.YEAR, -1);
+            Date oldLimit = c.getTime();
             try {
                 String text = Helper.downloadUrlString(url);
                 text = text.substring(text.indexOf("\"date\":\"") + 8);
                 text = text.substring(0, text.indexOf("T"));
-                stream.println(lang + ": " + text);
+                Date date = now;
+                try {
+                    date = sdf.parse(text);
+                } catch (ParseException ex) {
+                    Logger.getLogger(CheckResources.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+                Locale l = Locale.forLanguageTag(code.equals("en") ? "" : code);
+                ResourceBundle b = ResourceBundle.getBundle(AppStrings.getResourcePath(AboutDialog.class), l);
+                String translator = b.getString("translation.author");
+                boolean old = date.before(oldLimit);
+
+                stream.println(Locale.forLanguageTag(code).getDisplayName() + ": "
+                        + translator + " - "
+                        + sdf2.format(date)
+                        + (old ? " translation too old" : ""));
             } catch (IOException ex) {
                 Logger.getLogger(CheckResources.class.getName()).log(Level.SEVERE, null, ex);
             }
