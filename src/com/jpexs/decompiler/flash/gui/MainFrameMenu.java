@@ -46,6 +46,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -460,10 +461,13 @@ public abstract class MainFrameMenu implements MenuBuilder {
                         lang = null;
                     }
                     ByteArrayOutputStream os = new ByteArrayOutputStream();
-                    PrintStream stream = new PrintStream(os);
-                    CheckResources.checkResources(stream, lang);
-                    String str = new String(os.toByteArray(), Utf8Helper.charset);
-                    editor.setText(str);
+                    try (PrintStream stream = new PrintStream(os, false, "UTF-8")) {
+                        CheckResources.checkResources(stream, lang);
+                        String str = new String(os.toByteArray(), Utf8Helper.charset);
+                        editor.setText(str);
+                    } catch (UnsupportedEncodingException ex) {
+                        // ignore
+                    }
                 });
                 super.setVisible(bln);
             }
