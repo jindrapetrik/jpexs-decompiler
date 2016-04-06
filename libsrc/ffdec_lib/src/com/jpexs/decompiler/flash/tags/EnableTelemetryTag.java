@@ -29,8 +29,8 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.logging.Level;
@@ -109,9 +109,9 @@ public class EnableTelemetryTag extends Tag implements PasswordTag {
 
         try {
             md = MessageDigest.getInstance("SHA-256");
-            md.update(password.getBytes("UTF-8"));
+            md.update(password.getBytes(Utf8Helper.charset));
             return Helper.byteArrayToHex(md.digest());
-        } catch (NoSuchAlgorithmException | UnsupportedEncodingException ex) {
+        } catch (NoSuchAlgorithmException ex) {
 
         }
         return null;

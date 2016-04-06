@@ -23,8 +23,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -116,7 +114,7 @@ public class EcmaScript {
                 //TODO: logic similar to 8.12.8
                 return o.call("toString", new ArrayList<>());
             case "Number":
-                //TODO: logic similar to 8.12.8                
+                //TODO: logic similar to 8.12.8
                 return o.call("valueOf", new ArrayList<>());
             default:
                 return o.toPrimitive();

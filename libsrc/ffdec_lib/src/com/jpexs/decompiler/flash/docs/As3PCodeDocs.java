@@ -7,7 +7,6 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.utf8.Utf8Helper;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
@@ -17,7 +16,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TimeZone;
@@ -33,9 +31,11 @@ import java.util.logging.Logger;
 public class As3PCodeDocs {
 
     private static ResourceBundle prop;
+
     private static Map<AVM2InstructionFlag, String> flagDescriptions = new HashMap<>();
 
     private static Cache<String, String> docsCache = Cache.getInstance(false, true, "as3DocsCache");
+
     private static Map<String, InstructionDefinition> nameToDef = new HashMap<>();
 
     static final String NEWLINE = "\r\n";
@@ -273,16 +273,13 @@ public class As3PCodeDocs {
             return cached;
         }
         String style = "";
-        try {
-            InputStream is = As3PCodeDocs.class.getResourceAsStream("/com/jpexs/decompiler/flash/docs/docs.css");
-            if (is == null) {
-                Logger.getLogger(As3PCodeDocs.class.getName()).log(Level.SEVERE, "docs.css needed for documentation not found");
-            } else {
-                style = new String(Helper.readStream(is), "UTF-8");
-            }
-        } catch (UnsupportedEncodingException ex) {
-            //ignore
+        InputStream is = As3PCodeDocs.class.getResourceAsStream("/com/jpexs/decompiler/flash/docs/docs.css");
+        if (is == null) {
+            Logger.getLogger(As3PCodeDocs.class.getName()).log(Level.SEVERE, "docs.css needed for documentation not found");
+        } else {
+            style = new String(Helper.readStream(is), Utf8Helper.charset);
         }
+
         docsCache.put("__style", style);
         return style;
     }
@@ -293,16 +290,13 @@ public class As3PCodeDocs {
             return cached;
         }
         String js = "";
-        try {
-            InputStream is = As3PCodeDocs.class.getResourceAsStream("/com/jpexs/decompiler/flash/docs/docs.js");
-            if (is == null) {
-                Logger.getLogger(As3PCodeDocs.class.getName()).log(Level.SEVERE, "docs.js needed for documentation not found");
-            } else {
-                js = new String(Helper.readStream(is), "UTF-8");
-            }
-        } catch (UnsupportedEncodingException ex) {
-            //ignore
+        InputStream is = As3PCodeDocs.class.getResourceAsStream("/com/jpexs/decompiler/flash/docs/docs.js");
+        if (is == null) {
+            Logger.getLogger(As3PCodeDocs.class.getName()).log(Level.SEVERE, "docs.js needed for documentation not found");
+        } else {
+            js = new String(Helper.readStream(is), Utf8Helper.charset);
         }
+
         docsCache.put("__js", js);
         return js;
     }

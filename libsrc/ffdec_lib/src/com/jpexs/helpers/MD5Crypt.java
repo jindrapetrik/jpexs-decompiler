@@ -16,7 +16,7 @@
  */
 package com.jpexs.helpers;
 
-import java.io.UnsupportedEncodingException;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
@@ -93,16 +93,9 @@ public class MD5Crypt {
             salt = salt.substring(0, 8);
         }
 
-        byte[] passwordBytes = new byte[0];
-        byte[] constBytes = new byte[0];
-        byte[] saltBytes = new byte[0];
-        try {
-            passwordBytes = password.getBytes("UTF-8");
-            saltBytes = salt.getBytes("UTF-8");
-            constBytes = magic.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException ex) {
-            //ignore
-        }
+        byte[] passwordBytes = password.getBytes(Utf8Helper.charset);
+        byte[] saltBytes = salt.getBytes(Utf8Helper.charset);
+        byte[] constBytes = magic.getBytes(Utf8Helper.charset);
 
         MessageDigest b;
         try {
