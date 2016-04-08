@@ -606,6 +606,22 @@ public class Timeline {
         Matrix mat = transformation.concatenate(layerMatrix);
         rect = mat.transform(rect);
 
+        boolean cacheAsBitmap = layer.cacheAsBitmap() && drawable.isSingleFrame();
+        /* // draw bounds
+         AffineTransform trans = mat.preConcatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor)).toTransform();
+         g.setTransform(trans);
+         BoundedTag b = (BoundedTag) drawable;
+         g.setPaint(new Color(255, 255, 255, 128));
+         g.setComposite(BlendComposite.Invert);
+         g.setStroke(new BasicStroke((int) SWF.unitDivisor));
+         RECT r = b.getRect();
+         g.setFont(g.getFont().deriveFont((float) (12 * SWF.unitDivisor)));
+         g.drawString(drawable.toString(), r.Xmin + (int) (3 * SWF.unitDivisor), r.Ymin + (int) (15 * SWF.unitDivisor));
+         g.draw(new Rectangle(r.Xmin, r.Ymin, r.getWidth(), r.getHeight()));
+         g.drawLine(r.Xmin, r.Ymin, r.Xmax, r.Ymax);
+         g.drawLine(r.Xmax, r.Ymin, r.Xmin, r.Ymax);
+         g.setComposite(AlphaComposite.Dst);*/
+
         if (filters != null && filters.size() > 0) {
             // calculate size after applying the filters
             double deltaXMax = 0;

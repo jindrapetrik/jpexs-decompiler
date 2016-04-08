@@ -57,7 +57,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
-public abstract class ImageTag extends CharacterTag implements DrawableTag {
+public abstract class ImageTag extends DrawableTag {
 
     @SWFType(BasicType.UI16)
     public int characterID;

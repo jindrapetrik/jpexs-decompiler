@@ -50,7 +50,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
-public abstract class MorphShapeTag extends CharacterTag implements DrawableTag {
+public abstract class MorphShapeTag extends DrawableTag {
 
     public static final int MAX_RATIO = 65535;
 

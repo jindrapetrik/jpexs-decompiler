@@ -49,7 +49,7 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-public abstract class ShapeTag extends CharacterTag implements DrawableTag, LazyObject {
+public abstract class ShapeTag extends DrawableTag implements LazyObject {
 
     @SWFType(BasicType.UI16)
     public int shapeId;

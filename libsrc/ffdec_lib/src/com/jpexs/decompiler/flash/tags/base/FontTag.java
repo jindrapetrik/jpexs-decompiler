@@ -50,7 +50,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
-public abstract class FontTag extends CharacterTag implements AloneTag, DrawableTag {
+public abstract class FontTag extends DrawableTag implements AloneTag {
 
     public static final int PREVIEWSIZE = 500;
 

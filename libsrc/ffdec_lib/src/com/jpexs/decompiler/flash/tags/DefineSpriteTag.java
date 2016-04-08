@@ -56,7 +56,7 @@ import java.util.Set;
  * @author JPEXS
  */
 @SWFVersion(from = 3)
-public class DefineSpriteTag extends CharacterTag implements DrawableTag, Timelined {
+public class DefineSpriteTag extends DrawableTag implements Timelined {
 
     public static final int ID = 39;
 

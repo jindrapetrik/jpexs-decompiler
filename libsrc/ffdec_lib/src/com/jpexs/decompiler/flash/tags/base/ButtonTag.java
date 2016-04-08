@@ -40,7 +40,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
-public abstract class ButtonTag extends CharacterTag implements DrawableTag, Timelined {
+public abstract class ButtonTag extends DrawableTag implements Timelined {
 
     public static int FRAME_UP = 0;
 

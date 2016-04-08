@@ -119,6 +119,11 @@ public class DepthState {
         }
     }
 
+    public boolean cacheAsBitmap() {
+        return (placeObjectTag != null && placeObjectTag.cacheAsBitmap())
+                || (filters != null && filters.size() > 0);
+    }
+
     public PlaceObjectTypeTag toPlaceObjectTag(int depth) {
         if (minPlaceObjectNum <= 1) {
             CXFORM cxForm0 = colorTransForm == null ? null : new CXFORM(colorTransForm);

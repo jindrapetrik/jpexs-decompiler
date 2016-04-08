@@ -74,7 +74,7 @@ import org.w3c.dom.Element;
  *
  * @author JPEXS
  */
-public abstract class TextTag extends CharacterTag implements DrawableTag {
+public abstract class TextTag extends DrawableTag {
 
     public TextTag(SWF swf, int id, String name, ByteArrayRange data) {
         super(swf, id, name, data);
