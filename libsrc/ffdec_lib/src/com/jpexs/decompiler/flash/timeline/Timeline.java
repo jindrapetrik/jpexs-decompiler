@@ -606,7 +606,7 @@ public class Timeline {
         Matrix mat = transformation.concatenate(layerMatrix);
         rect = mat.transform(rect);
 
-        boolean cacheAsBitmap = layer.cacheAsBitmap() && drawable.isSingleFrame();
+        boolean cacheAsBitmap = layer.cacheAsBitmap() && layer.placeObjectTag != null && drawable.isSingleFrame();
         /* // draw bounds
          AffineTransform trans = mat.preConcatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor)).toTransform();
          g.setTransform(trans);
@@ -622,50 +622,12 @@ public class Timeline {
          g.drawLine(r.Xmax, r.Ymin, r.Xmin, r.Ymax);
          g.setComposite(AlphaComposite.Dst);*/
 
-        if (filters != null && filters.size() > 0) {
-            // calculate size after applying the filters
-            double deltaXMax = 0;
-            double deltaYMax = 0;
-            for (FILTER filter : filters) {
-                double x = filter.getDeltaX();
-                double y = filter.getDeltaY();
-                deltaXMax = Math.max(x, deltaXMax);
-                deltaYMax = Math.max(y, deltaYMax);
-            }
-            rect.xMin -= deltaXMax * unzoom;
-            rect.xMax += deltaXMax * unzoom;
-            rect.yMin -= deltaYMax * unzoom;
-            rect.yMax += deltaYMax * unzoom;
-        }
-
-        rect.xMin -= 1 * unzoom;
-        rect.yMin -= 1 * unzoom;
-        rect.xMin = Math.max(0, rect.xMin);
-        rect.yMin = Math.max(0, rect.yMin);
-
-        int newWidth = (int) (rect.getWidth() / unzoom);
-        int newHeight = (int) (rect.getHeight() / unzoom);
-        int deltaX = (int) (rect.xMin / unzoom);
-        int deltaY = (int) (rect.yMin / unzoom);
-        newWidth = Math.min(image.getWidth() - deltaX, newWidth) + 1;
-        newHeight = Math.min(image.getHeight() - deltaY, newHeight) + 1;
-
-        if (newWidth <= 0 || newHeight <= 0) {
-            return;
-        }
-
-        Matrix m = mat.preConcatenate(Matrix.getTranslateInstance(-rect.xMin, -rect.yMin));
-        //strokeTransform = strokeTransform.clone();
-        //strokeTransform.translate(-rect.xMin, -rect.yMin);
-        drawMatrix.translate(rect.xMin, rect.yMin);
-
         SerializableImage img = null;
-        String cacheKey = null;
-        if (drawable instanceof ShapeTag) {
-            cacheKey = ((ShapeTag) drawable).getCharacterId() + m.toString() + (clrTrans == null ? "" : clrTrans.toString());
-            //img = renderContext.shapeCache.get(cacheKey);
+        if (cacheAsBitmap) {
+            swf.getFromCache(layer.placeObjectTag);
         }
 
+        int stateCount = renderContext.stateUnderCursor == null ? 0 : renderContext.stateUnderCursor.size();
         int dframe;
         if (fontFrameNum != -1) {
             dframe = fontFrameNum;
@@ -673,40 +635,77 @@ public class Timeline {
             dframe = time % drawableFrameCount;
         }
 
-        if (drawable instanceof ButtonTag) {
-            dframe = ButtonTag.FRAME_UP;
-            if (renderContext.cursorPosition != null) {
-                Shape buttonShape = drawable.getOutline(ButtonTag.FRAME_HITTEST, time, ratio, renderContext, absMat, true);
-                if (buttonShape.contains(renderContext.cursorPosition)) {
-                    renderContext.mouseOverButton = (ButtonTag) drawable;
-                    if (renderContext.mouseButton > 0) {
-                        dframe = ButtonTag.FRAME_DOWN;
-                    } else {
-                        dframe = ButtonTag.FRAME_OVER;
+        if (img == null) {
+            if (filters != null && filters.size() > 0) {
+                // calculate size after applying the filters
+                double deltaXMax = 0;
+                double deltaYMax = 0;
+                for (FILTER filter : filters) {
+                    double x = filter.getDeltaX();
+                    double y = filter.getDeltaY();
+                    deltaXMax = Math.max(x, deltaXMax);
+                    deltaYMax = Math.max(y, deltaYMax);
+                }
+                rect.xMin -= deltaXMax * unzoom;
+                rect.xMax += deltaXMax * unzoom;
+                rect.yMin -= deltaYMax * unzoom;
+                rect.yMax += deltaYMax * unzoom;
+            }
+
+            rect.xMin -= 1 * unzoom;
+            rect.yMin -= 1 * unzoom;
+            rect.xMin = Math.max(0, rect.xMin);
+            rect.yMin = Math.max(0, rect.yMin);
+
+            int newWidth = (int) (rect.getWidth() / unzoom);
+            int newHeight = (int) (rect.getHeight() / unzoom);
+            int deltaX = (int) (rect.xMin / unzoom);
+            int deltaY = (int) (rect.yMin / unzoom);
+            newWidth = Math.min(image.getWidth() - deltaX, newWidth) + 1;
+            newHeight = Math.min(image.getHeight() - deltaY, newHeight) + 1;
+
+            if (newWidth <= 0 || newHeight <= 0) {
+                return;
+            }
+
+            Matrix m = mat.preConcatenate(Matrix.getTranslateInstance(-rect.xMin, -rect.yMin));
+            //strokeTransform = strokeTransform.clone();
+            //strokeTransform.translate(-rect.xMin, -rect.yMin);
+            drawMatrix.translate(rect.xMin, rect.yMin);
+
+            if (drawable instanceof ButtonTag) {
+                dframe = ButtonTag.FRAME_UP;
+                if (renderContext.cursorPosition != null) {
+                    Shape buttonShape = drawable.getOutline(ButtonTag.FRAME_HITTEST, time, ratio, renderContext, absMat, true);
+                    if (buttonShape.contains(renderContext.cursorPosition)) {
+                        renderContext.mouseOverButton = (ButtonTag) drawable;
+                        if (renderContext.mouseButton > 0) {
+                            dframe = ButtonTag.FRAME_DOWN;
+                        } else {
+                            dframe = ButtonTag.FRAME_OVER;
+                        }
                     }
                 }
             }
-        }
 
-        int stateCount = renderContext.stateUnderCursor == null ? 0 : renderContext.stateUnderCursor.size();
-        if (img == null) {
             img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB);
             img.fillTransparent();
 
             drawable.toImage(dframe, time, ratio, renderContext, img, isClip || clipDepth > -1, m, strokeTransform, absMat, clrTrans);
 
-            if (cacheKey != null) {
-                renderContext.shapeCache.put(cacheKey, img);
+            if (filters != null) {
+                for (FILTER filter : filters) {
+                    img = filter.apply(img);
+                }
             }
-        }
-        if (filters != null) {
-            for (FILTER filter : filters) {
-                img = filter.apply(img);
+            if (blendMode > 1) {
+                if (colorTransForm != null) {
+                    img = colorTransForm.apply(img);
+                }
             }
-        }
-        if (blendMode > 1) {
-            if (colorTransForm != null) {
-                img = colorTransForm.apply(img);
+
+            if (cacheAsBitmap) {
+                swf.putToCache(layer.placeObjectTag, img);
             }
         }
 
