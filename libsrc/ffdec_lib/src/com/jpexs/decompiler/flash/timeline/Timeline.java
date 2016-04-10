@@ -624,7 +624,7 @@ public class Timeline {
 
         SerializableImage img = null;
         if (cacheAsBitmap) {
-            swf.getFromCache(layer.placeObjectTag);
+            img = swf.getFromCache(layer.placeObjectTag);
         }
 
         int stateCount = renderContext.stateUnderCursor == null ? 0 : renderContext.stateUnderCursor.size();
@@ -635,28 +635,29 @@ public class Timeline {
             dframe = time % drawableFrameCount;
         }
 
-        if (img == null) {
-            if (filters != null && filters.size() > 0) {
-                // calculate size after applying the filters
-                double deltaXMax = 0;
-                double deltaYMax = 0;
-                for (FILTER filter : filters) {
-                    double x = filter.getDeltaX();
-                    double y = filter.getDeltaY();
-                    deltaXMax = Math.max(x, deltaXMax);
-                    deltaYMax = Math.max(y, deltaYMax);
-                }
-                rect.xMin -= deltaXMax * unzoom;
-                rect.xMax += deltaXMax * unzoom;
-                rect.yMin -= deltaYMax * unzoom;
-                rect.yMax += deltaYMax * unzoom;
+        if (filters != null && filters.size() > 0) {
+            // calculate size after applying the filters
+            double deltaXMax = 0;
+            double deltaYMax = 0;
+            for (FILTER filter : filters) {
+                double x = filter.getDeltaX();
+                double y = filter.getDeltaY();
+                deltaXMax = Math.max(x, deltaXMax);
+                deltaYMax = Math.max(y, deltaYMax);
             }
+            rect.xMin -= deltaXMax * unzoom;
+            rect.xMax += deltaXMax * unzoom;
+            rect.yMin -= deltaYMax * unzoom;
+            rect.yMax += deltaYMax * unzoom;
+        }
 
-            rect.xMin -= 1 * unzoom;
-            rect.yMin -= 1 * unzoom;
-            rect.xMin = Math.max(0, rect.xMin);
-            rect.yMin = Math.max(0, rect.yMin);
+        rect.xMin -= unzoom;
+        rect.yMin -= unzoom;
+        rect.xMin = Math.max(0, rect.xMin);
+        rect.yMin = Math.max(0, rect.yMin);
+        drawMatrix.translate(rect.xMin, rect.yMin);
 
+        if (img == null) {
             int newWidth = (int) (rect.getWidth() / unzoom);
             int newHeight = (int) (rect.getHeight() / unzoom);
             int deltaX = (int) (rect.xMin / unzoom);
@@ -671,7 +672,6 @@ public class Timeline {
             Matrix m = mat.preConcatenate(Matrix.getTranslateInstance(-rect.xMin, -rect.yMin));
             //strokeTransform = strokeTransform.clone();
             //strokeTransform.translate(-rect.xMin, -rect.yMin);
-            drawMatrix.translate(rect.xMin, rect.yMin);
 
             if (drawable instanceof ButtonTag) {
                 dframe = ButtonTag.FRAME_UP;
