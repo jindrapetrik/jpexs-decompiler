@@ -946,21 +946,6 @@ public class Timeline {
                 g.drawLine(r.Xmin, r.Ymin, r.Xmax, r.Ymax);
                 g.drawLine(r.Xmax, r.Ymin, r.Xmin, r.Ymax);
                 g.setComposite(AlphaComposite.Dst);
-                /*Matrix mat2 = mat.clone();
-                 mat2.translateX /= unzoom;
-                 mat2.translateY /= unzoom;
-                 AffineTransform trans = mat2.toTransform();
-                 g.setTransform(trans);
-                 BoundedTag b = (BoundedTag) character;
-                 g.setPaint(new Color(255, 255, 255, 128));
-                 g.setComposite(BlendComposite.Invert);
-                 RECT r = b.getRect();
-                 int div = (int) unzoom;
-                 g.drawString(character.toString(), r.Xmin / div + 3, r.Ymin / div + 15);
-                 g.draw(new Rectangle(r.Xmin / div, r.Ymin / div, r.getWidth() / div, r.getHeight() / div));
-                 g.drawLine(r.Xmin / div, r.Ymin / div, r.Xmax / div, r.Ymax / div);
-                 g.drawLine(r.Xmax / div, r.Ymin / div, r.Xmin / div, r.Ymax / div);
-                 g.setComposite(AlphaComposite.Dst);*/
             }
         }
 
