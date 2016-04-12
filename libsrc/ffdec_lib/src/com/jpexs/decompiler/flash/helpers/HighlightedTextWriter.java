@@ -211,6 +211,7 @@ public class HighlightedTextWriter extends GraphTextWriter {
             }
         }
         appendToSb(str);
+        fixNewLineCount(str);
         if (h != null) {
             h.len = sb.length() - newLineCount - h.startPos;
         }
@@ -336,6 +337,14 @@ public class HighlightedTextWriter extends GraphTextWriter {
             appendIndent();
         }
         sb.append(str);
+    }
+
+    private void fixNewLineCount(String str) {
+        for (int i = 0; i < str.length(); i++) {
+            if (str.charAt(i) == '\r') {
+                newLineCount++;
+            }
+        }
     }
 
     private void appendIndent() {
