@@ -340,11 +340,23 @@ public class HighlightedTextWriter extends GraphTextWriter {
     }
 
     private void fixNewLineCount(String str) {
+        int nl = 0;
+        int rn = 0;
+        char prevChar = 0;
         for (int i = 0; i < str.length(); i++) {
-            if (str.charAt(i) == '\r') {
-                newLineCount++;
+            char ch = str.charAt(i);
+            if (ch == '\r' || ch == '\n') {
+                rn++;
             }
+
+            if (ch == '\r' || (prevChar != '\r' && ch == '\n')) {
+                nl++;
+            }
+
+            prevChar = ch;
         }
+
+        newLineCount += rn - nl;
     }
 
     private void appendIndent() {
