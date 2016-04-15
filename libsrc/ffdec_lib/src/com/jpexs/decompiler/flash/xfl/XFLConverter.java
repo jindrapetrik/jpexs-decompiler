@@ -2311,6 +2311,11 @@ public class XFLConverter {
                 StartSoundTag startSound = (StartSoundTag) t;
                 SWF swf = startSound.getSwf();
                 DefineSoundTag s = swf.getSound(startSound.soundId);
+                if (s == null) {
+                    logger.log(Level.WARNING, "Sount tag (ID={0}) was not found", startSound.soundId);
+                    continue;
+                }
+
                 if (!files.containsKey("sound" + s.soundId + "." + s.getExportFormat().toString().toLowerCase())) { //Sound was not exported
                     startSound = null; // ignore
                 }
