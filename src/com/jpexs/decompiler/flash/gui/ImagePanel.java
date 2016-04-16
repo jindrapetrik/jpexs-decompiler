@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
+import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RenderContext;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
@@ -44,6 +45,7 @@ import com.jpexs.decompiler.flash.types.ConstantColorColorTransform;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SOUNDINFO;
 import com.jpexs.helpers.ByteArrayRange;
+import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
@@ -117,6 +119,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private MouseEvent lastMouseEvent = null;
 
     private final List<SoundTagPlayer> soundPlayers = new ArrayList<>();
+
+    private Cache<PlaceObjectTypeTag, SerializableImage> displayObjectCache = Cache.getInstance(false, false, "displayObject");
 
     private final IconPanel iconPanel;
 
@@ -544,6 +548,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         boolean modified = this.zoom.value != zoom.value || this.zoom.fit != zoom.fit;
         if (modified) {
             this.zoom = zoom;
+            displayObjectCache.clear();
             redraw();
             if (textTag != null) {
                 setText(textTag, newTextTag);
@@ -656,6 +661,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 frame = ButtonTag.FRAME_UP;
             }
 
+            displayObjectCache.clear();
             this.timelined = drawable;
             this.swf = swf;
             zoomAvailable = true;
@@ -803,6 +809,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
         textTag = null;
         newTextTag = null;
+        displayObjectCache.clear();
     }
 
     private void nextFrame(Timer thisTimer, final int cnt, final int timeShouldBe) {
@@ -1000,6 +1007,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
 
         RenderContext renderContext = new RenderContext();
+        renderContext.displayObjectCache = displayObjectCache;
         if (cursorPosition != null) {
             renderContext.cursorPosition = new Point((int) (cursorPosition.x * SWF.unitDivisor), (int) (cursorPosition.y * SWF.unitDivisor));
         }

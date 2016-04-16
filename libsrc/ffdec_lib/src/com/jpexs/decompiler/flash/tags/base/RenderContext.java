@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.timeline.DepthState;
+import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Point;
 import java.util.List;
@@ -36,4 +37,6 @@ public class RenderContext {
     public ButtonTag mouseOverButton;
 
     public SerializableImage borderImage;
+
+    public Cache<PlaceObjectTypeTag, SerializableImage> displayObjectCache;
 }

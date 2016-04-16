@@ -623,8 +623,8 @@ public class Timeline {
          g.setComposite(AlphaComposite.Dst);*/
 
         SerializableImage img = null;
-        if (cacheAsBitmap) {
-            img = swf.getFromCache(layer.placeObjectTag);
+        if (cacheAsBitmap && renderContext.displayObjectCache != null) {
+            img = renderContext.displayObjectCache.get(layer.placeObjectTag);
         }
 
         int stateCount = renderContext.stateUnderCursor == null ? 0 : renderContext.stateUnderCursor.size();
@@ -704,8 +704,8 @@ public class Timeline {
                 }
             }
 
-            if (cacheAsBitmap) {
-                swf.putToCache(layer.placeObjectTag, img);
+            if (cacheAsBitmap && renderContext.displayObjectCache != null) {
+                renderContext.displayObjectCache.put(layer.placeObjectTag, img);
             }
         }
 

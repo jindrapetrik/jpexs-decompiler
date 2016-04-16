@@ -329,9 +329,6 @@ public final class SWF implements SWFContainerItem, Timelined {
     private final Cache<String, SerializableImage> frameCache = Cache.getInstance(false, false, "frame");
 
     @Internal
-    private final Cache<PlaceObjectTypeTag, SerializableImage> displayObjectCache = Cache.getInstance(false, false, "displayObject");
-
-    @Internal
     private final Cache<CharacterTag, RECT> rectCache = Cache.getInstance(true, true, "rect");
 
     @Internal
@@ -402,7 +399,6 @@ public final class SWF implements SWFContainerItem, Timelined {
         as2Cache.clear();
         as3Cache.clear();
         frameCache.clear();
-        displayObjectCache.clear();
         soundCache.clear();
 
         timeline = null;
@@ -2487,13 +2483,6 @@ public final class SWF implements SWFContainerItem, Timelined {
         return null;
     }
 
-    public SerializableImage getFromCache(PlaceObjectTypeTag key) {
-        if (displayObjectCache.contains(key)) {
-            return displayObjectCache.get(key);
-        }
-        return null;
-    }
-
     public byte[] getFromCache(SoundTag soundTag) {
         if (soundCache.contains(soundTag)) {
             return soundCache.get(soundTag);
@@ -2507,17 +2496,12 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
     }
 
-    public void putToCache(PlaceObjectTypeTag key, SerializableImage img) {
-        displayObjectCache.put(key, img);
-    }
-
     public void putToCache(SoundTag soundTag, byte[] data) {
         soundCache.put(soundTag, data);
     }
 
     public void clearImageCache() {
         frameCache.clear();
-        displayObjectCache.clear();
         rectCache.clear();
         for (Tag tag : getTags()) {
             if (tag instanceof ImageTag) {
