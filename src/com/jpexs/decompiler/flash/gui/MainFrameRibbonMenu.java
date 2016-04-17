@@ -91,7 +91,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
 
     private static final int TYPE_TOGGLEMENUITEM = 3;
 
-    private Map<String, RibbonContextualTaskGroup> optinalGroups = new HashMap<>();
+    private final Map<String, RibbonContextualTaskGroup> optionalGroups = new HashMap<>();
 
     public MainFrameRibbonMenu(MainFrameRibbon mainFrame, JRibbon ribbon, boolean externalFlashPlayerUnavailable) {
         super(mainFrame, externalFlashPlayerUnavailable);
@@ -404,7 +404,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
                     if (menuOptional.get(sub)) {
                         RibbonContextualTaskGroup rct = new RibbonContextualTaskGroup("", new Color(128, 0, 0), rt);
                         ribbon.addContextualTaskGroup(rct);
-                        optinalGroups.put(sub, rct);
+                        optionalGroups.put(sub, rct);
                         //ribbon.setVisible(rct, false);
                     } else {
                         ribbon.addTask(rt);
@@ -598,7 +598,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
         Object o = menuItems.get(path);
         if (o instanceof RibbonTask) {
             if (menuOptional.get(path)) {
-                RibbonContextualTaskGroup rg = optinalGroups.get(path);
+                RibbonContextualTaskGroup rg = optionalGroups.get(path);
 
                 if (ribbon.isVisible(rg) != val) {
                     View.execInEventDispatch(new Runnable() {
@@ -627,8 +627,8 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
 
                     @Override
                     public void run() {
-                        if (!ribbon.isVisible(optinalGroups.get(path))) {
-                            ribbon.setVisible(optinalGroups.get(path), true);
+                        if (!ribbon.isVisible(optionalGroups.get(path))) {
+                            ribbon.setVisible(optionalGroups.get(path), true);
                         }
                         ribbon.setSelectedTask((RibbonTask) o);
                     }
