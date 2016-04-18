@@ -31,7 +31,7 @@ import javax.swing.JScrollPane;
  */
 public class DocsPanel extends JPanel implements DocsListener {
 
-    private JEditorPane textDisplay = new JEditorPane();
+    private final JEditorPane textDisplay = new JEditorPane();
 
     public DocsPanel() {
         setLayout(new BorderLayout(0, 0));

@@ -80,14 +80,14 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
 
     public static class LineMarker implements Comparable<LineMarker> {
 
-        private Color bgColor;
+        private final Color bgColor;
 
-        private Color color;
+        private final Color color;
 
         private FgPainter fgPainter;
 
         //private int line;
-        private int priority;
+        private final int priority;
 
         public FgPainter getForegroundPainter() {
             return fgPainter;
@@ -480,7 +480,7 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
 
     public static class FgPainter extends DefaultHighlighter.DefaultHighlightPainter {
 
-        private SyntaxStyle fgStyle;
+        private final SyntaxStyle fgStyle;
 
         public FgPainter(Color color, Color bgColor) {
             super(bgColor);

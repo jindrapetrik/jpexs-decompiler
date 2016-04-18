@@ -449,7 +449,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
         VariableNode root;
 
-        private Map<VariableNode, List<VariableNode>> nodeCache = new HashMap<>();
+        private final Map<VariableNode, List<VariableNode>> nodeCache = new HashMap<>();
 
         protected EventListenerList listenerList = new EventListenerList();
 
@@ -461,7 +461,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
         private static final int STRUCTURE_CHANGED = 3;
 
-        private MyTreeTable ttable;
+        private final MyTreeTable ttable;
 
         public VariablesTableModel(MyTreeTable ttable, List<Variable> vars, List<Long> parentIds) {
             this.ttable = ttable;

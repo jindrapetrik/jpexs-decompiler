@@ -24,9 +24,9 @@ import com.jpexs.decompiler.flash.tags.base.ASMSource;
  */
 public class ActionSearchResult {
 
-    private ASMSource src;
+    private final ASMSource src;
 
-    private String path;
+    private final String path;
 
     public ActionSearchResult(ASMSource src, String path) {
         this.src = src;

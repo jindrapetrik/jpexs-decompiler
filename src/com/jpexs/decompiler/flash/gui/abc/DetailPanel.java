@@ -82,7 +82,7 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
 
     private boolean buttonsShouldBeShown = false;
 
-    private DebuggerHandler.ConnectionListener conListener;
+    private final DebuggerHandler.ConnectionListener conListener;
 
     public DetailPanel(ABCPanel abcPanel) {
         this.abcPanel = abcPanel;
