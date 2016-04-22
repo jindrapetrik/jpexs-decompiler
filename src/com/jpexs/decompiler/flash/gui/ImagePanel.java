@@ -120,7 +120,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private final List<SoundTagPlayer> soundPlayers = new ArrayList<>();
 
-    private Cache<PlaceObjectTypeTag, SerializableImage> displayObjectCache = Cache.getInstance(false, false, "displayObject");
+    private final Cache<PlaceObjectTypeTag, SerializableImage> displayObjectCache = Cache.getInstance(false, false, "displayObject");
 
     private final IconPanel iconPanel;
 
@@ -142,7 +142,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private int msPerFrame;
 
-    private boolean lowQuality = false;
+    private final boolean lowQuality = false;
 
     private final double LQ_FACTOR = 2;
 
@@ -1207,7 +1207,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private long startRun = 0L;
 
-    private long startDrop = 0L;
+    private final long startDrop = 0L;
 
     private int skippedFrames = 0;
 
