@@ -128,7 +128,7 @@ public abstract class ImageTag extends DrawableTag {
         }
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageHelper.write(getImage(true).getBufferedImage(), getImageFormat(), baos);
+        ImageHelper.write(getImage(false).getBufferedImage(), getImageFormat(), baos);
         return new ByteArrayInputStream(baos.toByteArray());
     }
 
