@@ -16,7 +16,6 @@
  */
 package com.jpexs.helpers;
 
-import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFField;
 import java.lang.reflect.Array;

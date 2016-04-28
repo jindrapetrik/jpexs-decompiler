@@ -45,6 +45,7 @@ public class SetLocalAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assig
         return declaration;
     }
 
+    @Override
     public void setDeclaration(DeclarationAVM2Item declaration) {
         this.declaration = declaration;
     }

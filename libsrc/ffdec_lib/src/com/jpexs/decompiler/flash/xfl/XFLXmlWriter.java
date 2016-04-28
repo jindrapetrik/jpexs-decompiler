@@ -34,7 +34,7 @@ public class XFLXmlWriter implements XMLStreamWriter {
 
     private static final Logger logger = Logger.getLogger(XFLXmlWriter.class.getName());
 
-    private String newLineCharacters = "\n"; //Helper.newLine;
+    private final String newLineCharacters = "\n"; //Helper.newLine;
 
     private boolean newLine = true;
 

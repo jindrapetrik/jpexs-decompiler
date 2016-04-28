@@ -22,7 +22,7 @@ package com.jpexs.decompiler.flash.importers.svg;
  */
 public class SvgPathReader {
 
-    private String str;
+    private final String str;
 
     private int pos;
 

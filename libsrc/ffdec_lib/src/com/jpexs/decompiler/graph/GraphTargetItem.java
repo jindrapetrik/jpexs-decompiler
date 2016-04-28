@@ -25,7 +25,6 @@ import com.jpexs.decompiler.flash.abc.avm2.model.NewArrayAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewObjectAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.StringAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.ThisAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.UndefinedAVM2Item;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.configuration.Configuration;

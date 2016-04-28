@@ -21,11 +21,9 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewFunctionAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.AssignedValue;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
-import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.ValueKind;
-import static com.jpexs.decompiler.flash.abc.types.traits.Trait.TRAIT_GETTER;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -211,8 +209,8 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
 
         if (Configuration.handleSkinPartsAutomatically.get()) {
             /*
-                Hide: private static var _skinParts
-                (part of [SkinPart] compilations)
+             Hide: private static var _skinParts
+             (part of [SkinPart] compilations)
              */
             if (isStatic && "_skinParts".equals(getName(abc).getName(abc.constants, new ArrayList<>(), true))) {
                 if (kindType == Trait.TRAIT_SLOT) {
@@ -226,5 +224,4 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         }
         return true;
     }
-
 }

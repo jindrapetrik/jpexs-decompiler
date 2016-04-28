@@ -23,7 +23,6 @@ import com.jpexs.decompiler.flash.types.GRADRECORD;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import java.awt.BasicStroke;
-import java.awt.Shape;
 import java.awt.geom.GeneralPath;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +34,9 @@ import java.util.List;
 public class PathExporter extends ShapeExporterBase {
 
     private final List<GeneralPath> paths = new ArrayList<>();
+
     private final List<GeneralPath> strokes = new ArrayList<>();
+
     private double thickness = 0;
 
     private GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);

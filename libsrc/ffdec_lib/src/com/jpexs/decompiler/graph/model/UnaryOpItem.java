@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.graph.model;
 
-import com.jpexs.decompiler.flash.abc.avm2.model.ThisAVM2Item;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
@@ -31,6 +30,7 @@ import java.util.Set;
 public abstract class UnaryOpItem extends GraphTargetItem implements UnaryOp {
 
     public String operator;
+
     protected String coerce;
 
     public UnaryOpItem(GraphSourceItem instruction, GraphSourceItem lineStartItem, int precedence, GraphTargetItem value, String operator, String coerce) {

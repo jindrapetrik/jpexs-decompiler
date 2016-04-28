@@ -49,6 +49,7 @@ public class SetPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, As
         return declaration;
     }
 
+    @Override
     public void setDeclaration(DeclarationAVM2Item declaration) {
         this.declaration = declaration;
     }

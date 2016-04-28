@@ -939,6 +939,7 @@ public class EcmaFloatingDecimal {
         }
     }
 
+    @Override
     public String toString() {
         // most brain-dead version
         StringBuffer result = new StringBuffer(nDigits + 8);
