@@ -159,7 +159,7 @@ public class CheckResources {
             try {
                 String text = Helper.downloadUrlString(url);
                 text = text.substring(text.indexOf("\"date\":\"") + 8);
-                text = text.substring(0, text.indexOf("T"));
+                text = text.substring(0, text.indexOf('T'));
                 Date date = now;
                 try {
                     date = sdf.parse(text);

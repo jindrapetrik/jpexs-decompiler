@@ -36,7 +36,7 @@ import java.util.Map;
  */
 public class ABCMethodIndexing {
 
-    private ABC abc;
+    private final ABC abc;
 
     private Map<MethodInfo, Integer> bodyIdxFromMethod = new HashMap<>();
 

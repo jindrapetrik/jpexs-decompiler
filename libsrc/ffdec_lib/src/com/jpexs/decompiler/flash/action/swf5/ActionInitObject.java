@@ -51,7 +51,7 @@ public class ActionInitObject extends Action {
             return false;
         }
 
-        int num = (int) (double) (Double) lda.popAsNumber();
+        int num = (int) (double) lda.popAsNumber();
         if (lda.stack.size() < 2 * num) {
             return false;
         }

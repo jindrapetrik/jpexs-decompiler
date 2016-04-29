@@ -24,7 +24,6 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
-import java.util.ArrayList;
 
 /**
  *
@@ -33,7 +32,8 @@ import java.util.ArrayList;
 public class GetLexAVM2Item extends AVM2Item {
 
     public Multiname propertyName;
-    private DottedChain fullPropertyName;
+
+    private final DottedChain fullPropertyName;
 
     public GetLexAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, Multiname propertyName, AVM2ConstantPool constants) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);

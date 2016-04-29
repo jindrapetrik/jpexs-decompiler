@@ -29,7 +29,7 @@ public enum EcmaType {
     OBJECT("Object"),
     BOOLEAN("Boolean");
 
-    private String clsName;
+    private final String clsName;
 
     private EcmaType(String clsName) {
         this.clsName = clsName;

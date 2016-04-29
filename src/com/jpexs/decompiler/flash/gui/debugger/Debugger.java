@@ -183,8 +183,8 @@ public class Debugger {
                         String param[] = (ret.contains(";") ? ret.split(";") : new String[]{ret});
                         for (String p : param) {
                             if (p.contains("=")) {
-                                String key = p.substring(0, p.indexOf("="));
-                                String val = p.substring(p.indexOf("=") + 1);
+                                String key = p.substring(0, p.indexOf('='));
+                                String val = p.substring(p.indexOf('=') + 1);
                                 parameters.put(key, val);
                             } else {
                                 parameters.put(p, "true");

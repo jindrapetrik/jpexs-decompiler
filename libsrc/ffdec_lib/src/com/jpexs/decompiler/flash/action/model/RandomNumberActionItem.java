@@ -35,7 +35,7 @@ import java.util.Random;
  */
 public class RandomNumberActionItem extends ActionItem {
 
-    private static Random rnd = new Random();
+    private static final Random rnd = new Random();
 
     public RandomNumberActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem maximum) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY, maximum);

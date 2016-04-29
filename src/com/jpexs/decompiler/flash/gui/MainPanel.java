@@ -1600,7 +1600,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (swf.isAS3()) {
             String rawScriptName = scriptName;
             if (rawScriptName.startsWith("#PCODE ")) {
-                rawScriptName = rawScriptName.substring(rawScriptName.indexOf(";") + 1);
+                rawScriptName = rawScriptName.substring(rawScriptName.indexOf(';') + 1);
             }
 
             List<ABCContainerTag> abcList = swf.getAbcList();

@@ -197,6 +197,8 @@ public interface MenuBuilder {
      * @param priority Priority
      * @param subloader Action which loads menu inside
      * @param isLeaf Has no subitems?
+     * @param key
+     * @param isOptional
      */
     public void addMenuItem(String path, String title, String icon, ActionListener action, int priority, ActionListener subloader, boolean isLeaf, HotKey key, boolean isOptional);
 
@@ -209,6 +211,7 @@ public interface MenuBuilder {
      * @param icon Icon - resource name
      * @param action Action for clicking
      * @param priority Priority
+     * @param key
      */
     public void addToggleMenuItem(String path, String title, String group, String icon, ActionListener action, int priority, HotKey key);
 

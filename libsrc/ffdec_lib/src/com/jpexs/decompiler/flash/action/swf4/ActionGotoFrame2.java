@@ -116,8 +116,8 @@ public class ActionGotoFrame2 extends Action {
         String frame = EcmaScript.toString(lda.stack.pop());
         String target = "/";
         if (frame.contains(":")) {
-            target = frame.substring(0, frame.indexOf(":"));
-            frame = frame.substring(frame.indexOf(":") + 1);
+            target = frame.substring(0, frame.indexOf(':'));
+            frame = frame.substring(frame.indexOf(':') + 1);
         }
         if (frame.matches("[1-9][0-9]*|0")) {
             int frameNum = Integer.parseInt(frame);

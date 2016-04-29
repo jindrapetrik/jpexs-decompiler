@@ -80,6 +80,7 @@ public class HighlightedTextWriter extends GraphTextWriter {
      * Highlights specified text as instruction by adding special tags
      *
      * @param src
+     * @param startLineItem
      * @param pos Offset of instruction
      * @param data
      * @return HighlightedTextWriter

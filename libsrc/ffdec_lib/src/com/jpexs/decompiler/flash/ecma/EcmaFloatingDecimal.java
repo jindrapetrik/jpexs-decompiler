@@ -1038,6 +1038,7 @@ public class EcmaFloatingDecimal {
 
     // Per-thread buffer for string/stringbuffer conversion
     private static ThreadLocal perThreadBuffer = new ThreadLocal() {
+        @Override
         protected synchronized Object initialValue() {
             return new char[26];
         }
@@ -1657,6 +1658,7 @@ class FDBigInt {
         return ((long) (data[1]) << 32) | ((long) data[0] & 0xffffffffL);
     }
 
+    @Override
     public String toString() {
         StringBuffer r = new StringBuffer(30);
         r.append('[');

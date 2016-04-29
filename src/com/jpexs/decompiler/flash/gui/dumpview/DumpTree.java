@@ -132,7 +132,7 @@ public class DumpTree extends JTree {
                     } else if ("TAG".equals(di.type)) {
                         String name = di.name;
                         if (name.contains(" ")) {
-                            name = name.substring(0, name.indexOf(" ")).trim();
+                            name = name.substring(0, name.indexOf(' ')).trim();
                         }
                         switch (name) {
                             case DefineFontTag.NAME:
@@ -224,7 +224,6 @@ public class DumpTree extends JTree {
             return ret;
 
         }
-
     }
 
     public DumpTree(DumpTreeModel treeModel, MainPanel mainPanel) {

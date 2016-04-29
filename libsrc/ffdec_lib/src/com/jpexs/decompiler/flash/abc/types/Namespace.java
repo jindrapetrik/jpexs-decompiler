@@ -133,7 +133,7 @@ public class Namespace {
         if (name == null) {
             return false;
         }
-        if (name.equals("") && name_index == 0) {
+        if (name.isEmpty() && name_index == 0) {
             return true;
         }
         if (name_index == 0) {

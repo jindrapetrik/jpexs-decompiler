@@ -67,6 +67,7 @@ public class ActionListReader {
      * @param ip
      * @param endIp
      * @param path
+     * @param deobfuscationMode
      * @return List of actions
      * @throws IOException
      * @throws java.lang.InterruptedException

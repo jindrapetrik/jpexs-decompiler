@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
-import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
@@ -41,7 +40,9 @@ import java.util.Set;
 public class ThisAVM2Item extends AVM2Item {
 
     public DottedChain className;
+
     public boolean basicObject;
+
     public Multiname classMultiname;
 
     public ThisAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, Multiname classMultiname, DottedChain className, boolean basicObject) {

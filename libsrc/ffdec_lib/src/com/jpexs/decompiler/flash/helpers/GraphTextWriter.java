@@ -56,7 +56,7 @@ public abstract class GraphTextWriter {
      * Highlights specified text as instruction
      *
      * @param src
-     * @param firstLineItem
+     * @param startLineItem
      * @param pos Offset of instruction
      * @param data
      * @return GraphTextWriter

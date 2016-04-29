@@ -193,10 +193,10 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.MultiplyPIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.NegatePIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.PrologueIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.PushConstantIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.PushFloatIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.PushDNanIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.PushDecimalIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.PushFloat4Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.PushFloatIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.SendEnterIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.SetPropertyLateIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.Sf32x4Ins;
@@ -306,7 +306,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -427,6 +426,7 @@ public class AVM2Code implements Cloneable {
     }
 
     public static final InstructionDefinition[] instructionSet = new InstructionDefinition[256];
+
     public static final InstructionDefinition[] allInstructionSet = new InstructionDefinition[]{
         /*0x00*/null,
         /*0x01*/ new BkptIns(),
@@ -480,7 +480,7 @@ public class AVM2Code implements Cloneable {
         /*0x30*/ new PushScopeIns(),
         /*0x31*/ new PushNamespaceIns(),
         /*0x32*/ new HasNext2Ins(),
-        /*0x33*/ new PushDecimalIns(), //pushdecimal(minor 17), lix8 (internal-only) according to Tamarin        
+        /*0x33*/ new PushDecimalIns(), //pushdecimal(minor 17), lix8 (internal-only) according to Tamarin
         /*0x34*/ new PushDNanIns(), //pushdnan according to Flex SDK, lix16 (internal-only) according to Tamarin
         /*0x35*/ new Li8Ins(),
         /*0x36*/ new Li16Ins(),
@@ -717,6 +717,7 @@ public class AVM2Code implements Cloneable {
         }
 
     }
+
     public static final String IDENTOPEN = "/*IDENTOPEN*/";
 
     public static final String IDENTCLOSE = "/*IDENTCLOSE*/";
@@ -1637,7 +1638,7 @@ public class AVM2Code implements Cloneable {
              }
              }//*/
 
- /*if ((ip + 2 < code.size()) && (ins.definition instanceof NewCatchIns)) { // Filling local register in catch clause
+            /*if ((ip + 2 < code.size()) && (ins.definition instanceof NewCatchIns)) { // Filling local register in catch clause
              if (code.get(ip + 1).definition instanceof DupIns) {
              if (code.get(ip + 2).definition instanceof SetLocalTypeIns) {
              ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames);

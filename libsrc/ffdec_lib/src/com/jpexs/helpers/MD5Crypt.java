@@ -50,7 +50,7 @@ public class MD5Crypt {
         String checksum = hash.substring(magic.length());
         String salt = "";
         if (checksum.contains("$")) {
-            salt = checksum.substring(0, checksum.indexOf("$"));
+            salt = checksum.substring(0, checksum.indexOf('$'));
         }
         return hash.equals(crypt(password, salt, magic));
     }

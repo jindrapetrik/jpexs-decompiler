@@ -425,16 +425,16 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
         }
         //strip labels, e.g. ofs123:pushint 25
         if (curLine.matches("^\\p{L}+:")) {
-            curLine = curLine.substring(curLine.indexOf(":") + 1).trim();
+            curLine = curLine.substring(curLine.indexOf(':') + 1).trim();
         }
 
         //strip instruction arguments, we want only its name
         if (curLine.contains(" ")) {
-            curLine = curLine.substring(0, curLine.indexOf(" "));
+            curLine = curLine.substring(0, curLine.indexOf(' '));
         }
         //strip comments, e.g. pushnull;comment
         if (curLine.contains(";")) {
-            curLine = curLine.substring(0, curLine.indexOf(";"));
+            curLine = curLine.substring(0, curLine.indexOf(';'));
         }
         String insName = curLine.toLowerCase();
         if (insNameToDef.containsKey(insName)) {

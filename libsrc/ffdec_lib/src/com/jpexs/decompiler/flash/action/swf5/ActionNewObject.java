@@ -52,7 +52,7 @@ public class ActionNewObject extends Action {
         }
 
         String objectName = lda.popAsString();
-        int numArgs = (int) (double) (Double) lda.popAsNumber();
+        int numArgs = (int) (double) lda.popAsNumber();
         if (lda.stack.size() < numArgs) {
             return false;
         }

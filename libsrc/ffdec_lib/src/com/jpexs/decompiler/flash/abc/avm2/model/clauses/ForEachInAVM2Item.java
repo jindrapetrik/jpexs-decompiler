@@ -18,8 +18,6 @@ package com.jpexs.decompiler.flash.abc.avm2.model.clauses;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.model.InAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.SetTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.LoopWithType;
@@ -62,39 +60,39 @@ public class ForEachInAVM2Item extends LoopItem implements Block {
         super(instruction, lineStartIns, loop);
 
         /*
-        Following was commented out:
-        
-        The code should fix following:
-        for each (var a in col)
-        {
-            var b = a;      //a is temp reg   
-            trace(b);
-        }
-        
-        but fails for following:
-            for each (var a in col)
-            {
-                c[a] = a;
-            }
-        
-        
-         */
- /*
-        if (!commands.isEmpty()) {
-            GraphTargetItem firstAssign = commands.get(0);
-            if (firstAssign instanceof SetTypeAVM2Item) {
-                if (expression.object instanceof LocalRegAVM2Item) {
-                    if (((SetTypeAVM2Item) firstAssign).getValue().getNotCoerced() instanceof LocalRegAVM2Item) {
-                        if (((LocalRegAVM2Item) ((SetTypeAVM2Item) firstAssign).getValue().getNotCoerced()).regIndex == ((LocalRegAVM2Item) expression.object).regIndex) {
-                            commands.remove(0);
-                            expression.object = ((SetTypeAVM2Item) firstAssign).getObject();
-                        }
-                    }
+         Following was commented out:
 
-                }
-                //locAssign.
-            }
-        }*/
+         The code should fix following:
+         for each (var a in col)
+         {
+         var b = a;      //a is temp reg
+         trace(b);
+         }
+
+         but fails for following:
+         for each (var a in col)
+         {
+         c[a] = a;
+         }
+
+
+         */
+        /*
+         if (!commands.isEmpty()) {
+         GraphTargetItem firstAssign = commands.get(0);
+         if (firstAssign instanceof SetTypeAVM2Item) {
+         if (expression.object instanceof LocalRegAVM2Item) {
+         if (((SetTypeAVM2Item) firstAssign).getValue().getNotCoerced() instanceof LocalRegAVM2Item) {
+         if (((LocalRegAVM2Item) ((SetTypeAVM2Item) firstAssign).getValue().getNotCoerced()).regIndex == ((LocalRegAVM2Item) expression.object).regIndex) {
+         commands.remove(0);
+         expression.object = ((SetTypeAVM2Item) firstAssign).getObject();
+         }
+         }
+
+         }
+         //locAssign.
+         }
+         }*/
         this.expression = expression;
         this.commands = commands;
     }

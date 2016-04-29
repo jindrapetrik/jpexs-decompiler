@@ -87,7 +87,6 @@ import com.jpexs.decompiler.flash.abc.avm2.model.StringAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.UndefinedAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
-import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerAdapter;
@@ -238,14 +237,14 @@ public class AVM2DeobfuscatorSimpleOld extends SWFDecompilerAdapter {
             InstructionDefinition def = ins.definition;
             //System.err.println("" + ins + " stack size:" + stack.size());
             /*if (ins.definition instanceof NewFunctionIns) {
-                if (idx + 1 < code.code.size()) {
-                    if (code.code.get(idx + 1).definition instanceof PopIns) {
-                        code.removeInstruction(idx + 1, body);
-                        code.removeInstruction(idx, body);
-                        continue;
-                    }
-                }
-            } else */
+             if (idx + 1 < code.code.size()) {
+             if (code.code.get(idx + 1).definition instanceof PopIns) {
+             code.removeInstruction(idx + 1, body);
+             code.removeInstruction(idx, body);
+             continue;
+             }
+             }
+             } else */
             {
                 // do not throw EmptyStackException, much faster
                 int requiredStackSize = ins.getStackPopCount(localData);

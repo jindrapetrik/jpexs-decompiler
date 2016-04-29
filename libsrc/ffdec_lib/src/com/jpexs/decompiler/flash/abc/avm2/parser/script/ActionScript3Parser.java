@@ -2236,7 +2236,7 @@ public class ActionScript3Parser {
             case REGEXP:
                 String p = (String) s.value;
                 p = p.substring(1);
-                int spos = p.lastIndexOf("/");
+                int spos = p.lastIndexOf('/');
                 String mod = p.substring(spos + 1);
                 p = p.substring(0, spos);
                 p = p.replace("\\/", "/");
