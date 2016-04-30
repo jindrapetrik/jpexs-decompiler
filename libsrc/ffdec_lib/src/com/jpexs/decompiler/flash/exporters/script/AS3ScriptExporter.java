@@ -376,22 +376,26 @@ public class AS3ScriptExporter {
                 }
             }
 
-            File file = item.getExportFile(outdir, exportSettings);
-            String filePath = file.getPath();
-            if (files.contains(filePath.toLowerCase())) {
-                String parentPath = file.getParent();
-                String fileName = file.getName();
-                String extension = Path.getExtension(fileName);
-                String fileNameWithoutExtension = Path.getFileNameWithoutExtension(file);
-                int i = 2;
-                do {
-                    filePath = Path.combine(parentPath, fileNameWithoutExtension + "_" + i++ + extension);
-                } while (files.contains(filePath.toLowerCase()));
+            File file = null;
+            if (!exportSettings.singleFile) {
+                file = item.getExportFile(outdir, exportSettings);
+                String filePath = file.getPath();
+                if (files.contains(filePath.toLowerCase())) {
+                    String parentPath = file.getParent();
+                    String fileName = file.getName();
+                    String extension = Path.getExtension(fileName);
+                    String fileNameWithoutExtension = Path.getFileNameWithoutExtension(file);
+                    int i = 2;
+                    do {
+                        filePath = Path.combine(parentPath, fileNameWithoutExtension + "_" + i++ + extension);
+                    } while (files.contains(filePath.toLowerCase()));
 
-                file = new File(filePath);
+                    file = new File(filePath);
+                }
+
+                files.add(filePath.toLowerCase());
             }
 
-            files.add(filePath.toLowerCase());
             tasks.add(new ExportPackTask(handler, cnt++, packs.size(), item.getClassPath(), item, file, exportSettings, parallel, evl));
         }
 

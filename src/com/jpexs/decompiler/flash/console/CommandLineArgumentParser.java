@@ -81,6 +81,7 @@ import com.jpexs.decompiler.flash.exporters.settings.SoundExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.SpriteExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
 import com.jpexs.decompiler.flash.exporters.swf.SwfXmlExporter;
+import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.SearchInMemory;
 import com.jpexs.decompiler.flash.gui.SearchInMemoryListener;
@@ -219,8 +220,8 @@ public class CommandLineArgumentParser {
         return commandLineMode;
     }
 
-    public static void printCmdLineUsage(String filter) {
-        printCmdLineUsage(System.out, true, filter);
+    public static void printCmdLineUsage(String filter, boolean webHelp) {
+        printCmdLineUsage(System.out, webHelp, filter);
     }
 
     public static void printCmdLineUsage(PrintStream out, boolean webHelp, String filter) {
@@ -784,11 +785,11 @@ public class CommandLineArgumentParser {
             parseResourceDates(args);
         } else if (nextParam.equals("-help") || nextParam.equals("--help") || nextParam.equals("/?") || nextParam.equals("\\_") /* /? translates as this on windows */) {
             printHeader();
-            printCmdLineUsage(null);
+            printCmdLineUsage(null, false);
             System.exit(0);
         } else if (nextParam.equals("--webhelp")) { //for generating commandline usage on webpages
             ByteArrayOutputStream whbaos = new ByteArrayOutputStream();
-            printCmdLineUsage(new PrintStream(whbaos, true), false, null);
+            printCmdLineUsage(new PrintStream(whbaos, true), true, null);
             String wh = new String(whbaos.toByteArray());
             wh = wh.replace("<", "&lt;").replace(">", "&gt;");
             System.out.println(wh);
@@ -840,7 +841,7 @@ public class CommandLineArgumentParser {
 
     public static void badArguments(String command) {
         System.err.println("Error: Bad Commandline Arguments!");
-        printCmdLineUsage(command);
+        printCmdLineUsage(command, false);
         System.exit(1);
     }
 
@@ -1561,7 +1562,7 @@ public class CommandLineArgumentParser {
                 }
 
                 if (parallel && singleScriptFile) {
-                    System.out.println("Single file script export is not supported with enabled parallel speedup");
+                    logger.log(Level.WARNING, AppStrings.translate("export.script.singleFilePallelModeWarning"));
                     singleScriptFile = false;
                 }
 

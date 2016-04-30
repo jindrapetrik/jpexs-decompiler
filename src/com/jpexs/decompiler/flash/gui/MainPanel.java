@@ -1263,7 +1263,13 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     boolean parallel = Configuration.parallelSpeedUp.get();
                     String scriptsFolder = Path.combine(selFile2, ScriptExportSettings.EXPORT_FOLDER_NAME);
                     Path.createDirectorySafe(new File(scriptsFolder));
-                    ScriptExportSettings scriptExportSettings = new ScriptExportSettings(export.getValue(ScriptExportMode.class), !parallel && Configuration.scriptExportSingleFile.get());
+                    boolean singleScriptFile = Configuration.scriptExportSingleFile.get();
+                    if (parallel && singleScriptFile) {
+                        logger.log(Level.WARNING, AppStrings.translate("export.script.singleFilePallelModeWarning"));
+                        singleScriptFile = false;
+                    }
+
+                    ScriptExportSettings scriptExportSettings = new ScriptExportSettings(export.getValue(ScriptExportMode.class), singleScriptFile);
                     String singleFileName = Path.combine(scriptsFolder, swf.getShortFileName() + scriptExportSettings.getFileExtension());
                     try (FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
                         scriptExportSettings.singleFileWriter = writer;
@@ -1365,7 +1371,13 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             boolean parallel = Configuration.parallelSpeedUp.get();
             String scriptsFolder = Path.combine(selFile, ScriptExportSettings.EXPORT_FOLDER_NAME);
             Path.createDirectorySafe(new File(scriptsFolder));
-            ScriptExportSettings scriptExportSettings = new ScriptExportSettings(export.getValue(ScriptExportMode.class), !parallel && Configuration.scriptExportSingleFile.get());
+            boolean singleScriptFile = Configuration.scriptExportSingleFile.get();
+            if (parallel && singleScriptFile) {
+                logger.log(Level.WARNING, AppStrings.translate("export.script.singleFilePallelModeWarning"));
+                singleScriptFile = false;
+            }
+
+            ScriptExportSettings scriptExportSettings = new ScriptExportSettings(export.getValue(ScriptExportMode.class), singleScriptFile);
             String singleFileName = Path.combine(scriptsFolder, swf.getShortFileName() + scriptExportSettings.getFileExtension());
             try (FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
                 scriptExportSettings.singleFileWriter = writer;
@@ -1477,7 +1489,13 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             for (ScriptExportMode exportMode : ScriptExportMode.values()) {
                 String scriptsFolder = Path.combine(selFile, ScriptExportSettings.EXPORT_FOLDER_NAME, exportMode.name());
                 Path.createDirectorySafe(new File(scriptsFolder));
-                ScriptExportSettings scriptExportSettings = new ScriptExportSettings(exportMode, !parallel && Configuration.scriptExportSingleFile.get());
+                boolean singleScriptFile = Configuration.scriptExportSingleFile.get();
+                if (parallel && singleScriptFile) {
+                    logger.log(Level.WARNING, AppStrings.translate("export.script.singleFilePallelModeWarning"));
+                    singleScriptFile = false;
+                }
+
+                ScriptExportSettings scriptExportSettings = new ScriptExportSettings(exportMode, singleScriptFile);
                 String singleFileName = Path.combine(scriptsFolder, swf.getShortFileName() + scriptExportSettings.getFileExtension());
                 try (FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
                     scriptExportSettings.singleFileWriter = writer;

@@ -275,7 +275,9 @@ public class ScriptPack extends AS3ClassTreeItem {
             }
         }
 
-        Path.createDirectorySafe(file.getParentFile());
+        if (file != null) {
+            Path.createDirectorySafe(file.getParentFile());
+        }
 
         try (FileTextWriter writer = exportSettings.singleFile ? null : new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(file))) {
             FileTextWriter writer2 = exportSettings.singleFile ? exportSettings.singleFileWriter : writer;
