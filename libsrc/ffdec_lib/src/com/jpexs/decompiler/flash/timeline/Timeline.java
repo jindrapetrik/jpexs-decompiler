@@ -688,7 +688,7 @@ public class Timeline {
                 }
             }
 
-            img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB);
+            img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB_PRE);
             img.fillTransparent();
 
             drawable.toImage(dframe, time, ratio, renderContext, img, isClip || clipDepth > -1, m, strokeTransform, absMat, clrTrans);

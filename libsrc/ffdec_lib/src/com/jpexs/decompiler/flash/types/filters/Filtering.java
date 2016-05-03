@@ -516,7 +516,7 @@ public class Filtering {
 
     private static int[] getRGB(BufferedImage image) {
         int type = image.getType();
-        if (type == BufferedImage.TYPE_INT_ARGB || type == BufferedImage.TYPE_INT_RGB) {
+        if (type == BufferedImage.TYPE_INT_ARGB_PRE || type == BufferedImage.TYPE_INT_RGB) {
             return ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
         }
         int width = image.getWidth();
@@ -525,7 +525,7 @@ public class Filtering {
 
     public static void setRGB(BufferedImage image, int width, int height, int[] pixels) {
         int type = image.getType();
-        if (type == BufferedImage.TYPE_INT_ARGB || type == BufferedImage.TYPE_INT_RGB) {
+        if (type == BufferedImage.TYPE_INT_ARGB_PRE || type == BufferedImage.TYPE_INT_RGB) {
             image.getRaster().setDataElements(0, 0, width, height, pixels);
         } else {
             image.setRGB(0, 0, width, height, pixels, 0, width);
@@ -533,9 +533,9 @@ public class Filtering {
     }
 
     private static int[] moveRGB(int width, int height, int[] rgb, double deltaX, double deltaY, Color fill) {
-        BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB_PRE);
         setRGB(img, width, height, rgb);
-        BufferedImage retImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage retImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB_PRE);
         Graphics2D g = (Graphics2D) retImg.getGraphics();
         g.setPaint(fill);
         g.fillRect(0, 0, width, height);

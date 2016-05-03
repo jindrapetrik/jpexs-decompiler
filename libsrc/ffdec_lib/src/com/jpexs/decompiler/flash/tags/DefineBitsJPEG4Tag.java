@@ -116,7 +116,7 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
     }
 
     private byte[] createEmptyImage() {
-        BufferedImage img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB_PRE);
         ByteArrayOutputStream bitmapDataOS = new ByteArrayOutputStream();
         ImageHelper.write(img, ImageFormat.JPEG, bitmapDataOS);
         return bitmapDataOS.toByteArray();
@@ -185,7 +185,7 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
     }
 
     @Override
-    public SerializableImage getImage(boolean preMultiplyApha) {
+    public SerializableImage getImage() {
         try {
             BufferedImage image = ImageHelper.read(new ByteArrayInputStream(imageData.getArray(), imageData.getPos(), imageData.getLength()));
             if (image == null) {
@@ -193,7 +193,7 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
                 return null;
             }
 
-            image = ensurePreMultipled(image, preMultiplyApha);
+            //image = ensurePreMultipled(image, preMultiplyApha);
             SerializableImage img = new SerializableImage(image);
             if (bitmapAlphaData.getLength() == 0) {
                 return img;
@@ -204,17 +204,17 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
                 return img;
             }
 
+            int width = img.getWidth();
+            int height = img.getHeight();
+            SerializableImage img2 = new SerializableImage(width, height, SerializableImage.TYPE_INT_ARGB_PRE);
             int[] pixels = ((DataBufferInt) img.getRaster().getDataBuffer()).getData();
+            int[] pixels2 = ((DataBufferInt) img2.getRaster().getDataBuffer()).getData();
             for (int i = 0; i < pixels.length; i++) {
                 int a = alphaData[i] & 0xff;
-                if (preMultiplyApha) {
-                    pixels[i] = multiplyAlpha((pixels[i] & 0xffffff) | (a << 24));
-                } else {
-                    pixels[i] = (pixels[i] & 0xffffff) | (a << 24);
-                }
+                pixels2[i] = (pixels[i] & 0xffffff) | (a << 24);
             }
 
-            return img;
+            return img2;
         } catch (IOException ex) {
             Logger.getLogger(DefineBitsJPEG4Tag.class.getName()).log(Level.SEVERE, "Failed to get image", ex);
         }

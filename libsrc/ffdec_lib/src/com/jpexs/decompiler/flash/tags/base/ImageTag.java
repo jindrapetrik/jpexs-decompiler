@@ -34,7 +34,6 @@ import com.jpexs.decompiler.flash.types.LINESTYLE;
 import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
-import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
@@ -70,7 +69,7 @@ public abstract class ImageTag extends DrawableTag {
 
     public abstract InputStream getOriginalImageData();
 
-    public abstract SerializableImage getImage(boolean preMultiplyApha);
+    public abstract SerializableImage getImage();
 
     public abstract Dimension getImageDimension();
 
@@ -108,12 +107,12 @@ public abstract class ImageTag extends DrawableTag {
         return ImageFormat.UNKNOWN;
     }
 
-    public SerializableImage getImage() {
+    public SerializableImage getImageCached() {
         if (cachedImage != null) {
             return cachedImage;
         }
 
-        SerializableImage image = getImage(true);
+        SerializableImage image = getImage();
         if (Configuration.cacheImages.get()) {
             cachedImage = image;
         }
@@ -128,7 +127,7 @@ public abstract class ImageTag extends DrawableTag {
         }
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageHelper.write(getImage(false).getBufferedImage(), getImageFormat(), baos);
+        ImageHelper.write(getImage().getBufferedImage(), getImageFormat(), baos);
         return new ByteArrayInputStream(baos.toByteArray());
     }
 
@@ -144,43 +143,6 @@ public abstract class ImageTag extends DrawableTag {
             }
         }
         return false;
-    }
-
-    protected static int max255(float val) {
-        if (val > 255) {
-            return 255;
-        }
-        return (int) val;
-    }
-
-    protected static int multiplyAlpha(int value) {
-        int a = (value >> 24) & 0xFF;
-        int r = (value >> 16) & 0xFF;
-        int g = (value >> 8) & 0xFF;
-        int b = value & 0xFF;
-        float multiplier = a == 0 ? 0 : 255.0f / a;
-        r = max255(r * multiplier);
-        g = max255(g * multiplier);
-        b = max255(b * multiplier);
-        return RGBA.toInt(r, g, b, a);
-    }
-
-    public static void divideAlpha(int[] pixels) {
-        for (int i = 0; i < pixels.length; i++) {
-            pixels[i] = divideAlpha(pixels[i]) & 0xffffff;
-        }
-    }
-
-    protected static int divideAlpha(int value) {
-        int a = (value >> 24) & 0xFF;
-        int r = (value >> 16) & 0xFF;
-        int g = (value >> 8) & 0xFF;
-        int b = value & 0xFF;
-        float multiplier = a / 255.0f;
-        r = max255(r * multiplier);
-        g = max255(g * multiplier);
-        b = max255(b * multiplier);
-        return RGBA.toInt(r, g, b, a);
     }
 
     protected BufferedImage ensurePreMultipled(BufferedImage image, boolean preMultiplyApha) {

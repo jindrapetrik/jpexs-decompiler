@@ -222,7 +222,7 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
         finalizePath();
         ImageTag image = swf.getImage(bitmapId);
         if (image != null) {
-            SerializableImage img = image.getImage();
+            SerializableImage img = image.getImageCached();
             if (img != null) {
                 fillWidth = img.getWidth();
                 fillHeight = img.getHeight();

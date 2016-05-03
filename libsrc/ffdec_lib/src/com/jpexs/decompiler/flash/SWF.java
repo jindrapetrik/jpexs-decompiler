@@ -2699,12 +2699,12 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     public static SerializableImage frameToImageGet(Timeline timeline, int frame, int time, Point cursorPosition, int mouseButton, RECT displayRect, Matrix transformation, ColorTransform colorTransform, Color backGroundColor, double zoom) {
         if (timeline.getFrameCount() == 0) {
-            return new SerializableImage(1, 1, SerializableImage.TYPE_INT_ARGB);
+            return new SerializableImage(1, 1, SerializableImage.TYPE_INT_ARGB_PRE);
         }
 
         RECT rect = displayRect;
         SerializableImage image = new SerializableImage((int) (rect.getWidth() * zoom / SWF.unitDivisor) + 1,
-                (int) (rect.getHeight() * zoom / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
+                (int) (rect.getHeight() * zoom / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB_PRE);
         if (backGroundColor == null) {
             image.fillTransparent();
         } else {

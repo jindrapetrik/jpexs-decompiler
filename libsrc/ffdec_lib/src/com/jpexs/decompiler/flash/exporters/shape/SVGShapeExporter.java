@@ -102,7 +102,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
         finalizePath();
         ImageTag image = swf.getImage(bitmapId);
         if (image != null) {
-            SerializableImage img = image.getImage();
+            SerializableImage img = image.getImageCached();
             if (img != null) {
                 if (colorTransform != null) {
                     colorTransform.apply(img);

@@ -310,7 +310,7 @@ public class BitmapExporter extends ShapeExporterBase {
         finalizePath();
         ImageTag imageTag = swf.getImage(bitmapId);
         if (imageTag != null) {
-            SerializableImage img = imageTag.getImage();
+            SerializableImage img = imageTag.getImageCached();
             if (img != null) {
                 if (colorTransform != null) {
                     img = colorTransform.apply(img);

@@ -117,7 +117,7 @@ public class ShapeExporter {
                             RECT rect = st.getRect();
                             int newWidth = (int) (rect.getWidth() * settings.zoom / SWF.unitDivisor) + 1;
                             int newHeight = (int) (rect.getHeight() * settings.zoom / SWF.unitDivisor) + 1;
-                            SerializableImage img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB);
+                            SerializableImage img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB_PRE);
                             img.fillTransparent();
                             Matrix m = Matrix.getTranslateInstance(-rect.Xmin, -rect.Ymin);
                             m.scale(settings.zoom);

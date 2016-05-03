@@ -96,9 +96,9 @@ public class ImageExporter {
                                 fos.write(Helper.readStream(imageTag.getImageData()));
                             }
                         } else if (ffileFormat == ImageFormat.BMP) {
-                            BMPFile.saveBitmap(imageTag.getImage().getBufferedImage(), file);
+                            BMPFile.saveBitmap(imageTag.getImageCached().getBufferedImage(), file);
                         } else {
-                            ImageHelper.write(imageTag.getImage().getBufferedImage(), ffileFormat, file);
+                            ImageHelper.write(imageTag.getImageCached().getBufferedImage(), ffileFormat, file);
                         }
                     }, handler).run();
                     ret.add(file);

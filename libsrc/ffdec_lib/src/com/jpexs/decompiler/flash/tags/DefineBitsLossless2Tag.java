@@ -233,7 +233,7 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
     }
 
     @Override
-    public SerializableImage getImage(boolean preMultiplyApha) {
+    public SerializableImage getImage() {
         SerializableImage bi = new SerializableImage(bitmapWidth, bitmapHeight, SerializableImage.TYPE_INT_ARGB_PRE);
         int[] pixels = ((DataBufferInt) bi.getRaster().getDataBuffer()).getData();
 
@@ -269,7 +269,7 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
             }
         }
 
-        bi.getRaster().setDataElements(0, 0, bitmapWidth, bitmapHeight, pixels);
+        //bi.getRaster().setDataElements(0, 0, bitmapWidth, bitmapHeight, pixels);
         return bi;
     }
 

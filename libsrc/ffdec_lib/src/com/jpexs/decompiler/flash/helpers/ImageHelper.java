@@ -16,11 +16,12 @@
  */
 package com.jpexs.decompiler.flash.helpers;
 
-import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
+import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.helpers.Helper;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -67,12 +68,12 @@ public class ImageHelper {
         }
 
         int type = in.getType();
-        if (type != BufferedImage.TYPE_INT_ARGB && type != BufferedImage.TYPE_INT_RGB) {
+        if (type != BufferedImage.TYPE_INT_ARGB_PRE && type != BufferedImage.TYPE_INT_RGB) {
             // convert to ARGB
             int width = in.getWidth();
             int height = in.getHeight();
             int[] imgData = in.getRGB(0, 0, width, height, null, 0, width);
-            BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+            BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB_PRE);
             newImage.getRaster().setDataElements(0, 0, width, height, imgData);
             return newImage;
         }
@@ -102,6 +103,19 @@ public class ImageHelper {
         String formatName = getImageFormatString(format).toUpperCase(Locale.ENGLISH);
         if (format == ImageFormat.JPEG) {
             image = fixImageIOJpegBug(image);
+        } else {
+            if (image.getType() == BufferedImage.TYPE_INT_ARGB_PRE) {
+                BufferedImage image2 = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+                int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+                divideAlpha(pixels);
+
+                int[] pixels2 = ((DataBufferInt) image2.getRaster().getDataBuffer()).getData();
+                for (int i = 0; i < pixels.length; i++) {
+                    pixels2[i] = pixels[i];
+                }
+
+                image = image2;
+            }
         }
 
         try {
@@ -111,16 +125,44 @@ public class ImageHelper {
         }
     }
 
+    private static int max255(float val) {
+        if (val > 255) {
+            return 255;
+        }
+        return (int) val;
+    }
+
+    private static void divideAlpha(int[] pixels) {
+        for (int i = 0; i < pixels.length; i++) {
+            pixels[i] = divideAlpha(pixels[i]);
+        }
+    }
+
+    private static int divideAlpha(int value) {
+        int a = (value >> 24) & 0xFF;
+        int r = (value >> 16) & 0xFF;
+        int g = (value >> 8) & 0xFF;
+        int b = value & 0xFF;
+        float multiplier = a == 0 ? 0 : 255.0f / a;
+        r = max255(r * multiplier);
+        g = max255(g * multiplier);
+        b = max255(b * multiplier);
+        return RGBA.toInt(r, g, b, a);
+    }
+
     private static BufferedImage fixImageIOJpegBug(BufferedImage image) {
         int type = image.getType();
         if (type != BufferedImage.TYPE_INT_RGB) {
             // convert to RGB without alpha channel
             int width = image.getWidth();
             int height = image.getHeight();
-            int[] imgData = image.getRGB(0, 0, width, height, null, 0, width);
-            ImageTag.divideAlpha(imgData);
             BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-            newImage.getRaster().setDataElements(0, 0, width, height, imgData);
+            int[] pixels2 = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+            int[] pixels = image.getRGB(0, 0, width, height, null, 0, width);
+            for (int i = 0; i < pixels.length; i++) {
+                pixels2[i] = pixels[i] & 0xffffff;
+            }
+
             return newImage;
         }
 

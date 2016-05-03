@@ -100,7 +100,7 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
     }
 
     private byte[] createEmptyImage() {
-        BufferedImage img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB_PRE);
         ByteArrayOutputStream bitmapDataOS = new ByteArrayOutputStream();
         ImageHelper.write(img, ImageFormat.JPEG, bitmapDataOS);
         return bitmapDataOS.toByteArray();
@@ -130,7 +130,7 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
     }
 
     @Override
-    public SerializableImage getImage(boolean preMultiplyApha) {
+    public SerializableImage getImage() {
         try {
             BufferedImage image = ImageHelper.read(getOriginalImageData());
             if (image == null) {

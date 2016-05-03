@@ -1168,7 +1168,7 @@ public class Helper {
 
         int[] imgData;
         int type = image.getType();
-        if (type == BufferedImage.TYPE_INT_ARGB || type == BufferedImage.TYPE_INT_RGB) {
+        if (type == BufferedImage.TYPE_INT_ARGB_PRE || type == BufferedImage.TYPE_INT_RGB) {
             imgData = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
         } else {
             imgData = image.getRGB(0, 0, width, height, null, 0, width);
@@ -1225,7 +1225,7 @@ public class Helper {
 
         int[] imgData;
         int type = image.getType();
-        if (type == BufferedImage.TYPE_INT_ARGB || type == BufferedImage.TYPE_INT_RGB) {
+        if (type == BufferedImage.TYPE_INT_ARGB_PRE || type == BufferedImage.TYPE_INT_RGB) {
             imgData = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
         } else {
             imgData = image.getRGB(0, 0, width, height, null, 0, width);
