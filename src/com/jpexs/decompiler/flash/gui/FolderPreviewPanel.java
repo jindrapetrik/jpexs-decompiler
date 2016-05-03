@@ -320,7 +320,7 @@ public class FolderPreviewPanel extends JPanel {
             width = imgSrc.getWidth();
             height = imgSrc.getHeight();
         } else if (treeItem instanceof ImageTag) {
-            imgSrc = ((ImageTag) treeItem).getImage();
+            imgSrc = ((ImageTag) treeItem).getImageCached();
             width = imgSrc.getWidth();
             height = imgSrc.getHeight();
         } else if (treeItem instanceof BoundedTag) {
