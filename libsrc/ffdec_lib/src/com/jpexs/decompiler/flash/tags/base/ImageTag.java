@@ -43,8 +43,6 @@ import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Dimension;
 import java.awt.Shape;
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferInt;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -69,7 +67,7 @@ public abstract class ImageTag extends DrawableTag {
 
     public abstract InputStream getOriginalImageData();
 
-    public abstract SerializableImage getImage();
+    protected abstract SerializableImage getImage();
 
     public abstract Dimension getImageDimension();
 

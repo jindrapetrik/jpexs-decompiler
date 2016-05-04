@@ -137,7 +137,7 @@ public class DefineBitsTag extends ImageTag implements TagChangedListener {
     }
 
     @Override
-    public SerializableImage getImage() {
+    protected SerializableImage getImage() {
         InputStream imageStream = getOriginalImageData();
         if (imageStream != null) {
             try {

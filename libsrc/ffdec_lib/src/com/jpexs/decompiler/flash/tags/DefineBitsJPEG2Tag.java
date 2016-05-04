@@ -130,7 +130,7 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
     }
 
     @Override
-    public SerializableImage getImage() {
+    protected SerializableImage getImage() {
         try {
             BufferedImage image = ImageHelper.read(getOriginalImageData());
             if (image == null) {

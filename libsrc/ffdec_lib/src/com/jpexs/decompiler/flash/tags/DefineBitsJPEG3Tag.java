@@ -181,7 +181,7 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
     }
 
     @Override
-    public SerializableImage getImage() {
+    protected SerializableImage getImage() {
         try {
             int errorLength = hasErrorHeader(imageData) ? 4 : 0;
             ByteArrayInputStream bis = new ByteArrayInputStream(imageData.getArray(), imageData.getPos() + errorLength, imageData.getLength() - errorLength);
@@ -192,7 +192,6 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
                 return null;
             }
 
-            //image = ensurePreMultipled(image, preMultiplyApha);
             SerializableImage img = new SerializableImage(image);
             if (bitmapAlphaData.getLength() == 0) {
                 return img;

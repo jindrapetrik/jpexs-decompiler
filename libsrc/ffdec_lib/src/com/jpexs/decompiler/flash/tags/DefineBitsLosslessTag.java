@@ -228,7 +228,7 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
     }
 
     @Override
-    public SerializableImage getImage() {
+    protected SerializableImage getImage() {
         int[] pixels = new int[bitmapWidth * bitmapHeight];
         if (bitmapFormat == DefineBitsLosslessTag.FORMAT_8BIT_COLORMAPPED) {
             COLORMAPDATA colorMapData = getColorMapData();
