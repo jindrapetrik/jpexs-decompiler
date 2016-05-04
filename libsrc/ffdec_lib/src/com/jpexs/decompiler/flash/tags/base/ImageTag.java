@@ -143,21 +143,6 @@ public abstract class ImageTag extends DrawableTag {
         return false;
     }
 
-    protected BufferedImage ensurePreMultipled(BufferedImage image, boolean preMultiplyApha) {
-        if (image.getColorModel().isAlphaPremultiplied() == preMultiplyApha) {
-            return image;
-        }
-
-        BufferedImage imgRes = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
-        int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
-        int[] pixelsNew = ((DataBufferInt) imgRes.getRaster().getDataBuffer()).getData();
-        for (int i = 0; i < pixels.length; i++) {
-            pixelsNew[i] = pixels[i];
-        }
-
-        return imgRes;
-    }
-
     private SHAPEWITHSTYLE getShape() {
         RECT rect = getRect();
         return getShape(rect, false);
