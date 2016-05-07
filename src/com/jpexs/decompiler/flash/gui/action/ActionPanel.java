@@ -251,10 +251,9 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         return null;
     }
 
-    public List<ActionSearchResult> search(final String txt, boolean ignoreCase, boolean regexp, CancellableWorker<Void> worker) {
+    public List<ActionSearchResult> search(SWF swf, final String txt, boolean ignoreCase, boolean regexp, CancellableWorker<Void> worker) {
         if (txt != null && !txt.isEmpty()) {
             searchPanel.setOptions(ignoreCase, regexp);
-            SWF swf = mainPanel.getCurrentSwf();
             Map<String, ASMSource> asms = swf.getASMs(false);
             final List<ActionSearchResult> found = new ArrayList<>();
             Pattern pat;

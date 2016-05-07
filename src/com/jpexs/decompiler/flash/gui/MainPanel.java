@@ -1709,7 +1709,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                             if (swf.isAS3()) {
                                 abcResult = getABCPanel().search(swf, txt, ignoreCase, regexp, this);
                             } else {
-                                actionResult = getActionPanel().search(txt, ignoreCase, regexp, this);
+                                actionResult = getActionPanel().search(swf, txt, ignoreCase, regexp, this);
                             }
 
                             List<ABCPanelSearchResult> fAbcResult = abcResult;
