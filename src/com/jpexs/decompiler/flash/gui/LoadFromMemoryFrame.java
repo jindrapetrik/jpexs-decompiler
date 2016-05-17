@@ -142,9 +142,11 @@ public class LoadFromMemoryFrame extends AppFrame {
     private void refreshList() {
         model.clear();
         processList = ProcessTools.listProcesses();
-        Collections.sort(processList);
-        for (com.jpexs.process.Process p : processList) {
-            model.addElement(p);
+        if (processList != null) {
+            Collections.sort(processList);
+            for (com.jpexs.process.Process p : processList) {
+                model.addElement(p);
+            }
         }
     }
 
