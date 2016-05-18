@@ -1922,75 +1922,83 @@ public class CommandLineArgumentParser {
             badArguments("memorysearch");
         }
 
-        AtomicInteger cnt = new AtomicInteger();
-        List<com.jpexs.process.Process> procs = new ArrayList<>();
-        List<Process> processList = ProcessTools.listProcesses();
-        while (args.size() > 0) {
-            String arg = args.pop();
-            if (arg.matches("\\d+")) {
-                int processId = 0;
-                try {
-                    processId = Integer.parseInt(arg);
-                } catch (NumberFormatException nfe) {
-                    System.err.println("ProcessId should be integer");
-                    badArguments("memorysearch");
-                }
-
-                boolean found = false;
-                for (Process process : processList) {
-                    if (process.getPid() == processId) {
-                        if (!procs.contains(process)) {
-                            procs.add(process);
-                        }
-
-                        found = true;
-                        break; // only 1 process can have this process id
+        if (Platform.isWindows()) {
+            AtomicInteger cnt = new AtomicInteger();
+            List<com.jpexs.process.Process> procs = new ArrayList<>();
+            List<Process> processList = ProcessTools.listProcesses();
+            while (args.size() > 0) {
+                String arg = args.pop();
+                if (arg.matches("\\d+")) {
+                    int processId = 0;
+                    try {
+                        processId = Integer.parseInt(arg);
+                    } catch (NumberFormatException nfe) {
+                        System.err.println("ProcessId should be integer");
+                        badArguments("memorysearch");
                     }
-                }
 
-                if (!found) {
-                    System.out.println("Process id=" + processId + " was not found.");
-                }
-            } else {
-                boolean found = false;
-                for (Process process : processList) {
-                    if (process.getFileName().equals(arg)) {
-                        if (!procs.contains(process)) {
-                            procs.add(process);
+                    boolean found = false;
+                    if (processList != null) {
+                        for (Process process : processList) {
+                            if (process.getPid() == processId) {
+                                if (!procs.contains(process)) {
+                                    procs.add(process);
+                                }
+
+                                found = true;
+                                break; // only 1 process can have this process id
+                            }
                         }
-
-                        found = true;
                     }
-                }
 
-                if (!found) {
-                    System.out.println("Process name=" + arg + " was not found.");
+                    if (!found) {
+                        System.out.println("Process id=" + processId + " was not found.");
+                    }
+                } else {
+                    boolean found = false;
+                    if (processList != null) {
+                        for (Process process : processList) {
+                            if (process.getFileName().equals(arg)) {
+                                if (!procs.contains(process)) {
+                                    procs.add(process);
+                                }
+
+                                found = true;
+                            }
+                        }
+                    }
+
+                    if (!found) {
+                        System.out.println("Process name=" + arg + " was not found.");
+                    }
                 }
             }
-        }
 
-        try {
-            new SearchInMemory(new SearchInMemoryListener() {
+            try {
+                new SearchInMemory(new SearchInMemoryListener() {
 
-                @Override
-                public void publish(Object... chunks) {
-                    for (Object s : chunks) {
-                        if (s instanceof SwfInMemory) {
-                            SwfInMemory swf = (SwfInMemory) s;
-                            String fileName = cnt.getAndIncrement() + ".swf";
-                            System.out.println("SWF found (" + fileName + "). Version: " + swf.version + ", file size: " + swf.fileSize + ", address: " + swf.address);
-                            Helper.writeFile(fileName, swf.is);
+                    @Override
+                    public void publish(Object... chunks) {
+                        for (Object s : chunks) {
+                            if (s instanceof SwfInMemory) {
+                                SwfInMemory swf = (SwfInMemory) s;
+                                String fileName = cnt.getAndIncrement() + ".swf";
+                                System.out.println("SWF found (" + fileName + "). Version: " + swf.version + ", file size: " + swf.fileSize + ", address: " + swf.address);
+                                Helper.writeFile(fileName, swf.is);
+                            }
                         }
                     }
-                }
 
-                @Override
-                public void setProgress(int progress) {
-                    // ignore
-                }
-            }).search(procs);
-        } catch (Exception ex) {
-            logger.log(Level.SEVERE, null, ex);
+                    @Override
+                    public void setProgress(int progress) {
+                        // ignore
+                    }
+                }).search(procs);
+            } catch (Exception ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+        } else {
+            System.err.println("Memory search is only available on Windows platform.");
         }
 
         System.exit(0);
