@@ -16,11 +16,11 @@
  */
 package com.jpexs.decompiler.flash.action.special;
 
-import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.helpers.Helper;
 import java.util.HashMap;
 import java.util.List;
 
@@ -28,19 +28,16 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class ActionNop extends Action {
+public class ActionUnknown extends ActionNop {
 
-    public ActionNop() {
-        super(-1, 0);
-    }
-
-    protected ActionNop(int actionCode) {
-        super(actionCode, 0);
+    public ActionUnknown(int actionCode, int actionLength) {
+        super(actionCode);
+        this.actionLength = actionLength;
     }
 
     @Override
     public String toString() {
-        return "Nop";
+        return "Unknown_" + Helper.byteToHex((byte) getActionCode());
     }
 
     @Override
@@ -50,6 +47,5 @@ public class ActionNop extends Action {
 
     @Override
     public void translate(GraphSourceItem lineStartItem, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
-        //output.add(new SimpleActionTreeItem(this, "nop();"));
     }
 }

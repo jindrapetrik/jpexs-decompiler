@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.action.special.ActionDeobfuscateJump;
 import com.jpexs.decompiler.flash.action.special.ActionEnd;
 import com.jpexs.decompiler.flash.action.special.ActionNop;
 import com.jpexs.decompiler.flash.action.special.ActionStore;
+import com.jpexs.decompiler.flash.action.special.ActionUnknown;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.action.swf4.ActionJump;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
@@ -700,7 +701,7 @@ public class ActionListReader {
                 int actionLengthWithHeader = a.getTotalActionLength();
 
                 // unknown action, replace with jump
-                if (a instanceof ActionNop) {
+                if (a instanceof ActionUnknown && a.getActionCode() >= 0x80) {
                     ActionJump aJump = new ActionDeobfuscateJump(0);
                     int jumpLength = aJump.getTotalActionLength();
                     aJump.setAddress(a.getAddress());

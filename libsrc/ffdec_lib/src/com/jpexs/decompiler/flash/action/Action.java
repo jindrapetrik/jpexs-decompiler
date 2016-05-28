@@ -117,12 +117,12 @@ public abstract class Action implements GraphSourceItem {
     /**
      * Action type identifier
      */
-    public int actionCode;
+    private int actionCode;
 
     /**
      * Length of action data
      */
-    public int actionLength;
+    protected int actionLength;
 
     private long address;
 
@@ -185,6 +185,15 @@ public abstract class Action implements GraphSourceItem {
     @Override
     public long getAddress() {
         return address;
+    }
+
+    /**
+     * Return code of this action
+     *
+     * @return code of this action
+     */
+    public int getActionCode() {
+        return actionCode;
     }
 
     /**
@@ -1068,7 +1077,7 @@ public abstract class Action implements GraphSourceItem {
             }
 
             /*ActionJump && ActionIf removed*/
- /*if ((action instanceof ActionEnumerate2) || (action instanceof ActionEnumerate)) {
+            /*if ((action instanceof ActionEnumerate2) || (action instanceof ActionEnumerate)) {
              loopStart = ip + 1;
              isForIn = true;
              ip += 4;

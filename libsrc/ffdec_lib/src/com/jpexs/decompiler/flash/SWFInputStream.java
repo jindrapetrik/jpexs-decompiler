@@ -18,7 +18,7 @@ package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.special.ActionEnd;
-import com.jpexs.decompiler.flash.action.special.ActionNop;
+import com.jpexs.decompiler.flash.action.special.ActionUnknown;
 import com.jpexs.decompiler.flash.action.swf3.ActionGetURL;
 import com.jpexs.decompiler.flash.action.swf3.ActionGoToLabel;
 import com.jpexs.decompiler.flash.action.swf3.ActionGotoFrame;
@@ -1896,9 +1896,7 @@ public class SWFInputStream implements AutoCloseable {
                      //skip(actionLength);
                      }*/
                     //throw new UnknownActionException(actionCode);
-                    Action r = new ActionNop();
-                    r.actionCode = actionCode;
-                    r.actionLength = actionLength;
+                    Action r = new ActionUnknown(actionCode, actionLength);
                     if (Configuration.useDetailedLogging.get()) {
                         logger.log(Level.SEVERE, "Unknown action code: {0}", actionCode);
                     }
