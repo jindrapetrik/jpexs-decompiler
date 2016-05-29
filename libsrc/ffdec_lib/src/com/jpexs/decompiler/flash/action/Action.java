@@ -544,9 +544,20 @@ public abstract class Action implements GraphSourceItem {
                     long fileOffset = a.getFileOffset();
                     if (fileData != null && fileOffset != -1 && fileData.length > fileOffset + bytes.length - 1) {
                         writer.appendNoHilight(" (");
+                        boolean same = true;
                         for (int i = 0; i < bytes.length; i++) {
-                            writer.appendNoHilight(Helper.byteToHex(fileData[(int) (fileOffset + i)]));
-                            writer.appendNoHilight(" ");
+                            byte b = fileData[(int) (fileOffset + i)];
+                            if (b != bytes[i]) {
+                                same = false;
+                                break;
+                            }
+                        }
+
+                        if (!same) {
+                            for (int i = 0; i < bytes.length; i++) {
+                                writer.appendNoHilight(Helper.byteToHex(fileData[(int) (fileOffset + i)]));
+                                writer.appendNoHilight(" ");
+                            }
                         }
 
                         writer.appendNoHilight("@");
