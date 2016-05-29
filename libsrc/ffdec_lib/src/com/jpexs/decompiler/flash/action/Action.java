@@ -540,17 +540,19 @@ public abstract class Action implements GraphSourceItem {
                 writer.appendNoHilight("; ");
                 byte[] bytes = a.getBytes(version);
                 writer.appendNoHilight(Helper.bytesToHexString(bytes));
-                long fileOffset = a.getFileOffset();
-                if (fileData != null && fileOffset != -1 && fileData.length > fileOffset + bytes.length - 1) {
-                    writer.appendNoHilight(" (");
-                    for (int i = 0; i < bytes.length; i++) {
-                        writer.appendNoHilight(Helper.byteToHex(fileData[(int) (fileOffset + i)]));
-                        writer.appendNoHilight(" ");
-                    }
+                if (Configuration.showOriginalBytesInPcodeHex.get()) {
+                    long fileOffset = a.getFileOffset();
+                    if (fileData != null && fileOffset != -1 && fileData.length > fileOffset + bytes.length - 1) {
+                        writer.appendNoHilight(" (");
+                        for (int i = 0; i < bytes.length; i++) {
+                            writer.appendNoHilight(Helper.byteToHex(fileData[(int) (fileOffset + i)]));
+                            writer.appendNoHilight(" ");
+                        }
 
-                    writer.appendNoHilight("@");
-                    writer.appendNoHilight(Helper.formatHex(a.getFileOffset(), 8));
-                    writer.appendNoHilight(")");
+                        writer.appendNoHilight("@");
+                        writer.appendNoHilight(Helper.formatHex(fileOffset, 8));
+                        writer.appendNoHilight(")");
+                    }
                 }
 
                 writer.newLine();

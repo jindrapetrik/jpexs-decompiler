@@ -131,6 +131,8 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
 
     public JToggleButton resolveConstantsButton;
 
+    public JToggleButton showOriginalBytesInPcodeHexButton;
+
     public JLabel asmLabel = new HeaderLabel(AppStrings.translate("panel.disassembled"));
 
     public JLabel decLabel = new HeaderLabel(AppStrings.translate("panel.decompiled"));
@@ -637,6 +639,12 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         resolveConstantsButton.setMargin(new Insets(3, 3, 3, 3));
         resolveConstantsButton.setSelected(Configuration.resolveConstants.get());
 
+        showOriginalBytesInPcodeHexButton = new JToggleButton(View.getIcon("originalbytes16"));
+        showOriginalBytesInPcodeHexButton.addActionListener(this::showOriginalBytesInPcodeHexButtonActionPerformed);
+        showOriginalBytesInPcodeHexButton.setToolTipText(AppStrings.translate("button.showOriginalBytesInPcodeHex"));
+        showOriginalBytesInPcodeHexButton.setMargin(new Insets(3, 3, 3, 3));
+        showOriginalBytesInPcodeHexButton.setSelected(Configuration.showOriginalBytesInPcodeHex.get());
+
         topButtonsPan = new JPanel();
         topButtonsPan.setLayout(new BoxLayout(topButtonsPan, BoxLayout.X_AXIS));
         topButtonsPan.add(graphButton);
@@ -646,6 +654,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         topButtonsPan.add(constantsViewButton);
         topButtonsPan.add(Box.createRigidArea(new Dimension(10, 0)));
         topButtonsPan.add(resolveConstantsButton);
+        topButtonsPan.add(showOriginalBytesInPcodeHexButton);
 
         JPanel panCode = new JPanel(new BorderLayout());
         panCode.add(new JScrollPane(editor), BorderLayout.CENTER);
@@ -920,6 +929,14 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         srcWithHex = null;
         srcNoHex = null;
         // srcHexOnly = null; is not needed since it does not contains the resolved constant names
+        setHex(getExportMode(), src.getScriptName());
+    }
+
+    private void showOriginalBytesInPcodeHexButtonActionPerformed(ActionEvent evt) {
+        boolean resolve = showOriginalBytesInPcodeHexButton.isSelected();
+        Configuration.showOriginalBytesInPcodeHex.set(resolve);
+
+        srcWithHex = null;
         setHex(getExportMode(), src.getScriptName());
     }
 

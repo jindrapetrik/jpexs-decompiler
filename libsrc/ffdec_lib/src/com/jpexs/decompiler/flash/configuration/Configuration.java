@@ -175,6 +175,11 @@ public class Configuration {
     @ConfigurationCategory("script")
     public static final ConfigurationItem<Boolean> resolveConstants = null;
 
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("script")
+    @ConfigurationInternal
+    public static final ConfigurationItem<Boolean> showOriginalBytesInPcodeHex = null;
+
     /**
      * Limit of code subs (for obfuscated code)
      */
