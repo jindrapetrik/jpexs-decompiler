@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.action.fastactionlist;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.special.ActionStore;
+import com.jpexs.decompiler.flash.action.special.ActionUnknown;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.action.swf4.ActionJump;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
@@ -396,6 +397,23 @@ public class FastActionList implements Collection<ActionItem> {
                     push.values.clear();
                     push.values.add(obj);
                 }
+            }
+
+            item = item.next;
+        } while (item != firstItem);
+    }
+
+    public void removeUnknownActions() {
+        ActionItem item = firstItem;
+        if (item == null) {
+            return;
+        }
+
+        do {
+            Action action = item.action;
+            if (action instanceof ActionUnknown) {
+                item = removeItem(item);
+                continue;
             }
 
             item = item.next;

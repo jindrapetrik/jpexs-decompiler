@@ -1090,7 +1090,7 @@ public class Main {
                 final SWFList swfs1 = swfs;
                 final boolean first1 = first;
                 first = false;
-                if (firstSWF == null) {
+                if (firstSWF == null && swfs1.size() > 0) {
                     firstSWF = swfs1.get(0);
                 }
 

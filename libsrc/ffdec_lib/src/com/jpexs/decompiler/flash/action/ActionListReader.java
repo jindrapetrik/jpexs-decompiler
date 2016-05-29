@@ -22,7 +22,6 @@ import com.jpexs.decompiler.flash.action.deobfuscation.ActionDeobfuscator;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.special.ActionDeobfuscateJump;
 import com.jpexs.decompiler.flash.action.special.ActionEnd;
-import com.jpexs.decompiler.flash.action.special.ActionNop;
 import com.jpexs.decompiler.flash.action.special.ActionStore;
 import com.jpexs.decompiler.flash.action.special.ActionUnknown;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
@@ -820,17 +819,6 @@ public class ActionListReader {
                 }
 
                 int actionLengthWithHeader = a.getTotalActionLength();
-
-                // unknown action, replace with jump
-                if (a instanceof ActionNop) {
-                    ActionJump aJump = new ActionDeobfuscateJump(0);
-                    int jumpLength = aJump.getTotalActionLength();
-                    aJump.setAddress(a.getAddress());
-                    //FIXME! This offset can be larger than SI16 value!
-                    aJump.setJumpOffset(actionLengthWithHeader - jumpLength);
-                    a = aJump;
-                    actionLengthWithHeader = a.getTotalActionLength();
-                }
 
                 Action existingAction = actionMap.get(ip);
                 if (existingAction != null) {

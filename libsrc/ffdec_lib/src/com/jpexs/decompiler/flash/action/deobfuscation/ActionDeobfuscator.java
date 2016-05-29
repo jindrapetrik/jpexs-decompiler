@@ -101,6 +101,7 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
     @Override
     public void actionListParsed(ActionList actions, SWF swf) throws InterruptedException {
         FastActionList fastActions = new FastActionList(actions);
+        fastActions.removeUnknownActions();
         fastActions.expandPushes();
         Map<String, Object> fakeFunctions = getFakeFunctionResults(fastActions);
         boolean changed = true;
@@ -466,9 +467,9 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
             Action action = item.action;
 
             /*System.out.print(action.getASMSource(actions, new ArrayList<Long>(), ScriptExportMode.PCODE));
-            for (int j = 0; j < stack.size(); j++) {
+             for (int j = 0; j < stack.size(); j++) {
              System.out.print(" '" + stack.get(j).getResult() + "'");
-            }
+             }
              System.out.println();*/
             if (action instanceof ActionConstantPool) {
                 lastConstantPool = (ActionConstantPool) action;
