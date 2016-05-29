@@ -397,6 +397,15 @@ public class Helper {
         return sb.toString();
     }
 
+    public static String formatHex(long value, int width) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(Long.toHexString(value));
+        if (width > sb.length()) {
+            sb.insert(0, ZEROS8, 0, width - sb.length());
+        }
+        return sb.toString();
+    }
+
     public static String formatInt(int value, int width) {
         StringBuilder sb = new StringBuilder();
         sb.append(value);

@@ -46,6 +46,8 @@ public class ActionList extends ArrayList<Action> {
 
     public int deobfuscationMode;
 
+    public byte[] fileData;
+
     public ActionList() {
     }
 

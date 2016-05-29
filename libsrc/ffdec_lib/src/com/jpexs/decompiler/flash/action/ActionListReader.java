@@ -172,6 +172,7 @@ public class ActionListReader {
         getContainerLastActions(actions, containerLastActions);
 
         ActionList ret = new ActionList();
+        ret.fileData = actions.fileData;
 
         if (nextOffsets != null) {
             int index = 0;

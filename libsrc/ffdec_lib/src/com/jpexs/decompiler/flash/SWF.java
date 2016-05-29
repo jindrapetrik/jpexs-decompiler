@@ -2586,6 +2586,7 @@ public final class SWF implements SWFContainerItem, Timelined {
 
                 int version = swf == null ? SWF.DEFAULT_VERSION : swf.version;
                 ActionList list = ActionListReader.readActionListTimeout(listeners, rri, version, prevLength, prevLength + actionBytes.getLength(), src.toString()/*FIXME?*/, deobfuscationMode);
+                list.fileData = actionBytes.getArray();
                 list.deobfuscationMode = deobfuscationMode;
                 if (swf != null) {
                     swf.as2PcodeCache.put(src, list);
