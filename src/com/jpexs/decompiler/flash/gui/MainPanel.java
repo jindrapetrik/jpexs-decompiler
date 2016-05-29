@@ -84,6 +84,7 @@ import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
 import com.jpexs.decompiler.flash.gui.dumpview.DumpTree;
 import com.jpexs.decompiler.flash.gui.dumpview.DumpTreeModel;
 import com.jpexs.decompiler.flash.gui.dumpview.DumpViewPanel;
+import com.jpexs.decompiler.flash.gui.editor.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.gui.helpers.ObservableList;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTree;
@@ -2554,12 +2555,17 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         };
     }
 
-    public boolean saveText(TextTag textTag, String formattedText, String[] texts) {
+    public boolean saveText(TextTag textTag, String formattedText, String[] texts, LineMarkedEditorPane editor) {
         try {
             if (textTag.setFormattedText(getMissingCharacterHandler(), formattedText, texts)) {
                 return true;
             }
         } catch (TextParseException ex) {
+            if (editor != null) {
+                editor.gotoLine((int) ex.line);
+                editor.markError();
+            }
+
             View.showMessageDialog(null, translate("error.text.invalid").replace("%text%", ex.text).replace("%line%", Long.toString(ex.line)), translate("error"), JOptionPane.ERROR_MESSAGE);
         }
 

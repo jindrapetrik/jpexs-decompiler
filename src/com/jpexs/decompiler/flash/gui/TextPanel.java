@@ -339,7 +339,7 @@ public class TextPanel extends JPanel implements TagEditorPanel {
     }
 
     private void saveText(boolean refresh) {
-        if (mainPanel.saveText(textTag, textValue.getText(), null)) {
+        if (mainPanel.saveText(textTag, textValue.getText(), null, textValue)) {
             setEditText(false);
             setModified(false);
             textTag.getSwf().clearImageCache();

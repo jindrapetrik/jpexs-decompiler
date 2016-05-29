@@ -307,9 +307,9 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
         } catch (IOException ex) {
         } catch (InterruptedException ex) {
         } catch (AVM2ParseException ex) {
-            View.showMessageDialog(this, (ex.text + " on line " + ex.line));
             gotoLine((int) ex.line);
             markError();
+            View.showMessageDialog(this, (ex.text + " on line " + ex.line));
             return false;
         }
         return true;
