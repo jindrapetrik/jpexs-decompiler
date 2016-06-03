@@ -108,6 +108,8 @@ public abstract class AVM2Item extends GraphTargetItem {
         }
         if (propertyName instanceof FullMultinameAVM2Item) {
             if (((FullMultinameAVM2Item) propertyName).name != null) {
+                if (((FullMultinameAVM2Item) propertyName).namespace != null)
+                    writer.append(".");
                 return propertyName.toString(writer, localData);
             } else {
                 writer.append(".");

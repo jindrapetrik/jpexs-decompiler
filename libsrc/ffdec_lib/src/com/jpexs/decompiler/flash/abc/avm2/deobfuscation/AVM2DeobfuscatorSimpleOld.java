@@ -155,6 +155,16 @@ public class AVM2DeobfuscatorSimpleOld extends SWFDecompilerAdapter {
             return false;
         }
 
+        // find jump targets
+        List<Integer> jumpTargets = new ArrayList<Integer>();
+        for (int i = 0; i < code.code.size(); i++) {
+            AVM2Instruction ins = code.code.get(i);
+            if (ins.definition instanceof JumpIns) {
+                long address = ins.getTargetAddress();
+                jumpTargets.add( code.adr2pos(address) );
+            }
+        }
+
         AVM2LocalData localData = newLocalData(scriptIndex, abc, abc.constants, body, isStatic, classIndex);
         int localReservedCount = body.getLocalReservedCount();
         for (int i = 0; i < code.code.size(); i++) {
@@ -168,7 +178,7 @@ public class AVM2DeobfuscatorSimpleOld extends SWFDecompilerAdapter {
             localData.localRegs.clear();
             initLocalRegs(localData, localReservedCount, body.max_regs);
 
-            executeInstructions(staticRegs, body, abc, code, localData, i, code.code.size() - 1, null, inlineIns);
+            executeInstructions(staticRegs, body, abc, code, localData, i, code.code.size() - 1, null, inlineIns, jumpTargets);
         }
 
         return false;
@@ -218,7 +228,7 @@ public class AVM2DeobfuscatorSimpleOld extends SWFDecompilerAdapter {
         }
     }
 
-    private void executeInstructions(Map<Integer, GraphTargetItem> staticRegs, MethodBody body, ABC abc, AVM2Code code, AVM2LocalData localData, int idx, int endIdx, ExecutionResult result, List<AVM2Instruction> inlineIns) throws InterruptedException {
+    private void executeInstructions(Map<Integer, GraphTargetItem> staticRegs, MethodBody body, ABC abc, AVM2Code code, AVM2LocalData localData, int idx, int endIdx, ExecutionResult result, List<AVM2Instruction> inlineIns, List<Integer> jumpTargets) throws InterruptedException {
         List<GraphTargetItem> output = new ArrayList<>();
 
         FixItemCounterTranslateStack stack = new FixItemCounterTranslateStack("");
@@ -284,9 +294,13 @@ public class AVM2DeobfuscatorSimpleOld extends SWFDecompilerAdapter {
 
             if (inlineIns.contains(ins)) {
                 if (def instanceof SetLocalTypeIns) {
-                    int regId = ((SetLocalTypeIns) def).getRegisterId(ins);
-                    staticRegs.put(regId, localData.localRegs.get(regId).getNotCoerced());
-                    code.replaceInstruction(idx, new AVM2Instruction(0, DeobfuscatePopIns.getInstance(), null), body);
+                    InstructionDefinition prevDef = code.code.get(idx-1).definition;
+                    if ((prevDef instanceof DupIns && !jumpTargets.contains(idx-2)) || !jumpTargets.contains(idx-1))
+                    {
+                        int regId = ((SetLocalTypeIns) def).getRegisterId(ins);
+                        staticRegs.put(regId, localData.localRegs.get(regId).getNotCoerced());
+                        code.replaceInstruction(idx, new AVM2Instruction(0, DeobfuscatePopIns.getInstance(), null), body);
+                    }
                 }
             }
             if (def instanceof GetLocalTypeIns) {

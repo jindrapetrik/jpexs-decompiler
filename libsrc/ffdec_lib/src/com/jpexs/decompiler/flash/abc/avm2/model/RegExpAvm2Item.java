@@ -60,8 +60,6 @@ public class RegExpAvm2Item extends AVM2Item implements Callable {
                 ret.append("\\b");
             } else if (c == '\f') {
                 ret.append("\\f");
-            } else if (c == '/') {
-                ret.append("\\/");
             } else if (c < 32) {
                 ret.append("\\x").append(Helper.byteToHex((byte) c));
             } else {
