@@ -116,7 +116,7 @@ public final class DefineCompactedFont extends FontTag {
             fonts.add(new FontType(gis));
             gis.endDumpLevel();
         }
-        sis.skipBytes(mis.getPos());
+        sis.skipBytes(sis.available());
         if (fonts.size() > 1) {
             Logger.getLogger(DefineCompactedFont.class.getName()).log(Level.WARNING, "Compacted font has more than one FontType inside. This may cause problems while editing.");
         }
