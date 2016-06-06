@@ -42,6 +42,8 @@ import java.awt.Font;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -113,6 +115,10 @@ public final class DefineCompactedFont extends FontTag {
             gis.newDumpLevel("fontType", "FontType");
             fonts.add(new FontType(gis));
             gis.endDumpLevel();
+        }
+        sis.skipBytes(mis.getPos());
+        if (fonts.size() > 1) {
+            Logger.getLogger(DefineCompactedFont.class.getName()).log(Level.WARNING, "Compacted font has more than one FontType inside. This may cause problems while editing.");
         }
         rebuildShapeCache();
     }
