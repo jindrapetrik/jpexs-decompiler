@@ -154,7 +154,7 @@ public class DumpInfo implements TreeItem {
             return tag.getSwf();
         }
 
-        return null;
+        return DumpInfoSwfNode.getSwfNode(this).getSwf();
     }
 
     @Override

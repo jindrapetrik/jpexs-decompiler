@@ -2924,10 +2924,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         reload(false);
 
         if (source == dumpTree) {
-            Object sel = e.getPath().getLastPathComponent();
             Tag t = null;
-            if (sel instanceof DumpInfo) {
-                DumpInfo di = (DumpInfo) sel;
+            if (treeItem instanceof DumpInfo) {
+                DumpInfo di = (DumpInfo) treeItem;
                 t = di.getTag();
             }
 

@@ -160,7 +160,6 @@ public class EdgeType implements Serializable {
 
     private int[] readEdge(GFxInputStream sis) throws IOException {
         byte firstByte = (byte) sis.readUI8("firstByte");
-        int nb = sizes[firstByte & 0xF];
         byte raw1, raw2, raw3, raw4, raw5, raw6, raw7, raw8, raw9;
         raw1 = (byte) sis.readUI8("byte1");
         int[] data = new int[5];
