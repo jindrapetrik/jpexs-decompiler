@@ -62,6 +62,8 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
 
     public abstract void addCharacter(char character, Font font);
 
+    public abstract boolean removeCharacter(char character);
+
     public abstract void setAdvanceValues(Font font);
 
     public abstract char glyphToChar(int glyphIndex);
@@ -210,7 +212,7 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
         return FontTag.installedFontsByName.get(getSystemFontName());
     }
 
-    protected void shiftGlyphIndices(int fontId, int startIndex) {
+    protected void shiftGlyphIndices(int fontId, int startIndex, boolean increment) {
         for (Tag t : swf.getTags()) {
             List<TEXTRECORD> textRecords = null;
             if (t instanceof StaticTextTag) {
@@ -233,7 +235,11 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
                             continue;
                         }
                         if (en.glyphIndex >= startIndex) {
-                            en.glyphIndex++;
+                            if (increment) {
+                                en.glyphIndex++;
+                            } else {
+                                en.glyphIndex--;
+                            }
                         }
                     }
 

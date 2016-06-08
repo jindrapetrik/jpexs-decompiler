@@ -460,7 +460,7 @@ public class DefineFont3Tag extends FontTag {
         }
 
         if (!exists) {
-            shiftGlyphIndices(fontID, pos);
+            shiftGlyphIndices(fontID, pos, true);
             glyphShapeTable.add(pos, shp);
             codeTable.add(pos, (int) character);
         } else {
@@ -480,8 +480,56 @@ public class DefineFont3Tag extends FontTag {
 
         checkWideParameters();
         setModified(true);
+        getSwf().clearImageCache();
     }
 
+    @Override
+    public boolean removeCharacter(char character) {
+        
+        //Font Align Zones will be removed as removing character zones is not supported:-(
+        for (int i = 0; i < swf.getTags().size(); i++) {
+            Tag t = swf.getTags().get(i);
+            if (t instanceof DefineFontAlignZonesTag) {
+                DefineFontAlignZonesTag fa = (DefineFontAlignZonesTag) t;
+                if (fa.fontID == fontID) {
+                    swf.removeTag(t);
+                    i--;
+                }
+            }
+        }
+
+        int code = (int) character;
+        int pos = -1;
+        for (int i = 0; i < codeTable.size(); i++) {
+            if (codeTable.get(i) >= code) {
+                if (codeTable.get(i) == code) {
+                    pos = i;
+                    break;
+                }
+
+                return false;
+            }
+        }
+        if (pos == -1) {
+            return false;
+        }
+
+        glyphShapeTable.remove(pos);
+        codeTable.remove(pos);
+
+        if (fontFlagsHasLayout) {
+            fontBoundsTable.remove(pos);
+            fontAdvanceTable.remove(pos);
+        }
+
+        shiftGlyphIndices(fontID, pos + 1, false);
+        
+        checkWideParameters();
+        setModified(true);
+        getSwf().clearImageCache();
+        return true;
+    }
+    
     @Override
     public void setAdvanceValues(Font font) {
         boolean hasLayout = fontFlagsHasLayout;

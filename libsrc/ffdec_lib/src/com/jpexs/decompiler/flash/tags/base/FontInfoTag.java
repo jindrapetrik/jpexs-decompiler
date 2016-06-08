@@ -38,7 +38,9 @@ public abstract class FontInfoTag extends Tag implements CharacterIdTag {
 
     public abstract List<Integer> getCodeTable();
 
-    public abstract void addCharacter(int index, int character);
+    public abstract void addFontCharacter(int index, int character);
+
+    public abstract void removeFontCharacter(int index);
 
     @Override
     public int getCharacterId() {

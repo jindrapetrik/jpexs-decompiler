@@ -293,18 +293,54 @@ public class DefineFontTag extends FontTag {
         }
 
         if (!exists) {
-            shiftGlyphIndices(fontId, pos);
+            shiftGlyphIndices(fontId, pos, true);
             glyphShapeTable.add(pos, shp);
             if (fontInfoTag != null) {
-                fontInfoTag.addCharacter(pos, (int) character);
+                fontInfoTag.addFontCharacter(pos, (int) character);
             }
         } else {
             glyphShapeTable.set(pos, shp);
         }
 
         setModified(true);
+        getSwf().clearImageCache();
     }
 
+    @Override
+    public boolean removeCharacter(char character) {
+        ensureFontInfo();
+        if (fontInfoTag == null) {
+            return false;
+        }
+        
+        int code = (int) character;
+        int pos = -1;
+        List<Integer> codeTable = fontInfoTag.getCodeTable();
+        for (int i = 0; i < codeTable.size(); i++) {
+            if (codeTable.get(i) >= code) {
+                if (codeTable.get(i) == code) {
+                    pos = i;
+                    break;
+                }
+
+                return false;
+            }
+        }
+
+        if (pos == -1) {
+            return false;
+        }
+
+        glyphShapeTable.remove(pos);
+        fontInfoTag.removeFontCharacter(pos);
+
+        shiftGlyphIndices(fontId, pos + 1, false);
+        
+        setModified(true);
+        getSwf().clearImageCache();
+        return true;
+    }
+    
     @Override
     public void setAdvanceValues(Font font) {
         throw new UnsupportedOperationException("Setting the advance values for DefineFontTag is not supported.");

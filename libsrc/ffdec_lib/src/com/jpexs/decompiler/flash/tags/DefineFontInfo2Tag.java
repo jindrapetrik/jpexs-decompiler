@@ -145,8 +145,14 @@ public class DefineFontInfo2Tag extends FontInfoTag {
     }
 
     @Override
-    public void addCharacter(int index, int character) {
+    public void addFontCharacter(int index, int character) {
         codeTable.add(index, character);
+        setModified(true);
+    }
+
+    @Override
+    public void removeFontCharacter(int index) {
+        codeTable.remove(index);
         setModified(true);
     }
 

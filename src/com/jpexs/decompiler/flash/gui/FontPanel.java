@@ -198,9 +198,15 @@ public class FontPanel extends JPanel {
                 }
             }
         }
+    }
 
-        ft.setModified(true);
-        ft.getSwf().clearImageCache();
+    private void fontRemoveChars(FontTag ft, Set<Integer> selChars) {
+        FontTag f = (FontTag) mainPanel.tagTree.getCurrentTreeItem();
+
+        for (int ic : selChars) {
+            char c = (char) ic;
+            f.removeCharacter(c);
+        }
     }
 
     public void showFontTag(FontTag ft) {
@@ -260,6 +266,7 @@ public class FontPanel extends JPanel {
         JLabel fontCharsAddLabel = new JLabel();
         fontAddCharactersField = new JTextField();
         fontAddCharsButton = new JButton();
+        fontRemoveCharsButton = new JButton();
         fontSourceLabel = new JLabel();
         fontFamilyNameSelection = new JComboBox<>();
         fontFaceSelection = new JComboBox<>();
@@ -389,6 +396,9 @@ public class FontPanel extends JPanel {
         fontAddCharsButton.setText(AppStrings.translate("button.ok"));
         fontAddCharsButton.addActionListener(this::fontAddCharsButtonActionPerformed);
 
+        fontRemoveCharsButton.setText(AppStrings.translate("button.remove"));
+        fontRemoveCharsButton.addActionListener(this::fontRemoveCharsButtonActionPerformed);
+
         fontSourceLabel.setText(AppStrings.translate("font.source"));
 
         fontFamilyNameSelection.setPreferredSize(new Dimension(100, fontFamilyNameSelection.getMinimumSize().height));
@@ -441,6 +451,7 @@ public class FontPanel extends JPanel {
         addCharsPanel.add(fontCharsAddLabel, "0,0,R");
         addCharsPanel.add(fontAddCharactersField, "1,0,2,0");
         addCharsPanel.add(fontAddCharsButton, "3,0");
+        //addCharsPanel.add(fontRemoveCharsButton, "3,0");
         addCharsPanel.add(fontEmbedButton, "4,0");
 
         addCharsPanel.add(fontSourceLabel, "0,1,R");
@@ -497,7 +508,26 @@ public class FontPanel extends JPanel {
             if (!selChars.isEmpty()) {
                 fontAddChars(ft, selChars, ((FontFace) fontFaceSelection.getSelectedItem()).font);
                 fontAddCharactersField.setText("");
-                mainPanel.reload(true);
+                mainPanel.repaintTree();
+            }
+        }
+    }
+
+    private void fontRemoveCharsButtonActionPerformed(ActionEvent evt) {
+        String newchars = fontAddCharactersField.getText();
+
+        TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
+        if (item instanceof FontTag) {
+            FontTag ft = (FontTag) item;
+            Set<Integer> selChars = new TreeSet<>();
+            for (int c = 0; c < newchars.length(); c++) {
+                selChars.add(newchars.codePointAt(c));
+            }
+
+            if (!selChars.isEmpty()) {
+                fontRemoveChars(ft, selChars);
+                fontAddCharactersField.setText("");
+                mainPanel.repaintTree();
             }
         }
     }
@@ -648,6 +678,8 @@ public class FontPanel extends JPanel {
     private JTextField fontAddCharactersField;
 
     private JButton fontAddCharsButton;
+
+    private JButton fontRemoveCharsButton;
 
     private JLabel fontAscentLabel;
 

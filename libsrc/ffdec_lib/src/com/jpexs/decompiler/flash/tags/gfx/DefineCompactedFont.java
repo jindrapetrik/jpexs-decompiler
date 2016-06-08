@@ -179,7 +179,7 @@ public final class DefineCompactedFont extends FontTag {
         }
 
         if (!exists) {
-            shiftGlyphIndices(fontId, pos);
+            shiftGlyphIndices(fontId, pos, true);
         }
 
         Font fnt = cfont.deriveFont(fontStyle, Math.round(font.nominalSize * d));
@@ -196,6 +196,37 @@ public final class DefineCompactedFont extends FontTag {
 
         setModified(true);
         getSwf().clearImageCache();
+    }
+
+    @Override
+    public boolean removeCharacter(char character) {
+        FontType font = fonts.get(0);
+
+        int code = (int) character;
+        int pos = -1;
+        for (int i = 0; i < font.glyphInfo.size(); i++) {
+            if (font.glyphInfo.get(i).glyphCode >= code) {
+                if (font.glyphInfo.get(i).glyphCode == code) {
+                    pos = i;
+                    break;
+                }
+                
+                return false;
+            }
+        }
+
+        if (pos == -1) {
+            return false;
+        }
+        
+        font.glyphInfo.remove(pos);
+        font.glyphs.remove(pos);
+        shapeCache.remove(pos);
+        shiftGlyphIndices(fontId, pos + 1, false);
+
+        setModified(true);
+        getSwf().clearImageCache();
+        return true;
     }
 
     @Override

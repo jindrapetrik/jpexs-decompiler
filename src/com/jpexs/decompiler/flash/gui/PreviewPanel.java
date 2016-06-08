@@ -197,8 +197,11 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     private boolean readOnly = false;
 
+    private final int dividerSize;
+
     public void setReadOnly(boolean readOnly) {
         this.readOnly = readOnly;
+        setDividerSize(this.readOnly ? 0 : dividerSize);
         if (readOnly) {
             parametersPanel.setVisible(false);
         }
@@ -223,6 +226,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         createParametersPanel();
 
         showCardLeft(FLASH_VIEWER_CARD);
+        
+        dividerSize = getDividerSize();
     }
 
     private JPanel createEmptyCard() {
