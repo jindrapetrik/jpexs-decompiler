@@ -127,6 +127,7 @@ import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
+import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
 import com.jpexs.decompiler.flash.timeline.AS2Package;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.FrameScript;
@@ -2506,6 +2507,9 @@ public final class SWF implements SWFContainerItem, Timelined {
         for (Tag tag : getTags()) {
             if (tag instanceof ImageTag) {
                 ((ImageTag) tag).clearCache();
+            }
+            else if (tag instanceof DefineCompactedFont) {
+                ((DefineCompactedFont) tag).rebuildShapeCache();
             }
         }
     }
