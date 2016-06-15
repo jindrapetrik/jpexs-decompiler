@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.gui.player;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.FlashUnsupportedException;
 import com.jpexs.decompiler.flash.gui.Main;
+import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.javactivex.ActiveX;
 import com.jpexs.javactivex.ActiveXEvent;
 import com.jpexs.javactivex.ActiveXException;
@@ -38,6 +39,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -160,8 +165,16 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
         }
 
         try {
-            flash = ActiveX.createObject(ShockwaveFlash.class, this);
-        } catch (ActiveXException ex) {
+            Callable<ShockwaveFlash> callable = new Callable<ShockwaveFlash>() {
+                @Override
+                public ShockwaveFlash call() throws InterruptedException {
+                    return ActiveX.createObject(ShockwaveFlash.class, FlashPlayerPanel.this);
+                }
+            };
+
+            // hack: Kernel32.INSTANCE.ConnectNamedPipe never completes in AciveXControl static constructor
+            flash = CancellableWorker.call(callable, 5, TimeUnit.SECONDS);
+        } catch (ActiveXException | TimeoutException | InterruptedException | ExecutionException ex) {
             throw new FlashUnsupportedException();
         }
 
