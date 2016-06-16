@@ -1822,7 +1822,7 @@ public class CommandLineArgumentParser {
             SWF swf = new SWF();
             new SwfXmlImporter().importSwf(swf, xml);
             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(new File(args.pop())))) {
-                swf.saveTo(new BufferedOutputStream(fos));
+                swf.saveTo(fos);
             }
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
