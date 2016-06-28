@@ -119,7 +119,7 @@ public class ShapeExporter {
                             int newHeight = (int) (rect.getHeight() * settings.zoom / SWF.unitDivisor) + 1;
                             SerializableImage img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB_PRE);
                             img.fillTransparent();
-                            Matrix m = Matrix.getTranslateInstance(-rect.Xmin, -rect.Ymin);
+                            Matrix m = Matrix.getTranslateInstance(-rect.Xmin * settings.zoom, -rect.Ymin * settings.zoom);
                             m.scale(settings.zoom);
                             st.toImage(0, 0, 0, new RenderContext(), img, false, m, m, m, new CXFORMWITHALPHA());
                             if (settings.mode == ShapeExportMode.PNG) {
