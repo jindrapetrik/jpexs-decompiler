@@ -1,12 +1,13 @@
 package com.jpexs.decompiler.flash.amf.amf3;
 
-import com.jpexs.decompiler.flash.amf.amf3.types.ObjectType;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 
 public interface ObjectTypeSerializeHandler {
 
-    public ObjectType readObject(String className, InputStream is);
+    public List<Pair<String, Object>> readObject(String className, InputStream is) throws IOException;
 
-    public void writeObject(ObjectType val, OutputStream os);
+    public void writeObject(List<Pair<String, Object>> members, OutputStream os) throws IOException;
 }

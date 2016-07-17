@@ -12,8 +12,10 @@ import com.jpexs.decompiler.flash.amf.amf3.types.VectorDoubleType;
 import com.jpexs.decompiler.flash.amf.amf3.types.DictionaryType;
 import com.jpexs.decompiler.flash.amf.amf3.types.VectorUIntType;
 import com.jpexs.decompiler.flash.amf.amf3.types.BasicType;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -103,7 +105,7 @@ public class AMF3InputStream extends InputStream {
         byte buf[] = new byte[(int) byteLength]; //how about long strings(?), will the int length be enough?
         int cnt = is.read(buf);
         if (cnt < buf.length) {
-            throw new IOException("EOF");
+            throw new PrematureEndOfTheStreamException();
         }
         String retString = new String(buf, "UTF-8");
         return retString;
@@ -131,7 +133,7 @@ public class AMF3InputStream extends InputStream {
     private int safeRead() throws IOException {
         int ret = read();
         if (ret == -1) {
-            throw new IOException("EOF");
+            throw new PrematureEndOfTheStreamException();
         }
         return ret;
     }
@@ -141,11 +143,11 @@ public class AMF3InputStream extends InputStream {
         return is.read();
     }
 
-    public Object readValue() throws IOException {
+    public Object readValue() throws IOException, NoSerializerExistsException {
         return readValue(new HashMap<>());
     }
 
-    public Object readValue(Map<String, ObjectTypeSerializeHandler> serializers) throws IOException {
+    public Object readValue(Map<String, ObjectTypeSerializeHandler> serializers) throws IOException, NoSerializerExistsException {
         return readValue(serializers, new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
     }
 
@@ -153,7 +155,7 @@ public class AMF3InputStream extends InputStream {
             List<Object> objectTable,
             List<Traits> traitsTable,
             List<String> stringTable
-    ) throws IOException {
+    ) throws IOException, NoSerializerExistsException {
 
         int marker = readU8();
         switch (marker) {
@@ -197,7 +199,7 @@ public class AMF3InputStream extends InputStream {
                         byte buf[] = new byte[(int) byteLength]; //TODO: long strings, int is not enough for them
                         int cnt = is.read(buf);
                         if (cnt < buf.length) {
-                            throw new IOException("EOF");
+                            throw new PrematureEndOfTheStreamException();
                         }
                         xval = new String(buf, "UTF-8");
                     }
@@ -243,14 +245,27 @@ public class AMF3InputStream extends InputStream {
                         if (key.isEmpty()) {
                             break;
                         } else {
-                            Object val = readValue(serializers, objectTable, traitsTable, stringTable);
-                            assocPart.add(new Pair<>(key, val));
+                            try {
+                                Object val = readValue(serializers, objectTable, traitsTable, stringTable);
+                                assocPart.add(new Pair<>(key, val));
+                            } catch (NoSerializerExistsException nse) {
+                                assocPart.add(new Pair<>(key, nse.getIncompleteData()));
+                                throw new NoSerializerExistsException(nse.getClassName(), retArray, nse);
+                            }
                         }
                     }
                     LOGGER.log(Level.FINEST, "Array value: assocSize={0}", new Object[]{assocPart.size()});
 
                     for (int i = 0; i < denseCount; i++) {
-                        densePart.add(readValue(serializers, objectTable, traitsTable, stringTable));
+                        try {
+                            densePart.add(readValue(serializers, objectTable, traitsTable, stringTable));
+                        } catch (NoSerializerExistsException nse) {
+                            densePart.add(nse.getIncompleteData());
+                            for (int j = i + 1; j < denseCount; j++) {
+                                densePart.add(BasicType.UNKNOWN);
+                            }
+                            throw new NoSerializerExistsException(nse.getClassName(), retArray, nse);
+                        }
                     }
                     LOGGER.log(Level.FINER, "Array value: dense_size={0},assocSize={1}", new Object[]{densePart.size(), assocPart.size()});
                     return retArray;
@@ -274,13 +289,17 @@ public class AMF3InputStream extends InputStream {
                         if (objectTraitsExtFlag == 1) {
                             String className = readUtf8Vr(stringTable);
                             if (!serializers.containsKey(className)) {
-                                throw new IOException("No (de)serializer for class " + className + " found");
+                                throw new NoSerializerExistsException(className, new ObjectType(className, null, new ArrayList<>()), null);
                             }
-                            retObjectType = serializers.get(className).readObject(className, is);
+
+                            MonitoredInputStream mis = new MonitoredInputStream(is);
+                            List<Pair<String, Object>> serMembers = serializers.get(className).readObject(className, mis);
+                            byte serData[] = mis.getReadData();
+                            retObjectType = new ObjectType(className, serData, serMembers);
+
                             LOGGER.log(Level.FINER, "Object/Traits value: customSerialized");
-                            traits = new Traits(className, true, new ArrayList<>());// FIXME???
-                            traitsTable.add(traits);
-                            //TODO: verify this
+                            objectTable.add(retObjectType);
+                            return retObjectType;
                         } else {
                             int dynamicFlag = (int) ((objectU29 >> 3) & 1);
                             int numSealed = (int) (objectU29 >> 4);
@@ -310,8 +329,19 @@ public class AMF3InputStream extends InputStream {
                     Object retObjectType = new ObjectType(traits.isDynamic(), sealedMembers, dynamicMembers, traits.getClassName());
                     objectTable.add(retObjectType); //add it before any subvalue can reference it
                     List<Object> sealedMemberValues = new ArrayList<>();
+                    NoSerializerExistsException error = null;
+
                     for (int i = 0; i < traits.getSealedMemberNames().size(); i++) {
-                        sealedMemberValues.add(readValue(serializers, objectTable, traitsTable, stringTable));
+                        try {
+                            sealedMemberValues.add(readValue(serializers, objectTable, traitsTable, stringTable));
+                        } catch (NoSerializerExistsException nse) {
+                            sealedMemberValues.add(nse.getIncompleteData());
+                            for (int j = i + 1; j < traits.getSealedMemberNames().size(); j++) {
+                                sealedMemberValues.add(BasicType.UNKNOWN);
+                            }
+                            error = nse;
+                            break;
+                        }
                     }
 
                     for (int i = 0; i < traits.getSealedMemberNames().size(); i++) {
@@ -320,8 +350,13 @@ public class AMF3InputStream extends InputStream {
                     if (traits.isDynamic()) {
                         String dynamicMemberName;
                         while (!(dynamicMemberName = readUtf8Vr(stringTable)).isEmpty()) {
-                            Object dynamicMemberValue = readValue(serializers, objectTable, traitsTable, stringTable);
-                            dynamicMembers.add(new Pair<>(dynamicMemberName, dynamicMemberValue));
+                            try {
+                                Object dynamicMemberValue = readValue(serializers, objectTable, traitsTable, stringTable);
+                                dynamicMembers.add(new Pair<>(dynamicMemberName, dynamicMemberValue));
+                            } catch (NoSerializerExistsException nse) {
+                                dynamicMembers.add(new Pair<>(dynamicMemberName, nse.getIncompleteData()));
+                                throw new NoSerializerExistsException(nse.getClassName(), retObjectType, nse);
+                            }
                         }
                     }
 
@@ -356,7 +391,7 @@ public class AMF3InputStream extends InputStream {
                     int byteArrayLength = (int) (byteArrayU29 >> 1);
                     byte byteArrayBuf[] = new byte[byteArrayLength];
                     if (is.read(byteArrayBuf) != byteArrayLength) {
-                        throw new IOException("EOF");
+                        throw new PrematureEndOfTheStreamException();
                     }
 
                     LOGGER.log(Level.FINER, "ByteArray value: bytes[{0}]", byteArrayLength);
@@ -437,12 +472,25 @@ public class AMF3InputStream extends InputStream {
                     int fixed = readU8();
                     String objectTypeName = readUtf8Vr(stringTable); //uses "*" for any type
                     List<Object> vals = new ArrayList<>();
+                    NoSerializerExistsException error = null;
                     for (int i = 0; i < vectorObjectCountItems; i++) {
-                        vals.add(readValue(serializers, objectTable, traitsTable, stringTable));
+                        try {
+                            vals.add(readValue(serializers, objectTable, traitsTable, stringTable));
+                        } catch (NoSerializerExistsException nse) {
+                            vals.add(nse.getIncompleteData());
+                            for (int j = i + 1; j < vectorObjectCountItems; j++) {
+                                vals.add(BasicType.UNKNOWN);
+                            }
+                            error = nse;
+                            break;
+                        }
                     }
                     VectorObjectType retVectorObject = new VectorObjectType(fixed == 1, objectTypeName, vals);
                     LOGGER.log(Level.FINER, "Vector<Object> value: fixed={0}, size={1}, typeName:{2}]", new Object[]{fixed, vectorObjectCountItems, objectTypeName});
                     objectTable.add(retVectorObject);
+                    if (error != null) {
+                        throw new NoSerializerExistsException(error.getClassName(), retVectorObject, error);
+                    }
                     return retVectorObject;
                 } else {
                     int refIndexVectorObject = (int) (vectorObjectU29 >> 1);
@@ -456,13 +504,37 @@ public class AMF3InputStream extends InputStream {
                     int numEntries = (int) (dictionaryObjectU29 >> 1);
                     int weakKeys = readU8();
                     List<Pair<Object, Object>> data = new ArrayList<>();
+                    NoSerializerExistsException error = null;
                     for (int i = 0; i < numEntries; i++) {
-                        Object key = readValue(serializers, objectTable, traitsTable, stringTable);
-                        Object val = readValue(serializers, objectTable, traitsTable, stringTable);
+                        Object key;
+                        Object val;
+                        try {
+                            key = readValue(serializers, objectTable, traitsTable, stringTable);
+                            try {
+                                val = readValue(serializers, objectTable, traitsTable, stringTable);
+                            } catch (NoSerializerExistsException nse) {
+                                error = nse;
+                                val = BasicType.UNKNOWN;
+                            }
+                        } catch (NoSerializerExistsException nse) {
+                            error = nse;
+                            key = BasicType.UNKNOWN;
+                            val = BasicType.UNKNOWN;
+                        }
+
                         data.add(new Pair<>(key, val));
+                        if (error != null) {
+                            for (int j = i + 1; j < numEntries; j++) {
+                                data.add(new Pair<>(BasicType.UNKNOWN, BasicType.UNKNOWN));
+                            }
+                            break;
+                        }
                     }
                     DictionaryType retDictionary = new DictionaryType(weakKeys == 1, data);
                     objectTable.add(retDictionary);
+                    if (error != null) {
+                        throw new NoSerializerExistsException(error.getClassName(), retDictionary, error);
+                    }
                     return retDictionary;
                 } else {
                     int refIndexDictionary = (int) (dictionaryObjectU29 >> 1);
@@ -470,8 +542,31 @@ public class AMF3InputStream extends InputStream {
                     return objectTable.get(refIndexDictionary);
                 }
             default:
-                return null;
+                throw new UnsupportedValueType(marker);
         }
     }
 
+    private class MonitoredInputStream extends InputStream {
+
+        private final InputStream is;
+        private ByteArrayOutputStream baos;
+
+        public MonitoredInputStream(InputStream is) {
+            this.is = is;
+            this.baos = new ByteArrayOutputStream();
+        }
+
+        @Override
+        public int read() throws IOException {
+            int ret = is.read();
+            if (ret > -1) {
+                baos.write(ret);
+            }
+            return ret;
+        }
+
+        public byte[] getReadData() {
+            return baos.toByteArray();
+        }
+    }
 }

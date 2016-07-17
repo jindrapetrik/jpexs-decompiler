@@ -46,6 +46,9 @@ public class AMF3Tools {
         if (((List<? extends Class>) Arrays.asList(String.class, Long.class, Double.class, BasicType.class, Boolean.class)).contains(object.getClass())) {
             return;
         }
+        if (object instanceof BasicType) {
+            return;
+        }
         int prevRef = 0;
         if (referenceCount.containsKey(object)) {
             prevRef = referenceCount.get(object);
@@ -85,7 +88,11 @@ public class AMF3Tools {
         if (object instanceof String) {
             return "\"" + Helper.escapeActionScriptString((String) object) + "\"";
         }
-        if (((List<? extends Class>) Arrays.asList(Long.class, Double.class, BasicType.class, Boolean.class)).contains(object.getClass())) {
+        if (((List<? extends Class>) Arrays.asList(Long.class, Double.class, Boolean.class)).contains(object.getClass())) {
+            return object.toString();
+        }
+
+        if (object instanceof BasicType) {
             return object.toString();
         }
 
@@ -122,35 +129,58 @@ public class AMF3Tools {
             ret.append(indent(level + 1)).append("\"type\": \"Object\",\r\n");
             ret.append(addId);
             ret.append(indent(level + 1)).append("\"className\": ").append(amfToString(processedObjects, level, ot.getClassName(), referenceCount, objectAlias)).append(",\r\n");
-            ret.append(indent(level + 1)).append("\"dynamic\": ").append(ot.isDynamic()).append(",\r\n");
-            if (!ot.getSealedMembers().isEmpty()) {
-                ret.append(indent(level + 1)).append("\"sealedMembers\": {\r\n");
-                for (int i = 0; i < ot.getSealedMembers().size(); i++) {
-                    Pair<String, Object> member = ot.getSealedMembers().get(i);
-                    ret.append(indent(level + 2)).append(amfToString(processedObjects, level + 2, member.getFirst(), referenceCount, objectAlias)).append(":").append(amfToString(processedObjects, level + 1, member.getSecond(), referenceCount, objectAlias));
-                    if (i < ot.getSealedMembers().size() - 1) {
-                        ret.append(",\r\n");
-                    } else {
+            if (ot.isSerialized()) {
+                byte[] serData = ot.getSerializedData();
+                if (serData == null) {
+                    ret.append(indent(level + 1)).append("\"serialized\": unknown\r\n");
+                } else {
+                    ret.append(indent(level + 1)).append("\"serialized\": 0x").append(javax.xml.bind.DatatypeConverter.printHexBinary(serData)).append(",\r\n");
+                    if (!ot.getSerializedMembers().isEmpty()) {
+                        ret.append(indent(level + 1)).append("\"unserializedMembers\": {\r\n");
+                        for (int i = 0; i < ot.getSerializedMembers().size(); i++) {
+                            Pair<String, Object> member = ot.getSerializedMembers().get(i);
+                            ret.append(indent(level + 2)).append(amfToString(processedObjects, level + 2, member.getFirst(), referenceCount, objectAlias)).append(":").append(amfToString(processedObjects, level + 1, member.getSecond(), referenceCount, objectAlias));
+                            if (i < ot.getSerializedMembers().size() - 1) {
+                                ret.append(",\r\n");
+                            } else {
+                                ret.append("\r\n");
+                            }
+                        }
+                        ret.append(indent(level + 1)).append("}");
                         ret.append("\r\n");
                     }
                 }
-                ret.append(indent(level + 1)).append("}");
-                if (!ot.getDynamicMembers().isEmpty()) {
-                    ret.append(",");
-                }
-                ret.append("\r\n");
-            }
-            if (!ot.getDynamicMembers().isEmpty()) {
-                ret.append(indent(level + 1)).append("\"dynamicMembers\": {\r\n");
-                for (int i = 0; i < ot.getDynamicMembers().size(); i++) {
-                    Pair<String, Object> member = ot.getDynamicMembers().get(i);
-                    ret.append(indent(level + 2)).append(amfToString(processedObjects, level + 2, member.getFirst(), referenceCount, objectAlias)).append(":").append(amfToString(processedObjects, level + 2, member.getSecond(), referenceCount, objectAlias));
-                    if (i < ot.getDynamicMembers().size() - 1) {
+            } else {
+                ret.append(indent(level + 1)).append("\"dynamic\": ").append(ot.isDynamic()).append(",\r\n");
+                if (!ot.getSealedMembers().isEmpty()) {
+                    ret.append(indent(level + 1)).append("\"sealedMembers\": {\r\n");
+                    for (int i = 0; i < ot.getSealedMembers().size(); i++) {
+                        Pair<String, Object> member = ot.getSealedMembers().get(i);
+                        ret.append(indent(level + 2)).append(amfToString(processedObjects, level + 2, member.getFirst(), referenceCount, objectAlias)).append(":").append(amfToString(processedObjects, level + 1, member.getSecond(), referenceCount, objectAlias));
+                        if (i < ot.getSealedMembers().size() - 1) {
+                            ret.append(",\r\n");
+                        } else {
+                            ret.append("\r\n");
+                        }
+                    }
+                    ret.append(indent(level + 1)).append("}");
+                    if (!ot.getDynamicMembers().isEmpty()) {
                         ret.append(",");
                     }
                     ret.append("\r\n");
                 }
-                ret.append(indent(level + 1)).append("}\r\n");
+                if (!ot.getDynamicMembers().isEmpty()) {
+                    ret.append(indent(level + 1)).append("\"dynamicMembers\": {\r\n");
+                    for (int i = 0; i < ot.getDynamicMembers().size(); i++) {
+                        Pair<String, Object> member = ot.getDynamicMembers().get(i);
+                        ret.append(indent(level + 2)).append(amfToString(processedObjects, level + 2, member.getFirst(), referenceCount, objectAlias)).append(":").append(amfToString(processedObjects, level + 2, member.getSecond(), referenceCount, objectAlias));
+                        if (i < ot.getDynamicMembers().size() - 1) {
+                            ret.append(",");
+                        }
+                        ret.append("\r\n");
+                    }
+                    ret.append(indent(level + 1)).append("}\r\n");
+                }
             }
             ret.append(indent(level)).append("}");
         } else if (object instanceof ArrayType) {
@@ -198,7 +228,7 @@ public class AMF3Tools {
                 ret.append("\r\n");
             }
             ret.append(indent(level + 1)).append("}\r\n");
-            ret.append(indent(level)).append("}");
+            ret.append(indent(level) + "}");
         } else if (object instanceof ByteArrayType) {
             ByteArrayType ba = (ByteArrayType) object;
             byte data[] = ba.getData();
@@ -228,10 +258,6 @@ public class AMF3Tools {
                     + addId
                     + indent(level + 1) + "\"value\": " + amfToString(processedObjects, level, ((XmlType) object).getData(), referenceCount, objectAlias) + "\r\n"
                     + indent(level) + "}";
-        } else if (object == BasicType.NULL) {
-            return "null";
-        } else if (object == BasicType.UNDEFINED) {
-            return "undefined";
         } else {
             throw new IllegalArgumentException("Unsupported type: " + object.getClass());
         }
