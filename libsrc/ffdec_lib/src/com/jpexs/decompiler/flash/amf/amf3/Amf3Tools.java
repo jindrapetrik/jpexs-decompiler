@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Amf3Tools_ {
+public class Amf3Tools {
 
     /**
      * Converts AMF value to something human-readable.

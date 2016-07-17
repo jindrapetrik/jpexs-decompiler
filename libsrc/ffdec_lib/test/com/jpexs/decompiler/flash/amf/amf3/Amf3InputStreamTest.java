@@ -21,7 +21,7 @@ import org.testng.annotations.Test;
 public class Amf3InputStreamTest {
 
     private FileInputStream fis;
-    private AMF3InputStream is;
+    private Amf3InputStream is;
 
     @AfterTest
     public void deinitStream() {
@@ -45,7 +45,7 @@ public class Amf3InputStreamTest {
 
     private void initStream(String fileName) throws FileNotFoundException {
         fis = new FileInputStream("testdata/amf3/generated/" + fileName);
-        is = new AMF3InputStream(fis);
+        is = new Amf3InputStream(fis);
     }
 
     @Test
@@ -165,7 +165,7 @@ public class Amf3InputStreamTest {
     @Test(expectedExceptions = UnsupportedValueType.class)
     public void testUnsupportedMarker() throws IOException, NoSerializerExistsException {
         final int UNSUPPORTED_MARKER = 100;
-        is = new AMF3InputStream(new ByteArrayInputStream(new byte[]{UNSUPPORTED_MARKER}));
+        is = new Amf3InputStream(new ByteArrayInputStream(new byte[]{UNSUPPORTED_MARKER}));
         is.readValue();
     }
 }

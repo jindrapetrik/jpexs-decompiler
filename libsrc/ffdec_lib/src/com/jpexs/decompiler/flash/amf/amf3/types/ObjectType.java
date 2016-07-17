@@ -1,6 +1,6 @@
 package com.jpexs.decompiler.flash.amf.amf3.types;
 
-import com.jpexs.decompiler.flash.amf.amf3.Amf3Tools_;
+import com.jpexs.decompiler.flash.amf.amf3.Amf3Tools;
 import com.jpexs.decompiler.flash.amf.amf3.Pair;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
@@ -94,7 +94,7 @@ public class ObjectType implements WithSubValues {
 
     @Override
     public String toString() {
-        return Amf3Tools_.amfToString(this);
+        return Amf3Tools.amfToString(this);
     }
 
     public void setSerializedData(byte[] serializedData) {

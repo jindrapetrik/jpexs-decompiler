@@ -1,6 +1,6 @@
 package com.jpexs.decompiler.flash.amf.amf3.types;
 
-import com.jpexs.decompiler.flash.amf.amf3.Amf3Tools_;
+import com.jpexs.decompiler.flash.amf.amf3.Amf3Tools;
 
 public class ByteArrayType {
 
@@ -16,7 +16,7 @@ public class ByteArrayType {
 
     @Override
     public String toString() {
-        return Amf3Tools_.amfToString(this);
+        return Amf3Tools.amfToString(this);
     }
 
 }
