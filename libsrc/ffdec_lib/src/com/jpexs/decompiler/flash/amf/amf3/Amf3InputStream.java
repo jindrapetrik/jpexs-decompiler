@@ -115,8 +115,11 @@ public class Amf3InputStream extends InputStream {
         int stringNoRefFlag = (int) (u & 1);
         if (stringNoRefFlag == 1) {
             int byteLength = (int) (u >> 1); //TODO: long strings, int is not enough for them
-            String retString = readUtf8Char(byteLength);
-            stringTable.add(retString);
+            String retString = "";
+            if (byteLength > 0) {
+                retString = readUtf8Char(byteLength);
+                stringTable.add(retString);
+            }
             LOGGER.log(Level.FINE, "Read string: \"{0}\"", retString);
             return retString;
         } else { //flag==0
@@ -288,13 +291,14 @@ public class Amf3InputStream extends InputStream {
                         if (objectTraitsExtFlag == 1) {
                             String className = readUtf8Vr(stringTable);
                             if (!serializers.containsKey(className)) {
-                                throw new NoSerializerExistsException(className, new ObjectType(className, null, new ArrayList<>()), null);
+                                throw new NoSerializerExistsException(className, new ObjectType(new Traits(className, false, new ArrayList<>()), (byte[]) null, new ArrayList<>()), null);
                             }
 
                             MonitoredInputStream mis = new MonitoredInputStream(is);
                             List<Pair<String, Object>> serMembers = serializers.get(className).readObject(className, mis);
                             byte serData[] = mis.getReadData();
-                            retObjectType = new ObjectType(className, serData, serMembers);
+                            Traits unserTraits = new Traits(className, false, new ArrayList<>());
+                            retObjectType = new ObjectType(unserTraits, serData, serMembers);
 
                             LOGGER.log(Level.FINER, "Object/Traits value: customSerialized");
                             objectTable.add(retObjectType);
@@ -312,20 +316,16 @@ public class Amf3InputStream extends InputStream {
                             }
                             traits = new Traits(className, dynamicFlag == 1, sealedMemberNames);
                         }
-
+                        traitsTable.add(traits);
                     } else {
                         int refIndexTraits = (int) (objectU29 >> 2);
                         traits = traitsTable.get(refIndexTraits);
                         LOGGER.log(Level.FINER, "Traits value: reference({0}) - traitsize={1}", new Object[]{refIndexTraits, traits.getSealedMemberNames().size()});
                     }
-
-                    if (objectTraitsNoRefFlag == 1) {
-                        traitsTable.add(traits);
-                    }
                     List<Pair<String, Object>> sealedMembers = new ArrayList<>();
                     List<Pair<String, Object>> dynamicMembers = new ArrayList<>();
 
-                    Object retObjectType = new ObjectType(traits.isDynamic(), sealedMembers, dynamicMembers, traits.getClassName());
+                    Object retObjectType = new ObjectType(traits, sealedMembers, dynamicMembers);
                     objectTable.add(retObjectType); //add it before any subvalue can reference it
                     List<Object> sealedMemberValues = new ArrayList<>();
                     NoSerializerExistsException error = null;
@@ -503,6 +503,8 @@ public class Amf3InputStream extends InputStream {
                     int numEntries = (int) (dictionaryObjectU29 >> 1);
                     int weakKeys = readU8();
                     List<Pair<Object, Object>> data = new ArrayList<>();
+                    DictionaryType retDictionary = new DictionaryType(weakKeys == 1, data);
+                    objectTable.add(retDictionary);
                     NoSerializerExistsException error = null;
                     for (int i = 0; i < numEntries; i++) {
                         Object key;
@@ -529,8 +531,6 @@ public class Amf3InputStream extends InputStream {
                             break;
                         }
                     }
-                    DictionaryType retDictionary = new DictionaryType(weakKeys == 1, data);
-                    objectTable.add(retDictionary);
                     if (error != null) {
                         throw new NoSerializerExistsException(error.getClassName(), retDictionary, error);
                     }
@@ -541,7 +541,7 @@ public class Amf3InputStream extends InputStream {
                     return objectTable.get(refIndexDictionary);
                 }
             default:
-                throw new UnsupportedValueType(marker);
+                throw new UnsupportedValueTypeException(marker);
         }
     }
 

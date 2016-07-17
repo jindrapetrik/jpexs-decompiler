@@ -2,6 +2,7 @@ package com.jpexs.decompiler.flash.amf.amf3.types;
 
 import com.jpexs.decompiler.flash.amf.amf3.Amf3Tools;
 import com.jpexs.decompiler.flash.amf.amf3.Pair;
+import com.jpexs.decompiler.flash.amf.amf3.Traits;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,21 +10,24 @@ import com.jpexs.decompiler.flash.amf.amf3.WithSubValues;
 
 public class ObjectType implements WithSubValues {
 
-    private boolean dynamic;
     private List<Pair<String, Object>> sealedMembers;
     private List<Pair<String, Object>> dynamicMembers;
     private List<Pair<String, Object>> serializedMembers;
-    private String className;
     //null = not serialized or unknown
     private byte[] serializedData = null;
     private boolean serialized;
+    private Traits traits;
 
     public boolean isSerialized() {
         return serialized;
     }
 
-    public ObjectType(String className, byte[] serializedData, List<Pair<String, Object>> serializedMembers) {
-        this.className = className;
+    public Traits getTraits() {
+        return traits;
+    }
+
+    public ObjectType(Traits traits, byte[] serializedData, List<Pair<String, Object>> serializedMembers) {
+        this.traits = traits;
         this.serializedData = serializedData;
         this.serializedMembers = serializedMembers;
         this.dynamicMembers = new ArrayList<>();
@@ -31,17 +35,16 @@ public class ObjectType implements WithSubValues {
         this.serialized = true;
     }
 
-    public ObjectType(boolean dynamic, List<Pair<String, Object>> sealedMembers, List<Pair<String, Object>> dynamicMembers, String className) {
-        this.dynamic = dynamic;
+    public ObjectType(Traits traits, List<Pair<String, Object>> sealedMembers, List<Pair<String, Object>> dynamicMembers) {
         this.sealedMembers = sealedMembers;
         this.dynamicMembers = dynamicMembers;
-        this.className = className;
         this.serializedMembers = new ArrayList<>();
         this.serialized = false;
+        this.traits = traits;
     }
 
     public boolean isDynamic() {
-        return dynamic;
+        return traits.isDynamic();
     }
 
     public List<Pair<String, Object>> getDynamicMembers() {
@@ -53,23 +56,7 @@ public class ObjectType implements WithSubValues {
     }
 
     public String getClassName() {
-        return className;
-    }
-
-    public void setDynamic(boolean dynamic) {
-        this.dynamic = dynamic;
-    }
-
-    public void setDynamicMembers(List<Pair<String, Object>> dynamicMembers) {
-        this.dynamicMembers = dynamicMembers;
-    }
-
-    public void setSealedMembers(List<Pair<String, Object>> sealedMembers) {
-        this.sealedMembers = sealedMembers;
-    }
-
-    public void setClassName(String className) {
-        this.className = className;
+        return traits.getClassName();
     }
 
     @Override

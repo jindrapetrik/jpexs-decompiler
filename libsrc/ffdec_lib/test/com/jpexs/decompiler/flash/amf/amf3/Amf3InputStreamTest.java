@@ -67,7 +67,7 @@ public class Amf3InputStreamTest {
 
             @Override
             public void writeObject(List<Pair<String, Object>> members, OutputStream os) throws IOException {
-                throw new UnsupportedOperationException("Not supported yet.");
+                throw new UnsupportedOperationException("Not implemented");
             }
         });
         return serializers;
@@ -162,7 +162,7 @@ public class Amf3InputStreamTest {
         }
     }
 
-    @Test(expectedExceptions = UnsupportedValueType.class)
+    @Test(expectedExceptions = UnsupportedValueTypeException.class)
     public void testUnsupportedMarker() throws IOException, NoSerializerExistsException {
         final int UNSUPPORTED_MARKER = 100;
         is = new Amf3InputStream(new ByteArrayInputStream(new byte[]{UNSUPPORTED_MARKER}));
