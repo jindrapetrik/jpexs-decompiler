@@ -15,7 +15,6 @@ import com.jpexs.decompiler.flash.amf.amf3.types.BasicType;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
