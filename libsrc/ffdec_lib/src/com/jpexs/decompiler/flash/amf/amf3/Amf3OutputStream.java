@@ -3,11 +3,11 @@ package com.jpexs.decompiler.flash.amf.amf3;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class Amf3OutputStream_ extends OutputStream {
+public class Amf3OutputStream extends OutputStream {
 
     private final OutputStream os;
 
-    public Amf3OutputStream_(OutputStream os) {
+    public Amf3OutputStream(OutputStream os) {
         this.os = os;
     }
 
