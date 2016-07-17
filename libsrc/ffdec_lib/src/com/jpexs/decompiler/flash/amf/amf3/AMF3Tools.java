@@ -218,6 +218,7 @@ public class AMF3Tools {
             ret.append("{\r\n");
             ret.append(indent(level + 1)).append("\"type\": \"Dictionary\",\r\n");
             ret.append(addId);
+            ret.append(indent(level + 1)).append("\"weakKeys\": " + dt.hasWeakKeys() + ",\r\n");
             ret.append(indent(level + 1)).append("\"value\": {\r\n");
             for (int i = 0; i < dt.getPairs().size(); i++) {
                 Pair<Object, Object> pair = dt.getPairs().get(i);

@@ -35,4 +35,8 @@ public class DictionaryType implements WithSubValues {
         return AMF3Tools.amfToString(this);
     }
 
+    public boolean hasWeakKeys() {
+        return weakKeys;
+    }
+
 }
