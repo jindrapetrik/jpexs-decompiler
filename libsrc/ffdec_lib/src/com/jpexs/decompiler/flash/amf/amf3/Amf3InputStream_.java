@@ -22,12 +22,12 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class AMF3InputStream extends InputStream {
+public class Amf3InputStream_ extends InputStream {
 
-    public final static Logger LOGGER = Logger.getLogger(AMF3InputStream.class.getName());
+    public final static Logger LOGGER = Logger.getLogger(Amf3InputStream_.class.getName());
     private final InputStream is;
 
-    public AMF3InputStream(InputStream is) {
+    public Amf3InputStream_(InputStream is) {
         this.is = is;
     }
 

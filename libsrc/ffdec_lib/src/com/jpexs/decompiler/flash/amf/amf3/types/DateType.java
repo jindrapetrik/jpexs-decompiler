@@ -1,6 +1,6 @@
 package com.jpexs.decompiler.flash.amf.amf3.types;
 
-import com.jpexs.decompiler.flash.amf.amf3.AMF3Tools;
+import com.jpexs.decompiler.flash.amf.amf3.Amf3Tools_;
 import java.util.Date;
 
 public class DateType {
@@ -21,7 +21,7 @@ public class DateType {
 
     @Override
     public String toString() {
-        return AMF3Tools.amfToString(this);
+        return Amf3Tools_.amfToString(this);
     }
 
     public Date toDate() {
