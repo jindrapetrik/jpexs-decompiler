@@ -131,6 +131,8 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
 
     public JToggleButton resolveConstantsButton;
 
+    public JToggleButton showFileOffsetInPcodeHexButton;
+
     public JToggleButton showOriginalBytesInPcodeHexButton;
 
     public JLabel asmLabel = new HeaderLabel(AppStrings.translate("panel.disassembled"));
@@ -639,6 +641,12 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         resolveConstantsButton.setMargin(new Insets(3, 3, 3, 3));
         resolveConstantsButton.setSelected(Configuration.resolveConstants.get());
 
+        showFileOffsetInPcodeHexButton = new JToggleButton(View.getIcon("fileoffset16"));
+        showFileOffsetInPcodeHexButton.addActionListener(this::showFileOffsetInPcodeHexButtonActionPerformed);
+        showFileOffsetInPcodeHexButton.setToolTipText(AppStrings.translate("button.showFileOffsetInPcodeHex"));
+        showFileOffsetInPcodeHexButton.setMargin(new Insets(3, 3, 3, 3));
+        showFileOffsetInPcodeHexButton.setSelected(Configuration.showFileOffsetInPcodeHex.get());
+
         showOriginalBytesInPcodeHexButton = new JToggleButton(View.getIcon("originalbytes16"));
         showOriginalBytesInPcodeHexButton.addActionListener(this::showOriginalBytesInPcodeHexButtonActionPerformed);
         showOriginalBytesInPcodeHexButton.setToolTipText(AppStrings.translate("button.showOriginalBytesInPcodeHex"));
@@ -654,6 +662,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         topButtonsPan.add(constantsViewButton);
         topButtonsPan.add(Box.createRigidArea(new Dimension(10, 0)));
         topButtonsPan.add(resolveConstantsButton);
+        topButtonsPan.add(showFileOffsetInPcodeHexButton);
         topButtonsPan.add(showOriginalBytesInPcodeHexButton);
 
         JPanel panCode = new JPanel(new BorderLayout());
@@ -929,6 +938,14 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         srcWithHex = null;
         srcNoHex = null;
         // srcHexOnly = null; is not needed since it does not contains the resolved constant names
+        setHex(getExportMode(), src.getScriptName());
+    }
+
+    private void showFileOffsetInPcodeHexButtonActionPerformed(ActionEvent evt) {
+        boolean resolve = showFileOffsetInPcodeHexButton.isSelected();
+        Configuration.showFileOffsetInPcodeHex.set(resolve);
+
+        srcWithHex = null;
         setHex(getExportMode(), src.getScriptName());
     }
 

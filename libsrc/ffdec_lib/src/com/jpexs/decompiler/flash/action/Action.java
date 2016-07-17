@@ -538,12 +538,18 @@ public abstract class Action implements GraphSourceItem {
                     lastPush = false;
                 }
                 writer.appendNoHilight("; ");
+                long fileOffset = a.getFileOffset();
+                if (Configuration.showFileOffsetInPcodeHex.get()) {
+                    writer.appendNoHilight("@");
+                    writer.appendNoHilight(Helper.formatHex(fileOffset, 8));
+                    writer.appendNoHilight(" ");
+                }
+
                 byte[] bytes = a.getBytes(version);
                 writer.appendNoHilight(Helper.bytesToHexString(bytes));
+
                 if (Configuration.showOriginalBytesInPcodeHex.get()) {
-                    long fileOffset = a.getFileOffset();
                     if (fileData != null && fileOffset != -1 && fileData.length > fileOffset + bytes.length - 1) {
-                        writer.appendNoHilight(" (");
                         boolean same = true;
                         for (int i = 0; i < bytes.length; i++) {
                             byte b = fileData[(int) (fileOffset + i)];
@@ -554,15 +560,18 @@ public abstract class Action implements GraphSourceItem {
                         }
 
                         if (!same) {
+                            writer.appendNoHilight(" (");
                             for (int i = 0; i < bytes.length; i++) {
+                                if (i != 0) {
+                                    writer.appendNoHilight(" ");
+                                }
+
                                 writer.appendNoHilight(Helper.byteToHex(fileData[(int) (fileOffset + i)]));
-                                writer.appendNoHilight(" ");
                             }
+                            
+                            writer.appendNoHilight(")");
                         }
 
-                        writer.appendNoHilight("@");
-                        writer.appendNoHilight(Helper.formatHex(fileOffset, 8));
-                        writer.appendNoHilight(")");
                     }
                 }
 

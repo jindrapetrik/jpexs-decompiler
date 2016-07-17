@@ -63,7 +63,7 @@ public class ShapeExporter {
             return ret;
         }
 
-        File foutdir = new File(outdir);
+            File foutdir = new File(outdir);
         Path.createDirectorySafe(foutdir);
 
         int count = 0;

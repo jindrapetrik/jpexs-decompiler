@@ -178,6 +178,11 @@ public class Configuration {
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("script")
     @ConfigurationInternal
+    public static final ConfigurationItem<Boolean> showFileOffsetInPcodeHex = null;
+
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("script")
+    @ConfigurationInternal
     public static final ConfigurationItem<Boolean> showOriginalBytesInPcodeHex = null;
 
     /**
