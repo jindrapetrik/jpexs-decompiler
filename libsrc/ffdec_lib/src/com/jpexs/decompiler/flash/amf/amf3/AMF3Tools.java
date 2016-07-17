@@ -119,45 +119,45 @@ public class AMF3Tools {
         } else if (object instanceof ObjectType) {
             ObjectType ot = (ObjectType) object;
             ret.append("{\r\n");
-            ret.append(indent(level + 1) + "\"type\": \"Object\",\r\n");
+            ret.append(indent(level + 1)).append("\"type\": \"Object\",\r\n");
             ret.append(addId);
-            ret.append(indent(level + 1) + "\"className\": " + amfToString(processedObjects, level, ot.getClassName(), referenceCount, objectAlias) + ",\r\n");
-            ret.append(indent(level + 1) + "\"dynamic\": " + ot.isDynamic() + ",\r\n");
+            ret.append(indent(level + 1)).append("\"className\": ").append(amfToString(processedObjects, level, ot.getClassName(), referenceCount, objectAlias)).append(",\r\n");
+            ret.append(indent(level + 1)).append("\"dynamic\": ").append(ot.isDynamic()).append(",\r\n");
             if (!ot.getSealedMembers().isEmpty()) {
-                ret.append(indent(level + 1) + "\"sealedMembers\": {\r\n");
+                ret.append(indent(level + 1)).append("\"sealedMembers\": {\r\n");
                 for (int i = 0; i < ot.getSealedMembers().size(); i++) {
                     Pair<String, Object> member = ot.getSealedMembers().get(i);
-                    ret.append(indent(level + 2) + amfToString(processedObjects, level + 2, member.getFirst(), referenceCount, objectAlias) + ":" + amfToString(processedObjects, level + 1, member.getSecond(), referenceCount, objectAlias));
+                    ret.append(indent(level + 2)).append(amfToString(processedObjects, level + 2, member.getFirst(), referenceCount, objectAlias)).append(":").append(amfToString(processedObjects, level + 1, member.getSecond(), referenceCount, objectAlias));
                     if (i < ot.getSealedMembers().size() - 1) {
                         ret.append(",\r\n");
                     } else {
                         ret.append("\r\n");
                     }
                 }
-                ret.append(indent(level + 1) + "}");
+                ret.append(indent(level + 1)).append("}");
                 if (!ot.getDynamicMembers().isEmpty()) {
                     ret.append(",");
                 }
                 ret.append("\r\n");
             }
             if (!ot.getDynamicMembers().isEmpty()) {
-                ret.append(indent(level + 1) + "\"dynamicMembers\": {\r\n");
+                ret.append(indent(level + 1)).append("\"dynamicMembers\": {\r\n");
                 for (int i = 0; i < ot.getDynamicMembers().size(); i++) {
                     Pair<String, Object> member = ot.getDynamicMembers().get(i);
-                    ret.append(indent(level + 2) + amfToString(processedObjects, level + 2, member.getFirst(), referenceCount, objectAlias) + ":" + amfToString(processedObjects, level + 2, member.getSecond(), referenceCount, objectAlias));
+                    ret.append(indent(level + 2)).append(amfToString(processedObjects, level + 2, member.getFirst(), referenceCount, objectAlias)).append(":").append(amfToString(processedObjects, level + 2, member.getSecond(), referenceCount, objectAlias));
                     if (i < ot.getDynamicMembers().size() - 1) {
                         ret.append(",");
                     }
                     ret.append("\r\n");
                 }
-                ret.append(indent(level + 1) + "}\r\n");
+                ret.append(indent(level + 1)).append("}\r\n");
             }
-            ret.append(indent(level) + "}");
+            ret.append(indent(level)).append("}");
         } else if (object instanceof ArrayType) {
             ArrayType at = (ArrayType) object;
             ret.append("{\r\n");
-            ret.append(indent(level + 1) + "\"type\": \"Array\",\r\n");
-            ret.append(indent(level + 1) + "\"denseValues\": [");
+            ret.append(indent(level + 1)).append("\"type\": \"Array\",\r\n");
+            ret.append(indent(level + 1)).append("\"denseValues\": [");
 
             for (int i = 0; i < at.getDenseValues().size(); i++) {
                 if (i > 0) {
@@ -166,13 +166,13 @@ public class AMF3Tools {
                 ret.append(amfToString(processedObjects, level + 2, at.getDenseValues().get(i), referenceCount, objectAlias));
             }
             ret.append("],\r\n");
-            ret.append(indent(level + 1) + "\"associativeValues\": [");
+            ret.append(indent(level + 1)).append("\"associativeValues\": [");
             if (!at.getAssociativeValues().isEmpty()) {
                 ret.append("\r\n");
             }
             for (int i = 0; i < at.getAssociativeValues().size(); i++) {
                 Pair<String, Object> p = at.getAssociativeValues().get(i);
-                ret.append(indent(level + 2) + amfToString(processedObjects, level + 1, p.getFirst(), referenceCount, objectAlias) + " : " + amfToString(processedObjects, level + 1, p.getSecond(), referenceCount, objectAlias));
+                ret.append(indent(level + 2)).append(amfToString(processedObjects, level + 1, p.getFirst(), referenceCount, objectAlias)).append(" : ").append(amfToString(processedObjects, level + 1, p.getSecond(), referenceCount, objectAlias));
                 if (i < at.getAssociativeValues().size() - 1) {
                     ret.append(",");
                 }
@@ -182,23 +182,23 @@ public class AMF3Tools {
                 ret.append(indent(level + 1));
             }
             ret.append("]\r\n");
-            ret.append(indent(level) + "}");
+            ret.append(indent(level)).append("}");
         } else if (object instanceof DictionaryType) {
             DictionaryType dt = (DictionaryType) object;
             ret.append("{\r\n");
-            ret.append(indent(level + 1) + "\"type\": \"Dictionary\",\r\n");
+            ret.append(indent(level + 1)).append("\"type\": \"Dictionary\",\r\n");
             ret.append(addId);
-            ret.append(indent(level + 1) + "\"value\": {\r\n");
+            ret.append(indent(level + 1)).append("\"value\": {\r\n");
             for (int i = 0; i < dt.getPairs().size(); i++) {
                 Pair<Object, Object> pair = dt.getPairs().get(i);
-                ret.append(indent(level + 1) + amfToString(processedObjects, level + 1, pair.getFirst(), referenceCount, objectAlias) + " : " + amfToString(processedObjects, level + 1, pair.getSecond(), referenceCount, objectAlias));
+                ret.append(indent(level + 1)).append(amfToString(processedObjects, level + 1, pair.getFirst(), referenceCount, objectAlias)).append(" : ").append(amfToString(processedObjects, level + 1, pair.getSecond(), referenceCount, objectAlias));
                 if (i < dt.getPairs().size() - 1) {
                     ret.append(",");
                 }
                 ret.append("\r\n");
             }
-            ret.append(indent(level + 1) + "}\r\n");
-            ret.append(indent(level) + "}");
+            ret.append(indent(level + 1)).append("}\r\n");
+            ret.append(indent(level)).append("}");
         } else if (object instanceof ByteArrayType) {
             ByteArrayType ba = (ByteArrayType) object;
             byte data[] = ba.getData();
