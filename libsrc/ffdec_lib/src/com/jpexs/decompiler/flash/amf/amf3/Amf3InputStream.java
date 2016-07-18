@@ -1,5 +1,6 @@
 package com.jpexs.decompiler.flash.amf.amf3;
 
+import com.jpexs.decompiler.flash.EndOfStreamException;
 import com.jpexs.decompiler.flash.amf.amf3.types.ArrayType;
 import com.jpexs.decompiler.flash.amf.amf3.types.XmlType;
 import com.jpexs.decompiler.flash.amf.amf3.types.ObjectType;
@@ -187,7 +188,7 @@ public class Amf3InputStream extends InputStream {
         byte buf[] = new byte[(int) byteLength]; //how about long strings(?), will the int length be enough?
         int cnt = is.read(buf);
         if (cnt < buf.length) {
-            throw new PrematureEndOfTheStreamException();
+            throw new EndOfStreamException();
         }
         String retString = new String(buf, "UTF-8");
         endDumpLevel(retString);
@@ -220,7 +221,7 @@ public class Amf3InputStream extends InputStream {
     private int readInternal() throws IOException {
         int ret = read();
         if (ret == -1) {
-            throw new PrematureEndOfTheStreamException();
+            throw new EndOfStreamException();
         }
         return ret;
     }
@@ -510,7 +511,7 @@ public class Amf3InputStream extends InputStream {
                         int byteArrayLength = (int) (byteArrayU29 >> 1);
                         byte byteArrayBuf[] = new byte[byteArrayLength];
                         if (is.read(byteArrayBuf) != byteArrayLength) {
-                            throw new PrematureEndOfTheStreamException();
+                            throw new EndOfStreamException();
                         }
 
                         LOGGER.log(Level.FINER, "ByteArray value: bytes[{0}]", byteArrayLength);
