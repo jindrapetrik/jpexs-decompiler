@@ -4,7 +4,10 @@ import com.jpexs.decompiler.flash.amf.amf3.types.ArrayType;
 import com.jpexs.decompiler.flash.amf.amf3.types.DictionaryType;
 import com.jpexs.decompiler.flash.amf.amf3.types.ObjectType;
 import com.jpexs.decompiler.flash.amf.amf3.types.VectorObjectType;
+import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.MemoryInputStream;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -20,7 +23,6 @@ import org.testng.annotations.Test;
 
 public class Amf3InputStreamTest {
 
-    private FileInputStream fis;
     private Amf3InputStream is;
 
     @AfterTest
@@ -33,25 +35,17 @@ public class Amf3InputStreamTest {
             }
             is = null;
         }
-        if (fis != null) {
-            try {
-                fis.close();
-            } catch (IOException ex) {
-                //ignore
-            }
-            fis = null;
-        }
     }
 
-    private void initStream(String fileName) throws FileNotFoundException {
-        fis = new FileInputStream("testdata/amf3/generated/" + fileName);
-        is = new Amf3InputStream(fis);
+    private void initStream(String fileName) throws IOException {
+        String file = "testdata/amf3/generated/" + fileName;
+        is = new Amf3InputStream(new MemoryInputStream(Helper.readFile(file)));
     }
 
     @Test
     public void testReadObject() throws IOException, NoSerializerExistsException {
         initStream("all.bin");
-        is.readValue();
+        is.readValue("testValue");
     }
 
     private Map<String, ObjectTypeSerializeHandler> getSerializers() {
@@ -76,20 +70,20 @@ public class Amf3InputStreamTest {
     @Test(expectedExceptions = NoSerializerExistsException.class)
     public void testReadCustomSerializedNeedsSerializer() throws IOException, NoSerializerExistsException {
         initStream("custom.bin");
-        is.readValue(); //needs deserializer for CustomClass
+        is.readValue("testValue"); //needs deserializer for CustomClass
     }
 
     @Test
     public void testReadCustomSerialized() throws IOException, NoSerializerExistsException {
         initStream("custom.bin");
-        is.readValue(getSerializers());
+        is.readValue("testValue", getSerializers());
     }
 
     @Test
     public void testNoSerializerHandlingInObjectDynamicProp() throws IOException {
         initStream("noserializer_object_dynamic.bin");
         try {
-            is.readValue();
+            is.readValue("testValue");
         } catch (NoSerializerExistsException ex) {
             assertTrue(ex.getIncompleteData() instanceof ObjectType, "Expected datatype: ObjectType, Actual datatype: " + ex.getIncompleteData().getClass());
             //TODO: examinate the data more
@@ -100,7 +94,7 @@ public class Amf3InputStreamTest {
     public void testNoSerializerHandlingInObjectSealedProp() throws IOException {
         initStream("noserializer_object_sealed.bin");
         try {
-            is.readValue();
+            is.readValue("testValue");
         } catch (NoSerializerExistsException ex) {
             assertTrue(ex.getIncompleteData() instanceof ObjectType, "Expected datatype: ObjectType, Actual datatype: " + ex.getIncompleteData().getClass());
             //TODO: examinate the data more
@@ -111,7 +105,7 @@ public class Amf3InputStreamTest {
     public void testNoSerializerHandlingInArrayDense() throws IOException {
         initStream("noserializer_array_dense.bin");
         try {
-            is.readValue();
+            is.readValue("testValue");
         } catch (NoSerializerExistsException ex) {
             assertTrue(ex.getIncompleteData() instanceof ArrayType, "Expected datatype: ArrayType, Actual datatype: " + ex.getIncompleteData().getClass());
             //TODO: examinate the data more
@@ -122,7 +116,7 @@ public class Amf3InputStreamTest {
     public void testNoSerializerHandlingInArrayAssociative() throws IOException {
         initStream("noserializer_array_associative.bin");
         try {
-            is.readValue();
+            is.readValue("testValue");
         } catch (NoSerializerExistsException ex) {
             assertTrue(ex.getIncompleteData() instanceof ArrayType, "Expected datatype: ArrayType, Actual datatype: " + ex.getIncompleteData().getClass());
             //TODO: examinate the data more
@@ -133,7 +127,7 @@ public class Amf3InputStreamTest {
     public void testNoSerializerHandlingInVector() throws IOException {
         initStream("noserializer_vector.bin");
         try {
-            is.readValue();
+            is.readValue("testValue");
         } catch (NoSerializerExistsException ex) {
             assertTrue(ex.getIncompleteData() instanceof VectorObjectType, "Expected datatype: VectorObjectType, Actual datatype: " + ex.getIncompleteData().getClass());
             //TODO: examinate the data more
@@ -144,7 +138,7 @@ public class Amf3InputStreamTest {
     public void testNoSerializerHandlingInDictionaryValues() throws IOException {
         initStream("noserializer_dictionary_value.bin");
         try {
-            is.readValue();
+            is.readValue("testValue");
         } catch (NoSerializerExistsException ex) {
             assertTrue(ex.getIncompleteData() instanceof DictionaryType, "Expected datatype: DictionaryType, Actual datatype: " + ex.getIncompleteData().getClass());
             //TODO: examinate the data more
@@ -155,7 +149,7 @@ public class Amf3InputStreamTest {
     public void testNoSerializerHandlingInDictionaryKeys() throws IOException {
         initStream("noserializer_dictionary_key.bin");
         try {
-            is.readValue();
+            is.readValue("testValue");
         } catch (NoSerializerExistsException ex) {
             assertTrue(ex.getIncompleteData() instanceof DictionaryType, "Expected datatype: DictionaryType, Actual datatype: " + ex.getIncompleteData().getClass());
             //TODO: examinate the data more
@@ -165,7 +159,7 @@ public class Amf3InputStreamTest {
     @Test(expectedExceptions = UnsupportedValueTypeException.class)
     public void testUnsupportedMarker() throws IOException, NoSerializerExistsException {
         final int UNSUPPORTED_MARKER = 100;
-        is = new Amf3InputStream(new ByteArrayInputStream(new byte[]{UNSUPPORTED_MARKER}));
-        is.readValue();
+        is = new Amf3InputStream(new MemoryInputStream(new byte[]{UNSUPPORTED_MARKER}));
+        is.readValue("testValue");
     }
 }

@@ -16,6 +16,9 @@
  */
 package com.jpexs.decompiler.flash;
 
+import com.jpexs.decompiler.flash.amf.amf3.Amf3OutputStream;
+import com.jpexs.decompiler.flash.amf.amf3.NoSerializerExistsException;
+import com.jpexs.decompiler.flash.amf.amf3.ObjectTypeSerializeHandler;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.tags.DefineBitsLosslessTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -81,7 +84,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.Deflater;
@@ -1945,5 +1950,32 @@ public class SWFOutputStream extends OutputStream {
         writeUB(5, (value >> 19) & 0xff);
         writeUB(5, (value >> 11) & 0xff);
         writeUB(5, (value >> 3) & 0xff);
+    }
+
+    /**
+     * Writes AMF3 encoded value. Warning: Correct serializer needs to be passed
+     * as second parameter when using IExternalizable
+     *
+     * @param value
+     * @param serializers Map className=>Serializer for classes implementing
+     * IExternalizable
+     * @throws IOException
+     * @throws NoSerializerExistsException
+     */
+    public void writeAmf3Object(Object value, Map<String, ObjectTypeSerializeHandler> serializers) throws IOException, NoSerializerExistsException {
+        Amf3OutputStream ao = new Amf3OutputStream(os);
+        ao.writeValue(value, serializers);
+    }
+
+    /**
+     * Writes AMF3 encoded value. Warning: When the object implements
+     * IExternalizable, you need to pass serializer as second parameter
+     *
+     * @param value
+     * @throws IOException
+     * @throws NoSerializerExistsException
+     */
+    public void writeAmf3Object(Object value) throws IOException, NoSerializerExistsException {
+        writeAmf3Object(value, new HashMap<>());
     }
 }

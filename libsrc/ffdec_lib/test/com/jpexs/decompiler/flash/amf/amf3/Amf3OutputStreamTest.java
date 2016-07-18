@@ -1,5 +1,7 @@
 package com.jpexs.decompiler.flash.amf.amf3;
 
+import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.MemoryInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -76,23 +78,23 @@ public class Amf3OutputStreamTest {
     @Test(dataProvider = "files")
     public void testRecompile(String fileName) throws FileNotFoundException, IOException, NoSerializerExistsException {
 
-        File originalFile = new File("testdata/amf3/generated/" + fileName);
+        String originalFile = "testdata/amf3/generated/" + fileName;
 
-        byte[] originalData = readFile(originalFile);
+        byte[] originalData = Helper.readFile(originalFile);
         byte[] savedData;
-        try (FileInputStream fis = new FileInputStream(originalFile)) {
-            Amf3InputStream is = new Amf3InputStream(fis);
 
-            Object val = is.readValue(getSerializers());
-            File savedFile = new File("testdata/amf3/generated/recompiled." + fileName);
-            try (FileOutputStream fos = new FileOutputStream(savedFile)) {
-                Amf3OutputStream os = new Amf3OutputStream(fos);
-                os.writeValue(val, getSerializers());
-            }
-            savedData = readFile(savedFile);
-            savedFile.delete();
+        Amf3InputStream is = new Amf3InputStream(new MemoryInputStream(Helper.readFile(originalFile)));
+
+        Object val = is.readValue("testValue", getSerializers());
+        String savedFile = "testdata/amf3/generated/recompiled." + fileName;
+        try (FileOutputStream fos = new FileOutputStream(savedFile)) {
+            Amf3OutputStream os = new Amf3OutputStream(fos);
+            os.writeValue(val, getSerializers());
         }
+        savedData = Helper.readFile(savedFile);
 
         Assert.assertEquals(savedData, originalData);
+        new File(savedFile).delete();
+
     }
 }

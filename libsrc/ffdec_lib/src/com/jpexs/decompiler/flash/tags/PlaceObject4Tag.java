@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.EndOfStreamException;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.amf.amf3.NoSerializerExistsException;
 import com.jpexs.decompiler.flash.tags.base.ASMSourceContainer;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -37,10 +38,13 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
 import com.jpexs.helpers.ByteArrayRange;
+import com.jpexs.helpers.Helper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Same as PlaceObject3Tag except additional AMF data
@@ -230,7 +234,8 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
     @Reserved
     public boolean reserved;
 
-    public byte[] amfData;  //TODO: Parse AMF data?
+    //public byte[] amfData;  //TODO: Parse AMF data?
+    public Object amfData;
 
     /**
      * Constructor
@@ -241,7 +246,7 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
         super(swf, ID, NAME, null);
     }
 
-    public PlaceObject4Tag(SWF swf, boolean placeFlagMove, int depth, String className, int characterId, MATRIX matrix, CXFORMWITHALPHA colorTransform, int ratio, String name, int clipDepth, List<FILTER> surfaceFilterList, int blendMode, int bitmapCache, int visible, RGBA backgroundColor, CLIPACTIONS clipActions, byte[] amfData) {
+    public PlaceObject4Tag(SWF swf, boolean placeFlagMove, int depth, String className, int characterId, MATRIX matrix, CXFORMWITHALPHA colorTransform, int ratio, String name, int clipDepth, List<FILTER> surfaceFilterList, int blendMode, int bitmapCache, int visible, RGBA backgroundColor, CLIPACTIONS clipActions, Object amfData) {
         super(swf, ID, NAME, null);
         this.placeFlagHasClassName = className != null;
         this.placeFlagHasFilterList = surfaceFilterList != null;
@@ -353,8 +358,9 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
         if (placeFlagHasClipActions) {
             clipActions = sis.readCLIPACTIONS(swf, this, "clipActions");
         }
-
-        amfData = sis.readBytesEx(sis.available(), "amfData");
+        if (sis.available() > 0) {
+            amfData = sis.readAmf3Object("amfValue");
+        }
     }
 
     /**
@@ -423,6 +429,14 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
         }
         if (placeFlagHasClipActions) {
             sos.writeCLIPACTIONS(clipActions);
+        }
+        if (amfData != null) {
+            //sos.write(Helper.readFile("d:\\Dropbox\\Programovani\\JavaSE\\FFDec\\libsrc\\ffdec_lib\\testdata\\amf3\\generated\\all.bin"));
+            try {
+                sos.writeAmf3Object(amfData);
+            } catch (NoSerializerExistsException ex) {
+                throw new IOException("Class \"" + ex.getClassName() + "\" implements IExternalizable, it cannot be saved");
+            }
         }
     }
 

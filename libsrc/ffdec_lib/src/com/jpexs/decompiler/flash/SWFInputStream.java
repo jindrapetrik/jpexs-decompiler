@@ -118,6 +118,8 @@ import com.jpexs.decompiler.flash.action.swf7.ActionExtends;
 import com.jpexs.decompiler.flash.action.swf7.ActionImplementsOp;
 import com.jpexs.decompiler.flash.action.swf7.ActionThrow;
 import com.jpexs.decompiler.flash.action.swf7.ActionTry;
+import com.jpexs.decompiler.flash.amf.amf3.Amf3InputStream;
+import com.jpexs.decompiler.flash.amf.amf3.NoSerializerExistsException;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.tags.CSMTextSettingsTag;
@@ -756,6 +758,23 @@ public class SWFInputStream implements AutoCloseable {
         byte[] ret = readBytesInternalEx(count);
         endDumpLevel();
         return ret;
+    }
+
+    /**
+     * Reads AMF3 encoded value from the stream
+     *
+     * @param name
+     * @return
+     * @throws IOException
+     */
+    public Object readAmf3Object(String name) throws IOException {
+        Amf3InputStream ai = new Amf3InputStream(is);
+        ai.dumpInfo = this.dumpInfo;
+        try {
+            return ai.readValue("amfData");
+        } catch (NoSerializerExistsException nse) {
+            return nse.getIncompleteData();
+        }
     }
 
     /**
