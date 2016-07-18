@@ -14,11 +14,15 @@ import com.jpexs.decompiler.flash.amf.amf3.types.DictionaryType;
 import com.jpexs.decompiler.flash.amf.amf3.types.VectorUIntType;
 import com.jpexs.decompiler.flash.amf.amf3.types.BasicType;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +34,11 @@ public class Amf3InputStream extends InputStream {
     public final static Logger LOGGER = Logger.getLogger(Amf3InputStream.class.getName());
     private final MemoryInputStream is;
     public DumpInfo dumpInfo;
+    private static String NO_REFERENCE_BIT_TEXT = "not reference";
+    private static String REFERENCE_BIT_TEXT = "not reference";
+    private static String OBJECT_INDEX_TEXT = "object index";
+    private static String STRING_INDEX_TEXT = "string index";
+    private static String TRAIT_INDEX_TEXT = "trait index";
 
     public Amf3InputStream(MemoryInputStream is) {
         this.is = is;
@@ -57,16 +66,6 @@ public class Amf3InputStream extends InputStream {
             dumpInfo.previewValue = value;
             dumpInfo = dumpInfo.parent;
         }
-    }
-
-    private void renameLastDump(String newname) {
-        if (dumpInfo != null) {
-            if (!dumpInfo.getChildInfos().isEmpty()) {
-                DumpInfo di = dumpInfo.getChildInfos().get(dumpInfo.getChildInfos().size() - 1);
-                di.name = newname;
-            }
-        }
-
     }
 
     public void endDumpLevelUntil(DumpInfo di) {
@@ -135,7 +134,7 @@ public class Amf3InputStream extends InputStream {
         newDumpLevel(name, "DOUBLE");
         long lval = readLong();
         double ret = Double.longBitsToDouble(lval);
-        endDumpLevel(ret);
+        endDumpLevel(EcmaScript.toString(ret));
         return ret;
     }
 
@@ -144,6 +143,68 @@ public class Amf3InputStream extends InputStream {
         long val = readU29Internal();
         endDumpLevel(val);
         return val;
+    }
+
+    private void renameU29O_ref() {
+        renameU29("U29O-ref", REFERENCE_BIT_TEXT, OBJECT_INDEX_TEXT);
+    }
+
+    private void renameU29S_ref() {
+        renameU29("U29S-ref", REFERENCE_BIT_TEXT, STRING_INDEX_TEXT);
+    }
+
+    private void renameU29Traits_ref() {
+        renameU29("U29O-traits-ref", NO_REFERENCE_BIT_TEXT, "trait reference", TRAIT_INDEX_TEXT);
+    }
+
+    private void renameLastDump(String wholeName) {
+        if (dumpInfo != null) {
+            if (!dumpInfo.getChildInfos().isEmpty()) {
+                DumpInfo u29DumpInfo = dumpInfo.getChildInfos().get(dumpInfo.getChildInfos().size() - 1);
+                u29DumpInfo.name = wholeName;
+            }
+        }
+    }
+
+    private void setDumpInfoType(String type) {
+        if (dumpInfo != null) {
+            dumpInfo.type = type;
+        }
+    }
+
+    private void renameU29(String wholeName, String name1, String... names) {
+        List<String> bitNames = new ArrayList<>();
+        bitNames.add(name1);
+        bitNames.addAll(Arrays.asList(names));
+
+        String restName = bitNames.remove(bitNames.size() - 1);
+
+        if (bitNames.size() > 6) {
+            throw new RuntimeException("Renaming more than 6 bits in U29 is not supported");
+        }
+
+        if (dumpInfo != null) {
+            if (!dumpInfo.getChildInfos().isEmpty()) {
+                DumpInfo u29DumpInfo = dumpInfo.getChildInfos().get(dumpInfo.getChildInfos().size() - 1);
+                u29DumpInfo.name = wholeName;
+                long lastBytePos = u29DumpInfo.startByte + u29DumpInfo.lengthBytes - 1;   //last byte of U29 is least significant (U29 is big endian)
+
+                int remainingBitLength = ((int) u29DumpInfo.lengthBytes) * 8 - bitNames.size();
+                long u29val = ((long) (Long) u29DumpInfo.previewValue);
+
+                DumpInfo restDumpInfo = new DumpInfo(restName, "UB(" + remainingBitLength + ")", u29val >> bitNames.size(), lastBytePos, 0, u29DumpInfo.lengthBytes, remainingBitLength);
+                restDumpInfo.parent = u29DumpInfo;
+                u29DumpInfo.getChildInfos().add(restDumpInfo);
+
+                for (int i = bitNames.size() - 1; i >= 0; i--) {
+                    int bitVal = (int) ((u29val >> i) & 1);
+                    DumpInfo bitDumpInfo = new DumpInfo(bitNames.get(i), "bit", bitVal, lastBytePos, 7 - i, 1, 1);
+                    bitDumpInfo.parent = u29DumpInfo;
+                    u29DumpInfo.getChildInfos().add(bitDumpInfo);
+                }
+
+            }
+        }
     }
 
     public long readS29(String name) throws IOException {
@@ -191,31 +252,34 @@ public class Amf3InputStream extends InputStream {
             throw new EndOfStreamException();
         }
         String retString = new String(buf, "UTF-8");
-        endDumpLevel(retString);
+        endDumpLevel("\"" + Helper.escapeActionScriptString(retString) + "\"");
         return retString;
     }
 
     public String readUtf8Vr(String name, List<String> stringTable) throws IOException {
+        newDumpLevel(name, "UTF-8-vr");
         long u = readU29("U29S");
         int stringNoRefFlag = (int) (u & 1);
+        String retString;
         if (stringNoRefFlag == 1) {
-            renameLastDump("U29S-value");
+            renameU29("U29S-value", NO_REFERENCE_BIT_TEXT, "byte length");
             long byteLength = u >> 1; //TODO: long strings, int is not enough for them
-            String retString = readUtf8Char("characters", byteLength);
+            retString = readUtf8Char("characters", byteLength);
             if (byteLength > 0) {
                 stringTable.add(retString);
             }
             LOGGER.log(Level.FINE, "Read string: \"{0}\"", retString);
-            return retString;
         } else { //flag==0
-            renameLastDump("U29S-ref");
+            renameU29S_ref();
             int stringRefTableIndex = (int) (u >> 1);
 
-            String retString = stringTable.get(stringRefTableIndex);
+            retString = stringTable.get(stringRefTableIndex);
             LOGGER.log(Level.FINE, "Read string: reference({0}):" + retString, stringRefTableIndex);
-            return retString;
 
         }
+        endDumpLevel("\"" + Helper.escapeActionScriptString(retString) + "\"");
+        return retString;
+
     }
 
     private int readInternal() throws IOException {
@@ -253,26 +317,31 @@ public class Amf3InputStream extends InputStream {
             switch (marker) {
                 case Marker.UNDEFINED:
                     renameLastDump("undefined-marker");
+                    setDumpInfoType("undefined-type");
                     LOGGER.log(Level.FINE, "Read value: undefined");
                     result = BasicType.UNDEFINED;
                     break;
                 case Marker.NULL:
                     renameLastDump("null-marker");
+                    setDumpInfoType("null-type");
                     LOGGER.log(Level.FINE, "Read value: null");
                     result = BasicType.NULL;
                     break;
                 case Marker.FALSE:
                     renameLastDump("false-marker");
+                    setDumpInfoType("false-type");
                     LOGGER.log(Level.FINE, "Read value: false");
                     result = Boolean.FALSE;
                     break;
                 case Marker.TRUE:
                     renameLastDump("true-marker");
+                    setDumpInfoType("true-type");
                     LOGGER.log(Level.FINE, "Read value: true");
                     result = Boolean.TRUE;
                     break;
                 case Marker.INTEGER:
                     renameLastDump("integer-marker");
+                    setDumpInfoType("integer-type");
                     LOGGER.log(Level.FINE, "Read value: integer");
                     long ival = readS29("intValue");
                     LOGGER.log(Level.FINER, "Integer value: {0}", ival);
@@ -280,6 +349,7 @@ public class Amf3InputStream extends InputStream {
                     break;
                 case Marker.DOUBLE:
                     renameLastDump("double-marker");
+                    setDumpInfoType("double-type");
                     LOGGER.log(Level.FINE, "Read value: double");
                     double dval = readDouble("doubleValue");
                     LOGGER.log(Level.FINER, "Double value: {0}", "" + dval);
@@ -287,6 +357,7 @@ public class Amf3InputStream extends InputStream {
                     break;
                 case Marker.STRING:
                     renameLastDump("string-marker");
+                    setDumpInfoType("string-type");
                     LOGGER.log(Level.FINE, "Read value: string");
                     String sval = readUtf8Vr("stringValue", stringTable);
                     LOGGER.log(Level.FINER, "String value: {0}", sval);
@@ -294,11 +365,12 @@ public class Amf3InputStream extends InputStream {
                     break;
                 case Marker.XML_DOC:
                     renameLastDump("xml-doc-marker");
+                    setDumpInfoType("xml-doc-type");
                     LOGGER.log(Level.FINE, "Read value: xml_doc");
                     long xmlDocU29 = readU29("U29");
                     int xmlDocNoRefFlag = (int) (xmlDocU29 & 1);
                     if (xmlDocNoRefFlag == 1) {
-                        renameLastDump("U29X-value");
+                        renameU29("U29X-value", NO_REFERENCE_BIT_TEXT, "byte length");
                         long byteLength = xmlDocU29 >> 1;
                         String xval = readUtf8Char("characters", byteLength);
                         LOGGER.log(Level.FINER, "XmlDoc value: {0}", xval);
@@ -306,7 +378,7 @@ public class Amf3InputStream extends InputStream {
                         objectTable.add(retXmlDoc);
                         result = retXmlDoc;
                     } else {
-                        renameLastDump("U29O-ref");
+                        renameU29O_ref();
                         int refIndexXmlDoc = (int) (xmlDocU29 >> 1);
                         LOGGER.log(Level.FINER, "XmlDoc value: reference({0})", refIndexXmlDoc);
                         result = objectTable.get(refIndexXmlDoc);    //What if it's not XmlRef?
@@ -314,11 +386,12 @@ public class Amf3InputStream extends InputStream {
                     break;
                 case Marker.DATE:
                     renameLastDump("date-marker");
+                    setDumpInfoType("date-type");
                     LOGGER.log(Level.FINE, "Read value: date");
                     long dateU29 = readU29("U29");
                     int dateNoRefFlag = (int) (dateU29 & 1);
                     if (dateNoRefFlag == 1) {
-                        renameLastDump("U29D-value");
+                        renameU29("U29D-value", NO_REFERENCE_BIT_TEXT, "unused");
                         //remaining bits of dateU29 are not used
                         double dtval = readDouble("date-time");
                         DateType retDate = new DateType(dtval);
@@ -326,7 +399,7 @@ public class Amf3InputStream extends InputStream {
                         objectTable.add(retDate);
                         result = retDate;
                     } else {
-                        renameLastDump("U29O-ref");
+                        renameU29O_ref();
                         int refIndexDate = (int) (dateU29 >> 1);
                         LOGGER.log(Level.FINER, "Date value: reference({0})", refIndexDate);
                         result = objectTable.get(refIndexDate);   //What if it's not Date?
@@ -334,18 +407,19 @@ public class Amf3InputStream extends InputStream {
                     break;
                 case Marker.ARRAY:
                     renameLastDump("array-marker");
+                    setDumpInfoType("array-type");
                     LOGGER.log(Level.FINE, "Read value: array");
                     long arrayU29 = readU29("U29");
                     int arrayNoRefFlag = (int) (arrayU29 & 1);
                     if (arrayNoRefFlag == 1) {
-                        renameLastDump("U29A-value");
+                        renameU29("U29A-value", NO_REFERENCE_BIT_TEXT, "dense count");
                         int denseCount = (int) (arrayU29 >> 1);
                         LOGGER.log(Level.FINEST, "Array value: denseCount={0}", new Object[]{denseCount});
                         List<Pair<String, Object>> assocPart = new ArrayList<>();
                         List<Object> densePart = new ArrayList<>();
                         ArrayType retArray = new ArrayType(densePart, assocPart);
                         objectTable.add(retArray); //add before processing  elements which may reference this
-
+                        newDumpLevel("associativeValues", "assoc-value");
                         while (true) {
                             String key = readUtf8Vr("key", stringTable);
                             if (key.isEmpty()) {
@@ -361,8 +435,10 @@ public class Amf3InputStream extends InputStream {
                                 }
                             }
                         }
+                        endDumpLevel();
                         LOGGER.log(Level.FINEST, "Array value: assocSize={0}", new Object[]{assocPart.size()});
 
+                        newDumpLevel("denseValues", "value-type[]");
                         for (int i = 0; i < denseCount; i++) {
                             try {
                                 densePart.add(readValue("denseValue", serializers, objectTable, traitsTable, stringTable));
@@ -374,11 +450,12 @@ public class Amf3InputStream extends InputStream {
                                 throw new NoSerializerExistsException(nse.getClassName(), retArray, nse);
                             }
                         }
+                        endDumpLevel();
                         LOGGER.log(Level.FINER, "Array value: dense_size={0},assocSize={1}", new Object[]{densePart.size(), assocPart.size()});
                         result = retArray;
 
                     } else {
-                        renameLastDump("U29O-ref");
+                        renameU29O_ref();
                         int refIndexArray = (int) (arrayU29 >> 1);
                         LOGGER.log(Level.FINER, "Array value: reference({0})", refIndexArray);
                         result = objectTable.get(refIndexArray);   //What if it's not Array?
@@ -387,6 +464,7 @@ public class Amf3InputStream extends InputStream {
 
                 case Marker.OBJECT:
                     renameLastDump("object-marker");
+                    setDumpInfoType("object-type");
                     LOGGER.log(Level.FINE, "Read value: object");
                     long objectU29 = readU29("U29");
                     int objectNoRefFlag = (int) (objectU29 & 1);
@@ -397,15 +475,16 @@ public class Amf3InputStream extends InputStream {
                             int objectTraitsExtFlag = (int) ((objectU29 >> 2) & 1);
                             ObjectType retObjectType;
                             if (objectTraitsExtFlag == 1) {
-                                renameLastDump("U29O-traits-ext");
+                                renameU29("U29O-traits-ext", NO_REFERENCE_BIT_TEXT, "not trait reference", "externalized traits", "unused");
                                 String className = readUtf8Vr("className", stringTable);
                                 if (!serializers.containsKey(className)) {
                                     throw new NoSerializerExistsException(className, new ObjectType(new Traits(className, false, new ArrayList<>()), (byte[]) null, new ArrayList<>()), null);
                                 }
-
+                                newDumpLevel("serializedData", "U8[]");
                                 MonitoredInputStream mis = new MonitoredInputStream(is);
                                 List<Pair<String, Object>> serMembers = serializers.get(className).readObject(className, mis);
                                 byte serData[] = mis.getReadData();
+                                endDumpLevel();
                                 Traits unserTraits = new Traits(className, false, new ArrayList<>());
                                 retObjectType = new ObjectType(unserTraits, serData, serMembers);
 
@@ -414,7 +493,7 @@ public class Amf3InputStream extends InputStream {
                                 result = retObjectType;
                                 break markerswitch;
                             } else {
-                                renameLastDump("U29O-traits");
+                                renameU29("U29O-traits", NO_REFERENCE_BIT_TEXT, "not trait reference", "not externalized traits", "dynamic", "sealed count");
                                 int dynamicFlag = (int) ((objectU29 >> 3) & 1);
                                 int numSealed = (int) (objectU29 >> 4);
                                 LOGGER.log(Level.FINEST, "object dynamicFlag:{0}", dynamicFlag);
@@ -422,14 +501,19 @@ public class Amf3InputStream extends InputStream {
                                 String className = readUtf8Vr("className", stringTable);
                                 LOGGER.log(Level.FINEST, "object className:{0}", className);
                                 List<String> sealedMemberNames = new ArrayList<>();
-                                for (int i = 0; i < numSealed; i++) {
-                                    sealedMemberNames.add(readUtf8Vr("sealedMemberName", stringTable));
+                                if (numSealed > 0) {
+                                    newDumpLevel("sealedMemberNames", "UTF-8-vr[]");
+
+                                    for (int i = 0; i < numSealed; i++) {
+                                        sealedMemberNames.add(readUtf8Vr("sealedMemberName", stringTable));
+                                    }
+                                    endDumpLevel();
                                 }
                                 traits = new Traits(className, dynamicFlag == 1, sealedMemberNames);
                                 traitsTable.add(traits);
                             }
                         } else {
-                            renameLastDump("U29O-traits-ref");
+                            renameU29Traits_ref();
                             int refIndexTraits = (int) (objectU29 >> 2);
                             traits = traitsTable.get(refIndexTraits);
                             LOGGER.log(Level.FINER, "Traits value: reference({0}) - traitsize={1}", new Object[]{refIndexTraits, traits.getSealedMemberNames().size()});
@@ -441,41 +525,60 @@ public class Amf3InputStream extends InputStream {
                         objectTable.add(retObjectType); //add it before any subvalue can reference it
                         List<Object> sealedMemberValues = new ArrayList<>();
                         NoSerializerExistsException error = null;
-
-                        for (int i = 0; i < traits.getSealedMemberNames().size(); i++) {
-                            try {
-                                sealedMemberValues.add(readValue("sealedMemberValue", serializers, objectTable, traitsTable, stringTable));
-                            } catch (NoSerializerExistsException nse) {
-                                sealedMemberValues.add(nse.getIncompleteData());
-                                for (int j = i + 1; j < traits.getSealedMemberNames().size(); j++) {
-                                    sealedMemberValues.add(BasicType.UNKNOWN);
+                        if (!traits.getSealedMemberNames().isEmpty()) {
+                            newDumpLevel("sealedMemberValues", "value-type[]");
+                            for (int i = 0; i < traits.getSealedMemberNames().size(); i++) {
+                                try {
+                                    sealedMemberValues.add(readValue("sealedMemberValue", serializers, objectTable, traitsTable, stringTable));
+                                } catch (NoSerializerExistsException nse) {
+                                    sealedMemberValues.add(nse.getIncompleteData());
+                                    for (int j = i + 1; j < traits.getSealedMemberNames().size(); j++) {
+                                        sealedMemberValues.add(BasicType.UNKNOWN);
+                                    }
+                                    error = nse;
+                                    break;
                                 }
-                                error = nse;
-                                break;
                             }
+                            endDumpLevel();
                         }
 
                         for (int i = 0; i < traits.getSealedMemberNames().size(); i++) {
                             sealedMembers.add(new Pair<>(traits.getSealedMemberNames().get(i), sealedMemberValues.get(i)));
                         }
                         if (traits.isDynamic()) {
+                            newDumpLevel("dynamicMembers", "dynamic-member[]");
                             String dynamicMemberName;
-                            while (!(dynamicMemberName = readUtf8Vr("dynamicMemberName", stringTable)).isEmpty()) {
+                            while (!(dynamicMemberName = readUtf8Vr("name", stringTable)).isEmpty()) {
                                 try {
-                                    Object dynamicMemberValue = readValue("dynamicMemberValue", serializers, objectTable, traitsTable, stringTable);
+                                    Object dynamicMemberValue = readValue("value", serializers, objectTable, traitsTable, stringTable);
                                     dynamicMembers.add(new Pair<>(dynamicMemberName, dynamicMemberValue));
                                 } catch (NoSerializerExistsException nse) {
                                     dynamicMembers.add(new Pair<>(dynamicMemberName, nse.getIncompleteData()));
                                     throw new NoSerializerExistsException(nse.getClassName(), retObjectType, nse);
+                                } finally {
+                                    //group dumpInfo to one sub "dynamic-member"
+                                    if (dumpInfo != null) {
+                                        DumpInfo valueDumpInfo = dumpInfo.getChildInfos().remove(dumpInfo.getChildInfos().size() - 1);
+                                        DumpInfo nameDumpInfo = dumpInfo.getChildInfos().remove(dumpInfo.getChildInfos().size() - 1);
+                                        DumpInfo memberDumpInfo = new DumpInfo("member", "dynamic-member", "", nameDumpInfo.startByte, nameDumpInfo.lengthBytes + valueDumpInfo.lengthBytes);
+                                        memberDumpInfo.getChildInfos().add(nameDumpInfo);
+                                        memberDumpInfo.getChildInfos().add(valueDumpInfo);
+                                        memberDumpInfo.parent = dumpInfo;
+                                        nameDumpInfo.parent = memberDumpInfo;
+                                        valueDumpInfo.parent = memberDumpInfo;
+                                        memberDumpInfo.previewValue = "" + nameDumpInfo.previewValue + (valueDumpInfo.previewValue != null ? " : " + valueDumpInfo.previewValue : "");
+                                        dumpInfo.getChildInfos().add(memberDumpInfo);
+                                    }
                                 }
                             }
                             renameLastDump("UTF-8-empty");
+                            endDumpLevel();
                         }
 
                         LOGGER.log(Level.FINER, "Object value: dynamic={0},className={1},sealedSize={2},dynamicSize={3}", new Object[]{traits.isDynamic(), traits.getClassName(), sealedMembers.size(), dynamicMembers.size()});
                         result = retObjectType;
                     } else {
-                        renameLastDump("U29O-ref");
+                        renameU29O_ref();
                         int refIndexObject = (int) (objectU29 >> 1);
                         LOGGER.log(Level.FINER, "Object value: reference({0})", refIndexObject);
                         result = objectTable.get(refIndexObject);
@@ -483,11 +586,12 @@ public class Amf3InputStream extends InputStream {
                     break;
                 case Marker.XML:
                     renameLastDump("xml-marker");
+                    setDumpInfoType("xml-type");
                     LOGGER.log(Level.FINE, "Read value: xml");
                     long xmlU29 = readU29("U29");
                     int xmlNoRefFlag = (int) (xmlU29 & 1);
                     if (xmlNoRefFlag == 1) {
-                        renameLastDump("U29X-value");
+                        renameU29("U29X-value", NO_REFERENCE_BIT_TEXT, "byte length");
                         long byteLength = (xmlU29 >> 1);
                         String xString = readUtf8Char("characters", byteLength);
                         XmlType retXmlType = new XmlType(xString);
@@ -495,7 +599,7 @@ public class Amf3InputStream extends InputStream {
                         objectTable.add(retXmlType);
                         result = retXmlType;
                     } else {
-                        renameLastDump("U29O-ref");
+                        renameU29O_ref();
                         int refIndexXml = (int) (xmlU29 >> 1);
                         LOGGER.log(Level.FINER, "XML value: reference({0})", refIndexXml);
                         result = objectTable.get(refIndexXml);
@@ -503,23 +607,26 @@ public class Amf3InputStream extends InputStream {
                     break;
                 case Marker.BYTE_ARRAY:
                     renameLastDump("byte-array-marker");
+                    setDumpInfoType("bytearray-type");
                     LOGGER.log(Level.FINE, "Read value: bytearray");
                     long byteArrayU29 = readU29("U29");
                     int byteArrayNoRefFlag = (int) (byteArrayU29 & 1);
                     if (byteArrayNoRefFlag == 1) {
-                        renameLastDump("U29B-value");
+                        renameU29("U29B-value", NO_REFERENCE_BIT_TEXT, "byte array length");
                         int byteArrayLength = (int) (byteArrayU29 >> 1);
+                        newDumpLevel("bytes", "U8[]");
                         byte byteArrayBuf[] = new byte[byteArrayLength];
                         if (is.read(byteArrayBuf) != byteArrayLength) {
                             throw new EndOfStreamException();
                         }
+                        endDumpLevel();
 
                         LOGGER.log(Level.FINER, "ByteArray value: bytes[{0}]", byteArrayLength);
                         ByteArrayType retByteArrayType = new ByteArrayType(byteArrayBuf);
                         objectTable.add(retByteArrayType);
                         result = retByteArrayType;
                     } else {
-                        renameLastDump("U290-ref");
+                        renameU29O_ref();
                         int refIndexByteArray = (int) (byteArrayU29 >> 1);
                         LOGGER.log(Level.FINER, "ByteArray value: reference({0})", refIndexByteArray);
                         result = objectTable.get(refIndexByteArray);
@@ -527,23 +634,26 @@ public class Amf3InputStream extends InputStream {
                     break;
                 case Marker.VECTOR_INT:
                     renameLastDump("vector-int-marker");
+                    setDumpInfoType("vector-int-type");
                     LOGGER.log(Level.FINE, "Read value: vector_int");
                     long vectorIntU29 = readU29("U29");
                     int vectorIntNoRefFlag = (int) (vectorIntU29 & 1);
                     if (vectorIntNoRefFlag == 1) {
-                        renameLastDump("U29V-value");
+                        renameU29("U29V-value", NO_REFERENCE_BIT_TEXT, "item count");
                         int vectorIntCountItems = (int) (vectorIntU29 >> 1);
                         int fixed = readU8("fixed");
                         List<Long> vals = new ArrayList<>();
+                        newDumpLevel("items", "S32[]");
                         for (int i = 0; i < vectorIntCountItems; i++) {
-                            vals.add(readS32("value"));
+                            vals.add(readS32("intValue"));
                         }
+                        endDumpLevel();
                         VectorIntType retVectorInt = new VectorIntType(fixed == 1, vals);
                         LOGGER.log(Level.FINER, "Vector<int> value: fixed={0}, size={1}]", new Object[]{fixed, vectorIntCountItems});
                         objectTable.add(retVectorInt);
                         result = retVectorInt;
                     } else {
-                        renameLastDump("U29O-ref");
+                        renameU29O_ref();
                         int refIndexVectorInt = (int) (vectorIntU29 >> 1);
                         LOGGER.log(Level.FINER, "Vector<int> value: reference({0})", refIndexVectorInt);
                         result = objectTable.get(refIndexVectorInt);
@@ -551,23 +661,27 @@ public class Amf3InputStream extends InputStream {
                     break;
                 case Marker.VECTOR_UINT:
                     renameLastDump("vector-uint-marker");
+                    setDumpInfoType("vector-uint-type");
+
                     LOGGER.log(Level.FINE, "Read value: vector_uint");
                     long vectorUIntU29 = readU29("U29");
                     int vectorUIntNoRefFlag = (int) (vectorUIntU29 & 1);
                     if (vectorUIntNoRefFlag == 1) {
-                        renameLastDump("U29V-value");
+                        renameU29("U29V-value", NO_REFERENCE_BIT_TEXT, "item count");
                         int vectorUIntCountItems = (int) (vectorUIntU29 >> 1);
                         int fixed = readU8("fixed");
                         List<Long> vals = new ArrayList<>();
+                        newDumpLevel("items", "U32[]");
                         for (int i = 0; i < vectorUIntCountItems; i++) {
-                            vals.add(readU32("value"));
+                            vals.add(readU32("uintValue"));
                         }
+                        endDumpLevel();
                         VectorUIntType retVectorUInt = new VectorUIntType(fixed == 1, vals);
                         LOGGER.log(Level.FINER, "Vector<uint> value: fixed={0}, size={1}]", new Object[]{fixed, vectorUIntCountItems});
                         objectTable.add(retVectorUInt);
                         result = retVectorUInt;
                     } else {
-                        renameLastDump("U29O-ref");
+                        renameU29O_ref();
                         int refIndexVectorUInt = (int) (vectorUIntU29 >> 1);
                         LOGGER.log(Level.FINER, "Vector<uint> value: reference({0})", refIndexVectorUInt);
                         result = objectTable.get(refIndexVectorUInt);
@@ -575,23 +689,27 @@ public class Amf3InputStream extends InputStream {
                     break;
                 case Marker.VECTOR_DOUBLE:
                     renameLastDump("vector-double-marker");
+                    setDumpInfoType("vector-double-type");
+
                     LOGGER.log(Level.FINE, "Read value: vector_double");
                     long vectorDoubleU29 = readU29("U29");
                     int vectorDoubleNoRefFlag = (int) (vectorDoubleU29 & 1);
                     if (vectorDoubleNoRefFlag == 1) {
-                        renameLastDump("U29V-value");
+                        renameU29("U29V-value", NO_REFERENCE_BIT_TEXT, "item count");
                         int vectorDoubleCountItems = (int) (vectorDoubleU29 >> 1);
                         int fixed = readU8("fixed");
                         List<Double> vals = new ArrayList<>();
+                        newDumpLevel("items", "DOUBLE[]");
                         for (int i = 0; i < vectorDoubleCountItems; i++) {
-                            vals.add(readDouble("value"));
+                            vals.add(readDouble("doubleValue"));
                         }
+                        endDumpLevel();
                         VectorDoubleType retVectorDouble = new VectorDoubleType(fixed == 1, vals);
                         LOGGER.log(Level.FINER, "Vector<double> value: fixed={0}, size={1}]", new Object[]{fixed, vectorDoubleCountItems});
                         objectTable.add(retVectorDouble);
                         result = retVectorDouble;
                     } else {
-                        renameLastDump("U29O-ref");
+                        renameU29O_ref();
                         int refIndexVectorDouble = (int) (vectorDoubleU29 >> 1);
                         LOGGER.log(Level.FINER, "Vector<double> value: reference({0})", refIndexVectorDouble);
                         result = objectTable.get(refIndexVectorDouble);
@@ -599,16 +717,19 @@ public class Amf3InputStream extends InputStream {
                     break;
                 case Marker.VECTOR_OBJECT:
                     renameLastDump("vector-object-marker");
+                    setDumpInfoType("vector-object-type");
+
                     LOGGER.log(Level.FINE, "Read value: vector_object");
                     long vectorObjectU29 = readU29("U29");
                     int vectorObjectNoRefFlag = (int) (vectorObjectU29 & 1);
                     if (vectorObjectNoRefFlag == 1) {
-                        renameLastDump("U29V-value");
+                        renameU29("U29V-value", NO_REFERENCE_BIT_TEXT, "item count");
                         int vectorObjectCountItems = (int) (vectorObjectU29 >> 1);
                         int fixed = readU8("fixed");
                         String objectTypeName = readUtf8Vr("object-type-name", stringTable); //uses "*" for any type
                         List<Object> vals = new ArrayList<>();
                         NoSerializerExistsException error = null;
+                        newDumpLevel("items", "value_type[]");
                         for (int i = 0; i < vectorObjectCountItems; i++) {
                             try {
                                 vals.add(readValue("value", serializers, objectTable, traitsTable, stringTable));
@@ -621,6 +742,7 @@ public class Amf3InputStream extends InputStream {
                                 break;
                             }
                         }
+                        endDumpLevel();
                         VectorObjectType retVectorObject = new VectorObjectType(fixed == 1, objectTypeName, vals);
                         LOGGER.log(Level.FINER, "Vector<Object> value: fixed={0}, size={1}, typeName:{2}]", new Object[]{fixed, vectorObjectCountItems, objectTypeName});
                         objectTable.add(retVectorObject);
@@ -629,7 +751,7 @@ public class Amf3InputStream extends InputStream {
                         }
                         result = retVectorObject;
                     } else {
-                        renameLastDump("U29O-ref");
+                        renameU29O_ref();
 
                         int refIndexVectorObject = (int) (vectorObjectU29 >> 1);
                         LOGGER.log(Level.FINER, "Vector<Object> value: reference({0})", refIndexVectorObject);
@@ -638,16 +760,19 @@ public class Amf3InputStream extends InputStream {
                     break;
                 case Marker.DICTIONARY:
                     renameLastDump("dictionary-marker");
+                    setDumpInfoType("dictionary-type");
+
                     long dictionaryObjectU29 = readU29("U29");
                     int dictionaryNoRefFlag = (int) (dictionaryObjectU29 & 1);
                     if (dictionaryNoRefFlag == 1) {
-                        renameLastDump("U29Dict-value");
+                        renameU29("U29Dict-value", NO_REFERENCE_BIT_TEXT, "entries count");
                         int numEntries = (int) (dictionaryObjectU29 >> 1);
-                        int weakKeys = readU8("fixed");
+                        int weakKeys = readU8("weak keys");
                         List<Pair<Object, Object>> data = new ArrayList<>();
                         DictionaryType retDictionary = new DictionaryType(weakKeys == 1, data);
                         objectTable.add(retDictionary);
                         NoSerializerExistsException error = null;
+                        newDumpLevel("entries", "");
                         for (int i = 0; i < numEntries; i++) {
                             Object key;
                             Object val;
@@ -673,12 +798,13 @@ public class Amf3InputStream extends InputStream {
                                 break;
                             }
                         }
+                        endDumpLevel();
                         if (error != null) {
                             throw new NoSerializerExistsException(error.getClassName(), retDictionary, error);
                         }
                         result = retDictionary;
                     } else {
-                        renameLastDump("U29O-ref");
+                        renameU29O_ref();
                         int refIndexDictionary = (int) (dictionaryObjectU29 >> 1);
                         LOGGER.log(Level.FINER, "Dictionary value: reference({0})", refIndexDictionary);
                         result = objectTable.get(refIndexDictionary);
@@ -691,6 +817,29 @@ public class Amf3InputStream extends InputStream {
             endDumpLevel();
         }
         return result;
+    }
+
+    private static String valToPreviewString(Object v) {
+        if (v instanceof ObjectType) {
+            return "{...}";
+        }
+        if (v instanceof ArrayType) {
+            return "[...]";
+        }
+        if (v instanceof DictionaryType) {
+            return "";
+        }
+        if (v instanceof BasicType) {
+            return "";
+        }
+        if (v instanceof DateType) {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SS");
+            return sdf.format(((DateType) v).toDate());
+        }
+        if (v instanceof String) {
+            return "\"" + Helper.escapeActionScriptString((String) v) + "\"";
+        }
+        return EcmaScript.toString(v);
     }
 
     private class MonitoredInputStream extends InputStream {
