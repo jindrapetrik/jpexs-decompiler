@@ -164,6 +164,9 @@ package
       
       var objWithCustom:ObjectWithCustom = new ObjectWithCustom("1","2",custom,"4","5","6"); 
       writeToFile("noserializer_object_sealed.bin", objWithCustom);
+
+
+	writeToFile("simple.bin", {"a":7, "b":29});
     }
   }
 }

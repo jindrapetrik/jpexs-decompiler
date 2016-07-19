@@ -1,6 +1,6 @@
 package com.jpexs.decompiler.flash.amf.amf3.types;
 
-import com.jpexs.decompiler.flash.amf.amf3.Amf3Tools;
+import com.jpexs.decompiler.flash.exporters.amf.amf3.Amf3Exporter;
 import java.util.ArrayList;
 import java.util.List;
 import com.jpexs.decompiler.flash.amf.amf3.WithSubValues;
@@ -34,7 +34,7 @@ public abstract class AbstractVectorType<T> implements WithSubValues {
 
     @Override
     public String toString() {
-        return Amf3Tools.amfToString(this);
+        return Amf3Exporter.amfToString(this);
     }
 
 }

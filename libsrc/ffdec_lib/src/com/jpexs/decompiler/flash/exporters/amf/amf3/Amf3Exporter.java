@@ -1,5 +1,7 @@
-package com.jpexs.decompiler.flash.amf.amf3;
+package com.jpexs.decompiler.flash.exporters.amf.amf3;
 
+import com.jpexs.decompiler.flash.amf.amf3.Pair;
+import com.jpexs.decompiler.flash.amf.amf3.WithSubValues;
 import com.jpexs.decompiler.flash.amf.amf3.types.ArrayType;
 import com.jpexs.decompiler.flash.amf.amf3.types.XmlType;
 import com.jpexs.decompiler.flash.amf.amf3.types.ObjectType;
@@ -9,6 +11,7 @@ import com.jpexs.decompiler.flash.amf.amf3.types.ByteArrayType;
 import com.jpexs.decompiler.flash.amf.amf3.types.DateType;
 import com.jpexs.decompiler.flash.amf.amf3.types.DictionaryType;
 import com.jpexs.decompiler.flash.amf.amf3.types.BasicType;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.helpers.Helper;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -18,20 +21,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Amf3Tools {
+public class Amf3Exporter {
 
     /**
      * Converts AMF value to something human-readable.
      *
-     * @param obj
+     * @param amfValue
      * @return
      */
-    public static String amfToString(Object obj) {
+    public static String amfToString(Object amfValue) {
         Map<Object, Integer> refCount = new HashMap<>();
         List<Object> objectList = new ArrayList<>();
         Map<Object, String> objectAlias = new HashMap<>();
-        populateObjects(obj, refCount, objectList, objectAlias);
-        return amfToString(new ArrayList<>(), 0, obj, refCount, objectAlias);
+        populateObjects(amfValue, refCount, objectList, objectAlias);
+        return amfToString(new ArrayList<>(), 0, amfValue, refCount, objectAlias);
     }
 
     /**
@@ -89,7 +92,7 @@ public class Amf3Tools {
             return "\"" + Helper.escapeActionScriptString((String) object) + "\"";
         }
         if (((List<? extends Class>) Arrays.asList(Long.class, Double.class, Boolean.class)).contains(object.getClass())) {
-            return object.toString();
+            return EcmaScript.toString(object);
         }
 
         if (object instanceof BasicType) {
@@ -105,7 +108,7 @@ public class Amf3Tools {
         }
         processedObjects.add(object);
 
-        String addId = refCount > 1 ? indent(level + 1) + "\"id\": \"" + objectAlias.get(object) + "\"\r\n" : "";
+        String addId = refCount > 1 ? indent(level + 1) + "\"id\": \"" + objectAlias.get(object) + "\",\r\n" : "";
 
         if (object instanceof AbstractVectorType) {
             AbstractVectorType avt = (AbstractVectorType) object;
@@ -134,7 +137,7 @@ public class Amf3Tools {
                 if (serData == null) {
                     ret.append(indent(level + 1)).append("\"serialized\": unknown\r\n");
                 } else {
-                    ret.append(indent(level + 1)).append("\"serialized\": 0x").append(javax.xml.bind.DatatypeConverter.printHexBinary(serData)).append(",\r\n");
+                    ret.append(indent(level + 1)).append("\"serialized\": \"").append(javax.xml.bind.DatatypeConverter.printHexBinary(serData)).append("\",\r\n");
                     if (!ot.getSerializedMembers().isEmpty()) {
                         ret.append(indent(level + 1)).append("\"unserializedMembers\": {\r\n");
                         for (int i = 0; i < ot.getSerializedMembers().size(); i++) {
@@ -152,41 +155,44 @@ public class Amf3Tools {
                 }
             } else {
                 ret.append(indent(level + 1)).append("\"dynamic\": ").append(ot.isDynamic()).append(",\r\n");
-                if (!ot.getSealedMembers().isEmpty()) {
-                    ret.append(indent(level + 1)).append("\"sealedMembers\": {\r\n");
-                    for (int i = 0; i < ot.getSealedMembers().size(); i++) {
-                        Pair<String, Object> member = ot.getSealedMembers().get(i);
-                        ret.append(indent(level + 2)).append(amfToString(processedObjects, level + 2, member.getFirst(), referenceCount, objectAlias)).append(":").append(amfToString(processedObjects, level + 1, member.getSecond(), referenceCount, objectAlias));
-                        if (i < ot.getSealedMembers().size() - 1) {
-                            ret.append(",\r\n");
-                        } else {
-                            ret.append("\r\n");
-                        }
+                //if (!ot.getSealedMembers().isEmpty()) {
+                ret.append(indent(level + 1)).append("\"sealedMembers\": {\r\n");
+                for (int i = 0; i < ot.getSealedMembers().size(); i++) {
+                    Pair<String, Object> member = ot.getSealedMembers().get(i);
+                    ret.append(indent(level + 2)).append(amfToString(processedObjects, level + 2, member.getFirst(), referenceCount, objectAlias)).append(":").append(amfToString(processedObjects, level + 1, member.getSecond(), referenceCount, objectAlias));
+                    if (i < ot.getSealedMembers().size() - 1) {
+                        ret.append(",\r\n");
+                    } else {
+                        ret.append("\r\n");
                     }
-                    ret.append(indent(level + 1)).append("}");
-                    if (!ot.getDynamicMembers().isEmpty()) {
+                }
+                ret.append(indent(level + 1)).append("}");
+                //if (!ot.getDynamicMembers().isEmpty()) {
+                ret.append(",");
+                //}
+                ret.append("\r\n");
+                //}
+                //if (!ot.getDynamicMembers().isEmpty()) {
+                ret.append(indent(level + 1)).append("\"dynamicMembers\": {\r\n");
+                for (int i = 0; i < ot.getDynamicMembers().size(); i++) {
+                    Pair<String, Object> member = ot.getDynamicMembers().get(i);
+                    ret.append(indent(level + 2)).append(amfToString(processedObjects, level + 2, member.getFirst(), referenceCount, objectAlias));
+                    ret.append(":");
+                    ret.append(amfToString(processedObjects, level + 2, member.getSecond(), referenceCount, objectAlias));
+                    if (i < ot.getDynamicMembers().size() - 1) {
                         ret.append(",");
                     }
                     ret.append("\r\n");
                 }
-                if (!ot.getDynamicMembers().isEmpty()) {
-                    ret.append(indent(level + 1)).append("\"dynamicMembers\": {\r\n");
-                    for (int i = 0; i < ot.getDynamicMembers().size(); i++) {
-                        Pair<String, Object> member = ot.getDynamicMembers().get(i);
-                        ret.append(indent(level + 2)).append(amfToString(processedObjects, level + 2, member.getFirst(), referenceCount, objectAlias)).append(":").append(amfToString(processedObjects, level + 2, member.getSecond(), referenceCount, objectAlias));
-                        if (i < ot.getDynamicMembers().size() - 1) {
-                            ret.append(",");
-                        }
-                        ret.append("\r\n");
-                    }
-                    ret.append(indent(level + 1)).append("}\r\n");
-                }
+                ret.append(indent(level + 1)).append("}\r\n");
+                //}
             }
             ret.append(indent(level)).append("}");
         } else if (object instanceof ArrayType) {
             ArrayType at = (ArrayType) object;
             ret.append("{\r\n");
             ret.append(indent(level + 1)).append("\"type\": \"Array\",\r\n");
+            ret.append(addId);
             ret.append(indent(level + 1)).append("\"denseValues\": [");
 
             for (int i = 0; i < at.getDenseValues().size(); i++) {
@@ -196,7 +202,7 @@ public class Amf3Tools {
                 ret.append(amfToString(processedObjects, level + 2, at.getDenseValues().get(i), referenceCount, objectAlias));
             }
             ret.append("],\r\n");
-            ret.append(indent(level + 1)).append("\"associativeValues\": [");
+            ret.append(indent(level + 1)).append("\"associativeValues\": {");
             if (!at.getAssociativeValues().isEmpty()) {
                 ret.append("\r\n");
             }
@@ -211,15 +217,15 @@ public class Amf3Tools {
             if (!at.getAssociativeValues().isEmpty()) {
                 ret.append(indent(level + 1));
             }
-            ret.append("]\r\n");
+            ret.append("}\r\n");
             ret.append(indent(level)).append("}");
         } else if (object instanceof DictionaryType) {
             DictionaryType dt = (DictionaryType) object;
             ret.append("{\r\n");
             ret.append(indent(level + 1)).append("\"type\": \"Dictionary\",\r\n");
             ret.append(addId);
-            ret.append(indent(level + 1)).append("\"weakKeys\": " + dt.hasWeakKeys() + ",\r\n");
-            ret.append(indent(level + 1)).append("\"value\": {\r\n");
+            ret.append(indent(level + 1)).append("\"weakKeys\": ").append(dt.hasWeakKeys()).append(",\r\n");
+            ret.append(indent(level + 1)).append("\"entries\": {\r\n");
             for (int i = 0; i < dt.getPairs().size(); i++) {
                 Pair<Object, Object> pair = dt.getPairs().get(i);
                 ret.append(indent(level + 1)).append(amfToString(processedObjects, level + 1, pair.getFirst(), referenceCount, objectAlias)).append(" : ").append(amfToString(processedObjects, level + 1, pair.getSecond(), referenceCount, objectAlias));
@@ -229,14 +235,14 @@ public class Amf3Tools {
                 ret.append("\r\n");
             }
             ret.append(indent(level + 1)).append("}\r\n");
-            ret.append(indent(level) + "}");
+            ret.append(indent(level)).append("}");
         } else if (object instanceof ByteArrayType) {
             ByteArrayType ba = (ByteArrayType) object;
             byte data[] = ba.getData();
             return "{\r\n"
                     + indent(level + 1) + "\"type\": \"ByteArray\",\r\n"
                     + addId
-                    + indent(level + 1) + "\"value\": 0x" + javax.xml.bind.DatatypeConverter.printHexBinary(data) + "\r\n"
+                    + indent(level + 1) + "\"value\": \"" + javax.xml.bind.DatatypeConverter.printHexBinary(data) + "\"\r\n"
                     + indent(level) + "}";
         } else if (object instanceof DateType) {
             DateType dt = (DateType) object;
@@ -249,13 +255,13 @@ public class Amf3Tools {
 
         } else if (object instanceof XmlDocType) {
             return "{\r\n"
-                    + indent(level + 1) + "\"type\": \"XML\",\r\n"
+                    + indent(level + 1) + "\"type\": \"XMLDocument\",\r\n"
                     + addId
                     + indent(level + 1) + "\"value\": " + amfToString(processedObjects, level, ((XmlDocType) object).getData(), referenceCount, objectAlias) + "\r\n"
                     + indent(level) + "}";
         } else if (object instanceof XmlType) {
             return "{\r\n"
-                    + indent(level + 1) + "\"type\": \"XMLDocument\",\r\n"
+                    + indent(level + 1) + "\"type\": \"XML\",\r\n"
                     + addId
                     + indent(level + 1) + "\"value\": " + amfToString(processedObjects, level, ((XmlType) object).getData(), referenceCount, objectAlias) + "\r\n"
                     + indent(level) + "}";

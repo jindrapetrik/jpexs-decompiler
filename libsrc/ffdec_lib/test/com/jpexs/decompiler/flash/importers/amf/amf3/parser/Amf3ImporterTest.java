@@ -1,12 +1,15 @@
-package com.jpexs.decompiler.flash.amf.amf3;
+package com.jpexs.decompiler.flash.importers.amf.amf3.parser;
 
+import com.jpexs.decompiler.flash.importers.amf.amf3.Amf3ParseException;
+import com.jpexs.decompiler.flash.importers.amf.amf3.Amf3Importer;
+import com.jpexs.decompiler.flash.exporters.amf.amf3.Amf3Exporter;
+import com.jpexs.decompiler.flash.amf.amf3.Amf3InputStream;
+import com.jpexs.decompiler.flash.amf.amf3.NoSerializerExistsException;
+import com.jpexs.decompiler.flash.amf.amf3.ObjectTypeSerializeHandler;
+import com.jpexs.decompiler.flash.amf.amf3.Pair;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -18,7 +21,14 @@ import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-public class Amf3OutputStreamTest {
+public class Amf3ImporterTest {
+
+    @DataProvider(name = "files")
+    public static Object[][] provideSamples() {
+        return new Object[][]{
+            {"all.bin"}
+        };
+    }
 
     private Map<String, ObjectTypeSerializeHandler> getSerializers() {
         Map<String, ObjectTypeSerializeHandler> serializers = new HashMap<>();
@@ -48,41 +58,28 @@ public class Amf3OutputStreamTest {
         return serializers;
     }
 
-    @DataProvider(name = "files")
-    public static Object[][] provideSamples() {
-        return new Object[][]{
-            {"all.bin"},
-            {"custom.bin"},
-            {"noserializer_array_associative.bin"},
-            {"noserializer_array_dense.bin"},
-            {"noserializer_dictionary_key.bin"},
-            {"noserializer_dictionary_value.bin"},
-            {"noserializer_object_dynamic.bin"},
-            {"noserializer_object_sealed.bin"},
-            {"noserializer_vector.bin"}
-        };
-    }
-
     @Test(dataProvider = "files")
-    public void testRecompile(String fileName) throws FileNotFoundException, IOException, NoSerializerExistsException {
+    public void testRecompile(String fileName) throws IOException, NoSerializerExistsException, Amf3ParseException {
 
         String originalFile = "testdata/amf3/generated/" + fileName;
-
-        byte[] originalData = Helper.readFile(originalFile);
-        byte[] savedData;
 
         Amf3InputStream is = new Amf3InputStream(new MemoryInputStream(Helper.readFile(originalFile)));
 
         Object val = is.readValue("testValue", getSerializers());
-        String savedFile = "testdata/amf3/generated/recompiled." + fileName;
-        try (FileOutputStream fos = new FileOutputStream(savedFile)) {
-            Amf3OutputStream os = new Amf3OutputStream(fos);
-            os.writeValue(val, getSerializers());
-        }
-        savedData = Helper.readFile(savedFile);
+        String exported1File = "testdata/amf3/generated/exported1." + fileName;
+        String exported2File = "testdata/amf3/generated/exported2." + fileName;
 
-        Assert.assertEquals(savedData, originalData);
-        new File(savedFile).delete();
+        String exported1 = Amf3Exporter.amfToString(val);
+        Helper.writeFile(exported1File, exported1.getBytes("UTF-8"));
+        Amf3Importer imp = new Amf3Importer();
+        Object valImported = imp.stringToAmf(exported1);
+        String exported2 = Amf3Exporter.amfToString(valImported);
+
+        Helper.writeFile(exported2File, exported2.getBytes("UTF-8"));
+
+        Assert.assertEquals(exported2, exported1);
+        new File(exported1File).delete();
+        new File(exported2File).delete();
 
     }
 }
