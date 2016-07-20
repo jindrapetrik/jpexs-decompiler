@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import com.jpexs.decompiler.flash.amf.amf3.WithSubValues;
 
-public class DictionaryType implements WithSubValues {
+public class DictionaryType implements WithSubValues, Amf3ValueType {
 
     private boolean weakKeys;
     private List<Pair<Object, Object>> pairs;

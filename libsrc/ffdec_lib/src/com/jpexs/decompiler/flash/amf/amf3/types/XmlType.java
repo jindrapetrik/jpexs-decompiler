@@ -1,6 +1,6 @@
 package com.jpexs.decompiler.flash.amf.amf3.types;
 
-public class XmlType {
+public class XmlType implements Amf3ValueType {
 
     private String data;
 

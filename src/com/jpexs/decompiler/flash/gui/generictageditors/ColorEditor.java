@@ -75,6 +75,11 @@ public class ColorEditor extends JPanel implements GenericTagEditor, ActionListe
         return colorType;
     }
 
+    @Override
+    public void added() {
+
+    }
+
     public ColorEditor(String fieldName, Object obj, Field field, int index, Class<?> type) {
         this.obj = obj;
         this.field = field;

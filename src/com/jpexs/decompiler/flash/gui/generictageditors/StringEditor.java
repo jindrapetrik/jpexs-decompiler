@@ -126,4 +126,9 @@ public class StringEditor extends JTextArea implements GenericTagEditor {
     public String getReadOnlyValue() {
         return Helper.escapeHTML(getChangedValue().toString());
     }
+
+    @Override
+    public void added() {
+
+    }
 }

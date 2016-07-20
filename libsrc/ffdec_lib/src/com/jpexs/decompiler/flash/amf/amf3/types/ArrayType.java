@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import com.jpexs.decompiler.flash.amf.amf3.WithSubValues;
 
-public class ArrayType implements WithSubValues {
+public class ArrayType implements WithSubValues, Amf3ValueType {
 
     private List<Object> denseValues;
     private List<Pair<String, Object>> associativeValues;

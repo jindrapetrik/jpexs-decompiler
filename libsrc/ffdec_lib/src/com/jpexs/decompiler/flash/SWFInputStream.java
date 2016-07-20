@@ -119,6 +119,7 @@ import com.jpexs.decompiler.flash.action.swf7.ActionImplementsOp;
 import com.jpexs.decompiler.flash.action.swf7.ActionThrow;
 import com.jpexs.decompiler.flash.action.swf7.ActionTry;
 import com.jpexs.decompiler.flash.amf.amf3.Amf3InputStream;
+import com.jpexs.decompiler.flash.amf.amf3.Amf3Value;
 import com.jpexs.decompiler.flash.amf.amf3.NoSerializerExistsException;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
@@ -767,13 +768,13 @@ public class SWFInputStream implements AutoCloseable {
      * @return
      * @throws IOException
      */
-    public Object readAmf3Object(String name) throws IOException {
+    public Amf3Value readAmf3Object(String name) throws IOException {
         Amf3InputStream ai = new Amf3InputStream(is);
         ai.dumpInfo = this.dumpInfo;
         try {
-            return ai.readValue("amfData");
+            return new Amf3Value(ai.readValue("amfData"));
         } catch (NoSerializerExistsException nse) {
-            return nse.getIncompleteData();
+            return new Amf3Value(nse.getIncompleteData());
         }
     }
 

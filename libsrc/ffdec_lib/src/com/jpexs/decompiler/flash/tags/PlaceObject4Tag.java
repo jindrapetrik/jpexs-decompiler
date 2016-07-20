@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.EndOfStreamException;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.amf.amf3.Amf3Value;
 import com.jpexs.decompiler.flash.amf.amf3.NoSerializerExistsException;
 import com.jpexs.decompiler.flash.tags.base.ASMSourceContainer;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
@@ -234,8 +235,7 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
     @Reserved
     public boolean reserved;
 
-    //public byte[] amfData;  //TODO: Parse AMF data?
-    public Object amfData;
+    public Amf3Value amfData;
 
     /**
      * Constructor
@@ -246,7 +246,7 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
         super(swf, ID, NAME, null);
     }
 
-    public PlaceObject4Tag(SWF swf, boolean placeFlagMove, int depth, String className, int characterId, MATRIX matrix, CXFORMWITHALPHA colorTransform, int ratio, String name, int clipDepth, List<FILTER> surfaceFilterList, int blendMode, int bitmapCache, int visible, RGBA backgroundColor, CLIPACTIONS clipActions, Object amfData) {
+    public PlaceObject4Tag(SWF swf, boolean placeFlagMove, int depth, String className, int characterId, MATRIX matrix, CXFORMWITHALPHA colorTransform, int ratio, String name, int clipDepth, List<FILTER> surfaceFilterList, int blendMode, int bitmapCache, int visible, RGBA backgroundColor, CLIPACTIONS clipActions, Amf3Value amfData) {
         super(swf, ID, NAME, null);
         this.placeFlagHasClassName = className != null;
         this.placeFlagHasFilterList = surfaceFilterList != null;

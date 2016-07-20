@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import com.jpexs.decompiler.flash.amf.amf3.WithSubValues;
 
-public abstract class AbstractVectorType<T> implements WithSubValues {
+public abstract class AbstractVectorType<T> implements WithSubValues, Amf3ValueType {
 
     private boolean fixed;
     private List<T> values;

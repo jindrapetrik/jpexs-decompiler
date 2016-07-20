@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import com.jpexs.decompiler.flash.amf.amf3.WithSubValues;
 
-public class ObjectType implements WithSubValues {
+public class ObjectType implements WithSubValues, Amf3ValueType {
 
     private List<Pair<String, Object>> sealedMembers;
     private List<Pair<String, Object>> dynamicMembers;

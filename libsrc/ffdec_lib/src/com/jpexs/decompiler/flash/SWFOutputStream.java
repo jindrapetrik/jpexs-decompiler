@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.amf.amf3.Amf3OutputStream;
+import com.jpexs.decompiler.flash.amf.amf3.Amf3Value;
 import com.jpexs.decompiler.flash.amf.amf3.NoSerializerExistsException;
 import com.jpexs.decompiler.flash.amf.amf3.ObjectTypeSerializeHandler;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -1962,9 +1963,9 @@ public class SWFOutputStream extends OutputStream {
      * @throws IOException
      * @throws NoSerializerExistsException
      */
-    public void writeAmf3Object(Object value, Map<String, ObjectTypeSerializeHandler> serializers) throws IOException, NoSerializerExistsException {
+    public void writeAmf3Object(Amf3Value value, Map<String, ObjectTypeSerializeHandler> serializers) throws IOException, NoSerializerExistsException {
         Amf3OutputStream ao = new Amf3OutputStream(os);
-        ao.writeValue(value, serializers);
+        ao.writeValue(value.getValue(), serializers);
     }
 
     /**
@@ -1975,7 +1976,7 @@ public class SWFOutputStream extends OutputStream {
      * @throws IOException
      * @throws NoSerializerExistsException
      */
-    public void writeAmf3Object(Object value) throws IOException, NoSerializerExistsException {
+    public void writeAmf3Object(Amf3Value value) throws IOException, NoSerializerExistsException {
         writeAmf3Object(value, new HashMap<>());
     }
 }

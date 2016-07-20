@@ -139,4 +139,9 @@ public class BinaryDataEditor extends JButton implements GenericTagEditor {
     public int getBaseline(int width, int height) {
         return 0;
     }
+
+    @Override
+    public void added() {
+
+    }
 }
