@@ -633,4 +633,10 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
             matrix = old;
         }
     }
+
+    @Override
+    public Amf3Value getAmfData() {
+        return amfData;
+    }
+
 }

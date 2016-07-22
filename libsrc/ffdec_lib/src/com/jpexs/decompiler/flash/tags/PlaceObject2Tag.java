@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.amf.amf3.Amf3Value;
 import com.jpexs.decompiler.flash.tags.base.ASMSourceContainer;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -435,5 +436,10 @@ public class PlaceObject2Tag extends PlaceObjectTypeTag implements ASMSourceCont
             setModified(mod);
             matrix = old;
         }
+    }
+
+    @Override
+    public Amf3Value getAmfData() {
+        return null;
     }
 }
