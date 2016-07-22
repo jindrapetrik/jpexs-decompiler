@@ -430,8 +430,7 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
         if (placeFlagHasClipActions) {
             sos.writeCLIPACTIONS(clipActions);
         }
-        if (amfData != null) {
-            //sos.write(Helper.readFile("d:\\Dropbox\\Programovani\\JavaSE\\FFDec\\libsrc\\ffdec_lib\\testdata\\amf3\\generated\\all.bin"));
+        if (amfData != null && amfData.getValue() != null) {
             try {
                 sos.writeAmf3Object(amfData);
             } catch (NoSerializerExistsException ex) {

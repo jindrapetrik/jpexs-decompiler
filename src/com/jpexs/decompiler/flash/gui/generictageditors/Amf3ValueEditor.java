@@ -84,8 +84,12 @@ public class Amf3ValueEditor extends JEditorPane implements GenericTagEditor {
         this.fieldName = fieldName;
         try {
             Amf3Value val = (Amf3Value) ReflectionTools.getValue(obj, field, index);
-            String stringVal = Amf3Exporter.amfToString(val.getValue());
-            setText(stringVal);
+            if (val == null || val.getValue() == null) {
+                setText("");
+            } else {
+                String stringVal = Amf3Exporter.amfToString(val.getValue());
+                setText(stringVal);
+            }
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             // ignore
         }
@@ -93,11 +97,9 @@ public class Amf3ValueEditor extends JEditorPane implements GenericTagEditor {
 
     @Override
     public void save() {
-        Amf3Importer importer = new Amf3Importer();
         try {
-            Object newValue = importer.stringToAmf(getText());
-            ReflectionTools.setValue(obj, field, index, new Amf3Value(newValue));
-        } catch (IOException | Amf3ParseException | IllegalArgumentException | IllegalAccessException ex) {
+            ReflectionTools.setValue(obj, field, index, getChangedValue());
+        } catch (IllegalArgumentException | IllegalAccessException ex) {
             //ignore
         }
     }
@@ -118,8 +120,9 @@ public class Amf3ValueEditor extends JEditorPane implements GenericTagEditor {
     @Override
     public Object getChangedValue() {
         Amf3Importer importer = new Amf3Importer();
+        String textVal = getText();
         try {
-            return new Amf3Value(importer.stringToAmf(getText()));
+            return textVal.trim().isEmpty() ? null : new Amf3Value(importer.stringToAmf(textVal));
         } catch (IOException | Amf3ParseException ex) {
             //ignore
         }

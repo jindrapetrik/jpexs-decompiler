@@ -34,11 +34,10 @@ public class Amf3InputStream extends InputStream {
     public final static Logger LOGGER = Logger.getLogger(Amf3InputStream.class.getName());
     private final MemoryInputStream is;
     public DumpInfo dumpInfo;
-    private static String NO_REFERENCE_BIT_TEXT = "not reference";
-    private static String REFERENCE_BIT_TEXT = "not reference";
-    private static String OBJECT_INDEX_TEXT = "object index";
-    private static String STRING_INDEX_TEXT = "string index";
-    private static String TRAIT_INDEX_TEXT = "trait index";
+    private static final String NO_REFERENCE_BIT_TEXT = "not reference";
+    private static final String OBJECT_INDEX_TEXT = "object index";
+    private static final String STRING_INDEX_TEXT = "string index";
+    private static final String TRAIT_INDEX_TEXT = "trait index";
 
     public Amf3InputStream(MemoryInputStream is) {
         this.is = is;
@@ -146,11 +145,11 @@ public class Amf3InputStream extends InputStream {
     }
 
     private void renameU29O_ref() {
-        renameU29("U29O-ref", REFERENCE_BIT_TEXT, OBJECT_INDEX_TEXT);
+        renameU29("U29O-ref", NO_REFERENCE_BIT_TEXT, OBJECT_INDEX_TEXT);
     }
 
     private void renameU29S_ref() {
-        renameU29("U29S-ref", REFERENCE_BIT_TEXT, STRING_INDEX_TEXT);
+        renameU29("U29S-ref", NO_REFERENCE_BIT_TEXT, STRING_INDEX_TEXT);
     }
 
     private void renameU29Traits_ref() {
@@ -493,7 +492,7 @@ public class Amf3InputStream extends InputStream {
                                 result = retObjectType;
                                 break markerswitch;
                             } else {
-                                renameU29("U29O-traits", NO_REFERENCE_BIT_TEXT, "not trait reference", "not externalized traits", "dynamic", "sealed count");
+                                renameU29("U29O-traits", NO_REFERENCE_BIT_TEXT, "not trait reference", "externalized traits", "dynamic", "sealed count");
                                 int dynamicFlag = (int) ((objectU29 >> 3) & 1);
                                 int numSealed = (int) (objectU29 >> 4);
                                 LOGGER.log(Level.FINEST, "object dynamicFlag:{0}", dynamicFlag);

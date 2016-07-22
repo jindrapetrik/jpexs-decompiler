@@ -7,6 +7,10 @@ public class Amf3Value {
 
     private Object value;
 
+    public Amf3Value() {
+        setValue(null);
+    }
+
     public Amf3Value(Object value) {
         setValue(value);
     }
@@ -19,6 +23,9 @@ public class Amf3Value {
     }
 
     public static boolean isValueValid(Object value) {
+        if (value == null) {
+            return true;
+        }
         if (value instanceof Long) {
             return true;
         }
@@ -43,6 +50,9 @@ public class Amf3Value {
 
     @Override
     public String toString() {
+        if (value == null) {
+            return "";
+        }
         return Amf3Exporter.amfToString(value);
     }
 }
