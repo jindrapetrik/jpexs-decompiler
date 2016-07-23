@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.gui.generictageditors.Amf3ValueEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.BinaryDataEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.BooleanEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.ColorEditor;
+import com.jpexs.decompiler.flash.gui.generictageditors.FullSized;
 import com.jpexs.decompiler.flash.gui.generictageditors.GenericTagEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.NumberEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.StringEditor;
@@ -49,6 +50,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -66,6 +68,7 @@ import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractCellEditor;
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -75,6 +78,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
+import javax.swing.UIManager;
 import javax.swing.event.TreeModelListener;
 import javax.swing.plaf.basic.BasicLabelUI;
 import javax.swing.plaf.basic.BasicTreeUI;
@@ -135,6 +139,12 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
         @Override
         public Component getTreeCellEditorComponent(JTree tree, Object value, boolean isSelected, boolean expanded, boolean leaf, int row) {
+            Rectangle cellRect = tree.getPathBounds(tree.getPathForRow(row));
+            Rectangle treeVisibleRect = tree.getVisibleRect();
+            int scrollBarSize = ((Integer) UIManager.get("ScrollBar.width")).intValue();
+
+            Rectangle cellMaxVisibleRect = new Rectangle(cellRect.x, cellRect.y, treeVisibleRect.width - cellRect.x - tree.getInsets().left - tree.getInsets().right - scrollBarSize, cellRect.height);
+
             if (value instanceof FieldNode) {
                 fnode = (FieldNode) value;
                 JPanel panSum = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -194,7 +204,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                         }
 
                     };
-                    pan.setBackground(Color.white);
+                    pan.setOpaque(false);
                     nameLabel.setAlignmentY(TOP_ALIGNMENT);
                     pan.add(nameLabel);
 
@@ -203,6 +213,9 @@ public class GenericTagTreePanel extends GenericTagPanel {
                         nameLabel.setSize(nameLabel.getWidth(), editorComponent.getHeight());
                         editorComponent.setAlignmentY(TOP_ALIGNMENT);
                         pan.add(editorComponent);
+                        if (editorComponent instanceof FullSized) {
+                            editorComponent.setPreferredSize(new Dimension(cellMaxVisibleRect.width - (int) nameLabel.getPreferredSize().getWidth() - 5, editorComponent.getPreferredSize().height));
+                        }
                         if (editorComponent instanceof GenericTagEditor) {
                             ((GenericTagEditor) editorComponent).added();
                         }
@@ -212,6 +225,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                     }
                     panSum.add(pan);
                 }
+                panSum.setPreferredSize(new Dimension(cellMaxVisibleRect.width, panSum.getPreferredSize().height));
                 return panSum;
             }
             return null;
