@@ -1,16 +1,47 @@
-# Set the default behavior, in case people don't have core.autocrlf set.
-#* text=auto
+# Text files
+*.txt text
+*.xml text
+*.md text
 
-# Explicitly declare text files you want to always be normalized and converted
-# to native line endings on checkout.
-*.c text
-*.h text
-*.java text eol=crlf
-*.sh binary
+# Installers:
+*.iss text
+*.nsi text
+*.nsh text
 
-# Declare files that will always have CRLF line endings on checkout.
-*.sln text eol=crlf
+# Java
+*.java text
+*.mf text
+*.properties text
 
-# Denote all files that are truly binary and should not be modified.
+# Graphics:
+*.svg text
 *.png binary
 *.jpg binary
+*.bmp binary
+*.ico binary
+*.icns binary
+*.xcf binary
+*.gif binary
+
+# Findbugs:
+*.fbp text
+
+# Batch files
+*.sh text eol=lf
+*.bat text eol=crlf
+
+# Delphi sources
+*.dpr text eol=crlf
+*.dfm text eol=crlf
+*.pas text eol=crlf
+*.dof text eol=crlf
+
+# Executables
+*.dll binary
+*.exe binary
+*.jar binary
+*.res binary
+
+# Fonts
+*.otf binary
+*.ttf binary
