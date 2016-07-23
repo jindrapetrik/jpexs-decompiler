@@ -24,17 +24,30 @@ import java.util.Map;
 public class Amf3Exporter {
 
     /**
-     * Converts AMF value to something human-readable.
+     * Converts AMF value to something human-readable with indentStr " " and
+     * CRLF newlines
      *
      * @param amfValue
      * @return
      */
     public static String amfToString(Object amfValue) {
+        return amfToString(amfValue, "  ", "\r\n");
+    }
+
+    /**
+     * Converts AMF value to something human-readable.
+     *
+     * @param amfValue
+     * @param indentStr
+     * @param newLine
+     * @return
+     */
+    public static String amfToString(Object amfValue, String indentStr, String newLine) {
         Map<Object, Integer> refCount = new HashMap<>();
         List<Object> objectList = new ArrayList<>();
         Map<Object, String> objectAlias = new HashMap<>();
         populateObjects(amfValue, refCount, objectList, objectAlias);
-        return amfToString(new ArrayList<>(), 0, amfValue, refCount, objectAlias);
+        return amfToString(indentStr, newLine, new ArrayList<>(), 0, amfValue, refCount, objectAlias);
     }
 
     /**
@@ -87,7 +100,7 @@ public class Amf3Exporter {
      * @param objectAlias
      * @return
      */
-    private static String amfToString(List<Object> processedObjects, int level, Object object, Map<Object, Integer> referenceCount, Map<Object, String> objectAlias) {
+    private static String amfToString(String indentStr, String newLine, List<Object> processedObjects, int level, Object object, Map<Object, Integer> referenceCount, Map<Object, String> objectAlias) {
         if (object instanceof String) {
             return "\"" + Helper.escapeActionScriptString((String) object) + "\"";
         }
@@ -108,90 +121,90 @@ public class Amf3Exporter {
         }
         processedObjects.add(object);
 
-        String addId = refCount > 1 ? indent(level + 1) + "\"id\": \"" + objectAlias.get(object) + "\",\r\n" : "";
+        String addId = refCount > 1 ? indent(level + 1) + "\"id\": \"" + objectAlias.get(object) + "\"," + newLine : "";
 
         if (object instanceof AbstractVectorType) {
             AbstractVectorType avt = (AbstractVectorType) object;
-            ret.append("{\r\n");
-            ret.append(indent(level + 1)).append("\"type\": \"Vector\",\r\n");
+            ret.append("{").append(newLine);
+            ret.append(indent(level + 1)).append("\"type\": \"Vector\",").append(newLine);
             ret.append(addId);
-            ret.append(indent(level + 1)).append("\"fixed\": ").append(avt.isFixed()).append(",\r\n");
-            ret.append(indent(level + 1)).append("\"subtype\": ").append(amfToString(processedObjects, level, avt.getTypeName(), referenceCount, objectAlias)).append(",\r\n");
+            ret.append(indent(level + 1)).append("\"fixed\": ").append(avt.isFixed()).append(",").append(newLine);
+            ret.append(indent(level + 1)).append("\"subtype\": ").append(amfToString(indentStr, newLine, processedObjects, level, avt.getTypeName(), referenceCount, objectAlias)).append(",").append(newLine);
             ret.append(indent(level + 1)).append("\"values\": [");
             for (int i = 0; i < avt.getValues().size(); i++) {
                 if (i > 0) {
                     ret.append(", ");
                 }
-                ret.append(amfToString(processedObjects, level + 1, avt.getValues().get(i), referenceCount, objectAlias));
+                ret.append(amfToString(indentStr, newLine, processedObjects, level + 1, avt.getValues().get(i), referenceCount, objectAlias));
             }
-            ret.append("]\r\n");
+            ret.append("]").append(newLine);
             ret.append(indent(level)).append("}");
         } else if (object instanceof ObjectType) {
             ObjectType ot = (ObjectType) object;
-            ret.append("{\r\n");
-            ret.append(indent(level + 1)).append("\"type\": \"Object\",\r\n");
+            ret.append("{").append(newLine);
+            ret.append(indent(level + 1)).append("\"type\": \"Object\",").append(newLine);
             ret.append(addId);
-            ret.append(indent(level + 1)).append("\"className\": ").append(amfToString(processedObjects, level, ot.getClassName(), referenceCount, objectAlias)).append(",\r\n");
+            ret.append(indent(level + 1)).append("\"className\": ").append(amfToString(indentStr, newLine, processedObjects, level, ot.getClassName(), referenceCount, objectAlias)).append(",").append(newLine);
             if (ot.isSerialized()) {
                 byte[] serData = ot.getSerializedData();
                 if (serData == null) {
-                    ret.append(indent(level + 1)).append("\"serialized\": unknown\r\n");
+                    ret.append(indent(level + 1)).append("\"serialized\": unknown").append(newLine);
                 } else {
-                    ret.append(indent(level + 1)).append("\"serialized\": \"").append(javax.xml.bind.DatatypeConverter.printHexBinary(serData)).append("\",\r\n");
+                    ret.append(indent(level + 1)).append("\"serialized\": \"").append(javax.xml.bind.DatatypeConverter.printHexBinary(serData)).append("\",").append(newLine);
                     if (!ot.getSerializedMembers().isEmpty()) {
-                        ret.append(indent(level + 1)).append("\"unserializedMembers\": {\r\n");
+                        ret.append(indent(level + 1)).append("\"unserializedMembers\": {").append(newLine);
                         for (int i = 0; i < ot.getSerializedMembers().size(); i++) {
                             Pair<String, Object> member = ot.getSerializedMembers().get(i);
-                            ret.append(indent(level + 2)).append(amfToString(processedObjects, level + 2, member.getFirst(), referenceCount, objectAlias)).append(":").append(amfToString(processedObjects, level + 1, member.getSecond(), referenceCount, objectAlias));
+                            ret.append(indent(level + 2)).append(amfToString(indentStr, newLine, processedObjects, level + 2, member.getFirst(), referenceCount, objectAlias)).append(":").append(amfToString(indentStr, newLine, processedObjects, level + 1, member.getSecond(), referenceCount, objectAlias));
                             if (i < ot.getSerializedMembers().size() - 1) {
-                                ret.append(",\r\n");
+                                ret.append(",").append(newLine);
                             } else {
-                                ret.append("\r\n");
+                                ret.append(newLine);
                             }
                         }
                         ret.append(indent(level + 1)).append("}");
-                        ret.append("\r\n");
+                        ret.append(newLine);
                     }
                 }
             } else {
-                ret.append(indent(level + 1)).append("\"dynamic\": ").append(ot.isDynamic()).append(",\r\n");
+                ret.append(indent(level + 1)).append("\"dynamic\": ").append(ot.isDynamic()).append(",").append(newLine);
                 //if (!ot.getSealedMembers().isEmpty()) {
-                ret.append(indent(level + 1)).append("\"sealedMembers\": {\r\n");
+                ret.append(indent(level + 1)).append("\"sealedMembers\": {").append(newLine);
                 for (int i = 0; i < ot.getSealedMembers().size(); i++) {
                     Pair<String, Object> member = ot.getSealedMembers().get(i);
-                    ret.append(indent(level + 2)).append(amfToString(processedObjects, level + 2, member.getFirst(), referenceCount, objectAlias)).append(":").append(amfToString(processedObjects, level + 1, member.getSecond(), referenceCount, objectAlias));
+                    ret.append(indent(level + 2)).append(amfToString(indentStr, newLine, processedObjects, level + 2, member.getFirst(), referenceCount, objectAlias)).append(":").append(amfToString(indentStr, newLine, processedObjects, level + 1, member.getSecond(), referenceCount, objectAlias));
                     if (i < ot.getSealedMembers().size() - 1) {
-                        ret.append(",\r\n");
+                        ret.append(",").append(newLine);
                     } else {
-                        ret.append("\r\n");
+                        ret.append(newLine);
                     }
                 }
                 ret.append(indent(level + 1)).append("}");
                 //if (!ot.getDynamicMembers().isEmpty()) {
                 ret.append(",");
                 //}
-                ret.append("\r\n");
+                ret.append(newLine);
                 //}
                 //if (!ot.getDynamicMembers().isEmpty()) {
-                ret.append(indent(level + 1)).append("\"dynamicMembers\": {\r\n");
+                ret.append(indent(level + 1)).append("\"dynamicMembers\": {").append(newLine);
                 for (int i = 0; i < ot.getDynamicMembers().size(); i++) {
                     Pair<String, Object> member = ot.getDynamicMembers().get(i);
-                    ret.append(indent(level + 2)).append(amfToString(processedObjects, level + 2, member.getFirst(), referenceCount, objectAlias));
+                    ret.append(indent(level + 2)).append(amfToString(indentStr, newLine, processedObjects, level + 2, member.getFirst(), referenceCount, objectAlias));
                     ret.append(":");
-                    ret.append(amfToString(processedObjects, level + 2, member.getSecond(), referenceCount, objectAlias));
+                    ret.append(amfToString(indentStr, newLine, processedObjects, level + 2, member.getSecond(), referenceCount, objectAlias));
                     if (i < ot.getDynamicMembers().size() - 1) {
                         ret.append(",");
                     }
-                    ret.append("\r\n");
+                    ret.append(newLine);
                 }
-                ret.append(indent(level + 1)).append("}\r\n");
+                ret.append(indent(level + 1)).append("}").append(newLine);
                 //}
             }
             ret.append(indent(level)).append("}");
         } else if (object instanceof ArrayType) {
             ArrayType at = (ArrayType) object;
-            ret.append("{\r\n");
-            ret.append(indent(level + 1)).append("\"type\": \"Array\",\r\n");
+            ret.append("{").append(newLine);
+            ret.append(indent(level + 1)).append("\"type\": \"Array\",").append(newLine);
             ret.append(addId);
             ret.append(indent(level + 1)).append("\"denseValues\": [");
 
@@ -199,71 +212,71 @@ public class Amf3Exporter {
                 if (i > 0) {
                     ret.append(", ");
                 }
-                ret.append(amfToString(processedObjects, level + 2, at.getDenseValues().get(i), referenceCount, objectAlias));
+                ret.append(amfToString(indentStr, newLine, processedObjects, level + 2, at.getDenseValues().get(i), referenceCount, objectAlias));
             }
-            ret.append("],\r\n");
+            ret.append("],").append(newLine);
             ret.append(indent(level + 1)).append("\"associativeValues\": {");
             if (!at.getAssociativeValues().isEmpty()) {
-                ret.append("\r\n");
+                ret.append(newLine);
             }
             for (int i = 0; i < at.getAssociativeValues().size(); i++) {
                 Pair<String, Object> p = at.getAssociativeValues().get(i);
-                ret.append(indent(level + 2)).append(amfToString(processedObjects, level + 1, p.getFirst(), referenceCount, objectAlias)).append(" : ").append(amfToString(processedObjects, level + 1, p.getSecond(), referenceCount, objectAlias));
+                ret.append(indent(level + 2)).append(amfToString(indentStr, newLine, processedObjects, level + 1, p.getFirst(), referenceCount, objectAlias)).append(" : ").append(amfToString(indentStr, newLine, processedObjects, level + 1, p.getSecond(), referenceCount, objectAlias));
                 if (i < at.getAssociativeValues().size() - 1) {
                     ret.append(",");
                 }
-                ret.append("\r\n");
+                ret.append(newLine);
             }
             if (!at.getAssociativeValues().isEmpty()) {
                 ret.append(indent(level + 1));
             }
-            ret.append("}\r\n");
+            ret.append("}").append(newLine);
             ret.append(indent(level)).append("}");
         } else if (object instanceof DictionaryType) {
             DictionaryType dt = (DictionaryType) object;
-            ret.append("{\r\n");
-            ret.append(indent(level + 1)).append("\"type\": \"Dictionary\",\r\n");
+            ret.append("{").append(newLine);
+            ret.append(indent(level + 1)).append("\"type\": \"Dictionary\",").append(newLine);
             ret.append(addId);
-            ret.append(indent(level + 1)).append("\"weakKeys\": ").append(dt.hasWeakKeys()).append(",\r\n");
-            ret.append(indent(level + 1)).append("\"entries\": {\r\n");
+            ret.append(indent(level + 1)).append("\"weakKeys\": ").append(dt.hasWeakKeys()).append(",").append(newLine);
+            ret.append(indent(level + 1)).append("\"entries\": {").append(newLine);
             for (int i = 0; i < dt.getPairs().size(); i++) {
                 Pair<Object, Object> pair = dt.getPairs().get(i);
-                ret.append(indent(level + 1)).append(amfToString(processedObjects, level + 1, pair.getFirst(), referenceCount, objectAlias)).append(" : ").append(amfToString(processedObjects, level + 1, pair.getSecond(), referenceCount, objectAlias));
+                ret.append(indent(level + 1)).append(amfToString(indentStr, newLine, processedObjects, level + 1, pair.getFirst(), referenceCount, objectAlias)).append(" : ").append(amfToString(indentStr, newLine, processedObjects, level + 1, pair.getSecond(), referenceCount, objectAlias));
                 if (i < dt.getPairs().size() - 1) {
                     ret.append(",");
                 }
-                ret.append("\r\n");
+                ret.append(newLine);
             }
-            ret.append(indent(level + 1)).append("}\r\n");
+            ret.append(indent(level + 1)).append("}").append(newLine);
             ret.append(indent(level)).append("}");
         } else if (object instanceof ByteArrayType) {
             ByteArrayType ba = (ByteArrayType) object;
             byte data[] = ba.getData();
-            return "{\r\n"
-                    + indent(level + 1) + "\"type\": \"ByteArray\",\r\n"
+            return "{" + newLine
+                    + indent(level + 1) + "\"type\": \"ByteArray\"," + newLine
                     + addId
-                    + indent(level + 1) + "\"value\": \"" + javax.xml.bind.DatatypeConverter.printHexBinary(data) + "\"\r\n"
+                    + indent(level + 1) + "\"value\": \"" + javax.xml.bind.DatatypeConverter.printHexBinary(data) + "\"" + newLine
                     + indent(level) + "}";
         } else if (object instanceof DateType) {
             DateType dt = (DateType) object;
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SS");
-            return "{\r\n"
-                    + indent(level + 1) + "\"type\": \"Date\",\r\n"
+            return "{" + newLine
+                    + indent(level + 1) + "\"type\": \"Date\"," + newLine
                     + addId
-                    + indent(level + 1) + "\"value\": " + amfToString(processedObjects, level, sdf.format(new Date((long) dt.getVal())), referenceCount, objectAlias) + "\r\n"
+                    + indent(level + 1) + "\"value\": " + amfToString(indentStr, newLine, processedObjects, level, sdf.format(new Date((long) dt.getVal())), referenceCount, objectAlias) + newLine
                     + indent(level) + "}";
 
         } else if (object instanceof XmlDocType) {
-            return "{\r\n"
-                    + indent(level + 1) + "\"type\": \"XMLDocument\",\r\n"
+            return "{" + newLine
+                    + indent(level + 1) + "\"type\": \"XMLDocument\"," + newLine
                     + addId
-                    + indent(level + 1) + "\"value\": " + amfToString(processedObjects, level, ((XmlDocType) object).getData(), referenceCount, objectAlias) + "\r\n"
+                    + indent(level + 1) + "\"value\": " + amfToString(indentStr, newLine, processedObjects, level, ((XmlDocType) object).getData(), referenceCount, objectAlias) + newLine
                     + indent(level) + "}";
         } else if (object instanceof XmlType) {
-            return "{\r\n"
-                    + indent(level + 1) + "\"type\": \"XML\",\r\n"
+            return "{" + newLine
+                    + indent(level + 1) + "\"type\": \"XML\"," + newLine
                     + addId
-                    + indent(level + 1) + "\"value\": " + amfToString(processedObjects, level, ((XmlType) object).getData(), referenceCount, objectAlias) + "\r\n"
+                    + indent(level + 1) + "\"value\": " + amfToString(indentStr, newLine, processedObjects, level, ((XmlType) object).getData(), referenceCount, objectAlias) + newLine
                     + indent(level) + "}";
         } else {
             throw new IllegalArgumentException("Unsupported type: " + object.getClass());

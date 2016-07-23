@@ -37,6 +37,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
+import com.jpexs.decompiler.flash.amf.amf3.Amf3Value;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.TagTypeInfo;
 import com.jpexs.decompiler.flash.types.ALPHABITMAPDATA;
@@ -119,6 +120,7 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -249,7 +251,9 @@ public class SwfXmlImporter {
 
     private Object processObject(Element element, Class requiredType, SWF swf, Tag tag) throws IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InstantiationException, InvocationTargetException {
         String type = element.getAttribute("type");
-        if (type != null && !type.isEmpty()) {
+        if ("String".equals(type)) {
+            return element.getTextContent();
+        } else if (type != null && !type.isEmpty()) {
             Object childObj = createObject(type, swf, tag);
             if (childObj instanceof Tag) {
                 tag = (Tag) childObj;
@@ -304,7 +308,7 @@ public class SwfXmlImporter {
                 AVM2ConstantPool.class, Decimal.class, Namespace.class, NamespaceSet.class, Multiname.class, MethodInfo.class, MetadataInfo.class,
                 ValueKind.class, InstanceInfo.class, Traits.class, TraitClass.class, TraitFunction.class,
                 TraitMethodGetterSetter.class, TraitSlotConst.class, ClassInfo.class, ScriptInfo.class, MethodBody.class,
-                ABCException.class, ABCVersion.class};
+                ABCException.class, ABCVersion.class, Amf3Value.class};
             for (Class cls2 : knownObjects) {
                 if (!ReflectionTools.canInstantiateDefaultConstructor(cls2)) {
                     System.err.println("Can't instantiate: " + cls2.getName());
