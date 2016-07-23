@@ -78,6 +78,11 @@ public class StringEditor extends JTextArea implements GenericTagEditor {
             setPreferredSize(d);
             setSize(d);
         }
+        reset();
+    }
+
+    @Override
+    public void reset() {
         try {
             setText((String) ReflectionTools.getValue(obj, field, index));
         } catch (IllegalArgumentException | IllegalAccessException ex) {
@@ -89,7 +94,7 @@ public class StringEditor extends JTextArea implements GenericTagEditor {
     public void save() {
         try {
             ReflectionTools.setValue(obj, field, index, getText());
-        } catch (IllegalArgumentException | IllegalAccessException ex) {
+        } catch (IllegalAccessException ex) {
             // ignore
         }
     }
@@ -130,5 +135,9 @@ public class StringEditor extends JTextArea implements GenericTagEditor {
     @Override
     public void added() {
 
+    }
+
+    @Override
+    public void validateValue() {
     }
 }

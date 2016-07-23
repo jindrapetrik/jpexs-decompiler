@@ -71,12 +71,19 @@ public class NumberEditor extends JSpinner implements GenericTagEditor {
         this.type = type;
         this.swfType = swfType;
         this.fieldName = fieldName;
+
+        JFormattedTextField jtf = ((JSpinner.NumberEditor) getEditor()).getTextField();
+        DefaultFormatter formatter = (DefaultFormatter) jtf.getFormatter();
+        formatter.setCommitsOnValidEdit(true);
+        reset();
+
+    }
+
+    @Override
+    public void reset() {
         try {
             Object value = ReflectionTools.getValue(obj, field, index);
             setModel(getModel(swfType, value));
-            JFormattedTextField jtf = ((JSpinner.NumberEditor) getEditor()).getTextField();
-            DefaultFormatter formatter = (DefaultFormatter) jtf.getFormatter();
-            formatter.setCommitsOnValidEdit(true);
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             // ignore
         }
@@ -193,6 +200,10 @@ public class NumberEditor extends JSpinner implements GenericTagEditor {
             }
 
         });
+    }
+
+    @Override
+    public void validateValue() {
     }
 
     @Override

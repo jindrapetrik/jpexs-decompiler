@@ -1,11 +1,19 @@
 package com.jpexs.decompiler.flash.amf.amf3;
 
 import com.jpexs.decompiler.flash.amf.amf3.types.Amf3ValueType;
+import com.jpexs.decompiler.flash.amf.amf3.types.BasicType;
 import com.jpexs.decompiler.flash.exporters.amf.amf3.Amf3Exporter;
+import com.jpexs.decompiler.flash.importers.amf.amf3.Amf3Importer;
+import com.jpexs.decompiler.flash.importers.amf.amf3.Amf3ParseException;
+import com.jpexs.decompiler.flash.types.annotations.Multiline;
+import com.jpexs.decompiler.flash.types.annotations.SWFField;
+import java.io.IOException;
 
 public class Amf3Value {
 
-    private Object value;
+    @SWFField
+    @Multiline
+    private String data = null;
 
     public Amf3Value() {
         setValue(null);
@@ -19,7 +27,7 @@ public class Amf3Value {
         if (!isValueValid(value)) {
             throw new IllegalArgumentException("Invalid Amf value: " + value.getClass().getSimpleName());
         }
-        this.value = value;
+        this.data = value == null ? "" : Amf3Exporter.amfToString(value, "  ", "\n");
     }
 
     public static boolean isValueValid(Object value) {
@@ -45,14 +53,16 @@ public class Amf3Value {
     }
 
     public Object getValue() {
-        return value;
+        Amf3Importer imp = new Amf3Importer();
+        try {
+            return imp.stringToAmf(data);
+        } catch (IOException | Amf3ParseException ex) {
+            return BasicType.UNKNOWN;
+        }
     }
 
     @Override
     public String toString() {
-        if (value == null) {
-            return "";
-        }
-        return Amf3Exporter.amfToString(value);
+        return data;
     }
 }

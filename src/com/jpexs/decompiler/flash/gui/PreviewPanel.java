@@ -226,7 +226,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         createParametersPanel();
 
         showCardLeft(FLASH_VIEWER_CARD);
-        
+
         dividerSize = getDividerSize();
     }
 
@@ -1210,20 +1210,21 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     }
 
     private void saveGenericTagButtonActionPerformed(ActionEvent evt) {
-        genericTagPanel.save();
-        Tag tag = genericTagPanel.getTag();
-        SWF swf = tag.getSwf();
-        swf.clearImageCache();
-        swf.updateCharacters();
-        tag.getTimelined().resetTimeline();
-        swf.assignClassesToSymbols();
-        swf.assignExportNamesToSymbols();
-        mainPanel.refreshTree(swf);
-        mainPanel.setTagTreeSelectedNode(tag);
-        genericEditButton.setVisible(true);
-        genericSaveButton.setVisible(false);
-        genericCancelButton.setVisible(false);
-        genericTagPanel.setEditMode(false, null);
+        if (genericTagPanel.save()) {
+            Tag tag = genericTagPanel.getTag();
+            SWF swf = tag.getSwf();
+            swf.clearImageCache();
+            swf.updateCharacters();
+            tag.getTimelined().resetTimeline();
+            swf.assignClassesToSymbols();
+            swf.assignExportNamesToSymbols();
+            mainPanel.refreshTree(swf);
+            mainPanel.setTagTreeSelectedNode(tag);
+            genericEditButton.setVisible(true);
+            genericSaveButton.setVisible(false);
+            genericCancelButton.setVisible(false);
+            genericTagPanel.setEditMode(false, null);
+        }
     }
 
     private void cancelGenericTagButtonActionPerformed(ActionEvent evt) {

@@ -69,7 +69,7 @@ public class ColorEditor extends JPanel implements GenericTagEditor, ActionListe
 
     private int colorType;
 
-    private JButton buttonChange;
+    private final JButton buttonChange;
 
     public int getColorType() {
         return colorType;
@@ -86,6 +86,38 @@ public class ColorEditor extends JPanel implements GenericTagEditor, ActionListe
         this.index = index;
         this.type = type;
         this.fieldName = fieldName;
+
+        setLayout(new FlowLayout());
+
+        buttonChange = new JButton("") {
+
+            @Override
+            protected void paintComponent(Graphics g) {
+                g.setColor(getBackground());
+                g.fillRect(0, 0, getWidth(), getHeight());
+                super.paintBorder(g);
+            }
+
+        };
+        buttonChange.setToolTipText(AppStrings.translate("button.selectcolor.hint"));
+        buttonChange.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        buttonChange.addActionListener(this);
+
+        buttonChange.setBorderPainted(true);
+        buttonChange.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+        Dimension colorDim = new Dimension(16, 16);
+        buttonChange.setSize(colorDim);
+        buttonChange.setPreferredSize(colorDim);
+        add(buttonChange);
+        reset();
+    }
+
+    @Override
+    public void validateValue() {
+    }
+
+    @Override
+    public void reset() {
         try {
             Object val = ReflectionTools.getValue(obj, field, index);
             if (val instanceof RGBA) {
@@ -103,33 +135,11 @@ public class ColorEditor extends JPanel implements GenericTagEditor, ActionListe
             if (val instanceof ARGB) {
                 color = ((ARGB) val).toColor();
             }
-            setLayout(new FlowLayout());
 
-            //add(colorPanel);
-            buttonChange = new JButton("") {
-
-                @Override
-                protected void paintComponent(Graphics g) {
-                    g.setColor(getBackground());
-                    g.fillRect(0, 0, getWidth(), getHeight());
-                    super.paintBorder(g);
-                }
-
-            };
-            buttonChange.setToolTipText(AppStrings.translate("button.selectcolor.hint"));
-            buttonChange.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            buttonChange.addActionListener(this);
             buttonChange.setBackground(color);
-            buttonChange.setBorderPainted(true);
-            buttonChange.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-            Dimension colorDim = new Dimension(16, 16);
-            buttonChange.setSize(colorDim);
-            buttonChange.setPreferredSize(colorDim);
-            add(buttonChange);
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             // ignore
         }
-
     }
 
     @Override
@@ -137,7 +147,7 @@ public class ColorEditor extends JPanel implements GenericTagEditor, ActionListe
         Object val = getChangedValue();
         try {
             ReflectionTools.setValue(obj, field, index, val);
-        } catch (IllegalArgumentException | IllegalAccessException ex) {
+        } catch (IllegalAccessException ex) {
             // ignore
         }
     }
