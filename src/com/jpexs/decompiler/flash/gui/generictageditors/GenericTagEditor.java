@@ -24,6 +24,8 @@ import java.lang.reflect.Field;
  */
 public interface GenericTagEditor {
 
+    public void added();
+
     public void save();
 
     public void addChangeListener(ChangeListener l);

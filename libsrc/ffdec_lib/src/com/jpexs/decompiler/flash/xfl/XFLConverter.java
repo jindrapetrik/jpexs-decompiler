@@ -23,6 +23,9 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFCompression;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.amf.amf3.Amf3Value;
+import com.jpexs.decompiler.flash.amf.amf3.Pair;
+import com.jpexs.decompiler.flash.amf.amf3.types.ObjectType;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.MovieExporter;
 import com.jpexs.decompiler.flash.exporters.SoundExporter;
@@ -70,6 +73,7 @@ import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.tags.font.CharacterRanges;
+import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import com.jpexs.decompiler.flash.types.CLIPACTIONRECORD;
@@ -166,6 +170,10 @@ public class XFLConverter {
     public static final int KEY_MODE_MOTION_TWEEN = 8195;
 
     public static final int KEY_MODE_SHAPE_LAYERS = 8192;
+
+    public static final String PUBLISH_DATA_PREFIX = "PUB_PRST_DATA";
+
+    public static final String PUBLISH_DATA_FORMAT = "_EMBED_SWF_";
 
     private final Random random = new Random(123); // predictable random
 
@@ -581,7 +589,7 @@ public class XFLConverter {
 
         LINESTYLEARRAY actualLinestyles = lineStyles;
         int strokeStyleOrig = 0;
-        fillStyleCount = fillStyles.fillStyles.length;
+        fillStyleCount = fillStyles == null ? 0 : fillStyles.fillStyles.length;
         for (SHAPERECORD edge : shapeRecords) {
             if (edge instanceof StyleChangeRecord) {
                 StyleChangeRecord scr = (StyleChangeRecord) edge;
@@ -602,7 +610,7 @@ public class XFLConverter {
                             if ((fillStyle0 <= 0) && (fillStyle1 <= 0) && (strokeStyle > 0) && morphshape) {
                                 if (shapeNum == 4) {
                                     if (strokeStyleOrig > 0) {
-                                        if (!((LINESTYLE2) actualLinestyles.lineStyles[strokeStyleOrig]).hasFillFlag) {
+                                        if (actualLinestyles != null && !((LINESTYLE2) actualLinestyles.lineStyles[strokeStyleOrig]).hasFillFlag) {
                                             RGBA color = (RGBA) actualLinestyles.lineStyles[strokeStyleOrig].color;
                                             if (color.alpha == 0 && color.red == 0 && color.green == 0 && color.blue == 0) {
                                                 empty = true;
@@ -701,7 +709,7 @@ public class XFLConverter {
                         if ((fillStyle0 <= 0) && (fillStyle1 <= 0) && (strokeStyle > 0) && morphshape) {
                             if (shapeNum == 4) {
                                 if (strokeStyleOrig > 0) {
-                                    if (!((LINESTYLE2) actualLinestyles.lineStyles[strokeStyleOrig]).hasFillFlag) {
+                                    if (actualLinestyles != null && !((LINESTYLE2) actualLinestyles.lineStyles[strokeStyleOrig]).hasFillFlag) {
                                         RGBA color = (RGBA) actualLinestyles.lineStyles[strokeStyleOrig].color;
                                         if (color.alpha == 0 && color.red == 0 && color.green == 0 && color.blue == 0) {
                                             empty = true;
@@ -745,7 +753,7 @@ public class XFLConverter {
                 if ((fillStyle0 <= 0) && (fillStyle1 <= 0) && (strokeStyle > 0) && morphshape) {
                     if (shapeNum == 4) {
                         if (strokeStyleOrig > 0) {
-                            if (!((LINESTYLE2) actualLinestyles.lineStyles[strokeStyleOrig]).hasFillFlag) {
+                            if (actualLinestyles != null && !((LINESTYLE2) actualLinestyles.lineStyles[strokeStyleOrig]).hasFillFlag) {
                                 RGBA color = (RGBA) actualLinestyles.lineStyles[strokeStyleOrig].color;
                                 if (color.alpha == 0 && color.red == 0 && color.green == 0 && color.blue == 0) {
                                     empty = true;
@@ -1058,7 +1066,7 @@ public class XFLConverter {
         }
     }
 
-    private static void convertSymbolInstance(String name, MATRIX matrix, ColorTransform colorTransform, boolean cacheAsBitmap, int blendMode, List<FILTER> filters, boolean isVisible, RGBA backgroundColor, CLIPACTIONS clipActions, CharacterTag tag, HashMap<Integer, CharacterTag> characters, ReadOnlyTagList tags, FLAVersion flaVersion, XFLXmlWriter writer) throws XMLStreamException {
+    private static void convertSymbolInstance(String name, MATRIX matrix, ColorTransform colorTransform, boolean cacheAsBitmap, int blendMode, List<FILTER> filters, boolean isVisible, RGBA backgroundColor, CLIPACTIONS clipActions, Amf3Value metadata, CharacterTag tag, HashMap<Integer, CharacterTag> characters, ReadOnlyTagList tags, FLAVersion flaVersion, XFLXmlWriter writer) throws XMLStreamException {
         if (matrix == null) {
             matrix = new MATRIX();
         }
@@ -1184,6 +1192,55 @@ public class XFLConverter {
             writer.writeCData(sbActions.toString());
             writer.writeEndElement();
             writer.writeEndElement();
+        }
+        if (metadata != null && (metadata.getValue() instanceof ObjectType)) {
+            ObjectType metadataObject = (ObjectType) metadata.getValue();
+
+            if (metadataObject.isDynamic()) {
+                writer.writeStartElement("persistentData");
+                List<String> exportedNames = new ArrayList<>();
+                for (Pair<String, Object> dynamicMember : metadataObject.getDynamicMembers()) {
+                    String n = dynamicMember.getFirst();
+                    Object v = dynamicMember.getSecond();
+                    if (v instanceof Long) {
+                        exportedNames.add(n);
+                        writer.writeStartElement("PD");
+                        writer.writeAttribute("n", n);
+                        writer.writeAttribute("t", "i");
+                        writer.writeAttribute("v", (Long) v);
+                        writer.writeEndElement();
+                        exportedNames.add(n);
+                    } else if (v instanceof Double) {
+                        writer.writeStartElement("PD");
+                        writer.writeAttribute("n", n);
+                        writer.writeAttribute("t", "d");
+                        writer.writeAttribute("v", (Double) v);
+                        writer.writeEndElement();
+                        exportedNames.add(n);
+                    } else if (v instanceof String) {
+                        writer.writeStartElement("PD");
+                        writer.writeAttribute("n", n);
+                        //missing t attrinute = string (maybe "s"?)
+                        writer.writeAttribute("v", (String) v);
+                        writer.writeEndElement();
+                        exportedNames.add(n);
+                    }
+                    /*
+                    From JSFL, also data types integerArray ("I"), doubleArray("D") and byteArray("B") can be set.
+                    These datatypes can be in the FLA file but are not exported to SWF with _EMBED_SWF_ publish format.                   
+                     */
+                }
+
+                //Mark these names for publishing in embedded swf format:  (setPublishPersistentData function in JSFL)
+                for (String n : exportedNames) {
+                    writer.writeStartElement("PD");
+                    writer.writeAttribute("n", PUBLISH_DATA_PREFIX + PUBLISH_DATA_FORMAT + n);
+                    writer.writeAttribute("t", "i");
+                    writer.writeAttribute("v", 1);
+                    writer.writeEndElement();
+                }
+                writer.writeEndElement();
+            }
         }
         writer.writeEndElement();
     }
@@ -1332,7 +1389,7 @@ public class XFLConverter {
                                     } else if (character instanceof DefineVideoStreamTag) {
                                         convertVideoInstance(null, matrix, (DefineVideoStreamTag) character, null, recCharWriter);
                                     } else {
-                                        convertSymbolInstance(null, matrix, colorTransformAlpha, false, blendMode, filters, true, null, null, characters.get(rec.characterId), characters, tags, flaVersion, recCharWriter);
+                                        convertSymbolInstance(null, matrix, colorTransformAlpha, false, blendMode, filters, true, null, null, null, characters.get(rec.characterId), characters, tags, flaVersion, recCharWriter);
                                     }
 
                                     int duration = frame - lastFrame;
@@ -1909,6 +1966,7 @@ public class XFLConverter {
 
         CharacterTag character = null;
         MATRIX matrix = null;
+        Amf3Value metadata = null;
         String instanceName = null;
         ColorTransform colorTransForm = null;
         boolean cacheAsBitmap = false;
@@ -1953,6 +2011,10 @@ public class XFLConverter {
                     if (characters.containsKey(characterId)) {
                         character = characters.get(characterId);
                         if (po.flagMove()) {
+                            Amf3Value metadata2 = po.getAmfData();
+                            if (metadata2 != null && metadata2.getValue() != null) {
+                                metadata = metadata2;
+                            }
                             MATRIX matrix2 = po.getMatrix();
                             if (matrix2 != null) {
                                 matrix = matrix2;
@@ -1986,6 +2048,7 @@ public class XFLConverter {
                                 ratio = ratio2;
                             }
                         } else {
+                            metadata = po.getAmfData();
                             matrix = po.getMatrix();
                             instanceName = po.getInstanceName();
                             colorTransForm = po.getColorTransform();
@@ -2009,6 +2072,7 @@ public class XFLConverter {
                         shapeTween = false;
                     }
                     character = null;
+                    metadata = null;
                     matrix = null;
                     instanceName = null;
                     colorTransForm = null;
@@ -2041,7 +2105,7 @@ public class XFLConverter {
                         } else if (character instanceof DefineVideoStreamTag) {
                             convertVideoInstance(instanceName, matrix, (DefineVideoStreamTag) character, clipActions, elementsWriter);
                         } else {
-                            convertSymbolInstance(instanceName, matrix, colorTransForm, cacheAsBitmap, blendMode, filters, isVisible, backGroundColor, clipActions, character, characters, tags, flaVersion, elementsWriter);
+                            convertSymbolInstance(instanceName, matrix, colorTransForm, cacheAsBitmap, blendMode, filters, isVisible, backGroundColor, clipActions, metadata, character, characters, tags, flaVersion, elementsWriter);
                         }
                     }
                 }
@@ -2601,14 +2665,14 @@ public class XFLConverter {
             writer.writeEndElement();
 
             writer.writeStartElement("textRuns");
-            int fontId = -1;
+            int fontId;
             FontTag font = null;
-            String fontName = null;
+            String fontName;
             String psFontName = null;
             int textHeight = -1;
             RGB textColor = null;
             RGBA textColorA = null;
-            boolean newline = false;
+            boolean newline;
             boolean firstRun = true;
             @SuppressWarnings("unchecked")
             List<Integer> leftMargins = (List<Integer>) attrs.get("allLeftMargins");
@@ -2776,8 +2840,8 @@ public class XFLConverter {
                 int indent = -1;
                 int lineSpacing = -1;
                 String alignment = null;
-                boolean italic = false;
-                boolean bold = false;
+                boolean italic;
+                boolean bold;
                 String fontFace = null;
                 int size = -1;
                 RGBA textColor = null;
@@ -2807,9 +2871,9 @@ public class XFLConverter {
                         bold = ft.isBold();
                         size = det.fontHeight;
                         fontFace = fontName;
-                        String installedFont = null;
+                        String installedFont;
                         if ((installedFont = FontTag.isFontFamilyInstalled(fontName)) != null) {
-                            fontName = installedFont;
+                            //fontName = installedFont;
                             fontFace = new Font(installedFont, (italic ? Font.ITALIC : 0) | (bold ? Font.BOLD : 0) | (!italic && !bold ? Font.PLAIN : 0), size < 0 ? 10 : size).getPSName();
                         }
 
@@ -2866,6 +2930,33 @@ public class XFLConverter {
         }
     }
 
+    private boolean hasAmfMetadata(Tag tag) {
+        if (tag instanceof PlaceObjectTypeTag) {
+            PlaceObjectTypeTag po = (PlaceObjectTypeTag) tag;
+            if (po.getAmfData() != null && po.getAmfData().getValue() != null) {
+                return true;
+            }
+        }
+        if (tag instanceof Timelined) {
+            Timelined tl = (Timelined) tag;
+            for (Tag t : tl.getTags()) {
+                if (hasAmfMetadata(t)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean hasAmfMetadata(SWF swf) {
+        for (Tag t : swf.getTags()) {
+            if (hasAmfMetadata(t)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void convertSWF(AbortRetryIgnoreHandler handler, SWF swf, String swfFileName, String outfile, XFLExportSettings settings, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion flaVersion) throws IOException, InterruptedException {
 
         FileAttributesTag fa = swf.getFileAttributes();
@@ -2895,6 +2986,7 @@ public class XFLConverter {
         List<Integer> nonLibraryShapes = getNonLibraryShapes(swf.getTags(), characters);
         Map<Integer, String> characterClasses = getCharacterClasses(swf.getTags());
         Map<Integer, String> characterVariables = getCharacterVariables(swf.getTags());
+        boolean hasAmfMetadata = hasAmfMetadata(swf);
 
         String backgroundColor = "#ffffff";
         SetBackgroundColorTag setBgColorTag = swf.getBackgroundColor();
@@ -2940,6 +3032,18 @@ public class XFLConverter {
             domDocument.writeStartElement("timelines");
             convertTimeline(0, nonLibraryShapes, backgroundColor, swf.getTags(), swf.getTags(), characters, "Scene 1", flaVersion, files, domDocument);
             domDocument.writeEndElement();
+
+            if (hasAmfMetadata) {
+                domDocument.writeStartElement("persistentData");
+
+                domDocument.writeStartElement("PD");
+                domDocument.writeAttribute("n", PUBLISH_DATA_PREFIX + PUBLISH_DATA_FORMAT);
+                domDocument.writeAttribute("t", "i");
+                domDocument.writeAttribute("v", 1);
+                domDocument.writeEndElement();
+
+                domDocument.writeEndElement();
+            }
 
             domDocument.writeEndElement();
         } catch (XMLStreamException ex) {

@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.EndOfStreamException;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.amf.amf3.Amf3Value;
 import com.jpexs.decompiler.flash.tags.base.ASMSourceContainer;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -615,4 +616,10 @@ public class PlaceObject3Tag extends PlaceObjectTypeTag implements ASMSourceCont
             matrix = old;
         }
     }
+
+    @Override
+    public Amf3Value getAmfData() {
+        return null;
+    }
+
 }

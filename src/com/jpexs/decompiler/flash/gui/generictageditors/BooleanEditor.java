@@ -38,6 +38,11 @@ public class BooleanEditor extends JCheckBox implements GenericTagEditor {
 
     private final String fieldName;
 
+    @Override
+    public void added() {
+
+    }
+
     public BooleanEditor(String fieldName, Object obj, Field field, int index, Class<?> type) {
         super();
         this.obj = obj;

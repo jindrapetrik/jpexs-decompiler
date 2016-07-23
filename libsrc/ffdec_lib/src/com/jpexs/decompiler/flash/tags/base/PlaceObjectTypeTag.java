@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.amf.amf3.Amf3Value;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.ColorTransform;
@@ -75,6 +76,8 @@ public abstract class PlaceObjectTypeTag extends Tag implements CharacterIdTag {
     public abstract CLIPACTIONS getClipActions();
 
     public abstract void writeTagWithMatrix(SWFOutputStream sos, MATRIX m) throws IOException;
+
+    public abstract Amf3Value getAmfData();
 
     @Override
     public String getName() {

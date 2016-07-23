@@ -17,12 +17,15 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.amf.amf3.Amf3Value;
+import com.jpexs.decompiler.flash.gui.generictageditors.Amf3ValueEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.BinaryDataEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.BooleanEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.ChangeListener;
 import com.jpexs.decompiler.flash.gui.generictageditors.ColorEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.GenericTagEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.NumberEditor;
+import com.jpexs.decompiler.flash.gui.generictageditors.ScrollPanedEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.StringEditor;
 import com.jpexs.decompiler.flash.gui.helpers.SpringUtilities;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -409,6 +412,8 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
             editor = new ColorEditor(name, obj, field, index, type);
         } else if (type.equals(ByteArrayRange.class)) {
             editor = new BinaryDataEditor(mainPanel, name, obj, field, index, type);
+        } else if (type.equals(Amf3Value.class)) {
+            editor = new ScrollPanedEditor(new Amf3ValueEditor(name, obj, field, index, type));
         } else {
             if (value == null) {
                 if (readonly) {
@@ -436,6 +441,8 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
             fieldPaths.put(name, parList);
             fieldIndices.put(name, parIndices);
             addRow(name, editor, field);
+
+            ce.added();
         }
         return 1;
     }

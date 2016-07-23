@@ -57,6 +57,11 @@ public class NumberEditor extends JSpinner implements GenericTagEditor {
         return 0;
     }
 
+    @Override
+    public void added() {
+
+    }
+
     public NumberEditor(String fieldName, Object obj, Field field, int index, Class<?> type, SWFType swfType) {
         setSize(100, getSize().height);
         setMaximumSize(getSize());

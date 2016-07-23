@@ -17,11 +17,14 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.amf.amf3.Amf3Value;
+import com.jpexs.decompiler.flash.gui.generictageditors.Amf3ValueEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.BinaryDataEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.BooleanEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.ColorEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.GenericTagEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.NumberEditor;
+import com.jpexs.decompiler.flash.gui.generictageditors.ScrollPanedEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.StringEditor;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
@@ -166,6 +169,8 @@ public class GenericTagTreePanel extends GenericTagPanel {
                         editor = new ColorEditor(field.getName(), obj, field, index, type);
                     } else if (type.equals(byte[].class) || type.equals(ByteArrayRange.class)) {
                         editor = new BinaryDataEditor(mainPanel, field.getName(), obj, field, index, type);
+                    } else if (type.equals(Amf3Value.class)) {
+                        editor = new ScrollPanedEditor(new Amf3ValueEditor(field.getName(), obj, field, index, type));
                     }
                     if (editor != null) {
                         if (editors == null) {
@@ -199,6 +204,9 @@ public class GenericTagTreePanel extends GenericTagPanel {
                         nameLabel.setSize(nameLabel.getWidth(), editorComponent.getHeight());
                         editorComponent.setAlignmentY(TOP_ALIGNMENT);
                         pan.add(editorComponent);
+                        if (editorComponent instanceof GenericTagEditor) {
+                            ((GenericTagEditor) editorComponent).added();
+                        }
                         pan.setPreferredSize(new Dimension((int) nameLabel.getPreferredSize().getWidth() + 5 + (int) editorComponent.getPreferredSize().getWidth(), (int) editorComponent.getPreferredSize().getHeight()));
                     } else {
                         pan.setPreferredSize(new Dimension((int) nameLabel.getPreferredSize().getWidth(), (int) nameLabel.getPreferredSize().getHeight()));
@@ -945,6 +953,8 @@ public class GenericTagTreePanel extends GenericTagPanel {
         } else if (type.equals(RGB.class) || type.equals(RGBA.class) || type.equals(ARGB.class)) {
             return true;
         } else if (isByteArray || type.equals(ByteArrayRange.class)) {
+            return true;
+        } else if (type.equals(Amf3Value.class)) {
             return true;
         } else {
             return false;
