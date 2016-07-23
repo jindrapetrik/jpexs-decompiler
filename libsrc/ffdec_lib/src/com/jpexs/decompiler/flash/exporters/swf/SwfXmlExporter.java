@@ -114,7 +114,7 @@ public class SwfXmlExporter {
     private void generateXml(Document doc, Node node, String name, Object obj, boolean isListItem, int level) {
         Class cls = obj != null ? obj.getClass() : null;
 
-        if (cls == Byte.class || cls == byte.class
+        if (obj != null && (cls == Byte.class || cls == byte.class
                 || cls == Short.class || cls == short.class
                 || cls == Integer.class || cls == int.class
                 || cls == Long.class || cls == long.class
@@ -122,7 +122,7 @@ public class SwfXmlExporter {
                 || cls == Double.class || cls == double.class
                 || cls == Boolean.class || cls == boolean.class
                 || cls == Character.class || cls == char.class
-                || cls == String.class) {
+                || cls == String.class)) {
             Object value = obj;
             if (value instanceof String) {
                 value = Helper.removeInvalidXMLCharacters((String) value);
@@ -135,7 +135,7 @@ public class SwfXmlExporter {
             } else {
                 ((Element) node).setAttribute(name, value.toString());
             }
-        } else if (cls != null && cls.isEnum()) {
+        } else if (cls != null && obj != null && cls.isEnum()) {
             ((Element) node).setAttribute(name, obj.toString());
         } else if (obj instanceof ByteArrayRange) {
             ByteArrayRange range = (ByteArrayRange) obj;
@@ -144,7 +144,7 @@ public class SwfXmlExporter {
         } else if (obj instanceof byte[]) {
             byte[] data = (byte[]) obj;
             ((Element) node).setAttribute(name, Helper.byteArrayToHex(data));
-        } else if (cls != null && List.class.isAssignableFrom(cls)) {
+        } else if (cls != null && obj != null && List.class.isAssignableFrom(cls)) {
             List list = (List) obj;
             Element listNode = doc.createElement(name);
             node.appendChild(listNode);
@@ -197,12 +197,10 @@ public class SwfXmlExporter {
                     logger.log(Level.SEVERE, null, ex);
                 }
             }
-        } else {
-            if (isListItem) {
-                Element childNode = doc.createElement(name);
-                childNode.setAttribute("isNull", Boolean.TRUE.toString());
-                node.appendChild(childNode);
-            }
+        } else if (isListItem) {
+            Element childNode = doc.createElement(name);
+            childNode.setAttribute("isNull", Boolean.TRUE.toString());
+            node.appendChild(childNode);
         }
     }
 }
