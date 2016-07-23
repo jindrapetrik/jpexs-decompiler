@@ -768,14 +768,11 @@ public class SWFInputStream implements AutoCloseable {
      * @return
      * @throws IOException
      */
-    public Amf3Value readAmf3Object(String name) throws IOException {
+    public Amf3Value readAmf3Object(String name) throws IOException, NoSerializerExistsException {
         Amf3InputStream ai = new Amf3InputStream(is);
         ai.dumpInfo = this.dumpInfo;
-        try {
-            return new Amf3Value(ai.readValue("amfData"));
-        } catch (NoSerializerExistsException nse) {
-            return new Amf3Value(nse.getIncompleteData());
-        }
+
+        return new Amf3Value(ai.readValue("amfData"));
     }
 
     /**

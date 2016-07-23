@@ -359,7 +359,12 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
             clipActions = sis.readCLIPACTIONS(swf, this, "clipActions");
         }
         if (sis.available() > 0) {
-            amfData = sis.readAmf3Object("amfValue");
+            try {
+                amfData = sis.readAmf3Object("amfValue");
+            } catch (NoSerializerExistsException nse) {
+                amfData = new Amf3Value(nse.getIncompleteData());
+                Logger.getLogger(PlaceObject4Tag.class.getName()).log(Level.WARNING, "AMFData in PlaceObject4 contains IExternalizable object which cannot be read. Data object is truncated.", nse);
+            }
         }
     }
 
