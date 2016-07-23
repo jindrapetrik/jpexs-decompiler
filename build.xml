@@ -347,6 +347,7 @@
         <copy todir="${app.bundle.dir}/${app.osx.dir}.app/Contents/Resources/">
             <fileset dir="${dist.dir}" />
         </copy>                  
+        <fixcrlf srcdir="${app.bundle.dir}/${app.osx.dir}.app/Contents/Resources/" eol="lf" includes="**/*.txt" preservelastmodified="true" />
     </target>
     
     <target name="osx-app-archive" depends="osx-app-bundle">        
@@ -589,6 +590,9 @@
         <copy todir="${dist.dir}">
             <fileset dir="${resources.dir}" includes="**/*.*"/>
         </copy>
+        <fixcrlf srcdir="${dist.dir}" includes="**/*.txt" eol="crlf" preservelastmodified="true" />
+        <fixcrlf srcdir="${dist.dir}" includes="**/*.sh" eol="lf" preservelastmodified="true" />
+        <fixcrlf srcdir="${dist.dir}" includes="**/*.bat" eol="crlf" preservelastmodified="true" />
     </target>
     
     <target name="locales" depends="-loadversion">
@@ -904,5 +908,16 @@
     
     <target name="upload-last" depends="all,-upload">
         
-    </target>                        
+    </target>       
+    
+    <target name="fix-src-endoflines">
+        <fixcrlf srcdir="${src.dir}" includes="**/*.java" />
+        <fixcrlf srcdir="${src.dir}" includes="**/*.properties" />
+        <fixcrlf srcdir="${src.dir}" includes="**/*.txt" />        
+        <fixcrlf srcdir="${src.dir}" includes="**/*.xml" />                
+        <fixcrlf srcdir="${src.dir}" includes="**/*.flex" />                        
+        <fixcrlf srcdir="${src.dir}" includes="**/*.bat" eol="crlf" />
+        <fixcrlf srcdir="${src.dir}" includes="**/*.sh" eol="lf" />
+        <ant antfile="${core.lib.script}" target="fix-src-endoflines" inheritAll="false" usenativebasedir="true" />        
+    </target>                 
 </project>

@@ -244,5 +244,15 @@
         }
     ]]></script>
     </target>
+    
+    <target name="fix-src-endoflines">
+        <fixcrlf srcdir="${src.dir}" includes="**/*.java" />
+        <fixcrlf srcdir="${src.dir}" includes="**/*.properties" />
+        <fixcrlf srcdir="${src.dir}" includes="**/*.txt" />        
+        <fixcrlf srcdir="${src.dir}" includes="**/*.xml" />                
+        <fixcrlf srcdir="${src.dir}" includes="**/*.flex" />                        
+        <fixcrlf srcdir="${src.dir}" includes="**/*.bat" eol="crlf" />
+        <fixcrlf srcdir="${src.dir}" includes="**/*.sh" eol="lf" />
+    </target>   
 </project>
 
