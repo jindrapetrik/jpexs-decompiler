@@ -12,6 +12,8 @@
 *.java text
 *.mf text
 *.properties text
+# Generator of Lexical analyzers
+*.flex text
 
 # Graphics:
 *.svg text
