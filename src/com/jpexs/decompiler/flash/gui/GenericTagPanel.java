@@ -25,7 +25,6 @@ import com.jpexs.decompiler.flash.gui.generictageditors.ChangeListener;
 import com.jpexs.decompiler.flash.gui.generictageditors.ColorEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.GenericTagEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.NumberEditor;
-import com.jpexs.decompiler.flash.gui.generictageditors.ScrollPanedEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.StringEditor;
 import com.jpexs.decompiler.flash.gui.helpers.SpringUtilities;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -413,7 +412,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
         } else if (type.equals(ByteArrayRange.class)) {
             editor = new BinaryDataEditor(mainPanel, name, obj, field, index, type);
         } else if (type.equals(Amf3Value.class)) {
-            editor = new ScrollPanedEditor(new Amf3ValueEditor(name, obj, field, index, type));
+            editor = new Amf3ValueEditor(name, obj, field, index, type);
         } else {
             if (value == null) {
                 if (readonly) {
@@ -501,10 +500,15 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
         }
     }
 
-    public void save() {
+    public boolean save() {
         for (Object component : genericTagPropertiesEditPanel.getComponents()) {
             if (component instanceof GenericTagEditor) {
-                ((GenericTagEditor) component).save();
+                try {
+                    ((GenericTagEditor) component).validateValue();
+                    ((GenericTagEditor) component).save();
+                } catch (IllegalArgumentException iex) {
+                    return false;
+                }
             }
         }
         SWF swf = tag.getSwf();
@@ -512,6 +516,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
         tag.setModified(true);
         tag.setSwf(swf);
         setTagText(tag);
+        return true;
     }
 
     public Tag getTag() {

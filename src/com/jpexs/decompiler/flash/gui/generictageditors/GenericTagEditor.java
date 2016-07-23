@@ -26,6 +26,8 @@ public interface GenericTagEditor {
 
     public void added();
 
+    public void reset();
+
     public void save();
 
     public void addChangeListener(ChangeListener l);
@@ -37,4 +39,6 @@ public interface GenericTagEditor {
     public Field getField();
 
     public String getReadOnlyValue();
+
+    public void validateValue();
 }

@@ -24,7 +24,6 @@ import com.jpexs.decompiler.flash.gui.generictageditors.BooleanEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.ColorEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.GenericTagEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.NumberEditor;
-import com.jpexs.decompiler.flash.gui.generictageditors.ScrollPanedEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.StringEditor;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
@@ -170,7 +169,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                     } else if (type.equals(byte[].class) || type.equals(ByteArrayRange.class)) {
                         editor = new BinaryDataEditor(mainPanel, field.getName(), obj, field, index, type);
                     } else if (type.equals(Amf3Value.class)) {
-                        editor = new ScrollPanedEditor(new Amf3ValueEditor(field.getName(), obj, field, index, type));
+                        editor = new Amf3ValueEditor(field.getName(), obj, field, index, type);
                     }
                     if (editor != null) {
                         if (editors == null) {
@@ -250,19 +249,28 @@ public class GenericTagTreePanel extends GenericTagPanel {
         }
 
         @Override
-        public boolean stopCellEditing() {
-            super.stopCellEditing();
-
-            /*List<FieldNode> depends = ((MyTreeModel) tree.getModel()).getDependentFields(fnode);
-             boolean dep = false;
-             if (!depends.isEmpty()) {
-             dep = true;
-             }     */
+        public void cancelCellEditing() {
             if (editors != null) {
                 for (GenericTagEditor editor : editors) {
-                    editor.save();
+                    editor.reset();
                 }
             }
+            super.cancelCellEditing();
+        }
+
+        @Override
+        public boolean stopCellEditing() {
+            if (editors != null) {
+                for (GenericTagEditor editor : editors) {
+                    try {
+                        editor.validateValue();
+                        editor.save();
+                    } catch (IllegalArgumentException iex) {
+                        return false;
+                    }
+                }
+            }
+            super.stopCellEditing();
 
             editors = null;
 
@@ -885,20 +893,23 @@ public class GenericTagTreePanel extends GenericTagPanel {
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
-        tree.setEditable(edit);
         if (!edit) {
             tree.stopEditing();
         }
+        tree.setEditable(edit);
         refreshTree();
     }
 
     @Override
-    public void save() {
-        tree.stopEditing();
-        SWF swf = tag.getSwf();
-        assignTag(tag, editedTag);
-        tag.setModified(true);
-        tag.setSwf(swf);
+    public boolean save() {
+        if (tree.stopEditing()) {
+            SWF swf = tag.getSwf();
+            assignTag(tag, editedTag);
+            tag.setModified(true);
+            tag.setSwf(swf);
+            return true;
+        }
+        return false;
     }
 
     private void assignTag(Tag t, Tag assigned) {

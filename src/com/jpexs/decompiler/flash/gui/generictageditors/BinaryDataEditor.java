@@ -58,7 +58,16 @@ public class BinaryDataEditor extends JButton implements GenericTagEditor {
         this.fieldName = fieldName;
         setText(AppStrings.translate("button.replace"));
         addActionListener(this::buttonActionPerformed);
+        reset();
 
+    }
+
+    @Override
+    public void validateValue() {
+    }
+
+    @Override
+    public void reset() {
         try {
             Object val = ReflectionTools.getValue(obj, field, index);
             if (val instanceof byte[]) {

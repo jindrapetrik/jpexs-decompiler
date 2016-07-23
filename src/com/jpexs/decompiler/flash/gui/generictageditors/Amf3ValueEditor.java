@@ -18,25 +18,55 @@ package com.jpexs.decompiler.flash.gui.generictageditors;
 
 import com.jpexs.decompiler.flash.amf.amf3.Amf3Value;
 import com.jpexs.decompiler.flash.exporters.amf.amf3.Amf3Exporter;
+import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.importers.amf.amf3.Amf3Importer;
 import com.jpexs.decompiler.flash.importers.amf.amf3.Amf3ParseException;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ReflectionTools;
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.Timer;
+import javax.swing.JComponent;
 import javax.swing.JEditorPane;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 
 /**
  *
  * @author JPEXS
  */
-public class Amf3ValueEditor extends JEditorPane implements GenericTagEditor {
+public class Amf3ValueEditor extends JPanel implements GenericTagEditor {
+
+    private JEditorPane editor = new JEditorPane() {
+        @Override
+        public boolean getScrollableTracksViewportWidth() {
+            return true;
+        }
+
+        @Override
+        public Component.BaselineResizeBehavior getBaselineResizeBehavior() {
+            return Component.BaselineResizeBehavior.CONSTANT_ASCENT;
+        }
+
+        @Override
+        public int getBaseline(int width, int height) {
+            return 0;
+        }
+    };
 
     private final Object obj;
 
@@ -48,32 +78,16 @@ public class Amf3ValueEditor extends JEditorPane implements GenericTagEditor {
 
     private String fieldName;
 
+    private Amf3Value value;
+    private final JLabel errorLabel = new JLabel();
+    private Timer hideErrorTimer;
+    private final int TIMEOUT = 5000;
+
     @Override
     public void added() {
-        String s = getText();
-        setContentType("text/javascript");
-        setText(s);
-    }
-
-    @Override
-    public boolean getScrollableTracksViewportWidth() {
-        return true;
-    }
-
-    /*    @Override
-    public Dimension getPreferredSize() {
-        Dimension ret = super.getPreferredSize();
-        ret.width = 300;
-        return ret;
-    }*/
-    @Override
-    public Component.BaselineResizeBehavior getBaselineResizeBehavior() {
-        return Component.BaselineResizeBehavior.CONSTANT_ASCENT;
-    }
-
-    @Override
-    public int getBaseline(int width, int height) {
-        return 0;
+        String s = editor.getText();
+        editor.setContentType("text/javascript");
+        editor.setText(s);
     }
 
     public Amf3ValueEditor(String fieldName, Object obj, Field field, int index, Class<?> type) {
@@ -82,13 +96,31 @@ public class Amf3ValueEditor extends JEditorPane implements GenericTagEditor {
         this.index = index;
         this.type = type;
         this.fieldName = fieldName;
+
+        setLayout(new BorderLayout());
+
+        Dimension d = new Dimension(500, 330);
+        setSize(d);
+        setPreferredSize(d);
+
+        add(new JScrollPane(editor), BorderLayout.CENTER);
+        add(errorLabel, BorderLayout.SOUTH);
+        errorLabel.setBackground(Color.red);
+        errorLabel.setForeground(Color.white);
+        errorLabel.setOpaque(true);
+
+        reset();
+    }
+
+    @Override
+    public void reset() {
         try {
-            Amf3Value val = (Amf3Value) ReflectionTools.getValue(obj, field, index);
-            if (val == null || val.getValue() == null) {
-                setText("");
+            value = (Amf3Value) ReflectionTools.getValue(obj, field, index);
+            if (value == null || value.getValue() == null) {
+                editor.setText("");
             } else {
-                String stringVal = Amf3Exporter.amfToString(val.getValue());
-                setText(stringVal);
+                String stringVal = Amf3Exporter.amfToString(value.getValue());
+                editor.setText(stringVal);
             }
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             // ignore
@@ -98,8 +130,10 @@ public class Amf3ValueEditor extends JEditorPane implements GenericTagEditor {
     @Override
     public void save() {
         try {
-            ReflectionTools.setValue(obj, field, index, getChangedValue());
-        } catch (IllegalArgumentException | IllegalAccessException ex) {
+            Object val = getChangedValue();
+            ReflectionTools.setValue(obj, field, index, val);
+            value = (Amf3Value) val;
+        } catch (IllegalAccessException ex) {
             //ignore
         }
     }
@@ -107,7 +141,7 @@ public class Amf3ValueEditor extends JEditorPane implements GenericTagEditor {
     @Override
     public void addChangeListener(final ChangeListener l) {
         final GenericTagEditor t = this;
-        addFocusListener(new FocusAdapter() {
+        editor.addFocusListener(new FocusAdapter() {
 
             @Override
             public void focusLost(FocusEvent e) {
@@ -118,15 +152,38 @@ public class Amf3ValueEditor extends JEditorPane implements GenericTagEditor {
     }
 
     @Override
+    public void validateValue() {
+
+        Amf3Importer importer = new Amf3Importer();
+        String textVal = editor.getText();
+        try {
+            if (!textVal.trim().isEmpty()) {
+                importer.stringToAmf(textVal);
+            }
+        } catch (IOException | Amf3ParseException ex) {
+            final CaretListener cl = new CaretListener() {
+                @Override
+                public void caretUpdate(CaretEvent e) {
+                    errorLabel.setVisible(false);
+                    editor.removeCaretListener(this);
+                }
+            };
+            editor.addCaretListener(cl);
+            errorLabel.setText("<html>" + AppStrings.translate("error") + ":" + ex.getMessage() + "</html>");
+            errorLabel.setVisible(true);
+            throw new IllegalArgumentException("Invalid AMF value", ex);
+        }
+    }
+
+    @Override
     public Object getChangedValue() {
         Amf3Importer importer = new Amf3Importer();
-        String textVal = getText();
+        String textVal = editor.getText();
         try {
             return textVal.trim().isEmpty() ? null : new Amf3Value(importer.stringToAmf(textVal));
         } catch (IOException | Amf3ParseException ex) {
-            //ignore
+            return value;
         }
-        return null;
     }
 
     @Override
