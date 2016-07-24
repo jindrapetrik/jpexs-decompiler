@@ -33,7 +33,7 @@ public class ObjectType implements WithSubValues, Amf3ValueType, Map<String, Obj
     public ObjectType(Traits traits, byte[] serializedData, Map<String, Object> serializedMembers) {
         this.traits = traits;
         this.serializedData = serializedData;
-        this.serializedMembers = new ListMap(serializedMembers);
+        this.serializedMembers = new ListMap<>(serializedMembers);
         this.dynamicMembers = new ListMap<>();
         this.sealedMembers = new ListMap<>();
         this.serialized = true;
@@ -126,7 +126,23 @@ public class ObjectType implements WithSubValues, Amf3ValueType, Map<String, Obj
 
     @Override
     public boolean containsKey(Object key) {
-        return dynamicMembers.containsKey(key) || sealedMembers.containsKey(key) || serializedMembers.containsKey(key);
+        if (!(key instanceof String)) {
+            return false;
+        }
+        String keyString = (String) key;
+        return containsDynamicMember(keyString) || containsSealedMember(keyString) || containsSerializedMember(keyString);
+    }
+
+    public boolean containsSealedMember(String name) {
+        return sealedMembers.containsKey(name);
+    }
+
+    public boolean containsDynamicMember(String name) {
+        return dynamicMembers.containsKey(name);
+    }
+
+    public boolean containsSerializedMember(String name) {
+        return serializedMembers.containsKey(name);
     }
 
     @Override
