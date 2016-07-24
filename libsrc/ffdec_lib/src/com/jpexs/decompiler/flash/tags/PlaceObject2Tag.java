@@ -442,4 +442,14 @@ public class PlaceObject2Tag extends PlaceObjectTypeTag implements ASMSourceCont
     public Amf3Value getAmfData() {
         return null;
     }
+
+    @Override
+    public Integer getBitmapCache() {
+        return null;
+    }
+
+    @Override
+    public Integer getVisible() {
+        return null;
+    }
 }

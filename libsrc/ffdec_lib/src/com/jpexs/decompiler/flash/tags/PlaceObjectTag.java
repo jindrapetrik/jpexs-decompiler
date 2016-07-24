@@ -262,4 +262,13 @@ public class PlaceObjectTag extends PlaceObjectTypeTag {
         return null;
     }
 
+    @Override
+    public Integer getBitmapCache() {
+        return null;
+    }
+
+    @Override
+    public Integer getVisible() {
+        return null;
+    }
 }

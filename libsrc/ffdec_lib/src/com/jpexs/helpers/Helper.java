@@ -148,8 +148,8 @@ public class Helper {
     }
 
     /**
-     * Formats specified address to four numbers xxxx
-     * (or five numbers when showing decimal addresses)
+     * Formats specified address to four numbers xxxx (or five numbers when
+     * showing decimal addresses)
      *
      * @param number Address to format
      * @return String representation of the address
@@ -159,8 +159,8 @@ public class Helper {
     }
 
     /**
-     * Formats specified address to four numbers xxxx
-     * (or five numbers when showing decimal addresses)
+     * Formats specified address to four numbers xxxx (or five numbers when
+     * showing decimal addresses)
      *
      * @param number Address to format
      * @param decimal Use decimal format
@@ -648,7 +648,7 @@ public class Helper {
         for (String f : file) {
             try (FileInputStream fis = new FileInputStream(f)) {
                 byte[] buf = new byte[4096];
-                int cnt = 0;
+                int cnt;
                 while ((cnt = fis.read(buf)) > 0) {
                     baos.write(buf, 0, cnt);
                 }
@@ -657,6 +657,41 @@ public class Helper {
             }
         }
         return baos.toByteArray();
+    }
+
+    public static byte[] readFileEx(String... file) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        for (String f : file) {
+            FileInputStream fis = null;
+            try {
+                fis = new FileInputStream(f);
+
+                byte[] buf = new byte[4096];
+                int cnt;
+                while ((cnt = fis.read(buf)) > 0) {
+                    baos.write(buf, 0, cnt);
+                }
+            } finally {
+                if (fis != null) {
+                    try {
+                        fis.close();
+                    } catch (IOException ex) {
+                        //ignore
+                    }
+                }
+            }
+        }
+        return baos.toByteArray();
+    }
+
+    public static String readTextFileEx(String... file) throws IOException {
+        byte[] data = readFileEx(file);
+        if (data.length > 1 && data[0] == (byte) 0xef && data[1] == (byte) 0xbb && data[2] == (byte) 0xbf) {
+            // remove UTF-8 BOM
+            return new String(data, 3, data.length - 3, Utf8Helper.charset);
+        }
+
+        return new String(data, Utf8Helper.charset);
     }
 
     public static String readTextFile(String... file) {
@@ -983,13 +1018,11 @@ public class Helper {
                         writer.appendNoHilight(" ");
                     }
                     writer.appendNoHilight(byteToHex(data[idx])).appendNoHilight(" ");
-                } else {
-                    if (addChars) {
-                        if (i > 0 && i % groupSize == 0) {
-                            writer.appendNoHilight(" ");
-                        }
-                        writer.appendNoHilight("   ");
+                } else if (addChars) {
+                    if (i > 0 && i % groupSize == 0) {
+                        writer.appendNoHilight(" ");
                     }
+                    writer.appendNoHilight("   ");
                 }
                 address += bytesPerRow;
             }

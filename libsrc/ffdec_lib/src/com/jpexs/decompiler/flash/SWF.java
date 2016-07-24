@@ -2507,8 +2507,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         for (Tag tag : getTags()) {
             if (tag instanceof ImageTag) {
                 ((ImageTag) tag).clearCache();
-            }
-            else if (tag instanceof DefineCompactedFont) {
+            } else if (tag instanceof DefineCompactedFont) {
                 ((DefineCompactedFont) tag).rebuildShapeCache();
             }
         }
@@ -2891,15 +2890,15 @@ public final class SWF implements SWFContainerItem, Timelined {
             timelined.setModified(true);
             timelined.resetTimeline();
         } else // timeline should be always the swf here
-        if (removeDependencies) {
-            removeTagWithDependenciesFromTimeline(tag, timelined.getTimeline());
-            timelined.setModified(true);
-        } else {
-            boolean modified = removeTagFromTimeline(tag, timelined.getTimeline());
-            if (modified) {
+         if (removeDependencies) {
+                removeTagWithDependenciesFromTimeline(tag, timelined.getTimeline());
                 timelined.setModified(true);
+            } else {
+                boolean modified = removeTagFromTimeline(tag, timelined.getTimeline());
+                if (modified) {
+                    timelined.setModified(true);
+                }
             }
-        }
     }
 
     @Override
@@ -3647,5 +3646,11 @@ public final class SWF implements SWFContainerItem, Timelined {
             }
         }
         return null;
+    }
+
+    @Override
+    public void replaceTag(int index, Tag newTag) {
+        removeTag(index);
+        addTag(index, newTag);
     }
 }
