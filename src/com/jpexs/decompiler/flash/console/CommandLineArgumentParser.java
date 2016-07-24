@@ -2215,7 +2215,8 @@ public class CommandLineArgumentParser {
             outFile = Path.combine(outFile, exportFormat);
         };
 
-        outFile = Path.combine(outFile, inFile.getName());
+        String outFileName = inFile.getName().toLowerCase().endsWith(".swf") ? inFile.getName().substring(0, inFile.getName().length() - 3) + exportFormat : inFile.getName();
+        outFile = Path.combine(outFile, outFileName);
         XFLExportSettings settings = new XFLExportSettings();
         settings.compressed = compressed;
         settings.exportScript = exportScript;
