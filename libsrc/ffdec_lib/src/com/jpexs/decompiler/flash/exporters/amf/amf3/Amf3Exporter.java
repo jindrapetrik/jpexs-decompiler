@@ -1,6 +1,5 @@
 package com.jpexs.decompiler.flash.exporters.amf.amf3;
 
-import com.jpexs.decompiler.flash.amf.amf3.Pair;
 import com.jpexs.decompiler.flash.amf.amf3.WithSubValues;
 import com.jpexs.decompiler.flash.amf.amf3.types.ArrayType;
 import com.jpexs.decompiler.flash.amf.amf3.types.XmlType;
@@ -153,13 +152,17 @@ public class Amf3Exporter {
                     ret.append(indent(level + 1)).append("\"serialized\": \"").append(javax.xml.bind.DatatypeConverter.printHexBinary(serData)).append("\",").append(newLine);
                     if (!ot.getSerializedMembers().isEmpty()) {
                         ret.append(indent(level + 1)).append("\"unserializedMembers\": {").append(newLine);
-                        for (int i = 0; i < ot.getSerializedMembers().size(); i++) {
-                            Pair<String, Object> member = ot.getSerializedMembers().get(i);
-                            ret.append(indent(level + 2)).append(amfToString(indentStr, newLine, processedObjects, level + 2, member.getFirst(), referenceCount, objectAlias)).append(":").append(amfToString(indentStr, newLine, processedObjects, level + 1, member.getSecond(), referenceCount, objectAlias));
-                            if (i < ot.getSerializedMembers().size() - 1) {
-                                ret.append(",").append(newLine);
-                            } else {
-                                ret.append(newLine);
+                        {
+                            int i = 0;
+                            for (String key : ot.sealedMembersKeySet()) {
+                                Object val = ot.getSealedMember(key);
+                                ret.append(indent(level + 2)).append(amfToString(indentStr, newLine, processedObjects, level + 2, key, referenceCount, objectAlias)).append(":").append(amfToString(indentStr, newLine, processedObjects, level + 1, val, referenceCount, objectAlias));
+                                if (i < ot.serializedMembersSize() - 1) {
+                                    ret.append(",").append(newLine);
+                                } else {
+                                    ret.append(newLine);
+                                }
+                                i++;
                             }
                         }
                         ret.append(indent(level + 1)).append("}");
@@ -170,13 +173,17 @@ public class Amf3Exporter {
                 ret.append(indent(level + 1)).append("\"dynamic\": ").append(ot.isDynamic()).append(",").append(newLine);
                 //if (!ot.getSealedMembers().isEmpty()) {
                 ret.append(indent(level + 1)).append("\"sealedMembers\": {").append(newLine);
-                for (int i = 0; i < ot.getSealedMembers().size(); i++) {
-                    Pair<String, Object> member = ot.getSealedMembers().get(i);
-                    ret.append(indent(level + 2)).append(amfToString(indentStr, newLine, processedObjects, level + 2, member.getFirst(), referenceCount, objectAlias)).append(":").append(amfToString(indentStr, newLine, processedObjects, level + 1, member.getSecond(), referenceCount, objectAlias));
-                    if (i < ot.getSealedMembers().size() - 1) {
-                        ret.append(",").append(newLine);
-                    } else {
-                        ret.append(newLine);
+                {
+                    int i = 0;
+                    for (String key : ot.sealedMembersKeySet()) {
+                        Object val = ot.getSealedMember(key);
+                        ret.append(indent(level + 2)).append(amfToString(indentStr, newLine, processedObjects, level + 2, key, referenceCount, objectAlias)).append(":").append(amfToString(indentStr, newLine, processedObjects, level + 1, val, referenceCount, objectAlias));
+                        if (i < ot.sealedMembersSize() - 1) {
+                            ret.append(",").append(newLine);
+                        } else {
+                            ret.append(newLine);
+                        }
+                        i++;
                     }
                 }
                 ret.append(indent(level + 1)).append("}");
@@ -187,15 +194,19 @@ public class Amf3Exporter {
                 //}
                 //if (!ot.getDynamicMembers().isEmpty()) {
                 ret.append(indent(level + 1)).append("\"dynamicMembers\": {").append(newLine);
-                for (int i = 0; i < ot.getDynamicMembers().size(); i++) {
-                    Pair<String, Object> member = ot.getDynamicMembers().get(i);
-                    ret.append(indent(level + 2)).append(amfToString(indentStr, newLine, processedObjects, level + 2, member.getFirst(), referenceCount, objectAlias));
-                    ret.append(":");
-                    ret.append(amfToString(indentStr, newLine, processedObjects, level + 2, member.getSecond(), referenceCount, objectAlias));
-                    if (i < ot.getDynamicMembers().size() - 1) {
-                        ret.append(",");
+                {
+                    int i = 0;
+                    for (String key : ot.dynamicMembersKeySet()) {
+                        Object val = ot.getDynamicMember(key);
+                        ret.append(indent(level + 2)).append(amfToString(indentStr, newLine, processedObjects, level + 2, key, referenceCount, objectAlias));
+                        ret.append(":");
+                        ret.append(amfToString(indentStr, newLine, processedObjects, level + 2, val, referenceCount, objectAlias));
+                        if (i < ot.dynamicMembersSize() - 1) {
+                            ret.append(",");
+                        }
+                        ret.append(newLine);
+                        i++;
                     }
-                    ret.append(newLine);
                 }
                 ret.append(indent(level + 1)).append("}").append(newLine);
                 //}
@@ -219,13 +230,17 @@ public class Amf3Exporter {
             if (!at.getAssociativeValues().isEmpty()) {
                 ret.append(newLine);
             }
-            for (int i = 0; i < at.getAssociativeValues().size(); i++) {
-                Pair<String, Object> p = at.getAssociativeValues().get(i);
-                ret.append(indent(level + 2)).append(amfToString(indentStr, newLine, processedObjects, level + 1, p.getFirst(), referenceCount, objectAlias)).append(" : ").append(amfToString(indentStr, newLine, processedObjects, level + 1, p.getSecond(), referenceCount, objectAlias));
-                if (i < at.getAssociativeValues().size() - 1) {
-                    ret.append(",");
+            {
+                int i = 0;
+                for (String key : at.associativeKeySet()) {
+                    Object val = at.getAssociative(key);
+                    ret.append(indent(level + 2)).append(amfToString(indentStr, newLine, processedObjects, level + 1, key, referenceCount, objectAlias)).append(" : ").append(amfToString(indentStr, newLine, processedObjects, level + 1, val, referenceCount, objectAlias));
+                    if (i < at.getAssociativeValues().size() - 1) {
+                        ret.append(",");
+                    }
+                    ret.append(newLine);
+                    i++;
                 }
-                ret.append(newLine);
             }
             if (!at.getAssociativeValues().isEmpty()) {
                 ret.append(indent(level + 1));
@@ -239,13 +254,17 @@ public class Amf3Exporter {
             ret.append(addId);
             ret.append(indent(level + 1)).append("\"weakKeys\": ").append(dt.hasWeakKeys()).append(",").append(newLine);
             ret.append(indent(level + 1)).append("\"entries\": {").append(newLine);
-            for (int i = 0; i < dt.getPairs().size(); i++) {
-                Pair<Object, Object> pair = dt.getPairs().get(i);
-                ret.append(indent(level + 1)).append(amfToString(indentStr, newLine, processedObjects, level + 1, pair.getFirst(), referenceCount, objectAlias)).append(" : ").append(amfToString(indentStr, newLine, processedObjects, level + 1, pair.getSecond(), referenceCount, objectAlias));
-                if (i < dt.getPairs().size() - 1) {
-                    ret.append(",");
+            {
+                int i = 0;
+                for (Object key : dt.keySet()) {
+                    Object val = dt.get(key);
+                    ret.append(indent(level + 1)).append(amfToString(indentStr, newLine, processedObjects, level + 1, key, referenceCount, objectAlias)).append(" : ").append(amfToString(indentStr, newLine, processedObjects, level + 1, val, referenceCount, objectAlias));
+                    if (i < dt.size() - 1) {
+                        ret.append(",");
+                    }
+                    ret.append(newLine);
+                    i++;
                 }
-                ret.append(newLine);
             }
             ret.append(indent(level + 1)).append("}").append(newLine);
             ret.append(indent(level)).append("}");

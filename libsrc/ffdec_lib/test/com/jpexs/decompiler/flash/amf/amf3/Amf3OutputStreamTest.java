@@ -24,18 +24,18 @@ public class Amf3OutputStreamTest {
         Map<String, ObjectTypeSerializeHandler> serializers = new HashMap<>();
         serializers.put("CustomClass", new ObjectTypeSerializeHandler() {
             @Override
-            public List<Pair<String, Object>> readObject(String className, InputStream is) throws IOException {
-                List<Pair<String, Object>> members = new ArrayList<>();
-                members.add(new Pair<>("val8", (long) is.read()));
-                members.add(new Pair<>("val32", (long) ((is.read() << 24) + (is.read() << 16) + (is.read() << 8) + (is.read()))));
+            public Map<String, Object> readObject(String className, InputStream is) throws IOException {
+                Map<String, Object> members = new ListMap<>();
+                members.put("val8", (long) is.read());
+                members.put("val32", (long) ((is.read() << 24) + (is.read() << 16) + (is.read() << 8) + (is.read())));
                 return members;
             }
 
             @Override
-            public void writeObject(List<Pair<String, Object>> members, OutputStream os) throws IOException {
+            public void writeObject(Map<String, Object> members, OutputStream os) throws IOException {
                 Map<String, Object> memberMap = new HashMap<>();
-                for (Pair<String, Object> m : members) {
-                    memberMap.put(m.getFirst(), m.getSecond());
+                for (String key : members.keySet()) {
+                    memberMap.put(key, members.get(key));
                 }
                 os.write((int) (long) (Long) memberMap.get("val8"));
                 long val32 = (long) (Long) memberMap.get("val32");

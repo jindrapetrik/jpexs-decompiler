@@ -246,13 +246,13 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
         super(swf, ID, NAME, null);
     }
 
-    public PlaceObject4Tag(SWF swf, boolean placeFlagMove, int depth, String className, int characterId, MATRIX matrix, CXFORMWITHALPHA colorTransform, int ratio, String name, int clipDepth, List<FILTER> surfaceFilterList, int blendMode, int bitmapCache, int visible, RGBA backgroundColor, CLIPACTIONS clipActions, Amf3Value amfData) {
+    public PlaceObject4Tag(SWF swf, boolean placeFlagMove, int depth, String className, int characterId, MATRIX matrix, CXFORMWITHALPHA colorTransform, int ratio, String name, int clipDepth, List<FILTER> surfaceFilterList, int blendMode, Integer bitmapCache, Integer visible, RGBA backgroundColor, CLIPACTIONS clipActions, Amf3Value amfData) {
         super(swf, ID, NAME, null);
         this.placeFlagHasClassName = className != null;
         this.placeFlagHasFilterList = surfaceFilterList != null;
         this.placeFlagHasBlendMode = blendMode >= 0;
-        this.placeFlagHasCacheAsBitmap = bitmapCache >= 0;
-        this.placeFlagHasVisible = visible >= 0;
+        this.placeFlagHasCacheAsBitmap = bitmapCache != null;
+        this.placeFlagHasVisible = visible != null;
         this.placeFlagOpaqueBackground = backgroundColor != null;
         this.placeFlagHasClipActions = clipActions != null;
         this.placeFlagHasClipDepth = clipDepth >= 0;
@@ -272,8 +272,8 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
         this.clipDepth = clipDepth;
         this.surfaceFilterList = surfaceFilterList;
         this.blendMode = blendMode;
-        this.bitmapCache = bitmapCache;
-        this.visible = visible;
+        this.bitmapCache = bitmapCache == null ? 0 : bitmapCache;
+        this.visible = visible == null ? 0 : visible;
         this.backgroundColor = backgroundColor;
         this.clipActions = clipActions;
         this.amfData = amfData;
@@ -644,4 +644,19 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
         return amfData;
     }
 
+    @Override
+    public Integer getBitmapCache() {
+        if (placeFlagHasCacheAsBitmap) {
+            return bitmapCache;
+        }
+        return null;
+    }
+
+    @Override
+    public Integer getVisible() {
+        if (placeFlagHasVisible) {
+            return visible;
+        }
+        return null;
+    }
 }

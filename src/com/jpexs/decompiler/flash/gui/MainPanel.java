@@ -3592,6 +3592,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             @Override
             public void addTag(int index, Tag tag) {
             }
+
+            @Override
+            public void replaceTag(int index, Tag newTag) {
+            }
         };
     }
 

@@ -43,6 +43,12 @@ import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
+import com.jpexs.decompiler.flash.amf.amf3.Amf3InputStream;
+import com.jpexs.decompiler.flash.amf.amf3.Amf3OutputStream;
+import com.jpexs.decompiler.flash.amf.amf3.Amf3Value;
+import com.jpexs.decompiler.flash.amf.amf3.NoSerializerExistsException;
+import com.jpexs.decompiler.flash.amf.amf3.Traits;
+import com.jpexs.decompiler.flash.amf.amf3.types.ObjectType;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
 import com.jpexs.decompiler.flash.docs.As3PCodeDocs;
@@ -55,6 +61,7 @@ import com.jpexs.decompiler.flash.exporters.MovieExporter;
 import com.jpexs.decompiler.flash.exporters.ShapeExporter;
 import com.jpexs.decompiler.flash.exporters.SoundExporter;
 import com.jpexs.decompiler.flash.exporters.TextExporter;
+import com.jpexs.decompiler.flash.exporters.amf.amf3.Amf3Exporter;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.modes.BinaryDataExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ButtonExportMode;
@@ -98,6 +105,8 @@ import com.jpexs.decompiler.flash.importers.MorphShapeImporter;
 import com.jpexs.decompiler.flash.importers.ShapeImporter;
 import com.jpexs.decompiler.flash.importers.SwfXmlImporter;
 import com.jpexs.decompiler.flash.importers.TextImporter;
+import com.jpexs.decompiler.flash.importers.amf.amf3.Amf3Importer;
+import com.jpexs.decompiler.flash.importers.amf.amf3.Amf3ParseException;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
@@ -105,6 +114,7 @@ import com.jpexs.decompiler.flash.tags.DefineBitsJPEG4Tag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
+import com.jpexs.decompiler.flash.tags.PlaceObject4Tag;
 import com.jpexs.decompiler.flash.tags.ScriptLimitsTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -116,11 +126,14 @@ import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.MissingCharacterHandler;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
+import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.TextImportErrorHandler;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
+import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
+import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.decompiler.flash.xfl.FLAVersion;
@@ -129,6 +142,7 @@ import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.MemoryInputStream;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.ProgressListener;
 import com.jpexs.helpers.stat.StatisticData;
@@ -142,6 +156,7 @@ import com.sun.jna.platform.win32.Kernel32;
 import gnu.jpdf.PDFJob;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.awt.print.PageFormat;
 import java.awt.print.Paper;
@@ -165,10 +180,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -191,6 +208,9 @@ public class CommandLineArgumentParser {
     private static String stdOut = null;
 
     private static String stdErr = null;
+
+    private static final String METADATA_FORMAT_JSLIKE = "jslike";
+    private static final String METADATA_FORMAT_RAW = "raw";
 
     @SuppressWarnings("unchecked")
     private static final ConfigurationItem<Boolean>[] commandlineConfigBoolean = new ConfigurationItem[]{
@@ -523,6 +543,40 @@ public class CommandLineArgumentParser {
             out.println("  ...<format> is currently only html");
         }
 
+        if (filter == null || filter.equals("getinstancemetadata")) {
+            out.println(" " + (cnt++) + ") -getInstanceMetadata -instance <instanceName> [-outputFormat <outputFormat>] [-key <key> ] [-datafile <datafile>] <swffile>");
+            out.println("  ...reads instance metadata");
+            out.println("  ...-instance <instanceName>: name of instance to fetch metadata from");
+            out.println("  ...-outputFormat <outputFormat> (optional): format of output - one of: jslike|raw. Default is jslike.");
+            out.println("  ...- key <key> (optional): name of subkey to display. When present, only value from subkey <key> is shown, whole object value otherwise.");
+            out.println("  ...-datafile <datafile> (optional): File to write the data to. If ommited, stdout is used.");
+            out.println("  ...<swffile>: SWF file to read metadata from");
+        }
+
+        if (filter == null || filter.equals("setinstancemetadata")) {
+            out.println(" " + (cnt++) + ") -setInstanceMetadata -instance <instanceName>  [-inputFormat <inputFormat>] [-key <key> ] [-value <value> | -datafile <datafile>] [-outfile <outFile>] <swffile>");
+            out.println("  ...adds metadata to instance");
+            out.println("  ...-instance <instanceName>: name of instance to replace data in");
+            out.println("  ...-inputFormat <inputFormat>: format of input data - one of: jslike|raw. Default is jslike.");
+            out.println("  ...- key <key> (optional): name of subkey to use. When present, the value is set as object property with the <key> name.");
+            out.println("            Otherwise the value is set directly to the instance without any subkeys.");
+            out.println("  ...-value <value> (optional): value to set.");
+            out.println("  ...-datafile <datafile> (optional): value to set from file.");
+            out.println("  ...If no -value or -infile parameter present, the value to set is taken from stdin.");
+            out.println("  ...-outfile <outfile> (optional): Where to save resulting file. If ommited, original SWF file is overwritten.");
+            out.println("  ...<swffile>: SWF file to search instance in");
+        }
+
+        if (filter == null || filter.equals("removeinstancemetadata")) {
+            out.println(" " + (cnt++) + ") -removeInstanceMetadata -instance <instanceName> [-key <key> ] [-outfile <outFile>] <swffile>");
+            out.println("  ...removes metadata from instance");
+            out.println("  ...-instance <instanceName>: name of instance to remove data from");
+            out.println("  ...- key <key> (optional): name of subkey to remove. When present, only the value from subkey <key> of the AMF object is removed.");
+            out.println("            Otherwise all metadata are removed from the instance.");
+            out.println("  ...-outfile <outfile> (optional): Where to save resulting file. If ommited, original SWF file is overwritten.");
+            out.println("  ...<swffile>: SWF file to search instance in");
+        }
+
         printCmdLineUsageExamples(out, filter);
     }
 
@@ -530,68 +584,87 @@ public class CommandLineArgumentParser {
         out.println();
         out.println("Examples:");
 
+        final String PREFIX = "java -jar ffdec.jar ";
+
         boolean exampleFound = false;
         if (filter == null) {
-            out.println("java -jar ffdec.jar myfile.swf");
+            out.println(PREFIX + "myfile.swf");
             exampleFound = true;
         }
 
         if (filter == null || filter.equals("proxy")) {
-            out.println("java -jar ffdec.jar -proxy");
-            out.println("java -jar ffdec.jar -proxy -P1234");
+            out.println(PREFIX + "-proxy");
+            out.println(PREFIX + "-proxy -P1234");
             exampleFound = true;
         }
 
         if (filter == null || filter.equals("export") || filter.equals("format") || filter.equals("selectclass") || filter.equals("onerror")) {
-            out.println("java -jar ffdec.jar -export script \"C:\\decompiled\" myfile.swf");
-            out.println("java -jar ffdec.jar -selectclass com.example.MyClass,com.example.SecondClass -export script \"C:\\decompiled\" myfile.swf");
-            out.println("java -jar ffdec.jar -format script:pcode -export script \"C:\\decompiled\" myfile.swf");
-            out.println("java -jar ffdec.jar -format script:pcode,text:plain -export script,text,image \"C:\\decompiled\" myfile.swf");
-            out.println("java -jar ffdec.jar -format fla:cs5.5 -export fla \"C:\\sources\\myfile.fla\" myfile.swf");
-            out.println("java -jar ffdec.jar -onerror ignore -export script \"C:\\decompiled\" myfile.swf");
-            out.println("java -jar ffdec.jar -onerror retry 5 -export script \"C:\\decompiled\" myfile.swf");
+            out.println(PREFIX + "-export script \"C:\\decompiled\" myfile.swf");
+            out.println(PREFIX + "-selectclass com.example.MyClass,com.example.SecondClass -export script \"C:\\decompiled\" myfile.swf");
+            out.println(PREFIX + "-format script:pcode -export script \"C:\\decompiled\" myfile.swf");
+            out.println(PREFIX + "-format script:pcode,text:plain -export script,text,image \"C:\\decompiled\" myfile.swf");
+            out.println(PREFIX + "-format fla:cs5.5 -export fla \"C:\\sources\\myfile.fla\" myfile.swf");
+            out.println(PREFIX + "-onerror ignore -export script \"C:\\decompiled\" myfile.swf");
+            out.println(PREFIX + "-onerror retry 5 -export script \"C:\\decompiled\" myfile.swf");
             exampleFound = true;
         }
 
         if (filter == null || filter.equals("cli")) {
-            out.println("java -jar ffdec.jar -cli myfile.swf");
+            out.println(PREFIX + "-cli myfile.swf");
             exampleFound = true;
         }
 
         if (filter == null || filter.equals("dumpswf")) {
-            out.println("java -jar ffdec.jar -dumpSWF myfile.swf");
+            out.println(PREFIX + "-dumpSWF myfile.swf");
             exampleFound = true;
         }
 
         if (filter == null || filter.equals("compress")) {
-            out.println("java -jar ffdec.jar -compress myfile.swf myfilecomp.swf");
+            out.println(PREFIX + "-compress myfile.swf myfilecomp.swf");
             exampleFound = true;
         }
 
         if (filter == null || filter.equals("decompress")) {
-            out.println("java -jar ffdec.jar -decompress myfile.swf myfiledec.swf");
+            out.println(PREFIX + "-decompress myfile.swf myfiledec.swf");
             exampleFound = true;
         }
 
         if (filter == null || filter.equals("config")) {
-            out.println("java -jar ffdec.jar -config autoDeobfuscate=1,parallelSpeedUp=0 -export script \"C:\\decompiled\" myfile.swf");
+            out.println(PREFIX + "-config autoDeobfuscate=1,parallelSpeedUp=0 -export script \"C:\\decompiled\" myfile.swf");
             exampleFound = true;
         }
 
         if (filter == null || filter.equals("deobfuscate")) {
-            out.println("java -jar ffdec.jar -deobfuscate max myas3file_secure.swf myas3file.swf");
+            out.println(PREFIX + "-deobfuscate max myas3file_secure.swf myas3file.swf");
             exampleFound = true;
         }
 
         if (filter == null || filter.equals("enabledebugging")) {
-            out.println("java -jar ffdec.jar -enabledebugging -injectas3 myas3file.swf myas3file_debug.swf");
-            out.println("java -jar ffdec.jar -enabledebugging -generateswd myas2file.swf myas2file_debug.swf");
+            out.println(PREFIX + "-enabledebugging -injectas3 myas3file.swf myas3file_debug.swf");
+            out.println(PREFIX + "-enabledebugging -generateswd myas2file.swf myas2file_debug.swf");
             exampleFound = true;
         }
 
         if (filter == null || filter.equals("doc")) {
-            out.println("java -jar ffdec.jar -doc -type as3.pcode.instructions -format html");
-            out.println("java -jar ffdec.jar -doc -type as3.pcode.instructions -format html -locale en -out as3_docs_en.html");
+            out.println(PREFIX + "-doc -type as3.pcode.instructions -format html");
+            out.println(PREFIX + "-doc -type as3.pcode.instructions -format html -locale en -out as3_docs_en.html");
+            exampleFound = true;
+        }
+
+        if (filter == null || filter.equals("getinstancemetadata")) {
+            out.println(PREFIX + "-getInstanceMetadata -instance myobj -key keyone myfile.swf");
+            out.println(PREFIX + "-getInstanceMetadata -instance myobj2 -outputFormat raw -outfile out.amf myfile.swf");
+            exampleFound = true;
+        }
+        if (filter == null || filter.equals("setinstancemetadata")) {
+            out.println(PREFIX + "-setInstanceMetadata -instance myobj -key mykey -value 1234 myfile.swf");
+            out.println(PREFIX + "-setInstanceMetadata -instance myobj -key my -inputFormat raw -datafile value.amf -outfile modified.swf myfile.swf");
+            exampleFound = true;
+        }
+
+        if (filter == null || filter.equals("removeinstancemetadata")) {
+            out.println(PREFIX + "-removeInstanceMetadata -instance myobj -key mykey -outfile result.swf myfile.swf");
+            out.println(PREFIX + "-removeInstanceMetadata -instance myobj myfile.swf");
             exampleFound = true;
         }
 
@@ -633,6 +706,9 @@ public class CommandLineArgumentParser {
             nextParamOriginal = args.pop();
             if (nextParamOriginal != null) {
                 nextParam = nextParamOriginal.toLowerCase();
+            }
+            if (nextParam == null) {
+                nextParam = "";
             }
             switch (nextParam) {
                 case "-cli":
@@ -709,11 +785,20 @@ public class CommandLineArgumentParser {
         }
 
         String command = "";
+        if (nextParam == null) {
+            nextParam = "";
+        }
         if (nextParam.startsWith("-")) {
             command = nextParam.substring(1);
         }
 
-        if (command.equals("removefromcontextmenu")) {
+        if (command.equals("getinstancemetadata")) {
+            parseGetInstanceMetadata(args);
+        } else if (command.equals("setinstancemetadata")) {
+            parseSetInstanceMetadata(args);
+        } else if (command.equals("removeinstancemetadata")) {
+            parseRemoveInstanceMetadata(args);
+        } else if (command.equals("removefromcontextmenu")) {
             if (!args.isEmpty()) {
                 badArguments(command);
             }
@@ -900,6 +985,492 @@ public class CommandLineArgumentParser {
             badArguments("config");
         }
         setConfigurations(args.pop());
+    }
+
+    private static void parseGetInstanceMetadata(Stack<String> args) {
+        if (args.size() < 3) {
+            badArguments("getinstancemetadata");
+        }
+        Set<String> processedParams = new HashSet<>();
+        String format = METADATA_FORMAT_JSLIKE;
+        String key = null;
+        String instance = null;
+        File stdOutFile = null;
+        File swfFile = null;
+
+        while (!args.empty()) {
+            String paramName = args.pop().toLowerCase();
+            if (processedParams.contains(paramName)) {
+                System.err.println("Parameter " + paramName + " can appear only once.");
+            }
+            switch (paramName) {
+                case "-instance":
+                    if (args.isEmpty()) {
+                        System.err.println("Missing instance name");
+                        badArguments("getinstancemetadata");
+                    }
+                    instance = args.pop();
+                    break;
+                case "-outputformat":
+                    if (args.empty()) {
+                        System.err.println("Missing format value");
+                        badArguments("getinstancemetadata");
+                    }
+                    format = args.pop();
+                    if (!Arrays.asList(METADATA_FORMAT_RAW, METADATA_FORMAT_JSLIKE).contains(format)) {
+                        System.err.println("Invalid output format");
+                        badArguments("getinstancemetadata");
+                    }
+                    break;
+                case "-key":
+                    if (args.empty()) {
+                        System.err.println("Missing key value");
+                        badArguments("getinstancemetadata");
+                    }
+
+                    key = args.pop();
+                    break;
+                case "-datafile":
+                    if (args.empty()) {
+                        System.err.println("Missing datafile file");
+                        badArguments("getinstancemetadata");
+                    }
+                    stdOutFile = new File(args.pop());
+                    break;
+                default:
+                    if (!args.isEmpty()) {
+                        badArguments("getinstancemetadata");
+                    }
+                    swfFile = new File(paramName);
+                    paramName = null;
+            }
+            if (paramName != null) {
+                processedParams.add(paramName);
+            }
+        }
+        if (instance == null) {
+            System.err.println("No instance specified");
+            badArguments("getinstancemetadata");
+        }
+        if (swfFile == null) {
+            System.err.println("No SWF file specified");
+            badArguments("getinstancemetadata");
+        }
+
+        final String fInstance = instance;
+        final String fKey = key;
+        final String fFormat = format;
+
+        processReadSWF(swfFile, stdOutFile, new SwfAction() {
+            @Override
+            public void swfAction(SWF swf, OutputStream stdout) throws IOException {
+                if (!processTimelined(swf, stdout)) {
+                    System.err.println("No instance with name " + fInstance + " found");
+                    System.exit(0);
+                }
+            }
+
+            private boolean processTimelined(Timelined tim, OutputStream stdout) throws IOException {
+                ReadOnlyTagList rtl = tim.getTags();
+                for (int i = 0; i < rtl.size(); i++) {
+                    Tag t = rtl.get(i);
+                    if (t instanceof Timelined) {
+                        if (processTimelined((Timelined) t, stdout)) {
+                            return true;
+                        }
+                    }
+                    if (t instanceof PlaceObjectTypeTag) {
+                        PlaceObjectTypeTag pt = (PlaceObjectTypeTag) t;
+                        String instanceName = pt.getInstanceName();
+                        if (fInstance.equals(instanceName)) {
+                            Amf3Value oldValue = pt.getAmfData();
+                            if (oldValue == null) {
+                                System.err.println("No metadata for instance " + instanceName + " found");
+                                System.exit(1); //TODO? Different exit code
+                            }
+                            Object actualValue = oldValue.getValue();
+
+                            Object displayVal = actualValue;
+                            if (fKey != null) {
+                                if (actualValue instanceof ObjectType) {
+                                    ObjectType ot = (ObjectType) actualValue;
+                                    if (ot.containsDynamicMember(fKey)) {
+                                        displayVal = ot.getDynamicMember(fKey);
+                                    } else {
+                                        System.err.println("No value with key " + fKey + " exists");
+                                        System.err.println("Available keys: " + String.join(",", ot.dynamicMembersKeySet()));
+                                        System.exit(1);
+                                    }
+                                } else {
+                                    System.err.println("Metadata present, but not as Object type, cannot get key " + fKey);
+                                    System.exit(1);
+                                }
+                            }
+
+                            switch (fFormat) {
+                                case METADATA_FORMAT_JSLIKE:
+                                    stdout.write(Utf8Helper.getBytes(Amf3Exporter.amfToString(displayVal, "  ", System.lineSeparator()) + System.lineSeparator()));
+                                    break;
+                                case METADATA_FORMAT_RAW:
+                                    Amf3OutputStream aos = new Amf3OutputStream(stdout);
+                                    try {
+                                        aos.writeValue(displayVal);
+                                    } catch (NoSerializerExistsException ex) {
+                                        //should not happen
+                                    }
+                                    break;
+                            }
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+
+        });
+        System.exit(0);
+    }
+
+    private static void parseSetInstanceMetadata(Stack<String> args) {
+        if (args.size() < 3) {
+            badArguments("setinstancemetadata");
+        }
+        Set<String> processedParams = new HashSet<>();
+        String format = METADATA_FORMAT_JSLIKE;
+        String key = null;
+        String instance = null;
+        File outFile = null;
+        File swfFile = null;
+        String value = null;
+        File valueFile = null;
+
+        while (!args.empty()) {
+            String paramName = args.pop().toLowerCase();
+            if (processedParams.contains(paramName)) {
+                System.err.println("Parameter " + paramName + " can appear only once.");
+            }
+            switch (paramName) {
+                case "-instance":
+                    if (args.isEmpty()) {
+                        System.err.println("Missing instance name");
+                        badArguments("setinstancemetadata");
+                    }
+                    instance = args.pop();
+                    break;
+                case "-inputformat":
+                    if (args.empty()) {
+                        System.err.println("Missing format value");
+                        badArguments("setinstancemetadata");
+                    }
+                    format = args.pop();
+                    if (!Arrays.asList(METADATA_FORMAT_RAW, METADATA_FORMAT_JSLIKE).contains(format)) {
+                        System.err.println("Invalid output format");
+                        badArguments("setinstancemetadata");
+                    }
+                    break;
+                case "-key":
+                    if (args.empty()) {
+                        System.err.println("Missing key value");
+                        badArguments("setinstancemetadata");
+                    }
+
+                    key = args.pop();
+                    break;
+                case "-value":
+                    if (args.empty()) {
+                        System.err.println("Missing value");
+                        badArguments("setinstancemetadata");
+                    }
+
+                    value = args.pop();
+                    break;
+                case "-outfile":
+                    if (args.empty()) {
+                        System.err.println("Missing outFile");
+                        badArguments("setinstancemetadata");
+                    }
+                    outFile = new File(args.pop());
+                    break;
+
+                case "-datafile":
+                    if (args.empty()) {
+                        System.err.println("Missing datafile file");
+                        badArguments("setinstancemetadata");
+                    }
+                    valueFile = new File(args.pop());
+                    break;
+                default:
+                    if (!args.isEmpty()) {
+                        badArguments("setinstancemetadata");
+                    }
+                    swfFile = new File(paramName);
+                    paramName = null;
+            }
+            if (paramName != null) {
+                processedParams.add(paramName);
+            }
+        }
+        if (instance == null) {
+            System.err.println("No instance specified");
+            badArguments("getinstancemetadata");
+        }
+        if (swfFile == null) {
+            System.err.println("No SWF file specified");
+            badArguments("getinstancemetadata");
+        }
+        if (outFile == null) {
+            outFile = swfFile;
+        }
+
+        byte[] valueBytes = new byte[]{};
+        if (valueFile != null) {
+            try {
+                valueBytes = Helper.readFileEx(valueFile.getAbsolutePath());
+            } catch (IOException ex) {
+                System.err.println("Cannot read value: " + ex.getMessage());
+                System.exit(1);
+                return;
+            }
+        } else if (value != null) {
+            valueBytes = Utf8Helper.getBytes(value);
+        }
+
+        if (valueBytes.length == 0) {
+            valueBytes = Helper.readStream(System.in);
+        }
+
+        if (valueBytes.length < 1) {
+            System.err.println("No value to set specified");
+            System.exit(1);
+        }
+
+        Object amfValue = null;
+        try {
+            switch (format) {
+                case METADATA_FORMAT_JSLIKE:
+                    Amf3Importer importer = new Amf3Importer();
+                    amfValue = importer.stringToAmf(value);
+                    break;
+                case METADATA_FORMAT_RAW:
+                    Amf3InputStream ais = new Amf3InputStream(new MemoryInputStream(valueBytes));
+                    amfValue = ais.readValue("val");
+                    break;
+            }
+        } catch (IOException | Amf3ParseException | NoSerializerExistsException ex) {
+            System.err.println("Error parsing input value: " + ex.getMessage());
+            System.exit(1);
+            return;
+        }
+
+        final String fInstance = instance;
+        final String fKey = key;
+        final Object fAmfValue = amfValue;
+
+        processModifySWF(swfFile, outFile, null, new SwfAction() {
+            @Override
+            public void swfAction(SWF swf, OutputStream stdout) throws IOException {
+                if (!processTimelined(swf, stdout)) {
+                    System.err.println("No instance with name " + fInstance + " found");
+                    System.exit(0);
+                }
+            }
+
+            private boolean processTimelined(Timelined tim, OutputStream stdout) throws IOException {
+                ReadOnlyTagList rtl = tim.getTags();
+                for (int i = 0; i < rtl.size(); i++) {
+                    Tag t = rtl.get(i);
+                    if (t instanceof Timelined) {
+                        if (processTimelined((Timelined) t, stdout)) {
+                            return true;
+                        }
+                    }
+                    if (t instanceof PlaceObjectTypeTag) {
+                        PlaceObjectTypeTag pt = (PlaceObjectTypeTag) t;
+                        String instanceName = pt.getInstanceName();
+                        if (fInstance.equals(instanceName)) {
+
+                            Amf3Value oldValue = pt.getAmfData();
+                            if (oldValue != null && oldValue.getValue() == null) {
+                                oldValue = null;
+                            }
+                            if (oldValue != null && fKey != null) { //it has AMFData and we are going to set key
+                                Object actualValue = oldValue.getValue();
+                                if (actualValue instanceof ObjectType) {    //add it to ObjectType
+                                    ObjectType ot = (ObjectType) actualValue;
+                                    ot.putDynamicMember(fKey, fAmfValue);
+                                    t.setModified(true);
+                                    oldValue.setValue(ot);
+                                    System.out.println("Key " + fKey + " added");
+                                    System.out.println("New instance data for " + instanceName + ":");
+                                    System.out.println(Amf3Exporter.amfToString(ot, "  ", System.lineSeparator()));
+                                    return true;
+                                }
+                            }
+
+                            PlaceObject4Tag pt4;
+                            if (pt instanceof PlaceObject4Tag) {
+                                pt4 = (PlaceObject4Tag) pt;
+                            } else {
+                                pt4 = new PlaceObject4Tag(
+                                        pt.getSwf(), pt.flagMove(), pt.getDepth(), pt.getClassName(), pt.getCharacterId(), pt.getMatrix(), pt.getColorTransform() == null ? null : new CXFORMWITHALPHA(pt.getColorTransform()), pt.getRatio(),
+                                        pt.getInstanceName(), pt.getClipDepth(), pt.getFilters(), pt.getBlendMode(), pt.getBitmapCache(), pt.getVisible(), pt.getBackgroundColor(), pt.getClipActions(), pt.getAmfData());
+                                tim.replaceTag(i, pt4);
+                            }
+
+                            Object newValue;
+                            if (fKey != null) {
+                                ObjectType ot = new ObjectType(new Traits("", true, new ArrayList<>()));
+                                ot.put(fKey, fAmfValue);
+                                newValue = ot;
+                            } else {
+                                newValue = fAmfValue;
+                            }
+                            pt4.amfData = new Amf3Value(newValue);
+                            pt4.setModified(true);
+
+                            System.out.println("New instance data for " + instanceName + ":");
+                            System.out.println(Amf3Exporter.amfToString(newValue, "  ", System.lineSeparator()));
+
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+
+        });
+        System.exit(0);
+    }
+
+    private static void parseRemoveInstanceMetadata(Stack<String> args) {
+        if (args.size() < 2) {
+            badArguments("removeinstancemetadata");
+        }
+
+        Set<String> processedParams = new HashSet<>();
+        String key = null;
+        String instance = null;
+        File swfFile = null;
+        File outFile = null;
+        while (!args.empty()) {
+            String paramName = args.pop().toLowerCase();
+            if (processedParams.contains(paramName)) {
+                System.err.println("Parameter " + paramName + " can appear only once.");
+            }
+            switch (paramName) {
+                case "-instance":
+                    if (args.isEmpty()) {
+                        System.err.println("Missing instance name");
+                        badArguments("removeinstancemetadata");
+                    }
+                    instance = args.pop();
+                    break;
+                case "-key":
+                    if (args.empty()) {
+                        System.err.println("Missing key value");
+                        badArguments("removeinstancemetadata");
+                    }
+
+                    key = args.pop();
+                    break;
+                case "-outfile":
+                    if (args.empty()) {
+                        System.err.println("Missing outFile");
+                        badArguments("removeinstancemetadata");
+                    }
+                    outFile = new File(args.pop());
+                    break;
+                default:
+                    if (!args.isEmpty()) {
+                        badArguments("removeinstancemetadata");
+                    }
+                    swfFile = new File(paramName);
+                    paramName = null;
+            }
+            if (paramName != null) {
+                processedParams.add(paramName);
+            }
+        }
+        if (instance == null) {
+            System.err.println("No instance specified");
+            badArguments("removeinstancemetadata");
+        }
+        if (swfFile == null) {
+            System.err.println("No SWF file specified");
+            badArguments("removeinstancemetadata");
+        }
+        if (outFile == null) {
+            outFile = swfFile;
+        }
+
+        final String fInstance = instance;
+        final String fKey = key;
+
+        processModifySWF(swfFile, outFile, null, new SwfAction() {
+            @Override
+            public void swfAction(SWF swf, OutputStream stdout) throws IOException {
+                if (!processTimelined(swf, stdout)) {
+                    System.err.println("No instance with name " + fInstance + " found");
+                    System.exit(0);
+                }
+            }
+
+            private boolean processTimelined(Timelined tim, OutputStream stdout) throws IOException {
+                ReadOnlyTagList rtl = tim.getTags();
+                for (int i = 0; i < rtl.size(); i++) {
+                    Tag t = rtl.get(i);
+                    if (t instanceof Timelined) {
+                        if (processTimelined((Timelined) t, stdout)) {
+                            return true;
+                        }
+                    }
+                    if (t instanceof PlaceObject4Tag) {
+                        PlaceObject4Tag pt4 = (PlaceObject4Tag) t;
+                        String instanceName = pt4.getInstanceName();
+                        if (fInstance.equals(instanceName)) {
+                            Amf3Value oldValue = pt4.getAmfData();
+                            if (oldValue == null) {
+                                System.err.println("No metadata for instance " + instanceName + " found");
+                                System.exit(1); //TODO? Different exit code
+                            }
+                            Object actualValue = oldValue.getValue();
+
+                            if (fKey != null) {
+                                if (actualValue instanceof ObjectType) {
+                                    ObjectType ot = (ObjectType) actualValue;
+                                    if (ot.containsDynamicMember(fKey)) {
+                                        ot.remove(fKey);
+                                        oldValue.setValue(ot);
+                                        System.out.println("Key " + fKey + " removed");
+                                        System.out.println("New instance data for " + instanceName + ":");
+                                        System.out.println(Amf3Exporter.amfToString(ot, "  ", System.lineSeparator()));
+                                        pt4.setModified(true);
+                                        return true;
+                                    } else {
+                                        System.err.println("No value with key " + fKey + " exists");
+                                        System.err.println("Available keys: " + String.join(",", ot.dynamicMembersKeySet()));
+                                        System.exit(1);
+                                    }
+                                } else {
+                                    System.err.println("Metadata present, but not as Object type, cannot remove key " + fKey);
+                                    System.exit(1);
+                                }
+                            } else {
+                                pt4.amfData = null;
+                                pt4.setModified(true);
+                                System.out.println("Whole metadata removed for instance " + instanceName);
+                            }
+
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+
+        });
+        System.exit(0);
+
     }
 
     private static class Range {
@@ -1665,7 +2236,7 @@ public class CommandLineArgumentParser {
             badArguments("deobfuscate");
         }
         String mode = args.pop();
-        DeobfuscationLevel lev = null;
+        DeobfuscationLevel lev;
         switch (mode) {
             case "controlflow":
             case "max":
@@ -1683,7 +2254,7 @@ public class CommandLineArgumentParser {
             default:
                 System.err.println("Invalid level, must be one of: controlflow,traps,deadcode or 1,2,3/max");
                 System.exit(1);
-                break;
+                return;
         }
         File inFile = new File(args.pop());
         File outFile = new File(args.pop());
@@ -2112,9 +2683,11 @@ public class CommandLineArgumentParser {
                         Paper p = new Paper();
                         p.setSize(img.getWidth(), img.getHeight());
                         pf.setPaper(p);
-                        Graphics g = job.getGraphics(pf);
-                        g.drawImage(img, 0, 0, img.getWidth(), img.getHeight(), null);
-                        g.dispose();
+                        if (job != null) {
+                            Graphics g = job.getGraphics(pf);
+                            g.drawImage(img, 0, 0, img.getWidth(), img.getHeight(), null);
+                            g.dispose();
+                        }
                         System.out.println("OK");
 
                     }
@@ -2445,7 +3018,7 @@ public class CommandLineArgumentParser {
 
                     List<Integer> characterIds = new ArrayList<>();
                     for (int i = 0; i < characterIdsStr.length; i++) {
-                        int characterId = 0;
+                        int characterId;
                         try {
                             characterId = Integer.parseInt(characterIdsStr[i]);
                             characterIds.add(characterId);
@@ -2558,12 +3131,13 @@ public class CommandLineArgumentParser {
                 while (true) {
                     String tagNoToRemoveStr = args.pop();
 
-                    int tagNo = 0;
+                    int tagNo;
                     try {
                         tagNo = Integer.parseInt(tagNoToRemoveStr);
                     } catch (NumberFormatException nfe) {
                         System.err.println("Tag number should be integer");
                         System.exit(1);
+                        return;
                     }
                     if (tagNo < 0 || tagNo >= swf.getTags().size()) {
                         System.err.println("Tag number does not exist. Tag number should be between 0 and " + (swf.getTags().size() - 1));
@@ -2883,7 +3457,7 @@ public class CommandLineArgumentParser {
     }
 
     private static void parseInfo(Stack<String> args) throws FileNotFoundException {
-        File out = null;
+        File out;
         PrintWriter pw = new PrintWriter(System.out);
         boolean found = false;
         while (!args.isEmpty()) {
@@ -2902,7 +3476,7 @@ public class CommandLineArgumentParser {
                     }
                     break;
                 default:
-                    SWFBundle bundle = null;
+                    SWFBundle bundle;
                     String sfile = a;
                     File file = new File(sfile);
                     try {
@@ -3208,4 +3782,124 @@ public class CommandLineArgumentParser {
         }
         return vals[0];
     }
+
+    private static interface SwfAction {
+
+        public void swfAction(SWF swf, OutputStream stdout) throws IOException;
+    }
+
+    private static void processReadSWF(File inFile, File stdOutFile, SwfAction action) {
+        OutputStream stdout = null;
+
+        try {
+            if (stdOutFile != null) {
+                try {
+                    stdout = new FileOutputStream(stdOutFile);
+                } catch (FileNotFoundException ex) {
+                    System.err.println("File not found: " + ex.getMessage());
+                    System.exit(1);
+                }
+            } else {
+                stdout = System.out;
+            }
+
+            try (FileInputStream is = new FileInputStream(inFile)) {
+                SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
+                action.swfAction(swf, stdout);
+            } catch (FileNotFoundException ex) {
+                System.err.println("File not found: " + ex.getMessage());
+                System.exit(1);
+            } catch (InterruptedException ex) {
+                logger.log(Level.SEVERE, null, ex);
+                System.exit(1);
+            } catch (IOException ex) {
+                logger.log(Level.SEVERE, "Error", ex);
+                System.exit(1);
+            }
+        } finally {
+            if (stdOutFile != null) {
+                if (stdout != null) {
+                    try {
+                        stdout.close();
+                    } catch (IOException ex) {
+                        //ignore
+                    }
+                }
+            }
+        }
+    }
+
+    private static void processModifySWF(File inFile, File outFile, File stdOutFile, SwfAction action) {
+
+        OutputStream stdout = null;
+
+        try {
+            if (stdOutFile != null) {
+                try {
+                    stdout = new FileOutputStream(stdOutFile);
+                } catch (FileNotFoundException ex) {
+                    System.err.println("File not found: " + ex.getMessage());
+                    System.exit(1);
+                }
+            } else {
+                stdout = System.out;
+            }
+
+            File tmpFile = null;
+            if (inFile.equals(outFile)) {
+                try {
+                    tmpFile = File.createTempFile("ffdec_modify_", ".swf");
+                    outFile = tmpFile;
+                } catch (IOException ex) {
+                    System.err.println("Unable to create temp file");
+                    System.exit(1);
+                }
+            }
+            try (FileInputStream is = new FileInputStream(inFile);
+                    FileOutputStream fos = new FileOutputStream(outFile)) {
+                SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
+                action.swfAction(swf, stdout);
+                swf.saveTo(fos);
+            } catch (FileNotFoundException ex) {
+                System.err.println("File not found: " + ex.getMessage());
+                System.exit(1);
+            } catch (InterruptedException ex) {
+                logger.log(Level.SEVERE, null, ex);
+                System.exit(1);
+            } catch (IOException ex) {
+                logger.log(Level.SEVERE, "Error", ex);
+                System.exit(1);
+            }
+
+            if (tmpFile != null) {
+                try {
+                    if (!inFile.delete()) {
+                        System.err.println("Cannot overwrite original file");
+                        System.exit(1);
+                    }
+                    if (!tmpFile.renameTo(inFile)) {
+                        System.err.println("Cannot rename tempfile to original file");
+                        System.exit(1);
+                    }
+                    tmpFile = null;
+                    System.out.println(inFile + " overwritten.");
+                } finally {
+                    if (tmpFile != null && tmpFile.exists()) {
+                        tmpFile.delete();
+                    }
+                }
+            }
+        } finally {
+            if (stdOutFile != null) {
+                if (stdout != null) {
+                    try {
+                        stdout.close();
+                    } catch (IOException ex) {
+                        //ignore
+                    }
+                }
+            }
+        }
+    }
+
 }

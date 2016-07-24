@@ -424,4 +424,10 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
     public void clearReadOnlyListCache() {
         readOnlyTags = null;
     }
+
+    @Override
+    public void replaceTag(int index, Tag newTag) {
+        removeTag(index);
+        addTag(index, newTag);
+    }
 }

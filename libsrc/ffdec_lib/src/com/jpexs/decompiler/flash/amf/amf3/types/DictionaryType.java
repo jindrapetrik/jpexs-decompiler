@@ -1,32 +1,31 @@
 package com.jpexs.decompiler.flash.amf.amf3.types;
 
+import com.jpexs.decompiler.flash.amf.amf3.ListMap;
 import com.jpexs.decompiler.flash.exporters.amf.amf3.Amf3Exporter;
-import com.jpexs.decompiler.flash.amf.amf3.Pair;
 import java.util.ArrayList;
 import java.util.List;
 import com.jpexs.decompiler.flash.amf.amf3.WithSubValues;
+import java.util.HashMap;
+import java.util.Map;
 
-public class DictionaryType implements WithSubValues, Amf3ValueType {
+public class DictionaryType extends ListMap<Object, Object> implements WithSubValues, Amf3ValueType {
 
-    private boolean weakKeys;
-    private List<Pair<Object, Object>> pairs;
+    private final boolean weakKeys;
 
-    public DictionaryType(boolean weakKeys, List<Pair<Object, Object>> pairs) {
-        this.weakKeys = weakKeys;
-        this.pairs = pairs;
+    public DictionaryType(boolean weakKeys) {
+        this(weakKeys, new HashMap<>());
     }
 
-    public List<Pair<Object, Object>> getPairs() {
-        return pairs;
+    public DictionaryType(boolean weakKeys, Map<Object, Object> entries) {
+        super(true /*IdentityMap*/, entries);
+        this.weakKeys = weakKeys; //TODO? Really make the Map weak - something like WeakIdentityMap - but is it neccessary for serialization?
     }
 
     @Override
     public List<Object> getSubValues() {
         List<Object> ret = new ArrayList<>();
-        for (Pair<Object, Object> p : pairs) {
-            ret.add(p.getFirst());
-            ret.add(p.getSecond());
-        }
+        ret.addAll(keySet());
+        ret.addAll(values());
         return ret;
     }
 

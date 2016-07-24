@@ -240,12 +240,12 @@ public class PlaceObject3Tag extends PlaceObjectTypeTag implements ASMSourceCont
         super(swf, ID, NAME, null);
     }
 
-    public PlaceObject3Tag(SWF swf, boolean placeFlagMove, int depth, String className, int characterId, MATRIX matrix, CXFORMWITHALPHA colorTransform, int ratio, String name, int clipDepth, List<FILTER> surfaceFilterList, int blendMode, int bitmapCache, int visible, RGBA backgroundColor, CLIPACTIONS clipActions) {
+    public PlaceObject3Tag(SWF swf, boolean placeFlagMove, int depth, String className, int characterId, MATRIX matrix, CXFORMWITHALPHA colorTransform, int ratio, String name, int clipDepth, List<FILTER> surfaceFilterList, int blendMode, Integer bitmapCache, int visible, RGBA backgroundColor, CLIPACTIONS clipActions) {
         super(swf, ID, NAME, null);
         this.placeFlagHasClassName = className != null;
         this.placeFlagHasFilterList = surfaceFilterList != null;
         this.placeFlagHasBlendMode = blendMode >= 0;
-        this.placeFlagHasCacheAsBitmap = bitmapCache >= 0;
+        this.placeFlagHasCacheAsBitmap = bitmapCache != null;
         this.placeFlagHasVisible = visible >= 0;
         this.placeFlagOpaqueBackground = backgroundColor != null;
         this.placeFlagHasClipActions = clipActions != null;
@@ -266,7 +266,7 @@ public class PlaceObject3Tag extends PlaceObjectTypeTag implements ASMSourceCont
         this.clipDepth = clipDepth;
         this.surfaceFilterList = surfaceFilterList;
         this.blendMode = blendMode;
-        this.bitmapCache = bitmapCache;
+        this.bitmapCache = bitmapCache == null ? 0 : bitmapCache;
         this.visible = visible;
         this.backgroundColor = backgroundColor;
         this.clipActions = clipActions;
@@ -553,6 +553,14 @@ public class PlaceObject3Tag extends PlaceObjectTypeTag implements ASMSourceCont
     }
 
     @Override
+    public Integer getVisible() {
+        if (placeFlagHasVisible) {
+            return visible;
+        }
+        return null;
+    }
+
+    @Override
     public RGBA getBackgroundColor() {
         if (placeFlagOpaqueBackground) {
             return backgroundColor;
@@ -622,4 +630,11 @@ public class PlaceObject3Tag extends PlaceObjectTypeTag implements ASMSourceCont
         return null;
     }
 
+    @Override
+    public Integer getBitmapCache() {
+        if (placeFlagHasCacheAsBitmap) {
+            return bitmapCache;
+        }
+        return null;
+    }
 }

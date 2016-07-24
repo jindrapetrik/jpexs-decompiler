@@ -175,9 +175,9 @@ public class Amf3OutputStream extends OutputStream {
             objectTable.add(val);
 
             writeU29((val.getDenseValues().size() << 1) | NO_REFERENCE_FLAG);
-            for (Pair<String, Object> p : val.getAssociativeValues()) {
-                writeUtf8Vr(p.getFirst(), stringTable);
-                writeValue(p.getSecond(), serializers, stringTable, traitsTable, objectTable);
+            for (String key : val.associativeKeySet()) {
+                writeUtf8Vr(key, stringTable);
+                writeValue(val.getAssociative(key), serializers, stringTable, traitsTable, objectTable);
             }
             writeUtf8Vr("", stringTable);
             for (Object v : val.getDenseValues()) {
@@ -207,22 +207,22 @@ public class Amf3OutputStream extends OutputStream {
                     }
                 } else {
                     traitsTable.add(traits);
-                    writeU29((val.getSealedMembers().size() << 4) | NO_REFERENCE_FLAG | NO_TRAIT_REFERENCE_FLAG | (traits.isDynamic() ? DYNAMIC_FLAG : 0));
+                    writeU29((val.sealedMembersSize() << 4) | NO_REFERENCE_FLAG | NO_TRAIT_REFERENCE_FLAG | (traits.isDynamic() ? DYNAMIC_FLAG : 0));
                     writeUtf8Vr(val.getClassName(), stringTable);
-                    for (Pair<String, Object> v : val.getSealedMembers()) {
-                        writeUtf8Vr(v.getFirst(), stringTable);
+                    for (String key : val.sealedMembersKeySet()) {
+                        writeUtf8Vr(key, stringTable);
                     }
                 }
             } else {
                 writeU29((traitsIndex << 2) | NO_REFERENCE_FLAG);
             }
-            for (Pair<String, Object> v : val.getSealedMembers()) {
-                writeValue(v.getSecond(), serializers, stringTable, traitsTable, objectTable);
+            for (String key : val.sealedMembersKeySet()) {
+                writeValue(val.getSealedMember(key), serializers, stringTable, traitsTable, objectTable);
             }
             if (traits.isDynamic()) {
-                for (Pair<String, Object> v : val.getDynamicMembers()) {
-                    writeUtf8Vr(v.getFirst(), stringTable);
-                    writeValue(v.getSecond(), serializers, stringTable, traitsTable, objectTable);
+                for (String key : val.dynamicMembersKeySet()) {
+                    writeUtf8Vr(key, stringTable);
+                    writeValue(val.getDynamicMember(key), serializers, stringTable, traitsTable, objectTable);
                 }
                 writeUtf8Vr("", stringTable);
             }
@@ -349,11 +349,11 @@ public class Amf3OutputStream extends OutputStream {
             DictionaryType val = (DictionaryType) object;
             if (dictionaryIndex == -1) {
                 objectTable.add(val);
-                writeU29((val.getPairs().size() << 1) | NO_REFERENCE_FLAG);
+                writeU29((val.size() << 1) | NO_REFERENCE_FLAG);
                 writeU8(val.hasWeakKeys() ? 1 : 0);
-                for (Pair<Object, Object> p : val.getPairs()) {
-                    writeValue(p.getFirst(), serializers, stringTable, traitsTable, objectTable);
-                    writeValue(p.getSecond(), serializers, stringTable, traitsTable, objectTable);
+                for (Object key : val.keySet()) {
+                    writeValue(key, serializers, stringTable, traitsTable, objectTable);
+                    writeValue(val.get(key), serializers, stringTable, traitsTable, objectTable);
                 }
             } else {
                 writeU29(dictionaryIndex << 1);

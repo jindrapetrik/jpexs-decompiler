@@ -65,7 +65,11 @@ public abstract class PlaceObjectTypeTag extends Tag implements CharacterIdTag {
 
     public abstract boolean cacheAsBitmap();
 
+    public abstract Integer getBitmapCache();
+
     public abstract boolean isVisible();
+
+    public abstract Integer getVisible();
 
     public abstract RGBA getBackgroundColor();
 
