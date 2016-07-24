@@ -1,6 +1,6 @@
 package com.jpexs.decompiler.flash.importers.amf.amf3;
 
-import com.jpexs.decompiler.flash.amf.amf3.Pair;
+import com.jpexs.decompiler.flash.amf.amf3.ListMap;
 import com.jpexs.decompiler.flash.amf.amf3.Traits;
 import com.jpexs.decompiler.flash.amf.amf3.types.ArrayType;
 import com.jpexs.decompiler.flash.amf.amf3.types.BasicType;
@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class Amf3Importer {
 
@@ -111,17 +112,29 @@ public class Amf3Importer {
         public String toString() {
             StringBuilder sb = new StringBuilder();
             sb.append("{");
-            for (Pair<Object, Object> p : values) {
-                sb.append(p.getFirst()).append(":").append("?").append(",\r\n");
+            for (Object key : values.keySet()) {
+                sb.append(key).append(":").append("?").append(",\r\n");
             }
             sb.append("}");
             return sb.toString();
         }
 
-        private final List<Pair<Object, Object>> values = new ArrayList<>();
+        private final Map<Object, Object> values = new ListMap<>();
 
-        public void add(Object key, Object value) {
-            values.add(new Pair<>(key, value));
+        public Object remove(Object key) {
+            return values.remove(key);
+        }
+
+        public Set<Object> keySet() {
+            return values.keySet();
+        }
+
+        public Object get(Object key) {
+            return values.get(key);
+        }
+
+        public void put(Object key, Object value) {
+            values.put(key, value);
         }
 
         public String getString(Object key) throws Amf3ParseException {
@@ -251,64 +264,35 @@ public class Amf3Importer {
         }
 
         public boolean containsKey(Object key) {
-            for (Pair<Object, Object> p : values) {
-                if (p.getFirst().equals(key)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public Object get(Object key) {
-            for (Pair<Object, Object> p : values) {
-                if (p.getFirst().equals(key)) {
-                    return p.getSecond();
-                }
-            }
-            return null;
+            return values.containsKey(key);
         }
 
         public void resolve(Object key, Map<String, Object> objectTable, boolean allowTypedObject) throws Amf3ParseException {
-            for (Pair<Object, Object> p : values) {
-                if (p.getFirst().equals(key)) {
-                    Object resolved = resolveObjects(p.getSecond(), objectTable, allowTypedObject);
-                    p.setSecond(resolved);
-                    return;
-                }
-            }
+            Object val = values.get(key);
+            Object resolved = resolveObjects(val, objectTable, allowTypedObject);
+            values.put(key, resolved);
         }
 
         public List<String> stringKeys() {
             List<String> ret = new ArrayList<>();
-            for (Pair<Object, Object> p : values) {
-                if (p.getFirst() instanceof String) {
-                    ret.add((String) p.getFirst());
+            for (Object key : values.keySet()) {
+                if (key instanceof String) {
+                    ret.add((String) key);
                 }
             }
             return ret;
         }
 
-        public List<Pair<Object, Object>> getAll() {
+        public Map<Object, Object> getAll() {
             return values;
         }
 
-        public List<Pair<String, Object>> getStringMapped() {
-            List<Pair<String, Object>> ret = new ArrayList<>();
-            for (Pair<Object, Object> p : values) {
-                if (p.getFirst() instanceof String) {
-                    String keyStr = (String) p.getFirst();
-                    ret.add(new Pair<>(keyStr, p.getSecond()));
-                }
-            }
-            return ret;
-        }
-
-        public Map<String, Object> getStringMap() {
-            Map<String, Object> ret = new HashMap<>();
-            for (Pair<Object, Object> p : values) {
-                if (p.getFirst() instanceof String) {
-                    String keyStr = (String) p.getFirst();
-                    ret.put(keyStr, values);
+        public Map<String, Object> getStringMapped() {
+            Map<String, Object> ret = new ListMap<>();
+            for (Object key : values.keySet()) {
+                if (key instanceof String) {
+                    String keyStr = (String) key;
+                    ret.put(keyStr, values.get(key));
                 }
             }
             return ret;
@@ -326,7 +310,7 @@ public class Amf3Importer {
                 Object key = value(objectTable);
                 expectedType(SymbolType.COLON);
                 Object value = value(objectTable);
-                ret.add(key, value);
+                ret.put(key, value);
                 if ("id".equals(key)) {
                     if (!(value instanceof String)) {
                         throw new Amf3ParseException("id must be string value", lexer.yyline());
@@ -381,9 +365,9 @@ public class Amf3Importer {
                                 typedObject.resolve("sealedMembers", objectTable, false);
                                 JsObject jsoSealed = typedObject.getJsObject("sealedMembers");
 
-                                List<Pair<String, Object>> sealedMembers = jsoSealed.getStringMapped();
+                                Map<String, Object> sealedMembers = jsoSealed.getStringMapped();
                                 typedObject.resolve("dynamicMembers", objectTable, false);
-                                List<Pair<String, Object>> dynamicMembers = typedObject.getJsObject("dynamicMembers").getStringMapped();
+                                Map<String, Object> dynamicMembers = typedObject.getJsObject("dynamicMembers").getStringMapped();
 
                                 List<String> sealedMemberNames = new ArrayList<>(jsoSealed.stringKeys());
                                 resultObject = new ObjectType(new Traits(className, dynamic, sealedMemberNames), sealedMembers, dynamicMembers);
@@ -394,7 +378,7 @@ public class Amf3Importer {
                             List<Object> denseValues = typedObject.getJsArray("denseValues").getValues();
                             typedObject.resolve("associativeValues", objectTable, false);
                             JsObject resolvedArr = typedObject.getJsObject("associativeValues");
-                            List<Pair<String, Object>> associativeValues = resolvedArr.getStringMapped();
+                            Map<String, Object> associativeValues = resolvedArr.getStringMapped();
                             resultObject = new ArrayType(denseValues, associativeValues);
                             break;
 
@@ -427,7 +411,7 @@ public class Amf3Importer {
                         case "Dictionary":
                             boolean weakKeys = typedObject.getBoolean("weakKeys");
                             typedObject.resolve("entries", objectTable, false);
-                            List<Pair<Object, Object>> entries = typedObject.getJsObject("entries").getAll();
+                            Map<Object, Object> entries = typedObject.getJsObject("entries").getAll();
                             resultObject = new DictionaryType(weakKeys, entries);
                             break;
                         default:
@@ -439,9 +423,12 @@ public class Amf3Importer {
                 }
             } else { //not allowTypeObject
                 JsObject jsObject = (JsObject) object;
-                for (Pair<Object, Object> p : jsObject.getAll()) {
-                    p.setFirst(resolveObjects(p.getFirst(), objectTable, true));
-                    p.setSecond(resolveObjects(p.getSecond(), objectTable, true));
+                for (Object key : jsObject.keySet()) {
+                    Object val = jsObject.get(key);
+                    Object resKey = resolveObjects(key, objectTable, true);
+                    Object resVal = resolveObjects(val, objectTable, true);
+                    jsObject.remove(key);
+                    jsObject.put(resKey, resVal);
                 }
                 resultObject = jsObject;
             }
@@ -496,19 +483,23 @@ public class Amf3Importer {
             return objectsTable.get(key);
         } else if (object instanceof ObjectType) {
             ObjectType ot = (ObjectType) object;
-            for (Pair<String, Object> p : ot.getSealedMembers()) {
-                p.setSecond(replaceReferences(p.getSecond(), objectsTable));
+            for (String key : ot.sealedMembersKeySet()) {
+                ot.putSealedMember(key, replaceReferences(ot.getSealedMember(key), objectsTable));
             }
-            for (Pair<String, Object> p : ot.getDynamicMembers()) {
-                p.setSecond(replaceReferences(p.getSecond(), objectsTable));
+            for (String key : ot.dynamicMembersKeySet()) {
+                ot.putDynamicMember(key, replaceReferences(ot.getDynamicMember(key), objectsTable));
             }
+            for (String key : ot.serializedMembersKeySet()) {
+                ot.putSerializedMember(key, replaceReferences(ot.getSerializedMember(key), objectsTable));
+            }
+
         } else if (object instanceof ArrayType) {
             ArrayType at = (ArrayType) object;
-            for (Pair<String, Object> p : at.getAssociativeValues()) {
-                p.setSecond(replaceReferences(p.getSecond(), objectsTable));
+            for (String key : at.associativeKeySet()) {
+                at.putAssociative(key, replaceReferences(at.getAssociative(key), objectsTable));
             }
             for (int i = 0; i < at.getDenseValues().size(); i++) {
-                at.getDenseValues().set(i, replaceReferences(at.getDenseValues().get(i), objectsTable));
+                at.setDense(i, replaceReferences(at.getDense(i), objectsTable));
             }
         } else if (object instanceof VectorObjectType) {
             VectorObjectType vot = (VectorObjectType) object;
@@ -517,9 +508,12 @@ public class Amf3Importer {
             }
         } else if (object instanceof DictionaryType) {
             DictionaryType dt = (DictionaryType) object;
-            for (Pair<Object, Object> p : dt.getPairs()) {
-                p.setFirst(replaceReferences(p.getFirst(), objectsTable));
-                p.setSecond(replaceReferences(p.getSecond(), objectsTable));
+            for (Object key : dt.keySet()) {
+                Object val = dt.get(key);
+                Object newKey = replaceReferences(key, objectsTable);
+                Object newVal = replaceReferences(val, objectsTable);
+                dt.remove(key);
+                dt.put(newKey, newVal);
             }
         }
 

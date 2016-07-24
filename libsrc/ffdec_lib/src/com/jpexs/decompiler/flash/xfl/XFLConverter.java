@@ -24,7 +24,6 @@ import com.jpexs.decompiler.flash.SWFCompression;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.amf.amf3.Amf3Value;
-import com.jpexs.decompiler.flash.amf.amf3.Pair;
 import com.jpexs.decompiler.flash.amf.amf3.types.ObjectType;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.MovieExporter;
@@ -1199,9 +1198,8 @@ public class XFLConverter {
             if (metadataObject.isDynamic()) {
                 writer.writeStartElement("persistentData");
                 List<String> exportedNames = new ArrayList<>();
-                for (Pair<String, Object> dynamicMember : metadataObject.getDynamicMembers()) {
-                    String n = dynamicMember.getFirst();
-                    Object v = dynamicMember.getSecond();
+                for (String n : metadataObject.dynamicMembersKeySet()) {
+                    Object v = metadataObject.getDynamicMember(n);
                     if (v instanceof Long) {
                         exportedNames.add(n);
                         writer.writeStartElement("PD");

@@ -1,17 +1,18 @@
 package com.jpexs.decompiler.flash.amf.amf3;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.Set;
 
 public class Traits {
 
     private String className;
     private boolean dynamic;
-    private List<String> sealedMemberNames;
+    private Set<String> sealedMemberNames;
 
-    public Traits(String className, boolean dynamic, List<String> sealedMemberNames) {
+    public Traits(String className, boolean dynamic, Collection<? extends String> sealedMemberNames) {
         this.className = className;
         this.dynamic = dynamic;
-        this.sealedMemberNames = sealedMemberNames;
+        this.sealedMemberNames = new ListSet<>(sealedMemberNames);
     }
 
     public String getClassName() {
@@ -22,8 +23,8 @@ public class Traits {
         return dynamic;
     }
 
-    public List<String> getSealedMemberNames() {
-        return sealedMemberNames;
+    public Set<String> getSealedMemberNames() {
+        return new ListSet<>(sealedMemberNames);
     }
 
     public void setClassName(String className) {
@@ -34,8 +35,8 @@ public class Traits {
         this.dynamic = dynamic;
     }
 
-    public void setSealedMemberNames(List<String> sealedMemberNames) {
-        this.sealedMemberNames = sealedMemberNames;
+    public void setSealedMemberNames(Collection<? extends String> sealedMemberNames) {
+        this.sealedMemberNames = new ListSet<>(sealedMemberNames);
     }
 
 }

@@ -6,16 +6,10 @@ import com.jpexs.decompiler.flash.amf.amf3.types.ObjectType;
 import com.jpexs.decompiler.flash.amf.amf3.types.VectorObjectType;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import static org.testng.Assert.*;
 import org.testng.annotations.AfterTest;
@@ -52,15 +46,15 @@ public class Amf3InputStreamTest {
         Map<String, ObjectTypeSerializeHandler> serializers = new HashMap<>();
         serializers.put("CustomClass", new ObjectTypeSerializeHandler() {
             @Override
-            public List<Pair<String, Object>> readObject(String className, InputStream is) throws IOException {
-                List<Pair<String, Object>> members = new ArrayList<>();
-                members.add(new Pair<>("val8", (long) is.read()));
-                members.add(new Pair<>("val32", (long) ((is.read() << 24) + (is.read() << 16) + (is.read() << 8) + (is.read()))));
+            public Map<String, Object> readObject(String className, InputStream is) throws IOException {
+                Map<String, Object> members = new ListMap<>();
+                members.put("val8", (long) is.read());
+                members.put("val32", (long) ((is.read() << 24) + (is.read() << 16) + (is.read() << 8) + (is.read())));
                 return members;
             }
 
             @Override
-            public void writeObject(List<Pair<String, Object>> members, OutputStream os) throws IOException {
+            public void writeObject(Map<String, Object> members, OutputStream os) throws IOException {
                 throw new UnsupportedOperationException("Not implemented");
             }
         });

@@ -414,9 +414,9 @@ public class Amf3InputStream extends InputStream {
                         renameU29("U29A-value", NO_REFERENCE_BIT_TEXT, "dense count");
                         int denseCount = (int) (arrayU29 >> 1);
                         LOGGER.log(Level.FINEST, "Array value: denseCount={0}", new Object[]{denseCount});
-                        List<Pair<String, Object>> assocPart = new ArrayList<>();
+                        Map<String, Object> assocPart = new ListMap<>();
                         List<Object> densePart = new ArrayList<>();
-                        ArrayType retArray = new ArrayType(densePart, assocPart);
+                        ArrayType retArray = new ArrayType();
                         objectTable.add(retArray); //add before processing  elements which may reference this
                         newDumpLevel("associativeValues", "assoc-value");
                         while (true) {
@@ -427,13 +427,15 @@ public class Amf3InputStream extends InputStream {
                             } else {
                                 try {
                                     Object val = readValue("value", serializers, objectTable, traitsTable, stringTable);
-                                    assocPart.add(new Pair<>(key, val));
+                                    assocPart.put(key, val);
                                 } catch (NoSerializerExistsException nse) {
-                                    assocPart.add(new Pair<>(key, nse.getIncompleteData()));
+                                    assocPart.put(key, nse.getIncompleteData());
+                                    retArray.setAssociativeValues(assocPart);
                                     throw new NoSerializerExistsException(nse.getClassName(), retArray, nse);
                                 }
                             }
                         }
+                        retArray.setAssociativeValues(assocPart);
                         endDumpLevel();
                         LOGGER.log(Level.FINEST, "Array value: assocSize={0}", new Object[]{assocPart.size()});
 
@@ -446,9 +448,12 @@ public class Amf3InputStream extends InputStream {
                                 for (int j = i + 1; j < denseCount; j++) {
                                     densePart.add(BasicType.UNKNOWN);
                                 }
+                                retArray.setDenseValues(densePart);
                                 throw new NoSerializerExistsException(nse.getClassName(), retArray, nse);
                             }
                         }
+                        retArray.setDenseValues(densePart);
+
                         endDumpLevel();
                         LOGGER.log(Level.FINER, "Array value: dense_size={0},assocSize={1}", new Object[]{densePart.size(), assocPart.size()});
                         result = retArray;
@@ -477,11 +482,11 @@ public class Amf3InputStream extends InputStream {
                                 renameU29("U29O-traits-ext", NO_REFERENCE_BIT_TEXT, "not trait reference", "externalized traits", "unused");
                                 String className = readUtf8Vr("className", stringTable);
                                 if (!serializers.containsKey(className)) {
-                                    throw new NoSerializerExistsException(className, new ObjectType(new Traits(className, false, new ArrayList<>()), (byte[]) null, new ArrayList<>()), null);
+                                    throw new NoSerializerExistsException(className, new ObjectType(new Traits(className, false, new ArrayList<>()), (byte[]) null, new HashMap<>()), null);
                                 }
                                 newDumpLevel("serializedData", "U8[]");
                                 MonitoredInputStream mis = new MonitoredInputStream(is);
-                                List<Pair<String, Object>> serMembers = serializers.get(className).readObject(className, mis);
+                                Map<String, Object> serMembers = serializers.get(className).readObject(className, mis);
                                 byte serData[] = mis.getReadData();
                                 endDumpLevel();
                                 Traits unserTraits = new Traits(className, false, new ArrayList<>());
@@ -517,10 +522,10 @@ public class Amf3InputStream extends InputStream {
                             traits = traitsTable.get(refIndexTraits);
                             LOGGER.log(Level.FINER, "Traits value: reference({0}) - traitsize={1}", new Object[]{refIndexTraits, traits.getSealedMemberNames().size()});
                         }
-                        List<Pair<String, Object>> sealedMembers = new ArrayList<>();
-                        List<Pair<String, Object>> dynamicMembers = new ArrayList<>();
+                        Map<String, Object> sealedMembers = new ListMap<>();
+                        Map<String, Object> dynamicMembers = new ListMap<>();
 
-                        Object retObjectType = new ObjectType(traits, sealedMembers, dynamicMembers);
+                        ObjectType retObjectType = new ObjectType(traits);
                         objectTable.add(retObjectType); //add it before any subvalue can reference it
                         List<Object> sealedMemberValues = new ArrayList<>();
                         NoSerializerExistsException error = null;
@@ -541,18 +546,22 @@ public class Amf3InputStream extends InputStream {
                             endDumpLevel();
                         }
 
-                        for (int i = 0; i < traits.getSealedMemberNames().size(); i++) {
-                            sealedMembers.add(new Pair<>(traits.getSealedMemberNames().get(i), sealedMemberValues.get(i)));
+                        List<String> memberNames = new ArrayList<>();
+                        memberNames.addAll(traits.getSealedMemberNames());  //Assuming it is ListSet so maintains order
+                        for (int i = 0; i < memberNames.size(); i++) {
+                            sealedMembers.put(memberNames.get(i), sealedMemberValues.get(i));
                         }
+                        retObjectType.setSealedMembers(sealedMembers);
                         if (traits.isDynamic()) {
                             newDumpLevel("dynamicMembers", "dynamic-member[]");
                             String dynamicMemberName;
                             while (!(dynamicMemberName = readUtf8Vr("name", stringTable)).isEmpty()) {
                                 try {
                                     Object dynamicMemberValue = readValue("value", serializers, objectTable, traitsTable, stringTable);
-                                    dynamicMembers.add(new Pair<>(dynamicMemberName, dynamicMemberValue));
+                                    dynamicMembers.put(dynamicMemberName, dynamicMemberValue);
                                 } catch (NoSerializerExistsException nse) {
-                                    dynamicMembers.add(new Pair<>(dynamicMemberName, nse.getIncompleteData()));
+                                    dynamicMembers.put(dynamicMemberName, nse.getIncompleteData());
+                                    retObjectType.setDynamicMembers(dynamicMembers);
                                     throw new NoSerializerExistsException(nse.getClassName(), retObjectType, nse);
                                 } finally {
                                     //group dumpInfo to one sub "dynamic-member"
@@ -570,6 +579,7 @@ public class Amf3InputStream extends InputStream {
                                     }
                                 }
                             }
+                            retObjectType.setDynamicMembers(dynamicMembers);
                             renameLastDump("UTF-8-empty");
                             endDumpLevel();
                         }
@@ -767,8 +777,8 @@ public class Amf3InputStream extends InputStream {
                         renameU29("U29Dict-value", NO_REFERENCE_BIT_TEXT, "entries count");
                         int numEntries = (int) (dictionaryObjectU29 >> 1);
                         int weakKeys = readU8("weak keys");
-                        List<Pair<Object, Object>> data = new ArrayList<>();
-                        DictionaryType retDictionary = new DictionaryType(weakKeys == 1, data);
+                        Map<Object, Object> data = new ListMap<>(true);
+                        DictionaryType retDictionary = new DictionaryType(weakKeys == 1);
                         objectTable.add(retDictionary);
                         NoSerializerExistsException error = null;
                         newDumpLevel("entries", "");
@@ -789,10 +799,10 @@ public class Amf3InputStream extends InputStream {
                                 val = BasicType.UNKNOWN;
                             }
 
-                            data.add(new Pair<>(key, val));
+                            retDictionary.put(key, val);
                             if (error != null) {
                                 for (int j = i + 1; j < numEntries; j++) {
-                                    data.add(new Pair<>(BasicType.UNKNOWN, BasicType.UNKNOWN));
+                                    retDictionary.put(BasicType.UNKNOWN, BasicType.UNKNOWN);
                                 }
                                 break;
                             }
