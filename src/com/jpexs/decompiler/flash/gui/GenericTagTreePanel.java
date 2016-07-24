@@ -263,16 +263,6 @@ public class GenericTagTreePanel extends GenericTagPanel {
         }
 
         @Override
-        public void cancelCellEditing() {
-            if (editors != null) {
-                for (GenericTagEditor editor : editors) {
-                    editor.reset();
-                }
-            }
-            super.cancelCellEditing();
-        }
-
-        @Override
         public boolean stopCellEditing() {
             if (editors != null) {
                 for (GenericTagEditor editor : editors) {
@@ -907,7 +897,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
-        if (!edit) {
+        if (!edit && tree.isEditing()) {
             tree.stopEditing();
         }
         tree.setEditable(edit);
@@ -916,14 +906,15 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
     @Override
     public boolean save() {
-        if (tree.stopEditing()) {
-            SWF swf = tag.getSwf();
-            assignTag(tag, editedTag);
-            tag.setModified(true);
-            tag.setSwf(swf);
-            return true;
+        if (tree.isEditing() && !tree.stopEditing()) {
+            return false;
         }
-        return false;
+
+        SWF swf = tag.getSwf();
+        assignTag(tag, editedTag);
+        tag.setModified(true);
+        tag.setSwf(swf);
+        return true;
     }
 
     private void assignTag(Tag t, Tag assigned) {

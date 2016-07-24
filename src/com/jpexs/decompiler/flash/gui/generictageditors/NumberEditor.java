@@ -72,10 +72,10 @@ public class NumberEditor extends JSpinner implements GenericTagEditor {
         this.swfType = swfType;
         this.fieldName = fieldName;
 
+        reset();
         JFormattedTextField jtf = ((JSpinner.NumberEditor) getEditor()).getTextField();
         DefaultFormatter formatter = (DefaultFormatter) jtf.getFormatter();
         formatter.setCommitsOnValidEdit(true);
-        reset();
 
     }
 
