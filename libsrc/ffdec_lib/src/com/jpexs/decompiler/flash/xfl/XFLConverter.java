@@ -180,7 +180,6 @@ public class XFLConverter {
         if (record instanceof StyleChangeRecord) {
             StyleChangeRecord scr = (StyleChangeRecord) record;
             Point p = new Point(scr.moveDeltaX, scr.moveDeltaY);
-            //p = mat.apply(p);
             if (scr.stateMoveTo) {
                 ret.append("! ").append(p.x).append(" ").append(p.y);
             }
@@ -193,7 +192,6 @@ public class XFLConverter {
                 x += ser.deltaX;
             }
             Point p = new Point(x, y);
-            //p = mat.apply(p);
             ret.append("| ").append(p.x).append(" ").append(p.y);
         } else if (record instanceof CurvedEdgeRecord) {
             CurvedEdgeRecord cer = (CurvedEdgeRecord) record;
@@ -202,9 +200,7 @@ public class XFLConverter {
             int anchorX = cer.anchorDeltaX + controlX;
             int anchorY = cer.anchorDeltaY + controlY;
             Point control = new Point(controlX, controlY);
-            //control = mat.apply(control);
             Point anchor = new Point(anchorX, anchorY);
-            //anchor = mat.apply(anchor);
             ret.append("[ ").append(control.x).append(" ").append(control.y).append(" ").append(anchor.x).append(" ").append(anchor.y);
         }
     }
@@ -464,6 +460,177 @@ public class XFLConverter {
         }
     }
 
+    private static int snapToGrid(int v, int gridSize) {
+        double divisor = (double) gridSize;
+        int ret = (int) (Math.round(v / divisor) * divisor);
+        return ret;
+    }
+
+    //just some testing methods to smooth shapes more, but without success (issue #1257)
+    private static List<SHAPERECORD> snapShapeToGrid(List<SHAPERECORD> shapeRecords, int gridSize) {
+        List<SHAPERECORD> ret = new ArrayList<>(shapeRecords.size());
+        int hintedX = 0;
+        int hintedY = 0;
+        int correctX = 0;
+        int correctY = 0;
+        int lastCorrectX = 0;
+        int lastCorrectY = 0;
+        for (SHAPERECORD rec : shapeRecords) {
+            SHAPERECORD ch = rec.clone();
+            lastCorrectX = correctX;
+            lastCorrectY = correctY;
+            correctX = ch.changeX(correctX);
+            correctY = ch.changeY(correctY);
+
+            if (ch instanceof StyleChangeRecord) {
+                StyleChangeRecord scr = (StyleChangeRecord) ch;
+                if (scr.stateMoveTo) {
+                    int shouldBeX = snapToGrid(correctX, gridSize);
+                    int shouldBeY = snapToGrid(correctY, gridSize);
+
+                    scr.moveDeltaX = shouldBeX;
+                    scr.moveDeltaY = shouldBeY;
+
+                    hintedX = shouldBeX;
+                    hintedY = shouldBeY;
+                }
+            } else if (ch instanceof StraightEdgeRecord) {
+                StraightEdgeRecord ser = (StraightEdgeRecord) ch;
+                if (ser.generalLineFlag || !ser.vertLineFlag) { //has x
+                    int shouldBeX = snapToGrid(correctX, gridSize);
+                    ser.deltaX = shouldBeX - hintedX;
+                    hintedX = shouldBeX;
+                }
+                if (ser.generalLineFlag || ser.vertLineFlag) { //has y
+                    int shouldBeY = snapToGrid(correctY, gridSize);
+                    ser.deltaY = shouldBeY - hintedY;
+                    hintedY = shouldBeY;
+                }
+            } else if (ch instanceof CurvedEdgeRecord) {
+                CurvedEdgeRecord cer = (CurvedEdgeRecord) ch;
+                int controlShouldBeX = snapToGrid(lastCorrectX + cer.controlDeltaX, gridSize);
+                int controlShouldBeY = snapToGrid(lastCorrectY + cer.controlDeltaY, gridSize);
+
+                cer.controlDeltaX = controlShouldBeX - hintedX;
+                cer.controlDeltaY = controlShouldBeY - hintedY;
+
+                int anchorShouldBeX = snapToGrid(correctX, gridSize);
+                int anchorShouldBeY = snapToGrid(correctY, gridSize);
+
+                cer.anchorDeltaX = anchorShouldBeX - (hintedX + cer.controlDeltaX);
+                cer.anchorDeltaY = anchorShouldBeY - (hintedY + cer.controlDeltaY);
+                hintedX = anchorShouldBeX;
+                hintedY = anchorShouldBeY;
+            }
+            ret.add(ch);
+        }
+        return ret;
+    }
+
+    private static double distance(Point p1, Point p2) {
+        double dx = (p1.x - p2.x);
+        double dy = (p1.y - p2.y);
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    //just some testing methods to smooth shapes more, but without success (issue #1257)
+    private static List<SHAPERECORD> snapCloseTogether(List<SHAPERECORD> shapeRecords, double maxDistance) {
+        List<Point> points = new ArrayList<>();
+
+        int x = 0;
+        int y = 0;
+        Point prevPoint = null;
+        Point startPoint = null;
+        for (SHAPERECORD rec : shapeRecords) {
+            x = rec.changeX(x);
+            y = rec.changeY(y);
+
+            Point currentPoint = new Point(x, y);
+
+            if (rec instanceof StyleChangeRecord) {
+                StyleChangeRecord scr = (StyleChangeRecord) rec;
+                if (scr.stateMoveTo) {
+                    if (prevPoint != null && startPoint != null) {
+                        if (distance(prevPoint, startPoint) <= maxDistance) { //start and end of the path near => close
+                            prevPoint.x = startPoint.x;
+                            prevPoint.y = startPoint.y;
+                            System.err.println("CLOSED");
+                        }
+                    }
+                    startPoint = currentPoint;
+                }
+            }
+
+            /*for (Point p : points) {
+                if (distance(p, currentPoint) <= maxDistance) {
+                    currentPoint = (Point) p.clone();
+                    break;
+                }
+            }*/
+            points.add(currentPoint);
+            prevPoint = currentPoint;
+        }
+
+        List<SHAPERECORD> ret = new ArrayList<>(shapeRecords.size());
+        int hintedX = 0;
+        int hintedY = 0;
+        int correctX = 0;
+        int correctY = 0;
+        int lastCorrectX = 0;
+        int lastCorrectY = 0;
+        int index = 0;
+        for (SHAPERECORD rec : shapeRecords) {
+            SHAPERECORD ch = rec.clone();
+            lastCorrectX = correctX;
+            lastCorrectY = correctY;
+            correctX = ch.changeX(correctX);
+            correctY = ch.changeY(correctY);
+
+            if (ch instanceof StyleChangeRecord) {
+                StyleChangeRecord scr = (StyleChangeRecord) ch;
+                if (scr.stateMoveTo) {
+                    int shouldBeX = points.get(index).x;
+                    int shouldBeY = points.get(index).y;
+
+                    scr.moveDeltaX = shouldBeX;
+                    scr.moveDeltaY = shouldBeY;
+
+                    hintedX = shouldBeX;
+                    hintedY = shouldBeY;
+                }
+            } else if (ch instanceof StraightEdgeRecord) {
+                StraightEdgeRecord ser = (StraightEdgeRecord) ch;
+                if (ser.generalLineFlag || !ser.vertLineFlag) { //has x
+                    int shouldBeX = points.get(index).x;
+                    ser.deltaX = shouldBeX - hintedX;
+                    hintedX = shouldBeX;
+                }
+                if (ser.generalLineFlag || ser.vertLineFlag) { //has y
+                    int shouldBeY = points.get(index).y;
+                    ser.deltaY = shouldBeY - hintedY;
+                    hintedY = shouldBeY;
+                }
+            } else if (ch instanceof CurvedEdgeRecord) {
+                CurvedEdgeRecord cer = (CurvedEdgeRecord) ch;
+                //int controlShouldBeX = snapToGrid(lastCorrectX + cer.controlDeltaX, gridSize);
+                //int controlShouldBeY = snapToGrid(lastCorrectY + cer.controlDeltaY, gridSize);
+
+                //cer.controlDeltaX = controlShouldBeX - hintedX;
+                //cer.controlDeltaY = controlShouldBeY - hintedY;
+                int anchorShouldBeX = points.get(index).x;
+                int anchorShouldBeY = points.get(index).y;
+
+                cer.anchorDeltaX = anchorShouldBeX - (hintedX + cer.controlDeltaX);
+                cer.anchorDeltaY = anchorShouldBeY - (hintedY + cer.controlDeltaY);
+                hintedX = anchorShouldBeX;
+                hintedY = anchorShouldBeY;
+            }
+            ret.add(ch);
+            index++;
+        }
+        return ret;
+    }
+
     /**
      * Remove bugs in shape:
      *
@@ -528,6 +695,7 @@ public class XFLConverter {
         if (mat == null) {
             mat = new MATRIX();
         }
+        //TODO: insert some magic methods here to fix issue #1257
         shapeRecords = smoothShape(shapeRecords);
         List<SHAPERECORD> edges = new ArrayList<>();
         int lineStyleCount = 0;
