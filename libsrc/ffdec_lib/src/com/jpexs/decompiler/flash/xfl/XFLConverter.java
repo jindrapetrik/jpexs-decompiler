@@ -887,13 +887,13 @@ public class XFLConverter {
                         }
                         if (!empty) {
                             currentLayer.writeStartElement("Edge");
-                            if (fillStyle0 > -1) {
+                            if (lastFillStyle0 > -1) {
                                 currentLayer.writeAttribute("fillStyle0", lastFillStyle0);
                             }
-                            if (fillStyle1 > -1) {
+                            if (lastFillStyle1 > -1) {
                                 currentLayer.writeAttribute("fillStyle1", lastFillStyle1);
                             }
-                            if (strokeStyle > -1) {
+                            if (lastStrokeStyle > -1) {
                                 currentLayer.writeAttribute("strokeStyle", lastStrokeStyle);
                             }
                             StringBuilder edgesSb = new StringBuilder();
