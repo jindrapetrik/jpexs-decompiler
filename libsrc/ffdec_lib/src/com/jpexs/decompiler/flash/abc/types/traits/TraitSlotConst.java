@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.ValueKind;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
+import com.jpexs.decompiler.flash.exporters.script.ImportsUsagesParser;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
@@ -201,7 +202,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
             ignorePackage = getPackage(abc);
         }
         super.getImportsUsages(customNs, abc, imports, uses, ignorePackage, fullyQualifiedNames);
-        parseImportsUsagesFromMultiname(customNs, abc, imports, uses, abc.constants.getMultiname(type_index), getPackage(abc), fullyQualifiedNames);
+        ImportsUsagesParser.parseImportsUsagesFromMultiname(customNs, abc, imports, uses, abc.constants.getMultiname(type_index), getPackage(abc), fullyQualifiedNames);
     }
 
     @Override

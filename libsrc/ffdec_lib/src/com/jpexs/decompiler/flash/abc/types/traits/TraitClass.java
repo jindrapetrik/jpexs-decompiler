@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
+import com.jpexs.decompiler.flash.exporters.script.ImportsUsagesParser;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.graph.DottedChain;
@@ -84,26 +85,26 @@ public class TraitClass extends Trait implements TraitWithSlot {
         InstanceInfo instanceInfo = abc.instance_info.get(class_info);
         DottedChain packageName = instanceInfo.getName(abc.constants).getNamespace(abc.constants).getName(abc.constants); //assume not null name
 
-        parseImportsUsagesFromMultiname(customNs, abc, imports, uses, abc.constants.getMultiname(instanceInfo.name_index), packageName, fullyQualifiedNames);
+        ImportsUsagesParser.parseImportsUsagesFromMultiname(customNs, abc, imports, uses, abc.constants.getMultiname(instanceInfo.name_index), packageName, fullyQualifiedNames);
 
         if (instanceInfo.super_index > 0) {
-            parseImportsUsagesFromMultiname(customNs, abc, imports, uses, abc.constants.getMultiname(instanceInfo.super_index), packageName, fullyQualifiedNames);
+            ImportsUsagesParser.parseImportsUsagesFromMultiname(customNs, abc, imports, uses, abc.constants.getMultiname(instanceInfo.super_index), packageName, fullyQualifiedNames);
         }
         for (int i : instanceInfo.interfaces) {
-            parseImportsUsagesFromMultiname(customNs, abc, imports, uses, abc.constants.getMultiname(i), packageName, fullyQualifiedNames);
+            ImportsUsagesParser.parseImportsUsagesFromMultiname(customNs, abc, imports, uses, abc.constants.getMultiname(i), packageName, fullyQualifiedNames);
         }
 
         //static
         classInfo.static_traits.getImportsUsages(customNs, abc, imports, uses, packageName, fullyQualifiedNames);
 
         //static initializer
-        parseImportsUsagesFromMethodInfo(customNs, abc, classInfo.cinit_index, imports, uses, packageName, fullyQualifiedNames, new ArrayList<>());
+        ImportsUsagesParser.parseImportsUsagesFromMethodInfo(customNs, abc, classInfo.cinit_index, imports, uses, packageName, fullyQualifiedNames, new ArrayList<>());
 
         //instance
         instanceInfo.instance_traits.getImportsUsages(customNs, abc, imports, uses, packageName, fullyQualifiedNames);
 
         //instance initializer
-        parseImportsUsagesFromMethodInfo(customNs, abc, instanceInfo.iinit_index, imports, uses, packageName, fullyQualifiedNames, new ArrayList<>());
+        ImportsUsagesParser.parseImportsUsagesFromMethodInfo(customNs, abc, instanceInfo.iinit_index, imports, uses, packageName, fullyQualifiedNames, new ArrayList<>());
     }
 
     @Override

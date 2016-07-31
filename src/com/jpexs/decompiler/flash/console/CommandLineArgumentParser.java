@@ -75,6 +75,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ShapeExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.SoundExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.SpriteExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.TextExportMode;
+import com.jpexs.decompiler.flash.exporters.script.LinkReportExporter;
 import com.jpexs.decompiler.flash.exporters.settings.BinaryDataExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.ButtonExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.FontExportSettings;
@@ -577,6 +578,13 @@ public class CommandLineArgumentParser {
             out.println("  ...<swffile>: SWF file to search instance in");
         }
 
+        if (filter == null || filter.equals("linkreport")) {
+            out.println(" " + (cnt++) + ") -linkReport [-outfile <outfile>] <swffile>");
+            out.println("  ...generates linker report for the swffile");
+            out.println("  ...-outfile <outfile> (optional): Saves XML report to <outfile>. When ommited, the report is printed to stdout.");
+            out.println("  ...<swffile>: SWF file to search instance in");
+        }
+
         printCmdLineUsageExamples(out, filter);
     }
 
@@ -792,7 +800,9 @@ public class CommandLineArgumentParser {
             command = nextParam.substring(1);
         }
 
-        if (command.equals("getinstancemetadata")) {
+        if (command.equals("linkreport")) {
+            parseLinkReport(selectionClasses, args);
+        } else if (command.equals("getinstancemetadata")) {
             parseGetInstanceMetadata(args);
         } else if (command.equals("setinstancemetadata")) {
             parseSetInstanceMetadata(args);
@@ -985,6 +995,50 @@ public class CommandLineArgumentParser {
             badArguments("config");
         }
         setConfigurations(args.pop());
+    }
+
+    private static void parseLinkReport(List<String> selectionClasses, Stack<String> args) {
+        if (args.isEmpty()) {
+            badArguments("linkreport");
+        }
+        File stdOutFile = null;
+        File swfFile = null;
+        while (!args.isEmpty()) {
+            String paramName = args.pop().toLowerCase();
+            switch (paramName) {
+                case "-outfile":
+                    if (args.empty()) {
+                        System.err.println("Missing output file");
+                        badArguments("linkreport");
+                    }
+                    stdOutFile = new File(args.pop());
+                    break;
+                default:
+                    if (!args.isEmpty()) {
+                        badArguments("linkreport");
+                    }
+                    swfFile = new File(paramName);
+            }
+        }
+        if (swfFile == null) {
+            System.err.println("No SWF file specified");
+            badArguments("getinstancemetadata");
+        }
+        processReadSWF(swfFile, stdOutFile, (SWF swf, OutputStream stdout) -> {
+            LinkReportExporter lre = new LinkReportExporter();
+
+            List<ScriptPack> reportPacks;
+            try {
+                reportPacks = selectionClasses != null ? swf.getScriptPacksByClassNames(selectionClasses) : swf.getAS3Packs();
+            } catch (Exception ex) {
+                System.err.println("Error while getting packs");
+                System.exit(1);
+                return;
+            }
+
+            String reportStr = lre.generateReport(swf, reportPacks, null);
+            stdout.write(reportStr.getBytes("UTF-8"));
+        });
     }
 
     private static void parseGetInstanceMetadata(Stack<String> args) {
