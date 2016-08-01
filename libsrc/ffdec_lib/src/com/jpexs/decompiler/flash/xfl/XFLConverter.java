@@ -1691,7 +1691,7 @@ public class XFLConverter {
                     }
                 }
 
-                byte imageBytes[] = Helper.readStream(imageTag.getImageData());
+                byte[] imageBytes = Helper.readStream(imageTag.getImageData());
                 SerializableImage image = imageTag.getImageCached();
                 ImageFormat format = imageTag.getImageFormat();
                 String symbolFile = "bitmap" + symbol.getCharacterId() + imageTag.getImageFormat().getExtension();

@@ -308,7 +308,7 @@ public class View {
             List<Image> images = new ArrayList<>();
             MyResizableIcon[] icons = MyRibbonApplicationMenuButtonUI.getIcons();
             MyResizableIcon icon = icons[1];
-            int sizes[] = new int[]{256, 128, 64, 42, 40, 32, 20, 16};
+            int[] sizes = new int[]{256, 128, 64, 42, 40, 32, 20, 16};
             for (int size : sizes) {
                 icon.setIconSize(size, size);
                 BufferedImage bi = new BufferedImage(size, size, BufferedImage.TYPE_4BYTE_ABGR);
@@ -462,7 +462,7 @@ public class View {
     }
 
     public static int showConfirmDialog(final Component parentComponent, final Object message, final String title, final int optionType, final int messageTyp) {
-        final int ret[] = new int[1];
+        final int[] ret = new int[1];
         execInEventDispatch(() -> {
             ret[0] = JOptionPane.showConfirmDialog(parentComponent, message, title, optionType, messageTyp);
         });
@@ -489,7 +489,7 @@ public class View {
             warPanel.add(donotShowAgainCheckBox, BorderLayout.SOUTH);
         }
 
-        final int ret[] = new int[1];
+        final int[] ret = new int[1];
         final Object messageObj = warPanel == null ? message : warPanel;
         execInEventDispatch(() -> {
             ret[0] = JOptionPane.showConfirmDialog(parentComponent, messageObj, title, optionType, messageType);

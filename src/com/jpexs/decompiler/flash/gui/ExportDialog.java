@@ -136,7 +136,7 @@ public class ExportDialog extends AppDialog {
     public <E> E getValue(Class<E> option) {
         for (int i = 0; i < optionClasses.length; i++) {
             if (option == optionClasses[i]) {
-                E values[] = option.getEnumConstants();
+                E[] values = option.getEnumConstants();
                 return values[combos[i].getSelectedIndex()];
             }
         }
@@ -163,7 +163,7 @@ public class ExportDialog extends AppDialog {
         for (int i = 0; i < optionNames.length; i++) {
             int selIndex = combos[i].getSelectedIndex();
             Class c = optionClasses[i];
-            Object vals[] = c.getEnumConstants();
+            Object[] vals = c.getEnumConstants();
             String key = optionNames[i] + "." + vals[selIndex].toString().toLowerCase();
             if (i > 0) {
                 cfg.append(",");
@@ -215,7 +215,7 @@ public class ExportDialog extends AppDialog {
             exportFormatsStr = null;
         }
 
-        String exportFormatsArr[] = new String[0];
+        String[] exportFormatsArr = new String[0];
         if (exportFormatsStr != null) {
             if (exportFormatsStr.contains(",")) {
                 exportFormatsArr = exportFormatsStr.split(",");
@@ -250,8 +250,8 @@ public class ExportDialog extends AppDialog {
         boolean zoomable = false;
         for (int i = 0; i < optionNames.length; i++) {
             Class c = optionClasses[i];
-            Object vals[] = c.getEnumConstants();
-            String names[] = new String[vals.length];
+            Object[] vals = c.getEnumConstants();
+            String[] names = new String[vals.length];
             int itemIndex = -1;
             for (int j = 0; j < vals.length; j++) {
 

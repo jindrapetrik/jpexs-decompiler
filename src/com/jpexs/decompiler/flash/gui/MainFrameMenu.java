@@ -437,7 +437,6 @@ public abstract class MainFrameMenu implements MenuBuilder {
         CheckResources.checkResources(stream, null);
         final String str = new String(os.toByteArray(), Utf8Helper.charset);
         JDialog dialog = new JDialog() {
-
             @Override
             public void setVisible(boolean bln) {
                 setSize(new Dimension(800, 600));
@@ -1070,6 +1069,10 @@ public abstract class MainFrameMenu implements MenuBuilder {
         }
 
         finishMenu("");
+    }
+
+    public void showResourcesView() {
+        viewResourcesActionPerformed(null);
     }
 
     private void viewResourcesActionPerformed(ActionEvent evt) {

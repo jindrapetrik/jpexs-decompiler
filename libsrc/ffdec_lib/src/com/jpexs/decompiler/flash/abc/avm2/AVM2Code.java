@@ -2095,9 +2095,9 @@ public class AVM2Code implements Cloneable {
         }
         // Declarations
 
-        DeclarationAVM2Item d[] = new DeclarationAVM2Item[regCount];
+        DeclarationAVM2Item[] d = new DeclarationAVM2Item[regCount];
 
-        int param_types[] = abc.method_info.get(body.method_info).param_types;
+        int[] param_types = abc.method_info.get(body.method_info).param_types;
         int r = 1;
         for (int i = 0; i < param_types.length; i++) {
             GraphTargetItem type;

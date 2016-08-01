@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ABCInputStream;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
+import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecialType;
 import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.decompiler.flash.types.annotations.SWFField;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
@@ -72,9 +73,9 @@ public class DoABCTag extends Tag implements ABCContainerTag {
     @Override
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         ABCInputStream ais = new ABCInputStream(sis.getBaseStream());
-        
+
         // put it to the dumpview:
-        sis.readByteRangeEx(sis.available(), "abcBytes");
+        sis.readByteRangeEx(sis.available(), "abcBytes", DumpInfoSpecialType.ABC_BYTES, null);
         abc = new ABC(ais, swf, this);
     }
 

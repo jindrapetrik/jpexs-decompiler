@@ -56,6 +56,8 @@ import com.jpexs.decompiler.flash.abc.usages.MethodReturnTypeMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.MultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.TypeNameMultinameUsage;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
+import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecial;
+import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecialType;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -606,16 +608,20 @@ public class ABC {
         bodies = new ArrayList<>(bodies_count);
         for (int i = 0; i < bodies_count; i++) {
             DumpInfo di = ais.dumpInfo;
-            ais.newDumpLevel("method_body", "method_body_info");
+            DumpInfoSpecial dis = (DumpInfoSpecial) ais.newDumpLevel("method_body", "method_body_info", DumpInfoSpecialType.ABC_METHOD_BODY);
             MethodBody mb = new MethodBody(this, null, null, null); // do not create Traits in constructor
             try {
                 mb.method_info = ais.readU30("method_info");
+                if (dis != null) {
+                    dis.specialValue = mb.method_info;
+                }
+
                 mb.max_stack = ais.readU30("max_stack");
                 mb.max_regs = ais.readU30("max_regs");
                 mb.init_scope_depth = ais.readU30("init_scope_depth");
                 mb.max_scope_depth = ais.readU30("max_scope_depth");
                 int code_length = ais.readU30("code_length");
-                mb.setCodeBytes(ais.readBytes(code_length, "code"));
+                mb.setCodeBytes(ais.readBytes(code_length, "code", DumpInfoSpecialType.ABC_CODE));
                 int ex_count = ais.readU30("ex_count");
                 mb.exceptions = new ABCException[ex_count];
                 for (int j = 0; j < ex_count; j++) {

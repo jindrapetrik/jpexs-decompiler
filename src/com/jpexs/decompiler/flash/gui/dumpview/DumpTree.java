@@ -25,6 +25,8 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionListReader;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
+import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecial;
+import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecialType;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSwfNode;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainPanel;
@@ -72,6 +74,7 @@ import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamHead2Tag;
 import com.jpexs.decompiler.flash.tags.SoundStreamHeadTag;
+import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
@@ -270,6 +273,18 @@ public class DumpTree extends JTree {
         parseInstructionsMenuItem.addActionListener(this::parseInstructionsButtonActionPerformed);
         contextPopupMenu.add(parseInstructionsMenuItem);
 
+        final JMenuItem gotoTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.showInResources"));
+        gotoTagMenuItem.addActionListener(this::gotoTagButtonActionPerformed);
+        contextPopupMenu.add(gotoTagMenuItem);
+
+        final JMenuItem gotoActionListMenuItem = new JMenuItem(mainPanel.translate("contextmenu.showInResources"));
+        gotoActionListMenuItem.addActionListener(this::gotoActionListButtonActionPerformed);
+        contextPopupMenu.add(gotoActionListMenuItem);
+
+        final JMenuItem gotoMethodMenuItem = new JMenuItem(mainPanel.translate("contextmenu.showInResources"));
+        gotoMethodMenuItem.addActionListener(this::gotoMethodButtonActionPerformed);
+        contextPopupMenu.add(gotoMethodMenuItem);
+
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -293,9 +308,13 @@ public class DumpTree extends JTree {
                     parseActionsMenuItem.setVisible(false);
                     parseAbcMenuItem.setVisible(false);
                     parseInstructionsMenuItem.setVisible(false);
+                    gotoTagMenuItem.setVisible(false);
+                    gotoActionListMenuItem.setVisible(false);
+                    gotoMethodMenuItem.setVisible(false);
 
                     if (paths.length == 1) {
                         DumpInfo treeNode = (DumpInfo) paths[0].getLastPathComponent();
+                        DumpInfoSpecialType specialType = getSpecialType(treeNode);
 
                         if (treeNode instanceof DumpInfoSwfNode) {
                             closeSelectionMenuItem.setVisible(true);
@@ -303,22 +322,38 @@ public class DumpTree extends JTree {
 
                         if (treeNode.getEndByte() - treeNode.startByte > 3) {
                             saveToFileMenuItem.setVisible(true);
-                            if (treeNode.name.equals("bitmapAlphaData") || treeNode.name.equals("zlibBitmapData")) {
+                            if (specialType == DumpInfoSpecialType.ZLIB_DATA) {
                                 saveUncompressedToFileMenuItem.setVisible(true);
                             }
                         }
 
-                        // todo honfika: do not use string names, because it has conflicts e.g with DefineFont.code
-                        if (treeNode.name.equals("actionBytes") && treeNode.getChildCount() == 0) {
-                            parseActionsMenuItem.setVisible(true);
+                        boolean noChild = treeNode.getChildCount() == 0;
+
+                        if (noChild) {
+                            switch (specialType) {
+                                case ACTION_BYTES:
+                                    parseActionsMenuItem.setVisible(true);
+                                    break;
+                                case ABC_BYTES:
+                                    parseAbcMenuItem.setVisible(true);
+                                    break;
+                                case ABC_CODE:
+                                    parseInstructionsMenuItem.setVisible(true);
+                                    break;
+                            }
                         }
 
-                        if (treeNode.name.equals("abcBytes") && treeNode.getChildCount() == 0) {
-                            parseAbcMenuItem.setVisible(true);
-                        }
-
-                        if (treeNode.name.equals("code") && treeNode.parent.name.equals("method_body") && treeNode.getChildCount() == 0) {
-                            parseInstructionsMenuItem.setVisible(true);
+                        switch (specialType) {
+                            case TAG:
+                                gotoTagMenuItem.setVisible(true);
+                                break;
+                            case ACTION_BYTES:
+                                gotoActionListMenuItem.setVisible(true);
+                                break;
+                            case ABC_CODE:
+                            case ABC_METHOD_BODY:
+                                gotoMethodMenuItem.setVisible(true);
+                                break;
                         }
 
                         TreeModel model = getModel();
@@ -329,6 +364,13 @@ public class DumpTree extends JTree {
                 }
             }
         });
+    }
+
+    private DumpInfoSpecialType getSpecialType(DumpInfo dumpInfo) {
+        DumpInfoSpecialType specialType = dumpInfo instanceof DumpInfoSpecial
+                ? ((DumpInfoSpecial) dumpInfo).specialType
+                : DumpInfoSpecialType.NONE;
+        return specialType;
     }
 
     private void expandRecursiveButtonActionPerformed(ActionEvent evt) {
@@ -358,11 +400,10 @@ public class DumpTree extends JTree {
         if (fc.showSaveDialog(f) == JFileChooser.APPROVE_OPTION) {
             File sf = Helper.fixDialogFile(fc.getSelectedFile());
             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(sf))) {
+                byte[] data = DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf().originalUncompressedData;
                 if (decompress) {
-                    byte[] data = DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf().originalUncompressedData;
                     fos.write(SWFInputStream.uncompressByteArray(data, (int) dumpInfo.startByte, (int) (dumpInfo.getEndByte() - dumpInfo.startByte + 1)));
                 } else {
-                    byte[] data = DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf().originalUncompressedData;
                     fos.write(data, (int) dumpInfo.startByte, (int) (dumpInfo.getEndByte() - dumpInfo.startByte + 1));
                 }
             } catch (IOException ex) {
@@ -429,6 +470,48 @@ public class DumpTree extends JTree {
             logger.log(Level.SEVERE, null, ex);
         }
         repaint();
+    }
+
+    private void gotoTagButtonActionPerformed(ActionEvent evt) {
+        TreePath[] paths = getSelectionPaths();
+        DumpInfoSpecial dumpInfo = (DumpInfoSpecial) paths[0].getLastPathComponent();
+
+        SWF swf = DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf();
+        long address = (long) (Long) dumpInfo.specialValue;
+        Tag foundTag = null;
+        for (Tag tag : swf.getTags()) {
+            if (tag.getOriginalRange().getPos() == address) {
+                foundTag = tag;
+                break;
+            }
+        }
+
+        if (foundTag != null) {
+            mainPanel.getMainFrame().getMenu().showResourcesView();
+            mainPanel.setTagTreeSelectedNode(foundTag);
+        }
+    }
+
+    private void gotoActionListButtonActionPerformed(ActionEvent evt) {
+        TreePath[] paths = getSelectionPaths();
+        DumpInfoSpecial dumpInfo = (DumpInfoSpecial) paths[0].getLastPathComponent();
+
+        SWF swf = DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf();
+        long address = (long) (Long) dumpInfo.specialValue;
+        mainPanel.getMainFrame().getMenu().showResourcesView();
+        //mainPanel.setTagTreeSelectedNode(asm);
+    }
+
+    private void gotoMethodButtonActionPerformed(ActionEvent evt) {
+        TreePath[] paths = getSelectionPaths();
+        DumpInfoSpecial dumpInfo = (DumpInfoSpecial) paths[0].getLastPathComponent();
+        if (dumpInfo.specialType == DumpInfoSpecialType.ABC_CODE) {
+            dumpInfo = (DumpInfoSpecial) dumpInfo.parent; // method_body
+        }
+
+        SWF swf = DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf();
+        int method_info = (int) dumpInfo.specialValue;
+        // todo
     }
 
     private void closeSwfButtonActionPerformed(ActionEvent evt) {

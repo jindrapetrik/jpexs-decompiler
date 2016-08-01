@@ -290,7 +290,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
         final int val = sb.getValue(); //save scroll top
         SWFType swfType = field.getAnnotation(SWFType.class);
         if (swfType != null && !swfType.countField().isEmpty()) { //Fields with same countField must be removed from too
-            Field fields[] = obj.getClass().getDeclaredFields();
+            Field[] fields = obj.getClass().getDeclaredFields();
             for (int f = 0; f < fields.length; f++) {
                 SWFType fieldSwfType = fields[f].getAnnotation(SWFType.class);
                 if (fieldSwfType != null && fieldSwfType.countField().equals(swfType.countField())) {
@@ -338,7 +338,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
         final int val = sb.getValue(); //save scroll top
         SWFType swfType = field.getAnnotation(SWFType.class);
         if (swfType != null && !swfType.countField().isEmpty()) { //Fields with same countField must be enlarged too
-            Field fields[] = obj.getClass().getDeclaredFields();
+            Field[] fields = obj.getClass().getDeclaredFields();
             for (int f = 0; f < fields.length; f++) {
                 SWFType fieldSwfType = fields[f].getAnnotation(SWFType.class);
                 if (fieldSwfType != null && fieldSwfType.countField().equals(swfType.countField())) {

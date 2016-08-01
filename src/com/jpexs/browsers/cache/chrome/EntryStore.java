@@ -61,17 +61,17 @@ public class EntryStore extends CacheEntry {
 
     public CacheAddr long_key;           // Optional address of a long key.
 
-    public int data_size[] = new int[4];       // We can store up to 4 data streams for each
+    public int[] data_size = new int[4];       // We can store up to 4 data streams for each
 
-    public CacheAddr data_addr[] = new CacheAddr[4];       // entry.
+    public CacheAddr[] data_addr = new CacheAddr[4];       // entry.
 
     public long flags;              // Any combination of EntryFlags.
 
-    public int pad[] = new int[4];
+    public int[] pad = new int[4];
 
     public long self_hash;          // The hash of EntryStore up to this point.
 
-    public byte key[] = new byte[256 - 24 * 4];  // null terminated
+    public byte[] key = new byte[256 - 24 * 4];  // null terminated
 
     public EntryStore(InputStream is, File rootDir, Map<Integer, RandomAccessFile> dataFiles, File externalFilesDir) throws IOException {
         IndexInputStream iis = new IndexInputStream(is);
@@ -154,7 +154,7 @@ public class EntryStore extends CacheEntry {
         for (int h = 1; h < headers.size(); h++) {
             String hs = headers.get(h);
             if (hs.contains(":")) {
-                String hp[] = hs.split(":");
+                String[] hp = hs.split(":");
                 ret.put(hp[0].trim(), hp[1].trim());
             }
         }

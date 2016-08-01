@@ -72,7 +72,7 @@ public class PipeInputStream extends InputStream {
 
     @Override
     public synchronized int read() throws IOException {
-        byte d[] = new byte[1];
+        byte[] d = new byte[1];
         if (readPipe(d) == 0) {
             return -1;
         }

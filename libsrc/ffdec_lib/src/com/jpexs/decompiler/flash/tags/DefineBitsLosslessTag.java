@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecialType;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.base.AloneTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
@@ -115,7 +116,8 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
         if (bitmapFormat == FORMAT_8BIT_COLORMAPPED) {
             bitmapColorTableSize = sis.readUI8("bitmapColorTableSize");
         }
-        zlibBitmapData = sis.readByteRangeEx(sis.available(), "zlibBitmapData");
+
+        zlibBitmapData = sis.readByteRangeEx(sis.available(), "zlibBitmapData", DumpInfoSpecialType.ZLIB_DATA, null);
     }
 
     /**

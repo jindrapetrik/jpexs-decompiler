@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.ConstantPoolTooBigException;
+import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecialType;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -82,7 +83,7 @@ public class BUTTONCONDACTION implements ASMSource, Serializable {
         condIdleToOverUp = sis.readUB(1, "condIdleToOverUp") == 1;
         condKeyPress = (int) sis.readUB(7, "condKeyPress");
         condOverDownToIdle = sis.readUB(1, "condOverDownToIdle") == 1;
-        actionBytes = sis.readByteRangeEx(condActionSize <= 0 ? sis.available() : condActionSize - 4, "actionBytes");
+        actionBytes = sis.readByteRangeEx(condActionSize <= 0 ? sis.available() : condActionSize - 4, "actionBytes", DumpInfoSpecialType.ACTION_BYTES, sis.getPos());
     }
 
     @Override

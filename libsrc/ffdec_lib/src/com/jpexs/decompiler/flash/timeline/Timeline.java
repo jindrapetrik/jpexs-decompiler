@@ -583,9 +583,9 @@ public class Timeline {
      ------------
      6 |  7  | 8
 
-     ExportRectangle targetRect[] = new ExportRectangle[9];
-     ExportRectangle sourceRect[] = new ExportRectangle[9];
-     Matrix transforms[] = new Matrix[9];
+     ExportRectangle[] targetRect = new ExportRectangle[9];
+     ExportRectangle[] sourceRect = new ExportRectangle[9];
+     Matrix[] transforms = new Matrix[9];
 
      DefineScalingGridTag.getSlices(transformation, prevScale, boundsRect, scalingGrid, sourceRect, targetRect, transforms);
 
@@ -889,9 +889,9 @@ public class Timeline {
                 }
 
                 if (scalingRect != null) {
-                    ExportRectangle sourceRect[] = new ExportRectangle[9];
-                    ExportRectangle targetRect[] = new ExportRectangle[9];
-                    Matrix transforms[] = new Matrix[9];
+                    ExportRectangle[] sourceRect = new ExportRectangle[9];
+                    ExportRectangle[] targetRect = new ExportRectangle[9];
+                    Matrix[] transforms = new Matrix[9];
                     //mat => image
                     //t =>
                     //Matrix tx = transformation.concatenate(layerMatrix);

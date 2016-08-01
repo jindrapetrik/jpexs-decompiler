@@ -190,8 +190,8 @@ public class As3PCodeDocs {
                 String operandTypeRaw = AVM2Code.operandTypeToString(op, false);
                 String operandTypeCombined = AVM2Code.operandTypeToString(op, true);
                 if (operandTypeCombined.contains(", ")) {
-                    String operandTypesCombined[] = operandTypeCombined.split(", ?");
-                    String operandTypesRaw[] = operandTypeRaw.split(", ?");
+                    String[] operandTypesCombined = operandTypeCombined.split(", ?");
+                    String[] operandTypesRaw = operandTypeRaw.split(", ?");
 
                     for (int j = 0; j < operandTypesCombined.length; j++) {
                         if (!first) {
@@ -236,7 +236,7 @@ public class As3PCodeDocs {
         sb.append("<div class=\"stack\"><strong class=\"stack-title\">").append(getProperty("ui.stack")).append("</strong><span class=\"stack-values " + (def.hasFlag(AVM2InstructionFlag.UNKNOWN_STACK) ? " unknown" : "") + "\">").append(stack).append("</span>").append("</div>").append(NEWLINE);
         boolean flagsPrinted = false;
 
-        AVM2InstructionFlag flags[] = def.flags.clone();
+        AVM2InstructionFlag[] flags = def.flags.clone();
         Arrays.sort(flags, Enum::compareTo);
 
         for (AVM2InstructionFlag fl : flags) {

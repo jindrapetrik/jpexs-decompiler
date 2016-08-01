@@ -105,7 +105,7 @@ public interface MenuBuilder {
         }
 
         public HotKey(String h) {
-            String parts[] = h.contains("+") ? h.split("\\+") : new String[]{h};
+            String[] parts = h.contains("+") ? h.split("\\+") : new String[]{h};
             for (String s : parts) {
                 switch (s) {
                     case "SHIFT":

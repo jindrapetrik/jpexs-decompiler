@@ -723,7 +723,7 @@ public class Graph {
     protected void finalProcess(List<GraphTargetItem> list, int level, FinalProcessLocalData localData) throws InterruptedException {
 
         //For detection based on debug line information
-        boolean toDelete[] = new boolean[list.size()];
+        boolean[] toDelete = new boolean[list.size()];
         for (int i = 0; i < list.size(); i++) {
             if (Thread.currentThread().isInterrupted()) {
                 throw new InterruptedException();

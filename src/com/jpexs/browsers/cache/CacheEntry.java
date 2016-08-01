@@ -88,7 +88,7 @@ public abstract class CacheEntry {
         if (st == null) {
             return 0;
         }
-        String parts[] = st.split(" ");
+        String[] parts = st.split(" ");
         try {
             return Integer.parseInt(parts[1]);
         } catch (NumberFormatException nfe) {

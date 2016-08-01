@@ -215,7 +215,7 @@ public class ProxyFrame extends AppFrame implements CatchedListener, MouseListen
 
         loadReplacements();
 
-        Object data[][] = new Object[replacements.size()][3];
+        Object[][] data = new Object[replacements.size()][3];
 
         for (int i = 0; i < replacements.size(); i++) {
             Replacement r = replacements.get(i);
@@ -228,7 +228,7 @@ public class ProxyFrame extends AppFrame implements CatchedListener, MouseListen
 
             @Override
             public Class<?> getColumnClass(int columnIndex) {
-                Class classes[] = new Class[]{String.class, SizeItem.class, String.class};
+                Class[] classes = new Class[]{String.class, SizeItem.class, String.class};
                 return classes[columnIndex];
             }
 
@@ -370,7 +370,7 @@ public class ProxyFrame extends AppFrame implements CatchedListener, MouseListen
     }
 
     private int[] getSelectedRows() {
-        int sel[] = replacementsTable.getSelectedRows();
+        int[] sel = replacementsTable.getSelectedRows();
         for (int i = 0; i < sel.length; i++) {
             sel[i] = replacementsTable.getRowSorter().convertRowIndexToModel(sel[i]);
         }

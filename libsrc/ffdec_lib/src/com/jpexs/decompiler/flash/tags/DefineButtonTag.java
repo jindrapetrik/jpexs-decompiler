@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecialType;
 import com.jpexs.decompiler.flash.tags.base.ASMSourceContainer;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonAction;
@@ -101,7 +102,7 @@ public class DefineButtonTag extends ButtonTag implements ASMSourceContainer {
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         buttonId = sis.readUI16("buttonId");
         characters = sis.readBUTTONRECORDList(false, "characters");
-        actionBytes = sis.readByteRangeEx(sis.available(), "actionBytes");
+        actionBytes = sis.readByteRangeEx(sis.available(), "actionBytes", DumpInfoSpecialType.ACTION_BYTES, sis.getPos());
     }
 
     /**

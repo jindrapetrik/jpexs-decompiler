@@ -92,12 +92,12 @@ public class MapBucket extends CacheEntry {
         if (responseHead == null) {
             return null;
         }
-        String headers[] = responseHead.split("\r\n");
+        String[] headers = responseHead.split("\r\n");
         Map<String, String> ret = new HashMap<>();
         for (int h = 1; h < headers.length; h++) {
             String hs = headers[h];
             if (hs.contains(":")) {
-                String hp[] = hs.split(":");
+                String[] hp = hs.split(":");
                 ret.put(hp[0].trim(), hp[1].trim());
             }
         }
@@ -111,7 +111,7 @@ public class MapBucket extends CacheEntry {
             return null;
         }
         String responseHead = m.response.get("response-head");
-        String headers[] = responseHead.split("\r\n");
+        String[] headers = responseHead.split("\r\n");
         return headers[0];
     }
 

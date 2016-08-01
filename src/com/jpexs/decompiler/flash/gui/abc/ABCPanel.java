@@ -577,7 +577,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
             }
             Main.getDebugHandler().setVariable(((VariableNode) node).parentId, ((VariableNode) node).thisVar.name, valType, symb.value);
             //((VariableNode) node).refresh();
-            Object path[] = new Object[((VariableNode) node).path.size()];
+            Object[] path = new Object[((VariableNode) node).path.size()];
             for (int i = 0; i < path.length; i++) {
                 path[i] = ((VariableNode) node).path.get(i);
             }

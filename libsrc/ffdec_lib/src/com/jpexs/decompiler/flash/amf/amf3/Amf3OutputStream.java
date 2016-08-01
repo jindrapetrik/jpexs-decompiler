@@ -120,7 +120,7 @@ public class Amf3OutputStream extends OutputStream {
             if (!val.isEmpty()) {
                 stringTable.add(val);
             }
-            byte data[] = val.getBytes("UTF-8");
+            byte[] data = val.getBytes("UTF-8");
             writeU29((data.length << 1) | NO_REFERENCE_FLAG);
             writeBytes(data);
         } else {
@@ -132,7 +132,7 @@ public class Amf3OutputStream extends OutputStream {
         int objectIndex = objectTable.indexOf(val);
         if (objectIndex == -1) {
             objectTable.add(val);
-            byte data[] = val.getData();
+            byte[] data = val.getData();
             writeU29((data.length << 1) | NO_REFERENCE_FLAG);
             writeBytes(data);
         } else {
@@ -144,7 +144,7 @@ public class Amf3OutputStream extends OutputStream {
         int objectIndex = objectTable.indexOf(val);
         if (objectIndex == -1) {
             objectTable.add(val);
-            byte data[] = val.getData().getBytes("UTF-8");
+            byte[] data = val.getData().getBytes("UTF-8");
             writeU29((data.length << 1) | NO_REFERENCE_FLAG);
             writeBytes(data);
         } else {
@@ -156,7 +156,7 @@ public class Amf3OutputStream extends OutputStream {
         int objectIndex = objectTable.indexOf(val);
         if (objectIndex == -1) {
             objectTable.add(val);
-            byte data[] = val.getData().getBytes("UTF-8");
+            byte[] data = val.getData().getBytes("UTF-8");
             writeU29((data.length << 1) | NO_REFERENCE_FLAG);
             writeBytes(data);
         } else {

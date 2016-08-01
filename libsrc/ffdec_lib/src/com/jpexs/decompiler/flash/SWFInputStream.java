@@ -123,6 +123,8 @@ import com.jpexs.decompiler.flash.amf.amf3.Amf3Value;
 import com.jpexs.decompiler.flash.amf.amf3.NoSerializerExistsException;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
+import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecial;
+import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecialType;
 import com.jpexs.decompiler.flash.tags.CSMTextSettingsTag;
 import com.jpexs.decompiler.flash.tags.DebugIDTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
@@ -392,17 +394,25 @@ public class SWFInputStream implements AutoCloseable {
         is.seek(pos - startingPos);
     }
 
-    private void newDumpLevel(String name, String type) {
+    private DumpInfo newDumpLevel(String name, String type) {
+        return newDumpLevel(name, type, DumpInfoSpecialType.NONE, null);
+    }
+
+    private DumpInfo newDumpLevel(String name, String type, DumpInfoSpecialType specialType, Object specialValue) {
         if (dumpInfo != null) {
             long startByte = is.getPos();
             if (bitPos > 0) {
                 startByte--;
             }
-            DumpInfo di = new DumpInfo(name, type, null, startByte, bitPos, 0, 0);
+            DumpInfo di = specialType == DumpInfoSpecialType.NONE
+                    ? new DumpInfo(name, type, null, startByte, bitPos, 0, 0)
+                    : new DumpInfoSpecial(name, type, null, startByte, bitPos, 0, 0, specialType, specialValue);
             di.parent = dumpInfo;
             dumpInfo.getChildInfos().add(di);
             dumpInfo = di;
         }
+
+        return dumpInfo;
     }
 
     private void endDumpLevel() {
@@ -784,11 +794,26 @@ public class SWFInputStream implements AutoCloseable {
      * @throws IOException
      */
     public ByteArrayRange readByteRangeEx(long count, String name) throws IOException {
+        return readByteRangeEx(count, name, DumpInfoSpecialType.NONE, null);
+    }
+
+    /**
+     * Reads byte range from the stream
+     *
+     * @param count Number of bytes to read
+     * @param name
+     * @param specialType
+     * @param specialValue
+     * @return ByteArrayRange object
+     * @throws IOException
+     */
+    public ByteArrayRange readByteRangeEx(long count, String name, DumpInfoSpecialType specialType, Object specialValue) throws IOException {
         if (count <= 0) {
             return ByteArrayRange.EMPTY;
         }
 
-        newDumpLevel(name, "bytes");
+        newDumpLevel(name, "bytes", specialType, specialValue);
+
         int startPos = (int) getPos();
         skipBytesEx(count);
         endDumpLevel();
@@ -1179,7 +1204,7 @@ public class SWFInputStream implements AutoCloseable {
         boolean isAS3 = false;
         while (available() > 0) {
             long pos = getPos();
-            newDumpLevel(null, "TAG");
+            newDumpLevel(null, "TAG", DumpInfoSpecialType.TAG, getPos());
             try {
                 tag = readTag(timelined, level, pos, false, parallel1, skipUnusualTags, lazy);
             } catch (EOFException | EndOfStreamException ex) {

@@ -93,9 +93,9 @@ public class DebugPanel extends JPanel {
     private void safeSetTreeModel(MyTreeTable tt, MyTreeTableModel tmodel) {
         List<List<String>> expanded = View.getExpandedNodes(tt.getTree());
 
-        int selRows[] = tt.getSelectedRows();
+        int[] selRows = tt.getSelectedRows();
 
-        TreePath selPaths[] = new TreePath[selRows.length];
+        TreePath[] selPaths = new TreePath[selRows.length];
         for (int i = 0; i < selRows.length; i++) {
             selPaths[i] = tt.getTree().getPathForRow(selRows[i]);
         }
