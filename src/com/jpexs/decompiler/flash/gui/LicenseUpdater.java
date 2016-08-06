@@ -99,50 +99,48 @@ public class LicenseUpdater {
         for (File f : files) {
             if (f.isDirectory()) {
                 updateLicenseInDir(f, lgpl);
-            } else {
-                if (f.getName().endsWith(".java")) {
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    PrintWriter pw = new Utf8PrintWriter(baos);
-                    try {
-                        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f), Utf8Helper.charset))) {
-                            String s;
-                            boolean packageFound = false;
-                            String author = defaultAuthor;
-                            String yearStr = defaultYearStr;
-                            while ((s = br.readLine()) != null) {
-                                if (!packageFound) {
-                                    if (s.trim().startsWith("package")) {
-                                        packageFound = true;
-                                        pw.println(license.replace("{year}", yearStr).replace("{author}", author));
-                                    } else {
-                                        Matcher mAuthor = Pattern.compile(lgpl ? "^.*Copyright \\(C\\) ([0-9]+)(-[0-9]+)? (.*), All rights reserved.*" : "^.*Copyright \\(C\\) ([0-9]+)(-[0-9]+)? (.*)$").matcher(s);
-                                        if (mAuthor.matches()) {
-                                            author = mAuthor.group(3).trim();
-                                            int startYear = Integer.parseInt(mAuthor.group(1).trim());
-                                            if (startYear == defaultFinalYear) {
-                                                yearStr = Integer.toString(startYear);
-                                            } else {
-                                                yearStr = Integer.toString(startYear) + "-" + defaultFinalYear;
-                                            }
-                                            if (!author.equals(defaultAuthor)) {
-                                                System.out.println("Detected nodefault author:" + author + " in " + f.getAbsolutePath());
-                                            }
+            } else if (f.getName().endsWith(".java")) {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                PrintWriter pw = new Utf8PrintWriter(baos);
+                try {
+                    try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f), Utf8Helper.charset))) {
+                        String s;
+                        boolean packageFound = false;
+                        String author = defaultAuthor;
+                        String yearStr = defaultYearStr;
+                        while ((s = br.readLine()) != null) {
+                            if (!packageFound) {
+                                if (s.trim().startsWith("package")) {
+                                    packageFound = true;
+                                    pw.println(license.replace("{year}", yearStr).replace("{author}", author));
+                                } else {
+                                    Matcher mAuthor = Pattern.compile(lgpl ? "^.*Copyright \\(C\\) ([0-9]+)(-[0-9]+)? (.*), All rights reserved.*" : "^.*Copyright \\(C\\) ([0-9]+)(-[0-9]+)? (.*)$").matcher(s);
+                                    if (mAuthor.matches()) {
+                                        author = mAuthor.group(3).trim();
+                                        int startYear = Integer.parseInt(mAuthor.group(1).trim());
+                                        if (startYear == defaultFinalYear) {
+                                            yearStr = Integer.toString(startYear);
+                                        } else {
+                                            yearStr = Integer.toString(startYear) + "-" + defaultFinalYear;
+                                        }
+                                        if (!author.equals(defaultAuthor)) {
+                                            System.out.println("Detected nodefault author:" + author + " in " + f.getAbsolutePath());
                                         }
                                     }
                                 }
-                                if (packageFound) {
-                                    pw.println(s);
-                                }
+                            }
+                            if (packageFound) {
+                                pw.println(s);
                             }
                         }
-                        pw.close();
-                    } catch (IOException ex) {
                     }
+                    pw.close();
+                } catch (IOException ex) {
+                }
 
-                    try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(f))) {
-                        fos.write(baos.toByteArray());
-                    } catch (IOException ex) {
-                    }
+                try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(f))) {
+                    fos.write(baos.toByteArray());
+                } catch (IOException ex) {
                 }
             }
         }

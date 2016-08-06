@@ -55,65 +55,65 @@ public class MyRibbonApplicationMenuPopupPanelUI extends BasicRibbonApplicationM
         super.installComponents();
         Border newBorder = new CompoundBorder(new SubstanceBorder(new Insets(2,
                 2, 2, 2)), new Border() {
-                    @Override
-                    public boolean isBorderOpaque() {
-                        return true;
-                    }
+            @Override
+            public boolean isBorderOpaque() {
+                return true;
+            }
 
-                    @Override
-                    public Insets getBorderInsets(Component c) {
-                        return new Insets(18, 0, 0, 0);
-                    }
+            @Override
+            public Insets getBorderInsets(Component c) {
+                return new Insets(18, 0, 0, 0);
+            }
 
-                    @Override
-                    public void paintBorder(Component c, Graphics g, int x, int y,
-                            int width, int height) {
-                        SubstanceColorScheme bgFillScheme = SubstanceColorSchemeUtilities
+            @Override
+            public void paintBorder(Component c, Graphics g, int x, int y,
+                    int width, int height) {
+                SubstanceColorScheme bgFillScheme = SubstanceColorSchemeUtilities
                         .getColorScheme(c,
                                 ColorSchemeAssociationKind.HIGHLIGHT,
                                 ComponentState.ENABLED);
-                        SubstanceColorScheme bgBorderScheme = SubstanceColorSchemeUtilities
+                SubstanceColorScheme bgBorderScheme = SubstanceColorSchemeUtilities
                         .getColorScheme(c,
                                 ColorSchemeAssociationKind.HIGHLIGHT_BORDER,
                                 ComponentState.ENABLED);
-                        HighlightPainterUtils.paintHighlight(g, null, c, new Rectangle(
-                                        x, y, width, height), 0.0f, null, bgFillScheme,
-                                bgBorderScheme);
+                HighlightPainterUtils.paintHighlight(g, null, c, new Rectangle(
+                        x, y, width, height), 0.0f, null, bgFillScheme,
+                        bgBorderScheme);
 
-                        // draw the application menu button
-                        JRibbonApplicationMenuButton rendererButton = new JRibbonApplicationMenuButton(
-                                applicationMenuPopupPanel.getAppMenuButton()
-                                .getRibbon());
+                // draw the application menu button
+                JRibbonApplicationMenuButton rendererButton = new JRibbonApplicationMenuButton(
+                        applicationMenuPopupPanel.getAppMenuButton()
+                        .getRibbon());
 
-                        JRibbonApplicationMenuButton appMenuButton = applicationMenuPopupPanel
+                JRibbonApplicationMenuButton appMenuButton = applicationMenuPopupPanel
                         .getAppMenuButton();
-                        rendererButton.applyComponentOrientation(appMenuButton
-                                .getComponentOrientation());
+                rendererButton.applyComponentOrientation(appMenuButton
+                        .getComponentOrientation());
 
-                        rendererButton.setPopupKeyTip(appMenuButton.getPopupKeyTip());
-                        rendererButton.getPopupModel().setPopupShowing(true);
-                        rendererButton.setDisplayState(appMenuButton.getDisplayState());
+                rendererButton.setPopupKeyTip(appMenuButton.getPopupKeyTip());
+                rendererButton.getPopupModel().setPopupShowing(true);
+                rendererButton.setDisplayState(appMenuButton.getDisplayState());
 
-                        rendererButton.getPopupModel().setRollover(false);
-                        rendererButton.getPopupModel().setPressed(true);
-                        rendererButton.getPopupModel().setArmed(true);
+                rendererButton.getPopupModel().setRollover(false);
+                rendererButton.getPopupModel().setPressed(true);
+                rendererButton.getPopupModel().setArmed(true);
 
-                        CellRendererPane buttonRendererPane = new CellRendererPane();
-                        Point buttonLoc = appMenuButton.getLocationOnScreen();
-                        Point panelLoc = c.getLocationOnScreen();
+                CellRendererPane buttonRendererPane = new CellRendererPane();
+                Point buttonLoc = appMenuButton.getLocationOnScreen();
+                Point panelLoc = c.getLocationOnScreen();
 
-                        buttonRendererPane.setBounds(panelLoc.x - buttonLoc.x,
-                                panelLoc.y - buttonLoc.y, appMenuButton.getWidth(),
-                                appMenuButton.getHeight());
+                buttonRendererPane.setBounds(panelLoc.x - buttonLoc.x,
+                        panelLoc.y - buttonLoc.y, appMenuButton.getWidth(),
+                        appMenuButton.getHeight());
 
-                        buttonRendererPane.paintComponent(g, rendererButton,
-                                (Container) c, -panelLoc.x + buttonLoc.x, -panelLoc.y
-                                + buttonLoc.y, appMenuButton.getWidth(),
-                                appMenuButton.getHeight(), true);
-                        /*g.setColor(Color.red);
+                buttonRendererPane.paintComponent(g, rendererButton,
+                        (Container) c, -panelLoc.x + buttonLoc.x, -panelLoc.y
+                        + buttonLoc.y, appMenuButton.getWidth(),
+                        appMenuButton.getHeight(), true);
+                /*g.setColor(Color.red);
                          g.fillRect(0, 0, width,height);*/
-                    }
-                });
+            }
+        });
         this.applicationMenuPopupPanel.setBorder(newBorder);
 
         this.panelLevel2.setBorder(new Border() {

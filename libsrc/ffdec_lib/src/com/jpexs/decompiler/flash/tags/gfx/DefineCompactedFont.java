@@ -210,7 +210,7 @@ public final class DefineCompactedFont extends FontTag {
                     pos = i;
                     break;
                 }
-                
+
                 return false;
             }
         }
@@ -218,7 +218,7 @@ public final class DefineCompactedFont extends FontTag {
         if (pos == -1) {
             return false;
         }
-        
+
         font.glyphInfo.remove(pos);
         font.glyphs.remove(pos);
         shapeCache.remove(pos);

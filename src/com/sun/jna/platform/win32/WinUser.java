@@ -555,17 +555,17 @@ public interface WinUser extends StdCallLibrary, WinDef {
 
     int SM_CMOUSEBUTTONS = 43;
 
-    int SM_CXFIXEDFRAME = SM_CXDLGFRAME; /* ;win40 name change */
+    int SM_CXFIXEDFRAME = SM_CXDLGFRAME;
+    /* ;win40 name change */
 
+    int SM_CYFIXEDFRAME = SM_CYDLGFRAME;
+    /* ;win40 name change */
 
-    int SM_CYFIXEDFRAME = SM_CYDLGFRAME; /* ;win40 name change */
+    int SM_CXSIZEFRAME = SM_CXFRAME;
+    /* ;win40 name change */
 
-
-    int SM_CXSIZEFRAME = SM_CXFRAME; /* ;win40 name change */
-
-
-    int SM_CYSIZEFRAME = SM_CYFRAME; /* ;win40 name change */
-
+    int SM_CYSIZEFRAME = SM_CYFRAME;
+    /* ;win40 name change */
 
     int SM_SECURE = 44;
 

@@ -220,9 +220,9 @@ public class NameAVM2Item extends AssignableAVM2Item {
                 return toSourceMerge(localData, generator,
                         ins(AVM2Instructions.GetScopeObject, slotScope),
                         assignedValue, !(("" + assignedValue.returnType()).equals("" + type) && (basicTypes.contains("" + type))) ? generateCoerce(localData, generator, type) : null, needsReturn
-                                ? dupSetTemp(localData, generator, ret_temp) : null, generateSetLoc(regNumber), slotNumber > -1
-                                ? ins(AVM2Instructions.SetSlot, slotNumber)
-                                : null,
+                        ? dupSetTemp(localData, generator, ret_temp) : null, generateSetLoc(regNumber), slotNumber > -1
+                        ? ins(AVM2Instructions.SetSlot, slotNumber)
+                        : null,
                         needsReturn ? getTemp(localData, generator, ret_temp) : null,
                         killTemp(localData, generator, Arrays.asList(ret_temp)));
             } else {

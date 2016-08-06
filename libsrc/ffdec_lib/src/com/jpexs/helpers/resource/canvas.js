@@ -957,8 +957,7 @@ function doDrag(e) {
     if (dragWidth) {
         canvas.width = (startWidth + e.clientX - startX);
         canvas.height = canvas.width * originalHeight / originalWidth;
-    }
-    else if (dragHeight) {
+    } else if (dragHeight) {
         canvas.height = (startHeight + e.clientY - startY);
         canvas.width = canvas.height * originalWidth / originalHeight;
     }

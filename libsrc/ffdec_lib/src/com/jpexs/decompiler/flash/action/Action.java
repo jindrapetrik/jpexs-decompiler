@@ -568,7 +568,7 @@ public abstract class Action implements GraphSourceItem {
 
                                 writer.appendNoHilight(Helper.byteToHex(fileData[(int) (fileOffset + i)]));
                             }
-                            
+
                             writer.appendNoHilight(")");
                         }
 
@@ -1114,7 +1114,7 @@ public abstract class Action implements GraphSourceItem {
             }
 
             /*ActionJump && ActionIf removed*/
-            /*if ((action instanceof ActionEnumerate2) || (action instanceof ActionEnumerate)) {
+ /*if ((action instanceof ActionEnumerate2) || (action instanceof ActionEnumerate)) {
              loopStart = ip + 1;
              isForIn = true;
              ip += 4;

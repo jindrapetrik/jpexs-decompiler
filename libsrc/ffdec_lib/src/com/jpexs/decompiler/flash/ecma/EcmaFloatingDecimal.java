@@ -655,7 +655,7 @@ public class EcmaFloatingDecimal {
          * We keep track of powers of 2 and powers of 5.
          */
 
-        /*
+ /*
          * Estimate decimal exponent. (If it is small-ish,
          * we could double-check.)
          *
@@ -973,64 +973,60 @@ public class EcmaFloatingDecimal {
         if (isExceptional) {
             System.arraycopy(digits, 0, result, i, nDigits);
             i += nDigits;
-        } else {
-            if (decExponent > 0 && decExponent < 22) {
-                // print digits.digits.
-                int charLength = Math.min(nDigits, decExponent);
-                System.arraycopy(digits, 0, result, i, charLength);
+        } else if (decExponent > 0 && decExponent < 22) {
+            // print digits.digits.
+            int charLength = Math.min(nDigits, decExponent);
+            System.arraycopy(digits, 0, result, i, charLength);
+            i += charLength;
+            if (charLength < decExponent) {
+                charLength = decExponent - charLength;
+                System.arraycopy(zero, 0, result, i, charLength);
                 i += charLength;
-                if (charLength < decExponent) {
-                    charLength = decExponent - charLength;
-                    System.arraycopy(zero, 0, result, i, charLength);
-                    i += charLength;
-                } else {
-                    if (charLength < nDigits) {
-                        result[i++] = '.';
-                        int t = nDigits - charLength;
-                        System.arraycopy(digits, charLength, result, i, t);
-                        i += t;
-                    }
-                }
-            } else if (decExponent <= 0 && decExponent > -5) {
-                result[i++] = '0';
-                if (digits != zero) {
-                    result[i++] = '.';
-                    if (decExponent != 0) {
-                        System.arraycopy(zero, 0, result, i, -decExponent);
-                        i -= decExponent;
-                    }
-                    System.arraycopy(digits, 0, result, i, nDigits);
-                    i += nDigits;
-                }
-            } else {
-                result[i++] = digits[0];
+            } else if (charLength < nDigits) {
                 result[i++] = '.';
-                if (nDigits > 1) {
-                    System.arraycopy(digits, 1, result, i, nDigits - 1);
-                    i += nDigits - 1;
-                } else {
-                    result[i++] = '0';
+                int t = nDigits - charLength;
+                System.arraycopy(digits, charLength, result, i, t);
+                i += t;
+            }
+        } else if (decExponent <= 0 && decExponent > -5) {
+            result[i++] = '0';
+            if (digits != zero) {
+                result[i++] = '.';
+                if (decExponent != 0) {
+                    System.arraycopy(zero, 0, result, i, -decExponent);
+                    i -= decExponent;
                 }
-                result[i++] = 'e';
-                int e;
-                if (decExponent <= 0) {
-                    result[i++] = '-';
-                    e = -decExponent + 1;
-                } else {
-                    e = decExponent - 1;
-                }
-                // decExponent has 1, 2, or 3, digits
-                if (e <= 9) {
-                    result[i++] = (char) (e + '0');
-                } else if (e <= 99) {
-                    result[i++] = (char) (e / 10 + '0');
-                    result[i++] = (char) (e % 10 + '0');
-                } else {
-                    result[i++] = (char) (e / 100 + '0');
-                    e %= 100;
-                    result[i++] = (char) (e / 10 + '0');
-                    result[i++] = (char) (e % 10 + '0');
-                }
+                System.arraycopy(digits, 0, result, i, nDigits);
+                i += nDigits;
+            }
+        } else {
+            result[i++] = digits[0];
+            result[i++] = '.';
+            if (nDigits > 1) {
+                System.arraycopy(digits, 1, result, i, nDigits - 1);
+                i += nDigits - 1;
+            } else {
+                result[i++] = '0';
+            }
+            result[i++] = 'e';
+            int e;
+            if (decExponent <= 0) {
+                result[i++] = '-';
+                e = -decExponent + 1;
+            } else {
+                e = decExponent - 1;
+            }
+            // decExponent has 1, 2, or 3, digits
+            if (e <= 9) {
+                result[i++] = (char) (e + '0');
+            } else if (e <= 99) {
+                result[i++] = (char) (e / 10 + '0');
+                result[i++] = (char) (e % 10 + '0');
+            } else {
+                result[i++] = (char) (e / 100 + '0');
+                e %= 100;
+                result[i++] = (char) (e / 10 + '0');
+                result[i++] = (char) (e % 10 + '0');
             }
         }
         return i;
@@ -1185,8 +1181,8 @@ public class EcmaFloatingDecimal {
     }
 
     /**
-     * Extract a hexadecimal digit from position <code>position</code>
-     * of string <code>s</code>.
+     * Extract a hexadecimal digit from position <code>position</code> of string
+     * <code>s</code>.
      */
     static int getHexDigit(String s, int position) {
         int value = Character.digit(s.charAt(position), 16);
@@ -1567,8 +1563,8 @@ class FDBigInt {
             } else {
                 return 1; // b not big, answer is obvious;
             }
-        } else {
-            // a is not really big
+        } else // a is not really big
+        {
             if (b < 0) {
                 // but b is really big
                 return -1;

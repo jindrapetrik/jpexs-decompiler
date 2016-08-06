@@ -175,7 +175,8 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
                 + "Return\n"
                 + "}\n"
                 + "Push 2\n"
-                + "Jump label_1\n" + // remove this action
+                + "Jump label_1\n"
+                + // remove this action
                 "label_1:Push 3";
         String expectedResult
                 = "ConstantPool\n"

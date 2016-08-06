@@ -1638,7 +1638,7 @@ public class AVM2Code implements Cloneable {
              }
              }//*/
 
-            /*if ((ip + 2 < code.size()) && (ins.definition instanceof NewCatchIns)) { // Filling local register in catch clause
+ /*if ((ip + 2 < code.size()) && (ins.definition instanceof NewCatchIns)) { // Filling local register in catch clause
              if (code.get(ip + 1).definition instanceof DupIns) {
              if (code.get(ip + 2).definition instanceof SetLocalTypeIns) {
              ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames);

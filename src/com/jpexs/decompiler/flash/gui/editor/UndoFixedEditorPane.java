@@ -114,11 +114,9 @@ public class UndoFixedEditorPane extends JEditorPane {
                     contentType = "text/plain";
                     originalContentType = getContentType();
                     changeContentType(contentType);
-                } else {
-                    if (originalContentType != null) {
-                        changeContentType(originalContentType);
-                        originalContentType = null;
-                    }
+                } else if (originalContentType != null) {
+                    changeContentType(originalContentType);
+                    originalContentType = null;
                 }
 
                 Stopwatch sw = Stopwatch.startNew();

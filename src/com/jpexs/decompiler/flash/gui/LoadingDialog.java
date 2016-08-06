@@ -100,10 +100,8 @@ public class LoadingDialog extends AppDialog {
             public void windowClosing(WindowEvent e) {
                 if (Main.shouldCloseWhenClosingLoadingDialog) {
                     System.exit(0);
-                } else {
-                    if (worker != null) {
-                        worker.cancel(true);
-                    }
+                } else if (worker != null) {
+                    worker.cancel(true);
                 }
             }
         });

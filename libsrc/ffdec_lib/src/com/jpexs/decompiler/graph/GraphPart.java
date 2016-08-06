@@ -171,19 +171,15 @@ public class GraphPart implements Serializable {
         for (GraphPart p : nextParts) {
             if (p == part) {
                 return true;
-            } else {
-                if (p.leadsTo(localData, gr, code, part, visited, loops)) {
-                    return true;
-                }
+            } else if (p.leadsTo(localData, gr, code, part, visited, loops)) {
+                return true;
             }
         }
         for (GraphPart p : throwParts) {
             if (p == part) {
                 return true;
-            } else {
-                if (p.leadsTo(localData, gr, code, part, visited, loops)) {
-                    return true;
-                }
+            } else if (p.leadsTo(localData, gr, code, part, visited, loops)) {
+                return true;
             }
         }
         return false;

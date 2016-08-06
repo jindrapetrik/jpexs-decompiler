@@ -500,7 +500,7 @@ public class DefineFont2Tag extends FontTag {
                     pos = i;
                     break;
                 }
-                
+
                 return false;
             }
         }
@@ -524,7 +524,7 @@ public class DefineFont2Tag extends FontTag {
         getSwf().clearImageCache();
         return true;
     }
-    
+
     @Override
     public void setAdvanceValues(Font font) {
         boolean hasLayout = fontFlagsHasLayout;
