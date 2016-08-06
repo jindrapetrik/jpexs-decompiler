@@ -1157,6 +1157,12 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
                 return;
             }
         }
+        String flexLocation = Configuration.flexSdkLocation.get();
+        if (flexLocation.isEmpty() || (!new File(flexLocation).exists())) {
+            View.showMessageDialog(null, AppStrings.translate("message.flexpath.notset"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+            Main.advancedSettings("paths");
+            return;
+        }
         if (View.showConfirmDialog(null, AppStrings.translate("message.confirm.experimental.function"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, Configuration.warningExperimentalAS3Edit, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION) {
             setDecompiledEditMode(true);
         }
@@ -1173,11 +1179,6 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
         try {
             String oldSp = pack.getClassPath().toRawString();
-            /*List<ScriptPack> packs = abc.script_info.get(oldIndex).getPacks(abc, oldIndex, null, pack.allABCs);
-             if (!packs.isEmpty()) {
-
-             }*/
-
             String as = decompiledTextArea.getText();
             abc.replaceScriptPack(pack, as);
             lastDecompiled = as;

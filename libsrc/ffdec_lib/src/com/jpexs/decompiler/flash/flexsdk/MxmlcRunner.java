@@ -1,0 +1,54 @@
+package com.jpexs.decompiler.flash.flexsdk;
+
+import com.jpexs.helpers.Helper;
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+public class MxmlcRunner {
+
+    private String flexSdkPath;
+
+    public MxmlcRunner(String flexSdkPath) {
+        this.flexSdkPath = flexSdkPath;
+    }
+
+    public String getMxmlcPath() {
+        boolean isWin = System.getProperty("os.name").toLowerCase().contains("win");
+        return flexSdkPath + File.separator + "bin" + File.separator + "mxmlc" + (isWin ? ".exe" : "");
+    }
+
+    public void mxmlc(String... arguments) throws MxmlcException, InterruptedException, IOException {
+        String runArgs[] = new String[arguments.length + 1];
+        runArgs[0] = getMxmlcPath();
+        System.arraycopy(arguments, 0, runArgs, 1, arguments.length);
+        System.out.println("" + String.join(" ", runArgs));
+        Process proc = null;
+        try {
+            proc = Runtime.getRuntime().exec(runArgs);
+            Helper.readStream(proc.getInputStream());
+            String errstring = "";
+            try {
+                errstring = new String(Helper.readStream(proc.getErrorStream()), "UTF-8");
+            } catch (UnsupportedEncodingException ex) {
+                //should not happen
+            }
+            proc.waitFor();
+            int exitValue = proc.exitValue();
+            if (exitValue > 0) {
+                throw new MxmlcException(errstring);
+            }
+        } finally {
+            if (proc != null) {
+                try {
+                    proc.destroy();
+                } catch (Exception ex2) {
+                    //ignore
+                }
+            }
+        }
+    }
+
+}

@@ -151,6 +151,18 @@ public class SwfXmlImporter {
         }
     }
 
+    public Object importObject(String xml, Class requiredType, SWF swf) throws IOException {
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        try {
+            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+            Document doc = docBuilder.parse(new InputSource(new StringReader(xml)));
+            return processObject(doc.getDocumentElement(), requiredType, swf, null);
+        } catch (ParserConfigurationException | SAXException | IllegalArgumentException | IllegalAccessException | NoSuchMethodException | InstantiationException | InvocationTargetException ex) {
+            Logger.getLogger(SwfXmlImporter.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+
     private Field getField(Class cls, String name) throws NoSuchFieldException {
         Field field;
         try {
@@ -243,7 +255,7 @@ public class SwfXmlImporter {
                         setFieldValue(field, obj, childObj);
                     }
                 } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException | NoSuchMethodException | InstantiationException | InvocationTargetException ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, "Error while getting val from class " + cls + " field: " + name, ex);
                 }
             }
         }

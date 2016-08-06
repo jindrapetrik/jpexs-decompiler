@@ -42,7 +42,9 @@ import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
-import com.jpexs.decompiler.flash.exporters.script.ImportsUsagesParser;
+import com.jpexs.decompiler.flash.exporters.script.Dependency;
+import com.jpexs.decompiler.flash.exporters.script.DependencyParser;
+import com.jpexs.decompiler.flash.exporters.script.DependencyType;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
@@ -174,14 +176,14 @@ public abstract class Trait implements Cloneable, Serializable {
         return getName(abc).getNamespace(abc.constants).getName(abc.constants);
     }
 
-    public void getImportsUsages(String ignoredCustom, ABC abc, List<DottedChain> imports, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) {
+    public void getDependencies(String ignoredCustom, ABC abc, List<Dependency> dependencies, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) {
         if (ignoredCustom == null) {
             Namespace n = getName(abc).getNamespace(abc.constants);
             if (n.kind == Namespace.KIND_NAMESPACE) {
                 ignoredCustom = n.getName(abc.constants).toRawString();
             }
         }
-        ImportsUsagesParser.parseUsagesFromMultiname(ignoredCustom, abc, imports, uses, getName(abc), ignorePackage, fullyQualifiedNames);
+        DependencyParser.parseUsagesFromMultiname(ignoredCustom, abc, dependencies, uses, getName(abc), ignorePackage, fullyQualifiedNames, DependencyType.NAMESPACE);
     }
 
     private static final String[] builtInClasses = {"ArgumentError", "arguments", "Array", "Boolean", "Class", "Date", "DefinitionError", "Error", "EvalError", "Function", "int", "JSON", "Math", "Namespace", "Number", "Object", "QName", "RangeError", "ReferenceError", "RegExp", "SecurityError", "String", "SyntaxError", "TypeError", "uint", "URIError", "VerifyError", "XML", "XMLList"};
@@ -210,14 +212,21 @@ public abstract class Trait implements Cloneable, Serializable {
         }
 
         //imports
-        List<DottedChain> imports = new ArrayList<>();
+        List<Dependency> dependencies = new ArrayList<>();
         List<String> uses = new ArrayList<>();
         String customNs = null;
         Namespace ns = getName(abc).getNamespace(abc.constants);
         if (ns.kind == Namespace.KIND_NAMESPACE) {
             customNs = ns.getName(abc.constants).toRawString();
         }
-        getImportsUsages(customNs, abc, imports, uses, ignorePackage, new ArrayList<>());
+        getDependencies(customNs, abc, dependencies, uses, ignorePackage, new ArrayList<>());
+
+        List<DottedChain> imports = new ArrayList<>();
+        for (Dependency d : dependencies) {
+            if (!imports.contains(d.getId())) {
+                imports.add(d.getId());
+            }
+        }
 
         List<String> importnames = new ArrayList<>();
         importnames.addAll(namesInThisPackage);

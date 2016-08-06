@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Stub for generating Main tag of SWC file -->
+<item flags="1" name="_%hash%_flash_display_Sprite" type="DoABC2Tag">
+    <abc type="ABC">
+        <version major="46" minor="16" type="ABCVersion"/>
+        <constants type="AVM2ConstantPool">
+            <constant_int/>
+            <constant_uint/>
+            <constant_double/>
+            <constant_decimal/>
+            <constant_float/>
+            <constant_float4/>
+            <constant_string>
+                <item isNull="true"/>
+                <item>_%hash%_flash_display_Sprite</item>
+                <item/>
+                <item>_%hash%_flash_display_Sprite/_%hash%_flash_display_Sprite</item>
+                <item>Security</item>
+                <item>flash.system</item>
+                <item>allowDomain</item>
+                <item>apply</item>
+                <item>http://adobe.com/AS3/2006/builtin</item>
+                <item>_%hash%_flash_display_Sprite/allowDomainInRSL</item>
+                <item>void</item>
+                <item>domains</item>
+                <item>allowInsecureDomain</item>
+                <item>_%hash%_flash_display_Sprite/allowInsecureDomainInRSL</item>
+                <item>allowDomainInRSL</item>
+                <item>__go_to_definition_help</item>
+                <item>pos</item>
+                <item>602</item>
+                <item>allowInsecureDomainInRSL</item>
+                <item>922</item>
+                <item>flash.display</item>
+                <item>Sprite</item>
+                <item>Object</item>
+                <item>EventDispatcher</item>
+                <item>flash.events</item>
+                <item>DisplayObject</item>
+                <item>InteractiveObject</item>
+                <item>DisplayObjectContainer</item>
+                <item>ExcludeClass</item>
+                <item>__go_to_ctor_definition_help</item>
+                <item>275</item>
+                <item>130</item>
+            </constant_string>
+            <constant_namespace>
+                <item isNull="true"/>
+                <item kind="5" name_index="1" type="Namespace"/>
+                <item kind="22" name_index="5" type="Namespace"/>
+                <item kind="22" name_index="2" type="Namespace"/>
+                <item kind="8" name_index="8" type="Namespace"/>
+                <item kind="22" name_index="20" type="Namespace"/>
+                <item kind="24" name_index="1" type="Namespace"/>
+                <item kind="22" name_index="24" type="Namespace"/>
+                <item kind="22" name_index="2" type="Namespace"/>
+            </constant_namespace>
+            <constant_namespace_set/>
+            <constant_multiname>
+                <item isNull="true"/>
+                <item kind="7" name_index="4" namespace_index="2" namespace_set_index="0" qname_index="0" type="Multiname"/>
+                <item kind="7" name_index="6" namespace_index="3" namespace_set_index="0" qname_index="0" type="Multiname"/>
+                <item kind="7" name_index="7" namespace_index="4" namespace_set_index="0" qname_index="0" type="Multiname"/>
+                <item kind="7" name_index="10" namespace_index="3" namespace_set_index="0" qname_index="0" type="Multiname"/>
+                <item kind="7" name_index="12" namespace_index="3" namespace_set_index="0" qname_index="0" type="Multiname"/>
+                <item kind="7" name_index="14" namespace_index="3" namespace_set_index="0" qname_index="0" type="Multiname"/>
+                <item kind="7" name_index="18" namespace_index="3" namespace_set_index="0" qname_index="0" type="Multiname"/>
+                <item kind="7" name_index="1" namespace_index="3" namespace_set_index="0" qname_index="0" type="Multiname"/>
+                <item kind="7" name_index="21" namespace_index="5" namespace_set_index="0" qname_index="0" type="Multiname"/>
+                <item kind="7" name_index="22" namespace_index="3" namespace_set_index="0" qname_index="0" type="Multiname"/>
+                <item kind="7" name_index="23" namespace_index="7" namespace_set_index="0" qname_index="0" type="Multiname"/>
+                <item kind="7" name_index="25" namespace_index="5" namespace_set_index="0" qname_index="0" type="Multiname"/>
+                <item kind="7" name_index="26" namespace_index="5" namespace_set_index="0" qname_index="0" type="Multiname"/>
+                <item kind="7" name_index="27" namespace_index="5" namespace_set_index="0" qname_index="0" type="Multiname"/>
+            </constant_multiname>
+        </constants>
+        <method_info>
+            <item flags="0" name_index="2" ret_type="0" type="MethodInfo">
+                <param_types/>
+                <optional/>
+                <paramNames/>
+            </item>
+            <item flags="0" name_index="3" ret_type="0" type="MethodInfo">
+                <param_types/>
+                <optional/>
+                <paramNames/>
+            </item>
+            <item flags="132" name_index="9" ret_type="4" type="MethodInfo">
+                <param_types/>
+                <optional/>
+                <paramNames/>
+            </item>
+            <item flags="132" name_index="13" ret_type="4" type="MethodInfo">
+                <param_types/>
+                <optional/>
+                <paramNames/>
+            </item>
+            <item flags="0" name_index="2" ret_type="0" type="MethodInfo">
+                <param_types/>
+                <optional/>
+                <paramNames/>
+            </item>
+        </method_info>
+        <metadata_info>
+            <item name_index="15" type="MetadataInfo">
+                <keys>
+                    <item>16</item>
+                </keys>
+                <values>
+                    <item>17</item>
+                </values>
+            </item>
+            <item name_index="15" type="MetadataInfo">
+                <keys>
+                    <item>16</item>
+                </keys>
+                <values>
+                    <item>19</item>
+                </values>
+            </item>
+            <item name_index="28" type="MetadataInfo">
+                <keys/>
+                <values/>
+            </item>
+            <item name_index="29" type="MetadataInfo">
+                <keys>
+                    <item>16</item>
+                </keys>
+                <values>
+                    <item>30</item>
+                </values>
+            </item>
+            <item name_index="15" type="MetadataInfo">
+                <keys>
+                    <item>16</item>
+                </keys>
+                <values>
+                    <item>31</item>
+                </values>
+            </item>
+        </metadata_info>
+        <instance_info>
+            <item flags="9" iinit_index="1" name_index="8" protectedNS="6" super_index="9" type="InstanceInfo">
+                <interfaces/>
+                <instance_traits type="Traits">
+                    <traits>
+                        <item bytes="064100020100" disp_id="0" fileOffset="1994" kindFlags="4" kindType="1" method_info="2" name_index="6" type="TraitMethodGetterSetter">
+                            <metadata>
+                                <item>0</item>
+                            </metadata>
+                        </item>
+                        <item bytes="074100030101" disp_id="0" fileOffset="2000" kindFlags="4" kindType="1" method_info="3" name_index="7" type="TraitMethodGetterSetter">
+                            <metadata>
+                                <item>1</item>
+                            </metadata>
+                        </item>
+                    </traits>
+                </instance_traits>
+            </item>
+        </instance_info>
+        <class_info>
+            <item cinit_index="0" type="ClassInfo">
+                <static_traits type="Traits">
+                    <traits/>
+                </static_traits>
+            </item>
+        </class_info>
+        <script_info>
+            <item init_index="4" type="ScriptInfo">
+                <traits type="Traits">
+                    <traits>
+                        <item bytes="0844010003020304" class_info="0" fileOffset="2011" kindFlags="4" kindType="4" name_index="8" slot_id="1" type="TraitClass">
+                            <metadata>
+                                <item>2</item>
+                                <item>3</item>
+                                <item>4</item>
+                            </metadata>
+                        </item>
+                    </traits>
+                </traits>
+            </item>
+        </script_info>
+        <bodies>
+            <item codeBytes="d03047" init_scope_depth="8" max_regs="1" max_scope_depth="9" max_stack="1" method_info="0" type="MethodBody">
+                <exceptions/>
+                <traits type="Traits">
+                    <traits/>
+                </traits>
+            </item>
+            <item codeBytes="d030d0490047" init_scope_depth="9" max_regs="1" max_scope_depth="10" max_stack="1" method_info="1" type="MethodBody">
+                <exceptions/>
+                <traits type="Traits">
+                    <traits/>
+                </traits>
+            </item>
+            <item codeBytes="d0305d016601660220d14603022947" init_scope_depth="9" max_regs="2" max_scope_depth="10" max_stack="3" method_info="2" type="MethodBody">
+                <exceptions/>
+                <traits type="Traits">
+                    <traits/>
+                </traits>
+            </item>
+            <item codeBytes="d0305d016601660520d14603022947" init_scope_depth="9" max_regs="2" max_scope_depth="10" max_stack="3" method_info="3" type="MethodBody">
+                <exceptions/>
+                <traits type="Traits">
+                    <traits/>
+                </traits>
+            </item>
+            <item codeBytes="d03065005d0a660a305d0b660b305d0c660c305d0d660d305d0e660e305d096609305d09660958001d1d1d1d1d1d680847" init_scope_depth="1" max_regs="1" max_scope_depth="8" max_stack="2" method_info="4" type="MethodBody">
+                <exceptions/>
+                <traits type="Traits">
+                    <traits/>
+                </traits>
+            </item>
+        </bodies>
+    </abc>
+</item>

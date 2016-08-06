@@ -162,45 +162,28 @@ public class LinkReportExporter {
             for (Trait it : ii.instance_traits.traits) {
                 reportTrait(externalDefs, existingObjects, swf, abc, it);
             }
-            List<DottedChain> imports = new ArrayList<>();
+            List<Dependency> dependencies = new ArrayList<>();
             List<String> uses = new ArrayList<>();
 
             sb.append(indent(3)).append("<dep id=\"AS3\" />").append(newLineChar); //Automatic
 
-            getImportsUsagesFromClass(tc.class_info, null, abc, imports, uses, new DottedChain("FAKE!PACKAGE") /*do not skip any package*/, new ArrayList<>());
-            for (DottedChain dc : imports) {
+            tc.getDependencies(null, abc, dependencies, uses, new DottedChain("FAKE!PACKAGE"), new ArrayList<>());
+            for (Dependency dependency : dependencies) {
+                DottedChain dc = dependency.getId();
                 if (!"*".equals(dc.getLast())) {
                     //some toplevel "imports" can be only method calls
                     if (dc.getWithoutLast().isEmpty() && !existingObjects.contains(dc)) {
                         continue;
                     }
-                    String dep = dottedChainToId(dc);
-                    if (!allDeps.contains(dep)) {
-                        sb.append(indent(3)).append("<dep id=\"").append(dep).append("\" />").append(newLineChar);
-                        allDeps.add(dep);
+                    String reportDepId = dottedChainToId(dc);
+                    if (!allDeps.contains(reportDepId)) {
+                        sb.append(indent(3)).append("<dep id=\"").append(reportDepId).append("\" />").append(newLineChar);
+                        allDeps.add(reportDepId);
                     }
                 }
             }
         }
         return sb.toString();
-    }
-
-    private void getImportsUsagesFromClass(int class_info, String customNs, ABC abc, List<DottedChain> imports, List<String> uses, DottedChain ignoredPackage, List<DottedChain> fullyQualifiedNames) {
-        ClassInfo classInfo = abc.class_info.get(class_info);
-        InstanceInfo instanceInfo = abc.instance_info.get(class_info);
-
-        //static initializer
-        ImportsUsagesParser.parseImportsUsagesFromMethodInfo(customNs, abc, classInfo.cinit_index, imports, uses, ignoredPackage, fullyQualifiedNames, new ArrayList<>());
-
-        //instance initializer
-        ImportsUsagesParser.parseImportsUsagesFromMethodInfo(customNs, abc, instanceInfo.iinit_index, imports, uses, ignoredPackage, fullyQualifiedNames, new ArrayList<>());
-
-        //static
-        classInfo.static_traits.getImportsUsages(customNs, abc, imports, uses, ignoredPackage, fullyQualifiedNames);
-
-        //instance
-        instanceInfo.instance_traits.getImportsUsages(customNs, abc, imports, uses, ignoredPackage, fullyQualifiedNames);
-
     }
 
 }

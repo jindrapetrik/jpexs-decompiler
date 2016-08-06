@@ -25,7 +25,9 @@ import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
-import com.jpexs.decompiler.flash.exporters.script.ImportsUsagesParser;
+import com.jpexs.decompiler.flash.exporters.script.Dependency;
+import com.jpexs.decompiler.flash.exporters.script.DependencyParser;
+import com.jpexs.decompiler.flash.exporters.script.DependencyType;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.graph.DottedChain;
@@ -49,22 +51,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
     @Override
     public void delete(ABC abc, boolean d) {
-        ClassInfo classInfo = abc.class_info.get(class_info);
-        classInfo.deleted = d;
-        InstanceInfo instanceInfo = abc.instance_info.get(class_info);
-        instanceInfo.deleted = d;
-
-        classInfo.static_traits.delete(abc, d);
-        abc.method_info.get(classInfo.cinit_index).delete(abc, d);
-
-        instanceInfo.instance_traits.delete(abc, d);
-        abc.method_info.get(instanceInfo.iinit_index).delete(abc, d);
-
-        int protectedNS = instanceInfo.protectedNS;
-        if (protectedNS != 0) {
-            abc.constants.getNamespace(protectedNS).deleted = d;
-        }
-
+        abc.deleteClass(class_info, d);
         abc.constants.getMultiname(name_index).deleted = d;
     }
 
@@ -79,32 +66,31 @@ public class TraitClass extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public void getImportsUsages(String customNs, ABC abc, List<DottedChain> imports, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) {
-        super.getImportsUsages(customNs, abc, imports, uses, ignorePackage == null ? getPackage(abc) : ignorePackage, fullyQualifiedNames);
+    public void getDependencies(String customNs, ABC abc, List<Dependency> dependencies, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) {
+        super.getDependencies(customNs, abc, dependencies, uses, ignorePackage == null ? getPackage(abc) : ignorePackage, fullyQualifiedNames);
         ClassInfo classInfo = abc.class_info.get(class_info);
         InstanceInfo instanceInfo = abc.instance_info.get(class_info);
         DottedChain packageName = instanceInfo.getName(abc.constants).getNamespace(abc.constants).getName(abc.constants); //assume not null name
 
-        ImportsUsagesParser.parseImportsUsagesFromMultiname(customNs, abc, imports, uses, abc.constants.getMultiname(instanceInfo.name_index), packageName, fullyQualifiedNames);
-
+        //DependencyParser.parseDependenciesFromMultiname(customNs, abc, dependencies, uses, abc.constants.getMultiname(instanceInfo.name_index), packageName, fullyQualifiedNames);
         if (instanceInfo.super_index > 0) {
-            ImportsUsagesParser.parseImportsUsagesFromMultiname(customNs, abc, imports, uses, abc.constants.getMultiname(instanceInfo.super_index), packageName, fullyQualifiedNames);
+            DependencyParser.parseDependenciesFromMultiname(customNs, abc, dependencies, uses, abc.constants.getMultiname(instanceInfo.super_index), packageName, fullyQualifiedNames, DependencyType.INHERITANCE);
         }
         for (int i : instanceInfo.interfaces) {
-            ImportsUsagesParser.parseImportsUsagesFromMultiname(customNs, abc, imports, uses, abc.constants.getMultiname(i), packageName, fullyQualifiedNames);
+            DependencyParser.parseDependenciesFromMultiname(customNs, abc, dependencies, uses, abc.constants.getMultiname(i), packageName, fullyQualifiedNames, DependencyType.INHERITANCE);
         }
 
         //static
-        classInfo.static_traits.getImportsUsages(customNs, abc, imports, uses, packageName, fullyQualifiedNames);
+        classInfo.static_traits.getDependencies(customNs, abc, dependencies, uses, packageName, fullyQualifiedNames);
 
         //static initializer
-        ImportsUsagesParser.parseImportsUsagesFromMethodInfo(customNs, abc, classInfo.cinit_index, imports, uses, packageName, fullyQualifiedNames, new ArrayList<>());
+        DependencyParser.parseDependenciesFromMethodInfo(customNs, abc, classInfo.cinit_index, dependencies, uses, packageName, fullyQualifiedNames, new ArrayList<>());
 
         //instance
-        instanceInfo.instance_traits.getImportsUsages(customNs, abc, imports, uses, packageName, fullyQualifiedNames);
+        instanceInfo.instance_traits.getDependencies(customNs, abc, dependencies, uses, packageName, fullyQualifiedNames);
 
         //instance initializer
-        ImportsUsagesParser.parseImportsUsagesFromMethodInfo(customNs, abc, instanceInfo.iinit_index, imports, uses, packageName, fullyQualifiedNames, new ArrayList<>());
+        DependencyParser.parseDependenciesFromMethodInfo(customNs, abc, instanceInfo.iinit_index, dependencies, uses, packageName, fullyQualifiedNames, new ArrayList<>());
     }
 
     @Override

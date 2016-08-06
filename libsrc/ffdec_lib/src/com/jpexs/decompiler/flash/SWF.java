@@ -2535,10 +2535,14 @@ public final class SWF implements SWFContainerItem, Timelined {
         System.gc();
     }
 
+    public void clearAbcListCache() {
+        abcList = null;
+    }
+
     public void clearAllCache() {
         characters = null;
         characterIdTags = null;
-        abcList = null;
+        clearAbcListCache();
         timeline = null;
         clearReadOnlyListCache();
         clearImageCache();
@@ -2890,7 +2894,8 @@ public final class SWF implements SWFContainerItem, Timelined {
             timelined.setModified(true);
             timelined.resetTimeline();
         } else // timeline should be always the swf here
-         if (removeDependencies) {
+        {
+            if (removeDependencies) {
                 removeTagWithDependenciesFromTimeline(tag, timelined.getTimeline());
                 timelined.setModified(true);
             } else {
@@ -2899,6 +2904,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                     timelined.setModified(true);
                 }
             }
+        }
     }
 
     @Override

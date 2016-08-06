@@ -88,12 +88,14 @@ import com.jpexs.decompiler.flash.exporters.settings.ShapeExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.SoundExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.SpriteExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
+import com.jpexs.decompiler.flash.exporters.swf.SwfToSwcExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfXmlExporter;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.SearchInMemory;
 import com.jpexs.decompiler.flash.gui.SearchInMemoryListener;
 import com.jpexs.decompiler.flash.gui.SwfInMemory;
+import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.helpers.CheckResources;
 import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
@@ -193,6 +195,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -585,6 +588,13 @@ public class CommandLineArgumentParser {
             out.println("  ...<swffile>: SWF file to search instance in");
         }
 
+        if (filter == null || filter.equals("swf2swc")) {
+            out.println(" " + (cnt++) + ") -swf2swc <outfile> <swffile>");
+            out.println("  ...generates SWC file from SWF");
+            out.println("  ...<outfile>: Where to save SWC file");
+            out.println("  ...<swffile>: Input SWF file");
+        }
+
         printCmdLineUsageExamples(out, filter);
     }
 
@@ -800,7 +810,9 @@ public class CommandLineArgumentParser {
             command = nextParam.substring(1);
         }
 
-        if (command.equals("linkreport")) {
+        if (command.equals("swf2swc")) {
+            parseSwf2Swc(args);
+        } else if (command.equals("linkreport")) {
             parseLinkReport(selectionClasses, args);
         } else if (command.equals("getinstancemetadata")) {
             parseGetInstanceMetadata(args);
@@ -995,6 +1007,18 @@ public class CommandLineArgumentParser {
             badArguments("config");
         }
         setConfigurations(args.pop());
+    }
+
+    private static void parseSwf2Swc(Stack<String> args) {
+        if (args.size() < 2) {
+            badArguments("swf2swc");
+        }
+        final File outFile = new File(args.pop());
+        final File swfFile = new File(args.pop());
+        processReadSWF(swfFile, null, (SWF swf, OutputStream stdout) -> {
+            SwfToSwcExporter exporter = new SwfToSwcExporter();
+            exporter.exportSwf(swf, outFile, false);
+        });
     }
 
     private static void parseLinkReport(List<String> selectionClasses, Stack<String> args) {
@@ -3348,6 +3372,13 @@ public class CommandLineArgumentParser {
     }
 
     private static void parseImportScript(Stack<String> args) {
+
+        String flexLocation = Configuration.flexSdkLocation.get();
+        if (flexLocation.isEmpty() || (!new File(flexLocation).exists())) {
+            System.err.println("Flex SDK path not set");
+            System.exit(1);
+        }
+
         if (args.size() < 3) {
             badArguments("importscript");
         }

@@ -2146,6 +2146,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void importScript(final SWF swf) {
+
+        String flexLocation = Configuration.flexSdkLocation.get();
+        if (flexLocation.isEmpty() || (!new File(flexLocation).exists())) {
+            View.showMessageDialog(null, AppStrings.translate("message.flexpath.notset"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+            Main.advancedSettings("paths");
+            return;
+        }
+
         JFileChooser chooser = new JFileChooser();
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("import.select.directory"));
