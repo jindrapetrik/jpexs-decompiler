@@ -57,6 +57,10 @@ public class HexView extends JTable {
 
     private int mouseOverIdx = -1;
 
+    private int selectionStart = -1;
+
+    private int selectionEnd = -1;
+
     private HexViewListener listener;
 
     private class HighlightCellRenderer extends DefaultTableCellRenderer {
@@ -90,10 +94,12 @@ public class HexView extends JTable {
                 background = row % 2 == 0 ? bgColor : bgColorAlternate;
             }
 
-            if (idx != -1 && idx == mouseOverIdx) {
+            if (idx != -1 && (idx == mouseOverIdx
+                    || (idx >= selectionStart && idx <= selectionEnd))) {
                 foreground = new Color(255 - foreground.getRed(), 255 - foreground.getGreen(), 255 - foreground.getBlue());
                 background = new Color(255 - background.getRed(), 255 - background.getGreen(), 255 - background.getBlue());
             }
+
             l.setForeground(foreground);
             l.setBackground(background);
 
@@ -223,6 +229,25 @@ public class HexView extends JTable {
 
     public byte[] getData() {
         return getModel().getData();
+    }
+
+    public void selectByte(long byteNum) {
+        scrollToByte(byteNum);
+        listener.byteValueChanged((int) byteNum, getData()[(int) byteNum]);
+    }
+
+    public void selectBytes(long byteNum, int length) {
+        selectionStart = (int) byteNum;
+        selectionEnd = (int) (byteNum + length - 1);
+        scrollToByte(new long[]{byteNum}, new long[]{byteNum + length - 1});
+        listener.byteValueChanged((int) byteNum, getData()[(int) byteNum]);
+        getModel().fireTableDataChanged();
+    }
+
+    public void clearSelectedBytes() {
+        selectionStart = -1;
+        selectionEnd = -1;
+        getModel().fireTableDataChanged();
     }
 
     public void scrollToByte(long byteNum) {
