@@ -1809,48 +1809,49 @@ public class XFLConverter {
                     try {
                         SWFInputStream sis = new SWFInputStream(swf, soundData);
                         MP3SOUNDDATA s = new MP3SOUNDDATA(sis, false);
-                        //MP3FRAME frame = new MP3FRAME(sis);
-                        MP3FRAME frame = s.frames.get(0);
-                        int bitRate = frame.getBitRate();
+                        if (!s.frames.isEmpty()) {
+                            MP3FRAME frame = s.frames.get(0);
+                            int bitRate = frame.getBitRate();
 
-                        switch (bitRate) {
-                            case 8:
-                                bits = 6;
-                                break;
-                            case 16:
-                                bits = 7;
-                                break;
-                            case 20:
-                                bits = 8;
-                                break;
-                            case 24:
-                                bits = 9;
-                                break;
-                            case 32:
-                                bits = 10;
-                                break;
-                            case 48:
-                                bits = 11;
-                                break;
-                            case 56:
-                                bits = 12;
-                                break;
-                            case 64:
-                                bits = 13;
-                                break;
-                            case 80:
-                                bits = 14;
-                                break;
-                            case 112:
-                                bits = 15;
-                                break;
-                            case 128:
-                                bits = 16;
-                                break;
-                            case 160:
-                                bits = 17;
-                                break;
+                            switch (bitRate) {
+                                case 8:
+                                    bits = 6;
+                                    break;
+                                case 16:
+                                    bits = 7;
+                                    break;
+                                case 20:
+                                    bits = 8;
+                                    break;
+                                case 24:
+                                    bits = 9;
+                                    break;
+                                case 32:
+                                    bits = 10;
+                                    break;
+                                case 48:
+                                    bits = 11;
+                                    break;
+                                case 56:
+                                    bits = 12;
+                                    break;
+                                case 64:
+                                    bits = 13;
+                                    break;
+                                case 80:
+                                    bits = 14;
+                                    break;
+                                case 112:
+                                    bits = 15;
+                                    break;
+                                case 128:
+                                    bits = 16;
+                                    break;
+                                case 160:
+                                    bits = 17;
+                                    break;
 
+                            }
                         }
                     } catch (IOException | IndexOutOfBoundsException ex) {
                         logger.log(Level.SEVERE, null, ex);
