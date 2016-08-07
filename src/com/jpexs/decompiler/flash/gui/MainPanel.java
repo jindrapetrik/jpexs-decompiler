@@ -463,7 +463,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         tagTree = new TagTree(null, this);
         tagTree.addTreeSelectionListener(this);
         tagTree.setSelectionModel(new DefaultTreeSelectionModel() {
-
             private boolean isModified() {
                 if (abcPanel != null && abcPanel.isEditing()) {
                     abcPanel.tryAutoSave();
@@ -2097,7 +2096,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             String selFile = Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath();
             File textsFile = new File(Path.combine(selFile, TextExportSettings.EXPORT_FOLDER_NAME, TextExporter.TEXT_EXPORT_FILENAME_FORMATTED));
             TextImporter textImporter = new TextImporter(getMissingCharacterHandler(), new TextImportErrorHandler() {
-
                 // "configuration items" for the current replace only
                 private final ConfigurationItem<Boolean> showAgainImportError = new ConfigurationItem<>("showAgainImportError", true, true);
 
@@ -2520,7 +2518,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     private MissingCharacterHandler getMissingCharacterHandler() {
         return new MissingCharacterHandler() {
-
             // "configuration items" for the current replace only
             private final ConfigurationItem<Boolean> showAgainIgnoreMissingCharacters = new ConfigurationItem<>("showAgainIgnoreMissingCharacters", true, true);
 
@@ -2637,6 +2634,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 boolean ok = false;
                 try {
                     ok = ds.setSound(new FileInputStream(selfile), soundFormat);
+                    ds.getSwf().clearSoundCache();
                 } catch (IOException ex) {
                     //ignore
                 }
@@ -2832,7 +2830,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 }
             }
             FileFilter ff = new FileFilter() {
-
                 @Override
                 public boolean accept(File f) {
                     if (f.isDirectory()) {
@@ -3046,12 +3043,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 treePanelMode = TreePanelMode.TAG_TREE;
 
                 treePanel.addComponentListener(new ComponentAdapter() {
-
                     @Override
                     public void componentResized(ComponentEvent e) {
                         tagTree.scrollPathToVisible(tagTree.getSelectionPath());
                     }
-
                 });
 
                 reload(true);
@@ -3101,7 +3096,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         Main.loadingDialog.setVisible(true);
         new CancellableWorker<Void>() {
-
             @Override
             protected Void doInBackground() throws Exception {
                 try {
@@ -3109,7 +3103,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         try {
                             InputStream is = new ByteArrayInputStream(binaryDataTag.binaryData.getRangeData());
                             SWF bswf = new SWF(is, null, "(SWF Data)", new ProgressListener() {
-
                                 @Override
                                 public void progress(int p) {
                                     Main.loadingDialog.setPercent(p);
@@ -3281,7 +3274,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
             if (!Main.isInited() || !Main.isWorking() || Main.isDebugging()) {
                 CancellableWorker worker = new CancellableWorker() {
-
                     @Override
                     protected Void doInBackground() throws Exception {
                         ABCPanel abcPanel = getABCPanel();
@@ -3487,7 +3479,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public static Timelined makeTimelined(final Tag tag, final int fontFrameNum) {
 
         return new Timelined() {
-
             private Timeline tim;
 
             @Override

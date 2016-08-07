@@ -195,8 +195,10 @@ public class DumpViewPanel extends JPanel {
             }
         });
 
-        add(new JScrollPane(dumpViewHexTable), BorderLayout.CENTER);
-        add(searchPanel, BorderLayout.SOUTH);
+        JPanel hexPanel = new JPanel(new BorderLayout());
+        hexPanel.add(new JScrollPane(dumpViewHexTable), BorderLayout.CENTER);
+        hexPanel.add(searchPanel, BorderLayout.SOUTH);
+        add(hexPanel, BorderLayout.CENTER);
     }
 
     public void closeDumpViewSearch() {

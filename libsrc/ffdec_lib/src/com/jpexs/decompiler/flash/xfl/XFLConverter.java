@@ -1807,8 +1807,8 @@ public class XFLConverter {
                     }
                     format += 4; //quality best
                     try {
-                        MP3SOUNDDATA s = new MP3SOUNDDATA(new SWFInputStream(swf, soundData), false);
-                        //sis.readSI16();
+                        SWFInputStream sis = new SWFInputStream(swf, soundData);
+                        MP3SOUNDDATA s = new MP3SOUNDDATA(sis, false);
                         //MP3FRAME frame = new MP3FRAME(sis);
                         MP3FRAME frame = s.frames.get(0);
                         int bitRate = frame.getBitRate();

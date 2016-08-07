@@ -221,7 +221,6 @@ public class Main {
         final String ffile = file;
 
         CancellableWorker runWorker = new CancellableWorker() {
-
             @Override
             protected Object doInBackground() throws Exception {
                 Process proc;
@@ -280,7 +279,6 @@ public class Main {
                 freeRun();
                 mainFrame.getMenu().updateComponents();
             }
-
         };
 
         mainFrame.getMenu().updateComponents();
@@ -458,7 +456,6 @@ public class Main {
             final File fTempFile = tempFile;
             final List<File> tempFiles = new ArrayList<>();
             CancellableWorker instrumentWorker = new CancellableWorker() {
-
                 @Override
                 protected Object doInBackground() throws Exception {
 
@@ -486,7 +483,6 @@ public class Main {
                     Main.startDebugger();
                     runPlayer(AppStrings.translate("work.debugging.wait"), playerLocation, fTempFile.getAbsolutePath(), flashVars);
                 }
-
             };
 
             Main.startWork(AppStrings.translate("work.debugging.instrumenting"), instrumentWorker);
@@ -712,7 +708,6 @@ public class Main {
             final String[] yesno = new String[]{AppStrings.translate("button.yes"), AppStrings.translate("button.no"), AppStrings.translate("button.yes.all"), AppStrings.translate("button.no.all")};
 
             CancellableWorker<SWF> worker = new CancellableWorker<SWF>() {
-
                 private boolean yestoall = false;
 
                 private boolean notoall = false;
@@ -848,7 +843,6 @@ public class Main {
                 }
 
                 @Override
-
                 public SWF doInBackground() throws Exception {
                     return open(fInputStream, sourceInfo.getFile(), sourceInfo.getFileTitle());
                 }
@@ -1047,7 +1041,7 @@ public class Main {
         public OpenFileWorker(SWFSourceInfo[] sourceInfos, Runnable executeAfterOpen, int[] reloadIndices) {
             this.sourceInfos = sourceInfos;
             this.executeAfterOpen = executeAfterOpen;
-            int indices[] = new int[sourceInfos.length];
+            int[] indices = new int[sourceInfos.length];
             for (int i = 0; i < indices.length; i++) {
                 indices[i] = -1;
             }
@@ -1574,7 +1568,6 @@ public class Main {
             loadingDialog = new LoadingDialog();
 
             DebuggerTools.initDebugger().addMessageListener(new DebugListener() {
-
                 @Override
                 public void onMessage(String clientId, String msg) {
                 }
@@ -1620,7 +1613,6 @@ public class Main {
                 flashDebugger = new Debugger();
                 debugHandler = new DebuggerHandler();
                 debugHandler.addBreakListener(new DebuggerHandler.BreakListener() {
-
                     @Override
                     public void doContinue() {
                         mainFrame.getPanel().clearDebuggerColors();
@@ -1629,7 +1621,6 @@ public class Main {
                     @Override
                     public void breakAt(String scriptName, int line, final int classIndex, final int traitIndex, final int methodIndex) {
                         View.execInEventDispatch(new Runnable() {
-
                             @Override
                             public void run() {
                                 mainFrame.getPanel().gotoScriptLine(getMainFrame().getPanel().getCurrentSwf(), scriptName, line, classIndex, traitIndex, methodIndex);
@@ -1638,7 +1629,6 @@ public class Main {
                     }
                 });
                 debugHandler.addConnectionListener(new DebuggerHandler.ConnectionListener() {
-
                     @Override
                     public void connected() {
                         Main.mainFrame.getMenu().updateComponents();
@@ -1801,7 +1791,7 @@ public class Main {
                         if (Advapi32Util.registryValueExists(WinReg.HKEY_LOCAL_MACHINE, uninstKey, "NSIS: Language")) {
                             String installedLoc = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, uninstKey, "NSIS: Language");
                             int lcid = Integer.parseInt(installedLoc);
-                            char buf[] = new char[9];
+                            char[] buf = new char[9];
                             int cnt = Kernel32.INSTANCE.GetLocaleInfo(lcid, Kernel32.LOCALE_SISO639LANGNAME, buf, 9);
                             String langCode = new String(buf, 0, cnt).trim().toLowerCase();
 
@@ -1848,8 +1838,7 @@ public class Main {
         if (!tempDir.exists()) {
             return;
         }
-        File delFiles[] = tempDir.listFiles(new FilenameFilter() {
-
+        File[] delFiles = tempDir.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
                 return name.matches("ffdec_cache.*\\.tmp") || name.matches("javactivex_.*\\.exe") || name.matches("temp[0-9]+\\.swf") || name.matches("ffdec_view_.*\\.swf");
@@ -1930,7 +1919,7 @@ public class Main {
                 List<String> exfiles = new ArrayList<>();
                 List<String> extitles = new ArrayList<>();
                 String lastSessionTitles = Configuration.lastSessionFileTitles.get();
-                String fileTitles[] = new String[0];
+                String[] fileTitles = new String[0];
                 if (lastSessionTitles != null && !lastSessionTitles.isEmpty()) {
                     fileTitles = lastSessionTitles.split(File.pathSeparator, -1);
                 }
@@ -2294,7 +2283,6 @@ public class Main {
         }
 
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-
             @Override
             public void uncaughtException(Thread t, Throwable e) {
                 logger.log(Level.SEVERE, "Uncaught exception in thread: " + t.getName(), e);
