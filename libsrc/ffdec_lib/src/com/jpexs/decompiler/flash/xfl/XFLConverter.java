@@ -1393,7 +1393,7 @@ public class XFLConverter {
                     }
                     /*
                     From JSFL, also data types integerArray ("I"), doubleArray("D") and byteArray("B") can be set.
-                    These datatypes can be in the FLA file but are not exported to SWF with _EMBED_SWF_ publish format.                   
+                    These datatypes can be in the FLA file but are not exported to SWF with _EMBED_SWF_ publish format.
                      */
                 }
 
@@ -1852,7 +1852,7 @@ public class XFLConverter {
                                 break;
 
                         }
-                    } catch (IOException | ArrayIndexOutOfBoundsException ex) {
+                    } catch (IOException | IndexOutOfBoundsException ex) {
                         logger.log(Level.SEVERE, null, ex);
                     }
                 }
