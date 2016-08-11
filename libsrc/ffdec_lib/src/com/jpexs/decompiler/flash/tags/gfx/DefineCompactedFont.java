@@ -210,7 +210,7 @@ public final class DefineCompactedFont extends FontTag {
                     pos = i;
                     break;
                 }
-                
+
                 return false;
             }
         }
@@ -218,7 +218,7 @@ public final class DefineCompactedFont extends FontTag {
         if (pos == -1) {
             return false;
         }
-        
+
         font.glyphInfo.remove(pos);
         font.glyphs.remove(pos);
         shapeCache.remove(pos);
@@ -420,16 +420,16 @@ public final class DefineCompactedFont extends FontTag {
         ret.fontFlagsWideOffsets = true;
         ret.fontFlagsWideCodes = true;
         ret.fontFlagsHasLayout = true;
-        ret.fontAscent = (getAscent());
-        ret.fontDescent = (getDescent());
-        ret.fontLeading = (getLeading());
+        ret.fontAscent = resize(getAscent());
+        ret.fontDescent = resize(getDescent());
+        ret.fontLeading = resize(getLeading());
         ret.fontAdvanceTable = new ArrayList<>();
         ret.fontBoundsTable = new ArrayList<>();
         ret.codeTable = new ArrayList<>();
         ret.glyphShapeTable = new ArrayList<>();
         List<SHAPE> shp = getGlyphShapeTable();
         for (int g = 0; g < shp.size(); g++) {
-            ret.fontAdvanceTable.add(resize(getGlyphAdvance(g)));
+            ret.fontAdvanceTable.add((int) getGlyphAdvance(g)); //already resized
             ret.codeTable.add((int) glyphToChar(g));
 
             SHAPE shpX = resizeShape(shp.get(g));
