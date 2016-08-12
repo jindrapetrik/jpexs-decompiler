@@ -348,7 +348,15 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         return new HighlightedText(writer);
     }
 
+    private void updateHexButtons(ScriptExportMode exportMode) {
+        showFileOffsetInPcodeHexButton.setVisible(exportMode == ScriptExportMode.PCODE_HEX);
+        showOriginalBytesInPcodeHexButton.setVisible(exportMode == ScriptExportMode.PCODE_HEX);
+        resolveConstantsButton.setVisible(exportMode != ScriptExportMode.CONSTANTS && exportMode != ScriptExportMode.HEX);
+    }
+
     public void setHex(ScriptExportMode exportMode, String scriptName) {
+        updateHexButtons(exportMode);
+
         switch (exportMode) {
             case PCODE:
                 if (srcNoHex == null) {
@@ -662,8 +670,17 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         topButtonsPan.add(constantsViewButton);
         topButtonsPan.add(Box.createRigidArea(new Dimension(10, 0)));
         topButtonsPan.add(resolveConstantsButton);
+        topButtonsPan.add(Box.createRigidArea(new Dimension(10, 0)));
         topButtonsPan.add(showFileOffsetInPcodeHexButton);
         topButtonsPan.add(showOriginalBytesInPcodeHexButton);
+
+        if (hexOnlyButton.isSelected()) {
+            updateHexButtons(ScriptExportMode.HEX);
+        } else if (constantsViewButton.isSelected()) {
+            updateHexButtons(ScriptExportMode.CONSTANTS);
+        } else {
+            updateHexButtons(ScriptExportMode.PCODE);
+        }
 
         JPanel panCode = new JPanel(new BorderLayout());
         panCode.add(new JScrollPane(editor), BorderLayout.CENTER);
