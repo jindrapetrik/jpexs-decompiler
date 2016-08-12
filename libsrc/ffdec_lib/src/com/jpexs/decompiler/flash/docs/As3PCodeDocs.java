@@ -225,8 +225,8 @@ public class As3PCodeDocs {
                     }
                 }
             }
-            sb.append("</div>").append(NEWLINE);
         }
+        sb.append("</div>").append(NEWLINE);
 
         sb.append("<div class=\"short-description\">").append(insShortDescription).append("</div>").append(NEWLINE);
 
