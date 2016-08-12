@@ -207,6 +207,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             if (img == null) {
                 return;
             }
+            if (renderImage == null) {
+                return;
+            }
             Graphics2D g2 = null;
             do {
 
