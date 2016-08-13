@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.exporters.modes.SymbolClassExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.TextExportMode;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
+import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
@@ -175,6 +176,25 @@ public class ExportDialog extends AppDialog {
         Configuration.lastSelectedExportFormats.set(cfg.toString());
     }
 
+    private boolean optionCanHandle(int optionIndex, Object e) {
+        for (int i = 0; i < objClasses[optionIndex].length; i++) {
+            Class c = objClasses[optionIndex][i];
+            if (c.isInstance(e)) {
+                if (c == Frame.class) { //Frame class can be SWF frame or Sprite frame
+                    Frame f = (Frame) e;
+                    boolean isSprite = (f.timeline.timelined instanceof DefineSpriteTag);
+                    boolean spritesWanted = optionClasses[optionIndex] == SpriteExportMode.class;
+                    if (spritesWanted == isSprite) { //both true or both false
+                        return true;
+                    }
+                } else {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public ExportDialog(List<TreeItem> exportables) {
         setTitle(translate("dialog.title"));
         setResizable(false);
@@ -190,10 +210,8 @@ public class ExportDialog extends AppDialog {
                 exportableExists = true;
             } else {
                 for (TreeItem e : exportables) {
-                    for (int j = 0; j < objClasses[i].length; j++) {
-                        if (objClasses[i][j].isInstance(e)) {
-                            exportableExists = true;
-                        }
+                    if (optionCanHandle(i, e)) {
+                        exportableExists = true;
                     }
                 }
             }
