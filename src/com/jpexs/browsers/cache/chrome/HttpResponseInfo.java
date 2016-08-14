@@ -92,7 +92,7 @@ public class HttpResponseInfo {
     public String getHeaderValue(String header) {
         for (String h : headers) {
             if (h.contains(":")) {
-                String keyval[] = h.split(":");
+                String[] keyval = h.split(":");
                 String key = keyval[0].trim().toLowerCase();
                 String val = keyval[1].trim();
                 if (header.toLowerCase().equals(key)) {

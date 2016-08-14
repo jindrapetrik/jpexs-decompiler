@@ -47,6 +47,7 @@ import com.jpexs.decompiler.flash.types.SOUNDINFO;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.SerializableImage;
+import com.jpexs.helpers.Stopwatch;
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
@@ -204,6 +205,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             SerializableImage img = getImg();
             Rectangle rect = getRect();
             if (img == null) {
+                return;
+            }
+            if (renderImage == null) {
                 return;
             }
             Graphics2D g2 = null;
@@ -1034,7 +1038,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
             img = null;
             if (display) {
+                Stopwatch sw = Stopwatch.startNew();
                 img = getFrame(swf, frame, time, timelined, renderContext, selectedDepth, zoomDouble);
+                sw.stop();
+                if (sw.getElapsedMilliseconds() > 100) {
+                    logger.log(Level.WARNING, "Slow rendering. {0}. frame, time={1}, {2}ms", new Object[]{frame, time, sw.getElapsedMilliseconds()});
+                }
+
                 if (renderContext.borderImage != null) {
                     img = renderContext.borderImage;
                 }

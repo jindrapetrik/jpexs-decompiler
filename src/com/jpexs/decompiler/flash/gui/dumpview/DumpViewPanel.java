@@ -18,16 +18,27 @@ package com.jpexs.decompiler.flash.gui.dumpview;
 
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSwfNode;
+import com.jpexs.decompiler.flash.gui.MyTextField;
+import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.hexview.HexView;
 import com.jpexs.decompiler.flash.gui.hexview.HexViewListener;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
@@ -42,6 +53,10 @@ public class DumpViewPanel extends JPanel {
     private final JLabel dumpViewLabel;
 
     private final HexView dumpViewHexTable;
+
+    private JTextField filterField = new MyTextField("");
+
+    private JPanel searchPanel;
 
     private final DumpTree dumpTree;
 
@@ -68,7 +83,6 @@ public class DumpViewPanel extends JPanel {
 
         dumpViewHexTable = new HexView();
         dumpViewHexTable.addListener(new HexViewListener() {
-
             private int lastAddressUnderCursor = -1;
 
             @Override
@@ -136,7 +150,158 @@ public class DumpViewPanel extends JPanel {
             }
         });
 
-        add(new JScrollPane(dumpViewHexTable), BorderLayout.CENTER);
+        searchPanel = new JPanel();
+        searchPanel.setLayout(new BorderLayout());
+        searchPanel.add(filterField, BorderLayout.CENTER);
+        searchPanel.add(new JLabel(View.getIcon("search16")), BorderLayout.WEST);
+        JLabel closeSearchButton = new JLabel(View.getIcon("cancel16"));
+        closeSearchButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                closeDumpViewSearch();
+            }
+        });
+        searchPanel.add(closeSearchButton, BorderLayout.EAST);
+        searchPanel.setVisible(false);
+
+        dumpViewHexTable.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if ((e.getKeyCode() == 'F') && (e.isControlDown())) {
+                    searchPanel.setVisible(true);
+                    filterField.requestFocusInWindow();
+                }
+            }
+        });
+
+        filterField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                warn();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                warn();
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                warn();
+            }
+
+            public void warn() {
+                doSearch();
+            }
+        });
+
+        JPanel hexPanel = new JPanel(new BorderLayout());
+        hexPanel.add(new JScrollPane(dumpViewHexTable), BorderLayout.CENTER);
+        hexPanel.add(searchPanel, BorderLayout.SOUTH);
+        add(hexPanel, BorderLayout.CENTER);
+    }
+
+    public void closeDumpViewSearch() {
+        filterField.setText("");
+        doSearch();
+        searchPanel.setVisible(false);
+    }
+
+    private void doSearch() {
+        filterField.setBackground(Color.white);
+
+        String text = filterField.getText();
+        if (text.length() == 0) {
+            dumpViewHexTable.clearSelectedBytes();
+            return;
+        }
+
+        byte[] data = dumpViewHexTable.getData();
+
+        byte[] textBytes = Utf8Helper.getBytes(text);
+        byte[] hex = getAsHex(text);
+        byte[] foundArray = textBytes;
+
+        int pos = textBytes == null ? -1 : findHex(data, textBytes, 0, data.length);
+        int hexPos = hex == null ? -1 : findHex(data, hex, 0, data.length);
+
+        if (pos == -1 || (hexPos != -1 && hexPos < pos)) {
+            pos = hexPos;
+            foundArray = hex;
+        }
+
+        if (pos != -1) {
+            dumpViewHexTable.selectBytes(pos, foundArray.length);
+        } else {
+            dumpViewHexTable.clearSelectedBytes();
+            filterField.setBackground(Color.red);
+        }
+    }
+
+    private int findHex(byte[] data, byte[] searchData, int from, int to) {
+        for (int i = from; i < to; i++) {
+            if (isMatch(data, searchData, i)) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    private boolean isMatch(byte[] data, byte[] searchData, int pos) {
+        if (pos + searchData.length > data.length) {
+            return false;
+        }
+
+        for (int i = 0; i < searchData.length; i++) {
+            if (data[pos + i] != searchData[i]) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private byte[] getAsHex(String text) {
+        int charCount = 0;
+        for (int i = 0; i < text.length(); i++) {
+            char ch = Character.toUpperCase(text.charAt(i));
+            boolean whiteSpace = Character.isWhitespace(ch);
+            if (!((ch >= '0' && ch <= '9') || (ch >= 'A' && ch <= 'F') || whiteSpace)) {
+                return null;
+            }
+
+            if (!whiteSpace) {
+                charCount++;
+            }
+        }
+
+        if (charCount % 2 == 1) {
+            // hex character count should be even
+            return null;
+        }
+
+        byte[] result = new byte[charCount / 2];
+        int cnt = 0;
+        int v0 = 0;
+        for (int i = 0; i < text.length(); i++) {
+            char ch = Character.toUpperCase(text.charAt(i));
+            if (Character.isWhitespace(ch)) {
+                continue;
+            }
+
+            int v = Integer.parseInt(Character.toString(ch), 16);
+
+            if (cnt % 2 == 1) {
+                result[cnt / 2] = (byte) (v0 * 16 + v);
+            } else {
+                v0 = v;
+            }
+
+            cnt++;
+        }
+
+        return result;
     }
 
     public void clear() {

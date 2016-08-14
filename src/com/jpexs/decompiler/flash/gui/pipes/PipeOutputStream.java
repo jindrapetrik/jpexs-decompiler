@@ -72,7 +72,7 @@ public class PipeOutputStream extends OutputStream {
 
     @Override
     public synchronized void write(int b) throws IOException {
-        byte data[] = new byte[]{(byte) b};
+        byte[] data = new byte[]{(byte) b};
         IntByReference ibr = new IntByReference();
         boolean result = Kernel32.INSTANCE.WriteFile(pipe, data, data.length, ibr, null);
         if (!result) {

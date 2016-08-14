@@ -54,7 +54,7 @@ public class ImageHelper {
 
     public static BufferedImage read(InputStream input) throws IOException {
         BufferedImage in;
-        byte data[] = Helper.readStream(input);
+        byte[] data = Helper.readStream(input);
         try (ImageInputStream iis = ImageIO.createImageInputStream(new ByteArrayInputStream(data))) {
             CMYKJPEGImageReader r = new CMYKJPEGImageReader(new CMYKJPEGImageReaderSpi());
             r.setInput(iis);

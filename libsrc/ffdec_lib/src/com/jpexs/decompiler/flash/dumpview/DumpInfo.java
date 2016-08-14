@@ -94,7 +94,6 @@ public class DumpInfo implements TreeItem {
         }
 
         Collections.sort(childInfos, new Comparator<DumpInfo>() {
-
             @Override
             public int compare(DumpInfo o1, DumpInfo o2) {
                 int res = Long.compare(o1.startByte, o2.startByte);
@@ -149,7 +148,7 @@ public class DumpInfo implements TreeItem {
 
     @Override
     public SWF getSwf() {
-        Tag tag = getTag();
+        Tag tag = tagToResolve != null ? tagToResolve : resolvedTag;
         if (tag != null) {
             return tag.getSwf();
         }

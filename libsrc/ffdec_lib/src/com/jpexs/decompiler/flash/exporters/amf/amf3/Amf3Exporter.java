@@ -270,7 +270,7 @@ public class Amf3Exporter {
             ret.append(indent(level)).append("}");
         } else if (object instanceof ByteArrayType) {
             ByteArrayType ba = (ByteArrayType) object;
-            byte data[] = ba.getData();
+            byte[] data = ba.getData();
             return "{" + newLine
                     + indent(level + 1) + "\"type\": \"ByteArray\"," + newLine
                     + addId

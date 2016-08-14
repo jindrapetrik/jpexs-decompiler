@@ -207,7 +207,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
             throw new IllegalArgumentException("Not a menu: " + path);
         }
 
-        String parts[] = path.contains("/") ? path.split("\\/") : new String[]{""};
+        String[] parts = path.contains("/") ? path.split("\\/") : new String[]{""};
         List<String> subs = menuSubs.get(path);
 
         boolean onlyCheckboxes = true;
@@ -422,7 +422,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
                     bandCount++;
                 }
             }
-            AbstractRibbonBand bands[] = new AbstractRibbonBand[bandCount];
+            AbstractRibbonBand[] bands = new AbstractRibbonBand[bandCount];
             int b = 0;
             for (String sub : subs) {
                 if (sub.equals("-")) {

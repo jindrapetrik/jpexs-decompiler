@@ -1610,7 +1610,7 @@ public class CommandLineArgumentParser {
             Integer min = null;
             Integer max = null;
             if (r.contains("-")) {
-                String ps[] = r.split("\\-");
+                String[] ps = r.split("\\-");
                 if (ps.length != 2) {
                     System.err.println("invalid range");
                     badArguments("select");

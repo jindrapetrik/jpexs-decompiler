@@ -126,7 +126,7 @@ public class Debugger {
                 throw new EOFException();
             }
             len = (len << 24) + (len2 << 16) + (len3 << 8) + len4;
-            byte data[] = new byte[len];
+            byte[] data = new byte[len];
             int cnt;
             int off = 0;
             while (len > 0 && (cnt = is.read(data, off, len)) > 0) {
@@ -147,7 +147,7 @@ public class Debugger {
             }
             len = (len << 8) + len2;
 
-            byte buf[] = new byte[len];
+            byte[] buf = new byte[len];
             for (int i = 0; i < len; i++) {
                 int rd = is.read();
                 if (rd == -1) {
@@ -180,7 +180,7 @@ public class Debugger {
                     }
                 } else {
                     if (!ret.isEmpty()) {
-                        String param[] = (ret.contains(";") ? ret.split(";") : new String[]{ret});
+                        String[] param = (ret.contains(";") ? ret.split(";") : new String[]{ret});
                         for (String p : param) {
                             if (p.contains("=")) {
                                 String key = p.substring(0, p.indexOf('='));
@@ -215,7 +215,7 @@ public class Debugger {
                                 }
                                 break;
                             case MSG_LOADER_BYTES:
-                                byte retB[] = readBytes(is);
+                                byte[] retB = readBytes(is);
                                 for (DebugListener l : listeners) {
                                     l.onLoaderBytes(clientName, retB);
                                 }

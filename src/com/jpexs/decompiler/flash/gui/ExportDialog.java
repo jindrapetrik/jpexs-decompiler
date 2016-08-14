@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.exporters.modes.SymbolClassExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.TextExportMode;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
+import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
@@ -136,7 +137,7 @@ public class ExportDialog extends AppDialog {
     public <E> E getValue(Class<E> option) {
         for (int i = 0; i < optionClasses.length; i++) {
             if (option == optionClasses[i]) {
-                E values[] = option.getEnumConstants();
+                E[] values = option.getEnumConstants();
                 return values[combos[i].getSelectedIndex()];
             }
         }
@@ -163,7 +164,7 @@ public class ExportDialog extends AppDialog {
         for (int i = 0; i < optionNames.length; i++) {
             int selIndex = combos[i].getSelectedIndex();
             Class c = optionClasses[i];
-            Object vals[] = c.getEnumConstants();
+            Object[] vals = c.getEnumConstants();
             String key = optionNames[i] + "." + vals[selIndex].toString().toLowerCase();
             if (i > 0) {
                 cfg.append(",");
@@ -173,6 +174,25 @@ public class ExportDialog extends AppDialog {
 
         Configuration.lastSelectedExportZoom.set(Double.parseDouble(zoomTextField.getText()) / 100);
         Configuration.lastSelectedExportFormats.set(cfg.toString());
+    }
+
+    private boolean optionCanHandle(int optionIndex, Object e) {
+        for (int i = 0; i < objClasses[optionIndex].length; i++) {
+            Class c = objClasses[optionIndex][i];
+            if (c.isInstance(e)) {
+                if (c == Frame.class) { //Frame class can be SWF frame or Sprite frame
+                    Frame f = (Frame) e;
+                    boolean isSprite = (f.timeline.timelined instanceof DefineSpriteTag);
+                    boolean spritesWanted = optionClasses[optionIndex] == SpriteExportMode.class;
+                    if (spritesWanted == isSprite) { //both true or both false
+                        return true;
+                    }
+                } else {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public ExportDialog(List<TreeItem> exportables) {
@@ -190,10 +210,8 @@ public class ExportDialog extends AppDialog {
                 exportableExists = true;
             } else {
                 for (TreeItem e : exportables) {
-                    for (int j = 0; j < objClasses[i].length; j++) {
-                        if (objClasses[i][j].isInstance(e)) {
-                            exportableExists = true;
-                        }
+                    if (optionCanHandle(i, e)) {
+                        exportableExists = true;
                     }
                 }
             }
@@ -215,7 +233,7 @@ public class ExportDialog extends AppDialog {
             exportFormatsStr = null;
         }
 
-        String exportFormatsArr[] = new String[0];
+        String[] exportFormatsArr = new String[0];
         if (exportFormatsStr != null) {
             if (exportFormatsStr.contains(",")) {
                 exportFormatsArr = exportFormatsStr.split(",");
@@ -250,8 +268,8 @@ public class ExportDialog extends AppDialog {
         boolean zoomable = false;
         for (int i = 0; i < optionNames.length; i++) {
             Class c = optionClasses[i];
-            Object vals[] = c.getEnumConstants();
-            String names[] = new String[vals.length];
+            Object[] vals = c.getEnumConstants();
+            String[] names = new String[vals.length];
             int itemIndex = -1;
             for (int j = 0; j < vals.length; j++) {
 

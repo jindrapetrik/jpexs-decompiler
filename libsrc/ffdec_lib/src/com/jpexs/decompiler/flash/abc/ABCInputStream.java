@@ -32,6 +32,8 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
+import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecial;
+import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecialType;
 import com.jpexs.helpers.MemoryInputStream;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.ByteArrayOutputStream;
@@ -89,9 +91,15 @@ public class ABCInputStream implements AutoCloseable {
     }
 
     public DumpInfo newDumpLevel(String name, String type) {
+        return newDumpLevel(name, type, DumpInfoSpecialType.NONE);
+    }
+
+    public DumpInfo newDumpLevel(String name, String type, DumpInfoSpecialType specialType) {
         if (dumpInfo != null) {
             long startByte = is.getPos();
-            DumpInfo di = new DumpInfo(name, type, null, startByte, 0, 0, 0);
+            DumpInfo di = specialType == DumpInfoSpecialType.NONE
+                    ? new DumpInfo(name, type, null, startByte, 0, 0, 0)
+                    : new DumpInfoSpecial(name, type, null, startByte, 0, 0, 0, specialType);
             di.parent = dumpInfo;
             dumpInfo.getChildInfos().add(di);
             dumpInfo = di;
@@ -448,8 +456,8 @@ public class ABCInputStream implements AutoCloseable {
         return ret;
     }
 
-    public byte[] readBytes(int count, String name) throws IOException {
-        newDumpLevel(name, "Bytes");
+    public byte[] readBytes(int count, String name, DumpInfoSpecialType specialType) throws IOException {
+        newDumpLevel(name, "Bytes", specialType);
         byte[] ret = readBytesInternal(count);
         endDumpLevel();
         return ret;

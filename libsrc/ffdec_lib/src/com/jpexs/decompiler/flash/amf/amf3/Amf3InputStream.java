@@ -245,7 +245,7 @@ public class Amf3InputStream extends InputStream {
         }
         newDumpLevel(name, "UTF8-char");
 
-        byte buf[] = new byte[(int) byteLength]; //how about long strings(?), will the int length be enough?
+        byte[] buf = new byte[(int) byteLength]; //how about long strings(?), will the int length be enough?
         int cnt = is.read(buf);
         if (cnt < buf.length) {
             throw new EndOfStreamException();
@@ -487,7 +487,7 @@ public class Amf3InputStream extends InputStream {
                                 newDumpLevel("serializedData", "U8[]");
                                 MonitoredInputStream mis = new MonitoredInputStream(is);
                                 Map<String, Object> serMembers = serializers.get(className).readObject(className, mis);
-                                byte serData[] = mis.getReadData();
+                                byte[] serData = mis.getReadData();
                                 endDumpLevel();
                                 Traits unserTraits = new Traits(className, false, new ArrayList<>());
                                 retObjectType = new ObjectType(unserTraits, serData, serMembers);
@@ -624,7 +624,7 @@ public class Amf3InputStream extends InputStream {
                         renameU29("U29B-value", NO_REFERENCE_BIT_TEXT, "byte array length");
                         int byteArrayLength = (int) (byteArrayU29 >> 1);
                         newDumpLevel("bytes", "U8[]");
-                        byte byteArrayBuf[] = new byte[byteArrayLength];
+                        byte[] byteArrayBuf = new byte[byteArrayLength];
                         if (is.read(byteArrayBuf) != byteArrayLength) {
                             throw new EndOfStreamException();
                         }

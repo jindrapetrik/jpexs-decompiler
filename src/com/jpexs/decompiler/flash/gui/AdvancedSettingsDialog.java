@@ -256,7 +256,7 @@ public class AdvancedSettingsDialog extends AppDialog {
         Map<String, Component> tabs = new HashMap<>();
         getCategories(componentsMap, tabs, skinComboBox, getResourceBundle());
 
-        String catOrder[] = new String[]{"ui", "display", "decompilation", "script", "format", "export", "import", "paths", "limit", "update", "debug", "other"};
+        String[] catOrder = new String[]{"ui", "display", "decompilation", "script", "format", "export", "import", "paths", "limit", "update", "debug", "other"};
 
         for (String cat : catOrder) {
             if (!tabs.containsKey(cat)) {

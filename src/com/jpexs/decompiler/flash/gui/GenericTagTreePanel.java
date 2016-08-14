@@ -1068,7 +1068,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
         List<Field> ret = fieldCache.get(cls);
         if (ret == null) {
             ret = new ArrayList<>();
-            Field fields[] = cls.getFields();
+            Field[] fields = cls.getFields();
             for (Field f : fields) {
                 if (Modifier.isStatic(f.getModifiers())) {
                     continue;
@@ -1092,7 +1092,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
     private void addItem(Object obj, Field field, int index, Class<?> cls) {
         SWFArray swfArray = field.getAnnotation(SWFArray.class);
         if (swfArray != null && !swfArray.countField().isEmpty()) { //Fields with same countField must be enlarged too
-            Field fields[] = obj.getClass().getDeclaredFields();
+            Field[] fields = obj.getClass().getDeclaredFields();
             List<Integer> sameFlds = new ArrayList<>();
             for (int f = 0; f < fields.length; f++) {
                 SWFArray fieldSwfArray = fields[f].getAnnotation(SWFArray.class);
@@ -1154,7 +1154,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
     private void removeItem(Object obj, Field field, int index) {
         SWFArray swfArray = field.getAnnotation(SWFArray.class);
         if (swfArray != null && !swfArray.countField().isEmpty()) { //Fields with same countField must be removed from too
-            Field fields[] = obj.getClass().getDeclaredFields();
+            Field[] fields = obj.getClass().getDeclaredFields();
             for (int f = 0; f < fields.length; f++) {
                 SWFArray fieldSwfArray = fields[f].getAnnotation(SWFArray.class);
                 if (fieldSwfArray != null && fieldSwfArray.countField().equals(swfArray.countField())) {

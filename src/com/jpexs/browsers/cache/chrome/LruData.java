@@ -28,15 +28,15 @@ import java.util.Map;
  */
 public class LruData {
 
-    int pad1[] = new int[2];
+    int[] pad1 = new int[2];
 
     int filled;
 
-    int sizes[] = new int[5];
+    int[] sizes = new int[5];
 
-    CacheAddr heads[] = new CacheAddr[5];
+    CacheAddr[] heads = new CacheAddr[5];
 
-    CacheAddr tails[] = new CacheAddr[5];
+    CacheAddr[] tails = new CacheAddr[5];
 
     CacheAddr transaction;
 
@@ -44,7 +44,7 @@ public class LruData {
 
     int operation_list;
 
-    int pad2[] = new int[7];
+    int[] pad2 = new int[7];
 
     public LruData(InputStream is, File rootDir, Map<Integer, RandomAccessFile> dataFiles, File externalFilesDir) throws IOException {
         IndexInputStream iis = new IndexInputStream(is);

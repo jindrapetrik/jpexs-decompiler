@@ -170,7 +170,7 @@ public class DebuggerTools {
             }
         } else {
             Random rnd = new Random();
-            byte rb[] = new byte[16];
+            byte[] rb = new byte[16];
             rnd.nextBytes(rb);
             String rhex = Helper.byteArrayToHex(rb);
             try {

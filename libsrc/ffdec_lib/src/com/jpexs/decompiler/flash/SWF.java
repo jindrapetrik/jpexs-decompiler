@@ -2513,6 +2513,10 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
     }
 
+    public void clearSoundCache() {
+        soundCache.clear();
+    }
+
     public void clearScriptCache() {
         as2PcodeCache.clear();
         as2Cache.clear();

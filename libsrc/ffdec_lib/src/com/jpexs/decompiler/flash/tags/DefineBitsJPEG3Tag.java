@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecialType;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.base.AloneTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
@@ -93,7 +94,7 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
         characterID = sis.readUI16("characterID");
         long alphaDataOffset = sis.readUI32("alphaDataOffset");
         imageData = sis.readByteRangeEx(alphaDataOffset, "imageData");
-        bitmapAlphaData = sis.readByteRangeEx(sis.available(), "bitmapAlphaData");
+        bitmapAlphaData = sis.readByteRangeEx(sis.available(), "bitmapAlphaData", DumpInfoSpecialType.ZLIB_DATA, null);
     }
 
     /**

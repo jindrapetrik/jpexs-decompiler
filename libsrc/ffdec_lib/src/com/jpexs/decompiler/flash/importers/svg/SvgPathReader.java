@@ -61,34 +61,57 @@ public class SvgPathReader {
         return command;
     }
 
-    public double readDouble() {
-        int startPos = pos;
-
-        readWhiteSpaces();
-        if (peek() == '-') {
-            pos++;
-        }
-
-        boolean pointFound = false;
+    private void digitSequence() {
         while (hasNext()) {
             char ch = str.charAt(pos);
-            if (ch == '.') {
-                if (pointFound) {
-                    break;
-                }
 
-                pointFound = true;
-            } else if (ch >= '0' && ch <= '9') {
+            if (ch >= '0' && ch <= '9') {
             } else {
                 break;
             }
 
             pos++;
         }
+    }
 
-        double result = Double.parseDouble(str.substring(startPos, pos));
-        readSeparators();
-        return result;
+    public double readDouble() {
+        int startPos = pos;
+
+        readWhiteSpaces();
+        char ch = str.charAt(pos);
+        if (ch == '-') {
+            pos++;
+        }
+
+        digitSequence();
+        ch = str.charAt(pos);
+        if (ch == '.') {
+            pos++;
+            digitSequence();
+        }
+
+        ch = str.charAt(pos);
+        if (ch == 'e') {
+            pos++;
+            ch = str.charAt(pos);
+            if (ch == '-') {
+                pos++;
+            }
+
+            digitSequence();
+        }
+
+        boolean ok = false;
+        try {
+            double result = Double.parseDouble(str.substring(startPos, pos));
+            readSeparators();
+            ok = true;
+            return result;
+        } finally {
+            if (!ok) {
+                pos = startPos;
+            }
+        }
     }
 
     private void readWhiteSpaces() {

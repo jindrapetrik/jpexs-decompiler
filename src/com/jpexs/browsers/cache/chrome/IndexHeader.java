@@ -50,7 +50,7 @@ public class IndexHeader {
 
     long create_time;
 
-    int pad[] = new int[52];
+    int[] pad = new int[52];
 
     LruData lru;
 

@@ -91,7 +91,7 @@ public class FontEmbedDialog extends AppDialog {
         Font f = getSelectedFont();
         if (allCheckbox.isSelected()) {
             for (int i = 0; i < rangeCheckboxes.length; i++) {
-                int codes[] = CharacterRanges.rangeCodes(i);
+                int[] codes = CharacterRanges.rangeCodes(i);
                 for (int c : codes) {
                     if (f.canDisplay(c)) {
                         chars.add(c);
@@ -101,7 +101,7 @@ public class FontEmbedDialog extends AppDialog {
         } else {
             for (int i = 0; i < rangeCheckboxes.length; i++) {
                 if (rangeCheckboxes[i].isSelected()) {
-                    int codes[] = CharacterRanges.rangeCodes(i);
+                    int[] codes = CharacterRanges.rangeCodes(i);
                     for (int c : codes) {
                         if (f.canDisplay(c)) {
                             chars.add(c);
@@ -309,7 +309,7 @@ public class FontEmbedDialog extends AppDialog {
         Set<Integer> allChars = new HashSet<>();
         for (int i = 0; i < rc; i++) {
             rangeNames[i] = CharacterRanges.rangeName(i);
-            int codes[] = CharacterRanges.rangeCodes(i);
+            int[] codes = CharacterRanges.rangeCodes(i);
             int avail = 0;
             StringBuilder sample = new StringBuilder();
             for (int c = 0; c < codes.length; c++) {

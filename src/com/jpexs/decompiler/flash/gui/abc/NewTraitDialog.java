@@ -42,7 +42,7 @@ import javax.swing.event.AncestorListener;
  */
 public class NewTraitDialog extends AppDialog {
 
-    private static final int modifiers[] = new int[]{
+    private static final int[] modifiers = new int[]{
         Namespace.KIND_PACKAGE,
         Namespace.KIND_PRIVATE,
         Namespace.KIND_PROTECTED,
@@ -52,7 +52,7 @@ public class NewTraitDialog extends AppDialog {
         Namespace.KIND_STATIC_PROTECTED
     };
 
-    private static final int types[] = new int[]{
+    private static final int[] types = new int[]{
         Trait.TRAIT_METHOD,
         Trait.TRAIT_GETTER,
         Trait.TRAIT_SETTER,
@@ -103,7 +103,7 @@ public class NewTraitDialog extends AppDialog {
             translate("type.slot"),});
         staticCheckbox = new JCheckBox(translate("checkbox.static"));
         optionsPanel.add(staticCheckbox);
-        String accessStrings[] = new String[modifiers.length];
+        String[] accessStrings = new String[modifiers.length];
         for (int i = 0; i < accessStrings.length; i++) {
             String pref = Namespace.kindToPrefix(modifiers[i]);
             String name = Namespace.kindToStr(modifiers[i]);

@@ -45,9 +45,9 @@ public class CacheAddr {
 
     private static final int BLOCK_EVICTED = 7;
 
-    private static final String blockNames[] = new String[]{"EXTERNAL", "RANKINGS", "BLOCK_256", "BLOCK_1K", "BLOCK_4K", "BLOCK_FILES", "BLOCK_ENTRIES", "BLOCK_EVICTED"};
+    private static final String[] blockNames = new String[]{"EXTERNAL", "RANKINGS", "BLOCK_256", "BLOCK_1K", "BLOCK_4K", "BLOCK_FILES", "BLOCK_ENTRIES", "BLOCK_EVICTED"};
 
-    private static final int blockSizes[] = new int[]{0, 36, 256, 1024, 4096, 8, 104, 48};
+    private static final int[] blockSizes = new int[]{0, 36, 256, 1024, 4096, 8, 104, 48};
 
     private static final long kInitializedMask = 0x80000000L;
 

@@ -2,7 +2,7 @@ package com.jpexs.decompiler.flash.abc.types;
 
 public class Float4 {
 
-    public float values[] = new float[4];
+    public float[] values = new float[4];
 
     public Float4(float value1, float value2, float value3, float value4) {
         this.values = new float[]{value1, value2, value3, value4};

@@ -111,7 +111,7 @@ public class FirefoxCache implements CacheImplementation {
         if (profilesDir == null) {
             return null;
         }
-        File profiles[] = profilesDir.listFiles();
+        File[] profiles = profilesDir.listFiles();
         File profileDir = null;
         for (File f : profiles) {
             if (f.isDirectory()) {

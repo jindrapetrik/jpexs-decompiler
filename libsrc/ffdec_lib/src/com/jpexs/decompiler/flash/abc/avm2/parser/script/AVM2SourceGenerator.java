@@ -2074,11 +2074,11 @@ public class AVM2SourceGenerator implements SourceGenerator {
     }
 
     public int[] generateMetadata(List<Map.Entry<String, Map<String, String>>> metadata) {
-        int ret[] = new int[metadata.size()];
+        int[] ret = new int[metadata.size()];
         for (int i = 0; i < metadata.size(); i++) {
             Map.Entry<String, Map<String, String>> en = metadata.get(i);
-            int keys[] = new int[en.getValue().size()];
-            int values[] = new int[en.getValue().size()];
+            int[] keys = new int[en.getValue().size()];
+            int[] values = new int[en.getValue().size()];
             int j = 0;
             for (String key : en.getValue().keySet()) {
                 keys[j] = abcIndex.getSelectedAbc().constants.getStringId(key, true);
@@ -2226,7 +2226,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 boolean isNamespace = false;
                 int namespace = 0;
                 boolean isStatic = false;
-                int metadata[] = new int[0];
+                int[] metadata = new int[0];
                 if (item instanceof SlotAVM2Item) {
                     SlotAVM2Item sai = (SlotAVM2Item) item;
                     if (sai.isStatic() != generateStatic) {

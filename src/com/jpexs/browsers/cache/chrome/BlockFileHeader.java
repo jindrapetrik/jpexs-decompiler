@@ -43,13 +43,13 @@ public class BlockFileHeader {
 
     private final int max_entries;
 
-    private int empty[] = new int[4];
+    private int[] empty = new int[4];
 
-    private int hints[] = new int[4];
+    private int[] hints = new int[4];
 
     private final int updating;
 
-    private int user[] = new int[5];
+    private int[] user = new int[5];
 
     private final long allocation_map[];
 

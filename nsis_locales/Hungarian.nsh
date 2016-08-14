@@ -47,7 +47,7 @@
 !insertmacro LANG_STRING STRING_JRE_DETECTCOMPLETE "JRE Verzió detektálás kész - eredmény = "
 !insertmacro LANG_STRING STRING_JRE_DETECTCOMPLETE_OLD "Régi JRE található"
 !insertmacro LANG_STRING STRING_JRE_DETECTCOMPLETE_NO "JRE nem található"
-!insertmacro LANG_STRING STRING_JRE_DETECTCOMPARE_1 ""
+!insertmacro LANG_STRING STRING_JRE_DETECTCOMPARE_1 "A "
 !insertmacro LANG_STRING STRING_JRE_DETECTCOMPARE_2 " verzió összehasonlítása a "
 !insertmacro LANG_STRING STRING_JRE_DETECTCOMPARE_3 " verzióval. Eredmények: "
 !insertmacro LANG_STRING STRING_JRE_WILLDOWNLOAD "JRE letöltése innen: "

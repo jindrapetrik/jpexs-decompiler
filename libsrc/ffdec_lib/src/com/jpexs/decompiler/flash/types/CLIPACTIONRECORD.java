@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.ConstantPoolTooBigException;
+import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecialType;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -125,7 +126,7 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable {
             keyCode = sis.readUI8("keyCode");
             actionRecordSize--;
         }
-        actionBytes = sis.readByteRangeEx(actionRecordSize, "actionBytes");
+        actionBytes = sis.readByteRangeEx(actionRecordSize, "actionBytes", DumpInfoSpecialType.ACTION_BYTES, sis.getPos());
     }
 
     @Override

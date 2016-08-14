@@ -1393,7 +1393,7 @@ public class XFLConverter {
                     }
                     /*
                     From JSFL, also data types integerArray ("I"), doubleArray("D") and byteArray("B") can be set.
-                    These datatypes can be in the FLA file but are not exported to SWF with _EMBED_SWF_ publish format.                   
+                    These datatypes can be in the FLA file but are not exported to SWF with _EMBED_SWF_ publish format.
                      */
                 }
 
@@ -1691,7 +1691,7 @@ public class XFLConverter {
                     }
                 }
 
-                byte imageBytes[] = Helper.readStream(imageTag.getImageData());
+                byte[] imageBytes = Helper.readStream(imageTag.getImageData());
                 SerializableImage image = imageTag.getImageCached();
                 ImageFormat format = imageTag.getImageFormat();
                 String symbolFile = "bitmap" + symbol.getCharacterId() + imageTag.getImageFormat().getExtension();
@@ -1807,52 +1807,53 @@ public class XFLConverter {
                     }
                     format += 4; //quality best
                     try {
-                        MP3SOUNDDATA s = new MP3SOUNDDATA(new SWFInputStream(swf, soundData), false);
-                        //sis.readSI16();
-                        //MP3FRAME frame = new MP3FRAME(sis);
-                        MP3FRAME frame = s.frames.get(0);
-                        int bitRate = frame.getBitRate();
+                        SWFInputStream sis = new SWFInputStream(swf, soundData);
+                        MP3SOUNDDATA s = new MP3SOUNDDATA(sis, false);
+                        if (!s.frames.isEmpty()) {
+                            MP3FRAME frame = s.frames.get(0);
+                            int bitRate = frame.getBitRate();
 
-                        switch (bitRate) {
-                            case 8:
-                                bits = 6;
-                                break;
-                            case 16:
-                                bits = 7;
-                                break;
-                            case 20:
-                                bits = 8;
-                                break;
-                            case 24:
-                                bits = 9;
-                                break;
-                            case 32:
-                                bits = 10;
-                                break;
-                            case 48:
-                                bits = 11;
-                                break;
-                            case 56:
-                                bits = 12;
-                                break;
-                            case 64:
-                                bits = 13;
-                                break;
-                            case 80:
-                                bits = 14;
-                                break;
-                            case 112:
-                                bits = 15;
-                                break;
-                            case 128:
-                                bits = 16;
-                                break;
-                            case 160:
-                                bits = 17;
-                                break;
+                            switch (bitRate) {
+                                case 8:
+                                    bits = 6;
+                                    break;
+                                case 16:
+                                    bits = 7;
+                                    break;
+                                case 20:
+                                    bits = 8;
+                                    break;
+                                case 24:
+                                    bits = 9;
+                                    break;
+                                case 32:
+                                    bits = 10;
+                                    break;
+                                case 48:
+                                    bits = 11;
+                                    break;
+                                case 56:
+                                    bits = 12;
+                                    break;
+                                case 64:
+                                    bits = 13;
+                                    break;
+                                case 80:
+                                    bits = 14;
+                                    break;
+                                case 112:
+                                    bits = 15;
+                                    break;
+                                case 128:
+                                    bits = 16;
+                                    break;
+                                case 160:
+                                    bits = 17;
+                                    break;
 
+                            }
                         }
-                    } catch (IOException | ArrayIndexOutOfBoundsException ex) {
+                    } catch (IOException | IndexOutOfBoundsException ex) {
                         logger.log(Level.SEVERE, null, ex);
                     }
                 }

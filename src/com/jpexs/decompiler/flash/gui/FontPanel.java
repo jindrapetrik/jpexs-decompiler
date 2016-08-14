@@ -642,7 +642,7 @@ public class FontPanel extends JPanel {
                 Set<Integer> selChars = new HashSet<>();
                 try {
                     Font f = Font.createFont(Font.TRUETYPE_FONT, selfile);
-                    int required[] = new int[]{0x0001, 0x0000, 0x000D, 0x0020};
+                    int[] required = new int[]{0x0001, 0x0000, 0x000D, 0x0020};
                     loopi:
                     for (char i = 0; i < Character.MAX_VALUE; i++) {
                         for (int r : required) {

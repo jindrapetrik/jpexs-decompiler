@@ -273,15 +273,17 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
                             default:
                                 return false;
                         }
+
                         newSoundSize = true;
                         newSoundType = fr.isStereo();
                         int len = snd.sampleCount();
                         if (fr.isStereo()) {
                             len = len / 2;
                         }
-                        newSoundSampleCount = len;
 
+                        newSoundSampleCount = len;
                     }
+
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION);
                     sos.writeSI16(0); //Latency - how to calculate it?
