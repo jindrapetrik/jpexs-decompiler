@@ -131,14 +131,16 @@ public class TraitClass extends Trait implements TraitWithSlot {
         if (bodyIndex != -1) {
             writer.startTrait(GraphTextWriter.TRAIT_CLASS_INITIALIZER);
             writer.startMethod(classInfo.cinit_index);
-            if (!classInitializerIsEmpty) {
-                writer.startBlock();
-                abc.bodies.get(bodyIndex).toString(path +/*packageName +*/ "/" + instanceInfoName + ".staticinitializer", exportMode, abc, this, writer, fullyQualifiedNames);
-                writer.endBlock();
-            } else {
-                //Note: There must be trait/method highlight even if the initializer is empty to TraitList in GUI to work correctly
-                //TODO: handle this better in GUI(?)
-                writer.append(" ").newLine();
+            if (exportMode != ScriptExportMode.AS_METHOD_STUBS) {
+                if (!classInitializerIsEmpty) {
+                    writer.startBlock();
+                    abc.bodies.get(bodyIndex).toString(path +/*packageName +*/ "/" + instanceInfoName + ".staticinitializer", exportMode, abc, this, writer, fullyQualifiedNames);
+                    writer.endBlock();
+                } else {
+                    //Note: There must be trait/method highlight even if the initializer is empty to TraitList in GUI to work correctly
+                    //TODO: handle this better in GUI(?)
+                    writer.append(" ").newLine();
+                }
             }
             writer.endMethod();
             writer.endTrait();
@@ -178,8 +180,10 @@ public class TraitClass extends Trait implements TraitWithSlot {
             MethodBody body = bodyIndex == -1 ? null : abc.bodies.get(bodyIndex);
             abc.method_info.get(instanceInfo.iinit_index).getParamStr(writer, abc.constants, body, abc, fullyQualifiedNames);
             writer.appendNoHilight(")").startBlock();
-            if (body != null) {
-                body.toString(path +/*packageName +*/ "/" + instanceInfoName + ".initializer", exportMode, abc, this, writer, fullyQualifiedNames);
+            if (exportMode != ScriptExportMode.AS_METHOD_STUBS) {
+                if (body != null) {
+                    body.toString(path +/*packageName +*/ "/" + instanceInfoName + ".initializer", exportMode, abc, this, writer, fullyQualifiedNames);
+                }
             }
 
             writer.endBlock().newLine();

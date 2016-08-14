@@ -200,12 +200,14 @@ public class ScriptPack extends AS3ClassTreeItem {
             //TODO: handle this better in GUI(?)
             writer.startTrait(GraphTextWriter.TRAIT_SCRIPT_INITIALIZER);
             writer.startMethod(script_init);
-            if (!scriptInitializerIsEmpty) {
-                writer.startBlock();
-                abc.bodies.get(bodyIndex).toString(path +/*packageName +*/ "/.scriptinitializer", exportMode, abc, null, writer, new ArrayList<>());
-                writer.endBlock();
-            } else {
-                writer.append(" ");
+            if (exportMode != ScriptExportMode.AS_METHOD_STUBS) {
+                if (!scriptInitializerIsEmpty) {
+                    writer.startBlock();
+                    abc.bodies.get(bodyIndex).toString(path +/*packageName +*/ "/.scriptinitializer", exportMode, abc, null, writer, new ArrayList<>());
+                    writer.endBlock();
+                } else {
+                    writer.append(" ");
+                }
             }
             writer.endMethod();
             writer.endTrait();

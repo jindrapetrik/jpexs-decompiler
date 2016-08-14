@@ -386,4 +386,17 @@ public class MethodInfo {
         }
         return writer.hilightSpecial(rname, HighlightSpecialType.RETURNS);
     }
+
+    public String getReturnTypeRaw(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames) {
+        String rname = "*";
+        if (ret_type > 0) {
+            Multiname multiname = constants.getMultiname(ret_type);
+            if (multiname.kind != Multiname.TYPENAME && multiname.name_index > 0 && constants.getString(multiname.name_index).equals("void")) {
+                rname = "void";
+            } else {
+                rname = multiname.getName(constants, fullyQualifiedNames, false);
+            }
+        }
+        return rname;
+    }
 }

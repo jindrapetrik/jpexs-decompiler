@@ -6,7 +6,10 @@ import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
+import com.jpexs.decompiler.flash.exporters.script.AS3ScriptExporter;
 import com.jpexs.decompiler.flash.exporters.script.LinkReportExporter;
+import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
 import com.jpexs.decompiler.flash.exporters.swf.SwfToSwcExporter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -112,21 +115,38 @@ public class As3ScriptReplacer extends MxmlcRunner {
                 }
             }
 
-            //remove all subclasses
+            List<ScriptPack> removedPacks = new ArrayList<>();
+
+            //remove all subclasses from the SWC
             for (ScriptPack sp : copyPacks) {
                 DottedChain dc = sp.getPathPackage().add(sp.getPathScriptName());
                 if (isParentDeleted(sp.abc, sp.allABCs, dc)) {
                     sp.abc.script_info.get(sp.scriptIndex).delete(sp.abc, true);
                     modAbcs.add(sp.abc);
+                    removedPacks.add(sp);
                 }
             }
+
+            //Export subclasses so they can be compiled by Flex, but ONLY STUBS. 
+            //No method code to avoid code compilation problems.
+            //This compiled code won't be used at all in original SWF, 
+            //it is used only by Flex to properly compile current script
+            AS3ScriptExporter ex = new AS3ScriptExporter();
+            ex.exportActionScript3(swfCopy, null, tempDir.getAbsolutePath(), removedPacks, new ScriptExportSettings(ScriptExportMode.AS_METHOD_STUBS, false), false, null);
+
+            //now really remove the classes from SWF copy
             for (ABC a : modAbcs) {
                 a.pack();
             }
+            //Generate SWC file from the modified SWF file.
+            //Flex then uses the code already present in the SWC, no need to decompile it (hurray!)
             SwfToSwcExporter swcExport = new SwfToSwcExporter();
             swcExport.exportSwf(swfCopy, swcFile, true);
 
+            //Write new script
             Helper.writeFile(scriptFileToCompile.getAbsolutePath(), txt.getBytes("UTF-8"));
+
+            //Compile it (and subclasses stubs)
             mxmlc("-include-inheritance-dependencies-only", "-warnings=false", "-library-path", swcFile.getAbsolutePath(), "-source-path", tempDir.getAbsolutePath(), "-output", compiledSwfFile.getAbsolutePath(), "-debug=true", scriptFileToCompile.getAbsolutePath());
 
             try (FileInputStream fis = new FileInputStream(compiledSwfFile)) {
@@ -146,6 +166,7 @@ public class As3ScriptReplacer extends MxmlcRunner {
                 ABCContainerTag lastTag = newTags.get(newTags.size() - 1);
                 ((Tag) lastTag).setSwf(swf);
                 swf.addTag(oldTagIndex + 1, (Tag) lastTag);
+                //TODO: looks like ABCs need to be merged. Parent class needs to be defined earlier than used :-(
                 ((Tag) lastTag).setModified(true);
                 ((Tag) oldPack.abc.parentTag).setModified(true);
             }

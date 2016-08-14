@@ -37,6 +37,7 @@ import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
+import com.jpexs.decompiler.flash.abc.types.ValueKind;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
@@ -1450,5 +1451,52 @@ public class ABC {
         getSwf().clearAbcListCache();
         getSwf().clearScriptCache();
         getMethodIndexing();
+    }
+
+    public void mergeABC(ABC secondABC) {
+        Map<Integer, Integer> namespaceMap = new HashMap<>();
+        Map<Integer, Integer> namespaceSetMap = new HashMap<>();
+        Map<Integer, Integer> multinameMap = new HashMap<>();
+        Map<Integer, Integer> methodInfoMap = new HashMap<>();
+
+        constants.merge(secondABC.constants, namespaceMap, namespaceSetMap, multinameMap);
+        for (int i = 0; i < secondABC.method_info.size(); i++) {
+            MethodInfo secondMethodInfo = secondABC.method_info.get(i);
+            int newParamTypes[] = new int[secondMethodInfo.param_types.length];
+            int newParamNames[] = new int[secondMethodInfo.paramNames.length];
+            int newRetType = multinameMap.get(secondMethodInfo.ret_type);
+            int newNameIndex = constants.getStringId(secondABC.constants.getString(secondMethodInfo.name_index), true);
+            ValueKind newOptional[] = new ValueKind[secondMethodInfo.optional.length];
+            for (int k = 0; k < secondMethodInfo.optional.length; k++) {
+                int vkind = secondMethodInfo.optional[k].value_kind;
+                int newValueIndex;
+                switch (vkind) {
+                    case ValueKind.CONSTANT_ExplicitNamespace:
+                    case ValueKind.CONSTANT_Namespace:
+                    case ValueKind.CONSTANT_PackageInternalNs:
+                    case ValueKind.CONSTANT_PackageNamespace:
+                    case ValueKind.CONSTANT_ProtectedNamespace:
+                    case ValueKind.CONSTANT_PrivateNs:
+                    case ValueKind.CONSTANT_StaticProtectedNs:
+                        newValueIndex = namespaceMap.get(secondMethodInfo.optional[k].value_index);
+                        break;
+                    default:
+                        newValueIndex = secondMethodInfo.optional[k].value_index;
+                }
+                newOptional[k] = new ValueKind(newValueIndex, vkind);
+            }
+
+            MethodInfo newMethodInfo = new MethodInfo(newParamTypes, newRetType, newNameIndex, secondMethodInfo.flags, newOptional, newParamNames);
+            int newIndex = addMethodInfo(newMethodInfo);
+            methodInfoMap.put(i, newIndex);
+        }
+        for (MethodBody secondBody : secondABC.bodies) {
+            //TODO!!!
+            //MethodBody newBody = new MethodBody(this, mergeTraits(secondBody.traits), codeBytes, exceptions)
+        }
+    }
+
+    private Traits mergeTraits(Traits secondTraits) {
+        return null; //TODO
     }
 }
