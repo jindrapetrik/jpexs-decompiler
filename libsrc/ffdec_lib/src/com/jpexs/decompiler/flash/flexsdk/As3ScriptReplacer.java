@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.List;
 
 public class As3ScriptReplacer extends MxmlcRunner {
@@ -99,20 +100,28 @@ public class As3ScriptReplacer extends MxmlcRunner {
 
             //Make copy without the old script
             SWF swfCopy = recompileSWF(swf);
+            List<ABC> modAbcs = new ArrayList<>();
+
             List<ScriptPack> copyPacks = swfCopy.getAS3Packs();
             for (ScriptPack sp : copyPacks) {
                 if (sp.getClassPath().equals(oldPack.getClassPath())) {
                     sp.abc.script_info.get(sp.scriptIndex).delete(sp.abc, true);
                     ((Tag) sp.abc.parentTag).setModified(true);
+                    modAbcs.add(sp.abc);
                     break;
                 }
             }
+
             //remove all subclasses
             for (ScriptPack sp : copyPacks) {
                 DottedChain dc = sp.getPathPackage().add(sp.getPathScriptName());
                 if (isParentDeleted(sp.abc, sp.allABCs, dc)) {
                     sp.abc.script_info.get(sp.scriptIndex).delete(sp.abc, true);
+                    modAbcs.add(sp.abc);
                 }
+            }
+            for (ABC a : modAbcs) {
+                a.pack();
             }
             SwfToSwcExporter swcExport = new SwfToSwcExporter();
             swcExport.exportSwf(swfCopy, swcFile, true);
@@ -130,18 +139,15 @@ public class As3ScriptReplacer extends MxmlcRunner {
                     //NOO
                 }
                 int oldTagIndex = swf.getTags().indexOf((Tag) oldPack.abc.parentTag);
-                if (oldPack.abc.script_info.size() == 1) {
+                oldPack.abc.pack(); // removes old classes/methods/scripts
+                if (oldPack.abc.script_info.isEmpty()) {
                     swf.removeTag(oldTagIndex);
                 }
-
-                for (ABCContainerTag act : newTags) {
-                    ((Tag) act).setSwf(swf);
-                    swf.addTag(oldTagIndex + 1, (Tag) act);
-                    ((Tag) act).setModified(true);
-                }
+                ABCContainerTag lastTag = newTags.get(newTags.size() - 1);
+                ((Tag) lastTag).setSwf(swf);
+                swf.addTag(oldTagIndex + 1, (Tag) lastTag);
+                ((Tag) lastTag).setModified(true);
                 ((Tag) oldPack.abc.parentTag).setModified(true);
-                swf.clearAbcListCache();
-                swf.clearScriptCache();
             }
         } finally {
             if (tempDir != null && tempDir.exists()) {
