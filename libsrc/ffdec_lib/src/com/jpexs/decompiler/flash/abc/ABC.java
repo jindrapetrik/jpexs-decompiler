@@ -55,9 +55,13 @@ import com.jpexs.decompiler.flash.abc.usages.MethodParamsMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.MethodReturnTypeMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.MultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.TypeNameMultinameUsage;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecial;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecialType;
+import com.jpexs.decompiler.flash.exporters.script.LinkReportExporter;
+import com.jpexs.decompiler.flash.flexsdk.As3ScriptReplacer;
+import com.jpexs.decompiler.flash.flexsdk.MxmlcException;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -768,19 +772,11 @@ public class ABC {
             aos.writeU30(ci.cinit_index);
             aos.writeTraits(ci.static_traits);
         }
-        int numScripts = script_info.size();
-        for (ScriptInfo si : script_info) {
-            if (si.deleted) {
-                numScripts--;
-            }
-        }
 
-        aos.writeU30(numScripts);
+        aos.writeU30(script_info.size());
         for (ScriptInfo si : script_info) {
-            if (!si.deleted) {
-                aos.writeU30(si.init_index);
-                aos.writeTraits(si.traits);
-            }
+            aos.writeU30(si.init_index);
+            aos.writeTraits(si.traits);
         }
 
         aos.writeU30(bodies.size());
@@ -998,7 +994,9 @@ public class ABC {
     public List<ScriptPack> getScriptPacks(String packagePrefix, List<ABC> allAbcs) {
         List<ScriptPack> ret = new ArrayList<>();
         for (int i = 0; i < script_info.size(); i++) {
-            ret.addAll(script_info.get(i).getPacks(this, i, packagePrefix, allAbcs));
+            if (!script_info.get(i).deleted) {
+                ret.addAll(script_info.get(i).getPacks(this, i, packagePrefix, allAbcs));
+            }
         }
         return ret;
     }
@@ -1274,6 +1272,7 @@ public class ABC {
                     if (ins.definition.operands[i] == AVM2Code.DAT_CLASS_INDEX) {
                         if (ins.operands[i] > index) {
                             ins.operands[i]--;
+                            b.setModified();
                         }
                     }
                 }
@@ -1331,6 +1330,7 @@ public class ABC {
                     if (ins.definition.operands[i] == AVM2Code.DAT_METHOD_INDEX) {
                         if (ins.operands[i] > index) {
                             ins.operands[i]--;
+                            b.setModified();
                         }
                     }
                 }
@@ -1362,68 +1362,93 @@ public class ABC {
     }
 
     public boolean replaceScriptPack(ScriptPack pack, String as) throws AVM2ParseException, CompilationException, IOException, InterruptedException {
-        String scriptName = pack.getPathScriptName() + ".as";
-        int oldIndex = pack.scriptIndex;
-        int newIndex = script_info.size();
-        String documentClass = getSwf().getDocumentClass();
-        boolean isDocumentClass = documentClass != null && documentClass.equals(pack.getClassPath().toString());
+
+        final boolean USE_FLEX = true;
 
         boolean isSimple = pack.isSimple;
 
-        ScriptInfo si = script_info.get(oldIndex);
-        if (isSimple) {
-            si.delete(this, true);
+        if (USE_FLEX) {
+            if (!pack.isSimple) {
+                return false;
+            }
+            As3ScriptReplacer asr = new As3ScriptReplacer(Configuration.flexSdkLocation.get(), new LinkReportExporter());
+            try {
+                asr.replaceScript(pack.getSwf(), pack, as);
+            } catch (MxmlcException ex) {
+                throw new AVM2ParseException(ex.getMxmlcErrorOutput(), 0);
+            }
         } else {
+            String scriptName = pack.getPathScriptName() + ".as";
+            int oldIndex = pack.scriptIndex;
+            int newIndex = script_info.size();
+            String documentClass = getSwf().getDocumentClass();
+            boolean isDocumentClass = documentClass != null && documentClass.equals(pack.getClassPath().toString());
+
+            ScriptInfo si = script_info.get(oldIndex);
+            if (isSimple) {
+                si.delete(this, true);
+            } else {
+                for (int t : pack.traitIndices) {
+                    si.traits.traits.get(t).delete(this, true);
+                }
+            }
+
+            int newClassIndex = instance_info.size();
             for (int t : pack.traitIndices) {
-                si.traits.traits.get(t).delete(this, true);
+                if (si.traits.traits.get(t) instanceof TraitClass) {
+                    TraitClass tc = (TraitClass) si.traits.traits.get(t);
+                    newClassIndex = tc.class_info + 1;
+                }
+
             }
-        }
+            List<ABC> otherAbcs = new ArrayList<>(pack.allABCs);
+            otherAbcs.remove(this);
+            ActionScript3Parser.compile(as, this, otherAbcs, isDocumentClass, scriptName, newClassIndex, oldIndex);
 
-        int newClassIndex = instance_info.size();
-        for (int t : pack.traitIndices) {
-            if (si.traits.traits.get(t) instanceof TraitClass) {
-                TraitClass tc = (TraitClass) si.traits.traits.get(t);
-                newClassIndex = tc.class_info + 1;
+            if (isSimple) {
+                // Move newly added script to its position
+                script_info.set(oldIndex, script_info.get(newIndex));
+                script_info.remove(newIndex);
+            } else {
+                script_info.get(newIndex).setModified(true);
+                //Note: Is deleting traits safe?
+                List<Integer> todel = new ArrayList<>(new TreeSet<>(pack.traitIndices));
+                for (int i = todel.size() - 1; i >= 0; i--) {
+                    si.traits.traits.remove((int) todel.get(i));
+                }
             }
-
+            script_info.get(oldIndex).setModified(true);
         }
-        List<ABC> otherAbcs = new ArrayList<>(pack.allABCs);
-        otherAbcs.remove(this);
-        ActionScript3Parser.compile(as, this, otherAbcs, isDocumentClass, scriptName, newClassIndex, oldIndex);
-
-        if (isSimple) {
-            // Move newly added script to its position
-            script_info.set(oldIndex, script_info.get(newIndex));
-            script_info.remove(newIndex);
-        } else {
-            script_info.get(newIndex).setModified(true);
-            //Note: Is deleting traits safe?
-            List<Integer> todel = new ArrayList<>(new TreeSet<>(pack.traitIndices));
-            for (int i = todel.size() - 1; i >= 0; i--) {
-                si.traits.traits.remove((int) todel.get(i));
-            }
-        }
-
-        script_info.get(oldIndex).setModified(true);
-        pack(); // removes old classes/methods
         ((Tag) parentTag).setModified(true);
         return !isSimple;
     }
 
-    public void pack() {
+    private void packMethods() {
         for (int m = 0; m < method_info.size(); m++) {
             if (method_info.get(m).deleted) {
                 removeMethod(m);
                 m--;
             }
         }
+    }
+
+    public void pack() {
+        packMethods();
         for (int c = 0; c < instance_info.size(); c++) {
             if (instance_info.get(c).deleted) {
                 removeClass(c);
                 c--;
             }
         }
-
+        packMethods();
+        for (int s = 0; s < script_info.size(); s++) {
+            if (script_info.get(s).deleted) {
+                script_info.remove(s);
+                s--;
+            }
+        }
+        getSwf().clearAbcListCache();
+        getSwf().clearScriptCache();
         getMethodIndexing();
     }
 }
