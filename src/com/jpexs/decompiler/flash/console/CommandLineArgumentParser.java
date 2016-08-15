@@ -110,6 +110,7 @@ import com.jpexs.decompiler.flash.importers.SwfXmlImporter;
 import com.jpexs.decompiler.flash.importers.TextImporter;
 import com.jpexs.decompiler.flash.importers.amf.amf3.Amf3Importer;
 import com.jpexs.decompiler.flash.importers.amf.amf3.Amf3ParseException;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
@@ -595,6 +596,13 @@ public class CommandLineArgumentParser {
             out.println("  ...<swffile>: Input SWF file");
         }
 
+        if (filter == null || filter.equals("abcmerge")) {
+            out.println(" " + (cnt++) + ") -abcmerge <outfile> <swffile>");
+            out.println("  ...merge all ABC tags in SWF file to one");
+            out.println("  ...<outfile>: Where to save merged file");
+            out.println("  ...<swffile>: Input SWF file");
+        }
+
         printCmdLineUsageExamples(out, filter);
     }
 
@@ -810,7 +818,9 @@ public class CommandLineArgumentParser {
             command = nextParam.substring(1);
         }
 
-        if (command.equals("swf2swc")) {
+        if (command.equals("abcmerge")) {
+            parseAbcMerge(args);
+        } else if (command.equals("swf2swc")) {
             parseSwf2Swc(args);
         } else if (command.equals("linkreport")) {
             parseLinkReport(selectionClasses, args);
@@ -1007,6 +1017,27 @@ public class CommandLineArgumentParser {
             badArguments("config");
         }
         setConfigurations(args.pop());
+    }
+
+    private static void parseAbcMerge(Stack<String> args) {
+        if (args.size() < 2) {
+            badArguments("abcmerge");
+        }
+        final File outFile = new File(args.pop());
+        final File swfFile = new File(args.pop());
+        processModifySWF(swfFile, outFile, null, (SWF swf, OutputStream stdout) -> {
+            List<ABCContainerTag> abcList = swf.getAbcList();
+            if (!abcList.isEmpty() && abcList.size() > 1) {
+                ABC firstAbc = abcList.get(0).getABC();
+                for (int i = 1; i < abcList.size(); i++) {
+                    firstAbc.mergeABC(abcList.get(i).getABC());
+                }
+                for (int i = 1; i < abcList.size(); i++) {
+                    swf.removeTag((Tag) abcList.get(i));
+                }
+            }
+        });
+
     }
 
     private static void parseSwf2Swc(Stack<String> args) {

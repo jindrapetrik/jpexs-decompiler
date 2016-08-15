@@ -424,6 +424,10 @@ public final class MethodBody implements Cloneable {
 
     @Override
     public MethodBody clone() {
+        return clone(false);
+    }
+
+    public MethodBody clone(boolean deepTraits) {
         try {
             MethodBody ret = (MethodBody) super.clone();
             if (code != null) {
@@ -437,10 +441,9 @@ public final class MethodBody implements Cloneable {
                 }
             }
 
-            // maybe deep clone traits
-            /*if (traits != null) {
-             ret.traits = traits.clone();
-             }*/
+            if (deepTraits && traits != null) {
+                ret.traits = traits.clone();
+            }
             ret.convertedItems = null;
             ret.convertException = null;
 

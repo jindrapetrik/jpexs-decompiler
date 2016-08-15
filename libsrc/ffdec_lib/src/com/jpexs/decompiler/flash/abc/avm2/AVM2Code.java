@@ -1100,6 +1100,11 @@ public class AVM2Code implements Cloneable {
         }
     }
 
+    public void setInstructionOperand(int ip, int operandIndex, int value, MethodBody body) {
+        int oldVal = code.get(ip).operands[ip];
+        code.get(ip).operands[ip] = value;
+    }
+
     public byte[] getBytes() {
         return getBytes(null);
     }
@@ -2145,6 +2150,38 @@ public class AVM2Code implements Cloneable {
         return list;
     }
 
+    public void updateInstructionByteCountByAddr(long instructionAddress, int byteDelta, MethodBody body) {
+        if (byteDelta != 0) {
+            updateOffsets(new OffsetUpdater() {
+
+                @Override
+                public long updateInstructionOffset(long address) {
+                    if (address > instructionAddress) {
+                        return address + byteDelta;
+                    }
+                    return address;
+                }
+
+                @Override
+                public int updateOperandOffset(long insAddr, long targetAddress, int offset) {
+                    if (targetAddress > instructionAddress && insAddr <= instructionAddress) {
+                        return offset + byteDelta;
+                    }
+                    if (targetAddress <= instructionAddress && insAddr > instructionAddress) {
+                        return offset - byteDelta;
+                    }
+                    return offset;
+                }
+            }, body);
+            body.setModified();
+        }
+    }
+
+    public void updateInstructionByteCount(int pos, int byteDelta, MethodBody body) {
+        AVM2Instruction instruction = code.get(pos);
+        updateInstructionByteCountByAddr(instruction.getAddress(), byteDelta, body);
+    }
+
     public void updateOffsets(OffsetUpdater updater, MethodBody body) {
         for (int i = 0; i < code.size(); i++) {
             AVM2Instruction ins = code.get(i);
@@ -2172,6 +2209,7 @@ public class AVM2Code implements Cloneable {
                 }
             }
             ins.setAddress(updater.updateInstructionOffset(ins.getAddress()));
+            //Note: changing operands here does not change instruction byte length as offsets are always S24 (not variable length)
         }
 
         for (ABCException ex : body.exceptions) {

@@ -25,7 +25,7 @@ import com.jpexs.helpers.Helper;
  */
 public class ValueKind {
 
-    public static final int CONSTANT_Decimal = 0x02; //decimal
+    public static final int CONSTANT_DecimalOrFloat = 0x02; //decimal or float depending on ABC version
 
     public static final int CONSTANT_Int = 0x03;// integer
 
@@ -56,6 +56,8 @@ public class ValueKind {
     public static final int CONSTANT_StaticProtectedNs = 0x1A;// Namespace
 
     public static final int CONSTANT_PrivateNs = 0x05;// namespace
+
+    public static final int CONSTANT_Float4 = 0x1E;// float4
 
     private static final int[] optionalKinds = new int[]{0x03, 0x04, 0x06, 0x02, 0x01, 0x0B, 0x0A, 0x0C, 0x00, 0x08, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x05};
 
@@ -137,7 +139,7 @@ public class ValueKind {
             case CONSTANT_Double:
                 ret = "" + constants.getDouble(value_index);
                 break;
-            case CONSTANT_Decimal:
+            case CONSTANT_DecimalOrFloat:
                 ret = "" + constants.getDecimal(value_index);
                 break;
             case CONSTANT_Utf8:
@@ -179,7 +181,7 @@ public class ValueKind {
             case CONSTANT_Double:
                 ret = "Double(" + constants.getDouble(value_index) + ")";
                 break;
-            case CONSTANT_Decimal:
+            case CONSTANT_DecimalOrFloat:
                 ret = "Decimal(" + constants.getDecimal(value_index) + ")";
                 break;
             case CONSTANT_Utf8:

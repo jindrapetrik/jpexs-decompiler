@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnValueIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnVoidIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ThrowIns;
 import com.jpexs.decompiler.flash.abc.types.Float4;
+import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.DottedChain;
@@ -488,4 +489,42 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
     public String getFile() {
         return file;
     }
+
+    /**
+     * Set operand value the right way - update offsets neccessarily. Because
+     * some operand types are variable length (like U30)
+     *
+     * @param operandIndex
+     * @param newValue
+     * @param code
+     * @param body
+     */
+    public void setOperand(int operandIndex, int newValue, AVM2Code code, MethodBody body) {
+        int oldByteCount = getBytesLength();
+        operands[operandIndex] = newValue;
+        int newByteCount = getBytesLength();
+        int byteDelta = newByteCount - oldByteCount;
+        if (byteDelta != 0) {
+            code.updateInstructionByteCountByAddr(address, byteDelta, body);
+        }
+    }
+
+    /**
+     * Set operand values the right way - update offsets neccessarily. Because
+     * some operand types are variable length (like U30)
+     *
+     * @param operands
+     * @param code
+     * @param body
+     */
+    public void setOperands(int operands[], AVM2Code code, MethodBody body) {
+        int oldByteCount = getBytesLength();
+        this.operands = operands;
+        int newByteCount = getBytesLength();
+        int byteDelta = newByteCount - oldByteCount;
+        if (byteDelta != 0) {
+            code.updateInstructionByteCountByAddr(address, byteDelta, body);
+        }
+    }
+
 }
