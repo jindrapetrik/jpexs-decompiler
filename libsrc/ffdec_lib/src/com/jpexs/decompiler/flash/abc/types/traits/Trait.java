@@ -53,6 +53,7 @@ import com.jpexs.helpers.Helper;
 import java.io.Serializable;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -230,10 +231,16 @@ public abstract class Trait implements Cloneable, Serializable {
 
         List<String> importnames = new ArrayList<>();
         importnames.addAll(namesInThisPackage);
+        importnames.addAll(Arrays.asList(builtInClasses));
         for (int i = 0; i < imports.size(); i++) {
             DottedChain ipath = imports.get(i);
+            if (ipath.getWithoutLast().equals(ignorePackage)) { //do not check classes from same package, they are imported automatically
+                imports.remove(i);
+                i--;
+                continue;
+            }
             String name = ipath.getLast();
-            if (importnames.contains(name) || isBuiltInClass(name)) {
+            if (importnames.contains(name)) {
                 imports.remove(i);
                 i--;
                 fullyQualifiedNames.add(new DottedChain(name));
