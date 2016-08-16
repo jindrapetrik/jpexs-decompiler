@@ -24,7 +24,7 @@ public class MxmlcRunner {
         String runArgs[] = new String[arguments.length + 1];
         runArgs[0] = getMxmlcPath(flexSdkPath);
         System.arraycopy(arguments, 0, runArgs, 1, arguments.length);
-        System.out.println("" + String.join(" ", runArgs));
+        //System.out.println("" + String.join(" ", runArgs));
         Process proc = null;
         try {
             proc = Runtime.getRuntime().exec(runArgs);
