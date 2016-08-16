@@ -9,15 +9,13 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.testng.annotations.Test;
 
 public class As3ScriptReplacerTest {
 
     @Test
     public void testReplace() throws IOException, InterruptedException, Exception {
-        As3ScriptReplacer replacer = new As3ScriptReplacer(Configuration.flexSdkLocation.get(), new LinkReportExporter());
+        MxmlcAs3ScriptReplacer replacer = new MxmlcAs3ScriptReplacer(Configuration.flexSdkLocation.get(), new LinkReportExporter());
         SWF swf = new SWF(new BufferedInputStream(new FileInputStream("testdata/as3/as3.swf")), false);
         String replacement = "package classes\n"
                 + "{\n"
@@ -43,7 +41,7 @@ public class As3ScriptReplacerTest {
         classNames.add("classes.TestClass1");
         List<ScriptPack> packs = swf.getScriptPacksByClassNames(classNames);
         for (ScriptPack sp : packs) {
-            replacer.replaceScript(swf, sp, replacement);
+            replacer.replaceScript(sp, replacement);
             return;
         }
     }

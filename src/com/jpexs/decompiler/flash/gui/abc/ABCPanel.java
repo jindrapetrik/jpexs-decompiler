@@ -69,6 +69,7 @@ import com.jpexs.decompiler.flash.gui.abc.tablemodels.UIntTableModel;
 import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
 import com.jpexs.decompiler.flash.gui.editor.LinkHandler;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
+import com.jpexs.decompiler.flash.importers.As3ScriptReplacerFactory;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
@@ -1150,17 +1151,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
     }
 
     private void editDecompiledButtonActionPerformed(ActionEvent evt) {
-        File swc = Configuration.getPlayerSWC();
-        if (swc == null || !swc.exists()) {
-            if (View.showConfirmDialog(this, AppStrings.translate("message.playerpath.lib.notset"), AppStrings.translate("message.action.playerglobal.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE) == JOptionPane.OK_OPTION) {
-                Main.advancedSettings("paths");
-                return;
-            }
-        }
-        String flexLocation = Configuration.flexSdkLocation.get();
-        if (flexLocation.isEmpty() || (!new File(flexLocation).exists())) {
-            View.showMessageDialog(null, AppStrings.translate("message.flexpath.notset"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-            Main.advancedSettings("paths");
+        if (mainPanel.getAs3ScriptReplacer() == null) {
             return;
         }
         if (View.showConfirmDialog(null, AppStrings.translate("message.confirm.experimental.function"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, Configuration.warningExperimentalAS3Edit, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION) {
@@ -1180,7 +1171,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         try {
             String oldSp = pack.getClassPath().toRawString();
             String as = decompiledTextArea.getText();
-            abc.replaceScriptPack(pack, as);
+            abc.replaceScriptPack(mainPanel.getAs3ScriptReplacer(), pack, as);
             lastDecompiled = as;
             setDecompiledEditMode(false);
             mainPanel.updateClassesList();

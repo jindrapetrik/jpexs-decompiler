@@ -36,7 +36,7 @@ public class AS3ScriptImporter {
 
     private static final Logger logger = Logger.getLogger(AS3ScriptImporter.class.getName());
 
-    public int importScripts(String scriptsFolder, List<ScriptPack> packs) {
+    public int importScripts(As3ScriptReplacerInterface scriptReplacer, String scriptsFolder, List<ScriptPack> packs) {
         if (!scriptsFolder.endsWith(File.separator)) {
             scriptsFolder += File.separator;
         }
@@ -50,7 +50,7 @@ public class AS3ScriptImporter {
                     String txt = Helper.readTextFile(fileName);
 
                     try {
-                        pack.abc.replaceScriptPack(pack, txt);
+                        pack.abc.replaceScriptPack(scriptReplacer, pack, txt);
                     } catch (AVM2ParseException ex) {
                         logger.log(Level.SEVERE, "%error% on line %line%, file: %file%".replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)).replace("%file%", fileName));
                     } catch (CompilationException ex) {

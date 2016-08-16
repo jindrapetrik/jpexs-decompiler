@@ -613,6 +613,10 @@ public class Configuration {
     @ConfigurationInternal
     public static final ConfigurationItem<Double> guiAvm2DocsSplitPaneDividerLocationPercent = null;
 
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("script")
+    public static final ConfigurationItem<Boolean> useFlexAs3Compiler = null;
+
     private enum OSId {
 
         WINDOWS, OSX, UNIX

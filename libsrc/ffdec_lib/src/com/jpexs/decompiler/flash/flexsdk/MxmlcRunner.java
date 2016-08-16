@@ -15,14 +15,14 @@ public class MxmlcRunner {
         this.flexSdkPath = flexSdkPath;
     }
 
-    public String getMxmlcPath() {
+    public static String getMxmlcPath(String flexSdkPath) {
         boolean isWin = System.getProperty("os.name").toLowerCase().contains("win");
         return flexSdkPath + File.separator + "bin" + File.separator + "mxmlc" + (isWin ? ".exe" : "");
     }
 
     public void mxmlc(String... arguments) throws MxmlcException, InterruptedException, IOException {
         String runArgs[] = new String[arguments.length + 1];
-        runArgs[0] = getMxmlcPath();
+        runArgs[0] = getMxmlcPath(flexSdkPath);
         System.arraycopy(arguments, 0, runArgs, 1, arguments.length);
         System.out.println("" + String.join(" ", runArgs));
         Process proc = null;

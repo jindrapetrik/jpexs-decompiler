@@ -73,6 +73,7 @@ import com.jpexs.decompiler.flash.exporters.settings.SpriteExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
 import com.jpexs.decompiler.flash.exporters.swf.SwfJavaExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfXmlExporter;
+import com.jpexs.decompiler.flash.flexsdk.MxmlcAs3ScriptReplacer;
 import com.jpexs.decompiler.flash.gui.abc.ABCPanel;
 import com.jpexs.decompiler.flash.gui.abc.ABCPanelSearchResult;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
@@ -94,7 +95,10 @@ import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.helpers.Freed;
 import com.jpexs.decompiler.flash.importers.AS2ScriptImporter;
 import com.jpexs.decompiler.flash.importers.AS3ScriptImporter;
+import com.jpexs.decompiler.flash.importers.As3ScriptReplacerFactory;
+import com.jpexs.decompiler.flash.importers.As3ScriptReplacerInterface;
 import com.jpexs.decompiler.flash.importers.BinaryDataImporter;
+import com.jpexs.decompiler.flash.importers.FFDecAs3ScriptReplacer;
 import com.jpexs.decompiler.flash.importers.ImageImporter;
 import com.jpexs.decompiler.flash.importers.ShapeImporter;
 import com.jpexs.decompiler.flash.importers.SwfXmlImporter;
@@ -861,11 +865,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 ? translate("message.confirm.closeAll")
                 : translate("message.confirm.close").replace("{swfName}", swfList.toString());
 
-        if (View.showConfirmDialog(this, message, translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, Configuration.showCloseConfirmation, JOptionPane.OK_OPTION) != JOptionPane.OK_OPTION) {
-            return false;
-        }
-
-        return true;
+        return View.showConfirmDialog(this, message, translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, Configuration.showCloseConfirmation, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION;
     }
 
     public boolean isModified() {
@@ -2143,15 +2143,32 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
     }
 
-    public void importScript(final SWF swf) {
+    public As3ScriptReplacerInterface getAs3ScriptReplacer() {
+        As3ScriptReplacerInterface r = As3ScriptReplacerFactory.createByConfig();
+        if (!r.isAvailable()) {
+            if (r instanceof MxmlcAs3ScriptReplacer) {
+                if (View.showConfirmDialog(null, AppStrings.translate("message.flexpath.notset"), AppStrings.translate("error"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION) {
+                    Main.advancedSettings("paths");
+                }
+            } else if (r instanceof FFDecAs3ScriptReplacer) {
+                if (View.showConfirmDialog(this, AppStrings.translate("message.playerpath.lib.notset"), AppStrings.translate("message.action.playerglobal.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION) {
+                    Main.advancedSettings("paths");
+                }
+            } else {
+                //Not translated yet - just in case there are more Script replacers in the future. Unused now.
+                View.showConfirmDialog(this, "Current script replacer is not available", "Script replacer not available", JOptionPane.OK_OPTION, JOptionPane.ERROR_MESSAGE);
+            }
+            return null;
+        }
+        return r;
+    }
 
-        String flexLocation = Configuration.flexSdkLocation.get();
-        if (flexLocation.isEmpty() || (!new File(flexLocation).exists())) {
-            View.showMessageDialog(null, AppStrings.translate("message.flexpath.notset"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-            Main.advancedSettings("paths");
+    public void importScript(final SWF swf) {
+        As3ScriptReplacerInterface as3ScriptReplacer = getAs3ScriptReplacer();
+        if (as3ScriptReplacer == null) {
             return;
         }
-
+        String flexLocation = Configuration.flexSdkLocation.get();
         JFileChooser chooser = new JFileChooser();
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("import.select.directory"));
@@ -2162,7 +2179,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             String scriptsFolder = Path.combine(selFile, ScriptExportSettings.EXPORT_FOLDER_NAME);
 
             int countAs2 = new AS2ScriptImporter().importScripts(scriptsFolder, swf.getASMs(true));
-            int countAs3 = new AS3ScriptImporter().importScripts(scriptsFolder, swf.getAS3Packs());
+            int countAs3 = new AS3ScriptImporter().importScripts(as3ScriptReplacer, scriptsFolder, swf.getAS3Packs());
 
             if (countAs3 > 0) {
                 updateClassesList();

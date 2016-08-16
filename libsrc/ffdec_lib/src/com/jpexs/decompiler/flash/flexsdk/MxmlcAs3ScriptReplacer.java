@@ -3,6 +3,7 @@ package com.jpexs.decompiler.flash.flexsdk;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
+import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
@@ -15,6 +16,7 @@ import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
 import com.jpexs.decompiler.flash.exporters.swf.SwfToSwcExporter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
 import java.io.ByteArrayInputStream;
@@ -28,12 +30,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import com.jpexs.decompiler.flash.importers.As3ScriptReplacerInterface;
 
-public class As3ScriptReplacer extends MxmlcRunner {
+public class MxmlcAs3ScriptReplacer extends MxmlcRunner implements As3ScriptReplacerInterface {
 
     private LinkReportExporter linkReporter;
 
-    public As3ScriptReplacer(String flexSdkPath, LinkReportExporter linkReporter) {
+    public MxmlcAs3ScriptReplacer(String flexSdkPath, LinkReportExporter linkReporter) {
         super(flexSdkPath);
         this.linkReporter = linkReporter;
     }
@@ -87,8 +90,9 @@ public class As3ScriptReplacer extends MxmlcRunner {
         return false;
     }
 
-    public void replaceScript(SWF swf, ScriptPack oldPack, String txt) throws IOException, MxmlcException, InterruptedException {
-        if (!oldPack.isSimple) {
+    @Override
+    public void replaceScript(ScriptPack pack, String text) throws AVM2ParseException, CompilationException, IOException, InterruptedException {
+        if (!pack.isSimple) {
             throw new IOException("Cannot compile such file"); //Alchemy, etc.
         }
 
@@ -96,23 +100,23 @@ public class As3ScriptReplacer extends MxmlcRunner {
         try {
             tempDir = Files.createTempDirectory("ffdec-mxmlc-replace").toFile();
             File pkgDir = tempDir;
-            for (String pkgPart : oldPack.getClassPath().packageStr.toList()) {
+            for (String pkgPart : pack.getClassPath().packageStr.toList()) {
                 if (!pkgPart.isEmpty()) {
                     pkgDir = new File(pkgDir, pkgPart);
                 }
             }
             pkgDir.mkdirs();
-            File scriptFileToCompile = new File(pkgDir, oldPack.getClassPath().className + ".as");
+            File scriptFileToCompile = new File(pkgDir, pack.getClassPath().className + ".as");
             File compiledSwfFile = new File(pkgDir, "out.swf");
             File swcFile = new File(pkgDir, "out.swc");
 
             //Make copy without the old script
-            SWF swfCopy = recompileSWF(swf);
+            SWF swfCopy = recompileSWF(pack.getSwf());
             List<ABC> modAbcs = new ArrayList<>();
 
             List<ScriptPack> copyPacks = swfCopy.getAS3Packs();
             for (ScriptPack sp : copyPacks) {
-                if (sp.getClassPath().equals(oldPack.getClassPath())) {
+                if (sp.getClassPath().equals(pack.getClassPath())) {
                     sp.abc.script_info.get(sp.scriptIndex).delete(sp.abc, true);
                     ((Tag) sp.abc.parentTag).setModified(true);
                     modAbcs.add(sp.abc);
@@ -151,18 +155,22 @@ public class As3ScriptReplacer extends MxmlcRunner {
             swcExport.exportSwf(swfCopy, swcFile, true);
 
             //Write new script
-            Helper.writeFile(scriptFileToCompile.getAbsolutePath(), txt.getBytes("UTF-8"));
+            Helper.writeFile(scriptFileToCompile.getAbsolutePath(), text.getBytes("UTF-8"));
 
-            //Compile it (and subclasses stubs)
-            mxmlc("-strict=false", "-include-inheritance-dependencies-only", "-warnings=false", "-library-path", swcFile.getAbsolutePath(), "-source-path", tempDir.getAbsolutePath(), "-output", compiledSwfFile.getAbsolutePath(), "-debug=true", scriptFileToCompile.getAbsolutePath());
+            try {
+                //Compile it (and subclasses stubs)
+                mxmlc("-strict=false", "-include-inheritance-dependencies-only", "-warnings=false", "-library-path", swcFile.getAbsolutePath(), "-source-path", tempDir.getAbsolutePath(), "-output", compiledSwfFile.getAbsolutePath(), "-debug=true", scriptFileToCompile.getAbsolutePath());
+            } catch (MxmlcException ex1) {
+                throw new AVM2ParseException(ex1.getMxmlcErrorOutput(), 0);
+            }
 
             try (FileInputStream fis = new FileInputStream(compiledSwfFile)) {
                 SWF newSWF = new SWF(fis, false, false);
                 List<ABCContainerTag> newTags = newSWF.getAbcList();
-                int oldScriptIndex = oldPack.scriptIndex;
+                int oldScriptIndex = pack.scriptIndex;
                 int oldClassIndex = -1;
 
-                ScriptInfo oldScriptInfo = oldPack.abc.script_info.get(oldPack.scriptIndex);
+                ScriptInfo oldScriptInfo = pack.abc.script_info.get(pack.scriptIndex);
                 for (Trait t : oldScriptInfo.traits.traits) {
                     if (t instanceof TraitClass) {
                         int traitClassIndex = ((TraitClass) t).class_info;
@@ -171,18 +179,18 @@ public class As3ScriptReplacer extends MxmlcRunner {
                         }
                     }
                 }
-                if (oldPack.isSimple) {
-                    oldScriptInfo.delete(oldPack.abc, true);
+                if (pack.isSimple) {
+                    oldScriptInfo.delete(pack.abc, true);
                 } else {
                     //NOO
                 }
-                oldPack.abc.pack(); // removes old classes/methods/scripts
+                pack.abc.pack(); // removes old classes/methods/scripts
                 ABCContainerTag newTagsLast = newTags.get(newTags.size() - 1);
                 ABC newLastAbc = newTagsLast.getABC();
                 Map<Integer, Integer> classesMap = new HashMap<>();
                 Map<Integer, Integer> scriptsMap = new HashMap<>();
 
-                oldPack.abc.mergeABC(newLastAbc,
+                pack.abc.mergeABC(newLastAbc,
                         new HashMap<>(),
                         new HashMap<>(),
                         new HashMap<>(),
@@ -207,10 +215,10 @@ public class As3ScriptReplacer extends MxmlcRunner {
                 List<ScriptInfo> addedScripts = new ArrayList<>();
                 for (int i = addedScriptIndices.size() - 1; i >= 0; i--) {
                     int newScriptIndex = addedScriptIndices.get(i);
-                    addedScripts.add(0, oldPack.abc.script_info.remove(newScriptIndex));
+                    addedScripts.add(0, pack.abc.script_info.remove(newScriptIndex));
                 }
                 for (int i = 0; i < addedScripts.size(); i++) {
-                    oldPack.abc.script_info.add(oldScriptIndex + i, addedScripts.get(i));
+                    pack.abc.script_info.add(oldScriptIndex + i, addedScripts.get(i));
                 }
 
                 //IMPORTANT: Map newly created classes to their position as they
@@ -219,7 +227,7 @@ public class As3ScriptReplacer extends MxmlcRunner {
                 if (oldClassIndex > -1) {
                     List<Integer> addedClassIndices = new ArrayList<>(classesMap.values());
                     Collections.sort(addedClassIndices);
-                    int totalClassCount = oldPack.abc.class_info.size();
+                    int totalClassCount = pack.abc.class_info.size();
                     Map<Integer, Integer> classesRemap = new HashMap<>();
                     for (int i = 0; i < addedClassIndices.size(); i++) {
                         classesRemap.put(addedClassIndices.get(i), oldClassIndex + i);
@@ -236,14 +244,20 @@ public class As3ScriptReplacer extends MxmlcRunner {
                             }
                         }
                     }
-                    oldPack.abc.reorganizeClasses(classesRemap);
+                    pack.abc.reorganizeClasses(classesRemap);
                 }
-                ((Tag) oldPack.abc.parentTag).setModified(true);
+                ((Tag) pack.abc.parentTag).setModified(true);
             }
         } finally {
             if (tempDir != null && tempDir.exists()) {
-                //deleteFolder(tempDir);
+                deleteFolder(tempDir);
             }
         }
+    }
+
+    @Override
+    public boolean isAvailable() {
+        String flexLocation = Configuration.flexSdkLocation.get();
+        return !(flexLocation.isEmpty() || (!new File(MxmlcRunner.getMxmlcPath(flexLocation)).exists()));
     }
 }

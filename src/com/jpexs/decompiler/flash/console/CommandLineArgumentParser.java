@@ -90,6 +90,7 @@ import com.jpexs.decompiler.flash.exporters.settings.SpriteExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
 import com.jpexs.decompiler.flash.exporters.swf.SwfToSwcExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfXmlExporter;
+import com.jpexs.decompiler.flash.flexsdk.MxmlcAs3ScriptReplacer;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.SearchInMemory;
@@ -101,7 +102,10 @@ import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.importers.AS2ScriptImporter;
 import com.jpexs.decompiler.flash.importers.AS3ScriptImporter;
+import com.jpexs.decompiler.flash.importers.As3ScriptReplacerFactory;
+import com.jpexs.decompiler.flash.importers.As3ScriptReplacerInterface;
 import com.jpexs.decompiler.flash.importers.BinaryDataImporter;
+import com.jpexs.decompiler.flash.importers.FFDecAs3ScriptReplacer;
 import com.jpexs.decompiler.flash.importers.FontImporter;
 import com.jpexs.decompiler.flash.importers.ImageImporter;
 import com.jpexs.decompiler.flash.importers.MorphShapeImporter;
@@ -3421,7 +3425,7 @@ public class CommandLineArgumentParser {
                 SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
                 String scriptsFolder = Path.combine(args.pop(), ScriptExportSettings.EXPORT_FOLDER_NAME);
                 new AS2ScriptImporter().importScripts(scriptsFolder, swf.getASMs(true));
-                new AS3ScriptImporter().importScripts(scriptsFolder, swf.getAS3Packs());
+                new AS3ScriptImporter().importScripts(As3ScriptReplacerFactory.createByConfig(), scriptsFolder, swf.getAS3Packs());
 
                 try {
                     try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(outFile))) {
@@ -3552,18 +3556,31 @@ public class CommandLineArgumentParser {
     private static void replaceAS3(String as, ScriptPack pack) throws IOException, InterruptedException {
         System.out.println("Replace AS3");
         System.out.println("Warning: This feature is EXPERIMENTAL");
-        File swc = Configuration.getPlayerSWC();
-        if (swc == null) {
-            final String adobePage = "http://www.adobe.com/support/flashplayer/downloads.html";
-            System.err.println("For ActionScript 3 direct editation, a library called \"PlayerGlobal.swc\" needs to be downloaded from Adobe homepage:");
-            System.err.println(adobePage);
-            System.err.println("Download the library called PlayerGlobal(.swc), and place it to directory");
-            System.err.println(Configuration.getFlashLibPath().getAbsolutePath());
+        As3ScriptReplacerInterface scriptReplacer = As3ScriptReplacerFactory.createByConfig();
+        if (!scriptReplacer.isAvailable()) {
+            System.err.println("Current script replacer is not available.");
+            if (scriptReplacer instanceof FFDecAs3ScriptReplacer) {
+                System.err.println("Current replacer: FFDec");
+                final String adobePage = "http://www.adobe.com/support/flashplayer/downloads.html";
+                System.err.println("For ActionScript 3 direct editation, a library called \"PlayerGlobal.swc\" needs to be downloaded from Adobe homepage:");
+                System.err.println(adobePage);
+                System.err.println("Download the library called PlayerGlobal(.swc), and place it to directory");
+                System.err.println(Configuration.getFlashLibPath().getAbsolutePath());
+            } else if (scriptReplacer instanceof MxmlcAs3ScriptReplacer) {
+                System.err.println("Current replacer: Flex SDK");
+                final String flexPage = "http://www.adobe.com/devnet/flex/flex-sdk-download.html";
+                System.err.println("For ActionScript 3 direct editation, Flex SDK needs to be download");
+                System.err.println(flexPage);
+                System.err.println("Download FLEX Sdk, unzip it to some directory and set its directory path in the configuration");
+
+            } else {
+
+            }
             System.exit(1);
         }
 
         try {
-            pack.abc.replaceScriptPack(pack, as);
+            pack.abc.replaceScriptPack(scriptReplacer, pack, as);
         } catch (AVM2ParseException ex) {
             System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)));
             System.exit(1);
