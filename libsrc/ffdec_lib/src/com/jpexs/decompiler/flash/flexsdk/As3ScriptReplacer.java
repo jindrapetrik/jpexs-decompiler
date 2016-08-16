@@ -131,7 +131,9 @@ public class As3ScriptReplacer extends MxmlcRunner {
                     removedPacks.add(sp);
                 }
             }
-
+            for (ScriptPack sp : removedPacks) {
+                System.out.println("Removing class " + sp.getClassPath());
+            }
             //Export subclasses so they can be compiled by Flex, but ONLY STUBS. 
             //No method code to avoid code compilation problems.
             //This compiled code won't be used at all in original SWF, 
@@ -152,7 +154,7 @@ public class As3ScriptReplacer extends MxmlcRunner {
             Helper.writeFile(scriptFileToCompile.getAbsolutePath(), txt.getBytes("UTF-8"));
 
             //Compile it (and subclasses stubs)
-            mxmlc("-include-inheritance-dependencies-only", "-warnings=false", "-library-path", swcFile.getAbsolutePath(), "-source-path", tempDir.getAbsolutePath(), "-output", compiledSwfFile.getAbsolutePath(), "-debug=true", scriptFileToCompile.getAbsolutePath());
+            mxmlc("-strict=false", "-include-inheritance-dependencies-only", "-warnings=false", "-library-path", swcFile.getAbsolutePath(), "-source-path", tempDir.getAbsolutePath(), "-output", compiledSwfFile.getAbsolutePath(), "-debug=true", scriptFileToCompile.getAbsolutePath());
 
             try (FileInputStream fis = new FileInputStream(compiledSwfFile)) {
                 SWF newSWF = new SWF(fis, false, false);
