@@ -507,6 +507,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
         if (byteDelta != 0) {
             code.updateInstructionByteCountByAddr(address, byteDelta, body);
         }
+        body.setModified();
     }
 
     /**
@@ -525,6 +526,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
         if (byteDelta != 0) {
             code.updateInstructionByteCountByAddr(address, byteDelta, body);
         }
+        body.setModified();
     }
 
 }

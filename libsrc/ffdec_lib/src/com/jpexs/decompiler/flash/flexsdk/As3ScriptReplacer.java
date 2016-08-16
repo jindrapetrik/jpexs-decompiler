@@ -158,16 +158,11 @@ public class As3ScriptReplacer extends MxmlcRunner {
                 } else {
                     //NOO
                 }
-                int oldTagIndex = swf.getTags().indexOf((Tag) oldPack.abc.parentTag);
                 oldPack.abc.pack(); // removes old classes/methods/scripts
-                if (oldPack.abc.script_info.isEmpty()) {
-                    swf.removeTag(oldTagIndex);
-                }
-                ABCContainerTag lastTag = newTags.get(newTags.size() - 1);
-                ((Tag) lastTag).setSwf(swf);
-                swf.addTag(oldTagIndex + 1, (Tag) lastTag);
-                //TODO: looks like ABCs need to be merged. Parent class needs to be defined earlier than used :-(
-                ((Tag) lastTag).setModified(true);
+                ABCContainerTag newTagsLast = newTags.get(newTags.size() - 1);
+                ABC newLastAbc = newTagsLast.getABC();
+                oldPack.abc.mergeABC(newLastAbc);
+                //TODO: reorder classes
                 ((Tag) oldPack.abc.parentTag).setModified(true);
             }
         } finally {
