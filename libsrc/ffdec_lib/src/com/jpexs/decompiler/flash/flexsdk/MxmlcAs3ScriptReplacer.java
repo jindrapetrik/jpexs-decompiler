@@ -135,9 +135,6 @@ public class MxmlcAs3ScriptReplacer extends MxmlcRunner implements As3ScriptRepl
                     removedPacks.add(sp);
                 }
             }
-            for (ScriptPack sp : removedPacks) {
-                System.out.println("Removing class " + sp.getClassPath());
-            }
             //Export subclasses so they can be compiled by Flex, but ONLY STUBS. 
             //No method code to avoid code compilation problems.
             //This compiled code won't be used at all in original SWF, 
