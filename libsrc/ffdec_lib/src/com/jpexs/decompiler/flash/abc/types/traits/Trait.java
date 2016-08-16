@@ -54,6 +54,7 @@ import java.io.Serializable;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -264,6 +265,7 @@ public abstract class Trait implements Cloneable, Serializable {
         }
 
         boolean hasImport = false;
+        Collections.sort(imports);
         for (DottedChain imp : imports) {
             if (imp.size() > 1) {  //No imports from root package
                 writer.appendNoHilight("import " + imp.toPrintableString(true) + ";").newLine();
