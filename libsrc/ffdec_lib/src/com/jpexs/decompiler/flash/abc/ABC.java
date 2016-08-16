@@ -1266,6 +1266,50 @@ public class ABC {
         }
     }
 
+    public void reorganizeClasses(Map<Integer, Integer> classIndexMap) {
+        for (MethodBody b : bodies) {
+            for (AVM2Instruction ins : b.getCode().code) {
+                for (int i = 0; i < ins.definition.operands.length; i++) {
+                    if (ins.definition.operands[i] == AVM2Code.DAT_CLASS_INDEX) {
+                        if (classIndexMap.containsKey(ins.operands[i])) {
+                            ins.setOperand(i, classIndexMap.get(ins.operands[i]), b.getCode(), b);
+                        }
+                    }
+                }
+            }
+        }
+        for (ScriptInfo si : script_info) {
+            reorganizeClassesInTraits(si.traits, classIndexMap);
+        }
+        for (MethodBody b : bodies) {
+            reorganizeClassesInTraits(b.traits, classIndexMap);
+        }
+        Map<Integer, InstanceInfo> backupInstanceInfos = new HashMap<>();
+        Map<Integer, ClassInfo> backupClassInfos = new HashMap<>();
+        for (int from : classIndexMap.keySet()) {
+            backupInstanceInfos.put(from, instance_info.get(from));
+            backupClassInfos.put(from, class_info.get(from));
+        }
+        for (int from : classIndexMap.keySet()) {
+            int to = classIndexMap.get(from);
+            instance_info.set(to, backupInstanceInfos.get(from));
+            class_info.set(to, backupClassInfos.get(from));
+        }
+    }
+
+    private void reorganizeClassesInTraits(Traits traits, Map<Integer, Integer> classIndexMap) {
+        for (Trait t : traits.traits) {
+            if (t instanceof TraitClass) {
+                TraitClass tc = (TraitClass) t;
+                reorganizeClassesInTraits(instance_info.get(tc.class_info).instance_traits, classIndexMap);
+                reorganizeClassesInTraits(class_info.get(tc.class_info).static_traits, classIndexMap);
+                if (classIndexMap.containsKey(tc.class_info)) {
+                    tc.class_info = classIndexMap.get(tc.class_info);
+                }
+            }
+        }
+    }
+
     public void removeClass(int index) {
         for (MethodBody b : bodies) {
             for (AVM2Instruction ins : b.getCode().code) {

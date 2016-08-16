@@ -5,6 +5,8 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
+import com.jpexs.decompiler.flash.abc.types.traits.Trait;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.script.AS3ScriptExporter;
@@ -22,7 +24,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class As3ScriptReplacer extends MxmlcRunner {
 
@@ -152,7 +157,18 @@ public class As3ScriptReplacer extends MxmlcRunner {
             try (FileInputStream fis = new FileInputStream(compiledSwfFile)) {
                 SWF newSWF = new SWF(fis, false, false);
                 List<ABCContainerTag> newTags = newSWF.getAbcList();
+                int oldScriptIndex = oldPack.scriptIndex;
+                int oldClassIndex = -1;
+
                 ScriptInfo oldScriptInfo = oldPack.abc.script_info.get(oldPack.scriptIndex);
+                for (Trait t : oldScriptInfo.traits.traits) {
+                    if (t instanceof TraitClass) {
+                        int traitClassIndex = ((TraitClass) t).class_info;
+                        if (oldClassIndex == -1 || traitClassIndex < oldClassIndex) {
+                            oldClassIndex = traitClassIndex;
+                        }
+                    }
+                }
                 if (oldPack.isSimple) {
                     oldScriptInfo.delete(oldPack.abc, true);
                 } else {
@@ -161,8 +177,65 @@ public class As3ScriptReplacer extends MxmlcRunner {
                 oldPack.abc.pack(); // removes old classes/methods/scripts
                 ABCContainerTag newTagsLast = newTags.get(newTags.size() - 1);
                 ABC newLastAbc = newTagsLast.getABC();
-                oldPack.abc.mergeABC(newLastAbc);
-                //TODO: reorder classes
+                Map<Integer, Integer> classesMap = new HashMap<>();
+                Map<Integer, Integer> scriptsMap = new HashMap<>();
+
+                oldPack.abc.mergeABC(newLastAbc,
+                        new HashMap<>(),
+                        new HashMap<>(),
+                        new HashMap<>(),
+                        new HashMap<>(),
+                        new HashMap<>(),
+                        new HashMap<>(),
+                        new HashMap<>(),
+                        new HashMap<>(),
+                        new HashMap<>(),
+                        new HashMap<>(),
+                        new HashMap<>(),
+                        new HashMap<>(),
+                        classesMap,
+                        new HashMap<>(),
+                        scriptsMap
+                );
+
+                //Reorder newly created scripts to be in place
+                //where old script was
+                List<Integer> addedScriptIndices = new ArrayList<>(scriptsMap.values());
+                Collections.sort(addedScriptIndices);
+                List<ScriptInfo> addedScripts = new ArrayList<>();
+                for (int i = addedScriptIndices.size() - 1; i >= 0; i--) {
+                    int newScriptIndex = addedScriptIndices.get(i);
+                    addedScripts.add(0, oldPack.abc.script_info.remove(newScriptIndex));
+                }
+                for (int i = 0; i < addedScripts.size(); i++) {
+                    oldPack.abc.script_info.add(oldScriptIndex + i, addedScripts.get(i));
+                }
+
+                //IMPORTANT: Map newly created classes to their position as they
+                //were in original script because FlashPlayer needs
+                //parent class to be defined earlier
+                if (oldClassIndex > -1) {
+                    List<Integer> addedClassIndices = new ArrayList<>(classesMap.values());
+                    Collections.sort(addedClassIndices);
+                    int totalClassCount = oldPack.abc.class_info.size();
+                    Map<Integer, Integer> classesRemap = new HashMap<>();
+                    for (int i = 0; i < addedClassIndices.size(); i++) {
+                        classesRemap.put(addedClassIndices.get(i), oldClassIndex + i);
+                    }
+                    int mappingStart = oldClassIndex;
+                    for (int i = oldClassIndex; i < totalClassCount; i++) {
+                        if (!classesRemap.containsKey(i)) {
+                            for (int j = mappingStart; j < totalClassCount; j++) {
+                                if (!classesRemap.containsValue(j)) {
+                                    classesRemap.put(i, j);
+                                    mappingStart = j + 1;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    oldPack.abc.reorganizeClasses(classesRemap);
+                }
                 ((Tag) oldPack.abc.parentTag).setModified(true);
             }
         } finally {
