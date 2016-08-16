@@ -235,8 +235,11 @@ public class SwfToSwcExporter {
         String catalogStr = generateCatalog(swf, swfBytes, skipDependencies);
 
         File tempFile = new File((outSwcFile.getAbsolutePath()) + ".tmp");
-        try (FileOutputStream fos = new FileOutputStream(tempFile);
-                ZipOutputStream zos = new ZipOutputStream(fos)) {
+        FileOutputStream fos = null;
+        ZipOutputStream zos = null;
+        try {
+            fos = new FileOutputStream(tempFile);
+            zos = new ZipOutputStream(fos);
 
             ZipEntry libraryEntry = new ZipEntry("library.swf");
             zos.putNextEntry(libraryEntry);
@@ -249,9 +252,27 @@ public class SwfToSwcExporter {
             zos.closeEntry();
 
             zos.close();
+            zos = null;
+            fos.close();
+            fos = null;
             outSwcFile.delete();
             tempFile.renameTo(outSwcFile);
         } finally {
+            if (zos != null) {
+                try {
+                    zos.close();
+                } catch (IOException ex) {
+                    //ignore
+                }
+
+            }
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException ex) {
+                    //ignore
+                }
+            }
             if (tempFile.exists()) {
                 tempFile.delete();
             }
