@@ -8,6 +8,7 @@ import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScript3Parser;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.graph.CompilationException;
 import java.io.File;
 import java.io.IOException;
@@ -19,12 +20,12 @@ public class FFDecAs3ScriptReplacer implements As3ScriptReplacerInterface {
 
     @Override
     public void replaceScript(ScriptPack pack, String text) throws As3ScriptReplaceException, IOException, InterruptedException {
+        ABC abc = pack.abc;
+        SWF swf = pack.abc.getSwf();
+        String scriptName = pack.getPathScriptName() + ".as";
+        int oldIndex = pack.scriptIndex;
+        int newIndex = abc.script_info.size();
         try {
-            ABC abc = pack.abc;
-            SWF swf = pack.abc.getSwf();
-            String scriptName = pack.getPathScriptName() + ".as";
-            int oldIndex = pack.scriptIndex;
-            int newIndex = abc.script_info.size();
             String documentClass = swf.getDocumentClass();
             boolean isDocumentClass = documentClass != null && documentClass.equals(pack.getClassPath().toString());
 
@@ -48,6 +49,7 @@ public class FFDecAs3ScriptReplacer implements As3ScriptReplacerInterface {
             List<ABC> otherAbcs = new ArrayList<>(pack.allABCs);
 
             otherAbcs.remove(abc);
+            abc.script_info.get(oldIndex).delete(abc, true);
 
             ActionScript3Parser.compile(text, abc, otherAbcs, isDocumentClass, scriptName, newClassIndex, oldIndex);
             if (pack.isSimple) {
@@ -55,20 +57,16 @@ public class FFDecAs3ScriptReplacer implements As3ScriptReplacerInterface {
                 abc.script_info.set(oldIndex, abc.script_info.get(newIndex));
                 abc.script_info.remove(newIndex);
             } else {
-                abc.script_info.get(newIndex).setModified(true);
-                //Note: Is deleting traits safe?
-                List<Integer> todel = new ArrayList<>(new TreeSet<>(pack.traitIndices));
-                for (int i = todel.size() - 1; i >= 0; i--) {
-                    si.traits.traits.remove((int) todel.get(i));
-                }
+                //???
             }
-
-            abc.script_info.get(oldIndex)
-                    .setModified(true);
+            abc.script_info.get(oldIndex).setModified(true);
+            abc.pack();//remove old deleted items            
+            ((Tag) abc.parentTag).setModified(true);
         } catch (AVM2ParseException ex) {
+            abc.script_info.get(oldIndex).delete(abc, false);
             throw new As3ScriptReplaceException(new As3ScriptReplaceExceptionItem(null, ex.text, (int) ex.line));
         } catch (CompilationException ex) {
-            throw new As3ScriptReplaceException(new As3ScriptReplaceExceptionItem(null, ex.text, ex.line));
+            abc.script_info.get(oldIndex).delete(abc, false);
         }
     }
 
