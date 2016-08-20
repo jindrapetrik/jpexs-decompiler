@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeSet;
 
 public class FFDecAs3ScriptReplacer implements As3ScriptReplacerInterface {
 

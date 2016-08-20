@@ -3,14 +3,11 @@ package com.jpexs.decompiler.flash.flexsdk;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.configuration.Configuration;
-import com.jpexs.helpers.Helper;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import org.testng.annotations.Test;
 
 public class As3ScriptReplacerTest {
 

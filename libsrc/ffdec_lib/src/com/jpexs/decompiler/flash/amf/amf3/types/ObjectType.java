@@ -1,14 +1,14 @@
 package com.jpexs.decompiler.flash.amf.amf3.types;
 
-import com.jpexs.decompiler.flash.amf.amf3.ListSet;
 import com.jpexs.decompiler.flash.amf.amf3.ListMap;
-import com.jpexs.decompiler.flash.exporters.amf.amf3.Amf3Exporter;
+import com.jpexs.decompiler.flash.amf.amf3.ListSet;
 import com.jpexs.decompiler.flash.amf.amf3.Traits;
-import java.util.ArrayList;
-import java.util.List;
 import com.jpexs.decompiler.flash.amf.amf3.WithSubValues;
+import com.jpexs.decompiler.flash.exporters.amf.amf3.Amf3Exporter;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
