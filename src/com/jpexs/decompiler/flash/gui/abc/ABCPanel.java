@@ -1202,11 +1202,13 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         } catch (As3ScriptReplaceException asre) {
             StringBuilder sb = new StringBuilder();
             int firstErrorLine = As3ScriptReplaceExceptionItem.LINE_UNKNOWN;
+            int firstErrorCol = As3ScriptReplaceExceptionItem.COL_UNKNOWN;
             abc.script_info.get(oldIndex).delete(abc, false);
 
             for (As3ScriptReplaceExceptionItem item : asre.getExceptionItems()) {
                 if (firstErrorLine == As3ScriptReplaceExceptionItem.LINE_UNKNOWN) {
                     firstErrorLine = item.getLine();
+                    firstErrorCol = item.getCol();
                 }
                 sb.append(item.getFile()).append(":").append(item.getLine()).append(" (column ").append(item.getCol()).append(")").append(":").append("\n");
                 sb.append("  ").append(item.getMessage());
@@ -1214,11 +1216,16 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
                 sb.append("\n");
             }
             if (firstErrorLine != As3ScriptReplaceExceptionItem.LINE_UNKNOWN) {
-                decompiledTextArea.gotoLine((int) firstErrorLine);
+                if (firstErrorCol != As3ScriptReplaceExceptionItem.COL_UNKNOWN) {
+                    decompiledTextArea.gotoLineCol(firstErrorLine, firstErrorCol);
+                } else {
+                    decompiledTextArea.gotoLine(firstErrorLine);
+                }
                 decompiledTextArea.markError();
             }
             //View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
             View.showMessageDialog(this, sb.toString(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+            decompiledTextArea.requestFocus();
         } catch (Throwable ex) {
             Logger.getLogger(ABCPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
