@@ -15,6 +15,20 @@ public class As3ScriptReplaceException extends Exception {
         this.exceptionItems = exceptionItems;
     }
 
+    @Override
+    public String getMessage() {
+        StringBuilder sb = new StringBuilder();
+        for (As3ScriptReplaceExceptionItem item : exceptionItems) {
+            sb.append(item.toString()).append("\r\n");
+        }
+        return sb.toString();
+    }
+
+    @Override
+    public String getLocalizedMessage() {
+        return getMessage();
+    }
+
     public As3ScriptReplaceException(As3ScriptReplaceExceptionItem exceptionItem) {
         this.exceptionItems = new ArrayList<>();
         this.exceptionItems.add(exceptionItem);

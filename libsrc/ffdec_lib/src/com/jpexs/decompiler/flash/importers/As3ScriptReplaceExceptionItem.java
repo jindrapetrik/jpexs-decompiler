@@ -41,4 +41,9 @@ public class As3ScriptReplaceExceptionItem {
         return col;
     }
 
+    @Override
+    public String toString() {
+        return (file != null ? "" + file : "") + (line != LINE_UNKNOWN ? ("(" + line + ")") : "") + (col != COL_UNKNOWN ? (" col: " + col) : "");
+    }
+
 }

@@ -27,11 +27,14 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
+import com.jpexs.decompiler.flash.importers.As3ScriptReplaceException;
+import com.jpexs.decompiler.flash.importers.As3ScriptReplacerFactory;
 import com.jpexs.decompiler.flash.importers.FFDecAs3ScriptReplacer;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.TranslateException;
+import com.jpexs.helpers.Helper;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -55,6 +58,7 @@ public class DirectEditingTest extends FileTestBase {
         Configuration.autoDeobfuscate.set(false);
         Configuration.simplifyExpressions.set(false);
         Configuration._debugCopy.set(false);
+        Configuration.useFlexAs3Compiler.set(false);
     }
 
     public static final String TESTDATADIR = "testdata/directediting";
@@ -91,9 +95,11 @@ public class DirectEditingTest extends FileTestBase {
                         try {
                             en.toSource(htw, abc.script_info.get(s).traits.traits, new ConvertData(), ScriptExportMode.AS, false);
                             String original = htw.toString();
-                            abc.replaceScriptPack(new FFDecAs3ScriptReplacer() /*TODO: test the otherone*/, en, original);
+                            abc.replaceScriptPack(As3ScriptReplacerFactory.createFFDec() /*TODO: test the otherone*/, en, original);
+                        } catch (As3ScriptReplaceException ex) {
+                            fail("Exception during decompilation - file: " + filePath + " class: " + classPathString + " msg:" + ex.getMessage(), ex);
                         } catch (Exception ex) {
-                            fail("Exception during decompilation - file: " + filePath + " class: " + classPathString, ex);
+                            fail("Exception during decompilation - file: " + filePath + " class: " + classPathString + " msg:" + ex.getMessage(), ex);
                             throw ex;
                         }
                     }
@@ -142,7 +148,7 @@ public class DirectEditingTest extends FileTestBase {
             }
             //TODO: try tu run it in debug flashplayer (?)
         } catch (Exception ex) {
-            fail("Exception during decompilation: " + filePath, ex);
+            fail("Exception during decompilation: " + filePath + ":" + ex.getMessage(), ex);
         }
     }
 
