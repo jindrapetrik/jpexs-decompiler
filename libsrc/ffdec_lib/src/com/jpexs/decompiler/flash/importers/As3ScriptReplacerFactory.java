@@ -1,7 +1,6 @@
 package com.jpexs.decompiler.flash.importers;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
-import com.jpexs.decompiler.flash.exporters.script.LinkReportExporter;
 import com.jpexs.decompiler.flash.flexsdk.MxmlcAs3ScriptReplacer;
 
 public class As3ScriptReplacerFactory {
@@ -15,7 +14,7 @@ public class As3ScriptReplacerFactory {
     }
 
     public static As3ScriptReplacerInterface createFlex() {
-        return new MxmlcAs3ScriptReplacer(Configuration.flexSdkLocation.get(), new LinkReportExporter());
+        return new MxmlcAs3ScriptReplacer(Configuration.flexSdkLocation.get());
     }
 
     public static As3ScriptReplacerInterface createFFDec() {

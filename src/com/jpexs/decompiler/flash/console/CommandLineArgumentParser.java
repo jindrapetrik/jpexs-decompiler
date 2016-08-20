@@ -102,6 +102,8 @@ import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.importers.AS2ScriptImporter;
 import com.jpexs.decompiler.flash.importers.AS3ScriptImporter;
+import com.jpexs.decompiler.flash.importers.As3ScriptReplaceException;
+import com.jpexs.decompiler.flash.importers.As3ScriptReplaceExceptionItem;
 import com.jpexs.decompiler.flash.importers.As3ScriptReplacerFactory;
 import com.jpexs.decompiler.flash.importers.As3ScriptReplacerInterface;
 import com.jpexs.decompiler.flash.importers.BinaryDataImporter;
@@ -3581,11 +3583,10 @@ public class CommandLineArgumentParser {
 
         try {
             pack.abc.replaceScriptPack(scriptReplacer, pack, as);
-        } catch (AVM2ParseException ex) {
-            System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)));
-            System.exit(1);
-        } catch (CompilationException ex) {
-            System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)));
+        } catch (As3ScriptReplaceException asre) {
+            for (As3ScriptReplaceExceptionItem item : asre.getExceptionItems()) {
+                logger.log(Level.SEVERE, "%error% on line %line%, column %col%, file: %file%".replace("%error%", item.getMessage()).replace("%line%", Long.toString(item.getLine())).replace("%file%", item.getFile()).replace("%col%", "" + item.getCol()));
+            }
             System.exit(1);
         }
     }

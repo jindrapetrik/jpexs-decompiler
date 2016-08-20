@@ -6,6 +6,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.script.Dependency;
 import com.jpexs.decompiler.flash.exporters.script.DependencyType;
 import com.jpexs.decompiler.flash.importers.SwfXmlImporter;
@@ -127,14 +128,15 @@ public class SwfToSwcExporter {
                 String defId = dottedChainToId(cp.packageStr.add(cp.className));
 
                 sb.append("        <def id=\"").append(defId).append("\" />\n");
-                List<Dependency> dependencies = new ArrayList<>();
-                List<String> uses = new ArrayList<>();
-                pack.abc.script_info.get(pack.scriptIndex).traits.getDependencies(null, pack.abc, dependencies, uses, new DottedChain("NO:PACKAGE"), new ArrayList<>());
 
                 Set<DottedChain> allDeps = new HashSet<>();
                 allDeps.add(new DottedChain("AS3"));
                 sb.append("        <dep id=\"AS3\" type=\"").append(DEPENDENCY_NAMESPACE).append("\" />\n");
                 if (!skipDependencies) {
+                    List<Dependency> dependencies = new ArrayList<>();
+                    List<String> uses = new ArrayList<>();
+                    pack.abc.script_info.get(pack.scriptIndex).traits.getDependencies(null, pack.abc, dependencies, uses, new DottedChain("NO:PACKAGE"), new ArrayList<>());
+
                     for (Dependency d : dependencies) {
                         if ("*".equals(d.getId().getLast())) {
                             continue;
@@ -185,14 +187,22 @@ public class SwfToSwcExporter {
     private SWF recompileSWF(SWF swf) throws IOException, InterruptedException {
         ByteArrayOutputStream swfOrigBaos = new ByteArrayOutputStream();
         swf.saveTo(swfOrigBaos);
-        return new SWF(new ByteArrayInputStream(swfOrigBaos.toByteArray()), false, false);
+        return new SWF(new ByteArrayInputStream(swfOrigBaos.toByteArray()), Configuration.parallelSpeedUp.get(), false);
+    }
+
+    private static void printDelay(String title, long t1, long t2) {
+        //System.out.println("time " + title + ": " + (t2 - t1));
     }
 
     public void exportSwf(SWF swf, File outSwcFile, boolean skipDependencies) throws IOException {
-
+        long t4 = 0;
         //Make local copy of SWF so we do not modify original
         try {
+            long t1 = System.currentTimeMillis();
             swf = recompileSWF(swf);
+            long t2 = System.currentTimeMillis();
+            printDelay("swc.recompile", t1, t2);
+
             final String HASH = "myhash";
             String abcTagXml = new String(Helper.readStream(SwfToSwcExporter.class.getResourceAsStream("/com/jpexs/decompiler/flash/exporters/swf/swc_main_abctag.xml")), "UTF-8");
             abcTagXml = abcTagXml.replace("%hash%", HASH);
@@ -208,6 +218,7 @@ public class SwfToSwcExporter {
                     break;
                 }
             }
+
             for (int i = 0; i < list.size(); i++) {
                 if (list.get(i) instanceof SymbolClassTag) {
                     SymbolClassTag sct = (SymbolClassTag) list.get(i);
@@ -220,19 +231,32 @@ public class SwfToSwcExporter {
                     }
                 }
             }
+            long t3 = System.currentTimeMillis();
+            printDelay("swc.documentTag", t2, t3);
+
             if (!documentClassSet) {
                 throw new IOException("Original document class not found!");
             }
             swf = recompileSWF(swf);
+            t4 = System.currentTimeMillis();
+            printDelay("swc.recompile2", t3, t4);
 
         } catch (Exception ex) {
+            ex.printStackTrace();
+            System.exit(0);
             throw new RuntimeException(ex);
         }
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         swf.saveTo(baos);
         byte[] swfBytes = baos.toByteArray();
+        long t5 = System.currentTimeMillis();
+        printDelay("swc.getBytes", t4, t5);
+
         String catalogStr = generateCatalog(swf, swfBytes, skipDependencies);
+
+        long t6 = System.currentTimeMillis();
+        printDelay("swc.generateCatalog", t5, t6);
 
         File tempFile = new File((outSwcFile.getAbsolutePath()) + ".tmp");
         FileOutputStream fos = null;
@@ -277,6 +301,8 @@ public class SwfToSwcExporter {
                 tempFile.delete();
             }
         }
+        long t7 = System.currentTimeMillis();
+        printDelay("swc.zip", t6, t7);
 
     }
 }

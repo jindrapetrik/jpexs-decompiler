@@ -51,10 +51,10 @@ public class AS3ScriptImporter {
 
                     try {
                         pack.abc.replaceScriptPack(scriptReplacer, pack, txt);
-                    } catch (AVM2ParseException ex) {
-                        logger.log(Level.SEVERE, "%error% on line %line%, file: %file%".replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)).replace("%file%", fileName));
-                    } catch (CompilationException ex) {
-                        logger.log(Level.SEVERE, "%error% on line %line%, file: %file%".replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)).replace("%file%", fileName));
+                    } catch (As3ScriptReplaceException asre) {
+                        for (As3ScriptReplaceExceptionItem item : asre.getExceptionItems()) {
+                            logger.log(Level.SEVERE, "%error% on line %line%, column %col%, file: %file%".replace("%error%", item.getMessage()).replace("%line%", Long.toString(item.getLine())).replace("%file%", fileName).replace("%col%", "" + item.getCol()));
+                        }
                     } catch (InterruptedException ex) {
                         logger.log(Level.SEVERE, "error during script import, file: %file%".replace("%file%", fileName), ex);
                     }

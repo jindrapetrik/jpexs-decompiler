@@ -56,19 +56,15 @@ import com.jpexs.decompiler.flash.abc.usages.MethodParamsMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.MethodReturnTypeMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.MultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.TypeNameMultinameUsage;
-import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecial;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecialType;
-import com.jpexs.decompiler.flash.exporters.script.LinkReportExporter;
-import com.jpexs.decompiler.flash.flexsdk.MxmlcAs3ScriptReplacer;
-import com.jpexs.decompiler.flash.flexsdk.MxmlcException;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
+import com.jpexs.decompiler.flash.importers.As3ScriptReplaceException;
 import com.jpexs.decompiler.flash.importers.As3ScriptReplacerInterface;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
-import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.utf8.Utf8PrintWriter;
 import java.io.IOException;
@@ -1405,7 +1401,7 @@ public class ABC {
         method_info.remove(index);
     }
 
-    public boolean replaceScriptPack(As3ScriptReplacerInterface replacer, ScriptPack pack, String as) throws AVM2ParseException, CompilationException, IOException, InterruptedException {
+    public boolean replaceScriptPack(As3ScriptReplacerInterface replacer, ScriptPack pack, String as) throws As3ScriptReplaceException, IOException, InterruptedException {
         replacer.replaceScript(pack, as);
         ((Tag) parentTag).setModified(true);
         return pack.isSimple;

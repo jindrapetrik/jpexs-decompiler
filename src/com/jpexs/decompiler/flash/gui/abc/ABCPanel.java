@@ -27,7 +27,6 @@ import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
-import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.Reference;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
@@ -69,11 +68,12 @@ import com.jpexs.decompiler.flash.gui.abc.tablemodels.UIntTableModel;
 import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
 import com.jpexs.decompiler.flash.gui.editor.LinkHandler;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
-import com.jpexs.decompiler.flash.importers.As3ScriptReplacerFactory;
+import com.jpexs.decompiler.flash.importers.As3ScriptReplaceException;
+import com.jpexs.decompiler.flash.importers.As3ScriptReplaceExceptionItem;
+import com.jpexs.decompiler.flash.importers.As3ScriptReplacerInterface;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
-import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import de.hameister.treetable.MyTreeTable;
@@ -117,6 +117,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
+import javax.swing.SwingWorker;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.EventListenerList;
 import javax.swing.event.TableModelListener;
@@ -134,6 +135,9 @@ import jsyntaxpane.TokenType;
  * @author JPEXS
  */
 public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABCPanelSearchResult>, TagEditorPanel {
+
+    private As3ScriptReplacerInterface scriptReplacer = null;
+    private ScriptPack pack = null;
 
     private final MainPanel mainPanel;
 
@@ -1151,27 +1155,40 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
     }
 
     private void editDecompiledButtonActionPerformed(ActionEvent evt) {
-        if (mainPanel.getAs3ScriptReplacer() == null) {
+        scriptReplacer = mainPanel.getAs3ScriptReplacer();
+        if (scriptReplacer == null) {
             return;
         }
+
         if (View.showConfirmDialog(null, AppStrings.translate("message.confirm.experimental.function"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, Configuration.warningExperimentalAS3Edit, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION) {
+            pack = decompiledTextArea.getScriptLeaf();
             setDecompiledEditMode(true);
+            SwingWorker initReplaceWorker = new SwingWorker() {
+                @Override
+                protected Object doInBackground() throws Exception {
+                    scriptReplacer.initReplacement(pack);
+                    return null;
+                }
+            };
+            initReplaceWorker.execute();
         }
     }
 
     private void cancelDecompiledButtonActionPerformed(ActionEvent evt) {
         setDecompiledEditMode(false);
+        if (scriptReplacer != null) {
+            scriptReplacer.deinitReplacement(pack);
+        }
     }
 
     private void saveDecompiledButtonActionPerformed(ActionEvent evt) {
-        ScriptPack pack = decompiledTextArea.getScriptLeaf();
         int oldIndex = pack.scriptIndex;
         SWF.uncache(pack);
-
         try {
             String oldSp = pack.getClassPath().toRawString();
             String as = decompiledTextArea.getText();
-            abc.replaceScriptPack(mainPanel.getAs3ScriptReplacer(), pack, as);
+            abc.replaceScriptPack(scriptReplacer, pack, as);
+            scriptReplacer.deinitReplacement(pack);
             lastDecompiled = as;
             setDecompiledEditMode(false);
             mainPanel.updateClassesList();
@@ -1182,20 +1199,28 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
             reload();
             View.showMessageDialog(this, AppStrings.translate("message.action.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showCodeSavedMessage);
-        } catch (AVM2ParseException ex) {
+        } catch (As3ScriptReplaceException asre) {
+            StringBuilder sb = new StringBuilder();
+            int firstErrorLine = As3ScriptReplaceExceptionItem.LINE_UNKNOWN;
             abc.script_info.get(oldIndex).delete(abc, false);
-            decompiledTextArea.gotoLine((int) ex.line);
-            decompiledTextArea.markError();
-            View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-        } catch (CompilationException ex) {
-            abc.script_info.get(oldIndex).delete(abc, false);
-            decompiledTextArea.gotoLine((int) ex.line);
-            decompiledTextArea.markError();
-            View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
 
+            for (As3ScriptReplaceExceptionItem item : asre.getExceptionItems()) {
+                if (firstErrorLine == As3ScriptReplaceExceptionItem.LINE_UNKNOWN) {
+                    firstErrorLine = item.getLine();
+                }
+                sb.append(item.getFile()).append(":").append(item.getLine()).append(" (column ").append(item.getCol()).append(")").append(":").append("\n");
+                sb.append("  ").append(item.getMessage());
+                sb.append("\n");
+                sb.append("\n");
+            }
+            if (firstErrorLine != As3ScriptReplaceExceptionItem.LINE_UNKNOWN) {
+                decompiledTextArea.gotoLine((int) firstErrorLine);
+                decompiledTextArea.markError();
+            }
+            //View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+            View.showMessageDialog(this, sb.toString(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
         } catch (Throwable ex) {
-            Logger.getLogger(ABCPanel.class
-                    .getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ABCPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
