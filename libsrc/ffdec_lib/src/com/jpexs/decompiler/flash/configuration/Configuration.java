@@ -539,6 +539,11 @@ public class Configuration {
     @ConfigurationFile(".*\\.swc$")
     public static final ConfigurationItem<String> playerLibLocation = null;
 
+    @ConfigurationDefaultString("")
+    @ConfigurationCategory("paths")
+    @ConfigurationDirectory
+    public static final ConfigurationItem<String> flexSdkLocation = null;
+
     @ConfigurationDefaultDouble(0.7)
     @ConfigurationName("gui.avm2.splitPane.vars.dividerLocationPercent")
     @ConfigurationInternal
@@ -607,6 +612,10 @@ public class Configuration {
     @ConfigurationName("gui.avm2.splitPane.docs.dividerLocationPercent")
     @ConfigurationInternal
     public static final ConfigurationItem<Double> guiAvm2DocsSplitPaneDividerLocationPercent = null;
+
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("script")
+    public static final ConfigurationItem<Boolean> useFlexAs3Compiler = null;
 
     private enum OSId {
 

@@ -28,7 +28,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class DottedChain implements Serializable {
+public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     public static final DottedChain EMPTY = new DottedChain(true);
 
@@ -277,5 +277,10 @@ public class DottedChain implements Serializable {
         }
 
         return true;
+    }
+
+    @Override
+    public int compareTo(DottedChain o) {
+        return toRawString().compareTo(o.toRawString());
     }
 }

@@ -77,7 +77,7 @@ public class ForEachInAVM2Item extends LoopItem implements Block {
 
 
          */
-        /*
+ /*
          if (!commands.isEmpty()) {
          GraphTargetItem firstAssign = commands.get(0);
          if (firstAssign instanceof SetTypeAVM2Item) {

@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
+import com.jpexs.decompiler.flash.importers.FFDecAs3ScriptReplacer;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -90,7 +91,7 @@ public class DirectEditingTest extends FileTestBase {
                         try {
                             en.toSource(htw, abc.script_info.get(s).traits.traits, new ConvertData(), ScriptExportMode.AS, false);
                             String original = htw.toString();
-                            abc.replaceScriptPack(en, original);
+                            abc.replaceScriptPack(new FFDecAs3ScriptReplacer() /*TODO: test the otherone*/, en, original);
                         } catch (Exception ex) {
                             fail("Exception during decompilation - file: " + filePath + " class: " + classPathString, ex);
                             throw ex;

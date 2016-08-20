@@ -26,6 +26,9 @@ import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.ValueKind;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
+import com.jpexs.decompiler.flash.exporters.script.Dependency;
+import com.jpexs.decompiler.flash.exporters.script.DependencyParser;
+import com.jpexs.decompiler.flash.exporters.script.DependencyType;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
@@ -103,7 +106,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         return writer;
     }
 
-    public void getValueStr(Trait parent, ConvertData convertData, GraphTextWriter writer, ABC abc, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
+    public void getValueStr(ScriptExportMode exportMode, Trait parent, ConvertData convertData, GraphTextWriter writer, ABC abc, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
         if (convertData.assignedValues.containsKey(this)) {
 
             AssignedValue assignment = convertData.assignedValues.get(this);
@@ -116,8 +119,9 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
                 writer.appendNoHilight(assignment.method);
                 writer.newLine();
             }
-
-            assignment.value.toString(writer, LocalData.create(abc.constants, new HashMap<>(), fullyQualifiedNames));
+            if (exportMode != ScriptExportMode.AS_METHOD_STUBS) {
+                assignment.value.toString(writer, LocalData.create(abc.constants, new HashMap<>(), fullyQualifiedNames));
+            }
             writer.endMethod();
             writer.endTrait();
             return;
@@ -162,7 +166,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         getNameStr(writer, abc, fullyQualifiedNames);
         if (value_kind != 0 || convertData.assignedValues.containsKey(this)) {
             writer.appendNoHilight(" = ");
-            getValueStr(parent, convertData, writer, abc, fullyQualifiedNames);
+            getValueStr(exportMode, parent, convertData, writer, abc, fullyQualifiedNames);
         }
         return writer.appendNoHilight(";").newLine();
     }
@@ -171,7 +175,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
     public void convert(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
         getNameStr(writer, abc, fullyQualifiedNames);
         if (value_kind != 0 || convertData.assignedValues.containsKey(this)) {
-            getValueStr(parent, convertData, writer, abc, fullyQualifiedNames);
+            getValueStr(exportMode, parent, convertData, writer, abc, fullyQualifiedNames);
         }
     }
 
@@ -196,12 +200,12 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public void getImportsUsages(String customNs, ABC abc, List<DottedChain> imports, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) {
+    public void getDependencies(String customNs, ABC abc, List<Dependency> dependencies, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) {
         if (ignorePackage == null) {
             ignorePackage = getPackage(abc);
         }
-        super.getImportsUsages(customNs, abc, imports, uses, ignorePackage, fullyQualifiedNames);
-        parseImportsUsagesFromMultiname(customNs, abc, imports, uses, abc.constants.getMultiname(type_index), getPackage(abc), fullyQualifiedNames);
+        super.getDependencies(customNs, abc, dependencies, uses, ignorePackage, fullyQualifiedNames);
+        DependencyParser.parseDependenciesFromMultiname(customNs, abc, dependencies, uses, abc.constants.getMultiname(type_index), getPackage(abc), fullyQualifiedNames, DependencyType.SIGNATURE);
     }
 
     @Override

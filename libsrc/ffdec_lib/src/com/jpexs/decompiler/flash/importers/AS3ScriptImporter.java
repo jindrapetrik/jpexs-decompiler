@@ -36,7 +36,7 @@ public class AS3ScriptImporter {
 
     private static final Logger logger = Logger.getLogger(AS3ScriptImporter.class.getName());
 
-    public int importScripts(String scriptsFolder, List<ScriptPack> packs) {
+    public int importScripts(As3ScriptReplacerInterface scriptReplacer, String scriptsFolder, List<ScriptPack> packs) {
         if (!scriptsFolder.endsWith(File.separator)) {
             scriptsFolder += File.separator;
         }
@@ -50,11 +50,11 @@ public class AS3ScriptImporter {
                     String txt = Helper.readTextFile(fileName);
 
                     try {
-                        pack.abc.replaceScriptPack(pack, txt);
-                    } catch (AVM2ParseException ex) {
-                        logger.log(Level.SEVERE, "%error% on line %line%, file: %file%".replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)).replace("%file%", fileName));
-                    } catch (CompilationException ex) {
-                        logger.log(Level.SEVERE, "%error% on line %line%, file: %file%".replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)).replace("%file%", fileName));
+                        pack.abc.replaceScriptPack(scriptReplacer, pack, txt);
+                    } catch (As3ScriptReplaceException asre) {
+                        for (As3ScriptReplaceExceptionItem item : asre.getExceptionItems()) {
+                            logger.log(Level.SEVERE, "%error% on line %line%, column %col%, file: %file%".replace("%error%", item.getMessage()).replace("%line%", Long.toString(item.getLine())).replace("%file%", fileName).replace("%col%", "" + item.getCol()));
+                        }
                     } catch (InterruptedException ex) {
                         logger.log(Level.SEVERE, "error during script import, file: %file%".replace("%file%", fileName), ex);
                     }

@@ -308,16 +308,12 @@ public class FunctionActionItem extends ActionItem {
                     } else {
                         v.setBoxedValue(new DirectValueActionItem(new RegisterNumber(registerNames.indexOf(varName), varName)));
                     }
+                } else if (v.isDefinition()) {
+                    v.setBoxedValue(new DefineLocalActionItem(null, null, ((ActionSourceGenerator) generator).pushConstTargetItem(varName), stored));
+                } else if (stored != null) {
+                    v.setBoxedValue(new SetVariableActionItem(null, null, ((ActionSourceGenerator) generator).pushConstTargetItem(varName), stored));
                 } else {
-                    if (v.isDefinition()) {
-                        v.setBoxedValue(new DefineLocalActionItem(null, null, ((ActionSourceGenerator) generator).pushConstTargetItem(varName), stored));
-                    } else {
-                        if (stored != null) {
-                            v.setBoxedValue(new SetVariableActionItem(null, null, ((ActionSourceGenerator) generator).pushConstTargetItem(varName), stored));
-                        } else {
-                            v.setBoxedValue(new GetVariableActionItem(null, null, ((ActionSourceGenerator) generator).pushConstTargetItem(varName)));
-                        }
-                    }
+                    v.setBoxedValue(new GetVariableActionItem(null, null, ((ActionSourceGenerator) generator).pushConstTargetItem(varName)));
                 }
 
             }

@@ -377,6 +377,14 @@ public class AVM2ConstantPool implements Cloneable {
         return null;
     }
 
+    public int getDecimalId(Decimal val, boolean add) {
+        int id = getDecimalId(val);
+        if (add && id == -1) {
+            id = addDecimal(val);
+        }
+        return id;
+    }
+
     public Float getFloat(int index) {
         try {
             return constant_float.get(index);
@@ -512,6 +520,10 @@ public class AVM2ConstantPool implements Cloneable {
 
     private int getFloat4Id(Float4 value) {
         return constant_float4.indexOf(value);
+    }
+
+    private int getDecimalId(Decimal value) {
+        return constant_decimal.indexOf(value);
     }
 
     private int getStringId(String value) {
@@ -754,5 +766,133 @@ public class AVM2ConstantPool implements Cloneable {
             return new AVM2Instruction(0, AVM2Instructions.PushUndefined, null);
         }
         return null;
+    }
+
+    /**
+     * Merges second constantpool into this one
+     *
+     * @param secondPool
+     * @param stringMap
+     * @param intMap
+     * @param uintMap
+     * @param doubleMap
+     * @param floatMap
+     * @param float4Map
+     * @param decimalMap
+     * @param namespaceMap
+     * @param namespaceSetMap
+     * @param multinameMap
+     */
+    public void merge(AVM2ConstantPool secondPool, Map<Integer, Integer> stringMap, Map<Integer, Integer> intMap, Map<Integer, Integer> uintMap, Map<Integer, Integer> doubleMap, Map<Integer, Integer> floatMap, Map<Integer, Integer> float4Map, Map<Integer, Integer> decimalMap, Map<Integer, Integer> namespaceMap, Map<Integer, Integer> namespaceSetMap, Map<Integer, Integer> multinameMap) {
+        stringMap.put(0, 0);
+        for (int i = 1; i < secondPool.constant_string.size(); i++) {
+            String val = secondPool.constant_string.get(i);
+            stringMap.put(i, getStringId(val, true));
+        }
+        intMap.put(0, 0);
+        for (int i = 1; i < secondPool.constant_int.size(); i++) {
+            Long val = secondPool.constant_int.get(i);
+            intMap.put(i, getIntId(val, true));
+        }
+        uintMap.put(0, 0);
+        for (int i = 1; i < secondPool.constant_uint.size(); i++) {
+            Long val = secondPool.constant_uint.get(i);
+            uintMap.put(i, getUIntId(val, true));
+        }
+        doubleMap.put(0, 0);
+        for (int i = 1; i < secondPool.constant_double.size(); i++) {
+            Double val = secondPool.constant_double.get(i);
+            doubleMap.put(i, getDoubleId(val, true));
+        }
+        floatMap.put(0, 0);
+        for (int i = 1; i < secondPool.constant_float.size(); i++) {
+            Float val = secondPool.constant_float.get(i);
+            floatMap.put(i, getFloatId(val, true));
+        }
+        float4Map.put(0, 0);
+        for (int i = 1; i < secondPool.constant_float4.size(); i++) {
+            Float4 val = secondPool.constant_float4.get(i);
+            float4Map.put(i, getFloat4Id(val, true));
+        }
+        decimalMap.put(0, 0);
+        for (int i = 1; i < secondPool.constant_decimal.size(); i++) {
+            Decimal val = secondPool.constant_decimal.get(i);
+            decimalMap.put(i, getDecimalId(val, true));
+        }
+        namespaceMap.put(0, 0);
+        for (int i = 1; i < secondPool.constant_namespace.size(); i++) {
+            Namespace secondNamespace = secondPool.constant_namespace.get(i);
+            int mappedId;
+            int newNameIndex = stringMap.get(secondNamespace.name_index);
+            if (secondNamespace.kind == Namespace.KIND_PRIVATE) {//always add, this does not exists in this ABC. Conflicting private namespaces can have same names.
+                mappedId = addNamespace(secondNamespace.kind, newNameIndex);
+            } else {
+                mappedId = getNamespaceId(secondNamespace.kind, newNameIndex, 0, true);
+            }
+            namespaceMap.put(i, mappedId);
+        }
+        namespaceSetMap.put(0, 0);
+        for (int i = 1; i < secondPool.constant_namespace_set.size(); i++) {
+            NamespaceSet secondNamespaceSet = secondPool.constant_namespace_set.get(i);
+            int mappedsNss[] = new int[secondNamespaceSet.namespaces.length];
+            for (int n = 0; n < secondNamespaceSet.namespaces.length; n++) {
+                mappedsNss[n] = namespaceMap.get(secondNamespaceSet.namespaces[n]);
+            }
+            int mappedId = getNamespaceSetId(mappedsNss, true);
+            namespaceSetMap.put(i, mappedId);
+        }
+        multinameMap.put(0, 0);
+        for (int i = 1; i < secondPool.constant_multiname.size(); i++) {
+            Multiname secondMultiname = secondPool.constant_multiname.get(i);
+            Multiname newMultiname = null;
+            int newNameIndex = secondMultiname.name_index <= 0 ? secondMultiname.name_index : stringMap.get(secondMultiname.name_index);
+            int newNsIndex = secondMultiname.namespace_index <= 0 ? secondMultiname.namespace_index : namespaceMap.get(secondMultiname.namespace_index);
+            int newNssIndex = secondMultiname.namespace_set_index <= 0 ? secondMultiname.namespace_set_index : namespaceSetMap.get(secondMultiname.namespace_set_index);
+
+            switch (secondMultiname.kind) {
+                case Multiname.MULTINAME:
+                    newMultiname = Multiname.createMultiname(false, newNameIndex, newNssIndex);
+                    break;
+                case Multiname.MULTINAMEA:
+                    newMultiname = Multiname.createMultiname(true, newNameIndex, newNssIndex);
+                    break;
+                case Multiname.MULTINAMEL:
+                    newMultiname = Multiname.createMultinameL(false, newNssIndex);
+                    break;
+                case Multiname.MULTINAMELA:
+                    newMultiname = Multiname.createMultinameL(true, newNssIndex);
+                    break;
+                case Multiname.QNAME:
+                    newMultiname = Multiname.createQName(false, newNameIndex, newNsIndex);
+                    break;
+                case Multiname.QNAMEA:
+                    newMultiname = Multiname.createQName(true, newNameIndex, newNsIndex);
+                    break;
+                case Multiname.RTQNAME:
+                    newMultiname = Multiname.createRTQName(false, newNameIndex);
+                    break;
+                case Multiname.RTQNAMEA:
+                    newMultiname = Multiname.createRTQName(true, newNameIndex);
+                    break;
+                case Multiname.RTQNAMEL:
+                    newMultiname = Multiname.createRTQNameL(false);
+                    break;
+                case Multiname.RTQNAMELA:
+                    newMultiname = Multiname.createRTQNameL(true);
+                    break;
+                case Multiname.TYPENAME:
+                    int newQnameIndex = multinameMap.get(secondMultiname.qname_index);
+                    int newParams[] = new int[secondMultiname.params.length];
+                    for (int p = 0; p < secondMultiname.params.length; p++) {
+                        newParams[p] = multinameMap.get(secondMultiname.params[p]);
+                    }
+                    newMultiname = Multiname.createTypeName(newQnameIndex, newParams);
+                    break;
+            }
+
+            int mappedId = getMultinameId(newMultiname, true);
+            multinameMap.put(i, mappedId);
+        }
+
     }
 }

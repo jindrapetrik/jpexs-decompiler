@@ -225,10 +225,8 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
             selectedLabel.setText(AppStrings.translate(name));
             if (trait == null) {
                 traitNameLabel.setText("-");
-            } else {
-                if (abcPanel != null) {
-                    traitNameLabel.setText(trait.getName(abcPanel.abc).getName(abcPanel.abc.constants, null, false));
-                }
+            } else if (abcPanel != null) {
+                traitNameLabel.setText(trait.getName(abcPanel.abc).getName(abcPanel.abc.constants, null, false));
             }
         });
 

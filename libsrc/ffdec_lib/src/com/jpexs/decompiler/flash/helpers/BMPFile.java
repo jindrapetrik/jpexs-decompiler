@@ -92,6 +92,7 @@ public class BMPFile extends Component {
             b.save(image, image.getWidth(null), image.getHeight(null));
         }
     }
+
     /*
      *  The saveMethod is the main method of the process. This method
      *  will call the convertImage method to convert the memory image to
@@ -100,7 +101,6 @@ public class BMPFile extends Component {
      *  information header; and writeBitmap writes the image.
      *
      */
-
     private void save(Image parImage, int parWidth, int parHeight) throws IOException {
         convertImage(parImage, parWidth, parHeight);
         writeBitmapFileHeader();
@@ -108,12 +108,12 @@ public class BMPFile extends Component {
         writeBitmap();
 
     }
+
     /*
      * convertImage converts the memory image to the bitmap format (BRG).
      * It also computes some information for the bitmap info header.
      *
      */
-
     private boolean convertImage(Image parImage, int parWidth, int parHeight) {
         int pad;
         bitmap = new int[parWidth * parHeight];
@@ -133,6 +133,7 @@ public class BMPFile extends Component {
         biHeight = parHeight;
         return (true);
     }
+
     /*
      * writeBitmap converts the image returned from the pixel grabber to
      * the format required. Remember: scan lines are inverted in
@@ -140,7 +141,6 @@ public class BMPFile extends Component {
      *
      * Each scan line must be padded to an even 4-byte boundary.
      */
-
     private void writeBitmap() throws IOException {
         byte[] rgb = new byte[3];
         int width = biWidth;
@@ -165,11 +165,11 @@ public class BMPFile extends Component {
         bfSize += padCount;
         biSizeImage += padCount;
     }
+
     /*
      * writeBitmapFileHeader writes the bitmap file header to the file.
      *
      */
-
     private void writeBitmapFileHeader() throws IOException {
 
         fo.write(bfType);
@@ -178,13 +178,13 @@ public class BMPFile extends Component {
         fo.write(intToWord(bfReserved2));
         fo.write(intToDWord(bfOffBits));
     }
+
     /*
      *
      * writeBitmapInfoHeader writes the bitmap information header
      * to the file.
      *
      */
-
     private void writeBitmapInfoHeader() throws IOException {
 
         fo.write(intToDWord(biSize));
@@ -200,26 +200,26 @@ public class BMPFile extends Component {
         fo.write(intToDWord(biClrImportant));
 
     }
+
     /*
      *
      * intToWord converts an int to a word, where the return
      * value is stored in a 2-byte array.
      *
      */
-
     private byte[] intToWord(int parValue) {
         byte[] retValue = new byte[2];
         retValue[0] = (byte) (parValue & 0x00FF);
         retValue[1] = (byte) ((parValue >> 8) & 0x00FF);
         return (retValue);
     }
+
     /*
      *
      * intToDWord converts an int to a double word, where the return
      * value is stored in a 4-byte array.
      *
      */
-
     private byte[] intToDWord(int parValue) {
         byte[] retValue = new byte[4];
         retValue[0] = (byte) (parValue & 0x00FF);

@@ -57,6 +57,7 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -68,6 +69,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 import javax.swing.WindowConstants;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableModel;
 import org.pushingpixels.substance.api.ColorSchemeAssociationKind;
@@ -479,24 +482,19 @@ public class AdvancedSettingsDialog extends AppDialog {
                     itemCount, 2, //rows, cols
                     6, 6, //initX, initY
                     6, 6);       //xPad, yPad
-            //https://www.adobe.com/support/flashplayer/debug_downloads.html
             if (resourceBundle.containsKey("config.group.tip." + cat)) {
                 String tip = resourceBundle.getString("config.group.tip." + cat);
-                String url = null;
+                String urls[] = new String[0];
                 if (resourceBundle.containsKey("config.group.link." + cat)) {
-                    url = resourceBundle.getString("config.group.link." + cat);
+                    urls = resourceBundle.getString("config.group.link." + cat).split(" ");
+                }
+                for (int i = 0; i < urls.length; i++) {
+                    tip = tip.replace("%link" + (i + 1) + "%", urls[i]);
                 }
                 JPanel p = new JPanel(new BorderLayout());
                 p.add(configPanel, BorderLayout.CENTER);
                 JPanel tipPanel = new JPanel(new FlowLayout());
-                tipPanel.add(new JLabel("<html><b>" + resourceBundle.getString("tip") + "</b>" + tip + "</html>"));
-                if (url != null) {
-                    String linkText = url;
-                    if (resourceBundle.containsKey("config.group.linkText." + cat)) {
-                        linkText = resourceBundle.getString("config.group.linkText." + cat);
-                    }
-                    tipPanel.add(new LinkLabel(linkText, url));
-                }
+                tipPanel.add(new HtmlLabel("<b>" + resourceBundle.getString("tip") + "</b>" + tip));
                 p.add(tipPanel, BorderLayout.SOUTH);
                 configPanel = p;
             }

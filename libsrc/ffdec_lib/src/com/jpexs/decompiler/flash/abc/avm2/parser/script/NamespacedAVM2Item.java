@@ -180,30 +180,28 @@ public class NamespacedAVM2Item extends AssignableAVM2Item {
                         killTemp(localData, generator, Arrays.asList(obj_temp))
                 );
             }
+        } else if (assignedValue != null) {
+            return toSourceMerge(localData, generator,
+                    obj == null ? ns : null, obj == null ? NameAVM2Item.generateCoerce(localData, generator, new TypeItem(DottedChain.NAMESPACE)) : null, obj != null ? obj : ins(AVM2Instructions.FindPropertyStrict, constants.getMultinameId(Multiname.createRTQName(attr, constants.getStringId(name, true)), true)),
+                    ns, NameAVM2Item.generateCoerce(localData, generator, new TypeItem(DottedChain.NAMESPACE)), assignedValue,
+                    needsReturn ? dupSetTemp(localData, generator, ret_temp) : null,
+                    ins(AVM2Instructions.SetProperty, constants.getMultinameId(Multiname.createRTQName(attr, constants.getStringId(name, true)), true)),
+                    needsReturn ? getTemp(localData, generator, ret_temp) : null,
+                    killTemp(localData, generator, Arrays.asList(ns_temp, index_temp, ret_temp))
+            );
         } else {
-            if (assignedValue != null) {
-                return toSourceMerge(localData, generator,
-                        obj == null ? ns : null, obj == null ? NameAVM2Item.generateCoerce(localData, generator, new TypeItem(DottedChain.NAMESPACE)) : null, obj != null ? obj : ins(AVM2Instructions.FindPropertyStrict, constants.getMultinameId(Multiname.createRTQName(attr, constants.getStringId(name, true)), true)),
-                        ns, NameAVM2Item.generateCoerce(localData, generator, new TypeItem(DottedChain.NAMESPACE)), assignedValue,
-                        needsReturn ? dupSetTemp(localData, generator, ret_temp) : null,
-                        ins(AVM2Instructions.SetProperty, constants.getMultinameId(Multiname.createRTQName(attr, constants.getStringId(name, true)), true)),
-                        needsReturn ? getTemp(localData, generator, ret_temp) : null,
-                        killTemp(localData, generator, Arrays.asList(ns_temp, index_temp, ret_temp))
-                );
-            } else {
-                return toSourceMerge(localData, generator,
-                        obj == null ? ns : null, obj == null ? NameAVM2Item.generateCoerce(localData, generator, new TypeItem(DottedChain.NAMESPACE)) : null, obj != null ? obj : ins(AVM2Instructions.FindPropertyStrict, constants.getMultinameId(Multiname.createRTQName(attr, constants.getStringId(name, true)), true)),
-                        call ? dupSetTemp(localData, generator, obj_temp) : null,
-                        ns, NameAVM2Item.generateCoerce(localData, generator, new TypeItem(DottedChain.NAMESPACE)),
-                        construct ? callargs : null,
-                        ins(construct ? AVM2Instructions.ConstructProp : delete ? AVM2Instructions.DeleteProperty : AVM2Instructions.GetProperty, constants.getMultinameId(Multiname.createRTQName(attr, constants.getStringId(name, true)), true), construct ? callargs.size() : null),
-                        call ? getTemp(localData, generator, obj_temp) : null,
-                        call ? callargs : null,
-                        call ? ins(AVM2Instructions.Call, callargs.size()) : null,
-                        needsReturn ? null : ins(AVM2Instructions.Pop),
-                        killTemp(localData, generator, Arrays.asList(obj_temp))
-                );
-            }
+            return toSourceMerge(localData, generator,
+                    obj == null ? ns : null, obj == null ? NameAVM2Item.generateCoerce(localData, generator, new TypeItem(DottedChain.NAMESPACE)) : null, obj != null ? obj : ins(AVM2Instructions.FindPropertyStrict, constants.getMultinameId(Multiname.createRTQName(attr, constants.getStringId(name, true)), true)),
+                    call ? dupSetTemp(localData, generator, obj_temp) : null,
+                    ns, NameAVM2Item.generateCoerce(localData, generator, new TypeItem(DottedChain.NAMESPACE)),
+                    construct ? callargs : null,
+                    ins(construct ? AVM2Instructions.ConstructProp : delete ? AVM2Instructions.DeleteProperty : AVM2Instructions.GetProperty, constants.getMultinameId(Multiname.createRTQName(attr, constants.getStringId(name, true)), true), construct ? callargs.size() : null),
+                    call ? getTemp(localData, generator, obj_temp) : null,
+                    call ? callargs : null,
+                    call ? ins(AVM2Instructions.Call, callargs.size()) : null,
+                    needsReturn ? null : ins(AVM2Instructions.Pop),
+                    killTemp(localData, generator, Arrays.asList(obj_temp))
+            );
         }
     }
 

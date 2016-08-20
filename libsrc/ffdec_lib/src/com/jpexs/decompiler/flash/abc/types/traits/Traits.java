@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
+import com.jpexs.decompiler.flash.exporters.script.Dependency;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.graph.DottedChain;
@@ -244,9 +245,9 @@ public class Traits implements Cloneable, Serializable {
         }
     }
 
-    public void getImportsUsages(String customNs, ABC abc, List<DottedChain> imports, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) {
+    public void getDependencies(String customNs, ABC abc, List<Dependency> dependencies, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) {
         for (Trait t : traits) {
-            t.getImportsUsages(customNs, abc, imports, uses, ignorePackage, fullyQualifiedNames);
+            t.getDependencies(customNs, abc, dependencies, uses, ignorePackage, fullyQualifiedNames);
         }
     }
 }

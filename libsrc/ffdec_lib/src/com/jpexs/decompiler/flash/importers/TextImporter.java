@@ -60,10 +60,8 @@ public class TextImporter {
                 int id = Integer.parseInt(idLine.substring(3).trim());
                 String[] records = textArr[1].split(recordSeparator);
                 result.put(id, records);
-            } else {
-                if (errorHandler.handle(null)) {
-                    return null;
-                }
+            } else if (errorHandler.handle(null)) {
+                return null;
             }
         }
         return result;
@@ -142,11 +140,9 @@ public class TextImporter {
                     return false;
                 }
             }
-        } else {
-            if (textTag != null) {
-                if (!saveText(textTag, newText, null)) {
-                    return false;
-                }
+        } else if (textTag != null) {
+            if (!saveText(textTag, newText, null)) {
+                return false;
             }
         }
 

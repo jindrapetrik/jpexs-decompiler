@@ -2502,6 +2502,7 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     public void clearImageCache() {
+        jtt = null;
         frameCache.clear();
         rectCache.clear();
         for (Tag tag : getTags()) {
@@ -2539,10 +2540,14 @@ public final class SWF implements SWFContainerItem, Timelined {
         System.gc();
     }
 
+    public void clearAbcListCache() {
+        abcList = null;
+    }
+
     public void clearAllCache() {
         characters = null;
         characterIdTags = null;
-        abcList = null;
+        clearAbcListCache();
         timeline = null;
         clearReadOnlyListCache();
         clearImageCache();

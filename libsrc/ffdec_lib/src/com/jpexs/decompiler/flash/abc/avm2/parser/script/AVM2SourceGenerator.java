@@ -2197,6 +2197,9 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 ts.traits.add(tc);
                 traits[k] = tc;
                 traits[k].metadata = generateMetadata(((InterfaceAVM2Item) item).metadata);
+                if (traits[k].metadata.length > 0) {
+                    traits[k].kindFlags |= Trait.ATTR_Metadata;
+                }
             }
 
             if (item instanceof ClassAVM2Item) {
@@ -2215,7 +2218,9 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 ts.traits.add(tc);
                 traits[k] = tc;
                 traits[k].metadata = generateMetadata(((ClassAVM2Item) item).metadata);
-
+                if (traits[k].metadata.length > 0) {
+                    traits[k].kindFlags |= Trait.ATTR_Metadata;
+                }
             }
             if ((item instanceof SlotAVM2Item) || (item instanceof ConstAVM2Item)) {
                 TraitSlotConst tsc = new TraitSlotConst();
@@ -2274,6 +2279,9 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 ts.traits.add(tsc);
                 traits[k] = tsc;
                 traits[k].metadata = metadata;
+                if (traits[k].metadata.length > 0) {
+                    traits[k].kindFlags |= Trait.ATTR_Metadata;
+                }
             }
             if ((item instanceof MethodAVM2Item) || (item instanceof GetterAVM2Item) || (item instanceof SetterAVM2Item)) {
                 MethodAVM2Item mai = (MethodAVM2Item) item;
@@ -2293,6 +2301,9 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
                 traits[k] = tmgs;
                 traits[k].metadata = generateMetadata(((MethodAVM2Item) item).metadata);
+                if (traits[k].metadata.length > 0) {
+                    traits[k].kindFlags |= Trait.ATTR_Metadata;
+                }
             }
             /*else if (item instanceof FunctionAVM2Item) {
              TraitFunction tf = new TraitFunction();

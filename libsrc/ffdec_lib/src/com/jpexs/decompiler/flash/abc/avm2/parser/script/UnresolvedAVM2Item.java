@@ -116,12 +116,12 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         }
         return -1;
     }
+
     /*
      public GraphTargetItem getNs() {
      return ns;
      }
      */
-
     public void appendName(String name) {
         this.name = this.name.add(name);
     }

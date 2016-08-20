@@ -485,7 +485,7 @@ public class DefineFont3Tag extends FontTag {
 
     @Override
     public boolean removeCharacter(char character) {
-        
+
         //Font Align Zones will be removed as removing character zones is not supported:-(
         for (int i = 0; i < swf.getTags().size(); i++) {
             Tag t = swf.getTags().get(i);
@@ -523,13 +523,13 @@ public class DefineFont3Tag extends FontTag {
         }
 
         shiftGlyphIndices(fontID, pos + 1, false);
-        
+
         checkWideParameters();
         setModified(true);
         getSwf().clearImageCache();
         return true;
     }
-    
+
     @Override
     public void setAdvanceValues(Font font) {
         boolean hasLayout = fontFlagsHasLayout;
