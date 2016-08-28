@@ -599,8 +599,9 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
             if (curLine == null) {
                 return;
             }
+            curLine = curLine.trim();
             //strip labels, e.g. ofs123:pushint 25
-            if (curLine.matches("^\\p{L}+:")) {
+            if (curLine.matches("\\p{L}[\\p{L}0-9]*:.*")) {
                 curLine = curLine.substring(curLine.indexOf(':') + 1).trim();
             }
 
@@ -617,7 +618,6 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
             if (loc != null) {
                 SwingUtilities.convertPointToScreen(loc, this);
             }
-
             if (insNameToDef.containsKey(insName)) {
                 fireDocs("instruction." + insName, As3PCodeDocs.getDocsForIns(insName, false, true, true), loc);
                 return;
