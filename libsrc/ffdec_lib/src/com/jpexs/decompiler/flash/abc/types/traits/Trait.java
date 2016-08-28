@@ -393,19 +393,23 @@ public abstract class Trait implements Cloneable, Serializable {
         writer.hilightSpecial(abc.constants.multinameToString(name_index), HighlightSpecialType.TRAIT_NAME);
 
         if ((kindFlags & ATTR_Final) > 0) {
-            writer.append(" flag ");
+            writer.newLine();
+            writer.append("flag ");
             writer.hilightSpecial("FINAL", HighlightSpecialType.ATTR_FINAL);
         }
         if ((kindFlags & ATTR_Override) > 0) {
-            writer.append(" flag ");
+            writer.newLine();
+            writer.append("flag ");
             writer.hilightSpecial("OVERRIDE", HighlightSpecialType.ATTR_OVERRIDE);
         }
         if ((kindFlags & ATTR_Metadata) > 0) {
-            writer.append(" flag ");
+            writer.newLine();
+            writer.append("flag ");
             writer.hilightSpecial("METADATA", HighlightSpecialType.ATTR_METADATA);
         }
         if ((kindFlags & ATTR_0x8) > 0) {
-            writer.append(" flag ");
+            writer.newLine();
+            writer.append("flag ");
             writer.hilightSpecial("0x8", HighlightSpecialType.ATTR_0x8);
         }
         if ((kindFlags & ATTR_Metadata) > 0) {
