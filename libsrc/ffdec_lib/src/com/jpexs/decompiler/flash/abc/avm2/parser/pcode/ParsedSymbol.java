@@ -196,6 +196,10 @@ public class ParsedSymbol {
 
     public static final int TYPE_KEYWORD_OVERRIDE = 85;
 
+    public static final int TYPE_KEYWORD_METADATA_BLOCK = 86;
+    public static final int TYPE_KEYWORD_ITEM = 87;
+    public static final int TYPE_KEYWORD_END = 88;
+
     public ParsedSymbol(int type, Object value) {
         this.type = type;
         this.value = value;

@@ -84,7 +84,7 @@ public class ActionScript3DeobfuscatorTest extends ActionScript2TestBase {
             }
         });
         MethodBody b = new MethodBody(abc, new Traits(), new byte[0], new ABCException[0]);
-        AVM2Code code = ASM3Parser.parse(new StringReader(str), abc.constants, null, b, new MethodInfo());
+        AVM2Code code = ASM3Parser.parse(abc, new StringReader(str), null, b, new MethodInfo());
         b.setCode(code);
         new AVM2DeobfuscatorJumps().avm2CodeRemoveTraps("test", 0, true, 0, abc, null, 0, b);
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);

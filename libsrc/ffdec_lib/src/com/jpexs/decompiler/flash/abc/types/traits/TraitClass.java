@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.exporters.script.DependencyParser;
 import com.jpexs.decompiler.flash.exporters.script.DependencyType;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TypeItem;
@@ -264,5 +265,14 @@ public class TraitClass extends Trait implements TraitWithSlot {
     public TraitClass clone() {
         TraitClass ret = (TraitClass) super.clone();
         return ret;
+    }
+
+    @Override
+    public GraphTextWriter convertTraitHeader(ABC abc, GraphTextWriter writer) {
+        convertCommonHeaderFlags("class", abc, writer);
+        writer.appendNoHilight(" slotid ");
+        writer.hilightSpecial(Integer.toString(slot_id), HighlightSpecialType.SLOT_ID);
+        writer.newLine();
+        return writer;
     }
 }

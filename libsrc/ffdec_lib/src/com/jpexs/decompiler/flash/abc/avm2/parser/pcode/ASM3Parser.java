@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.parser.pcode;
 
+import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
@@ -26,6 +27,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushShortIns;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.Float4;
+import com.jpexs.decompiler.flash.abc.types.MetadataInfo;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
@@ -40,10 +42,13 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.helpers.Helper;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  *
@@ -85,8 +90,8 @@ public class ASM3Parser {
         }
     }
 
-    public static AVM2Code parse(Reader reader, AVM2ConstantPool constants, Trait trait, MethodBody body, MethodInfo info) throws IOException, AVM2ParseException, InterruptedException {
-        return parse(reader, constants, trait, null, body, info);
+    public static AVM2Code parse(ABC abc, Reader reader, Trait trait, MethodBody body, MethodInfo info) throws IOException, AVM2ParseException, InterruptedException {
+        return parse(abc, reader, trait, null, body, info);
     }
 
     private static int checkMultinameIndex(AVM2ConstantPool constants, int index, int line) throws AVM2ParseException {
@@ -109,60 +114,109 @@ public class ASM3Parser {
         }
     }
 
-    public static boolean parseSlotConst(Reader reader, AVM2ConstantPool constants, TraitSlotConst tsc) throws IOException, AVM2ParseException {
-        Flasm3Lexer lexer = new Flasm3Lexer(reader);
-        expected(ParsedSymbol.TYPE_KEYWORD_TRAIT, "trait", lexer);
-        int name_index = parseMultiName(constants, lexer);
+    private static void parseTraitParams(ABC abc, Flasm3Lexer lexer, Trait t) throws IOException, AVM2ParseException {
+        ParsedSymbol symb;// = lexer.lex();
 
-        ParsedSymbol symb = lexer.lex();
+        List<Map.Entry<String, Map<String, String>>> metadata = new ArrayList<>();
 
         int flags = 0;
-        while (symb.type == ParsedSymbol.TYPE_KEYWORD_FLAG) {
+        while (true) {
             symb = lexer.lex();
-            switch (symb.type) {
-                case ParsedSymbol.TYPE_KEYWORD_FINAL:
-                    flags |= Trait.ATTR_Final;
-                    break;
-                case ParsedSymbol.TYPE_KEYWORD_OVERRIDE:
-                    flags |= Trait.ATTR_Override;
-                    break;
-                case ParsedSymbol.TYPE_KEYWORD_METADATA:
-                    flags |= Trait.ATTR_Metadata;
-                    break;
-                default:
-                    throw new AVM2ParseException("Invalid trait flag", lexer.yyline());
+            if (symb.type == ParsedSymbol.TYPE_KEYWORD_FLAG) {
+                symb = lexer.lex();
+                switch (symb.type) {
+                    case ParsedSymbol.TYPE_KEYWORD_FINAL:
+                        flags |= Trait.ATTR_Final;
+                        break;
+                    case ParsedSymbol.TYPE_KEYWORD_OVERRIDE:
+                        flags |= Trait.ATTR_Override;
+                        break;
+                    case ParsedSymbol.TYPE_KEYWORD_METADATA:
+                        flags |= Trait.ATTR_Metadata;
+                        break;
+                    default:
+                        throw new AVM2ParseException("Invalid trait flag", lexer.yyline());
+                }
+            } else if (symb.type == ParsedSymbol.TYPE_KEYWORD_METADATA_BLOCK) {
+                symb = lexer.lex();
+                expected(symb, ParsedSymbol.TYPE_STRING, "string metadata");
+                String mkey = (String) symb.value;
+                symb = lexer.lex();
+                Map<String, String> items = new HashMap<>();
+                while (symb.type == ParsedSymbol.TYPE_KEYWORD_ITEM) {
+                    symb = lexer.lex();
+                    expected(symb, ParsedSymbol.TYPE_STRING, "string key");
+                    String key = (String) symb.value;
+                    symb = lexer.lex();
+                    expected(symb, ParsedSymbol.TYPE_STRING, "string value");
+                    String val = (String) symb.value;
+                    items.put(key, val);
+                    symb = lexer.lex();
+                }
+                expected(symb, ParsedSymbol.TYPE_KEYWORD_END, "end");
+                symb = lexer.lex();
+                if (symb.type != ParsedSymbol.TYPE_COMMENT) {
+                    lexer.pushback(symb);
+                }
+                metadata.add(new AbstractMap.SimpleEntry<>(mkey, items));
+            } else {
+                lexer.pushback(symb);
+                break;
             }
-            symb = lexer.lex();
         }
 
-        switch (symb.type) {
-            case ParsedSymbol.TYPE_KEYWORD_SLOT:
-            case ParsedSymbol.TYPE_KEYWORD_CONST:
-                expected(ParsedSymbol.TYPE_KEYWORD_SLOTID, "slotid", lexer);
-                symb = lexer.lex();
-                expected(symb, ParsedSymbol.TYPE_INTEGER, "Integer");
-                int slotid = (int) (long) (Long) symb.value;
-                expected(ParsedSymbol.TYPE_KEYWORD_TYPE, "type", lexer);
-                int type = parseMultiName(constants, lexer);
-                expected(ParsedSymbol.TYPE_KEYWORD_VALUE, "value", lexer);
-                ValueKind val = parseValue(constants, lexer);
-                tsc.slot_id = slotid;
-                tsc.type_index = type;
-                tsc.value_kind = val.value_kind;
-                tsc.value_index = val.value_index;
-                tsc.kindFlags = flags;
-                break;
-            /*case ParsedSymbol.TYPE_KEYWORD_CLASS:
-             break;
-             case ParsedSymbol.TYPE_KEYWORD_FUNCTION:
-             break;
-             case ParsedSymbol.TYPE_KEYWORD_METHOD:
-             case ParsedSymbol.TYPE_KEYWORD_GETTER:
-             case ParsedSymbol.TYPE_KEYWORD_SETTER:
-             break;*/
-            default:
-                throw new AVM2ParseException("Unexpected trait type", lexer.yyline());
+        t.kindFlags = flags;
+        if ((flags & Trait.ATTR_Metadata) > 0) {
+            int metadataArray[] = new int[metadata.size()];
+            for (int i = 0; i < metadata.size(); i++) {
+                Map.Entry<String, Map<String, String>> entry = metadata.get(i);
+                int mkey = abc.constants.getStringId(entry.getKey(), true);
+                Map<String, String> items = entry.getValue();
+                int keys[] = new int[items.size()];
+                int vals[] = new int[items.size()];
+
+                int pos = 0;
+                for (String key : items.keySet()) {
+                    int ikey = abc.constants.getStringId(key, true);
+                    int ival = abc.constants.getStringId(items.get(key), true);
+                    keys[pos] = ikey;
+                    vals[pos] = ival;
+                    pos++;
+                }
+                MetadataInfo mi = new MetadataInfo(mkey, keys, vals);
+                metadataArray[i] = abc.getMetadataId(mi, true);
+            }
+            t.metadata = metadataArray;
         }
+
+    }
+
+    public static boolean parseSlotConst(ABC abc, Reader reader, AVM2ConstantPool constants, TraitSlotConst tsc) throws IOException, AVM2ParseException {
+        Flasm3Lexer lexer = new Flasm3Lexer(reader);
+        expected(ParsedSymbol.TYPE_KEYWORD_TRAIT, "trait", lexer);
+        ParsedSymbol symb = lexer.lex();
+        if (symb.type == ParsedSymbol.TYPE_KEYWORD_SLOT) {
+            tsc.kindType = Trait.TRAIT_SLOT;
+        } else if (symb.type == ParsedSymbol.TYPE_KEYWORD_CONST) {
+            tsc.kindType = Trait.TRAIT_CONST;
+        } else {
+            throw new AVM2ParseException("slot or const expected", lexer.yyline());
+        }
+        int name_index = parseMultiName(constants, lexer);
+        parseTraitParams(abc, lexer, tsc);
+
+        expected(ParsedSymbol.TYPE_KEYWORD_SLOTID, "slotid", lexer);
+        symb = lexer.lex();
+        expected(symb, ParsedSymbol.TYPE_INTEGER, "Integer");
+        int slotid = (int) (long) (Long) symb.value;
+        expected(ParsedSymbol.TYPE_KEYWORD_TYPE, "type", lexer);
+        int type = parseMultiName(constants, lexer);
+        expected(ParsedSymbol.TYPE_KEYWORD_VALUE, "value", lexer);
+        ValueKind val = parseValue(constants, lexer);
+        tsc.slot_id = slotid;
+        tsc.type_index = type;
+        tsc.value_kind = val.value_kind;
+        tsc.value_index = val.value_index;
         tsc.name_index = name_index;
         return true;
     }
@@ -515,7 +569,8 @@ public class ASM3Parser {
         return new ValueKind(value_index, value_kind);
     }
 
-    public static AVM2Code parse(Reader reader, AVM2ConstantPool constants, Trait trait, MissingSymbolHandler missingHandler, MethodBody body, MethodInfo info) throws IOException, AVM2ParseException, InterruptedException {
+    public static AVM2Code parse(ABC abc, Reader reader, Trait trait, MissingSymbolHandler missingHandler, MethodBody body, MethodInfo info) throws IOException, AVM2ParseException, InterruptedException {
+        AVM2ConstantPool constants = abc.constants;
         AVM2Code code = new AVM2Code();
 
         List<OffsetItem> offsetItems = new ArrayList<>();
@@ -566,6 +621,7 @@ public class ASM3Parser {
                                 break;
                         }
                         tm.name_index = parseMultiName(constants, lexer);
+                        parseTraitParams(abc, lexer, trait);
                         expected(ParsedSymbol.TYPE_KEYWORD_DISPID, "dispid", lexer);
                         symb = lexer.lex();
                         expected(symb, ParsedSymbol.TYPE_INTEGER, "Integer");
@@ -576,6 +632,9 @@ public class ASM3Parser {
                         if (!(trait instanceof TraitFunction)) {
                             throw new AVM2ParseException("Unxpected trait type", lexer.yyline());
                         }
+
+                        //NAME
+                        parseTraitParams(abc, lexer, trait);
                         break;
 
                 }

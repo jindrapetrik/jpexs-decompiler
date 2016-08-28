@@ -135,4 +135,13 @@ public class TraitFunction extends Trait implements TraitWithSlot {
             DependencyParser.parseDependenciesFromMethodInfo(customNs, abc, method_info, dependencies, uses, ignorePackage, fullyQualifiedNames, new ArrayList<>());
         }
     }
+
+    @Override
+    public GraphTextWriter convertTraitHeader(ABC abc, GraphTextWriter writer) {
+        convertCommonHeaderFlags("function", abc, writer);
+        writer.newLine();
+        writer.appendNoHilight("slotid ");
+        writer.hilightSpecial(Integer.toString(slot_id), HighlightSpecialType.SLOT_ID);
+        return writer;
+    }
 }

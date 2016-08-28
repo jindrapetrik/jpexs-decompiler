@@ -115,6 +115,9 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
 
     private HighlightedText getHighlightedText(ScriptExportMode exportMode) {
         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
+        if (trait != null && exportMode != ScriptExportMode.AS && exportMode != ScriptExportMode.AS_METHOD_STUBS) {
+            trait.convertTraitHeader(abc, writer);
+        }
         abc.bodies.get(bodyIndex).getCode().toASMSource(abc.constants, trait, abc.method_info.get(abc.bodies.get(bodyIndex).method_info), abc.bodies.get(bodyIndex), exportMode, writer);
         return new HighlightedText(writer);
     }
@@ -257,7 +260,7 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
                 MethodBody mb = abc.bodies.get(bodyIndex);
                 mb.setCodeBytes(data);
             } else {
-                AVM2Code acode = ASM3Parser.parse(new StringReader(text), abc.constants, trait, new MissingSymbolHandler() {
+                AVM2Code acode = ASM3Parser.parse(abc, new StringReader(text), trait, new MissingSymbolHandler() {
                     //no longer ask for adding new constants
                     @Override
                     public boolean missingString(String value) {

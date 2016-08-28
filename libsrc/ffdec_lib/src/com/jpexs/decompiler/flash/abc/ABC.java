@@ -68,6 +68,7 @@ import com.jpexs.helpers.utf8.Utf8PrintWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -155,6 +156,29 @@ public class ABC {
         if (protectedNS != 0) {
             abc.constants.getNamespace(protectedNS).deleted = d;
         }
+    }
+
+    /**
+     * Gets id of metadata/add metadata
+     *
+     * @param newMetadata
+     * @param add Add if not found?
+     * @return New index or -1 if not found (add=false)
+     */
+    public int getMetadataId(MetadataInfo newMetadata, boolean add) {
+        for (int m = 0; m < metadata_info.size(); m++) {
+            MetadataInfo metadata = metadata_info.get(m);
+            if (metadata.name_index == newMetadata.name_index && Arrays.equals(metadata.keys, newMetadata.keys) && Arrays.equals(metadata.values, newMetadata.values)) {
+                return m;
+            }
+        }
+        if (add) {
+            int newIndex = metadata_info.size();
+            metadata_info.add(newMetadata);
+            ((Tag) parentTag).setModified(true);
+            return newIndex;
+        }
+        return -1;
     }
 
     public TraitMethodGetterSetter addMethod(int classId, String name, boolean isStatic) {

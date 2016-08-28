@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.exporters.script.DependencyParser;
 import com.jpexs.decompiler.flash.exporters.script.DependencyType;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
@@ -75,6 +76,8 @@ public abstract class Trait implements Cloneable, Serializable {
     public static final int ATTR_Override = 0x2;
 
     public static final int ATTR_Metadata = 0x4;
+
+    public static final int ATTR_0x8 = 0x8; //unknown
 
     public static final int TRAIT_SLOT = 0;
 
@@ -379,6 +382,62 @@ public abstract class Trait implements Cloneable, Serializable {
     }
 
     public void convert(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
+    }
+
+    public abstract GraphTextWriter convertTraitHeader(ABC abc, GraphTextWriter writer);
+
+    public GraphTextWriter convertCommonHeaderFlags(String traitType, ABC abc, GraphTextWriter writer) {
+        writer.appendNoHilight("trait ");
+        writer.hilightSpecial(traitType, HighlightSpecialType.TRAIT_TYPE);
+        writer.appendNoHilight(" ");
+        writer.hilightSpecial(abc.constants.multinameToString(name_index), HighlightSpecialType.TRAIT_NAME);
+
+        if ((kindFlags & ATTR_Final) > 0) {
+            writer.append(" flag ");
+            writer.hilightSpecial("FINAL", HighlightSpecialType.ATTR_FINAL);
+        }
+        if ((kindFlags & ATTR_Override) > 0) {
+            writer.append(" flag ");
+            writer.hilightSpecial("OVERRIDE", HighlightSpecialType.ATTR_OVERRIDE);
+        }
+        if ((kindFlags & ATTR_Metadata) > 0) {
+            writer.append(" flag ");
+            writer.hilightSpecial("METADATA", HighlightSpecialType.ATTR_METADATA);
+        }
+        if ((kindFlags & ATTR_0x8) > 0) {
+            writer.append(" flag ");
+            writer.hilightSpecial("0x8", HighlightSpecialType.ATTR_0x8);
+        }
+        if ((kindFlags & ATTR_Metadata) > 0) {
+            writer.newLine();
+            for (int m : metadata) {
+                writer.append("metadata");
+                writer.append("\"");
+                writer.append(Helper.escapeActionScriptString(abc.constants.getString(abc.metadata_info.get(m).name_index)));
+                writer.append("\"");
+                writer.newLine();
+                if (m >= 0 && m < abc.metadata_info.size()) {
+                    for (int i = 0; i < abc.metadata_info.get(m).keys.length; i++) {
+                        int key = abc.metadata_info.get(m).keys[i];
+                        int val = abc.metadata_info.get(m).values[i];
+                        writer.append("item ");
+
+                        writer.append("\"");
+                        writer.append(Helper.escapeActionScriptString(abc.constants.getString(key)));
+                        writer.append("\"");
+
+                        writer.append(" ");
+
+                        writer.append("\"");
+                        writer.append(Helper.escapeActionScriptString(abc.constants.getString(val)));
+                        writer.append("\"");
+                        writer.newLine();
+                    }
+                }
+                writer.append("end ;metadata");
+            }
+        }
+        return writer;
     }
 
     public GraphTextWriter toStringPackaged(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {

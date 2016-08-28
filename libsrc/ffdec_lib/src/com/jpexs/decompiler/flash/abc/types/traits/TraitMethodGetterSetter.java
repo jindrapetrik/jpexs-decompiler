@@ -138,6 +138,9 @@ public class TraitMethodGetterSetter extends Trait {
         } else {
             writer.startBlock();
             if (exportMode != ScriptExportMode.AS_METHOD_STUBS) {
+                if (exportMode != ScriptExportMode.AS) {
+                    convertTraitHeader(abc, writer);
+                }
                 if (bodyIndex != -1) {
                     abc.bodies.get(bodyIndex).toString(path, exportMode, abc, this, writer, fullyQualifiedNames);
                 }
@@ -202,4 +205,24 @@ public class TraitMethodGetterSetter extends Trait {
         return true;
     }
 
+    @Override
+    public GraphTextWriter convertTraitHeader(ABC abc, GraphTextWriter writer) {
+
+        switch (kindType) {
+            case Trait.TRAIT_METHOD:
+                convertCommonHeaderFlags("method", abc, writer);
+                break;
+            case Trait.TRAIT_GETTER:
+                convertCommonHeaderFlags("getter", abc, writer);
+                break;
+            case Trait.TRAIT_SETTER:
+                convertCommonHeaderFlags("setter", abc, writer);
+                break;
+        }
+        writer.newLine();
+        writer.appendNoHilight("dispid ");
+        writer.hilightSpecial("" + disp_id, HighlightSpecialType.DISP_ID);
+        writer.newLine();
+        return writer;
+    }
 }

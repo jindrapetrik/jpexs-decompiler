@@ -3504,7 +3504,7 @@ public class CommandLineArgumentParser {
             mb.setCodeBytes(data);
         } else {
             try {
-                AVM2Code acode = ASM3Parser.parse(new StringReader(text), abc.constants, trait, new MissingSymbolHandler() {
+                AVM2Code acode = ASM3Parser.parse(abc, new StringReader(text), trait, new MissingSymbolHandler() {
                     //no longer ask for adding new constants
                     @Override
                     public boolean missingString(String value) {
