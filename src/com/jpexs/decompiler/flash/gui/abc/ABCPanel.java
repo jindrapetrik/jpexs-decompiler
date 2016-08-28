@@ -71,6 +71,7 @@ import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
 import com.jpexs.decompiler.flash.importers.As3ScriptReplaceException;
 import com.jpexs.decompiler.flash.importers.As3ScriptReplaceExceptionItem;
 import com.jpexs.decompiler.flash.importers.As3ScriptReplacerInterface;
+import com.jpexs.decompiler.flash.importers.FFDecAs3ScriptReplacer;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
@@ -1206,12 +1207,16 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
             StringBuilder sb = new StringBuilder();
             int firstErrorLine = As3ScriptReplaceExceptionItem.LINE_UNKNOWN;
             int firstErrorCol = As3ScriptReplaceExceptionItem.COL_UNKNOWN;
+            String firstErrorText = null;
             abc.script_info.get(oldIndex).delete(abc, false);
 
             for (As3ScriptReplaceExceptionItem item : asre.getExceptionItems()) {
                 if (firstErrorLine == As3ScriptReplaceExceptionItem.LINE_UNKNOWN) {
                     firstErrorLine = item.getLine();
                     firstErrorCol = item.getCol();
+                }
+                if (firstErrorText == null) {
+                    firstErrorText = item.getMessage();
                 }
                 sb.append(item.getFile()).append(":").append(item.getLine()).append(" (column ").append(item.getCol()).append(")").append(":").append("\n");
                 sb.append("  ").append(item.getMessage());
@@ -1226,8 +1231,12 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
                 }
                 decompiledTextArea.markError();
             }
-            //View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-            View.showMessageDialog(this, sb.toString(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+
+            if (scriptReplacer instanceof FFDecAs3ScriptReplacer) { //oldStyle error display - single error, no column
+                View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", firstErrorText).replace("%line%", Long.toString(firstErrorLine)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+            } else {
+                View.showMessageDialog(this, sb.toString(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+            }
             decompiledTextArea.requestFocus();
         } catch (Throwable ex) {
             Logger.getLogger(ABCPanel.class.getName()).log(Level.SEVERE, null, ex);
