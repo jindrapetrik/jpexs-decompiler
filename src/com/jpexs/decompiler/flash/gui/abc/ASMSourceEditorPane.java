@@ -23,13 +23,16 @@ import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2Graph;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.ASM3Parser;
+import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.Flasm3Lexer;
 import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.MissingSymbolHandler;
+import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.ParsedSymbol;
 import com.jpexs.decompiler.flash.abc.types.Decimal;
 import com.jpexs.decompiler.flash.abc.types.Float4;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.docs.As3PCodeDocs;
+import com.jpexs.decompiler.flash.docs.As3PCodeOtherDocs;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.gui.GraphDialog;
 import com.jpexs.decompiler.flash.gui.View;
@@ -46,9 +49,11 @@ import java.awt.Point;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
@@ -423,34 +428,210 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
         }
     }
 
+    private String getLevel() {
+        int currentLine = getLine();
+
+        int caretPos = getCaretPosition();
+        Flasm3Lexer lexer = new Flasm3Lexer(new StringReader(getText().replace("\r\n", "\n")));
+        ParsedSymbol symb;
+        String lastLevel = null;
+        final Integer singleUse[] = new Integer[]{
+            ParsedSymbol.TYPE_KEYWORD_FINAL,
+            ParsedSymbol.TYPE_KEYWORD_OVERRIDE,
+            ParsedSymbol.TYPE_KEYWORD_METADATA,
+            ParsedSymbol.TYPE_KEYWORD_NEED_REST,
+            ParsedSymbol.TYPE_KEYWORD_NEED_ARGUMENTS,
+            ParsedSymbol.TYPE_KEYWORD_NEED_ACTIVATION,
+            ParsedSymbol.TYPE_KEYWORD_SET_DXNS,
+            ParsedSymbol.TYPE_KEYWORD_IGNORE_REST,
+            ParsedSymbol.TYPE_KEYWORD_HAS_PARAM_NAMES,
+            ParsedSymbol.TYPE_KEYWORD_HAS_OPTIONAL
+        };
+
+        final Integer openingBlocks[] = new Integer[]{
+            ParsedSymbol.TYPE_KEYWORD_METHOD,
+            ParsedSymbol.TYPE_KEYWORD_CODE,
+            ParsedSymbol.TYPE_KEYWORD_BODY,
+            ParsedSymbol.TYPE_KEYWORD_TRAIT,
+            ParsedSymbol.TYPE_KEYWORD_METADATA_BLOCK
+        };
+        final Integer singleLine[] = new Integer[]{
+            ParsedSymbol.TYPE_KEYWORD_ITEM,
+            ParsedSymbol.TYPE_KEYWORD_NAME,
+            ParsedSymbol.TYPE_KEYWORD_FLAG,
+            ParsedSymbol.TYPE_KEYWORD_PARAM,
+            ParsedSymbol.TYPE_KEYWORD_PARAMNAME,
+            ParsedSymbol.TYPE_KEYWORD_OPTIONAL,
+            ParsedSymbol.TYPE_KEYWORD_RETURNS,
+            ParsedSymbol.TYPE_KEYWORD_MAXSTACK,
+            ParsedSymbol.TYPE_KEYWORD_LOCALCOUNT,
+            ParsedSymbol.TYPE_KEYWORD_INITSCOPEDEPTH,
+            ParsedSymbol.TYPE_KEYWORD_MAXSCOPEDEPTH,
+            ParsedSymbol.TYPE_KEYWORD_TRY,
+            ParsedSymbol.TYPE_KEYWORD_DISPID,
+            ParsedSymbol.TYPE_KEYWORD_SLOTID,};
+        final Integer parameters[] = new Integer[]{
+            ParsedSymbol.TYPE_KEYWORD_FROM,
+            ParsedSymbol.TYPE_KEYWORD_TO,
+            ParsedSymbol.TYPE_KEYWORD_TARGET,
+            ParsedSymbol.TYPE_KEYWORD_NAME,
+            ParsedSymbol.TYPE_KEYWORD_TYPE,
+            ParsedSymbol.TYPE_KEYWORD_SLOT,
+            ParsedSymbol.TYPE_KEYWORD_CONST,
+            ParsedSymbol.TYPE_KEYWORD_GETTER,
+            ParsedSymbol.TYPE_KEYWORD_SETTER};
+        final List<Integer> openingBlocksList = Arrays.asList(openingBlocks);
+        final List<Integer> singleLineList = Arrays.asList(singleLine);
+        final List<Integer> parameterList = Arrays.asList(parameters);
+        final List<Integer> singleUseList = Arrays.asList(singleUse);
+
+        final int TYPE_IGNORED = 0;
+        final int TYPE_OPENING_BLOCK = 1;
+        final int TYPE_LINE_BLOCK = 2;
+        final int TYPE_PARAMETER = 3;
+        final int TYPE_SINGLE_USE = 4;
+        final int TYPE_CLOSING_BLOCK = 5;
+
+        Stack<String> levels = new Stack<>();
+        Stack<Integer> types = new Stack<>();
+        Stack<Integer> lines = new Stack<>();
+
+        int prev = -1;
+        int lastType;
+        int lastLine = 0;
+        do {
+            try {
+                symb = lexer.lex();
+            } catch (IOException | AVM2ParseException ex) {
+                break; //error
+            }
+            int line = lexer.yyline();
+
+            lastLevel = null;
+            if (!levels.isEmpty()) {
+                lastLevel = levels.peek();
+            }
+
+            int type = TYPE_IGNORED;
+            if (symb.type == ParsedSymbol.TYPE_KEYWORD_METHOD && "trait".equals(lastLevel)) {
+                type = TYPE_PARAMETER;
+            } else if (symb.type == ParsedSymbol.TYPE_KEYWORD_NAME && "try".equals(lastLevel)) {
+                type = TYPE_PARAMETER;
+            } else if (openingBlocksList.contains(symb.type)) {
+                type = TYPE_OPENING_BLOCK;
+            } else if (singleLineList.contains(symb.type)) {
+                type = TYPE_LINE_BLOCK;
+            } else if (parameterList.contains(symb.type)) {
+                type = TYPE_PARAMETER;
+            } else if (singleUseList.contains(symb.type)) {
+                type = TYPE_SINGLE_USE;
+            } else if (symb.type == ParsedSymbol.TYPE_KEYWORD_END) {
+                if (levels.isEmpty()) {
+                    break; //error
+                }
+                levels.pop();
+                types.pop();
+                lines.pop();
+                type = TYPE_CLOSING_BLOCK;
+            }
+
+            boolean aboutToBreak = false;
+            //lexer.yylength()
+            if (caretPos < lexer.yychar() + lexer.yylength()) {
+                aboutToBreak = true;
+            }
+
+            if (line != lastLine && !levels.isEmpty()) {
+                while (types.peek() == TYPE_LINE_BLOCK || types.peek() == TYPE_PARAMETER) {
+                    levels.pop();
+                    types.pop();
+                    lines.pop();
+                }
+            }
+
+            if (type != TYPE_IGNORED) {
+                if (!levels.isEmpty()) {
+                    if (types.peek() == TYPE_PARAMETER) {
+                        levels.pop();
+                        types.pop();
+                        lines.pop();
+                    }
+                }
+                if (type != TYPE_CLOSING_BLOCK) {
+                    levels.push((String) symb.value);
+                    types.push(type);
+                    lines.push(lexer.yyline());
+                }
+
+            }
+            if (aboutToBreak) {
+                break;
+            }
+
+            if (type == TYPE_SINGLE_USE) {
+                if (!levels.isEmpty()) {
+                    levels.pop();
+                    types.pop();
+                    lines.pop();
+                }
+            }
+            prev = symb.type;
+            if (type == ParsedSymbol.TYPE_KEYWORD_CODE) {
+                //do not process code itself - it's too long
+                break;
+            }
+            lastLine = line;
+        } while (symb.type != ParsedSymbol.TYPE_EOF);
+        String ret = String.join(".", levels);
+        return ret;
+    }
+
     public void updateDocs() {
-        String curLine = getCurrentLineText();
+        String path = getLevel();
 
-        if (curLine == null) {
-            return;
+        String pathNoTrait = path;
+        if (path.startsWith("trait.method")) {
+            pathNoTrait = path.substring("trait.".length());
         }
-        //strip labels, e.g. ofs123:pushint 25
-        if (curLine.matches("^\\p{L}+:")) {
-            curLine = curLine.substring(curLine.indexOf(':') + 1).trim();
-        }
+        if (pathNoTrait.startsWith("method.body.code")) {
+            String curLine = getCurrentLineText();
 
-        //strip instruction arguments, we want only its name
-        if (curLine.contains(" ")) {
-            curLine = curLine.substring(0, curLine.indexOf(' '));
-        }
-        //strip comments, e.g. pushnull;comment
-        if (curLine.contains(";")) {
-            curLine = curLine.substring(0, curLine.indexOf(';'));
-        }
-        String insName = curLine.toLowerCase();
-        if (insNameToDef.containsKey(insName)) {
+            if (curLine == null) {
+                return;
+            }
+            //strip labels, e.g. ofs123:pushint 25
+            if (curLine.matches("^\\p{L}+:")) {
+                curLine = curLine.substring(curLine.indexOf(':') + 1).trim();
+            }
+
+            //strip instruction arguments, we want only its name
+            if (curLine.contains(" ")) {
+                curLine = curLine.substring(0, curLine.indexOf(' '));
+            }
+            //strip comments, e.g. pushnull;comment
+            if (curLine.contains(";")) {
+                curLine = curLine.substring(0, curLine.indexOf(';'));
+            }
+            String insName = curLine.toLowerCase();
             Point loc = getLineLocation(getLine() + 1);
             if (loc != null) {
                 SwingUtilities.convertPointToScreen(loc, this);
             }
-            fireDocs(insName, As3PCodeDocs.getDocsForIns(insName, false, true, true), loc);
-        } else {
+
+            if (insNameToDef.containsKey(insName)) {
+                fireDocs("instruction." + insName, As3PCodeDocs.getDocsForIns(insName, false, true, true), loc);
+                return;
+            }
+        }
+        String pathDocs = As3PCodeOtherDocs.getDocsForPath(pathNoTrait);
+        if (pathDocs == null) {
             fireNoDocs();
+        } else {
+            Point loc = getLineLocation(getLine() + 1);
+            if (loc != null) {
+                SwingUtilities.convertPointToScreen(loc, this);
+            }
+            fireDocs(pathNoTrait, pathDocs, loc);
         }
     }
 
