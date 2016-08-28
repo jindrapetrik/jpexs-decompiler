@@ -377,7 +377,6 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         }
 
         private void reloadChildren() {
-            InGetVariable igv = Main.getDebugHandler().getVariable(parentId, thisVar.name, true);
             childs = new ArrayList<>();
             childTraits = new ArrayList<>();
             InGetVariable igv = Main.getDebugHandler().getVariable(parentId, thisVar.name, true);
