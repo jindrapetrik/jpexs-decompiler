@@ -63,7 +63,7 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
 
     public JButton saveButton = new JButton(AppStrings.translate("button.save"), View.getIcon("save16"));
 
-    public JButton editButton = new JButton(AppStrings.translate("button.edit"), View.getIcon("edit16"));
+    public JButton editButton = new JButton(AppStrings.translate("button.edit.script.disassembled"), View.getIcon("edit16"));
 
     public JButton cancelButton = new JButton(AppStrings.translate("button.cancel"), View.getIcon("cancel16"));
 
