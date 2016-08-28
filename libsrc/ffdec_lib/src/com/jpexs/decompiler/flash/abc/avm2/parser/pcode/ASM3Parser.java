@@ -572,7 +572,8 @@ public class ASM3Parser {
     public static AVM2Code parse(ABC abc, Reader reader, Trait trait, MissingSymbolHandler missingHandler, MethodBody body, MethodInfo info) throws IOException, AVM2ParseException, InterruptedException {
         AVM2ConstantPool constants = abc.constants;
         AVM2Code code = new AVM2Code();
-
+        int openedBlocks = 0;
+        boolean autoCloseBlocks = false;
         List<OffsetItem> offsetItems = new ArrayList<>();
         List<LabelItem> labelItems = new ArrayList<>();
         List<ABCException> exceptions = new ArrayList<>();
@@ -594,9 +595,11 @@ public class ASM3Parser {
         do {
             symb = lexer.lex();
             if (Arrays.asList(ParsedSymbol.TYPE_KEYWORD_BODY, ParsedSymbol.TYPE_KEYWORD_CODE, ParsedSymbol.TYPE_KEYWORD_METHOD).contains(symb.type)) {
+                openedBlocks++;
                 continue;
             }
             if (symb.type == ParsedSymbol.TYPE_KEYWORD_TRAIT) {
+                openedBlocks++;
                 if (trait == null) {
                     throw new AVM2ParseException("No trait expected", lexer.yyline());
                 }
@@ -787,6 +790,14 @@ public class ASM3Parser {
             if (symb.type == ParsedSymbol.TYPE_COMMENT) {
                 if (lastIns != null) {
                     lastIns.comment = (String) symb.value;
+                }
+                continue;
+            }
+            if (symb.type == ParsedSymbol.TYPE_KEYWORD_END) {
+                if (openedBlocks > 0) {
+                    openedBlocks--;
+                } else {
+                    throw new AVM2ParseException("End block encountered but there is no block opened", lexer.yyline());
                 }
                 continue;
             }
@@ -1054,6 +1065,10 @@ public class ASM3Parser {
                 throw new AVM2ParseException("Unexpected symbol", lexer.yyline());
             }
         } while (symb.type != ParsedSymbol.TYPE_EOF);
+
+        if (!autoCloseBlocks && openedBlocks > 0) {
+            throw new AVM2ParseException("End of the block expected: " + openedBlocks + "x", lexer.yyline());
+        }
 
         code.compact();
         for (LabelItem li : labelItems) {

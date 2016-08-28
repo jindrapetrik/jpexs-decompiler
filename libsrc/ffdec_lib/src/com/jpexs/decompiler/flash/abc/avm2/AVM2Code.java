@@ -1152,45 +1152,15 @@ public class AVM2Code implements Cloneable {
 
     public String toASMSource(AVM2ConstantPool constants) {
         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
-        toASMSource(constants, null, null, null, new ArrayList<>(), ScriptExportMode.PCODE, writer);
+        toASMSource(constants, null, null, new ArrayList<>(), ScriptExportMode.PCODE, writer);
         return writer.toString();
     }
 
-    public GraphTextWriter toASMSource(AVM2ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, ScriptExportMode exportMode, GraphTextWriter writer) {
-        return toASMSource(constants, trait, info, body, new ArrayList<>(), exportMode, writer);
+    public GraphTextWriter toASMSource(AVM2ConstantPool constants, MethodInfo info, MethodBody body, ScriptExportMode exportMode, GraphTextWriter writer) {
+        return toASMSource(constants, info, body, new ArrayList<>(), exportMode, writer);
     }
 
-    public GraphTextWriter toASMSource(AVM2ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, List<Integer> outputMap, ScriptExportMode exportMode, GraphTextWriter writer) {
-        if (trait != null) {
-            if (trait instanceof TraitFunction) {
-                TraitFunction tf = (TraitFunction) trait;
-                writer.appendNoHilight("trait ");
-                writer.hilightSpecial("function ", HighlightSpecialType.TRAIT_TYPE);
-                writer.hilightSpecial(constants.multinameToString(tf.name_index), HighlightSpecialType.TRAIT_NAME);
-                writer.appendNoHilight(" slotid ");
-                writer.hilightSpecial("" + tf.slot_id, HighlightSpecialType.SLOT_ID);
-                writer.newLine();
-            }
-            if (trait instanceof TraitMethodGetterSetter) {
-                TraitMethodGetterSetter tm = (TraitMethodGetterSetter) trait;
-                writer.appendNoHilight("trait ");
-                switch (tm.kindType) {
-                    case Trait.TRAIT_METHOD:
-                        writer.hilightSpecial("method ", HighlightSpecialType.TRAIT_TYPE);
-                        break;
-                    case Trait.TRAIT_GETTER:
-                        writer.hilightSpecial("getter ", HighlightSpecialType.TRAIT_TYPE);
-                        break;
-                    case Trait.TRAIT_SETTER:
-                        writer.hilightSpecial("setter ", HighlightSpecialType.TRAIT_TYPE);
-                        break;
-                }
-                writer.hilightSpecial(constants.multinameToString(tm.name_index), HighlightSpecialType.TRAIT_NAME);
-                writer.appendNoHilight(" dispid ");
-                writer.hilightSpecial("" + tm.disp_id, HighlightSpecialType.DISP_ID);
-                writer.newLine();
-            }
-        }
+    public GraphTextWriter toASMSource(AVM2ConstantPool constants, MethodInfo info, MethodBody body, List<Integer> outputMap, ScriptExportMode exportMode, GraphTextWriter writer) {
 
         if (info != null) {
             writer.appendNoHilight("method").newLine();
@@ -1317,7 +1287,6 @@ public class AVM2Code implements Cloneable {
 
         writer.newLine();
         writer.appendNoHilight("code").newLine();
-
         int ip = 0;
         int largeLimit = 20000;
         boolean markOffsets = code.size() <= largeLimit;
@@ -1361,6 +1330,13 @@ public class AVM2Code implements Cloneable {
             }
         } else if (exportMode == ScriptExportMode.CONSTANTS) {
             writer.appendNoHilight("Constant export mode is not supported.").newLine();
+        }
+        writer.appendNoHilight("end ; code").newLine();
+        if (body != null) {
+            writer.appendNoHilight("end ; body").newLine();
+        }
+        if (info != null) {
+            writer.appendNoHilight("end ; method").newLine();
         }
 
         return writer;

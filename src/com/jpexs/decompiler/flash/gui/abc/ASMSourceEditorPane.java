@@ -118,7 +118,10 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
         if (trait != null && exportMode != ScriptExportMode.AS && exportMode != ScriptExportMode.AS_METHOD_STUBS) {
             trait.convertTraitHeader(abc, writer);
         }
-        abc.bodies.get(bodyIndex).getCode().toASMSource(abc.constants, trait, abc.method_info.get(abc.bodies.get(bodyIndex).method_info), abc.bodies.get(bodyIndex), exportMode, writer);
+        abc.bodies.get(bodyIndex).getCode().toASMSource(abc.constants, abc.method_info.get(abc.bodies.get(bodyIndex).method_info), abc.bodies.get(bodyIndex), exportMode, writer);
+        if (trait != null) {
+            writer.appendNoHilight("end ; trait").newLine();
+        }
         return new HighlightedText(writer);
     }
 

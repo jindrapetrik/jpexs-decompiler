@@ -434,7 +434,7 @@ public abstract class Trait implements Cloneable, Serializable {
                         writer.newLine();
                     }
                 }
-                writer.append("end ;metadata");
+                writer.append("end ; metadata");
             }
         }
         return writer;
