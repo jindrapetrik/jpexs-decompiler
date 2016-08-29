@@ -8,6 +8,7 @@ import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -37,13 +38,9 @@ public class As3PCodeOtherDocs extends AbstractDocs {
             return v;
         }
 
-        String docStr = "";
         String pathNoTrait = path;
         if (path.startsWith("trait.method")) {
             pathNoTrait = path.substring("trait.".length());
-        }
-        if (prop.containsKey(pathNoTrait)) {
-            docStr = prop.getString(pathNoTrait);
         }
 
         StringBuilder sb = new StringBuilder();
@@ -56,7 +53,32 @@ public class As3PCodeOtherDocs extends AbstractDocs {
         sb.append(" class=\"otherdoc\"");
         sb.append(">");
 
-        sb.append(docStr);
+        String pathParts[] = new String[]{path};
+        if (path.contains(".")) {
+            pathParts = path.split("\\.");
+        }
+        for (int i = 0; i < pathParts.length; i++) {
+            String curPath = String.join(".", Arrays.copyOf(pathParts, i + 1));
+            if (curPath.startsWith("trait.method")) {
+                curPath = path.substring("trait.".length());
+            }
+            if (prop.containsKey(curPath)) {
+                String docStr = prop.getString(curPath);
+                sb.append("<div class=\"path-block\">");
+                for (int j = 0; j < i; j++) {
+                    sb.append("&nbsp;");
+                    sb.append("&nbsp;");
+                }
+                sb.append("<span class=\"path\">");
+                sb.append(pathParts[i]);
+                sb.append("</span>");
+                sb.append(" ");
+                sb.append("<span class=\"path-docs\">");
+                sb.append(docStr);
+                sb.append("</span>");
+                sb.append("</div>");
+            }
+        }
 
         sb.append("</");
         sb.append(standalone ? "body" : "div"); //.instruction

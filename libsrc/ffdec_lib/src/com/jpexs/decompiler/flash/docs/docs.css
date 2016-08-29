@@ -14,3 +14,6 @@ body {font-family: serif;}
 h1, h2, h3, h4, h5 {font-family: sans-serif;}
 .instruction-signature {font-family: "Courier New", monospace; font-size: 1.05em;}
 .filter {font-family: sans-serif; }
+.path {font-weight: bold; color: blue;}
+.path-block {}
+.path-docs {}
