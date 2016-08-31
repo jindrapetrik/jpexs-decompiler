@@ -175,7 +175,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
     private final JLabel experimentalLabel = new JLabel(AppStrings.translate("action.edit.experimental"));
 
-    private final JButton editDecompiledButton = new JButton(AppStrings.translate("button.edit"), View.getIcon("edit16"));
+    private final JButton editDecompiledButton = new JButton(AppStrings.translate("button.edit.script.decompiled"), View.getIcon("edit16"));
 
     private final JButton saveDecompiledButton = new JButton(AppStrings.translate("button.save"), View.getIcon("save16"));
 

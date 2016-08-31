@@ -228,4 +228,21 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         }
         return true;
     }
+
+    @Override
+    public GraphTextWriter convertTraitHeader(ABC abc, GraphTextWriter writer) {
+        convertCommonHeaderFlags(isConst() ? "const" : "slot", abc, writer);
+        writer.newLine();
+        writer.appendNoHilight("slotid ");
+        writer.hilightSpecial(Integer.toString(slot_id), HighlightSpecialType.SLOT_ID);
+        writer.newLine();
+        writer.appendNoHilight("type ");
+        writer.hilightSpecial(abc.constants.multinameToString(type_index), HighlightSpecialType.TRAIT_TYPE_NAME);
+        writer.newLine();
+        writer.appendNoHilight("value ");
+        writer.hilightSpecial((new ValueKind(value_index, value_kind).toASMString(abc.constants)), HighlightSpecialType.TRAIT_VALUE);
+        writer.newLine();
+        return writer;
+    }
+
 }

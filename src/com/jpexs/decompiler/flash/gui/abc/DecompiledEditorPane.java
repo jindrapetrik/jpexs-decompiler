@@ -122,7 +122,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
     }
 
     public void setNoTrait() {
-        abcPanel.detailPanel.showCard(DetailPanel.UNSUPPORTED_TRAIT_CARD, null);
+        abcPanel.detailPanel.showCard(DetailPanel.UNSUPPORTED_TRAIT_CARD, null, 0);
     }
 
     public void hilightSpecial(HighlightSpecialType type, long index) {
@@ -193,7 +193,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         this.classIndex = classIndex;
     }
 
-    private boolean displayMethod(int pos, int methodIndex, String name, Trait trait, boolean isStatic) {
+    private boolean displayMethod(int pos, int methodIndex, String name, Trait trait, int traitIndex, boolean isStatic) {
         ABC abc = getABC();
         if (abc == null) {
             return false;
@@ -216,7 +216,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                 trait = null;
             }
         }
-        abcPanel.detailPanel.showCard(DetailPanel.METHOD_TRAIT_CARD, trait);
+        abcPanel.detailPanel.showCard(DetailPanel.METHOD_GETTER_SETTER_TRAIT_CARD, trait, traitIndex);
         MethodCodePanel methodCodePanel = abcPanel.detailPanel.methodTraitPanel.methodCodePanel;
         if (reset || (methodCodePanel.getBodyIndex() != bi)) {
             methodCodePanel.setBodyIndex(scriptName, bi, abc, name, trait, script.scriptIndex);
@@ -552,7 +552,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                     }
                 }
 
-                displayMethod(pos, (int) tm.getProperties().index, name, currentTrait, isStatic);
+                displayMethod(pos, (int) tm.getProperties().index, name, currentTrait, lastTraitIndex, isStatic);
                 currentMethodHighlight = tm;
                 return;
             }
@@ -572,8 +572,9 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                         abcPanel.detailPanel.slotConstTraitPanel.load((TraitSlotConst) currentTrait, abc,
                                 abc.isStaticTraitId(classIndex, lastTraitIndex));
                         final Trait ftrait = currentTrait;
+                        final int ftraitIndex = lastTraitIndex;
                         View.execInEventDispatch(() -> {
-                            abcPanel.detailPanel.showCard(DetailPanel.SLOT_CONST_TRAIT_CARD, ftrait);
+                            abcPanel.detailPanel.showCard(DetailPanel.SLOT_CONST_TRAIT_CARD, ftrait, ftraitIndex);
                         });
                         abcPanel.detailPanel.setEditMode(false);
                         currentMethodHighlight = null;
@@ -594,7 +595,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                     name += ":" + currentTrait.getName(abc).getName(abc.constants, null, false);
                 }
 
-                displayMethod(pos, abc.findMethodIdByTraitId(classIndex, lastTraitIndex), name, currentTrait, isStatic);
+                displayMethod(pos, abc.findMethodIdByTraitId(classIndex, lastTraitIndex), name, currentTrait, lastTraitIndex, isStatic);
                 return;
             }
             setNoTrait();

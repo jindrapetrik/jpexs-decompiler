@@ -111,13 +111,13 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
 
     public JButton saveButton = new JButton(AppStrings.translate("button.save"), View.getIcon("save16"));
 
-    public JButton editButton = new JButton(AppStrings.translate("button.edit"), View.getIcon("edit16"));
+    public JButton editButton = new JButton(AppStrings.translate("button.edit.script.disassembled"), View.getIcon("edit16"));
 
     public JButton cancelButton = new JButton(AppStrings.translate("button.cancel"), View.getIcon("cancel16"));
 
     public JLabel experimentalLabel = new JLabel(AppStrings.translate("action.edit.experimental"));
 
-    public JButton editDecompiledButton = new JButton(AppStrings.translate("button.edit"), View.getIcon("edit16"));
+    public JButton editDecompiledButton = new JButton(AppStrings.translate("button.edit.script.decompiled"), View.getIcon("edit16"));
 
     public JButton saveDecompiledButton = new JButton(AppStrings.translate("button.save"), View.getIcon("save16"));
 
