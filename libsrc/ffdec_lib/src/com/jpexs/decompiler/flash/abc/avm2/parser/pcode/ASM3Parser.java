@@ -573,7 +573,7 @@ public class ASM3Parser {
         AVM2ConstantPool constants = abc.constants;
         AVM2Code code = new AVM2Code();
         int openedBlocks = 0;
-        boolean autoCloseBlocks = false;
+        boolean autoCloseBlocks = true; //TODO? Put to false. But how about old imports?
         List<OffsetItem> offsetItems = new ArrayList<>();
         List<LabelItem> labelItems = new ArrayList<>();
         List<ABCException> exceptions = new ArrayList<>();
