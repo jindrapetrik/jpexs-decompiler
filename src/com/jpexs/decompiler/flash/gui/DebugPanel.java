@@ -26,20 +26,30 @@ import de.hameister.treetable.MyTreeTable;
 import de.hameister.treetable.MyTreeTableModel;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
+import javax.swing.JTree;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.table.DefaultTableModel;
@@ -105,11 +115,22 @@ public class DebugPanel extends JPanel {
         View.expandTreeNodes(tt.getTree(), expanded);
         for (int i = 0; i < selRows.length; i++) {
             selRows[i] = tt.getTree().getRowForPath(selPaths[i]);
+            if (selRows[i] == -1) {
+                continue;
+            }
             if (i == 0) {
                 tt.setRowSelectionInterval(selRows[i], selRows[i]);
             } else {
                 tt.addRowSelectionInterval(selRows[i], selRows[i]);
             }
+        }
+
+        int ROW_HEIGHT = new JLabel("A").getPreferredSize().height;
+
+        JTree tree = tt.getTree();
+        tree.setRowHeight(ROW_HEIGHT);
+        for (int i = 0; i < tt.getRowCount(); i++) {
+            tt.setRowHeight(i, ROW_HEIGHT);
         }
 
     }
@@ -119,74 +140,81 @@ public class DebugPanel extends JPanel {
         debugRegistersTable = new MyTreeTable(new ABCPanel.VariablesTableModel(debugRegistersTable, new ArrayList<>(), new ArrayList<>()), false);
         debugLocalsTable = new MyTreeTable(new ABCPanel.VariablesTableModel(debugLocalsTable, new ArrayList<>(), new ArrayList<>()), false);
 
-        //Add watch feature, commented out. I tried it, but without success. I can't add watch in Flash Pro or FDB either. :-(
-        /*
-         //locales
-         debug.watch.add = Add watch to %name%
-         debug.watch.add.read = Read
-         debug.watch.add.write = Write
-         debug.watch.add.readwrite = Read+Write
+        MouseAdapter watchHandler = new MouseAdapter() {
 
-         error.debug.watch.add = Cannot add watch to this variable.
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    dopop(e);
+                }
+            }
 
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    dopop(e);
+                }
+            }
 
-         MouseAdapter watchHandler = new MouseAdapter() {
+            private void dopop(MouseEvent e) {
+                if (debugLocalsTable.getSelectedRow() == -1) {
+                    return;
+                }
+                Object node = debugLocalsTable.getTree().getPathForRow(debugLocalsTable.getSelectedRow()).getLastPathComponent();
+                Variable v;
+                ABCPanel.VariableNode vn;
+                if (node instanceof ABCPanel.VariableNode) {
+                    vn = ((ABCPanel.VariableNode) node);
+                    v = vn.var;
+                } else {
+                    return;
+                }
 
-         @Override
-         public void mousePressed(MouseEvent e) {
-         if (e.isPopupTrigger()) {
-         dopop(e);
-         }
-         }
+                JPopupMenu pm = new JPopupMenu();
+                //TODO!!
+                if (v.typeName != null && v.typeName.startsWith("flash.utils::ByteArray")) {
+                    JMenu exportMenu = new JMenu("Export %name%".replace("%name%", v.name));
+                    JMenuItem exportByteArray = new JMenuItem("Export bytearray");
+                    exportByteArray.addActionListener((ActionEvent e1) -> {
+                        Main.dumpBytes(v);
+                    });
 
-         @Override
-         public void mouseReleased(MouseEvent e) {
-         if (e.isPopupTrigger()) {
-         dopop(e);
-         }
-         }
+                    exportMenu.add(exportByteArray);
+                    pm.add(exportMenu);
+                }
+                long watchParentId = vn.parentObjectId;
 
-         private void dopop(MouseEvent e) {
-         if (debugLocalsTable.getSelectedRow() == -1) {
-         return;
-         }
-         Variable v = ((ABCPanel.VariablesTableModel) debugLocalsTable.getModel()).getVars().get(debugLocalsTable.getSelectedRow());
-         final long v_id = ((ABCPanel.VariablesTableModel) debugLocalsTable.getModel()).getVarIds().get(debugLocalsTable.getSelectedRow());
+                JMenu addWatchMenu = new JMenu(AppStrings.translate("debug.watch.add").replace("%name%", v.name));
+                JMenuItem watchReadMenuItem = new JMenuItem(AppStrings.translate("debug.watch.add.read"));
+                watchReadMenuItem.addActionListener((ActionEvent e1) -> {
+                    if (!Main.addWatch(v, watchParentId, true, false)) {
+                        View.showMessageDialog(DebugPanel.this, AppStrings.translate("error.debug.watch.add"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                    }
+                });
+                JMenuItem watchWriteMenuItem = new JMenuItem(AppStrings.translate("debug.watch.add.write"));
+                watchWriteMenuItem.addActionListener((ActionEvent e1) -> {
+                    if (!Main.addWatch(v, watchParentId, false, true)) {
+                        View.showMessageDialog(DebugPanel.this, AppStrings.translate("error.debug.watch.add"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                    }
+                });
+                JMenuItem watchReadWriteMenuItem = new JMenuItem(AppStrings.translate("debug.watch.add.readwrite"));
+                watchReadWriteMenuItem.addActionListener((ActionEvent e1) -> {
+                    if (!Main.addWatch(v, watchParentId, true, true)) {
+                        View.showMessageDialog(DebugPanel.this, AppStrings.translate("error.debug.watch.add"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                    }
+                });
 
-         JPopupMenu pm = new JPopupMenu();
-         JMenu addWatchMenu = new JMenu(AppStrings.translate("debug.watch.add").replace("%name%", v.name));
-         JMenuItem watchReadMenuItem = new JMenuItem(AppStrings.translate("debug.watch.add.read"));
-         watchReadMenuItem.addActionListener((ActionEvent e1) -> {
-         if (!Main.addWatch(v, v_id, true, false)) {
-         View.showMessageDialog(DebugPanel.this, AppStrings.translate("debug.watch.add"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-         }
-         });
-         JMenuItem watchWriteMenuItem = new JMenuItem(AppStrings.translate("debug.watch.add.write"));
-         watchWriteMenuItem.addActionListener((ActionEvent e1) -> {
-         if (!Main.addWatch(v, v_id, false, true)) {
-         View.showMessageDialog(DebugPanel.this, AppStrings.translate("debug.watch.add"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-         }
-         });
-         JMenuItem watchReadWriteMenuItem = new JMenuItem(AppStrings.translate("debug.watch.add.readwrite"));
-         watchReadWriteMenuItem.addActionListener((ActionEvent e1) -> {
-         if (!Main.addWatch(v, v_id, true, true)) {
-         View.showMessageDialog(DebugPanel.this, AppStrings.translate("debug.watch.add"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-         }
-         });
+                addWatchMenu.add(watchReadMenuItem);
+                addWatchMenu.add(watchWriteMenuItem);
+                addWatchMenu.add(watchReadWriteMenuItem);
+                pm.add(addWatchMenu);
+                pm.show(e.getComponent(), e.getX(), e.getY());
+            }
+        };
 
-         addWatchMenu.add(watchReadMenuItem);
-         addWatchMenu.add(watchWriteMenuItem);
-         addWatchMenu.add(watchReadWriteMenuItem);
-         pm.add(addWatchMenu);
+        debugLocalsTable.addMouseListener(watchHandler);
 
-         pm.show(e.getComponent(), e.getX(), e.getY());
-         }
-         };
-
-         debugLocalsTable.addMouseListener(watchHandler);
-         debugScopeTable.addMouseListener(watchHandler);
-
-         */
+        //debugScopeTable.addMouseListener(watchHandler);                           
         debugScopeTable = new MyTreeTable(new ABCPanel.VariablesTableModel(debugScopeTable, new ArrayList<>(), new ArrayList<>()), false);
 
         callStackTable = new JTable();
@@ -281,6 +309,33 @@ public class DebugPanel extends JPanel {
         add(varTabs, BorderLayout.CENTER);
     }
 
+    /*    private void getVariableList() {
+        // make sure the player has stopped and send our message awaiting a response
+
+        Main.getDebugHandler().getVariable(VariableConstants.GLOBAL_ID, TOOL_TIP_TEXT_KEY, loading)
+
+        requestFrame(0, isolateId);  // our 0th frame gets our local context
+
+        // now let's request all of the special variables too
+        getValueWorker(VariableConstants.GLOBAL_ID, isolateId);
+        getValueWorker(VariableConstants.THIS_ID, isolateId);
+        getValueWorker(VariableConstants.ROOT_ID, isolateId);
+
+        // request as many levels as we can get
+        int i = 0;
+        Value v = null;
+        do {
+            v = getValueWorker(Value.LEVEL_ID - i, isolateId);
+        } while (i++ < 128 && v != null);
+
+        // now that we've primed the DManager we can request the base variable whose
+        // children are the variables that are available
+        v = m_manager.getValue(Value.BASE_ID, isolateId);
+        if (v == null) {
+            throw new VersionException();
+        }
+        return v.getMembers(this);
+    }*/
     public void refresh() {
 
         View.execInEventDispatch(new Runnable() {
