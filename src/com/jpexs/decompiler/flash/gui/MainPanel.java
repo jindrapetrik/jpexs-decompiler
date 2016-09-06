@@ -3298,10 +3298,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 setSourceWorker = null;
             }
             if (!Main.isInited() || !Main.isWorking() || Main.isDebugging()) {
+                ABCPanel abcPanel = getABCPanel();
                 CancellableWorker worker = new CancellableWorker() {
                     @Override
                     protected Void doInBackground() throws Exception {
-                        ABCPanel abcPanel = getABCPanel();
                         abcPanel.detailPanel.methodTraitPanel.methodCodePanel.clear();
                         abcPanel.setAbc(scriptLeaf.abc);
                         abcPanel.decompiledTextArea.setScript(scriptLeaf, true);
@@ -3321,7 +3321,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                             try {
                                 get();
                             } catch (CancellationException ex) {
-                                getABCPanel().decompiledTextArea.setText("// " + AppStrings.translate("work.canceled"));
+                                abcPanel.decompiledTextArea.setText("// " + AppStrings.translate("work.canceled"));
                             } catch (Exception ex) {
                                 logger.log(Level.SEVERE, "Error", ex);
                                 getABCPanel().decompiledTextArea.setText("// " + AppStrings.translate("decompilationError") + ": " + ex);

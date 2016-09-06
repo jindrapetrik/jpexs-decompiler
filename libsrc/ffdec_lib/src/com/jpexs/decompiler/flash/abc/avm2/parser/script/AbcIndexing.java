@@ -48,7 +48,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
-public class AbcIndexing {
+public final class AbcIndexing {
 
     private AbcIndexing parent = null;
 

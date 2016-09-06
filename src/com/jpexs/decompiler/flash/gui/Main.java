@@ -1862,7 +1862,61 @@ public class Main {
      */
     public static void main(String[] args) throws IOException {
         setSessionLoaded(false);
+
+        //args = new String[]{"--resourcedates"};
+        //args = new String[]{"-cli", "C:\\124\\123flashchat.swf"};
+        //args = new String[]{"-compress", "C:\\FFDec\\5.1.0_nightly900\\as3.swf", "C:\\FFDec\\5.1.0_nightly543\\as3_4.swf", "lzma"};
+        //String a = new String(Helper.readStream(ApplicationInfo.class.getResourceAsStream("/project.properties")));
+        //ResourceBundle a = ResourceBundle.getBundle("jsyntaxpane/Bundle");
+        //CheckResources.compareResources(System.out, "2635a809463a450d2630f6cd488d679d4a5c3e13", null);
+        String nightlyVersion = "1317";
+        /*args = new String[]{
+         "-stat",
+         "-config", "parallelSpeedUp=1,cacheOnDisk=0,autoDeobfuscate=1",
+         "-format", "script:as,singlescript:0,singletext:1",
+         "-exportTimeout", "3600",
+         "-timeout", "60",
+         "-exportFileTimeout", "1800",
+         "-selectclass", "com.ludia.gameengine.F__ZN3AS32ui5flash3net12NetGroupInfo8internal41iprop_postingReceiveControlBytesPerSecondcvdEv",
+         "-stdout", "C:\\FFDec/8.0.1_nightly" + nightlyVersion + "/txtnb/out/{swfFile}.txt",
+         "-stderr", "C:\\FFDec/8.0.1_nightly" + nightlyVersion + "/txtnb/err/{swfFile}_err.txt",
+         "-export", "script_as2", "C:\\FFDec/8.0.1_nightly" + nightlyVersion + "/txtnb/exp", "C:\\FFDec/swf/"
+         };*/
+
+ /*args = new String[]{
+         "-config", "parallelSpeedUp=0,cacheOnDisk=0,autoDeobfuscate=1",
+         "-format", "script:as,singlescript:0,singletext:1",
+         "-exportTimeout", "3600",
+         "-timeout", "60",
+         "-stdout", "C:\\FFDec/8.0.1_nightly" + nightlyVersion + "/txt/out/{swfFile}.txt",
+         "-stderr", "C:\\FFDec/8.0.1_nightly" + nightlyVersion + "/txt/err/{swfFile}_err.txt",
+         "-selectclass", "�^q�.�!l�",
+         "-export", "script", "C:\\FFDec/8.0.1_nightly" + nightlyVersion + "/txt/out", "C:\\FFDec/swf/06AC0000-10.swf"
+         };*/
+ /*args = new String[]{
+         "-config", "parallelSpeedUp=0,cacheOnDisk=0,autoDeobfuscate=1",
+         "-format", "script:as,singlescript:0,singletext:1",
+         "-exportTimeout", "3600",
+         "-timeout", "60",
+         "-stdout", "C:\\FFDec/8.0.1_nightly" + nightlyVersion + "/txt/out/{swfFile}.txt",
+         "-stderr", "C:\\FFDec/8.0.1_nightly" + nightlyVersion + "/txt/err/{swfFile}_err.txt",
+         //"-selectclass", "preloader.Preloader",
+         "-export", "script", "C:\\FFDec/8.0.1_nightly" + nightlyVersion + "/txt/out", "C:\\FFDec/swf/Enter2.swf"
+         };*/
+ /*args = new String[]{
+         "-remove", "C:\\FFDec/swf/06AC0000-10.swf", "C:\\FFDec/swf/06AC0000-10_2.swf", "2", "1",};
+         args = new String[0];
+         args = new String[]{
+         "-config", "parallelSpeedUp=1",
+         "-dumpSWF", "C:\\FFDec/swf/06AC0000-10.swf"};*/
+        //args = new String[]{"-replace", "C:\\FFDec/8.0.1_nightly" + nightlyVersion + "/as2.swf", "C:\\FFDec/8.0.1_nightly" + nightlyVersion + "/as2_zg.swf", "34", "C:\\FFDec/8.0.1_nightly" + nightlyVersion + "/a.txt",};
+        //args = new String[]{"-replaceCharacterId", "C:\\FFDec/8.0.1_nightly" + nightlyVersion + "/as2.swf", "C:\\FFDec/8.0.1_nightly" + nightlyVersion + "/as2_zg.swf", "1,101,2,102,3,103",};
+        //args = new String[]{"-replace", "C:\\FFDec/8.0.1_nightly" + nightlyVersion + "/as2.swf", "C:\\FFDec/8.0.1_nightly" + nightlyVersion + "/as2_2.swf", "1", "C:\\FFDec/8.0.1_nightly" + nightlyVersion + "/1.png", "nofill",};
+        //args = new String[]{"-renameInvalidIdentifiers", "typeNumber", "C:\\111\\original.swf", "C:\\111\\renamed.swf",};
         clearTemp();
+//        String pluginPath = Configuration.pluginPath.get();
+//        if (pluginPath != null && !pluginPath.isEmpty()) {
+//        }
 
         try {
             SWFDecompilerPlugin.loadPlugins();
