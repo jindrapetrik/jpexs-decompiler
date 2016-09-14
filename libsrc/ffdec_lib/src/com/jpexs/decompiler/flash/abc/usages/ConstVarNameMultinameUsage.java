@@ -25,8 +25,8 @@ import com.jpexs.decompiler.flash.abc.types.traits.Traits;
  */
 public class ConstVarNameMultinameUsage extends ConstVarMultinameUsage implements DefinitionUsage {
 
-    public ConstVarNameMultinameUsage(ABC abc, int multinameIndex, int classIndex, int traitIndex, boolean isStatic, Traits traits, int parentTraitIndex) {
-        super(abc, multinameIndex, classIndex, traitIndex, isStatic, traits, parentTraitIndex);
+    public ConstVarNameMultinameUsage(ABC abc, int multinameIndex, int scriptIndex, int classIndex, int traitIndex, int traitsType, Traits traits, int parentTraitIndex) {
+        super(abc, multinameIndex, scriptIndex, classIndex, traitIndex, traitsType, traits, parentTraitIndex);
     }
 
     @Override

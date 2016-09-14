@@ -24,23 +24,16 @@ import com.jpexs.decompiler.flash.abc.ABC;
  */
 public abstract class InsideClassMultinameUsage extends MultinameUsage {
 
-    public int multinameIndex;
-
     public int classIndex;
 
     public InsideClassMultinameUsage(ABC abc, int multinameIndex, int classIndex) {
-        super(abc);
-        this.multinameIndex = multinameIndex;
+        super(abc, multinameIndex);
         this.classIndex = classIndex;
     }
 
     @Override
     public String toString() {
         return "class " + abc.constants.getMultiname(abc.instance_info.get(classIndex).name_index).getNameWithNamespace(abc.constants).toPrintableString(true);
-    }
-
-    public int getMultinameIndex() {
-        return multinameIndex;
     }
 
     public int getClassIndex() {

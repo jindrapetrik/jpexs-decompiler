@@ -25,8 +25,19 @@ import com.jpexs.decompiler.flash.abc.ABC;
 public abstract class MultinameUsage {
 
     public ABC abc;
+    public int multinameIndex;
 
-    public MultinameUsage(ABC abc) {
+    public MultinameUsage(ABC abc, int multinameIndex) {
         this.abc = abc;
+        this.multinameIndex = multinameIndex;
     }
+
+    public int getMultinameIndex() {
+        return multinameIndex;
+    }
+
+    public ABC getAbc() {
+        return abc;
+    }
+
 }

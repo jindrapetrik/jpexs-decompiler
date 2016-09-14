@@ -23,21 +23,34 @@ import com.jpexs.decompiler.flash.abc.types.traits.Traits;
  *
  * @author JPEXS
  */
-public abstract class TraitMultinameUsage extends InsideClassMultinameUsage {
+public abstract class TraitMultinameUsage extends MultinameUsage {
 
     public int traitIndex;
 
-    public boolean isStatic;
+    public static final int TRAITS_TYPE_CLASS = 1;
+    public static final int TRAITS_TYPE_INSTANCE = 2;
+    public static final int TRAITS_TYPE_SCRIPT = 3;
+
+    public int traitsType;
+    public int classIndex;
+    public int scriptIndex;
 
     public Traits traits;
 
     public int parentTraitIndex;
 
-    public TraitMultinameUsage(ABC abc, int multinameIndex, int classIndex, int traitIndex, boolean isStatic, Traits traits, int parentTraitIndex) {
-        super(abc, multinameIndex, classIndex);
+    public TraitMultinameUsage(ABC abc, int multinameIndex, int scriptIndex, int classIndex, int traitIndex, int traitsType, Traits traits, int parentTraitIndex) {
+        super(abc, multinameIndex);
+        this.scriptIndex = scriptIndex;
+        this.classIndex = classIndex;
         this.traitIndex = traitIndex;
-        this.isStatic = isStatic;
+        this.traitsType = traitsType;
         this.traits = traits;
         this.parentTraitIndex = parentTraitIndex;
+    }
+
+    @Override
+    public String toString() {
+        return "class " + abc.constants.getMultiname(abc.instance_info.get(classIndex).name_index).getNameWithNamespace(abc.constants).toPrintableString(true);
     }
 }

@@ -27,8 +27,8 @@ public class TypeNameMultinameUsage extends MultinameUsage {
 
     public int typename_index;
 
-    public TypeNameMultinameUsage(ABC abc, int typename_index) {
-        super(abc);
+    public TypeNameMultinameUsage(ABC abc, int multinameIndex, int typename_index) {
+        super(abc, multinameIndex);
         this.typename_index = typename_index;
     }
 
