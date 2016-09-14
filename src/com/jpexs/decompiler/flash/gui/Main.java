@@ -19,6 +19,8 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.debugger.flash.Debugger;
 import com.jpexs.debugger.flash.DebuggerCommands;
 import com.jpexs.debugger.flash.Variable;
+import com.jpexs.debugger.flash.VariableType;
+import com.jpexs.debugger.flash.messages.in.InCallFunction;
 import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.SWF;
@@ -204,6 +206,29 @@ public class Main {
 
     public static synchronized boolean isRunning() {
         return runProcess != null && !runProcessDebug;
+    }
+
+    /**
+     * FIXME!
+     *
+     * @param v
+     */
+    public static synchronized void dumpBytes(Variable v) {
+        InCallFunction icf;
+        try {
+            long objectId = 0l;
+            if ((v.vType == VariableType.OBJECT || v.vType == VariableType.MOVIECLIP)) {
+                objectId = (Long) v.value;
+            }
+            Object oldPos = getDebugHandler().getVariable(objectId, "position", true).parent.value;
+            getDebugHandler().setVariable(objectId, "position", VariableType.NUMBER, 0);
+            icf = getDebugHandler().callFunction(false, "readUTF", v, new ArrayList<>());
+            System.out.println("Result=" + icf.variables.get(0).value);
+            getDebugHandler().setVariable(objectId, "position", VariableType.NUMBER, oldPos);
+        } catch (DebuggerHandler.ActionScriptException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 
     public static synchronized boolean addWatch(Variable v, long v_id, boolean watchRead, boolean watchWrite) {
