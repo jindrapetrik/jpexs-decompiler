@@ -172,7 +172,7 @@ public class DebugPanel extends JPanel {
 
                 JPopupMenu pm = new JPopupMenu();
                 //TODO!!
-                if (v.typeName != null && v.typeName.startsWith("flash.utils::ByteArray")) {
+                /*if (v.typeName != null && v.typeName.startsWith("flash.utils::ByteArray")) {
                     JMenu exportMenu = new JMenu("Export %name%".replace("%name%", v.name));
                     JMenuItem exportByteArray = new JMenuItem("Export bytearray");
                     exportByteArray.addActionListener((ActionEvent e1) -> {
@@ -181,7 +181,7 @@ public class DebugPanel extends JPanel {
 
                     exportMenu.add(exportByteArray);
                     pm.add(exportMenu);
-                }
+                }*/
                 long watchParentId = vn.parentObjectId;
 
                 JMenu addWatchMenu = new JMenu(AppStrings.translate("debug.watch.add").replace("%name%", v.name));
