@@ -115,13 +115,13 @@ public class UsageFrame extends AppDialog implements MouseListener {
                         } else {
                             traitIndex = tmu.traitIndex;
                         }
-                        if (!tmu.isStatic) {
+                        if (tmu.traitsType == TraitMultinameUsage.TRAITS_TYPE_INSTANCE) {
                             traitIndex += abcPanel.abc.class_info.get(tmu.classIndex).static_traits.traits.size();
                         }
                         if (tmu instanceof MethodMultinameUsage) {
                             MethodMultinameUsage mmu = (MethodMultinameUsage) usage;
                             if (mmu.isInitializer == true) {
-                                traitIndex = abcPanel.abc.class_info.get(mmu.classIndex).static_traits.traits.size() + abcPanel.abc.instance_info.get(mmu.classIndex).instance_traits.traits.size() + (mmu.isStatic ? 1 : 0);
+                                traitIndex = abcPanel.abc.class_info.get(mmu.classIndex).static_traits.traits.size() + abcPanel.abc.instance_info.get(mmu.classIndex).instance_traits.traits.size() + (mmu.traitsType == TraitMultinameUsage.TRAITS_TYPE_CLASS ? 1 : 0);
                             }
                         }
                         abcPanel.decompiledTextArea.gotoTrait(traitIndex);
