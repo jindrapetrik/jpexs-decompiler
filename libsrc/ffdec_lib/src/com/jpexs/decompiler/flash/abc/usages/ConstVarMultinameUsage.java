@@ -68,7 +68,7 @@ public abstract class ConstVarMultinameUsage extends TraitMultinameUsage {
         } catch (InterruptedException ex) {
             // ignore
         }
-        return writer.toString();
+        return writer.toString().trim();
     }
 
     public int getTraitIndex() {

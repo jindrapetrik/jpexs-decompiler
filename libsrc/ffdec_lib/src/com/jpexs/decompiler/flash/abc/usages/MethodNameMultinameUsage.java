@@ -33,4 +33,17 @@ public class MethodNameMultinameUsage extends MethodMultinameUsage implements De
     public String toString() {
         return super.toString() + " name";
     }
+
+    @Override
+    public boolean collides(MultinameUsage other) {
+        if ((other instanceof MethodNameMultinameUsage) || (other instanceof ConstVarNameMultinameUsage)) {
+            TraitMultinameUsage otherTrait = (TraitMultinameUsage) other;
+            if (otherTrait.classIndex == classIndex && otherTrait.traitsType == traitsType) {
+                if (other.sameMultinameName(this)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }

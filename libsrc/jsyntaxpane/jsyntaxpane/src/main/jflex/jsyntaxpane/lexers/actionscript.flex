@@ -110,6 +110,8 @@ SingleCharacter = [^\r\n\'\\]
 OIdentifierCharacter = [^\r\n\u00A7\\]
 Preprocessor = \u00A7\u00A7 {Identifier}
 
+NamespaceSuffix = "#" {DecIntegerLiteral}
+
 RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
 
 %state STRING, CHARLITERAL, XMLSTARTTAG, XML, OIDENTIFIER
@@ -289,7 +291,9 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
                                     xmlTagName = s.substring(1);
                                  }*/
   /* identifiers */
+  {Identifier}{NamespaceSuffix}  { return token(TokenType.REGEX); }
   {Identifier}                   { return token(TokenType.IDENTIFIER); }
+  
 }
 
 <XMLSTARTTAG> {
@@ -328,6 +332,12 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
 }
 
 <OIDENTIFIER> {
+   "\u00A7" {NamespaceSuffix}                           {
+                                     yybegin(YYINITIAL);
+                                     // length also includes the trailing quote + namespace suffix
+                                     return token(TokenType.REGEX, tokenStart, tokenLength + yylength());
+                                 }
+
   "\u00A7"                            {
                                      yybegin(YYINITIAL);
                                      // length also includes the trailing quote

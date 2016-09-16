@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.Traits;
  *
  * @author JPEXS
  */
-public abstract class TraitMultinameUsage extends MultinameUsage {
+public abstract class TraitMultinameUsage extends MultinameUsage implements InsideClassMultinameUsageInterface {
 
     public int traitIndex;
 
@@ -53,4 +53,15 @@ public abstract class TraitMultinameUsage extends MultinameUsage {
     public String toString() {
         return "class " + abc.constants.getMultiname(abc.instance_info.get(classIndex).name_index).getNameWithNamespace(abc.constants).toPrintableString(true);
     }
+
+    @Override
+    public boolean collides(MultinameUsage other) {
+        return false;
+    }
+
+    @Override
+    public int getClassIndex() {
+        return classIndex;
+    }
+
 }

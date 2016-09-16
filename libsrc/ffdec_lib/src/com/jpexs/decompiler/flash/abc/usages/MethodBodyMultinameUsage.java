@@ -33,4 +33,10 @@ public class MethodBodyMultinameUsage extends MethodMultinameUsage {
     public String toString() {
         return super.toString() + " body";
     }
+
+    @Override
+    public boolean collides(MultinameUsage other) {
+        return false;
+    }
+
 }

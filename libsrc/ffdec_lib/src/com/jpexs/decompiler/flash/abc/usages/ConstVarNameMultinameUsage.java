@@ -33,4 +33,18 @@ public class ConstVarNameMultinameUsage extends ConstVarMultinameUsage implement
     public String toString() {
         return super.toString() + " name";
     }
+
+    @Override
+    public boolean collides(MultinameUsage other) {
+        if ((other instanceof ConstVarNameMultinameUsage) || (other instanceof MethodNameMultinameUsage)) {
+            TraitMultinameUsage otherTrait = (TraitMultinameUsage) other;
+            if (otherTrait.classIndex == classIndex && otherTrait.traitsType == traitsType) {
+                if (other.sameMultinameName(this)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 }

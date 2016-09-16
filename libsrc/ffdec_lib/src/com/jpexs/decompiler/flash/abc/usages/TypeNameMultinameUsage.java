@@ -36,4 +36,9 @@ public class TypeNameMultinameUsage extends MultinameUsage {
     public String toString() {
         return "TypeName " + abc.constants.getMultiname(typename_index).toString(abc.constants, new ArrayList<>());
     }
+
+    @Override
+    public boolean collides(MultinameUsage other) {
+        return false;
+    }
 }

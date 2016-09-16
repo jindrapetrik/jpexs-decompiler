@@ -73,6 +73,13 @@ public class Multiname {
     @Internal
     public boolean deleted;
 
+    @Internal
+    private boolean displayNamespace = false;
+
+    public void setDisplayNamespace(boolean displayNamespace) {
+        this.displayNamespace = displayNamespace;
+    }
+
     private boolean validType() {
         boolean cnt = false;
         for (int i = 0; i < multinameKinds.length; i++) {
@@ -335,11 +342,15 @@ public class Multiname {
             return isAttribute() ? "@*" : "*";
         } else {
             String name = constants.getString(name_index);
+            String nssuffix = "";
+            if (displayNamespace) {
+                nssuffix += "#" + namespace_index;
+            }
             if (fullyQualifiedNames != null && fullyQualifiedNames.contains(DottedChain.parse(name))) {
                 DottedChain dc = getNameWithNamespace(constants);
                 return raw ? dc.toRawString() : dc.toPrintableString(true);
             }
-            return (isAttribute() ? "@" : "") + (raw ? name : IdentifiersDeobfuscation.printIdentifier(true, name));
+            return (isAttribute() ? "@" : "") + (raw ? name : IdentifiersDeobfuscation.printIdentifier(true, name) + nssuffix);
         }
     }
 

@@ -692,19 +692,9 @@ public class ABC {
             SWFDecompilerPlugin.fireMethodBodyParsed(this, mb, swf);
         }
 
+        markSameContextMultinames();
         getMethodIndexing();
 
-        /*for(int i=0;i<script_count;i++){
-         MethodBody bod=bodies.get(bodyIdxFromMethodIdx.get(script_info.get(i).init_index));
-         GraphTextWriter t=new HighlightedTextWriter(Configuration.getCodeFormatting(),false);
-         try {
-         bod.toString("script", ScriptExportMode.PCODE,  this, null, constants, method_info, t, new ArrayList<>());
-         } catch (InterruptedException ex) {
-         Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, null, ex);
-         }
-         System.out.println(""+t.toString());
-         }
-         //System.exit(0);*/
         SWFDecompilerPlugin.fireAbcParsed(this, swf);
     }
 
@@ -1117,6 +1107,60 @@ public class ABC {
             }
         }
         return ret;
+    }
+
+    public void markSameContextMultinames() {
+
+        //Reset
+        for (int multinameIndex = 1; multinameIndex < constants.getMultinameCount(); multinameIndex++) {
+            constants.getMultiname(multinameIndex).setDisplayNamespace(false);
+        }
+
+        //group qnames with same name 
+        Map<String, List<Integer>> nameToQNameIndices = new HashMap<>();
+        for (int multinameIndex = 1; multinameIndex < constants.getMultinameCount(); multinameIndex++) {
+            Multiname m = constants.getMultiname(multinameIndex);
+            if (m.kind == Multiname.QNAME || m.kind == Multiname.QNAMEA) {
+                String name = m.getName(constants, new ArrayList<>(), true);
+                if (!nameToQNameIndices.containsKey(name)) {
+                    nameToQNameIndices.put(name, new ArrayList<>());
+                }
+                nameToQNameIndices.get(name).add(multinameIndex);
+            }
+        }
+        Set<MultinameUsage> collidingUsages = new HashSet<>();
+
+        //find context of names with count 2 or more
+        for (String name : nameToQNameIndices.keySet()) {
+            List<Integer> multinameIndices = nameToQNameIndices.get(name);
+            if (multinameIndices.size() > 1) {
+                List<List<MultinameUsage>> allUsages = new ArrayList<>();
+                for (int multinameIndex : multinameIndices) {
+                    List<MultinameUsage> usages = findMultinameUsage(multinameIndex);
+                    for (MultinameUsage usage : usages) {
+                        for (List<MultinameUsage> prevUsages : allUsages) {
+                            for (MultinameUsage prevUsage : prevUsages) {
+                                if (prevUsage.collides(usage)) {
+                                    collidingUsages.add(usage);
+                                    collidingUsages.add(prevUsage);
+                                }
+                            }
+                        }
+                    }
+                    allUsages.add(usages);
+                }
+            }
+        }
+
+        Set<Integer> collidingMultinameIndices = new HashSet<>();
+
+        for (MultinameUsage col : collidingUsages) {
+            collidingMultinameIndices.add(col.multinameIndex);
+        }
+
+        for (int multinameIndex : collidingMultinameIndices) {
+            constants.getMultiname(multinameIndex).setDisplayNamespace(true);
+        }
     }
 
     public List<MultinameUsage> findMultinameUsage(int multinameIndex) {

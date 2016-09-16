@@ -33,4 +33,10 @@ public class ConstVarTypeMultinameUsage extends ConstVarMultinameUsage {
     public String toString() {
         return super.toString() + " type";
     }
+
+    @Override
+    public boolean collides(MultinameUsage other) {
+        return false;
+    }
+
 }
