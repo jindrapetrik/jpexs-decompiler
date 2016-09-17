@@ -123,7 +123,7 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
             return false;
         }
 
-        abc.markSameContextMultinames();
+        abc.refreshMultinameNamespaceSuffixes();
         ((Tag) abc.parentTag).setModified(true);
         return true;
     }

@@ -693,7 +693,7 @@ public class ABC {
             SWFDecompilerPlugin.fireMethodBodyParsed(this, mb, swf);
         }
 
-        markSameContextMultinames();
+        refreshMultinameNamespaceSuffixes();
         getMethodIndexing();
 
         SWFDecompilerPlugin.fireAbcParsed(this, swf);
@@ -1117,7 +1117,11 @@ public class ABC {
         return ret;
     }
 
-    public void markSameContextMultinames() {
+    /**
+     * Appends namespace (#123) suffix to multinames which collide with each
+     * other. For example same name consts/vars/methods or same class names.
+     */
+    public void refreshMultinameNamespaceSuffixes() {
 
         //Reset
         for (int multinameIndex = 1; multinameIndex < constants.getMultinameCount(); multinameIndex++) {

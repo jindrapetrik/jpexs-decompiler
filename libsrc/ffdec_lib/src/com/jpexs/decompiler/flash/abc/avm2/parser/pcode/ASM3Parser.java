@@ -1129,7 +1129,7 @@ public class ASM3Parser {
                 info.optional[i] = optional.get(i);
             }
         }
-        abc.markSameContextMultinames();
+        abc.refreshMultinameNamespaceSuffixes();
         return code;
     }
 }
