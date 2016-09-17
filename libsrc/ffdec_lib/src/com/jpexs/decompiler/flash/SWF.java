@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AbcMultiNameCollisionFixer;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.DeobfuscationLevel;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetLexAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.InitPropertyAVM2Item;
@@ -1216,6 +1217,8 @@ public final class SWF implements SWFContainerItem, Timelined {
 
         if (Configuration.autoRenameIdentifiers.get()) {
             deobfuscateIdentifiers(RenameType.TYPENUMBER);
+            AbcMultiNameCollisionFixer collisionFixer = new AbcMultiNameCollisionFixer();
+            collisionFixer.fixCollisions(this);
             assignClassesToSymbols();
             clearScriptCache();
         }
@@ -2899,8 +2902,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             timelined.setModified(true);
             timelined.resetTimeline();
         } else // timeline should be always the swf here
-        {
-            if (removeDependencies) {
+         if (removeDependencies) {
                 removeTagWithDependenciesFromTimeline(tag, timelined.getTimeline());
                 timelined.setModified(true);
             } else {
@@ -2909,7 +2911,6 @@ public final class SWF implements SWFContainerItem, Timelined {
                     timelined.setModified(true);
                 }
             }
-        }
     }
 
     @Override
