@@ -103,11 +103,11 @@ public class InstanceInfo {
         }
 
         writer.appendNoHilight(modifiers + objType);
-        writer.hilightSpecial(abc.constants.getMultiname(name_index).getName(abc.constants, null/* No full names here*/, false), HighlightSpecialType.CLASS_NAME);
+        writer.hilightSpecial(abc.constants.getMultiname(name_index).getName(abc.constants, null/* No full names here*/, false, true), HighlightSpecialType.CLASS_NAME);
 
         if (super_index > 0) {
-            String typeName = abc.constants.getMultiname(super_index).getNameWithNamespace(abc.constants).toRawString();
-            String parentName = abc.constants.getMultiname(super_index).getName(abc.constants, fullyQualifiedNames, false);
+            String typeName = abc.constants.getMultiname(super_index).getNameWithNamespace(abc.constants, true).toRawString();
+            String parentName = abc.constants.getMultiname(super_index).getName(abc.constants, fullyQualifiedNames, false, true);
             if (!parentName.equals("Object")) {
                 writer.appendNoHilight(" extends ");
                 writer.hilightSpecial(parentName, HighlightSpecialType.TYPE_NAME, typeName);
@@ -123,8 +123,8 @@ public class InstanceInfo {
                 if (i > 0) {
                     writer.append(", ");
                 }
-                String typeName = abc.constants.getMultiname(interfaces[i]).getNameWithNamespace(abc.constants).toRawString();
-                writer.hilightSpecial(abc.constants.getMultiname(interfaces[i]).getName(abc.constants, fullyQualifiedNames, false), HighlightSpecialType.TYPE_NAME, typeName);
+                String typeName = abc.constants.getMultiname(interfaces[i]).getNameWithNamespace(abc.constants, true).toRawString();
+                writer.hilightSpecial(abc.constants.getMultiname(interfaces[i]).getName(abc.constants, fullyQualifiedNames, false, true), HighlightSpecialType.TYPE_NAME, typeName);
             }
         }
 

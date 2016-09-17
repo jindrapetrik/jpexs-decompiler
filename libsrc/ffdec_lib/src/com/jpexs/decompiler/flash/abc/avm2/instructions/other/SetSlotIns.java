@@ -104,7 +104,7 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
         if (slotname != null) {
             if (value instanceof LocalRegAVM2Item) {
                 LocalRegAVM2Item lr = (LocalRegAVM2Item) value;
-                String slotNameStr = slotname.getName(localData.getConstants(), localData.fullyQualifiedNames, true);
+                String slotNameStr = slotname.getName(localData.getConstants(), localData.fullyQualifiedNames, true, true);
                 if (localData.localRegNames.containsKey(lr.regIndex)) {
                     if (localData.localRegNames.get(lr.regIndex).equals(slotNameStr)) {
                         return; //Register with same name to slot
@@ -179,7 +179,7 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
         for (int t = 0; t < body.traits.traits.size(); t++) {
             if (body.traits.traits.get(t) instanceof TraitSlotConst) {
                 if (((TraitSlotConst) body.traits.traits.get(t)).slot_id == slotIndex) {
-                    slotname = body.traits.traits.get(t).getName(abc).getName(abc.constants, fullyQualifiedNames, true);
+                    slotname = body.traits.traits.get(t).getName(abc).getName(abc.constants, fullyQualifiedNames, true, true);
                 }
             }
 

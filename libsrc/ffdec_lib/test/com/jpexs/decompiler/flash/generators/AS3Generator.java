@@ -55,12 +55,16 @@ public class AS3Generator {
                 break;
             }
         }
+        if (tag == null) {
+            System.err.println("No ABC found");
+            return;
+        }
         ABC abc = tag.getABC();
         int classId = abc.findClassByName("classes.Test");
         StringBuilder s = new StringBuilder();
         for (Trait t : abc.instance_info.get(classId).instance_traits.traits) {
             if (t instanceof TraitMethodGetterSetter) {
-                String name = t.getName(abc).getName(abc.constants, null, true);
+                String name = t.getName(abc).getName(abc.constants, null, true, true);
                 if (name.startsWith("test")) {
                     s.append("@Test\r\npublic void ");
                     s.append(name);

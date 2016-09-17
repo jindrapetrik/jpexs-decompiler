@@ -86,11 +86,11 @@ public class MxmlcAs3ScriptReplacer extends MxmlcRunner implements As3ScriptRepl
         if (ii.deleted) {
             return true;
         }
-        if (ii.super_index != 0 && isParentDeleted(abc, allAbcs, abc.constants.getMultiname(ii.super_index).getNameWithNamespace(abc.constants))) {
+        if (ii.super_index != 0 && isParentDeleted(abc, allAbcs, abc.constants.getMultiname(ii.super_index).getNameWithNamespace(abc.constants, false))) {
             return true;
         }
         for (int iface : ii.interfaces) {
-            if (isParentDeleted(abc, allAbcs, abc.constants.getMultiname(iface).getNameWithNamespace(abc.constants))) {
+            if (isParentDeleted(abc, allAbcs, abc.constants.getMultiname(iface).getNameWithNamespace(abc.constants, false))) {
                 return true;
             }
         }
@@ -265,7 +265,7 @@ public class MxmlcAs3ScriptReplacer extends MxmlcRunner implements As3ScriptRepl
 
             //remove all subclasses from the SWC
             for (ScriptPack sp : copyPacks) {
-                DottedChain dc = sp.getPathPackage().add(sp.getPathScriptName());
+                DottedChain dc = sp.getPathPackage().add(sp.getPathScriptName(), "");
                 if (isParentDeleted(sp.abc, sp.allABCs, dc)) {
                     sp.abc.script_info.get(sp.scriptIndex).delete(sp.abc, true);
                     modAbcs.add(sp.abc);

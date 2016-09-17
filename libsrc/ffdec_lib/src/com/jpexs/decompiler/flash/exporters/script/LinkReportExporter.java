@@ -92,7 +92,7 @@ public class LinkReportExporter {
 
         List<DottedChain> existingObjects = new ArrayList<>();
         for (ScriptPack sp : as3scripts) {
-            existingObjects.add(sp.getClassPath().packageStr.add(sp.getClassPath().className));
+            existingObjects.add(sp.getClassPath().packageStr.add(sp.getClassPath().className, sp.getClassPath().namespaceSuffix));
         }
 
         for (ScriptPack sp : revList) {
@@ -119,7 +119,7 @@ public class LinkReportExporter {
             ns = abc.constants.getNamespace(nss.namespaces[0]);
         }
         String pkgName = ns == null ? "" : ns.getName(abc.constants).toRawString();
-        String clsName = multiName.getName(abc.constants, new ArrayList<>(), true);
+        String clsName = multiName.getName(abc.constants, new ArrayList<>(), true, true);
         return pkgName.isEmpty() ? clsName : pkgName + ":" + clsName;
     }
 
@@ -167,7 +167,7 @@ public class LinkReportExporter {
 
             sb.append(indent(3)).append("<dep id=\"AS3\" />").append(newLineChar); //Automatic
 
-            tc.getDependencies(null, abc, dependencies, uses, new DottedChain("FAKE!PACKAGE"), new ArrayList<>());
+            tc.getDependencies(null, abc, dependencies, uses, new DottedChain(new String[]{"FAKE!PACKAGE"}, ""), new ArrayList<>());
             for (Dependency dependency : dependencies) {
                 DottedChain dc = dependency.getId();
                 if (!"*".equals(dc.getLast())) {

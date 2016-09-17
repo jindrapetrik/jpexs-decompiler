@@ -54,12 +54,11 @@ public abstract class MultinameUsage {
             return false;
         }
         if ((thisM.kind == Multiname.QNAME || thisM.kind == Multiname.QNAMEA) && otherM.kind == thisM.kind) {
-            String thisName = thisM.getName(abc.constants, new ArrayList<>(), true);
-            String otherName = otherM.getName(other.abc.constants, new ArrayList<>(), true);
+            String thisName = thisM.getName(abc.constants, new ArrayList<>(), true, true);
+            String otherName = otherM.getName(other.abc.constants, new ArrayList<>(), true, true);
             Namespace thisNs = thisM.getNamespace(abc.constants);
             Namespace otherNs = otherM.getNamespace(other.abc.constants);
             if (!Objects.equals(thisName, otherName)) {
-                System.err.println("not equal name: " + thisName + ", " + otherName);
                 return false;
             }
 

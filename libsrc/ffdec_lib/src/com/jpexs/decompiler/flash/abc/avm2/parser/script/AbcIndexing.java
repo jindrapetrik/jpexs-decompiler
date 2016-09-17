@@ -278,7 +278,7 @@ public final class AbcIndexing {
 
         @Override
         public String toString() {
-            return abc.constants.getMultiname(abc.instance_info.get(index).name_index).getNameWithNamespace(abc.constants).toPrintableString(true);
+            return abc.constants.getMultiname(abc.instance_info.get(index).name_index).getNameWithNamespace(abc.constants, true).toPrintableString(true);
         }
 
         public ClassIndex(int index, ABC abc, ClassIndex parent) {
@@ -389,7 +389,7 @@ public final class AbcIndexing {
         if (ci != null && ci.parent != null && (prop.abc == null || prop.propNsIndex == 0)) {
             ci = ci.parent;
             //parent protected
-            DottedChain parentClass = ci.abc.instance_info.get(ci.index).getName(ci.abc.constants).getNameWithNamespace(ci.abc.constants);
+            DottedChain parentClass = ci.abc.instance_info.get(ci.index).getName(ci.abc.constants).getNameWithNamespace(ci.abc.constants, true);
             TraitIndex pti = findProperty(new PropertyDef(prop.propName, new TypeItem(parentClass), ci.abc, ci.abc.instance_info.get(ci.index).protectedNS), findStatic, findInstance);
             if (pti != null) {
                 return pti;
@@ -414,7 +414,7 @@ public final class AbcIndexing {
             }
             return new ApplyTypeAVM2Item(null, null, obj, params);
         } else {
-            return new TypeItem(m.getNameWithNamespace(constants));
+            return new TypeItem(m.getNameWithNamespace(constants, true));
         }
     }
 
@@ -453,12 +453,12 @@ public final class AbcIndexing {
                 propValue = new ValueKind(tsc.value_index, tsc.value_kind);
             }
             if (map != null) {
-                PropertyDef dp = new PropertyDef(t.getName(abc).getName(abc.constants, new ArrayList<>() /*?*/, true), multinameToType(name_index, abc.constants), abc, abc.constants.getMultiname(t.name_index).namespace_index);
+                PropertyDef dp = new PropertyDef(t.getName(abc).getName(abc.constants, new ArrayList<>() /*?*/, true, true /*FIXME ???*/), multinameToType(name_index, abc.constants), abc, abc.constants.getMultiname(t.name_index).namespace_index);
                 map.put(dp, new TraitIndex(t, abc, getTraitReturnType(abc, t), propValue, multinameToType(name_index, abc.constants)));
             }
             if (mapNs != null) {
                 Multiname m = abc.constants.getMultiname(t.name_index);
-                PropertyNsDef ndp = new PropertyNsDef(t.getName(abc).getName(abc.constants, new ArrayList<>() /*?*/, true), m == null || m.namespace_index == 0 ? DottedChain.EMPTY : m.getNamespace(abc.constants).getName(abc.constants), abc, m == null ? 0 : m.namespace_index);
+                PropertyNsDef ndp = new PropertyNsDef(t.getName(abc).getName(abc.constants, new ArrayList<>() /*?*/, true, true/*FIXME ???*/), m == null || m.namespace_index == 0 ? DottedChain.EMPTY : m.getNamespace(abc.constants).getName(abc.constants), abc, m == null ? 0 : m.namespace_index);
                 TraitIndex ti = new TraitIndex(t, abc, getTraitReturnType(abc, t), propValue, multinameToType(name_index, abc.constants));
                 if (!mapNs.containsKey(ndp)) {
                     mapNs.put(ndp, ti);
@@ -552,7 +552,7 @@ public final class AbcIndexing {
         for (ClassIndex cindex : addedClasses) {
             int parentClassName = abc.instance_info.get(cindex.index).super_index;
             if (parentClassName > 0) {
-                TypeItem parentClass = new TypeItem(abc.constants.getMultiname(parentClassName).getNameWithNamespace(abc.constants));
+                TypeItem parentClass = new TypeItem(abc.constants.getMultiname(parentClassName).getNameWithNamespace(abc.constants, true));
                 ClassIndex parentClassIndex = findClass(parentClass);
                 if (parentClassIndex == null) {
                     //Parent class can be deleted, do not check. TODO: handle this better

@@ -97,9 +97,9 @@ public class TraitsListItem {
             return "__" + STR_SCRIPT_INITIALIZER;
         }
         if (isStatic) {
-            return abc.class_info.get(classIndex).static_traits.traits.get(index).getName(abc).getName(abc.constants, null, false);
+            return abc.class_info.get(classIndex).static_traits.traits.get(index).getName(abc).getName(abc.constants, null, false, true);
         } else {
-            return abc.instance_info.get(classIndex).instance_traits.traits.get(index).getName(abc).getName(abc.constants, null, false);
+            return abc.instance_info.get(classIndex).instance_traits.traits.get(index).getName(abc).getName(abc.constants, null, false, true);
         }
     }
 

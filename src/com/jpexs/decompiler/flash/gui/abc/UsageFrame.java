@@ -92,7 +92,7 @@ public class UsageFrame extends AppDialog implements MouseListener {
         cont.add(new JScrollPane(usageList), BorderLayout.CENTER);
         cont.add(buttonsPanel, BorderLayout.SOUTH);
         setSize(400, 300);
-        setTitle((definitions ? translate("dialog.title.declaration") : translate("dialog.title")) + abc.constants.getMultiname(multinameIndex).getNameWithNamespace(abc.constants).toPrintableString(true));
+        setTitle((definitions ? translate("dialog.title.declaration") : translate("dialog.title")) + abc.constants.getMultiname(multinameIndex).getNameWithNamespace(abc.constants, true).toPrintableString(true));
         View.centerScreen(this);
         View.setWindowIcon(this);
     }
@@ -133,7 +133,7 @@ public class UsageFrame extends AppDialog implements MouseListener {
                 settrait.run();
             } else {
                 abcPanel.decompiledTextArea.addScriptListener(settrait);
-                abcPanel.hilightScript(abcPanel.getSwf(), icu.getAbc().instance_info.get(icu.getClassIndex()).getName(icu.getAbc().constants).getNameWithNamespace(icu.getAbc().constants).toRawString());
+                abcPanel.hilightScript(abcPanel.getSwf(), icu.getAbc().instance_info.get(icu.getClassIndex()).getName(icu.getAbc().constants).getNameWithNamespace(icu.getAbc().constants, true).toRawString());
             }
         }
     }

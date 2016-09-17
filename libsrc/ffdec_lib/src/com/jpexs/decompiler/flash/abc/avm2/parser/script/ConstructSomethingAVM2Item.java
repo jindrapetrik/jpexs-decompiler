@@ -65,7 +65,7 @@ public class ConstructSomethingAVM2Item extends CallAVM2Item {
 
         if (resname instanceof TypeItem) {
             TypeItem prop = (TypeItem) resname;
-            if (localData.isStatic && localData.pkg.add(localData.currentClass).equals(prop.fullTypeName)) {
+            if (localData.isStatic && localData.pkg.addWithSuffix(localData.currentClass).equals(prop.fullTypeName)) {
                 return toSourceMerge(localData, generator,
                         new AVM2Instruction(0, AVM2Instructions.GetLocal0, new int[]{}), arguments,
                         new AVM2Instruction(0, AVM2Instructions.Construct, new int[]{arguments.size()}));

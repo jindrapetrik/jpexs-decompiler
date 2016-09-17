@@ -51,7 +51,7 @@ public class DependencyParser {
         } else if ((ns.kind != Namespace.KIND_PACKAGE) && (ns.kind != Namespace.KIND_PACKAGE_INTERNAL)) {
             return;
         }
-        newimport = newimport.add(name);
+        newimport = newimport.addWithSuffix(name);
         Dependency dep = new Dependency(newimport, dependencyType);
 
         if (!dependencies.contains(dep)) {
@@ -80,7 +80,7 @@ public class DependencyParser {
                 return;
             }
             Namespace ns = m.getNamespace(abc.constants);
-            String name = m.getName(abc.constants, fullyQualifiedNames, true);
+            String name = m.getName(abc.constants, fullyQualifiedNames, true, true);
             NamespaceSet nss = m.getNamespaceSet(abc.constants);
             if (ns != null) {
                 parseDependenciesFromNS(ignoredCustom, abc, dependencies, uses, m.namespace_index, ignorePackage, name, dependencyType);
@@ -114,7 +114,7 @@ public class DependencyParser {
             }
             for (AVM2Instruction ins : body.getCode().code) {
                 if (ins.definition instanceof AlchemyTypeIns) {
-                    DottedChain nimport = AlchemyTypeIns.ALCHEMY_PACKAGE.add(ins.definition.instructionName);
+                    DottedChain nimport = AlchemyTypeIns.ALCHEMY_PACKAGE.addWithSuffix(ins.definition.instructionName);
                     Dependency depExp = new Dependency(nimport, DependencyType.EXPRESSION);
                     if (!dependencies.contains(depExp)) {
                         dependencies.add(depExp);
@@ -166,7 +166,7 @@ public class DependencyParser {
                 return;
             }
             Namespace ns = m.getNamespace(abc.constants);
-            String name = m.getName(abc.constants, fullyQualifiedNames, false);
+            String name = m.getName(abc.constants, fullyQualifiedNames, false, true);
             NamespaceSet nss = m.getNamespaceSet(abc.constants);
             if (ns != null) {
                 parseUsagesFromNS(ignoredCustom, abc, dependencies, uses, m.namespace_index, ignorePackage, name);

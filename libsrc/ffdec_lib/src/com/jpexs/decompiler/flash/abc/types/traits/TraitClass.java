@@ -114,7 +114,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         fullyQualifiedNames = new ArrayList<>();
         writeImportsUsages(abc, writer, packageName, fullyQualifiedNames);
 
-        String instanceInfoName = instanceInfoMultiname.getName(abc.constants, fullyQualifiedNames, false);
+        String instanceInfoName = instanceInfoMultiname.getName(abc.constants, fullyQualifiedNames, false, true);
 
         writer.startClass(class_info);
 
@@ -175,7 +175,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
             writer.startMethod(instanceInfo.iinit_index);
             writer.appendNoHilight(modifier);
             writer.appendNoHilight("function ");
-            writer.appendNoHilight(m.getName(abc.constants, null/*do not want full names here*/, false));
+            writer.appendNoHilight(m.getName(abc.constants, null/*do not want full names here*/, false, true));
             writer.appendNoHilight("(");
             bodyIndex = abc.findBodyIndex(instanceInfo.iinit_index);
             MethodBody body = bodyIndex == -1 ? null : abc.bodies.get(bodyIndex);
@@ -210,12 +210,12 @@ public class TraitClass extends Trait implements TraitWithSlot {
         fullyQualifiedNames = new ArrayList<>();
 
         InstanceInfo instanceInfo = abc.instance_info.get(class_info);
-        String instanceInfoName = instanceInfo.getName(abc.constants).getName(abc.constants, fullyQualifiedNames, false);
+        String instanceInfoName = instanceInfo.getName(abc.constants).getName(abc.constants, fullyQualifiedNames, false, true);
         ClassInfo classInfo = abc.class_info.get(class_info);
 
         AbcIndexing index = new AbcIndexing(abc.getSwf());
         //for simplification of String(this)
-        convertData.thisHasDefaultToPrimitive = null == index.findProperty(new AbcIndexing.PropertyDef("toString", new TypeItem(instanceInfo.getName(abc.constants).getNameWithNamespace(abc.constants)), abc, abc.constants.getNamespaceId(Namespace.KIND_PACKAGE, DottedChain.TOPLEVEL, abc.constants.getStringId("", true), true)), false, true);
+        convertData.thisHasDefaultToPrimitive = null == index.findProperty(new AbcIndexing.PropertyDef("toString", new TypeItem(instanceInfo.getName(abc.constants).getNameWithNamespace(abc.constants, true)), abc, abc.constants.getNamespaceId(Namespace.KIND_PACKAGE, DottedChain.TOPLEVEL, abc.constants.getStringId("", true), true)), false, true);
 
         //class initializer
         int bodyIndex = abc.findBodyIndex(classInfo.cinit_index);

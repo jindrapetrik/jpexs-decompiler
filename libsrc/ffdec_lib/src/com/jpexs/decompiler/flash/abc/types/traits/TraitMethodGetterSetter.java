@@ -95,7 +95,7 @@ public class TraitMethodGetterSetter extends Trait {
 
         getModifiers(abc, isStatic, writer);
         writer.hilightSpecial("function " + addKind, HighlightSpecialType.TRAIT_TYPE);
-        writer.hilightSpecial(getName(abc).getName(abc.constants, fullyQualifiedNames, false), HighlightSpecialType.TRAIT_NAME);
+        writer.hilightSpecial(getName(abc).getName(abc.constants, fullyQualifiedNames, false, true), HighlightSpecialType.TRAIT_NAME);
         writer.appendNoHilight("(");
         abc.method_info.get(method_info).getParamStr(writer, abc.constants, body, abc, fullyQualifiedNames);
         writer.appendNoHilight(") : ");
@@ -109,7 +109,7 @@ public class TraitMethodGetterSetter extends Trait {
             writeImportsUsages(abc, writer, getPackage(abc), fullyQualifiedNames);
         }
         writer.startMethod(method_info);
-        path = path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames, false);
+        path = path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames, false, true);
         convertHeader(parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
         int bodyIndex = abc.findBodyIndex(method_info);
         if (exportMode != ScriptExportMode.AS_METHOD_STUBS) {
@@ -130,7 +130,7 @@ public class TraitMethodGetterSetter extends Trait {
         }
         getMetaData(parent, convertData, abc, writer);
         writer.startMethod(method_info);
-        path = path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames, false);
+        path = path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames, false, true);
         toStringHeader(parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
         int bodyIndex = abc.findBodyIndex(method_info);
         if (classIndex != -1 && abc.instance_info.get(classIndex).isInterface() || bodyIndex == -1) {
@@ -190,10 +190,10 @@ public class TraitMethodGetterSetter extends Trait {
     @Override
     public boolean isVisible(boolean isStatic, ABC abc) {
         if (Configuration.handleSkinPartsAutomatically.get()) {
-            if ("skinParts".equals(getName(abc).getName(abc.constants, new ArrayList<>(), true))) {
+            if ("skinParts".equals(getName(abc).getName(abc.constants, new ArrayList<>(), true, true))) {
                 if (kindType == TRAIT_GETTER) {
                     MethodInfo mi = abc.method_info.get(method_info);
-                    if (mi.param_types.length == 0 && "Object".equals(abc.constants.getMultiname(mi.ret_type).getNameWithNamespace(abc.constants).toRawString())) {
+                    if (mi.param_types.length == 0 && "Object".equals(abc.constants.getMultiname(mi.ret_type).getNameWithNamespace(abc.constants, true).toRawString())) {
                         if (abc.constants.getNamespace(abc.constants.getMultiname(name_index).namespace_index).kind == Namespace.KIND_PROTECTED) {
                             return false;
                         }

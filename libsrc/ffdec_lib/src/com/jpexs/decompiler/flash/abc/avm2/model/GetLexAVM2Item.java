@@ -38,7 +38,7 @@ public class GetLexAVM2Item extends AVM2Item {
     public GetLexAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, Multiname propertyName, AVM2ConstantPool constants) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.propertyName = propertyName;
-        this.fullPropertyName = propertyName.getNameWithNamespace(constants);
+        this.fullPropertyName = propertyName.getNameWithNamespace(constants, true);
     }
 
     public String getRawPropertyName() {
@@ -47,9 +47,9 @@ public class GetLexAVM2Item extends AVM2Item {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
-        String localName = propertyName.getName(localData.constantsAvm2, localData.fullyQualifiedNames, false);
+        String localName = propertyName.getName(localData.constantsAvm2, localData.fullyQualifiedNames, false, true);
         getSrcData().localName = localName;
-        return writer.append(propertyName.getName(localData.constantsAvm2, localData.fullyQualifiedNames, false));
+        return writer.append(propertyName.getName(localData.constantsAvm2, localData.fullyQualifiedNames, false, true));
     }
 
     @Override

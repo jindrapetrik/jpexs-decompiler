@@ -51,7 +51,7 @@ public abstract class TraitMultinameUsage extends MultinameUsage implements Insi
 
     @Override
     public String toString() {
-        return "class " + abc.constants.getMultiname(abc.instance_info.get(classIndex).name_index).getNameWithNamespace(abc.constants).toPrintableString(true);
+        return "class " + abc.constants.getMultiname(abc.instance_info.get(classIndex).name_index).getNameWithNamespace(abc.constants, true).toPrintableString(true);
     }
 
     @Override

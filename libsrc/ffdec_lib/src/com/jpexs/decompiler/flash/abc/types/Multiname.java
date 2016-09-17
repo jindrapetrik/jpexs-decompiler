@@ -76,6 +76,13 @@ public class Multiname {
     @Internal
     private boolean displayNamespace = false;
 
+    public String getNamespaceSuffix() {
+        if (displayNamespace) {
+            return "#" + namespace_index;
+        }
+        return "";
+    }
+
     public void setDisplayNamespace(boolean displayNamespace) {
         this.displayNamespace = displayNamespace;
     }
@@ -307,12 +314,12 @@ public class Multiname {
         return null;
     }
 
-    private String typeNameToStr(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames, boolean raw) {
+    private String typeNameToStr(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames, boolean dontDeobfuscate, boolean withSuffix) {
         if (constants.getMultiname(qname_index).name_index == name_index) {
             return "ambiguousTypeName";
         }
         StringBuilder typeNameStr = new StringBuilder();
-        typeNameStr.append(constants.getMultiname(qname_index).getName(constants, fullyQualifiedNames, raw));
+        typeNameStr.append(constants.getMultiname(qname_index).getName(constants, fullyQualifiedNames, dontDeobfuscate, withSuffix));
         if (params != null && params.length > 0) {
             typeNameStr.append(".<");
             for (int i = 0; i < params.length; i++) {
@@ -323,7 +330,7 @@ public class Multiname {
                 if (param == 0) {
                     typeNameStr.append("*");
                 } else {
-                    typeNameStr.append(constants.getMultiname(param).getName(constants, fullyQualifiedNames, raw));
+                    typeNameStr.append(constants.getMultiname(param).getName(constants, fullyQualifiedNames, dontDeobfuscate, withSuffix));
                 }
             }
             typeNameStr.append(">");
@@ -331,9 +338,9 @@ public class Multiname {
         return typeNameStr.toString();
     }
 
-    public String getName(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames, boolean raw) {
+    public String getName(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames, boolean dontDeobfuscate, boolean withSuffix) {
         if (kind == TYPENAME) {
-            return typeNameToStr(constants, fullyQualifiedNames, raw);
+            return typeNameToStr(constants, fullyQualifiedNames, dontDeobfuscate, withSuffix);
         }
         if (name_index == -1) {
             return "";
@@ -342,19 +349,15 @@ public class Multiname {
             return isAttribute() ? "@*" : "*";
         } else {
             String name = constants.getString(name_index);
-            String nssuffix = "";
-            if (displayNamespace) {
-                nssuffix += "#" + namespace_index;
+            if (fullyQualifiedNames != null && fullyQualifiedNames.contains(DottedChain.parseWithSuffix(name))) {
+                DottedChain dc = getNameWithNamespace(constants, withSuffix);
+                return dontDeobfuscate ? dc.toRawString() : dc.toPrintableString(true);
             }
-            if (fullyQualifiedNames != null && fullyQualifiedNames.contains(DottedChain.parse(name))) {
-                DottedChain dc = getNameWithNamespace(constants);
-                return raw ? dc.toRawString() : dc.toPrintableString(true);
-            }
-            return (isAttribute() ? "@" : "") + (raw ? name : IdentifiersDeobfuscation.printIdentifier(true, name) + nssuffix);
+            return (isAttribute() ? "@" : "") + (dontDeobfuscate ? name : IdentifiersDeobfuscation.printIdentifier(true, name)) + (withSuffix ? getNamespaceSuffix() : "");
         }
     }
 
-    public DottedChain getNameWithNamespace(AVM2ConstantPool constants) {
+    public DottedChain getNameWithNamespace(AVM2ConstantPool constants, boolean withSuffix) {
         Namespace ns = getNamespace(constants);
         if (ns == null) {
             NamespaceSet nss = getNamespaceSet(constants);
@@ -364,11 +367,11 @@ public class Multiname {
                 }
             }
         }
-        String name = getName(constants, null, true);
+        String name = getName(constants, null, false, false);
         if (ns != null) {
-            return ns.getName(constants).add(name);
+            return ns.getName(constants).add(name, withSuffix ? getNamespaceSuffix() : "");
         }
-        return new DottedChain(name);
+        return new DottedChain(new String[]{name}, withSuffix ? getNamespaceSuffix() : "");
     }
 
     public Namespace getNamespace(AVM2ConstantPool constants) {
@@ -492,7 +495,7 @@ public class Multiname {
             return false;
         }
 
-        if (!Objects.equals(other.getName(otherCpool, new ArrayList<>(), true), getName(thisCpool, new ArrayList<>(), true))) {
+        if (!Objects.equals(other.getName(otherCpool, new ArrayList<>(), true, true), getName(thisCpool, new ArrayList<>(), true, true))) {
             return false;
         }
 

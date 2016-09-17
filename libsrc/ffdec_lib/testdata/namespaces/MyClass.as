@@ -30,69 +30,85 @@
 
 		
 		public function f1():int {
-			return 1;
+			return 17;
 		}
 		
 		public function f2():int {
-			return 2;
+			return 18;
 		}
 				
         
 		protected function f1x():int {
-			return 3;
+			return 19;
 		}
 		
 		protected function f2x():int {
-			return 4;
+			return 20;
 		}				
 		
 		
 		private function f1y():int {
-			return 5;
+			return 21;
 		}
 		
 		private function f2y():int {
-			return 6;
+			return 22;
 		}
 		
 		
 		public static function f1():int {
-			return 7;
+			return 23;
 		}
 		public static function f2():int {
-			return 8;
+			return 24;
 		}
 				
 				
         protected static function f1x():int {
-			return 9;
+			return 25;
 		}
 		protected static function f2x():int {
-			return 10;
+			return 26;
 		}				
 		
 		
 		private static function f1y():int {
-			return 11;
+			return 27;
 		}
 		private static function f2y():int {
-			return 12;
+			return 28;
 		}
 		
 		myns function f1():int {
-			return 13;
+			return 29;
 		}
 		myns function f2():int {
-			return 14;
+			return 30;
 		}
 		
 		myns2 function f1():int {
-			return 15;
+			return 31;
 		}
 		myns2 function f2():int {
-			return 16;
+			return 32;
 		}		
 											
+											
+		public function getResult():int {
+			var inst_a = this.a1 + this.a2 + this.a1x + this.a2x + this.a1y + this.a2y;
+			var inst_f = this.f1() + this.f2() + this.f1x() + this.f2x() + this.f1y() + this.f2y();
+			var inst = inst_a + inst_f;
+			
+			var stat_a = MyClass.a1 + MyClass.a2 + MyClass.a1x + MyClass.a2x + MyClass.a1y + MyClass.a2y;
+			var stat_f = MyClass.f1() + MyClass.f2() + MyClass.f1x() + MyClass.f2x() + MyClass.f1y() + MyClass.f2y();									
+			var stat = stat_a + stat_f;
+			
+			var ns_a = myns::a1 + myns::a2 + myns2::a1 + myns2::a2;
+			var ns_f = myns::f1() + myns::f2() + myns2::f1() + myns2::f2();
+			var ns = ns_a + ns_f;
+														
+			return inst+stat+ns; //528
+		}
 	}
 	
 }

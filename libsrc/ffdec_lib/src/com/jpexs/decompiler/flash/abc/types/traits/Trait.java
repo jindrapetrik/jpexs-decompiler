@@ -118,11 +118,11 @@ public abstract class Trait implements Cloneable, Serializable {
             public var attr2;
              */
             if (parent instanceof TraitClass) {
-                String thisName = getName(abc).getName(abc.constants, new ArrayList<>(), true);
+                String thisName = getName(abc).getName(abc.constants, new ArrayList<>(), true, true);
                 List<Trait> classTraits = abc.class_info.get(((TraitClass) parent).class_info).static_traits.traits;
                 for (Trait t : classTraits) {
                     if (t.kindType == Trait.TRAIT_SLOT) {
-                        if ("_skinParts".equals(t.getName(abc).getName(abc.constants, new ArrayList<>(), true))) {
+                        if ("_skinParts".equals(t.getName(abc).getName(abc.constants, new ArrayList<>(), true, true))) {
                             if (t.getName(abc).getNamespace(abc.constants).kind == Namespace.KIND_PRIVATE) {
                                 if (convertData.assignedValues.containsKey(t)) {
                                     if (convertData.assignedValues.get(t).value instanceof NewObjectAVM2Item) {
@@ -233,7 +233,7 @@ public abstract class Trait implements Cloneable, Serializable {
             if (importnames.contains(name)) {
                 imports.remove(i);
                 i--;
-                fullyQualifiedNames.add(new DottedChain(name));
+                fullyQualifiedNames.add(DottedChain.parseWithSuffix(name));
             } else {
                 importnames.add(name);
             }
@@ -246,7 +246,7 @@ public abstract class Trait implements Cloneable, Serializable {
             if (name.equals("*")) {
                 continue;
             }
-            DottedChain dAll = pkg.add("*");
+            DottedChain dAll = pkg.addWithSuffix("*");
             if (imports.contains(dAll)) {
                 imports.remove(i);
                 i--;
@@ -491,8 +491,9 @@ public abstract class Trait implements Cloneable, Serializable {
         Multiname name = getName(abc);
         Namespace ns = name.getNamespace(abc.constants);
         DottedChain packageName = ns == null ? DottedChain.EMPTY : ns.getName(abc.constants);
-        String objectName = name.getName(abc.constants, null, true);
-        return new ClassPath(packageName, objectName); //assume not null name
+        String objectName = name.getName(abc.constants, null, true, false);
+        String namespaceSuffix = name.getNamespaceSuffix();
+        return new ClassPath(packageName, objectName, namespaceSuffix); //assume not null name
     }
 
     @Override

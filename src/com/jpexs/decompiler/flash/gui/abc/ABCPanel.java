@@ -213,7 +213,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
                         continue;
                     }
                     if (Configuration._ignoreAdditionalFlexClasses.get()) {
-                        String fullName = pack.getClassPath().packageStr.add(pack.getClassPath().className).toRawString();
+                        String fullName = pack.getClassPath().packageStr.add(pack.getClassPath().className, pack.getClassPath().namespaceSuffix).toRawString();
                         if (ignoredClasses.contains(fullName)) {
                             continue;
                         }
@@ -1244,7 +1244,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
                 ClassPath classPath = item.getClassPath();
 
                 // first check the className to avoid calling unnecessary toString
-                if (name.endsWith(classPath.className) && classPath.toRawString().equals(name)) {
+                if (name.endsWith(classPath.className + classPath.namespaceSuffix) && classPath.toRawString().equals(name)) {
                     pack = item;
                     break;
                 }

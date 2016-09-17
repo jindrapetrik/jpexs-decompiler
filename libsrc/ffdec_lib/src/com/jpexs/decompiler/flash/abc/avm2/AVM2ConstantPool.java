@@ -664,7 +664,7 @@ public class AVM2ConstantPool implements Cloneable {
         String str = getString(index);
         DottedChain chain = dottedChainCache.get(str);
         if (chain == null) {
-            chain = DottedChain.parse(str);
+            chain = DottedChain.parseWithSuffix(str);
             dottedChainCache.put(str, chain);
         }
 

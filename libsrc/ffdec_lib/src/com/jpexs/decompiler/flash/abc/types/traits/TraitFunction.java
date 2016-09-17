@@ -65,7 +65,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
         }
         getModifiers(abc, isStatic, writer);
         writer.hilightSpecial("function ", HighlightSpecialType.TRAIT_TYPE);
-        writer.hilightSpecial(abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false), HighlightSpecialType.TRAIT_NAME);
+        writer.hilightSpecial(abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false, true), HighlightSpecialType.TRAIT_NAME);
         writer.appendNoHilight("(");
         abc.method_info.get(method_info).getParamStr(writer, abc.constants, body, abc, fullyQualifiedNames);
         writer.appendNoHilight(") : ");
@@ -87,7 +87,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
         writer.startBlock();
         int bodyIndex = abc.findBodyIndex(method_info);
         if (bodyIndex != -1) {
-            abc.bodies.get(bodyIndex).toString(path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false), exportMode, abc, this, writer, fullyQualifiedNames);
+            abc.bodies.get(bodyIndex).toString(path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false, true), exportMode, abc, this, writer, fullyQualifiedNames);
         }
         writer.endBlock();
 
@@ -104,7 +104,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
         convertHeader(parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
         int bodyIndex = abc.findBodyIndex(method_info);
         if (bodyIndex != -1) {
-            abc.bodies.get(bodyIndex).convert(convertData, path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false), exportMode, isStatic, method_info, scriptIndex, classIndex, abc, this, new ScopeStack(), 0, writer, fullyQualifiedNames, null, true);
+            abc.bodies.get(bodyIndex).convert(convertData, path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false, true), exportMode, isStatic, method_info, scriptIndex, classIndex, abc, this, new ScopeStack(), 0, writer, fullyQualifiedNames, null, true);
         }
         writer.endMethod();
     }

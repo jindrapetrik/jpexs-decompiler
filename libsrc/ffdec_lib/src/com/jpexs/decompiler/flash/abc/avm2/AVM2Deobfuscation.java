@@ -48,9 +48,9 @@ public class AVM2Deobfuscation {
 
     private final Map<String, Integer> usageTypesCount = new HashMap<>();
 
-    public static final DottedChain FLASH_PROXY = new DottedChain("flash", "utils", "flash_proxy");
+    public static final DottedChain FLASH_PROXY = new DottedChain(new String[]{"flash", "utils", "flash_proxy"}, "");
 
-    public static final DottedChain BUILTIN = new DottedChain("-");
+    public static final DottedChain BUILTIN = new DottedChain(new String[]{"-"}, "");
 
     public AVM2Deobfuscation(SWF swf, AVM2ConstantPool constants) {
         this.swf = swf;
@@ -111,12 +111,12 @@ public class AVM2Deobfuscation {
             }
             if (swf.as3StringConstantExists(ret)
                     || IdentifiersDeobfuscation.isReservedWord2(ret)
-                    || deobfuscated.containsValue(DottedChain.parse(ret))) {
+                    || deobfuscated.containsValue(DottedChain.parseWithSuffix(ret))) {
                 found = true;
                 rndSize++;
             }
         } while (found);
-        deobfuscated.put(DottedChain.parse(orig), DottedChain.parse(ret));
+        deobfuscated.put(DottedChain.parseWithSuffix(orig), DottedChain.parseWithSuffix(ret));
         return ret;
     }
 
@@ -130,7 +130,7 @@ public class AVM2Deobfuscation {
         }
         boolean isValid = isValidNSPart(s);
         if (!isValid) {
-            DottedChain sChain = DottedChain.parse(s);
+            DottedChain sChain = DottedChain.parseWithSuffix(s);
             DottedChain newName;
             if (namesMap.containsKey(sChain)) {
                 newName = namesMap.get(sChain);
@@ -186,19 +186,19 @@ public class AVM2Deobfuscation {
 
         if (!isValid) {
             DottedChain newname;
-            DottedChain sChain = DottedChain.parse(s);
+            DottedChain sChain = DottedChain.parseWithSuffix(s);
             if (namesMap.containsKey(sChain)) {
                 newname = namesMap.get(sChain);
             } else {
                 String str = fooString(namesMap, constants.getString(strIndex), firstUppercase, stringUsageTypes.get(strIndex), renameType);
-                newname = DottedChain.parse(str);
+                newname = DottedChain.parseWithSuffix(str);
             }
             if (stringUsages.contains(strIndex) || namespaceUsages.contains(strIndex)) { // this name is already referenced as String
                 strIndex = constants.addString(s); // add new index
             }
             constants.setString(strIndex, newname.toRawString());
             if (!namesMap.containsKey(sChain)) {
-                namesMap.put(sChain, DottedChain.parse(constants.getString(strIndex)));
+                namesMap.put(sChain, DottedChain.parseWithSuffix(constants.getString(strIndex)));
             }
         }
         return strIndex;

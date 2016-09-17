@@ -22,11 +22,11 @@ import com.jpexs.decompiler.flash.abc.ABC;
  *
  * @author JPEXS
  */
-public class ClassNameMultinameUsage extends MultinameUsage implements DefinitionUsage, InsideClassMultinameUsageInterface {
+public class ClassNameInTraitMultinameUsage extends MultinameUsage implements DefinitionUsage, InsideClassMultinameUsageInterface {
 
     private int classIndex;
 
-    public ClassNameMultinameUsage(ABC abc, int multinameIndex, int classIndex) {
+    public ClassNameInTraitMultinameUsage(ABC abc, int multinameIndex, int classIndex) {
         super(abc, multinameIndex);
         this.classIndex = classIndex;
     }
@@ -38,7 +38,7 @@ public class ClassNameMultinameUsage extends MultinameUsage implements Definitio
 
     @Override
     public String toString() {
-        return "class " + abc.constants.getMultiname(abc.instance_info.get(classIndex).name_index).getNameWithNamespace(abc.constants, true).toPrintableString(true);
+        return "class " + abc.constants.getMultiname(abc.instance_info.get(classIndex).name_index).getNameWithNamespace(abc.constants, true).toPrintableString(true) + " trait name";
     }
 
     @Override

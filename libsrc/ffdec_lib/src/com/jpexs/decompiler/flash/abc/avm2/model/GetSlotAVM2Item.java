@@ -46,18 +46,18 @@ public class GetSlotAVM2Item extends AVM2Item {
         }
 
         getSrcData().localName = getNameAsStr(localData);
-        return writer.append(slotName.getName(localData.constantsAvm2, localData.fullyQualifiedNames, false));
+        return writer.append(slotName.getName(localData.constantsAvm2, localData.fullyQualifiedNames, false, true));
     }
 
     public String getNameAsStr(LocalData localData) {
-        return slotName.getName(localData.constantsAvm2, localData.fullyQualifiedNames, false);
+        return slotName.getName(localData.constantsAvm2, localData.fullyQualifiedNames, false, true);
     }
 
     public GraphTextWriter getName(GraphTextWriter writer, LocalData localData) {
         if (slotName == null) {
             return writer.append("/*UnknownSlot*/");
         }
-        return writer.append(slotName.getName(localData.constantsAvm2, localData.fullyQualifiedNames, false));
+        return writer.append(slotName.getName(localData.constantsAvm2, localData.fullyQualifiedNames, false, true));
     }
 
     @Override

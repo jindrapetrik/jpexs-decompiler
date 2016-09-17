@@ -119,7 +119,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
             }
             return new ApplyTypeAVM2Item(null, null, obj, params);
         } else {
-            return new TypeItem(m.getNameWithNamespace(constants));
+            return new TypeItem(m.getNameWithNamespace(constants, true));
         }
     }
 
@@ -245,7 +245,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                             }
                         }
                         if (AVM2SourceGenerator.searchPrototypeChain(otherNs, localData.privateNs, localData.protectedNs, false, abcIndex, ftn.getWithoutLast(), ftn.getLast(), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc)) {
-                            objType = new TypeItem(outNs.getVal().add(outName.getVal()));
+                            objType = new TypeItem(outNs.getVal().addWithSuffix(outName.getVal()));
                             propType = outPropType.getVal();
                             propIndex = constants.getMultinameId(Multiname.createQName(false,
                                     constants.getStringId(propertyName, true),
@@ -260,7 +260,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                         for (MethodBody b : callStack) {
                             for (int i = 0; i < b.traits.traits.size(); i++) {
                                 Trait t = b.traits.traits.get(i);
-                                if (t.getName(abc).getName(constants, null, true).equals(propertyName)) {
+                                if (t.getName(abc).getName(constants, null, true, true).equals(propertyName)) {
                                     if (t instanceof TraitSlotConst) {
                                         TraitSlotConst tsc = (TraitSlotConst) t;
                                         objType = new TypeItem(DottedChain.FUNCTION);
@@ -287,7 +287,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                 int name_index = 0;
                                 for (int m = 1; m < constants.getMultinameCount(); m++) {
                                     Multiname mname = constants.getMultiname(m);
-                                    if (mname.kind == Multiname.QNAME && mname.getName(constants, null, true).equals(propertyName) && mname.namespace_index == nsindex) {
+                                    if (mname.kind == Multiname.QNAME && mname.getName(constants, null, true, true).equals(propertyName) && mname.namespace_index == nsindex) {
                                         name_index = m;
                                         break;
                                     }
@@ -363,7 +363,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                             }
                                         }
                                         if (AVM2SourceGenerator.searchPrototypeChain(otherns, localData.privateNs, localData.protectedNs, false, abcIndex, nsname, (((TypeItem) p.objType).fullTypeName.getLast()), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc)) {
-                                            objType = new TypeItem(outNs.getVal().add(outName.getVal()));
+                                            objType = new TypeItem(outNs.getVal().addWithSuffix(outName.getVal()));
                                             propType = p.returnType;
                                             propIndex = constants.getMultinameId(Multiname.createQName(false,
                                                     constants.getStringId(propertyName, true),
@@ -683,7 +683,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                     otherNs.add(n.getCpoolIndex(abcIndex));
                 }
             }
-            if (!localData.subMethod && cname != null && AVM2SourceGenerator.searchPrototypeChain(otherNs, localData.privateNs, localData.protectedNs, true, abcIndex, pkgName, cname, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc) && (localData.getFullClass().equals(outNs.getVal().add(outName.getVal()).toRawString()))) {
+            if (!localData.subMethod && cname != null && AVM2SourceGenerator.searchPrototypeChain(otherNs, localData.privateNs, localData.protectedNs, true, abcIndex, pkgName, cname, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc) && (localData.getFullClass().equals(outNs.getVal().addWithSuffix(outName.getVal()).toRawString()))) {
                 NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.getFullClass()), 0, "this", null, false, openedNamespaces);
                 nobj.setRegNumber(0);
                 obj = nobj;

@@ -66,7 +66,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
             }
         }
         assertNotNull(tag);
-        clsIndex = tag.getABC().findClassByName(new DottedChain("classes", "Test"));
+        clsIndex = tag.getABC().findClassByName(new DottedChain(new String[]{"classes", "Test"}, ""));
         assertTrue(clsIndex > -1);
         this.abc = tag.getABC();
         Configuration.autoDeobfuscate.set(false);

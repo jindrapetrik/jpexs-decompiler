@@ -51,7 +51,7 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
     }
 
     public ClassesListTreeModel(SWF swf) {
-        super(null, null);
+        super(null, null, null);
         root = new AS3Package(null, swf);
         this.swf = swf;
         this.list = swf.getAS3Packs();
@@ -92,7 +92,7 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
                 continue;
             }
             if (Configuration._ignoreAdditionalFlexClasses.get()) {
-                String fullName = item.getClassPath().packageStr.add(item.getClassPath().className).toRawString();
+                String fullName = item.getClassPath().packageStr.add(item.getClassPath().className, item.getClassPath().namespaceSuffix).toRawString();
                 if (ignoredClasses.contains(fullName)) {
                     continue;
                 }
