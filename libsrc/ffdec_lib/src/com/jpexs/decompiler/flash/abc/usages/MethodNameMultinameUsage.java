@@ -38,7 +38,7 @@ public class MethodNameMultinameUsage extends MethodMultinameUsage implements De
     public boolean collides(MultinameUsage other) {
         if ((other instanceof MethodNameMultinameUsage) || (other instanceof ConstVarNameMultinameUsage)) {
             TraitMultinameUsage otherTrait = (TraitMultinameUsage) other;
-            if (otherTrait.classIndex == classIndex && otherTrait.traitsType == traitsType) {
+            if (otherTrait.classIndex == classIndex && otherTrait.traitsType == traitsType && otherTrait.parentTraitIndex == parentTraitIndex) {
                 if (other.sameMultinameName(this)) {
                     return true;
                 }
