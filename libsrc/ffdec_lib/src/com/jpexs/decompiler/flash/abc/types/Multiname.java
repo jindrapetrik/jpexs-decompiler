@@ -117,6 +117,18 @@ public class Multiname {
         }
     }
 
+    public boolean hasOwnName() {
+        return kind == QNAME || kind == QNAMEA || kind == RTQNAME || kind == RTQNAMEA || kind == MULTINAME || kind == MULTINAMEA;
+    }
+
+    public boolean hasOwnNamespace() {
+        return kind == QNAME || kind == QNAMEA;
+    }
+
+    public boolean hasOwnNamespaceSet() {
+        return kind == MULTINAME || kind == MULTINAMEA || kind == MULTINAMEL || kind == MULTINAMELA;
+    }
+
     public static Multiname createQName(boolean attribute, int name_index, int namespace_index) {
         return new Multiname(attribute ? QNAMEA : QNAME, name_index, namespace_index, 0, 0, null);
     }
