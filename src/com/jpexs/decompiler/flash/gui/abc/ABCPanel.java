@@ -1048,7 +1048,10 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
             return false; //?
         }
         SyntaxDocument sd = (SyntaxDocument) decompiledTextArea.getDocument();
-        Token t = sd.getTokenAt(pos + 1);
+        Token currentChartoken = sd.getTokenAt(pos);
+        Token nextChartoken = sd.getTokenAt(pos + 1);
+
+        Token t = currentChartoken != null && currentChartoken.length == 1 ? currentChartoken : nextChartoken;
         if (t == null || (t.type != TokenType.IDENTIFIER && t.type != TokenType.KEYWORD && t.type != TokenType.REGEX)) {
             return false;
         }
