@@ -97,23 +97,23 @@ public class DebuggerTools {
                 }
                 for (int i = 1; i < a.constants.getMultinameCount(); i++) {
                     Multiname m = a.constants.getMultiname(i);
-                    if ("flash.display.Loader".equals(m.getNameWithNamespace(a.constants).toRawString())) {
+                    if ("flash.display.Loader".equals(m.getNameWithNamespace(a.constants, true).toRawString())) {
                         m.namespace_index = a.constants.getNamespaceId(Namespace.KIND_PACKAGE, debuggerPkg, 0, true);
                         m.name_index = a.constants.getStringId("DebugLoader", true);
                         ((Tag) ct).setModified(true);
-                    } else if ("flash.utils.getDefinitionByName".equals(m.getNameWithNamespace(a.constants).toRawString())) {
+                    } else if ("flash.utils.getDefinitionByName".equals(m.getNameWithNamespace(a.constants, true).toRawString())) {
                         m.namespace_index = a.constants.getNamespaceId(Namespace.KIND_PACKAGE, debuggerPkg, 0, true);
                         m.name_index = a.constants.getStringId("debugGetDefinitionByName", true);
                         ((Tag) ct).setModified(true);
-                    } else if ("flash.utils.getQualifiedClassName".equals(m.getNameWithNamespace(a.constants).toRawString())) {
+                    } else if ("flash.utils.getQualifiedClassName".equals(m.getNameWithNamespace(a.constants, true).toRawString())) {
                         m.namespace_index = a.constants.getNamespaceId(Namespace.KIND_PACKAGE, debuggerPkg, 0, true);
                         m.name_index = a.constants.getStringId("debugGetQualifiedClassName", true);
                         ((Tag) ct).setModified(true);
-                    } else if ("flash.utils.getQualifiedSuperclassName".equals(m.getNameWithNamespace(a.constants).toRawString())) {
+                    } else if ("flash.utils.getQualifiedSuperclassName".equals(m.getNameWithNamespace(a.constants, true).toRawString())) {
                         m.namespace_index = a.constants.getNamespaceId(Namespace.KIND_PACKAGE, debuggerPkg, 0, true);
                         m.name_index = a.constants.getStringId("debugGetQualifiedSuperclassName", true);
                         ((Tag) ct).setModified(true);
-                    } else if ("flash.utils.describeType".equals(m.getNameWithNamespace(a.constants).toRawString())) {
+                    } else if ("flash.utils.describeType".equals(m.getNameWithNamespace(a.constants, true).toRawString())) {
                         m.namespace_index = a.constants.getNamespaceId(Namespace.KIND_PACKAGE, debuggerPkg, 0, true);
                         m.name_index = a.constants.getStringId("debugDescribeType", true);
                         ((Tag) ct).setModified(true);
@@ -131,7 +131,7 @@ public class DebuggerTools {
                 ABC a = ct.getABC();
                 for (int i = 1; i < a.constants.getMultinameCount(); i++) {
                     Multiname m = a.constants.getMultiname(i);
-                    if ("trace".equals(m.getNameWithNamespace(a.constants).toRawString())) {
+                    if ("trace".equals(m.getNameWithNamespace(a.constants, true).toRawString())) {
                         m.namespace_index = a.constants.getNamespaceId(Namespace.KIND_PACKAGE, debuggerPkg, 0, true);
                         m.name_index = a.constants.getStringId(fname, true);
                         ((Tag) ct).setModified(true);
@@ -154,7 +154,7 @@ public class DebuggerTools {
                 ABC a = ct.getABC();
                 for (int i = 1; i < a.constants.getMultinameCount(); i++) {
                     Multiname m = a.constants.getMultiname(i);
-                    String packageStr = m.getNameWithNamespace(a.constants).toString();
+                    String packageStr = m.getNameWithNamespace(a.constants, true).toString();
                     if (isDebuggerClass(packageStr, "debugTrace")
                             || isDebuggerClass(packageStr, "debugAlert")
                             || isDebuggerClass(packageStr, "debugSocket")

@@ -1754,7 +1754,7 @@ public class AVM2Code implements Cloneable {
                                         if (code.get(ip + plus + 2).definition instanceof SwapIns) {
                                             if (code.get(ip + plus + 4).definition instanceof PopScopeIns) {
                                                 if (code.get(ip + plus + 3).definition instanceof SetPropertyIns) {
-                                                    functionName = abc.constants.getMultiname(code.get(ip + plus + 3).operands[0]).getName(abc.constants, fullyQualifiedNames, true);
+                                                    functionName = abc.constants.getMultiname(code.get(ip + plus + 3).operands[0]).getName(abc.constants, fullyQualifiedNames, true, true);
                                                     scopeStack.pop();// with
                                                     output.remove(output.size() - 1); // with
                                                     ip = ip + plus + 4; // +1 below
@@ -2040,7 +2040,7 @@ public class AVM2Code implements Cloneable {
 
                                             if (value instanceof NewFunctionAVM2Item) {
                                                 NewFunctionAVM2Item f = (NewFunctionAVM2Item) value;
-                                                f.functionName = tsc.getName(abc).getName(abc.constants, fullyQualifiedNames, true);
+                                                f.functionName = tsc.getName(abc).getName(abc.constants, fullyQualifiedNames, true, true);
                                             }
                                             AssignedValue av = new AssignedValue(value, initializerType, methodIndex);
                                             convertData.assignedValues.put(tsc, av);
@@ -2085,7 +2085,7 @@ public class AVM2Code implements Cloneable {
             if (param_types[i] == 0) {
                 type = TypeItem.UNBOUNDED;
             } else {
-                type = new TypeItem(abc.constants.getMultiname(param_types[i]).getNameWithNamespace(abc.constants));
+                type = new TypeItem(abc.constants.getMultiname(param_types[i]).getNameWithNamespace(abc.constants, true));
             }
             if (d.length > r) {
                 d[r] = new DeclarationAVM2Item(new SetLocalAVM2Item(null, null, r, new NullAVM2Item(null, null)), type);
@@ -2174,8 +2174,7 @@ public class AVM2Code implements Cloneable {
              ins.operands[j] = updater.updateOperandOffset(target, ins.operands[j]);
              }
              }*/ //Faster, but not so universal
-            {
-                if (ins.definition instanceof IfTypeIns) {
+             if (ins.definition instanceof IfTypeIns) {
                     long target = ins.getTargetAddress();
                     try {
                         ins.operands[0] = updater.updateOperandOffset(ins.getAddress(), target, ins.operands[0]);
@@ -2183,7 +2182,6 @@ public class AVM2Code implements Cloneable {
                         throw new ConvertException("Invalid offset (" + ins + ")", i);
                     }
                 }
-            }
             ins.setAddress(updater.updateInstructionOffset(ins.getAddress()));
             //Note: changing operands here does not change instruction byte length as offsets are always S24 (not variable length)
         }

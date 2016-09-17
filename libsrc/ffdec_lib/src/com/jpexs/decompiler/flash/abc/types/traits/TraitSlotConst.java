@@ -76,7 +76,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
     public String getType(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames) {
         String typeStr = "*";
         if (type_index > 0) {
-            typeStr = constants.getMultiname(type_index).getName(constants, fullyQualifiedNames, false);
+            typeStr = constants.getMultiname(type_index).getName(constants, fullyQualifiedNames, false, true);
         }
         return typeStr;
     }
@@ -101,7 +101,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
             slotconst = "namespace";
         }
         writer.hilightSpecial(slotconst + " ", HighlightSpecialType.TRAIT_TYPE);
-        writer.hilightSpecial(getName(abc).getName(abc.constants, fullyQualifiedNames, false), HighlightSpecialType.TRAIT_NAME);
+        writer.hilightSpecial(getName(abc).getName(abc.constants, fullyQualifiedNames, false, true), HighlightSpecialType.TRAIT_NAME);
         writer.hilightSpecial(typeStr, HighlightSpecialType.TRAIT_TYPE_NAME);
         return writer;
     }
@@ -216,9 +216,9 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
              Hide: private static var _skinParts
              (part of [SkinPart] compilations)
              */
-            if (isStatic && "_skinParts".equals(getName(abc).getName(abc.constants, new ArrayList<>(), true))) {
+            if (isStatic && "_skinParts".equals(getName(abc).getName(abc.constants, new ArrayList<>(), true, true))) {
                 if (kindType == Trait.TRAIT_SLOT) {
-                    if ("_skinParts".equals(getName(abc).getName(abc.constants, new ArrayList<>(), true))) {
+                    if ("_skinParts".equals(getName(abc).getName(abc.constants, new ArrayList<>(), true, true))) {
                         if (getName(abc).getNamespace(abc.constants).kind == Namespace.KIND_PRIVATE) {
                             return false;
                         }

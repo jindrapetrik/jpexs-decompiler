@@ -2204,7 +2204,7 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     public void renameAS2Identifier(String identifier, String newname) throws InterruptedException {
         Map<DottedChain, DottedChain> selected = new HashMap<>();
-        selected.put(DottedChain.parse(identifier), DottedChain.parse(newname));
+        selected.put(DottedChain.parseWithSuffix(identifier), DottedChain.parseWithSuffix(newname));
         renameAS2Identifiers(null, selected);
     }
 
@@ -2276,7 +2276,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                                     String fname = dvf.toStringNoH(null);
                                     String changed = deobfuscation.deobfuscateName(false, fname, false, "method", deobfuscated, renameType, selected);
                                     if (changed != null) {
-                                        deobfuscated.put(DottedChain.parse(fname), DottedChain.parse(changed));
+                                        deobfuscated.put(DottedChain.parseWithSuffix(fname), DottedChain.parseWithSuffix(changed));
                                     }
                                 }
                             }
@@ -2295,7 +2295,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                                 String vname = dvf.toStringNoH(null);
                                 String changed = deobfuscation.deobfuscateName(false, vname, false, "attribute", deobfuscated, renameType, selected);
                                 if (changed != null) {
-                                    deobfuscated.put(DottedChain.parse(vname), DottedChain.parse(changed));
+                                    deobfuscated.put(DottedChain.parseWithSuffix(vname), DottedChain.parseWithSuffix(changed));
                                 }
                             }
                         }
@@ -2331,7 +2331,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                                 changedNameStr = changedNameStr2;
                             }
                             ret++;
-                            deobfuscated.put(DottedChain.parse(nameStr), DottedChain.parse(changedNameStr));
+                            deobfuscated.put(DottedChain.parseWithSuffix(nameStr), DottedChain.parseWithSuffix(changedNameStr));
                             pos++;
                         }
                         name = mem.object;
@@ -2355,7 +2355,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                                 changedNameStr = changedNameStr2;
                             }
                             ret++;
-                            deobfuscated.put(DottedChain.parse(nameStr), DottedChain.parse(changedNameStr));
+                            deobfuscated.put(DottedChain.parseWithSuffix(nameStr), DottedChain.parseWithSuffix(changedNameStr));
                             pos++;
                         }
                     }
@@ -2899,7 +2899,8 @@ public final class SWF implements SWFContainerItem, Timelined {
             timelined.setModified(true);
             timelined.resetTimeline();
         } else // timeline should be always the swf here
-         if (removeDependencies) {
+        {
+            if (removeDependencies) {
                 removeTagWithDependenciesFromTimeline(tag, timelined.getTimeline());
                 timelined.setModified(true);
             } else {
@@ -2908,6 +2909,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                     timelined.setModified(true);
                 }
             }
+        }
     }
 
     @Override
@@ -3538,10 +3540,10 @@ public final class SWF implements SWFContainerItem, Timelined {
                 if (firstTrait instanceof TraitClass) {
                     int cindex = ((TraitClass) firstTrait).class_info;
                     Multiname superName = documentPack.abc.constants.getMultiname(documentPack.abc.instance_info.get(cindex).super_index);
-                    String parentClass = superName.getNameWithNamespace(documentPack.abc.constants).toRawString();
+                    String parentClass = superName.getNameWithNamespace(documentPack.abc.constants, true).toRawString();
                     if ("mx.managers.SystemManager".equals(parentClass)) {
                         for (Trait t : documentPack.abc.instance_info.get(cindex).instance_traits.traits) {
-                            if ((t instanceof TraitMethodGetterSetter) && "info".equals(t.getName(documentPack.abc).getName(documentPack.abc.constants, new ArrayList<>(), true))) {
+                            if ((t instanceof TraitMethodGetterSetter) && "info".equals(t.getName(documentPack.abc).getName(documentPack.abc.constants, new ArrayList<>(), true, true))) {
 
                                 int mi = ((TraitMethodGetterSetter) t).method_info;
                                 try {
@@ -3627,7 +3629,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                                                                                 if (cit instanceof SetPropertyAVM2Item) {
                                                                                     if (cit.value instanceof GetLexAVM2Item) {
                                                                                         GetLexAVM2Item gl = (GetLexAVM2Item) cit.value;
-                                                                                        ignoredClasses.add(gl.propertyName.getNameWithNamespace(p.abc.constants).toRawString());
+                                                                                        ignoredClasses.add(gl.propertyName.getNameWithNamespace(p.abc.constants, true).toRawString());
                                                                                     }
                                                                                 }
                                                                             }

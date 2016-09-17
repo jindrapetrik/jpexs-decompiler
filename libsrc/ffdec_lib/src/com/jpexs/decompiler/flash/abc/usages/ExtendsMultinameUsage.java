@@ -22,14 +22,28 @@ import com.jpexs.decompiler.flash.abc.ABC;
  *
  * @author JPEXS
  */
-public class ExtendsMultinameUsage extends InsideClassMultinameUsage {
+public class ExtendsMultinameUsage extends MultinameUsage implements InsideClassMultinameUsageInterface {
+
+    private int classIndex;
 
     public ExtendsMultinameUsage(ABC abc, int multinameIndex, int classIndex) {
-        super(abc, multinameIndex, classIndex);
+        super(abc, multinameIndex);
+        this.classIndex = classIndex;
+    }
+
+    @Override
+    public int getClassIndex() {
+        return classIndex;
     }
 
     @Override
     public String toString() {
         return super.toString() + " extends";
     }
+
+    @Override
+    public boolean collides(MultinameUsage other) {
+        return false;
+    }
+
 }

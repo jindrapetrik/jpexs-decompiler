@@ -97,7 +97,7 @@ public class TryAVM2Item extends AVM2Item implements Block {
 
             int eti = catchExceptions.get(e).type_index;
 
-            data.declaredType = eti <= 0 ? DottedChain.ALL : localData.constantsAvm2.getMultiname(eti).getNameWithNamespace(localData.constantsAvm2);
+            data.declaredType = eti <= 0 ? DottedChain.ALL : localData.constantsAvm2.getMultiname(eti).getNameWithNamespace(localData.constantsAvm2, true);
             writer.hilightSpecial(localName, HighlightSpecialType.TRY_NAME, e, data);
             writer.append(":");
             writer.hilightSpecial(catchExceptions.get(e).getTypeName(localData.constantsAvm2, localData.fullyQualifiedNames), HighlightSpecialType.TRY_TYPE, e);

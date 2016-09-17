@@ -29,30 +29,37 @@ public class ClassPath {
 
     public final String className;
 
-    public ClassPath(DottedChain packageStr, String className) {
+    public final String namespaceSuffix;
+
+    public ClassPath(DottedChain packageStr, String className, String namespaceSuffix) {
         this.packageStr = packageStr == null ? DottedChain.TOPLEVEL : packageStr;
         this.className = className;
+        this.namespaceSuffix = namespaceSuffix;
     }
 
     @Override
     public String toString() {
-        return packageStr.add(className).toPrintableString(true);
+        return packageStr.add(className, namespaceSuffix).toPrintableString(true);
     }
 
     public String toRawString() {
-        return packageStr.add(className).toRawString();
+        return packageStr.add(className, namespaceSuffix).toRawString();
     }
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 37 * hash + Objects.hashCode(packageStr);
-        hash = 37 * hash + Objects.hashCode(className);
+        int hash = 3;
+        hash = 31 * hash + Objects.hashCode(this.packageStr);
+        hash = 31 * hash + Objects.hashCode(this.className);
+        hash = 31 * hash + Objects.hashCode(this.namespaceSuffix);
         return hash;
     }
 
     @Override
     public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
         if (obj == null) {
             return false;
         }
@@ -60,9 +67,16 @@ public class ClassPath {
             return false;
         }
         final ClassPath other = (ClassPath) obj;
-        if (!Objects.equals(packageStr, other.packageStr)) {
+        if (!Objects.equals(this.className, other.className)) {
             return false;
         }
-        return Objects.equals(className, other.className);
+        if (!Objects.equals(this.namespaceSuffix, other.namespaceSuffix)) {
+            return false;
+        }
+        if (!Objects.equals(this.packageStr, other.packageStr)) {
+            return false;
+        }
+        return true;
     }
+
 }

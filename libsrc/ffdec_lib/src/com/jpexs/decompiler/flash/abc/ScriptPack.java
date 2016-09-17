@@ -98,7 +98,7 @@ public class ScriptPack extends AS3ClassTreeItem {
     }
 
     public ScriptPack(ClassPath path, ABC abc, List<ABC> allAbcs, int scriptIndex, List<Integer> traitIndices) {
-        super(path.className, path);
+        super(path.className, path.namespaceSuffix, path);
         this.abc = abc;
         this.scriptIndex = scriptIndex;
         this.traitIndices = traitIndices;
@@ -124,7 +124,7 @@ public class ScriptPack extends AS3ClassTreeItem {
             Multiname name = abc.script_info.get(scriptIndex).traits.traits.get(t).getName(abc);
             Namespace ns = name.getNamespace(abc.constants);
             if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
-                scriptName = name.getName(abc.constants, null, false);
+                scriptName = name.getName(abc.constants, null, false, true);
             }
         }
         return scriptName;

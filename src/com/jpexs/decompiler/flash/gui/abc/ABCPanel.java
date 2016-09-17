@@ -213,7 +213,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
                         continue;
                     }
                     if (Configuration._ignoreAdditionalFlexClasses.get()) {
-                        String fullName = pack.getClassPath().packageStr.add(pack.getClassPath().className).toRawString();
+                        String fullName = pack.getClassPath().packageStr.add(pack.getClassPath().className, pack.getClassPath().namespaceSuffix).toRawString();
                         if (ignoredClasses.contains(fullName)) {
                             continue;
                         }
@@ -1048,7 +1048,10 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
             return false; //?
         }
         SyntaxDocument sd = (SyntaxDocument) decompiledTextArea.getDocument();
-        Token t = sd.getTokenAt(pos + 1);
+        Token currentChartoken = sd.getTokenAt(pos);
+        Token nextChartoken = sd.getTokenAt(pos + 1);
+
+        Token t = currentChartoken != null && currentChartoken.length == 1 ? currentChartoken : nextChartoken;
         if (t == null || (t.type != TokenType.IDENTIFIER && t.type != TokenType.KEYWORD && t.type != TokenType.REGEX)) {
             return false;
         }
@@ -1102,7 +1105,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         Reference<Integer> multinameIndexRef = new Reference<>(0);
 
         if (decompiledTextArea.getPropertyTypeAtPos(pos, abcIndex, classIndex, traitIndex, classTrait, multinameIndexRef)) {
-            UsageFrame.gotoUsage(ABCPanel.this, new TraitMultinameUsage(getAbcList().get(abcIndex.getVal()).getABC(), multinameIndexRef.getVal(), classIndex.getVal(), traitIndex.getVal(), classTrait.getVal(), null, -1) {
+            UsageFrame.gotoUsage(ABCPanel.this, new TraitMultinameUsage(getAbcList().get(abcIndex.getVal()).getABC(), multinameIndexRef.getVal(), decompiledTextArea.getScriptLeaf().scriptIndex, classIndex.getVal(), traitIndex.getVal(), classTrait.getVal() ? TraitMultinameUsage.TRAITS_TYPE_CLASS : TraitMultinameUsage.TRAITS_TYPE_INSTANCE, null, -1) {
             });
             return;
         }
@@ -1244,7 +1247,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
                 ClassPath classPath = item.getClassPath();
 
                 // first check the className to avoid calling unnecessary toString
-                if (name.endsWith(classPath.className) && classPath.toRawString().equals(name)) {
+                if (name.endsWith(classPath.className + classPath.namespaceSuffix) && classPath.toRawString().equals(name)) {
                     pack = item;
                     break;
                 }

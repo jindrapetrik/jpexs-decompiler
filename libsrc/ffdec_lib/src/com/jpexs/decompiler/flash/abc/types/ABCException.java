@@ -65,14 +65,14 @@ public class ABCException implements Serializable, Cloneable {
         if (name_index == 0) {
             return "";
         }
-        return constants.getMultiname(name_index).getName(constants, fullyQualifiedNames, false);
+        return constants.getMultiname(name_index).getName(constants, fullyQualifiedNames, false, true);
     }
 
     public String getTypeName(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames) {
         if (type_index == 0) {
             return "*";
         }
-        return constants.getMultiname(type_index).getName(constants, fullyQualifiedNames, false);
+        return constants.getMultiname(type_index).getName(constants, fullyQualifiedNames, false, true);
     }
 
     @Override

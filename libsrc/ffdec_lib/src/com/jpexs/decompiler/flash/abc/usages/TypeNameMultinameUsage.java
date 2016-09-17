@@ -27,13 +27,18 @@ public class TypeNameMultinameUsage extends MultinameUsage {
 
     public int typename_index;
 
-    public TypeNameMultinameUsage(ABC abc, int typename_index) {
-        super(abc);
+    public TypeNameMultinameUsage(ABC abc, int multinameIndex, int typename_index) {
+        super(abc, multinameIndex);
         this.typename_index = typename_index;
     }
 
     @Override
     public String toString() {
         return "TypeName " + abc.constants.getMultiname(typename_index).toString(abc.constants, new ArrayList<>());
+    }
+
+    @Override
+    public boolean collides(MultinameUsage other) {
+        return false;
     }
 }

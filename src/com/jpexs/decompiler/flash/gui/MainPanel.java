@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AbcMultiNameCollisionFixer;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.DeobfuscationLevel;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -1911,6 +1912,48 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
         reload(true);
         updateClassesList();
+    }
+
+    public void renameColliding(final SWF swf) {
+        if (swf == null) {
+            return;
+        }
+        if (confirmExperimental()) {
+            new CancellableWorker<Integer>() {
+                @Override
+                protected Integer doInBackground() throws Exception {
+                    AbcMultiNameCollisionFixer fixer = new AbcMultiNameCollisionFixer();
+                    return fixer.fixCollisions(swf);
+                }
+
+                @Override
+                protected void onStart() {
+                    Main.startWork(translate("work.renaming.identifiers") + "...", this);
+                }
+
+                @Override
+                protected void done() {
+                    View.execInEventDispatch(() -> {
+                        try {
+                            int cnt = get();
+                            Main.stopWork();
+                            View.showMessageDialog(null, translate("message.rename.renamed").replace("%count%", Integer.toString(cnt)));
+                            swf.assignClassesToSymbols();
+                            swf.clearScriptCache();
+                            if (abcPanel != null) {
+                                abcPanel.reload();
+                            }
+                            updateClassesList();
+                            reload(true);
+                        } catch (Exception ex) {
+                            logger.log(Level.SEVERE, "Error during renaming identifiers", ex);
+                            Main.stopWork();
+                            View.showMessageDialog(null, translate("error.occured").replace("%error%", ex.getClass().getSimpleName()));
+                        }
+                    });
+                }
+            }.execute();
+        }
     }
 
     public void renameOneIdentifier(final SWF swf) {

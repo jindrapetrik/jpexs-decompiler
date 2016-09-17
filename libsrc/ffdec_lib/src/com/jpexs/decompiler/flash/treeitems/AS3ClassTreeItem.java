@@ -29,13 +29,20 @@ public abstract class AS3ClassTreeItem implements TreeItem {
 
     private final ClassPath path;
 
-    public AS3ClassTreeItem(String name, ClassPath path) {
+    private final String namespaceSuffix;
+
+    public AS3ClassTreeItem(String name, String namespaceSuffix, ClassPath path) {
         this.name = name;
         this.path = path;
+        this.namespaceSuffix = namespaceSuffix;
     }
 
-    public String getName() {
-        return name;
+    public String getNameWithNamespaceSuffix() {
+        String ret = name;
+        if (namespaceSuffix != null) {
+            ret += namespaceSuffix;
+        }
+        return ret;
     }
 
     public String getPath() {
@@ -44,6 +51,10 @@ public abstract class AS3ClassTreeItem implements TreeItem {
 
     @Override
     public String toString() {
-        return IdentifiersDeobfuscation.printIdentifier(true, name);
+        String ret = IdentifiersDeobfuscation.printIdentifier(true, name);
+        if (namespaceSuffix != null) {
+            ret += namespaceSuffix;
+        }
+        return ret;
     }
 }

@@ -3749,7 +3749,7 @@ public class CommandLineArgumentParser {
         String dcs = swf.getDocumentClass();
         if (dcs != null) {
             if (dcs.contains(".")) {
-                DottedChain dc = new DottedChain(dcs.split("\\."));
+                DottedChain dc = DottedChain.parseWithSuffix(dcs);
                 pw.println("documentClass=" + dc.toPrintableString(true));
             } else {
                 pw.println("documentClass=" + IdentifiersDeobfuscation.printIdentifier(true, dcs));

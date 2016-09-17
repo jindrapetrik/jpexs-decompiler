@@ -319,7 +319,7 @@ public class MethodInfo {
             }
             DottedChain ptype = DottedChain.ALL;
             if (param_types[i] > 0) {
-                ptype = constants.getMultiname(param_types[i]).getNameWithNamespace(constants);
+                ptype = constants.getMultiname(param_types[i]).getNameWithNamespace(constants, true);
             }
 
             HighlightData pdata = new HighlightData();
@@ -340,7 +340,7 @@ public class MethodInfo {
             if (param_types[i] == 0) {
                 writer.hilightSpecial("*", HighlightSpecialType.PARAM, i);
             } else {
-                writer.hilightSpecial(constants.getMultiname(param_types[i]).getName(constants, fullyQualifiedNames, false), HighlightSpecialType.PARAM, i);
+                writer.hilightSpecial(constants.getMultiname(param_types[i]).getName(constants, fullyQualifiedNames, false, true), HighlightSpecialType.PARAM, i);
             }
             if (optional != null) {
                 if (i >= param_types.length - optional.length) {
@@ -381,7 +381,7 @@ public class MethodInfo {
             if (multiname.kind != Multiname.TYPENAME && multiname.name_index > 0 && constants.getString(multiname.name_index).equals("void")) {
                 rname = "void";
             } else {
-                rname = multiname.getName(constants, fullyQualifiedNames, false);
+                rname = multiname.getName(constants, fullyQualifiedNames, false, true);
             }
         }
         return writer.hilightSpecial(rname, HighlightSpecialType.RETURNS);
@@ -394,7 +394,7 @@ public class MethodInfo {
             if (multiname.kind != Multiname.TYPENAME && multiname.name_index > 0 && constants.getString(multiname.name_index).equals("void")) {
                 rname = "void";
             } else {
-                rname = multiname.getName(constants, fullyQualifiedNames, false);
+                rname = multiname.getName(constants, fullyQualifiedNames, false, true);
             }
         }
         return rname;

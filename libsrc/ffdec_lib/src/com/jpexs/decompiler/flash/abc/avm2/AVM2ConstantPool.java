@@ -34,8 +34,10 @@ import com.jpexs.helpers.HashArrayList;
 import com.jpexs.helpers.utf8.Utf8PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -662,7 +664,7 @@ public class AVM2ConstantPool implements Cloneable {
         String str = getString(index);
         DottedChain chain = dottedChainCache.get(str);
         if (chain == null) {
-            chain = DottedChain.parse(str);
+            chain = DottedChain.parseWithSuffix(str);
             dottedChainCache.put(str, chain);
         }
 

@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.gui.abc;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
-import com.jpexs.decompiler.flash.abc.usages.InsideClassMultinameUsage;
+import com.jpexs.decompiler.flash.abc.usages.InsideClassMultinameUsageInterface;
 import com.jpexs.decompiler.flash.abc.usages.MethodMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.MultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.TraitMultinameUsage;
@@ -92,21 +92,21 @@ public class UsageFrame extends AppDialog implements MouseListener {
         cont.add(new JScrollPane(usageList), BorderLayout.CENTER);
         cont.add(buttonsPanel, BorderLayout.SOUTH);
         setSize(400, 300);
-        setTitle((definitions ? translate("dialog.title.declaration") : translate("dialog.title")) + abc.constants.getMultiname(multinameIndex).getNameWithNamespace(abc.constants).toPrintableString(true));
+        setTitle((definitions ? translate("dialog.title.declaration") : translate("dialog.title")) + abc.constants.getMultiname(multinameIndex).getNameWithNamespace(abc.constants, true).toPrintableString(true));
         View.centerScreen(this);
         View.setWindowIcon(this);
     }
 
     public static void gotoUsage(final ABCPanel abcPanel, final MultinameUsage usage) {
-        if (usage instanceof InsideClassMultinameUsage) {
-            final InsideClassMultinameUsage icu = (InsideClassMultinameUsage) usage;
+        if (usage instanceof InsideClassMultinameUsageInterface) {
+            final InsideClassMultinameUsageInterface icu = (InsideClassMultinameUsageInterface) usage;
 
             Runnable settrait = new Runnable() {
 
                 @Override
                 public void run() {
                     abcPanel.decompiledTextArea.removeScriptListener(this);
-                    abcPanel.decompiledTextArea.setClassIndex(icu.classIndex);
+                    abcPanel.decompiledTextArea.setClassIndex(icu.getClassIndex());
                     if (usage instanceof TraitMultinameUsage) {
                         TraitMultinameUsage tmu = (TraitMultinameUsage) usage;
                         int traitIndex;
@@ -115,13 +115,13 @@ public class UsageFrame extends AppDialog implements MouseListener {
                         } else {
                             traitIndex = tmu.traitIndex;
                         }
-                        if (!tmu.isStatic) {
+                        if (tmu.traitsType == TraitMultinameUsage.TRAITS_TYPE_INSTANCE) {
                             traitIndex += abcPanel.abc.class_info.get(tmu.classIndex).static_traits.traits.size();
                         }
                         if (tmu instanceof MethodMultinameUsage) {
                             MethodMultinameUsage mmu = (MethodMultinameUsage) usage;
                             if (mmu.isInitializer == true) {
-                                traitIndex = abcPanel.abc.class_info.get(mmu.classIndex).static_traits.traits.size() + abcPanel.abc.instance_info.get(mmu.classIndex).instance_traits.traits.size() + (mmu.isStatic ? 1 : 0);
+                                traitIndex = abcPanel.abc.class_info.get(mmu.classIndex).static_traits.traits.size() + abcPanel.abc.instance_info.get(mmu.classIndex).instance_traits.traits.size() + (mmu.traitsType == TraitMultinameUsage.TRAITS_TYPE_CLASS ? 1 : 0);
                             }
                         }
                         abcPanel.decompiledTextArea.gotoTrait(traitIndex);
@@ -129,11 +129,11 @@ public class UsageFrame extends AppDialog implements MouseListener {
                 }
             };
 
-            if (abcPanel.decompiledTextArea.getClassIndex() == icu.classIndex && abcPanel.abc == icu.abc) {
+            if (abcPanel.decompiledTextArea.getClassIndex() == icu.getClassIndex() && abcPanel.abc == icu.getAbc()) {
                 settrait.run();
             } else {
                 abcPanel.decompiledTextArea.addScriptListener(settrait);
-                abcPanel.hilightScript(abcPanel.getSwf(), icu.abc.instance_info.get(icu.classIndex).getName(icu.abc.constants).getNameWithNamespace(icu.abc.constants).toRawString());
+                abcPanel.hilightScript(abcPanel.getSwf(), icu.getAbc().instance_info.get(icu.getClassIndex()).getName(icu.getAbc().constants).getNameWithNamespace(icu.getAbc().constants, true).toRawString());
             }
         }
     }

@@ -214,7 +214,7 @@ public abstract class InstructionDefinition implements Serializable {
             }
         }
 
-        return new FullMultinameAVM2Item(property, ins, localData.lineStartInstruction, multinameIndex, localData.abc.constants.getMultiname(multinameIndex).getName(localData.getConstants(), new ArrayList<>(), true), name, ns);
+        return new FullMultinameAVM2Item(property, ins, localData.lineStartInstruction, multinameIndex, localData.abc.constants.getMultiname(multinameIndex).getName(localData.getConstants(), new ArrayList<>(), true, true), name, ns);
     }
 
     protected int getMultinameRequiredStackSize(AVM2ConstantPool constants, int multinameIndex) {
@@ -258,7 +258,7 @@ public abstract class InstructionDefinition implements Serializable {
         if (constants.getMultiname(multinameIndex).needsName()) {
             name = stack.get(pos).toString();
         } else {
-            name = GraphTextWriter.hilighOffset(constants.getMultiname(multinameIndex).getName(constants, fullyQualifiedNames, false), ins.getAddress());
+            name = GraphTextWriter.hilighOffset(constants.getMultiname(multinameIndex).getName(constants, fullyQualifiedNames, false, true), ins.getAddress());
         }
         return name + ns;
     }

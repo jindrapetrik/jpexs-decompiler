@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.timeline;
 
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
 import java.util.ArrayList;
@@ -44,7 +45,7 @@ public class AS3Package extends AS3ClassTreeItem {
     private List<ScriptPack> sortedScripts;
 
     public AS3Package(String packageName, SWF swf) {
-        super(packageName, null);
+        super(packageName, "", null);
         this.swf = swf;
         this.packageName = packageName;
     }
@@ -81,12 +82,13 @@ public class AS3Package extends AS3ClassTreeItem {
     }
 
     public void addScriptPack(ScriptPack script) {
-        scripts.put(script.getClassPath().className, script);
+        ClassPath cp = script.getClassPath();
+        scripts.put(cp.className + cp.namespaceSuffix, script);
         sortedScripts = null;
     }
 
     public void addSubPackage(AS3Package subPackage) {
-        subPackages.put(subPackage.getName(), subPackage);
+        subPackages.put(subPackage.getNameWithNamespaceSuffix(), subPackage);
         sortedPackages = null;
     }
 

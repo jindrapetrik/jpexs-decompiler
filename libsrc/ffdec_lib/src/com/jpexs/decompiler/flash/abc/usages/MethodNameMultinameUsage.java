@@ -25,12 +25,25 @@ import com.jpexs.decompiler.flash.abc.types.traits.Traits;
  */
 public class MethodNameMultinameUsage extends MethodMultinameUsage implements DefinitionUsage {
 
-    public MethodNameMultinameUsage(ABC abc, int multinameIndex, int classIndex, int traitIndex, boolean isStatic, boolean isInitializer, Traits traits, int parentTraitIndex) {
-        super(abc, multinameIndex, classIndex, traitIndex, isStatic, isInitializer, traits, parentTraitIndex);
+    public MethodNameMultinameUsage(ABC abc, int multinameIndex, int scriptIndex, int classIndex, int traitIndex, int traitsType, boolean isInitializer, Traits traits, int parentTraitIndex) {
+        super(abc, multinameIndex, scriptIndex, classIndex, traitIndex, traitsType, isInitializer, traits, parentTraitIndex);
     }
 
     @Override
     public String toString() {
         return super.toString() + " name";
+    }
+
+    @Override
+    public boolean collides(MultinameUsage other) {
+        if ((other instanceof MethodNameMultinameUsage) || (other instanceof ConstVarNameMultinameUsage)) {
+            TraitMultinameUsage otherTrait = (TraitMultinameUsage) other;
+            if (otherTrait.classIndex == classIndex && otherTrait.traitsType == traitsType && otherTrait.parentTraitIndex == parentTraitIndex) {
+                if (other.sameMultinameName(this)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
