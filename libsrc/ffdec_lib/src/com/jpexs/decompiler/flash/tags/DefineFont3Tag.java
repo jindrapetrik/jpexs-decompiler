@@ -468,13 +468,13 @@ public class DefineFont3Tag extends FontTag {
         }
         if (fontFlagsHasLayout) {
 
-            Font fnt = new Font(fontName, fontStyle, 1024); // Not multiplied with divider as it causes problems to create font with height around 20k
+            Font advanceFont = font.deriveFont(fontStyle, 1024); // Not multiplied with divider as it causes problems to create font with height around 20k
             if (!exists) {
                 fontBoundsTable.add(pos, shp.getBounds());
-                fontAdvanceTable.add(pos, (int) getDivider() * Math.round(FontHelper.getFontAdvance(fnt, character)));
+                fontAdvanceTable.add(pos, (int) getDivider() * Math.round(FontHelper.getFontAdvance(advanceFont, character)));
             } else {
                 fontBoundsTable.set(pos, shp.getBounds());
-                fontAdvanceTable.set(pos, (int) getDivider() * Math.round(FontHelper.getFontAdvance(fnt, character)));
+                fontAdvanceTable.set(pos, (int) getDivider() * Math.round(FontHelper.getFontAdvance(advanceFont, character)));
             }
         }
 
