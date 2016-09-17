@@ -532,25 +532,26 @@ public class DefineFont3Tag extends FontTag {
 
     @Override
     public void setAdvanceValues(Font font) {
-        boolean hasLayout = fontFlagsHasLayout;
-        fontFlagsHasLayout = true;
-        fontAdvanceTable = new ArrayList<>();
-        if (!hasLayout) {
-            fontBoundsTable = new ArrayList<>();
-            fontKerningTable = new ArrayList<>();
-        }
-
-        for (Integer character : codeTable) {
+        List<RECT> newFontBoundsTable = new ArrayList<>();
+        List<Integer> newFontAdvanceTable = new ArrayList<>();
+        for (int i = 0; i < codeTable.size(); i++) {
+            Integer character = codeTable.get(i);
             char ch = (char) (int) character;
-            if (!font.canDisplay(ch)) {
+            if (!font.canDisplay(ch) && fontFlagsHasLayout) { //cannot display, leave old if exist
+                newFontAdvanceTable.add(fontAdvanceTable.get(i));
+                newFontBoundsTable.add(fontBoundsTable.get(i));
                 continue;
             }
             SHAPE shp = SHAPERECORD.fontCharacterToSHAPE(font, (int) Math.round(getDivider() * 1024), ch);
-            fontBoundsTable.add(shp.getBounds());
+            newFontBoundsTable.add(shp.getBounds());
             int fontStyle = getFontStyle();
             Font advanceFont = font.deriveFont(fontStyle, 1024); // Not multiplied with divider as it causes problems to create font with height around 20k
-            fontAdvanceTable.add((int) getDivider() * Math.round(FontHelper.getFontAdvance(advanceFont, ch)));
+            newFontAdvanceTable.add((int) getDivider() * Math.round(FontHelper.getFontAdvance(advanceFont, ch)));
         }
+        fontAdvanceTable = newFontAdvanceTable;
+        fontBoundsTable = newFontBoundsTable;
+        fontKerningTable = new ArrayList<>();
+        fontFlagsHasLayout = true;
     }
 
     @Override
