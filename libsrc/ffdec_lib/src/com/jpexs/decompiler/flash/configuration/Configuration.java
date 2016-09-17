@@ -617,6 +617,10 @@ public class Configuration {
     @ConfigurationCategory("script")
     public static final ConfigurationItem<Boolean> useFlexAs3Compiler = null;
 
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("ui")
+    public static final ConfigurationItem<Boolean> showSetAdvanceValuesMessage = null;
+
     private enum OSId {
 
         WINDOWS, OSX, UNIX
