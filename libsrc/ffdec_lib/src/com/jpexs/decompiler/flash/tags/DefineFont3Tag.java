@@ -542,6 +542,9 @@ public class DefineFont3Tag extends FontTag {
 
         for (Integer character : codeTable) {
             char ch = (char) (int) character;
+            if (!font.canDisplay(ch)) {
+                continue;
+            }
             SHAPE shp = SHAPERECORD.fontCharacterToSHAPE(font, (int) Math.round(getDivider() * 1024), ch);
             fontBoundsTable.add(shp.getBounds());
             int fontStyle = getFontStyle();
