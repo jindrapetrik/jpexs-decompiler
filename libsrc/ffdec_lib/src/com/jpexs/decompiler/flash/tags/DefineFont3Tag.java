@@ -545,8 +545,8 @@ public class DefineFont3Tag extends FontTag {
             SHAPE shp = SHAPERECORD.fontCharacterToSHAPE(font, (int) Math.round(getDivider() * 1024), ch);
             fontBoundsTable.add(shp.getBounds());
             int fontStyle = getFontStyle();
-            Font fnt = new Font(font.getFontName(), fontStyle, 1024); // Not multiplied with divider as it causes problems to create font with height around 20k
-            fontAdvanceTable.add((int) getDivider() * Math.round(FontHelper.getFontAdvance(fnt, ch)));
+            Font advanceFont = font.deriveFont(fontStyle, 1024); // Not multiplied with divider as it causes problems to create font with height around 20k
+            fontAdvanceTable.add((int) getDivider() * Math.round(FontHelper.getFontAdvance(advanceFont, ch)));
         }
     }
 
