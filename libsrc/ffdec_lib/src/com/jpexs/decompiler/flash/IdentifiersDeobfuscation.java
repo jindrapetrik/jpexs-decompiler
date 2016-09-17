@@ -227,8 +227,8 @@ public class IdentifiersDeobfuscation {
             name = changedName;
         }
         if (changed) {
-            String newClassName = "";
-            if (pkg == null) {
+            String newClassName;
+            if ((pkg == null) || (pkg.isEmpty()) || (pkg.isTopLevel())) {
                 newClassName = name;
             } else {
                 newClassName = pkg + "." + name;
@@ -283,7 +283,6 @@ public class IdentifiersDeobfuscation {
     }
 
     public String deobfuscateName(boolean as3, String s, boolean firstUppercase, String usageType, HashMap<DottedChain, DottedChain> namesMap, RenameType renameType, Map<DottedChain, DottedChain> selected) {
-        boolean isValid = true;
         if (usageType == null) {
             usageType = "name";
         }
@@ -295,7 +294,7 @@ public class IdentifiersDeobfuscation {
             }
         }
 
-        isValid = isValidName(as3, s);
+        boolean isValid = isValidName(as3, s);
         if (!isValid) {
             if (namesMap.containsKey(sChain)) {
                 return namesMap.get(sChain).toRawString();
