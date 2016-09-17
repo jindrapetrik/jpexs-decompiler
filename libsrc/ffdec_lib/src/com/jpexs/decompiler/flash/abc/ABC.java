@@ -1118,11 +1118,10 @@ public class ABC {
     }
 
     /**
-     * Appends namespace (#123) suffix to multinames which collide with each
-     * other. For example same name consts/vars/methods or same class names.
+     * Gets colliding usages of multinames. For example same name
+     * consts/vars/methods or same class names. Mostly in obfuscated files.
      */
-    public void refreshMultinameNamespaceSuffixes() {
-
+    public Set<MultinameUsage> getCollidingMultinameUsages() {
         //Reset
         for (int multinameIndex = 1; multinameIndex < constants.getMultinameCount(); multinameIndex++) {
             constants.getMultiname(multinameIndex).setDisplayNamespace(false);
@@ -1163,10 +1162,20 @@ public class ABC {
                 }
             }
         }
+        return collidingUsages;
+    }
+
+    /**
+     * Appends namespace (#123) suffix to multinames which collide with each
+     * other. For example same name consts/vars/methods or same class names.
+     */
+    public void refreshMultinameNamespaceSuffixes() {
+
+        Set<MultinameUsage> collidingMultinameUsages = getCollidingMultinameUsages();
 
         Set<Integer> collidingMultinameIndices = new HashSet<>();
 
-        for (MultinameUsage col : collidingUsages) {
+        for (MultinameUsage col : collidingMultinameUsages) {
             //System.err.println("collides " + col);
             collidingMultinameIndices.add(col.multinameIndex);
         }
