@@ -75,7 +75,7 @@
     
  
 
-    <target name="compile" depends="build_lib">
+    <target name="compile" depends="build_lib,-copy-lib">
         <!--<delete dir="${compile.dir}"/>-->        
         <mkdir dir="${compile.dir}"/>
         <javac srcdir="${src.dir}" destdir="${compile.dir}" includes="**/*.java" target="${target.java}" source="${target.java}" debug="true"
@@ -736,7 +736,7 @@
         
     </target>
     
-    <target name="build" depends="-loadversion,build_lib,-timestamp,-suffix,compile">        
+    <target name="build" depends="-loadversion,build_lib,-copy-lib,-timestamp,-suffix,compile">        
         <mkdir dir="${dist.dir}"/>
         <!-- <delete dir="${dist.lib.dir}"/> -->
         <mkdir dir="${dist.lib.dir}"/>
