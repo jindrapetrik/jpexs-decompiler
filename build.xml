@@ -348,6 +348,7 @@
             <fileset dir="${dist.dir}" />
         </copy>                  
         <fixcrlf srcdir="${app.bundle.dir}/${app.osx.dir}.app/Contents/Resources/" eol="lf" includes="**/*.txt" preservelastmodified="true" />
+        <fixcrlf srcdir="${app.bundle.dir}/${app.osx.dir}.app/Contents/Resources/" eol="lf" includes="**/*.md" preservelastmodified="true" />    
     </target>
     
     <target name="osx-app-archive" depends="osx-app-bundle">        
@@ -590,6 +591,8 @@
         <copy todir="${dist.dir}">
             <fileset dir="${resources.dir}" includes="**/*.*"/>
         </copy>
+        <copy todir="${dist.dir}" file="${changelog.file}"/>
+        <fixcrlf srcdir="${dist.dir}" includes="**/*.md" eol="crlf" preservelastmodified="true" />        
         <fixcrlf srcdir="${dist.dir}" includes="**/*.txt" eol="crlf" preservelastmodified="true" />
         <fixcrlf srcdir="${dist.dir}" includes="**/*.sh" eol="lf" preservelastmodified="true" />
         <fixcrlf srcdir="${dist.dir}" includes="**/*.bat" eol="crlf" preservelastmodified="true" />
@@ -903,6 +906,7 @@
         <fixcrlf srcdir="${src.dir}" includes="**/*.java" />
         <fixcrlf srcdir="${src.dir}" includes="**/*.properties" />
         <fixcrlf srcdir="${src.dir}" includes="**/*.txt" />        
+        <fixcrlf srcdir="${src.dir}" includes="**/*.md" />
         <fixcrlf srcdir="${src.dir}" includes="**/*.xml" />                
         <fixcrlf srcdir="${src.dir}" includes="**/*.flex" />                        
         <fixcrlf srcdir="${src.dir}" includes="**/*.bat" eol="crlf" />
