@@ -265,6 +265,9 @@
                         <location>version.properties</location>
                     </source-file>
                     <source-file>
+                        <location>CHANGELOG.md</location>
+                    </source-file>
+                    <source-file>
                         <location>nbproject/project.xml</location>
                     </source-file>
                     <source-file>
