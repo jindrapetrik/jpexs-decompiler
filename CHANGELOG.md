@@ -23,6 +23,7 @@ All notable changes to this project will be documented in this file.
 - GUI: Script editing buttons now named "Edit ActionScript" and "Edit P-code"
 - Set advance values button has confirm dialog with information
 - #1274 Linux package no longer requires Oracle Java only
+- Library now packaged inside ZIP file
 
 ### Fixed
 - P-code docs formatting fix
