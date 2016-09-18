@@ -1628,8 +1628,10 @@ public class AVM2SourceGenerator implements SourceGenerator {
         }
 
         String mask = Configuration.registerNameFormat.get();
-        mask = mask.replace("%d", "([0-9]+)");
-        Pattern pat = Pattern.compile(mask);
+        String maskRegexp = mask.replace("%d", "([0-9]+)");
+        Pattern pat = Pattern.compile(maskRegexp);
+
+        final String UNUSED = "~~unused";
 
         //Two rounds
         for (int round = 1; round <= 2; round++) {
@@ -1644,11 +1646,10 @@ public class AVM2SourceGenerator implements SourceGenerator {
                             if ((round == 1) && (m.matches())) {
                                 String regIndexStr = m.group(1);
                                 int regIndex = Integer.parseInt(regIndexStr);
-                                while (registerNames.size() <= regIndex + 1) {
-                                    String standardName = String.format(mask, registerNames.size() - 1);
-                                    registerNames.add(standardName);
+                                while (registerNames.size() <= regIndex) {
+                                    registerNames.add(UNUSED);
                                     registerTypes.add("*");
-                                    slotNames.add(standardName);
+                                    slotNames.add(UNUSED);
                                     slotTypes.add("*");
                                     registerLines.add(paramLine);
                                 }
@@ -1659,15 +1660,38 @@ public class AVM2SourceGenerator implements SourceGenerator {
                                 registerLines.set(regIndex, n.line);
                             } //in second round the rest
                             else if (round == 2 && !m.matches()) {
-                                registerNames.add(n.getVariableName());
-                                registerTypes.add(n.type.toString());
-                                slotNames.add(n.getVariableName());
-                                slotTypes.add(n.type.toString());
-                                registerLines.add(n.line);
+                                int newRegIndex = -1;
+                                for (int j = 0; j < registerNames.size(); j++) {
+                                    if (UNUSED.equals(registerNames.get(j))) {
+                                        newRegIndex = j;
+                                        break;
+                                    }
+                                }
+                                if (newRegIndex == -1) {
+                                    newRegIndex = registerNames.size();
+                                    registerNames.add(UNUSED);
+                                    registerTypes.add("*");
+                                    slotNames.add(UNUSED);
+                                    slotTypes.add("*");
+                                    registerLines.add(paramLine);
+                                }
+                                registerNames.set(newRegIndex, n.getVariableName());
+                                registerTypes.set(newRegIndex, n.type.toString());
+                                slotNames.set(newRegIndex, n.getVariableName());
+                                slotTypes.set(newRegIndex, n.type.toString());
+                                registerLines.set(newRegIndex, n.line);
                             }
                         }
                     }
                 }
+            }
+        }
+
+        for (int j = 0; j < registerNames.size(); j++) {
+            if (UNUSED.equals(registerNames.get(j))) {
+                String standardName = String.format(mask, j);
+                registerNames.set(j, standardName);
+                slotNames.set(j, standardName);
             }
         }
 
