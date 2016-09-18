@@ -1908,6 +1908,7 @@ public class Main {
 
         if (args.length == 0) {
             initGui();
+            checkLibraryVersion();
             View.execInEventDispatch(() -> {
                 if (Configuration.allowOnlyOneInstance.get() && FirstInstance.focus()) { //Try to focus first instance
                     Main.exit();
@@ -1917,6 +1918,7 @@ public class Main {
                 }
             });
         } else {
+            checkLibraryVersion();
             setSessionLoaded(true);
             String[] filesToOpen = CommandLineArgumentParser.parseArguments(args);
             if (filesToOpen != null && filesToOpen.length > 0) {
@@ -1932,6 +1934,13 @@ public class Main {
                     }
                 });
             }
+        }
+    }
+
+    private static void checkLibraryVersion() {
+        if (!ApplicationInfo.version.equals("unknown") && !ApplicationInfo.libraryVersion.equals("unknown")
+                && !ApplicationInfo.version.equals("A" + ApplicationInfo.libraryVersion)) {
+            logger.log(Level.WARNING, "Application version is different from library version. FFDec may not work properly.");
         }
     }
 

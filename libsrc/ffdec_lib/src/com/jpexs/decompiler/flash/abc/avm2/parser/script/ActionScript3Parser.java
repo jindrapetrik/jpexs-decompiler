@@ -2564,6 +2564,7 @@ public class ActionScript3Parser {
         for (ABC a : otherAbcs) {
             abcIndex.addAbc(a);
         }
+
         abcIndex.addAbc(abc);
     }
 
@@ -2572,6 +2573,7 @@ public class ActionScript3Parser {
             if (Configuration.getPlayerSWC() == null) {
                 throw new IOException("Player SWC library not found, please place it to " + Configuration.getFlashLibPath());
             }
+
             SWC swc = new SWC(new FileInputStream(Configuration.getPlayerSWC()));
             SWF swf = new SWF(swc.getSWF("library.swf"), true);
             playerGlobalAbcIndex = new AbcIndexing(swf);
