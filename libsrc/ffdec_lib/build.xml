@@ -193,7 +193,7 @@
         <property name="version.debug" value="true" />
     </target>
     
-    <target name="-load-version" depends="-check-version-exists,-load-version-file,-load-version-null"> 
+    <target name="-load-version" depends="-check-versionfile-exists,-load-version-file,-load-version-null"> 
         <property name="version" value="${version.major}.${version.minor}.${version.release}" />
         <property name="version.number" value="${version.major}.${version.minor}.${version.release}.${version.build}" />  
         <script language="javascript">
