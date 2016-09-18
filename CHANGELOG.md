@@ -2,6 +2,40 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- optional AS3 direct editation with Flex SDK
+- AS3 p-code editing - metadata read/write support
+- AS3 p-code editing - end of the block command like in RABCDasm
+- AS3 p-code editing - popup docs for more than instructions
+- Debugger - New columns for variable details - scope, flags, trait
+- Debugger - Add watch feature
+- AS3 decompilation - colliding trait/class names handling - show hash suffix with namespace index on such cases
+- Deobfuscation Tool - Fix colliding trait/classes via toolbar command
+- Auto rename identifiers option now fixes colliding trait/classes aswell
+- #1254 FLA export - detecting scripts on AS3 timeline
+- #907 FFDec Library JAR file has version inside it.
+- Display warning when library version and GUI version mismatch
+- Changelog file
+
+### Changed
+- #1189 AS3 - sort imports to have same order always
+- GUI: AS3 P-code header show actual trait type and method type
+- GUI: Script editing buttons now named "Edit ActionScript" and "Edit P-code"
+- Set advance values button has confirm dialog with information
+- #1274 Linux package no longer requires Oracle Java only
+
+### Fixed
+- P-code docs formatting fix
+- Export dialog - handling sprite and SWF frames correctly
+- #1275 debugger - show local variables fixes
+- AS3 p-code editing - popup docs correctly displayed when label on line start
+- #1278 replacing DefineBits error
+- #1281 DefineFont 2/3 getting character advance value when replacing fix
+- Set advance values button - Do not set advance if the char cannot be displayed in source font
+- AS3 Goto declaration for single character names
+- Identifier renaming for top level classes
+- AS3 direct editation not correctly saving local register names
+- #1254 FLA export - placing AS3 classes to FLA directory instead of scripts dir
 
 ## [9.0.0] - 2016-08-12
 ### New
