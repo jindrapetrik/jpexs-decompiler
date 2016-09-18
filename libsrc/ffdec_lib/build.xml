@@ -127,13 +127,20 @@
     </target>             
     
     <target name="-nightly-suffix" if="nightly">        
-        <property name="version.suffix" value="_${git.short.tag}"/>         
+        <property name="version.suffix" value="_nightly${version.build}"/>         
     </target>
     
-    <target name="-nonightly-suffix" unless="nightly">
+    <target name="-no-suffix" unless="version.suffix">
         <property name="version.suffix" value=""/>         
     </target>
     
+    <target name="-private-suffix" if="private">                
+        <property name="version.suffix" value="_private_${git.short.tag}"/>         
+    </target>
+    
+    <target name="-suffix" depends="-nightly-suffix,-private-suffix,-no-suffix">
+       
+    </target>
     
     <target name="-git-check-exists" >
         <property environment="env" />
@@ -203,7 +210,7 @@
         </script>
     </target>
     
-    <target name="build" depends="-load-version,-timestamp,-nightly-suffix,-nonightly-suffix,compile">
+    <target name="build" depends="-load-version,-timestamp,-suffix,compile">
         <mkdir dir="${dist.dir}"/>                        
                                                      
         <propertyfile file="${compile.dir}/${properties.name}"
