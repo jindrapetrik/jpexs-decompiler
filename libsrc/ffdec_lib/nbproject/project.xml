@@ -220,6 +220,9 @@ auxiliary.show.customizer.message=<message>
                     <source-file>
                         <location>nbproject/ide-file-targets.xml</location>
                     </source-file>
+                    <source-file>
+                        <location>version.properties</location>
+                    </source-file>
                 </items>
                 <context-menu>
                     <ide-action name="build"/>
