@@ -62,7 +62,7 @@
         <property name="private" value="true" />        
     </target>
     <target name="-loadversion-prop" if="newversion.type">
-        <loadproperties srcfile="version.properties" prefix="version"/> 
+        <loadproperties srcfile="${version_info}" prefix="version"/> 
         <property name="version" value="${version.major}.${version.minor}.${version.release}" />
         <property name="version.number" value="${version.major}.${version.minor}.${version.release}.${version.build}" />  
         <script language="javascript">
@@ -503,7 +503,7 @@
             <arg value="${newversion.type}" />
             
         </java>        
-        <echo file="version.properties" message="${newversion.prop}" force=""/>
+        <echo file="${version_info}" message="${newversion.prop}" force=""/>
     </target>
     
     <target name="-upload-do" if="upload.config.exists">
@@ -654,13 +654,14 @@
     </target>
     <target name="-timestamp" depends="-loadversion,git-tag">
         <tstamp>
-            <format property="BUILTAT" pattern="MM/dd/yyyy hh:mm aa" timezone="CET"/>
-            <format property="VERDATE" pattern="yyyyddMM_hhmm" timezone="CET"/>
+            <format property="BUILTAT" pattern="MM/dd/yyyy hh:mm aa" timezone="CET" locale="en"/>
+            <format property="VERDATE" pattern="yyyyddMM_hhmm" timezone="CET" locale="en"/>
         </tstamp>        
         <echo level="info" message="Version: ${version}"/>
     </target>
     
-    <target name="build_lib">
+    <target name="build_lib" depends="-loadversion,-save-version-info">
+        <copy file="${version_info}" tofile="${core.lib.version_info}" />
         <ant antfile="${core.lib.script}" target="build" inheritAll="false" usenativebasedir="true"/>
         <copy file="${core.lib.path}" todir="${lib.dir}" />
     </target>
@@ -837,20 +838,8 @@
         <!-- NOTHING -->       
     </target>
     
-    <target name="-git-commit-versioninfo">        
-        <exec executable="git" failonerror="true">
-            <arg value="add"/>            
-            <arg value="version.properties"/>
-        </exec>
-        <exec executable="git" failonerror="true">
-            <arg value="commit"/>            
-            <arg value="-m"/>
-            <arg value="version changed to ${newversion.major}.${newversion.minor}.${newversion.release} build ${newversion.build}"/>
-        </exec> 
-    </target>
-    
     <target name="-loadoldversion">
-        <loadproperties srcfile="version.properties" prefix="oldversion" />
+        <loadproperties srcfile="${version_info}" prefix="oldversion" />
     </target>
     
     <target name="-inc-major">
@@ -870,17 +859,17 @@
     </target>   
     
     <target name="-save-version-info-file">        
-        <propertyfile file="version.properties"
+        <propertyfile file="${version_info}"
                       comment="DO NOT MODIFY - it is updated automatically with the build script">                               
-            <entry key="major" value="${newversion.major}"/>
-            <entry key="minor" value="${newversion.minor}"/>
-            <entry key="release" value="${newversion.release}"/>
-            <entry key="build" value="${newversion.build}"/>
-            <entry key="debug" value="${newversion.debug}"/>
+            <entry key="major" value="${version.major}"/>
+            <entry key="minor" value="${version.minor}"/>
+            <entry key="release" value="${version.release}"/>
+            <entry key="build" value="${version.build}"/>
+            <entry key="debug" value="${version.debug}"/>
         </propertyfile>        
     </target>     
     
-    <target name="-save-version-info" depends="-save-version-info-file,-git-commit-versioninfo">        
+    <target name="-save-version-info" depends="-save-version-info-file">
         
     </target>
     
