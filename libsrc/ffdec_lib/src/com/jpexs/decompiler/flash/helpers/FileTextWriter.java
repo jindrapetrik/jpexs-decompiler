@@ -16,122 +16,17 @@
  */
 package com.jpexs.decompiler.flash.helpers;
 
-import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
-import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
-import com.jpexs.helpers.utf8.Utf8OutputStreamWriter;
-import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.Writer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Provides methods for highlighting positions of instructions in the text.
  *
  * @author JPEXS
  */
-public class FileTextWriter extends GraphTextWriter implements AutoCloseable {
+public class FileTextWriter extends StreamTextWriter implements AutoCloseable {
 
-    private final Writer writer;
-
-    private boolean newLine = true;
-
-    private int indent;
-
-    private int writtenBytes;
-
-    public FileTextWriter(CodeFormatting formatting, FileOutputStream fos) {
-        super(formatting);
-        this.writer = new Utf8OutputStreamWriter(new BufferedOutputStream(fos));
+    public FileTextWriter(CodeFormatting formatting, FileOutputStream os) {
+        super(formatting, os);
     }
 
-    @Override
-    public GraphTextWriter hilightSpecial(String text, HighlightSpecialType type, String specialValue, HighlightData data) {
-        writeToFile(text);
-        return this;
-    }
-
-    @Override
-    public FileTextWriter append(String str) {
-        writeToFile(str);
-        return this;
-    }
-
-    @Override
-    public GraphTextWriter appendWithData(String str, HighlightData data) {
-        writeToFile(str);
-        return this;
-    }
-
-    @Override
-    public FileTextWriter append(String str, long offset, long fileOffset) {
-        writeToFile(str);
-        return this;
-    }
-
-    @Override
-    public FileTextWriter appendNoHilight(int i) {
-        writeToFile(Integer.toString(i));
-        return this;
-    }
-
-    @Override
-    public FileTextWriter appendNoHilight(String str) {
-        writeToFile(str);
-        return this;
-    }
-
-    @Override
-    public FileTextWriter indent() {
-        indent++;
-        return this;
-    }
-
-    @Override
-    public FileTextWriter unindent() {
-        indent--;
-        return this;
-    }
-
-    @Override
-    public FileTextWriter newLine() {
-        writeToFile(formatting.newLineChars);
-        newLine = true;
-        return this;
-    }
-
-    @Override
-    public int getLength() {
-        return writtenBytes;
-    }
-
-    @Override
-    public int getIndent() {
-        return indent;
-    }
-
-    private void writeToFile(String str) {
-        if (newLine) {
-            newLine = false;
-            appendIndent();
-        }
-        try {
-            writer.write(str);
-            writtenBytes += str.length();
-        } catch (IOException ex) {
-            Logger.getLogger(FileTextWriter.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    private void appendIndent() {
-        for (int i = 0; i < indent; i++) {
-            writeToFile(formatting.indentString);
-        }
-    }
-
-    @Override
-    public void close() throws IOException {
-        writer.close();
-    }
 }
