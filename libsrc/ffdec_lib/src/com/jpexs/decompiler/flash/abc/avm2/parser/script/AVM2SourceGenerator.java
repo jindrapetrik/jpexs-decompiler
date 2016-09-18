@@ -1649,17 +1649,18 @@ public class AVM2SourceGenerator implements SourceGenerator {
                                 while (registerNames.size() <= regIndex) {
                                     registerNames.add(UNUSED);
                                     registerTypes.add("*");
-                                    slotNames.add(UNUSED);
-                                    slotTypes.add("*");
                                     registerLines.add(paramLine);
                                 }
                                 registerNames.set(regIndex, varName);
                                 registerTypes.set(regIndex, varName);
-                                slotNames.set(regIndex, varName);
-                                slotTypes.set(regIndex, varName);
                                 registerLines.set(regIndex, n.line);
+
+                                slotNames.add(varName);
+                                slotTypes.add(n.type.toString());
                             } //in second round the rest
                             else if (round == 2 && !m.matches()) {
+
+                                //search for some unused indices first:
                                 int newRegIndex = -1;
                                 for (int j = 0; j < registerNames.size(); j++) {
                                     if (UNUSED.equals(registerNames.get(j))) {
@@ -1671,15 +1672,14 @@ public class AVM2SourceGenerator implements SourceGenerator {
                                     newRegIndex = registerNames.size();
                                     registerNames.add(UNUSED);
                                     registerTypes.add("*");
-                                    slotNames.add(UNUSED);
-                                    slotTypes.add("*");
                                     registerLines.add(paramLine);
                                 }
                                 registerNames.set(newRegIndex, n.getVariableName());
                                 registerTypes.set(newRegIndex, n.type.toString());
-                                slotNames.set(newRegIndex, n.getVariableName());
-                                slotTypes.set(newRegIndex, n.type.toString());
                                 registerLines.set(newRegIndex, n.line);
+
+                                slotNames.add(n.getVariableName());
+                                slotTypes.add(n.type.toString());
                             }
                         }
                     }
