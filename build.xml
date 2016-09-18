@@ -181,9 +181,9 @@
         <echo level="info" message="Setup created in ${exe.file}"/>
     </target>
     
-    <target name="library" depends="-loadversion,build_lib">
+    <target name="library" depends="-loadversion,release_lib,-copy-lib">
         <mkdir dir="${releases.dir}"/>
-        <copy file="${core.lib.path}" tofile="${releases.dir}/${prefix.filename}_${version}${version.suffix}_lib.jar"/>
+        <copy file="${lib.file}" todir="${releases.dir}" />
     </target>
     
     <target name="archive" depends="-loadversion,dist">
@@ -461,7 +461,7 @@
 
     </target>
 
-    <target name="release" depends="library,archive,deb,osx-app-archive,installer,osx-app-installer,locales">        
+    <target name="release" depends="library,archive,deb,osx-app-archive,installer,osx-app-installer,locales">
 
     </target>
          
@@ -557,6 +557,11 @@
             <arg value="-file" />
             <arg value="fileLang" />
             <arg value="${lang.file}" />
+            
+            <arg value="-file" />
+            <arg value="fileLib" />
+            <arg value="${lib.file}" />
+            
         </java>
     </target>
     
@@ -663,10 +668,19 @@
         <echo level="info" message="Version: ${version}"/>
     </target>
     
+    <target name="release_lib" depends="-loadversion,-save-version-info">
+        <copy file="${version_info}" tofile="${core.lib.version_info}" />        
+        <ant antfile="${core.lib.script}" target="release" inheritAll="false" usenativebasedir="true"/>
+        <property  name="lib.file" value="${lib.releases.dir}/${lib.prefix.filename}_${version}${version.suffix}.zip" />
+    </target>
+    
     <target name="build_lib" depends="-loadversion,-save-version-info">
         <copy file="${version_info}" tofile="${core.lib.version_info}" />
         <ant antfile="${core.lib.script}" target="build" inheritAll="false" usenativebasedir="true"/>
-        <copy file="${core.lib.path}" todir="${lib.dir}" />
+    </target>
+    
+    <target name="-copy-lib">
+        <copy file="${core.lib.path}" todir="${lib.dir}" />    
     </target>
     
     <target name="clean_lib">

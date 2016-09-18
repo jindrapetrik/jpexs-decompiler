@@ -227,6 +227,15 @@
         </jar>
     </target>
     
+    <target name="release" depends="build">
+        <zip destfile="${releases.dir}/${prefix.filename}_${version}${version.suffix}.zip">
+            <zipfileset file="${dist.dir}/${jar.filename}.jar" filemode="755" fullpath="${jar.filename}.jar"></zipfileset>
+            <zipfileset file="${gui.changelog.file}" fullpath="${changelog.file}"></zipfileset>
+            <zipfileset file="${license.file}" fullpath="${license.file}"></zipfileset>
+        </zip>
+    </target>
+    
+    
     <target name="javadoc">
         <mkdir dir="${javadoc.dir}"/>
         <javadoc sourcepath="${src.dir}" destdir="${javadoc.dir}" windowtitle="${project.name}"
