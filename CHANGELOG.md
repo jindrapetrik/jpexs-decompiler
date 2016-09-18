@@ -1450,6 +1450,8 @@ All notable changes to this project will be documented in this file.
 - AS3: Finding usage of multinames from constant table
 
 ## [alpha 7] - 2010-09-04
+### New
+- Initial public release
 
 [Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version9.0.0...dev
 [9.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version8.0.1...version9.0.0
@@ -1545,3 +1547,4 @@ All notable changes to this project will be documented in this file.
 [alpha 10]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha9...alpha10
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
+[alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
