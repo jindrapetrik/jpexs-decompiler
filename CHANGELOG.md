@@ -1452,96 +1452,96 @@ All notable changes to this project will be documented in this file.
 ## [alpha 7] - 2010-09-04
 
 [Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version9.0.0...dev
-[8.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version8.0.1...version9.0.0
-[8.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version8.0.0...version8.0.1
-[7.1.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version7.1.2...version8.0.0
-[7.1.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version7.1.1...version7.1.2
-[7.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version7.1.0...version7.1.1
-[7.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version7.0.1...version7.1.0
-[7.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version7.0.0...version7.0.1
-[6.1.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version6.1.1...version7.0.0
-[6.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version6.1.0...version6.1.1
-[6.0.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version6.0.2...version6.1.0
-[6.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version6.0.1...version6.0.2
-[6.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version6.0.0...version6.0.1
-[5.3.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version5.3.0...version6.0.0
-[5.2.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version5.2.0...version5.3.0
-[5.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version5.1.0...version5.2.0
-[5.0.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version5.0.2...version5.1.0
-[5.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version5.0.1...version5.0.2
-[5.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version5.0.0...version5.0.1
-[4.1.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version4.1.1...version5.0.0
-[4.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version4.1.0...version4.1.1
-[4.0.5]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version4.0.5...version4.1.0
-[4.0.4]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version4.0.4...version4.0.5
-[4.0.3]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version4.0.3...version4.0.4
-[4.0.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version4.0.2...version4.0.3
-[4.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version4.0.1...version4.0.2
-[4.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version4.0.0...version4.0.1
-[3.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version3.0.0...version4.0.0
-[2.1.4]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version2.1.4...version3.0.0
-[2.1.3]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version2.1.3...version2.1.4
-[2.1.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version2.1.2...version2.1.3
-[2.1.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version2.1.1...version2.1.2
-[2.1.0 update 2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version2.1.0u2...version2.1.1
-[2.1.0 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version2.1.0u1...version2.1.0u2
-[2.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version2.1.0...version2.1.0u1
-[2.0.1 update 2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version2.0.1u2...version2.1.0
-[2.0.1 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version2.0.1u1...version2.0.1u2
-[2.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version2.0.1...version2.0.1u1
-[2.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version2.0.0...version2.0.1
-[1.8.1 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.8.1u1...version2.0.0
-[1.8.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.8.1...version1.8.1u1
-[1.8.0 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.8.0u1...version1.8.1
-[1.8.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.8.0...version1.8.0u1
-[1.7.4 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.7.4u1...version1.8.0
-[1.7.4]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.7.4...version1.7.4u1
-[1.7.3 update 2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.7.3u2...version1.7.4
-[1.7.3 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.7.3u1...version1.7.3u2
-[1.7.3]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.7.3...version1.7.3u1
-[1.7.2 update 2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.7.2u2...version1.7.3
-[1.7.2 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.7.2u1...version1.7.2u2
-[1.7.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.7.2...version1.7.2u1
-[1.7.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.7.1...version1.7.2
-[1.7.0 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.7.0u1...version1.7.1
-[1.7.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.7.0...version1.7.0u1
-[1.6.7]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.6.7...version1.7.0
-[1.6.6 update 2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.6.6u2...version1.6.7
-[1.6.6 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.6.6u1...version1.6.6u2
-[1.6.6]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.6.6...version1.6.6u1
-[1.6.5 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.6.5u1...version1.6.6
-[1.6.5]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.6.5...version1.6.5u1
-[1.6.4 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.6.4u1...version1.6.5
-[1.6.4]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.6.4...version1.6.4u1
-[1.6.3 update 2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.6.3u2...version1.6.4
-[1.6.3 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.6.3u1...version1.6.3u2
-[1.6.3]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.6.3...version1.6.3u1
-[1.6.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.6.2...version1.6.3
-[1.6.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.6.1...version1.6.2
-[1.6.0 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.6.0u1...version1.6.1
-[1.6.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.6.0...version1.6.0u1
-[1.5.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.5.2...version1.6.0
-[1.5.1 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.5.1u1...version1.5.2
-[1.5.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.5.1...version1.5.1u1
-[1.5.0 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.5.0u1...version1.5.1
-[1.5.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.5.0...version1.5.0u1
-[1.4.3 update 2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.4.3u2...version1.5.0
-[1.4.3 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.4.3u1...version1.4.3u2
-[1.4.3]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.4.3...version1.4.3u1
-[1.4.2 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.4.2u1...version1.4.3
-[1.4.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.4.2...version1.4.2u1
-[1.4.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.4.1...version1.4.2
-[1.4.0 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.4.0u1...version1.4.1
-[1.4.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.4.0...version1.4.0u1
-[1.3.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.3.1...version1.4.0
-[1.3.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.3.0...version1.3.1
-[1.2.0 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.2.0u1...version1.3.0
-[1.2.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.2.0...version1.2.0u1
-[1.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.1.0...version1.2.0
-[1.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.0.1...version1.1.0
-[1.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.0.0...version1.0.1
-[beta 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/beta1...version1.0.0
-[alpha 10]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha10...beta1
-[alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha9...alpha10
-[alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
-[alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
+[9.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version8.0.1...version9.0.0
+[8.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version8.0.0...version8.0.1
+[8.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version7.1.2...version8.0.0
+[7.1.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version7.1.1...version7.1.2
+[7.1.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version7.1.0...version7.1.1
+[7.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version7.0.1...version7.1.0
+[7.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version7.0.0...version7.0.1
+[7.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version6.1.1...version7.0.0
+[6.1.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version6.1.0...version6.1.1
+[6.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version6.0.2...version6.1.0
+[6.0.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version6.0.1...version6.0.2
+[6.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version6.0.0...version6.0.1
+[6.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version5.3.0...version6.0.0
+[5.3.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version5.2.0...version5.3.0
+[5.2.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version5.1.0...version5.2.0
+[5.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version5.0.2...version5.1.0
+[5.0.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version5.0.1...version5.0.2
+[5.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version5.0.0...version5.0.1
+[5.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version4.1.1...version5.0.0
+[4.1.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version4.1.0...version4.1.1
+[4.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version4.0.5...version4.1.0
+[4.0.5]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version4.0.4...version4.0.5
+[4.0.4]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version4.0.3...version4.0.4
+[4.0.3]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version4.0.2...version4.0.3
+[4.0.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version4.0.1...version4.0.2
+[4.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version4.0.0...version4.0.1
+[4.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version3.0.0...version4.0.0
+[3.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version2.1.4...version3.0.0
+[2.1.4]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version2.1.3...version2.1.4
+[2.1.3]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version2.1.2...version2.1.3
+[2.1.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version2.1.1...version2.1.2
+[2.1.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version2.1.0u2...version2.1.1
+[2.1.0 update 2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version2.1.0u1...version2.1.0u2
+[2.1.0 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version2.1.0...version2.1.0u1
+[2.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version2.0.1u2...version2.1.0
+[2.0.1 update 2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version2.0.1u1...version2.0.1u2
+[2.0.1 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version2.0.1...version2.0.1u1
+[2.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version2.0.0...version2.0.1
+[2.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.8.1u1...version2.0.0
+[1.8.1 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.8.1...version1.8.1u1
+[1.8.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.8.0u1...version1.8.1
+[1.8.0 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.8.0...version1.8.0u1
+[1.8.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.7.4u1...version1.8.0
+[1.7.4 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.7.4...version1.7.4u1
+[1.7.4]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.7.3u2...version1.7.4
+[1.7.3 update 2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.7.3u1...version1.7.3u2
+[1.7.3 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.7.3...version1.7.3u1
+[1.7.3]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.7.2u2...version1.7.3
+[1.7.2 update 2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.7.2u1...version1.7.2u2
+[1.7.2 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.7.2...version1.7.2u1
+[1.7.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.7.1...version1.7.2
+[1.7.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.7.0u1...version1.7.1
+[1.7.0 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.7.0...version1.7.0u1
+[1.7.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.6.7...version1.7.0
+[1.6.7]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.6.6u2...version1.6.7
+[1.6.6 update 2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.6.6u1...version1.6.6u2
+[1.6.6 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.6.6...version1.6.6u1
+[1.6.6]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.6.5u1...version1.6.6
+[1.6.5 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.6.5...version1.6.5u1
+[1.6.5]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.6.4u1...version1.6.5
+[1.6.4 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.6.4...version1.6.4u1
+[1.6.4]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.6.3u2...version1.6.4
+[1.6.3 update 2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.6.3u1...version1.6.3u2
+[1.6.3 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.6.3...version1.6.3u1
+[1.6.3]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.6.2...version1.6.3
+[1.6.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.6.1...version1.6.2
+[1.6.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.6.0u1...version1.6.1
+[1.6.0 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.6.0...version1.6.0u1
+[1.6.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.5.2...version1.6.0
+[1.5.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.5.1u1...version1.5.2
+[1.5.1 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.5.1...version1.5.1u1
+[1.5.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.5.0u1...version1.5.1
+[1.5.0 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.5.0...version1.5.0u1
+[1.5.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.4.3u2...version1.5.0
+[1.4.3 update 2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.4.3u1...version1.4.3u2
+[1.4.3 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.4.3...version1.4.3u1
+[1.4.3]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.4.2u1...version1.4.3
+[1.4.2 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.4.2...version1.4.2u1
+[1.4.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.4.1...version1.4.2
+[1.4.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.4.0u1...version1.4.1
+[1.4.0 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.4.0...version1.4.0u1
+[1.4.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.3.1...version1.4.0
+[1.3.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.3.0...version1.3.1
+[1.3.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.2.0u1...version1.3.0
+[1.2.0 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.2.0...version1.2.0u1
+[1.2.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.1.0...version1.2.0
+[1.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.0.1...version1.1.0
+[1.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.0.0...version1.0.1
+[1.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/beta1...version1.0.0
+[beta 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha10...beta1
+[alpha 10]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha9...alpha10
+[alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
+[alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
