@@ -21,7 +21,7 @@ before_install:
   - unzip nsis-3.0-stubs.zip -d $tools_dir/nsis-3.0-src/Stubs
   - wget -q https://www.free-decompiler.com/flash/launch4j-3.9-linux.tgz
   - tar zxvf launch4j-3.9-linux.tgz -C $tools_dir >/dev/null
-  - echo "nsis.path = $tools_dir/nsis-3.0-src/bin/makensis" > tools.properties
+  - echo "nsis.path = $tools_dir/nsis-3.0-src/bin" > tools.properties
   - echo "launch4j.path = $tools_dir/launch4j" >> tools.properties
   - echo "username=$website_user" > jpexs_website.properties
   - echo "password=$website_password" >> jpexs_website.properties
