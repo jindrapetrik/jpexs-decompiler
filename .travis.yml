@@ -4,10 +4,9 @@ install: ant deps
 script: ant new-version-nightlybuild
 before_install:
   - sudo apt-get -qq update
-  - sudo apt-get install -y libxml2-dev
-  - sudo apt-get install scons
-  - sudo apt-get install zlib1g-dev
-  - sudo apt-get install unzip
+  - sudo apt-get install -y scons
+  - sudo apt-get install -y zlib1g-dev
+  - sudo apt-get install -y unzip
   - wget -q https://www.free-decompiler.com/flash/nsis-3.0-src.tar.bz2
   - bzip2 -d nsis-3.0-src.tar.bz2
   - tar xvf nsis-3.0-src.tar -C $tools_dir >/dev/null  
