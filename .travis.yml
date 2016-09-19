@@ -1,7 +1,7 @@
 language: java
 jdk: [oraclejdk8]
 install: ant deps
-script: ant testhalt
+script: ant new-version-nightlybuild
 before_install:
   - sudo apt-get -qq update
   - sudo apt-get install -y libxml2-dev
@@ -12,7 +12,7 @@ before_install:
   - bzip2 -d nsis-3.0-src.tar.bz2
   - tar xvf nsis-3.0-src.tar -C ~ >/dev/null  
   - cd ~/nsis-3.0-src/  
-  - scons UNICODE=yes SKIPSTUBS=all SKIPPLUGINS=all SKIPUTILS=all SKIPMISC=all NSIS_CONFIG_CONST_DATA=no PREFIX=~/nsis-3.0-src/ install-compiler
+  - scons UNICODE=yes SKIPSTUBS=all SKIPPLUGINS=all SKIPUTILS=all SKIPMISC=all NSIS_CONFIG_CONST_DATA=no PREFIX=~/nsis-3.0-src/ install-compiler >/dev/null
   - mkdir share
   - ln -s ~/nsis-3.0-src share/nsis
   - cd -  
@@ -22,3 +22,5 @@ before_install:
   - tar zxvf launch4j-3.9-linux.tgz -C ~ >/dev/null
   - echo "nsis.path = ~/nsis-3.0-src/bin/makensis" > tools.properties
   - echo "launch4j.path = ~/launch4j" >> tools.properties
+  - echo "username=$website_user" > jpexs_website.properties
+  - echo "password=$website_password" >> jpexs_website.properties
