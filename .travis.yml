@@ -8,16 +8,17 @@ before_install:
   - sudo apt-get install scons
   - sudo apt-get install zlib1g-dev
   - sudo apt-get install unzip
-  - svn checkout http://svn.code.sf.net/p/nsis/code/ ~/nsis/
-  - mkdir ~/nsis/
-  - cd ~/nsis/
-  - scons UNICODE=yes SKIPSTUBS=all SKIPPLUGINS=all SKIPUTILS=all SKIPMISC=all NSIS_CONFIG_CONST_DATA=no PREFIX=~/nsis/ install-compiler
+  - wget -q https://www.free-decompiler.com/flash/nsis-3.0-src.tar.bz2
+  - bzip2 -d nsis-3.0-src.tar.bz2
+  - tar xvf nsis-3.0-src.tar -c ~ >/dev/null  
+  - cd ~/nsis-3.0-src/  
+  - scons UNICODE=yes SKIPSTUBS=all SKIPPLUGINS=all SKIPUTILS=all SKIPMISC=all NSIS_CONFIG_CONST_DATA=no PREFIX=~/nsis-3.0-src/ install-compiler
   - mkdir share
-  - ln -s ~/nsis share/nsis
+  - ln -s ~/nsis-3.0-src share/nsis
+  - cd -  
   - wget -q https://www.free-decompiler.com/flash/nsis-3.0-stubs.zip
-  - unzip nsis-3.0-stubs.zip -d Stubs
+  - unzip nsis-3.0-stubs.zip -d ~/nsis-3.0-src/Stubs
   - wget -q https://www.free-decompiler.com/flash/launch4j-3.9-linux.tgz
   - tar zxvf launch4j-3.9-linux.tgz -C ~ >/dev/null
-  - cd -
-  - echo "nsis.path = ~/nsis/bin/makensis" > tools.properties
+  - echo "nsis.path = ~/nsis-3.0-src/bin/makensis" > tools.properties
   - echo "launch4j.path = ~/launch4j" >> tools.properties
