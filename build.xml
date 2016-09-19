@@ -109,6 +109,10 @@
         </javac>
     </target>
 
+    <target name="-test-halt-always">
+        <property name="test.halt.failure" value="true" />
+    </target>
+
     <target name="-test-halt-newver" if="new.version">
         <property name="test.halt.failure" value="true" />
     </target>
@@ -116,6 +120,9 @@
         <property name="test.halt.failure" value="false" />
     </target>
 
+    <target name="testhalt" depends="-test-halt-always,test">
+        
+    </target>
     <target name="test" depends="-test-halt-newver,-test-halt-nonewver,test_lib,compile,compile-tests">
         <delete dir="${test.result.dir}"/>
         <mkdir dir="${test.result.dir}"/>
