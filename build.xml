@@ -971,12 +971,12 @@
         <echo message="Detected homedir in OSX: ${app.homedir}" level="info"/>
     </target>   
        
-    <target name="-get-home-from-user" if="${user.home}" unless="os_specific_home_isset">
+    <target name="-get-home-from-user" if="user.home" unless="os_specific_home_isset">
         <property name="app.homedir" value="${user.home}/.${project.name}" />
         <echo message="Detected homedir in user home: ${app.homedir}" level="info"/>
     </target>   
     
-    <target name="-get-home-no" unless="${user.home}">
+    <target name="-get-home-no" unless="user.home">
         <property name="app.homedir" value="." />
         <echo message="Detected homedir in current dir: ${app.homedir}" level="info"/>
     </target>   
