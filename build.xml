@@ -959,29 +959,36 @@
     
     <target name="-get-home-from-user-windows-appdata" if="windows_appdata_isset">
         <property name="app.homedir" value="${env.APPDATA}\${vendor}\${project.name}" />
+        <echo message="Detected homedir in Windows APPDATA: ${app.homedir}" level="info"/>
     </target>
     
     <target name="-get-home-from-user-windows-home" if="windows_home_isset" unless="windows_appdata_isset">
         <property name="app.homedir" value="${user.home}\Application Data\${vendor}\${project.name}" />
+        <echo message="Detected homedir in Windows home Application Data: ${app.homedir}" level="info"/>
     </target>
     <target name="-get-home-from-user-osx-home" if="osx_home_isset">
         <property name="app.homedir" value="${user.home}/Library/Application Support/${project.name}" />
+        <echo message="Detected homedir in OSX: ${app.homedir}" level="info"/>
     </target>   
        
     <target name="-get-home-from-user" if="${user.home}" unless="os_specific_home_isset">
         <property name="app.homedir" value="${user.home}/.${project.name}" />
+        <echo message="Detected homedir in user home: ${app.homedir}" level="info"/>
     </target>   
     
     <target name="-get-home-no" unless="${user.home}">
         <property name="app.homedir" value="." />
+        <echo message="Detected homedir in current dir: ${app.homedir}" level="info"/>
     </target>   
                                                                                                                                                                                                                                                                                                     
     <target name="-get-home" depends="-get-home-from-user-windows-appdata,-get-home-from-user-windows-home,-get-home-from-user-osx-home,-get-home-from-user,-get-home-no">        
-                
+        
     </target>
     
     <target name="-get-playerglobal-home" depends="-get-home">
         <property name="playerglobal.homedir" value="${app.homedir}/flashlib"/>
+        <mkdir dir="${playerglobal.homedir}"/>
+        <echo message="PlayerGlobal homedir: ${playerglobal.homedir}" level="info"/>
     </target>
     
     <target name="download-playerglobal" depends="-get-playerglobal-home">
