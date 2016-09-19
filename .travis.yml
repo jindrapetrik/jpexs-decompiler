@@ -10,7 +10,7 @@ before_install:
   - sudo apt-get install unzip
   - wget -q https://www.free-decompiler.com/flash/nsis-3.0-src.tar.bz2
   - bzip2 -d nsis-3.0-src.tar.bz2
-  - tar xvf nsis-3.0-src.tar -c ~ >/dev/null  
+  - tar xvf nsis-3.0-src.tar -C ~ >/dev/null  
   - cd ~/nsis-3.0-src/  
   - scons UNICODE=yes SKIPSTUBS=all SKIPPLUGINS=all SKIPUTILS=all SKIPMISC=all NSIS_CONFIG_CONST_DATA=no PREFIX=~/nsis-3.0-src/ install-compiler
   - mkdir share
