@@ -914,8 +914,86 @@
     
     <target name="upload-last" depends="all,-upload">
         
-    </target>       
+    </target>
     
+        
+    <target name="windows-home" >
+        
+    </target>
+                  
+    
+    <property environment="env" />
+    
+    <condition property="windows_appdata_isset">
+        <and>
+            <os family="windows"/>                
+            <isset property="env.APPDATA" />
+        </and>
+    </condition>
+    <condition property="windows_home_isset">
+        <and>
+            <isset property="user.home" />
+            <os family="windows"/>                            
+        </and>
+    </condition>
+    
+    <condition property="osx_home_isset">
+        <and>
+            <isset property="user.home" />
+            <os family="mac"/>                    
+        </and>        
+    </condition>
+    
+    
+    <condition property="os_specific_home_isset">
+        <or>
+            <isset property="osx_home_isset" />
+            <isset property="windows_appdata_isset" />                            
+            <isset property="windows_home_isset" />  
+        </or>        
+    </condition>
+    
+    <target name="-get-env">
+        <property environment="env"/>
+    </target>
+    
+    <target name="-get-home-from-user-windows-appdata" if="windows_appdata_isset">
+        <property name="app.homedir" value="${env.APPDATA}\${vendor}\${project.name}" />
+    </target>
+    
+    <target name="-get-home-from-user-windows-home" if="windows_home_isset" unless="windows_appdata_isset">
+        <property name="app.homedir" value="${user.home}\Application Data\${vendor}\${project.name}" />
+    </target>
+    <target name="-get-home-from-user-osx-home" if="osx_home_isset">
+        <property name="app.homedir" value="${user.home}/Library/Application Support/${project.name}" />
+    </target>   
+       
+    <target name="-get-home-from-user" if="${user.home}" unless="os_specific_home_isset">
+        <property name="app.homedir" value="${user.home}/.${project.name}" />
+    </target>   
+    
+    <target name="-get-home-no" unless="${user.home}">
+        <property name="app.homedir" value="." />
+    </target>   
+                                                                                                                                                                                                                                                                                                    
+    <target name="-get-home" depends="-get-home-from-user-windows-appdata,-get-home-from-user-windows-home,-get-home-from-user-osx-home,-get-home-from-user,-get-home-no">        
+                
+    </target>
+    
+    <target name="-get-playerglobal-home" depends="-get-home">
+        <property name="playerglobal.homedir" value="${app.homedir}/flashlib"/>
+    </target>
+    
+    <target name="download-playerglobal" depends="-get-playerglobal-home">
+        <tempfile property="adobe.temp.file" prefix="adobepages" suffix=".html" deleteonexit="true" />
+        <get src="${adobe.playerglobal.pages.url}" dest="${adobe.temp.file}" />       
+        <replaceregexp flags="s" file="${adobe.temp.file}" match=".*&lt;a href=&quot;([^&quot;]+)&quot;&gt;&lt;img[^&gt;]*/&gt;Download the playerglobal\.swc to target the latest version APIs&lt;/a&gt;.*" replace="\1" />
+        <loadfile srcfile="${adobe.temp.file}" property="playerglobal.url" />
+        <replaceregexp file="${adobe.temp.file}" match=".*/([^/]+\.swc)$" replace="\1" />        
+        <loadfile srcfile="${adobe.temp.file}" property="playerglobal.filename" />
+        <get src="${playerglobal.url}" dest="${playerglobal.homedir}/${playerglobal.filename}" />
+        <delete file="${adobe.temp.file}"/>
+    </target>
     <target name="fix-src-endoflines">
         <fixcrlf srcdir="${src.dir}" includes="**/*.java" />
         <fixcrlf srcdir="${src.dir}" includes="**/*.properties" />
@@ -926,5 +1004,8 @@
         <fixcrlf srcdir="${src.dir}" includes="**/*.bat" eol="crlf" />
         <fixcrlf srcdir="${src.dir}" includes="**/*.sh" eol="lf" />
         <ant antfile="${core.lib.script}" target="fix-src-endoflines" inheritAll="false" usenativebasedir="true" />        
+    </target>
+    <target name="deps" depends="download-playerglobal">
+        
     </target>                 
 </project>
