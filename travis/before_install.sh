@@ -42,8 +42,8 @@ echo "launch4j.path = $tools_dir/launch4j" >> tools.properties
 
 # Travis secure variable $website_password is not available from outside 
 # of jpexs repository (e.g pull requests from other users on GitHub)
-if [ -z ${website_password+x} ]; then 
-    # Store username and password for uploading releases to jpexs server
-    echo "username=$website_user" > jpexs_website.properties
-    echo "password=$website_password" >> jpexs_website.properties
+if ! [ -z ${website_password+x} ]; then 
+  # Store username and password for uploading releases to jpexs server
+  echo "username=$website_user" > jpexs_website.properties
+  echo "password=$website_password" >> jpexs_website.properties
 fi
