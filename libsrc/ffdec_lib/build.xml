@@ -193,21 +193,26 @@
         <loadproperties srcfile="${version_info}" prefix="version" />        
     </target>
     
-    <target name="-load-version-null" unless="versionfile.exists">        
+    <target name="-load-version-private" unless="versionfile.exists">        
         <property name="version.major" value="0" />
         <property name="version.minor" value="0" />
         <property name="version.release" value="0" />
         <property name="version.debug" value="true" />
+        <property name="version.build" value="0" />                    
+        <property name="private" value="true" />  
     </target>
-    
-    <target name="-load-version" depends="-check-versionfile-exists,-load-version-file,-load-version-null"> 
+            
+    <target name="-load-version" depends="-check-versionfile-exists,-load-version-file,-load-version-private"> 
         <property name="version" value="${version.major}.${version.minor}.${version.release}" />
         <property name="version.number" value="${version.major}.${version.minor}.${version.release}.${version.build}" />  
         <script language="javascript">
-            if(project.getProperty("version.debug")=="true"){
+            
+            if(project.getProperty("version.build")=="0") {
+                project.setProperty("private",true);                
+            } else if(project.getProperty("version.debug")=="true") {
                 project.setProperty("nightly",true);
             }
-        </script>
+        </script>                 
     </target>
     
     <target name="build" depends="-load-version,-timestamp,-suffix,compile">
