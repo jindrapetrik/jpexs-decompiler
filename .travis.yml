@@ -1,27 +1,5 @@
 language: java
 jdk: [oraclejdk8]
-install: ant deps
-script: ant new-version-nightlybuild
-before_install:
-  - sudo apt-get -qq update
-  - sudo apt-get install -y scons
-  - sudo apt-get install -y zlib1g-dev
-  - sudo apt-get install -y unzip
-  - sudo apt-get install -y lib32ncurses5 lib32z1
-  - mkdir $tools_dir
-  - wget -q https://www.free-decompiler.com/flash/nsis-3.0-src.tar.bz2
-  - bzip2 -d nsis-3.0-src.tar.bz2
-  - tar xvf nsis-3.0-src.tar -C $tools_dir >/dev/null  
-  - cd $tools_dir/nsis-3.0-src/  
-  - scons UNICODE=yes SKIPSTUBS=all SKIPPLUGINS=all SKIPUTILS=all SKIPMISC=all NSIS_CONFIG_CONST_DATA=no PREFIX=$tools_dir/nsis-3.0-src/ install-compiler >/dev/null
-  - mkdir share
-  - ln -s $tools_dir/nsis-3.0-src share/nsis
-  - cd -  
-  - wget -q https://www.free-decompiler.com/flash/nsis-3.0-addon.zip
-  - unzip -u nsis-3.0-addon.zip -d $tools_dir/nsis-3.0-src
-  - wget -q https://www.free-decompiler.com/flash/launch4j-3.9-linux.tgz
-  - tar zxvf launch4j-3.9-linux.tgz -C $tools_dir >/dev/null
-  - echo "nsis.path = $tools_dir/nsis-3.0-src/bin" > tools.properties
-  - echo "launch4j.path = $tools_dir/launch4j" >> tools.properties
-  - echo "username=$website_user" > jpexs_website.properties
-  - echo "password=$website_password" >> jpexs_website.properties
+before_install: ./travis/before_install.sh
+install: ./travis/install.sh
+script: ./travis/script.sh
