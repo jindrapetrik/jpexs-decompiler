@@ -17,8 +17,8 @@ before_install:
   - mkdir share
   - ln -s $tools_dir/nsis-3.0-src share/nsis
   - cd -  
-  - wget -q https://www.free-decompiler.com/flash/nsis-3.0-stubs.zip
-  - unzip nsis-3.0-stubs.zip -d $tools_dir/nsis-3.0-src/Stubs
+  - wget -q https://www.free-decompiler.com/flash/nsis-3.0-addon.zip
+  - unzip nsis-3.0-stubs.zip -d $tools_dir/nsis-3.0-src
   - wget -q https://www.free-decompiler.com/flash/launch4j-3.9-linux.tgz
   - tar zxvf launch4j-3.9-linux.tgz -C $tools_dir >/dev/null
   - echo "nsis.path = $tools_dir/nsis-3.0-src/bin" > tools.properties
