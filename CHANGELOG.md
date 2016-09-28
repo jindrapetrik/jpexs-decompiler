@@ -37,7 +37,7 @@ All notable changes to this project will be documented in this file.
 - Identifier renaming for top level classes
 - AS3 direct editation not correctly saving local register names
 - #1254 FLA export - placing AS3 classes to FLA directory instead of scripts dir
-- Max installer fix (.pkg)
+- Mac OS X installer fix (.pkg)
 
 ## [9.0.0] - 2016-08-12
 ### Added
