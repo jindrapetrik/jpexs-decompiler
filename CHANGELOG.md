@@ -94,7 +94,7 @@ All notable changes to this project will be documented in this file.
 - [#1268] GFX compacted font - fixed advance values on export
 
 ## [8.0.1] - 2016-02-20
-### New
+### Changed
 - FFDec debug tab in advanced settings moved to other tabs
 
 ### Fixed
@@ -918,13 +918,9 @@ All notable changes to this project will be documented in this file.
 - [#382] AS3: Adding new method
 
 ## [1.7.3] - 2013-09-27
-### New
-- AS3: New p-code syntax inspired by RABCDasm
+### Added
 - AS3: Multiname and namespace editing.
 - [#382],[#396] AS3: Adding new trait (method/slot/const)
-- AS3: Editing whole trait in one textarea
-- AS3: Removed messages about adding new constants
-- AS3: Modified colors in editor
 - AS3: Highlighting pair parenthesis/bracket
 - AS3: Editing various new P-code parameters
 - AS3: Highligting of trait names/types/parameters
@@ -933,9 +929,15 @@ All notable changes to this project will be documented in this file.
 - [#391] AS3: Native methods mark
 - [#395] Support for GFx ScaleForm SWFs (with fonts editing)
 - Displaying fonts in internal viewer
-- [#301] Clearing error log causes icon to reset
 - [#334], [#395] New Embed font dialog - selecting character ranges with preview
 - Replacing characters in font (Yes/No to all dialog)
+
+### Changed
+- AS3: New p-code syntax inspired by RABCDasm
+- AS3: Editing whole trait in one textarea
+- AS3: Removed messages about adding new constants
+- AS3: Modified colors in editor
+- [#301] Clearing error log causes icon to reset
 
 ## [1.7.2 update 2] - 2013-09-13
 ### Changed
@@ -1580,7 +1582,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2: Better decompiling of Ifs, For..in
 
 ## [alpha 7] - 2010-09-04
-### New
+### Added
 - Initial public release
 
 [Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version9.0.0...dev
