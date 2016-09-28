@@ -1544,7 +1544,7 @@ All notable changes to this project will be documented in this file.
 - Proxy: Some minor fixes
 
 ## [alpha 10] - 2011-07-13
-### Addded
+### Added
 - AS3:Highlighting actual line
 - AS3:Completing instruction names via Ctrl+Space
 - AS3:Editing method parameters, method body parameters via tab panel
