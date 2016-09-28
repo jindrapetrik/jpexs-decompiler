@@ -39,14 +39,11 @@ All notable changes to this project will be documented in this file.
 - #1254 FLA export - placing AS3 classes to FLA directory instead of scripts dir
 
 ## [9.0.0] - 2016-08-12
-### New
+### Added
 - Instance metadata (AMF3) editing in PlaceObject4
-- [#1162] improved opening loaded SWF files
 - [#1156] Flash Viewer - DefineScalingGrid support (9-slice scaling)
-- Flash Viewer - skip frames when not on time
 - [#1171] Export stroke scale to FLA
 - FLA export - check invalid unicode characters
-- [#1199] Automatically import alpha channel to JPEG3/4 from PNG
 - [#1170] Extract from memory in commandline
 - Reload one vs Reload all buttons
 - ABC: Float and Float4 support
@@ -55,6 +52,11 @@ All notable changes to this project will be documented in this file.
 - Search in dump view
 - Jump to resources view from hex view
 - Show warning on 32bit JRE
+
+### Changed
+- [#1162] improved opening loaded SWF files
+- Flash Viewer - skip frames when not on time
+- [#1199] Automatically import alpha channel to JPEG3/4 from PNG
 
 ### Fixed
 - [#1151] Filters on texts fixed
@@ -100,8 +102,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2 Simplify expressions fix
 
 ## [8.0.0] - 2016-02-18
-### New
-- New application icon and splash screen
+### Added
 - Debugger - AS1/2 Show registers
 - Debugger - display variables in the tree structure
 - Debugger - set value of variable
@@ -109,21 +110,24 @@ All notable changes to this project will be documented in this file.
 - Debugger - P-code level debugging for both AS1/2 and AS3
 - Basic SVG import for shapes
 - Simplify expression setting
-- [#1145] AS3 better declaration type detection, better convert_x instruction handling
 - [#1118] Loading characters through ImportAssets - show as readonly
 - [#409], [#1132], [SkinPart] metadata support - decompilation and direct editation in AS3
 - [#1134] compiling §§ instructions back while direct editation (§§goto is still missing)
 - [#1121] Ability to save binary data by its name
 - [#1052] Add object to existing frame
 - Allow adding tag to main timeline
-- Binary export - use .swf extension for swf files
 - AS1/2: Ctrl+click to declaration of variables, registers
 - Allow trait specification in pcode import
 - Icons for tag types in Dump view
-- Better tree labels in generic tag editor (Raw edit)
-- [#758] Allow zooming more than preview area in internal viewer
 - Show error message when a text tag is invalid (glyph index problem)
 - AS3 direct editation - store local register names in debug info = allow to rename them
+
+### Changed
+- New application icon and splash screen
+- [#1145] AS3 better declaration type detection, better convert_x instruction handling
+- Binary export - use .swf extension for swf files
+- Better tree labels in generic tag editor (Raw edit)
+- [#758] Allow zooming more than preview area in internal viewer
 
 ### Fixed
 - [#1096] FLA export - pretty print
@@ -170,10 +174,12 @@ All notable changes to this project will be documented in this file.
 - Critical debugger fix - widelines
 
 ## [7.1.0] - 2015-11-23
-### New
+### Added
 - AS1/2 debugger
-- Starting debugger on demand
 - Breakpoint/IP marker on line beginning
+
+### Changed
+- Starting debugger on demand
 - Installer message about playerglobal is only warning now
 
 ### Fixed
@@ -185,10 +191,14 @@ All notable changes to this project will be documented in this file.
 - Debugger: Adding breakpoint if script initializer not displayed
 
 ## [7.0.0] - 2015-11-18
-### New
+### Added
 - AS3 Debugger - breakpoints, stepping, show variables
-- Better Configuration of flashplayer paths
 - Faster AS3 direct editation
+
+### Changed
+- Better Configuration of flashplayer paths
+
+### Removed
 - Removed old "debugger" buttons
 - Removed search from browsers cache - inactual code
 
@@ -211,15 +221,17 @@ All notable changes to this project will be documented in this file.
 - [#933] AS3 allow numbers as object literal keys
 
 ## [6.1.0] - 2015-10-26
-### New
+### Added
 - Open other loaded SWFs during playback (useful for loaders)
 - Export uncompressed data from dump tree
-- Faster syntax highlighting
-- Better AS1/2 deobfuscator
-- [#418] AS3 deobfuscator improved
 - Print performance statistics from commandline
 - [#1062] Editing/displaying script initializers
 - Enable debugging on SWF file (commandline)
+
+### Changed
+- Faster syntax highlighting
+- Better AS1/2 deobfuscator
+- [#418] AS3 deobfuscator improved
 
 ### Fixed
 - AS call method fix (first parameter is "this")
@@ -233,10 +245,8 @@ All notable changes to this project will be documented in this file.
 - [#1037] isXML call
 
 ## [6.0.2] - 2015-09-12
-### New
+### Added
 - AS3: Display and direct edit trait Metadata
-- AS2 parser - add string to constant pool if there is not enough space
-- Deprecated commandline parameters removed
 - Allow to specify tag type on image or shape import
 - Convert image tags from commandline
 - [#489] Hex decode very large integers
@@ -244,7 +254,13 @@ All notable changes to this project will be documented in this file.
 - Dependent characters in basic tag info
 - [#1007] replace bytearray in raw editing
 - Italian translation
+
+### Changed
+- AS2 parser - add string to constant pool if there is not enough space
 - [#1044] AS2 - order scripts by physical location, name by offset
+
+### Removed
+- Deprecated commandline parameters removed
 
 ### Fixed
 - JNA problems on some JDKs
@@ -267,24 +283,23 @@ All notable changes to this project will be documented in this file.
 - [#1030] stack overflow fix
 
 ## [6.0.1] - 2015-07-06
-### New
-- [#944],[#991],[#939],[#942] AS3 deobfuscation improvements
+### Added
 - Special §§ instructions marked as red
 - [#949] Replace alpha channel from commandline
 - AS3 deobfuscation from commandline
 - Option to ignore FlashCC/Alchemy packages
+
+### Changed
+- [#944],[#991],[#939],[#942] AS3 deobfuscation improvements
 
 ### Fixed
 - AS1/2 deobfuscation fixed
 - [#952] Not loading SWF without extension
 
 ## [6.0.0] - 2015-07-04
-### New
-- AS decompilation highly improved
-- Better &&, || handling
+### Added
 - New AS3 deobfuscation method
 - Internal "preprocessor" §§ actions introduced - §§pop,§§push,...
-- Old AS1/2/3 deobfuscation method marked as deprecated (can be enabled back deep in the configuration)
 - Allow reload FFDec when no SWF is opened
 - [#858] Allow to set compression type in header
 - [#905] Show codec details for sound items
@@ -295,14 +310,22 @@ All notable changes to this project will be documented in this file.
 - Open multiple files with drag and drop
 - Better "multi packs" handling (Alchemy)
 - SWF version 29 to flash player 18 mapping
-- Some old tags added, DoABCDefine renamed to DoABC2
 - ImportAssets2 sha1 field
 - [#924] Sprites to image from commandline
 - AS1/2 direct editation big numbers fix
-- Separated Sprite export settings
 - Allow to add FILTERs and SHAPERECORDs in generic tag editor
 - Enable close all menu when no swf is selected
 - Restore modified state even when something goes wrong
+- Some old tags added
+
+### Changed
+- AS decompilation highly improved
+- Better &&, || handling
+- DoABCDefine renamed to DoABC2
+- Separated Sprite export settings
+
+### Deprecated
+- Old AS1/2/3 deobfuscation method marked as deprecated (can be enabled back deep in the configuration)
 
 ### Fixed
 - Many decompilation problems - EmptyStack exception, Maximum recursion level reached, etc.
@@ -325,23 +348,27 @@ All notable changes to this project will be documented in this file.
 - [#938] Parallel speedup limit fix
 
 ## [5.3.0] - 2015-05-25
-### New
+### Added
+- Generic tag editor: improved table editing (import/export assets tags, etc.)
+
+### Changed
 - Classic (nonribbon) UI improved - has same items as Ribbon UI
 - Icons improvements
 - Disabling menu items when work in progress
-- Generic tag editor: improved table editing (import/export assets tags, etc.)
 
 ### Fixed
 - [#897] Classic UI fix
 
 ## [5.2.0] - 2015-05-22
-### New
+### Added
+- UI8 editbox for swf version in header panel
+- Basic tag information panel
+
+### Changed
 - AS1/2: Shown only the constant pool(s) in pcode editor
 - Do not allow to chage tag tree selection, when current tag is under editing
 - Faster bitmap export
 - Using less memory when playing sounds
-- UI8 editbox for swf version in header panel
-- Basic tag information panel
 - Error message changed when the opened file is not swf
 
 ### Fixed
@@ -360,17 +387,19 @@ All notable changes to this project will be documented in this file.
 - Extensions of exported images fixed
 
 ## [5.1.0] - 2015-05-04
-### New
+### Added
 - Allow to copy/move multiple tags, and dependencies
-- Better gif exporter
 - [#842] For reconstruction if debug line info present
-- [#772]: closing loading dialog now cancels the loading of the swf
-- [#762]:export pcode with different extension
 - [#841] Loop control for sound preview
 - [#845] Import exported AS1/2 (DefineButton2&DefineSprite) button
 - Scrollbar added to fontpanel
 - SWF header editor
 - Configure what object types to export in exportdialog
+
+### Changed
+- Better gif exporter
+- [#772]: closing loading dialog now cancels the loading of the swf
+- [#762] export pcode with different extension
 
 ### Fixed
 - CRITICAL: Update System Bug causing updates not working
@@ -382,7 +411,7 @@ All notable changes to this project will be documented in this file.
 - [#728] Large fonts, [#857] add scroll on DefineFont3
 
 ## [5.0.2] - 2015-04-18
-### New
+### Added
 - Reopen last session
 
 ### Fixed
@@ -393,25 +422,27 @@ All notable changes to this project will be documented in this file.
 - [#860]: Opening bundle (zip, swc, any binary file) files fixed
 
 ## [5.0.0] - 2015-04-18
-### New
+### Added
 - Color skins
-- Default color skin altered
-- [#350] Allow only one running instance (Windows only, can be turned off)
 - [#824] Mac OS X package
 - [#809] Move left,right buttons for DefineTexts using translatex parameter
 - [#805] Editor mode for DefineTexts
-- SWFs in zip based bundles (SWC for example) can be modified & saved
 - [#825] Hotkeys for next/previous DefineText
 - Export/Import symbol classes/export asset tags
-- Performace improvements
-- More compact SWF-XML format
 - Frame export progress
 - [#737] Single file script export
 - Displaying changed AS3 scripts in GUI as bold
-- Marking changed parentnodes as bold too
 - Additional character info tags placed under character node
 - New icons for other tags (metadata,fileattributes,setbackground,place/remove)
 - Metadata tag editor
+
+### Changed
+- Default color skin altered
+- [#350] Allow only one running instance (Windows only, can be turned off)
+- SWFs in zip based bundles (SWC for example) can be modified & saved
+- Performace improvements
+- More compact SWF-XML format
+- Marking changed parentnodes as bold too
 
 ### Fixed
 - [#814] Exporting with scale problem
@@ -428,24 +459,31 @@ All notable changes to this project will be documented in this file.
 - [#837] AS3 try..finally without catch
 
 ## [4.1.1] - 2015-02-21
-### New
-- Java 8 now required
+### Added
 - Export/Import XML added to ribbon menu
 - Few GUI enhancements
 - Undo tag changes context menu
+
+### Changed
+- Java 8 now required
+
+### Removed
+- Removed support for Java below 8
 
 ### Fixed
 - [#811] export ActionScript
 
 ## [4.1.0] - 2015-02-18
-### New
+### Added
 - XML export/import
-- performance improvements
 - confirmation dialogs added
 - Add support for non-standard ABC-compressed SWF file
 - [#745] Copy tag to another SWF
-- [#758] Zoom to fit is dynamic
 - [#803] Align text in DefineText
+
+### Changed
+- performance improvements
+- [#758] Zoom to fit is dynamic
 
 ### Fixed
 - [#738] Frame export
@@ -472,7 +510,7 @@ All notable changes to this project will be documented in this file.
 - Other minor fixes
 
 ## [4.0.5] - 2014-12-01
-### New
+### Added
 - Escape control characters in strings, identifier names
 - [#676] import text error messages / logging enhancement
 - [#734] \xAB escapes, \uABCD escapes
@@ -485,14 +523,14 @@ All notable changes to this project will be documented in this file.
 - [#735] Automatic deobfuscation not correctly switched (required restart)
 
 ## [4.0.4] - 2014-11-23
-### New
+### Changed
 - better file cache, removing unneccessary temp files
 
 ### Fixed
 - obfuscated identifiers
 
 ## [4.0.3] - 2014-11-23
-### New
+### Added
 - [#722] Go to next/previous frame
 - BMP file format export (images,frames,shapes) and import(images)
 
@@ -502,12 +540,14 @@ All notable changes to this project will be documented in this file.
 - [#635],[#726] placing cursor inside Unicode characters
 
 ## [4.0.2] - 2014-11-22
-### New
-- [#720]: edited shape tag is not marked as modified after replacing
+### Added
 - show frame number during play
 - flashplayer - show controls for DefineSprite
 - goto frame
 - [#716],[#717],[#718] Proxy - save SWF, replace, copy URL, filesizes, table design
+
+### Changed
+- [#720]: edited shape tag is not marked as modified after replacing
 - reorganized about dialog
 
 ### Fixed
@@ -525,30 +565,32 @@ All notable changes to this project will be documented in this file.
 - Checking for updates moved to separate thread
 
 ## [4.0.0] - 2014-11-11
-### New
+### Added
 - [#677] Zoom level in export settings
 - internal viewer: linear/srgb gradients
 - zooming buttons for flashplayer/internal viewer
 - stroke scaling modes for canvas export
 - create snapshot button
-- better FlashPlayer integration using JavactiveX library
 - [#389] Selecting font face on import
 - [#701] Importing font from TTF file
 - Reorganized font panel
 - [#707] Debugger for logging messages
 - [#302] AS3: Better Ctrl+Click handling with underline, more declaration targets
 - [#685] Getting local register names from debug info can be disabled
-- Faster building tag tree
-- Faster timeline construction
 - Adding new tags
 - [#698] Allowing unicode letters in identifiers
 - [#710] Information about deobfuscation in error comments
-- [#711] Improved folder view - faster and with correct context menu
 - One EXE for 32/64 bit, uses percentage memory.
 - EXE SplashScreen
 - New Improved Windows Installer (NSIS) - can install Java and FlashPlayer, download playerglobal.swc
 - Config setting to load inner SWFs automatically
 - Replace shape with image
+
+### Changed
+- better FlashPlayer integration using JavactiveX library
+- Faster building tag tree
+- Faster timeline construction
+- [#711] Improved folder view - faster and with correct context menu
 
 ### Fixed
 - AS2 deobfuscation fixes
@@ -568,15 +610,17 @@ All notable changes to this project will be documented in this file.
 - [#539] for(each) in declaration fixes
 
 ## [3.0.0] - 2014-09-20
-### New
+### Added
 - Separated GUI (GPL) and library (now LGPL)
 - Editing obfuscated identifiers via new paragraph(§) syntax
 - Timeline View with preview and object hilighting
 - Show GFX data in dump view
 - [#650] New parameter to replace binarydata, images, sounds, scripts from commandline
 - Dump view - selecting node
-- Removed deprecated commandline export formats (see --help)
 - [#680] Loading subSWFs from binaryTags now optional (button/context menu) to avoid unnecessary memory consumption
+
+### Removed
+- Removed deprecated commandline export formats (see --help)
 
 ### Fixed
 - FileAttributes tag reading fix
@@ -594,7 +638,7 @@ All notable changes to this project will be documented in this file.
 - [#684] Sound streams inside DefineSprites, soundstream handling
 
 ## [2.1.4] - 2014-08-23
-### New
+### Added
 - AS1/2: New method for deobfuscation (can be switched off in settings)
 - AS1/2: Using eval/set on invalid identifiers, quotes in function names/parameters
 
@@ -603,13 +647,15 @@ All notable changes to this project will be documented in this file.
 - [#648] Export from embedded SWF
 
 ## [2.1.3] - 2014-08-18
-### New
-- Allow selecting multiple files in open file dialog
+### Added
 - Show "save" and "saveas" in application menu
-- Faster dump info collecting (less memory)
 - Saving data range in dump view
 - Show actions, abcdata in dumpview (context menu on the tree node)
 - [#612] show color in hex format
+
+### Changed
+- Faster dump info collecting (less memory)
+- Allow selecting multiple files in open file dialog
 
 ### Fixed
 - [#623] ffdec.sh UNIX file endings, executable
@@ -621,7 +667,7 @@ All notable changes to this project will be documented in this file.
 - [#640] text import fixed, ignore BOM
 
 ## [2.1.2] - 2014-07-20
-### New
+### Added
 - Dump view
 - Context menu: Jump to character, raw edit all tags
 - Catalan translation
@@ -641,7 +687,7 @@ All notable changes to this project will be documented in this file.
 - [#594] Setting for curly brace
 
 ## [2.1.1] - 2014-06-05
-### New
+### Added
 - [#302] Find declaration (Ctrl+click, Ctrl+B), Find usages (Ctrl+U) - Works only for exactly same multinames, not local registers
 - AS1/2 direct edit - global functions improvements
 - AS1/2 negate operator, unary minus operator
@@ -650,12 +696,14 @@ All notable changes to this project will be documented in this file.
 - Statusbar loading animation improved
 - [#579] AS3 direct editation - removing old class/methods from ABC
 - remove character without the dependencies (remove only the place/remove tags)
-- [#337] quickfind visibility improved
 - Running on system with no home directory
-- [#584] commandline script export - select whole packages (use .+ at the end of -selectas3class)
 - [#428] PDF export (as images only)
 - Commandline FlashPaper to PDF export
 - Select frames / Characters commandline options
+
+### Changed
+- [#337] quickfind visibility improved
+- [#584] commandline script export - select whole packages (use .+ at the end of -selectas3class)
 
 ### Fixed
 - [#576] AS1/2 direct editation: DefineFunction2 fix
@@ -673,7 +721,7 @@ All notable changes to this project will be documented in this file.
 - Canvas export colortransform fix
 
 ## [2.1.0 update 2] - 2014-05-08
-### New
+### Added
 - AS3 decompilation/editation: Vector initializers
 - AS3 direct editation: more classes in one file
 
@@ -682,15 +730,17 @@ All notable changes to this project will be documented in this file.
 - Various AS3 direct editation fixes
 
 ## [2.1.0 update 1] - 2014-05-05
-### New
-- HTML Canvas export improvements
+### Added
 - Portugese-brasilian translation
+
+### Changed
+- HTML Canvas export improvements
 
 ### Fixed
 - Various AS3 direct editation bugs, like [#570]
 
 ## [2.1.0] - 2014-05-01
-### New
+### Added
 - AS3 direct editation (Experimental!)
 - Frames SVG Export
 - Shape/MorphShape/Frames HTML 5 Canvas Export
@@ -713,7 +763,7 @@ All notable changes to this project will be documented in this file.
 - [#557] Nullpointer fix (private namespaces)
 
 ## [2.0.1] - 2014-04-03
-### New
+### Added
 - Thumbnail view
 - Font TTF export
 - Exporting frames: PNGs, AVI, GIF (via Internal flash viewer)
@@ -726,12 +776,14 @@ All notable changes to this project will be documented in this file.
 - [#504]: Unicode characters in JSyntaxPane
 - Internal viewer: showing object under cursor
 - Folder icons
-- Single frames animated.
 - Sound/Image format on command line.
 - Removing placeobject tags
 - Removing frames
 - AS: "elseif" statements
 - Code formatting: space before parenthesis
+
+### Changed
+- Single frames animated.
 
 ### Fixed
 - [#529] limit the number of displayed binaryData bytes
@@ -744,18 +796,23 @@ All notable changes to this project will be documented in this file.
 - [#494] Fixed nightly builds updates
 
 ## [2.0.0] - 2014-03-02
-### New
+### Added
 - Generic tag tree editor
 - Timeline view (stub only)
-- Improved Internal Flash viewer - better shapes, morphshapes, DefineEditText tag, clipping, blend modes
 - FLA export to CS5, CS5.5, CC format (previously only CS6 was supported)
-- Improved commandline usage (Some options are now deprecated, see --help)
 - [#513]: command line option to extract swf from binary file
 - Configurable code formatting (Indentation + brace position)
-- Automatic deobfuscation default value set to False (See News on webpages)
 - [#262] Export FLA: Font character ranges export
 - Configurable checking for updates
+
+### Changed
+- Improved Internal Flash viewer - better shapes, morphshapes, DefineEditText tag, clipping, blend modes
+- Improved commandline usage
+- Automatic deobfuscation default value set to False (See News on webpages)
 - Check for updates can be configured to inform about Nightly builds aswell
+
+### Deprecated
+- Some commandline options are now deprecated, see --help
 
 ### Fixed
 - [#499] Cannot save via Proxy fixed
@@ -777,24 +834,26 @@ All notable changes to this project will be documented in this file.
 - cosmetic changes
 
 ## [1.8.1] - 2014-01-30
-### New
+### Added
 - [#299] replace DefineBits images
 - [#303] open folder with exported FLA
 - [#324],[#346] SWC/zip/other binary file support
-- [#369] new SVG and preview image rendering
 - [#371] detailed logging
-- [#390] refresh font list without reloading the application
 - [#426] command line switch to rename identifiers
-- [#453] update texts aftert adding new character to a font tag
 - [#457] clear recent opened files list
 - [#458] save selected system font for swf fonts
-- [#459] remember text panel splitter position
 - [#460] text editor: do not scroll to the end automatically
-- [#461] font panel gui redesigned
 - [#462] font embedding dialog: show more sample characters
 - [#463] global search in texts
 - [#465] make font properties editable
 - [#466] font preview
+
+### Changed
+- [#369] new SVG and preview image rendering
+- [#390] refresh font list without reloading the application
+- [#453] update texts aftert adding new character to a font tag
+- [#459] remember text panel splitter position
+- [#461] font panel gui redesigned
 
 ### Fixed
 - [#451] dialog windows are not on the center of the screen
@@ -807,14 +866,14 @@ All notable changes to this project will be documented in this file.
 - [#493] missing search results
 
 ## [1.8.0 update 1] - 2013-12-27
-### New
+### Added
 - [#453] refresh (edit+save action) all texts button
 
 ### Fixed
 - Flash panel and font panel fixed
 
 ## [1.8.0] - 2013-12-27
-### New
+### Added
 - [#350] Allow to open multiple SWFs
 - [#365] Filter fake SWFs during memory search
 - [#366] Allow to sort the result list in memory search window
@@ -829,7 +888,7 @@ All notable changes to this project will be documented in this file.
 - [#451] Dialogue window positions on a multi-monitor configuration fixed
 
 ## [1.7.4 update 1] - 2013-12-05
-### New
+### Added
 - [#426] Command line parameter for renaming invalid identifiers
 
 ### Fixed
@@ -839,7 +898,7 @@ All notable changes to this project will be documented in this file.
 - [#397], [#431] Deobfuscation stucked sometimes problem fixed
 
 ## [1.7.4] - 2013-11-10
-### New
+### Added
 - [#169] hexedit method body bytes
 - [#335] last opened files
 - [#404] Exporting P-code and Hex + console parameters
@@ -855,7 +914,7 @@ All notable changes to this project will be documented in this file.
 - [#398] AS3 p-code values with index 0 (null)
 
 ## [1.7.3 update 1] - 2013-09-28
-### Fixed
+### Added
 - [#382] AS3: Adding new method
 
 ## [1.7.3] - 2013-09-27
@@ -879,7 +938,7 @@ All notable changes to this project will be documented in this file.
 - Replacing characters in font (Yes/No to all dialog)
 
 ## [1.7.2 update 2] - 2013-09-13
-### New
+### Changed
 - Updated translations
 
 ### Fixed
@@ -887,22 +946,24 @@ All notable changes to this project will be documented in this file.
 - [#386] SWF resizing
 
 ## [1.7.2 update 1] - 2013-09-11
-### New
+### Changed
 - updated translations
 
 ### Fixed
 - [#383] Fixed cache loading when Firefox not used
 
 ## [1.7.2] - 2013-09-11
-### New
+### Added
 - [#357] Sounds Preview (Windows only)
 - Movies preview (Windows only)
 - Whole SWF display
 - Preview controls (Play,Pause,Stop)
 - Search SWFs in browsers cache (Firefox, Chrome)
 - [#367] Memory search: Save selected files to disk
-- [#380] Faster displaying DefineBitsLossless(2) images
 - Portugese translation
+
+### Changed
+- [#380] Faster displaying DefineBitsLossless(2) images
 
 ### Fixed
 - [#292] Background color for Fonts preview fixed
@@ -911,7 +972,7 @@ All notable changes to this project will be documented in this file.
 - MORPHGRADIENT reading fix
 
 ## [1.7.1] - 2013-08-25
-### New
+### Added
 - Loading SWFs from other processes memory (Windows only, sorry)
 - [#325] Spanish translation
 - [#210] Ukrainian and Dutch translation
@@ -939,7 +1000,7 @@ All notable changes to this project will be documented in this file.
 - [#338] Expand/collapse icon in errorlog
 
 ## [1.7.0 update 1] - 2013-08-11
-### New
+### Added
 - [#315] German translation (partial)
 
 ### Fixed
@@ -957,19 +1018,21 @@ All notable changes to this project will be documented in this file.
 - [#323] AS3: Fixed default switch part
 
 ## [1.7.0] - 2013-08-03
-### New
-- New GUI based on Substance look and feel
-- Menu changed to ribbon panel
-- New round icon
+### Added
 - Listing contributors on about page
 - [#223] AS2: Detecting uninitialized class fields
 - [#250] Export FLA: Detecting static fields margin and spacing
-- [#258] AS1/2: Improved chained assignments
 - [#261] Export FLA: AS1/2 Frame scripts on first layer
-- [#267] Starting program without choosing a file
 - [#269] Commandline parameters for switching configuration
 - [#274] AS3 Displaying elapsed time during commandline export
 - [#275] AS3 Removing returnvoid as last statement
+
+### Changed
+- New GUI based on Substance look and feel
+- Menu changed to ribbon panel
+- New round icon
+- [#258] AS1/2: Improved chained assignments
+- [#267] Starting program without choosing a file
 - [#286] Saving to temp file first
 
 ### Fixed
@@ -988,10 +1051,12 @@ All notable changes to this project will be documented in this file.
 - [#284],... other small fixes
 
 ## [1.6.7] - 2013-07-20
-### New
+### Added
 - [#220] Selection of font to import characters from
 - [#232] Automatically add .swf extension in saveas dialog
 - [#253] Abort/Retry/Ignore dialog on errors with file saving
+
+### Changed
 - Improved translations
 
 ### Fixed
@@ -1014,7 +1079,7 @@ All notable changes to this project will be documented in this file.
 - [#241] Program could not be started
 
 ## [1.6.6 update 1] - 2013-07-16
-### New
+### Changed
 - Better localization support
 
 ### Fixed
@@ -1022,15 +1087,17 @@ All notable changes to this project will be documented in this file.
 - [#237] Parentheses in AS1/2 add,subtract
 
 ## [1.6.6] - 2013-07-16
-### New
-- [#203] Improved direct editing of AS1/2
-- [#207] Update SWF preview after switching external/internal flash player
+### Added
 - [#217] Russian translation (focus)
 - [#219] Hungarian translation (honfika)
 - [#224] Swedish translation (Capasha)
 - [#220] Adding characters to Fonts, displaying font info
 - [#121] Search progress indication
 - Error log
+
+### Changed
+- [#203] Improved direct editing of AS1/2
+- [#207] Update SWF preview after switching external/internal flash player
 
 ### Fixed
 - [#151] Memory caching
@@ -1057,17 +1124,19 @@ All notable changes to this project will be documented in this file.
 - [#213] AS2 Fixed var fields quotes, switch nullpointer
 
 ## [1.6.5] - 2013-07-08
-### New
+### Added
 - Multilanguage support (currently English and Czech)
 - [#151] Option for caching in memory instead of files
 - [#168] Export selection in tree context menu
-- [#173],[#190] Better renaming
-- [#129], [#153] Better deobfuscation
 - [#176] option to show main class on startup
 - [#177] saving window maximized state
+- [#202] Removing tags other than DefineSprite
+
+### Changed
+- [#173],[#190] Better renaming
+- [#129], [#153] Better deobfuscation
 - [#180] better error handling
 - [#185],[#186] better displaying and exporting onclip actions
-- [#202] Removing tags other than DefineSprite
 
 ### Fixed
 - [#123] Better context menu integration
@@ -1099,18 +1168,20 @@ All notable changes to this project will be documented in this file.
 - [#165] AS3:direct lookupswitch support
 
 ## [1.6.4] - 2013-06-30
-### New
+### Added
 - [#63] Globally rename identifier
 - [#67] Deobfuscation - rename identifiers according to type
 - [#117] Drag & Drop SWF file to main window opens it
 - [#123] Context menu integration on Windows
 - [#127] Drag & Drop items from tree outside of application
 - [#134] AS3: Find document class
-- [#142] Using exportassets tag for tag names
 - [#144] New lines in plain text export
+- [#155] Remembering window size + splitbar positions between runs
+
+### Changed
+- [#142] Using exportassets tag for tag names
 - [#146] Display AS2 classes as tree of packages
 - Better loop detection
-- [#155] Remembering window size + splitbar positions between runs
 
 ### Fixed
 - [#129] AS1/2: not refreshing decompiled after rename
@@ -1131,7 +1202,7 @@ All notable changes to this project will be documented in this file.
 - other minor fixes
 
 ## [1.6.3 update 2] - 2013-06-21
-### New
+### Changed
 - [#149] Ifs with empty onTrue branches now inverted
 
 ### Fixed
@@ -1142,7 +1213,8 @@ All notable changes to this project will be documented in this file.
 - Memory limit decreased - FFDec was not working on 32 bit JVM.
 
 ## [1.6.3] - 2013-06-20
-### New
+
+### Changed
 - Parallel SpeedUp can be disabled in menu
 - Better loop detection
 
@@ -1159,9 +1231,11 @@ All notable changes to this project will be documented in this file.
 - [#113],[#133],[#140] Memory limit increased
 
 ## [1.6.2] - 2013-06-09
-### New
-- [#108] - Faster loading and decompiling (Parallelism)
+### Added
 - New loop detection algorithm
+
+### Changed
+- [#108] - Faster loading and decompiling (Parallelism)
 - Improved Internal flash viewer - shapes and morphshapes
 
 ### Fixed
@@ -1171,10 +1245,15 @@ All notable changes to this project will be documented in this file.
 - [#105],[#104],[#101] fixed via new loop detection
 
 ## [1.6.1] - 2013-06-03
-### New
+### Added
 - Internal Flash Viewer - preview of flash parts (shapes,sprites,frames) without need of Flash Player. (Used on nonWindows platforms by default)
-- Application needs Java 1.7 to run
 - [#109], [#106], [#107] some code improvements
+
+### Changed
+- Application needs Java 1.7 to run
+
+### Removed
+- Support for Java before 1.7
 
 ### Fixed
 - [#102], [#110] AS3: Class highlight fix
@@ -1186,7 +1265,7 @@ All notable changes to this project will be documented in this file.
 - loop fixes
 
 ## [1.6.0 update 1] - 2013-05-25
-### New
+### Added
 - better FLA export
 
 ### Fixed
@@ -1196,7 +1275,7 @@ All notable changes to this project will be documented in this file.
 - [#100] large obfuscated code support
 
 ## [1.6.0] - 2013-05-20
-### New
+### Added
 - Export to FLA (Experimental BETA!)
 - [#85] Search text in all ActionScripts
 - SWF 11 support
@@ -1209,7 +1288,7 @@ All notable changes to this project will be documented in this file.
 - [#95] Better script end handling
 
 ## [1.5.2] - 2013-05-05
-### New
+### Added
 - Improved automatic update system (changes log).
 - Handling script traits as separate objects.
 - [#86] open/save file dialog now accepts absolute paths in quotes
@@ -1221,7 +1300,7 @@ All notable changes to this project will be documented in this file.
 - [#82] printgraph issue
 
 ## [1.5.1 update 1] - 2013-05-04
-### New
+### Added
 - Exporting texts via commandline
 - Exporting all via commandline
 
@@ -1236,7 +1315,7 @@ All notable changes to this project will be documented in this file.
 - Displaying shapes,morphshapes and sprites with bitmaps
 
 ## [1.5.1] - 2013-05-01
-### New
+### Added
 - Support for larger switches (10+cases)
 - Editing text tags
 - [#65] Exporting text tags
@@ -1253,7 +1332,7 @@ All notable changes to this project will be documented in this file.
 - Automatic deobfuscation config defaulted to Off for AS1/2.
 
 ## [1.5.0] - 2013-04-20
-### New
+### Added
 - Direct editing of ActionScript 1/2 code (Beta)
 - AS1/2: ifFrameLoaded support
 - Automatic deobfuscation can be disabled in the menu
@@ -1264,6 +1343,8 @@ All notable changes to this project will be documented in this file.
 - [#69] - DoABC vs DoABCDefine tags decompilation
 - [#75] - Comma separator in while/do..while conditions, better if..return handling
 - AS1/2: parsing NaN,Infinity value (Fix for [#73])
+
+### Changed
 - New icons (edit/save/cancel and main menu)
 
 ### Fixed
@@ -1286,7 +1367,7 @@ All notable changes to this project will be documented in this file.
 - While true fix
 
 ## [1.4.3] - 2013-04-04
-### New
+### Added
 - AS1/2 Better deobfuscation
 
 ### Fixed
@@ -1304,13 +1385,15 @@ All notable changes to this project will be documented in this file.
 - AS3 switch
 
 ## [1.4.2] - 2013-03-24
-### New
+### Added
 - [#42] - Displaying code as hex
-- Graph button changed to icon.
 - AS1/2: Renaming identifiers (deobfuscation)
 - AS1/2,AS3: Better deobfuscation
 - Storing configuration to user home
 - Installer for Windows systems
+
+### Changed
+- Graph button changed to icon.
 
 ### Fixed
 - [#39] - AS1/2 NewMethod..Pop fix
@@ -1323,7 +1406,7 @@ All notable changes to this project will be documented in this file.
 - Logging exceptions during export
 
 ## [1.4.1] - 2013-03-10
-### New
+### Added
 - Exporting sounds
 - Better AS1/2 deobfuscation (disassembly & decompilation)
 
@@ -1337,11 +1420,9 @@ All notable changes to this project will be documented in this file.
 - [#37] - AS3: Reversed loop conditions
 
 ## [1.4.0] - 2013-03-03
-### New
-- Tree view instead of tabs
-- AS1/2 and AS3 now share same decompiling method.
-- New icons - Silk icons
+### Added
 - AS3: ignoring return void at the end of methods
+- New icons - Silk icons
 - AS3: Traits list sort button
 - Better Graph display
 - Frames view
@@ -1349,12 +1430,16 @@ All notable changes to this project will be documented in this file.
 - Some AS3 related Tests
 - Homepage & Donate link in the menu
 
+### Changed
+- Tree view instead of tabs
+- AS1/2 and AS3 now share same decompiling method.
+
 ### Fixed
 - [#34] - Reversed loop conditions
 - [#35] - Fixed unicode strings (Japanese)
 
 ## [1.3.1] - 2013-02-23
-### New
+### Changed
 - Flash player no longer uses SWT library
 
 ### Fixed
@@ -1363,16 +1448,18 @@ All notable changes to this project will be documented in this file.
 - DefineBitsLossLess 1&2 on 8bit colormapped images
 
 ## [1.3.0] - 2013-02-17
-### New
-- Application renamed from "JP ActionScript Decompiler" to "JPEXS Free Flash Decompiler".
-- Complete new decompiling method in both AS1/2 and AS3
+### Added
 - Decompilation is more resistant to obfuscation
 - Shapes SVG export
 - AS2: Decompiling classes & interfaces
 - Click&go feature - clicking actionscript source displays appropriate P-code instruction and vice-versa (both AS1/2 and AS3)
-- To edit source, Edit button must be pressed first (Due to click&go feature)
 - AS3: Deobfuscation menu
 - Graph button for displaying code flow Graph
+
+### Changed
+- Complete new decompiling method in both AS1/2 and AS3
+- Application renamed from "JP ActionScript Decompiler" to "JPEXS Free Flash Decompiler".
+- To edit source, Edit button must be pressed first (Due to click&go feature)
 
 ### Fixed
 - AS3: Method info editor fixed
@@ -1380,19 +1467,21 @@ All notable changes to this project will be documented in this file.
 
 ## [1.2.0 update 1] - 2013-01-19
 ## [1.2.0] - 2013-01-19
-### New
+### Added
 - Displaying various SWF objects (shapes, sprites,...) with flash player library (Windows only, sorry).
 - Images display and export
-- One merged window for AS1/2 and 3.
 - AS2: Exporting selection
 - Progressbar during loading
+
+### Changed
+- One merged window for AS1/2 and 3.
 - Updated icons
 
 ### Fixed
 - AS3: xml attrib, switch in anonymous function (in AS2 too)
 
 ## [1.1.0] - 2013-01-02
-### New
+### Added
 - Checking for updates
 - AS2: Exporting
 - AS3: Decompiling whole scripts instead of just classes
@@ -1409,7 +1498,7 @@ All notable changes to this project will be documented in this file.
 - AS3: set_local..get_local, dup, chained assignments, highlighting, callsupervoid, typenames, with statement, loops
 
 ## [1.0.1] - 2012-12-26
-### New
+### Added
 - AS3: Runtime namespace resolving
 - AS3: Arguments variable
 - AS3: Better recognizing Pre/Post Increments/Decrements
@@ -1419,39 +1508,43 @@ All notable changes to this project will be documented in this file.
 - AS3: Fixed static variables
 
 ## [1.0.0] - 2012-12-24
-### New
+### Added
 - Support for LZMA compressed files
 - AS3: Detecting local register types for declaration.
 - AS3: Displaying inline functions
 - AS3: Last save/open dir is remembered
 - AS3: Better usage detection for multinames
-- AS3: GUI - Constants tab moved to the top
 - AS3: Commandline arguments for exporting
 - AS3: Better chained assignments
-- AS3: Deobfuscation is now optional, can be accessed via menu
 - AS2: FSCommand2 instruction support
 - Proxy: Mimetype application/octet-stream added
 - Added executable for Windows users.
+
+### Changed
+- AS3: GUI - Constants tab moved to the top
+- AS3: Deobfuscation is now optional, can be accessed via menu
 
 ### Fixed
 - AS3: rest parameter, for..in, fail on large classes (due to sub limiter)
 - Other minor fixes
 
 ## [beta 1] - 2011-07-30
-### New
+### Added
 - AS3: Automatic computing method body parameters (EXPERIMENTAL)
 - AS3: Editing return type of methods
 - AS3: Editing type and default value for variables/constants (Slot/Const traits)
-- Gui: Updated Icons
 - AS1/2: Few enhancements
 - About dialog
+
+### Changed
+- Gui: Updated Icons
 
 ### Fixed
 - AS 1/2: Fixed large bug causing Ifs to not decompile properly
 - Proxy: Some minor fixes
 
 ## [alpha 10] - 2011-07-13
-### New
+### Addded
 - AS3:Highlighting actual line
 - AS3:Completing instruction names via Ctrl+Space
 - AS3:Editing method parameters, method body parameters via tab panel
@@ -1470,7 +1563,7 @@ All notable changes to this project will be documented in this file.
 - AS3:Other minor fixes
 
 ## [alpha 9] - 2011-07-02
-### New
+### Added
 - AS3: Added disassembling of some new types of instructions
 - AS3: Exporting source as PCode
 
@@ -1478,11 +1571,13 @@ All notable changes to this project will be documented in this file.
 - AS3: Many other bugfixes...
 
 ## [alpha 8] - 2010-09-19
-### New
-- AS1/2: Better GUI
-- AS1/2: Better decompiling of Ifs, For..in
+### Added
 - AS3: Editing exceptions
 - AS3: Finding usage of multinames from constant table
+
+### Changed
+- AS1/2: Better GUI
+- AS1/2: Better decompiling of Ifs, For..in
 
 ## [alpha 7] - 2010-09-04
 ### New
