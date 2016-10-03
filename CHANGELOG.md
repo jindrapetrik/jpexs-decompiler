@@ -39,6 +39,7 @@ All notable changes to this project will be documented in this file.
 - #1254 FLA export - placing AS3 classes to FLA directory instead of scripts dir
 - Mac OS X installer fix (.pkg)
 - #1289 AS1/2 direct editation - variables used in inner functions must not be stored in local registers
+- #1283 AS3 Unbounded Vector - Vector<*> decompilation and direct editation fix
 
 ## [9.0.0] - 2016-08-12
 ### Added

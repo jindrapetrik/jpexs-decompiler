@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrictIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.ApplyTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.InitVectorAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
@@ -114,6 +115,9 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                 GraphTargetItem r = multinameToType(visited, pm, constants);
                 if (r == null) {
                     return null;
+                }
+                if (pm == 0) {
+                    r = new NullAVM2Item(null, null);
                 }
                 params.add(r);
             }

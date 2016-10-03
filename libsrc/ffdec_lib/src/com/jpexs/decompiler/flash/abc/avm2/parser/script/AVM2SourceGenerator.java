@@ -2688,7 +2688,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
             int[] params = new int[atype.params.size()];
             int i = 0;
             for (GraphTargetItem s : atype.params) {
-                params[i++] = resolveType(localData, s, abcIndex);
+                params[i++] = (s instanceof NullAVM2Item) ? 0 : resolveType(localData, s, abcIndex);
             }
             return constants.getMultinameId(Multiname.createTypeName(name_index, params), true);
         }
