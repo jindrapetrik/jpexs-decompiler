@@ -41,6 +41,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -64,6 +65,7 @@ public class FunctionActionItem extends ActionItem {
     private int regStart;
 
     private List<VariableActionItem> variables;
+    private List<FunctionActionItem> innerFunctions;
 
     public static final int REGISTER_THIS = 1;
 
@@ -88,7 +90,7 @@ public class FunctionActionItem extends ActionItem {
         super(null, null, PRECEDENCE_PRIMARY);
     }
 
-    public FunctionActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, String functionName, List<String> paramNames, Map<Integer, String> regNames, List<GraphTargetItem> actions, List<String> constants, int regStart, List<VariableActionItem> variables) {
+    public FunctionActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, String functionName, List<String> paramNames, Map<Integer, String> regNames, List<GraphTargetItem> actions, List<String> constants, int regStart, List<VariableActionItem> variables, List<FunctionActionItem> innerFunctions) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.actions = actions;
         this.constants = constants;
@@ -97,6 +99,7 @@ public class FunctionActionItem extends ActionItem {
         this.regNames = regNames;
         this.regStart = regStart;
         this.variables = variables;
+        this.innerFunctions = innerFunctions;
     }
 
     @Override
@@ -207,6 +210,30 @@ public class FunctionActionItem extends ActionItem {
         return true;
     }
 
+    private Set<String> getDefinedVariableNames(List<VariableActionItem> variables) {
+        Set<String> ret = new HashSet<>();
+        for (VariableActionItem v : variables) {
+            if (v.isDefinition()) {
+                ret.add(v.getVariableName());
+            }
+        }
+        return ret;
+    }
+
+    private void getDeeplyUsedVariableNames(Set<String> topLevelDefinedVariableNames, FunctionActionItem fun, Set<String> deeplyUsedVariableNames) {
+
+        Set<String> definedVarNamesInFunc = getDefinedVariableNames(fun.variables);
+        for (VariableActionItem v : fun.variables) {
+            if (!v.isDefinition() && !definedVarNamesInFunc.contains(v.getVariableName()) && topLevelDefinedVariableNames.contains(v.getVariableName())) {
+                deeplyUsedVariableNames.add(v.getVariableName());
+            }
+        }
+
+        for (FunctionActionItem innerFun : fun.innerFunctions) {
+            getDeeplyUsedVariableNames(topLevelDefinedVariableNames, innerFun, deeplyUsedVariableNames);
+        }
+    }
+
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
 
@@ -282,10 +309,31 @@ public class FunctionActionItem extends ActionItem {
         if (localData.inFunction > 1) {
             needsFun2 = true;
         }
+
+        //If the function parameter or local variable is used in inner function, 
+        //it must not be stored in a local register.
+        Set<String> topLevelVariableNames = new HashSet<>();
+        for (VariableActionItem v : variables) {
+            if (v.isDefinition()) {
+                topLevelVariableNames.add(v.getVariableName());
+            }
+        }
+        for (String pn : paramNames) {
+            topLevelVariableNames.add(pn);
+        }
+        Set<String> deeplyUsedVariableNames = new HashSet<>();
+        for (FunctionActionItem fun : innerFunctions) {
+            getDeeplyUsedVariableNames(topLevelVariableNames, fun, deeplyUsedVariableNames);
+        }
+
         if (needsFun2) {
             for (int i = 0; i < paramNames.size(); i++) {
-                paramRegs.add(registerNames.size());
-                registerNames.add(paramNames.get(i));
+                if (deeplyUsedVariableNames.contains(paramNames.get(i))) {
+                    paramRegs.add(0); //this will be variable, no register
+                } else {
+                    paramRegs.add(registerNames.size());
+                    registerNames.add(paramNames.get(i));
+                }
             }
         }
 
@@ -297,7 +345,7 @@ public class FunctionActionItem extends ActionItem {
                 String varName = v.getVariableName();
                 GraphTargetItem stored = v.getStoreValue();
                 if (needsFun2) {
-                    if (v.isDefinition() && !registerNames.contains(varName)) {
+                    if (v.isDefinition() && !registerNames.contains(varName) && !deeplyUsedVariableNames.contains(varName)) {
                         registerNames.add(varName);
                     }
                 }
