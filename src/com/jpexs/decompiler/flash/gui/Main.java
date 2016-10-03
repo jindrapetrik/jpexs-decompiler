@@ -93,6 +93,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -1939,7 +1940,7 @@ public class Main {
 
     private static void checkLibraryVersion() {
         if (!ApplicationInfo.version.equals("unknown") && !ApplicationInfo.libraryVersion.equals("unknown")
-                && !ApplicationInfo.version.equals("A" + ApplicationInfo.libraryVersion)) {
+                && !Objects.equals(ApplicationInfo.version, ApplicationInfo.libraryVersion)) {
             logger.log(Level.WARNING, "Application version is different from library version. FFDec may not work properly.");
         }
     }
