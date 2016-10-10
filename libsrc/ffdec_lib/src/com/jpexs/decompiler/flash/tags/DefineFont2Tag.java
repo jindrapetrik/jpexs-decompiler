@@ -230,7 +230,7 @@ public class DefineFont2Tag extends FontTag {
         if (!fontFlagsWideCodes) {
             for (int i = 0; i < numGlyphs; i++) {
                 long code = codeTable.get(i);
-                if (code > 0xffff) {
+                if (code > 0xff) {
                     fontFlagsWideCodes = true;
                 }
             }
