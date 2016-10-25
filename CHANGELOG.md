@@ -41,6 +41,7 @@ All notable changes to this project will be documented in this file.
 - #1289 AS1/2 direct editation - variables used in inner functions must not be stored in local registers
 - #1283 AS3 Unbounded Vector - Vector<*> decompilation and direct editation fix
 - #1294 Font editation (DefineFont2/3) - correct switching of wide character codes
+- #1302 Callpropvoid instruction docblock not correct
 
 ## [9.0.0] - 2016-08-12
 ### Added
