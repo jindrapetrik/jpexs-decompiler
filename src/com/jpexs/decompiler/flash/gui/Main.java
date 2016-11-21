@@ -1231,7 +1231,6 @@ public class Main {
                 return OpenFileResult.NOT_FOUND;
             }
             swfFile = file.getCanonicalPath();
-            Configuration.addRecentFile(swfFile);
             SWFSourceInfo sourceInfo = new SWFSourceInfo(null, swfFile, fileTitle);
             OpenFileResult openResult = openFile(sourceInfo);
             return openResult;
@@ -1271,6 +1270,14 @@ public class Main {
         }
 
         loadingDialog.setVisible(true);
+
+        for (int i = 0; i < sourceInfos.size(); i++) {
+            SWFSourceInfo si = newSourceInfos[i];
+            String fileName = si.getFile();
+            if (fileName != null) {
+                Configuration.addRecentFile(fileName);
+            }
+        }
 
         OpenFileWorker wrk = new OpenFileWorker(newSourceInfos, executeAfterOpen, reloadIndices);
         wrk.execute();
