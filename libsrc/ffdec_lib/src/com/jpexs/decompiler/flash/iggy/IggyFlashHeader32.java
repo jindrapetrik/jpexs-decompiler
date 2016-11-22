@@ -1,6 +1,5 @@
 package com.jpexs.decompiler.flash.iggy;
 
-import com.jpexs.decompiler.flash.iggy.annotations.IggyArrayFieldType;
 import com.jpexs.decompiler.flash.iggy.annotations.IggyFieldType;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.TagTypeInfo;
@@ -41,7 +40,7 @@ public class IggyFlashHeader32 implements StructureInterface {
     @IggyFieldType(DataType.uint32_t)
     long ymax; // 0x24 in pixels
     @IggyFieldType(DataType.uint32_t)
-    long unk_28; // probably numer of blocks/objects after header
+    long unk_28; // probably number of blocks/objects after header
     @IggyFieldType(DataType.uint32_t)
     long unk_2C;
     @IggyFieldType(DataType.uint32_t)
