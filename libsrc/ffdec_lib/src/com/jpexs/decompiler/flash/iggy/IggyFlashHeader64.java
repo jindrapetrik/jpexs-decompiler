@@ -1,7 +1,12 @@
 package com.jpexs.decompiler.flash.iggy;
 
 import com.jpexs.decompiler.flash.iggy.annotations.IggyFieldType;
+import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.TagTypeInfo;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -43,7 +48,7 @@ public class IggyFlashHeader64 implements StructureInterface {
     long unk_50;
     @IggyFieldType(DataType.uint32_t)
     long unk_54;
-    float unk_58;
+    float frame_rate;
     @IggyFieldType(DataType.uint32_t)
     long unk_5C;
     @IggyFieldType(DataType.uint64_t)
@@ -72,7 +77,16 @@ public class IggyFlashHeader64 implements StructureInterface {
     long unk_B0; // Maybe number of classes / as3 names
     @IggyFieldType(DataType.uint32_t)
     long unk_B4;
+    @IggyFieldType(value = DataType.uint16_t, count = 20)
+    String name;
 
+    List<Integer> tagIds = new ArrayList<>();
+    List<Long> tagIdsExtendedInfo = new ArrayList<>();
+
+    /*@IggyArrayFieldType(value = DataType.uint32_t, count = 20)
+    long unk_offsets_a[] = new long[20];
+    @IggyArrayFieldType(value = DataType.uint32_t, count = 20)
+    long unk_offsets_b[] = new long[20];*/
     // Offset 0xB8 (outside header): there are *unk_40* relative offsets that point to flash objects.
     // The flash objects are in a format different to swf but there is probably a way to convert between them.
     // After the offsets, the bodies of objects pointed above, which apparently have a code like 0xFFXX to identify the type of object, followed by a (unique?) identifier
@@ -101,7 +115,7 @@ public class IggyFlashHeader64 implements StructureInterface {
         unk_4C = stream.readUI32();
         unk_50 = stream.readUI32();
         unk_54 = stream.readUI32();
-        unk_58 = stream.readFloat();
+        frame_rate = stream.readFloat();
         unk_5C = stream.readUI32();
         unk_60 = stream.readUI64();
         unk_68 = stream.readUI64();
@@ -116,7 +130,26 @@ public class IggyFlashHeader64 implements StructureInterface {
         unk_AC = stream.readUI32();
         unk_B0 = stream.readUI32();
         unk_B4 = stream.readUI32();
+        StringBuilder nameBuilder = new StringBuilder();
+        do {
+            char c = (char) stream.readUI16();
+            if (c == '\0') {
+                break;
+            }
+            nameBuilder.append(c);
+        } while (true);
+        name = nameBuilder.toString();
 
+        while (true) {
+            long typeLen = stream.readUI32();
+            if (typeLen == 0) {
+                break;
+            }
+            long tagLength = stream.readUI32();
+            int tagType = (int) ((typeLen >>> 6) + 10) & 0x3FF;
+            tagIds.add(tagType);
+            tagIdsExtendedInfo.add(tagLength);
+        }
     }
 
     @Override
@@ -144,7 +177,7 @@ public class IggyFlashHeader64 implements StructureInterface {
         sb.append("unk_4C ").append(unk_4C).append("\r\n");
         sb.append("unk_50 ").append(unk_50).append("\r\n");
         sb.append("unk_54 ").append(unk_54).append("\r\n");
-        sb.append("unk_58 ").append(unk_58).append("\r\n");
+        sb.append("frame_rate ").append(frame_rate).append("\r\n");
         sb.append("unk_5C ").append(unk_5C).append("\r\n");
         sb.append("unk_60 ").append(unk_60).append("\r\n");
         sb.append("unk_68 ").append(unk_68).append("\r\n");
@@ -159,6 +192,17 @@ public class IggyFlashHeader64 implements StructureInterface {
         sb.append("unk_AC ").append(unk_AC).append("\r\n");
         sb.append("unk_B0 ").append(unk_B0).append("\r\n");
         sb.append("unk_B4 ").append(unk_B4).append("\r\n");
+        sb.append("name ").append(name).append("\r\n");
+        Map<Integer, TagTypeInfo> map = Tag.getKnownClasses();
+        sb.append("tags:").append("\r\n");
+        for (int i = 0; i < tagIds.size(); i++) {
+            TagTypeInfo tti = map.get(tagIds.get(i));
+            sb.append(" tag ").append(tagIds.get(i)).append(":").append(tti == null ? "?" : tti.getName());
+            if (tagIdsExtendedInfo.get(i) > 0) {
+                sb.append(" (special: ").append(tagIdsExtendedInfo.get(i)).append(")");
+            }
+            sb.append("\r\n");
+        }
         sb.append("]");
         return sb.toString();
 

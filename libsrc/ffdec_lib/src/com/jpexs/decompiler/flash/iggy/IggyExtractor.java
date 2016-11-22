@@ -37,25 +37,26 @@ public class IggyExtractor extends AbstractDataStream implements AutoCloseable {
             subFileEntries.add(new IggySubFileEntry(this));
         }
 
-        List<ByteArrayDataStream> indexStreams = new ArrayList<>();
+        List<byte[]> indexDatas = new ArrayList<>();
         List<ByteArrayDataStream> flashStreams = new ArrayList<>();
 
         for (int i = 0; i < subFileEntries.size(); i++) {
             IggySubFileEntry entry = subFileEntries.get(i);
-            ByteArrayDataStream entryStream = getEntryDataStream(i);
             if (entry.type == IggySubFileEntry.TYPE_INDEX) {
-                indexStreams.add(entryStream);
+                indexDatas.add(getEntryData(i));
             } else if (entry.type == IggySubFileEntry.TYPE_FLASH) {
-                flashStreams.add(entryStream);
+                flashStreams.add(getEntryDataStream(i));
             }
         }
 
+        IggyFlashHeader64 fh64 = null;
+        IggyFlashHeader32 fh32 = null;
+
         for (ByteArrayDataStream fs : flashStreams) {
             if (is64()) {
-                IggyFlashHeader64 fh = new IggyFlashHeader64(fs);
-                System.out.println("" + fh);
+                fh64 = new IggyFlashHeader64(fs);
             } else {
-                IggyFlashHeader32 fh = new IggyFlashHeader32(fs);
+                fh32 = new IggyFlashHeader32(fs);
             }
         }
     }

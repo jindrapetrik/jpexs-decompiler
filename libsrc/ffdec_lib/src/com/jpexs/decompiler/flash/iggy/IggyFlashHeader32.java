@@ -1,7 +1,13 @@
 package com.jpexs.decompiler.flash.iggy;
 
+import com.jpexs.decompiler.flash.iggy.annotations.IggyArrayFieldType;
 import com.jpexs.decompiler.flash.iggy.annotations.IggyFieldType;
+import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.TagTypeInfo;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -46,7 +52,7 @@ public class IggyFlashHeader32 implements StructureInterface {
     long unk_38;
     @IggyFieldType(DataType.uint32_t)
     long unk_3C;
-    float unk_40;
+    float frame_rate;
     @IggyFieldType(DataType.uint32_t)
     long unk_44;
     @IggyFieldType(DataType.uint32_t)
@@ -75,6 +81,11 @@ public class IggyFlashHeader32 implements StructureInterface {
     long unk_78; // Maybe number of classes / as3 names
     @IggyFieldType(DataType.uint32_t)
     long unk_7C;
+    @IggyFieldType(value = DataType.uint16_t, count = 20)
+    String name;
+
+    List<Integer> tagIds = new ArrayList<>();
+    List<Long> tagIdsExtendedInfo = new ArrayList<>();
 
     // Offset 0x80 (outside header): there are *unk_28* relative offsets that point to flash objects.
     // The flash objects are in a format different to swf but there is probably a way to convert between them.
@@ -104,7 +115,7 @@ public class IggyFlashHeader32 implements StructureInterface {
         unk_34 = stream.readUI32();
         unk_38 = stream.readUI32();
         unk_3C = stream.readUI32();
-        unk_40 = stream.readFloat();
+        frame_rate = stream.readFloat();
         unk_44 = stream.readUI32();
         unk_48 = stream.readUI32();
         unk_4C = stream.readUI32();
@@ -120,6 +131,26 @@ public class IggyFlashHeader32 implements StructureInterface {
         unk_74 = stream.readUI32();
         unk_78 = stream.readUI32();
         unk_7C = stream.readUI32();
+        StringBuilder nameBuilder = new StringBuilder();
+        do {
+            char c = (char) stream.readUI16();
+            if (c == '\0') {
+                break;
+            }
+            nameBuilder.append(c);
+        } while (true);
+        name = nameBuilder.toString();
+
+        while (true) {
+            long typeLen = stream.readUI16(); //TODO: check whether it's really UI16 - 64bit works with UI32
+            if (typeLen == 0) {
+                break;
+            }
+            long tagLength = stream.readUI16();
+            int tagType = (int) ((typeLen >>> 6) + 10) & 0x3FF;
+            tagIds.add(tagType);
+            tagIdsExtendedInfo.add(tagLength);
+        }
     }
 
     @Override
@@ -148,7 +179,7 @@ public class IggyFlashHeader32 implements StructureInterface {
         sb.append("unk_34 ").append(unk_34).append("\r\n");
         sb.append("unk_38 ").append(unk_38).append("\r\n");
         sb.append("unk_3C ").append(unk_3C).append("\r\n");
-        sb.append("unk_40 ").append(unk_40).append("\r\n");
+        sb.append("frame_rate ").append(frame_rate).append("\r\n");
         sb.append("unk_44 ").append(unk_44).append("\r\n");
         sb.append("unk_48 ").append(unk_48).append("\r\n");
         sb.append("unk_4C ").append(unk_4C).append("\r\n");
@@ -163,6 +194,17 @@ public class IggyFlashHeader32 implements StructureInterface {
         sb.append("unk_74 ").append(unk_74).append("\r\n");
         sb.append("unk_78 ").append(unk_78).append("\r\n");
         sb.append("unk_7C ").append(unk_7C).append("\r\n");
+        sb.append("name ").append(name).append("\r\n");
+        Map<Integer, TagTypeInfo> map = Tag.getKnownClasses();
+        sb.append("tags:").append("\r\n");
+        for (int i = 0; i < tagIds.size(); i++) {
+            TagTypeInfo tti = map.get(tagIds.get(i));
+            sb.append(" tag ").append(tagIds.get(i)).append(":").append(tti == null ? "?" : tti.getName());
+            if (tagIdsExtendedInfo.get(i) > 0) {
+                sb.append(" (special: ").append(tagIdsExtendedInfo.get(i)).append(")");
+            }
+            sb.append("\r\n");
+        }
         sb.append("]");
         return sb.toString();
     }
