@@ -30,12 +30,17 @@ public class IggyFile extends AbstractDataStream implements AutoCloseable {
     private IggyHeader header;
     private List<IggySubFileEntry> subFileEntries = new ArrayList<>();
 
-    private List<List<Integer>> indexTables = new ArrayList<>();
-    private List<List<Long>> offsetTables = new ArrayList<>();
-
     private List<IggyFlashHeaderInterface> headers = new ArrayList<>();
-    private List<IggyNameAndTagList> namesAndTagLists = new ArrayList<>();
-    private List<List<ByteArrayDataStream>> tagDataTables = new ArrayList<>();
+    private List<IggyDataReader> flashDataReaders = new ArrayList<>();
+
+    @Override
+    public long position() {
+        try {
+            return raf.getFilePointer();
+        } catch (IOException ex) {
+            return -1;
+        }
+    }
 
     public IggyFile(File file) throws IOException {
         raf = new RandomAccessFile(file, "r");
@@ -44,7 +49,9 @@ public class IggyFile extends AbstractDataStream implements AutoCloseable {
             subFileEntries.add(new IggySubFileEntry(this));
         }
 
-        List<ByteArrayDataStream> flashStreams = new ArrayList<>();
+        //TODO: use these two for something
+        List<List<Integer>> indexTables = new ArrayList<>();
+        List<List<Long>> offsetTables = new ArrayList<>();
 
         for (int i = 0; i < subFileEntries.size(); i++) {
             IggySubFileEntry entry = subFileEntries.get(i);
@@ -57,49 +64,18 @@ public class IggyFile extends AbstractDataStream implements AutoCloseable {
                 offsetTables.add(offsets);
             } else if (entry.type == IggySubFileEntry.TYPE_FLASH) {
                 IggyFlashHeaderInterface hdr;
-                if (is64()) {
-                    hdr = new IggyFlashHeader64(dataStream);
-                } else {
+                //if (is64()) {
+                //FIXME: Make 32 bit version work
+                hdr = new IggyFlashHeader64(dataStream);
+                /*} else {
                     hdr = new IggyFlashHeader32(dataStream);
-                }
-                //System.out.println("hdr=" + hdr);
-                IggyNameAndTagList nameTagList = new IggyNameAndTagList(dataStream);
-                //System.out.println("nameTagList=" + nameTagList);
+                }*/
+                System.out.println("hdr=" + hdr);
+                IggyDataReader dataReader = new IggyDataReader((IggyFlashHeader64) hdr, dataStream);
+                System.out.println("dataReader=" + dataReader);
                 headers.add(hdr);
-                namesAndTagLists.add(nameTagList);
-                flashStreams.add(dataStream);
+                flashDataReaders.add(dataReader);
             }
-        }
-        for (int i = 0; i < flashStreams.size(); i++) {
-            ByteArrayDataStream flashStream = flashStreams.get(i);
-            List<Long> offsets = offsetTables.get(i);
-            List<Long> tagIds = namesAndTagLists.get(i).getTagIds();
-            List<Long> tagExtraInfo = namesAndTagLists.get(i).getTagIdsExtraInfo();
-            int offsetIndex = 3; //0 = SWF name, 1 = UI16 zero, 2 = tag list
-
-            List<ByteArrayDataStream> tagDataStreams = new ArrayList<>();
-            final int MAX_BUF_SIZE = 4096;
-            for (int t = 0; t < tagIds.size(); t++) {
-                long startOffset = offsets.get(offsetIndex);
-                long endOffset = offsets.get(offsetIndex + 1);
-                long dataLength = endOffset - startOffset;
-                long extraInfo = tagExtraInfo.get(t); //TODO: What's this for?
-                flashStream.seek(startOffset, SeekMode.SET);
-                long remLength = dataLength;
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                do {
-                    int readCount = remLength >= MAX_BUF_SIZE ? MAX_BUF_SIZE : (int) remLength;
-                    byte[] buf = flashStream.readBytes(readCount);
-                    baos.write(buf);
-                    remLength -= readCount;
-                } while (remLength > 0);
-                byte tagBytes[] = baos.toByteArray(); //TODO: optimize speed - without ByteArrayOutputStream
-
-                ByteArrayDataStream tagDataStream = new ByteArrayDataStream(tagBytes, is64());
-                tagDataStreams.add(tagDataStream);
-                offsetIndex++;
-            }
-            tagDataTables.add(tagDataStreams);
         }
     }
 
@@ -689,27 +665,11 @@ public class IggyFile extends AbstractDataStream implements AutoCloseable {
     }
 
     public int getSwfCount() {
-        return tagDataTables.size();
+        return flashDataReaders.size();
     }
 
     public String getSwfName(int swfIndex) {
-        return namesAndTagLists.get(swfIndex).getName();
-    }
-
-    public List<Long> getSwfTagIds(int swfIndex) {
-        return namesAndTagLists.get(swfIndex).getTagIds();
-    }
-
-    public Long getSwfTagId(int swfIndex, int tagIndex) {
-        return namesAndTagLists.get(swfIndex).getTagIds().get(tagIndex);
-    }
-
-    public List<Long> getSwfTagExtraInfos(int swfIndex) {
-        return namesAndTagLists.get(swfIndex).getTagIdsExtraInfo();
-    }
-
-    public Long getSwfTagExtraInfo(int swfIndex, int tagIndex) {
-        return namesAndTagLists.get(swfIndex).getTagIdsExtraInfo().get(tagIndex);
+        return flashDataReaders.get(swfIndex).getName();
     }
 
     public long getSwfXMin(int swfIndex) {
@@ -731,36 +691,4 @@ public class IggyFile extends AbstractDataStream implements AutoCloseable {
     public float getSwfFrameRate(int swfIndex) {
         return headers.get(swfIndex).getFrameRate();
     }
-
-    public int getSwfTagCount(int swfIndex) {
-        return getSwfTagIds(swfIndex).size();
-    }
-
-    public AbstractDataStream gettSwfTagDataStream(int swfIndex, int tagIndex) {
-        return tagDataTables.get(swfIndex).get(tagIndex);
-    }
-
-    public InputStream getSwfTagInputStream(int swfIndex, int tagIndex) {
-        return new ByteArrayInputStream(getSwfTagData(swfIndex, tagIndex));
-    }
-
-    public byte[] getSwfTagData(int swfIndex, int tagIndex) {
-        AbstractDataStream stream = gettSwfTagDataStream(swfIndex, tagIndex);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        int bufSize = 4096;
-        //Assuming available() result is always known (= not returning null)
-        while (stream.available() > 0) {
-            if (stream.available() < bufSize) {
-                bufSize = (int) (long) stream.available();
-            }
-            try {
-                byte[] buffer = stream.readBytes(bufSize);
-                baos.write(buffer);
-            } catch (IOException iex) {
-                //ignore
-            }
-        }
-        return baos.toByteArray();
-    }
-
 }

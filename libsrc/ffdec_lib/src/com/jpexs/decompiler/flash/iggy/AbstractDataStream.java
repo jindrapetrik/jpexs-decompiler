@@ -16,6 +16,8 @@ public abstract class AbstractDataStream {
      */
     public abstract Long available();
 
+    public abstract long position();
+
     public abstract boolean is64();
 
     protected long readUI64() throws IOException {

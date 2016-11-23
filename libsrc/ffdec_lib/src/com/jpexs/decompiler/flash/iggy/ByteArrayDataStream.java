@@ -18,6 +18,11 @@ public class ByteArrayDataStream extends AbstractDataStream {
         this(new byte[initialSize], use64bit);
     }
 
+    @Override
+    public long position() {
+        return pos;
+    }
+
     public ByteArrayDataStream(byte data[], boolean use64bit) {
         this.data = data;
         pos = 0;

@@ -2,17 +2,8 @@ package com.jpexs.decompiler.flash.iggy.conversion;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFCompression;
-import com.jpexs.decompiler.flash.SWFInputStream;
-import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.iggy.AbstractDataStream;
 import com.jpexs.decompiler.flash.iggy.IggyFile;
-import com.jpexs.decompiler.flash.iggy.IggyFlashHeaderInterface;
-import com.jpexs.decompiler.flash.iggy.SeekMode;
-import com.jpexs.decompiler.flash.tags.Tag;
-import com.jpexs.decompiler.flash.tags.UnknownTag;
 import com.jpexs.decompiler.flash.types.RECT;
-import com.jpexs.helpers.ByteArrayRange;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -20,7 +11,7 @@ import java.io.OutputStream;
 
 /**
  *
- * Unfinished WIP!
+ * WIP
  *
  * @author JPEXS
  */
@@ -70,7 +61,7 @@ public class IggyToSwfConvertor {
                 (int) (file.getSwfYMax(swfIndex) * SWF.unitDivisor));
         swf.version = 9; //FIXME
 
-        //TODO: Convert tags
+        //TODO!!!
         throw new UnsupportedOperationException("Not implemented yet");
     }
 }
