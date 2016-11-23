@@ -1,6 +1,6 @@
 package com.jpexs.decompiler.flash.iggy;
 
-import java.io.ByteArrayInputStream;
+import com.jpexs.decompiler.flash.SWF;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.File;
@@ -30,11 +30,12 @@ public class IggyExtractor extends AbstractDataStream implements AutoCloseable {
     private IggyHeader header;
     private List<IggySubFileEntry> subFileEntries = new ArrayList<>();
 
-    List<List<Integer>> indexTables = new ArrayList<>();
-    List<List<Long>> offsetTables = new ArrayList<>();
+    private List<List<Integer>> indexTables = new ArrayList<>();
+    private List<List<Long>> offsetTables = new ArrayList<>();
 
-    List<IggyFlashHeaderInterface> headers = new ArrayList<>();
-    List<IggyNameAndTagList> namesAndTagLists = new ArrayList<>();
+    private List<IggyFlashHeaderInterface> headers = new ArrayList<>();
+    private List<IggyNameAndTagList> namesAndTagLists = new ArrayList<>();
+    private List<List<ByteArrayDataStream>> tagDataTables = new ArrayList<>();
 
     public IggyExtractor(File file) throws IOException {
         raf = new RandomAccessFile(file, "r");
@@ -67,8 +68,33 @@ public class IggyExtractor extends AbstractDataStream implements AutoCloseable {
             }
         }
         for (int i = 0; i < flashStreams.size(); i++) {
+            ByteArrayDataStream flashStream = flashStreams.get(i);
             List<Long> offsets = offsetTables.get(i);
-            //TODO
+            List<Integer> tagIds = namesAndTagLists.get(i).getTagIds();
+            List<Long> tagExtended = namesAndTagLists.get(i).getTagIdsExtendedInfo();
+            int offsetIndex = 3; //0 = SWF name, 1 = UI16 zero, 2 = tag list
+
+            List<ByteArrayDataStream> tagDataStreams = new ArrayList<>();
+            final int MAX_BUF_SIZE = 4096;
+            for (int t = 0; t < tagIds.size(); t++) {
+                long startOffset = offsets.get(offsetIndex);
+                long endOffset = offsets.get(offsetIndex + 1);
+                long dataLength = endOffset - startOffset;
+                flashStream.seek(startOffset, SeekMode.SET);
+                long remLength = dataLength;
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                do {
+                    int readCount = remLength >= MAX_BUF_SIZE ? MAX_BUF_SIZE : (int) remLength;
+                    byte[] buf = flashStream.readBytes(readCount);
+                    baos.write(buf);
+                    remLength -= readCount;
+                } while (remLength > 0);
+                byte tagBytes[] = baos.toByteArray(); //TODO: optimize speed - without ByteArrayOutputStream
+                ByteArrayDataStream tagDataStream = new ByteArrayDataStream(tagBytes, is64());
+                tagDataStreams.add(tagDataStream);
+                offsetIndex++;
+            }
+            tagDataTables.add(tagDataStreams);
         }
     }
 
@@ -655,6 +681,26 @@ public class IggyExtractor extends AbstractDataStream implements AutoCloseable {
         } catch (IOException ex) {
             return null;
         }
+    }
+
+    public int getSwfCount() {
+        return tagDataTables.size();
+    }
+
+    public String getSwfName(int swfIndex) {
+        return namesAndTagLists.get(swfIndex).getName();
+    }
+
+    public List<Integer> getSwfTagIds(int swfIndex) {
+        return namesAndTagLists.get(swfIndex).getTagIds();
+    }
+
+    public List<Long> getSwfTagExtraInfos(int swfIndex) {
+        return namesAndTagLists.get(swfIndex).getTagIdsExtendedInfo();
+    }
+
+    public SWF extractSwf(int swfIndex) {
+        return null; //TODO
     }
 
 }
