@@ -16,12 +16,12 @@ public class IggyNameAndTagList implements StructureInterface {
     private String name;
 
     @IggyArrayFieldType(value = DataType.ubits, count = 10)
-    private List<Integer> tagIds;
+    private List<Long> tagIds;
 
     @IggyArrayFieldType(value = DataType.uint16_t)
     private List<Long> tagIdsExtraInfo;
 
-    public IggyNameAndTagList(String name, List<Integer> tagIds, List<Long> tagIdsExtendedInfo) {
+    public IggyNameAndTagList(String name, List<Long> tagIds, List<Long> tagIdsExtendedInfo) {
         this.name = name;
         this.tagIds = tagIds;
         this.tagIdsExtraInfo = tagIdsExtendedInfo;
@@ -46,12 +46,11 @@ public class IggyNameAndTagList implements StructureInterface {
         tagIds = new ArrayList<>();
         tagIdsExtraInfo = new ArrayList<>();
         while (true) {
-            long typeLen = stream.readUI32();
-            if (typeLen == 0) {
+            long tagType = stream.readUI32() & 0xffffffffL;
+            if (tagType == 0) {
                 break;
             }
             long tagLength = stream.readUI32();
-            int tagType = (int) ((typeLen >>> 6) + 10) & 0x3FF;
             tagIds.add(tagType);
             tagIdsExtraInfo.add(tagLength);
         }
@@ -61,7 +60,7 @@ public class IggyNameAndTagList implements StructureInterface {
         return name;
     }
 
-    public List<Integer> getTagIds() {
+    public List<Long> getTagIds() {
         return tagIds;
     }
 
@@ -72,6 +71,19 @@ public class IggyNameAndTagList implements StructureInterface {
     @Override
     public void writeToDataStream(AbstractDataStream stream) throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[\r\n");
+        sb.append("name ").append(name).append("\r\n");
+        sb.append("tags:").append("\r\n");
+        for (int i = 0; i < tagIds.size(); i++) {
+            sb.append("tag ").append(String.format("%08X", tagIds.get(i))).append(" extra ").append(tagIdsExtraInfo.get(i)).append("\r\n");
+        }
+        sb.append("]");
+        return sb.toString();
     }
 
 }

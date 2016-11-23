@@ -78,10 +78,6 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
     @IggyFieldType(DataType.uint32_t)
     long unk_B4;
 
-    /*@IggyArrayFieldType(value = DataType.uint32_t, count = 20)
-    long unk_offsets_a[] = new long[20];
-    @IggyArrayFieldType(value = DataType.uint32_t, count = 20)
-    long unk_offsets_b[] = new long[20];*/
     // Offset 0xB8 (outside header): there are *unk_40* relative offsets that point to flash objects.
     // The flash objects are in a format different to swf but there is probably a way to convert between them.
     // After the offsets, the bodies of objects pointed above, which apparently have a code like 0xFFXX to identify the type of object, followed by a (unique?) identifier
@@ -90,13 +86,6 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
     // it is written in a different way.
     public IggyFlashHeader64(AbstractDataStream stream) throws IOException {
         readFromDataStream(stream);
-    }
-
-    private int ofs = 0;
-    private List<Long> offsets;
-
-    private String currentOffset() {
-        return String.format(" [offset: %d]", offsets.get(ofs++));
     }
 
     /*
@@ -110,7 +99,6 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
      */
     @Override
     public void readFromDataStream(AbstractDataStream stream) throws IOException {
-        this.offsets = offsets;
         main_offset = stream.readUI64();
         as3_section_offset = stream.readUI64();
         unk_offset = stream.readUI64();
@@ -153,18 +141,36 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("[\r\n");
-        sb.append("main_offset ").append(main_offset).append(currentOffset()).append("\r\n");
-        sb.append("as3_section_offset ").append(as3_section_offset).append(currentOffset()).append("\r\n");
-        sb.append("unk_offset ").append(unk_offset).append(currentOffset()).append("\r\n");
-        sb.append("unk_offset2 ").append(unk_offset2).append(currentOffset()).append("\r\n");
-        sb.append("unk_offset3 ").append(unk_offset3).append(currentOffset()).append("\r\n");
-        sb.append("unk_offset4 ").append(unk_offset4).append(currentOffset()).append("\r\n");
-        sb.append("xmin ").append(xmin).append(currentOffset()).append("\r\n");
-        sb.append("ymin ").append(ymin).append(currentOffset()).append("\r\n");
-        sb.append("xmax ").append(ymax).append(currentOffset()).append("\r\n");
-        sb.append("ymax ").append(ymax).append(currentOffset()).append("\r\n");
-        sb.append("unk_40 ").append(unk_40).append(currentOffset()).append("\r\n");
-        sb.append("unk_44 ").append(unk_44).append(currentOffset()).append("\r\n");
+        sb.append("main_offset ").append(main_offset).append("\r\n");
+        sb.append("as3_section_offset ").append(as3_section_offset);
+        sb.append(" global: ").append(main_offset + as3_section_offset);
+        sb.append("\r\n");
+        sb.append("unk_offset ").append(unk_offset);
+        if (unk_offset != 1) {
+            sb.append(" global: ").append(main_offset + unk_offset);
+        }
+        sb.append("\r\n");
+        sb.append("unk_offset2 ").append(unk_offset2);
+        if (unk_offset2 != 1) {
+            sb.append(" global: ").append(main_offset + unk_offset2);
+        }
+        sb.append("\r\n");
+        sb.append("unk_offset3 ").append(unk_offset3);
+        if (unk_offset3 != 1) {
+            sb.append(" global: ").append(main_offset + unk_offset3);
+        }
+        sb.append("\r\n");
+        sb.append("unk_offset4 ").append(unk_offset4);
+        if (unk_offset4 != 1) {
+            sb.append(" global: ").append(main_offset + unk_offset4);
+        }
+        sb.append("\r\n");
+        sb.append("xmin ").append(xmin).append("\r\n");
+        sb.append("ymin ").append(ymin).append("\r\n");
+        sb.append("xmax ").append(ymax).append("\r\n");
+        sb.append("ymax ").append(ymax).append("\r\n");
+        sb.append("unk_40 ").append(unk_40).append("\r\n");
+        sb.append("unk_44 ").append(unk_44).append("\r\n");
         sb.append("unk_48 ").append(unk_48).append("\r\n");
         sb.append("unk_4C ").append(unk_4C).append("\r\n");
         sb.append("unk_50 ").append(unk_50).append("\r\n");

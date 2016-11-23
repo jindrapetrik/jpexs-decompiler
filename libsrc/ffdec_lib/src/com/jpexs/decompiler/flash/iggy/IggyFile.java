@@ -62,16 +62,19 @@ public class IggyFile extends AbstractDataStream implements AutoCloseable {
                 } else {
                     hdr = new IggyFlashHeader32(dataStream);
                 }
+                //System.out.println("hdr=" + hdr);
+                IggyNameAndTagList nameTagList = new IggyNameAndTagList(dataStream);
+                //System.out.println("nameTagList=" + nameTagList);
                 headers.add(hdr);
-                namesAndTagLists.add(new IggyNameAndTagList(dataStream));
+                namesAndTagLists.add(nameTagList);
                 flashStreams.add(dataStream);
             }
         }
         for (int i = 0; i < flashStreams.size(); i++) {
             ByteArrayDataStream flashStream = flashStreams.get(i);
             List<Long> offsets = offsetTables.get(i);
-            List<Integer> tagIds = namesAndTagLists.get(i).getTagIds();
-            List<Long> tagExtended = namesAndTagLists.get(i).getTagIdsExtraInfo();
+            List<Long> tagIds = namesAndTagLists.get(i).getTagIds();
+            List<Long> tagExtraInfo = namesAndTagLists.get(i).getTagIdsExtraInfo();
             int offsetIndex = 3; //0 = SWF name, 1 = UI16 zero, 2 = tag list
 
             List<ByteArrayDataStream> tagDataStreams = new ArrayList<>();
@@ -80,6 +83,7 @@ public class IggyFile extends AbstractDataStream implements AutoCloseable {
                 long startOffset = offsets.get(offsetIndex);
                 long endOffset = offsets.get(offsetIndex + 1);
                 long dataLength = endOffset - startOffset;
+                long extraInfo = tagExtraInfo.get(t); //TODO: What's this for?
                 flashStream.seek(startOffset, SeekMode.SET);
                 long remLength = dataLength;
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -90,6 +94,7 @@ public class IggyFile extends AbstractDataStream implements AutoCloseable {
                     remLength -= readCount;
                 } while (remLength > 0);
                 byte tagBytes[] = baos.toByteArray(); //TODO: optimize speed - without ByteArrayOutputStream
+
                 ByteArrayDataStream tagDataStream = new ByteArrayDataStream(tagBytes, is64());
                 tagDataStreams.add(tagDataStream);
                 offsetIndex++;
@@ -691,11 +696,11 @@ public class IggyFile extends AbstractDataStream implements AutoCloseable {
         return namesAndTagLists.get(swfIndex).getName();
     }
 
-    public List<Integer> getSwfTagIds(int swfIndex) {
+    public List<Long> getSwfTagIds(int swfIndex) {
         return namesAndTagLists.get(swfIndex).getTagIds();
     }
 
-    public Integer getSwfTagId(int swfIndex, int tagIndex) {
+    public Long getSwfTagId(int swfIndex, int tagIndex) {
         return namesAndTagLists.get(swfIndex).getTagIds().get(tagIndex);
     }
 
