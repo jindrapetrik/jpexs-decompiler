@@ -17,7 +17,7 @@ import java.util.Map;
  * All relative offsets are relative from that specific field position All
  * relative offsets can get value "1" to indicate "nothing"
  */
-public class IggyFlashHeader32 implements StructureInterface {
+public class IggyFlashHeader32 implements IggyFlashHeaderInterface {
 
     @IggyFieldType(DataType.uint32_t)
     long main_offset; // 0 Relative offset to first section (matches sizeof header)

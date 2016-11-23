@@ -3,6 +3,8 @@ package com.jpexs.decompiler.flash.iggy;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *

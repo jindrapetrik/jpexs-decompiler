@@ -33,47 +33,47 @@ public class IggyExtractor extends AbstractDataStream implements AutoCloseable {
     List<List<Integer>> indexTables = new ArrayList<>();
     List<List<Long>> offsetTables = new ArrayList<>();
 
-    IggyFlashHeader64 fh64 = null;
-    IggyFlashHeader32 fh32 = null;
+    List<IggyFlashHeaderInterface> headers = new ArrayList<>();
+    List<IggyNameAndTagList> namesAndTagLists = new ArrayList<>();
 
     public IggyExtractor(File file) throws IOException {
         raf = new RandomAccessFile(file, "r");
         header = new IggyHeader(this);
-        for (int i = 0; i < header.num_subfiles; i++) {
+        for (int i = 0; i < header.getNumSubfiles(); i++) {
             subFileEntries.add(new IggySubFileEntry(this));
         }
 
-        List<byte[]> indexDatas = new ArrayList<>();
         List<ByteArrayDataStream> flashStreams = new ArrayList<>();
 
         for (int i = 0; i < subFileEntries.size(); i++) {
             IggySubFileEntry entry = subFileEntries.get(i);
+            ByteArrayDataStream dataStream = getEntryDataStream(i);
             if (entry.type == IggySubFileEntry.TYPE_INDEX) {
-                indexDatas.add(getEntryData(i));
+                List<Integer> indexTable = new ArrayList<>();
+                List<Long> offsets = new ArrayList<>();
+                IggyIndexParser.parseIndex(dataStream, indexTable, offsets);
+                indexTables.add(indexTable);
+                offsetTables.add(offsets);
             } else if (entry.type == IggySubFileEntry.TYPE_FLASH) {
-                flashStreams.add(getEntryDataStream(i));
+                IggyFlashHeaderInterface hdr;
+                if (is64()) {
+                    hdr = new IggyFlashHeader64(dataStream);
+                } else {
+                    hdr = new IggyFlashHeader32(dataStream);
+                }
+                headers.add(hdr);
+                namesAndTagLists.add(new IggyNameAndTagList(dataStream));
+                flashStreams.add(dataStream);
             }
         }
-
-        for (byte[] index_data : indexDatas) {
-            List<Integer> indexTableEntry = new ArrayList<>();
-            List<Long> offsets = new ArrayList<>();
-            parseIndex(is64(), index_data, indexTableEntry, offsets);
-            indexTables.add(indexTableEntry);
-            offsetTables.add(offsets);
-        }
-
-        for (ByteArrayDataStream fs : flashStreams) {
-            if (is64()) {
-                fh64 = new IggyFlashHeader64(fs);
-                System.out.println("" + fh64);
-            } else {
-                fh32 = new IggyFlashHeader32(fs);
-            }
+        for (int i = 0; i < flashStreams.size(); i++) {
+            List<Long> offsets = offsetTables.get(i);
+            //TODO
         }
     }
 
-    private boolean is64() {
+    @Override
+    public boolean is64() {
         return header.is64();
     }
 
@@ -112,7 +112,7 @@ public class IggyExtractor extends AbstractDataStream implements AutoCloseable {
             baos.write(buf, 0, cnt);
         }
         byte data[] = baos.toByteArray();
-        return new ByteArrayDataStream(data);
+        return new ByteArrayDataStream(data, is64());
     }
 
     public InputStream getEntryInputStream(int entryIndex) {
@@ -252,7 +252,7 @@ public class IggyExtractor extends AbstractDataStream implements AutoCloseable {
     }
 
     private static boolean updateIndex(long item_offset /*uint32_t*/, boolean is_64, byte index_bytes[], long item_size_change /*int32_t*/) throws IOException {
-        ByteArrayDataStream stream = new ByteArrayDataStream(index_bytes);
+        ByteArrayDataStream stream = new ByteArrayDataStream(index_bytes, is_64);
 
         /*
         index_table:
@@ -468,7 +468,7 @@ public class IggyExtractor extends AbstractDataStream implements AutoCloseable {
      * @throws IOException
      */
     private static Long itemLength(long item_offset /*uint32_t*/, boolean is_64, byte index_bytes[], Long newValue) throws IOException {
-        ByteArrayDataStream stream = new ByteArrayDataStream(index_bytes);
+        ByteArrayDataStream stream = new ByteArrayDataStream(index_bytes, is_64);
 
         /*
         index_table:
@@ -646,156 +646,6 @@ public class IggyExtractor extends AbstractDataStream implements AutoCloseable {
             }
         }
         return null;
-    }
-
-    /**
-     *
-     * @param is_64
-     * @param index_bytes
-     * @param indexTableEntry
-     * @param offsets
-     * @throws IOException
-     */
-    private static void parseIndex(boolean is_64, byte index_bytes[], List<Integer> indexTableEntry, List<Long> offsets) throws IOException {
-        ByteArrayDataStream stream = new ByteArrayDataStream(index_bytes);
-
-        int index_table_size = stream.readUI8();
-        int[] index_table = new int[index_table_size];
-
-        for (int i = 0; i < index_table_size; i++) {
-            int offset = stream.readUI8();
-            //System.err.printf("index_table_entry: %02x\n", offset);
-            index_table[i] = offset;
-            indexTableEntry.add(offset);
-            int num = stream.readUI8();
-            stream.seek(num * 2, SeekMode.CUR);
-        }
-
-        long offset = 0;
-        int code;
-
-        while ((code = stream.readUI8()) > -1) {
-            //DPRINTF("Code = %x\n", code);
-
-            if (code < 0x80) // 0-0x7F
-            {
-                // code is directly an index to the index_table
-                if (code >= index_table_size) {
-                    System.err.printf("< 0x80: index is greater than index_table_size. %x > %x\n", code, index_table_size);
-                    return;
-                }
-
-                offset += index_table[code];
-            } else if (code < 0xC0) // 0x80-BF
-            {
-                int index;
-
-                if ((index = stream.readUI8()) < 0) {
-                    System.err.printf("< 0xC0: Cannot read index.\n");
-                    return;
-                }
-
-                if (index >= index_table_size) {
-                    System.err.printf("< 0xC0: index is greater than index_table_size. %x > %x\n", index, index_table_size);
-                    return;
-                }
-
-                int n = code - 0x7F;
-                offset += index_table[index] * n;
-            } else if (code < 0xD0) // 0xC0-0xCF
-            {
-                offset += ((code * 2) - 0x17E);
-            } else if (code < 0xE0) // 0xD0-0xDF
-            {
-                // Code here depends on plattform[0], we are assuming it is 1, as we checked in load function
-                int i = code & 0xF;
-                int n8;
-                int n;
-
-                if ((n8 = stream.readUI8()) < 0) {
-                    System.err.printf("< 0xE0: Cannot read n.\n");
-                    return;
-                }
-
-                n = n8 + 1;
-
-                if (is_64) {
-                    if (i <= 2) {
-                        offset += 8 * n; // Ptr type
-                    } else if (i <= 4) {
-                        offset += 2 * n;
-                    } else if (i == 5) {
-                        offset += 4 * n;
-                    } else if (i == 6) {
-                        offset += 8 * n; // 64 bits type
-                    } else {
-                        System.err.printf("< 0xE0: Invalid value for i (%x %x)\n", i, code);
-                    }
-                } else {
-                    switch (i) {
-                        case 2:
-                            offset += 4 * n;  // Ptr type
-                            break;
-
-                        case 4:
-                            offset += 2 * n;
-                            break;
-
-                        case 5:
-                            offset += 4 * n; // 32 bits type
-                            break;
-
-                        case 6:
-                            offset += 8 * n;
-                            break;
-
-                        default:
-                            System.err.printf("< 0xE0: invalid value for i (%x %x)\n", i, code);
-                    }
-                }
-            } else if (code == 0xFC) {
-                stream.seek(1, SeekMode.CUR);
-            } else if (code == 0xFD) {
-                int n, m;
-
-                if ((n = stream.readUI8()) < 0) {
-                    System.err.printf("0xFD: Cannot read n.\n");
-                    return;
-                }
-
-                if ((m = stream.readUI8()) < 0) {
-                    System.err.printf("0xFD: Cannot read m.\n");
-                    return;
-                }
-
-                offset += n;
-                stream.seek(m * 2, SeekMode.CUR);
-            } else if (code == 0xFE) {
-                int n8;
-                int n;
-
-                if ((n8 = stream.readUI8()) < 0) {
-                    System.err.printf("0xFE: Cannot read n.\n");
-                    return;
-                }
-
-                n = n8 + 1;
-                offset += n;
-            } else if (code == 0xFF) {
-                long n;
-
-                if ((n = stream.readUI32()) < 0) {
-                    System.err.printf("0xFF: Cannot read n.\n");
-                    return;
-                }
-
-                offset += n;
-            } else {
-                System.err.printf("Unrecognized code: %x\n", code);
-            }
-
-            offsets.add(offset);
-        }
     }
 
     @Override

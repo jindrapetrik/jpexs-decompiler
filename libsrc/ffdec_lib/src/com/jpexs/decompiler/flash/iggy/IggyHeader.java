@@ -3,7 +3,6 @@ package com.jpexs.decompiler.flash.iggy;
 import com.jpexs.decompiler.flash.iggy.annotations.IggyArrayFieldType;
 import com.jpexs.decompiler.flash.iggy.annotations.IggyFieldType;
 import java.io.IOException;
-import java.math.BigInteger;
 
 /**
  *
@@ -19,51 +18,62 @@ public class IggyHeader implements StructureInterface {
 
     //Must be 0xED0A6749
     @IggyFieldType(DataType.uint32_t)
-    public long magic = MAGIC;
+    private long magic = MAGIC;
 
     //Assume 0x900
     @IggyFieldType(DataType.uint32_t)
-    public long version;
+    private long version;
 
     //Assuming: 1
     @IggyFieldType(value = DataType.uint8_t)
-    public int platform1;
+    private int platform1;
 
     //32/64
     @IggyFieldType(value = DataType.uint8_t)
-    public int platform2_bittness;
+    private int platform2;
 
     //Assuming: 1
     @IggyFieldType(value = DataType.uint8_t)
-    public int platform3;
+    private int platform3;
 
     //Usually: 3
     @IggyFieldType(value = DataType.uint8_t)
-    public int platform4;
+    private int platform4;
 
     //flags for platform 64?
     @IggyFieldType(DataType.uint32_t)
-    public long unk_0C;
+    private long unk_0C;
 
     @IggyArrayFieldType(value = DataType.uint8_t, count = 12)
-    public byte[] reserved;
+    private byte[] reserved;
 
     @IggyFieldType(value = DataType.uint32_t)
-    public long num_subfiles;
+    private long numSubfiles;
 
     public IggyHeader(AbstractDataStream stream) throws IOException {
         readFromDataStream(stream);
     }
 
-    public IggyHeader(long version, int platform1, int platform2_bittness, int platform3, int platform4, long unk_0C, byte[] reserved, long num_subfiles) {
+    /**
+     *
+     * @param version
+     * @param platform1
+     * @param platform2 32/64
+     * @param platform3
+     * @param platform4
+     * @param unk_0C
+     * @param reserved
+     * @param num_subfiles
+     */
+    public IggyHeader(long version, int platform1, int platform2, int platform3, int platform4, long unk_0C, byte[] reserved, long num_subfiles) {
         this.version = version;
         this.platform1 = platform1;
-        this.platform2_bittness = platform2_bittness;
+        this.platform2 = platform2;
         this.platform3 = platform3;
         this.platform4 = platform4;
         this.unk_0C = unk_0C;
         this.reserved = reserved;
-        this.num_subfiles = num_subfiles;
+        this.numSubfiles = num_subfiles;
     }
 
     @Override
@@ -71,10 +81,10 @@ public class IggyHeader implements StructureInterface {
         StringBuilder sb = new StringBuilder();
         sb.append("[");
         sb.append("version: ").append(version).append(", ");
-        sb.append("platform: ").append(platform1).append(" ").append(platform2_bittness).append(" ").append(platform3).append(" ").append(platform4).append(", ");
+        sb.append("platform: ").append(platform1).append(" ").append(platform2).append(" ").append(platform3).append(" ").append(platform4).append(", ");
         sb.append("unk_0C: ").append(String.format("%08X", unk_0C)).append(", ");
         sb.append("reserved: 12 bytes").append(", ");
-        sb.append("num_subfiles: ").append(num_subfiles);
+        sb.append("num_subfiles: ").append(numSubfiles);
         sb.append("]");
         return sb.toString();
     }
@@ -87,12 +97,12 @@ public class IggyHeader implements StructureInterface {
         }
         version = stream.readUI32();
         platform1 = stream.readUI8();
-        platform2_bittness = stream.readUI8();
+        platform2 = stream.readUI8(); //32/64
         platform3 = stream.readUI8();
         platform4 = stream.readUI8();
         unk_0C = stream.readUI32();
         reserved = stream.readBytes(12);
-        num_subfiles = stream.readUI32();
+        numSubfiles = stream.readUI32();
     }
 
     @Override
@@ -101,7 +111,43 @@ public class IggyHeader implements StructureInterface {
     }
 
     public boolean is64() {
-        return platform2_bittness == 64;
+        return platform2 == 64;
+    }
+
+    public long getMagic() {
+        return magic;
+    }
+
+    public long getVersion() {
+        return version;
+    }
+
+    public int getPlatform1() {
+        return platform1;
+    }
+
+    public int getPlatform2() {
+        return platform2;
+    }
+
+    public int getPlatform3() {
+        return platform3;
+    }
+
+    public int getPlatform4() {
+        return platform4;
+    }
+
+    public long getUnk_0C() {
+        return unk_0C;
+    }
+
+    public byte[] getReserved() {
+        return reserved;
+    }
+
+    public long getNumSubfiles() {
+        return numSubfiles;
     }
 
 }

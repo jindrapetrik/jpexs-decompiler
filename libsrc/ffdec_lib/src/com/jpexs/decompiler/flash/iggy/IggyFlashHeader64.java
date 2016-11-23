@@ -14,7 +14,7 @@ import java.util.Map;
  *
  * Based of works of somebody called eternity.
  */
-public class IggyFlashHeader64 implements StructureInterface {
+public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
 
     @IggyFieldType(DataType.uint64_t)
     long main_offset; // 0 Relative offset to first section (matches sizeof header);
@@ -77,11 +77,6 @@ public class IggyFlashHeader64 implements StructureInterface {
     long unk_B0; // Maybe number of classes / as3 names
     @IggyFieldType(DataType.uint32_t)
     long unk_B4;
-    @IggyFieldType(value = DataType.uint16_t, count = 20)
-    String name;
-
-    List<Integer> tagIds = new ArrayList<>();
-    List<Long> tagIdsExtendedInfo = new ArrayList<>();
 
     /*@IggyArrayFieldType(value = DataType.uint32_t, count = 20)
     long unk_offsets_a[] = new long[20];
@@ -97,8 +92,25 @@ public class IggyFlashHeader64 implements StructureInterface {
         readFromDataStream(stream);
     }
 
+    private int ofs = 0;
+    private List<Long> offsets;
+
+    private String currentOffset() {
+        return String.format(" [offset: %d]", offsets.get(ofs++));
+    }
+
+    /*
+    offsets:
+    name (UI16 chars, zero terminated)
+    UI16
+    taglist_offset (aka main_offset)
+    after_taglist
+    
+    
+     */
     @Override
     public void readFromDataStream(AbstractDataStream stream) throws IOException {
+        this.offsets = offsets;
         main_offset = stream.readUI64();
         as3_section_offset = stream.readUI64();
         unk_offset = stream.readUI64();
@@ -130,26 +142,6 @@ public class IggyFlashHeader64 implements StructureInterface {
         unk_AC = stream.readUI32();
         unk_B0 = stream.readUI32();
         unk_B4 = stream.readUI32();
-        StringBuilder nameBuilder = new StringBuilder();
-        do {
-            char c = (char) stream.readUI16();
-            if (c == '\0') {
-                break;
-            }
-            nameBuilder.append(c);
-        } while (true);
-        name = nameBuilder.toString();
-
-        while (true) {
-            long typeLen = stream.readUI32();
-            if (typeLen == 0) {
-                break;
-            }
-            long tagLength = stream.readUI32();
-            int tagType = (int) ((typeLen >>> 6) + 10) & 0x3FF;
-            tagIds.add(tagType);
-            tagIdsExtendedInfo.add(tagLength);
-        }
     }
 
     @Override
@@ -161,18 +153,18 @@ public class IggyFlashHeader64 implements StructureInterface {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("[\r\n");
-        sb.append("main_offset ").append(main_offset).append("\r\n");
-        sb.append("as3_section_offset ").append(as3_section_offset).append("\r\n");
-        sb.append("unk_offset ").append(unk_offset).append("\r\n");
-        sb.append("unk_offset2 ").append(unk_offset2).append("\r\n");
-        sb.append("unk_offset3 ").append(unk_offset3).append("\r\n");
-        sb.append("unk_offset4 ").append(unk_offset4).append("\r\n");
-        sb.append("xmin ").append(xmin).append("\r\n");
-        sb.append("ymin ").append(ymin).append("\r\n");
-        sb.append("xmax ").append(ymax).append("\r\n");
-        sb.append("ymax ").append(ymax).append("\r\n");
-        sb.append("unk_40 ").append(unk_40).append("\r\n");
-        sb.append("unk_44 ").append(unk_44).append("\r\n");
+        sb.append("main_offset ").append(main_offset).append(currentOffset()).append("\r\n");
+        sb.append("as3_section_offset ").append(as3_section_offset).append(currentOffset()).append("\r\n");
+        sb.append("unk_offset ").append(unk_offset).append(currentOffset()).append("\r\n");
+        sb.append("unk_offset2 ").append(unk_offset2).append(currentOffset()).append("\r\n");
+        sb.append("unk_offset3 ").append(unk_offset3).append(currentOffset()).append("\r\n");
+        sb.append("unk_offset4 ").append(unk_offset4).append(currentOffset()).append("\r\n");
+        sb.append("xmin ").append(xmin).append(currentOffset()).append("\r\n");
+        sb.append("ymin ").append(ymin).append(currentOffset()).append("\r\n");
+        sb.append("xmax ").append(ymax).append(currentOffset()).append("\r\n");
+        sb.append("ymax ").append(ymax).append(currentOffset()).append("\r\n");
+        sb.append("unk_40 ").append(unk_40).append(currentOffset()).append("\r\n");
+        sb.append("unk_44 ").append(unk_44).append(currentOffset()).append("\r\n");
         sb.append("unk_48 ").append(unk_48).append("\r\n");
         sb.append("unk_4C ").append(unk_4C).append("\r\n");
         sb.append("unk_50 ").append(unk_50).append("\r\n");
@@ -192,17 +184,6 @@ public class IggyFlashHeader64 implements StructureInterface {
         sb.append("unk_AC ").append(unk_AC).append("\r\n");
         sb.append("unk_B0 ").append(unk_B0).append("\r\n");
         sb.append("unk_B4 ").append(unk_B4).append("\r\n");
-        sb.append("name ").append(name).append("\r\n");
-        Map<Integer, TagTypeInfo> map = Tag.getKnownClasses();
-        sb.append("tags:").append("\r\n");
-        for (int i = 0; i < tagIds.size(); i++) {
-            TagTypeInfo tti = map.get(tagIds.get(i));
-            sb.append(" tag ").append(tagIds.get(i)).append(":").append(tti == null ? "?" : tti.getName());
-            if (tagIdsExtendedInfo.get(i) > 0) {
-                sb.append(" (special: ").append(tagIdsExtendedInfo.get(i)).append(")");
-            }
-            sb.append("\r\n");
-        }
         sb.append("]");
         return sb.toString();
 

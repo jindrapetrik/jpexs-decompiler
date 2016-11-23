@@ -16,6 +16,8 @@ public abstract class AbstractDataStream {
      */
     public abstract Long available();
 
+    public abstract boolean is64();
+
     protected long readUI64() throws IOException {
         try {
             return (readUI32() + (readUI32() << 32)) & 0xffffffffffffffffL;
