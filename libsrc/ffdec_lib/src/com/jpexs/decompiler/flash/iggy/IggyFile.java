@@ -1,6 +1,6 @@
 package com.jpexs.decompiler.flash.iggy;
 
-import com.jpexs.decompiler.flash.SWF;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.File;
@@ -22,9 +22,9 @@ import java.util.logging.Logger;
  * Based of works of somebody called eternity.
  *
  */
-public class IggyExtractor extends AbstractDataStream implements AutoCloseable {
+public class IggyFile extends AbstractDataStream implements AutoCloseable {
 
-    final static Logger LOGGER = Logger.getLogger(IggyExtractor.class.getName());
+    final static Logger LOGGER = Logger.getLogger(IggyFile.class.getName());
 
     private RandomAccessFile raf;
     private IggyHeader header;
@@ -37,7 +37,7 @@ public class IggyExtractor extends AbstractDataStream implements AutoCloseable {
     private List<IggyNameAndTagList> namesAndTagLists = new ArrayList<>();
     private List<List<ByteArrayDataStream>> tagDataTables = new ArrayList<>();
 
-    public IggyExtractor(File file) throws IOException {
+    public IggyFile(File file) throws IOException {
         raf = new RandomAccessFile(file, "r");
         header = new IggyHeader(this);
         for (int i = 0; i < header.getNumSubfiles(); i++) {
@@ -71,7 +71,7 @@ public class IggyExtractor extends AbstractDataStream implements AutoCloseable {
             ByteArrayDataStream flashStream = flashStreams.get(i);
             List<Long> offsets = offsetTables.get(i);
             List<Integer> tagIds = namesAndTagLists.get(i).getTagIds();
-            List<Long> tagExtended = namesAndTagLists.get(i).getTagIdsExtendedInfo();
+            List<Long> tagExtended = namesAndTagLists.get(i).getTagIdsExtraInfo();
             int offsetIndex = 3; //0 = SWF name, 1 = UI16 zero, 2 = tag list
 
             List<ByteArrayDataStream> tagDataStreams = new ArrayList<>();
@@ -183,7 +183,7 @@ public class IggyExtractor extends AbstractDataStream implements AutoCloseable {
 
     public static void extractIggyFile(File iggyFile, File extractDir) throws IOException {
         final String FILENAME_FORMAT = "index%d_type%d.bin";
-        try (IggyExtractor ir = new IggyExtractor(iggyFile)) {
+        try (IggyFile ir = new IggyFile(iggyFile)) {
             for (int i = 0; i < ir.getNumEntries(); i++) {
                 IggySubFileEntry entry = ir.getSubFileEntry(i);
                 try (FileOutputStream fos = new FileOutputStream(new File(extractDir, String.format(FILENAME_FORMAT, i, entry.type)))) {
@@ -695,12 +695,67 @@ public class IggyExtractor extends AbstractDataStream implements AutoCloseable {
         return namesAndTagLists.get(swfIndex).getTagIds();
     }
 
-    public List<Long> getSwfTagExtraInfos(int swfIndex) {
-        return namesAndTagLists.get(swfIndex).getTagIdsExtendedInfo();
+    public Integer getSwfTagId(int swfIndex, int tagIndex) {
+        return namesAndTagLists.get(swfIndex).getTagIds().get(tagIndex);
     }
 
-    public SWF extractSwf(int swfIndex) {
-        return null; //TODO
+    public List<Long> getSwfTagExtraInfos(int swfIndex) {
+        return namesAndTagLists.get(swfIndex).getTagIdsExtraInfo();
+    }
+
+    public Long getSwfTagExtraInfo(int swfIndex, int tagIndex) {
+        return namesAndTagLists.get(swfIndex).getTagIdsExtraInfo().get(tagIndex);
+    }
+
+    public long getSwfXMin(int swfIndex) {
+        return headers.get(swfIndex).getXMin();
+    }
+
+    public long getSwfYMin(int swfIndex) {
+        return headers.get(swfIndex).getYMin();
+    }
+
+    public long getSwfXMax(int swfIndex) {
+        return headers.get(swfIndex).getXMax();
+    }
+
+    public long getSwfYMax(int swfIndex) {
+        return headers.get(swfIndex).getYMax();
+    }
+
+    public float getSwfFrameRate(int swfIndex) {
+        return headers.get(swfIndex).getFrameRate();
+    }
+
+    public int getSwfTagCount(int swfIndex) {
+        return getSwfTagIds(swfIndex).size();
+    }
+
+    public AbstractDataStream gettSwfTagDataStream(int swfIndex, int tagIndex) {
+        return tagDataTables.get(swfIndex).get(tagIndex);
+    }
+
+    public InputStream getSwfTagInputStream(int swfIndex, int tagIndex) {
+        return new ByteArrayInputStream(getSwfTagData(swfIndex, tagIndex));
+    }
+
+    public byte[] getSwfTagData(int swfIndex, int tagIndex) {
+        AbstractDataStream stream = gettSwfTagDataStream(swfIndex, tagIndex);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        int bufSize = 4096;
+        //Assuming available() result is always known (= not returning null)
+        while (stream.available() > 0) {
+            if (stream.available() < bufSize) {
+                bufSize = (int) (long) stream.available();
+            }
+            try {
+                byte[] buffer = stream.readBytes(bufSize);
+                baos.write(buffer);
+            } catch (IOException iex) {
+                //ignore
+            }
+        }
+        return baos.toByteArray();
     }
 
 }

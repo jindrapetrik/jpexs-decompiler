@@ -19,12 +19,12 @@ public class IggyNameAndTagList implements StructureInterface {
     private List<Integer> tagIds;
 
     @IggyArrayFieldType(value = DataType.uint16_t)
-    private List<Long> tagIdsExtendedInfo;
+    private List<Long> tagIdsExtraInfo;
 
     public IggyNameAndTagList(String name, List<Integer> tagIds, List<Long> tagIdsExtendedInfo) {
         this.name = name;
         this.tagIds = tagIds;
-        this.tagIdsExtendedInfo = tagIdsExtendedInfo;
+        this.tagIdsExtraInfo = tagIdsExtendedInfo;
     }
 
     public IggyNameAndTagList(AbstractDataStream stream) throws IOException {
@@ -44,7 +44,7 @@ public class IggyNameAndTagList implements StructureInterface {
         name = nameBuilder.toString();
 
         tagIds = new ArrayList<>();
-        tagIdsExtendedInfo = new ArrayList<>();
+        tagIdsExtraInfo = new ArrayList<>();
         while (true) {
             long typeLen = stream.readUI32();
             if (typeLen == 0) {
@@ -53,7 +53,7 @@ public class IggyNameAndTagList implements StructureInterface {
             long tagLength = stream.readUI32();
             int tagType = (int) ((typeLen >>> 6) + 10) & 0x3FF;
             tagIds.add(tagType);
-            tagIdsExtendedInfo.add(tagLength);
+            tagIdsExtraInfo.add(tagLength);
         }
     }
 
@@ -65,8 +65,8 @@ public class IggyNameAndTagList implements StructureInterface {
         return tagIds;
     }
 
-    public List<Long> getTagIdsExtendedInfo() {
-        return tagIdsExtendedInfo;
+    public List<Long> getTagIdsExtraInfo() {
+        return tagIdsExtraInfo;
     }
 
     @Override

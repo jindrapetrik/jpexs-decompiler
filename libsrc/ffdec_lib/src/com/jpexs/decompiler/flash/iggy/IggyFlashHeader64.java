@@ -48,7 +48,7 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
     long unk_50;
     @IggyFieldType(DataType.uint32_t)
     long unk_54;
-    float frame_rate;
+    float frameRate;
     @IggyFieldType(DataType.uint32_t)
     long unk_5C;
     @IggyFieldType(DataType.uint64_t)
@@ -127,7 +127,7 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
         unk_4C = stream.readUI32();
         unk_50 = stream.readUI32();
         unk_54 = stream.readUI32();
-        frame_rate = stream.readFloat();
+        frameRate = stream.readFloat();
         unk_5C = stream.readUI32();
         unk_60 = stream.readUI64();
         unk_68 = stream.readUI64();
@@ -169,7 +169,7 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
         sb.append("unk_4C ").append(unk_4C).append("\r\n");
         sb.append("unk_50 ").append(unk_50).append("\r\n");
         sb.append("unk_54 ").append(unk_54).append("\r\n");
-        sb.append("frame_rate ").append(frame_rate).append("\r\n");
+        sb.append("frameRate ").append(frameRate).append("\r\n");
         sb.append("unk_5C ").append(unk_5C).append("\r\n");
         sb.append("unk_60 ").append(unk_60).append("\r\n");
         sb.append("unk_68 ").append(unk_68).append("\r\n");
@@ -187,6 +187,31 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
         sb.append("]");
         return sb.toString();
 
+    }
+
+    @Override
+    public long getXMin() {
+        return xmin;
+    }
+
+    @Override
+    public long getYMin() {
+        return ymin;
+    }
+
+    @Override
+    public long getXMax() {
+        return xmax;
+    }
+
+    @Override
+    public long getYMax() {
+        return ymax;
+    }
+
+    @Override
+    public float getFrameRate() {
+        return frameRate;
     }
 
 }
