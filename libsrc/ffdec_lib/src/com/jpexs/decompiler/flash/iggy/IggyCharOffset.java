@@ -50,7 +50,9 @@ public class IggyCharOffset implements StructureInterface {
         xscale = stream.readUI16();
         yscale = stream.readUI16();
         zero3 = stream.readUI32();
-        offset = ischar1 > 0 ? stream.position() + stream.readUI64() : 0 /*napr. mezera*/;
+        long cur_position = stream.position();
+        long relative_offset = stream.readUI64();
+        offset = ischar1 > 0 ? cur_position + relative_offset : 0;
     }
 
     @Override

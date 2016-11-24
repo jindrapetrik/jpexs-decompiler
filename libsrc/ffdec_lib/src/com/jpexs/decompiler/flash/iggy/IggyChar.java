@@ -64,6 +64,7 @@ public class IggyChar implements StructureInterface {
 
     @Override
     public void readFromDataStream(AbstractDataStream s) throws IOException {
+        s.seek(offset, SeekMode.SET);
         minx = s.readFloat();
         miny = s.readFloat();
         maxx = s.readFloat();
@@ -77,7 +78,7 @@ public class IggyChar implements StructureInterface {
         two1 = s.readUI32();
 
         if ((one != 1) | (one2 != 1) | (one3 != 1) | (one4 != 1) | (two1 != 2)) {
-            LOGGER.warning(String.format("Unique header at pos %08X\n", offset));
+            LOGGER.info(String.format("Unique header at pos %d\n", offset));
         }
 
         nodes = new ArrayList<>();

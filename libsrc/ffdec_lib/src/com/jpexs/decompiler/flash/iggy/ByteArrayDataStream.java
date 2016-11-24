@@ -11,7 +11,7 @@ import java.util.Arrays;
 public class ByteArrayDataStream extends AbstractDataStream {
 
     private byte[] data;
-    private int pos;
+    private long pos;
     private boolean use64bit;
 
     public ByteArrayDataStream(int initialSize, boolean use64bit) {
@@ -39,7 +39,9 @@ public class ByteArrayDataStream extends AbstractDataStream {
         if (pos >= data.length) {
             throw new EOFException("End of stream reached");
         }
-        return data[pos++] & 0xff;
+        int ret = data[(int) pos] & 0xff;
+        pos++;
+        return ret;
     }
 
     public void resize(int newsize) {
@@ -54,7 +56,8 @@ public class ByteArrayDataStream extends AbstractDataStream {
         if (pos >= data.length) {
             throw new EOFException("End of stream reached");
         }
-        data[pos++] = (byte) val;
+        data[(int) pos] = (byte) val;
+        pos++;
     }
 
     @Override

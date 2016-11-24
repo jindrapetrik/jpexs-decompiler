@@ -43,7 +43,7 @@ public abstract class AbstractDataStream {
 
     protected long readUI32() throws IOException {
         try {
-            return (readUI8() + (readUI8() << 8) + (readUI8() << 16) + (readUI8() << 24)) & 0xffffffff;
+            return (readUI8() + (readUI8() << 8) + (readUI8() << 16) + (readUI8() << 24));
         } catch (EOFException ex) {
             return -1;
         }

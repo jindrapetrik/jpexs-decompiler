@@ -2,7 +2,9 @@ package com.jpexs.decompiler.flash.iggy;
 
 import com.jpexs.decompiler.flash.iggy.annotations.IggyArrayFieldType;
 import com.jpexs.decompiler.flash.iggy.annotations.IggyFieldType;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import org.omg.CORBA.StructMemberHelper;
 
@@ -93,82 +95,155 @@ public class IggyFontPart implements StructureInterface {
 
     byte[] padTo4byteBoundary;
 
+    public IggyFontPart(int type, int order_in_iggy_file, byte[] zeroone, int char_count2, int[] what_1, long flags, long start_of_char_struct, long start_of_char_index, long start_of_scale, long kern_count, float[] unk_float, long start_of_kern, long zero_padd, long what_2, long zero_padd_2, long start_of_name, long one_padd, int xscale, int yscale, long zero_padd_3, float ssr1, float ssr2, long char_count, long zero_padd_4, long what_3, byte[] zeroes, float sss1, long one_padd2, float sss2, long one_padd3, float sss3, long one_padd4, float sss4, long one_padd5, String name, List<IggyCharOffset> charOffsets, List<IggyChar> chars, IggyCharIndices charIndices, IggyCharScales charScales, IggyCharKerning charKernings, byte[] padTo4byteBoundary) {
+        this.type = type;
+        this.order_in_iggy_file = order_in_iggy_file;
+        this.zeroone = zeroone;
+        this.char_count2 = char_count2;
+        this.what_1 = what_1;
+        this.flags = flags;
+        this.start_of_char_struct = start_of_char_struct;
+        this.start_of_char_index = start_of_char_index;
+        this.start_of_scale = start_of_scale;
+        this.kern_count = kern_count;
+        this.unk_float = unk_float;
+        this.start_of_kern = start_of_kern;
+        this.zero_padd = zero_padd;
+        this.what_2 = what_2;
+        this.zero_padd_2 = zero_padd_2;
+        this.start_of_name = start_of_name;
+        this.one_padd = one_padd;
+        this.xscale = xscale;
+        this.yscale = yscale;
+        this.zero_padd_3 = zero_padd_3;
+        this.ssr1 = ssr1;
+        this.ssr2 = ssr2;
+        this.char_count = char_count;
+        this.zero_padd_4 = zero_padd_4;
+        this.what_3 = what_3;
+        this.zeroes = zeroes;
+        this.sss1 = sss1;
+        this.one_padd2 = one_padd2;
+        this.sss2 = sss2;
+        this.one_padd3 = one_padd3;
+        this.sss3 = sss3;
+        this.one_padd4 = one_padd4;
+        this.sss4 = sss4;
+        this.one_padd5 = one_padd5;
+        this.name = name;
+        this.charOffsets = charOffsets;
+        this.chars = chars;
+        this.charIndices = charIndices;
+        this.charScales = charScales;
+        this.charKernings = charKernings;
+        this.padTo4byteBoundary = padTo4byteBoundary;
+    }
+
+    public IggyFontPart(AbstractDataStream stream) throws IOException {
+        readFromDataStream(stream);
+    }
+
+    private long readAbsoluteOffset(AbstractDataStream stream) throws IOException {
+        long offset = stream.readUI64();
+        if (offset == 1) {
+            return 0;
+        }
+        return stream.position() - 8 + offset;
+    }
+
     @Override
-    public void readFromDataStream(AbstractDataStream s) throws IOException {
-        type = s.readUI16();
-        order_in_iggy_file = s.readUI16();
-        zeroone = s.readBytes(28);
-        char_count2 = s.readUI16();
+    public void readFromDataStream(AbstractDataStream stream) throws IOException {
+        /*byte remData[] = stream.readBytes((int) (long) stream.available());
+        try (FileOutputStream fos = new FileOutputStream("d:\\Dropbox\\jpexs-laptop\\iggi\\out.part")) {
+            fos.write(remData);
+        }
+
+        System.exit(0);*/
+        type = stream.readUI16();
+        order_in_iggy_file = stream.readUI16();
+        zeroone = stream.readBytes(28);
+        char_count2 = stream.readUI16();
         what_1 = new int[3];
         for (int i = 0; i < what_1.length; i++) {
-            what_1[i] = s.readUI16();
+            what_1[i] = stream.readUI16();
         }
-        flags = s.readUI64();
-        start_of_char_struct = s.position() + s.readUI64();
-        start_of_char_index = s.position() + s.readUI64();
-        start_of_scale = s.position() + s.readUI64();
-        kern_count = s.readUI32();
+        flags = stream.readUI64();
+        start_of_char_struct = readAbsoluteOffset(stream);
+        start_of_char_index = readAbsoluteOffset(stream);
+        start_of_scale = readAbsoluteOffset(stream);
+        kern_count = stream.readUI32();
         unk_float = new float[5];
         for (int i = 0; i < unk_float.length; i++) {
-            unk_float[i] = s.readFloat();
+            unk_float[i] = stream.readFloat();
         }
-        start_of_kern = s.position() + s.readUI64();
-        zero_padd = s.readUI64();
-        what_2 = s.readUI64();
-        zero_padd_2 = s.readUI64();
-        start_of_name = s.position() + s.readUI64();
-        one_padd = s.readUI64();
-        xscale = s.readUI16();
-        yscale = s.readUI16();
-        zero_padd_3 = s.readUI64();
-        ssr1 = s.readFloat();
-        ssr2 = s.readFloat();
-        char_count = s.readUI32();
-        zero_padd_4 = s.readUI64();
-        what_3 = s.readUI64();
-        s.seek(272, SeekMode.CUR);
-        sss1 = s.readFloat();
-        one_padd2 = s.readUI32();
-        sss2 = s.readFloat();
-        one_padd3 = s.readUI32();
-        sss3 = s.readFloat();
-        one_padd4 = s.readUI32();
-        sss4 = s.readFloat();
-        one_padd5 = s.readUI32();
-        s.seek(start_of_name, SeekMode.CUR);
-
-        StringBuilder nameBuilder = new StringBuilder();
-        int nameCharCnt = 0;
-        do {
-            char c = (char) s.readUI16();
-            nameCharCnt++;
-            if (c == '\0') {
-                break;
+        start_of_kern = readAbsoluteOffset(stream);
+        zero_padd = stream.readUI64();
+        what_2 = stream.readUI64();
+        zero_padd_2 = stream.readUI64();
+        start_of_name = readAbsoluteOffset(stream);
+        one_padd = stream.readUI64();
+        xscale = stream.readUI16();
+        yscale = stream.readUI16();
+        zero_padd_3 = stream.readUI64();
+        ssr1 = stream.readFloat();
+        ssr2 = stream.readFloat();
+        char_count = stream.readUI32();
+        zero_padd_4 = stream.readUI64();
+        what_3 = stream.readUI64();
+        stream.seek(272, SeekMode.CUR);
+        sss1 = stream.readFloat();
+        one_padd2 = stream.readUI32();
+        sss2 = stream.readFloat();
+        one_padd3 = stream.readUI32();
+        sss3 = stream.readFloat();
+        one_padd4 = stream.readUI32();
+        sss4 = stream.readFloat();
+        one_padd5 = stream.readUI32();
+        if (start_of_name != 0) {
+            stream.seek(start_of_name, SeekMode.SET);
+            StringBuilder nameBuilder = new StringBuilder();
+            int nameCharCnt = 0;
+            do {
+                char c = (char) stream.readUI16();
+                nameCharCnt++;
+                if (c == '\0') {
+                    break;
+                }
+                nameBuilder.append(c);
+            } while (true);
+            stream.seek(32 - nameCharCnt * 2, SeekMode.CUR);
+            name = nameBuilder.toString();
+        }
+        stream.readUI64(); //pad zero        
+        if (start_of_char_struct != 0) {
+            stream.seek(start_of_char_struct, SeekMode.SET);
+            charOffsets = new ArrayList<>();
+            for (int i = 0; i < char_count; i++) {
+                charOffsets.add(new IggyCharOffset(stream));
             }
-            nameBuilder.append(c);
-        } while (true);
-        s.seek(16 - nameCharCnt * 2, SeekMode.CUR);
-        name = nameBuilder.toString();
-        s.seek(start_of_char_struct, SeekMode.CUR);
-
-        for (int i = 0; i < char_count; i++) {
-            charOffsets.add(new IggyCharOffset(s));
-        }
-        for (int i = 0; i < char_count; i++) {
-            long offset = charOffsets.get(i).offset;
-            if (offset > 0) {
-                chars.add(new IggyChar(s, offset));
-            } else {
-                s.readUI8();
-                chars.add(null);
+            chars = new ArrayList<>();
+            for (int i = 0; i < char_count; i++) {
+                long offset = charOffsets.get(i).offset;
+                if (offset > 0) {
+                    chars.add(new IggyChar(stream, offset));
+                } else {
+                    stream.seek(1, SeekMode.CUR);
+                    chars.add(null);
+                }
             }
         }
-        s.seek(start_of_char_index, SeekMode.CUR);
-        charIndices = new IggyCharIndices(s, char_count);
-        s.seek(start_of_scale, SeekMode.CUR);
-        charScales = new IggyCharScales(s, char_count);
-        s.seek(start_of_kern, SeekMode.CUR);
-        charKernings = new IggyCharKerning(s, kern_count);
+        if (start_of_char_index != 0) {
+            stream.seek(start_of_char_index, SeekMode.SET);
+            charIndices = new IggyCharIndices(stream, char_count);
+        }
+        if (start_of_scale != 0) {
+            stream.seek(start_of_scale, SeekMode.SET);
+            charScales = new IggyCharScales(stream, char_count);
+        }
+        if (start_of_kern != 0) {
+            stream.seek(start_of_kern, SeekMode.SET);
+            charKernings = new IggyCharKerning(stream, kern_count);
+        }
     }
 
     @Override
