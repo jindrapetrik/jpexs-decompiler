@@ -77,9 +77,7 @@ public class IggyFile extends AbstractDataStream implements AutoCloseable {
 
         for (int swfIndex = 0; swfIndex < headers.size(); swfIndex++) {
             IggyFlashHeaderInterface hdr = headers.get(swfIndex);
-            System.out.println("hdr=" + hdr);
             IggyDataReader dataReader = new IggyDataReader((IggyFlashHeader64) hdr /*FIXME for 32*/, flashDataStreams.get(swfIndex), offsetTables.get(swfIndex));
-            System.out.println("dataReader=" + dataReader);
             flashDataReaders.add(dataReader);
         }
     }
