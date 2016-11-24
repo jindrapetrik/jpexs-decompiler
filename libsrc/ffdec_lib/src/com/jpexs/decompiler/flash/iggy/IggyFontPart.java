@@ -153,12 +153,6 @@ public class IggyFontPart implements StructureInterface {
 
     @Override
     public void readFromDataStream(AbstractDataStream stream) throws IOException {
-        /*byte remData[] = stream.readBytes((int) (long) stream.available());
-        try (FileOutputStream fos = new FileOutputStream("d:\\Dropbox\\jpexs-laptop\\iggi\\out.part")) {
-            fos.write(remData);
-        }
-
-        System.exit(0);*/
         type = stream.readUI16();
         order_in_iggy_file = stream.readUI16();
         zeroone = stream.readBytes(28);

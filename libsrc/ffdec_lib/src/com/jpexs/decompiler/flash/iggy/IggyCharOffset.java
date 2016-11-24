@@ -2,12 +2,15 @@ package com.jpexs.decompiler.flash.iggy;
 
 import com.jpexs.decompiler.flash.iggy.annotations.IggyFieldType;
 import java.io.IOException;
+import java.util.logging.Logger;
 
 /**
  *
  * @author JPEXS
  */
 public class IggyCharOffset implements StructureInterface {
+
+    private static Logger LOGGER = Logger.getLogger(IggyCharOffset.class.getName());
 
     @IggyFieldType(DataType.uint64_t)
     long zero;
@@ -52,7 +55,12 @@ public class IggyCharOffset implements StructureInterface {
         zero3 = stream.readUI32();
         long cur_position = stream.position();
         long relative_offset = stream.readUI64();
-        offset = ischar1 > 0 ? cur_position + relative_offset : 0;
+        if (ischar1 > 0) {
+            offset = cur_position + relative_offset;
+        } else {
+            offset = 0;
+            LOGGER.info(String.format("Empty char"));
+        }
     }
 
     @Override

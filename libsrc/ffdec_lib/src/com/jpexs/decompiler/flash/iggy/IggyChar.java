@@ -79,6 +79,7 @@ public class IggyChar implements StructureInterface {
 
         if ((one != 1) | (one2 != 1) | (one3 != 1) | (one4 != 1) | (two1 != 2)) {
             LOGGER.info(String.format("Unique header at pos %d\n", offset));
+            //System.exit(0);
         }
 
         nodes = new ArrayList<>();
