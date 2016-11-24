@@ -12,7 +12,7 @@ import org.omg.CORBA.StructMemberHelper;
  *
  * @author JPEXS
  */
-public class IggyFontPart implements StructureInterface {
+public class IggyFontData implements StructureInterface {
 
     @IggyFieldType(DataType.uint16_t)
     int type;   //stejny pro rozdilne fonty
@@ -95,7 +95,7 @@ public class IggyFontPart implements StructureInterface {
 
     byte[] padTo4byteBoundary;
 
-    public IggyFontPart(int type, int order_in_iggy_file, byte[] zeroone, int char_count2, int[] what_1, long flags, long start_of_char_struct, long start_of_char_index, long start_of_scale, long kern_count, float[] unk_float, long start_of_kern, long zero_padd, long what_2, long zero_padd_2, long start_of_name, long one_padd, int xscale, int yscale, long zero_padd_3, float ssr1, float ssr2, long char_count, long zero_padd_4, long what_3, byte[] zeroes, float sss1, long one_padd2, float sss2, long one_padd3, float sss3, long one_padd4, float sss4, long one_padd5, String name, List<IggyCharOffset> charOffsets, List<IggyChar> chars, IggyCharIndices charIndices, IggyCharScales charScales, IggyCharKerning charKernings, byte[] padTo4byteBoundary) {
+    public IggyFontData(int type, int order_in_iggy_file, byte[] zeroone, int char_count2, int[] what_1, long flags, long start_of_char_struct, long start_of_char_index, long start_of_scale, long kern_count, float[] unk_float, long start_of_kern, long zero_padd, long what_2, long zero_padd_2, long start_of_name, long one_padd, int xscale, int yscale, long zero_padd_3, float ssr1, float ssr2, long char_count, long zero_padd_4, long what_3, byte[] zeroes, float sss1, long one_padd2, float sss2, long one_padd3, float sss3, long one_padd4, float sss4, long one_padd5, String name, List<IggyCharOffset> charOffsets, List<IggyChar> chars, IggyCharIndices charIndices, IggyCharScales charScales, IggyCharKerning charKernings, byte[] padTo4byteBoundary) {
         this.type = type;
         this.order_in_iggy_file = order_in_iggy_file;
         this.zeroone = zeroone;
@@ -139,7 +139,7 @@ public class IggyFontPart implements StructureInterface {
         this.padTo4byteBoundary = padTo4byteBoundary;
     }
 
-    public IggyFontPart(AbstractDataStream stream) throws IOException {
+    public IggyFontData(AbstractDataStream stream) throws IOException {
         readFromDataStream(stream);
     }
 
@@ -244,6 +244,46 @@ public class IggyFontPart implements StructureInterface {
     @Override
     public void writeToDataStream(AbstractDataStream stream) throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public long getFlags() {
+        return flags;
+    }
+
+    public int getXscale() {
+        return xscale;
+    }
+
+    public int getYscale() {
+        return yscale;
+    }
+
+    public long getCharacterCount() {
+        return char_count;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<IggyChar> getChars() {
+        return chars;
+    }
+
+    public IggyCharIndices getCharIndices() {
+        return charIndices;
+    }
+
+    public IggyCharScales getCharScales() {
+        return charScales;
+    }
+
+    public IggyCharKerning getCharKernings() {
+        return charKernings;
     }
 
 }

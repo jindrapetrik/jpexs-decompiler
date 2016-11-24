@@ -13,6 +13,10 @@ public class IggyCharNode implements StructureInterface {
 
     private static Logger LOGGER = Logger.getLogger(IggyCharNode.class.getName());
 
+    public static int NODE_TYPE_MOVE = 1;
+    public static int NODE_TYPE_LINE_TO = 2;
+    public static int NODE_TYPE_CURVE_POINT = 3;
+
     @IggyFieldType(DataType.float_t)
     float x1;
     @IggyFieldType(DataType.float_t)
@@ -78,4 +82,41 @@ public class IggyCharNode implements StructureInterface {
     public void writeToDataStream(AbstractDataStream stream) throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+
+    public float getX1() {
+        return x1;
+    }
+
+    public float getY1() {
+        return y1;
+    }
+
+    public float getX2() {
+        return x2;
+    }
+
+    public float getY2() {
+        return y2;
+    }
+
+    public int getNodeType() {
+        return node_type;
+    }
+
+    public int getNodeSubType() {
+        return node_subtype;
+    }
+
+    public int getZer1() {
+        return zer1;
+    }
+
+    public int getZer2() {
+        return zer2;
+    }
+
+    public boolean isStart() {
+        return isstart == 1;
+    }
+
 }

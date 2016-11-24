@@ -16,6 +16,10 @@ public class IggyCharIndices implements StructureInterface {
     @IggyFieldType(DataType.uint32_t)
     long padd;
 
+    public List<Character> getChars() {
+        return chars;
+    }
+
     private long charCount;
 
     public IggyCharIndices(AbstractDataStream stream, long charCount) throws IOException {

@@ -33,6 +33,18 @@ public class IggyFile extends AbstractDataStream implements AutoCloseable {
     private List<IggyFlashHeaderInterface> headers = new ArrayList<>();
     private List<IggyDataReader> flashDataReaders = new ArrayList<>();
 
+    public int getFontCount(int swfIndex) {
+        return flashDataReaders.get(swfIndex).fontDatas.size();
+    }
+
+    public IggyFontData getFontData(int swfIndex, int fontIndex) {
+        return flashDataReaders.get(swfIndex).fontDatas.get(fontIndex);
+    }
+
+    public IggyFontInfo getFontInfo(int swfIndex, int fontIndex) {
+        return null; //FIXME!!! //flashDataReaders.get(swfIndex).fontInfos.get(fontIndex);
+    }
+
     @Override
     public long position() {
         try {

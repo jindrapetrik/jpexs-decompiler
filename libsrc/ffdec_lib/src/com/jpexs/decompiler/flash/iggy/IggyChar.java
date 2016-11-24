@@ -14,7 +14,6 @@ public class IggyChar implements StructureInterface {
 
     private static Logger LOGGER = Logger.getLogger(IggyChar.class.getName());
 
-    //if offset = 1, zadnychar, 1 byte[1]
     @IggyFieldType(DataType.float_t)
     float minx;
     @IggyFieldType(DataType.float_t)
@@ -24,7 +23,7 @@ public class IggyChar implements StructureInterface {
     @IggyFieldType(DataType.float_t)
     float maxy;
     @IggyFieldType(DataType.uint64_t)
-    long unk; // stejny vetsinou - napr. 48
+    long unk; // stejny vetsinou - napr. 48 - JP: to by mohlo byt advance
     @IggyFieldType(DataType.uint64_t)
     long count;
     @IggyFieldType(DataType.uint64_t)
@@ -77,8 +76,8 @@ public class IggyChar implements StructureInterface {
         one4 = s.readUI32();
         two1 = s.readUI32();
 
-        if ((one != 1) | (one2 != 1) | (one3 != 1) | (one4 != 1) | (two1 != 2)) {
-            LOGGER.fine(String.format("Unique header at pos %d\n", offset));
+        if ((one != 1) || (one2 != 1) || (one3 != 1) || (one4 != 1) || (two1 != 2)) {
+            LOGGER.fine(String.format("Unique header at pos %d, one: %d, one2: %d, one3: %d, one4: %d, two1: %d\n", offset, one, one2, one3, one4, two1));
         }
 
         nodes = new ArrayList<>();
@@ -91,6 +90,50 @@ public class IggyChar implements StructureInterface {
     @Override
     public void writeToDataStream(AbstractDataStream stream) throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public float getMinx() {
+        return minx;
+    }
+
+    public float getMiny() {
+        return miny;
+    }
+
+    public float getMaxx() {
+        return maxx;
+    }
+
+    public float getMaxy() {
+        return maxy;
+    }
+
+    public long getUnk() {
+        return unk;
+    }
+
+    public long getOne() {
+        return one;
+    }
+
+    public long getOne2() {
+        return one2;
+    }
+
+    public long getOne3() {
+        return one3;
+    }
+
+    public long getOne4() {
+        return one4;
+    }
+
+    public long getTwo1() {
+        return two1;
+    }
+
+    public List<IggyCharNode> getNodes() {
+        return nodes;
     }
 
 }

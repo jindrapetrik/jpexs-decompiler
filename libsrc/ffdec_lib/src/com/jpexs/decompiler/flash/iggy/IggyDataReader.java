@@ -19,7 +19,7 @@ public class IggyDataReader implements StructureInterface {
     @IggyFieldType(value = DataType.widechar_t, count = 48)
     String name;
 
-    List<IggyFontPart> fontParts;
+    List<IggyFontData> fontDatas;
     List<IggyFontInfo> fontInfos;
 
     private IggyFlashHeader64 header;
@@ -90,12 +90,12 @@ public class IggyDataReader implements StructureInterface {
             }
         }
 
-        fontParts = new ArrayList<>();
+        fontDatas = new ArrayList<>();
         fontInfos = new ArrayList<>();
         for (int i = 0; i < header.font_count; i++) {
             stream.seek(font_main_offsets[i], SeekMode.SET);
-            IggyFontPart part = new IggyFontPart(stream);
-            fontParts.add(part);
+            IggyFontData part = new IggyFontData(stream);
+            fontDatas.add(part);
         }
     }
 
