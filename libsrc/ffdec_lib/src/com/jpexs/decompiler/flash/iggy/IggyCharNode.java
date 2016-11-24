@@ -64,13 +64,13 @@ public class IggyCharNode implements StructureInterface {
         isstart = s.readUI32();
 
         if ((zer1 != 0) | (zer2 != 0)) {
-            LOGGER.warning(String.format("Unknown zeroes at pos %08X\n", s.position() - 6));
+            LOGGER.fine(String.format("Unknown zeroes at pos %08X\n", s.position() - 6));
         }
         if ((!first) & (isstart != 1)) {
-            LOGGER.warning(String.format("Unknown format at pos %08X\n", s.position() - 4));
+            LOGGER.fine(String.format("Unknown format at pos %08X\n", s.position() - 4));
         }
         if ((first) & (isstart != 0)) {
-            LOGGER.warning(String.format("Unknown format at pos %08X\n", s.position() - 4));
+            LOGGER.fine(String.format("Unknown format at pos %08X\n", s.position() - 4));
         }
     }
 

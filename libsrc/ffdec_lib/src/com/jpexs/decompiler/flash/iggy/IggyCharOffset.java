@@ -59,7 +59,7 @@ public class IggyCharOffset implements StructureInterface {
             offset = cur_position + relative_offset;
         } else {
             offset = 0;
-            LOGGER.info(String.format("Empty char"));
+            LOGGER.finer(String.format("Empty char"));
         }
     }
 
