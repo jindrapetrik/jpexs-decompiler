@@ -18,12 +18,9 @@ public class IggyDataReader implements StructureInterface {
 
     @IggyFieldType(value = DataType.widechar_t, count = 48)
     String name;
-    @IggyFieldType(value = DataType.uint64_t)
-    long unk_pad;
-    @IggyArrayFieldType(value = DataType.uint64_t, countField = "font_count")
-    long font_main_offsets[];
-    @IggyArrayFieldType(value = DataType.uint64_t, countField = "font_count")
-    long font_info_offsets[];
+
+    List<ByteArrayDataStream> fontMainStreams = new ArrayList<>();
+    List<ByteArrayDataStream> fontInfoStreams = new ArrayList<>();
 
     private IggyFlashHeader64 header;
     private Map<Long, Long> sizesOfOffsets;
@@ -40,9 +37,6 @@ public class IggyDataReader implements StructureInterface {
 
     @Override
     public void readFromDataStream(AbstractDataStream stream) throws IOException {
-
-        stream.seek(header.swf_name_offset, SeekMode.SET);
-
         StringBuilder nameBuilder = new StringBuilder();
         int charCnt = 0;
         do {
@@ -55,14 +49,14 @@ public class IggyDataReader implements StructureInterface {
         } while (true);
         stream.seek(48 - charCnt * 2, SeekMode.CUR);
         name = nameBuilder.toString();
-        unk_pad = stream.readUI64(); //padding one
-        font_main_offsets = new long[(int) header.font_count];
+
+        long[] font_main_offsets = new long[(int) header.font_count];
         for (int i = 0; i < header.font_count; i++) {
             long pos = stream.position();
             long offset = stream.readUI64();
             font_main_offsets[i] = offset == NO_OFFSET ? NO_OFFSET : pos + offset;
         }
-        font_info_offsets = new long[(int) header.font_count];
+        long[] font_info_offsets = new long[(int) header.font_count];
         for (int i = 0; i < header.font_count; i++) {
             long pos = stream.position();
             long offset = stream.readUI64();
@@ -70,8 +64,6 @@ public class IggyDataReader implements StructureInterface {
         }
         long pad_len = 840 - stream.position();
         stream.seek(pad_len, SeekMode.CUR);
-
-        List<ByteArrayDataStream> fontMainStreams = new ArrayList<>();
 
         for (int i = 0; i < header.font_count; i++) {
             long fontMainOffset = font_main_offsets[i];
@@ -86,8 +78,6 @@ public class IggyDataReader implements StructureInterface {
                 fontMainStreams.add(new ByteArrayDataStream(fontMainData, stream.is64()));
             }
         }
-
-        List<ByteArrayDataStream> fontInfoStreams = new ArrayList<>();
 
         for (int i = 0; i < header.font_count; i++) {
             long fontInfoOffset = font_info_offsets[i];
@@ -118,10 +108,6 @@ public class IggyDataReader implements StructureInterface {
         StringBuilder sb = new StringBuilder();
         sb.append("[\r\n");
         sb.append("name ").append(name).append("\r\n");
-        for (int i = 0; i < header.font_count; i++) {
-            sb.append("font[").append(i).append("] main_offset:").append(font_main_offsets[i]).append(" info_offset:").append(font_info_offsets[i]).append("\r\n");
-        }
-        sb.append("]");
         return sb.toString();
     }
 
