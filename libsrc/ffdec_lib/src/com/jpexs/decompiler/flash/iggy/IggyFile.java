@@ -52,6 +52,7 @@ public class IggyFile extends AbstractDataStream implements AutoCloseable {
         //TODO: use these two for something
         List<List<Integer>> indexTables = new ArrayList<>();
         List<List<Long>> offsetTables = new ArrayList<>();
+        List<AbstractDataStream> flashDataStreams = new ArrayList<>();
 
         for (int i = 0; i < subFileEntries.size(); i++) {
             IggySubFileEntry entry = subFileEntries.get(i);
@@ -64,18 +65,22 @@ public class IggyFile extends AbstractDataStream implements AutoCloseable {
                 offsetTables.add(offsets);
             } else if (entry.type == IggySubFileEntry.TYPE_FLASH) {
                 IggyFlashHeaderInterface hdr;
-                //if (is64()) {
-                //FIXME: Make 32 bit version work
-                hdr = new IggyFlashHeader64(dataStream);
-                /*} else {
+                if (is64()) {
+                    hdr = new IggyFlashHeader64(dataStream);
+                } else {
                     hdr = new IggyFlashHeader32(dataStream);
-                }*/
-                System.out.println("hdr=" + hdr);
-                IggyDataReader dataReader = new IggyDataReader((IggyFlashHeader64) hdr, dataStream);
-                System.out.println("dataReader=" + dataReader);
+                }
                 headers.add(hdr);
-                flashDataReaders.add(dataReader);
+                flashDataStreams.add(dataStream);
             }
+        }
+
+        for (int swfIndex = 0; swfIndex < headers.size(); swfIndex++) {
+            IggyFlashHeaderInterface hdr = headers.get(swfIndex);
+            System.out.println("hdr=" + hdr);
+            IggyDataReader dataReader = new IggyDataReader((IggyFlashHeader64) hdr /*FIXME for 32*/, flashDataStreams.get(swfIndex), offsetTables.get(swfIndex));
+            System.out.println("dataReader=" + dataReader);
+            flashDataReaders.add(dataReader);
         }
     }
 

@@ -49,7 +49,7 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
     @IggyFieldType(DataType.uint64_t)
     long fonts_offset;
     @IggyFieldType(DataType.uint64_t)
-    long font_infos_offset;
+    long unk_68;
     @IggyFieldType(DataType.uint64_t)
     long names_offset; // 0x70 relative offset to the names/import section of the file  - end of fonts
     @IggyFieldType(DataType.uint64_t)
@@ -104,7 +104,7 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
         frame_rate = stream.readFloat();
         unk_5C = stream.readUI32();
         fonts_offset = stream.readUI64();
-        font_infos_offset = stream.readUI64();
+        unk_68 = stream.readUI64();
         names_offset = stream.readUI64();
         unk_offset5 = stream.readUI64();
         unk_80 = stream.readUI64();
@@ -165,7 +165,7 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
         sb.append("frame_rate ").append(frame_rate).append("\r\n");
         sb.append("unk_5C ").append(unk_5C).append("\r\n");
         sb.append("fonts_offset ").append(fonts_offset).append("\r\n");
-        sb.append("font_infos_offset ").append(font_infos_offset).append("\r\n");
+        sb.append("unk_68 ").append(unk_68).append("\r\n");
         sb.append("names_offset ").append(names_offset).append("\r\n");
         sb.append("unk_offset5 ").append(unk_offset5).append("\r\n");
         sb.append("unk_80 ").append(unk_80).append("\r\n");

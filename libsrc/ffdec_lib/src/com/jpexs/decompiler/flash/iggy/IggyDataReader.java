@@ -4,7 +4,9 @@ import com.jpexs.decompiler.flash.iggy.annotations.IggyArrayFieldType;
 import com.jpexs.decompiler.flash.iggy.annotations.IggyFieldType;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -12,19 +14,27 @@ import java.util.List;
  */
 public class IggyDataReader implements StructureInterface {
 
+    final static int NO_OFFSET = 1;
+
     @IggyFieldType(value = DataType.widechar_t, count = 48)
     String name;
     @IggyFieldType(value = DataType.uint64_t)
     long unk_pad;
     @IggyArrayFieldType(value = DataType.uint64_t, countField = "font_count")
-    long[] font_main_offsets;
+    long font_main_offsets[];
     @IggyArrayFieldType(value = DataType.uint64_t, countField = "font_count")
     long font_info_offsets[];
 
     private IggyFlashHeader64 header;
+    private Map<Long, Long> sizesOfOffsets;
 
-    public IggyDataReader(IggyFlashHeader64 header, AbstractDataStream stream) throws IOException {
+    public IggyDataReader(IggyFlashHeader64 header, AbstractDataStream stream, List<Long> offsets) throws IOException {
         this.header = header;
+        sizesOfOffsets = new HashMap<>();
+        for (int i = 0; i < offsets.size() - 1; i++) {
+            sizesOfOffsets.put(offsets.get(i), offsets.get(i + 1) - offsets.get(i));
+        }
+        sizesOfOffsets.put(offsets.get(offsets.size() - 1), 0L); //Last offset has 0L length?
         readFromDataStream(stream);
     }
 
@@ -46,14 +56,52 @@ public class IggyDataReader implements StructureInterface {
         stream.seek(48 - charCnt * 2, SeekMode.CUR);
         name = nameBuilder.toString();
         unk_pad = stream.readUI64(); //padding one
+        font_main_offsets = new long[(int) header.font_count];
         for (int i = 0; i < header.font_count; i++) {
-            font_main_offsets[i] = stream.readUI64();
+            long pos = stream.position();
+            long offset = stream.readUI64();
+            font_main_offsets[i] = offset == NO_OFFSET ? NO_OFFSET : pos + offset;
         }
+        font_info_offsets = new long[(int) header.font_count];
         for (int i = 0; i < header.font_count; i++) {
-            font_info_offsets[i] = stream.readUI64();
+            long pos = stream.position();
+            long offset = stream.readUI64();
+            font_info_offsets[i] = offset == NO_OFFSET ? NO_OFFSET : pos + offset;
         }
-        System.out.println("pos=" + stream.position());
+        long pad_len = 840 - stream.position();
+        stream.seek(pad_len, SeekMode.CUR);
 
+        List<ByteArrayDataStream> fontMainStreams = new ArrayList<>();
+
+        for (int i = 0; i < header.font_count; i++) {
+            long fontMainOffset = font_main_offsets[i];
+            if (fontMainOffset == NO_OFFSET) {
+                fontMainStreams.add(null);
+            } else {
+                long fontMainSize = sizesOfOffsets.get(font_main_offsets[i]);
+
+                stream.seek(fontMainOffset, SeekMode.SET);
+                byte[] fontMainData = stream.readBytes((int) fontMainSize);
+
+                fontMainStreams.add(new ByteArrayDataStream(fontMainData, stream.is64()));
+            }
+        }
+
+        List<ByteArrayDataStream> fontInfoStreams = new ArrayList<>();
+
+        for (int i = 0; i < header.font_count; i++) {
+            long fontInfoOffset = font_info_offsets[i];
+            if (fontInfoOffset == NO_OFFSET) {
+                fontInfoStreams.add(null);
+            } else {
+                long fontInfoSize = sizesOfOffsets.get(font_info_offsets[i]);
+
+                stream.seek(fontInfoOffset, SeekMode.SET);
+                byte[] fontInfoData = stream.readBytes((int) fontInfoSize);
+
+                fontInfoStreams.add(new ByteArrayDataStream(fontInfoData, stream.is64()));
+            }
+        }
     }
 
     public String getName() {
@@ -70,6 +118,9 @@ public class IggyDataReader implements StructureInterface {
         StringBuilder sb = new StringBuilder();
         sb.append("[\r\n");
         sb.append("name ").append(name).append("\r\n");
+        for (int i = 0; i < header.font_count; i++) {
+            sb.append("font[").append(i).append("] main_offset:").append(font_main_offsets[i]).append(" info_offset:").append(font_info_offsets[i]).append("\r\n");
+        }
         sb.append("]");
         return sb.toString();
     }
