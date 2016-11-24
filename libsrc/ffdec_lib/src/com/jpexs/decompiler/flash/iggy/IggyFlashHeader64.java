@@ -12,7 +12,7 @@ import java.io.IOException;
 public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
 
     @IggyFieldType(DataType.uint64_t)
-    long swf_name_offset; // 0 Relative offset to first section (matches sizeof header);
+    long main_offset; // 0 Relative offset to first section (matches sizeof header);
     @IggyFieldType(DataType.uint64_t)
     long as3_section_offset; // 8  Relative offset to as3 file names table...
     @IggyFieldType(DataType.uint64_t)
@@ -43,6 +43,7 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
     long unk_50;
     @IggyFieldType(DataType.uint32_t)
     long unk_54;
+    @IggyFieldType(DataType.float_t)
     float frame_rate;
     @IggyFieldType(DataType.uint32_t)
     long unk_5C;
@@ -85,7 +86,7 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
 
     @Override
     public void readFromDataStream(AbstractDataStream stream) throws IOException {
-        swf_name_offset = stream.readUI64();
+        main_offset = stream.readUI64();
         as3_section_offset = stream.readUI64();
         unk_offset = stream.readUI64();
         unk_offset2 = stream.readUI64();
@@ -128,28 +129,28 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("[\r\n");
-        sb.append("main_offset ").append(swf_name_offset).append("\r\n");
+        sb.append("main_offset ").append(main_offset).append("\r\n");
         sb.append("as3_section_offset ").append(as3_section_offset);
-        sb.append(" global: ").append(swf_name_offset + as3_section_offset);
+        sb.append(" global: ").append(main_offset + as3_section_offset);
         sb.append("\r\n");
         sb.append("unk_offset ").append(unk_offset);
         if (unk_offset != 1) {
-            sb.append(" global: ").append(swf_name_offset + unk_offset);
+            sb.append(" global: ").append(main_offset + unk_offset);
         }
         sb.append("\r\n");
         sb.append("unk_offset2 ").append(unk_offset2);
         if (unk_offset2 != 1) {
-            sb.append(" global: ").append(swf_name_offset + unk_offset2);
+            sb.append(" global: ").append(main_offset + unk_offset2);
         }
         sb.append("\r\n");
         sb.append("unk_offset3 ").append(unk_offset3);
         if (unk_offset3 != 1) {
-            sb.append(" global: ").append(swf_name_offset + unk_offset3);
+            sb.append(" global: ").append(main_offset + unk_offset3);
         }
         sb.append("\r\n");
         sb.append("unk_offset4 ").append(unk_offset4);
         if (unk_offset4 != 1) {
-            sb.append(" global: ").append(swf_name_offset + unk_offset4);
+            sb.append(" global: ").append(main_offset + unk_offset4);
         }
         sb.append("\r\n");
         sb.append("xmin ").append(xmin).append("\r\n");

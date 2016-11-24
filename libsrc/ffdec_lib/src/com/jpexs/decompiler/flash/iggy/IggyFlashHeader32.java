@@ -1,12 +1,7 @@
 package com.jpexs.decompiler.flash.iggy;
 
 import com.jpexs.decompiler.flash.iggy.annotations.IggyFieldType;
-import com.jpexs.decompiler.flash.tags.Tag;
-import com.jpexs.decompiler.flash.tags.TagTypeInfo;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  *
@@ -51,6 +46,7 @@ public class IggyFlashHeader32 implements IggyFlashHeaderInterface {
     long unk_38;
     @IggyFieldType(DataType.uint32_t)
     long unk_3C;
+    @IggyFieldType(DataType.float_t)
     float frameRate;
     @IggyFieldType(DataType.uint32_t)
     long unk_44;
