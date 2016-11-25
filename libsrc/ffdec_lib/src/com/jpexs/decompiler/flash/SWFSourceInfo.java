@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash;
 
+import com.jpexs.decompiler.flash.iggy.conversion.IggySwfBundle;
 import com.jpexs.helpers.Path;
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -94,6 +95,8 @@ public class SWFSourceInfo {
                     return new SWC(new File(file));
                 case ".zip":
                     return new ZippedSWFBundle(new File(file));
+                case ".iggy":
+                    return new IggySwfBundle(new File(file));
             }
         }
 

@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.TreeNodeType;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.iggy.conversion.IggySwfBundle;
 import com.jpexs.decompiler.flash.tags.CSMTextSettingsTag;
 import com.jpexs.decompiler.flash.tags.DebugIDTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
@@ -358,6 +359,8 @@ public class TagTree extends JTree {
                     return TreeNodeType.BUNDLE_ZIP;
                 } else if (slist.bundle.getClass() == SWC.class) {
                     return TreeNodeType.BUNDLE_SWC;
+                } else if (slist.bundle.getClass() == IggySwfBundle.class) {
+                    return TreeNodeType.BUNDLE_IGGY;
                 } else {
                     return TreeNodeType.BUNDLE_BINARY;
                 }
