@@ -12,6 +12,7 @@ import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -33,16 +34,20 @@ public class IggyFile extends AbstractDataStream implements AutoCloseable {
     private List<IggyFlashHeaderInterface> headers = new ArrayList<>();
     private List<IggyDataReader> flashDataReaders = new ArrayList<>();
 
-    public int getFontCount(int swfIndex) {
-        return flashDataReaders.get(swfIndex).fontDatas.size();
+    public Set<Integer> getFontIds(int swfIndex) {
+        return flashDataReaders.get(swfIndex).fonts.keySet();
     }
 
-    public IggyFontData getFontData(int swfIndex, int fontIndex) {
-        return flashDataReaders.get(swfIndex).fontDatas.get(fontIndex);
+    public IggyFont getFont(int swfIndex, int fontId) {
+        return flashDataReaders.get(swfIndex).fonts.get(fontId);
     }
 
-    public IggyFontInfo getFontInfo(int swfIndex, int fontIndex) {
-        return null; //FIXME!!! //flashDataReaders.get(swfIndex).fontInfos.get(fontIndex);
+    public IggyText getText(int swfIndex, int textId) {
+        return flashDataReaders.get(swfIndex).texts.get(textId);
+    }
+
+    public Set<Integer> getTextIds(int swfIndex) {
+        return flashDataReaders.get(swfIndex).texts.keySet();
     }
 
     @Override
@@ -61,8 +66,7 @@ public class IggyFile extends AbstractDataStream implements AutoCloseable {
             subFileEntries.add(new IggySubFileEntry(this));
         }
 
-        //TODO: use these two for something
-        List<List<Integer>> indexTables = new ArrayList<>();
+        List<List<Integer>> indexTables = new ArrayList<>(); //TODO: use this two for something ??
         List<List<Long>> offsetTables = new ArrayList<>();
         List<AbstractDataStream> flashDataStreams = new ArrayList<>();
 
@@ -156,6 +160,7 @@ public class IggyFile extends AbstractDataStream implements AutoCloseable {
         };
     }
 
+    @Override
     protected int read() throws IOException {
         int val = raf.read();
         if (val == -1) {
@@ -217,6 +222,7 @@ public class IggyFile extends AbstractDataStream implements AutoCloseable {
     }
 
     public static void main(String[] args) throws IOException {
+        System.out.println("Iggy file splitter");
         if (args.length == 0) {
             System.err.println("No file specified");
             System.exit(1);

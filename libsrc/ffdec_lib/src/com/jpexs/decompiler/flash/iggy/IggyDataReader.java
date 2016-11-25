@@ -19,8 +19,9 @@ public class IggyDataReader implements StructureInterface {
     @IggyFieldType(value = DataType.widechar_t, count = 48)
     String name;
 
-    List<IggyFontData> fontDatas;
-    List<IggyFontInfo> fontInfos;
+    Map<Integer, IggyFont> fonts;
+    Map<Integer, IggyText> texts;
+    Map<Integer, Integer> text2Font;
 
     private IggyFlashHeader64 header;
     private Map<Long, Long> sizesOfOffsets;
@@ -52,50 +53,55 @@ public class IggyDataReader implements StructureInterface {
 
         stream.readUI64(); //pad 1
 
-        long[] font_main_offsets = new long[(int) header.font_count];
+        long[] fontOffsets = new long[(int) header.font_count];
         for (int i = 0; i < header.font_count; i++) {
-            font_main_offsets[i] = stream.position() + stream.readUI64();
+            fontOffsets[i] = stream.position() + stream.readUI64();
         }
-        long[] font_info_offsets = new long[(int) header.font_count];
-        for (int i = 0; i < header.font_count; i++) {
-            long pos = stream.position();
-            long offset = stream.readUI64();
-            font_info_offsets[i] = offset == NO_OFFSET ? NO_OFFSET : pos + offset;
+        List<Long> textOffsets = new ArrayList<>();
+
+        while (true) {
+            long val = stream.readUI64();
+            if (val == 1) {
+                break;
+            }
+            textOffsets.add(stream.position() + val);
         }
-        long pad_len = 840 - stream.position();
-        stream.seek(pad_len, SeekMode.CUR);
 
-        /*List<ByteArrayDataStream> fontMainStreams = new ArrayList<>();
+        //long pad_len = 840 - stream.position();
+        stream.seek(840, SeekMode.SET);
 
-        for (int i = 0; i < header.font_count; i++) {
-            long fontMainOffset = font_main_offsets[i];
-            //long fontMainSize = sizesOfOffsets.get(font_main_offsets[i]);
-            //stream.seek(fontMainOffset, SeekMode.SET);
-            //byte[] fontMainData = stream.readBytes((int) fontMainSize);
-            //fontMainStreams.add(new ByteArrayDataStream(fontMainData, stream.is64()));
-        }*/
-        List<ByteArrayDataStream> fontInfoStreams = new ArrayList<>();
+        Long lastOffset = null;
+        texts = new HashMap<>();
+        text2Font = new HashMap<>();
+        long textDataSizes[] = new long[(int) header.font_count];
 
-        for (int i = 0; i < header.font_count; i++) {
-            long fontInfoOffset = font_info_offsets[i];
-            if (fontInfoOffset == NO_OFFSET) {
-                fontInfoStreams.add(null);
+        long offsetAfterTexts = header.as3_section_offset;
+
+        for (int i = 0; i < textOffsets.size(); i++) {
+            long textOffset = textOffsets.get(i);
+            if (lastOffset == null) {
+                lastOffset = textOffset;
             } else {
-                long fontInfoSize = sizesOfOffsets.get(font_info_offsets[i]);
-
-                stream.seek(fontInfoOffset, SeekMode.SET);
-                byte[] fontInfoData = stream.readBytes((int) fontInfoSize);
-
-                fontInfoStreams.add(new ByteArrayDataStream(fontInfoData, stream.is64()));
+                textDataSizes[i - 1] = textOffset - lastOffset;
             }
         }
+        if (lastOffset != null) {
+            textDataSizes[(int) header.font_count - 1] = offsetAfterTexts - lastOffset;
+        }
 
-        fontDatas = new ArrayList<>();
-        fontInfos = new ArrayList<>();
+        for (int i = 0; i < textOffsets.size(); i++) {
+            long textOffset = textOffsets.get(i);
+            stream.seek(textOffset, SeekMode.SET);
+            byte[] textData = stream.readBytes((int) textDataSizes[i]);
+            IggyText text = new IggyText(new ByteArrayDataStream(textData, stream.is64()));
+            text2Font.put(text.textId, text.fontId);
+            texts.put(text.textId, text);
+        }
+        fonts = new HashMap<>();
         for (int i = 0; i < header.font_count; i++) {
-            stream.seek(font_main_offsets[i], SeekMode.SET);
-            IggyFontData part = new IggyFontData(stream);
-            fontDatas.add(part);
+            stream.seek(fontOffsets[i], SeekMode.SET);
+            IggyFont font = new IggyFont(stream);
+            fonts.put(font.fontId, font);
         }
     }
 

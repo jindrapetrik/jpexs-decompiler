@@ -12,12 +12,12 @@ import org.omg.CORBA.StructMemberHelper;
  *
  * @author JPEXS
  */
-public class IggyFontData implements StructureInterface {
+public class IggyFont implements StructureInterface {
 
     @IggyFieldType(DataType.uint16_t)
     int type;   //stejny pro rozdilne fonty
     @IggyFieldType(DataType.uint16_t)
-    int order_in_iggy_file;
+    int fontId;
     @IggyArrayFieldType(value = DataType.uint8_t, count = 28)
     byte[] zeroone; // stejny pro rozdilne fonty
     @IggyFieldType(DataType.uint16_t)
@@ -83,7 +83,6 @@ public class IggyFontData implements StructureInterface {
     @IggyFieldType(DataType.uint32_t)
     long one_padd5;
 
-    //FSeek(start_name);
     @IggyFieldType(value = DataType.widechar_t, count = 16)
     String name;
 
@@ -95,9 +94,9 @@ public class IggyFontData implements StructureInterface {
 
     byte[] padTo4byteBoundary;
 
-    public IggyFontData(int type, int order_in_iggy_file, byte[] zeroone, int char_count2, int[] what_1, long flags, long start_of_char_struct, long start_of_char_index, long start_of_scale, long kern_count, float[] unk_float, long start_of_kern, long zero_padd, long what_2, long zero_padd_2, long start_of_name, long one_padd, int xscale, int yscale, long zero_padd_3, float ssr1, float ssr2, long char_count, long zero_padd_4, long what_3, byte[] zeroes, float sss1, long one_padd2, float sss2, long one_padd3, float sss3, long one_padd4, float sss4, long one_padd5, String name, List<IggyCharOffset> charOffsets, List<IggyChar> chars, IggyCharIndices charIndices, IggyCharScales charScales, IggyCharKerning charKernings, byte[] padTo4byteBoundary) {
+    public IggyFont(int type, int order_in_iggy_file, byte[] zeroone, int char_count2, int[] what_1, long flags, long start_of_char_struct, long start_of_char_index, long start_of_scale, long kern_count, float[] unk_float, long start_of_kern, long zero_padd, long what_2, long zero_padd_2, long start_of_name, long one_padd, int xscale, int yscale, long zero_padd_3, float ssr1, float ssr2, long char_count, long zero_padd_4, long what_3, byte[] zeroes, float sss1, long one_padd2, float sss2, long one_padd3, float sss3, long one_padd4, float sss4, long one_padd5, String name, List<IggyCharOffset> charOffsets, List<IggyChar> chars, IggyCharIndices charIndices, IggyCharScales charScales, IggyCharKerning charKernings, byte[] padTo4byteBoundary) {
         this.type = type;
-        this.order_in_iggy_file = order_in_iggy_file;
+        this.fontId = order_in_iggy_file;
         this.zeroone = zeroone;
         this.char_count2 = char_count2;
         this.what_1 = what_1;
@@ -139,7 +138,7 @@ public class IggyFontData implements StructureInterface {
         this.padTo4byteBoundary = padTo4byteBoundary;
     }
 
-    public IggyFontData(AbstractDataStream stream) throws IOException {
+    public IggyFont(AbstractDataStream stream) throws IOException {
         readFromDataStream(stream);
     }
 
@@ -155,7 +154,7 @@ public class IggyFontData implements StructureInterface {
     public void readFromDataStream(AbstractDataStream stream) throws IOException {
         ByteArrayDataStream s = new ByteArrayDataStream(stream.readBytes((int) (long) stream.available()), stream.is64());
         type = s.readUI16();
-        order_in_iggy_file = s.readUI16();
+        fontId = s.readUI16();
         zeroone = s.readBytes(28);
         char_count2 = s.readUI16();
         what_1 = new int[3];

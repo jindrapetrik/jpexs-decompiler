@@ -4,8 +4,8 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFCompression;
 import com.jpexs.decompiler.flash.iggy.IggyChar;
 import com.jpexs.decompiler.flash.iggy.IggyFile;
-import com.jpexs.decompiler.flash.iggy.IggyFontData;
-import com.jpexs.decompiler.flash.iggy.IggyFontInfo;
+import com.jpexs.decompiler.flash.iggy.IggyFont;
+import com.jpexs.decompiler.flash.iggy.IggyText;
 import com.jpexs.decompiler.flash.tags.DefineFont2Tag;
 import com.jpexs.decompiler.flash.tags.EndTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
@@ -16,6 +16,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Set;
 
 /**
  *
@@ -75,12 +76,13 @@ public class IggyToSwfConvertor {
         fat.useNetwork = false;
         swf.addTag(fat);
 
-        int fontCount = file.getFontCount(swfIndex);
-        for (int fontIndex = 0; fontIndex < fontCount; fontIndex++) {
-            IggyFontData iggyFontData = file.getFontData(swfIndex, fontIndex);
-            IggyFontInfo fontInfo = file.getFontInfo(swfIndex, fontIndex); //TODO!           
+        Set<Integer> fontKeys = file.getFontIds(swfIndex);
+
+        for (int fontKey : fontKeys) {
+            IggyFont iggyFontData = file.getFont(swfIndex, fontKey);
+            IggyText fontInfo = file.getText(swfIndex, fontKey);
             DefineFont2Tag fontTag = new DefineFont2Tag(swf);
-            fontTag.fontID = fontIndex + 1;
+            fontTag.fontID = fontKey + 1;
             fontTag.codeTable = new ArrayList<>();
             fontTag.fontName = iggyFontData.getName();
             fontTag.glyphShapeTable = new ArrayList<>();
