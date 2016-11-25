@@ -3,6 +3,8 @@ package com.jpexs.decompiler.flash.iggy.conversion;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFCompression;
 import com.jpexs.decompiler.flash.iggy.IggyChar;
+import com.jpexs.decompiler.flash.iggy.IggyCharKerning;
+import com.jpexs.decompiler.flash.iggy.IggyCharOffset;
 import com.jpexs.decompiler.flash.iggy.IggyFile;
 import com.jpexs.decompiler.flash.iggy.IggyFont;
 import com.jpexs.decompiler.flash.iggy.IggyText;
@@ -10,14 +12,18 @@ import com.jpexs.decompiler.flash.tags.DefineEditTextTag;
 import com.jpexs.decompiler.flash.tags.DefineFont2Tag;
 import com.jpexs.decompiler.flash.tags.EndTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
+import com.jpexs.decompiler.flash.types.KERNINGRECORD;
 import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.SHAPE;
+import java.awt.Color;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -60,6 +66,10 @@ public class IggyToSwfConvertor {
         swf.saveTo(output);
     }
 
+    private static int makeLengthsCorrect(double val) {
+        return (int) (SWF.unitDivisor * val);
+    }
+
     public static SWF getSwf(IggyFile file, int swfIndex) {
         SWF swf = new SWF();
         swf.compression = SWFCompression.NONE;
@@ -90,6 +100,40 @@ public class IggyToSwfConvertor {
             currentCharId++;
             fontIndex2CharId.put(fontIndex, currentCharId);
             fontTag.fontID = currentCharId;
+            System.out.println("===================");
+            System.out.println("xscale: " + iggyFont.getXscale());  //80
+            System.out.println("yscale: " + iggyFont.getYscale());  //19          
+
+            System.out.println("unk_float1: " + iggyFont.getUnk_float()[0]);
+            System.out.println("unk_float2: " + iggyFont.getUnk_float()[1]);
+            System.out.println("unk_float3: " + iggyFont.getUnk_float()[2]);
+            System.out.println("unk_float4: " + iggyFont.getUnk_float()[3]);
+            System.out.println("unk_float5: " + iggyFont.getUnk_float()[4]);
+            System.out.println("what_2: " + iggyFont.getWhat_2());
+            System.out.println("what_3: " + iggyFont.getWhat_3());
+
+            /*List<IggyCharOffset> offsets = iggyFont.getc();
+            fontTag.fontAdvanceTable = new ArrayList<>();
+            for (int i = 0; i < offsets.size(); i++) {
+                fontTag.fontAdvanceTable.add((int) offsets.get(i).getOffset());
+            }*/
+            //FIXME
+            IggyCharKerning ker = iggyFont.getCharKernings();
+            if (ker != null) {
+                fontTag.fontKerningTable = new ArrayList<>();
+                for (int i = 0; i < ker.getKernCount(); i++) {
+                    int kerningCode1 = ker.getCharsA().get(i);
+                    int kerningCode2 = ker.getCharsA().get(i);
+                    int kerningOffset = ker.getKerningOffsets().get(i);
+                    fontTag.fontKerningTable.add(new KERNINGRECORD(kerningCode1, kerningCode2, kerningOffset));
+                }
+            }
+
+            fontTag.fontFlagsWideCodes = true;
+            fontTag.fontFlagsWideOffsets = true;
+            fontTag.fontAscent = iggyFont.getAscent();
+            fontTag.fontDescent = iggyFont.getDescent();
+            fontTag.fontLeading = iggyFont.getLeading();
             fontTag.codeTable = new ArrayList<>();
             fontTag.fontName = iggyFont.getName();
             fontTag.glyphShapeTable = new ArrayList<>();
@@ -123,7 +167,18 @@ public class IggyToSwfConvertor {
             textIndex2CharId.put(iggyText.getTextIndex(), currentCharId);
             textTag.characterID = currentCharId;
             textTag.hasText = true;
-            textTag.initialText = iggyText.getInitialText();
+            textTag.initialText = "A";//iggyText.getInitialText();
+            //textTag.html = true;
+            textTag.hasTextColor = true;
+            textTag.textColor = new RGBA(Color.black);
+            textTag.fontHeight = 20 * 40; //??            
+            textTag.readOnly = true;
+            textTag.bounds = new RECT(
+                    makeLengthsCorrect(iggyText.getPar3()),
+                    makeLengthsCorrect(iggyText.getPar1()),
+                    makeLengthsCorrect(iggyText.getPar4()),
+                    makeLengthsCorrect(iggyText.getPar2())
+            );
             //textTag.hasFont = true;
             //textTag.fontId = fontIndex2CharId.get(iggyText.getFontIndex());
             textTag.setModified(true);

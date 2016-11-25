@@ -24,11 +24,11 @@ import java.util.List;
 public class IggyCharToShapeConvertor {
 
     private static int convertDistanceX(double val) {
-        return (int) (20.0 * val * 1024.0);
+        return (int) (val * 1024.0);
     }
 
     private static int convertDistanceY(double val) {
-        return (int) (20.0 * val * 1024.0);
+        return (int) (val * 1024.0);
     }
 
     public static SHAPE convertCharToShape(IggyChar igchar) {

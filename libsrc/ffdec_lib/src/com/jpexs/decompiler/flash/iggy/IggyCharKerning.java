@@ -16,6 +16,22 @@ public class IggyCharKerning implements StructureInterface {
     List<Short> kerningOffsets;
     long pad;
 
+    public long getKernCount() {
+        return kernCount;
+    }
+
+    public List<Character> getCharsA() {
+        return charsA;
+    }
+
+    public List<Character> getCharsB() {
+        return charsB;
+    }
+
+    public List<Short> getKerningOffsets() {
+        return kerningOffsets;
+    }
+
     public IggyCharKerning(AbstractDataStream stream, long kernCount) throws IOException {
         this.kernCount = kernCount;
         readFromDataStream(stream);
