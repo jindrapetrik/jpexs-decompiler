@@ -136,6 +136,40 @@ public class IggyToSwfConvertor {
         return swf;
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
+
+        if (args.length < 2 || (args[0].isEmpty() || args[1].isEmpty())) {
+            System.err.println("Invalid arguments");
+            System.err.println("Usage: iggy-extract.bat file.iggy d:/outdir/");
+            System.exit(1);
+        }
+
+        File file = new File(args[0]);
+        if (!file.exists()) {
+            System.err.println("FAIL: Input file: " + file.getAbsolutePath() + " does not exist.");
+            System.exit(1);
+        }
+        File outDir = new File(args[1]);
+        if (!outDir.exists()) {
+            if (!outDir.mkdirs()) {
+                System.err.println("FAIL: Cannot create output directory");
+                System.exit(1);
+            }
+        }
+
+        try {
+            System.out.print("(1/2) Loading file " + args[0] + "...");
+            IggyFile iggyFile = new IggyFile(new File(args[0]));
+            System.out.println("OK");
+            System.out.print("(2/2) Exporting SWF files to " + args[1] + "...");
+            exportAllSwfsToDir(iggyFile, new File(args[1]));
+            System.out.println("OK");
+            System.out.println("All finished sucessfully.");
+            System.exit(0);
+        } catch (IOException ex) {
+            System.out.println("FAIL");
+            System.err.println("Error while converting: " + ex.getMessage());
+            System.exit(1);
+        }
     }
 }
