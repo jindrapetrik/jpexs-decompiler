@@ -89,19 +89,19 @@ public class IggyDataReader implements StructureInterface {
             textDataSizes[(int) header.font_count - 1] = offsetAfterTexts - lastOffset;
         }
 
-        for (int i = 0; i < textOffsets.size(); i++) {
-            long textOffset = textOffsets.get(i);
+        for (int textIndex = 0; textIndex < textOffsets.size(); textIndex++) {
+            long textOffset = textOffsets.get(textIndex);
             stream.seek(textOffset, SeekMode.SET);
-            byte[] textData = stream.readBytes((int) textDataSizes[i]);
+            byte[] textData = stream.readBytes((int) textDataSizes[textIndex]);
             IggyText text = new IggyText(new ByteArrayDataStream(textData, stream.is64()));
-            text2Font.put(text.textId, text.fontId);
-            texts.put(text.textId, text);
+            text2Font.put(textIndex, text.fontIndex);
+            texts.put(textIndex, text);
         }
         fonts = new HashMap<>();
-        for (int i = 0; i < header.font_count; i++) {
-            stream.seek(fontOffsets[i], SeekMode.SET);
+        for (int fontIndex = 0; fontIndex < header.font_count; fontIndex++) {
+            stream.seek(fontOffsets[fontIndex], SeekMode.SET);
             IggyFont font = new IggyFont(stream);
-            fonts.put(font.fontId, font);
+            fonts.put(fontIndex, font);
         }
     }
 

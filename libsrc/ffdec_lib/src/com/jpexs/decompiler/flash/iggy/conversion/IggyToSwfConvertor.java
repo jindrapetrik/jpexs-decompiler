@@ -6,6 +6,7 @@ import com.jpexs.decompiler.flash.iggy.IggyChar;
 import com.jpexs.decompiler.flash.iggy.IggyFile;
 import com.jpexs.decompiler.flash.iggy.IggyFont;
 import com.jpexs.decompiler.flash.iggy.IggyText;
+import com.jpexs.decompiler.flash.tags.DefineEditTextTag;
 import com.jpexs.decompiler.flash.tags.DefineFont2Tag;
 import com.jpexs.decompiler.flash.tags.EndTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
@@ -16,6 +17,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -76,22 +79,26 @@ public class IggyToSwfConvertor {
         fat.useNetwork = false;
         swf.addTag(fat);
 
-        Set<Integer> fontKeys = file.getFontIds(swfIndex);
+        Set<Integer> fontIndices = file.getFontIds(swfIndex);
 
-        for (int fontKey : fontKeys) {
-            IggyFont iggyFontData = file.getFont(swfIndex, fontKey);
-            IggyText fontInfo = file.getText(swfIndex, fontKey);
+        int currentCharId = 0;
+        Map<Integer, Integer> fontIndex2CharId = new HashMap<>();
+
+        for (int fontIndex : fontIndices) {
+            IggyFont iggyFont = file.getFont(swfIndex, fontIndex);
             DefineFont2Tag fontTag = new DefineFont2Tag(swf);
-            fontTag.fontID = fontKey + 1;
+            currentCharId++;
+            fontIndex2CharId.put(fontIndex, currentCharId);
+            fontTag.fontID = currentCharId;
             fontTag.codeTable = new ArrayList<>();
-            fontTag.fontName = iggyFontData.getName();
+            fontTag.fontName = iggyFont.getName();
             fontTag.glyphShapeTable = new ArrayList<>();
             fontTag.fontAdvanceTable = new ArrayList<>();
             fontTag.fontBoundsTable = new ArrayList<>();
 
-            for (int i = 0; i < iggyFontData.getCharacterCount(); i++) {
-                int code = iggyFontData.getCharIndices().getChars().get(i);
-                IggyChar chr = iggyFontData.getChars().get(i);
+            for (int i = 0; i < iggyFont.getCharacterCount(); i++) {
+                int code = iggyFont.getCharIndices().getChars().get(i);
+                IggyChar chr = iggyFont.getChars().get(i);
                 if (chr != null) {
                     fontTag.codeTable.add(code);
                     SHAPE shp = IggyCharToShapeConvertor.convertCharToShape(chr);
@@ -100,11 +107,29 @@ public class IggyToSwfConvertor {
                     fontTag.fontBoundsTable.add(shp.getBounds());
 
                 }
-                //TODO: handle spaces, etc.
+                //FIXME: handle spaces (with no vectors), etc.
             }
             fontTag.setModified(true);
             swf.addTag(fontTag);
         }
+
+        Map<Integer, Integer> textIndex2CharId = new HashMap<>();
+
+        Set<Integer> textIds = file.getTextIds(swfIndex);
+        for (int textId : textIds) {
+            IggyText iggyText = file.getText(swfIndex, textId);
+            DefineEditTextTag textTag = new DefineEditTextTag(swf);
+            currentCharId++;
+            textIndex2CharId.put(iggyText.getTextIndex(), currentCharId);
+            textTag.characterID = currentCharId;
+            textTag.hasText = true;
+            textTag.initialText = iggyText.getInitialText();
+            //textTag.hasFont = true;
+            //textTag.fontId = fontIndex2CharId.get(iggyText.getFontIndex());
+            textTag.setModified(true);
+            swf.addTag(textTag);
+        }
+
         swf.addTag(new EndTag(swf));
         swf.setModified(true);
 
@@ -112,6 +137,5 @@ public class IggyToSwfConvertor {
     }
 
     public static void main(String[] args) throws IOException {
-
     }
 }

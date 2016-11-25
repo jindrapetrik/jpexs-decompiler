@@ -13,7 +13,7 @@ public class IggyText implements StructureInterface {
     @IggyFieldType(DataType.uint16_t)
     int type; // Tag type
     @IggyFieldType(DataType.uint16_t)
-    int textId;
+    int textIndex;
     @IggyArrayFieldType(value = DataType.uint8_t, count = 28)
     byte zeroone[];
     @IggyFieldType(DataType.float_t)
@@ -27,7 +27,7 @@ public class IggyText implements StructureInterface {
     @IggyFieldType(DataType.uint16_t)
     int enum_hex;
     @IggyFieldType(DataType.uint16_t)
-    int fontId;
+    int fontIndex;
     @IggyFieldType(DataType.uint32_t)
     long zero;
     @IggyFieldType(DataType.uint64_t)
@@ -39,14 +39,14 @@ public class IggyText implements StructureInterface {
 
     public IggyText(int type, int order_in_iggy_file, byte[] zeroone, float par1, float par2, float par3, float par4, int enum_hex, int for_which_font_order_in_iggyfile, long zero, long one, byte[] some, long offset_of_name, String name) {
         this.type = type;
-        this.textId = order_in_iggy_file;
+        this.textIndex = order_in_iggy_file;
         this.zeroone = zeroone;
         this.par1 = par1;
         this.par2 = par2;
         this.par3 = par3;
         this.par4 = par4;
         this.enum_hex = enum_hex;
-        this.fontId = for_which_font_order_in_iggyfile;
+        this.fontIndex = for_which_font_order_in_iggyfile;
         this.zero = zero;
         this.one = one;
         this.some = some;
@@ -60,14 +60,14 @@ public class IggyText implements StructureInterface {
     @Override
     public void readFromDataStream(AbstractDataStream s) throws IOException {
         type = s.readUI16();
-        textId = s.readUI16();
+        textIndex = s.readUI16();
         zeroone = s.readBytes(28);
         par1 = s.readFloat();
         par2 = s.readFloat();
         par3 = s.readFloat();
         par4 = s.readFloat();
         enum_hex = s.readUI16();
-        fontId = s.readUI16();
+        fontIndex = s.readUI16();
         zero = s.readUI32();
         one = s.readUI64();
         some = s.readBytes(32);
@@ -91,8 +91,8 @@ public class IggyText implements StructureInterface {
         return type;
     }
 
-    public int getOrder_in_iggy_file() {
-        return textId;
+    public int getTextIndex() {
+        return textIndex;
     }
 
     public byte[] getZeroone() {
@@ -119,8 +119,8 @@ public class IggyText implements StructureInterface {
         return enum_hex;
     }
 
-    public int getFor_which_font_order_in_iggyfile() {
-        return fontId;
+    public int getFontIndex() {
+        return fontIndex;
     }
 
     public long getZero() {
@@ -135,7 +135,7 @@ public class IggyText implements StructureInterface {
         return some;
     }
 
-    public String getIntitalText() {
+    public String getInitialText() {
         return initialText;
     }
 
