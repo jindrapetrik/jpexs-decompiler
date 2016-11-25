@@ -23,7 +23,7 @@ public class IggyChar implements StructureInterface {
     @IggyFieldType(DataType.float_t)
     float maxy;
     @IggyFieldType(DataType.uint64_t)
-    long unk; // stejny vetsinou - napr. 48 - JP: to by mohlo byt advance
+    long advance; // stejny vetsinou - napr. 48 - JP: to by mohlo byt advance
     @IggyFieldType(DataType.uint64_t)
     long count;
     @IggyFieldType(DataType.uint64_t)
@@ -46,12 +46,12 @@ public class IggyChar implements StructureInterface {
         readFromDataStream(stream);
     }
 
-    public IggyChar(float minx, float miny, float maxx, float maxy, long unk, long count, long one, long one2, long one3, long one4, long two1, List<IggyCharNode> nodes) {
+    public IggyChar(float minx, float miny, float maxx, float maxy, long advance, long count, long one, long one2, long one3, long one4, long two1, List<IggyCharNode> nodes) {
         this.minx = minx;
         this.miny = miny;
         this.maxx = maxx;
         this.maxy = maxy;
-        this.unk = unk;
+        this.advance = advance;
         this.count = count;
         this.one = one;
         this.one2 = one2;
@@ -68,7 +68,7 @@ public class IggyChar implements StructureInterface {
         miny = s.readFloat();
         maxx = s.readFloat();
         maxy = s.readFloat();
-        unk = s.readUI64();
+        advance = s.readUI64();
         count = s.readUI64();
         one = s.readUI64();
         one2 = s.readUI64();
@@ -108,8 +108,8 @@ public class IggyChar implements StructureInterface {
         return maxy;
     }
 
-    public long getUnk() {
-        return unk;
+    public long getAdvance() {
+        return advance;
     }
 
     public long getOne() {

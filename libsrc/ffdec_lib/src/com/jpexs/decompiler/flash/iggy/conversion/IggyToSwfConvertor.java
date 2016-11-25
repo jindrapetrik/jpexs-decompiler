@@ -85,14 +85,18 @@ public class IggyToSwfConvertor {
             fontTag.fontName = iggyFontData.getName();
             fontTag.glyphShapeTable = new ArrayList<>();
             fontTag.fontAdvanceTable = new ArrayList<>();
+            fontTag.fontBoundsTable = new ArrayList<>();
 
             for (int i = 0; i < iggyFontData.getCharacterCount(); i++) {
                 int code = iggyFontData.getCharIndices().getChars().get(i);
                 IggyChar chr = iggyFontData.getChars().get(i);
                 if (chr != null) {
                     fontTag.codeTable.add(code);
-                    fontTag.glyphShapeTable.add(IggyCharToShapeConvertor.convertCharToShape(chr));
-                    fontTag.fontAdvanceTable.add((int) chr.getUnk());
+                    SHAPE shp = IggyCharToShapeConvertor.convertCharToShape(chr);
+                    fontTag.glyphShapeTable.add(shp);
+                    fontTag.fontAdvanceTable.add((int) chr.getAdvance());
+                    fontTag.fontBoundsTable.add(shp.getBounds());
+
                 }
                 //TODO: handle spaces, etc.
             }

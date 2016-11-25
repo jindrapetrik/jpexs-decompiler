@@ -18,14 +18,14 @@ public class IggyCharNode implements StructureInterface {
     public static int NODE_TYPE_CURVE_POINT = 3;
 
     @IggyFieldType(DataType.float_t)
-    float x1;
+    float targetX;
     @IggyFieldType(DataType.float_t)
-    float y1; // zaporne
+    float targetY; // negative
     @IggyFieldType(DataType.float_t)
-    float x2;
+    float controlX; // for curves
     @IggyFieldType(DataType.float_t)
-    float y2; // zaporne 
-    @IggyFieldType(DataType.uint8_t)  //1-pocatek,2-point/line,3-curve 
+    float controlY; // for curves, negative 
+    @IggyFieldType(DataType.uint8_t)  //1-moveto, 2-lineto , 3 - curve to
     int node_type;
     @IggyFieldType(DataType.uint8_t) // 208 start smooth (for j=1 only), 61 smooth interupt (muze a nemusi byt pro novy oddeleny kus charu - kdyz je subtype predchoziho vetsi nez 0 (kupr 5) bude pro oddeleny usek 61, jinak pokud je subtype predchoziho 0 bude pro oddeleny usek 0)
     int node_subtype;
@@ -39,10 +39,10 @@ public class IggyCharNode implements StructureInterface {
     private boolean first;
 
     public IggyCharNode(float x1, float y1, float x2, float y2, int node_type, int node_subtype, int zer1, int zer2, long isstart) {
-        this.x1 = x1;
-        this.y1 = y1;
-        this.x2 = x2;
-        this.y2 = y2;
+        this.targetX = x1;
+        this.targetY = y1;
+        this.controlX = x2;
+        this.controlY = y2;
         this.node_type = node_type;
         this.node_subtype = node_subtype;
         this.zer1 = zer1;
@@ -57,10 +57,10 @@ public class IggyCharNode implements StructureInterface {
 
     @Override
     public void readFromDataStream(AbstractDataStream s) throws IOException {
-        x1 = s.readFloat();
-        y1 = s.readFloat();
-        x2 = s.readFloat();
-        y2 = s.readFloat();
+        targetX = s.readFloat();
+        targetY = s.readFloat();
+        controlX = s.readFloat();
+        controlY = s.readFloat();
         node_type = s.readUI8();
         node_subtype = s.readUI8();
         zer1 = s.readUI8();
@@ -84,19 +84,19 @@ public class IggyCharNode implements StructureInterface {
     }
 
     public float getX1() {
-        return x1;
+        return targetX;
     }
 
     public float getY1() {
-        return y1;
+        return targetY;
     }
 
     public float getX2() {
-        return x2;
+        return controlX;
     }
 
     public float getY2() {
-        return y2;
+        return controlY;
     }
 
     public int getNodeType() {
