@@ -314,4 +314,8 @@ public class IggyFont implements StructureInterface {
         return what_3;
     }
 
+    public List<IggyCharOffset> getCharOffsets() {
+        return charOffsets;
+    }
+
 }

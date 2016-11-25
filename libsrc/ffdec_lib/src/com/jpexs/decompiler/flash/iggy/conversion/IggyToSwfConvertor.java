@@ -112,15 +112,15 @@ public class IggyToSwfConvertor {
             System.out.println("what_2: " + iggyFont.getWhat_2());
             System.out.println("what_3: " + iggyFont.getWhat_3());
 
-            /*List<IggyCharOffset> offsets = iggyFont.getc();
+            fontTag.fontFlagsHasLayout = true;
+            List<IggyCharOffset> offsets = iggyFont.getCharOffsets();
             fontTag.fontAdvanceTable = new ArrayList<>();
             for (int i = 0; i < offsets.size(); i++) {
-                fontTag.fontAdvanceTable.add((int) offsets.get(i).getOffset());
-            }*/
-            //FIXME
+                fontTag.fontAdvanceTable.add((int) offsets.get(i).getXscale());
+            }
+            fontTag.fontKerningTable = new ArrayList<>();
             IggyCharKerning ker = iggyFont.getCharKernings();
             if (ker != null) {
-                fontTag.fontKerningTable = new ArrayList<>();
                 for (int i = 0; i < ker.getKernCount(); i++) {
                     int kerningCode1 = ker.getCharsA().get(i);
                     int kerningCode2 = ker.getCharsA().get(i);

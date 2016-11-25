@@ -67,4 +67,33 @@ public class IggyCharOffset implements StructureInterface {
     public void writeToDataStream(AbstractDataStream stream) throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+
+    public long getZero() {
+        return zero;
+    }
+
+    public int getIschar1() {
+        return ischar1;
+    }
+
+    public int getIschar2() {
+        return ischar2;
+    }
+
+    public long getZero2() {
+        return zero2;
+    }
+
+    public int getXscale() {
+        return xscale;
+    }
+
+    public int getYscale() {
+        return yscale;
+    }
+
+    public long getZero3() {
+        return zero3;
+    }
+
 }
