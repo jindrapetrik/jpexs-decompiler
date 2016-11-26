@@ -675,7 +675,7 @@
         <echo level="info" message="Version: ${version}"/>
     </target>
     
-    <target name="release_lib" depends="-loadversion,-save-version-info">
+    <target name="release_lib" depends="git-tag,-loadversion,-save-version-info,-suffix">
         <copy file="${version_info}" tofile="${core.lib.version_info}" />        
         <ant antfile="${core.lib.script}" target="release" inheritAll="false" usenativebasedir="true"/>
         <property  name="lib.file" value="${lib.releases.dir}/${lib.prefix.filename}_${version}${version.suffix}.zip" />

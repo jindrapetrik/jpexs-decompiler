@@ -1271,7 +1271,7 @@ public class Main {
 
         loadingDialog.setVisible(true);
 
-        for (int i = 0; i < sourceInfos.size(); i++) {
+        for (int i = 0; i < newSourceInfos.length; i++) {
             SWFSourceInfo si = newSourceInfos[i];
             String fileName = si.getFile();
             if (fileName != null) {
@@ -1434,7 +1434,7 @@ public class Main {
         }
         fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
         FileFilter allSupportedFilter = new FileFilter() {
-            private final String[] supportedExtensions = new String[]{".swf", ".gfx", ".swc", ".zip"};
+            private final String[] supportedExtensions = new String[]{".swf", ".gfx", ".swc", ".zip", ".iggy"};
 
             @Override
             public boolean accept(File f) {
@@ -1492,6 +1492,19 @@ public class Main {
             }
         };
         fc.addChoosableFileFilter(gfxFilter);
+
+        FileFilter iggyFilter = new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return (f.getName().toLowerCase().endsWith(".iggy")) || (f.isDirectory());
+            }
+
+            @Override
+            public String getDescription() {
+                return AppStrings.translate("filter.iggy");
+            }
+        };
+        fc.addChoosableFileFilter(iggyFilter);
 
         FileFilter zipFilter = new FileFilter() {
             @Override

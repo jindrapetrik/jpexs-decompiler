@@ -418,7 +418,7 @@ public class DefineEditTextTag extends TextTag {
                                     char firstChar = size.charAt(0);
                                     if (firstChar != '+' && firstChar != '-') {
                                         int fontSize = Integer.parseInt(size);
-                                        style.fontHeight = (int) Math.round(fontSize * (style.font == null ? 1 : style.font.getDivider()));
+                                        style.fontHeight = (int) Math.round(fontSize * SWF.unitDivisor);
                                         style.fontLeading = leading;
                                     } else {
                                         // todo: parse relative sizes
@@ -428,6 +428,11 @@ public class DefineEditTextTag extends TextTag {
                                  {
                                     if (face != null && face.length() > 0) {
                                         style.fontFace = face;
+                                        FontTag insideFont = swf.getFontByName(face);
+                                        style.font = insideFont;
+                                        if (insideFont != null) {
+                                            style.fontFace = null;
+                                        }
                                     }
                                 }
                                 // todo: parse the following attributes: letterSpacing, kerning
@@ -581,7 +586,7 @@ public class DefineEditTextTag extends TextTag {
     public boolean setFormattedText(MissingCharacterHandler missingCharHandler, String formattedText, String[] texts) throws TextParseException {
         try {
             TextLexer lexer = new TextLexer(new StringReader(formattedText));
-            ParsedSymbol s = null;
+            ParsedSymbol s;
             formattedText = "";
             RECT bounds = new RECT(this.bounds);
             boolean wordWrap = false;
@@ -691,7 +696,7 @@ public class DefineEditTextTag extends TextTag {
                                     useOutlines = true;
                                 }
                                 break;
-                            case "font":
+                            case "font"://note: height parameter must be also present
                                 try {
                                     fontId = Integer.parseInt(paramValue);
 
@@ -699,6 +704,7 @@ public class DefineEditTextTag extends TextTag {
                                     if (ft == null) {
                                         throw new TextParseException("Font not found.", lexer.yyline());
                                     }
+                                    hasFont = true;
                                 } catch (NumberFormatException ne) {
                                     throw new TextParseException("Invalid font value. Number expected. Found: " + paramValue, lexer.yyline());
                                 }
@@ -707,8 +713,9 @@ public class DefineEditTextTag extends TextTag {
                                 fontClass = paramValue;
                                 break;
                             case "height":
-                                try {
+                                try {//TODO: font parameter must be also present
                                     fontHeight = Integer.parseInt(paramValue);
+                                    hasFont = true;
                                 } catch (NumberFormatException ne) {
                                     throw new TextParseException("Invalid height value. Number expected. Found: " + paramValue, lexer.yyline());
                                 }
@@ -899,6 +906,14 @@ public class DefineEditTextTag extends TextTag {
     public void getNeededCharacters(Set<Integer> needed) {
         if (hasFont) {
             needed.add(fontId);
+        }
+        if (html && hasText) {
+            List<CharacterWithStyle> chs = getTextWithStyle();
+            for (CharacterWithStyle ch : chs) {
+                if (ch.style.font != null) {
+                    needed.add(ch.style.font.getFontId());
+                }
+            }
         }
     }
 
@@ -1118,6 +1133,10 @@ public class DefineEditTextTag extends TextTag {
                             fid = ft.getFontId();
                         }
                     }
+                    if (tr.style.font != null) {
+                        fid = tr.style.font.getFontId();
+                    }
+
                     tr2.styleFlagsHasFont = fid != 0;
                     tr2.fontId = fid;
                     tr2.textHeight = tr.style.fontHeight;

@@ -546,6 +546,20 @@ public final class SWF implements SWFContainerItem, Timelined {
         return null;
     }
 
+    public FontTag getFontByName(String fontName) {
+        if (fontName == null) {
+            return null;
+        }
+        for (Tag t : getTags()) {
+            if (t instanceof FontTag) {
+                if (fontName.equals(((FontTag) t).getFontName())) {
+                    return (FontTag) t;
+                }
+            }
+        }
+        return null;
+    }
+
     public FontTag getFont(int fontId) {
         CharacterTag characterTag = getCharacters().get(fontId);
         if (characterTag instanceof FontTag) {
@@ -2902,7 +2916,8 @@ public final class SWF implements SWFContainerItem, Timelined {
             timelined.setModified(true);
             timelined.resetTimeline();
         } else // timeline should be always the swf here
-         if (removeDependencies) {
+        {
+            if (removeDependencies) {
                 removeTagWithDependenciesFromTimeline(tag, timelined.getTimeline());
                 timelined.setModified(true);
             } else {
@@ -2911,6 +2926,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                     timelined.setModified(true);
                 }
             }
+        }
     }
 
     @Override

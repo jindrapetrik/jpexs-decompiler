@@ -280,7 +280,7 @@ public class AdvancedSettingsDialog extends AppDialog {
         fc.setMultiSelectionEnabled(false);
         fc.setCurrentDirectory(new File((String) config.get()));
         FileFilter allSupportedFilter = new FileFilter() {
-            private final String[] supportedExtensions = new String[]{".swf", ".gfx", ".swc", ".zip"};
+            private final String[] supportedExtensions = new String[]{".swf", ".gfx", ".swc", ".zip", ".iggy"};
 
             @Override
             public boolean accept(File f) {
