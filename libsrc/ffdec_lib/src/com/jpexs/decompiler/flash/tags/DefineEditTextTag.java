@@ -428,6 +428,7 @@ public class DefineEditTextTag extends TextTag {
                                  {
                                     if (face != null && face.length() > 0) {
                                         style.fontFace = face;
+                                        style.font = swf.getFontByName(face);
                                     }
                                 }
                                 // todo: parse the following attributes: letterSpacing, kerning
@@ -581,7 +582,7 @@ public class DefineEditTextTag extends TextTag {
     public boolean setFormattedText(MissingCharacterHandler missingCharHandler, String formattedText, String[] texts) throws TextParseException {
         try {
             TextLexer lexer = new TextLexer(new StringReader(formattedText));
-            ParsedSymbol s = null;
+            ParsedSymbol s;
             formattedText = "";
             RECT bounds = new RECT(this.bounds);
             boolean wordWrap = false;
@@ -899,6 +900,14 @@ public class DefineEditTextTag extends TextTag {
     public void getNeededCharacters(Set<Integer> needed) {
         if (hasFont) {
             needed.add(fontId);
+        }
+        if (html && hasText) {
+            List<CharacterWithStyle> chs = getTextWithStyle();
+            for (CharacterWithStyle ch : chs) {
+                if (ch.style.font != null) {
+                    needed.add(ch.style.font.getFontId());
+                }
+            }
         }
     }
 
