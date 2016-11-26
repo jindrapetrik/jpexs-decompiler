@@ -9,9 +9,9 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-public class IggyCharNode implements StructureInterface {
+public class IggyShapeNode implements StructureInterface {
 
-    private static Logger LOGGER = Logger.getLogger(IggyCharNode.class.getName());
+    private static Logger LOGGER = Logger.getLogger(IggyShapeNode.class.getName());
 
     public static int NODE_TYPE_MOVE = 1;
     public static int NODE_TYPE_LINE_TO = 2;
@@ -38,7 +38,7 @@ public class IggyCharNode implements StructureInterface {
 
     private boolean first;
 
-    public IggyCharNode(float x1, float y1, float x2, float y2, int node_type, int node_subtype, int zer1, int zer2, long isstart) {
+    public IggyShapeNode(float x1, float y1, float x2, float y2, int node_type, int node_subtype, int zer1, int zer2, long isstart) {
         this.targetX = x1;
         this.targetY = y1;
         this.controlX = x2;
@@ -50,7 +50,7 @@ public class IggyCharNode implements StructureInterface {
         this.isstart = isstart;
     }
 
-    public IggyCharNode(AbstractDataStream s, boolean first) throws IOException {
+    public IggyShapeNode(AbstractDataStream s, boolean first) throws IOException {
         this.first = first;
         readFromDataStream(s);
     }

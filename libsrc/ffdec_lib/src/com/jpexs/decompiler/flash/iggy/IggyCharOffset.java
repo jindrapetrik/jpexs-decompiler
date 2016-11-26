@@ -72,12 +72,12 @@ public class IggyCharOffset implements StructureInterface {
         return zero;
     }
 
-    public int getIschar1() {
-        return ischar1;
+    public boolean isChar1() {
+        return ischar1 > 0;
     }
 
-    public int getIschar2() {
-        return ischar2;
+    public boolean isChar2() {
+        return ischar2 > 0;
     }
 
     public long getZero2() {

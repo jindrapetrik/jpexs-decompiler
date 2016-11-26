@@ -8,21 +8,25 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class IggyCharScales implements StructureInterface {
+public class IggyCharAdvances implements StructureInterface {
 
-    List<Float> scales;
+    List<Float> advances;
     private long charCount;
 
-    public IggyCharScales(AbstractDataStream stream, long charCount) throws IOException {
+    public List<Float> getScales() {
+        return advances;
+    }
+
+    public IggyCharAdvances(AbstractDataStream stream, long charCount) throws IOException {
         this.charCount = charCount;
         readFromDataStream(stream);
     }
 
     @Override
     public void readFromDataStream(AbstractDataStream stream) throws IOException {
-        scales = new ArrayList<>();
+        advances = new ArrayList<>();
         for (int i = 0; i < charCount; i++) {
-            scales.add(stream.readFloat());
+            advances.add(stream.readFloat());
         }
     }
 

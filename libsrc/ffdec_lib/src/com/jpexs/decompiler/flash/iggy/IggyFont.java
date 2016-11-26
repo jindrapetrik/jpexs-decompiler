@@ -91,14 +91,14 @@ public class IggyFont implements StructureInterface {
     String name;
 
     List<IggyCharOffset> charOffsets;
-    List<IggyChar> glyphs;
+    List<IggyShape> glyphs;
     IggyCharIndices codePoints;
-    IggyCharScales charScales;
+    IggyCharAdvances charScales;
     IggyCharKerning charKernings;
 
     byte[] padTo4byteBoundary;
 
-    public IggyFont(int type, int order_in_iggy_file, byte[] zeroone, int char_count2, int ascent, int descent, int leading, long flags, long start_of_char_struct, long start_of_char_index, long start_of_scale, long kern_count, float[] unk_float, long start_of_kern, long zero_padd, long what_2, long zero_padd_2, long start_of_name, long one_padd, int xscale, int yscale, long zero_padd_3, float ssr1, float ssr2, long char_count, long zero_padd_4, long what_3, byte[] zeroes, float sss1, long one_padd2, float sss2, long one_padd3, float sss3, long one_padd4, float sss4, long one_padd5, String name, List<IggyCharOffset> charOffsets, List<IggyChar> chars, IggyCharIndices charIndices, IggyCharScales charScales, IggyCharKerning charKernings, byte[] padTo4byteBoundary) {
+    public IggyFont(int type, int order_in_iggy_file, byte[] zeroone, int char_count2, int ascent, int descent, int leading, long flags, long start_of_char_struct, long start_of_char_index, long start_of_scale, long kern_count, float[] unk_float, long start_of_kern, long zero_padd, long what_2, long zero_padd_2, long start_of_name, long one_padd, int xscale, int yscale, long zero_padd_3, float ssr1, float ssr2, long char_count, long zero_padd_4, long what_3, byte[] zeroes, float sss1, long one_padd2, float sss2, long one_padd3, float sss3, long one_padd4, float sss4, long one_padd5, String name, List<IggyCharOffset> charOffsets, List<IggyShape> chars, IggyCharIndices charIndices, IggyCharAdvances charScales, IggyCharKerning charKernings, byte[] padTo4byteBoundary) {
         this.type = type;
         this.fontId = order_in_iggy_file;
         this.zeroone = zeroone;
@@ -223,12 +223,7 @@ public class IggyFont implements StructureInterface {
             glyphs = new ArrayList<>();
             for (int i = 0; i < char_count; i++) {
                 long offset = charOffsets.get(i).offset;
-                if (offset > 0) {
-                    glyphs.add(new IggyChar(s, offset));
-                } else {
-                    s.seek(1, SeekMode.CUR);
-                    glyphs.add(null);
-                }
+                glyphs.add(new IggyShape(s, offset));
             }
         }
         if (start_of_char_index != 0) {
@@ -237,7 +232,7 @@ public class IggyFont implements StructureInterface {
         }
         if (start_of_scale != 0) {
             s.seek(start_of_scale, SeekMode.SET);
-            charScales = new IggyCharScales(s, char_count);
+            charScales = new IggyCharAdvances(s, char_count);
         }
         if (start_of_kern != 0) {
             s.seek(start_of_kern, SeekMode.SET);
@@ -274,7 +269,7 @@ public class IggyFont implements StructureInterface {
         return name;
     }
 
-    public List<IggyChar> getChars() {
+    public List<IggyShape> getChars() {
         return glyphs;
     }
 
@@ -282,7 +277,7 @@ public class IggyFont implements StructureInterface {
         return codePoints;
     }
 
-    public IggyCharScales getCharScales() {
+    public IggyCharAdvances getCharAdvances() {
         return charScales;
     }
 

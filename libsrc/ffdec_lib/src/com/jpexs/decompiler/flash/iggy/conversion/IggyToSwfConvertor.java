@@ -2,9 +2,11 @@ package com.jpexs.decompiler.flash.iggy.conversion;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFCompression;
-import com.jpexs.decompiler.flash.iggy.IggyChar;
+import com.jpexs.decompiler.flash.iggy.IggyShape;
 import com.jpexs.decompiler.flash.iggy.IggyCharKerning;
+import com.jpexs.decompiler.flash.iggy.IggyShapeNode;
 import com.jpexs.decompiler.flash.iggy.IggyCharOffset;
+import com.jpexs.decompiler.flash.iggy.IggyCharAdvances;
 import com.jpexs.decompiler.flash.iggy.IggyFile;
 import com.jpexs.decompiler.flash.iggy.IggyFont;
 import com.jpexs.decompiler.flash.iggy.IggyText;
@@ -12,10 +14,17 @@ import com.jpexs.decompiler.flash.tags.DefineEditTextTag;
 import com.jpexs.decompiler.flash.tags.DefineFont2Tag;
 import com.jpexs.decompiler.flash.tags.EndTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
+import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
 import com.jpexs.decompiler.flash.types.KERNINGRECORD;
+import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.SHAPE;
+import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
+import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
+import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
+import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
+import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import java.awt.Color;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -66,8 +75,84 @@ public class IggyToSwfConvertor {
         swf.saveTo(output);
     }
 
-    private static int makeLengthsCorrect(double val) {
-        return (int) (SWF.unitDivisor * val);
+    private static int makeLengthsTwip(double val) {
+        return (int) (val * SWF.unitDivisor);
+    }
+
+    private static int makeLengthsEm(double val) {
+        return (int) (val * 1024.0);
+    }
+
+    private static SHAPE createEmptyChar() {
+        SHAPE shape = new SHAPE();
+        List<SHAPERECORD> retList = new ArrayList<>();
+
+        {
+            StyleChangeRecord scr = new StyleChangeRecord();
+            scr.stateMoveTo = true;
+            scr.moveDeltaX = 0;
+            scr.moveDeltaY = 0;
+            scr.fillStyles = new FILLSTYLEARRAY();
+            scr.lineStyles = new LINESTYLEARRAY();
+            scr.calculateBits();
+            retList.add(scr);
+        }
+
+        /*{
+            StraightEdgeRecord ser = new StraightEdgeRecord();
+            ser.deltaX = 1024;
+            ser.deltaY = 0;
+            ser.generalLineFlag = true;
+            ser.simplify();
+            ser.calculateBits();
+            retList.add(ser);
+        }
+
+        {
+            StraightEdgeRecord ser = new StraightEdgeRecord();
+            ser.deltaX = 0;
+            ser.deltaY = -1024;
+            ser.generalLineFlag = true;
+            ser.simplify();
+            ser.calculateBits();
+            retList.add(ser);
+        }
+
+        {
+            StraightEdgeRecord ser = new StraightEdgeRecord();
+            ser.deltaX = -1024;
+            ser.deltaY = 0;
+            ser.generalLineFlag = true;
+            ser.simplify();
+            ser.calculateBits();
+            retList.add(ser);
+        }
+
+        {
+            StraightEdgeRecord ser = new StraightEdgeRecord();
+            ser.deltaX = 0;
+            ser.deltaY = 1024;
+            ser.generalLineFlag = true;
+            ser.simplify();
+            ser.calculateBits();
+            retList.add(ser);
+        }*/
+        StyleChangeRecord init;
+        if (!retList.isEmpty() && retList.get(0) instanceof StyleChangeRecord) {
+            init = (StyleChangeRecord) retList.get(0);
+        } else {
+            init = new StyleChangeRecord();
+            retList.add(0, init);
+        }
+
+        retList.add(new EndShapeRecord());
+        init.stateFillStyle1 = true;
+        init.fillStyle1 = 1;
+        shape.shapeRecords = retList;
+        shape.numFillBits = 1;
+        shape.numLineBits = 0;
+
+        return shape;
     }
 
     public static SWF getSwf(IggyFile file, int swfIndex) {
@@ -100,7 +185,7 @@ public class IggyToSwfConvertor {
             currentCharId++;
             fontIndex2CharId.put(fontIndex, currentCharId);
             fontTag.fontID = currentCharId;
-            System.out.println("===================");
+            /*System.out.println("===================");
             System.out.println("xscale: " + iggyFont.getXscale());  //80
             System.out.println("yscale: " + iggyFont.getYscale());  //19          
 
@@ -110,14 +195,8 @@ public class IggyToSwfConvertor {
             System.out.println("unk_float4: " + iggyFont.getUnk_float()[3]);
             System.out.println("unk_float5: " + iggyFont.getUnk_float()[4]);
             System.out.println("what_2: " + iggyFont.getWhat_2());
-            System.out.println("what_3: " + iggyFont.getWhat_3());
+            System.out.println("what_3: " + iggyFont.getWhat_3());*/
 
-            fontTag.fontFlagsHasLayout = true;
-            List<IggyCharOffset> offsets = iggyFont.getCharOffsets();
-            fontTag.fontAdvanceTable = new ArrayList<>();
-            for (int i = 0; i < offsets.size(); i++) {
-                fontTag.fontAdvanceTable.add((int) offsets.get(i).getXscale());
-            }
             fontTag.fontKerningTable = new ArrayList<>();
             IggyCharKerning ker = iggyFont.getCharKernings();
             if (ker != null) {
@@ -137,21 +216,19 @@ public class IggyToSwfConvertor {
             fontTag.codeTable = new ArrayList<>();
             fontTag.fontName = iggyFont.getName();
             fontTag.glyphShapeTable = new ArrayList<>();
-            fontTag.fontAdvanceTable = new ArrayList<>();
             fontTag.fontBoundsTable = new ArrayList<>();
-
+            fontTag.fontAdvanceTable = new ArrayList<>();
+            fontTag.fontFlagsHasLayout = true;
+            IggyCharAdvances advanceValues = iggyFont.getCharAdvances();
             for (int i = 0; i < iggyFont.getCharacterCount(); i++) {
                 int code = iggyFont.getCharIndices().getChars().get(i);
-                IggyChar chr = iggyFont.getChars().get(i);
-                if (chr != null) {
-                    fontTag.codeTable.add(code);
-                    SHAPE shp = IggyCharToShapeConvertor.convertCharToShape(chr);
-                    fontTag.glyphShapeTable.add(shp);
-                    fontTag.fontAdvanceTable.add((int) chr.getAdvance());
-                    fontTag.fontBoundsTable.add(shp.getBounds());
+                IggyShape glyph = iggyFont.getChars().get(i);
+                fontTag.codeTable.add(code);
+                SHAPE shp = IggyShapeToSwfConvertor.convertCharToShape(glyph);
+                fontTag.glyphShapeTable.add(shp);
+                fontTag.fontBoundsTable.add(shp.getBounds());
+                fontTag.fontAdvanceTable.add(makeLengthsEm(advanceValues.getScales().get(i)));
 
-                }
-                //FIXME: handle spaces (with no vectors), etc.
             }
             fontTag.setModified(true);
             swf.addTag(fontTag);
@@ -167,26 +244,33 @@ public class IggyToSwfConvertor {
             textIndex2CharId.put(iggyText.getTextIndex(), currentCharId);
             textTag.characterID = currentCharId;
             textTag.hasText = true;
-            textTag.initialText = "A";//iggyText.getInitialText();
-            //textTag.html = true;
-            textTag.hasTextColor = true;
-            textTag.textColor = new RGBA(Color.black);
-            textTag.fontHeight = 20 * 40; //??            
+            textTag.initialText = iggyText.getInitialText();
+            textTag.html = true;
+            textTag.noSelect = true;
+            textTag.wasStatic = true;
+            //textTag.multiline = true;
+            //textTag.wordWrap = true;
+            //textTag.hasTextColor = true;
+            //textTag.textColor = new RGBA(Color.black);
+            textTag.fontHeight = 40; //??            
             textTag.readOnly = true;
             textTag.bounds = new RECT(
-                    makeLengthsCorrect(iggyText.getPar3()),
-                    makeLengthsCorrect(iggyText.getPar1()),
-                    makeLengthsCorrect(iggyText.getPar4()),
-                    makeLengthsCorrect(iggyText.getPar2())
+                    makeLengthsTwip(iggyText.getPar3()),
+                    makeLengthsTwip(iggyText.getPar1()),
+                    makeLengthsTwip(iggyText.getPar4()),
+                    makeLengthsTwip(iggyText.getPar2())
             );
+
             //textTag.hasFont = true;
             //textTag.fontId = fontIndex2CharId.get(iggyText.getFontIndex());
             textTag.setModified(true);
             swf.addTag(textTag);
         }
 
-        swf.addTag(new EndTag(swf));
-        swf.setModified(true);
+        swf.addTag(
+                new EndTag(swf));
+        swf.setModified(
+                true);
 
         return swf;
     }
