@@ -248,11 +248,14 @@ public class IggyToSwfConvertor {
             textTag.html = true;
             textTag.noSelect = true;
             textTag.wasStatic = true;
+            textTag.hasFont = false;
+            textTag.hasFontClass = false;
+            textTag.hasMaxLength = false;
             //textTag.multiline = true;
             //textTag.wordWrap = true;
             //textTag.hasTextColor = true;
             //textTag.textColor = new RGBA(Color.black);
-            textTag.fontHeight = 40; //??            
+            //textTag.fontHeight = 40; //??            
             textTag.readOnly = true;
             textTag.bounds = new RECT(
                     makeLengthsTwip(iggyText.getPar3()),
