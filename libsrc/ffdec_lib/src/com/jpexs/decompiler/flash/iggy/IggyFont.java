@@ -2,17 +2,17 @@ package com.jpexs.decompiler.flash.iggy;
 
 import com.jpexs.decompiler.flash.iggy.annotations.IggyArrayFieldType;
 import com.jpexs.decompiler.flash.iggy.annotations.IggyFieldType;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import org.omg.CORBA.StructMemberHelper;
 
 /**
  *
  * @author JPEXS
  */
 public class IggyFont implements StructureInterface {
+
+    public static final int ID = 0xFF16;
 
     @IggyFieldType(DataType.uint16_t)
     int type;   //stejny pro rozdilne fonty

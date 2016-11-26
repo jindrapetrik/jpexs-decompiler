@@ -234,6 +234,9 @@ public class IggyToSwfConvertor {
             swf.addTag(fontTag);
         }
 
+        /*       
+        //TODO: Texts, they are incomplete
+        
         Map<Integer, Integer> textIndex2CharId = new HashMap<>();
 
         Set<Integer> textIds = file.getTextIds(swfIndex);
@@ -269,7 +272,7 @@ public class IggyToSwfConvertor {
             textTag.setModified(true);
             swf.addTag(textTag);
         }
-
+         */
         swf.addTag(
                 new EndTag(swf));
         swf.setModified(

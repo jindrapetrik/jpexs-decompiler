@@ -3296,7 +3296,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
 
         // save last selected node to config
-        if (treeItem != null) {
+        if (treeItem != null && !(treeItem instanceof SWFList)) {
             SWF swf = treeItem.getSwf();
             if (swf != null) {
                 swf = swf.getRootSwf();
