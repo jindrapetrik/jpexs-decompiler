@@ -10,6 +10,8 @@ import java.io.IOException;
  */
 public class IggyText implements StructureInterface {
 
+    public static final int ID = 0xFF06;
+
     @IggyFieldType(DataType.uint16_t)
     int type; // Tag type
     @IggyFieldType(DataType.uint16_t)
@@ -26,6 +28,25 @@ public class IggyText implements StructureInterface {
     float par4;
     @IggyFieldType(DataType.uint16_t)
     int enum_hex;
+
+    //Guessed
+    boolean hasText;
+    boolean wordWrap;
+    boolean multiline;
+    boolean password;
+    boolean readOnly;
+    boolean hasTextColor;
+    boolean hasMaxLength;
+    boolean hasFont;
+    boolean hasFontClass;
+    boolean autosize;
+    boolean hasLayout;
+    boolean noSelect;
+    boolean border;
+    boolean wasStatic;
+    boolean html;
+    boolean useOutlines;
+
     @IggyFieldType(DataType.uint16_t)
     int fontIndex;
     @IggyFieldType(DataType.uint32_t)
@@ -59,18 +80,49 @@ public class IggyText implements StructureInterface {
 
     @Override
     public void readFromDataStream(AbstractDataStream s) throws IOException {
+
         type = s.readUI16();
+        //characterId - iggy Id
         textIndex = s.readUI16();
         zeroone = s.readBytes(28);
+
+        //bounds?:
         par1 = s.readFloat();
         par2 = s.readFloat();
         par3 = s.readFloat();
         par4 = s.readFloat();
+
+        //flags
         enum_hex = s.readUI16();
-        fontIndex = s.readUI16();
+
+        int en = enum_hex;
+
+        //guessing - it could be like DefineEditText?...
+        hasText = ((en >> 0) & 1) == 1;
+        wordWrap = ((en >> 1) & 1) == 1;
+        multiline = ((en >> 2) & 1) == 1;
+        password = ((en >> 3) & 1) == 1;
+        readOnly = ((en >> 4) & 1) == 1;
+        hasTextColor = ((en >> 5) & 1) == 1;
+        hasMaxLength = ((en >> 6) & 1) == 1;
+        hasFont = ((en >> 7) & 1) == 1;
+        hasFontClass = ((en >> 8) & 1) == 1;
+        autosize = ((en >> 9) & 1) == 1;
+        hasLayout = ((en >> 10) & 1) == 1;
+        noSelect = ((en >> 11) & 1) == 1;
+        border = ((en >> 12) & 1) == 1;
+        wasStatic = ((en >> 13) & 1) == 1;
+        html = ((en >> 14) & 1) == 1;
+        useOutlines = ((en >> 15) & 1) == 1;
+
+        //if hasFont?
+        fontIndex = s.readUI16(); //fontId
+        //if hasFontClass - readString?
+        //if hasFont || hasFontClass - readFontHeight?
+        //if hasTextColor....?
         zero = s.readUI32();
-        one = s.readUI64();
-        some = s.readBytes(32);
+        one = s.readUI64(); //01CB FF33 3333
+        some = s.readBytes(32); // [6] => 40, [24] => 8
         StringBuilder textBuilder = new StringBuilder();
         do {
             char c = (char) s.readUI16();
