@@ -1271,7 +1271,7 @@ public class Main {
 
         loadingDialog.setVisible(true);
 
-        for (int i = 0; i < sourceInfos.size(); i++) {
+        for (int i = 0; i < newSourceInfos.length; i++) {
             SWFSourceInfo si = newSourceInfos[i];
             String fileName = si.getFile();
             if (fileName != null) {
