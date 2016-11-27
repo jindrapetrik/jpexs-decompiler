@@ -83,78 +83,6 @@ public class IggyToSwfConvertor {
         return (int) (val * 1024.0);
     }
 
-    private static SHAPE createEmptyChar() {
-        SHAPE shape = new SHAPE();
-        List<SHAPERECORD> retList = new ArrayList<>();
-
-        {
-            StyleChangeRecord scr = new StyleChangeRecord();
-            scr.stateMoveTo = true;
-            scr.moveDeltaX = 0;
-            scr.moveDeltaY = 0;
-            scr.fillStyles = new FILLSTYLEARRAY();
-            scr.lineStyles = new LINESTYLEARRAY();
-            scr.calculateBits();
-            retList.add(scr);
-        }
-
-        /*{
-            StraightEdgeRecord ser = new StraightEdgeRecord();
-            ser.deltaX = 1024;
-            ser.deltaY = 0;
-            ser.generalLineFlag = true;
-            ser.simplify();
-            ser.calculateBits();
-            retList.add(ser);
-        }
-
-        {
-            StraightEdgeRecord ser = new StraightEdgeRecord();
-            ser.deltaX = 0;
-            ser.deltaY = -1024;
-            ser.generalLineFlag = true;
-            ser.simplify();
-            ser.calculateBits();
-            retList.add(ser);
-        }
-
-        {
-            StraightEdgeRecord ser = new StraightEdgeRecord();
-            ser.deltaX = -1024;
-            ser.deltaY = 0;
-            ser.generalLineFlag = true;
-            ser.simplify();
-            ser.calculateBits();
-            retList.add(ser);
-        }
-
-        {
-            StraightEdgeRecord ser = new StraightEdgeRecord();
-            ser.deltaX = 0;
-            ser.deltaY = 1024;
-            ser.generalLineFlag = true;
-            ser.simplify();
-            ser.calculateBits();
-            retList.add(ser);
-        }*/
-        StyleChangeRecord init;
-        if (!retList.isEmpty() && retList.get(0) instanceof StyleChangeRecord) {
-            init = (StyleChangeRecord) retList.get(0);
-        } else {
-            init = new StyleChangeRecord();
-            retList.add(0, init);
-        }
-
-        retList.add(new EndShapeRecord());
-        init.stateFillStyle1 = true;
-        init.fillStyle1 = 1;
-        shape.shapeRecords = retList;
-        shape.numFillBits = 1;
-        shape.numLineBits = 0;
-
-        return shape;
-    }
-
     public static SWF getSwf(IggyFile file, int swfIndex) {
         SWF swf = new SWF();
         swf.compression = SWFCompression.NONE;
@@ -203,7 +131,7 @@ public class IggyToSwfConvertor {
                 for (int i = 0; i < ker.getKernCount(); i++) {
                     int kerningCode1 = ker.getCharsA().get(i);
                     int kerningCode2 = ker.getCharsA().get(i);
-                    int kerningOffset = ker.getKerningOffsets().get(i);
+                    int kerningOffset = makeLengthsEm(ker.getKerningOffsets().get(i));
                     fontTag.fontKerningTable.add(new KERNINGRECORD(kerningCode1, kerningCode2, kerningOffset));
                 }
             }
