@@ -1,5 +1,7 @@
 package com.jpexs.decompiler.flash.iggy;
 
+import com.jpexs.decompiler.flash.iggy.streams.StructureInterface;
+
 /**
  *
  * @author JPEXS

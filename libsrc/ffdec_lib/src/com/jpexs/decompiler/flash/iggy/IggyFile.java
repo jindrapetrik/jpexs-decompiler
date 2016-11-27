@@ -1,5 +1,10 @@
 package com.jpexs.decompiler.flash.iggy;
 
+import com.jpexs.decompiler.flash.iggy.streams.StructureInterface;
+import com.jpexs.decompiler.flash.iggy.streams.SeekMode;
+import com.jpexs.decompiler.flash.iggy.streams.RandomAccessFileDataStream;
+import com.jpexs.decompiler.flash.iggy.streams.AbstractDataStream;
+import com.jpexs.decompiler.flash.iggy.streams.ByteArrayDataStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
@@ -23,13 +28,13 @@ import java.util.logging.Logger;
  * Based of works of somebody called eternity.
  *
  */
-public class IggyFile extends AbstractDataStream implements AutoCloseable {
+public class IggyFile implements StructureInterface {
 
     final static Logger LOGGER = Logger.getLogger(IggyFile.class.getName());
 
-    private RandomAccessFile raf;
     private IggyHeader header;
     private List<IggySubFileEntry> subFileEntries = new ArrayList<>();
+    private List<byte[]> subFileEntriesData = new ArrayList<>();
 
     private List<IggyFlashHeaderInterface> headers = new ArrayList<>();
     private List<IggyDataReader> flashDataReaders = new ArrayList<>();
@@ -50,57 +55,16 @@ public class IggyFile extends AbstractDataStream implements AutoCloseable {
         return flashDataReaders.get(swfIndex).texts.keySet();
     }
 
-    @Override
-    public long position() {
-        try {
-            return raf.getFilePointer();
-        } catch (IOException ex) {
-            return -1;
-        }
-    }
-
     public IggyFile(File file) throws IOException {
-        raf = new RandomAccessFile(file, "r");
-        header = new IggyHeader(this);
-        for (int i = 0; i < header.getNumSubfiles(); i++) {
-            subFileEntries.add(new IggySubFileEntry(this));
-        }
-
-        List<List<Integer>> indexTables = new ArrayList<>(); //TODO: use this two for something ??
-        List<List<Long>> offsetTables = new ArrayList<>();
-        List<AbstractDataStream> flashDataStreams = new ArrayList<>();
-
-        for (int i = 0; i < subFileEntries.size(); i++) {
-            IggySubFileEntry entry = subFileEntries.get(i);
-            ByteArrayDataStream dataStream = getEntryDataStream(i);
-            if (entry.type == IggySubFileEntry.TYPE_INDEX) {
-                List<Integer> indexTable = new ArrayList<>();
-                List<Long> offsets = new ArrayList<>();
-                IggyIndexParser.parseIndex(dataStream, indexTable, offsets);
-                indexTables.add(indexTable);
-                offsetTables.add(offsets);
-            } else if (entry.type == IggySubFileEntry.TYPE_FLASH) {
-                IggyFlashHeaderInterface hdr;
-                if (is64()) {
-                    hdr = new IggyFlashHeader64(dataStream);
-                } else {
-                    hdr = new IggyFlashHeader32(dataStream);
-                }
-                headers.add(hdr);
-                flashDataStreams.add(dataStream);
-            }
-        }
-
-        for (int swfIndex = 0; swfIndex < headers.size(); swfIndex++) {
-            IggyFlashHeaderInterface hdr = headers.get(swfIndex);
-            IggyDataReader dataReader = new IggyDataReader((IggyFlashHeader64) hdr /*FIXME for 32*/, flashDataStreams.get(swfIndex), offsetTables.get(swfIndex));
-            flashDataReaders.add(dataReader);
+        try (AbstractDataStream stream = new RandomAccessFileDataStream(file)) {
+            readFromDataStream(stream);
         }
     }
 
-    @Override
-    public boolean is64() {
-        return header.is64();
+    public IggyFile(RandomAccessFile rafile) throws IOException {
+        try (AbstractDataStream stream = new RandomAccessFileDataStream(rafile)) {
+            readFromDataStream(stream);
+        }
     }
 
     public IggyHeader getHeader() {
@@ -118,55 +82,11 @@ public class IggyFile extends AbstractDataStream implements AutoCloseable {
         return subFileEntries.size();
     }
 
-    public byte[] getEntryData(int entryIndex) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        InputStream is = getEntryInputStream(entryIndex);
-        byte buf[] = new byte[1024];
-        int cnt;
-        while ((cnt = is.read(buf)) > 0) {
-            baos.write(buf, 0, cnt);
+    public byte[] getEntryData(int entryIndex) {
+        if (entryIndex < 0 || entryIndex >= subFileEntries.size()) {
+            throw new ArrayIndexOutOfBoundsException("No entry with index " + entryIndex + " exists");
         }
-        return baos.toByteArray();
-    }
-
-    public ByteArrayDataStream getEntryDataStream(int entryIndex) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        InputStream is = getEntryInputStream(entryIndex);
-        byte buf[] = new byte[1024];
-        int cnt;
-        while ((cnt = is.read(buf)) > 0) {
-            baos.write(buf, 0, cnt);
-        }
-        byte data[] = baos.toByteArray();
-        return new ByteArrayDataStream(data, is64());
-    }
-
-    public InputStream getEntryInputStream(int entryIndex) {
-        IggySubFileEntry entry = getSubFileEntry(entryIndex);
-
-        return new InputStream() {
-            long offset = entry.offset;
-            long maxOffset = entry.offset + entry.size;
-
-            @Override
-            public synchronized int read() throws IOException {
-                if (offset < maxOffset) {
-                    raf.seek(offset);
-                    offset++;
-                    return raf.read();
-                }
-                return -1;
-            }
-        };
-    }
-
-    @Override
-    protected int read() throws IOException {
-        int val = raf.read();
-        if (val == -1) {
-            throw new EOFException();
-        }
-        return val;
+        return subFileEntriesData.get(entryIndex);
     }
 
     @Override
@@ -184,12 +104,11 @@ public class IggyFile extends AbstractDataStream implements AutoCloseable {
 
     public static void extractIggyFile(File iggyFile, File extractDir) throws IOException {
         final String FILENAME_FORMAT = "index%d_type%d.bin";
-        try (IggyFile ir = new IggyFile(iggyFile)) {
-            for (int i = 0; i < ir.getNumEntries(); i++) {
-                IggySubFileEntry entry = ir.getSubFileEntry(i);
-                try (FileOutputStream fos = new FileOutputStream(new File(extractDir, String.format(FILENAME_FORMAT, i, entry.type)))) {
-                    fos.write(ir.getEntryData(i));
-                }
+        IggyFile ir = new IggyFile(iggyFile);
+        for (int i = 0; i < ir.getNumEntries(); i++) {
+            IggySubFileEntry entry = ir.getSubFileEntry(i);
+            try (FileOutputStream fos = new FileOutputStream(new File(extractDir, String.format(FILENAME_FORMAT, i, entry.type)))) {
+                fos.write(ir.getEntryData(i));
             }
         }
     }
@@ -250,32 +169,6 @@ public class IggyFile extends AbstractDataStream implements AutoCloseable {
             }
         } catch (IOException ex) {
             // ignore
-        }
-    }
-
-    @Override
-    public void close() {
-        try {
-            raf.close();
-        } catch (IOException ex) {
-            //ignore
-        }
-    }
-
-    @Override
-    protected void seek(long pos, SeekMode mode) throws IOException {
-        long newpos = pos;
-        if (mode == SeekMode.CUR) {
-            newpos = raf.getFilePointer() + pos;
-        } else if (mode == SeekMode.END) {
-            newpos = raf.length() - pos;
-        }
-        if (newpos > raf.length()) {
-            throw new ArrayIndexOutOfBoundsException("Position outside bounds accessed: " + pos + ". Size: " + raf.length());
-        } else if (newpos < 0) {
-            throw new ArrayIndexOutOfBoundsException("Negative position accessed: " + pos);
-        } else {
-            raf.seek(newpos);
         }
     }
 
@@ -676,15 +569,6 @@ public class IggyFile extends AbstractDataStream implements AutoCloseable {
         return null;
     }
 
-    @Override
-    public Long available() {
-        try {
-            return raf.length() - raf.getFilePointer();
-        } catch (IOException ex) {
-            return null;
-        }
-    }
-
     public int getSwfCount() {
         return flashDataReaders.size();
     }
@@ -712,4 +596,61 @@ public class IggyFile extends AbstractDataStream implements AutoCloseable {
     public float getSwfFrameRate(int swfIndex) {
         return headers.get(swfIndex).getFrameRate();
     }
+
+    private void parseEntries() throws IOException {
+        List<List<Integer>> indexTables = new ArrayList<>(); //TODO: use this for something ??
+        List<List<Long>> offsetTables = new ArrayList<>();
+        List<AbstractDataStream> flashDataStreams = new ArrayList<>();
+
+        for (int i = 0; i < subFileEntries.size(); i++) {
+            IggySubFileEntry entry = subFileEntries.get(i);
+            AbstractDataStream dataStream = new ByteArrayDataStream(getEntryData(i), header.is64());
+            if (entry.type == IggySubFileEntry.TYPE_INDEX) {
+                List<Integer> indexTable = new ArrayList<>();
+                List<Long> offsets = new ArrayList<>();
+                IggyIndexParser.parseIndex(dataStream, indexTable, offsets);
+                indexTables.add(indexTable);
+                offsetTables.add(offsets);
+            } else if (entry.type == IggySubFileEntry.TYPE_FLASH) {
+                IggyFlashHeaderInterface hdr;
+                if (header.is64()) {
+                    hdr = new IggyFlashHeader64(dataStream);
+                } else {
+                    hdr = new IggyFlashHeader32(dataStream);
+                    throw new UnsupportedOperationException("Iggy 32bit files are not supported"); //TODO
+                }
+                headers.add(hdr);
+                flashDataStreams.add(dataStream);
+            }
+        }
+
+        for (int swfIndex = 0; swfIndex < headers.size(); swfIndex++) {
+            IggyFlashHeaderInterface hdr = headers.get(swfIndex);
+            IggyDataReader dataReader = new IggyDataReader((IggyFlashHeader64) hdr, flashDataStreams.get(swfIndex), offsetTables.get(swfIndex));
+            flashDataReaders.add(dataReader);
+        }
+    }
+
+    @Override
+    public void readFromDataStream(AbstractDataStream stream) throws IOException {
+        header = new IggyHeader(stream);
+        for (int i = 0; i < header.getNumSubfiles(); i++) {
+            subFileEntries.add(new IggySubFileEntry(stream));
+        }
+        for (IggySubFileEntry entry : subFileEntries) {
+            stream.seek(entry.offset, SeekMode.SET);
+            byte[] entryData = stream.readBytes((int) entry.size);
+            subFileEntriesData.add(entryData);
+        }
+        parseEntries();
+    }
+
+    @Override
+    public void writeToDataStream(AbstractDataStream stream) throws IOException {
+        header.writeToDataStream(stream);
+        for (IggySubFileEntry entry : subFileEntries) {
+            entry.writeToDataStream(stream);
+        }
+    }
+
 }

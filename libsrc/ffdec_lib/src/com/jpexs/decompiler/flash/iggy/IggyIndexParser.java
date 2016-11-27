@@ -1,5 +1,7 @@
 package com.jpexs.decompiler.flash.iggy;
 
+import com.jpexs.decompiler.flash.iggy.streams.SeekMode;
+import com.jpexs.decompiler.flash.iggy.streams.AbstractDataStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
@@ -28,7 +30,7 @@ public class IggyIndexParser {
      * @param offsets Output list of offsets
      * @throws IOException on error
      */
-    public static void parseIndex(ByteArrayDataStream indexStream, List<Integer> indexTableEntry, List<Long> offsets) throws IOException {
+    public static void parseIndex(AbstractDataStream indexStream, List<Integer> indexTableEntry, List<Long> offsets) throws IOException {
         int indexTableSize = indexStream.readUI8();
         int[] indexTable = new int[indexTableSize];
         for (int i = 0; i < indexTableSize; i++) {

@@ -1,5 +1,6 @@
 package com.jpexs.decompiler.flash.iggy;
 
+import com.jpexs.decompiler.flash.iggy.streams.AbstractDataStream;
 import java.io.IOException;
 
 /**
