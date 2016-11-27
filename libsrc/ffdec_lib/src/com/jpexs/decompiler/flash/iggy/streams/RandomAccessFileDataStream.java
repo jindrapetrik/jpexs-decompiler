@@ -12,15 +12,16 @@ import java.io.RandomAccessFile;
  */
 public class RandomAccessFileDataStream extends AbstractDataStream {
 
+    private File file;
     private RandomAccessFile raf;
-    private boolean is64;
 
-    public RandomAccessFileDataStream(File file) throws FileNotFoundException {
-        this(new RandomAccessFile(file, "rw"));
+    protected File getFile() {
+        return file;
     }
 
-    public RandomAccessFileDataStream(RandomAccessFile rafile) {
-        this.raf = rafile;
+    public RandomAccessFileDataStream(File file) throws FileNotFoundException {
+        this.file = file;
+        raf = new RandomAccessFile(file, "rw");
     }
 
     @Override
@@ -74,6 +75,11 @@ public class RandomAccessFileDataStream extends AbstractDataStream {
         } catch (IOException ex) {
             //ignore
         }
+    }
+
+    @Override
+    public void write(int val) throws IOException {
+        raf.write(val);
     }
 
 }

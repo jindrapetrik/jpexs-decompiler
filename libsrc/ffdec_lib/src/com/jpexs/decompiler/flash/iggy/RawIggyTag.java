@@ -1,6 +1,7 @@
 package com.jpexs.decompiler.flash.iggy;
 
-import com.jpexs.decompiler.flash.iggy.streams.AbstractDataStream;
+import com.jpexs.decompiler.flash.iggy.streams.ReadDataStreamInterface;
+import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
 import java.io.IOException;
 
 /**
@@ -13,7 +14,7 @@ public class RawIggyTag extends IggyTag {
     int tagType;
     private int length;
 
-    public RawIggyTag(int tagType, AbstractDataStream stream, int length) throws IOException {
+    public RawIggyTag(int tagType, ReadDataStreamInterface stream, int length) throws IOException {
         this.length = length;
         this.tagType = tagType;
         readFromDataStream(stream);
@@ -25,12 +26,12 @@ public class RawIggyTag extends IggyTag {
     }
 
     @Override
-    public void readFromDataStream(AbstractDataStream stream) throws IOException {
+    public void readFromDataStream(ReadDataStreamInterface stream) throws IOException {
         rawData = stream.readBytes(length);
     }
 
     @Override
-    public void writeToDataStream(AbstractDataStream stream) throws IOException {
+    public void writeToDataStream(WriteDataStreamInterface stream) throws IOException {
         stream.writeBytes(rawData);
     }
 

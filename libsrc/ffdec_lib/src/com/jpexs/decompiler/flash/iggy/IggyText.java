@@ -1,9 +1,10 @@
 package com.jpexs.decompiler.flash.iggy;
 
 import com.jpexs.decompiler.flash.iggy.streams.StructureInterface;
-import com.jpexs.decompiler.flash.iggy.streams.AbstractDataStream;
 import com.jpexs.decompiler.flash.iggy.annotations.IggyArrayFieldType;
 import com.jpexs.decompiler.flash.iggy.annotations.IggyFieldType;
+import com.jpexs.decompiler.flash.iggy.streams.ReadDataStreamInterface;
+import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
 import java.io.IOException;
 
 /**
@@ -76,12 +77,12 @@ public class IggyText implements StructureInterface {
         this.initialText = name;
     }
 
-    public IggyText(AbstractDataStream stream) throws IOException {
+    public IggyText(ReadDataStreamInterface stream) throws IOException {
         this.readFromDataStream(stream);
     }
 
     @Override
-    public void readFromDataStream(AbstractDataStream s) throws IOException {
+    public void readFromDataStream(ReadDataStreamInterface s) throws IOException {
 
         type = s.readUI16();
         //characterId - iggy Id
@@ -137,7 +138,7 @@ public class IggyText implements StructureInterface {
     }
 
     @Override
-    public void writeToDataStream(AbstractDataStream stream) throws IOException {
+    public void writeToDataStream(WriteDataStreamInterface stream) throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

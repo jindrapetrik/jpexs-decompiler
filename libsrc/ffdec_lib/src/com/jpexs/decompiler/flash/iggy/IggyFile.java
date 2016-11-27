@@ -3,11 +3,10 @@ package com.jpexs.decompiler.flash.iggy;
 import com.jpexs.decompiler.flash.iggy.streams.StructureInterface;
 import com.jpexs.decompiler.flash.iggy.streams.SeekMode;
 import com.jpexs.decompiler.flash.iggy.streams.RandomAccessFileDataStream;
-import com.jpexs.decompiler.flash.iggy.streams.AbstractDataStream;
-import com.jpexs.decompiler.flash.iggy.streams.ByteArrayDataStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.EOFException;
+import com.jpexs.decompiler.flash.iggy.streams.ReadDataStreamInterface;
+import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
+import com.jpexs.decompiler.flash.iggy.streams.DataStreamInterface;
+import com.jpexs.decompiler.flash.iggy.streams.TemporaryDataStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
@@ -37,7 +36,7 @@ public class IggyFile implements StructureInterface {
     private List<byte[]> subFileEntriesData = new ArrayList<>();
 
     private List<IggyFlashHeaderInterface> headers = new ArrayList<>();
-    private List<IggyDataReader> flashDataReaders = new ArrayList<>();
+    private List<IggySwf> flashDataReaders = new ArrayList<>();
 
     public Set<Integer> getFontIds(int swfIndex) {
         return flashDataReaders.get(swfIndex).fonts.keySet();
@@ -55,14 +54,12 @@ public class IggyFile implements StructureInterface {
         return flashDataReaders.get(swfIndex).texts.keySet();
     }
 
-    public IggyFile(File file) throws IOException {
-        try (AbstractDataStream stream = new RandomAccessFileDataStream(file)) {
-            readFromDataStream(stream);
-        }
+    public IggyFile(String filePath) throws IOException {
+        this(new File(filePath));
     }
 
-    public IggyFile(RandomAccessFile rafile) throws IOException {
-        try (AbstractDataStream stream = new RandomAccessFileDataStream(rafile)) {
+    public IggyFile(File file) throws IOException {
+        try (ReadDataStreamInterface stream = new RandomAccessFileDataStream(file)) {
             readFromDataStream(stream);
         }
     }
@@ -141,22 +138,15 @@ public class IggyFile implements StructureInterface {
     }
 
     public static void main(String[] args) throws IOException {
-        System.out.println("Iggy file splitter");
-        if (args.length == 0) {
-            System.err.println("No file specified");
-            System.exit(1);
-        }
+        String inFileName = "d:\\Dropbox\\jpexs-laptop\\iggi\\lib_loc_english_font.iggy";
+        String outFileName = "d:\\Dropbox\\jpexs-laptop\\iggi\\lib_loc_english_font2.iggy";
 
-        for (String s : args) {
-            File f = new File(s);
-            if (!f.exists()) {
-                System.err.println("File " + f + " does not exists");
-                System.exit(1);
-            }
-            processFile(f);
-
+        File inFile = new File(inFileName);
+        File outFile = new File(outFileName);
+        IggyFile iggyFile = new IggyFile(inFile);
+        try (RandomAccessFileDataStream outputStream = new RandomAccessFileDataStream(outFile)) {
+            iggyFile.writeToDataStream(outputStream);
         }
-        System.exit(0);
     }
 
     private static void copyStream(InputStream is, OutputStream os) {
@@ -173,7 +163,7 @@ public class IggyFile implements StructureInterface {
     }
 
     private static boolean updateIndex(long item_offset /*uint32_t*/, boolean is_64, byte index_bytes[], long item_size_change /*int32_t*/) throws IOException {
-        ByteArrayDataStream stream = new ByteArrayDataStream(index_bytes);
+        TemporaryDataStream stream = new TemporaryDataStream(index_bytes);
 
         /*
         index_table:
@@ -389,7 +379,7 @@ public class IggyFile implements StructureInterface {
      * @throws IOException
      */
     private static Long itemLength(long item_offset /*uint32_t*/, boolean is_64, byte index_bytes[], Long newValue) throws IOException {
-        ByteArrayDataStream stream = new ByteArrayDataStream(index_bytes);
+        TemporaryDataStream stream = new TemporaryDataStream(index_bytes);
 
         /*
         index_table:
@@ -597,14 +587,47 @@ public class IggyFile implements StructureInterface {
         return headers.get(swfIndex).getFrameRate();
     }
 
+    //WIP
+    public boolean replaceSwf(int targetSwfIndex, IggySwf iggySwf) {
+        if (targetSwfIndex < 0 || targetSwfIndex >= getSwfCount()) {
+            throw new ArrayIndexOutOfBoundsException("No such SWF file index");
+        }
+        byte replacementData[];
+        try (DataStreamInterface stream = new TemporaryDataStream()) {
+            iggySwf.writeToDataStream(stream);
+            replacementData = stream.getAllBytes();
+        } catch (IOException ex) {
+            Logger.getLogger(IggyFile.class.getName()).log(Level.SEVERE, "Error during updating SWF", ex);
+            return false;
+        }
+
+        int swfIndex = 0;
+        long offsetsChange = 0;
+        for (int i = 0; i < subFileEntries.size(); i++) {
+            IggySubFileEntry entry = subFileEntries.get(i);
+            entry.offset += offsetsChange;
+            if (entry.type == IggySubFileEntry.TYPE_FLASH) {
+                if (swfIndex == targetSwfIndex) {
+                    long oldSize = entry.size;
+                    long newSize = replacementData.length;
+                    offsetsChange = offsetsChange + (newSize - oldSize);
+                    //entries after this one will have modified offsets
+                }
+                swfIndex++;
+            }
+        }
+        subFileEntriesData.set(targetSwfIndex, replacementData);
+        return true;
+    }
+
     private void parseEntries() throws IOException {
         List<List<Integer>> indexTables = new ArrayList<>(); //TODO: use this for something ??
         List<List<Long>> offsetTables = new ArrayList<>();
-        List<AbstractDataStream> flashDataStreams = new ArrayList<>();
+        List<DataStreamInterface> flashDataStreams = new ArrayList<>();
 
         for (int i = 0; i < subFileEntries.size(); i++) {
             IggySubFileEntry entry = subFileEntries.get(i);
-            AbstractDataStream dataStream = new ByteArrayDataStream(getEntryData(i));
+            DataStreamInterface dataStream = new TemporaryDataStream(getEntryData(i));
             if (entry.type == IggySubFileEntry.TYPE_INDEX) {
                 List<Integer> indexTable = new ArrayList<>();
                 List<Long> offsets = new ArrayList<>();
@@ -626,13 +649,13 @@ public class IggyFile implements StructureInterface {
 
         for (int swfIndex = 0; swfIndex < headers.size(); swfIndex++) {
             IggyFlashHeaderInterface hdr = headers.get(swfIndex);
-            IggyDataReader dataReader = new IggyDataReader((IggyFlashHeader64) hdr, flashDataStreams.get(swfIndex), offsetTables.get(swfIndex));
+            IggySwf dataReader = new IggySwf((IggyFlashHeader64) hdr, flashDataStreams.get(swfIndex), offsetTables.get(swfIndex));
             flashDataReaders.add(dataReader);
         }
     }
 
     @Override
-    public void readFromDataStream(AbstractDataStream stream) throws IOException {
+    public void readFromDataStream(ReadDataStreamInterface stream) throws IOException {
         header = new IggyHeader(stream);
         for (int i = 0; i < header.getNumSubfiles(); i++) {
             subFileEntries.add(new IggySubFileEntry(stream));
@@ -646,10 +669,17 @@ public class IggyFile implements StructureInterface {
     }
 
     @Override
-    public void writeToDataStream(AbstractDataStream stream) throws IOException {
+    public void writeToDataStream(WriteDataStreamInterface stream) throws IOException {
         header.writeToDataStream(stream);
         for (IggySubFileEntry entry : subFileEntries) {
             entry.writeToDataStream(stream);
+        }
+        for (int i = 0; i < subFileEntries.size(); i++) {
+            IggySubFileEntry entry = subFileEntries.get(i);
+            byte[] entryData = subFileEntriesData.get(i);
+
+            stream.seek(entry.offset, SeekMode.SET);
+            stream.writeBytes(entryData);
         }
     }
 

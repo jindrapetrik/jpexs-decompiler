@@ -2,8 +2,10 @@ package com.jpexs.decompiler.flash.iggy;
 
 import com.jpexs.decompiler.flash.iggy.streams.StructureInterface;
 import com.jpexs.decompiler.flash.iggy.streams.SeekMode;
-import com.jpexs.decompiler.flash.iggy.streams.AbstractDataStream;
+import com.jpexs.decompiler.flash.iggy.streams.ReadDataStreamInterface;
+import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
 import com.jpexs.decompiler.flash.iggy.annotations.IggyFieldType;
+import com.jpexs.decompiler.flash.iggy.streams.DataStreamInterface;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -13,7 +15,7 @@ import java.util.Map;
  *
  * @author JPEXS
  */
-public class IggyDataReader implements StructureInterface {
+public class IggySwf implements StructureInterface {
 
     final static int NO_OFFSET = 1;
 
@@ -28,7 +30,7 @@ public class IggyDataReader implements StructureInterface {
     private Map<Long, Long> sizesOfOffsets;
     private List<Long> allOffsets;
 
-    public IggyDataReader(IggyFlashHeader64 header, AbstractDataStream stream, List<Long> offsets) throws IOException {
+    public IggySwf(IggyFlashHeader64 header, ReadDataStreamInterface stream, List<Long> offsets) throws IOException {
         this.header = header;
         sizesOfOffsets = new HashMap<>();
         for (int i = 0; i < offsets.size() - 1; i++) {
@@ -40,7 +42,7 @@ public class IggyDataReader implements StructureInterface {
     }
 
     @Override
-    public void readFromDataStream(AbstractDataStream stream) throws IOException {
+    public void readFromDataStream(ReadDataStreamInterface stream) throws IOException {
         //here is offset[0]
         StringBuilder nameBuilder = new StringBuilder();
         do {
@@ -77,8 +79,8 @@ public class IggyDataReader implements StructureInterface {
     }
 
     @Override
-    public void writeToDataStream(AbstractDataStream stream) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void writeToDataStream(WriteDataStreamInterface stream) throws IOException {
+        throw new UnsupportedOperationException("Not supported yet."); //TODO!!!
     }
 
     @Override

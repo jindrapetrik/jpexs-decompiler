@@ -1,7 +1,8 @@
 package com.jpexs.decompiler.flash.iggy;
 
 import com.jpexs.decompiler.flash.iggy.streams.StructureInterface;
-import com.jpexs.decompiler.flash.iggy.streams.AbstractDataStream;
+import com.jpexs.decompiler.flash.iggy.streams.ReadDataStreamInterface;
+import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,13 +35,13 @@ public class IggyCharKerning implements StructureInterface {
         return kerningOffsets;
     }
 
-    public IggyCharKerning(AbstractDataStream stream, long kernCount) throws IOException {
+    public IggyCharKerning(ReadDataStreamInterface stream, long kernCount) throws IOException {
         this.kernCount = kernCount;
         readFromDataStream(stream);
     }
 
     @Override
-    public void readFromDataStream(AbstractDataStream stream) throws IOException {
+    public void readFromDataStream(ReadDataStreamInterface stream) throws IOException {
         charsA = new ArrayList<>();
         charsB = new ArrayList<>();
         kerningOffsets = new ArrayList<>();
@@ -53,7 +54,7 @@ public class IggyCharKerning implements StructureInterface {
     }
 
     @Override
-    public void writeToDataStream(AbstractDataStream stream) throws IOException {
+    public void writeToDataStream(WriteDataStreamInterface stream) throws IOException {
         for (int i = 0; i < kernCount; i++) {
             stream.writeUI16(charsA.get(i));
             stream.writeUI16(charsB.get(i));

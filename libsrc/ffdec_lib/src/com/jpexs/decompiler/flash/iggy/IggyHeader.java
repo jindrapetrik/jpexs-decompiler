@@ -1,7 +1,8 @@
 package com.jpexs.decompiler.flash.iggy;
 
 import com.jpexs.decompiler.flash.iggy.streams.StructureInterface;
-import com.jpexs.decompiler.flash.iggy.streams.AbstractDataStream;
+import com.jpexs.decompiler.flash.iggy.streams.ReadDataStreamInterface;
+import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
 import com.jpexs.decompiler.flash.iggy.annotations.IggyArrayFieldType;
 import com.jpexs.decompiler.flash.iggy.annotations.IggyFieldType;
 import java.io.IOException;
@@ -52,7 +53,7 @@ public class IggyHeader implements StructureInterface {
     @IggyFieldType(value = DataType.uint32_t)
     private long numSubfiles;
 
-    public IggyHeader(AbstractDataStream stream) throws IOException {
+    public IggyHeader(ReadDataStreamInterface stream) throws IOException {
         readFromDataStream(stream);
     }
 
@@ -92,7 +93,7 @@ public class IggyHeader implements StructureInterface {
     }
 
     @Override
-    public void readFromDataStream(AbstractDataStream stream) throws IOException {
+    public void readFromDataStream(ReadDataStreamInterface stream) throws IOException {
         magic = stream.readUI32();
         if (magic != IggyHeader.MAGIC) {
             throw new IOException("Invalid Iggy file");
@@ -108,7 +109,7 @@ public class IggyHeader implements StructureInterface {
     }
 
     @Override
-    public void writeToDataStream(AbstractDataStream s) throws IOException {
+    public void writeToDataStream(WriteDataStreamInterface s) throws IOException {
         s.writeUI32(magic);
         s.writeUI32(version);
         s.writeUI8(platform1);

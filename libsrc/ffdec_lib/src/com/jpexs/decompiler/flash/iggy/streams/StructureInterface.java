@@ -10,7 +10,7 @@ import java.util.List;
  */
 public interface StructureInterface {
 
-    public void readFromDataStream(AbstractDataStream stream) throws IOException;
+    public void readFromDataStream(ReadDataStreamInterface stream) throws IOException;
 
-    public void writeToDataStream(AbstractDataStream stream) throws IOException;
+    public void writeToDataStream(WriteDataStreamInterface stream) throws IOException;
 }

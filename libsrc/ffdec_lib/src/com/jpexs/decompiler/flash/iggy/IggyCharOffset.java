@@ -1,7 +1,8 @@
 package com.jpexs.decompiler.flash.iggy;
 
 import com.jpexs.decompiler.flash.iggy.streams.StructureInterface;
-import com.jpexs.decompiler.flash.iggy.streams.AbstractDataStream;
+import com.jpexs.decompiler.flash.iggy.streams.ReadDataStreamInterface;
+import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
 import com.jpexs.decompiler.flash.iggy.annotations.IggyFieldType;
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -31,7 +32,7 @@ public class IggyCharOffset implements StructureInterface {
     @IggyFieldType(DataType.uint64_t)
     long offset;
 
-    public IggyCharOffset(AbstractDataStream stream) throws IOException {
+    public IggyCharOffset(ReadDataStreamInterface stream) throws IOException {
         readFromDataStream(stream);
     }
 
@@ -47,7 +48,7 @@ public class IggyCharOffset implements StructureInterface {
     }
 
     @Override
-    public void readFromDataStream(AbstractDataStream stream) throws IOException {
+    public void readFromDataStream(ReadDataStreamInterface stream) throws IOException {
         zero = stream.readUI64();
         ischar1 = stream.readUI16();
         ischar2 = stream.readUI16();
@@ -66,7 +67,7 @@ public class IggyCharOffset implements StructureInterface {
     }
 
     @Override
-    public void writeToDataStream(AbstractDataStream stream) throws IOException {
+    public void writeToDataStream(WriteDataStreamInterface stream) throws IOException {
         stream.writeUI64(zero);
         stream.writeUI16(ischar1);
         stream.writeUI16(ischar2);

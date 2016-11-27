@@ -3,6 +3,8 @@ package com.jpexs.decompiler.flash.iggy;
 import com.jpexs.decompiler.flash.iggy.streams.StructureInterface;
 import com.jpexs.decompiler.flash.iggy.streams.AbstractDataStream;
 import com.jpexs.decompiler.flash.iggy.annotations.IggyFieldType;
+import com.jpexs.decompiler.flash.iggy.streams.ReadDataStreamInterface;
+import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -52,13 +54,13 @@ public class IggyShapeNode implements StructureInterface {
         this.isstart = isstart;
     }
 
-    public IggyShapeNode(AbstractDataStream s, boolean first) throws IOException {
+    public IggyShapeNode(ReadDataStreamInterface s, boolean first) throws IOException {
         this.first = first;
         readFromDataStream(s);
     }
 
     @Override
-    public void readFromDataStream(AbstractDataStream s) throws IOException {
+    public void readFromDataStream(ReadDataStreamInterface s) throws IOException {
         targetX = s.readFloat();
         targetY = s.readFloat();
         controlX = s.readFloat();
@@ -81,7 +83,7 @@ public class IggyShapeNode implements StructureInterface {
     }
 
     @Override
-    public void writeToDataStream(AbstractDataStream s) throws IOException {
+    public void writeToDataStream(WriteDataStreamInterface s) throws IOException {
         s.writeFloat(targetX);
         s.writeFloat(targetY);
         s.writeFloat(controlX);

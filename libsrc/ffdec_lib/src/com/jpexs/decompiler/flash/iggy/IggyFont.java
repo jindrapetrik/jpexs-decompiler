@@ -1,8 +1,9 @@
 package com.jpexs.decompiler.flash.iggy;
 
 import com.jpexs.decompiler.flash.iggy.streams.SeekMode;
-import com.jpexs.decompiler.flash.iggy.streams.AbstractDataStream;
-import com.jpexs.decompiler.flash.iggy.streams.ByteArrayDataStream;
+import com.jpexs.decompiler.flash.iggy.streams.ReadDataStreamInterface;
+import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
+import com.jpexs.decompiler.flash.iggy.streams.TemporaryDataStream;
 import com.jpexs.decompiler.flash.iggy.annotations.IggyArrayFieldType;
 import com.jpexs.decompiler.flash.iggy.annotations.IggyFieldType;
 import java.io.IOException;
@@ -147,11 +148,11 @@ public class IggyFont extends IggyTag {
         this.padTo4byteBoundary = padTo4byteBoundary;
     }
 
-    public IggyFont(AbstractDataStream stream) throws IOException {
+    public IggyFont(ReadDataStreamInterface stream) throws IOException {
         readFromDataStream(stream);
     }
 
-    private long readAbsoluteOffset(AbstractDataStream stream) throws IOException {
+    private long readAbsoluteOffset(ReadDataStreamInterface stream) throws IOException {
         long offset = stream.readUI64();
         if (offset == 1) {
             return 0;
@@ -159,7 +160,7 @@ public class IggyFont extends IggyTag {
         return stream.position() - 8 + offset;
     }
 
-    private void writeAbsoluteOffset(AbstractDataStream stream, long offset) throws IOException {
+    private void writeAbsoluteOffset(WriteDataStreamInterface stream, long offset) throws IOException {
         if (offset == 0) {
             stream.writeUI64(1);
         } else {
@@ -167,7 +168,7 @@ public class IggyFont extends IggyTag {
         }
     }
 
-    private void writeRelativeOffset(AbstractDataStream stream, long offset) throws IOException {
+    private void writeRelativeOffset(WriteDataStreamInterface stream, long offset) throws IOException {
         if (offset == 0) {
             stream.writeUI64(1);
         } else {
@@ -176,8 +177,8 @@ public class IggyFont extends IggyTag {
     }
 
     @Override
-    public void readFromDataStream(AbstractDataStream stream) throws IOException {
-        ByteArrayDataStream s = new ByteArrayDataStream(stream.readBytes((int) (long) stream.available()));
+    public void readFromDataStream(ReadDataStreamInterface stream) throws IOException {
+        TemporaryDataStream s = new TemporaryDataStream(stream.readBytes((int) (long) stream.available()));
         type = s.readUI16();
         fontId = s.readUI16();
         zeroone = s.readBytes(28);
@@ -260,7 +261,7 @@ public class IggyFont extends IggyTag {
     }
 
     @Override
-    public void writeToDataStream(AbstractDataStream s) throws IOException {
+    public void writeToDataStream(WriteDataStreamInterface s) throws IOException {
         s.writeUI16(type);
         s.writeUI16(fontId);
         s.writeBytes(zeroone);

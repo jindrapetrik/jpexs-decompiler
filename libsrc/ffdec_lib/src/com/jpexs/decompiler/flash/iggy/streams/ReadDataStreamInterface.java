@@ -33,6 +33,8 @@ public interface ReadDataStreamInterface extends AutoCloseable {
 
     public void seek(long pos, SeekMode mode) throws IOException;
 
+    public byte[] getAllBytes() throws IOException;
+
     @Override
     public void close();
 }

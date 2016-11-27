@@ -111,6 +111,14 @@ public abstract class AbstractDataStream implements DataStreamInterface {
         return ret;
     }
 
+    public byte[] getAllBytes() throws IOException {
+        long oldPos = position();
+        seek(0, SeekMode.SET);
+        byte[] ret = readBytes((int) (long) available());
+        seek(oldPos, SeekMode.SET);
+        return ret;
+    }
+
     @Override
     public void writeBytes(byte[] data) throws IOException {
         for (int i = 0; i < data.length; i++) {

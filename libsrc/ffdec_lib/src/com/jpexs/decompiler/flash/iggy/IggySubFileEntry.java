@@ -1,7 +1,8 @@
 package com.jpexs.decompiler.flash.iggy;
 
 import com.jpexs.decompiler.flash.iggy.streams.StructureInterface;
-import com.jpexs.decompiler.flash.iggy.streams.AbstractDataStream;
+import com.jpexs.decompiler.flash.iggy.streams.ReadDataStreamInterface;
+import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.IOException;
@@ -33,7 +34,7 @@ public class IggySubFileEntry implements StructureInterface {
     @SWFType(BasicType.UI32)
     long offset;
 
-    public IggySubFileEntry(AbstractDataStream stream) throws IOException {
+    public IggySubFileEntry(ReadDataStreamInterface stream) throws IOException {
         readFromDataStream(stream);
     }
 
@@ -57,7 +58,7 @@ public class IggySubFileEntry implements StructureInterface {
     }
 
     @Override
-    public void readFromDataStream(AbstractDataStream stream) throws IOException {
+    public void readFromDataStream(ReadDataStreamInterface stream) throws IOException {
         type = stream.readUI32();
         size = stream.readUI32();
         size2 = stream.readUI32();
@@ -65,7 +66,7 @@ public class IggySubFileEntry implements StructureInterface {
     }
 
     @Override
-    public void writeToDataStream(AbstractDataStream stream) throws IOException {
+    public void writeToDataStream(WriteDataStreamInterface stream) throws IOException {
         stream.writeUI32(type);
         stream.writeUI32(size);
         stream.writeUI32(size2);
