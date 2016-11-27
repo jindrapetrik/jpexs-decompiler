@@ -173,7 +173,7 @@ public class IggyFile implements StructureInterface {
     }
 
     private static boolean updateIndex(long item_offset /*uint32_t*/, boolean is_64, byte index_bytes[], long item_size_change /*int32_t*/) throws IOException {
-        ByteArrayDataStream stream = new ByteArrayDataStream(index_bytes, is_64);
+        ByteArrayDataStream stream = new ByteArrayDataStream(index_bytes);
 
         /*
         index_table:
@@ -389,7 +389,7 @@ public class IggyFile implements StructureInterface {
      * @throws IOException
      */
     private static Long itemLength(long item_offset /*uint32_t*/, boolean is_64, byte index_bytes[], Long newValue) throws IOException {
-        ByteArrayDataStream stream = new ByteArrayDataStream(index_bytes, is_64);
+        ByteArrayDataStream stream = new ByteArrayDataStream(index_bytes);
 
         /*
         index_table:
@@ -604,11 +604,11 @@ public class IggyFile implements StructureInterface {
 
         for (int i = 0; i < subFileEntries.size(); i++) {
             IggySubFileEntry entry = subFileEntries.get(i);
-            AbstractDataStream dataStream = new ByteArrayDataStream(getEntryData(i), header.is64());
+            AbstractDataStream dataStream = new ByteArrayDataStream(getEntryData(i));
             if (entry.type == IggySubFileEntry.TYPE_INDEX) {
                 List<Integer> indexTable = new ArrayList<>();
                 List<Long> offsets = new ArrayList<>();
-                IggyIndexParser.parseIndex(dataStream, indexTable, offsets);
+                IggyIndexParser.parseIndex(header.is64(), dataStream, indexTable, offsets);
                 indexTables.add(indexTable);
                 offsetTables.add(offsets);
             } else if (entry.type == IggySubFileEntry.TYPE_FLASH) {

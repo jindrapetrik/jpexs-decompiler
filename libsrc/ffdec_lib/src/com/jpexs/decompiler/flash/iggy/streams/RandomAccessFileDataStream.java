@@ -41,15 +41,6 @@ public class RandomAccessFileDataStream extends AbstractDataStream {
         }
     }
 
-    public void set64(boolean is64) {
-        this.is64 = is64;
-    }
-
-    @Override
-    public boolean is64() {
-        return is64;
-    }
-
     @Override
     public int read() throws IOException {
         int val = raf.read();

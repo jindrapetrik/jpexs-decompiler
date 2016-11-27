@@ -21,9 +21,6 @@ public abstract class AbstractDataStream implements DataStreamInterface {
     public abstract long position();
 
     @Override
-    public abstract boolean is64();
-
-    @Override
     public long readUI64() throws IOException {
         try {
             return (readUI32() + (readUI32() << 32)) & 0xffffffffffffffffL;

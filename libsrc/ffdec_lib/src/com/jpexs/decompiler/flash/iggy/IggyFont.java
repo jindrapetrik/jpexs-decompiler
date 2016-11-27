@@ -177,7 +177,7 @@ public class IggyFont extends IggyTag {
 
     @Override
     public void readFromDataStream(AbstractDataStream stream) throws IOException {
-        ByteArrayDataStream s = new ByteArrayDataStream(stream.readBytes((int) (long) stream.available()), stream.is64());
+        ByteArrayDataStream s = new ByteArrayDataStream(stream.readBytes((int) (long) stream.available()));
         type = s.readUI16();
         fontId = s.readUI16();
         zeroone = s.readBytes(28);

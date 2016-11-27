@@ -30,7 +30,7 @@ public class IggyIndexParser {
      * @param offsets Output list of offsets
      * @throws IOException on error
      */
-    public static void parseIndex(AbstractDataStream indexStream, List<Integer> indexTableEntry, List<Long> offsets) throws IOException {
+    public static void parseIndex(boolean is64, AbstractDataStream indexStream, List<Integer> indexTableEntry, List<Long> offsets) throws IOException {
         int indexTableSize = indexStream.readUI8();
         int[] indexTable = new int[indexTableSize];
         for (int i = 0; i < indexTableSize; i++) {
@@ -90,7 +90,7 @@ public class IggyIndexParser {
 
                 n = n8 + 1;
 
-                if (indexStream.is64()) {
+                if (is64) {
                     if (i <= 2) {
                         offset += 8 * n; // Ptr type
                     } else if (i <= 4) {

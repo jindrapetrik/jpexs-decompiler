@@ -12,10 +12,9 @@ public class ByteArrayDataStream extends AbstractDataStream {
 
     private byte[] data;
     private long pos;
-    private boolean use64bit;
 
-    public ByteArrayDataStream(int initialSize, boolean use64bit) {
-        this(new byte[initialSize], use64bit);
+    public ByteArrayDataStream(int initialSize) {
+        this(new byte[initialSize]);
     }
 
     @Override
@@ -23,15 +22,9 @@ public class ByteArrayDataStream extends AbstractDataStream {
         return pos;
     }
 
-    public ByteArrayDataStream(byte data[], boolean use64bit) {
+    public ByteArrayDataStream(byte data[]) {
         this.data = data;
         pos = 0;
-        this.use64bit = use64bit;
-    }
-
-    @Override
-    public boolean is64() {
-        return use64bit;
     }
 
     @Override
