@@ -64,7 +64,10 @@ public class IggySubFileEntry implements StructureInterface {
 
     @Override
     public void writeToDataStream(AbstractDataStream stream) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        stream.writeUI32(type);
+        stream.writeUI32(size);
+        stream.writeUI32(size2);
+        stream.writeUI32(offset);
     }
 
 }

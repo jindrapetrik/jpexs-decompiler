@@ -32,6 +32,8 @@ public class IggyCharAdvances implements StructureInterface {
 
     @Override
     public void writeToDataStream(AbstractDataStream stream) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        for (int i = 0; i < advances.size(); i++) {
+            stream.writeFloat(advances.get(i));
+        }
     }
 }

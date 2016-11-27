@@ -65,7 +65,18 @@ public class IggyCharOffset implements StructureInterface {
 
     @Override
     public void writeToDataStream(AbstractDataStream stream) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        stream.writeUI64(zero);
+        stream.writeUI16(ischar1);
+        stream.writeUI16(ischar2);
+        stream.writeUI32(zero2);
+        stream.writeUI16(xscale);
+        stream.writeUI16(yscale);
+        stream.writeUI32(zero3);
+        if (ischar1 > 0) {
+            stream.writeUI64(offset - stream.position());
+        } else {
+            stream.writeUI64(1);
+        }
     }
 
     public long getZero() {

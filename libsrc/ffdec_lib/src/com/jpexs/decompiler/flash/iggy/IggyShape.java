@@ -104,8 +104,22 @@ public class IggyShape implements StructureInterface {
     }
 
     @Override
-    public void writeToDataStream(AbstractDataStream stream) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void writeToDataStream(AbstractDataStream s) throws IOException {
+        s.writeFloat(minx);
+        s.writeFloat(miny);
+        s.writeFloat(maxx);
+        s.writeFloat(maxy);
+        s.writeUI64(unk);
+        s.writeUI64(count);
+        s.writeUI64(one);
+        s.writeUI64(one2);
+        s.writeUI64(one3);
+        s.writeUI32(one4);
+        s.writeUI32(two1);
+
+        for (IggyShapeNode node : nodes) {
+            node.writeToDataStream(s);
+        }
     }
 
     public float getMinx() {

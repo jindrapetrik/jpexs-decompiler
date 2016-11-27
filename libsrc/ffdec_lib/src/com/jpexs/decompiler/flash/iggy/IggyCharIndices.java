@@ -38,7 +38,10 @@ public class IggyCharIndices implements StructureInterface {
 
     @Override
     public void writeToDataStream(AbstractDataStream stream) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        for (int i = 0; i < chars.size(); i++) {
+            stream.writeUI16(chars.get(i));
+        }
+        stream.writeUI32(padd);
     }
 
 }

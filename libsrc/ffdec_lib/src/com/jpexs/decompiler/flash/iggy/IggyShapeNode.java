@@ -79,8 +79,16 @@ public class IggyShapeNode implements StructureInterface {
     }
 
     @Override
-    public void writeToDataStream(AbstractDataStream stream) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void writeToDataStream(AbstractDataStream s) throws IOException {
+        s.writeFloat(targetX);
+        s.writeFloat(targetY);
+        s.writeFloat(controlX);
+        s.writeFloat(controlY);
+        s.writeUI8(node_type);
+        s.writeUI8(node_subtype);
+        s.writeUI8(zer1);
+        s.writeUI8(zer2);
+        s.writeUI32(isstart);
     }
 
     public float getX1() {

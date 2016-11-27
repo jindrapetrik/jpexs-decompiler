@@ -100,6 +100,12 @@ public abstract class AbstractDataStream {
         return ret;
     }
 
+    protected void writeBytes(byte[] data) throws IOException {
+        for (int i = 0; i < data.length; i++) {
+            write(data[i] & 0xff);
+        }
+    }
+
     protected abstract int read() throws IOException;
 
     protected abstract void seek(long pos, SeekMode mode) throws IOException;

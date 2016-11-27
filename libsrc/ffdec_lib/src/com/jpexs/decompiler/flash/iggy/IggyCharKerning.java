@@ -52,7 +52,12 @@ public class IggyCharKerning implements StructureInterface {
 
     @Override
     public void writeToDataStream(AbstractDataStream stream) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        for (int i = 0; i < kernCount; i++) {
+            stream.writeUI16(charsA.get(i));
+            stream.writeUI16(charsB.get(i));
+            stream.writeUI16(kerningOffsets.get(i));
+        }
+        stream.writeUI32(pad);
     }
 
 }

@@ -10,7 +10,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class IggyFont implements StructureInterface {
+public class IggyFont extends IggyTag {
 
     public static final int ID = 0xFF16;
 
@@ -156,6 +156,22 @@ public class IggyFont implements StructureInterface {
         return stream.position() - 8 + offset;
     }
 
+    private void writeAbsoluteOffset(AbstractDataStream stream, long offset) throws IOException {
+        if (offset == 0) {
+            stream.writeUI64(1);
+        } else {
+            stream.writeUI64(offset - stream.position());
+        }
+    }
+
+    private void writeRelativeOffset(AbstractDataStream stream, long offset) throws IOException {
+        if (offset == 0) {
+            stream.writeUI64(1);
+        } else {
+            stream.writeUI64(offset);
+        }
+    }
+
     @Override
     public void readFromDataStream(AbstractDataStream stream) throws IOException {
         ByteArrayDataStream s = new ByteArrayDataStream(stream.readBytes((int) (long) stream.available()), stream.is64());
@@ -241,8 +257,83 @@ public class IggyFont implements StructureInterface {
     }
 
     @Override
-    public void writeToDataStream(AbstractDataStream stream) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void writeToDataStream(AbstractDataStream s) throws IOException {
+        s.writeUI16(type);
+        s.writeUI16(fontId);
+        s.writeBytes(zeroone);
+        s.writeUI16(char_count2);
+        s.writeUI16(ascent);
+        s.writeUI16(descent);
+        s.writeUI16(leading);
+        s.writeUI64(flags);
+        writeAbsoluteOffset(s, start_of_char_struct);
+        writeAbsoluteOffset(s, start_of_char_index);
+        writeAbsoluteOffset(s, start_of_scale);
+        s.writeUI32(kern_count);
+        for (int i = 0; i < unk_float.length; i++) {
+            s.writeFloat(unk_float[i]);
+        }
+        writeAbsoluteOffset(s, start_of_kern);
+        s.writeUI64(zero_padd);
+        s.writeUI64(what_2);
+        s.writeUI64(zero_padd_2);
+        writeAbsoluteOffset(s, start_of_name);
+        s.writeUI64(one_padd);
+        s.writeUI16(xscale);
+        s.writeUI16(yscale);
+        s.writeUI64(zero_padd_3);
+        s.writeFloat(ssr1);
+        s.writeFloat(ssr2);
+        s.writeUI32(char_count);
+        s.writeUI64(zero_padd_4);
+        s.writeUI64(what_3);
+        //s.seek(272, SeekMode.CUR);
+        for (int i = 0; i < 272; i++) {
+            s.write(0);
+        }
+        s.writeFloat(sss1);
+        s.writeUI32(one_padd2);
+        s.writeFloat(sss2);
+        s.writeUI32(one_padd3);
+        s.writeFloat(sss3);
+        s.writeUI32(one_padd4);
+        s.writeFloat(sss4);
+        s.writeUI32(one_padd5);
+        if (start_of_name != 0) {
+            for (char c : name.toCharArray()) {
+                s.writeUI16(c);
+            }
+            s.writeUI16(0);
+
+            //align to 8 bytes boundary
+            int len = name.length() * 2 + 2;
+            int rem = 8 - (len % 8);
+            for (int i = 0; i < rem; i++) {
+                s.write(0);
+            }
+        }
+        s.writeUI64(0); //pad zero
+        if (start_of_char_struct != 0) {
+            //offsets of shapes
+            for (IggyCharOffset ofs : charOffsets) {
+                ofs.writeToDataStream(s);
+            }
+            for (IggyShape shp : glyphs) {
+                shp.writeToDataStream(s);
+            }
+        }
+        if (start_of_char_index != 0) {
+            for (char c : codePoints.chars) {
+                s.writeUI16(c);
+            }
+            s.writeUI32(0);
+        }
+        if (start_of_scale != 0) {
+            charScales.writeToDataStream(s);
+        }
+        if (start_of_kern != 0) {
+            charKernings.writeToDataStream(s);
+        }
     }
 
     public int getType() {
@@ -311,6 +402,11 @@ public class IggyFont implements StructureInterface {
 
     public List<IggyCharOffset> getCharOffsets() {
         return charOffsets;
+    }
+
+    @Override
+    public int getTagType() {
+        return ID;
     }
 
 }

@@ -106,8 +106,16 @@ public class IggyHeader implements StructureInterface {
     }
 
     @Override
-    public void writeToDataStream(AbstractDataStream stream) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void writeToDataStream(AbstractDataStream s) throws IOException {
+        s.writeUI32(magic);
+        s.writeUI32(version);
+        s.writeUI8(platform1);
+        s.writeUI8(platform2);
+        s.writeUI8(platform3);
+        s.writeUI8(platform4);
+        s.writeUI32(unk_0C);
+        s.writeBytes(reserved);
+        s.writeUI32(numSubfiles);
     }
 
     public boolean is64() {
