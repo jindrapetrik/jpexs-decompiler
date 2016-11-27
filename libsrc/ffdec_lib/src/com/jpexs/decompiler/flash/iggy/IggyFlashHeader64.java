@@ -124,7 +124,37 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
 
     @Override
     public void writeToDataStream(WriteDataStreamInterface stream) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        stream.writeUI64(main_offset);
+        stream.writeUI64(as3_section_offset);
+        stream.writeUI64(unk_offset);
+        stream.writeUI64(unk_offset2);
+        stream.writeUI64(unk_offset3);
+        stream.writeUI64(unk_offset4);
+        stream.writeUI32(xmin);
+        stream.writeUI32(ymin);
+        stream.writeUI32(xmax);
+        stream.writeUI32(ymax);
+        stream.writeUI32(unk_40);
+        stream.writeUI32(unk_44);
+        stream.writeUI32(unk_48);
+        stream.writeUI32(unk_4C);
+        stream.writeUI32(unk_50);
+        stream.writeUI32(unk_54);
+        stream.writeFloat(frame_rate);
+        stream.writeUI32(unk_5C);
+        stream.writeUI64(fonts_offset);
+        stream.writeUI64(unk_68);
+        stream.writeUI64(names_offset);
+        stream.writeUI64(unk_offset5);
+        stream.writeUI64(unk_80);
+        stream.writeUI64(last_section_offset);
+        stream.writeUI64(unk_offset6);
+        stream.writeUI64(as3_code_offset);
+        stream.writeUI64(as3_names_offset);
+        stream.writeUI32(unk_A8);
+        stream.writeUI32(unk_AC);
+        stream.writeUI32(font_count);
+        stream.writeUI32(unk_B4);
     }
 
     @Override

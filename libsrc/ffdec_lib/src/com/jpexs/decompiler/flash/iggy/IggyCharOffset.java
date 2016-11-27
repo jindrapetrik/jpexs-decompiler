@@ -82,6 +82,10 @@ public class IggyCharOffset implements StructureInterface {
         }
     }
 
+    public boolean hasGlyph() {
+        return offset > 0;
+    }
+
     public long getZero() {
         return zero;
     }

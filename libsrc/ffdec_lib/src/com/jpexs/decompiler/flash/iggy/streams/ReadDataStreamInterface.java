@@ -15,6 +15,8 @@ public interface ReadDataStreamInterface extends AutoCloseable {
      */
     public Long available();
 
+    public Long totalSize();
+
     public long position();
 
     public long readUI64() throws IOException;

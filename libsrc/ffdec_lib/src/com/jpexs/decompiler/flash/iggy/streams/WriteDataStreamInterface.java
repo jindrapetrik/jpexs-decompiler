@@ -15,6 +15,8 @@ public interface WriteDataStreamInterface extends AutoCloseable {
      */
     public Long available();
 
+    public Long totalSize();
+
     public long position();
 
     public boolean writeUI64(long val) throws IOException;

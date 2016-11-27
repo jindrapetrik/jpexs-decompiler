@@ -176,9 +176,13 @@ public class IggyFont extends IggyTag {
         }
     }
 
+    private long makeAbsOffset(ReadDataStreamInterface s, long offset) {
+        return offset == 1 ? 0 : s.position() - 8 + offset;
+    }
+
     @Override
-    public void readFromDataStream(ReadDataStreamInterface stream) throws IOException {
-        TemporaryDataStream s = new TemporaryDataStream(stream.readBytes((int) (long) stream.available()));
+    public void readFromDataStream(ReadDataStreamInterface s) throws IOException {
+        long basePos = s.position();
         type = s.readUI16();
         fontId = s.readUI16();
         zeroone = s.readBytes(28);
@@ -187,19 +191,25 @@ public class IggyFont extends IggyTag {
         descent = s.readUI16();
         leading = s.readUI16();
         flags = s.readUI64();
-        start_of_char_struct = readAbsoluteOffset(s);
-        start_of_char_index = readAbsoluteOffset(s);
-        start_of_scale = readAbsoluteOffset(s);
+        start_of_char_struct = s.readUI64();
+        long abs_start_of_char_struct = makeAbsOffset(s, start_of_char_struct);
+        start_of_char_index = s.readUI64();
+        long abs_start_of_char_index = makeAbsOffset(s, start_of_char_struct);
+        start_of_scale = s.readUI64();
+        long abs_start_of_scale = makeAbsOffset(s, start_of_char_struct);
+
         kern_count = s.readUI32();
         unk_float = new float[5];
         for (int i = 0; i < unk_float.length; i++) {
             unk_float[i] = s.readFloat();
         }
-        start_of_kern = readAbsoluteOffset(s);
+        start_of_kern = s.readUI64();
+        long abs_start_of_kern = makeAbsOffset(s, start_of_kern);
         zero_padd = s.readUI64();
         what_2 = s.readUI64();
         zero_padd_2 = s.readUI64();
-        start_of_name = readAbsoluteOffset(s);
+        start_of_name = s.readUI64();
+        long abs_start_of_name = makeAbsOffset(s, start_of_name);
         one_padd = s.readUI64();
         xscale = s.readUI16();
         yscale = s.readUI16();
@@ -209,7 +219,7 @@ public class IggyFont extends IggyTag {
         char_count = s.readUI32();
         zero_padd_4 = s.readUI64();
         what_3 = s.readUI64();
-        s.seek(272, SeekMode.CUR);
+        s.seek(basePos + 272, SeekMode.SET);
         sss1 = s.readFloat();
         one_padd2 = s.readUI32();
         sss2 = s.readFloat();
@@ -218,8 +228,8 @@ public class IggyFont extends IggyTag {
         one_padd4 = s.readUI32();
         sss4 = s.readFloat();
         one_padd5 = s.readUI32();
-        if (start_of_name != 0) {
-            s.seek(start_of_name, SeekMode.SET);
+        if (abs_start_of_name != 0) {
+            s.seek(abs_start_of_name, SeekMode.SET);
             StringBuilder nameBuilder = new StringBuilder();
             int nameCharCnt = 0;
             do {
@@ -234,8 +244,8 @@ public class IggyFont extends IggyTag {
             name = nameBuilder.toString();
         }
         s.readUI64(); //pad zero        
-        if (start_of_char_struct != 0) {
-            s.seek(start_of_char_struct, SeekMode.SET);
+        if (abs_start_of_char_struct != 0) {
+            s.seek(abs_start_of_char_struct, SeekMode.SET);
             charOffsets = new ArrayList<>();
             for (int i = 0; i < char_count; i++) {
                 charOffsets.add(new IggyCharOffset(s));
@@ -243,19 +253,23 @@ public class IggyFont extends IggyTag {
             glyphs = new ArrayList<>();
             for (int i = 0; i < char_count; i++) {
                 long offset = charOffsets.get(i).offset;
-                glyphs.add(new IggyShape(s, offset));
+                if (offset != 0) {
+                    glyphs.add(new IggyShape(s, offset));
+                } else {
+                    glyphs.add(null);
+                }
             }
         }
-        if (start_of_char_index != 0) {
-            s.seek(start_of_char_index, SeekMode.SET);
+        if (abs_start_of_char_index != 0) {
+            s.seek(abs_start_of_char_index, SeekMode.SET);
             codePoints = new IggyCharIndices(s, char_count);
         }
-        if (start_of_scale != 0) {
-            s.seek(start_of_scale, SeekMode.SET);
+        if (abs_start_of_scale != 0) {
+            s.seek(abs_start_of_scale, SeekMode.SET);
             charScales = new IggyCharAdvances(s, char_count);
         }
-        if (start_of_kern != 0) {
-            s.seek(start_of_kern, SeekMode.SET);
+        if (abs_start_of_kern != 0) {
+            s.seek(abs_start_of_kern, SeekMode.SET);
             charKernings = new IggyCharKerning(s, kern_count);
         }
     }
@@ -270,18 +284,23 @@ public class IggyFont extends IggyTag {
         s.writeUI16(descent);
         s.writeUI16(leading);
         s.writeUI64(flags);
-        writeAbsoluteOffset(s, start_of_char_struct);
-        writeAbsoluteOffset(s, start_of_char_index);
-        writeAbsoluteOffset(s, start_of_scale);
+        long abs_start_of_char_struct = s.position() + start_of_char_struct;
+        s.writeUI64(start_of_char_struct);
+        long abs_start_of_char_index = s.position() + start_of_char_index;
+        s.writeUI64(start_of_char_index);
+        long abs_start_of_scale = s.position() + start_of_scale;
+        s.writeUI64(start_of_scale);
         s.writeUI32(kern_count);
         for (int i = 0; i < unk_float.length; i++) {
             s.writeFloat(unk_float[i]);
         }
-        writeAbsoluteOffset(s, start_of_kern);
+        long abs_start_of_kern = s.position() + start_of_kern;
+        s.writeUI64(start_of_kern);
         s.writeUI64(zero_padd);
         s.writeUI64(what_2);
         s.writeUI64(zero_padd_2);
-        writeAbsoluteOffset(s, start_of_name);
+        long abs_start_of_name = s.position() + start_of_name;
+        s.writeUI64(start_of_name);
         s.writeUI64(one_padd);
         s.writeUI16(xscale);
         s.writeUI16(yscale);
@@ -291,10 +310,7 @@ public class IggyFont extends IggyTag {
         s.writeUI32(char_count);
         s.writeUI64(zero_padd_4);
         s.writeUI64(what_3);
-        //s.seek(272, SeekMode.CUR);
-        for (int i = 0; i < 272; i++) {
-            s.write(0);
-        }
+        s.seek(272, SeekMode.SET);
         s.writeFloat(sss1);
         s.writeUI32(one_padd2);
         s.writeFloat(sss2);
@@ -303,7 +319,8 @@ public class IggyFont extends IggyTag {
         s.writeUI32(one_padd4);
         s.writeFloat(sss4);
         s.writeUI32(one_padd5);
-        if (start_of_name != 0) {
+        if (abs_start_of_name != 0) {
+            s.seek(abs_start_of_name, SeekMode.SET);
             for (char c : name.toCharArray()) {
                 s.writeUI16(c);
             }
@@ -317,25 +334,33 @@ public class IggyFont extends IggyTag {
             }
         }
         s.writeUI64(0); //pad zero
-        if (start_of_char_struct != 0) {
+        if (abs_start_of_char_struct != 0) {
+            s.seek(abs_start_of_char_struct, SeekMode.SET);
             //offsets of shapes
             for (IggyCharOffset ofs : charOffsets) {
                 ofs.writeToDataStream(s);
             }
-            for (IggyShape shp : glyphs) {
-                shp.writeToDataStream(s);
+            for (int i = 0; i < glyphs.size(); i++) {
+                IggyShape shp = glyphs.get(i);
+                if (shp != null) {
+                    s.seek(charOffsets.get(i).offset, SeekMode.SET);
+                    shp.writeToDataStream(s);
+                }
             }
         }
-        if (start_of_char_index != 0) {
+        if (abs_start_of_char_index != 0) {
+            s.seek(abs_start_of_char_index, SeekMode.SET);
             for (char c : codePoints.chars) {
                 s.writeUI16(c);
             }
             s.writeUI32(0);
         }
-        if (start_of_scale != 0) {
+        if (abs_start_of_scale != 0) {
+            s.seek(abs_start_of_scale, SeekMode.SET);
             charScales.writeToDataStream(s);
         }
-        if (start_of_kern != 0) {
+        if (abs_start_of_kern != 0) {
+            s.seek(abs_start_of_kern, SeekMode.SET);
             charKernings.writeToDataStream(s);
         }
     }
@@ -411,6 +436,11 @@ public class IggyFont extends IggyTag {
     @Override
     public int getTagType() {
         return ID;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("IggyFontTag (%04X)", ID);
     }
 
 }

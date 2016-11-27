@@ -150,11 +150,20 @@ public class IggyToSwfConvertor {
             IggyCharAdvances advanceValues = iggyFont.getCharAdvances();
             for (int i = 0; i < iggyFont.getCharacterCount(); i++) {
                 int code = iggyFont.getCharIndices().getChars().get(i);
-                IggyShape glyph = iggyFont.getChars().get(i);
                 fontTag.codeTable.add(code);
-                SHAPE shp = IggyShapeToSwfConvertor.convertCharToShape(glyph);
+                IggyShape glyph = iggyFont.getChars().get(i);
+                SHAPE shp;
+                if (glyph != null) {
+                    shp = IggyShapeToSwfConvertor.convertCharToShape(glyph);
+                    fontTag.fontBoundsTable.add(shp.getBounds());
+                } else {
+                    shp = new SHAPE();
+                    shp.shapeRecords = new ArrayList<>();
+                    shp.shapeRecords.add(new EndShapeRecord());
+                    fontTag.fontBoundsTable.add(new RECT()); //??
+                }
                 fontTag.glyphShapeTable.add(shp);
-                fontTag.fontBoundsTable.add(shp.getBounds());
+
                 fontTag.fontAdvanceTable.add(makeLengthsEm(advanceValues.getScales().get(i)));
 
             }

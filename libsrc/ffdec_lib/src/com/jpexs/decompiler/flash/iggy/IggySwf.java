@@ -6,7 +6,9 @@ import com.jpexs.decompiler.flash.iggy.streams.ReadDataStreamInterface;
 import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
 import com.jpexs.decompiler.flash.iggy.annotations.IggyFieldType;
 import com.jpexs.decompiler.flash.iggy.streams.DataStreamInterface;
+import com.jpexs.decompiler.flash.iggy.streams.TemporaryDataStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,17 +30,26 @@ public class IggySwf implements StructureInterface {
 
     private IggyFlashHeader64 header;
     private Map<Long, Long> sizesOfOffsets;
-    private List<Long> allOffsets;
+    private List<Long> offsets;
+    private List<IggyTag> tags = new ArrayList<>();
+
+    public List<IggyTag> getTags() {
+        return tags;
+    }
 
     public IggySwf(IggyFlashHeader64 header, ReadDataStreamInterface stream, List<Long> offsets) throws IOException {
         this.header = header;
+        this.offsets = offsets;
+        calcSizesFromOffsets();
+        readFromDataStream(stream);
+    }
+
+    private void calcSizesFromOffsets() {
         sizesOfOffsets = new HashMap<>();
         for (int i = 0; i < offsets.size() - 1; i++) {
             sizesOfOffsets.put(offsets.get(i), offsets.get(i + 1) - offsets.get(i));
         }
         sizesOfOffsets.put(offsets.get(offsets.size() - 1), 0L); //Last offset has 0L length?
-        this.allOffsets = offsets;
-        readFromDataStream(stream);
     }
 
     @Override
@@ -56,20 +67,25 @@ public class IggySwf implements StructureInterface {
         //here is offset[1]
         int pad8 = 8 - (int) (stream.position() % 8);
         stream.seek(pad8, SeekMode.CUR);
-        //here is offset [2]        
+        //here is offset [2]                                       
         fonts = new HashMap<>();
         int fontIndex = 0;
-        for (int i = 2; i < allOffsets.size(); i++) {
-            long offset = allOffsets.get(i);
+        for (int ofs = 2; ofs < offsets.size(); ofs++) {
+            long offset = offsets.get(ofs);
+            if (offset < stream.position()) {
+                continue;
+            }
             stream.seek(offset, SeekMode.SET);
             int type = stream.readUI16();
             stream.seek(-2, SeekMode.CUR);
             if (type == IggyFont.ID) {
                 IggyFont font = new IggyFont(stream);
                 fonts.put(fontIndex++, font);
-            }
-            if (type == IggyText.ID) {
-                //TODO: Texts - incomplete
+                tags.add(font);
+            } else if (ofs < offsets.size() - 1) {
+                int len = (int) (offsets.get(ofs + 1) - offsets.get(ofs));
+                RawIggyPart rtag = new RawIggyPart(type, stream, len);
+                tags.add(rtag);
             }
         }
     }
@@ -80,7 +96,29 @@ public class IggySwf implements StructureInterface {
 
     @Override
     public void writeToDataStream(WriteDataStreamInterface stream) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO!!!
+        List<Long> newOffsets = new ArrayList<>();
+
+        try {
+            newOffsets.add(stream.position());
+            for (int i = 0; i < name.length(); i++) {
+                stream.writeUI16(name.charAt(i));
+            }
+            stream.writeUI16(0);
+            newOffsets.add(stream.position());
+            long pad8 = 8 - (stream.position() % 8);
+            for (int i = 0; i < pad8; i++) {
+                stream.write(0);
+            }
+            newOffsets.add(stream.position());
+            for (IggyTag tag : tags) {
+                tag.writeToDataStream(stream);
+                newOffsets.add(stream.position());
+            }
+        } catch (IOException ex) {
+            //ignore
+        }
+        this.offsets = newOffsets;
+        calcSizesFromOffsets();
     }
 
     @Override

@@ -8,13 +8,13 @@ import java.io.IOException;
  *
  * @author JPEXS
  */
-public class RawIggyTag extends IggyTag {
+public class RawIggyPart extends IggyTag {
 
     byte[] rawData;
     int tagType;
     private int length;
 
-    public RawIggyTag(int tagType, ReadDataStreamInterface stream, int length) throws IOException {
+    public RawIggyPart(int tagType, ReadDataStreamInterface stream, int length) throws IOException {
         this.length = length;
         this.tagType = tagType;
         readFromDataStream(stream);

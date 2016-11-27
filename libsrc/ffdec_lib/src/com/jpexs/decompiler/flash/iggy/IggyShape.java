@@ -62,7 +62,7 @@ public class IggyShape implements StructureInterface {
 
     private long offset;
 
-    public IggyShape(AbstractDataStream stream, long offset) throws IOException {
+    public IggyShape(ReadDataStreamInterface stream, long offset) throws IOException {
         this.offset = offset;
         readFromDataStream(stream);
     }

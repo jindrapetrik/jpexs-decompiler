@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -22,6 +24,15 @@ public class RandomAccessFileDataStream extends AbstractDataStream {
     public RandomAccessFileDataStream(File file) throws FileNotFoundException {
         this.file = file;
         raf = new RandomAccessFile(file, "rw");
+    }
+
+    @Override
+    public Long totalSize() {
+        try {
+            return raf.length();
+        } catch (IOException ex) {
+            return null;
+        }
     }
 
     @Override
@@ -52,6 +63,13 @@ public class RandomAccessFileDataStream extends AbstractDataStream {
     }
 
     @Override
+    public byte[] readBytes(int numBytes) throws IOException {
+        byte buf[] = new byte[numBytes];
+        raf.readFully(buf);
+        return buf;
+    }
+
+    @Override
     public void seek(long pos, SeekMode mode) throws IOException {
         long newpos = pos;
         if (mode == SeekMode.CUR) {
@@ -60,7 +78,11 @@ public class RandomAccessFileDataStream extends AbstractDataStream {
             newpos = raf.length() - pos;
         }
         if (newpos > raf.length()) {
-            throw new ArrayIndexOutOfBoundsException("Position outside bounds accessed: " + pos + ". Size: " + raf.length());
+            raf.seek(raf.length());
+            long curpos = raf.length();
+            for (long i = curpos; i < newpos; i++) {
+                raf.write(0);
+            }
         } else if (newpos < 0) {
             throw new ArrayIndexOutOfBoundsException("Negative position accessed: " + pos);
         } else {
