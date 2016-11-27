@@ -131,7 +131,7 @@ public class IggyToSwfConvertor {
                 for (int i = 0; i < ker.getKernCount(); i++) {
                     int kerningCode1 = ker.getCharsA().get(i);
                     int kerningCode2 = ker.getCharsA().get(i);
-                    int kerningOffset = makeLengthsEm(ker.getKerningOffsets().get(i));
+                    int kerningOffset = ker.getKerningOffsets().get(i);
                     fontTag.fontKerningTable.add(new KERNINGRECORD(kerningCode1, kerningCode2, kerningOffset));
                 }
             }
