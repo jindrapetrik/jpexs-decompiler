@@ -194,9 +194,9 @@ public class IggyFont extends IggyTag {
         start_of_char_struct = s.readUI64();
         long abs_start_of_char_struct = makeAbsOffset(s, start_of_char_struct);
         start_of_char_index = s.readUI64();
-        long abs_start_of_char_index = makeAbsOffset(s, start_of_char_struct);
+        long abs_start_of_char_index = makeAbsOffset(s, start_of_char_index);
         start_of_scale = s.readUI64();
-        long abs_start_of_scale = makeAbsOffset(s, start_of_char_struct);
+        long abs_start_of_scale = makeAbsOffset(s, start_of_scale);
 
         kern_count = s.readUI32();
         unk_float = new float[5];
