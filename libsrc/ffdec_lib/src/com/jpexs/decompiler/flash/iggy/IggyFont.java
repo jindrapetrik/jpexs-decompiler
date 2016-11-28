@@ -6,6 +6,7 @@ import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
 import com.jpexs.decompiler.flash.iggy.streams.TemporaryDataStream;
 import com.jpexs.decompiler.flash.iggy.annotations.IggyArrayFieldType;
 import com.jpexs.decompiler.flash.iggy.annotations.IggyFieldType;
+import com.jpexs.decompiler.flash.iggy.streams.DataStreamInterface;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -180,6 +181,10 @@ public class IggyFont extends IggyTag {
         return offset == 1 ? 0 : s.position() - 8 + offset;
     }
 
+    private long makeAbsOffset(WriteDataStreamInterface s, long offset) {
+        return offset == 1 ? 0 : s.position() - 8 + offset;
+    }
+
     @Override
     public void readFromDataStream(ReadDataStreamInterface s) throws IOException {
         long basePos = s.position();
@@ -284,23 +289,23 @@ public class IggyFont extends IggyTag {
         s.writeUI16(descent);
         s.writeUI16(leading);
         s.writeUI64(flags);
-        long abs_start_of_char_struct = s.position() + start_of_char_struct;
         s.writeUI64(start_of_char_struct);
-        long abs_start_of_char_index = s.position() + start_of_char_index;
+        long abs_start_of_char_struct = makeAbsOffset(s, start_of_char_struct);
         s.writeUI64(start_of_char_index);
-        long abs_start_of_scale = s.position() + start_of_scale;
+        long abs_start_of_char_index = makeAbsOffset(s, start_of_char_index);
         s.writeUI64(start_of_scale);
+        long abs_start_of_scale = makeAbsOffset(s, start_of_scale);
         s.writeUI32(kern_count);
         for (int i = 0; i < unk_float.length; i++) {
             s.writeFloat(unk_float[i]);
         }
-        long abs_start_of_kern = s.position() + start_of_kern;
         s.writeUI64(start_of_kern);
+        long abs_start_of_kern = makeAbsOffset(s, start_of_kern);
         s.writeUI64(zero_padd);
         s.writeUI64(what_2);
         s.writeUI64(zero_padd_2);
-        long abs_start_of_name = s.position() + start_of_name;
         s.writeUI64(start_of_name);
+        long abs_start_of_name = makeAbsOffset(s, start_of_name);
         s.writeUI64(one_padd);
         s.writeUI16(xscale);
         s.writeUI16(yscale);
