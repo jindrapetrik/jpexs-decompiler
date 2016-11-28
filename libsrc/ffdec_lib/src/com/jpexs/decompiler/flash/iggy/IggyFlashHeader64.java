@@ -55,8 +55,10 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
     long additional_import1;
     @IggyFieldType(DataType.uint32_t)
     long zero1;
-    //boolean imported = false;
-    //if( additional_import1 > 0 ) imported  = true
+
+    //local
+    private int imported = 0;
+
     @IggyFieldType(DataType.uint64_t)
     long unk_guid; // same for some fonts (eng + chinese)
     @IggyFieldType(DataType.uint64_t)
@@ -101,6 +103,10 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
     private long flash_filename_address;
     private long decl_strings_address;
     private long type_fonts_address;
+
+    public boolean isImported() {
+        return imported == 1;
+    }
 
     public long getBaseAddress() {
         return base_address;
@@ -177,6 +183,9 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
         frame_rate = stream.readFloat();
         unk_5C = stream.readUI32();
         additional_import1 = stream.readUI32();
+        if (additional_import1 > 0) {
+            imported = 1;
+        }
         zero1 = stream.readUI32();
         unk_guid = stream.readUI64();
 

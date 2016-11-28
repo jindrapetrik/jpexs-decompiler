@@ -142,4 +142,13 @@ public abstract class AbstractDataStream implements DataStreamInterface {
         //nothing
     }
 
+    @Override
+    public int readUI8(long addr) throws IOException {
+        long curPos = position();
+        seek(addr, SeekMode.SET);
+        int val = readUI8();
+        seek(curPos, SeekMode.SET);
+        return val;
+    }
+
 }
