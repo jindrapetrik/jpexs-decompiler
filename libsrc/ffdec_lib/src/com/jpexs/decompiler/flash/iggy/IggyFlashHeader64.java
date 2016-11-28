@@ -64,7 +64,7 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
     @IggyFieldType(DataType.uint64_t)
     long off_names; // 0x70 relative offset to the names/import section of the file  - end of fonts
     @IggyFieldType(DataType.uint64_t)
-    long off_unk8C; // 0x78 relative offset to something
+    long off_unk78; // 0x78 relative offset to something
     @IggyFieldType(DataType.uint64_t)
     long off_unk80;
     @IggyFieldType(DataType.uint64_t)
@@ -97,12 +97,34 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
     private long font_end_address;
     private long sequence_start_address;
     private long names_address;
-    private long unk8C_address;
+    private long unk78_address;
     private long unk80_address;
     private long last_section_address;
     private long flash_filename_address;
     private long decl_strings_address;
     private long type_fonts_address;
+
+    /**
+     * Updates all addresses by inserting gap
+     *
+     * @param pos Position to insert bytes
+     * @param size Number of bytes
+     */
+    public void insertGapAfter(long pos, long size) {
+        for (Field f : IggyFlashHeader64.class.getDeclaredFields()) {
+            if (f.getName().endsWith("_address")) {
+                try {
+                    long val = f.getLong(this);
+                    if (val > pos) {
+                        long newval = val + size;
+                        f.setLong(this, newval);
+                    }
+                } catch (IllegalAccessException iex) {
+                    //should not happen
+                }
+            }
+        }
+    }
 
     public boolean isImported() {
         return imported == 1;
@@ -120,6 +142,10 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
         return font_end_address;
     }
 
+    public void setFontEndAddress(long val) {
+        this.font_end_address = val;
+    }
+
     public long getSequenceStartAddress() {
         return sequence_start_address;
     }
@@ -128,8 +154,8 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
         return names_address;
     }
 
-    public long getUnk8CAddress() {
-        return unk8C_address;
+    public long getUnk78Address() {
+        return unk78_address;
     }
 
     public long getUnk80Address() {
@@ -191,8 +217,8 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
 
         off_names = stream.readUI64();
         names_address = off_names + stream.position() - 8;
-        off_unk8C = stream.readUI64();
-        unk8C_address = off_unk8C + stream.position() - 8;
+        off_unk78 = stream.readUI64();
+        unk78_address = off_unk78 + stream.position() - 8;
         off_unk80 = stream.readUI64();
         unk80_address = off_unk80 + stream.position() - 8;
         off_last_section = stream.readUI64();
@@ -211,11 +237,16 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
 
     @Override
     public void writeToDataStream(WriteDataStreamInterface stream) throws IOException {
+        off_start = base_address - stream.position();
         stream.writeUI64(off_start);
+        off_seq_end = sequence_end_address - stream.position();
         stream.writeUI64(off_seq_end);
+        off_font_end = font_end_address - stream.position();
         stream.writeUI64(off_font_end);
+        off_seq_start1 = sequence_start_address - stream.position();
         stream.writeUI64(off_seq_start1);
         stream.writeUI64(pad_to_match);
+        off_seq_start2 = sequence_start_address - stream.position();
         stream.writeUI64(off_seq_start2);
         stream.writeUI32(xmin);
         stream.writeUI32(ymin);
@@ -232,12 +263,19 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
         stream.writeUI32(additional_import1);
         stream.writeUI32(zero1);
         stream.writeUI64(unk_guid);
+        off_names = names_address - stream.position();
         stream.writeUI64(off_names);
-        stream.writeUI64(off_unk8C);
+        off_unk78 = unk78_address - stream.position();
+        stream.writeUI64(off_unk78);
+        off_unk80 = unk80_address - stream.position();
         stream.writeUI64(off_unk80);
+        off_last_section = last_section_address - stream.position();
         stream.writeUI64(off_last_section);
+        off_flash_filename = flash_filename_address - stream.position();
         stream.writeUI64(off_flash_filename);
+        off_decl_strings = decl_strings_address - stream.position();
         stream.writeUI64(off_decl_strings);
+        off_type_of_fonts = type_fonts_address - stream.position();
         stream.writeUI64(off_type_of_fonts);
         stream.writeUI64(flags);
         stream.writeUI32(font_count);

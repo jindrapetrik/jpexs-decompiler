@@ -25,35 +25,57 @@ public class IggySwf implements StructureInterface {
     String name;
 
     Map<Integer, IggyFont> fonts;
-    Map<Integer, IggyText> texts;
-    Map<Integer, Integer> text2Font;
 
     private IggyFlashHeader64 hdr;
-    private Map<Long, Long> sizesOfOffsets;
-    private List<Long> offsets;
-    private List<IggyTag> tags = new ArrayList<>();
 
-    public List<IggyTag> getTags() {
-        return tags;
-    }
+    private byte[] allFontBytes;
 
-    public IggySwf(IggyFlashHeader64 header, ReadDataStreamInterface stream, List<Long> offsets) throws IOException {
-        this.hdr = header;
-        this.offsets = offsets;
-        calcSizesFromOffsets();
+    public IggySwf(ReadDataStreamInterface stream) throws IOException {
         readFromDataStream(stream);
     }
 
-    private void calcSizesFromOffsets() {
-        sizesOfOffsets = new HashMap<>();
-        for (int i = 0; i < offsets.size() - 1; i++) {
-            sizesOfOffsets.put(offsets.get(i), offsets.get(i + 1) - offsets.get(i));
+    private long font_data_addresses[];
+    private long font_data_sizes[];
+    private List<Long> text_addresses = new ArrayList<>();
+    private List<Long> text_data_sizes = new ArrayList<>();
+    private List<Long> font_add_off = new ArrayList<>();
+    private List<Long> font_add_size = new ArrayList<>();
+
+    public void replaceFontTag(int fontIndex, IggyFont newFont) throws IOException {
+        long newLen;
+        byte newData[];
+        try (WriteDataStreamInterface stream = new TemporaryDataStream()) {
+            newFont.writeToDataStream(stream);
+            newData = stream.getAllBytes();
+            newLen = newData.length;
         }
-        sizesOfOffsets.put(offsets.get(offsets.size() - 1), 0L); //Last offset has 0L length?
+        long oldLen = font_data_sizes[fontIndex];
+        long diff = newLen - oldLen;
+        if (diff != 0) {
+            font_data_sizes[fontIndex] = newLen;
+            for (int i = fontIndex; i < hdr.font_count; i++) {
+                font_data_addresses[i] += diff;
+            }
+            for (int i = 0; i < text_addresses.size(); i++) {
+                text_addresses.set(i, text_addresses.get(i) + diff);
+            }
+            for (int i = 0; i < font_add_off.size(); i++) {
+                font_add_off.set(i, font_add_off.get(i) + diff);
+            }
+        }
+        hdr.insertGapAfter(font_data_addresses[fontIndex], diff);
+
     }
 
     @Override
     public void readFromDataStream(ReadDataStreamInterface s) throws IOException {
+        this.hdr = new IggyFlashHeader64(s);
+        //Save all font bytes to buffer for later easy modification
+        long curPos = s.position();
+        long maxPos = hdr.getFontEndAddress();
+        allFontBytes = s.readBytes((int) (maxPos - curPos));
+        s.seek(curPos, SeekMode.SET);
+
         //here is offset[0]
         StringBuilder nameBuilder = new StringBuilder();
         do {
@@ -71,8 +93,8 @@ public class IggySwf implements StructureInterface {
         s.seek(hdr.getBaseAddress(), SeekMode.SET);
         s.readUI64(); //one pad
 
-        long font_data_addresses[] = new long[(int) hdr.font_count];
-        long font_data_sizes[] = new long[(int) hdr.font_count];
+        font_data_addresses = new long[(int) hdr.font_count];
+        font_data_sizes = new long[(int) hdr.font_count];
 
         for (int i = 0; i < hdr.font_count; i++) {
             long offset = s.readUI64();
@@ -85,8 +107,6 @@ public class IggySwf implements StructureInterface {
                 font_data_sizes[i] = next_offset - offset;
             }
         }
-        List<Long> text_addresses = new ArrayList<>();
-        List<Long> text_data_sizes = new ArrayList<>();
         while (true) {
             long offset = s.readUI64();
             long text_addr = offset + s.position() - 8;
@@ -101,8 +121,6 @@ public class IggySwf implements StructureInterface {
             }
         }
 
-        List<Long> font_add_off = new ArrayList<>();
-        List<Long> font_add_size = new ArrayList<>();
         if (hdr.isImported()) { // tohle muze narusit iggy order, ale oni to pak stejne pocitaji dle infa 
             long additionalOffset = s.readUI64();
             font_add_off.add(additionalOffset + s.position() - 8);
@@ -129,7 +147,6 @@ public class IggySwf implements StructureInterface {
             s.seek(font_data_addresses[i], SeekMode.SET);
             //byte font_data[] = s.readBytes((int) font_data_sizes[i]);
             IggyFont font = new IggyFont(s);
-            tags.add(font);
             fonts.put(i/*??*/, font);
         }
 
@@ -151,30 +168,26 @@ public class IggySwf implements StructureInterface {
     }
 
     @Override
-    public void writeToDataStream(WriteDataStreamInterface stream) throws IOException {
-        List<Long> newOffsets = new ArrayList<>();
-
-        try {
-            newOffsets.add(stream.position());
-            for (int i = 0; i < name.length(); i++) {
-                stream.writeUI16(name.charAt(i));
+    public void writeToDataStream(WriteDataStreamInterface st) throws IOException {
+        try (DataStreamInterface s = new TemporaryDataStream(allFontBytes)) {
+            hdr.writeToDataStream(s);
+            s.writeUI64(1);
+            for (int i = 0; i < font_data_addresses.length; i++) {
+                long offset = font_data_addresses[i] - s.position() + 8;
+                s.writeUI64(offset);
             }
-            stream.writeUI16(0);
-            newOffsets.add(stream.position());
-            long pad8 = 8 - (stream.position() % 8);
-            for (int i = 0; i < pad8; i++) {
-                stream.write(0);
+            s.writeUI64(1);
+            for (int i = 0; i < text_addresses.size(); i++) {
+                long offset = text_addresses.get(i) - s.position() + 8;
+                s.writeUI64(offset);
             }
-            newOffsets.add(stream.position());
-            for (IggyTag tag : tags) {
-                tag.writeToDataStream(stream);
-                newOffsets.add(stream.position());
+            s.writeUI64(1);
+            s.seek(840, SeekMode.SET);
+            for (int i = 0; i < hdr.font_count; i++) {
+                fonts.get(i).writeToDataStream(s);
             }
-        } catch (IOException ex) {
-            //ignore
+            st.writeBytes(s.getAllBytes());
         }
-        this.offsets = newOffsets;
-        calcSizesFromOffsets();
     }
 
     @Override

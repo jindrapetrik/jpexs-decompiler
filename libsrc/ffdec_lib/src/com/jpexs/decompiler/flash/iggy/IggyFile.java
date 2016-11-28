@@ -43,30 +43,29 @@ public class IggyFile implements StructureInterface {
 
     public static final int FIRST_TAG_POSITION = 3;
 
-    public void replaceTag(int swfIndex, int tagIndex, IggyTag newTag) throws IOException {
-        WriteDataStreamInterface stream = new TemporaryDataStream();
-        newTag.writeToDataStream(stream);
+    public void replaceFontTag(int targetSwfIndex, int fontIndex, IggyFont newFont) throws IOException {
+        IggySwf iggySwf = iggySwfs.get(targetSwfIndex);
+        iggySwf.replaceFontTag(fontIndex, newFont);
 
-        setSwfItemLength(swfIndex, FIRST_TAG_POSITION + tagIndex, stream.totalSize());
-    }
-
-    public void saveTag(int swfIndex, IggyTag newTag) throws IOException {
-        WriteDataStreamInterface stream = new TemporaryDataStream();
-        newTag.writeToDataStream(stream);
-
-        int tagIndex = 0;
-        List<IggyTag> taglist = iggySwfs.get(swfIndex).getTags();
-        for (IggyTag t : taglist) {
-            if (t == newTag) {
-                break;
+        DataStreamInterface flashStream = new TemporaryDataStream();
+        iggySwf.writeToDataStream(flashStream);
+        byte flashData[] = flashStream.getAllBytes();
+        int swfIndex = 0;
+        int offsetChange = 0;
+        for (int i = 0; i < subFileEntries.size(); i++) {
+            IggySubFileEntry entry = subFileEntries.get(i);
+            entry.offset += offsetChange;
+            if (entry.type == IggySubFileEntry.TYPE_FLASH) {
+                if (swfIndex == targetSwfIndex) {
+                    long newLen = flashData.length;
+                    long oldLen = entry.size;
+                    offsetChange += (newLen - oldLen);
+                }
+                swfIndex++;
             }
-            tagIndex++;
         }
-        if (tagIndex < taglist.size()) {
-            setSwfItemLength(swfIndex, FIRST_TAG_POSITION + tagIndex, stream.totalSize());
-        } else {
-            throw new IllegalArgumentException("Tag does not exists in this iggy file");
-        }
+        subFileEntriesData.set(targetSwfIndex, flashData);
+        //TODO: Update index
     }
 
     private boolean setSwfItemLength(int swfIndex, int itemindex, long newLength) {
@@ -101,14 +100,6 @@ public class IggyFile implements StructureInterface {
 
     public IggyFont getFont(int swfIndex, int fontId) {
         return iggySwfs.get(swfIndex).fonts.get(fontId);
-    }
-
-    public IggyText getText(int swfIndex, int textId) {
-        return iggySwfs.get(swfIndex).texts.get(textId);
-    }
-
-    public Set<Integer> getTextIds(int swfIndex) {
-        return iggySwfs.get(swfIndex).texts.keySet();
     }
 
     public IggyFile(String filePath) throws IOException {
@@ -202,7 +193,8 @@ public class IggyFile implements StructureInterface {
         File outFile = new File(outFileName);
         IggyFile iggyFile = new IggyFile(inFile);
         IggySwf iswf = iggyFile.getSwf(0);
-        iggyFile.replaceSwf(0, iswf);
+        IggyFont ifont = iswf.fonts.get(0);
+        iggyFile.replaceFontTag(0, 0, ifont);
         outFile.delete();
         try (RandomAccessFileDataStream outputStream = new RandomAccessFileDataStream(outFile)) {
             iggyFile.writeToDataStream(outputStream);
@@ -649,7 +641,9 @@ public class IggyFile implements StructureInterface {
 
     //WIP
     public boolean replaceSwf(int targetSwfIndex, IggySwf iggySwf) {
-        if (targetSwfIndex < 0 || targetSwfIndex >= getSwfCount()) {
+        return false; //Not working yet - need to make IggySWF.writeToDataStream work
+
+        /*if (targetSwfIndex < 0 || targetSwfIndex >= getSwfCount()) {
             throw new ArrayIndexOutOfBoundsException("No such SWF file index");
         }
         byte replacementData[];
@@ -680,7 +674,7 @@ public class IggyFile implements StructureInterface {
             }
         }
         subFileEntriesData.set(targetSwfIndex, replacementData);
-        return true;
+        return true;*/
     }
 
     private void parseEntries() throws IOException {
@@ -697,22 +691,8 @@ public class IggyFile implements StructureInterface {
                 indexTables.add(indexTable);
                 offsetTables.add(offsets);
             } else if (entry.type == IggySubFileEntry.TYPE_FLASH) {
-                IggyFlashHeaderInterface hdr;
-                if (header.is64()) {
-                    hdr = new IggyFlashHeader64(dataStream);
-                } else {
-                    hdr = new IggyFlashHeader32(dataStream);
-                    throw new UnsupportedOperationException("Iggy 32bit files are not supported"); //TODO
-                }
-                headers.add(hdr);
-                flashDataStreams.add(dataStream);
+                iggySwfs.add(new IggySwf(dataStream));
             }
-        }
-
-        for (int swfIndex = 0; swfIndex < headers.size(); swfIndex++) {
-            IggyFlashHeaderInterface hdr = headers.get(swfIndex);
-            IggySwf dataReader = new IggySwf((IggyFlashHeader64) hdr, flashDataStreams.get(swfIndex), offsetTables.get(swfIndex));
-            iggySwfs.add(dataReader);
         }
     }
 
