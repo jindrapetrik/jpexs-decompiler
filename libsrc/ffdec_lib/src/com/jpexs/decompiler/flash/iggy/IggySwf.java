@@ -41,6 +41,10 @@ public class IggySwf implements StructureInterface {
     private List<Long> font_add_off = new ArrayList<>();
     private List<Long> font_add_size = new ArrayList<>();
 
+    public IggyFlashHeader64 getHdr() {
+        return hdr;
+    }
+
     public void replaceFontTag(int fontIndex, IggyFont newFont) throws IOException {
         long newLen;
         byte newData[];

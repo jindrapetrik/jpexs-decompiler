@@ -620,23 +620,23 @@ public class IggyFile implements StructureInterface {
     }
 
     public long getSwfXMin(int swfIndex) {
-        return headers.get(swfIndex).getXMin();
+        return iggySwfs.get(swfIndex).getHdr().getXMin();
     }
 
     public long getSwfYMin(int swfIndex) {
-        return headers.get(swfIndex).getYMin();
+        return iggySwfs.get(swfIndex).getHdr().getYMin();
     }
 
     public long getSwfXMax(int swfIndex) {
-        return headers.get(swfIndex).getXMax();
+        return iggySwfs.get(swfIndex).getHdr().getXMax();
     }
 
     public long getSwfYMax(int swfIndex) {
-        return headers.get(swfIndex).getYMax();
+        return iggySwfs.get(swfIndex).getHdr().getYMax();
     }
 
     public float getSwfFrameRate(int swfIndex) {
-        return headers.get(swfIndex).getFrameRate();
+        return iggySwfs.get(swfIndex).getHdr().getFrameRate();
     }
 
     //WIP
