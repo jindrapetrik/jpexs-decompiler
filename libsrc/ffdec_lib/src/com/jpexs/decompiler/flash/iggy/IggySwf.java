@@ -7,6 +7,8 @@ import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
 import com.jpexs.decompiler.flash.iggy.annotations.IggyFieldType;
 import com.jpexs.decompiler.flash.iggy.streams.DataStreamInterface;
 import com.jpexs.decompiler.flash.iggy.streams.TemporaryDataStream;
+import com.jpexs.helpers.Helper;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,6 +40,8 @@ public class IggySwf implements StructureInterface {
     private long font_data_sizes[];
     private List<Long> text_addresses = new ArrayList<>();
     private List<Long> text_data_sizes = new ArrayList<>();
+    private List<byte[]> text_data_bytes = new ArrayList<>();
+    private byte font_add_data[];
     private List<Long> font_add_off = new ArrayList<>();
     private List<Long> font_add_size = new ArrayList<>();
 
@@ -95,7 +99,7 @@ public class IggySwf implements StructureInterface {
         s.seek(pad8, SeekMode.CUR);
         //here is offset [2]
         s.seek(hdr.getBaseAddress(), SeekMode.SET);
-        s.readUI64(); //one pad
+        s.readUI64(); //pad 1
 
         font_data_addresses = new long[(int) hdr.font_count];
         font_data_sizes = new long[(int) hdr.font_count];
@@ -113,6 +117,9 @@ public class IggySwf implements StructureInterface {
         }
         while (true) {
             long offset = s.readUI64();
+            if (offset == 1) {
+                break;
+            }
             long text_addr = offset + s.position() - 8;
             text_addresses.add(text_addr);
             long next_offset = s.readUI64();
@@ -124,13 +131,14 @@ public class IggySwf implements StructureInterface {
                 text_data_sizes.add(next_offset - offset);
             }
         }
+        s.readUI64(); //1
 
         if (hdr.isImported()) { // tohle muze narusit iggy order, ale oni to pak stejne pocitaji dle infa 
             long additionalOffset = s.readUI64();
             font_add_off.add(additionalOffset + s.position() - 8);
             font_add_size.add(hdr.getFontEndAddress() - font_add_off.get(0));
             if (s.readUI8(font_add_off.get(0)) != 22) { //22 = Text
-                for (int i = 0; i < hdr.font_count; i++) {
+                for (int i = 0; i < text_addresses.size(); i++) {
                     if (s.readUI8(text_addresses.get(i)) == 22) { //TEXT
                         long pomoff;
                         long pomsize;
@@ -144,26 +152,29 @@ public class IggySwf implements StructureInterface {
                 }
             }
         }
-
-        //long skipBytes = 840 - s.position();
         fonts = new HashMap<>();
         for (int i = 0; i < hdr.font_count; i++) {
             s.seek(font_data_addresses[i], SeekMode.SET);
             //byte font_data[] = s.readBytes((int) font_data_sizes[i]);
             IggyFont font = new IggyFont(s);
-            fonts.put(i/*??*/, font);
+            fonts.put(i, font);
         }
 
         for (int i = 0; i < text_addresses.size(); i++) {
+            s.seek(text_addresses.get(i), SeekMode.SET);
             byte text_data[] = s.readBytes((int) (long) text_data_sizes.get(i));
+            text_data_bytes.add(text_data);
         }
 
         if (hdr.isImported()) {
             s.seek(font_add_off.get(0), SeekMode.SET);
-            byte font_add_data[] = s.readBytes((int) (long) font_add_size.get(0));
+            font_add_data = s.readBytes((int) (long) font_add_size.get(0));
         }
-
         s.seek(hdr.getFontEndAddress(), SeekMode.SET);
+
+        WriteDataStreamInterface outs = new TemporaryDataStream();
+        writeToDataStream(outs);
+        Helper.writeFile("d:\\Dropbox\\jpexs-laptop\\iggi\\parts\\swf_out.bin", outs.getAllBytes());
 
     }
 
@@ -172,25 +183,47 @@ public class IggySwf implements StructureInterface {
     }
 
     @Override
-    public void writeToDataStream(WriteDataStreamInterface st) throws IOException {
-        try (DataStreamInterface s = new TemporaryDataStream(allFontBytes)) {
-            hdr.writeToDataStream(s);
-            s.writeUI64(1);
-            for (int i = 0; i < font_data_addresses.length; i++) {
-                long offset = font_data_addresses[i] - s.position() + 8;
-                s.writeUI64(offset);
+    public void writeToDataStream(WriteDataStreamInterface s) throws IOException {
+        hdr.writeToDataStream(s);
+        for (int i = 0; i < name.length(); i++) {
+            s.writeUI16(name.charAt(i));
+        }
+        s.writeUI16(0);
+
+        int pad8 = 8 - (int) (s.position() % 8);
+        if (pad8 < 8) {
+            for (int i = 0; i < pad8; i++) {
+                s.write(0);
             }
-            s.writeUI64(1);
-            for (int i = 0; i < text_addresses.size(); i++) {
-                long offset = text_addresses.get(i) - s.position() + 8;
-                s.writeUI64(offset);
+        }
+        s.writeUI64(1);
+        for (int i = 0; i < font_data_addresses.length; i++) {
+            long offset = font_data_addresses[i] - s.position();
+            s.writeUI64(offset);
+        }
+        for (int i = 0; i < text_addresses.size(); i++) {
+            long offset = text_addresses.get(i) - s.position();
+            s.writeUI64(offset);
+        }
+        s.writeUI64(1);
+
+        if (hdr.font_count > 0) {
+            while (s.position() < font_data_addresses[0]) {
+                s.writeUI64(1);
             }
-            s.writeUI64(1);
-            s.seek(840, SeekMode.SET);
-            for (int i = 0; i < hdr.font_count; i++) {
-                fonts.get(i).writeToDataStream(s);
-            }
-            st.writeBytes(s.getAllBytes());
+        }
+        for (int i = 0; i < hdr.font_count; i++) {
+            s.seek(font_data_addresses[i], SeekMode.SET);
+            fonts.get(i).writeToDataStream(s);
+        }
+        for (int i = 0; i < text_data_bytes.size(); i++) {
+            s.seek(text_addresses.get(i), SeekMode.SET);
+            s.writeBytes(text_data_bytes.get(i));
+        }
+
+        if (hdr.isImported()) {
+            s.seek(font_add_off.get(0), SeekMode.SET);
+            s.writeBytes(font_add_data);
         }
     }
 

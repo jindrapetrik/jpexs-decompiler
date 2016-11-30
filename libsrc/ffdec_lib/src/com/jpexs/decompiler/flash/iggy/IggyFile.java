@@ -7,6 +7,7 @@ import com.jpexs.decompiler.flash.iggy.streams.ReadDataStreamInterface;
 import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
 import com.jpexs.decompiler.flash.iggy.streams.DataStreamInterface;
 import com.jpexs.decompiler.flash.iggy.streams.TemporaryDataStream;
+import com.jpexs.helpers.Helper;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
@@ -186,7 +187,7 @@ public class IggyFile implements StructureInterface {
     }
 
     public static void main(String[] args) throws IOException {
-        String inFileName = "d:\\Dropbox\\jpexs-laptop\\iggi\\lib_loc_english_font.iggy";
+        /*String inFileName = "d:\\Dropbox\\jpexs-laptop\\iggi\\lib_loc_english_font.iggy";
         String outFileName = "d:\\Dropbox\\jpexs-laptop\\iggi\\lib_loc_english_font2.iggy";
 
         File inFile = new File(inFileName);
@@ -198,7 +199,7 @@ public class IggyFile implements StructureInterface {
         outFile.delete();
         try (RandomAccessFileDataStream outputStream = new RandomAccessFileDataStream(outFile)) {
             iggyFile.writeToDataStream(outputStream);
-        }
+        }*/
     }
 
     private static void copyStream(InputStream is, OutputStream os) {
@@ -719,7 +720,6 @@ public class IggyFile implements StructureInterface {
         for (int i = 0; i < subFileEntries.size(); i++) {
             IggySubFileEntry entry = subFileEntries.get(i);
             byte[] entryData = subFileEntriesData.get(i);
-
             stream.seek(entry.offset, SeekMode.SET);
             stream.writeBytes(entryData);
         }

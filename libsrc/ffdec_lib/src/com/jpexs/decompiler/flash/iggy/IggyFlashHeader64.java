@@ -95,7 +95,8 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
     private long base_address;
     private long sequence_end_address;
     private long font_end_address;
-    private long sequence_start_address;
+    private long sequence_start_address1;
+    private long sequence_start_address2;
     private long names_address;
     private long unk78_address;
     private long unk80_address;
@@ -146,8 +147,12 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
         this.font_end_address = val;
     }
 
-    public long getSequenceStartAddress() {
-        return sequence_start_address;
+    public long getSequenceStartAddress1() {
+        return sequence_start_address1;
+    }
+
+    public long getSequenceStartAddress2() {
+        return sequence_start_address2;
     }
 
     public long getNamesAddress() {
@@ -180,13 +185,14 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
 
     @Override
     public void readFromDataStream(ReadDataStreamInterface stream) throws IOException {
-        off_start = stream.readUI64();
+        /*  0:*/ off_start = stream.readUI64();
         base_address = off_start + stream.position() - 8;
-        off_seq_end = stream.readUI64();
+        /*  8:*/ off_seq_end = stream.readUI64();
         sequence_end_address = off_seq_end + stream.position() - 8;
-        off_font_end = stream.readUI64();
+        /* 10:*/ off_font_end = stream.readUI64();
         font_end_address = off_font_end + stream.position() - 8;
-        off_seq_start1 = stream.readUI64(); //to 1 padd occurence (2 times)
+        /* 18:*/ off_seq_start1 = stream.readUI64(); //to 1 padd occurence (2 times)
+        sequence_start_address1 = off_seq_start1 + stream.position() - 8;
         pad_to_match = stream.readUI64();
         if (pad_to_match != 1) {
             throw new IOException("Wrong iggy file - no pad to match 1");
@@ -195,7 +201,7 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
         if (off_seq_start1 != off_seq_start2) {
             throw new IOException("Wrong iggy font format (sequence_start)!\n");
         }
-        sequence_start_address = off_seq_start2 + stream.position() - 8;
+        sequence_start_address2 = off_seq_start2 + stream.position() - 8;
         xmin = stream.readUI32();
         ymin = stream.readUI32();
         xmax = stream.readUI32();
@@ -243,10 +249,10 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
         stream.writeUI64(off_seq_end);
         off_font_end = font_end_address - stream.position();
         stream.writeUI64(off_font_end);
-        off_seq_start1 = sequence_start_address - stream.position();
+        off_seq_start1 = sequence_start_address1 - stream.position();
         stream.writeUI64(off_seq_start1);
         stream.writeUI64(pad_to_match);
-        off_seq_start2 = sequence_start_address - stream.position();
+        off_seq_start2 = sequence_start_address2 - stream.position();
         stream.writeUI64(off_seq_start2);
         stream.writeUI32(xmin);
         stream.writeUI32(ymin);

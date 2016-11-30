@@ -17,7 +17,6 @@ public class IggyCharKerning implements StructureInterface {
     List<Character> charsA;
     List<Character> charsB;
     List<Short> kerningOffsets;
-    long pad;
 
     public long getKernCount() {
         return kernCount;
@@ -50,7 +49,6 @@ public class IggyCharKerning implements StructureInterface {
             charsB.add((char) stream.readUI16());
             kerningOffsets.add((short) stream.readUI16());
         }
-        pad = stream.readUI32();
     }
 
     @Override
@@ -60,7 +58,6 @@ public class IggyCharKerning implements StructureInterface {
             stream.writeUI16(charsB.get(i));
             stream.writeUI16(kerningOffsets.get(i));
         }
-        stream.writeUI32(pad);
     }
 
 }

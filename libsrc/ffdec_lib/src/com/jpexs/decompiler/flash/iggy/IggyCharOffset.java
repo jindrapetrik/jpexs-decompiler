@@ -30,7 +30,13 @@ public class IggyCharOffset implements StructureInterface {
     @IggyFieldType(DataType.uint32_t)
     long zero3;
     @IggyFieldType(DataType.uint64_t)
+    private long address;
+
     long offset;
+
+    public long getAddress() {
+        return address;
+    }
 
     public IggyCharOffset(ReadDataStreamInterface stream) throws IOException {
         readFromDataStream(stream);
@@ -56,12 +62,11 @@ public class IggyCharOffset implements StructureInterface {
         xscale = stream.readUI16();
         yscale = stream.readUI16();
         zero3 = stream.readUI32();
-        long cur_position = stream.position();
-        long relative_offset = stream.readUI64();
+        offset = stream.readUI64();
         if (ischar1 > 0) {
-            offset = cur_position + relative_offset;
+            address = offset + stream.position() - 8;
         } else {
-            offset = 0;
+            address = 0;
             LOGGER.finer(String.format("Empty char"));
         }
     }
@@ -75,11 +80,7 @@ public class IggyCharOffset implements StructureInterface {
         stream.writeUI16(xscale);
         stream.writeUI16(yscale);
         stream.writeUI32(zero3);
-        if (ischar1 > 0) {
-            stream.writeUI64(offset - stream.position());
-        } else {
-            stream.writeUI64(1);
-        }
+        stream.writeUI64(offset);
     }
 
     public boolean hasGlyph() {

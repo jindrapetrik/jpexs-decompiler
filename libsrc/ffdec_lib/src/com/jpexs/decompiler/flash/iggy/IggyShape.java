@@ -60,10 +60,7 @@ public class IggyShape implements StructureInterface {
 
     List<IggyShapeNode> nodes;
 
-    private long offset;
-
-    public IggyShape(ReadDataStreamInterface stream, long offset) throws IOException {
-        this.offset = offset;
+    public IggyShape(ReadDataStreamInterface stream) throws IOException {
         readFromDataStream(stream);
     }
 
@@ -84,7 +81,6 @@ public class IggyShape implements StructureInterface {
 
     @Override
     public void readFromDataStream(ReadDataStreamInterface s) throws IOException {
-        s.seek(offset, SeekMode.SET);
         minx = s.readFloat();
         miny = s.readFloat();
         maxx = s.readFloat();
@@ -98,7 +94,7 @@ public class IggyShape implements StructureInterface {
         two1 = s.readUI32();
 
         if ((one != 1) || (one2 != 1) || (one3 != 1) || (one4 != 1) || (two1 != 2)) {
-            LOGGER.fine(String.format("Unique header at pos %d, one: %d, one2: %d, one3: %d, one4: %d, two1: %d\n", offset, one, one2, one3, one4, two1));
+            LOGGER.fine(String.format("Unique header at one: %d, one2: %d, one3: %d, one4: %d, two1: %d\n", one, one2, one3, one4, two1));
         }
 
         nodes = new ArrayList<>();
