@@ -22,11 +22,17 @@ public abstract class AbstractDataStream implements DataStreamInterface {
 
     @Override
     public long readUI64() throws IOException {
-        try {
-            return (readUI32() + (readUI32() << 32)) & 0xffffffffffffffffL;
-        } catch (EOFException ex) {
-            return -1;
-        }
+        long lsb = readUI32();
+        long msb = readUI32();
+        long result = msb << 32 | lsb;
+        return result & 0xffffffffffffffffL;
+    }
+
+    @Override
+    public long readSI64() throws IOException {
+        long lsb = readUI32();
+        long msb = readUI32();
+        return msb << 32 | lsb;
     }
 
     @Override
@@ -44,9 +50,23 @@ public abstract class AbstractDataStream implements DataStreamInterface {
     }
 
     @Override
+    public boolean writeSI64(long val) throws IOException {
+        write((int) (val & 0xff));
+        write((int) ((val >> 8) & 0xff));
+        write((int) ((val >> 16) & 0xff));
+        write((int) ((val >> 24) & 0xff));
+
+        write((int) ((val >> 32) & 0xff));
+        write((int) ((val >> 40) & 0xff));
+        write((int) ((val >> 48) & 0xff));
+        write((int) ((val >> 56) & 0xff));
+        return true;
+    }
+
+    @Override
     public long readUI32() throws IOException {
         try {
-            return (readUI8() + (readUI8() << 8) + (readUI8() << 16) + (readUI8() << 24));
+            return (readUI8() | (readUI8() << 8) | (readUI8() << 16) | (readUI8() << 24));
         } catch (EOFException ex) {
             return -1;
         }
@@ -64,7 +84,7 @@ public abstract class AbstractDataStream implements DataStreamInterface {
     @Override
     public int readUI16() throws IOException {
         try {
-            return (readUI8() + (readUI8() << 8)) & 0xffff;
+            return (readUI8() | (readUI8() << 8)) & 0xffff;
         } catch (EOFException ex) {
             return -1;
         }

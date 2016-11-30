@@ -44,6 +44,7 @@ public class IggySwf implements StructureInterface {
     private byte font_add_data[];
     private List<Long> font_add_off = new ArrayList<>();
     private List<Long> font_add_size = new ArrayList<>();
+    private FontBinInfo font_bin_info[];
 
     public IggyFlashHeader64 getHdr() {
         return hdr;
@@ -171,11 +172,16 @@ public class IggySwf implements StructureInterface {
             font_add_data = s.readBytes((int) (long) font_add_size.get(0));
         }
         s.seek(hdr.getFontEndAddress(), SeekMode.SET);
+        font_bin_info = new FontBinInfo[(int) hdr.font_count];
+        for (int i = 0; i < hdr.font_count; i++) {
+            font_bin_info[i] = new FontBinInfo(s);
+        }
+        s.seek(hdr.getSequenceStartAddress1(), SeekMode.SET);
 
-        WriteDataStreamInterface outs = new TemporaryDataStream();
+        //TODO: sequence,typeoffonts,declstrings,binarydata
+        /*WriteDataStreamInterface outs = new TemporaryDataStream();
         writeToDataStream(outs);
-        Helper.writeFile("d:\\Dropbox\\jpexs-laptop\\iggi\\parts\\swf_out.bin", outs.getAllBytes());
-
+        Helper.writeFile("d:\\Dropbox\\jpexs-laptop\\iggi\\parts\\swf_out.bin", outs.getAllBytes());*/
     }
 
     public String getName() {
@@ -225,6 +231,11 @@ public class IggySwf implements StructureInterface {
             s.seek(font_add_off.get(0), SeekMode.SET);
             s.writeBytes(font_add_data);
         }
+        s.seek(hdr.getFontEndAddress(), SeekMode.SET);
+        for (int i = 0; i < hdr.font_count; i++) {
+            font_bin_info[i].writeToDataStream(s);
+        }
+        //TODO: sequence,typeoffonts,declstrings,binarydata
     }
 
     @Override

@@ -16,17 +16,17 @@ import java.lang.reflect.Field;
 public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
 
     @IggyFieldType(DataType.uint64_t)
-    long off_start; // 0 Relative offset to first section (matches sizeof header);
+    long off_base; // 0 Relative offset to first section (matches sizeof header);
     @IggyFieldType(DataType.uint64_t)
-    long off_seq_end; // 8  Relative offset to as3 file names table...
+    long off_sequence_end; // 8  Relative offset to as3 file names table...
     @IggyFieldType(DataType.uint64_t)
     long off_font_end; // 0x10   relative offset to something
     @IggyFieldType(DataType.uint64_t)
-    long off_seq_start1; // 0x18  relative offset to something
+    long off_sequence_start1; // 0x18  relative offset to something
     @IggyFieldType(DataType.uint64_t)
-    long pad_to_match; //  0x20 relative offset to something
+    long off_sequence_start2; //  0x20 relative offset to something
     @IggyFieldType(DataType.uint64_t)
-    long off_seq_start2; // 0x28 names_offset; 0x50 relative pointer to the names/import section of the file
+    long off_sequence_start3; // 0x28 names_offset; 0x50 relative pointer to the names/import section of the file
     @IggyFieldType(DataType.uint32_t)
     long xmin; // 0x30 in pixels
     @IggyFieldType(DataType.uint32_t)
@@ -66,7 +66,7 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
     @IggyFieldType(DataType.uint64_t)
     long off_unk78; // 0x78 relative offset to something
     @IggyFieldType(DataType.uint64_t)
-    long off_unk80;
+    long unk80;
     @IggyFieldType(DataType.uint64_t)
     long off_last_section;
     @IggyFieldType(DataType.uint64_t)
@@ -97,9 +97,9 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
     private long font_end_address;
     private long sequence_start_address1;
     private long sequence_start_address2;
+    private long sequence_start_address3;
     private long names_address;
     private long unk78_address;
-    private long unk80_address;
     private long last_section_address;
     private long flash_filename_address;
     private long decl_strings_address;
@@ -152,7 +152,7 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
     }
 
     public long getSequenceStartAddress2() {
-        return sequence_start_address2;
+        return sequence_start_address3;
     }
 
     public long getNamesAddress() {
@@ -161,10 +161,6 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
 
     public long getUnk78Address() {
         return unk78_address;
-    }
-
-    public long getUnk80Address() {
-        return unk80_address;
     }
 
     public long getLastSectionAddress() {
@@ -185,28 +181,30 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
 
     @Override
     public void readFromDataStream(ReadDataStreamInterface stream) throws IOException {
-        /*  0:*/ off_start = stream.readUI64();
-        base_address = off_start + stream.position() - 8;
-        /*  8:*/ off_seq_end = stream.readUI64();
-        sequence_end_address = off_seq_end + stream.position() - 8;
-        /* 10:*/ off_font_end = stream.readUI64();
-        font_end_address = off_font_end + stream.position() - 8;
-        /* 18:*/ off_seq_start1 = stream.readUI64(); //to 1 padd occurence (2 times)
-        sequence_start_address1 = off_seq_start1 + stream.position() - 8;
-        pad_to_match = stream.readUI64();
-        if (pad_to_match != 1) {
-            throw new IOException("Wrong iggy file - no pad to match 1");
-        }
-        off_seq_start2 = stream.readUI64();
-        if (off_seq_start1 != off_seq_start2) {
-            throw new IOException("Wrong iggy font format (sequence_start)!\n");
-        }
-        sequence_start_address2 = off_seq_start2 + stream.position() - 8;
+        off_base = stream.readUI64();
+        base_address = off_base == 1 ? 0 : off_base + stream.position() - 8;
+
+        off_sequence_end = stream.readUI64();
+        sequence_end_address = off_sequence_end == 1 ? 0 : off_sequence_end + stream.position() - 8;
+
+        off_font_end = stream.readUI64();
+        font_end_address = off_font_end == 1 ? 0 : off_font_end + stream.position() - 8;
+
+        off_sequence_start1 = stream.readUI64();
+        sequence_start_address1 = off_sequence_start1 == 1 ? 0 : off_sequence_start1 + stream.position() - 8;
+
+        off_sequence_start2 = stream.readUI64();
+        sequence_start_address2 = off_sequence_start2 == 1 ? 0 : off_sequence_start2 + stream.position() - 8;
+
+        off_sequence_start3 = stream.readUI64();
+        sequence_start_address3 = off_sequence_start3 == 1 ? 0 : off_sequence_start3 + stream.position() - 8;
+
         xmin = stream.readUI32();
         ymin = stream.readUI32();
         xmax = stream.readUI32();
         ymax = stream.readUI32();
-        unk_40 = stream.readUI32();
+
+        unk_40 = stream.readUI32(); // probably number of blocks/objects after header
         unk_44 = stream.readUI32();
         unk_48 = stream.readUI32();
         unk_4C = stream.readUI32();
@@ -222,19 +220,24 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
         unk_guid = stream.readUI64();
 
         off_names = stream.readUI64();
-        names_address = off_names + stream.position() - 8;
+        names_address = off_names == 1 ? 0 : off_names + stream.position() - 8;
+
         off_unk78 = stream.readUI64();
-        unk78_address = off_unk78 + stream.position() - 8;
-        off_unk80 = stream.readUI64();
-        unk80_address = off_unk80 + stream.position() - 8;
+        unk78_address = off_unk78 == 1 ? 0 : off_unk78 + stream.position() - 8;
+
+        unk80 = stream.readUI64(); //Maybe number of imports/names pointed by names_offset
+
         off_last_section = stream.readUI64();
-        last_section_address = off_last_section + stream.position() - 8;
+        last_section_address = off_last_section == 1 ? 0 : off_last_section + stream.position() - 8;
+
         off_flash_filename = stream.readUI64();
-        flash_filename_address = off_flash_filename + stream.position() - 8;
-        off_decl_strings = stream.readUI64();
-        decl_strings_address = off_decl_strings + stream.position() - 8;
-        off_type_of_fonts = stream.readUI64();
-        type_fonts_address = off_type_of_fonts + stream.position() - 8;
+        flash_filename_address = off_flash_filename == 1 ? 0 : off_flash_filename + stream.position() - 8;
+
+        off_decl_strings = stream.readUI64(); //relative offset to as3 code (16 bytes header + abc blob)
+        decl_strings_address = off_decl_strings == 1 ? 0 : off_decl_strings + stream.position() - 8;
+
+        off_type_of_fonts = stream.readUI64(); //relative offset to as3 file names table (or classes names or whatever)
+        type_fonts_address = off_type_of_fonts == 1 ? 0 : off_type_of_fonts + stream.position() - 8;
 
         flags = stream.readUI64();
         font_count = stream.readUI32();
@@ -243,17 +246,18 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
 
     @Override
     public void writeToDataStream(WriteDataStreamInterface stream) throws IOException {
-        off_start = base_address - stream.position();
-        stream.writeUI64(off_start);
-        off_seq_end = sequence_end_address - stream.position();
-        stream.writeUI64(off_seq_end);
-        off_font_end = font_end_address - stream.position();
+        off_base = base_address == 0 ? 1 : base_address - stream.position();
+        stream.writeUI64(off_base);
+        off_sequence_end = sequence_end_address == 0 ? 1 : sequence_end_address - stream.position();
+        stream.writeUI64(off_sequence_end);
+        off_font_end = font_end_address == 0 ? 1 : font_end_address - stream.position();
         stream.writeUI64(off_font_end);
-        off_seq_start1 = sequence_start_address1 - stream.position();
-        stream.writeUI64(off_seq_start1);
-        stream.writeUI64(pad_to_match);
-        off_seq_start2 = sequence_start_address2 - stream.position();
-        stream.writeUI64(off_seq_start2);
+        off_sequence_start1 = sequence_start_address1 == 0 ? 1 : sequence_start_address1 - stream.position();
+        stream.writeUI64(off_sequence_start1);
+        off_sequence_start2 = sequence_start_address2 == 0 ? 1 : sequence_start_address2 - stream.position();
+        stream.writeUI64(off_sequence_start2);
+        off_sequence_start3 = sequence_start_address3 == 0 ? 1 : sequence_start_address3 - stream.position();
+        stream.writeUI64(off_sequence_start3);
         stream.writeUI32(xmin);
         stream.writeUI32(ymin);
         stream.writeUI32(xmax);
@@ -269,19 +273,18 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
         stream.writeUI32(additional_import1);
         stream.writeUI32(zero1);
         stream.writeUI64(unk_guid);
-        off_names = names_address - stream.position();
+        off_names = names_address == 0 ? 1 : names_address - stream.position();
         stream.writeUI64(off_names);
-        off_unk78 = unk78_address - stream.position();
+        off_unk78 = unk78_address == 0 ? 1 : unk78_address - stream.position();
         stream.writeUI64(off_unk78);
-        off_unk80 = unk80_address - stream.position();
-        stream.writeUI64(off_unk80);
-        off_last_section = last_section_address - stream.position();
+        stream.writeUI64(unk80);
+        off_last_section = last_section_address == 0 ? 1 : last_section_address - stream.position();
         stream.writeUI64(off_last_section);
-        off_flash_filename = flash_filename_address - stream.position();
+        off_flash_filename = flash_filename_address == 0 ? 1 : flash_filename_address - stream.position();
         stream.writeUI64(off_flash_filename);
-        off_decl_strings = decl_strings_address - stream.position();
+        off_decl_strings = decl_strings_address == 0 ? 1 : decl_strings_address - stream.position();
         stream.writeUI64(off_decl_strings);
-        off_type_of_fonts = type_fonts_address - stream.position();
+        off_type_of_fonts = type_fonts_address == 0 ? 1 : type_fonts_address - stream.position();
         stream.writeUI64(off_type_of_fonts);
         stream.writeUI64(flags);
         stream.writeUI32(font_count);
