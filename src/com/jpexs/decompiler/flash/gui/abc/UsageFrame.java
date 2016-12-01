@@ -102,7 +102,6 @@ public class UsageFrame extends AppDialog implements MouseListener {
             final InsideClassMultinameUsageInterface icu = (InsideClassMultinameUsageInterface) usage;
 
             Runnable settrait = new Runnable() {
-
                 @Override
                 public void run() {
                     abcPanel.decompiledTextArea.removeScriptListener(this);
@@ -110,18 +109,18 @@ public class UsageFrame extends AppDialog implements MouseListener {
                     if (usage instanceof TraitMultinameUsage) {
                         TraitMultinameUsage tmu = (TraitMultinameUsage) usage;
                         int traitIndex;
-                        if (tmu.parentTraitIndex > -1) {
-                            traitIndex = tmu.parentTraitIndex;
+                        if (tmu.getParentTraitIndex() > -1) {
+                            traitIndex = tmu.getParentTraitIndex();
                         } else {
-                            traitIndex = tmu.traitIndex;
+                            traitIndex = tmu.getTraitIndex();
                         }
-                        if (tmu.traitsType == TraitMultinameUsage.TRAITS_TYPE_INSTANCE) {
-                            traitIndex += abcPanel.abc.class_info.get(tmu.classIndex).static_traits.traits.size();
+                        if (tmu.getTraitsType() == TraitMultinameUsage.TRAITS_TYPE_INSTANCE) {
+                            traitIndex += abcPanel.abc.class_info.get(tmu.getClassIndex()).static_traits.traits.size();
                         }
                         if (tmu instanceof MethodMultinameUsage) {
                             MethodMultinameUsage mmu = (MethodMultinameUsage) usage;
-                            if (mmu.isInitializer == true) {
-                                traitIndex = abcPanel.abc.class_info.get(mmu.classIndex).static_traits.traits.size() + abcPanel.abc.instance_info.get(mmu.classIndex).instance_traits.traits.size() + (mmu.traitsType == TraitMultinameUsage.TRAITS_TYPE_CLASS ? 1 : 0);
+                            if (mmu.isInitializer() == true) {
+                                traitIndex = abcPanel.abc.class_info.get(mmu.getClassIndex()).static_traits.traits.size() + abcPanel.abc.instance_info.get(mmu.getClassIndex()).instance_traits.traits.size() + (mmu.getTraitsType() == TraitMultinameUsage.TRAITS_TYPE_CLASS ? 1 : 0);
                             }
                         }
                         abcPanel.decompiledTextArea.gotoTrait(traitIndex);
