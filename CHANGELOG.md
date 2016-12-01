@@ -44,6 +44,7 @@ All notable changes to this project will be documented in this file.
 - #1294 Font editation (DefineFont2/3) - correct switching of wide character codes
 - #1302 Callpropvoid instruction docblock not correct
 - #1309 recent files not getting updates
+- #1312 faster colliding usages finder
 
 ## [9.0.0] - 2016-08-12
 ### Added

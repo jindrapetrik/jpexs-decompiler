@@ -32,7 +32,7 @@ import java.util.ArrayList;
  */
 public abstract class MethodMultinameUsage extends TraitMultinameUsage {
 
-    public boolean isInitializer;
+    private boolean isInitializer;
 
     public MethodMultinameUsage(ABC abc, int multinameIndex, int scriptIndex, int classIndex, int traitIndex, int traitsType, boolean isInitializer, Traits traits, int parentTraitIndex) {
         super(abc, multinameIndex, scriptIndex, classIndex, traitIndex, traitsType, traits, parentTraitIndex);
@@ -89,8 +89,32 @@ public abstract class MethodMultinameUsage extends TraitMultinameUsage {
         return writer.toString().trim();
     }
 
-    public int getTraitIndex() {
-        return traitIndex;
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 61 * hash + (this.isInitializer ? 1 : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        final MethodMultinameUsage other = (MethodMultinameUsage) obj;
+        if (this.isInitializer != other.isInitializer) {
+            return false;
+        }
+        return true;
     }
 
     public boolean isStatic() {

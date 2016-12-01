@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2016 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -28,8 +28,9 @@ import java.util.Objects;
  */
 public abstract class MultinameUsage {
 
-    public ABC abc;
-    public int multinameIndex;
+    protected final ABC abc;
+
+    private final int multinameIndex;
 
     public MultinameUsage(ABC abc, int multinameIndex) {
         this.abc = abc;
@@ -48,7 +49,7 @@ public abstract class MultinameUsage {
         Multiname thisM = abc.constants.getMultiname(multinameIndex);
         Multiname otherM = other.abc.constants.getMultiname(other.multinameIndex);
         if (thisM == null && otherM == null) {
-            return false;
+            return false; // honfika: why false?
         }
         if (thisM == null || otherM == null) {
             return false;
@@ -83,6 +84,35 @@ public abstract class MultinameUsage {
 
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 97 * hash + Objects.hashCode(this.abc);
+        hash = 97 * hash + this.multinameIndex;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final MultinameUsage other = (MultinameUsage) obj;
+        if (this.multinameIndex != other.multinameIndex) {
+            return false;
+        }
+        if (!Objects.equals(this.abc, other.abc)) {
+            return false;
+        }
+        return true;
     }
 
     public abstract boolean collides(MultinameUsage other);

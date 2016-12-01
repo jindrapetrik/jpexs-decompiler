@@ -24,7 +24,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
  */
 public class ClassNameInTraitMultinameUsage extends MultinameUsage implements DefinitionUsage, InsideClassMultinameUsageInterface {
 
-    private int classIndex;
+    private final int classIndex;
 
     public ClassNameInTraitMultinameUsage(ABC abc, int multinameIndex, int classIndex) {
         super(abc, multinameIndex);
@@ -42,6 +42,34 @@ public class ClassNameInTraitMultinameUsage extends MultinameUsage implements De
     }
 
     @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 67 * hash + this.classIndex;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        final ClassNameInTraitMultinameUsage other = (ClassNameInTraitMultinameUsage) obj;
+        if (this.classIndex != other.classIndex) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public boolean collides(MultinameUsage other) {
         if (other instanceof InsideClassMultinameUsageInterface) {
             if (((InsideClassMultinameUsageInterface) other).getClassIndex() == getClassIndex()) {
@@ -53,5 +81,4 @@ public class ClassNameInTraitMultinameUsage extends MultinameUsage implements De
         }
         return false;
     }
-
 }

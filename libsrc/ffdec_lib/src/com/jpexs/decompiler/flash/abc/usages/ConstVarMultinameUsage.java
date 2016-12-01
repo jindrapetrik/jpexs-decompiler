@@ -71,10 +71,6 @@ public abstract class ConstVarMultinameUsage extends TraitMultinameUsage {
         return writer.toString().trim();
     }
 
-    public int getTraitIndex() {
-        return traitIndex;
-    }
-
     public boolean isStatic() {
         return traitsType == TRAITS_TYPE_CLASS;
     }
