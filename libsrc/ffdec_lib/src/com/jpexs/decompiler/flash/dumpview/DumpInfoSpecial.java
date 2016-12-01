@@ -36,9 +36,4 @@ public class DumpInfoSpecial extends DumpInfo {
         this.specialType = specialType;
         this.specialValue = specialValue;
     }
-
-    @Override
-    public String toString() {
-        return super.toString() + " (special: " + specialValue + ")";
-    }
 }
