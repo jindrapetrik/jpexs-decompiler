@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class IggyCharIndices implements StructureInterface {
 
-    @IggyFieldType(value = DataType.widechar_t)
+    @IggyFieldType(value = DataType.wchar_t)
     List<Character> chars;
     @IggyFieldType(DataType.uint32_t)
     long padd;

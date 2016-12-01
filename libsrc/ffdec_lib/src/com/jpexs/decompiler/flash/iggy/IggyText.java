@@ -58,7 +58,7 @@ public class IggyText implements StructureInterface {
     long one;
     @IggyArrayFieldType(value = DataType.uint8_t, count = 32)
     byte[] some; // same for different fonts
-    @IggyArrayFieldType(value = DataType.widechar_t)
+    @IggyArrayFieldType(value = DataType.wchar_t)
     String initialText; //till end of info file?
 
     public IggyText(int type, int order_in_iggy_file, byte[] zeroone, float par1, float par2, float par3, float par4, int enum_hex, int for_which_font_order_in_iggyfile, long zero, long one, byte[] some, long offset_of_name, String name) {

@@ -23,7 +23,7 @@ public class IggySwf implements StructureInterface {
 
     final static int NO_OFFSET = 1;
 
-    @IggyFieldType(value = DataType.widechar_t, count = 48)
+    @IggyFieldType(value = DataType.wchar_t, count = 48)
     String name;
 
     Map<Integer, IggyFont> fonts;
@@ -45,6 +45,10 @@ public class IggySwf implements StructureInterface {
     private List<Long> font_add_off = new ArrayList<>();
     private List<Long> font_add_size = new ArrayList<>();
     private FontBinInfo font_bin_info[];
+    private IggySequence sequence;
+    private IggyFontTypeInfo type_info[];
+    private String type_info_name[];
+    private IggyDeclStrings decl_strings;
 
     public IggyFlashHeader64 getHdr() {
         return hdr;
@@ -177,8 +181,20 @@ public class IggySwf implements StructureInterface {
             font_bin_info[i] = new FontBinInfo(s);
         }
         s.seek(hdr.getSequenceStartAddress1(), SeekMode.SET);
+        sequence = new IggySequence(s);
+        s.seek(hdr.getTypeFontsAddress(), SeekMode.SET);
+        type_info = new IggyFontTypeInfo[(int) hdr.font_count];
+        type_info_name = new String[(int) hdr.font_count];
+        for (int i = 0; i < hdr.font_count; i++) {
+            type_info[i] = new IggyFontTypeInfo(s);
+        }
+        for (int i = 0; i < hdr.font_count; i++) {
+            type_info_name[i] = type_info[i].readFontInfo(s);
+        }
 
-        //TODO: sequence,typeoffonts,declstrings,binarydata
+        s.seek(hdr.getDeclStringsAddress(), SeekMode.SET);
+        decl_strings = new IggyDeclStrings(s);
+        //TODO: binarydata
         /*WriteDataStreamInterface outs = new TemporaryDataStream();
         writeToDataStream(outs);
         Helper.writeFile("d:\\Dropbox\\jpexs-laptop\\iggi\\parts\\swf_out.bin", outs.getAllBytes());*/
@@ -235,7 +251,21 @@ public class IggySwf implements StructureInterface {
         for (int i = 0; i < hdr.font_count; i++) {
             font_bin_info[i].writeToDataStream(s);
         }
-        //TODO: sequence,typeoffonts,declstrings,binarydata
+        s.seek(hdr.getSequenceStartAddress1(), SeekMode.SET);
+        sequence.writeToDataStream(s);
+
+        s.seek(hdr.getTypeFontsAddress(), SeekMode.SET);
+        for (int i = 0; i < hdr.font_count; i++) {
+            type_info[i].writeToDataStream(s);
+        }
+
+        for (int i = 0; i < hdr.font_count; i++) {
+            type_info[i].writeFontInfo(type_info_name[i], s);
+        }
+        s.seek(hdr.getDeclStringsAddress(), SeekMode.SET);
+        decl_strings.writeToDataStream(s);
+
+        //TODO: binarydata
     }
 
     @Override

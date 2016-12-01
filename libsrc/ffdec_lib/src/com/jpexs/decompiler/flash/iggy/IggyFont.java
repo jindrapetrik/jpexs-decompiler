@@ -73,7 +73,7 @@ public class IggyFont extends IggyTag {
     long zero_padd_4;
     @IggyFieldType(DataType.uint64_t)
     long what_3;
-    @IggyFieldType(value = DataType.widechar_t, count = 40)
+    @IggyFieldType(value = DataType.wchar_t, count = 40)
     String subName = "";
     @IggyFieldType(value = DataType.uint8_t, count = 48)
     byte[] zeroes48a;
@@ -98,7 +98,7 @@ public class IggyFont extends IggyTag {
     @IggyFieldType(DataType.uint32_t)
     long one_padd5;
 
-    @IggyFieldType(value = DataType.widechar_t, count = 16)
+    @IggyFieldType(value = DataType.wchar_t, count = 16)
     String name;
 
     List<IggyCharOffset> charOffsets;

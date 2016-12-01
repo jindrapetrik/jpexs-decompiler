@@ -29,7 +29,7 @@ public class FieldPrinter {
                         case uint64_t:
                             sb.append(f.getLong(val));
                             break;
-                        case widechar_t:
+                        case wchar_t:
                             sb.append("\"").append(f.get(val)).append("\"");
                             break;
                     }
@@ -65,7 +65,7 @@ public class FieldPrinter {
                     case uint64_t:
                         sb.append("UI64");
                         break;
-                    case widechar_t:
+                    case wchar_t:
                         sb.append("//FIXME");
                         break;
                 }
