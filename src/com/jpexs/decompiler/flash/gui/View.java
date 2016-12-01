@@ -132,6 +132,8 @@ public class View {
 
     public static final TexturePaint transparentPaint;
 
+    private static FontPolicy defaultFontPolicy;
+
     private static final Color transparentColor1 = new Color(0x99, 0x99, 0x99);
 
     private static final Color transparentColor2 = new Color(0x66, 0x66, 0x66);
@@ -152,7 +154,7 @@ public class View {
      */
     public static void setLookAndFeel() {
 
-        //Save default font for Chinese characters
+        // Save default font for Chinese characters
         final Font defaultFont = (new JLabel()).getFont();
         try {
 
@@ -193,12 +195,16 @@ public class View {
             UIManager.put("FormattedTextField.background", Color.white);
             UIManager.put("CommandButtonUI", MyCommandButtonUI.class.getName());
 
-            FontPolicy pol = SubstanceLookAndFeel.getFontPolicy();
+            if (defaultFontPolicy == null) {
+                defaultFontPolicy = SubstanceLookAndFeel.getFontPolicy();
+            }
+
+            FontPolicy pol = defaultFontPolicy;
             final FontSet fs = pol.getFontSet("Substance", null);
 
             double fontSizeMultiplier = Configuration.guiFontSizeMultiplier.get();
 
-            //Restore default font for chinese characters
+            // Restore default font for chinese characters
             SubstanceLookAndFeel.setFontPolicy(new FontPolicy() {
                 private final FontSet fontSet = new FontSet() {
                     private FontUIResource controlFont;
