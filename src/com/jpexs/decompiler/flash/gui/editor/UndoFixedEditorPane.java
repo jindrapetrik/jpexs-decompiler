@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.gui.editor;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.helpers.Stopwatch;
+import java.awt.Font;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.io.Reader;
@@ -61,7 +62,6 @@ public class UndoFixedEditorPane extends JEditorPane {
 
     private void addDocumentListener() {
         documentListener = new DocumentListener() {
-
             @Override
             public void insertUpdate(DocumentEvent e) {
                 fireTextChanged();
@@ -88,7 +88,9 @@ public class UndoFixedEditorPane extends JEditorPane {
     public void changeContentType(String type) {
         if (!type.equals(getContentType())) {
             removeDocumentListener();
+            Font oldFont = getFont();
             setContentType(type);
+            setFont(oldFont);
             addDocumentListener();
         }
     }

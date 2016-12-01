@@ -284,6 +284,11 @@ public class Configuration {
     @ConfigurationName("gui.window.maximized.vertical")
     public static final ConfigurationItem<Boolean> guiWindowMaximizedVertical = null;
 
+    @ConfigurationDefaultDouble(1)
+    @ConfigurationCategory("display")
+    @ConfigurationName("gui.fontSizeMultiplier")
+    public static final ConfigurationItem<Double> guiFontSizeMultiplier = null;
+
     @ConfigurationDefaultDouble(0.5)
     @ConfigurationName("gui.avm2.splitPane.dividerLocationPercent")
     @ConfigurationInternal
@@ -622,7 +627,6 @@ public class Configuration {
     public static final ConfigurationItem<Boolean> showSetAdvanceValuesMessage = null;
 
     private enum OSId {
-
         WINDOWS, OSX, UNIX
     }
 
@@ -1018,7 +1022,6 @@ public class Configuration {
         File libsDir = getFlashLibPath();
         if (libsDir != null && libsDir.exists()) {
             File[] libs = libsDir.listFiles(new FilenameFilter() {
-
                 @Override
                 public boolean accept(File dir, String name) {
                     return name.toLowerCase().startsWith("playerglobal");
@@ -1043,7 +1046,6 @@ public class Configuration {
         File projectoDir = getProjectorPath();
         if (projectoDir != null && projectoDir.exists()) {
             File[] projectors = projectoDir.listFiles(new FilenameFilter() {
-
                 @Override
                 public boolean accept(File dir, String name) {
                     switch (exportMode) {
