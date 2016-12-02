@@ -750,7 +750,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 if (treeItem instanceof Frame) {
                     Frame fn = (Frame) treeItem;
                     Timelined parent = fn.timeline.timelined;
-                    List<Integer> doneCharacters = new ArrayList<>();
+
+                    Set<Integer> doneCharacters = new HashSet<>();
                     for (Tag t : parent.getTags()) {
                         if (t instanceof FileAttributesTag || t instanceof SetBackgroundColorTag) {
                             continue;
@@ -770,18 +771,14 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                             }
                         }
 
-                        if (t instanceof ShowFrameTag || t instanceof PlaceObjectTypeTag || t instanceof RemoveTag) {
-                            continue;
-                        }
-
+                        //if (t instanceof ShowFrameTag || t instanceof PlaceObjectTypeTag || t instanceof RemoveTag) {
+                        //    continue;
+                        //}
                         if (t instanceof CharacterTag) {
                             int characterId = ((CharacterTag) t).getCharacterId();
-                            if (!doneCharacters.contains(characterId)) {
-                                doneCharacters.add(((CharacterTag) t).getCharacterId());
-                            }
+                            doneCharacters.add(characterId);
+                            writeTag(t, sos2);
                         }
-
-                        writeTag(t, sos2);
                     }
 
                     RECT r = parent.getRect();
