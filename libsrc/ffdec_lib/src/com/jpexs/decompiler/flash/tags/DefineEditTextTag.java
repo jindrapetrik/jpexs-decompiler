@@ -381,7 +381,6 @@ public class DefineEditTextTag extends TextTag {
             try {
                 saxParser = factory.newSAXParser();
                 DefaultHandler handler = new DefaultHandler() {
-
                     @Override
                     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
                         TextStyle style = styles.peek();
@@ -999,26 +998,23 @@ public class DefineEditTextTag extends TextTag {
                     if (i + 1 < txt.size()) {
                         nextChar = txt.get(i + 1).character;
                     }
-                    int advance;
+
                     FontTag font = lastStyle.font;
                     DynamicTextGlyphEntry ge = new DynamicTextGlyphEntry();
                     ge.fontFace = lastStyle.fontFace;
+                    if (ge.fontFace == null && font != null) {
+                        ge.fontFace = font.getFontName();
+                    }
+
                     ge.fontStyle = (lastStyle.bold ? Font.BOLD : 0) | (lastStyle.italic ? Font.ITALIC : 0);
                     ge.character = c;
-                    ge.glyphIndex = font == null ? -1 : font.charToGlyph(c);
-                    if (font != null && font.hasLayout()) {
-                        int kerningAdjustment = 0;
-                        if (nextChar != null) {
-                            kerningAdjustment = font.getCharKerningAdjustment(c, nextChar);
-                            kerningAdjustment /= font.getDivider();
-                        }
-                        advance = (int) Math.round(Math.round((double) lastStyle.fontHeight * (font.getGlyphAdvance(ge.glyphIndex) + kerningAdjustment) / (font.getDivider() * 1024.0)));
-                    } else {
-                        String fontName = lastStyle.fontFace != null ? lastStyle.fontFace : FontTag.defaultFontName;
-                        int fontStyle = font == null ? ge.fontStyle : font.getFontStyle();
-                        advance = (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(fontName, fontStyle, (int) (lastStyle.fontHeight / SWF.unitDivisor), c, nextChar));
-                    }
-                    ge.glyphAdvance = advance;
+
+                    ge.glyphIndex = -1; // always use system character glyphs in edit text
+
+                    String fontName = ge.fontFace != null ? ge.fontFace : FontTag.defaultFontName;
+                    int fontStyle = font == null ? ge.fontStyle : font.getFontStyle();
+                    ge.glyphAdvance = (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(fontName, fontStyle, (int) (lastStyle.fontHeight / SWF.unitDivisor), c, nextChar));
+
                     textModel.addGlyph(c, ge);
                     if (Character.isWhitespace(c)) {
                         lastWasWhiteSpace = true;

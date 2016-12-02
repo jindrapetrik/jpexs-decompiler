@@ -97,7 +97,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private boolean stillFrame = false;
 
-    private Timer timer;
+    private volatile Timer timer;
 
     private int frame = -1;
 
