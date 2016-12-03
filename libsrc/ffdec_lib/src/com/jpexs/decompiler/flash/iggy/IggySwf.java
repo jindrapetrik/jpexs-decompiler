@@ -88,21 +88,14 @@ public class IggySwf implements StructureInterface {
         long maxPos = hdr.getFontEndAddress();
         allFontBytes = s.readBytes((int) (maxPos - curPos));
         s.seek(curPos, SeekMode.SET);
-
-        //here is offset[0]
-        StringBuilder nameBuilder = new StringBuilder();
-        do {
-            char c = (char) s.readUI16();
-            if (c == '\0') {
-                break;
-            }
-            nameBuilder.append(c);
-        } while (true);
-        name = nameBuilder.toString();
-        //here is offset[1]
+        //here is offset[0] - 184
+        name = s.readWChar();
+        //here is offset[1] - 230
         int pad8 = 8 - (int) (s.position() % 8);
-        s.seek(pad8, SeekMode.CUR);
-        //here is offset [2]
+        if (pad8 > 8) {
+            s.seek(pad8, SeekMode.CUR);
+        }
+        //here is offset [2]  - 232
         s.seek(hdr.getBaseAddress(), SeekMode.SET);
         s.readUI64(); //pad 1
 
@@ -157,6 +150,7 @@ public class IggySwf implements StructureInterface {
                 }
             }
         }
+        //here is offset [3]  - 744
         fonts = new HashMap<>();
         for (int i = 0; i < hdr.font_count; i++) {
             s.seek(font_data_addresses[i], SeekMode.SET);
@@ -176,10 +170,12 @@ public class IggySwf implements StructureInterface {
             font_add_data = s.readBytes((int) (long) font_add_size.get(0));
         }
         s.seek(hdr.getFontEndAddress(), SeekMode.SET);
+        //here is offset [4]  - 856 ?        
         font_bin_info = new FontBinInfo[(int) hdr.font_count];
         for (int i = 0; i < hdr.font_count; i++) {
             font_bin_info[i] = new FontBinInfo(s);
         }
+
         s.seek(hdr.getSequenceStartAddress1(), SeekMode.SET);
         sequence = new IggySequence(s);
         s.seek(hdr.getTypeFontsAddress(), SeekMode.SET);
@@ -194,7 +190,6 @@ public class IggySwf implements StructureInterface {
 
         s.seek(hdr.getDeclStringsAddress(), SeekMode.SET);
         decl_strings = new IggyDeclStrings(s);
-        //TODO: binarydata
         /*WriteDataStreamInterface outs = new TemporaryDataStream();
         writeToDataStream(outs);
         Helper.writeFile("d:\\Dropbox\\jpexs-laptop\\iggi\\parts\\swf_out.bin", outs.getAllBytes());*/
@@ -207,17 +202,9 @@ public class IggySwf implements StructureInterface {
     @Override
     public void writeToDataStream(WriteDataStreamInterface s) throws IOException {
         hdr.writeToDataStream(s);
-        for (int i = 0; i < name.length(); i++) {
-            s.writeUI16(name.charAt(i));
-        }
-        s.writeUI16(0);
-
-        int pad8 = 8 - (int) (s.position() % 8);
-        if (pad8 < 8) {
-            for (int i = 0; i < pad8; i++) {
-                s.write(0);
-            }
-        }
+        s.getIndexing().writeIndexUI8SkipTwice8(184, 25);
+        s.writeWChar(name);
+        s.pad8bytes();
         s.writeUI64(1);
         for (int i = 0; i < font_data_addresses.length; i++) {
             long offset = font_data_addresses[i] - s.position();
@@ -227,8 +214,6 @@ public class IggySwf implements StructureInterface {
             long offset = text_addresses.get(i) - s.position();
             s.writeUI64(offset);
         }
-        s.writeUI64(1);
-
         if (hdr.font_count > 0) {
             while (s.position() < font_data_addresses[0]) {
                 s.writeUI64(1);
@@ -264,8 +249,6 @@ public class IggySwf implements StructureInterface {
         }
         s.seek(hdr.getDeclStringsAddress(), SeekMode.SET);
         decl_strings.writeToDataStream(s);
-
-        //TODO: binarydata
     }
 
     @Override

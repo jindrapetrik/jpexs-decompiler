@@ -255,22 +255,14 @@ public class IggyFont extends IggyTag {
         zeroes48b = s.readBytes(48);
 
         if (abs_start_of_name != 0) {
+            //here is offset [5]  - 1096       
             s.seek(abs_start_of_name, SeekMode.SET);
-            StringBuilder nameBuilder = new StringBuilder();
-            int nameCharCnt = 0;
-            do {
-                char c = (char) s.readUI16();
-                nameCharCnt++;
-                if (c == '\0') {
-                    break;
-                }
-                nameBuilder.append(c);
-            } while (true);
-            s.seek(32 - nameCharCnt * 2, SeekMode.CUR);
-            name = nameBuilder.toString();
+            name = s.readWChar();
+            //here is offset [6]  - 1130
+            s.pad8bytes();
         }
-        s.readUI64(); //pad zero        
         if (abs_start_of_char_struct != 0) {
+            //here is offset [7]  - 1136
             s.seek(abs_start_of_char_struct, SeekMode.SET);
             charOffsets = new ArrayList<>();
             for (int i = 0; i < char_count; i++) {

@@ -1,7 +1,11 @@
 package com.jpexs.decompiler.flash.iggy.streams;
 
+import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
 
 /**
  *
@@ -169,6 +173,38 @@ public abstract class AbstractDataStream implements DataStreamInterface {
         int val = readUI8();
         seek(curPos, SeekMode.SET);
         return val;
+    }
+
+    @Override
+    public boolean writeWChar(String name) throws IOException {
+        for (int i = 0; i < name.length(); i++) {
+            writeUI16(name.charAt(i));
+        }
+        writeUI16(0);
+        return true;
+    }
+
+    @Override
+    public String readWChar() throws IOException {
+        StringBuilder strBuilder = new StringBuilder();
+        do {
+            char c = (char) readUI16();
+            if (c == '\0') {
+                break;
+            }
+            strBuilder.append(c);
+        } while (true);
+        return strBuilder.toString();
+    }
+
+    @Override
+    public void pad8bytes() throws IOException {
+        int pad8 = 8 - (int) (position() % 8);
+        if (pad8 < 8) {
+            for (int i = 0; i < pad8; i++) {
+                write(0);
+            }
+        }
     }
 
 }

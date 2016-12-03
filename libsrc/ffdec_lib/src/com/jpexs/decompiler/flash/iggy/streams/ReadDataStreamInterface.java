@@ -41,6 +41,10 @@ public interface ReadDataStreamInterface extends AutoCloseable {
 
     public byte[] getAllBytes() throws IOException;
 
+    public String readWChar() throws IOException;
+
+    public void pad8bytes() throws IOException;
+
     @Override
     public void close();
 }

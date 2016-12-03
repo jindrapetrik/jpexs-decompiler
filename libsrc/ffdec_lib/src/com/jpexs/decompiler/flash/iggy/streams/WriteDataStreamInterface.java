@@ -27,6 +27,10 @@ public interface WriteDataStreamInterface extends AutoCloseable {
 
     public boolean writeUI16(int val) throws IOException;
 
+    public boolean writeWChar(String val) throws IOException;
+
+    public void pad8bytes() throws IOException;
+
     public boolean writeUI8(int val) throws IOException;
 
     public void write(int val) throws IOException;
@@ -41,4 +45,8 @@ public interface WriteDataStreamInterface extends AutoCloseable {
 
     @Override
     public void close();
+
+    public void setIndexing(IndexingDataStreamInterface indexing);
+
+    public IndexingDataStreamInterface getIndexing();
 }

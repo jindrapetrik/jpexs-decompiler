@@ -6,6 +6,8 @@ import com.jpexs.decompiler.flash.iggy.streams.RandomAccessFileDataStream;
 import com.jpexs.decompiler.flash.iggy.streams.ReadDataStreamInterface;
 import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
 import com.jpexs.decompiler.flash.iggy.streams.DataStreamInterface;
+import com.jpexs.decompiler.flash.iggy.streams.IndexingDataStream;
+import com.jpexs.decompiler.flash.iggy.streams.IndexingDataStreamInterface;
 import com.jpexs.decompiler.flash.iggy.streams.TemporaryDataStream;
 import com.jpexs.helpers.Helper;
 import java.io.File;
@@ -48,7 +50,9 @@ public class IggyFile implements StructureInterface {
         IggySwf iggySwf = iggySwfs.get(targetSwfIndex);
         iggySwf.replaceFontTag(fontIndex, newFont);
 
+        IndexingDataStreamInterface indexStream = new IndexingDataStream();
         DataStreamInterface flashStream = new TemporaryDataStream();
+        flashStream.setIndexing(indexStream);
         iggySwf.writeToDataStream(flashStream);
         byte flashData[] = flashStream.getAllBytes();
         int swfIndex = 0;
@@ -56,17 +60,29 @@ public class IggyFile implements StructureInterface {
         for (int i = 0; i < subFileEntries.size(); i++) {
             IggySubFileEntry entry = subFileEntries.get(i);
             entry.offset += offsetChange;
+            if (entry.type == IggySubFileEntry.TYPE_INDEX) {
+                if (swfIndex == targetSwfIndex) {
+                    byte indexData[] = indexStream.getIndexBytes();
+                    long newLen = indexData.length;
+                    long oldLen = entry.size;
+                    entry.size = newLen;
+                    entry.size2 = newLen;
+                    offsetChange += (newLen - oldLen);
+                    subFileEntriesData.set(i, indexData);
+                }
+                swfIndex++;
+            }
             if (entry.type == IggySubFileEntry.TYPE_FLASH) {
                 if (swfIndex == targetSwfIndex) {
                     long newLen = flashData.length;
                     long oldLen = entry.size;
+                    entry.size = newLen;
+                    entry.size2 = newLen;
                     offsetChange += (newLen - oldLen);
+                    subFileEntriesData.set(i, flashData);
                 }
-                swfIndex++;
             }
         }
-        subFileEntriesData.set(targetSwfIndex, flashData);
-        //TODO: Update index
     }
 
     private boolean setSwfItemLength(int swfIndex, int itemindex, long newLength) {
@@ -187,19 +203,31 @@ public class IggyFile implements StructureInterface {
     }
 
     public static void main(String[] args) throws IOException {
-        /*String inFileName = "d:\\Dropbox\\jpexs-laptop\\iggi\\lib_loc_english_font.iggy";
+        String inFileName = "d:\\Dropbox\\jpexs-laptop\\iggi\\lib_loc_english_font.iggy";
         String outFileName = "d:\\Dropbox\\jpexs-laptop\\iggi\\lib_loc_english_font2.iggy";
+
+        File extractDirOrig = new File("d:\\Dropbox\\jpexs-laptop\\iggi\\extraxtdir_orig");
+        File extractDirNew = new File("d:\\Dropbox\\jpexs-laptop\\iggi\\extraxtdir_new");
+
+        if (!extractDirOrig.exists()) {
+            extractDirOrig.mkdir();
+        }
+        if (!extractDirNew.exists()) {
+            extractDirNew.mkdir();
+        }
 
         File inFile = new File(inFileName);
         File outFile = new File(outFileName);
         IggyFile iggyFile = new IggyFile(inFile);
+        extractIggyFile(inFile, extractDirOrig);
         IggySwf iswf = iggyFile.getSwf(0);
         IggyFont ifont = iswf.fonts.get(0);
         iggyFile.replaceFontTag(0, 0, ifont);
         outFile.delete();
         try (RandomAccessFileDataStream outputStream = new RandomAccessFileDataStream(outFile)) {
             iggyFile.writeToDataStream(outputStream);
-        }*/
+        }
+        extractIggyFile(outFile, extractDirNew);
     }
 
     private static void copyStream(InputStream is, OutputStream os) {

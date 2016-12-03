@@ -16,13 +16,24 @@ public class RandomAccessFileDataStream extends AbstractDataStream {
 
     private File file;
     private RandomAccessFile raf;
+    private IndexingDataStreamInterface indexing;
 
     protected File getFile() {
         return file;
     }
 
+    @Override
+    public void setIndexing(IndexingDataStreamInterface indexing) {
+        this.indexing = indexing;
+    }
+
     public RandomAccessFileDataStream(File file) throws FileNotFoundException {
+        this(file, new EmptyIndexing());
+    }
+
+    public RandomAccessFileDataStream(File file, IndexingDataStreamInterface indexing) throws FileNotFoundException {
         this.file = file;
+        this.indexing = indexing;
         raf = new RandomAccessFile(file, "rw");
     }
 
@@ -102,6 +113,26 @@ public class RandomAccessFileDataStream extends AbstractDataStream {
     @Override
     public void write(int val) throws IOException {
         raf.write(val);
+    }
+
+    @Override
+    public IndexingDataStreamInterface getIndexing() {
+        return indexing;
+    }
+
+    @Override
+    public boolean writeWChar(String name) throws IOException {
+        indexing.writeIndex16bit(name.length() + 1);
+        return super.writeWChar(name);
+    }
+
+    @Override
+    public void pad8bytes() throws IOException {
+        int pad8 = 8 - (int) (position() % 8);
+        if (pad8 < 8) {
+            indexing.writeIndexMultiply2(pad8 / 2);
+        }
+        super.pad8bytes();
     }
 
 }
