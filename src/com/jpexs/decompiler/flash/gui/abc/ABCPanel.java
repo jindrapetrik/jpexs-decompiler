@@ -82,7 +82,6 @@ import de.hameister.treetable.MyTreeTableModel;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -955,7 +954,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         splitPane.setContinuousLayout(true);
 
         decompiledTextArea.changeContentType("text/actionscript");
-        decompiledTextArea.setFont(new Font("Monospaced", Font.PLAIN, decompiledTextArea.getFont().getSize()));
+        decompiledTextArea.setFont(Configuration.getSourceFont());
 
         View.addEditorAction(decompiledTextArea, new AbstractAction() {
             @Override

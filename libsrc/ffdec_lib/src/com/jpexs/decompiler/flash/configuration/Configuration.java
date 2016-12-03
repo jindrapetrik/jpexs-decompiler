@@ -19,8 +19,10 @@ package com.jpexs.decompiler.flash.configuration;
 import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.exporters.modes.ExeExportMode;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
+import com.jpexs.decompiler.flash.helpers.FontHelper;
 import com.jpexs.decompiler.flash.importers.TextImportResizeTextBoundsMode;
 import com.jpexs.helpers.Helper;
+import java.awt.Font;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -288,6 +290,12 @@ public class Configuration {
     @ConfigurationCategory("display")
     @ConfigurationName("gui.fontSizeMultiplier")
     public static final ConfigurationItem<Double> guiFontSizeMultiplier = null;
+
+    // font used in AS1/2/3 source area, P-Code area, Define Text area and in Metadata area
+    @ConfigurationDefaultString("Monospaced-Plain-12")
+    @ConfigurationCategory("display")
+    @ConfigurationName("gui.sourceFont")
+    public static final ConfigurationItem<String> sourceFontString = null;
 
     @ConfigurationDefaultDouble(0.5)
     @ConfigurationName("gui.avm2.splitPane.dividerLocationPercent")
@@ -705,6 +713,10 @@ public class Configuration {
             ret += File.separator;
         }
         return ret;
+    }
+
+    public static Font getSourceFont() {
+        return FontHelper.stringToFont(sourceFontString.get());
     }
 
     public static List<String> getRecentFiles() {

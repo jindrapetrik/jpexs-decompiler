@@ -60,7 +60,6 @@ import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
@@ -763,8 +762,8 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         setLayout(new BorderLayout());
         add(splitPane = new JPersistentSplitPane(JSplitPane.HORIZONTAL_SPLIT, panA, panB, Configuration.guiActionSplitPaneDividerLocationPercent), BorderLayout.CENTER);
 
-        editor.setFont(new Font("Monospaced", Font.PLAIN, editor.getFont().getSize()));
-        decompiledEditor.setFont(new Font("Monospaced", Font.PLAIN, decompiledEditor.getFont().getSize()));
+        editor.setFont(Configuration.getSourceFont());
+        decompiledEditor.setFont(Configuration.getSourceFont());
         decompiledEditor.changeContentType("text/actionscript");
 
         editor.addCaretListener(new CaretListener() {

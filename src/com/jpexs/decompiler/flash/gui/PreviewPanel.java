@@ -77,7 +77,6 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.io.BufferedInputStream;
@@ -400,7 +399,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         //metadataEditor.setContentType("text/xml");
         metadataEditor.setEditable(false);
 
-        metadataEditor.setFont(new Font("Monospaced", Font.PLAIN, metadataEditor.getFont().getSize()));
+        metadataEditor.setFont(Configuration.getSourceFont());
         metadataEditor.changeContentType("text/xml");
         metadataEditor.addTextChangedListener(this::metadataTextChanged);
 
