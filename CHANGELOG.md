@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 - Auto rename identifiers option now fixes colliding trait/classes aswell
 - #1254 FLA export - detecting scripts on AS3 timeline
 - #907 FFDec Library JAR file has version inside it.
+- #1311, #1313 actionScript source font size
 - Display warning when library version and GUI version mismatch
 - Changelog file
 
@@ -44,7 +45,6 @@ All notable changes to this project will be documented in this file.
 - #1294 Font editation (DefineFont2/3) - correct switching of wide character codes
 - #1302 Callpropvoid instruction docblock not correct
 - #1309 recent files not getting updates
-- #1311 actionScript source font size
 - #1312 faster colliding usages finder
 - #1303 garbled text when exporting frame with text
 - #1314 user interface: button order
