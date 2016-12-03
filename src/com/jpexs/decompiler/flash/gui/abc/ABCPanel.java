@@ -137,6 +137,7 @@ import jsyntaxpane.TokenType;
 public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABCPanelSearchResult>, TagEditorPanel {
 
     private As3ScriptReplacerInterface scriptReplacer = null;
+
     private ScriptPack pack = null;
 
     private final MainPanel mainPanel;
@@ -187,7 +188,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         return mainPanel;
     }
 
-    public List<ABCPanelSearchResult> search(final SWF swf, final String txt, boolean ignoreCase, boolean regexp, CancellableWorker<Void> worker) {
+    public List<ABCPanelSearchResult> search(final SWF swf, final String txt, boolean ignoreCase, boolean regexp, boolean pcode, CancellableWorker<Void> worker) {
+        // todo: pcode seach
         List<String> ignoredClasses = new ArrayList<>();
         List<String> ignoredNss = new ArrayList<>();
 
@@ -310,6 +312,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         public List<VariableNode> path = new ArrayList<>();
 
         public Variable var;
+
         public Variable varInsideGetter;
 
         public Long parentObjectId;
@@ -317,6 +320,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         public int level;
 
         public Variable trait;
+
         public long traitId;
 
         private List<VariableNode> childs;
@@ -392,8 +396,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
                 igv = Main.getDebugHandler().getVariable(parentObjectId, var.name, true);
             }
 
-            //current var is getter function - set it to value really got 
-            //if ((var.flags & VariableFlags.HAS_GETTER) > 0) 
+            //current var is getter function - set it to value really got
+            //if ((var.flags & VariableFlags.HAS_GETTER) > 0)
             {
                 varInsideGetter = igv.parent;
             }
@@ -506,10 +510,15 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         }
 
         private static final int COLUMN_NAME = 0;
+
         private static final int COLUMN_TRAIT = 1;
+
         private static final int COLUMN_SCOPE = 2;
+
         private static final int COLUMN_FLAGS = 3;
+
         private static final int COLUMN_TYPE = 4;
+
         private static final int COLUMN_VALUE = 5;
 
         @Override
@@ -852,7 +861,6 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         decompiledTextArea.addTextChangedListener(this::decompiledTextAreaTextChanged);
 
         decompiledTextArea.setLinkHandler(new LinkHandler() {
-
             @Override
             public boolean isLink(Token token) {
                 return hasDeclaration(token.start);
@@ -921,7 +929,6 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         panB.add(decLabel, BorderLayout.NORTH);
 
         Main.getDebugHandler().addConnectionListener(new DebuggerHandler.ConnectionListener() {
-
             @Override
             public void connected() {
                 decButtonsPan.setVisible(false);
@@ -1293,7 +1300,6 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
     public void setDecompiledEditMode(boolean val) {
         View.execInEventDispatch(new Runnable() {
-
             @Override
             public void run() {
                 if (val) {

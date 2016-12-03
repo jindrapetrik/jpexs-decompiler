@@ -1701,16 +1701,19 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 boolean ignoreCase = searchDialog.ignoreCaseCheckBox.isSelected();
                 boolean regexp = searchDialog.regexpCheckBox.isSelected();
 
-                if (searchDialog.searchInASRadioButton.isSelected()) {
+                boolean scriptSearch = searchDialog.searchInASRadioButton.isSelected()
+                        || searchDialog.searchInPCodeRadioButton.isSelected();
+                if (scriptSearch) {
+                    boolean pCodeSearch = searchDialog.searchInPCodeRadioButton.isSelected();
                     new CancellableWorker<Void>() {
                         @Override
                         protected Void doInBackground() throws Exception {
                             List<ABCPanelSearchResult> abcResult = null;
                             List<ActionSearchResult> actionResult = null;
                             if (swf.isAS3()) {
-                                abcResult = getABCPanel().search(swf, txt, ignoreCase, regexp, this);
+                                abcResult = getABCPanel().search(swf, txt, ignoreCase, regexp, pCodeSearch, this);
                             } else {
-                                actionResult = getActionPanel().search(swf, txt, ignoreCase, regexp, this);
+                                actionResult = getActionPanel().search(swf, txt, ignoreCase, regexp, pCodeSearch, this);
                             }
 
                             List<ABCPanelSearchResult> fAbcResult = abcResult;

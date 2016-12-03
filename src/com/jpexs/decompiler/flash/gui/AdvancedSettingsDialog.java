@@ -187,8 +187,8 @@ public class AdvancedSettingsDialog extends AppDialog {
         buttonsPanel.add(buttonsLeftPanel, BorderLayout.WEST);
 
         JPanel buttonsRightPanel = new JPanel(new FlowLayout());
-        buttonsRightPanel.add(cancelButton);
         buttonsRightPanel.add(okButton);
+        buttonsRightPanel.add(cancelButton);
         buttonsPanel.add(buttonsRightPanel, BorderLayout.EAST);
 
         cnt.add(buttonsPanel, BorderLayout.SOUTH);
@@ -197,13 +197,11 @@ public class AdvancedSettingsDialog extends AppDialog {
 
         JComboBox<SkinSelect> skinComboBox = new JComboBox<>();
         skinComboBox.setRenderer(new SubstanceDefaultListCellRenderer() {
-
             @Override
             public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 SubstanceDefaultListCellRenderer cmp = (SubstanceDefaultListCellRenderer) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus); //To change body of generated methods, choose Tools | Templates.
                 final SkinSelect ss = (SkinSelect) value;
                 cmp.setIcon(new Icon() {
-
                     @Override
                     public void paintIcon(Component c, Graphics g, int x, int y) {
                         Graphics2D g2 = (Graphics2D) g;
@@ -241,7 +239,6 @@ public class AdvancedSettingsDialog extends AppDialog {
                 });
                 return cmp;
             }
-
         });
         skinComboBox.addItem(new SkinSelect(OceanicSkin.NAME, OceanicSkin.class.getName()));
         Map<String, SkinInfo> skins = SubstanceLookAndFeel.getAllSkins();

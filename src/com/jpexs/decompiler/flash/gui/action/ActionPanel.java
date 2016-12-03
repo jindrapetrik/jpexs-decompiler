@@ -255,7 +255,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         return null;
     }
 
-    public List<ActionSearchResult> search(SWF swf, final String txt, boolean ignoreCase, boolean regexp, CancellableWorker<Void> worker) {
+    public List<ActionSearchResult> search(SWF swf, final String txt, boolean ignoreCase, boolean regexp, boolean pcode, CancellableWorker<Void> worker) {
         if (txt != null && !txt.isEmpty()) {
             searchPanel.setOptions(ignoreCase, regexp);
             Map<String, ASMSource> asms = swf.getASMs(false);
@@ -469,7 +469,6 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         final boolean decompileNeeded = decompile;
 
         CancellableWorker worker = new CancellableWorker() {
-
             @Override
             protected Void doInBackground() throws Exception {
 
@@ -585,7 +584,6 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         decompiledEditor = new DebuggableEditorPane();
         decompiledEditor.setEditable(false);
         decompiledEditor.setLinkHandler(new LinkHandler() {
-
             @Override
             public boolean isLink(Token token) {
                 int pos = token.start;
@@ -740,7 +738,6 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
 
         //decPanel.add(searchPanel, BorderLayout.NORTH);
         Main.getDebugHandler().addConnectionListener(new DebuggerHandler.ConnectionListener() {
-
             @Override
             public void connected() {
                 decButtonsPan.setVisible(false);
