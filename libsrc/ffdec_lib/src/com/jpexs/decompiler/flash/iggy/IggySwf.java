@@ -62,7 +62,11 @@ public class IggySwf implements StructureInterface {
             newData = stream.getAllBytes();
             newLen = newData.length;
         }
-        long oldLen = font_data_sizes[fontIndex];
+
+        //FIXME
+        Helper.writeFile("d:\\Dropbox\\jpexs-laptop\\iggi\\extraxtdir_new\\font" + fontIndex + ".bin", newData);
+
+        /* long oldLen = font_data_sizes[fontIndex];
         long diff = newLen - oldLen;
         if (diff != 0) {
             font_data_sizes[fontIndex] = newLen;
@@ -77,7 +81,7 @@ public class IggySwf implements StructureInterface {
             }
         }
         hdr.insertGapAfter(font_data_addresses[fontIndex], diff);
-
+         */
     }
 
     @Override
@@ -154,7 +158,10 @@ public class IggySwf implements StructureInterface {
         fonts = new HashMap<>();
         for (int i = 0; i < hdr.font_count; i++) {
             s.seek(font_data_addresses[i], SeekMode.SET);
-            //byte font_data[] = s.readBytes((int) font_data_sizes[i]);
+            byte font_data[] = s.readBytes((int) font_data_sizes[i]);
+            //FIXME
+            Helper.writeFile("d:\\Dropbox\\jpexs-laptop\\iggi\\extraxtdir_orig\\font" + i + ".bin", font_data);
+            s.seek(-font_data_sizes[i], SeekMode.CUR);
             IggyFont font = new IggyFont(s);
             fonts.put(i, font);
         }

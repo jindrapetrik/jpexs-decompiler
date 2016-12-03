@@ -285,7 +285,7 @@ public class IggyFont extends IggyTag {
         }
         if (abs_start_of_scale != 0) {
             s.seek(abs_start_of_scale, SeekMode.SET);
-            charScales = new IggyCharAdvances(s, char_count);
+            charScales = new IggyCharAdvances(s, glyphs);
         }
         if (abs_start_of_kern != 0) {
             s.seek(abs_start_of_kern, SeekMode.SET);
@@ -366,14 +366,15 @@ public class IggyFont extends IggyTag {
         s.writeUI64(0); //pad zero
         if (abs_start_of_char_struct != 0) {
             s.seek(abs_start_of_char_struct, SeekMode.SET);
+            long baseOfsAddr = s.position();
             //offsets of shapes
             for (IggyCharOffset ofs : charOffsets) {
                 ofs.writeToDataStream(s);
             }
+            //long afterOfsAddr = s.position();
             for (int i = 0; i < glyphs.size(); i++) {
                 IggyShape shp = glyphs.get(i);
                 if (shp != null) {
-                    s.seek(charOffsets.get(i).getAddress(), SeekMode.SET);
                     shp.writeToDataStream(s);
                 }
             }
