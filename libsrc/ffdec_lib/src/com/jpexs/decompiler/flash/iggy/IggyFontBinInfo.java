@@ -10,7 +10,9 @@ import java.io.IOException;
  *
  * @author JPEXS
  */
-public class FontBinInfo implements StructureInterface {
+public class IggyFontBinInfo implements StructureInterface {
+
+    public static final int STRUCT_SIZE = 96;
 
     @IggyFieldType(DataType.uint64_t)
     long size_of_this_info = 96;
@@ -35,7 +37,7 @@ public class FontBinInfo implements StructureInterface {
     @IggyFieldType(value = DataType.uint8_t, count = 40)
     byte pad[];
 
-    public FontBinInfo(ReadDataStreamInterface s) throws IOException {
+    public IggyFontBinInfo(ReadDataStreamInterface s) throws IOException {
         readFromDataStream(s);
     }
 

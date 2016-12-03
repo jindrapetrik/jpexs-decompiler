@@ -13,6 +13,8 @@ import java.util.logging.Logger;
  */
 public class IggyCharOffset implements StructureInterface {
 
+    public static final int STRUCT_SIZE = 32;
+
     private static Logger LOGGER = Logger.getLogger(IggyCharOffset.class.getName());
 
     @IggyFieldType(DataType.uint64_t)

@@ -1,5 +1,6 @@
 package com.jpexs.decompiler.flash.iggy;
 
+import static com.jpexs.decompiler.flash.iggy.IggyShape.STRUCT_SIZE;
 import com.jpexs.decompiler.flash.iggy.streams.StructureInterface;
 import com.jpexs.decompiler.flash.iggy.streams.AbstractDataStream;
 import com.jpexs.decompiler.flash.iggy.annotations.IggyFieldType;
@@ -14,6 +15,8 @@ import java.util.logging.Logger;
  * @author JPEXS
  */
 public class IggyShapeNode implements StructureInterface {
+
+    public static final int STRUCT_SIZE = 24;
 
     private static Logger LOGGER = Logger.getLogger(IggyShapeNode.class.getName());
 

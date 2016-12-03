@@ -51,16 +51,10 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
     float frame_rate;
     @IggyFieldType(DataType.uint32_t)
     long unk_5C;
-    @IggyFieldType(DataType.uint32_t)
-    long additional_import1;
-    @IggyFieldType(DataType.uint32_t)
-    long zero1;
-
-    //local
-    private int imported = 0;
-
     @IggyFieldType(DataType.uint64_t)
-    long unk_guid; // same for some fonts (eng + chinese)
+    long imported_guid;
+    @IggyFieldType(DataType.uint64_t)
+    long my_guid; // same for some fonts (eng + chinese)
     @IggyFieldType(DataType.uint64_t)
     long off_names; // 0x70 relative offset to the names/import section of the file  - end of fonts
     @IggyFieldType(DataType.uint64_t)
@@ -127,8 +121,8 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
         }
     }
 
-    public boolean isImported() {
-        return imported == 1;
+    public long getImported_guid() {
+        return imported_guid;
     }
 
     public long getBaseAddress() {
@@ -212,12 +206,8 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
         unk_54 = stream.readUI32();
         frame_rate = stream.readFloat();
         unk_5C = stream.readUI32();
-        additional_import1 = stream.readUI32();
-        if (additional_import1 > 0) {
-            imported = 1;
-        }
-        zero1 = stream.readUI32();
-        unk_guid = stream.readUI64();
+        imported_guid = stream.readUI64();
+        my_guid = stream.readUI64();
 
         off_names = stream.readUI64();
         names_address = off_names == 1 ? 0 : off_names + stream.position() - 8;
@@ -270,9 +260,8 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
         stream.writeUI32(unk_54);
         stream.writeFloat(frame_rate);
         stream.writeUI32(unk_5C);
-        stream.writeUI32(additional_import1);
-        stream.writeUI32(zero1);
-        stream.writeUI64(unk_guid);
+        stream.writeUI64(imported_guid);
+        stream.writeUI64(my_guid);
         off_names = names_address == 0 ? 1 : names_address - stream.position();
         stream.writeUI64(off_names);
         off_unk78 = unk78_address == 0 ? 1 : unk78_address - stream.position();

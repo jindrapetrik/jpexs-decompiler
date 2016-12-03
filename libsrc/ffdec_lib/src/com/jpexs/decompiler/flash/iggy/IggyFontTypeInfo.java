@@ -13,6 +13,7 @@ import java.io.IOException;
  */
 public class IggyFontTypeInfo implements StructureInterface {
 
+    public static final int STRUCT_SIZE = 24;
     @IggyFieldType(DataType.uint64_t)
     long zero;
     @IggyFieldType(DataType.uint64_t)

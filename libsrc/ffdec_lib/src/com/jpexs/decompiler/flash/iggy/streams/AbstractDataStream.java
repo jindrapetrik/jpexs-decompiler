@@ -199,11 +199,22 @@ public abstract class AbstractDataStream implements DataStreamInterface {
 
     @Override
     public void pad8bytes() throws IOException {
-        int pad8 = 8 - (int) (position() % 8);
-        if (pad8 < 8) {
-            for (int i = 0; i < pad8; i++) {
+        int pad8 = (int) (position() % 8);
+        switch (pad8) {
+            case 1:
                 write(0);
-            }
+            case 2:
+                write(0);
+            case 3:
+                write(0);
+            case 4:
+                write(0);
+            case 5:
+                write(0);
+            case 6:
+                write(0);
+            case 7:
+                write(0);
         }
     }
 

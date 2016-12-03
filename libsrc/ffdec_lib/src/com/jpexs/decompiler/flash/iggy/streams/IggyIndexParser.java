@@ -1,10 +1,8 @@
-package com.jpexs.decompiler.flash.iggy;
+package com.jpexs.decompiler.flash.iggy.streams;
 
-import com.jpexs.decompiler.flash.iggy.streams.SeekMode;
-import com.jpexs.decompiler.flash.iggy.streams.AbstractDataStream;
-import com.jpexs.decompiler.flash.iggy.streams.ReadDataStreamInterface;
-import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
@@ -14,30 +12,40 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author Jindra
+ * @author JPEXS
  */
 public class IggyIndexParser {
 
     private static Logger LOGGER = Logger.getLogger(IggyIndexParser.class.getName());
 
+    /*
+    static PrintWriter pw;
+
     static {
+        try {
+            pw = new PrintWriter("d:\\Dropbox\\jpexs-laptop\\iggi\\extraxtdir_new\\index.txt");
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(IggyIndexParser.class.getName()).log(Level.SEVERE, null, ex);
+        }
         LOGGER.setLevel(Level.ALL);
         LOGGER.addHandler(new Handler() {
             @Override
             public void publish(LogRecord record) {
-                System.out.println("" + record.getMessage());
+                pw.println("" + record.getMessage());
             }
 
             @Override
             public void flush() {
+                pw.flush();
             }
 
             @Override
             public void close() throws SecurityException {
+                pw.close();
             }
         });
     }
-
+     */
     /**
      * Parser for index data. It creates table of indices and table of offsets
      *
@@ -51,7 +59,7 @@ public class IggyIndexParser {
         int[] indexTable = new int[indexTableSize];
         for (int i = 0; i < indexTableSize; i++) {
             int offset = indexStream.readUI8();
-            LOGGER.fine(String.format("index_table_entry: %02x", offset));
+            LOGGER.fine(String.format("index_table_entry: %d", offset));
             indexTable[i] = offset;
             indexTableEntry.add(offset);
             int num = indexStream.readUI8();
@@ -61,8 +69,12 @@ public class IggyIndexParser {
         long offset = 0;
         int code;
 
+        String tabs = "\t\t\t\t";
+
+        LOGGER.finer(String.format("-- OFFSET: 0" + tabs));
+
         while ((code = indexStream.readUI8()) > -1) {
-            LOGGER.finer(String.format("Code = %x", code));
+            LOGGER.finer(String.format("Code = 0x%02X", code));
 
             if (code < 0x80) // 0-0x7F
             {
@@ -74,7 +86,7 @@ public class IggyIndexParser {
                 }
 
                 offset += indexTable[code];
-                LOGGER.finest(String.format("ofset += %d", indexTable[code]));
+                LOGGER.finest(String.format("LENGTH = indexTable[%d] = %d", code, indexTable[code]));
 
             } else if (code < 0xC0) // 0x80-BF
             {
@@ -92,11 +104,14 @@ public class IggyIndexParser {
                 }
 
                 int n = code - 0x7F;
+                LOGGER.finest(String.format("index = %d, n = code - 0x7F = %d", index, n));
+                LOGGER.finest(String.format("LENGTH = indexTable[index] * n = indexTable[%d] * %d = %d", index, n, indexTable[index] * n));
                 offset += indexTable[index] * n;
             } else if (code < 0xD0) // 0xC0-0xCF
             {
                 LOGGER.finest("0xC0-CF: code*2-0x17E");
                 offset += ((code * 2) - 0x17E);
+                LOGGER.finest(String.format("LENGTH = (code * 2) - 0x17E = (0x%02X * 2) - 0x17E = %d", code, ((code * 2) - 0x17E)));
             } else if (code < 0xE0) // 0xD0-0xDF
             {
                 LOGGER.finest("0xD0-0xDF: platform based");
@@ -119,16 +134,16 @@ public class IggyIndexParser {
                 if (is64) {
                     if (i <= 2) {
                         offset += 8 * n; // Ptr type
-                        LOGGER.finest(String.format("offset += %d", 8 * n));
+                        LOGGER.finest(String.format("LENGTH = 8 * n = 8 * %d = %d", n, 8 * n));
                     } else if (i <= 4) {
                         offset += 2 * n;
-                        LOGGER.finest(String.format("offset += %d", 2 * n));
+                        LOGGER.finest(String.format("LENGTH = 2 * n = 2 * %d = %d", n, 2 * n));
                     } else if (i == 5) {
                         offset += 4 * n;
-                        LOGGER.finest(String.format("offset += %d", 4 * n));
+                        LOGGER.finest(String.format("LENGTH = 4 * n = 4 * %d = %d", n, 4 * n));
                     } else if (i == 6) {
                         offset += 8 * n; // 64 bits type
-                        LOGGER.finest(String.format("offset += %d", 8 * n));
+                        LOGGER.finest(String.format("LENGTH = 8 * n = 8 * %d = %d", n, 8 * n));
                     } else {
                         LOGGER.severe(String.format("< 0xE0: Invalid value for i (%x %x)", i, code));
                     }
@@ -136,26 +151,26 @@ public class IggyIndexParser {
                     switch (i) {
                         case 2:
                             offset += 4 * n;  // Ptr type
-                            LOGGER.finest(String.format("offset += %d", 4 * n));
+                            LOGGER.finest(String.format("LENGTH = 4 * n = 4 * %d = %d", n, 4 * n));
                             break;
                         case 4:
                             offset += 2 * n;
-                            LOGGER.finest(String.format("offset += %d", 2 * n));
+                            LOGGER.finest(String.format("LENGTH = 2 * n = 2 * %d = %d", n, 2 * n));
                             break;
                         case 5:
                             offset += 4 * n; // 32 bits type
-                            LOGGER.finest(String.format("offset += %d", 4 * n));
+                            LOGGER.finest(String.format("LENGTH = 4 * n = 4 * %d = %d", n, 4 * n));
                             break;
                         case 6:
                             offset += 8 * n;
-                            LOGGER.finest(String.format("offset += %d", 8 * n));
+                            LOGGER.finest(String.format("LENGTH = 8 * n = 8 * %d = %d", n, 8 * n));
                             break;
                         default:
                             LOGGER.severe(String.format("< 0xE0: invalid value for i (%x %x)", i, code));
                     }
                 }
             } else if (code == 0xFC) {
-                LOGGER.finest(String.format("0xFC: skip 1 "));
+                LOGGER.finest(String.format("0xFC: SKIP 1 "));
                 indexStream.seek(1, SeekMode.CUR);
             } else if (code == 0xFD) {
                 LOGGER.finest(String.format("0xFD: 0..255, skip 2 * 0..255 "));
@@ -165,16 +180,18 @@ public class IggyIndexParser {
                     LOGGER.severe(String.format("0xFD: Cannot read n."));
                     return;
                 }
+                LOGGER.finest(String.format("n = %d", n));
 
                 if ((m = indexStream.readUI8()) < 0) {
                     LOGGER.severe(String.format("0xFD: Cannot read m."));
                     return;
                 }
+                LOGGER.finest(String.format("m = %d", m));
 
                 offset += n;
-                LOGGER.finest(String.format("offset += %d", n));
+                LOGGER.finest(String.format("LENGTH = n = %d", n));
                 indexStream.seek(m * 2, SeekMode.CUR);
-                LOGGER.finest(String.format("skip %d", m * 2));
+                LOGGER.finest(String.format("SKIP m * 2 = skip %d * 2 = %d", m, m * 2));
             } else if (code == 0xFE) {
                 LOGGER.finest(String.format("0xFD: 0..255 + 1 "));
                 int n8;
@@ -184,10 +201,11 @@ public class IggyIndexParser {
                     LOGGER.severe(String.format("0xFE: Cannot read n."));
                     return;
                 }
+                LOGGER.finest(String.format("n8 = %d", n8));
 
                 n = n8 + 1;
                 offset += n;
-                LOGGER.finest(String.format("offset += %d", n));
+                LOGGER.finest(String.format("LENGTH = n8 + 1 = %d + 1 = %d", n8, n));
             } else if (code == 0xFF) {
                 LOGGER.finest(String.format("0xFF: 32bit "));
                 long n;
@@ -198,12 +216,12 @@ public class IggyIndexParser {
                 }
 
                 offset += n;
-                LOGGER.finest(String.format("offset += %d", n));
+                LOGGER.finest(String.format("LENGTH = n = %d", n));
             } else {
                 LOGGER.warning(String.format("Unrecognized code: %x", code));
             }
 
-            LOGGER.finer(String.format("OFFSET: %d", offset));
+            LOGGER.finer(String.format("-- OFFSET: %d" + tabs, offset));
 
             offsets.add(offset);
         }

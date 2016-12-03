@@ -13,6 +13,8 @@ import java.util.List;
  */
 public class IggyCharKerning implements StructureInterface {
 
+    public static final int STRUCT_SIZE = 6;
+
     private long kernCount;
     List<Character> charsA;
     List<Character> charsB;

@@ -1,13 +1,13 @@
 package com.jpexs.decompiler.flash.iggy;
 
+import com.jpexs.decompiler.flash.iggy.streams.IggyIndexParser;
+import com.jpexs.decompiler.flash.iggy.streams.IggyIndexBuilder;
 import com.jpexs.decompiler.flash.iggy.streams.StructureInterface;
 import com.jpexs.decompiler.flash.iggy.streams.SeekMode;
 import com.jpexs.decompiler.flash.iggy.streams.RandomAccessFileDataStream;
 import com.jpexs.decompiler.flash.iggy.streams.ReadDataStreamInterface;
 import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
 import com.jpexs.decompiler.flash.iggy.streams.DataStreamInterface;
-import com.jpexs.decompiler.flash.iggy.streams.IndexingDataStream;
-import com.jpexs.decompiler.flash.iggy.streams.IndexingDataStreamInterface;
 import com.jpexs.decompiler.flash.iggy.streams.TemporaryDataStream;
 import com.jpexs.helpers.Helper;
 import java.io.File;
@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -38,11 +39,7 @@ public class IggyFile implements StructureInterface {
     private List<IggySubFileEntry> subFileEntries = new ArrayList<>();
     private List<byte[]> subFileEntriesData = new ArrayList<>();
 
-    private List<IggyFlashHeaderInterface> headers = new ArrayList<>();
     private List<IggySwf> iggySwfs = new ArrayList<>();
-    private List<List<Integer>> indexTables = new ArrayList<>();
-    private List<List<Long>> offsetTables = new ArrayList<>();
-    private List<DataStreamInterface> indexDataStreams = new ArrayList<>();
 
     public static final int FIRST_TAG_POSITION = 3;
 
@@ -50,7 +47,7 @@ public class IggyFile implements StructureInterface {
         IggySwf iggySwf = iggySwfs.get(targetSwfIndex);
         iggySwf.replaceFontTag(fontIndex, newFont);
 
-        IndexingDataStreamInterface indexStream = new IndexingDataStream();
+        IggyIndexBuilder indexStream = new IggyIndexBuilder();
         DataStreamInterface flashStream = new TemporaryDataStream();
         flashStream.setIndexing(indexStream);
         iggySwf.writeToDataStream(flashStream);
@@ -85,34 +82,12 @@ public class IggyFile implements StructureInterface {
         }
     }
 
-    private boolean setSwfItemLength(int swfIndex, int itemindex, long newLength) {
-        DataStreamInterface stream = indexDataStreams.get(swfIndex);
-
-        List<Long> offsetTable = offsetTables.get(swfIndex);
-
-        long offset = offsetTable.get(itemindex);
-        long nextOffset = itemindex == offsetTable.size() - 1 ? stream.totalSize() : offsetTable.get(itemindex + 1);
-        long currentSize = nextOffset - offset;
-        try {
-            byte indexData[] = stream.getAllBytes();
-            setItemLength(offset, header.is64(), indexData, newLength);
-            indexDataStreams.set(swfIndex, new TemporaryDataStream(indexData)); //TODO: optimize!
-            long lengthDelta = newLength - currentSize;
-            for (int i = itemindex + 1; i < offsetTable.size(); i++) {
-                offsetTable.set(i, offsetTable.get(i) + lengthDelta);
-            }
-            return true;
-        } catch (IOException ex) {
-            return false;
-        }
-    }
-
     public IggySwf getSwf(int swfIndex) {
         return iggySwfs.get(swfIndex);
     }
 
-    public Set<Integer> getFontIds(int swfIndex) {
-        return iggySwfs.get(swfIndex).fonts.keySet();
+    public int getFontCount(int swfIndex) {
+        return iggySwfs.get(swfIndex).fonts.size();
     }
 
     public IggyFont getFont(int swfIndex, int fontId) {
@@ -221,13 +196,15 @@ public class IggyFile implements StructureInterface {
         IggyFile iggyFile = new IggyFile(inFile);
         extractIggyFile(inFile, extractDirOrig);
         IggySwf iswf = iggyFile.getSwf(0);
-        IggyFont ifont = iswf.fonts.get(0);
-        iggyFile.replaceFontTag(0, 0, ifont);
+        iggyFile.replaceSwf(0, iswf);
+        //IggyFont ifont = iswf.fonts.get(0);
+        //iggyFile.replaceFontTag(0, 0, ifont);
         outFile.delete();
         try (RandomAccessFileDataStream outputStream = new RandomAccessFileDataStream(outFile)) {
             iggyFile.writeToDataStream(outputStream);
         }
         extractIggyFile(outFile, extractDirNew);
+        System.exit(0);
     }
 
     private static void copyStream(InputStream is, OutputStream os) {
@@ -669,27 +646,42 @@ public class IggyFile implements StructureInterface {
     }
 
     //WIP
-    public boolean replaceSwf(int targetSwfIndex, IggySwf iggySwf) {
-        return false; //Not working yet - need to make IggySWF.writeToDataStream work
+    public boolean replaceSwf(int targetSwfIndex, IggySwf iggySwf) throws IOException {
 
-        /*if (targetSwfIndex < 0 || targetSwfIndex >= getSwfCount()) {
+        if (targetSwfIndex < 0 || targetSwfIndex >= getSwfCount()) {
             throw new ArrayIndexOutOfBoundsException("No such SWF file index");
         }
         byte replacementData[];
+        byte replacementIndexData[];
+        IggyIndexBuilder ib = new IggyIndexBuilder();
         try (DataStreamInterface stream = new TemporaryDataStream()) {
-            headers.get(targetSwfIndex).writeToDataStream(stream);
+            stream.setIndexing(ib);
             iggySwf.writeToDataStream(stream);
             replacementData = stream.getAllBytes();
+            replacementIndexData = ib.getIndexBytes();
         } catch (IOException ex) {
             Logger.getLogger(IggyFile.class.getName()).log(Level.SEVERE, "Error during updating SWF", ex);
             return false;
         }
+
+        IggyIndexParser.parseIndex(true, new TemporaryDataStream(replacementIndexData), new ArrayList<>(), new ArrayList<>());
 
         int swfIndex = 0;
         long offsetsChange = 0;
         for (int i = 0; i < subFileEntries.size(); i++) {
             IggySubFileEntry entry = subFileEntries.get(i);
             entry.offset += offsetsChange;
+            if (entry.type == IggySubFileEntry.TYPE_INDEX) {
+                if (swfIndex == targetSwfIndex) {
+                    long oldSize = entry.size;
+                    long newSize = replacementIndexData.length;
+                    offsetsChange = offsetsChange + (newSize - oldSize);
+                    entry.size = newSize;
+                    entry.size2 = newSize;
+                    subFileEntriesData.set(i, replacementIndexData);
+                }
+                swfIndex++;
+            }
             if (entry.type == IggySubFileEntry.TYPE_FLASH) {
                 if (swfIndex == targetSwfIndex) {
                     long oldSize = entry.size;
@@ -698,29 +690,19 @@ public class IggyFile implements StructureInterface {
                     entry.size = newSize;
                     entry.size2 = newSize;
                     //entries after this one will have modified offsets
+                    subFileEntriesData.set(i, replacementData);
                 }
-                swfIndex++;
             }
         }
-        subFileEntriesData.set(targetSwfIndex, replacementData);
-        return true;*/
+
+        return true;
     }
 
     private void parseEntries() throws IOException {
-        List<DataStreamInterface> flashDataStreams = new ArrayList<>();
-
         for (int i = 0; i < subFileEntries.size(); i++) {
             IggySubFileEntry entry = subFileEntries.get(i);
-            DataStreamInterface dataStream = new TemporaryDataStream(getEntryData(i));
-            if (entry.type == IggySubFileEntry.TYPE_INDEX) {
-                List<Integer> indexTable = new ArrayList<>();
-                List<Long> offsets = new ArrayList<>();
-                IggyIndexParser.parseIndex(header.is64(), dataStream, indexTable, offsets);
-                indexDataStreams.add(dataStream);
-                indexTables.add(indexTable);
-                offsetTables.add(offsets);
-            } else if (entry.type == IggySubFileEntry.TYPE_FLASH) {
-                iggySwfs.add(new IggySwf(dataStream));
+            if (entry.type == IggySubFileEntry.TYPE_FLASH) {
+                iggySwfs.add(new IggySwf(new TemporaryDataStream(getEntryData(i))));
             }
         }
     }

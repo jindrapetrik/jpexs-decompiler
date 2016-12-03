@@ -46,7 +46,7 @@ public interface WriteDataStreamInterface extends AutoCloseable {
     @Override
     public void close();
 
-    public void setIndexing(IndexingDataStreamInterface indexing);
+    public void setIndexing(IggyIndexBuilder indexing);
 
-    public IndexingDataStreamInterface getIndexing();
+    public IggyIndexBuilder getIndexing();
 }

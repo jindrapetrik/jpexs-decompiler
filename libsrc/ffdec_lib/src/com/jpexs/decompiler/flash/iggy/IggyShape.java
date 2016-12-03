@@ -1,9 +1,12 @@
 package com.jpexs.decompiler.flash.iggy;
 
+import static com.jpexs.decompiler.flash.iggy.IggyCharOffset.STRUCT_SIZE;
+import static com.jpexs.decompiler.flash.iggy.IggyShapeNode.STRUCT_SIZE;
 import com.jpexs.decompiler.flash.iggy.streams.StructureInterface;
 import com.jpexs.decompiler.flash.iggy.streams.SeekMode;
 import com.jpexs.decompiler.flash.iggy.streams.AbstractDataStream;
 import com.jpexs.decompiler.flash.iggy.annotations.IggyFieldType;
+import com.jpexs.decompiler.flash.iggy.streams.IggyIndexBuilder;
 import com.jpexs.decompiler.flash.iggy.streams.ReadDataStreamInterface;
 import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
 import java.io.IOException;
@@ -16,6 +19,8 @@ import java.util.logging.Logger;
  * @author JPEXS
  */
 public class IggyShape implements StructureInterface {
+
+    public static final int STRUCT_SIZE = 64;
 
     private static Logger LOGGER = Logger.getLogger(IggyShape.class.getName());
 
@@ -106,6 +111,7 @@ public class IggyShape implements StructureInterface {
 
     @Override
     public void writeToDataStream(WriteDataStreamInterface s) throws IOException {
+        s.getIndexing().writeConstLength(IggyIndexBuilder.CONST_SHAPE_SIZE);
         s.writeFloat(minx);
         s.writeFloat(miny);
         s.writeFloat(maxx);
@@ -117,6 +123,8 @@ public class IggyShape implements StructureInterface {
         s.writeUI64(one3);
         s.writeUI32(one4);
         s.writeUI32(two1);
+
+        s.getIndexing().writeConstLengthArray(IggyIndexBuilder.CONST_SHAPE_NODE_SIZE, nodes.size());
 
         for (IggyShapeNode node : nodes) {
             node.writeToDataStream(s);

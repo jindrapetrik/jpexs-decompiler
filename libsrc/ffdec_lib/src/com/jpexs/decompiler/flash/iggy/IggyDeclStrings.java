@@ -2,6 +2,7 @@ package com.jpexs.decompiler.flash.iggy;
 
 import com.jpexs.decompiler.flash.iggy.annotations.IggyArrayFieldType;
 import com.jpexs.decompiler.flash.iggy.annotations.IggyFieldType;
+import com.jpexs.decompiler.flash.iggy.streams.IggyIndexBuilder;
 import com.jpexs.decompiler.flash.iggy.streams.ReadDataStreamInterface;
 import com.jpexs.decompiler.flash.iggy.streams.StructureInterface;
 import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
@@ -51,10 +52,14 @@ public class IggyDeclStrings implements StructureInterface {
 
     @Override
     public void writeToDataStream(WriteDataStreamInterface s) throws IOException {
+        IggyIndexBuilder ib = s.getIndexing();
         s.writeUI64(one);
         s.writeUI32(size);
         s.writeBytes(xxx);
+        ib.writeLengthSkipTwice(8 + 4 + 3, 0);
+        ib.writeLengthUI32(size);
         s.writeBytes(data);
+        ib.writeConstLength(IggyIndexBuilder.CONST_SEQUENCE_SIZE);
         s.writeBytes(padd);
         s.writeUI64(one);
         s.writeUI64(zero);

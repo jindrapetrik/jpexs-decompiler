@@ -102,12 +102,13 @@ public class IggyToSwfConvertor {
         fat.useNetwork = false;
         swf.addTag(fat);
 
-        Set<Integer> fontIndices = file.getFontIds(swfIndex);
+        //Set<Integer> fontIndices = file.getFontIds(swfIndex);
+        int fontCount = file.getFontCount(swfIndex);
 
         int currentCharId = 0;
         Map<Integer, Integer> fontIndex2CharId = new HashMap<>();
 
-        for (int fontIndex : fontIndices) {
+        for (int fontIndex = 0; fontIndex < fontCount; fontIndex++) {
             IggyFont iggyFont = file.getFont(swfIndex, fontIndex);
             DefineFont2Tag fontTag = new DefineFont2Tag(swf);
             currentCharId++;
