@@ -285,7 +285,7 @@ public class IggyFont extends IggyTag {
         }
         if (abs_start_of_scale != 0) {
             s.seek(abs_start_of_scale, SeekMode.SET);
-            charScales = new IggyCharAdvances(s, glyphs);
+            charScales = new IggyCharAdvances(s, char_count);
         }
         if (abs_start_of_kern != 0) {
             s.seek(abs_start_of_kern, SeekMode.SET);

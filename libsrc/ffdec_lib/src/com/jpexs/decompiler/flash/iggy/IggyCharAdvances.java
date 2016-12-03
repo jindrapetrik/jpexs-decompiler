@@ -14,35 +14,29 @@ import java.util.List;
 public class IggyCharAdvances implements StructureInterface {
 
     List<Float> advances;
-    private List<IggyShape> glyphs;
+    private long charCount;
 
     public List<Float> getScales() {
         return advances;
     }
 
-    public IggyCharAdvances(ReadDataStreamInterface stream, List<IggyShape> glyphs) throws IOException {
-        this.glyphs = glyphs;
+    public IggyCharAdvances(ReadDataStreamInterface stream, long charCount) throws IOException {
+        this.charCount = charCount;
         readFromDataStream(stream);
     }
 
     @Override
     public void readFromDataStream(ReadDataStreamInterface stream) throws IOException {
         advances = new ArrayList<>();
-        for (int i = 0; i < glyphs.size(); i++) {
-            if (glyphs.get(i) != null) {
-                advances.add(stream.readFloat());
-            } else {
-                advances.add(null);
-            }
+        for (int i = 0; i < charCount; i++) {
+            advances.add(stream.readFloat());
         }
     }
 
     @Override
     public void writeToDataStream(WriteDataStreamInterface stream) throws IOException {
         for (int i = 0; i < advances.size(); i++) {
-            if (advances.get(i) != null) {
-                stream.writeFloat(advances.get(i));
-            }
+            stream.writeFloat(advances.get(i));
         }
     }
 }

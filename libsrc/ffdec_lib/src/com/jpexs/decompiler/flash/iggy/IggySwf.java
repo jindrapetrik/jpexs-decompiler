@@ -114,7 +114,7 @@ public class IggySwf implements StructureInterface {
             if (next_offset == 1) {
                 font_data_sizes[i] = hdr.getFontEndAddress() - font_data_addresses[i];
             } else {
-                font_data_sizes[i] = next_offset - offset;
+                font_data_sizes[i] = next_offset - offset + 8;
             }
         }
         while (true) {
@@ -130,7 +130,7 @@ public class IggySwf implements StructureInterface {
                 text_data_sizes.add(hdr.getFontEndAddress() - text_addr);
                 break;
             } else {
-                text_data_sizes.add(next_offset - offset);
+                text_data_sizes.add(next_offset - offset + 8);
             }
         }
         s.readUI64(); //1
