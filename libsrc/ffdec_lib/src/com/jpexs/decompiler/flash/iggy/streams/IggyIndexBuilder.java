@@ -21,33 +21,6 @@ import java.util.logging.Logger;
 public class IggyIndexBuilder {
 
     private static Logger LOGGER = Logger.getLogger(IggyIndexBuilder.class.getName());
-
-    /*static PrintWriter pw;
-
-    static {
-        try {
-            pw = new PrintWriter("d:\\Dropbox\\jpexs-laptop\\iggi\\extraxtdir_new\\index.txt");
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(IggyIndexParser.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        LOGGER.setLevel(Level.ALL);
-        LOGGER.addHandler(new Handler() {
-            @Override
-            public void publish(LogRecord record) {
-                pw.println("" + record.getMessage());
-            }
-
-            @Override
-            public void flush() {
-                pw.flush();
-            }
-
-            @Override
-            public void close() throws SecurityException {
-                pw.close();
-            }
-        });
-    }*/
     private static final int CODE_FC_SKIP1 = 0xFC;
     private static final int CODE_FD_OFS8_SKIP_TWICE8 = 0xFD;
     private static final int CODE_FE_OFS8_POSITIVE = 0xFE;
@@ -80,19 +53,6 @@ public class IggyIndexBuilder {
     public static final int CONST_TEXT_DATA_SIZE = 8;
     public static final int CONST_SEQUENCE_SIZE = 9;
 
-    /*final byte[] STATIC_HDR = new byte[]{
-        (byte) 0x0A, (byte) 0x18, (byte) 0x07, (byte) 0x00, (byte) 0x05, (byte) 0x04, (byte) 0x05, (byte) 0x08, (byte) 0x05, (byte) 0x0C, (byte) 0x05, (byte) 0x12, (byte) 0x04, (byte) 0x14, (byte) 0x04, (byte) 0x16,
-        (byte) 0x04, (byte) 0x06, (byte) 0x03, (byte) 0x00, (byte) 0x04, (byte) 0x02, (byte) 0x04, (byte) 0x04, (byte) 0x04, (byte) 0x20, (byte) 0x03, (byte) 0x08, (byte) 0x04, (byte) 0x10, (byte) 0x08, (byte) 0x18,
-        (byte) 0x02, (byte) 0x60, (byte) 0x0D, (byte) 0x00, (byte) 0x02, (byte) 0x09, (byte) 0x03, (byte) 0x0C, (byte) 0x05, (byte) 0x10, (byte) 0x05, (byte) 0x14, (byte) 0x05, (byte) 0x18, (byte) 0x05, (byte) 0x1C,
-        (byte) 0x05, (byte) 0x20, (byte) 0x05, (byte) 0x24, (byte) 0x05, (byte) 0x28, (byte) 0x04, (byte) 0x30, (byte) 0x02, (byte) 0x38, (byte) 0x04, (byte) 0x3A, (byte) 0x04, (byte) 0x18, (byte) 0x02, (byte) 0x08,
-        (byte) 0x02, (byte) 0x10, (byte) 0x05, (byte) 0x40, (byte) 0x09, (byte) 0x00, (byte) 0x05, (byte) 0x04, (byte) 0x05, (byte) 0x08, (byte) 0x05, (byte) 0x0C, (byte) 0x05, (byte) 0x10, (byte) 0x02, (byte) 0x18,
-        (byte) 0x05, (byte) 0x20, (byte) 0x02, (byte) 0x28, (byte) 0x02, (byte) 0x30, (byte) 0x02, (byte) 0x70, (byte) 0x12, (byte) 0x01, (byte) 0x0C, (byte) 0x02, (byte) 0x04, (byte) 0x08, (byte) 0x05, (byte) 0x10,
-        (byte) 0x02, (byte) 0x20, (byte) 0x04, (byte) 0x22, (byte) 0x04, (byte) 0x24, (byte) 0x04, (byte) 0x26, (byte) 0x04, (byte) 0x2B, (byte) 0x03, (byte) 0x30, (byte) 0x02, (byte) 0x38, (byte) 0x02, (byte) 0x40,
-        (byte) 0x02, (byte) 0x48, (byte) 0x05, (byte) 0x4C, (byte) 0x05, (byte) 0x50, (byte) 0x05, (byte) 0x54, (byte) 0x05, (byte) 0x58, (byte) 0x05, (byte) 0x60, (byte) 0x02, (byte) 0xF0, (byte) 0x01, (byte) 0x10,
-        (byte) 0x02, (byte) 0x68, (byte) 0x12, (byte) 0x01, (byte) 0x0C, (byte) 0x02, (byte) 0x04, (byte) 0x08, (byte) 0x05, (byte) 0x10, (byte) 0x02, (byte) 0x20, (byte) 0x05, (byte) 0x24, (byte) 0x05, (byte) 0x28,
-        (byte) 0x05, (byte) 0x2C, (byte) 0x05, (byte) 0x30, (byte) 0x04, (byte) 0x32, (byte) 0x04, (byte) 0x38, (byte) 0x02, (byte) 0x44, (byte) 0x04, (byte) 0x46, (byte) 0x04, (byte) 0x48, (byte) 0x04, (byte) 0x4A,
-        (byte) 0x04, (byte) 0x4C, (byte) 0x04, (byte) 0x4E, (byte) 0x04, (byte) 0x60, (byte) 0x02, (byte) 0x10, (byte) 0x02, (byte) 0x00, (byte) 0x02, (byte) 0x08, (byte) 0x05};
-     */
     private long position = 0;
 
     public IggyIndexBuilder() throws IOException {
@@ -157,14 +117,6 @@ public class IggyIndexBuilder {
         return writeIndex(constIndex, false, 0);
     }
 
-    /*private int indexOfConst(int val) {
-        int index = constTable.indexOf(val);
-        if (index > -1) {
-            return index;
-        }
-        constTable.add(val);
-        return constTable.size() - 1;
-    }*/
     public long writeConstLengthArray(int constIndex, long cnt) {
         long ret = 0;
         long rem = cnt;

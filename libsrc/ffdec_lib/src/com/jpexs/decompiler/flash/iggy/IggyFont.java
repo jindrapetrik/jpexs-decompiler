@@ -273,10 +273,8 @@ public class IggyFont extends IggyTag {
             }
             glyphs = new ArrayList<>();
             for (int i = 0; i < char_count; i++) {
-                //System.err.println("read char " + (i + 1) + "/" + char_count);
                 long addr = charAddresses.get(i);
                 if (addr != 0) {
-                    //System.err.println("read chars at offset " + addr);
                     s.seek(addr, SeekMode.SET);
                     glyphs.add(new IggyShape(s));
                 } else {
