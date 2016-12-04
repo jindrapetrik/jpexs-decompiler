@@ -3,6 +3,9 @@ package com.jpexs.decompiler.flash.iggy.conversion;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFBundle;
 import com.jpexs.decompiler.flash.iggy.IggyFile;
+import com.jpexs.decompiler.flash.iggy.IggyFont;
+import com.jpexs.decompiler.flash.tags.DefineFont2Tag;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
 import com.jpexs.helpers.ReReadableInputStream;
@@ -12,10 +15,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -47,21 +54,21 @@ public class IggySwfBundle implements SWFBundle {
 
     @Override
     public int length() {
-        return iggyFile.getSwfCount();
+        return 1;
     }
 
     @Override
     public Set<String> getKeys() {
         Set<String> ret = new TreeSet<>();
         for (int i = 0; i < length(); i++) {
-            ret.add(iggyFile.getSwfName(i));
+            ret.add(iggyFile.getSwfName());
         }
         return ret;
     }
 
     private int keyToSwfIndex(String key) {
         for (int i = 0; i < length(); i++) {
-            if (key.equals(iggyFile.getSwfName(i))) {
+            if (key.equals(iggyFile.getSwfName())) {
                 return i;
             }
         }
@@ -70,7 +77,7 @@ public class IggySwfBundle implements SWFBundle {
 
     @Override
     public SeekableInputStream getSWF(String key) throws IOException {
-        SWF swf = IggyToSwfConvertor.getSwf(iggyFile, keyToSwfIndex(key));
+        SWF swf = IggyToSwfConvertor.getSwf(iggyFile);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         swf.saveTo(baos);
         MemoryInputStream mis = new MemoryInputStream(baos.toByteArray());
@@ -93,12 +100,35 @@ public class IggySwfBundle implements SWFBundle {
 
     @Override
     public boolean isReadOnly() {
-        return true; //TODO: make writable
+        return false;
     }
 
     @Override
     public boolean putSWF(String key, InputStream is) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        try {
+            int swfIndex = 0;
+            SWF swf = new SWF(is, false, false);
+            List<DefineFont2Tag> fontTags = new ArrayList<>();
+            for (CharacterTag ct : swf.getCharacters().values()) {
+                if (ct instanceof DefineFont2Tag) {
+                    fontTags.add((DefineFont2Tag) ct);
+                }
+            }
+            int fontCount = iggyFile.getFontCount();
+            if (fontCount != fontTags.size()) {
+                throw new IOException("Font count is different from original iggy file");
+            }
+            for (int i = 0; i < fontCount; i++) {
+                IggyFont iggyFont = iggyFile.getFont(i);
+                DefineFont2Tag fontTag = fontTags.get(i);
+                SwfToIggyConvertor.updateIggyFont(iggyFont, fontTag);
+            }
+            iggyFile.saveChanges();
+            return true;
+        } catch (InterruptedException ex) {
+            return false;
+        }
+
     }
 
 }

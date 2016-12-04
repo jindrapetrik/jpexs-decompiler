@@ -20,6 +20,11 @@ public class IggyCharAdvances implements StructureInterface {
         return advances;
     }
 
+    public IggyCharAdvances(List<Float> advances) {
+        this.advances = advances;
+        this.charCount = advances.size();
+    }
+
     public IggyCharAdvances(ReadDataStreamInterface stream, long charCount) throws IOException {
         this.charCount = charCount;
         readFromDataStream(stream);

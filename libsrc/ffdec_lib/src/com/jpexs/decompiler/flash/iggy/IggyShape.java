@@ -69,18 +69,18 @@ public class IggyShape implements StructureInterface {
         readFromDataStream(stream);
     }
 
-    public IggyShape(float minx, float miny, float maxx, float maxy, long advance, long count, long one, long one2, long one3, long one4, long two1, List<IggyShapeNode> nodes) {
+    public IggyShape(float minx, float miny, float maxx, float maxy, List<IggyShapeNode> nodes) {
         this.minx = minx;
         this.miny = miny;
         this.maxx = maxx;
         this.maxy = maxy;
-        this.unk = advance;
-        this.count = count;
-        this.one = one;
-        this.one2 = one2;
-        this.one3 = one3;
-        this.one4 = one4;
-        this.two1 = two1;
+        this.unk = 0; //??
+        this.one = 1;
+        this.one2 = 1;
+        this.one3 = 1;
+        this.one4 = 1;
+        this.two1 = 2;
+        this.count = nodes.size();
         this.nodes = nodes;
     }
 

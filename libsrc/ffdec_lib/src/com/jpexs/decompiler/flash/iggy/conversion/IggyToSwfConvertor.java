@@ -9,6 +9,7 @@ import com.jpexs.decompiler.flash.iggy.IggyCharOffset;
 import com.jpexs.decompiler.flash.iggy.IggyCharAdvances;
 import com.jpexs.decompiler.flash.iggy.IggyFile;
 import com.jpexs.decompiler.flash.iggy.IggyFont;
+import com.jpexs.decompiler.flash.iggy.IggySwf;
 import com.jpexs.decompiler.flash.iggy.IggyText;
 import com.jpexs.decompiler.flash.tags.DefineEditTextTag;
 import com.jpexs.decompiler.flash.tags.DefineFont2Tag;
@@ -44,56 +45,42 @@ import java.util.Set;
  */
 public class IggyToSwfConvertor {
 
-    public static SWF[] getAllSwfs(IggyFile file) {
-        SWF[] ret = new SWF[file.getSwfCount()];
-        for (int i = 0; i < ret.length; i++) {
-            ret[i] = getSwf(file, i);
-        }
-        return ret;
-    }
-
     public static void exportAllSwfsToDir(IggyFile file, File outputDir) throws IOException {
-        for (int swfIndex = 0; swfIndex < file.getSwfCount(); swfIndex++) {
-            exportSwfToDir(file, swfIndex, outputDir);
+        exportSwfToDir(file, outputDir);
+    }
+
+    public static void exportSwfToDir(IggyFile file, File outputDir) throws IOException {
+        try (FileOutputStream fos = new FileOutputStream(new File(outputDir, file.getSwfName()))) {
+            exportSwf(file, fos);
         }
     }
 
-    public static void exportSwfToDir(IggyFile file, int swfIndex, File outputDir) throws IOException {
-        try (FileOutputStream fos = new FileOutputStream(new File(outputDir, file.getSwfName(swfIndex)))) {
-            exportSwf(file, swfIndex, fos);
-        }
-    }
-
-    public static void exportSwfToFile(IggyFile file, int swfIndex, File outputFile) throws IOException {
+    public static void exportSwfToFile(IggyFile file, File outputFile) throws IOException {
         try (FileOutputStream fos = new FileOutputStream(outputFile)) {
-            exportSwf(file, swfIndex, fos);
+            exportSwf(file, fos);
         }
     }
 
-    public static void exportSwf(IggyFile file, int swfIndex, OutputStream output) throws IOException {
-        SWF swf = getSwf(file, swfIndex);
+    public static void exportSwf(IggyFile file, OutputStream output) throws IOException {
+        SWF swf = getSwf(file);
         swf.saveTo(output);
-    }
-
-    private static int makeLengthsTwip(double val) {
-        return (int) (val * SWF.unitDivisor);
     }
 
     private static int makeLengthsEm(double val) {
         return (int) (val * 1024.0);
     }
 
-    public static SWF getSwf(IggyFile file, int swfIndex) {
+    public static SWF getSwf(IggyFile file) {
         SWF swf = new SWF();
         swf.compression = SWFCompression.NONE;
         swf.frameCount = 1; //FIXME!!        
-        swf.frameRate = file.getSwfFrameRate(swfIndex);
+        swf.frameRate = file.getSwfFrameRate();
         swf.gfx = false;
         swf.displayRect = new RECT(
-                (int) (file.getSwfXMin(swfIndex) * SWF.unitDivisor),
-                (int) (file.getSwfXMax(swfIndex) * SWF.unitDivisor),
-                (int) (file.getSwfYMin(swfIndex) * SWF.unitDivisor),
-                (int) (file.getSwfYMax(swfIndex) * SWF.unitDivisor));
+                (int) (file.getSwfXMin() * SWF.unitDivisor),
+                (int) (file.getSwfXMax() * SWF.unitDivisor),
+                (int) (file.getSwfYMin() * SWF.unitDivisor),
+                (int) (file.getSwfYMax() * SWF.unitDivisor));
         swf.version = 10; //FIXME
 
         FileAttributesTag fat = new FileAttributesTag(swf);
@@ -101,15 +88,14 @@ public class IggyToSwfConvertor {
         fat.hasMetadata = false;
         fat.useNetwork = false;
         swf.addTag(fat);
-
         //Set<Integer> fontIndices = file.getFontIds(swfIndex);
-        int fontCount = file.getFontCount(swfIndex);
+        int fontCount = file.getFontCount();
 
         int currentCharId = 0;
         Map<Integer, Integer> fontIndex2CharId = new HashMap<>();
 
         for (int fontIndex = 0; fontIndex < fontCount; fontIndex++) {
-            IggyFont iggyFont = file.getFont(swfIndex, fontIndex);
+            IggyFont iggyFont = file.getFont(fontIndex);
             DefineFont2Tag fontTag = new DefineFont2Tag(swf);
             currentCharId++;
             fontIndex2CharId.put(fontIndex, currentCharId);

@@ -43,19 +43,19 @@ public class IggyShapeToSwfConvertor {
             if (ign.getNodeType() == IggyShapeNode.NODE_TYPE_MOVE) {
                 StyleChangeRecord scr = new StyleChangeRecord();
                 scr.stateMoveTo = true;
-                prevX = scr.moveDeltaX = makeLengthsEmX(ign.getX1());
-                prevY = scr.moveDeltaY = makeLengthsEmY(ign.getY1());
+                prevX = scr.moveDeltaX = makeLengthsEmX(ign.getTargetX());
+                prevY = scr.moveDeltaY = makeLengthsEmY(ign.getTargetY());
                 scr.fillStyles = new FILLSTYLEARRAY();
                 scr.lineStyles = new LINESTYLEARRAY();
                 scr.calculateBits();
                 retList.add(scr);
             } else {
 
-                int curX1 = makeLengthsEmX(ign.getX1());
-                int curY1 = makeLengthsEmY(ign.getY1());
+                int curX1 = makeLengthsEmX(ign.getTargetX());
+                int curY1 = makeLengthsEmY(ign.getTargetY());
 
-                int curX2 = makeLengthsEmX(ign.getX2());
-                int curY2 = makeLengthsEmY(ign.getY2());
+                int curX2 = makeLengthsEmX(ign.getControlX());
+                int curY2 = makeLengthsEmY(ign.getControlY());
 
                 if (ign.getNodeType() == IggyShapeNode.NODE_TYPE_LINE_TO) {
                     StraightEdgeRecord ser = new StraightEdgeRecord();

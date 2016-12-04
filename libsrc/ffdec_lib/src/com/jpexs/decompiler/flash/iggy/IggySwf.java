@@ -28,9 +28,9 @@ public class IggySwf implements StructureInterface {
     String name;
 
     List<IggyFont> fonts = new ArrayList<>();
-    private List<Long> font_data_addresses = new ArrayList<>();
+    // private List<Long> font_data_addresses = new ArrayList<>();
     List<IggyFont> add_fonts = new ArrayList<>();
-    private List<Long> add_font_data_addresses = new ArrayList<>();
+//    private List<Long> add_font_data_addresses = new ArrayList<>();
 
     private IggyFlashHeader64 hdr;
 
@@ -38,14 +38,16 @@ public class IggySwf implements StructureInterface {
         readFromDataStream(stream);
     }
     private List<IggyText> texts = new ArrayList<>();
-    private List<Long> text_data_addresses = new ArrayList<>();
+    //private List<Long> text_data_addresses = new ArrayList<>();
     private List<IggyText> add_texts = new ArrayList<>();
-    private List<Long> add_text_data_addresses = new ArrayList<>();
+    //private List<Long> add_text_data_addresses = new ArrayList<>();
 
-    private byte font_add_data[];
-    private List<Long> font_additional_size = new ArrayList<>();
+    //private byte font_add_data[];
+    //private List<Long> font_additional_size = new ArrayList<>();
     private IggyFontBinInfo font_bin_info[];
-    private IggySequence sequence;
+    private List<String> sequenceNames = new ArrayList<>();
+    //private List<Long> sequenceValues = new ArrayList<>();
+
     private IggyFontTypeInfo type_info[];
     private String type_info_name[];
     private IggyDeclStrings decl_strings;
@@ -54,36 +56,6 @@ public class IggySwf implements StructureInterface {
 
     public IggyFlashHeader64 getHdr() {
         return hdr;
-    }
-
-    public void replaceFontTag(int fontIndex, IggyFont newFont) throws IOException {
-        /*long newLen;
-        byte newData[];
-        try (WriteDataStreamInterface stream = new TemporaryDataStream()) {
-            newFont.writeToDataStream(stream);
-            newData = stream.getAllBytes();
-            newLen = newData.length;
-        }
-
-        //FIXME
-        Helper.writeFile("d:\\Dropbox\\jpexs-laptop\\iggi\\extraxtdir_new\\font" + fontIndex + ".bin", newData);
-
-         long oldLen = font_data_sizes[fontIndex];
-        long diff = newLen - oldLen;
-        if (diff != 0) {
-            font_data_sizes[fontIndex] = newLen;
-            for (int i = fontIndex; i < hdr.font_count; i++) {
-                font_data_addresses[i] += diff;
-            }
-            for (int i = 0; i < text_addresses.size(); i++) {
-                text_addresses.set(i, text_addresses.get(i) + diff);
-            }
-            for (int i = 0; i < font_add_off.size(); i++) {
-                font_add_off.set(i, font_add_off.get(i) + diff);
-            }
-        }
-        hdr.insertGapAfter(font_data_addresses[fontIndex], diff);
-         */
     }
 
     @Override
@@ -97,7 +69,7 @@ public class IggySwf implements StructureInterface {
         if (pad8 > 8) {
             s.seek(pad8, SeekMode.CUR);
         }
-        //here is offset [2]  - 232
+        //here is offset [2]  - 232        
         s.seek(hdr.getBaseAddress(), SeekMode.SET);
         s.readUI64(); //pad 1
 
@@ -121,12 +93,12 @@ public class IggySwf implements StructureInterface {
             switch (kind) {
                 case 22 /*FONT*/:
                     IggyFont font = new IggyFont(s);
-                    font_data_addresses.add(addr);
+                    //font_data_addresses.add(addr);
                     fonts.add(font);
                     break;
                 case 6 /*TEXT*/:
                     IggyText text = new IggyText(s);
-                    text_data_addresses.add(addr);
+                    //text_data_addresses.add(addr);
                     texts.add(text);
                     break;
                 default:
@@ -151,12 +123,12 @@ public class IggySwf implements StructureInterface {
                 switch (kind) {
                     case 22 /*FONT*/:
                         IggyFont font = new IggyFont(s);
-                        add_font_data_addresses.add(addr);
+                        //add_font_data_addresses.add(addr);
                         add_fonts.add(font);
                         break;
                     case 6 /*TEXT*/:
                         IggyText text = new IggyText(s);
-                        add_text_data_addresses.add(addr);
+                        //add_text_data_addresses.add(addr);
                         add_texts.add(text);
                         break;
                     default:
@@ -164,91 +136,6 @@ public class IggySwf implements StructureInterface {
                 }
             }
         }
-
-        /*
-        for (int i = 0; i < hdr.font_count; i++) {
-            long offset = s.readUI64();
-            font_data_addresses[i] = offset + s.position() - 8;
-            long next_offset = s.readUI64();
-            s.seek(-8, SeekMode.CUR);
-            if (next_offset == 1) {
-                font_data_sizes[i] = hdr.getFontEndAddress() - font_data_addresses[i];
-            } else {
-                font_data_sizes[i] = next_offset - offset + 8;
-            }
-        }
-        while (true) {
-            long offset = s.readUI64();
-            if (offset == 1) {
-                break;
-            }
-            long text_addr = offset + s.position() - 8;
-            text_addresses.add(text_addr);
-            long next_offset = s.readUI64();
-            s.seek(-8, SeekMode.CUR);
-            if (next_offset == 1) {
-                text_data_sizes.add(hdr.getFontEndAddress() - text_addr);
-                break;
-            } else {
-                text_data_sizes.add(next_offset - offset + 8);
-            }
-        }
-        s.readUI64(); //1
-
-        if (hdr.getImported_guid() != 0) {
-            ofs_additional = s.readUI64();
-            additional_address = ofs_additional + s.position() - 8;
-            font_additional_addresses.add(additional_address);
-            font_additional_size.add(hdr.getFontEndAddress() - font_additional_addresses.get(0));
-
-            if (s.readUI8(font_additional_addresses.get(0)) != 22) { //additional is not text
-                // font je hozen mezi infa...
-                for (int i = 0; i < text_addresses.size(); i++) { //walk all already read texts
-                    if (s.readUI8(text_addresses.get(i)) == 22) { //check if it's text
-                        long pomoff;
-                        long pomsize;
-                        pomoff = text_addresses.get(i);
-                        pomsize = text_data_sizes.get(i);
-                        text_addresses.set(i, font_additional_addresses.get(0));
-                        text_data_sizes.set(i, font_additional_size.get(0));
-                        font_additional_addresses.set(0, pomoff);
-                        font_additional_size.set(0, pomsize);
-                    }
-                }
-            }
-        }*/
-
- /*        if (s.readUI8(s.position()) == 22) { //22 = Text
-            byte[] textHdr = s.readBytes(IggyText.STRUCT_SIZE);
-            String textStr = s.readWChar();
-            s.pad8bytes();
-        }*/
-        //here is offset [3]  - 744
-        /* fonts = new ArrayList<>();
-        for (int i = 0; i < hdr.font_count; i++) {
-            s.seek(font_data_addresses[i], SeekMode.SET);
-            byte font_data[] = s.readBytes((int) font_data_sizes[i]);
-            //FIXME
-            //Helper.writeFile("d:\\Dropbox\\jpexs-laptop\\iggi\\extraxtdir_orig\\font" + i + ".bin", font_data);
-            s.seek(-font_data_sizes[i], SeekMode.CUR);
-            IggyFont font = new IggyFont(s);
-            fonts.add(font);
-        }
-
-        for (int i = 0;
-                i < text_addresses.size();
-                i++) {
-            s.seek(text_addresses.get(i), SeekMode.SET);
-            texts.add(new IggyText(s));
-            //byte text_data[] = s.readBytes((int) (long) text_data_sizes.get(i));
-            //text_data_bytes.add(text_data);
-        }
-
-        if (hdr.getImported_guid()
-                != 0) {
-            s.seek(font_additional_addresses.get(0), SeekMode.SET);
-            font_add_data = s.readBytes((int) (long) font_additional_size.get(0));
-        }*/
         s.seek(hdr.getFontEndAddress(), SeekMode.SET);
         //here is offset [4]  - 856 ?        
         font_bin_info = new IggyFontBinInfo[(int) hdr.font_count];
@@ -256,9 +143,33 @@ public class IggySwf implements StructureInterface {
             font_bin_info[i] = new IggyFontBinInfo(s);
         }
 
-        s.seek(hdr.getSequenceStartAddress1(), SeekMode.SET);
-        sequence = new IggySequence(s);
+        sequenceNames = new ArrayList<>();
 
+        long seq_addresses[] = new long[]{hdr.getSequenceStartAddress1(), hdr.getSequenceStartAddress2(), hdr.getSequenceStartAddress3()};
+        long seq_name_addresses[] = new long[3];
+        for (int i = 0; i < 3; i++) {
+            if (seq_addresses[i] == 0) {
+                seq_name_addresses[i] = 0;
+                //0
+            } else {
+                s.seek(seq_addresses[i], SeekMode.SET);
+                long ofs_seq_name = s.readUI64();
+                seq_name_addresses[i] = ofs_seq_name == 1 ? 0 : ofs_seq_name + s.position() - 8;
+                s.readUI64(); //is this crucial?
+            }
+        }
+
+        for (int i = 0; i < 3; i++) {
+            if (seq_name_addresses[i] > 0) {
+                s.seek(seq_name_addresses[i], SeekMode.SET);
+                sequenceNames.add(s.readWChar());
+            } else {
+                sequenceNames.add(null);
+            }
+        }
+        s.pad8bytes();
+
+        //sequence = new IggySequence(s);
         s.seek(hdr.getTypeFontsAddress(), SeekMode.SET);
         type_info = new IggyFontTypeInfo[(int) hdr.font_count];
         type_info_name = new String[(int) hdr.font_count];
@@ -266,7 +177,8 @@ public class IggySwf implements StructureInterface {
             type_info[i] = new IggyFontTypeInfo(s);
         }
         for (int i = 0; i < hdr.font_count; i++) {
-            type_info_name[i] = type_info[i].readFontInfo(s);
+            s.seek(type_info[i].getLocal_name_ofs_pos() + type_info[i].ofs_local_name, SeekMode.SET);
+            type_info_name[i] = s.readWChar();
         }
 
         s.seek(hdr.getDeclStringsAddress(), SeekMode.SET);
@@ -290,64 +202,114 @@ public class IggySwf implements StructureInterface {
         ib.write16bitArray(name.length() + 1);
         ib.writeTwoPaddingBytes();
         ib.write64bitPointerArray(64);
-        for (int i = 0; i < font_data_addresses.size(); i++) {
-            long offset = font_data_addresses.get(i) - s.position();
-            s.writeUI64(offset);
+        long posBeforeOffsets = s.position();
+
+        final int FILL_LATER = 1;
+
+        List<Long> fontPosFillLater = new ArrayList<>();
+
+        for (int i = 0; i < fonts.size(); i++) {
+            fontPosFillLater.add(s.position());
+            s.writeUI64(FILL_LATER);
         }
-        for (int i = 0; i < text_data_addresses.size(); i++) {
-            long offset = text_data_addresses.get(i) - s.position();
-            s.writeUI64(offset);
+        List<Long> textPosFillLater = new ArrayList<>();
+        for (int i = 0; i < texts.size(); i++) {
+            textPosFillLater.add(s.position());
+            s.writeUI64(FILL_LATER);
         }
         s.writeUI64(1);
-        if (additional_address != 0) {
-            long ofs_additional = additional_address - s.position();
-            s.writeUI64(ofs_additional);
+
+        long addPosFillLater = s.position();
+        s.writeUI64(FILL_LATER);
+        long posAfter = posBeforeOffsets + 64 * 8;
+        long curPos = s.position();
+        long numLeft = posAfter - curPos;
+        long ofsLeft = numLeft / 8;
+        for (int i = 0; i < ofsLeft - 1; i++) {
+            s.writeUI64(FILL_LATER);
         }
 
-        while (s.position() < font_data_addresses.get(0)) {
-            s.writeUI64(1);
-        }
         for (int i = 0; i < fonts.size(); i++) {
-            s.seek(font_data_addresses.get(i), SeekMode.SET);
+            s.setOlderOffsetToThisPos(fontPosFillLater.get(i));
             fonts.get(i).writeToDataStream(s);
         }
         for (int i = 0; i < texts.size(); i++) {
-            s.seek(text_data_addresses.get(i), SeekMode.SET);
+            s.setOlderOffsetToThisPos(textPosFillLater.get(i));
             texts.get(i).writeToDataStream(s);
         }
 
-        if (hdr.getImported_guid() != 0) {
+        if (!add_fonts.isEmpty() || !add_texts.isEmpty()) {
+            s.setOlderOffsetToThisPos(addPosFillLater);
+
+            List<Long> addFontPosFillLater = new ArrayList<>();
+
             for (int i = 0; i < add_fonts.size(); i++) {
-                s.seek(add_font_data_addresses.get(i), SeekMode.SET);
-                fonts.get(i).writeToDataStream(s);
+                addFontPosFillLater.add(s.position());
+                s.writeUI64(FILL_LATER);
+            }
+            List<Long> addTextPosFillLater = new ArrayList<>();
+            for (int i = 0; i < add_texts.size(); i++) {
+                addTextPosFillLater.add(s.position());
+                s.writeUI64(FILL_LATER);
+            }
+            s.writeUI64(FILL_LATER);
+            for (int i = 0; i < add_fonts.size(); i++) {
+                s.setOlderOffsetToThisPos(addFontPosFillLater.get(i));
+                add_fonts.get(i).writeToDataStream(s);
             }
             for (int i = 0; i < add_texts.size(); i++) {
-                s.seek(add_text_data_addresses.get(i), SeekMode.SET);
-                texts.get(i).writeToDataStream(s);
+                s.setOlderOffsetToThisPos(addTextPosFillLater.get(i));
+                add_texts.get(i).writeToDataStream(s);
             }
         }
-        s.seek(hdr.getFontEndAddress(), SeekMode.SET);
+        s.setOlderOffsetToThisPos(hdr.getFont_end_ofs_pos());
         ib.writeConstLengthArray(IggyIndexBuilder.CONST_BIN_INFO_SIZE, hdr.font_count);
         for (int i = 0; i < hdr.font_count; i++) {
             font_bin_info[i].writeToDataStream(s);
         }
 
-        s.seek(hdr.getSequenceStartAddress1(), SeekMode.SET);
-        sequence.writeToDataStream(s);
+        long seq_ofs_pos[] = new long[]{hdr.getSequence_start1_ofs_pos(), hdr.getSequence_start2_ofs_pos(), hdr.getSequence_start3_ofs_pos()};
+        long off_seq_expected[] = new long[]{hdr.off_sequence_start1, hdr.off_sequence_start2, hdr.off_sequence_start3};
+
+        long seq_name_fill_later[] = new long[3];
+
+        s.setOlderOffsetToThisPos(seq_ofs_pos[0]);
+        s.writeUI64(1);
+        s.writeUI64(1);
+        ib.writeLengthCustom(16, new int[]{0}, new int[]{2});
+
+        seq_name_fill_later[2] = s.position();
+        s.setOlderOffsetToThisPos(seq_ofs_pos[2]);
+        s.writeUI64(FILL_LATER);
+        s.writeUI64(0);
+        ib.writeConstLength(IggyIndexBuilder.CONST_SEQUENCE_SIZE);
+        for (int i = 0; i < 3; i++) {
+            if (sequenceNames.get(i) != null) {
+                s.setOlderOffsetToThisPos(seq_name_fill_later[i]);
+                ib.write16bitArray(sequenceNames.get(i).length() + 1);
+                s.writeWChar(sequenceNames.get(i));
+            }
+        }
+        s.pad8bytes();
+        ib.pad8bytes();
 
         ib.writeConstLengthArray(IggyIndexBuilder.CONST_TYPE_INFO_SIZE, hdr.font_count);
-        s.seek(hdr.getTypeFontsAddress(), SeekMode.SET);
+        s.setOlderOffsetToThisPos(hdr.getType_fonts_ofs_pos());
+        //s.seek(hdr.getTypeFontsAddress(), SeekMode.SET);
         for (int i = 0; i < hdr.font_count; i++) {
             type_info[i].writeToDataStream(s);
         }
 
         for (int i = 0; i < hdr.font_count; i++) {
             ib.write16bitArray(type_info_name[i].length() + 1);
-            type_info[i].writeFontInfo(type_info_name[i], s);
+            s.setOlderOffsetToThisPos(type_info[i].getLocal_name_ofs_pos());
+            s.writeWChar(type_info_name[i]);
         }
         s.pad8bytes();
         ib.pad8bytes();
-        s.seek(hdr.getDeclStringsAddress(), SeekMode.SET);
+
+        s.setOlderOffsetToThisPos(hdr.getDecl_strings_ofs_pos());
+        //s.seek(hdr.getDeclStringsAddress(), SeekMode.SET);
         decl_strings.writeToDataStream(s);
     }
 

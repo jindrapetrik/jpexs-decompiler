@@ -45,16 +45,17 @@ public class IggyShapeNode implements StructureInterface {
 
     private boolean first;
 
-    public IggyShapeNode(float x1, float y1, float x2, float y2, int node_type, int node_subtype, int zer1, int zer2, long isstart) {
-        this.targetX = x1;
-        this.targetY = y1;
-        this.controlX = x2;
-        this.controlY = y2;
+    public IggyShapeNode(float targetX, float targetY, float controlX, float controlY, int node_type, int node_subtype, boolean first) {
+        this.targetX = targetX;
+        this.targetY = targetY;
+        this.controlX = controlX;
+        this.controlY = controlY;
         this.node_type = node_type;
         this.node_subtype = node_subtype;
-        this.zer1 = zer1;
-        this.zer2 = zer2;
-        this.isstart = isstart;
+        this.zer1 = 0;
+        this.zer2 = 0;
+        this.first = first;
+        this.isstart = first ? 0 : 1;
     }
 
     public IggyShapeNode(ReadDataStreamInterface s, boolean first) throws IOException {
@@ -98,19 +99,19 @@ public class IggyShapeNode implements StructureInterface {
         s.writeUI32(isstart);
     }
 
-    public float getX1() {
+    public float getTargetX() {
         return targetX;
     }
 
-    public float getY1() {
+    public float getTargetY() {
         return targetY;
     }
 
-    public float getX2() {
+    public float getControlX() {
         return controlX;
     }
 
-    public float getY2() {
+    public float getControlY() {
         return controlY;
     }
 

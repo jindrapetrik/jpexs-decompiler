@@ -227,4 +227,15 @@ public abstract class AbstractDataStream implements DataStreamInterface {
         writeUI64(actual);
         seek(curPos, SeekMode.SET);
     }
+
+    public void setOlderOffsetToThisPosCheck(long savedPos, long expected) throws IOException {
+        if (expected == 1) {
+            return;
+        }
+        long curPos = position();
+        long actual = curPos - savedPos;
+        if (actual != expected) {
+            throw new RuntimeException("Expected " + expected + " but found actual " + actual + ". Diff:" + ((actual - expected) > 0 ? "+" : "") + (actual - expected));
+        }
+    }
 }

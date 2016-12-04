@@ -4,20 +4,14 @@ import com.jpexs.decompiler.flash.iggy.IggyCharKerning;
 import com.jpexs.decompiler.flash.iggy.IggyCharOffset;
 import com.jpexs.decompiler.flash.iggy.IggyFontBinInfo;
 import com.jpexs.decompiler.flash.iggy.IggyFontTypeInfo;
-import com.jpexs.decompiler.flash.iggy.IggySequence;
 import com.jpexs.decompiler.flash.iggy.IggyShape;
 import com.jpexs.decompiler.flash.iggy.IggyShapeNode;
 import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 /**
@@ -73,7 +67,7 @@ public class IggyIndexBuilder {
     private static final int CONST_VAL_GENERAL_FONT_INFO_SIZE = 112;
     private static final int CONST_VAL_GENERAL_FONT_INFO2_SIZE = 240;
     private static final int CONST_VAL_TEXT_DATA_SIZE = 104;
-    private static final int CONST_VAL_SEQUENCE_SIZE = IggySequence.STRUCT_SIZE;
+    private static final int CONST_VAL_SEQUENCE_SIZE = 16;
 
     public static final int CONST_SHAPE_NODE_SIZE = 0;
     public static final int CONST_KERNING_RECORD_SIZE = 1;
@@ -175,8 +169,12 @@ public class IggyIndexBuilder {
         long ret = 0;
         long rem = cnt;
         while (true) {
+            if (rem == 0) {
+                break;
+            }
             if (rem == 1) {
-                return writeIndex(constIndex, false, 0);
+                ret += writeIndex(constIndex, false, 0);
+                break;
             }
             if (rem <= 64) {
                 ret += writeIndex(0x80 + (int) rem - 1, false, constIndex);
@@ -307,10 +305,7 @@ public class IggyIndexBuilder {
                 int index;
 
                 indexStream.writeUI8((int) val);
-                if ((index = (int) val) < 0) {
-                    LOGGER.severe(String.format("< 0xC0: Cannot read index."));
-                    return 0;
-                }
+                index = (int) val;
 
                 if (index >= constTable.size()) {
                     LOGGER.severe(String.format("< 0xC0: index is greater than index_table_size. %x > %x", index, constTable.size()));

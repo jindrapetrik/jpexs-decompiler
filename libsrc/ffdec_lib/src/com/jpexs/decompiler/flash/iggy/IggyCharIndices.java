@@ -25,6 +25,12 @@ public class IggyCharIndices implements StructureInterface {
 
     private long charCount;
 
+    public IggyCharIndices(List<Character> chars) {
+        this.chars = chars;
+        this.charCount = chars.size();
+        padd = 0;
+    }
+
     public IggyCharIndices(ReadDataStreamInterface stream, long charCount) throws IOException {
         this.charCount = charCount;
         readFromDataStream(stream);

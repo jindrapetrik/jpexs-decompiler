@@ -99,6 +99,67 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
     private long decl_strings_address;
     private long type_fonts_address;
 
+    private long base_ofs_pos;
+    private long sequence_end_ofs_pos;
+    private long font_end_ofs_pos;
+    private long sequence_start1_ofs_pos;
+    private long sequence_start2_ofs_pos;
+    private long sequence_start3_ofs_pos;
+    private long names_ofs_pos;
+    private long unk78_ofs_pos;
+    private long last_section_ofs_pos;
+    private long flash_filename_ofs_pos;
+    private long decl_strings_ofs_pos;
+    private long type_fonts_ofs_pos;
+
+    public long getBase_ofs_pos() {
+        return base_ofs_pos;
+    }
+
+    public long getSequence_end_ofs_pos() {
+        return sequence_end_ofs_pos;
+    }
+
+    public long getFont_end_ofs_pos() {
+        return font_end_ofs_pos;
+    }
+
+    public long getSequence_start1_ofs_pos() {
+        return sequence_start1_ofs_pos;
+    }
+
+    public long getSequence_start2_ofs_pos() {
+        return sequence_start2_ofs_pos;
+    }
+
+    public long getSequence_start3_ofs_pos() {
+        return sequence_start3_ofs_pos;
+    }
+
+    public long getNames_ofs_pos() {
+        return names_ofs_pos;
+    }
+
+    public long getUnk78_ofs_pos() {
+        return unk78_ofs_pos;
+    }
+
+    public long getLast_section_ofs_pos() {
+        return last_section_ofs_pos;
+    }
+
+    public long getFlash_filename_ofs_pos() {
+        return flash_filename_ofs_pos;
+    }
+
+    public long getDecl_strings_ofs_pos() {
+        return decl_strings_ofs_pos;
+    }
+
+    public long getType_fonts_ofs_pos() {
+        return type_fonts_ofs_pos;
+    }
+
     /**
      * Updates all addresses by inserting gap
      *
@@ -146,6 +207,10 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
     }
 
     public long getSequenceStartAddress2() {
+        return sequence_start_address2;
+    }
+
+    public long getSequenceStartAddress3() {
         return sequence_start_address3;
     }
 
@@ -175,21 +240,27 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
 
     @Override
     public void readFromDataStream(ReadDataStreamInterface stream) throws IOException {
+        base_ofs_pos = stream.position();
         off_base = stream.readUI64();
         base_address = off_base == 1 ? 0 : off_base + stream.position() - 8;
 
+        sequence_end_ofs_pos = stream.position();
         off_sequence_end = stream.readUI64();
         sequence_end_address = off_sequence_end == 1 ? 0 : off_sequence_end + stream.position() - 8;
 
+        font_end_ofs_pos = stream.position();
         off_font_end = stream.readUI64();
         font_end_address = off_font_end == 1 ? 0 : off_font_end + stream.position() - 8;
 
+        sequence_start1_ofs_pos = stream.position();
         off_sequence_start1 = stream.readUI64();
         sequence_start_address1 = off_sequence_start1 == 1 ? 0 : off_sequence_start1 + stream.position() - 8;
 
+        sequence_start2_ofs_pos = stream.position();
         off_sequence_start2 = stream.readUI64();
         sequence_start_address2 = off_sequence_start2 == 1 ? 0 : off_sequence_start2 + stream.position() - 8;
 
+        sequence_start3_ofs_pos = stream.position();
         off_sequence_start3 = stream.readUI64();
         sequence_start_address3 = off_sequence_start3 == 1 ? 0 : off_sequence_start3 + stream.position() - 8;
 
@@ -209,23 +280,29 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
         imported_guid = stream.readUI64();
         my_guid = stream.readUI64();
 
+        names_ofs_pos = stream.position();
         off_names = stream.readUI64();
         names_address = off_names == 1 ? 0 : off_names + stream.position() - 8;
 
+        unk78_ofs_pos = stream.position();
         off_unk78 = stream.readUI64();
         unk78_address = off_unk78 == 1 ? 0 : off_unk78 + stream.position() - 8;
 
         unk80 = stream.readUI64(); //Maybe number of imports/names pointed by names_offset
 
+        last_section_ofs_pos = stream.position();
         off_last_section = stream.readUI64();
         last_section_address = off_last_section == 1 ? 0 : off_last_section + stream.position() - 8;
 
+        flash_filename_ofs_pos = stream.position();
         off_flash_filename = stream.readUI64();
         flash_filename_address = off_flash_filename == 1 ? 0 : off_flash_filename + stream.position() - 8;
 
+        decl_strings_ofs_pos = stream.position();
         off_decl_strings = stream.readUI64(); //relative offset to as3 code (16 bytes header + abc blob)
         decl_strings_address = off_decl_strings == 1 ? 0 : off_decl_strings + stream.position() - 8;
 
+        type_fonts_ofs_pos = stream.position();
         off_type_of_fonts = stream.readUI64(); //relative offset to as3 file names table (or classes names or whatever)
         type_fonts_address = off_type_of_fonts == 1 ? 0 : off_type_of_fonts + stream.position() - 8;
 

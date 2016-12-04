@@ -36,6 +36,16 @@ public class IggyCharKerning implements StructureInterface {
         return kerningOffsets;
     }
 
+    public IggyCharKerning(List<Character> charsA, List<Character> charsB, List<Short> kerningOffsets) {
+        if ((charsA.size() != charsB.size()) || (charsB.size() != kerningOffsets.size())) {
+            throw new RuntimeException("sizes of charsA, charsB and offsets must match");
+        }
+        this.kernCount = charsA.size();
+        this.charsA = charsA;
+        this.charsB = charsB;
+        this.kerningOffsets = kerningOffsets;
+    }
+
     public IggyCharKerning(ReadDataStreamInterface stream, long kernCount) throws IOException {
         this.kernCount = kernCount;
         readFromDataStream(stream);

@@ -108,9 +108,7 @@ public class IggyFont extends IggyTag {
     IggyCharAdvances charScales;
     IggyCharKerning charKernings;
 
-    byte[] padTo4byteBoundary;
-
-    public IggyFont(int type, int fontId, byte[] zeroone, int char_count2, int ascent, int descent, int leading, long flags, long kern_count, float[] unk_float, long zero_padd, long what_2, long zero_padd_2, long one_padd, int xscale, int yscale, long zero_padd_3, float ssr1, float ssr2, long char_count, long zero_padd_4, long what_3, byte[] zeroes48a, byte[] zeroes48b, float sss1, long one_padd2, float sss2, long one_padd3, float sss3, long one_padd4, float sss4, long one_padd5, String name, List<IggyCharOffset> charOffsets, List<IggyShape> glyphs, IggyCharIndices codePoints, IggyCharAdvances charScales, IggyCharKerning charKernings, byte[] padTo4byteBoundary) {
+    public IggyFont(int type, int fontId, byte[] zeroone, int char_count2, int ascent, int descent, int leading, long flags, long kern_count, float[] unk_float, long zero_padd, long what_2, long zero_padd_2, long one_padd, int xscale, int yscale, long zero_padd_3, float ssr1, float ssr2, long char_count, long zero_padd_4, long what_3, byte[] zeroes48a, byte[] zeroes48b, float sss1, long one_padd2, float sss2, long one_padd3, float sss3, long one_padd4, float sss4, long one_padd5, String name, List<IggyCharOffset> charOffsets, List<IggyShape> glyphs, IggyCharIndices codePoints, IggyCharAdvances charScales, IggyCharKerning charKernings) {
         this.type = type;
         this.fontId = fontId;
         this.zeroone = zeroone;
@@ -149,7 +147,6 @@ public class IggyFont extends IggyTag {
         this.codePoints = codePoints;
         this.charScales = charScales;
         this.charKernings = charKernings;
-        this.padTo4byteBoundary = padTo4byteBoundary;
     }
 
     public IggyFont(ReadDataStreamInterface stream) throws IOException {
@@ -276,8 +273,10 @@ public class IggyFont extends IggyTag {
             }
             glyphs = new ArrayList<>();
             for (int i = 0; i < char_count; i++) {
+                //System.err.println("read char " + (i + 1) + "/" + char_count);
                 long addr = charAddresses.get(i);
                 if (addr != 0) {
+                    //System.err.println("read chars at offset " + addr);
                     s.seek(addr, SeekMode.SET);
                     glyphs.add(new IggyShape(s));
                 } else {
@@ -504,6 +503,110 @@ public class IggyFont extends IggyTag {
     @Override
     public String toString() {
         return String.format("IggyFontTag (%04X)", ID);
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    public void setFontId(int fontId) {
+        this.fontId = fontId;
+    }
+
+    public void setCharCount2(int char_count2) {
+        this.char_count2 = char_count2;
+    }
+
+    public void setAscent(int ascent) {
+        this.ascent = ascent;
+    }
+
+    public void setDescent(int descent) {
+        this.descent = descent;
+    }
+
+    public void setLeading(int leading) {
+        this.leading = leading;
+    }
+
+    public void setFlags(long flags) {
+        this.flags = flags;
+    }
+
+    public void setUnkFloat(float[] unk_float) {
+        this.unk_float = unk_float;
+    }
+
+    public void setWhat2(long what_2) {
+        this.what_2 = what_2;
+    }
+
+    public void setXScale(int xscale) {
+        this.xscale = xscale;
+    }
+
+    public void setYScale(int yscale) {
+        this.yscale = yscale;
+    }
+
+    public void setSsr1(float ssr1) {
+        this.ssr1 = ssr1;
+    }
+
+    public void setSsr2(float ssr2) {
+        this.ssr2 = ssr2;
+    }
+
+    public void setCharCount(long char_count) {
+        this.char_count = char_count;
+    }
+
+    public void setWhat3(long what_3) {
+        this.what_3 = what_3;
+    }
+
+    public void setSubName(String subName) {
+        this.subName = subName;
+    }
+
+    public void setSss1(float sss1) {
+        this.sss1 = sss1;
+    }
+
+    public void setSss2(float sss2) {
+        this.sss2 = sss2;
+    }
+
+    public void setSss3(float sss3) {
+        this.sss3 = sss3;
+    }
+
+    public void setSss4(float sss4) {
+        this.sss4 = sss4;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setCharOffsets(List<IggyCharOffset> charOffsets) {
+        this.charOffsets = charOffsets;
+    }
+
+    public void setGlyphs(List<IggyShape> glyphs) {
+        this.glyphs = glyphs;
+    }
+
+    public void setCodePoints(IggyCharIndices codePoints) {
+        this.codePoints = codePoints;
+    }
+
+    public void setCharScales(IggyCharAdvances charScales) {
+        this.charScales = charScales;
+    }
+
+    public void setCharKernings(IggyCharKerning charKernings) {
+        this.charKernings = charKernings;
     }
 
 }

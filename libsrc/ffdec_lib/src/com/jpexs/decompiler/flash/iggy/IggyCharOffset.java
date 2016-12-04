@@ -38,15 +38,15 @@ public class IggyCharOffset implements StructureInterface {
         readFromDataStream(stream);
     }
 
-    public IggyCharOffset(long zero, int ischar1, int ischar2, long zero2, int xscale, int yscale, long zero3, long offset) {
-        this.zero = zero;
+    public IggyCharOffset(int ischar1, int ischar2, int xscale, int yscale) {
+        this.zero = 0;
         this.ischar1 = ischar1;
         this.ischar2 = ischar2;
-        this.zero2 = zero2;
+        this.zero2 = 0;
         this.xscale = xscale;
         this.yscale = yscale;
-        this.zero3 = zero3;
-        this.offset = offset;
+        this.zero3 = 0;
+        this.offset = 0;
     }
 
     @Override

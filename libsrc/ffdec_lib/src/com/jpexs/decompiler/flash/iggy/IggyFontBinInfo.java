@@ -15,7 +15,7 @@ public class IggyFontBinInfo implements StructureInterface {
     public static final int STRUCT_SIZE = 96;
 
     @IggyFieldType(DataType.uint64_t)
-    long size_of_this_info = 96;
+    long size_of_this_info = STRUCT_SIZE;
     @IggyFieldType(value = DataType.uint16_t, count = 4)
     int font_specific[];
     @IggyFieldType(DataType.float_t)
