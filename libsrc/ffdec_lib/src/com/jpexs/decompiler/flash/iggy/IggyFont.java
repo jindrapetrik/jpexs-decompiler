@@ -264,12 +264,19 @@ public class IggyFont extends IggyTag {
             //here is offset [7]  - 1136
             s.seek(abs_start_of_char_struct, SeekMode.SET);
             charOffsets = new ArrayList<>();
+            List<Long> charAddresses = new ArrayList<>();
             for (int i = 0; i < char_count; i++) {
-                charOffsets.add(new IggyCharOffset(s));
+                IggyCharOffset iggyOffset = new IggyCharOffset(s);
+                charOffsets.add(iggyOffset);
+                if (iggyOffset.offset == 1) {
+                    charAddresses.add(0L);
+                } else {
+                    charAddresses.add(iggyOffset.offset + s.position() - 8);
+                }
             }
             glyphs = new ArrayList<>();
             for (int i = 0; i < char_count; i++) {
-                long addr = charOffsets.get(i).getAddress();
+                long addr = charAddresses.get(i);
                 if (addr != 0) {
                     s.seek(addr, SeekMode.SET);
                     glyphs.add(new IggyShape(s));
@@ -374,14 +381,18 @@ public class IggyFont extends IggyTag {
             s.setOlderOffsetToThisPos(start_of_char_struct_ofs_pos);
 
             ib.writeConstLengthArray(IggyIndexBuilder.CONST_CHAR_OFFSET_SIZE, charOffsets.size());
+
+            List<Long> toFixOffsets = new ArrayList<>();
             //offsets of shapes
             for (IggyCharOffset ofs : charOffsets) {
+                ofs.offset = FILL_LATER_IF_AVAILABLE;
                 ofs.writeToDataStream(s);
+                toFixOffsets.add(s.position() - 8);
             }
-            //long afterOfsAddr = s.position();
             for (int i = 0; i < glyphs.size(); i++) {
                 IggyShape shp = glyphs.get(i);
                 if (shp != null) {
+                    s.setOlderOffsetToThisPos(toFixOffsets.get(i));
                     shp.writeToDataStream(s);
                 }
             }

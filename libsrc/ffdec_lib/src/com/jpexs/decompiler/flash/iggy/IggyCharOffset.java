@@ -32,13 +32,7 @@ public class IggyCharOffset implements StructureInterface {
     @IggyFieldType(DataType.uint32_t)
     long zero3;
     @IggyFieldType(DataType.uint64_t)
-    private long address;
-
     long offset;
-
-    public long getAddress() {
-        return address;
-    }
 
     public IggyCharOffset(ReadDataStreamInterface stream) throws IOException {
         readFromDataStream(stream);
@@ -65,12 +59,6 @@ public class IggyCharOffset implements StructureInterface {
         yscale = stream.readUI16();
         zero3 = stream.readUI32();
         offset = stream.readUI64();
-        if (ischar1 > 0) {
-            address = offset + stream.position() - 8;
-        } else {
-            address = 0;
-            LOGGER.finer(String.format("Empty char"));
-        }
     }
 
     @Override
