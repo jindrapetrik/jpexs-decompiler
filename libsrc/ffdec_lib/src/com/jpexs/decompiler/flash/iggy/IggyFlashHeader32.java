@@ -1,6 +1,8 @@
 package com.jpexs.decompiler.flash.iggy;
 
 import com.jpexs.decompiler.flash.iggy.annotations.IggyFieldType;
+import com.jpexs.decompiler.flash.iggy.streams.ReadDataStreamInterface;
+import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
 import java.io.IOException;
 
 /**
@@ -83,12 +85,12 @@ public class IggyFlashHeader32 implements IggyFlashHeaderInterface {
     // for the object.
     // A DefineEditText-like object can be easily spotted and apparently uses type code 0x06 (or 0xFF06) but as stated above,
     // it is written in a different way.
-    public IggyFlashHeader32(AbstractDataStream stream) throws IOException {
+    public IggyFlashHeader32(ReadDataStreamInterface stream) throws IOException {
         readFromDataStream(stream);
     }
 
     @Override
-    public void readFromDataStream(AbstractDataStream stream) throws IOException {
+    public void readFromDataStream(ReadDataStreamInterface stream) throws IOException {
         main_offset = stream.readUI32();
         as3_section_offset = stream.readUI32();
         unk_offset = stream.readUI32();
@@ -124,7 +126,7 @@ public class IggyFlashHeader32 implements IggyFlashHeaderInterface {
     }
 
     @Override
-    public void writeToDataStream(AbstractDataStream stream) throws IOException {
+    public void writeToDataStream(WriteDataStreamInterface stream) throws IOException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

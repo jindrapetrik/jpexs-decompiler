@@ -2,6 +2,9 @@ package com.jpexs.decompiler.flash.iggy;
 
 import com.jpexs.decompiler.flash.iggy.annotations.IggyArrayFieldType;
 import com.jpexs.decompiler.flash.iggy.annotations.IggyFieldType;
+import com.jpexs.decompiler.flash.iggy.streams.ReadDataStreamInterface;
+import com.jpexs.decompiler.flash.iggy.streams.StructureInterface;
+import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
 import java.io.IOException;
 
 /**
@@ -13,6 +16,8 @@ import java.io.IOException;
  * Based of works of somebody called eternity.
  */
 public class IggyHeader implements StructureInterface {
+
+    public static int STRUCT_SIZE = 32;
 
     public static long MAGIC = 0xED0A6749;
 
@@ -50,7 +55,7 @@ public class IggyHeader implements StructureInterface {
     @IggyFieldType(value = DataType.uint32_t)
     private long numSubfiles;
 
-    public IggyHeader(AbstractDataStream stream) throws IOException {
+    public IggyHeader(ReadDataStreamInterface stream) throws IOException {
         readFromDataStream(stream);
     }
 
@@ -90,7 +95,7 @@ public class IggyHeader implements StructureInterface {
     }
 
     @Override
-    public void readFromDataStream(AbstractDataStream stream) throws IOException {
+    public void readFromDataStream(ReadDataStreamInterface stream) throws IOException {
         magic = stream.readUI32();
         if (magic != IggyHeader.MAGIC) {
             throw new IOException("Invalid Iggy file");
@@ -106,8 +111,16 @@ public class IggyHeader implements StructureInterface {
     }
 
     @Override
-    public void writeToDataStream(AbstractDataStream stream) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void writeToDataStream(WriteDataStreamInterface s) throws IOException {
+        s.writeUI32(magic);
+        s.writeUI32(version);
+        s.writeUI8(platform1);
+        s.writeUI8(platform2);
+        s.writeUI8(platform3);
+        s.writeUI8(platform4);
+        s.writeUI32(unk_0C);
+        s.writeBytes(reserved);
+        s.writeUI32(numSubfiles);
     }
 
     public boolean is64() {

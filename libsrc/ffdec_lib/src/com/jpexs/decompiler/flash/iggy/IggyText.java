@@ -2,6 +2,11 @@ package com.jpexs.decompiler.flash.iggy;
 
 import com.jpexs.decompiler.flash.iggy.annotations.IggyArrayFieldType;
 import com.jpexs.decompiler.flash.iggy.annotations.IggyFieldType;
+import com.jpexs.decompiler.flash.iggy.streams.IggyIndexBuilder;
+import com.jpexs.decompiler.flash.iggy.streams.ReadDataStreamInterface;
+import com.jpexs.decompiler.flash.iggy.streams.SeekMode;
+import com.jpexs.decompiler.flash.iggy.streams.StructureInterface;
+import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
 import java.io.IOException;
 
 /**
@@ -9,6 +14,8 @@ import java.io.IOException;
  * @author JPEXS
  */
 public class IggyText implements StructureInterface {
+
+    public static final int STRUCT_SIZE = 104;
 
     public static final int ID = 0xFF06;
 
@@ -55,7 +62,9 @@ public class IggyText implements StructureInterface {
     long one;
     @IggyArrayFieldType(value = DataType.uint8_t, count = 32)
     byte[] some; // same for different fonts
-    @IggyArrayFieldType(value = DataType.widechar_t)
+    long ofs_name;
+
+    @IggyArrayFieldType(value = DataType.wchar_t)
     String initialText; //till end of info file?
 
     public IggyText(int type, int order_in_iggy_file, byte[] zeroone, float par1, float par2, float par3, float par4, int enum_hex, int for_which_font_order_in_iggyfile, long zero, long one, byte[] some, long offset_of_name, String name) {
@@ -74,12 +83,12 @@ public class IggyText implements StructureInterface {
         this.initialText = name;
     }
 
-    public IggyText(AbstractDataStream stream) throws IOException {
+    public IggyText(ReadDataStreamInterface stream) throws IOException {
         this.readFromDataStream(stream);
     }
 
     @Override
-    public void readFromDataStream(AbstractDataStream s) throws IOException {
+    public void readFromDataStream(ReadDataStreamInterface s) throws IOException {
 
         type = s.readUI16();
         //characterId - iggy Id
@@ -92,51 +101,42 @@ public class IggyText implements StructureInterface {
         par3 = s.readFloat();
         par4 = s.readFloat();
 
-        //flags
         enum_hex = s.readUI16();
-
-        int en = enum_hex;
-
-        //guessing - it could be like DefineEditText?...
-        hasText = ((en >> 0) & 1) == 1;
-        wordWrap = ((en >> 1) & 1) == 1;
-        multiline = ((en >> 2) & 1) == 1;
-        password = ((en >> 3) & 1) == 1;
-        readOnly = ((en >> 4) & 1) == 1;
-        hasTextColor = ((en >> 5) & 1) == 1;
-        hasMaxLength = ((en >> 6) & 1) == 1;
-        hasFont = ((en >> 7) & 1) == 1;
-        hasFontClass = ((en >> 8) & 1) == 1;
-        autosize = ((en >> 9) & 1) == 1;
-        hasLayout = ((en >> 10) & 1) == 1;
-        noSelect = ((en >> 11) & 1) == 1;
-        border = ((en >> 12) & 1) == 1;
-        wasStatic = ((en >> 13) & 1) == 1;
-        html = ((en >> 14) & 1) == 1;
-        useOutlines = ((en >> 15) & 1) == 1;
-
-        //if hasFont?
         fontIndex = s.readUI16(); //fontId
-        //if hasFontClass - readString?
-        //if hasFont || hasFontClass - readFontHeight?
-        //if hasTextColor....?
         zero = s.readUI32();
         one = s.readUI64(); //01CB FF33 3333
         some = s.readBytes(32); // [6] => 40, [24] => 8
-        StringBuilder textBuilder = new StringBuilder();
-        do {
-            char c = (char) s.readUI16();
-            if (c == '\0') {
-                break;
-            }
-            textBuilder.append(c);
-        } while (true);
-        initialText = textBuilder.toString();
+        ofs_name = s.readUI64();
+        long name_address = ofs_name + s.position() - 8;
+        s.seek(name_address, SeekMode.SET);
+        initialText = s.readWChar();
+        s.pad8bytes();
     }
 
     @Override
-    public void writeToDataStream(AbstractDataStream stream) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void writeToDataStream(WriteDataStreamInterface s) throws IOException {
+        s.getIndexing().writeConstLength(IggyIndexBuilder.CONST_TEXT_DATA_SIZE);
+        s.writeUI16(type);
+        s.writeUI16(textIndex);
+        s.writeBytes(zeroone);
+        s.writeFloat(par1);
+        s.writeFloat(par2);
+        s.writeFloat(par3);
+        s.writeFloat(par4);
+        s.writeUI16(enum_hex);
+        s.writeUI16(fontIndex);
+        s.writeUI32(zero);
+        s.writeUI64(one);
+        s.writeBytes(some);
+        s.writeUI64(ofs_name);
+        long name_address = ofs_name + s.position() - 8;
+        s.seek(name_address, SeekMode.SET);
+        s.writeWChar(initialText);
+        s.pad8bytes();
+
+        s.getIndexing().write16bitArray(initialText.length() + 1);
+        s.getIndexing().pad8bytes();
+
     }
 
     public int getType() {

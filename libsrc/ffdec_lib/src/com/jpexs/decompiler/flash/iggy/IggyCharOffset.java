@@ -1,6 +1,9 @@
 package com.jpexs.decompiler.flash.iggy;
 
 import com.jpexs.decompiler.flash.iggy.annotations.IggyFieldType;
+import com.jpexs.decompiler.flash.iggy.streams.ReadDataStreamInterface;
+import com.jpexs.decompiler.flash.iggy.streams.StructureInterface;
+import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
 import java.io.IOException;
 import java.util.logging.Logger;
 
@@ -9,6 +12,8 @@ import java.util.logging.Logger;
  * @author JPEXS
  */
 public class IggyCharOffset implements StructureInterface {
+
+    public static final int STRUCT_SIZE = 32;
 
     private static Logger LOGGER = Logger.getLogger(IggyCharOffset.class.getName());
 
@@ -29,23 +34,23 @@ public class IggyCharOffset implements StructureInterface {
     @IggyFieldType(DataType.uint64_t)
     long offset;
 
-    public IggyCharOffset(AbstractDataStream stream) throws IOException {
+    public IggyCharOffset(ReadDataStreamInterface stream) throws IOException {
         readFromDataStream(stream);
     }
 
-    public IggyCharOffset(long zero, int ischar1, int ischar2, long zero2, int xscale, int yscale, long zero3, long offset) {
-        this.zero = zero;
+    public IggyCharOffset(int ischar1, int ischar2, int xscale, int yscale) {
+        this.zero = 0;
         this.ischar1 = ischar1;
         this.ischar2 = ischar2;
-        this.zero2 = zero2;
+        this.zero2 = 0;
         this.xscale = xscale;
         this.yscale = yscale;
-        this.zero3 = zero3;
-        this.offset = offset;
+        this.zero3 = 0;
+        this.offset = 0;
     }
 
     @Override
-    public void readFromDataStream(AbstractDataStream stream) throws IOException {
+    public void readFromDataStream(ReadDataStreamInterface stream) throws IOException {
         zero = stream.readUI64();
         ischar1 = stream.readUI16();
         ischar2 = stream.readUI16();
@@ -53,19 +58,23 @@ public class IggyCharOffset implements StructureInterface {
         xscale = stream.readUI16();
         yscale = stream.readUI16();
         zero3 = stream.readUI32();
-        long cur_position = stream.position();
-        long relative_offset = stream.readUI64();
-        if (ischar1 > 0) {
-            offset = cur_position + relative_offset;
-        } else {
-            offset = 0;
-            LOGGER.finer(String.format("Empty char"));
-        }
+        offset = stream.readUI64();
     }
 
     @Override
-    public void writeToDataStream(AbstractDataStream stream) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void writeToDataStream(WriteDataStreamInterface stream) throws IOException {
+        stream.writeUI64(zero);
+        stream.writeUI16(ischar1);
+        stream.writeUI16(ischar2);
+        stream.writeUI32(zero2);
+        stream.writeUI16(xscale);
+        stream.writeUI16(yscale);
+        stream.writeUI32(zero3);
+        stream.writeUI64(offset);
+    }
+
+    public boolean hasGlyph() {
+        return offset > 0;
     }
 
     public long getZero() {

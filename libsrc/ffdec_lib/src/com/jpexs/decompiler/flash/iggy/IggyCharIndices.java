@@ -1,6 +1,9 @@
 package com.jpexs.decompiler.flash.iggy;
 
 import com.jpexs.decompiler.flash.iggy.annotations.IggyFieldType;
+import com.jpexs.decompiler.flash.iggy.streams.ReadDataStreamInterface;
+import com.jpexs.decompiler.flash.iggy.streams.StructureInterface;
+import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +14,7 @@ import java.util.List;
  */
 public class IggyCharIndices implements StructureInterface {
 
-    @IggyFieldType(value = DataType.widechar_t)
+    @IggyFieldType(value = DataType.wchar_t)
     List<Character> chars;
     @IggyFieldType(DataType.uint32_t)
     long padd;
@@ -22,13 +25,19 @@ public class IggyCharIndices implements StructureInterface {
 
     private long charCount;
 
-    public IggyCharIndices(AbstractDataStream stream, long charCount) throws IOException {
+    public IggyCharIndices(List<Character> chars) {
+        this.chars = chars;
+        this.charCount = chars.size();
+        padd = 0;
+    }
+
+    public IggyCharIndices(ReadDataStreamInterface stream, long charCount) throws IOException {
         this.charCount = charCount;
         readFromDataStream(stream);
     }
 
     @Override
-    public void readFromDataStream(AbstractDataStream stream) throws IOException {
+    public void readFromDataStream(ReadDataStreamInterface stream) throws IOException {
         chars = new ArrayList<>();
         for (int i = 0; i < charCount; i++) {
             chars.add((char) stream.readUI16());
@@ -37,8 +46,11 @@ public class IggyCharIndices implements StructureInterface {
     }
 
     @Override
-    public void writeToDataStream(AbstractDataStream stream) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void writeToDataStream(WriteDataStreamInterface stream) throws IOException {
+        for (int i = 0; i < chars.size(); i++) {
+            stream.writeUI16(chars.get(i));
+        }
+        stream.writeUI32(padd);
     }
 
 }

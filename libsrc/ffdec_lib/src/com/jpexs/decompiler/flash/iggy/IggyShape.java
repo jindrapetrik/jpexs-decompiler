@@ -1,6 +1,10 @@
 package com.jpexs.decompiler.flash.iggy;
 
 import com.jpexs.decompiler.flash.iggy.annotations.IggyFieldType;
+import com.jpexs.decompiler.flash.iggy.streams.IggyIndexBuilder;
+import com.jpexs.decompiler.flash.iggy.streams.ReadDataStreamInterface;
+import com.jpexs.decompiler.flash.iggy.streams.StructureInterface;
+import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +15,8 @@ import java.util.logging.Logger;
  * @author JPEXS
  */
 public class IggyShape implements StructureInterface {
+
+    public static final int STRUCT_SIZE = 64;
 
     private static Logger LOGGER = Logger.getLogger(IggyShape.class.getName());
 
@@ -55,31 +61,27 @@ public class IggyShape implements StructureInterface {
 
     List<IggyShapeNode> nodes;
 
-    private long offset;
-
-    public IggyShape(AbstractDataStream stream, long offset) throws IOException {
-        this.offset = offset;
+    public IggyShape(ReadDataStreamInterface stream) throws IOException {
         readFromDataStream(stream);
     }
 
-    public IggyShape(float minx, float miny, float maxx, float maxy, long advance, long count, long one, long one2, long one3, long one4, long two1, List<IggyShapeNode> nodes) {
+    public IggyShape(float minx, float miny, float maxx, float maxy, List<IggyShapeNode> nodes) {
         this.minx = minx;
         this.miny = miny;
         this.maxx = maxx;
         this.maxy = maxy;
-        this.unk = advance;
-        this.count = count;
-        this.one = one;
-        this.one2 = one2;
-        this.one3 = one3;
-        this.one4 = one4;
-        this.two1 = two1;
+        this.unk = 0; //??
+        this.one = 1;
+        this.one2 = 1;
+        this.one3 = 1;
+        this.one4 = 1;
+        this.two1 = 2;
+        this.count = nodes.size();
         this.nodes = nodes;
     }
 
     @Override
-    public void readFromDataStream(AbstractDataStream s) throws IOException {
-        s.seek(offset, SeekMode.SET);
+    public void readFromDataStream(ReadDataStreamInterface s) throws IOException {
         minx = s.readFloat();
         miny = s.readFloat();
         maxx = s.readFloat();
@@ -93,7 +95,7 @@ public class IggyShape implements StructureInterface {
         two1 = s.readUI32();
 
         if ((one != 1) || (one2 != 1) || (one3 != 1) || (one4 != 1) || (two1 != 2)) {
-            LOGGER.fine(String.format("Unique header at pos %d, one: %d, one2: %d, one3: %d, one4: %d, two1: %d\n", offset, one, one2, one3, one4, two1));
+            LOGGER.fine(String.format("Unique header at one: %d, one2: %d, one3: %d, one4: %d, two1: %d\n", one, one2, one3, one4, two1));
         }
 
         nodes = new ArrayList<>();
@@ -104,8 +106,25 @@ public class IggyShape implements StructureInterface {
     }
 
     @Override
-    public void writeToDataStream(AbstractDataStream stream) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void writeToDataStream(WriteDataStreamInterface s) throws IOException {
+        s.getIndexing().writeConstLength(IggyIndexBuilder.CONST_SHAPE_SIZE);
+        s.writeFloat(minx);
+        s.writeFloat(miny);
+        s.writeFloat(maxx);
+        s.writeFloat(maxy);
+        s.writeUI64(unk);
+        s.writeUI64(count);
+        s.writeUI64(one);
+        s.writeUI64(one2);
+        s.writeUI64(one3);
+        s.writeUI32(one4);
+        s.writeUI32(two1);
+
+        s.getIndexing().writeConstLengthArray(IggyIndexBuilder.CONST_SHAPE_NODE_SIZE, nodes.size());
+
+        for (IggyShapeNode node : nodes) {
+            node.writeToDataStream(s);
+        }
     }
 
     public float getMinx() {

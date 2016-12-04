@@ -1,8 +1,10 @@
 package com.jpexs.decompiler.flash.iggy;
 
 import com.jpexs.decompiler.flash.iggy.annotations.IggyFieldType;
+import com.jpexs.decompiler.flash.iggy.streams.ReadDataStreamInterface;
+import com.jpexs.decompiler.flash.iggy.streams.StructureInterface;
+import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
 import java.io.IOException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -10,6 +12,8 @@ import java.util.logging.Logger;
  * @author JPEXS
  */
 public class IggyShapeNode implements StructureInterface {
+
+    public static final int STRUCT_SIZE = 24;
 
     private static Logger LOGGER = Logger.getLogger(IggyShapeNode.class.getName());
 
@@ -38,25 +42,26 @@ public class IggyShapeNode implements StructureInterface {
 
     private boolean first;
 
-    public IggyShapeNode(float x1, float y1, float x2, float y2, int node_type, int node_subtype, int zer1, int zer2, long isstart) {
-        this.targetX = x1;
-        this.targetY = y1;
-        this.controlX = x2;
-        this.controlY = y2;
+    public IggyShapeNode(float targetX, float targetY, float controlX, float controlY, int node_type, int node_subtype, boolean first) {
+        this.targetX = targetX;
+        this.targetY = targetY;
+        this.controlX = controlX;
+        this.controlY = controlY;
         this.node_type = node_type;
         this.node_subtype = node_subtype;
-        this.zer1 = zer1;
-        this.zer2 = zer2;
-        this.isstart = isstart;
+        this.zer1 = 0;
+        this.zer2 = 0;
+        this.first = first;
+        this.isstart = first ? 0 : 1;
     }
 
-    public IggyShapeNode(AbstractDataStream s, boolean first) throws IOException {
+    public IggyShapeNode(ReadDataStreamInterface s, boolean first) throws IOException {
         this.first = first;
         readFromDataStream(s);
     }
 
     @Override
-    public void readFromDataStream(AbstractDataStream s) throws IOException {
+    public void readFromDataStream(ReadDataStreamInterface s) throws IOException {
         targetX = s.readFloat();
         targetY = s.readFloat();
         controlX = s.readFloat();
@@ -79,23 +84,31 @@ public class IggyShapeNode implements StructureInterface {
     }
 
     @Override
-    public void writeToDataStream(AbstractDataStream stream) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void writeToDataStream(WriteDataStreamInterface s) throws IOException {
+        s.writeFloat(targetX);
+        s.writeFloat(targetY);
+        s.writeFloat(controlX);
+        s.writeFloat(controlY);
+        s.writeUI8(node_type);
+        s.writeUI8(node_subtype);
+        s.writeUI8(zer1);
+        s.writeUI8(zer2);
+        s.writeUI32(isstart);
     }
 
-    public float getX1() {
+    public float getTargetX() {
         return targetX;
     }
 
-    public float getY1() {
+    public float getTargetY() {
         return targetY;
     }
 
-    public float getX2() {
+    public float getControlX() {
         return controlX;
     }
 
-    public float getY2() {
+    public float getControlY() {
         return controlY;
     }
 
