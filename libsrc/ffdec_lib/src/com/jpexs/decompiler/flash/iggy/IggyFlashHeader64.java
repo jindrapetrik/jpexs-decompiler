@@ -278,6 +278,9 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
         stream.writeUI64(flags);
         stream.writeUI32(font_count);
         stream.writeUI32(zero2);
+
+        stream.getIndexing().writeLengthCustom(184, new int[]{0x00, 0x08, 0x10, 0x18, 0x20, 0x28, 0x30, 0x34, 0x38, 0x3C, 0x40, 0x44, 0x48, 0x4C, 0x50, 0x58, 0x70, 0x78, 0x80, 0x84, 0x88, 0x90, 0x98, 0xA0, 0xB0}, new int[]{2, 2, 2, 2, 2, 2, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 2, 2, 5, 5, 2, 2, 2, 2, 5});
+
     }
 
     @Override

@@ -60,6 +60,8 @@ public class IggyIndexBuilder {
     private static final int CODE_FF_OFS32 = 0xFF;
 
     private List<Integer> constTable = new ArrayList<>();
+    private Map<Integer, List<Integer>> constTableOffsets = new HashMap<>();
+    private Map<Integer, List<Integer>> constTableTypes = new HashMap<>();
     private WriteDataStreamInterface indexStream;
 
     private static final int CONST_VAL_SHAPE_NODE_SIZE = IggyShapeNode.STRUCT_SIZE;
@@ -70,21 +72,8 @@ public class IggyIndexBuilder {
     private static final int CONST_VAL_SHAPE_SIZE = IggyShape.STRUCT_SIZE;
     private static final int CONST_VAL_GENERAL_FONT_INFO_SIZE = 112;
     private static final int CONST_VAL_GENERAL_FONT_INFO2_SIZE = 240;
-    private static final int CONST_VAL_IMPORTED_DATA_SIZE = 104;
+    private static final int CONST_VAL_TEXT_DATA_SIZE = 104;
     private static final int CONST_VAL_SEQUENCE_SIZE = IggySequence.STRUCT_SIZE;
-
-    public static final int[] DEFAULT_CONST_TABLE = new int[]{
-        CONST_VAL_SHAPE_NODE_SIZE,
-        CONST_VAL_KERNING_RECORD_SIZE,
-        CONST_VAL_CHAR_OFFSET_SIZE,
-        CONST_VAL_BIN_INFO_SIZE,
-        CONST_VAL_TYPE_INFO_SIZE,
-        CONST_VAL_SHAPE_SIZE,
-        CONST_VAL_GENERAL_FONT_INFO_SIZE,
-        CONST_VAL_GENERAL_FONT_INFO2_SIZE,
-        CONST_VAL_IMPORTED_DATA_SIZE,
-        CONST_VAL_SEQUENCE_SIZE
-    };
 
     public static final int CONST_SHAPE_NODE_SIZE = 0;
     public static final int CONST_KERNING_RECORD_SIZE = 1;
@@ -94,11 +83,11 @@ public class IggyIndexBuilder {
     public static final int CONST_SHAPE_SIZE = 5;
     public static final int CONST_GENERAL_FONT_INFO_SIZE = 6;
     public static final int CONST_GENERAL_FONT_INFO2_SIZE = 7;
-    public static final int CONST_IMPORTED_DATA_SIZE = 8;
+    public static final int CONST_TEXT_DATA_SIZE = 8;
     public static final int CONST_SEQUENCE_SIZE = 9;
 
-    //If these skipped numbers matter, this is sample
-    final byte[] STATIC_HDR = new byte[]{(byte) 0x0A, (byte) 0x18, (byte) 0x07, (byte) 0x00, (byte) 0x05, (byte) 0x04, (byte) 0x05, (byte) 0x08, (byte) 0x05, (byte) 0x0C, (byte) 0x05, (byte) 0x12, (byte) 0x04, (byte) 0x14, (byte) 0x04, (byte) 0x16,
+    /*final byte[] STATIC_HDR = new byte[]{
+        (byte) 0x0A, (byte) 0x18, (byte) 0x07, (byte) 0x00, (byte) 0x05, (byte) 0x04, (byte) 0x05, (byte) 0x08, (byte) 0x05, (byte) 0x0C, (byte) 0x05, (byte) 0x12, (byte) 0x04, (byte) 0x14, (byte) 0x04, (byte) 0x16,
         (byte) 0x04, (byte) 0x06, (byte) 0x03, (byte) 0x00, (byte) 0x04, (byte) 0x02, (byte) 0x04, (byte) 0x04, (byte) 0x04, (byte) 0x20, (byte) 0x03, (byte) 0x08, (byte) 0x04, (byte) 0x10, (byte) 0x08, (byte) 0x18,
         (byte) 0x02, (byte) 0x60, (byte) 0x0D, (byte) 0x00, (byte) 0x02, (byte) 0x09, (byte) 0x03, (byte) 0x0C, (byte) 0x05, (byte) 0x10, (byte) 0x05, (byte) 0x14, (byte) 0x05, (byte) 0x18, (byte) 0x05, (byte) 0x1C,
         (byte) 0x05, (byte) 0x20, (byte) 0x05, (byte) 0x24, (byte) 0x05, (byte) 0x28, (byte) 0x04, (byte) 0x30, (byte) 0x02, (byte) 0x38, (byte) 0x04, (byte) 0x3A, (byte) 0x04, (byte) 0x18, (byte) 0x02, (byte) 0x08,
@@ -109,14 +98,40 @@ public class IggyIndexBuilder {
         (byte) 0x02, (byte) 0x68, (byte) 0x12, (byte) 0x01, (byte) 0x0C, (byte) 0x02, (byte) 0x04, (byte) 0x08, (byte) 0x05, (byte) 0x10, (byte) 0x02, (byte) 0x20, (byte) 0x05, (byte) 0x24, (byte) 0x05, (byte) 0x28,
         (byte) 0x05, (byte) 0x2C, (byte) 0x05, (byte) 0x30, (byte) 0x04, (byte) 0x32, (byte) 0x04, (byte) 0x38, (byte) 0x02, (byte) 0x44, (byte) 0x04, (byte) 0x46, (byte) 0x04, (byte) 0x48, (byte) 0x04, (byte) 0x4A,
         (byte) 0x04, (byte) 0x4C, (byte) 0x04, (byte) 0x4E, (byte) 0x04, (byte) 0x60, (byte) 0x02, (byte) 0x10, (byte) 0x02, (byte) 0x00, (byte) 0x02, (byte) 0x08, (byte) 0x05};
-
+     */
     private long position = 0;
 
     public IggyIndexBuilder() throws IOException {
         indexStream = new TemporaryDataStream();
-        for (int i = 0; i < DEFAULT_CONST_TABLE.length; i++) {
-            constTable.add(DEFAULT_CONST_TABLE[i]);
+
+        addConst(CONST_VAL_SHAPE_NODE_SIZE, new int[]{0, 4, 8, 0xC, 0x12, 0x14, 0x16}, new int[]{5, 5, 5, 5, 4, 4, 4});
+        addConst(CONST_VAL_KERNING_RECORD_SIZE, new int[]{0, 2, 4}, new int[]{4, 4, 4});
+        addConst(CONST_VAL_CHAR_OFFSET_SIZE, new int[]{8, 0x10, 0x18}, new int[]{4, 8, 2});
+        addConst(CONST_VAL_BIN_INFO_SIZE, new int[]{0, 9, 0xC, 0x10, 0x14, 0x18, 0x1C, 0x20, 0x24, 0x28, 0x30, 0x38, 0x3A}, new int[]{2, 3, 5, 5, 5, 5, 5, 5, 5, 4, 2, 4, 4});
+        addConst(CONST_VAL_TYPE_INFO_SIZE, new int[]{8, 0x10}, new int[]{2, 5});
+        addConst(CONST_VAL_SHAPE_SIZE, new int[]{0, 4, 8, 0xC, 0x10, 0x18, 0x20, 0x28, 0x30}, new int[]{5, 5, 5, 5, 2, 5, 2, 2, 2});
+        addConst(CONST_VAL_GENERAL_FONT_INFO_SIZE, new int[]{0x1, 0x02, 0x08, 0x10, 0x20, 0x22, 0x24, 0x26, 0x2B, 0x30, 0x38, 0x40, 0x48, 0x4C, 0x50, 0x54, 0x58, 0x60}, new int[]{0xC, 4, 5, 2, 4, 4, 4, 4, 3, 2, 2, 2, 5, 5, 5, 5, 5, 2});
+        addConst(CONST_VAL_GENERAL_FONT_INFO2_SIZE, new int[]{0x10}, new int[]{2});
+        addConst(CONST_VAL_TEXT_DATA_SIZE, new int[]{0x01, 0x02, 0x08, 0x10, 0x20, 0x24, 0x28, 0x2C, 0x30, 0x32, 0x38, 0x44, 0x46, 0x48, 0x4A, 0x4C, 0x4E, 0x60}, new int[]{0x0C, 4, 5, 2, 5, 5, 5, 5, 4, 4, 2, 4, 4, 4, 4, 4, 4, 2});
+        addConst(CONST_VAL_SEQUENCE_SIZE, new int[]{0, 8}, new int[]{2, 5});
+    }
+
+    private void addConst(int totalLength, int[] localOffsets, int[] types) {
+        if (localOffsets.length != types.length) {
+            throw new RuntimeException("Size of localOffsets does not match size of types on adding consts with total length " + totalLength);
         }
+        constTable.add(totalLength);
+        int newIndex = constTable.size() - 1;
+        List<Integer> localOffsetsList = new ArrayList<>();
+        for (int t : localOffsets) {
+            localOffsetsList.add(t);
+        }
+        List<Integer> typesList = new ArrayList<>();
+        for (int t : types) {
+            typesList.add(t);
+        }
+        constTableOffsets.put(newIndex, localOffsetsList);
+        constTableTypes.put(newIndex, typesList);
     }
 
     private byte[] getIndexTableBytes() {
@@ -124,7 +139,11 @@ public class IggyIndexBuilder {
         baos.write(constTable.size());
         for (int i = 0; i < constTable.size(); i++) {
             baos.write(constTable.get(i));
-            baos.write(0);
+            baos.write(constTableOffsets.get(i).size());
+            for (int j = 0; j < constTableOffsets.get(i).size(); j++) {
+                baos.write(constTableOffsets.get(i).get(j));
+                baos.write(constTableTypes.get(i).get(j));
+            }
         }
         return baos.toByteArray();
     }
@@ -141,14 +160,7 @@ public class IggyIndexBuilder {
     }
 
     public long writeConstLength(int constIndex) {
-        return writeIndex(constIndex, false, 0, 0);
-    }
-
-    private long writeConstLengthArrayUpTo64(int constIndex, int cntUpTo64) {
-        if (cntUpTo64 == 1) {
-            return writeIndex(constIndex, false, 0, 0);
-        }
-        return writeIndex(0x80 + cntUpTo64 - 1, false, constIndex, 0);
+        return writeIndex(constIndex, false, 0);
     }
 
     /*private int indexOfConst(int val) {
@@ -163,17 +175,18 @@ public class IggyIndexBuilder {
         long ret = 0;
         long rem = cnt;
         while (true) {
+            if (rem == 1) {
+                return writeIndex(constIndex, false, 0);
+            }
             if (rem <= 64) {
-                ret += writeConstLengthArrayUpTo64(constIndex, (int) rem);
+                ret += writeIndex(0x80 + (int) rem - 1, false, constIndex);
                 break;
             } else {
                 rem -= 64;
-                ret += writeConstLengthArrayUpTo64(constIndex, 64);
-
+                ret += writeIndex(0x80 + 64 - 1, false, constIndex);
             }
         }
         return ret;
-
     }
 
     public long pad8bytes() {
@@ -210,52 +223,69 @@ public class IggyIndexBuilder {
     }
 
     public long writePaddingBytes(int twoPlusHowManyTwoBytes) {
-        return writeIndex(0xC0 + twoPlusHowManyTwoBytes, false, 0, 0);
+        return writeIndex(0xC0 + twoPlusHowManyTwoBytes, false, 0);
     }
 
     public long writePointerArray(boolean is64, long cnt) {
-        return writeIndex(0xD0 + 0x2, is64, cnt - 1, 0);
+        return writeIndex(0xD0 + 0x2, is64, cnt - 1);
     }
 
     public long write64bitPointerArray(long cnt) {
-        return writeIndex(0xD0 + 0x2, true, cnt - 1, 0);
+        return writeIndex(0xD0 + 0x2, true, cnt - 1);
     }
 
     public long write32bitPointerArray(long cnt) {
-        return writeIndex(0xD0 + 0x2, false, cnt - 1, 0);
+        return writeIndex(0xD0 + 0x2, false, cnt - 1);
     }
 
     public long write16bitArray(long cnt) {
-        return writeIndex(0xD0 + 0x4, false, cnt - 1, 0);
+        return writeIndex(0xD0 + 0x4, false, cnt - 1);
     }
 
     public long write32bitArray(long cnt) {
-        return writeIndex(0xD0 + 0x5, false, cnt - 1, 0);
+        return writeIndex(0xD0 + 0x5, false, cnt - 1);
     }
 
     public long write64bitArray(long cnt) {
-        return writeIndex(0xD0 + 0x6, false, cnt - 1, 0);
+        return writeIndex(0xD0 + 0x6, false, cnt - 1);
     }
 
     public long skipOneInIndex() {
-        return writeIndex(CODE_FC_SKIP1, false, 0, 0);
+        return writeIndex(CODE_FC_SKIP1, false, 0);
     }
 
-    public long writeLengthSkipTwice(int lenUI8, int skipTwice) {
-        return writeIndex(CODE_FD_OFS8_SKIP_TWICE8, false, lenUI8, skipTwice);
+    public long writeLengthCustom(int totalLen, int localOffsets[], int platformTypes[]) {
+        return writeIndex(CODE_FD_OFS8_SKIP_TWICE8, false, totalLen, localOffsets, platformTypes);
     }
 
     public long writeLengthBytePositive(int valUI8) {
-        return writeIndex(CODE_FE_OFS8_POSITIVE, false, valUI8, 0);
+        return writeIndex(CODE_FE_OFS8_POSITIVE, false, valUI8);
     }
 
     public long writeLengthUI32(long offset) {
-        return writeIndex(CODE_FF_OFS32, false, offset, 0);
+        return writeIndex(CODE_FF_OFS32, false, offset);
     }
 
-    private long writeIndex(int code, boolean is64, long val, long skipNum) {
+    public static int platformNumSize(boolean is64, int i) {
+        if (i <= 2) {
+            return is64 ? 8 : 4;
+        } else if (i <= 4) {
+            return 2;
+        } else if (i == 5) {
+            return 4;
+        } else if (i == 6) {
+            return 8;
+        }
+        throw new RuntimeException("Uknown platform num");
+    }
+
+    private long writeIndex(int code, boolean is64, long val) {
+        return writeIndex(code, is64, val, null, null);
+    }
+
+    private long writeIndex(int code, boolean is64, long val, int localOffsets[], int platformTypes[]) {
         try {
-            LOGGER.finest(String.format("index offset: %d, %04X", STATIC_HDR.length + indexStream.position(), STATIC_HDR.length + indexStream.position()));
+            //LOGGER.finest(String.format("index offset: %d, %04X", STATIC_HDR.length + indexStream.position(), STATIC_HDR.length + indexStream.position()));
             LOGGER.finer(String.format("Code = 0x%02X", code));
             indexStream.writeUI8(code);
             if (code < 0x80) // 0-0x7F
@@ -366,31 +396,25 @@ public class IggyIndexBuilder {
             } else if (code == CODE_FC_SKIP1) {
                 LOGGER.finest(String.format("0xFC: skip 1 "));
                 //indexStream.seek(1, SeekMode.CUR);
+                indexStream.write(0); //??
                 return 1; //seek 1
             } else if (code == CODE_FD_OFS8_SKIP_TWICE8) {
                 LOGGER.finest(String.format("0xFD: 0..255, skip 2 * 0..255 "));
                 int n, m;
 
+                n = (int) val;
                 indexStream.writeUI8((int) val);
-
-                if ((n = (int) val) < 0) {
-                    LOGGER.severe(String.format("0xFD: Cannot read n."));
-                    return 0;
-                }
-
-                indexStream.writeUI8((int) skipNum);
-
-                if ((m = (int) skipNum) < 0) {
-                    LOGGER.severe(String.format("0xFD: Cannot read m."));
-                    return 0;
-                }
+                m = localOffsets.length;
+                indexStream.writeUI8(localOffsets.length);
 
                 long offset = n;
                 position += n;
                 LOGGER.finest(String.format("offset += %d", n));
-                long skip = m * 2;
-                LOGGER.finest(String.format("skip %d", m * 2));
-                return offset + skip;
+                for (int i = 0; i < localOffsets.length; i++) {
+                    indexStream.writeUI8(localOffsets[i]);
+                    indexStream.writeUI8(platformTypes[i]);
+                }
+                return offset;
             } else if (code == CODE_FE_OFS8_POSITIVE) {
                 LOGGER.finest(String.format("0xFD: 0..255 + 1 "));
                 int n8;

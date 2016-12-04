@@ -55,7 +55,7 @@ public class IggySequence implements StructureInterface {
     @Override
     public void writeToDataStream(WriteDataStreamInterface s) throws IOException {
         IggyIndexBuilder ib = s.getIndexing();
-        ib.writeLengthSkipTwice(16, 0);
+        ib.writeLengthCustom(16, new int[]{0x00}, new int[]{2});
         for (int i = 0; i < onepadd.length; i++) {
             s.writeUI64(onepadd[i]);
         }

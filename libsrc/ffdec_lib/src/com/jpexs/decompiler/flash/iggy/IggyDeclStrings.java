@@ -56,7 +56,7 @@ public class IggyDeclStrings implements StructureInterface {
         s.writeUI64(one);
         s.writeUI32(size);
         s.writeBytes(xxx);
-        ib.writeLengthSkipTwice(8 + 4 + 3, 0);
+        ib.writeLengthCustom(15, new int[]{0x00, 0x08}, new int[]{2, 5});
         ib.writeLengthUI32(size);
         s.writeBytes(data);
         ib.writeConstLength(IggyIndexBuilder.CONST_SEQUENCE_SIZE);

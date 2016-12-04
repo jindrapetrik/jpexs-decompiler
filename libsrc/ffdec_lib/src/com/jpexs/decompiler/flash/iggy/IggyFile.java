@@ -197,8 +197,6 @@ public class IggyFile implements StructureInterface {
         extractIggyFile(inFile, extractDirOrig);
         IggySwf iswf = iggyFile.getSwf(0);
         iggyFile.replaceSwf(0, iswf);
-        //IggyFont ifont = iswf.fonts.get(0);
-        //iggyFile.replaceFontTag(0, 0, ifont);
         outFile.delete();
         try (RandomAccessFileDataStream outputStream = new RandomAccessFileDataStream(outFile)) {
             iggyFile.writeToDataStream(outputStream);
@@ -664,8 +662,7 @@ public class IggyFile implements StructureInterface {
             return false;
         }
 
-        IggyIndexParser.parseIndex(true, new TemporaryDataStream(replacementIndexData), new ArrayList<>(), new ArrayList<>());
-
+        //IggyIndexParser.parseIndex(true, new TemporaryDataStream(replacementIndexData), new ArrayList<>(), new ArrayList<>());
         int swfIndex = 0;
         long offsetsChange = 0;
         for (int i = 0; i < subFileEntries.size(); i++) {
@@ -704,6 +701,9 @@ public class IggyFile implements StructureInterface {
             if (entry.type == IggySubFileEntry.TYPE_FLASH) {
                 iggySwfs.add(new IggySwf(new TemporaryDataStream(getEntryData(i))));
             }
+            /*if (entry.type == IggySubFileEntry.TYPE_INDEX) {
+                IggyIndexParser.parseIndex(true, new TemporaryDataStream(getEntryData(i)), new ArrayList<>(), new ArrayList<>());
+            }*/
         }
     }
 

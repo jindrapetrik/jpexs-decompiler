@@ -290,7 +290,6 @@ public class IggySwf implements StructureInterface {
     public void writeToDataStream(WriteDataStreamInterface s) throws IOException {
         IggyIndexBuilder ib = s.getIndexing();
         hdr.writeToDataStream(s);
-        ib.writeLengthSkipTwice(184, 0);
         s.writeWChar(name);
         s.pad8bytes();
         s.writeUI64(1);

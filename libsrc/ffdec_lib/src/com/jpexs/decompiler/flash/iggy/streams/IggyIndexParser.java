@@ -18,12 +18,11 @@ public class IggyIndexParser {
 
     private static Logger LOGGER = Logger.getLogger(IggyIndexParser.class.getName());
 
-    /*
-    static PrintWriter pw;
+    /*static PrintWriter pw;
 
     static {
         try {
-            pw = new PrintWriter("d:\\Dropbox\\jpexs-laptop\\iggi\\extraxtdir_new\\index.txt");
+            pw = new PrintWriter("d:\\Dropbox\\jpexs-laptop\\iggi\\extraxtdir_orig\\index2.txt");
         } catch (FileNotFoundException ex) {
             Logger.getLogger(IggyIndexParser.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -44,8 +43,7 @@ public class IggyIndexParser {
                 pw.close();
             }
         });
-    }
-     */
+    }*/
     /**
      * Parser for index data. It creates table of indices and table of offsets
      *
@@ -63,7 +61,11 @@ public class IggyIndexParser {
             indexTable[i] = offset;
             indexTableEntry.add(offset);
             int num = indexStream.readUI8();
-            indexStream.seek(num * 2, SeekMode.CUR);
+            for (int j = 0; j < num; j++) {
+                int locOffset = indexStream.readUI8();
+                int type = indexStream.readUI8();
+                LOGGER.finer(String.format("- local offset: %d, type: %d", locOffset, type));
+            }
         }
 
         long offset = 0;
@@ -190,8 +192,22 @@ public class IggyIndexParser {
 
                 offset += n;
                 LOGGER.finest(String.format("LENGTH = n = %d", n));
-                indexStream.seek(m * 2, SeekMode.CUR);
-                LOGGER.finest(String.format("SKIP m * 2 = skip %d * 2 = %d", m, m * 2));
+                StringBuilder locOffStr = new StringBuilder();
+                StringBuilder platStr = new StringBuilder();
+                for (int i = 0; i < m; i++) {
+                    int localOffset = indexStream.readUI8();
+                    int platformType = indexStream.readUI8();
+                    if (i > 0) {
+                        locOffStr.append(", ");
+                        platStr.append(", ");
+                    }
+                    locOffStr.append(String.format("0x%02X", localOffset));
+                    platStr.append(platformType);
+                    LOGGER.finest(String.format("- localOffset 0x%02X, platformType %d", localOffset, platformType));
+                }
+                LOGGER.finer(String.format("stream.writeLengthCustom(%s,new int[]{%s},new int[]{%s}", n, locOffStr, platStr));
+                //indexStream.seek(m * 2, SeekMode.CUR);
+                //LOGGER.finest(String.format("SKIP m * 2 = skip %d * 2 = %d", m, m * 2));
             } else if (code == 0xFE) {
                 LOGGER.finest(String.format("0xFD: 0..255 + 1 "));
                 int n8;

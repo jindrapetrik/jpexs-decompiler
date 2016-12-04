@@ -115,7 +115,7 @@ public class IggyText implements StructureInterface {
 
     @Override
     public void writeToDataStream(WriteDataStreamInterface s) throws IOException {
-        s.getIndexing().writeConstLength(IggyIndexBuilder.CONST_IMPORTED_DATA_SIZE);
+        s.getIndexing().writeConstLength(IggyIndexBuilder.CONST_TEXT_DATA_SIZE);
         s.writeUI16(type);
         s.writeUI16(textIndex);
         s.writeBytes(zeroone);
