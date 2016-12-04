@@ -19,6 +19,8 @@ public interface WriteDataStreamInterface extends AutoCloseable {
 
     public long position();
 
+    public void setOlderOffsetToThisPos(long savedPos) throws IOException;
+
     public boolean writeUI64(long val) throws IOException;
 
     public boolean writeSI64(long val) throws IOException;

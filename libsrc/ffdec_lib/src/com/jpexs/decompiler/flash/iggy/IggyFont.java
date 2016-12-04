@@ -36,26 +36,26 @@ public class IggyFont extends IggyTag {
     int leading;
     @IggyFieldType(DataType.uint64_t)
     long flags;
-    @IggyFieldType(DataType.uint64_t)
-    long start_of_char_struct;
-    @IggyFieldType(DataType.uint64_t)
-    long start_of_char_index;
-    @IggyFieldType(DataType.uint64_t)
-    long start_of_scale;
+    //@IggyFieldType(DataType.uint64_t)
+    //long start_of_char_struct;
+    //@IggyFieldType(DataType.uint64_t)
+    //long start_of_char_index;
+    //@IggyFieldType(DataType.uint64_t)
+    //long start_of_scale;
     @IggyFieldType(DataType.uint32_t)
     long kern_count;
     @IggyArrayFieldType(value = DataType.float_t, count = 5)
     float[] unk_float;
-    @IggyFieldType(DataType.uint64_t)
-    long start_of_kern;
+    //@IggyFieldType(DataType.uint64_t)
+    //long start_of_kern;
     @IggyFieldType(DataType.uint64_t)
     long zero_padd;
     @IggyFieldType(DataType.uint64_t)
     long what_2;
     @IggyFieldType(DataType.uint64_t)
     long zero_padd_2;
-    @IggyFieldType(DataType.uint64_t)
-    long start_of_name;
+    //@IggyFieldType(DataType.uint64_t)
+    //long start_of_name;
     @IggyFieldType(DataType.uint64_t)
     long one_padd;
     @IggyFieldType(DataType.uint16_t)
@@ -110,25 +110,20 @@ public class IggyFont extends IggyTag {
 
     byte[] padTo4byteBoundary;
 
-    public IggyFont(int type, int order_in_iggy_file, byte[] zeroone, int char_count2, int ascent, int descent, int leading, long flags, long start_of_char_struct, long start_of_char_index, long start_of_scale, long kern_count, float[] unk_float, long start_of_kern, long zero_padd, long what_2, long zero_padd_2, long start_of_name, long one_padd, int xscale, int yscale, long zero_padd_3, float ssr1, float ssr2, long char_count, long zero_padd_4, long what_3, byte[] zeroes48, float sss1, long one_padd2, float sss2, long one_padd3, float sss3, long one_padd4, float sss4, long one_padd5, String name, List<IggyCharOffset> charOffsets, List<IggyShape> chars, IggyCharIndices charIndices, IggyCharAdvances charScales, IggyCharKerning charKernings, byte[] padTo4byteBoundary) {
+    public IggyFont(int type, int fontId, byte[] zeroone, int char_count2, int ascent, int descent, int leading, long flags, long kern_count, float[] unk_float, long zero_padd, long what_2, long zero_padd_2, long one_padd, int xscale, int yscale, long zero_padd_3, float ssr1, float ssr2, long char_count, long zero_padd_4, long what_3, byte[] zeroes48a, byte[] zeroes48b, float sss1, long one_padd2, float sss2, long one_padd3, float sss3, long one_padd4, float sss4, long one_padd5, String name, List<IggyCharOffset> charOffsets, List<IggyShape> glyphs, IggyCharIndices codePoints, IggyCharAdvances charScales, IggyCharKerning charKernings, byte[] padTo4byteBoundary) {
         this.type = type;
-        this.fontId = order_in_iggy_file;
+        this.fontId = fontId;
         this.zeroone = zeroone;
         this.char_count2 = char_count2;
         this.ascent = ascent;
         this.descent = descent;
         this.leading = leading;
         this.flags = flags;
-        this.start_of_char_struct = start_of_char_struct;
-        this.start_of_char_index = start_of_char_index;
-        this.start_of_scale = start_of_scale;
         this.kern_count = kern_count;
         this.unk_float = unk_float;
-        this.start_of_kern = start_of_kern;
         this.zero_padd = zero_padd;
         this.what_2 = what_2;
         this.zero_padd_2 = zero_padd_2;
-        this.start_of_name = start_of_name;
         this.one_padd = one_padd;
         this.xscale = xscale;
         this.yscale = yscale;
@@ -138,7 +133,8 @@ public class IggyFont extends IggyTag {
         this.char_count = char_count;
         this.zero_padd_4 = zero_padd_4;
         this.what_3 = what_3;
-        this.zeroes48a = zeroes48;
+        this.zeroes48a = zeroes48a;
+        this.zeroes48b = zeroes48b;
         this.sss1 = sss1;
         this.one_padd2 = one_padd2;
         this.sss2 = sss2;
@@ -149,8 +145,8 @@ public class IggyFont extends IggyTag {
         this.one_padd5 = one_padd5;
         this.name = name;
         this.charOffsets = charOffsets;
-        this.glyphs = chars;
-        this.codePoints = charIndices;
+        this.glyphs = glyphs;
+        this.codePoints = codePoints;
         this.charScales = charScales;
         this.charKernings = charKernings;
         this.padTo4byteBoundary = padTo4byteBoundary;
@@ -194,7 +190,6 @@ public class IggyFont extends IggyTag {
 
     @Override
     public void readFromDataStream(ReadDataStreamInterface s) throws IOException {
-        long basePos = s.position();
         type = s.readUI16();
         fontId = s.readUI16();
         zeroone = s.readBytes(28);
@@ -203,11 +198,11 @@ public class IggyFont extends IggyTag {
         descent = s.readUI16();
         leading = s.readUI16();
         flags = s.readUI64();
-        start_of_char_struct = s.readUI64();
+        long start_of_char_struct = s.readUI64();
         long abs_start_of_char_struct = makeAbsOffset(s, start_of_char_struct);
-        start_of_char_index = s.readUI64();
+        long start_of_char_index = s.readUI64();
         long abs_start_of_char_index = makeAbsOffset(s, start_of_char_index);
-        start_of_scale = s.readUI64();
+        long start_of_scale = s.readUI64();
         long abs_start_of_scale = makeAbsOffset(s, start_of_scale);
 
         kern_count = s.readUI32();
@@ -215,14 +210,14 @@ public class IggyFont extends IggyTag {
         for (int i = 0; i < unk_float.length; i++) {
             unk_float[i] = s.readFloat();
         }
-        start_of_kern = s.readUI64();
+        long start_of_kern = s.readUI64();
         long abs_start_of_kern = makeAbsOffset(s, start_of_kern);
         zero_padd = s.readUI64();
 
         //--------------------------------------
         what_2 = s.readUI64();
         zero_padd_2 = s.readUI64();
-        start_of_name = s.readUI64();
+        long start_of_name = s.readUI64();
         long abs_start_of_name = makeAbsOffset(s, start_of_name);
         one_padd = s.readUI64();
         xscale = s.readUI16();
@@ -299,6 +294,7 @@ public class IggyFont extends IggyTag {
 
     @Override
     public void writeToDataStream(WriteDataStreamInterface s) throws IOException {
+        final int FILL_LATER_IF_AVAILABLE = 1;
         IggyIndexBuilder ib = s.getIndexing();
         ib.writeConstLength(IggyIndexBuilder.CONST_GENERAL_FONT_INFO_SIZE);
         s.writeUI16(type);
@@ -309,24 +305,24 @@ public class IggyFont extends IggyTag {
         s.writeUI16(descent);
         s.writeUI16(leading);
         s.writeUI64(flags);
-        s.writeUI64(start_of_char_struct);
-        long abs_start_of_char_struct = makeAbsOffset(s, start_of_char_struct);
-        s.writeUI64(start_of_char_index);
-        long abs_start_of_char_index = makeAbsOffset(s, start_of_char_index);
-        s.writeUI64(start_of_scale);
-        long abs_start_of_scale = makeAbsOffset(s, start_of_scale);
+        long start_of_char_struct_ofs_pos = s.position();
+        s.writeUI64(FILL_LATER_IF_AVAILABLE);
+        long start_of_char_index_ofs_pos = s.position();
+        s.writeUI64(FILL_LATER_IF_AVAILABLE);
+        long start_of_scale_ofs_pos = s.position();
+        s.writeUI64(FILL_LATER_IF_AVAILABLE);
         s.writeUI32(kern_count);
         for (int i = 0; i < unk_float.length; i++) {
             s.writeFloat(unk_float[i]);
         }
-        s.writeUI64(start_of_kern);
-        long abs_start_of_kern = makeAbsOffset(s, start_of_kern);
+        long start_of_kern_ofs_pos = s.position();
+        s.writeUI64(FILL_LATER_IF_AVAILABLE);
         s.writeUI64(zero_padd);
         ib.writeConstLength(IggyIndexBuilder.CONST_GENERAL_FONT_INFO2_SIZE);
         s.writeUI64(what_2);
         s.writeUI64(zero_padd_2);
-        s.writeUI64(start_of_name);
-        long abs_start_of_name = makeAbsOffset(s, start_of_name);
+        long start_of_name_ofs_pos = s.position();
+        s.writeUI64(FILL_LATER_IF_AVAILABLE);
         s.writeUI64(one_padd);
         s.writeUI16(xscale);
         s.writeUI16(yscale);
@@ -353,8 +349,8 @@ public class IggyFont extends IggyTag {
         s.writeFloat(sss4);
         s.writeUI32(one_padd5);
         s.writeBytes(zeroes48b);
-        if (abs_start_of_name != 0) {
-            s.seek(abs_start_of_name, SeekMode.SET);
+        if (name != null) {
+            s.setOlderOffsetToThisPos(start_of_name_ofs_pos);
             for (char c : name.toCharArray()) {
                 s.writeUI16(c);
             }
@@ -373,9 +369,9 @@ public class IggyFont extends IggyTag {
             }
         }
 
-        s.writeUI64(0); //pad zero
-        if (abs_start_of_char_struct != 0) {
-            s.seek(abs_start_of_char_struct, SeekMode.SET);
+        //s.writeUI64(0); //pad zero
+        if (charOffsets != null) {
+            s.setOlderOffsetToThisPos(start_of_char_struct_ofs_pos);
 
             ib.writeConstLengthArray(IggyIndexBuilder.CONST_CHAR_OFFSET_SIZE, charOffsets.size());
             //offsets of shapes
@@ -390,8 +386,8 @@ public class IggyFont extends IggyTag {
                 }
             }
         }
-        if (abs_start_of_char_index != 0) {
-            s.seek(abs_start_of_char_index, SeekMode.SET);
+        if (codePoints != null) {
+            s.setOlderOffsetToThisPos(start_of_char_index_ofs_pos);
             for (char c : codePoints.chars) {
                 s.writeUI16(c);
             }
@@ -399,15 +395,15 @@ public class IggyFont extends IggyTag {
             ib.pad8bytes();
             s.pad8bytes();
         }
-        if (abs_start_of_scale != 0) {
-            s.seek(abs_start_of_scale, SeekMode.SET);
+        if (charScales != null) {
+            s.setOlderOffsetToThisPos(start_of_scale_ofs_pos);
             charScales.writeToDataStream(s);
             ib.write32bitArray(charScales.advances.size());
             ib.pad8bytes();
             s.pad8bytes();
         }
-        if (abs_start_of_kern != 0) {
-            s.seek(abs_start_of_kern, SeekMode.SET);
+        if (charKernings != null) {
+            s.setOlderOffsetToThisPos(start_of_kern_ofs_pos);
             ib.writeConstLengthArray(IggyIndexBuilder.CONST_KERNING_RECORD_SIZE, kern_count);
             charKernings.writeToDataStream(s);
             ib.pad8bytes();

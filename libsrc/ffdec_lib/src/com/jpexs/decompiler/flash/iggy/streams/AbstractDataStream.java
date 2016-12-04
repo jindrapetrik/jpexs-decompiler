@@ -218,4 +218,13 @@ public abstract class AbstractDataStream implements DataStreamInterface {
         }
     }
 
+    @Override
+    public void setOlderOffsetToThisPos(long savedPos) throws IOException {
+        long curPos = position();
+        long actual = curPos - savedPos;
+
+        seek(savedPos, SeekMode.SET);
+        writeUI64(actual);
+        seek(curPos, SeekMode.SET);
+    }
 }
