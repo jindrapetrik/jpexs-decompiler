@@ -178,6 +178,11 @@ public class IggyFile implements StructureInterface {
     }
 
     public static void main(String[] args) throws IOException {
+        /*
+        String indexFileName = "d:\\Dropbox\\jpexs-laptop\\iggi\\extraxtdir_orig\\index4_type0.bin";
+        IggyIndexParser.parseIndex(true, new TemporaryDataStream(Helper.readFile(indexFileName)), new ArrayList<>(), new ArrayList<>());
+
+        System.exit(0);*/
         String inFileName = "d:\\Dropbox\\jpexs-laptop\\iggi\\lib_loc_english_font.iggy";
         String outFileName = "d:\\Dropbox\\jpexs-laptop\\iggi\\lib_loc_english_font2.iggy";
 
@@ -643,7 +648,25 @@ public class IggyFile implements StructureInterface {
         return iggySwfs.get(swfIndex).getHdr().getFrameRate();
     }
 
-    //WIP
+    /**
+     * Removes entries of type INDEX.There can be more than one INDEX,
+     * continuous. This removes all ot them.
+     */
+    public void removeIndexEntries() {
+        long offsetsChange = 0;
+        final int ENTRY_SIZE = 16;
+        for (int i = 0; i < subFileEntries.size(); i++) {
+            IggySubFileEntry entry = subFileEntries.get(i);
+            entry.offset += offsetsChange;
+            if (entry.type == IggySubFileEntry.TYPE_INDEX) {
+                offsetsChange = offsetsChange - entry.size - ENTRY_SIZE;
+                subFileEntriesData.remove(i);
+                subFileEntries.remove(i);
+                i--;
+            }
+        }
+    }
+
     public boolean replaceSwf(int targetSwfIndex, IggySwf iggySwf) throws IOException {
 
         if (targetSwfIndex < 0 || targetSwfIndex >= getSwfCount()) {
@@ -668,30 +691,22 @@ public class IggyFile implements StructureInterface {
         for (int i = 0; i < subFileEntries.size(); i++) {
             IggySubFileEntry entry = subFileEntries.get(i);
             entry.offset += offsetsChange;
-            if (entry.type == IggySubFileEntry.TYPE_INDEX) {
-                if (swfIndex == targetSwfIndex) {
-                    long oldSize = entry.size;
-                    long newSize = replacementIndexData.length;
-                    offsetsChange = offsetsChange + (newSize - oldSize);
-                    entry.size = newSize;
-                    entry.size2 = newSize;
-                    subFileEntriesData.set(i, replacementIndexData);
-                }
-                swfIndex++;
-            }
             if (entry.type == IggySubFileEntry.TYPE_FLASH) {
                 if (swfIndex == targetSwfIndex) {
                     long oldSize = entry.size;
                     long newSize = replacementData.length;
-                    offsetsChange = offsetsChange + (newSize - oldSize);
                     entry.size = newSize;
                     entry.size2 = newSize;
-                    //entries after this one will have modified offsets
+                    offsetsChange = offsetsChange + (newSize - oldSize); //entries after this one will have modified offsets
                     subFileEntriesData.set(i, replacementData);
                 }
             }
         }
 
+        removeIndexEntries();
+        IggySubFileEntry indexEntry = new IggySubFileEntry(IggySubFileEntry.TYPE_INDEX, replacementIndexData.length, replacementIndexData.length, 0 /*offset will be set automatically*/);
+        subFileEntries.add(indexEntry);
+        subFileEntriesData.add(replacementIndexData);
         return true;
     }
 
@@ -724,15 +739,22 @@ public class IggyFile implements StructureInterface {
     @Override
     public void writeToDataStream(WriteDataStreamInterface stream) throws IOException {
         header.writeToDataStream(stream);
-        for (IggySubFileEntry entry : subFileEntries) {
-            entry.writeToDataStream(stream);
-        }
+
+        long startOffset = IggyHeader.STRUCT_SIZE + IggySubFileEntry.STRUCTURE_SIZE * subFileEntries.size();
+        long currentOffset = startOffset;
+
         for (int i = 0; i < subFileEntries.size(); i++) {
             IggySubFileEntry entry = subFileEntries.get(i);
+            entry.offset = currentOffset;
+            currentOffset += entry.size;
+            entry.writeToDataStream(stream);
+        }
+
+        for (int i = 0; i < subFileEntries.size(); i++) {
             byte[] entryData = subFileEntriesData.get(i);
-            stream.seek(entry.offset, SeekMode.SET);
             stream.writeBytes(entryData);
         }
+
     }
 
 }

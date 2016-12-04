@@ -22,7 +22,7 @@ public class IggyIndexParser {
 
     static {
         try {
-            pw = new PrintWriter("d:\\Dropbox\\jpexs-laptop\\iggi\\extraxtdir_orig\\index2.txt");
+            pw = new PrintWriter("d:\\Dropbox\\jpexs-laptop\\iggi\\extraxtdir_orig\\index2b.txt");
         } catch (FileNotFoundException ex) {
             Logger.getLogger(IggyIndexParser.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -43,7 +43,8 @@ public class IggyIndexParser {
                 pw.close();
             }
         });
-    }*/
+    }
+     */
     /**
      * Parser for index data. It creates table of indices and table of offsets
      *

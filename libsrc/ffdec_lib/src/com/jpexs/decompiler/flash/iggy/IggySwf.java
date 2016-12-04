@@ -34,8 +34,6 @@ public class IggySwf implements StructureInterface {
 
     private IggyFlashHeader64 hdr;
 
-    private byte[] allFontBytes;
-
     public IggySwf(ReadDataStreamInterface stream) throws IOException {
         readFromDataStream(stream);
     }
@@ -92,10 +90,6 @@ public class IggySwf implements StructureInterface {
     public void readFromDataStream(ReadDataStreamInterface s) throws IOException {
         this.hdr = new IggyFlashHeader64(s);
         //Save all font bytes to buffer for later easy modification
-        long curPos = s.position();
-        long maxPos = hdr.getFontEndAddress();
-        allFontBytes = s.readBytes((int) (maxPos - curPos));
-        s.seek(curPos, SeekMode.SET);
         //here is offset[0] - 184
         name = s.readWChar();
         //here is offset[1] - 230

@@ -17,6 +17,8 @@ import java.util.List;
  */
 public class IggySubFileEntry implements StructureInterface {
 
+    public static final int STRUCTURE_SIZE = 16;
+
     public static final int TYPE_INDEX = 0;
     public static final int TYPE_FLASH = 1;
 

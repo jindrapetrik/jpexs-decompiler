@@ -17,6 +17,8 @@ import java.io.IOException;
  */
 public class IggyHeader implements StructureInterface {
 
+    public static int STRUCT_SIZE = 32;
+
     public static long MAGIC = 0xED0A6749;
 
     //Must be 0xED0A6749
