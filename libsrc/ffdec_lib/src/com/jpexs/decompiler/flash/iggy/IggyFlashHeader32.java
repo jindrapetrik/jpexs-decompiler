@@ -1,8 +1,8 @@
 package com.jpexs.decompiler.flash.iggy;
 
+import com.jpexs.decompiler.flash.iggy.annotations.IggyFieldType;
 import com.jpexs.decompiler.flash.iggy.streams.ReadDataStreamInterface;
 import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
-import com.jpexs.decompiler.flash.iggy.annotations.IggyFieldType;
 import java.io.IOException;
 
 /**

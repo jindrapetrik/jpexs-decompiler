@@ -1,9 +1,9 @@
 package com.jpexs.decompiler.flash.iggy;
 
-import com.jpexs.decompiler.flash.iggy.streams.StructureInterface;
-import com.jpexs.decompiler.flash.iggy.streams.ReadDataStreamInterface;
-import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
 import com.jpexs.decompiler.flash.iggy.annotations.IggyFieldType;
+import com.jpexs.decompiler.flash.iggy.streams.ReadDataStreamInterface;
+import com.jpexs.decompiler.flash.iggy.streams.StructureInterface;
+import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;

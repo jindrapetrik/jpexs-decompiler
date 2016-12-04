@@ -1,13 +1,10 @@
 package com.jpexs.decompiler.flash.iggy;
 
-import static com.jpexs.decompiler.flash.iggy.IggyShape.STRUCT_SIZE;
-import com.jpexs.decompiler.flash.iggy.streams.StructureInterface;
-import com.jpexs.decompiler.flash.iggy.streams.AbstractDataStream;
 import com.jpexs.decompiler.flash.iggy.annotations.IggyFieldType;
 import com.jpexs.decompiler.flash.iggy.streams.ReadDataStreamInterface;
+import com.jpexs.decompiler.flash.iggy.streams.StructureInterface;
 import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
 import java.io.IOException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**

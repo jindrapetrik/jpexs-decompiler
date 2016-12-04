@@ -1,13 +1,11 @@
 package com.jpexs.decompiler.flash.iggy;
 
-import com.jpexs.decompiler.flash.iggy.streams.SeekMode;
-import com.jpexs.decompiler.flash.iggy.streams.ReadDataStreamInterface;
-import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
-import com.jpexs.decompiler.flash.iggy.streams.TemporaryDataStream;
 import com.jpexs.decompiler.flash.iggy.annotations.IggyArrayFieldType;
 import com.jpexs.decompiler.flash.iggy.annotations.IggyFieldType;
-import com.jpexs.decompiler.flash.iggy.streams.DataStreamInterface;
 import com.jpexs.decompiler.flash.iggy.streams.IggyIndexBuilder;
+import com.jpexs.decompiler.flash.iggy.streams.ReadDataStreamInterface;
+import com.jpexs.decompiler.flash.iggy.streams.SeekMode;
+import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
