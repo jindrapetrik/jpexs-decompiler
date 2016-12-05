@@ -284,6 +284,7 @@ public class IggySwf implements StructureInterface {
                 s.writeWChar(sequenceNames.get(i));
             }
         }
+        s.setOlderOffsetToThisPos(hdr.getSequence_end_ofs_pos());
         s.pad8bytes();
         ib.pad8bytes();
 
