@@ -5,6 +5,7 @@ import com.jpexs.decompiler.flash.SWFBundle;
 import com.jpexs.decompiler.flash.iggy.IggyFile;
 import com.jpexs.decompiler.flash.iggy.IggyFont;
 import com.jpexs.decompiler.flash.tags.DefineFont2Tag;
+import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
@@ -106,12 +107,11 @@ public class IggySwfBundle implements SWFBundle {
     @Override
     public boolean putSWF(String key, InputStream is) throws IOException {
         try {
-            int swfIndex = 0;
             SWF swf = new SWF(is, false, false);
             List<DefineFont2Tag> fontTags = new ArrayList<>();
-            for (CharacterTag ct : swf.getCharacters().values()) {
-                if (ct instanceof DefineFont2Tag) {
-                    fontTags.add((DefineFont2Tag) ct);
+            for (Tag t : swf.getTags()) {
+                if (t instanceof DefineFont2Tag) {
+                    fontTags.add((DefineFont2Tag) t);
                 }
             }
             int fontCount = iggyFile.getFontCount();
