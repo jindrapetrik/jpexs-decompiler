@@ -2979,11 +2979,13 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 // show welcome panel after closing swfs
                 updateUi();
             } else {
-                if (swf == null) {
+                if (swf == null && swfs.get(0) != null) {
                     swf = swfs.get(0).get(0);
                 }
 
-                updateUi(swf);
+                if (swf != null) {
+                    updateUi(swf);
+                }
             }
         } else {
             updateUi();
