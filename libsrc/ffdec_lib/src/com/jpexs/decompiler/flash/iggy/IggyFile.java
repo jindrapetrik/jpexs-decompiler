@@ -43,14 +43,6 @@ public class IggyFile implements StructureInterface {
         return iggySwf;
     }
 
-    public int getFontCount() {
-        return iggySwf.fonts.size();
-    }
-
-    public IggyFont getFont(int fontId) {
-        return iggySwf.fonts.get(fontId);
-    }
-
     public IggyFile(String filePath) throws IOException {
         this(new File(filePath));
     }
@@ -234,31 +226,14 @@ public class IggyFile implements StructureInterface {
 
         for (int i = 0; i < subFileEntries.size(); i++) {
             IggySubFileEntry entry = subFileEntries.get(i);
-            if (entry.type != IggySubFileEntry.TYPE_FLASH || entry.type != IggySubFileEntry.TYPE_INDEX) {
-                continue;
-            }
             entry.offset = currentOffset;
             currentOffset += entry.size;
             entry.writeToDataStream(stream);
         }
 
         for (int i = 0; i < subFileEntries.size(); i++) {
-            IggySubFileEntry entry = subFileEntries.get(i);
-            if (entry.type != IggySubFileEntry.TYPE_FLASH || entry.type != IggySubFileEntry.TYPE_INDEX) {
-                continue;
-            }
-
             byte[] entryData = subFileEntriesData.get(i);
             stream.writeBytes(entryData);
-        }
-
-        for (int i = 0; i < subFileEntries.size(); i++) {
-            IggySubFileEntry entry = subFileEntries.get(i);
-            if (entry.type != IggySubFileEntry.TYPE_FLASH || entry.type != IggySubFileEntry.TYPE_INDEX) {
-                subFileEntries.remove(i);
-                subFileEntriesData.remove(i);
-                i--;
-            }
         }
 
     }

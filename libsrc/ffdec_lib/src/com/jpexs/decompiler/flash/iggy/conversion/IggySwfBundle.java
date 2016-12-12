@@ -108,21 +108,7 @@ public class IggySwfBundle implements SWFBundle {
     public boolean putSWF(String key, InputStream is) throws IOException {
         try {
             SWF swf = new SWF(is, false, false);
-            List<DefineFont2Tag> fontTags = new ArrayList<>();
-            for (Tag t : swf.getTags()) {
-                if (t instanceof DefineFont2Tag) {
-                    fontTags.add((DefineFont2Tag) t);
-                }
-            }
-            int fontCount = iggyFile.getFontCount();
-            if (fontCount != fontTags.size()) {
-                throw new IOException("Font count is different from original iggy file");
-            }
-            for (int i = 0; i < fontCount; i++) {
-                IggyFont iggyFont = iggyFile.getFont(i);
-                DefineFont2Tag fontTag = fontTags.get(i);
-                SwfToIggyConvertor.updateIggyFont(iggyFont, fontTag);
-            }
+            SwfToIggyConvertor.updateIggy(iggyFile.getSwf(), swf);
             iggyFile.saveChanges();
             return true;
         } catch (InterruptedException ex) {

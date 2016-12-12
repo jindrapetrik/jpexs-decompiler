@@ -70,6 +70,10 @@ public class IggyToSwfConvertor {
         return (int) (val * 1024.0);
     }
 
+    private static int makeLengthsTwip(double val) {
+        return (int) (val * SWF.unitDivisor);
+    }
+
     public static SWF getSwf(IggyFile file) {
         SWF swf = new SWF();
         swf.compression = SWFCompression.NONE;
@@ -77,10 +81,10 @@ public class IggyToSwfConvertor {
         swf.frameRate = file.getSwfFrameRate();
         swf.gfx = false;
         swf.displayRect = new RECT(
-                (int) (file.getSwfXMin() * SWF.unitDivisor),
-                (int) (file.getSwfXMax() * SWF.unitDivisor),
-                (int) (file.getSwfYMin() * SWF.unitDivisor),
-                (int) (file.getSwfYMax() * SWF.unitDivisor));
+                makeLengthsTwip(file.getSwfXMin()),
+                makeLengthsTwip(file.getSwfXMax()),
+                makeLengthsTwip(file.getSwfYMin()),
+                makeLengthsTwip(file.getSwfYMax()));
         swf.version = 10; //FIXME
 
         FileAttributesTag fat = new FileAttributesTag(swf);
@@ -88,14 +92,13 @@ public class IggyToSwfConvertor {
         fat.hasMetadata = false;
         fat.useNetwork = false;
         swf.addTag(fat);
-        //Set<Integer> fontIndices = file.getFontIds(swfIndex);
-        int fontCount = file.getFontCount();
+        IggySwf iggySwf = file.getSwf();
 
         int currentCharId = 0;
         Map<Integer, Integer> fontIndex2CharId = new HashMap<>();
 
-        for (int fontIndex = 0; fontIndex < fontCount; fontIndex++) {
-            IggyFont iggyFont = file.getFont(fontIndex);
+        for (int fontIndex = 0; fontIndex < iggySwf.getFonts().size(); fontIndex++) {
+            IggyFont iggyFont = iggySwf.getFonts().get(fontIndex);
             DefineFont2Tag fontTag = new DefineFont2Tag(swf);
             currentCharId++;
             fontIndex2CharId.put(fontIndex, currentCharId);
@@ -158,17 +161,13 @@ public class IggyToSwfConvertor {
             swf.addTag(fontTag);
         }
 
-        /*       
-        //TODO: Texts, they are incomplete
-        
         Map<Integer, Integer> textIndex2CharId = new HashMap<>();
 
-        Set<Integer> textIds = file.getTextIds(swfIndex);
-        for (int textId : textIds) {
-            IggyText iggyText = file.getText(swfIndex, textId);
+        for (int textIndex = 0; textIndex < iggySwf.getTexts().size(); textIndex++) {
+            IggyText iggyText = iggySwf.getTexts().get(textIndex);
             DefineEditTextTag textTag = new DefineEditTextTag(swf);
             currentCharId++;
-            textIndex2CharId.put(iggyText.getTextIndex(), currentCharId);
+            textIndex2CharId.put(textIndex, currentCharId);
             textTag.characterID = currentCharId;
             textTag.hasText = true;
             textTag.initialText = iggyText.getInitialText();
@@ -185,10 +184,10 @@ public class IggyToSwfConvertor {
             //textTag.fontHeight = 40; //??            
             textTag.readOnly = true;
             textTag.bounds = new RECT(
-                    makeLengthsTwip(iggyText.getPar3()),
                     makeLengthsTwip(iggyText.getPar1()),
-                    makeLengthsTwip(iggyText.getPar4()),
-                    makeLengthsTwip(iggyText.getPar2())
+                    makeLengthsTwip(iggyText.getPar3()),
+                    makeLengthsTwip(iggyText.getPar2()),
+                    makeLengthsTwip(iggyText.getPar4())
             );
 
             //textTag.hasFont = true;
@@ -196,7 +195,7 @@ public class IggyToSwfConvertor {
             textTag.setModified(true);
             swf.addTag(textTag);
         }
-         */
+
         swf.addTag(
                 new EndTag(swf));
         swf.setModified(

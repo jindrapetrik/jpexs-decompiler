@@ -191,4 +191,8 @@ public class IggyText implements StructureInterface {
         return initialText;
     }
 
+    public void setInitialText(String initialText) {
+        this.initialText = initialText;
+    }
+
 }
