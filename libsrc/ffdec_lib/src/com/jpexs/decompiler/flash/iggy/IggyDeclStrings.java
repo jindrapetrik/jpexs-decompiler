@@ -71,7 +71,6 @@ public class IggyDeclStrings implements StructureInterface {
             byte[] padd = new byte[((int) (((15 + data.length) / 8 + 1) * 8 - 15 - data.length))];
             s.writeBytes(padd);
         }
-        s.writeBytes(padd);
         ib.writeConstLength(IggyIndexBuilder.CONST_SEQUENCE_SIZE);
         s.writeUI64(one);
         s.writeUI64(zero);
