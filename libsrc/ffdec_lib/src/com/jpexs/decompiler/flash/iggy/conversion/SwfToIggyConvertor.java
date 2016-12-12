@@ -1,15 +1,25 @@
 package com.jpexs.decompiler.flash.iggy.conversion;
 
+import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.iggy.IggyCharAdvances;
 import com.jpexs.decompiler.flash.iggy.IggyCharIndices;
 import com.jpexs.decompiler.flash.iggy.IggyCharKerning;
 import com.jpexs.decompiler.flash.iggy.IggyCharOffset;
 import com.jpexs.decompiler.flash.iggy.IggyFont;
 import com.jpexs.decompiler.flash.iggy.IggyShape;
+import com.jpexs.decompiler.flash.iggy.IggySwf;
+import com.jpexs.decompiler.flash.iggy.IggyText;
+import com.jpexs.decompiler.flash.tags.DefineEditTextTag;
 import com.jpexs.decompiler.flash.tags.DefineFont2Tag;
+import com.jpexs.decompiler.flash.tags.DoABC2Tag;
+import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.types.KERNINGRECORD;
 import com.jpexs.decompiler.flash.types.SHAPE;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -20,6 +30,57 @@ public class SwfToIggyConvertor {
 
     private static float normalizeLengths(int val) {
         return (val / 1024f);
+    }
+
+    public static void updateIggy(IggySwf iggySwf, SWF swf) throws IOException {
+        List<DefineFont2Tag> fontTags = new ArrayList<>();
+        List<DefineEditTextTag> textTags = new ArrayList<>();
+        List<DoABC2Tag> abcTags = new ArrayList<>();
+
+        for (Tag t : swf.getTags()) {
+            if (t instanceof DefineFont2Tag) {
+                fontTags.add((DefineFont2Tag) t);
+            }
+            if (t instanceof DefineEditTextTag) {
+                textTags.add((DefineEditTextTag) t);
+            }
+            if (t instanceof DoABC2Tag) {
+                abcTags.add((DoABC2Tag) t);
+            }
+        }
+        if (abcTags.size() > 1) {
+            throw new IOException("Cannot save more than one ABC tag");
+        }
+        int fontCount = iggySwf.getFonts().size();
+        if (fontCount != fontTags.size()) {
+            throw new IOException("Font count is different from original iggy file");
+        }
+        for (int i = 0; i < fontCount; i++) {
+            IggyFont iggyFont = iggySwf.getFonts().get(i);
+            DefineFont2Tag fontTag = fontTags.get(i);
+            SwfToIggyConvertor.updateIggyFont(iggyFont, fontTag);
+        }
+
+        int textCount = iggySwf.getTexts().size();
+        if (textCount != textTags.size()) {
+            throw new IOException("Text count is different from original iggy file");
+        }
+        for (int i = 0; i < textCount; i++) {
+            IggyText iggyText = iggySwf.getTexts().get(i);
+            DefineEditTextTag textTag = textTags.get(i);
+            SwfToIggyConvertor.updateIggyText(iggyText, textTag);
+        }
+        if (!abcTags.isEmpty()) {
+            DoABC2Tag abcTag = abcTags.get(0);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            byte abcTagData[] = abcTag.getData();
+            byte declData[] = Arrays.copyOfRange(abcTagData, 4/*UI32 flags*/ + 1 /*empty string as name*/ + 3 /*versions, leaving one zero intact*/, abcTagData.length);
+            iggySwf.getDeclStrings().setData(declData);
+        }
+    }
+
+    public static void updateIggyText(IggyText iggyText, DefineEditTextTag textTag) {
+        iggyText.setInitialText(textTag.initialText);
     }
 
     public static void updateIggyFont(IggyFont iggyFont, DefineFont2Tag fontTag) {
@@ -90,14 +151,6 @@ public class SwfToIggyConvertor {
         iggyFont.setCodePoints(codePoints);
         iggyFont.setCharScales(charScales);
         iggyFont.setCharKernings(charKernings);
-        /*
-        IggyFont iggyFont = new IggyFont(IggyFont.ID, 0, zeroone, fontTag.getCharacterCount(),
-                fontTag.getAscent(), fontTag.getDescent(), fontTag.getLeading(), flags,
-                fontTag.fontKerningTable.size(), unk_float, 0, what_2, 0, 1,
-                xscale, yscale, 0, ssr1, ssr2, fontTag.getCharacterCount(), 0, what_3, zeroes48a, zeroes48b,
-                sss1, 1, sss2, 1, sss3, 1, sss4, 1, fontTag.getFontName(),
-                charOffsets, glyphs, codePoints, charScales, charKernings);
-         */
     }
 
     public static IggyFont createIggyFont(DefineFont2Tag fontTag) {

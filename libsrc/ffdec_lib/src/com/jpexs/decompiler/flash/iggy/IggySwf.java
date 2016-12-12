@@ -21,9 +21,9 @@ public class IggySwf implements StructureInterface {
     @IggyFieldType(value = DataType.wchar_t, count = 48)
     String name;
 
-    List<IggyFont> fonts = new ArrayList<>();
+    private List<IggyFont> fonts = new ArrayList<>();
     // private List<Long> font_data_addresses = new ArrayList<>();
-    List<IggyFont> add_fonts = new ArrayList<>();
+    private List<IggyFont> add_fonts = new ArrayList<>();
 //    private List<Long> add_font_data_addresses = new ArrayList<>();
 
     private IggyFlashHeader64 hdr;
@@ -50,6 +50,22 @@ public class IggySwf implements StructureInterface {
 
     public IggyFlashHeader64 getHdr() {
         return hdr;
+    }
+
+    public List<IggyFont> getFonts() {
+        return fonts;
+    }
+
+    public List<IggyFont> getAddFonts() {
+        return add_fonts;
+    }
+
+    public List<IggyText> getTexts() {
+        return texts;
+    }
+
+    public List<IggyText> getAddTexts() {
+        return add_texts;
     }
 
     @Override
@@ -314,6 +330,10 @@ public class IggySwf implements StructureInterface {
         sb.append("[\r\n");
         sb.append("name ").append(name).append("\r\n");
         return sb.toString();
+    }
+
+    public IggyDeclStrings getDeclStrings() {
+        return decl_strings;
     }
 
 }

@@ -2,17 +2,20 @@ package com.jpexs.decompiler.flash.iggy.conversion;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFCompression;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.iggy.IggyShape;
 import com.jpexs.decompiler.flash.iggy.IggyCharKerning;
 import com.jpexs.decompiler.flash.iggy.IggyShapeNode;
 import com.jpexs.decompiler.flash.iggy.IggyCharOffset;
 import com.jpexs.decompiler.flash.iggy.IggyCharAdvances;
+import com.jpexs.decompiler.flash.iggy.IggyDeclStrings;
 import com.jpexs.decompiler.flash.iggy.IggyFile;
 import com.jpexs.decompiler.flash.iggy.IggyFont;
 import com.jpexs.decompiler.flash.iggy.IggySwf;
 import com.jpexs.decompiler.flash.iggy.IggyText;
 import com.jpexs.decompiler.flash.tags.DefineEditTextTag;
 import com.jpexs.decompiler.flash.tags.DefineFont2Tag;
+import com.jpexs.decompiler.flash.tags.DoABC2Tag;
 import com.jpexs.decompiler.flash.tags.EndTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
 import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
@@ -26,7 +29,9 @@ import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
+import com.jpexs.helpers.ByteArrayRange;
 import java.awt.Color;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -36,6 +41,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -70,6 +77,10 @@ public class IggyToSwfConvertor {
         return (int) (val * 1024.0);
     }
 
+    private static int makeLengthsTwip(double val) {
+        return (int) (val * SWF.unitDivisor);
+    }
+
     public static SWF getSwf(IggyFile file) {
         SWF swf = new SWF();
         swf.compression = SWFCompression.NONE;
@@ -77,25 +88,24 @@ public class IggyToSwfConvertor {
         swf.frameRate = file.getSwfFrameRate();
         swf.gfx = false;
         swf.displayRect = new RECT(
-                (int) (file.getSwfXMin() * SWF.unitDivisor),
-                (int) (file.getSwfXMax() * SWF.unitDivisor),
-                (int) (file.getSwfYMin() * SWF.unitDivisor),
-                (int) (file.getSwfYMax() * SWF.unitDivisor));
+                makeLengthsTwip(file.getSwfXMin()),
+                makeLengthsTwip(file.getSwfXMax()),
+                makeLengthsTwip(file.getSwfYMin()),
+                makeLengthsTwip(file.getSwfYMax()));
         swf.version = 10; //FIXME
 
         FileAttributesTag fat = new FileAttributesTag(swf);
-        fat.actionScript3 = false;
+        fat.actionScript3 = true;
         fat.hasMetadata = false;
         fat.useNetwork = false;
         swf.addTag(fat);
-        //Set<Integer> fontIndices = file.getFontIds(swfIndex);
-        int fontCount = file.getFontCount();
+        IggySwf iggySwf = file.getSwf();
 
         int currentCharId = 0;
         Map<Integer, Integer> fontIndex2CharId = new HashMap<>();
 
-        for (int fontIndex = 0; fontIndex < fontCount; fontIndex++) {
-            IggyFont iggyFont = file.getFont(fontIndex);
+        for (int fontIndex = 0; fontIndex < iggySwf.getFonts().size(); fontIndex++) {
+            IggyFont iggyFont = iggySwf.getFonts().get(fontIndex);
             DefineFont2Tag fontTag = new DefineFont2Tag(swf);
             currentCharId++;
             fontIndex2CharId.put(fontIndex, currentCharId);
@@ -158,17 +168,13 @@ public class IggyToSwfConvertor {
             swf.addTag(fontTag);
         }
 
-        /*       
-        //TODO: Texts, they are incomplete
-        
         Map<Integer, Integer> textIndex2CharId = new HashMap<>();
 
-        Set<Integer> textIds = file.getTextIds(swfIndex);
-        for (int textId : textIds) {
-            IggyText iggyText = file.getText(swfIndex, textId);
+        for (int textIndex = 0; textIndex < iggySwf.getTexts().size(); textIndex++) {
+            IggyText iggyText = iggySwf.getTexts().get(textIndex);
             DefineEditTextTag textTag = new DefineEditTextTag(swf);
             currentCharId++;
-            textIndex2CharId.put(iggyText.getTextIndex(), currentCharId);
+            textIndex2CharId.put(textIndex, currentCharId);
             textTag.characterID = currentCharId;
             textTag.hasText = true;
             textTag.initialText = iggyText.getInitialText();
@@ -185,10 +191,10 @@ public class IggyToSwfConvertor {
             //textTag.fontHeight = 40; //??            
             textTag.readOnly = true;
             textTag.bounds = new RECT(
-                    makeLengthsTwip(iggyText.getPar3()),
                     makeLengthsTwip(iggyText.getPar1()),
-                    makeLengthsTwip(iggyText.getPar4()),
-                    makeLengthsTwip(iggyText.getPar2())
+                    makeLengthsTwip(iggyText.getPar3()),
+                    makeLengthsTwip(iggyText.getPar2()),
+                    makeLengthsTwip(iggyText.getPar4())
             );
 
             //textTag.hasFont = true;
@@ -196,7 +202,28 @@ public class IggyToSwfConvertor {
             textTag.setModified(true);
             swf.addTag(textTag);
         }
-         */
+
+        IggyDeclStrings declStrings = iggySwf.getDeclStrings();
+        if (declStrings != null) {
+            byte[] abcData = declStrings.getData();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            try {
+                baos.write(new byte[]{1, 0, 0, 0, 0, 0x10, 0, 0x2E});
+                baos.write(abcData);
+            } catch (IOException ex) {
+                //should not happen
+            }
+            byte[] fullAbcTagData = baos.toByteArray();
+            try {
+                DoABC2Tag nabc = new DoABC2Tag(new SWFInputStream(swf, fullAbcTagData), new ByteArrayRange(fullAbcTagData));
+                nabc.setModified(true);
+                swf.addTag(nabc);
+            } catch (IOException ex) {
+                //ignore
+            }
+
+        }
+
         swf.addTag(
                 new EndTag(swf));
         swf.setModified(

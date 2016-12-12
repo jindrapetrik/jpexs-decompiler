@@ -5,6 +5,7 @@ import com.jpexs.decompiler.flash.SWFBundle;
 import com.jpexs.decompiler.flash.iggy.IggyFile;
 import com.jpexs.decompiler.flash.iggy.IggyFont;
 import com.jpexs.decompiler.flash.tags.DefineFont2Tag;
+import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
@@ -106,23 +107,8 @@ public class IggySwfBundle implements SWFBundle {
     @Override
     public boolean putSWF(String key, InputStream is) throws IOException {
         try {
-            int swfIndex = 0;
             SWF swf = new SWF(is, false, false);
-            List<DefineFont2Tag> fontTags = new ArrayList<>();
-            for (CharacterTag ct : swf.getCharacters().values()) {
-                if (ct instanceof DefineFont2Tag) {
-                    fontTags.add((DefineFont2Tag) ct);
-                }
-            }
-            int fontCount = iggyFile.getFontCount();
-            if (fontCount != fontTags.size()) {
-                throw new IOException("Font count is different from original iggy file");
-            }
-            for (int i = 0; i < fontCount; i++) {
-                IggyFont iggyFont = iggyFile.getFont(i);
-                DefineFont2Tag fontTag = fontTags.get(i);
-                SwfToIggyConvertor.updateIggyFont(iggyFont, fontTag);
-            }
+            SwfToIggyConvertor.updateIggy(iggyFile.getSwf(), swf);
             iggyFile.saveChanges();
             return true;
         } catch (InterruptedException ex) {
