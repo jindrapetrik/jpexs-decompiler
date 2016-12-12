@@ -828,8 +828,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     private void updateUi(final SWF swf) {
 
-        mainFrame.setTitle(ApplicationInfo.applicationVerName + (Configuration.displayFileName.get() ? " - " + swf.getFileTitle() : ""));
-
         List<ABCContainerTag> abcList = swf.getAbcList();
 
         boolean hasAbc = !abcList.isEmpty();

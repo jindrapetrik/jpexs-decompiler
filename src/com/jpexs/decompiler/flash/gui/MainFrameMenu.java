@@ -192,7 +192,6 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
     private boolean saveAs(SWF swf, SaveFileMode mode) {
         if (Main.saveFileDialog(swf, mode)) {
-            mainFrame.setTitle(ApplicationInfo.applicationVerName + (Configuration.displayFileName.get() ? " - " + swf.getFileTitle() : ""));
             updateComponents(swf);
             return true;
         }
@@ -763,7 +762,17 @@ public abstract class MainFrameMenu implements MenuBuilder {
         setMenuEnabled("/debugging/debug/continue", isDebugPaused);
         //setMenuEnabled("/debugging/debug/stack", isDebugPaused);
         //setMenuEnabled("/debugging/debug/watch", isDebugPaused);
+        StringBuilder titleBuilder = new StringBuilder();
+        titleBuilder.append(ApplicationInfo.applicationVerName);
 
+        if (Configuration.displayFileName.get() && swf != null) {
+            titleBuilder.append(" - ");
+            if (swf.swfList != null && swf.swfList.isBundle()) {
+                titleBuilder.append(swf.swfList.name).append("/");
+            }
+            titleBuilder.append(swf.getFileTitle());
+        }
+        mainFrame.setTitle(titleBuilder.toString());
     }
 
     private void registerHotKeys() {
