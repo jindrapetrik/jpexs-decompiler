@@ -1,6 +1,7 @@
 package com.jpexs.decompiler.flash.iggy.conversion;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.iggy.IggyCharAdvances;
 import com.jpexs.decompiler.flash.iggy.IggyCharIndices;
 import com.jpexs.decompiler.flash.iggy.IggyCharKerning;
@@ -11,11 +12,14 @@ import com.jpexs.decompiler.flash.iggy.IggySwf;
 import com.jpexs.decompiler.flash.iggy.IggyText;
 import com.jpexs.decompiler.flash.tags.DefineEditTextTag;
 import com.jpexs.decompiler.flash.tags.DefineFont2Tag;
+import com.jpexs.decompiler.flash.tags.DoABC2Tag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.types.KERNINGRECORD;
 import com.jpexs.decompiler.flash.types.SHAPE;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -31,6 +35,7 @@ public class SwfToIggyConvertor {
     public static void updateIggy(IggySwf iggySwf, SWF swf) throws IOException {
         List<DefineFont2Tag> fontTags = new ArrayList<>();
         List<DefineEditTextTag> textTags = new ArrayList<>();
+        List<DoABC2Tag> abcTags = new ArrayList<>();
 
         for (Tag t : swf.getTags()) {
             if (t instanceof DefineFont2Tag) {
@@ -39,6 +44,12 @@ public class SwfToIggyConvertor {
             if (t instanceof DefineEditTextTag) {
                 textTags.add((DefineEditTextTag) t);
             }
+            if (t instanceof DoABC2Tag) {
+                abcTags.add((DoABC2Tag) t);
+            }
+        }
+        if (abcTags.size() > 1) {
+            throw new IOException("Cannot save more than one ABC tag");
         }
         int fontCount = iggySwf.getFonts().size();
         if (fontCount != fontTags.size()) {
@@ -58,6 +69,13 @@ public class SwfToIggyConvertor {
             IggyText iggyText = iggySwf.getTexts().get(i);
             DefineEditTextTag textTag = textTags.get(i);
             SwfToIggyConvertor.updateIggyText(iggyText, textTag);
+        }
+        if (!abcTags.isEmpty()) {
+            DoABC2Tag abcTag = abcTags.get(0);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            byte abcTagData[] = abcTag.getData();
+            byte declData[] = Arrays.copyOfRange(abcTagData, 4/*UI32 flags*/ + 1 /*empty string as name*/ + 3 /*versions, leaving one zero intact*/, abcTagData.length);
+            iggySwf.getDeclStrings().setData(declData);
         }
     }
 

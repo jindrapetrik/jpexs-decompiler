@@ -2,17 +2,20 @@ package com.jpexs.decompiler.flash.iggy.conversion;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFCompression;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.iggy.IggyShape;
 import com.jpexs.decompiler.flash.iggy.IggyCharKerning;
 import com.jpexs.decompiler.flash.iggy.IggyShapeNode;
 import com.jpexs.decompiler.flash.iggy.IggyCharOffset;
 import com.jpexs.decompiler.flash.iggy.IggyCharAdvances;
+import com.jpexs.decompiler.flash.iggy.IggyDeclStrings;
 import com.jpexs.decompiler.flash.iggy.IggyFile;
 import com.jpexs.decompiler.flash.iggy.IggyFont;
 import com.jpexs.decompiler.flash.iggy.IggySwf;
 import com.jpexs.decompiler.flash.iggy.IggyText;
 import com.jpexs.decompiler.flash.tags.DefineEditTextTag;
 import com.jpexs.decompiler.flash.tags.DefineFont2Tag;
+import com.jpexs.decompiler.flash.tags.DoABC2Tag;
 import com.jpexs.decompiler.flash.tags.EndTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
 import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
@@ -26,7 +29,9 @@ import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
+import com.jpexs.helpers.ByteArrayRange;
 import java.awt.Color;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -36,6 +41,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -88,7 +95,7 @@ public class IggyToSwfConvertor {
         swf.version = 10; //FIXME
 
         FileAttributesTag fat = new FileAttributesTag(swf);
-        fat.actionScript3 = false;
+        fat.actionScript3 = true;
         fat.hasMetadata = false;
         fat.useNetwork = false;
         swf.addTag(fat);
@@ -194,6 +201,27 @@ public class IggyToSwfConvertor {
             //textTag.fontId = fontIndex2CharId.get(iggyText.getFontIndex());
             textTag.setModified(true);
             swf.addTag(textTag);
+        }
+
+        IggyDeclStrings declStrings = iggySwf.getDeclStrings();
+        if (declStrings != null) {
+            byte[] abcData = declStrings.getData();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            try {
+                baos.write(new byte[]{1, 0, 0, 0, 0, 0x10, 0, 0x2E});
+                baos.write(abcData);
+            } catch (IOException ex) {
+                //should not happen
+            }
+            byte[] fullAbcTagData = baos.toByteArray();
+            try {
+                DoABC2Tag nabc = new DoABC2Tag(new SWFInputStream(swf, fullAbcTagData), new ByteArrayRange(fullAbcTagData));
+                nabc.setModified(true);
+                swf.addTag(nabc);
+            } catch (IOException ex) {
+                //ignore
+            }
+
         }
 
         swf.addTag(

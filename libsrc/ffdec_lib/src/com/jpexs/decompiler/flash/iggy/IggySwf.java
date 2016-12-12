@@ -332,4 +332,8 @@ public class IggySwf implements StructureInterface {
         return sb.toString();
     }
 
+    public IggyDeclStrings getDeclStrings() {
+        return decl_strings;
+    }
+
 }
