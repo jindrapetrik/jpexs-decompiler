@@ -796,7 +796,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                     if (treeItem instanceof DefineSpriteTag) {
                         isSprite = true;
                     }
-                    int chtId = 0;
+                    int chtId = -1;
                     if (treeItem instanceof CharacterTag) {
                         chtId = ((CharacterTag) treeItem).getCharacterId();
                     }
@@ -1068,7 +1068,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                         for (VideoFrameTag f : frs) {
                             if (!first) {
                                 ratio++;
-                                new PlaceObject2Tag(swf, true, 1, 0, null, null, ratio, null, -1, null).writeTag(sos2);
+                                new PlaceObject2Tag(swf, true, 1, -1, null, null, ratio, null, -1, null).writeTag(sos2);
                             }
                             f.writeTag(sos2);
                             new ShowFrameTag(swf).writeTag(sos2);

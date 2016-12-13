@@ -2762,21 +2762,8 @@ public final class SWF implements SWFContainerItem, Timelined {
         ReadOnlyTagList tags = timelined.getTags();
         if (toRemove instanceof CharacterTag) {
             int characterId = ((CharacterTag) toRemove).getCharacterId();
-
-            if (characterId != 0) {
-                dependingChars.add(characterId);
-                for (int i = 0; i < tags.size(); i++) {
-                    Tag t = tags.get(i);
-                    if (t instanceof CharacterIdTag) {
-                        CharacterIdTag c = (CharacterIdTag) t;
-                        Set<Integer> needed = new HashSet<>();
-                        t.getNeededCharacters(needed);
-                        if (needed.contains(characterId)) {
-                            dependingChars.add(c.getCharacterId());
-                        }
-                    }
-                }
-            }
+            dependingChars = getDependentCharacters(characterId);
+            dependingChars.add(characterId);
         }
 
         for (int i = 0; i < tags.size(); i++) {
@@ -2794,19 +2781,24 @@ public final class SWF implements SWFContainerItem, Timelined {
                     }
                 }
             }
+
             if (t instanceof PlaceObjectTypeTag) {
                 PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
                 int placeCharId = po.getCharacterId();
                 int depth = po.getDepth();
-                if (placeCharId != 0) {
+                if (placeCharId >= 0) {
                     stage.put(depth, placeCharId);
-                    if (dependingChars.contains(placeCharId)) {
-                        timelined.removeTag(i);
-                        i--;
-                        continue;
-                    }
+                } else if (stage.containsKey(depth)) {
+                    placeCharId = stage.get(depth);
+                }
+
+                if (placeCharId >= 0 && dependingChars.contains(placeCharId)) {
+                    timelined.removeTag(i);
+                    i--;
+                    continue;
                 }
             }
+
             if (t instanceof CharacterIdTag) {
                 CharacterIdTag c = (CharacterIdTag) t;
                 if (dependingChars.contains(c.getCharacterId())) {
@@ -2815,20 +2807,13 @@ public final class SWF implements SWFContainerItem, Timelined {
                     continue;
                 }
             }
-            Set<Integer> needed = new HashSet<>();
-            t.getNeededCharacters(needed);
-            for (int dep : dependingChars) {
-                if (needed.contains(dep)) {
-                    timelined.removeTag(i);
-                    i--;
-                    //continue;
-                }
-            }
+
             if (t == toRemove) {
                 timelined.removeTag(i);
                 i--;
                 continue;
             }
+
             if (t instanceof Timelined) {
                 removeTagWithDependenciesFromTimeline(toRemove, ((Timelined) t).getTimeline());
             }
@@ -2916,7 +2901,8 @@ public final class SWF implements SWFContainerItem, Timelined {
             timelined.setModified(true);
             timelined.resetTimeline();
         } else // timeline should be always the swf here
-         if (removeDependencies) {
+        {
+            if (removeDependencies) {
                 removeTagWithDependenciesFromTimeline(tag, timelined.getTimeline());
                 timelined.setModified(true);
             } else {
@@ -2925,6 +2911,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                     timelined.setModified(true);
                 }
             }
+        }
     }
 
     @Override

@@ -507,8 +507,13 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
 
     @Override
     public void setCharacterId(int characterId) {
-        placeFlagHasCharacter = true;
-        this.characterId = characterId;
+        if (characterId >= 0) {
+            placeFlagHasCharacter = true;
+            this.characterId = characterId;
+        } else {
+            placeFlagHasCharacter = false;
+            this.characterId = -1;
+        }
     }
 
     @Override

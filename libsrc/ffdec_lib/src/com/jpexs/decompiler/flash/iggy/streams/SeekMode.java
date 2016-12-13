@@ -2,7 +2,7 @@ package com.jpexs.decompiler.flash.iggy.streams;
 
 /**
  *
- * @author Jindra
+ * @author JPEXS
  */
 public enum SeekMode {
     SET, CUR, END

@@ -1362,7 +1362,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         fpsShouldBe = timeline.frameRate;
         fpsIs = fpsShouldBe;
         scheduleTask(singleFrame, 0);
-
     }
 
     @Override
