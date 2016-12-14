@@ -1135,7 +1135,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         try {
             tempFile = File.createTempFile("ffdec_view_", ".swf");
             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
-                swf.saveTo(fos);
+                swf.saveTo(fos, false);
             }
             //Inject Loader
             if (swf.isAS3() && Configuration.autoOpenLoadedSWFs.get() && !Configuration.internalFlashViewer.get() && !DebuggerTools.hasDebugger(swf)) {

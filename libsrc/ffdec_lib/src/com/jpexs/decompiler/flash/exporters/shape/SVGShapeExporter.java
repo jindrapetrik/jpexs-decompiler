@@ -133,8 +133,11 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
                 imageElement.setAttribute("xlink:href", "data:image/" + format + ";base64," + base64ImgData);
                 pattern.appendChild(imageElement);
                 exporter.addToGroup(pattern);
+                return;
             }
         }
+
+        path.setAttribute("fill", "#ff0000");
     }
 
     @Override

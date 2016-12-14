@@ -870,6 +870,11 @@ public final class SWF implements SWFContainerItem, Timelined {
         compress(new ByteArrayInputStream(uncompressedData), os, compression, lzmaProperties);
     }
 
+    public void saveTo(OutputStream os, boolean gfx) throws IOException {
+        byte[] uncompressedData = saveToByteArray(gfx);
+        compress(new ByteArrayInputStream(uncompressedData), os, compression, lzmaProperties);
+    }
+
     public byte[] getHeaderBytes() {
         return getHeaderBytes(compression, gfx);
     }
@@ -903,6 +908,10 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     private byte[] saveToByteArray() throws IOException {
+        return saveToByteArray(gfx);
+    }
+
+    private byte[] saveToByteArray(boolean gfx) throws IOException {
         fixCharactersOrder(false);
 
         byte[] data;
