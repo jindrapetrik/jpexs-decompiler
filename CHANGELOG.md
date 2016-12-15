@@ -48,6 +48,7 @@ All notable changes to this project will be documented in this file.
 - #1312 faster colliding usages finder
 - #1303 garbled text when exporting frame with text
 - #1314 user interface: button order
+- Internal viewer shows red image when bitmap fill is not available (see issue #1320)
 
 ## [9.0.0] - 2016-08-12
 ### Added
