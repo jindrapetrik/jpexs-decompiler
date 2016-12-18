@@ -228,12 +228,14 @@ public class SoundStreamHeadTag extends Tag implements SoundStreamHeadTypeTag {
     public List<ByteArrayRange> getRawSoundData() {
         List<ByteArrayRange> ret = new ArrayList<>();
         List<SoundStreamBlockTag> blocks = getBlocks();
-        for (SoundStreamBlockTag block : blocks) {
-            ByteArrayRange data = block.streamSoundData;
-            if (streamSoundCompression == SoundFormat.FORMAT_MP3) {
-                ret.add(data.getSubRange(4, data.getLength() - 4));
-            } else {
-                ret.add(data);
+        if (blocks != null) {
+            for (SoundStreamBlockTag block : blocks) {
+                ByteArrayRange data = block.streamSoundData;
+                if (streamSoundCompression == SoundFormat.FORMAT_MP3) {
+                    ret.add(data.getSubRange(4, data.getLength() - 4));
+                } else {
+                    ret.add(data);
+                }
             }
         }
         return ret;

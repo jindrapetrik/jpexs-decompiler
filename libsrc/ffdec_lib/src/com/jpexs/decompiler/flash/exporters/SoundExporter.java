@@ -160,11 +160,13 @@ public class SoundExporter {
         } else {
             List<ByteArrayRange> soundData = st.getRawSoundData();
             SWF swf = ((Tag) st).getSwf();
-            List<SWFInputStream> siss = new ArrayList<>();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
             for (ByteArrayRange data : soundData) {
-                siss.add(new SWFInputStream(swf, data.getRangeData()));
+                baos.write(data.getArray(), data.getPos(), data.getLength());
             }
-            fmt.createWav(siss, fos);
+
+            SWFInputStream sis = new SWFInputStream(swf, baos.toByteArray());
+            fmt.createWav(sis, fos);
         }
     }
 }

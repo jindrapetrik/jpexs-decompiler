@@ -94,7 +94,6 @@ public class SoundTagPlayer implements MediaDisplay {
         this.loopCount = loops;
         clip = (Clip) AudioSystem.getLine(new Line.Info(Clip.class));
         clip.addLineListener(new LineListener() {
-
             @Override
             public void update(LineEvent event) {
                 if (event.getType() == LineEvent.Type.STOP) {
@@ -123,7 +122,6 @@ public class SoundTagPlayer implements MediaDisplay {
 
         timer = new Timer();
         timer.schedule(new TimerTask() {
-
             @Override
             public void run() {
 
@@ -141,7 +139,6 @@ public class SoundTagPlayer implements MediaDisplay {
             openSound(tag);
         } else {
             new Thread() {
-
                 @Override
                 public void run() {
                     try {
@@ -155,7 +152,6 @@ public class SoundTagPlayer implements MediaDisplay {
                         }
                     }
                 }
-
             }.start();
         }
     }
@@ -166,14 +162,13 @@ public class SoundTagPlayer implements MediaDisplay {
         if (wavData == null) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             List<ByteArrayRange> soundData = tag.getRawSoundData();
-            List<SWFInputStream> siss = new ArrayList<>();
             for (ByteArrayRange data : soundData) {
-                SWFInputStream sis = new SWFInputStream(swf, data.getArray(), 0, data.getPos() + data.getLength());
-                sis.seek(data.getPos());
-                siss.add(sis);
+                baos.write(data.getArray(), data.getPos(), data.getLength());
             }
 
-            tag.getSoundFormat().createWav(siss, baos);
+            SWFInputStream sis = new SWFInputStream(swf, baos.toByteArray());
+            baos = new ByteArrayOutputStream();
+            tag.getSoundFormat().createWav(sis, baos);
             wavData = baos.toByteArray();
             swf.putToCache(tag, wavData);
         }
