@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.types.BITMAPDATA;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.COLORMAPDATA;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
+import com.jpexs.decompiler.flash.types.annotations.EnumValue;
 import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
@@ -54,6 +55,9 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
     public static final String NAME = "DefineBitsLossless";
 
     @SWFType(BasicType.UI8)
+    @EnumValue(value = FORMAT_8BIT_COLORMAPPED, text = "8-bit colormapped")
+    @EnumValue(value = FORMAT_15BIT_RGB, text = "15-bit RGB")
+    @EnumValue(value = FORMAT_24BIT_RGB, text = "24-bit RGB")
     public int bitmapFormat;
 
     @SWFType(BasicType.UI16)
@@ -232,7 +236,7 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
     @Override
     protected SerializableImage getImage() {
         int[] pixels = new int[bitmapWidth * bitmapHeight];
-        if (bitmapFormat == DefineBitsLosslessTag.FORMAT_8BIT_COLORMAPPED) {
+        if (bitmapFormat == FORMAT_8BIT_COLORMAPPED) {
             COLORMAPDATA colorMapData = getColorMapData();
             int pos32aligned = 0;
             int pos = 0;
@@ -252,13 +256,13 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
                     pos32aligned++;
                 }
             }
-        } else if ((bitmapFormat == DefineBitsLosslessTag.FORMAT_15BIT_RGB) || (bitmapFormat == DefineBitsLosslessTag.FORMAT_24BIT_RGB)) {
+        } else if ((bitmapFormat == FORMAT_15BIT_RGB) || (bitmapFormat == FORMAT_24BIT_RGB)) {
             BITMAPDATA bitmapData = getBitmapData();
             int pos = 0;
             int[] bitmapPixelData = null;
-            if (bitmapFormat == DefineBitsLosslessTag.FORMAT_15BIT_RGB) {
+            if (bitmapFormat == FORMAT_15BIT_RGB) {
                 bitmapPixelData = bitmapData.bitmapPixelDataPix15;
-            } else if (bitmapFormat == DefineBitsLosslessTag.FORMAT_24BIT_RGB) {
+            } else if (bitmapFormat == FORMAT_24BIT_RGB) {
                 bitmapPixelData = bitmapData.bitmapPixelDataPix24;
             }
 

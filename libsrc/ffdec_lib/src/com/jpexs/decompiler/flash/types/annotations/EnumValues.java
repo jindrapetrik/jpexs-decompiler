@@ -22,29 +22,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Mark for field that it is available only whern certain field (value) is set
  *
  * @author JPEXS
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface Conditional {
+public @interface EnumValues {
 
-    ///Name of field on which this depends
-    String[] value() default {};
-
-    ///Tag IDs which this field must be in
-    int[] tags() default {};
-
-    ///Minimum SWF version for this field
-    int minSwfVersion() default 1;
-
-    ///Maximum SWF version for this field
-    int maxSwfVersion() default Integer.MAX_VALUE;
-
-    ///List of values for condition (if true/false is not enough)
-    int[] options() default {};
-
-    ///Revert condition (if false...)
-    boolean revert() default false;
+    EnumValue[] value();
 }

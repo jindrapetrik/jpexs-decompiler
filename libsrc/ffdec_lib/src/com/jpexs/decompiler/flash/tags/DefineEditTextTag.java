@@ -52,6 +52,7 @@ import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
+import com.jpexs.decompiler.flash.types.annotations.EnumValue;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
@@ -146,6 +147,10 @@ public class DefineEditTextTag extends TextTag {
 
     @SWFType(BasicType.UI8)
     @Conditional("hasLayout")
+    @EnumValue(value = ALIGN_LEFT, text = "Left")
+    @EnumValue(value = ALIGN_RIGHT, text = "Right")
+    @EnumValue(value = ALIGN_CENTER, text = "Center")
+    @EnumValue(value = ALIGN_JUSTIFY, text = "Justify")
     public int align;
 
     @SWFType(BasicType.UI16)
@@ -168,6 +173,14 @@ public class DefineEditTextTag extends TextTag {
 
     @Conditional("hasText")
     public String initialText;
+
+    public static final int ALIGN_LEFT = 0;
+
+    public static final int ALIGN_RIGHT = 1;
+
+    public static final int ALIGN_CENTER = 2;
+
+    public static final int ALIGN_JUSTIFY = 3;
 
     /**
      * Constructor
@@ -1103,16 +1116,16 @@ public class DefineEditTextTag extends TextTag {
                 yOffset += currentOffset;
                 int alignOffset = 0;
                 switch (align) {
-                    case 0: // left
+                    case ALIGN_LEFT:
                         alignOffset = 0;
                         break;
-                    case 1: // right
+                    case ALIGN_RIGHT:
                         alignOffset = bounds.getWidth() - width;
                         break;
-                    case 2: // center
+                    case ALIGN_CENTER:
                         alignOffset = (bounds.getWidth() - width) / 2;
                         break;
-                    case 3: // justify
+                    case ALIGN_JUSTIFY:
                         // todo;
                         break;
                 }

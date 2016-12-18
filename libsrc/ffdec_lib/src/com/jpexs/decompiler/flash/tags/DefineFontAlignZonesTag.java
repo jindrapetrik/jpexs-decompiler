@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.ZONERECORD;
+import com.jpexs.decompiler.flash.types.annotations.EnumValue;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
@@ -46,6 +47,9 @@ public class DefineFontAlignZonesTag extends Tag implements CharacterIdTag {
     public int fontID;
 
     @SWFType(value = BasicType.UB, count = 2)
+    @EnumValue(value = 0, text = "Thin")
+    @EnumValue(value = 1, text = "Medium")
+    @EnumValue(value = 2, text = "Thick")
     public int CSMTableHint;
 
     @Reserved

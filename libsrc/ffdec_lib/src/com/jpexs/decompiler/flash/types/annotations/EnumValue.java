@@ -17,34 +17,24 @@
 package com.jpexs.decompiler.flash.types.annotations;
 
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Mark for field that it is available only whern certain field (value) is set
  *
  * @author JPEXS
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface Conditional {
+@Repeatable(EnumValues.class)
+public @interface EnumValue {
 
-    ///Name of field on which this depends
-    String[] value() default {};
+    int value();
 
-    ///Tag IDs which this field must be in
-    int[] tags() default {};
+    String text();
 
-    ///Minimum SWF version for this field
+    // todo: check in generic tag editor
     int minSwfVersion() default 1;
-
-    ///Maximum SWF version for this field
-    int maxSwfVersion() default Integer.MAX_VALUE;
-
-    ///List of values for condition (if true/false is not enough)
-    int[] options() default {};
-
-    ///Revert condition (if false...)
-    boolean revert() default false;
 }

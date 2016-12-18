@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.gui.generictageditors.Amf3ValueEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.BinaryDataEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.BooleanEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.ColorEditor;
+import com.jpexs.decompiler.flash.gui.generictageditors.EnumEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.FullSized;
 import com.jpexs.decompiler.flash.gui.generictageditors.GenericTagEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.NumberEditor;
@@ -33,6 +34,8 @@ import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
+import com.jpexs.decompiler.flash.types.annotations.EnumValue;
+import com.jpexs.decompiler.flash.types.annotations.EnumValues;
 import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.Multiline;
@@ -109,13 +112,11 @@ public class GenericTagTreePanel extends GenericTagPanel {
         public MyTree() {
             setBackground(Color.white);
             setUI(new BasicTreeUI() {
-
                 @Override
                 public void paint(Graphics g, JComponent c) {
                     setHashColor(Color.gray);
                     super.paint(g, c);
                 }
-
             });
             setCellRenderer(new MyTreeCellRenderer());
             setCellEditor(new MyTreeCellEditor(this));
@@ -163,7 +164,15 @@ public class GenericTagTreePanel extends GenericTagPanel {
                     GenericTagEditor editor = null;
                     SWFType swfType = field.getAnnotation(SWFType.class);
                     Multiline multiline = field.getAnnotation(Multiline.class);
-                    if (type.equals(int.class) || type.equals(Integer.class)
+                    EnumValues enumValues = field.getAnnotation(EnumValues.class);
+                    if (enumValues != null && (type.equals(int.class) || type.equals(Integer.class))) {
+                        Map<Integer, String> values = new HashMap<>();
+                        for (EnumValue enumValue : enumValues.value()) {
+                            values.put(enumValue.value(), enumValue.text());
+                        }
+
+                        editor = new EnumEditor(field.getName(), obj, field, index, type, swfType, values);
+                    } else if (type.equals(int.class) || type.equals(Integer.class)
                             || type.equals(short.class) || type.equals(Short.class)
                             || type.equals(long.class) || type.equals(Long.class)
                             || type.equals(double.class) || type.equals(Double.class)
@@ -191,7 +200,6 @@ public class GenericTagTreePanel extends GenericTagPanel {
                     fl.setAlignOnBaseline(true);
                     pan.setLayout(fl);
                     JLabel nameLabel = new JLabel(fnode.getNameType(i) + " = ") {
-
                         @Override
                         public BaselineResizeBehavior getBaselineResizeBehavior() {
                             return Component.BaselineResizeBehavior.CONSTANT_ASCENT;
@@ -201,7 +209,6 @@ public class GenericTagTreePanel extends GenericTagPanel {
                         public int getBaseline(int width, int height) {
                             return 0;
                         }
-
                     };
                     pan.setOpaque(false);
                     nameLabel.setAlignmentY(TOP_ALIGNMENT);
@@ -374,7 +381,6 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
                                         mi = new JMenuItem(AppStrings.translate("generictag.array.insertbeginning").replace("%item%", itemStr));
                                         mi.addActionListener(new ActionListener() {
-
                                             @Override
                                             public void actionPerformed(ActionEvent e) {
                                                 addItem(fnode.obj, fnode.fieldSet.get(FIELD_INDEX), 0, null);
@@ -388,7 +394,6 @@ public class GenericTagTreePanel extends GenericTagPanel {
                                         if (fnode.index > -1) {
                                             mi = new JMenuItem(AppStrings.translate("generictag.array.insertbefore").replace("%item%", itemStr));
                                             mi.addActionListener(new ActionListener() {
-
                                                 @Override
                                                 public void actionPerformed(ActionEvent e) {
                                                     addItem(fnode.obj, fnode.fieldSet.get(FIELD_INDEX), fnode.index, null);
@@ -401,7 +406,6 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
                                             mi = new JMenuItem(AppStrings.translate("generictag.array.remove").replace("%item%", itemStr));
                                             mi.addActionListener(new ActionListener() {
-
                                                 @Override
                                                 public void actionPerformed(ActionEvent e) {
                                                     removeItem(fnode.obj, fnode.fieldSet.get(FIELD_INDEX), fnode.index);
@@ -411,7 +415,6 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
                                             mi = new JMenuItem(AppStrings.translate("generictag.array.insertafter").replace("%item%", itemStr));
                                             mi.addActionListener(new ActionListener() {
-
                                                 @Override
                                                 public void actionPerformed(ActionEvent e) {
                                                     addItem(fnode.obj, fnode.fieldSet.get(FIELD_INDEX), fnode.index + 1, null);
@@ -425,7 +428,6 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
                                         mi = new JMenuItem(AppStrings.translate("generictag.array.insertend").replace("%item%", itemStr));
                                         mi.addActionListener(new ActionListener() {
-
                                             @Override
                                             public void actionPerformed(ActionEvent e) {
                                                 addItem(fnode.obj, fnode.fieldSet.get(FIELD_INDEX), ReflectionTools.getFieldSubSize(fnode.obj, fnode.fieldSet.get(FIELD_INDEX)), null);
@@ -558,12 +560,23 @@ public class GenericTagTreePanel extends GenericTagPanel {
                     colorAdd = "<cite style=\"color:rgb(" + color.getRed() + "," + color.getGreen() + "," + color.getBlue() + ");\">\u25cf</cite> ";
                 }
 
+                EnumValues enumValues = field.getAnnotation(EnumValues.class);
+                String enumAdd = "";
+                if (enumValues != null && val instanceof Integer) {
+                    Map<Integer, String> values = new HashMap<>();
+                    for (EnumValue enumValue : enumValues.value()) {
+                        values.put(enumValue.value(), enumValue.text());
+                    }
+
+                    enumAdd = " - " + values.get(val);
+                }
+
                 if (val instanceof byte[]) {
                     valStr += " = " + ((byte[]) val).length + " byte";
                 } else if (val instanceof ByteArrayRange) {
                     valStr += " = " + ((ByteArrayRange) val).getLength() + " byte";
                 } else {
-                    valStr += " = " + colorAdd + val.toString();
+                    valStr += " = " + colorAdd + val.toString() + enumAdd;
                 }
             }
             return getNameType(fieldIndex) + valStr;
