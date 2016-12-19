@@ -20,8 +20,6 @@ import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.RetryTask;
-import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.exporters.modes.SoundExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.SoundExportSettings;
 import com.jpexs.decompiler.flash.flv.AUDIODATA;
@@ -159,14 +157,7 @@ public class SoundExporter {
             }
         } else {
             List<ByteArrayRange> soundData = st.getRawSoundData();
-            SWF swf = ((Tag) st).getSwf();
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            for (ByteArrayRange data : soundData) {
-                baos.write(data.getArray(), data.getPos(), data.getLength());
-            }
-
-            SWFInputStream sis = new SWFInputStream(swf, baos.toByteArray());
-            fmt.createWav(sis, fos);
+            fmt.createWav(soundData, fos);
         }
     }
 }

@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.gui.player.MediaDisplay;
 import com.jpexs.decompiler.flash.gui.player.MediaDisplayListener;
 import com.jpexs.decompiler.flash.gui.player.Zoom;
@@ -160,15 +159,9 @@ public class SoundTagPlayer implements MediaDisplay {
         SWF swf = ((Tag) tag).getSwf();
         byte[] wavData = swf.getFromCache(tag);
         if (wavData == null) {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
             List<ByteArrayRange> soundData = tag.getRawSoundData();
-            for (ByteArrayRange data : soundData) {
-                baos.write(data.getArray(), data.getPos(), data.getLength());
-            }
-
-            SWFInputStream sis = new SWFInputStream(swf, baos.toByteArray());
-            baos = new ByteArrayOutputStream();
-            tag.getSoundFormat().createWav(sis, baos);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            tag.getSoundFormat().createWav(soundData, baos);
             wavData = baos.toByteArray();
             swf.putToCache(tag, wavData);
         }
