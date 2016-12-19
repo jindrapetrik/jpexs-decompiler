@@ -88,6 +88,18 @@ public class MP3Decoder extends SoundDecoder {
 
             return -1;
         }
+
+        @Override
+        public int read(byte[] b, int off, int len) throws IOException {
+            len = Math.min(len, remaining);
+            if (len > 0) {
+                System.arraycopy(buf, pos, b, off, len);
+                remaining -= len;
+                pos += len;
+            }
+
+            return len;
+        }
     }
 
     public MP3Decoder(SoundFormat soundFormat) {
