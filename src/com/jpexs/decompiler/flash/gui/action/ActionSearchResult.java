@@ -26,15 +26,22 @@ public class ActionSearchResult {
 
     private final ASMSource src;
 
+    private final boolean pcode;
+
     private final String path;
 
-    public ActionSearchResult(ASMSource src, String path) {
+    public ActionSearchResult(ASMSource src, boolean pcode, String path) {
         this.src = src;
+        this.pcode = pcode;
         this.path = path;
     }
 
     public ASMSource getSrc() {
         return src;
+    }
+
+    public boolean isPcode() {
+        return pcode;
     }
 
     @Override

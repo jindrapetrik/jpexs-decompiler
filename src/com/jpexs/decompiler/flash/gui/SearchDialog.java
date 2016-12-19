@@ -109,7 +109,7 @@ public class SearchDialog extends AppDialog {
             searchInPCodeRadioButton.setSelected(false);
             searchInTextsRadioButton.setSelected(false);
             rbPanel.add(searchInASRadioButton);
-            // todo: honfika rbPanel.add(searchInPCodeRadioButton);
+            rbPanel.add(searchInPCodeRadioButton);
             rbPanel.add(searchInTextsRadioButton);
             cnt.add(rbPanel);
         }

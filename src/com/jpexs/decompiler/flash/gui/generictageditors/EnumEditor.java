@@ -213,6 +213,7 @@ public class EnumEditor extends JComboBox<ComboBoxItem<Integer>> implements Gene
 
     @Override
     public Object getChangedValue() {
+        @SuppressWarnings("unchecked")
         ComboBoxItem<Integer> item = (ComboBoxItem<Integer>) getSelectedItem();
         int value = item.getValue();
         return value;

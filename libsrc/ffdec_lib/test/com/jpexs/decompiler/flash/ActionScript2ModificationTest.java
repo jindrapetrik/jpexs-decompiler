@@ -79,7 +79,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
             DoActionTag doa = getFirstActionTag();
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
             HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
-            doa.getASMSource(ScriptExportMode.PCODE, writer, doa.getActions());
+            doa.getASMSource(ScriptExportMode.PCODE, writer, null);
             String actualResult = normalizeLabels(writer.toString());
 
             actualResult = cleanPCode(actualResult);
@@ -105,7 +105,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
             DoActionTag doa = getFirstActionTag();
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
             HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
-            doa.getASMSource(ScriptExportMode.PCODE, writer, doa.getActions());
+            doa.getASMSource(ScriptExportMode.PCODE, writer, null);
             String actualResult = normalizeLabels(writer.toString());
 
             actualResult = cleanPCode(actualResult);
@@ -131,7 +131,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
             DoActionTag doa = getFirstActionTag();
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
             HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
-            doa.getASMSource(ScriptExportMode.PCODE, writer, doa.getActions());
+            doa.getASMSource(ScriptExportMode.PCODE, writer, null);
             String actualResult = normalizeLabels(writer.toString());
 
             actualResult = cleanPCode(actualResult);
@@ -154,7 +154,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
             DoActionTag doa = getFirstActionTag();
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
             HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
-            doa.getASMSource(ScriptExportMode.PCODE, writer, doa.getActions());
+            doa.getASMSource(ScriptExportMode.PCODE, writer, null);
             String actualResult = normalizeLabels(writer.toString());
 
             actualResult = cleanPCode(actualResult);

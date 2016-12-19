@@ -62,9 +62,7 @@ import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
-import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
-import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
@@ -475,23 +473,6 @@ public abstract class Action implements GraphSourceItem {
         }
     }
 
-    /**
-     * Converts list of actions to ASM source
-     *
-     * @param listeners
-     * @param address
-     * @param list List of actions
-     * @param version SWF version
-     * @param exportMode PCode or hex?
-     * @return source ASM
-     *
-     */
-    public static String actionsToString(List<DisassemblyListener> listeners, long address, ActionList list, int version, ScriptExportMode exportMode) {
-        HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
-        actionsToString(listeners, address, list, version, exportMode, writer);
-        return writer.toString();
-    }
-
     private static void informListeners(List<DisassemblyListener> listeners, int pos, int count) {
         if (pos % INFORM_LISTENER_RESOLUTION == 0) {
             DisassemblyListener[] listenersArray = listeners.toArray(new DisassemblyListener[listeners.size()]);
@@ -861,25 +842,11 @@ public abstract class Action implements GraphSourceItem {
      * @param asm
      * @param actions List of actions
      * @param path
-     * @return source
-     * @throws java.lang.InterruptedException
-     */
-    public static String actionsToSource(final ASMSource asm, final List<Action> actions, final String path) throws InterruptedException {
-        HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
-        actionsToSource(asm, actions, path, writer);
-        return writer.toString();
-    }
-
-    /**
-     * Converts list of actions to ActionScript source code
-     *
-     * @param asm
-     * @param actions List of actions
-     * @param path
      * @param writer
+     * @return
      * @throws java.lang.InterruptedException
      */
-    public static void actionsToSource(final ASMSource asm, final List<Action> actions, final String path, GraphTextWriter writer) throws InterruptedException {
+    public static GraphTextWriter actionsToSource(final ASMSource asm, final List<Action> actions, final String path, GraphTextWriter writer) throws InterruptedException {
         writer.suspendMeasure();
         List<GraphTargetItem> tree = null;
         Throwable convertException = null;
@@ -932,6 +899,8 @@ public abstract class Action implements GraphSourceItem {
         if (asm != null) {
             asm.getActionSourceSuffix(writer);
         }
+
+        return writer;
     }
 
     /**

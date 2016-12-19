@@ -76,9 +76,7 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
         return scriptIndex;
     }
 
-    private List<Highlighting> disassembledHilights = new ArrayList<>();
-
-    private List<Highlighting> specialHilights = new ArrayList<>();
+    private HighlightedText highlightedText = new HighlightedText();
 
     private final List<DocsListener> docsListeners = new ArrayList<>();
 
@@ -176,7 +174,7 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
 
     public void hilighSpecial(HighlightSpecialType type, String specialValue) {
         Highlighting h2 = null;
-        for (Highlighting sh : specialHilights) {
+        for (Highlighting sh : highlightedText.getSpecialHighlights()) {
             if (type.equals(sh.getProperties().subtype)) {
                 if (sh.getProperties().specialValue.equals(specialValue)) {
                     h2 = sh;
@@ -198,7 +196,7 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
         if (isEditable()) {
             return;
         }
-        Highlighting h2 = Highlighting.searchOffset(disassembledHilights, offset);
+        Highlighting h2 = Highlighting.searchOffset(highlightedText.getInstructionHighlights(), offset);
         if (h2 != null) {
             ignoreCarret = true;
             if (h2.startPos <= getDocument().getLength()) {
@@ -304,7 +302,6 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
                     public boolean missingFloat4(Float4 value) {
                         return true;
                     }
-
                 }, abc.bodies.get(bodyIndex), abc.method_info.get(abc.bodies.get(bodyIndex).method_info));
                 //acode.getBytes(abc.bodies.get(bodyIndex).getCodeBytes());
                 abc.bodies.get(bodyIndex).setCode(acode);
@@ -328,16 +325,13 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
 
     @Override
     public void setText(String t) {
-        disassembledHilights = new ArrayList<>();
-        specialHilights = new ArrayList<>();
-        super.setText(t);
-        setCaretPosition(0);
+        setText(new HighlightedText(t));
     }
 
     public void setText(HighlightedText highlightedText) {
-        disassembledHilights = highlightedText.instructionHilights;
-        if (!disassembledHilights.isEmpty()) {
-            int firstPos = disassembledHilights.get(0).startPos;
+        this.highlightedText = highlightedText;
+        if (!highlightedText.getInstructionHighlights().isEmpty()) {
+            int firstPos = highlightedText.getInstructionHighlights().get(0).startPos;
             String txt = highlightedText.text;
             txt = txt.replace("\r", "");
             int line = 0;
@@ -348,7 +342,7 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
             }
             firstInstrLine = line;
         }
-        specialHilights = highlightedText.specialHilights;
+
         super.setText(highlightedText.text);
         setCaretPosition(0);
     }
@@ -401,13 +395,13 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
     }
 
     public Highlighting getSelectedSpecial() {
-        return Highlighting.searchPos(specialHilights, getCaretPosition());
+        return Highlighting.searchPos(highlightedText.getSpecialHighlights(), getCaretPosition());
     }
 
     public long getSelectedOffset() {
         int pos = getCaretPosition();
         Highlighting lastH = null;
-        for (Highlighting h : disassembledHilights) {
+        for (Highlighting h : highlightedText.getInstructionHighlights()) {
             if (pos < h.startPos) {
                 break;
             }

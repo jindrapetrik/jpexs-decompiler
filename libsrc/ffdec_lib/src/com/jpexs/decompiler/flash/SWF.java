@@ -20,7 +20,6 @@ import SevenZip.Compression.LZMA.Decoder;
 import SevenZip.Compression.LZMA.Encoder;
 import com.jpexs.debugger.flash.SWD;
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.abc.CachedDecompilation;
 import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
@@ -46,7 +45,6 @@ import com.jpexs.decompiler.flash.action.ActionGraphSource;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.ActionListReader;
 import com.jpexs.decompiler.flash.action.ActionLocalData;
-import com.jpexs.decompiler.flash.action.CachedScript;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
@@ -343,10 +341,10 @@ public final class SWF implements SWFContainerItem, Timelined {
     private final Cache<ASMSource, ActionList> as2PcodeCache = Cache.getInstance(true, true, "as2pcode");
 
     @Internal
-    private final Cache<ASMSource, CachedScript> as2Cache = Cache.getInstance(true, false, "as2");
+    private final Cache<ASMSource, HighlightedText> as2Cache = Cache.getInstance(true, false, "as2");
 
     @Internal
-    private final Cache<ScriptPack, CachedDecompilation> as3Cache = Cache.getInstance(true, false, "as3");
+    private final Cache<ScriptPack, HighlightedText> as3Cache = Cache.getInstance(true, false, "as3");
 
     public static List<String> swfSignatures = Arrays.asList(
             "FWS", // Uncompressed Flash
@@ -2640,7 +2638,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
     }
 
-    public static CachedScript getFromCache(ASMSource src) {
+    public static HighlightedText getFromCache(ASMSource src) {
         SWF swf = src.getSwf();
         if (swf.as2Cache.contains(src)) {
             return swf.as2Cache.get(src);
@@ -2649,32 +2647,23 @@ public final class SWF implements SWFContainerItem, Timelined {
         return null;
     }
 
-    public static CachedScript getCached(ASMSource src, ActionList actions) throws InterruptedException {
+    public static HighlightedText getCached(ASMSource src, ActionList actions) throws InterruptedException {
         SWF swf = src.getSwf();
         if (swf.as2Cache.contains(src)) {
             return swf.as2Cache.get(src);
         }
 
-        if (actions == null) {
-            actions = src.getActions();
-        }
-
         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
         writer.startFunction("!script");
-        Action.actionsToSource(src, actions, src.toString()/*FIXME?*/, writer);
+        src.getActionScriptSource(writer, actions);
         writer.endFunction();
-        List<Highlighting> hilights = writer.instructionHilights;
-        List<Highlighting> methodHilights = writer.methodHilights;
-        List<Highlighting> classHilights = writer.classHilights;
-        List<Highlighting> specialHilights = writer.specialHilights;
 
-        String srcNoHex = writer.toString();
-        CachedScript res = new CachedScript(srcNoHex, hilights, methodHilights, classHilights, specialHilights);
+        HighlightedText res = new HighlightedText(writer);
         swf.as2Cache.put(src, res);
         return res;
     }
 
-    public static CachedDecompilation getCached(ScriptPack pack) throws InterruptedException {
+    public static HighlightedText getCached(ScriptPack pack) throws InterruptedException {
         SWF swf = pack.getSwf();
         if (swf.as3Cache.contains(pack)) {
             return swf.as3Cache.get(pack);
@@ -2688,8 +2677,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         boolean parallel = Configuration.parallelSpeedUp.get();
         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
         pack.toSource(writer, script == null ? null : script.traits.traits, new ConvertData(), ScriptExportMode.AS, parallel);
-        HighlightedText hilightedCode = new HighlightedText(writer);
-        CachedDecompilation res = new CachedDecompilation(hilightedCode);
+        HighlightedText res = new HighlightedText(writer);
         swf.as3Cache.put(pack, res);
 
         return res;
@@ -2910,8 +2898,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             timelined.setModified(true);
             timelined.resetTimeline();
         } else // timeline should be always the swf here
-        {
-            if (removeDependencies) {
+         if (removeDependencies) {
                 removeTagWithDependenciesFromTimeline(tag, timelined.getTimeline());
                 timelined.setModified(true);
             } else {
@@ -2920,7 +2907,6 @@ public final class SWF implements SWFContainerItem, Timelined {
                     timelined.setModified(true);
                 }
             }
-        }
     }
 
     @Override
@@ -3333,7 +3319,7 @@ public final class SWF implements SWFContainerItem, Timelined {
 
             HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
             try {
-                asms.get(name).getASMSource(ScriptExportMode.PCODE, writer, asms.get(name).getActions());
+                asms.get(name).getASMSource(ScriptExportMode.PCODE, writer, null);
             } catch (InterruptedException ex) {
                 logger.log(Level.SEVERE, null, ex);
             }
@@ -3399,9 +3385,9 @@ public final class SWF implements SWFContainerItem, Timelined {
             for (String name : names) {
                 List<SWD.DebugRegisters> regitems = new ArrayList<>();
                 moduleId++;
-                CachedScript cs;
+                HighlightedText cs;
                 try {
-                    cs = SWF.getCached(asms.get(name), asms.get(name).getActions());
+                    cs = SWF.getCached(asms.get(name), null);
                 } catch (InterruptedException ex) {
                     return false;
                 }
@@ -3411,7 +3397,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 Map<Integer, String> regNames = new HashMap<>();
 
                 for (int pos = 0; pos < txt.length(); pos++) {
-                    Highlighting h = Highlighting.searchPos(cs.hilights, pos);
+                    Highlighting h = Highlighting.searchPos(cs.getInstructionHighlights(), pos);
                     if (h != null) {
 
                         int firstLineOffset = (int) h.getProperties().firstLineOffset;

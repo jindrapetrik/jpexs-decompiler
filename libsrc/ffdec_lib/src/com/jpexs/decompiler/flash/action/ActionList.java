@@ -17,6 +17,8 @@
 package com.jpexs.decompiler.flash.action;
 
 import com.jpexs.decompiler.flash.SWF;
+import static com.jpexs.decompiler.flash.action.Action.actionsToSource;
+import static com.jpexs.decompiler.flash.action.Action.actionsToString;
 import com.jpexs.decompiler.flash.action.special.ActionNop;
 import com.jpexs.decompiler.flash.action.special.ActionStore;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
@@ -26,7 +28,9 @@ import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
 import com.jpexs.decompiler.flash.action.swf5.ActionConstantPool;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
+import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.FileTextWriter;
+import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -97,7 +101,6 @@ public class ActionList extends ArrayList<Action> {
 
     public Iterator<Action> getReferencesFor(final Action target) {
         return new Iterator<Action>() {
-
             private final Iterator<Action> iterator = ActionList.this.iterator();
 
             private Action action = getNext();
@@ -160,7 +163,6 @@ public class ActionList extends ArrayList<Action> {
 
     public Iterable<ActionConstantPool> getConstantPools() {
         return () -> new Iterator<ActionConstantPool>() {
-
             private final Iterator<Action> iterator = ActionList.this.iterator();
 
             private ActionConstantPool action = getNext();
@@ -197,7 +199,6 @@ public class ActionList extends ArrayList<Action> {
 
     public Iterable<ActionPush> getPushes() {
         return () -> new Iterator<ActionPush>() {
-
             private final Iterator<Action> iterator = ActionList.this.iterator();
 
             private ActionPush action = getNext();
@@ -547,12 +548,16 @@ public class ActionList extends ArrayList<Action> {
 
     @Override
     public String toString() {
-        return Action.actionsToString(new ArrayList<>(), 0, this, SWF.DEFAULT_VERSION, ScriptExportMode.PCODE);
+        HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
+        actionsToString(new ArrayList<>(), 0, this, SWF.DEFAULT_VERSION, ScriptExportMode.PCODE, writer);
+        return writer.toString();
     }
 
     public String toSource() {
         try {
-            return Action.actionsToSource(null, this, "");
+            HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
+            actionsToSource(null, this, "", writer);
+            return writer.toString();
         } catch (InterruptedException ex) {
             Logger.getLogger(ActionList.class.getName()).log(Level.SEVERE, null, ex);
         }

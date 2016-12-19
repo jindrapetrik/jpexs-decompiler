@@ -66,7 +66,6 @@ public class SearchResultsDialog<E> extends AppDialog {
         buttonsPanel.add(gotoButton);
         buttonsPanel.add(closeButton);
         resultsList.addKeyListener(new KeyAdapter() {
-
             @Override
             public void keyReleased(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -76,7 +75,6 @@ public class SearchResultsDialog<E> extends AppDialog {
         });
 
         resultsList.addMouseListener(new MouseAdapter() {
-
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {

@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
-import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -108,7 +107,7 @@ public class DirectEditingTest extends FileTestBase {
                 for (ASMSource asm : asms.values()) {
                     try {
                         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
-                        Action.actionsToSource(asm, asm.getActions(), asm.toString()/*FIXME?*/, writer);
+                        asm.getActionScriptSource(writer, null);
                         String as = writer.toString();
                         as = asm.removePrefixAndSuffix(as);
                         ActionScript2Parser par = new ActionScript2Parser(swf.version);
@@ -118,7 +117,7 @@ public class DirectEditingTest extends FileTestBase {
                             fail("Unable to parse: " + as + "/" + asm.toString(), ex);
                         }
                         writer = new HighlightedTextWriter(new CodeFormatting(), false);
-                        Action.actionsToSource(asm, asm.getActions(), asm.toString()/*FIXME?*/, writer);
+                        asm.getActionScriptSource(writer, null);
                         String as2 = writer.toString();
                         as2 = asm.removePrefixAndSuffix(as2);
                         try {
@@ -127,7 +126,7 @@ public class DirectEditingTest extends FileTestBase {
                             fail("Unable to parse: " + asm.getSwf().getShortFileName() + "/" + asm.toString(), ex);
                         }
                         writer = new HighlightedTextWriter(new CodeFormatting(), false);
-                        Action.actionsToSource(asm, asm.getActions(), asm.toString()/*FIXME?*/, writer);
+                        asm.getActionScriptSource(writer, null);
                         String as3 = writer.toString();
                         as3 = asm.removePrefixAndSuffix(as3);
                         if (!as3.equals(as2)) {

@@ -65,6 +65,15 @@ public class ButtonAction implements ASMSource {
         return Action.actionsToString(listeners, 0, actions, getSwf().version, exportMode, writer);
     }
 
+    @Override
+    public GraphTextWriter getActionScriptSource(GraphTextWriter writer, ActionList actions) throws InterruptedException {
+        if (actions == null) {
+            actions = getActions();
+        }
+
+        return Action.actionsToSource(this, actions, toString()/*FIXME?*/, writer);
+    }
+
     /**
      * Whether or not this object contains ASM source
      *

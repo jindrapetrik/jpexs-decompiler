@@ -21,7 +21,6 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraph;
 import com.jpexs.decompiler.flash.action.ActionList;
-import com.jpexs.decompiler.flash.action.CachedScript;
 import com.jpexs.decompiler.flash.action.ConstantPoolTooBigException;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
@@ -138,16 +137,6 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
 
     public JLabel decLabel = new HeaderLabel(AppStrings.translate("panel.decompiled"));
 
-    public List<Highlighting> decompiledHilights = new ArrayList<>();
-
-    public List<Highlighting> specialHighlights = new ArrayList<>();
-
-    public List<Highlighting> classHighlights = new ArrayList<>();
-
-    public List<Highlighting> methodHighlights = new ArrayList<>();
-
-    public List<Highlighting> disassembledHilights = new ArrayList<>();
-
     private boolean ignoreCarret = false;
 
     private boolean editMode = false;
@@ -168,7 +157,9 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
 
     private HighlightedText srcConstants;
 
-    private String lastDecompiled = "";
+    private HighlightedText disassembledText = new HighlightedText();
+
+    private HighlightedText lastDecompiled = new HighlightedText();
 
     private ASMSource lastASM;
 
@@ -213,7 +204,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
                 }
             }
             if (ident == null) {
-                Highlighting h = Highlighting.searchPos(decompiledHilights, pos);
+                Highlighting h = Highlighting.searchPos(lastDecompiled.getInstructionHighlights(), pos);
                 if (h != null) {
                     List<Action> list = lastCode;
                     Action lastIns = null;
@@ -271,14 +262,21 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
                 String workText = AppStrings.translate("work.searching");
                 String decAdd = "";
                 ASMSource asm = item.getValue();
-                if (!SWF.isCached(asm)) {
+                if (!pcode && !SWF.isCached(asm)) {
                     decAdd = ", " + AppStrings.translate("work.decompiling");
                 }
 
                 Main.startWork(workText + " \"" + txt + "\"" + decAdd + " - (" + pos + "/" + asms.size() + ") " + item.getKey() + "... ", worker);
                 try {
-                    if (pat.matcher(SWF.getCached(asm, null).text).find()) {
-                        found.add(new ActionSearchResult(asm, item.getKey()));
+                    if (pcode) {
+                        HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
+                        asm.getASMSource(ScriptExportMode.PCODE, writer, null);
+                        String text = writer.toString();
+                        if (pat.matcher(text).find()) {
+                            found.add(new ActionSearchResult(asm, pcode, item.getKey()));
+                        }
+                    } else if (pat.matcher(SWF.getCached(asm, null).text).find()) {
+                        found.add(new ActionSearchResult(asm, pcode, item.getKey()));
                     }
                 } catch (InterruptedException ex) {
                     break;
@@ -314,17 +312,16 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         View.execInEventDispatch(() -> {
             int pos = editor.getCaretPosition();
             Highlighting lastH = null;
-            for (Highlighting h : disassembledHilights) {
+            for (Highlighting h : disassembledText.getInstructionHighlights()) {
                 if (pos < h.startPos) {
                     break;
                 }
                 lastH = h;
             }
             Long offset = lastH == null ? 0 : lastH.getProperties().offset;
-            disassembledHilights = text.instructionHilights;
-            String stripped = text.text;
-            setEditorText(scriptName, stripped, contentType);
-            Highlighting h = Highlighting.searchOffset(disassembledHilights, offset);
+            disassembledText = text;
+            setEditorText(scriptName, text.text, contentType);
+            Highlighting h = Highlighting.searchOffset(disassembledText.getInstructionHighlights(), offset);
             if (h != null) {
                 if (h.startPos <= editor.getDocument().getLength()) {
                     editor.setCaretPosition(h.startPos);
@@ -445,19 +442,15 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
 
         boolean decompile = Configuration.decompile.get();
         if (!decompile) {
-            lastDecompiled = Helper.getDecompilationSkippedComment();
-            setDecompiledText(asm.getScriptName(), lastDecompiled);
+            lastDecompiled = new HighlightedText(Helper.getDecompilationSkippedComment());
+            setDecompiledText(asm.getScriptName(), lastDecompiled.text);
         } else {
-            CachedScript sc = SWF.getFromCache(asm);
+            HighlightedText sc = SWF.getFromCache(asm);
             if (sc != null) {
                 decompile = false;
-                decompiledHilights = sc.hilights;
-                methodHighlights = sc.methodHilights;
-                classHighlights = sc.classHilights;
-                specialHighlights = sc.specialHilights;
-                lastDecompiled = sc.text;
+                lastDecompiled = sc;
                 lastASM = asm;
-                setDecompiledText(lastASM.getScriptName(), lastDecompiled);
+                setDecompiledText(lastASM.getScriptName(), lastDecompiled.text);
             }
         }
 
@@ -484,14 +477,10 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
                 if (decompileNeeded) {
                     setDecompiledText("-", "// " + AppStrings.translate("work.decompiling") + "...");
 
-                    CachedScript sc = SWF.getCached(asm, actions);
-                    decompiledHilights = sc.hilights;
-                    methodHighlights = sc.methodHilights;
-                    classHighlights = sc.classHilights;
-                    specialHighlights = sc.specialHilights;
-                    lastDecompiled = sc.text;
+                    HighlightedText sc = SWF.getCached(asm, actions);
+                    lastDecompiled = sc;
                     lastASM = asm;
-                    setDecompiledText(lastASM.getScriptName(), lastDecompiled);
+                    setDecompiledText(lastASM.getScriptName(), lastDecompiled.text);
                     setDecompiledEditMode(false);
                 }
                 setEditMode(false);
@@ -528,20 +517,20 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
     }
 
     public int getLocalDeclarationOfPos(int pos) {
-        Highlighting sh = Highlighting.searchPos(specialHighlights, pos);
-        Highlighting h = Highlighting.searchPos(decompiledHilights, pos);
+        Highlighting sh = Highlighting.searchPos(lastDecompiled.getSpecialHighlights(), pos);
+        Highlighting h = Highlighting.searchPos(lastDecompiled.getInstructionHighlights(), pos);
 
         if (h == null) {
             return -1;
         }
 
-        List<Highlighting> tms = Highlighting.searchAllPos(methodHighlights, pos);
+        List<Highlighting> tms = Highlighting.searchAllPos(lastDecompiled.getMethodHighlights(), pos);
         if (tms.isEmpty()) {
             return -1;
         }
         for (Highlighting tm : tms) {
 
-            List<Highlighting> tm_tms = Highlighting.searchAllLocalNames(methodHighlights, tm.getProperties().localName);
+            List<Highlighting> tm_tms = Highlighting.searchAllLocalNames(lastDecompiled.getMethodHighlights(), tm.getProperties().localName);
             //is it already declaration?
             if (h.getProperties().declaration || (sh != null && sh.getProperties().declaration)) {
                 return -1; //no jump
@@ -549,7 +538,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
 
             String lname = h.getProperties().localName;
             if ("this".equals(lname)) {
-                Highlighting ch = Highlighting.searchPos(classHighlights, pos);
+                Highlighting ch = Highlighting.searchPos(lastDecompiled.getClassHighlights(), pos);
                 //    int cindex = (int) ch.getProperties().index;
                 return ch.startPos;
             }
@@ -566,7 +555,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
             search.declaration = true;
 
             for (Highlighting tm1 : tm_tms) {
-                Highlighting rh = Highlighting.search(decompiledHilights, search, tm1.startPos, tm1.startPos + tm1.len);
+                Highlighting rh = Highlighting.search(lastDecompiled.getInstructionHighlights(), search, tm1.startPos, tm1.startPos + tm1.len);
                 if (rh != null) {
                     return rh.startPos;
                 }
@@ -586,7 +575,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
             @Override
             public boolean isLink(Token token) {
                 int pos = token.start;
-                Highlighting h = Highlighting.searchPos(decompiledHilights, pos);
+                Highlighting h = Highlighting.searchPos(lastDecompiled.getInstructionHighlights(), pos);
                 if (h != null) {
                     if (h.getProperties().localName != null && !h.getProperties().declaration) {
                         return getLocalDeclarationOfPos(pos) != -1;
@@ -778,14 +767,14 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
                 editor.getCaret().setVisible(true);
                 int pos = editor.getCaretPosition();
                 Highlighting lastH = null;
-                for (Highlighting h : disassembledHilights) {
+                for (Highlighting h : disassembledText.getInstructionHighlights()) {
                     if (pos < h.startPos) {
                         break;
                     }
                     lastH = h;
                 }
                 Long ofs = lastH == null ? 0 : lastH.getProperties().offset;
-                Highlighting h2 = Highlighting.searchOffset(decompiledHilights, ofs);
+                Highlighting h2 = Highlighting.searchOffset(lastDecompiled.getInstructionHighlights(), ofs);
                 if (h2 != null) {
                     ignoreCarret = true;
                     if (h2.startPos <= decompiledEditor.getDocument().getLength()) {
@@ -809,9 +798,9 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
                 }
                 decompiledEditor.getCaret().setVisible(true);
                 int pos = decompiledEditor.getCaretPosition();
-                Highlighting h = Highlighting.searchPos(decompiledHilights, pos);
+                Highlighting h = Highlighting.searchPos(lastDecompiled.getInstructionHighlights(), pos);
                 if (h != null) {
-                    Highlighting h2 = Highlighting.searchOffset(disassembledHilights, h.getProperties().offset);
+                    Highlighting h2 = Highlighting.searchOffset(disassembledText.getInstructionHighlights(), h.getProperties().offset);
                     if (h2 != null) {
                         ignoreCarret = true;
                         if (h2.startPos > 0 && h2.startPos < editor.getText().length()) {
@@ -888,7 +877,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
             int lastLine = decompiledEditor.getLine();
             int prefLines = lastASM.getPrefixLineCount();
             if (val) {
-                String newText = lastASM.removePrefixAndSuffix(lastDecompiled);
+                String newText = lastASM.removePrefixAndSuffix(lastDecompiled.text);
                 setDecompiledText(lastASM.getScriptName(), newText);
                 if (lastLine > -1) {
                     if (lastLine - prefLines >= 0) {
@@ -896,8 +885,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
                     }
                 }
             } else {
-                String newText = lastDecompiled;
-                setDecompiledText(lastASM.getScriptName(), newText);
+                setDecompiledText(lastASM.getScriptName(), lastDecompiled.text);
                 if (lastLine > -1) {
                     decompiledEditor.gotoLine(lastLine + prefLines + 1);
                 }
@@ -1060,7 +1048,11 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         decompiledEditor.setCaretPosition(0);
 
         View.execInEventDispatchLater(() -> {
-            searchPanel.showQuickFindDialog(decompiledEditor);
+            if (item.isPcode()) {
+                searchPanel.showQuickFindDialog(editor);
+            } else {
+                searchPanel.showQuickFindDialog(decompiledEditor);
+            }
         });
     }
 

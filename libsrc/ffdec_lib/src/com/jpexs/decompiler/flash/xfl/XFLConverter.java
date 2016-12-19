@@ -37,7 +37,6 @@ import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
-import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.amf.amf3.Amf3Value;
 import com.jpexs.decompiler.flash.amf.amf3.types.ObjectType;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -1434,7 +1433,7 @@ public class XFLConverter {
     private static String convertActionScript12(ASMSource as) {
         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
         try {
-            Action.actionsToSource(as, as.getActions(), as.toString()/*FIXME?*/, writer);
+            as.getActionScriptSource(writer, null);
         } catch (InterruptedException ex) {
             logger.log(Level.SEVERE, null, ex);
         }

@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file.
 - #1311, #1313 actionScript source font size
 - Display warning when library version and GUI version mismatch
 - Changelog file
+- #1308 Search by all P-code files (AS 1/2 only)
 
 ### Changed
 - #1189 AS3 - sort imports to have same order always
