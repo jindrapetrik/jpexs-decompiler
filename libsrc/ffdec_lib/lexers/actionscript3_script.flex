@@ -203,6 +203,8 @@ SingleCharacter = [^\r\n\'\\]
 OIdentifierCharacter = [^\r\n\u00A7\\]
 Preprocessor = \u00A7\u00A7 {Identifier}
 
+NamespaceSuffix = "#" {DecIntegerLiteral}
+
 RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
 
 %state STRING, CHARLITERAL,XMLOPENTAG,XMLOPENTAGATTRIB,XMLINSTROPENTAG,XMLINSTRATTRIB,XMLCDATA,XMLCOMMENT,XML,OIDENTIFIER
@@ -371,6 +373,7 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
   {Identifier}                   { return new ParsedSymbol(SymbolGroup.IDENTIFIER, SymbolType.IDENTIFIER, yytext()); }
   /* regexp */
   {RegExp}                       { return new ParsedSymbol(SymbolGroup.REGEXP, SymbolType.REGEXP, yytext()); }
+  {NamespaceSuffix}              { return new ParsedSymbol(SymbolGroup.NAMESPACESUFFIX, SymbolType.NAMESPACESUFFIX, Integer.parseInt(yytext().substring(1))); }   
 }
 
 <XMLOPENTAG> {

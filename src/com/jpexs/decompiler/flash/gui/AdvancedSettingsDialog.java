@@ -187,8 +187,8 @@ public class AdvancedSettingsDialog extends AppDialog {
         buttonsPanel.add(buttonsLeftPanel, BorderLayout.WEST);
 
         JPanel buttonsRightPanel = new JPanel(new FlowLayout());
-        buttonsRightPanel.add(cancelButton);
         buttonsRightPanel.add(okButton);
+        buttonsRightPanel.add(cancelButton);
         buttonsPanel.add(buttonsRightPanel, BorderLayout.EAST);
 
         cnt.add(buttonsPanel, BorderLayout.SOUTH);
@@ -197,13 +197,11 @@ public class AdvancedSettingsDialog extends AppDialog {
 
         JComboBox<SkinSelect> skinComboBox = new JComboBox<>();
         skinComboBox.setRenderer(new SubstanceDefaultListCellRenderer() {
-
             @Override
             public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 SubstanceDefaultListCellRenderer cmp = (SubstanceDefaultListCellRenderer) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus); //To change body of generated methods, choose Tools | Templates.
                 final SkinSelect ss = (SkinSelect) value;
                 cmp.setIcon(new Icon() {
-
                     @Override
                     public void paintIcon(Component c, Graphics g, int x, int y) {
                         Graphics2D g2 = (Graphics2D) g;
@@ -241,7 +239,6 @@ public class AdvancedSettingsDialog extends AppDialog {
                 });
                 return cmp;
             }
-
         });
         skinComboBox.addItem(new SkinSelect(OceanicSkin.NAME, OceanicSkin.class.getName()));
         Map<String, SkinInfo> skins = SubstanceLookAndFeel.getAllSkins();
@@ -280,7 +277,7 @@ public class AdvancedSettingsDialog extends AppDialog {
         fc.setMultiSelectionEnabled(false);
         fc.setCurrentDirectory(new File((String) config.get()));
         FileFilter allSupportedFilter = new FileFilter() {
-            private final String[] supportedExtensions = new String[]{".swf", ".gfx", ".swc", ".zip"};
+            private final String[] supportedExtensions = new String[]{".swf", ".gfx", ".swc", ".zip", ".iggy"};
 
             @Override
             public boolean accept(File f) {
@@ -479,24 +476,19 @@ public class AdvancedSettingsDialog extends AppDialog {
                     itemCount, 2, //rows, cols
                     6, 6, //initX, initY
                     6, 6);       //xPad, yPad
-            //https://www.adobe.com/support/flashplayer/debug_downloads.html
             if (resourceBundle.containsKey("config.group.tip." + cat)) {
                 String tip = resourceBundle.getString("config.group.tip." + cat);
-                String url = null;
+                String urls[] = new String[0];
                 if (resourceBundle.containsKey("config.group.link." + cat)) {
-                    url = resourceBundle.getString("config.group.link." + cat);
+                    urls = resourceBundle.getString("config.group.link." + cat).split(" ");
+                }
+                for (int i = 0; i < urls.length; i++) {
+                    tip = tip.replace("%link" + (i + 1) + "%", urls[i]);
                 }
                 JPanel p = new JPanel(new BorderLayout());
                 p.add(configPanel, BorderLayout.CENTER);
                 JPanel tipPanel = new JPanel(new FlowLayout());
-                tipPanel.add(new JLabel("<html><b>" + resourceBundle.getString("tip") + "</b>" + tip + "</html>"));
-                if (url != null) {
-                    String linkText = url;
-                    if (resourceBundle.containsKey("config.group.linkText." + cat)) {
-                        linkText = resourceBundle.getString("config.group.linkText." + cat);
-                    }
-                    tipPanel.add(new LinkLabel(linkText, url));
-                }
+                tipPanel.add(new HtmlLabel("<b>" + resourceBundle.getString("tip") + "</b>" + tip));
                 p.add(tipPanel, BorderLayout.SOUTH);
                 configPanel = p;
             }

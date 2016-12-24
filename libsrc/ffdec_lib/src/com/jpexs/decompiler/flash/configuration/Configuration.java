@@ -19,8 +19,10 @@ package com.jpexs.decompiler.flash.configuration;
 import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.exporters.modes.ExeExportMode;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
+import com.jpexs.decompiler.flash.helpers.FontHelper;
 import com.jpexs.decompiler.flash.importers.TextImportResizeTextBoundsMode;
 import com.jpexs.helpers.Helper;
+import java.awt.Font;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -284,6 +286,17 @@ public class Configuration {
     @ConfigurationName("gui.window.maximized.vertical")
     public static final ConfigurationItem<Boolean> guiWindowMaximizedVertical = null;
 
+    @ConfigurationDefaultDouble(1)
+    @ConfigurationCategory("display")
+    @ConfigurationName("gui.fontSizeMultiplier")
+    public static final ConfigurationItem<Double> guiFontSizeMultiplier = null;
+
+    // font used in AS1/2/3 source area, P-Code area, Define Text area and in Metadata area
+    @ConfigurationDefaultString("Monospaced-Plain-12")
+    @ConfigurationCategory("display")
+    @ConfigurationName("gui.sourceFont")
+    public static final ConfigurationItem<String> sourceFontString = null;
+
     @ConfigurationDefaultDouble(0.5)
     @ConfigurationName("gui.avm2.splitPane.dividerLocationPercent")
     @ConfigurationInternal
@@ -539,6 +552,11 @@ public class Configuration {
     @ConfigurationFile(".*\\.swc$")
     public static final ConfigurationItem<String> playerLibLocation = null;
 
+    @ConfigurationDefaultString("")
+    @ConfigurationCategory("paths")
+    @ConfigurationDirectory
+    public static final ConfigurationItem<String> flexSdkLocation = null;
+
     @ConfigurationDefaultDouble(0.7)
     @ConfigurationName("gui.avm2.splitPane.vars.dividerLocationPercent")
     @ConfigurationInternal
@@ -608,8 +626,15 @@ public class Configuration {
     @ConfigurationInternal
     public static final ConfigurationItem<Double> guiAvm2DocsSplitPaneDividerLocationPercent = null;
 
-    private enum OSId {
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("script")
+    public static final ConfigurationItem<Boolean> useFlexAs3Compiler = null;
 
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("ui")
+    public static final ConfigurationItem<Boolean> showSetAdvanceValuesMessage = null;
+
+    private enum OSId {
         WINDOWS, OSX, UNIX
     }
 
@@ -688,6 +713,10 @@ public class Configuration {
             ret += File.separator;
         }
         return ret;
+    }
+
+    public static Font getSourceFont() {
+        return FontHelper.stringToFont(sourceFontString.get());
     }
 
     public static List<String> getRecentFiles() {
@@ -1005,7 +1034,6 @@ public class Configuration {
         File libsDir = getFlashLibPath();
         if (libsDir != null && libsDir.exists()) {
             File[] libs = libsDir.listFiles(new FilenameFilter() {
-
                 @Override
                 public boolean accept(File dir, String name) {
                     return name.toLowerCase().startsWith("playerglobal");
@@ -1030,7 +1058,6 @@ public class Configuration {
         File projectoDir = getProjectorPath();
         if (projectoDir != null && projectoDir.exists()) {
             File[] projectors = projectoDir.listFiles(new FilenameFilter() {
-
                 @Override
                 public boolean accept(File dir, String name) {
                     switch (exportMode) {

@@ -97,7 +97,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private boolean stillFrame = false;
 
-    private Timer timer;
+    private volatile Timer timer;
 
     private int frame = -1;
 
@@ -207,20 +207,23 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             if (img == null) {
                 return;
             }
-            if (renderImage == null) {
-                return;
-            }
-            Graphics2D g2 = null;
-            do {
 
-                int valid = renderImage.validate(View.getDefaultConfiguration());
+            Graphics2D g2 = null;
+            VolatileImage ri;
+            do {
+                ri = this.renderImage;
+                if (ri == null) {
+                    return;
+                }
+
+                int valid = ri.validate(View.getDefaultConfiguration());
 
                 if (valid == VolatileImage.IMAGE_INCOMPATIBLE) {
-                    renderImage = View.createRenderImage(getWidth(), getHeight(), Transparency.TRANSLUCENT);
+                    ri = View.createRenderImage(getWidth(), getHeight(), Transparency.TRANSLUCENT);
                 }
 
                 try {
-                    g2 = renderImage.createGraphics();
+                    g2 = ri.createGraphics();
                     g2.setPaint(View.transparentPaint);
                     g2.fill(new Rectangle(0, 0, getWidth(), getHeight()));
                     g2.setComposite(AlphaComposite.SrcOver);
@@ -237,21 +240,27 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     }
                 }
 
-            } while (renderImage.contentsLost());
+            } while (ri.contentsLost());
         }
 
         public IconPanel() {
             addComponentListener(new ComponentAdapter() {
                 @Override
                 public void componentResized(ComponentEvent e) {
-                    renderImage = View.createRenderImage(getWidth(), getHeight(), Transparency.TRANSLUCENT);
+                    int width = getWidth();
+                    int height = getHeight();
+                    if (width > 0 && height > 0) {
+                        renderImage = View.createRenderImage(width, height, Transparency.TRANSLUCENT);
+                    } else {
+                        renderImage = null;
+                    }
+
                     if (_img != null) {
                         calcRect();
                         render();
                     }
                     repaint();
                 }
-
             });
             addMouseListener(new MouseAdapter() {
                 @Override
@@ -267,7 +276,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         dragStart = null;
                     }
                 }
-
             });
             addMouseMotionListener(new MouseMotionAdapter() {
                 @Override
@@ -281,7 +289,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         repaint();
                     }
                 }
-
             });
         }
 
@@ -361,15 +368,16 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         protected void paintComponent(Graphics g) {
             Graphics2D g2d = (Graphics2D) g;
 
-            if (renderImage != null) {
+            VolatileImage ri = this.renderImage;
+            if (ri != null) {
                 calcRect();
-                if (renderImage.validate(View.getDefaultConfiguration()) != VolatileImage.IMAGE_OK) {
-                    renderImage = View.createRenderImage(getWidth(), getHeight(), Transparency.TRANSLUCENT);
+                if (ri.validate(View.getDefaultConfiguration()) != VolatileImage.IMAGE_OK) {
+                    ri = View.createRenderImage(getWidth(), getHeight(), Transparency.TRANSLUCENT);
                     render();
                 }
 
-                if (renderImage != null) {
-                    g2d.drawImage(renderImage, 0, 0, null);
+                if (ri != null) {
+                    g2d.drawImage(ri, 0, 0, null);
                 }
             }
             g2d.setColor(Color.red);
@@ -470,7 +478,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         add(iconPanel, BorderLayout.CENTER);
         add(debugLabel, BorderLayout.NORTH);
         iconPanel.addMouseListener(new MouseAdapter() {
-
             @Override
             public void mouseEntered(MouseEvent e) {
                 synchronized (ImagePanel.class) {
@@ -519,7 +526,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     }
                 }
             }
-
         });
         iconPanel.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
@@ -537,7 +543,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     redraw();
                 }
             }
-
         });
     }
 
@@ -656,7 +661,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     System.out.println("trace:" + o.toString());
                 }
             }
-
         };
         lda = new LocalDataArea(stage);
         synchronized (ImagePanel.class) {
@@ -1153,7 +1157,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
             sp = new SoundTagPlayer(st, loopCount, false);
             sp.addEventListener(new MediaDisplayListener() {
-
                 @Override
                 public void mediaDisplayStateChanged(MediaDisplay source) {
                 }
@@ -1359,7 +1362,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         fpsShouldBe = timeline.frameRate;
         fpsIs = fpsShouldBe;
         scheduleTask(singleFrame, 0);
-
     }
 
     @Override

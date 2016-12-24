@@ -1,15 +1,15 @@
 package com.jpexs.decompiler.flash.exporters.amf.amf3;
 
 import com.jpexs.decompiler.flash.amf.amf3.WithSubValues;
-import com.jpexs.decompiler.flash.amf.amf3.types.ArrayType;
-import com.jpexs.decompiler.flash.amf.amf3.types.XmlType;
-import com.jpexs.decompiler.flash.amf.amf3.types.ObjectType;
 import com.jpexs.decompiler.flash.amf.amf3.types.AbstractVectorType;
-import com.jpexs.decompiler.flash.amf.amf3.types.XmlDocType;
+import com.jpexs.decompiler.flash.amf.amf3.types.ArrayType;
+import com.jpexs.decompiler.flash.amf.amf3.types.BasicType;
 import com.jpexs.decompiler.flash.amf.amf3.types.ByteArrayType;
 import com.jpexs.decompiler.flash.amf.amf3.types.DateType;
 import com.jpexs.decompiler.flash.amf.amf3.types.DictionaryType;
-import com.jpexs.decompiler.flash.amf.amf3.types.BasicType;
+import com.jpexs.decompiler.flash.amf.amf3.types.ObjectType;
+import com.jpexs.decompiler.flash.amf.amf3.types.XmlDocType;
+import com.jpexs.decompiler.flash.amf.amf3.types.XmlType;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.helpers.Helper;
 import java.text.SimpleDateFormat;

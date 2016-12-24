@@ -25,8 +25,6 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Deobfuscation;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushStringIns;
-import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
-import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScript3Parser;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.ClassInfo;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
@@ -37,6 +35,7 @@ import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
+import com.jpexs.decompiler.flash.abc.types.ValueKind;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
@@ -54,26 +53,28 @@ import com.jpexs.decompiler.flash.abc.usages.MethodNameMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.MethodParamsMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.MethodReturnTypeMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.MultinameUsage;
+import com.jpexs.decompiler.flash.abc.usages.TraitMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.TypeNameMultinameUsage;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecial;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecialType;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
+import com.jpexs.decompiler.flash.importers.As3ScriptReplaceException;
+import com.jpexs.decompiler.flash.importers.As3ScriptReplacerInterface;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
-import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.utf8.Utf8PrintWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -137,6 +138,48 @@ public class ABC {
     public int addMethodInfo(MethodInfo mi) {
         method_info.add(mi);
         return method_info.size() - 1;
+    }
+
+    public void deleteClass(int class_info, boolean d) {
+        ABC abc = this;
+        ClassInfo classInfo = abc.class_info.get(class_info);
+        classInfo.deleted = d;
+        InstanceInfo instanceInfo = abc.instance_info.get(class_info);
+        instanceInfo.deleted = d;
+
+        classInfo.static_traits.delete(abc, d);
+        abc.method_info.get(classInfo.cinit_index).delete(abc, d);
+
+        instanceInfo.instance_traits.delete(abc, d);
+        abc.method_info.get(instanceInfo.iinit_index).delete(abc, d);
+
+        int protectedNS = instanceInfo.protectedNS;
+        if (protectedNS != 0) {
+            abc.constants.getNamespace(protectedNS).deleted = d;
+        }
+    }
+
+    /**
+     * Gets id of metadata/add metadata
+     *
+     * @param newMetadata
+     * @param add Add if not found?
+     * @return New index or -1 if not found (add=false)
+     */
+    public int getMetadataId(MetadataInfo newMetadata, boolean add) {
+        for (int m = 0; m < metadata_info.size(); m++) {
+            MetadataInfo metadata = metadata_info.get(m);
+            if (metadata.name_index == newMetadata.name_index && Arrays.equals(metadata.keys, newMetadata.keys) && Arrays.equals(metadata.values, newMetadata.values)) {
+                return m;
+            }
+        }
+        if (add) {
+            int newIndex = metadata_info.size();
+            metadata_info.add(newMetadata);
+            ((Tag) parentTag).setModified(true);
+            return newIndex;
+        }
+        return -1;
     }
 
     public TraitMethodGetterSetter addMethod(int classId, String name, boolean isStatic) {
@@ -349,7 +392,7 @@ public class ABC {
                     int mIndex = body.getCode().code.get(ip).operands[0];
                     if (mIndex > 0) {
                         Multiname m = constants.getMultiname(mIndex);
-                        if (m.getNameWithNamespace(constants).toRawString().equals("flash.utils.getDefinitionByName")) {
+                        if (m.getNameWithNamespace(constants, true).toRawString().equals("flash.utils.getDefinitionByName")) {
                             if (ip > 0) {
                                 if (body.getCode().code.get(ip - 1).definition instanceof PushStringIns) {
                                     int strIndex = body.getCode().code.get(ip - 1).operands[0];
@@ -649,19 +692,9 @@ public class ABC {
             SWFDecompilerPlugin.fireMethodBodyParsed(this, mb, swf);
         }
 
+        refreshMultinameNamespaceSuffixes();
         getMethodIndexing();
 
-        /*for(int i=0;i<script_count;i++){
-         MethodBody bod=bodies.get(bodyIdxFromMethodIdx.get(script_info.get(i).init_index));
-         GraphTextWriter t=new HighlightedTextWriter(Configuration.getCodeFormatting(),false);
-         try {
-         bod.toString("script", ScriptExportMode.PCODE,  this, null, constants, method_info, t, new ArrayList<>());
-         } catch (InterruptedException ex) {
-         Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, null, ex);
-         }
-         System.out.println(""+t.toString());
-         }
-         //System.exit(0);*/
         SWFDecompilerPlugin.fireAbcParsed(this, swf);
     }
 
@@ -749,6 +782,7 @@ public class ABC {
             aos.writeU30(ci.cinit_index);
             aos.writeTraits(ci.static_traits);
         }
+
         aos.writeU30(script_info.size());
         for (ScriptInfo si : script_info) {
             aos.writeU30(si.init_index);
@@ -793,9 +827,9 @@ public class ABC {
         return getMethodIndexing().findMethodBodyIndex(methodInfo);
     }
 
-    public MethodBody findBodyClassInitializerByClass(String className) {
+    public MethodBody findBodyClassInitializerByClass(String classNameWithSuffix) {
         for (int i = 0; i < instance_info.size(); i++) {
-            if (className.equals(constants.getMultiname(instance_info.get(i).name_index).getName(constants, null, true))) {
+            if (classNameWithSuffix.equals(constants.getMultiname(instance_info.get(i).name_index).getName(constants, null, true, true))) {
                 MethodBody body = findBody(class_info.get(i).cinit_index);
                 if (body != null) {
                     return body;
@@ -806,9 +840,9 @@ public class ABC {
         return null;
     }
 
-    public MethodBody findBodyInstanceInitializerByClass(String className) {
+    public MethodBody findBodyInstanceInitializerByClass(String classNameWithSuffix) {
         for (int i = 0; i < instance_info.size(); i++) {
-            if (className.equals(constants.getMultiname(instance_info.get(i).name_index).getName(constants, null, true))) {
+            if (classNameWithSuffix.equals(constants.getMultiname(instance_info.get(i).name_index).getName(constants, null, true, true))) {
                 MethodBody body = findBody(instance_info.get(i).iinit_index);
                 if (body != null) {
                     return body;
@@ -819,13 +853,13 @@ public class ABC {
         return null;
     }
 
-    public MethodBody findBodyByClassAndName(String className, String methodName) {
+    public MethodBody findBodyByClassAndName(String classNameWithSuffix, String methodNameWithSuffix) {
         for (int i = 0; i < instance_info.size(); i++) {
-            if (className.equals(constants.getMultiname(instance_info.get(i).name_index).getName(constants, null, true))) {
+            if (classNameWithSuffix.equals(constants.getMultiname(instance_info.get(i).name_index).getName(constants, null, true, true))) {
                 for (Trait t : instance_info.get(i).instance_traits.traits) {
                     if (t instanceof TraitMethodGetterSetter) {
                         TraitMethodGetterSetter t2 = (TraitMethodGetterSetter) t;
-                        if (methodName.equals(t2.getName(this).getName(constants, null, true))) {
+                        if (methodNameWithSuffix.equals(t2.getName(this).getName(constants, null, true, true))) {
                             MethodBody body = findBody(t2.method_info);
                             if (body != null) {
                                 return body;
@@ -837,7 +871,7 @@ public class ABC {
                 for (Trait t : class_info.get(i).static_traits.traits) {
                     if (t instanceof TraitMethodGetterSetter) {
                         TraitMethodGetterSetter t2 = (TraitMethodGetterSetter) t;
-                        if (methodName.equals(t2.getName(this).getName(constants, null, true))) {
+                        if (methodNameWithSuffix.equals(t2.getName(this).getName(constants, null, true, true))) {
                             MethodBody body = findBody(t2.method_info);
                             if (body != null) {
                                 return body;
@@ -922,7 +956,7 @@ public class ABC {
                         TraitSlotConst s = ((TraitSlotConst) t);
                         if (s.isNamespace()) {
                             String key = constants.getNamespace(s.value_index).getName(constants).toRawString(); // assume not null
-                            DottedChain val = constants.getMultiname(s.name_index).getNameWithNamespace(constants);
+                            DottedChain val = constants.getMultiname(s.name_index).getNameWithNamespace(constants, true);
                             map.put(key, val);
                         }
                     }
@@ -970,7 +1004,9 @@ public class ABC {
     public List<ScriptPack> getScriptPacks(String packagePrefix, List<ABC> allAbcs) {
         List<ScriptPack> ret = new ArrayList<>();
         for (int i = 0; i < script_info.size(); i++) {
-            ret.addAll(script_info.get(i).getPacks(this, i, packagePrefix, allAbcs));
+            if (!script_info.get(i).deleted) {
+                ret.addAll(script_info.get(i).getPacks(this, i, packagePrefix, allAbcs));
+            }
         }
         return ret;
     }
@@ -999,22 +1035,22 @@ public class ABC {
         }
     }
 
-    private void checkMultinameUsedInMethod(int multinameIndex, int methodInfo, List<MultinameUsage> ret, int classIndex, int traitIndex, boolean isStatic, boolean isInitializer, Traits traits, int parentTraitIndex) {
+    private void checkMultinameUsedInMethod(int multinameIndex, int methodInfo, List<MultinameUsage> ret, int scriptIndex, int classIndex, int traitIndex, int traitsType, boolean isInitializer, Traits traits, int parentTraitIndex) {
         for (int p = 0; p < method_info.get(methodInfo).param_types.length; p++) {
             if (method_info.get(methodInfo).param_types[p] == multinameIndex) {
-                ret.add(new MethodParamsMultinameUsage(this, multinameIndex, classIndex, traitIndex, isStatic, isInitializer, traits, parentTraitIndex));
+                ret.add(new MethodParamsMultinameUsage(this, multinameIndex, scriptIndex, classIndex, traitIndex, traitsType, isInitializer, traits, parentTraitIndex));
                 break;
             }
         }
         if (method_info.get(methodInfo).ret_type == multinameIndex) {
-            ret.add(new MethodReturnTypeMultinameUsage(this, multinameIndex, classIndex, traitIndex, isStatic, isInitializer, traits, parentTraitIndex));
+            ret.add(new MethodReturnTypeMultinameUsage(this, multinameIndex, scriptIndex, classIndex, traitIndex, traitsType, isInitializer, traits, parentTraitIndex));
         }
         MethodBody body = findBody(methodInfo);
         if (body != null) {
-            findMultinameUsageInTraits(body.traits, multinameIndex, isStatic, classIndex, ret, traitIndex);
+            findMultinameUsageInTraits(body.traits, multinameIndex, traitsType, scriptIndex, classIndex, ret, traitIndex);
             for (ABCException e : body.exceptions) {
                 if ((e.name_index == multinameIndex) || (e.type_index == multinameIndex)) {
-                    ret.add(new MethodBodyMultinameUsage(this, multinameIndex, classIndex, traitIndex, isStatic, isInitializer, traits, parentTraitIndex));
+                    ret.add(new MethodBodyMultinameUsage(this, multinameIndex, scriptIndex, classIndex, traitIndex, traitsType, isInitializer, traits, parentTraitIndex));
                     return;
                 }
             }
@@ -1022,7 +1058,7 @@ public class ABC {
                 for (int o = 0; o < ins.definition.operands.length; o++) {
                     if (ins.definition.operands[o] == AVM2Code.DAT_MULTINAME_INDEX) {
                         if (ins.operands[o] == multinameIndex) {
-                            ret.add(new MethodBodyMultinameUsage(this, multinameIndex, classIndex, traitIndex, isStatic, isInitializer, traits, parentTraitIndex));
+                            ret.add(new MethodBodyMultinameUsage(this, multinameIndex, scriptIndex, classIndex, traitIndex, traitsType, isInitializer, traits, parentTraitIndex));
                             return;
                         }
                     }
@@ -1031,23 +1067,93 @@ public class ABC {
         }
     }
 
-    private void findMultinameUsageInTraits(Traits traits, int multinameIndex, boolean isStatic, int classIndex, List<MultinameUsage> ret, int parentTraitIndex) {
+    private void checkAllMultinameUsedInMethod(int methodInfo, List<List<MultinameUsage>> ret, int scriptIndex, int classIndex, int traitIndex, int traitsType, boolean isInitializer, Traits traits, int parentTraitIndex) {
+        boolean[] foundMultinames = new boolean[constants.getMultinameCount()];
+        for (int p = 0; p < method_info.get(methodInfo).param_types.length; p++) {
+            int methodParamsMultinameIndex = method_info.get(methodInfo).param_types[p];
+            if (!foundMultinames[methodParamsMultinameIndex]) {
+                ret.get(methodParamsMultinameIndex).add(new MethodParamsMultinameUsage(this, methodParamsMultinameIndex, scriptIndex, classIndex, traitIndex, traitsType, isInitializer, traits, parentTraitIndex));
+                foundMultinames[methodParamsMultinameIndex] = true;
+            }
+        }
+        int methodReturnTypeMultinameIndex = method_info.get(methodInfo).ret_type;
+        ret.get(methodReturnTypeMultinameIndex).add(new MethodReturnTypeMultinameUsage(this, methodReturnTypeMultinameIndex, scriptIndex, classIndex, traitIndex, traitsType, isInitializer, traits, parentTraitIndex));
+
+        MethodBody body = findBody(methodInfo);
+        if (body != null) {
+            findAllMultinameUsageInTraits(body.traits, traitsType, scriptIndex, classIndex, ret, traitIndex);
+            foundMultinames = new boolean[constants.getMultinameCount()];
+            for (ABCException e : body.exceptions) {
+                if (!foundMultinames[e.name_index]) {
+                    ret.get(e.name_index).add(new MethodBodyMultinameUsage(this, e.name_index, scriptIndex, classIndex, traitIndex, traitsType, isInitializer, traits, parentTraitIndex));
+                    foundMultinames[e.name_index] = true;
+                }
+
+                if (!foundMultinames[e.type_index]) {
+                    ret.get(e.type_index).add(new MethodBodyMultinameUsage(this, e.type_index, scriptIndex, classIndex, traitIndex, traitsType, isInitializer, traits, parentTraitIndex));
+                    foundMultinames[e.type_index] = true;
+                }
+            }
+            for (AVM2Instruction ins : body.getCode().code) {
+                for (int o = 0; o < ins.definition.operands.length; o++) {
+                    if (ins.definition.operands[o] == AVM2Code.DAT_MULTINAME_INDEX) {
+                        int mi = ins.operands[o];
+                        if (!foundMultinames[mi]) {
+                            ret.get(mi).add(new MethodBodyMultinameUsage(this, mi, scriptIndex, classIndex, traitIndex, traitsType, isInitializer, traits, parentTraitIndex));
+                            foundMultinames[mi] = true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void findMultinameUsageInTraits(Traits traits, int multinameIndex, int traitsType, int scriptIndex, int classIndex, List<MultinameUsage> ret, int parentTraitIndex) {
         for (int t = 0; t < traits.traits.size(); t++) {
+            //Assuming instance_info.name_index has same multiname as in the class trait
+            /*if (traits.traits.get(t) instanceof TraitClass) {
+                TraitClass tc = (TraitClass) traits.traits.get(t);
+                if (tc.name_index == multinameIndex) {
+                    ret.add(new ClassNameInTraitMultinameUsage(this, multinameIndex, tc.class_info));
+                }
+            }*/
             if (traits.traits.get(t) instanceof TraitSlotConst) {
                 TraitSlotConst tsc = (TraitSlotConst) traits.traits.get(t);
                 if (tsc.name_index == multinameIndex) {
-                    ret.add(new ConstVarNameMultinameUsage(this, multinameIndex, classIndex, t, isStatic, traits, parentTraitIndex));
+                    ret.add(new ConstVarNameMultinameUsage(this, multinameIndex, scriptIndex, classIndex, t, traitsType, traits, parentTraitIndex));
                 }
                 if (tsc.type_index == multinameIndex) {
-                    ret.add(new ConstVarTypeMultinameUsage(this, multinameIndex, classIndex, t, isStatic, traits, parentTraitIndex));
+                    ret.add(new ConstVarTypeMultinameUsage(this, multinameIndex, scriptIndex, classIndex, t, traitsType, traits, parentTraitIndex));
                 }
             }
             if (traits.traits.get(t) instanceof TraitMethodGetterSetter) {
                 TraitMethodGetterSetter tmgs = (TraitMethodGetterSetter) traits.traits.get(t);
                 if (tmgs.name_index == multinameIndex) {
-                    ret.add(new MethodNameMultinameUsage(this, multinameIndex, classIndex, t, isStatic, false, traits, parentTraitIndex));
+                    ret.add(new MethodNameMultinameUsage(this, multinameIndex, scriptIndex, classIndex, t, traitsType, false, traits, parentTraitIndex));
                 }
-                checkMultinameUsedInMethod(multinameIndex, tmgs.method_info, ret, classIndex, t, isStatic, false, traits, parentTraitIndex);
+                checkMultinameUsedInMethod(multinameIndex, tmgs.method_info, ret, scriptIndex, classIndex, t, traitsType, false, traits, parentTraitIndex);
+            }
+        }
+    }
+
+    private void findAllMultinameUsageInTraits(Traits traits, int traitsType, int scriptIndex, int classIndex, List<List<MultinameUsage>> ret, int parentTraitIndex) {
+        for (int t = 0; t < traits.traits.size(); t++) {
+            //Assuming instance_info.name_index has same multiname as in the class trait
+            /*if (traits.traits.get(t) instanceof TraitClass) {
+                TraitClass tc = (TraitClass) traits.traits.get(t);
+                if (tc.name_index == multinameIndex) {
+                    ret.add(new ClassNameInTraitMultinameUsage(this, multinameIndex, tc.class_info));
+                }
+            }*/
+            if (traits.traits.get(t) instanceof TraitSlotConst) {
+                TraitSlotConst tsc = (TraitSlotConst) traits.traits.get(t);
+                ret.get(tsc.name_index).add(new ConstVarNameMultinameUsage(this, tsc.name_index, scriptIndex, classIndex, t, traitsType, traits, parentTraitIndex));
+                ret.get(tsc.type_index).add(new ConstVarTypeMultinameUsage(this, tsc.type_index, scriptIndex, classIndex, t, traitsType, traits, parentTraitIndex));
+            }
+            if (traits.traits.get(t) instanceof TraitMethodGetterSetter) {
+                TraitMethodGetterSetter tmgs = (TraitMethodGetterSetter) traits.traits.get(t);
+                ret.get(tmgs.name_index).add(new MethodNameMultinameUsage(this, tmgs.name_index, scriptIndex, classIndex, t, traitsType, false, traits, parentTraitIndex));
+                checkAllMultinameUsedInMethod(tmgs.method_info, ret, scriptIndex, classIndex, t, traitsType, false, traits, parentTraitIndex);
             }
         }
     }
@@ -1063,10 +1169,95 @@ public class ABC {
         return ret;
     }
 
+    public List<MultinameUsage> findMultinameUsageOfNamespace(int namespaceIndex) {
+        List<MultinameUsage> ret = new ArrayList<>();
+        for (int multinameIndex = 1; multinameIndex < constants.getMultinameCount(); multinameIndex++) {
+            if (constants.getMultiname(multinameIndex).namespace_index == namespaceIndex) {
+                ret.addAll(findMultinameUsage(multinameIndex));
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * Gets colliding usages of multinames. For example same name
+     * consts/vars/methods or same class names. Mostly in obfuscated files.
+     */
+    public Set<MultinameUsage> getCollidingMultinameUsages() {
+        //Reset
+        for (int multinameIndex = 1; multinameIndex < constants.getMultinameCount(); multinameIndex++) {
+            constants.getMultiname(multinameIndex).setDisplayNamespace(false);
+        }
+
+        //group qnames with same name
+        Map<String, List<Integer>> nameToQNameIndices = new HashMap<>();
+        for (int multinameIndex = 1; multinameIndex < constants.getMultinameCount(); multinameIndex++) {
+            Multiname m = constants.getMultiname(multinameIndex);
+            if (m.kind == Multiname.QNAME || m.kind == Multiname.QNAMEA) {
+                String name = m.getName(constants, new ArrayList<>(), true, false);
+                List<Integer> indices = nameToQNameIndices.get(name);
+                if (indices == null) {
+                    indices = new ArrayList<>();
+                    nameToQNameIndices.put(name, indices);
+                }
+
+                indices.add(multinameIndex);
+            }
+        }
+        Set<MultinameUsage> collidingUsages = new HashSet<>();
+
+        // find context of names with count 2 or more
+        List<List<MultinameUsage>> usagesList = findAllMultinameUsage();
+        for (String name : nameToQNameIndices.keySet()) {
+            List<Integer> multinameIndices = nameToQNameIndices.get(name);
+            if (multinameIndices.size() > 1) {
+                List<List<MultinameUsage>> allUsages = new ArrayList<>();
+                for (int multinameIndex : multinameIndices) {
+                    List<MultinameUsage> usages = usagesList.get(multinameIndex);
+                    for (MultinameUsage usage : usages) {
+                        for (List<MultinameUsage> prevUsages : allUsages) {
+                            for (MultinameUsage prevUsage : prevUsages) {
+                                if (prevUsage.collides(usage)) {
+                                    collidingUsages.add(usage);
+                                    collidingUsages.add(prevUsage);
+                                }
+                            }
+                        }
+                    }
+                    allUsages.add(usages);
+                }
+            }
+        }
+        return collidingUsages;
+    }
+
+    /**
+     * Appends namespace (#123) suffix to multinames which collide with each
+     * other. For example same name consts/vars/methods or same class names.
+     */
+    public void refreshMultinameNamespaceSuffixes() {
+
+        Set<MultinameUsage> collidingMultinameUsages = getCollidingMultinameUsages();
+
+        Set<Integer> collidingMultinameIndices = new HashSet<>();
+
+        for (MultinameUsage col : collidingMultinameUsages) {
+            //System.err.println("collides " + col);
+            collidingMultinameIndices.add(col.getMultinameIndex());
+        }
+
+        for (int multinameIndex : collidingMultinameIndices) {
+            constants.getMultiname(multinameIndex).setDisplayNamespace(true);
+        }
+    }
+
     public List<MultinameUsage> findMultinameUsage(int multinameIndex) {
         List<MultinameUsage> ret = new ArrayList<>();
         if (multinameIndex == 0) {
             return ret;
+        }
+        for (int s = 0; s < script_info.size(); s++) {
+            findMultinameUsageInTraits(script_info.get(s).traits, multinameIndex, TraitMultinameUsage.TRAITS_TYPE_SCRIPT, s, -1, ret, -1);
         }
         for (int c = 0; c < instance_info.size(); c++) {
             if (instance_info.get(c).name_index == multinameIndex) {
@@ -1080,21 +1271,22 @@ public class ABC {
                     ret.add(new ImplementsMultinameUsage(this, multinameIndex, c));
                 }
             }
-            checkMultinameUsedInMethod(multinameIndex, instance_info.get(c).iinit_index, ret, c, 0, false, true, null, -1);
-            checkMultinameUsedInMethod(multinameIndex, class_info.get(c).cinit_index, ret, c, 0, true, true, null, -1);
-            findMultinameUsageInTraits(instance_info.get(c).instance_traits, multinameIndex, false, c, ret, -1);
-            findMultinameUsageInTraits(class_info.get(c).static_traits, multinameIndex, true, c, ret, -1);
+            checkMultinameUsedInMethod(multinameIndex, instance_info.get(c).iinit_index, ret, -1/*FIXME*/, c, 0, TraitMultinameUsage.TRAITS_TYPE_INSTANCE, true, null, -1);
+            checkMultinameUsedInMethod(multinameIndex, class_info.get(c).cinit_index, ret, -1/*FIXME*/, c, 0, TraitMultinameUsage.TRAITS_TYPE_CLASS, true, null, -1);
+            findMultinameUsageInTraits(instance_info.get(c).instance_traits, multinameIndex, TraitMultinameUsage.TRAITS_TYPE_INSTANCE, -1/*FIXME*/, c, ret, -1);
+            findMultinameUsageInTraits(class_info.get(c).static_traits, multinameIndex, TraitMultinameUsage.TRAITS_TYPE_CLASS, -1/*FIXME*/, c, ret, -1);
         }
         loopm:
-        for (int m = 1; m < constants.getMultinameCount(); m++) {
-            if (constants.getMultiname(m).kind == Multiname.TYPENAME) {
-                if (constants.getMultiname(m).qname_index == multinameIndex) {
-                    ret.add(new TypeNameMultinameUsage(this, m));
+        for (int t = 1; t < constants.getMultinameCount(); t++) {
+            Multiname multiname = constants.getMultiname(t);
+            if (multiname.kind == Multiname.TYPENAME) {
+                if (multiname.qname_index == multinameIndex) {
+                    ret.add(new TypeNameMultinameUsage(this, multinameIndex, t));
                     continue;
                 }
-                for (int mp : constants.getMultiname(m).params) {
+                for (int mp : multiname.params) {
                     if (mp == multinameIndex) {
-                        ret.add(new TypeNameMultinameUsage(this, m));
+                        ret.add(new TypeNameMultinameUsage(this, multinameIndex, t));
                         continue loopm;
                     }
                 }
@@ -1103,11 +1295,54 @@ public class ABC {
         return ret;
     }
 
-    public int findMethodInfoByName(int classId, String methodName) {
+    public List<List<MultinameUsage>> findAllMultinameUsage() {
+        List<List<MultinameUsage>> ret = new ArrayList<>();
+        for (int i = 0; i < constants.getMultinameCount(); i++) {
+            ret.add(new ArrayList<>());
+        }
+
+        for (int s = 0; s < script_info.size(); s++) {
+            findAllMultinameUsageInTraits(script_info.get(s).traits, TraitMultinameUsage.TRAITS_TYPE_SCRIPT, s, -1, ret, -1);
+        }
+        for (int c = 0; c < instance_info.size(); c++) {
+            int classNameMultinameIndex = instance_info.get(c).name_index;
+            ret.get(classNameMultinameIndex).add(new ClassNameMultinameUsage(this, classNameMultinameIndex, c));
+            int extendsMultinameIndex = instance_info.get(c).super_index;
+            ret.get(extendsMultinameIndex).add(new ExtendsMultinameUsage(this, extendsMultinameIndex, c));
+            for (int i = 0; i < instance_info.get(c).interfaces.length; i++) {
+                int implementsMultinameIndex = instance_info.get(c).interfaces[i];
+                ret.get(implementsMultinameIndex).add(new ImplementsMultinameUsage(this, implementsMultinameIndex, c));
+            }
+            checkAllMultinameUsedInMethod(instance_info.get(c).iinit_index, ret, -1/*FIXME*/, c, 0, TraitMultinameUsage.TRAITS_TYPE_INSTANCE, true, null, -1);
+            checkAllMultinameUsedInMethod(class_info.get(c).cinit_index, ret, -1/*FIXME*/, c, 0, TraitMultinameUsage.TRAITS_TYPE_CLASS, true, null, -1);
+            findAllMultinameUsageInTraits(instance_info.get(c).instance_traits, TraitMultinameUsage.TRAITS_TYPE_INSTANCE, -1/*FIXME*/, c, ret, -1);
+            findAllMultinameUsageInTraits(class_info.get(c).static_traits, TraitMultinameUsage.TRAITS_TYPE_CLASS, -1/*FIXME*/, c, ret, -1);
+        }
+
+        boolean[] foundMultinames = new boolean[constants.getMultinameCount()];
+        for (int t = 1; t < constants.getMultinameCount(); t++) {
+            Multiname multiname = constants.getMultiname(t);
+            if (multiname.kind == Multiname.TYPENAME) {
+                if (!foundMultinames[multiname.qname_index]) {
+                    ret.get(multiname.qname_index).add(new TypeNameMultinameUsage(this, multiname.qname_index, t));
+                    foundMultinames[multiname.qname_index] = true;
+                }
+                for (int mp : multiname.params) {
+                    if (!foundMultinames[mp]) {
+                        ret.get(mp).add(new TypeNameMultinameUsage(this, mp, t));
+                        foundMultinames[mp] = true;
+                    }
+                }
+            }
+        }
+        return ret;
+    }
+
+    public int findMethodInfoByName(int classId, String methodNameWithSuffix) {
         if (classId > -1) {
             for (Trait t : instance_info.get(classId).instance_traits.traits) {
                 if (t instanceof TraitMethodGetterSetter) {
-                    if (t.getName(this).getName(constants, null, true).equals(methodName)) {
+                    if (t.getName(this).getName(constants, null, true, true).equals(methodNameWithSuffix)) {
                         return ((TraitMethodGetterSetter) t).method_info;
                     }
                 }
@@ -1116,11 +1351,11 @@ public class ABC {
         return -1;
     }
 
-    public int findMethodBodyByName(int classId, String methodName) {
+    public int findMethodBodyByName(int classId, String methodNameWithSuffix) {
         if (classId > -1) {
             for (Trait t : instance_info.get(classId).instance_traits.traits) {
                 if (t instanceof TraitMethodGetterSetter) {
-                    if (t.getName(this).getName(constants, null, true).equals(methodName)) {
+                    if (t.getName(this).getName(constants, null, true, true).equals(methodNameWithSuffix)) {
                         return findBodyIndex(((TraitMethodGetterSetter) t).method_info);
                     }
                 }
@@ -1139,10 +1374,10 @@ public class ABC {
         return findClassByName(str);
     }
 
-    public int findClassByName(String name) {
+    public int findClassByName(String nameWithSuffix) {
         for (int c = 0; c < instance_info.size(); c++) {
-            DottedChain s = constants.getMultiname(instance_info.get(c).name_index).getNameWithNamespace(constants);
-            if (name.equals(s.toRawString())) {
+            DottedChain s = constants.getMultiname(instance_info.get(c).name_index).getNameWithNamespace(constants, true);
+            if (nameWithSuffix.equals(s.toRawString())) {
                 return c;
             }
         }
@@ -1210,7 +1445,7 @@ public class ABC {
                 for (int i = 0; i < ins.definition.operands.length; i++) {
                     if (ins.definition.operands[i] == AVM2Code.DAT_CLASS_INDEX) {
                         if (ins.operands[i] >= index) {
-                            ins.operands[i]++;
+                            ins.setOperand(i, ins.operands[i] + 1, b.getCode(), b);
                         }
                     }
                 }
@@ -1239,13 +1474,57 @@ public class ABC {
         }
     }
 
+    public void reorganizeClasses(Map<Integer, Integer> classIndexMap) {
+        for (MethodBody b : bodies) {
+            for (AVM2Instruction ins : b.getCode().code) {
+                for (int i = 0; i < ins.definition.operands.length; i++) {
+                    if (ins.definition.operands[i] == AVM2Code.DAT_CLASS_INDEX) {
+                        if (classIndexMap.containsKey(ins.operands[i])) {
+                            ins.setOperand(i, classIndexMap.get(ins.operands[i]), b.getCode(), b);
+                        }
+                    }
+                }
+            }
+        }
+        for (ScriptInfo si : script_info) {
+            reorganizeClassesInTraits(si.traits, classIndexMap);
+        }
+        for (MethodBody b : bodies) {
+            reorganizeClassesInTraits(b.traits, classIndexMap);
+        }
+        Map<Integer, InstanceInfo> backupInstanceInfos = new HashMap<>();
+        Map<Integer, ClassInfo> backupClassInfos = new HashMap<>();
+        for (int from : classIndexMap.keySet()) {
+            backupInstanceInfos.put(from, instance_info.get(from));
+            backupClassInfos.put(from, class_info.get(from));
+        }
+        for (int from : classIndexMap.keySet()) {
+            int to = classIndexMap.get(from);
+            instance_info.set(to, backupInstanceInfos.get(from));
+            class_info.set(to, backupClassInfos.get(from));
+        }
+    }
+
+    private void reorganizeClassesInTraits(Traits traits, Map<Integer, Integer> classIndexMap) {
+        for (Trait t : traits.traits) {
+            if (t instanceof TraitClass) {
+                TraitClass tc = (TraitClass) t;
+                reorganizeClassesInTraits(instance_info.get(tc.class_info).instance_traits, classIndexMap);
+                reorganizeClassesInTraits(class_info.get(tc.class_info).static_traits, classIndexMap);
+                if (classIndexMap.containsKey(tc.class_info)) {
+                    tc.class_info = classIndexMap.get(tc.class_info);
+                }
+            }
+        }
+    }
+
     public void removeClass(int index) {
         for (MethodBody b : bodies) {
             for (AVM2Instruction ins : b.getCode().code) {
                 for (int i = 0; i < ins.definition.operands.length; i++) {
                     if (ins.definition.operands[i] == AVM2Code.DAT_CLASS_INDEX) {
                         if (ins.operands[i] > index) {
-                            ins.operands[i]--;
+                            ins.setOperand(i, ins.operands[i] - 1, b.getCode(), b);
                         }
                     }
                 }
@@ -1302,7 +1581,7 @@ public class ABC {
                 for (int i = 0; i < ins.definition.operands.length; i++) {
                     if (ins.definition.operands[i] == AVM2Code.DAT_METHOD_INDEX) {
                         if (ins.operands[i] > index) {
-                            ins.operands[i]--;
+                            ins.setOperand(i, ins.operands[i] - 1, b.getCode(), b);
                         }
                     }
                 }
@@ -1333,69 +1612,437 @@ public class ABC {
         method_info.remove(index);
     }
 
-    public boolean replaceScriptPack(ScriptPack pack, String as) throws AVM2ParseException, CompilationException, IOException, InterruptedException {
-        String scriptName = pack.getPathScriptName() + ".as";
-        int oldIndex = pack.scriptIndex;
-        int newIndex = script_info.size();
-        String documentClass = getSwf().getDocumentClass();
-        boolean isDocumentClass = documentClass != null && documentClass.equals(pack.getClassPath().toString());
-
-        boolean isSimple = pack.isSimple;
-
-        ScriptInfo si = script_info.get(oldIndex);
-        if (isSimple) {
-            si.delete(this, true);
-        } else {
-            for (int t : pack.traitIndices) {
-                si.traits.traits.get(t).delete(this, true);
-            }
-        }
-
-        int newClassIndex = instance_info.size();
-        for (int t : pack.traitIndices) {
-            if (si.traits.traits.get(t) instanceof TraitClass) {
-                TraitClass tc = (TraitClass) si.traits.traits.get(t);
-                newClassIndex = tc.class_info + 1;
-            }
-
-        }
-        List<ABC> otherAbcs = new ArrayList<>(pack.allABCs);
-        otherAbcs.remove(this);
-        ActionScript3Parser.compile(as, this, otherAbcs, isDocumentClass, scriptName, newClassIndex, oldIndex);
-
-        if (isSimple) {
-            // Move newly added script to its position
-            script_info.set(oldIndex, script_info.get(newIndex));
-            script_info.remove(newIndex);
-        } else {
-            script_info.get(newIndex).setModified(true);
-            //Note: Is deleting traits safe?
-            List<Integer> todel = new ArrayList<>(new TreeSet<>(pack.traitIndices));
-            for (int i = todel.size() - 1; i >= 0; i--) {
-                si.traits.traits.remove((int) todel.get(i));
-            }
-        }
-
-        script_info.get(oldIndex).setModified(true);
-        pack(); // removes old classes/methods
+    public boolean replaceScriptPack(As3ScriptReplacerInterface replacer, ScriptPack pack, String as) throws As3ScriptReplaceException, IOException, InterruptedException {
+        replacer.replaceScript(pack, as);
         ((Tag) parentTag).setModified(true);
-        return !isSimple;
+        return pack.isSimple;
     }
 
-    public void pack() {
-        for (int c = 0; c < instance_info.size(); c++) {
-            if (instance_info.get(c).deleted) {
-                removeClass(c);
-                c--;
-            }
-        }
+    private void packMethods() {
         for (int m = 0; m < method_info.size(); m++) {
             if (method_info.get(m).deleted) {
                 removeMethod(m);
                 m--;
             }
         }
+    }
 
+    public void pack() {
+        packMethods();
+        for (int c = 0; c < instance_info.size(); c++) {
+            if (instance_info.get(c).deleted) {
+                removeClass(c);
+                c--;
+            }
+        }
+        packMethods();
+        for (int s = 0; s < script_info.size(); s++) {
+            if (script_info.get(s).deleted) {
+                script_info.remove(s);
+                s--;
+            }
+        }
+        getSwf().clearAbcListCache();
+        getSwf().clearScriptCache();
         getMethodIndexing();
+    }
+
+    /**
+     * Merges second ABC to this one.
+     *
+     * @param secondABC
+     */
+    public void mergeABC(ABC secondABC) {
+        Map<Integer, Integer> mergeStringMap = new HashMap<>();
+        Map<Integer, Integer> mergeIntMap = new HashMap<>();
+        Map<Integer, Integer> mergeUIntMap = new HashMap<>();
+        Map<Integer, Integer> mergeDoubleMap = new HashMap<>();
+        Map<Integer, Integer> mergeFloatMap = new HashMap<>();
+        Map<Integer, Integer> mergeFloat4Map = new HashMap<>();
+        Map<Integer, Integer> mergeDecimalMap = new HashMap<>();
+
+        Map<Integer, Integer> mergeNamespaceMap = new HashMap<>();
+        Map<Integer, Integer> mergeNamespaceSetMap = new HashMap<>();
+        Map<Integer, Integer> mergeMultinameMap = new HashMap<>();
+        Map<Integer, Integer> mergeMethodInfoMap = new HashMap<>();
+        Map<Integer, Integer> mergeMethodBodyMap = new HashMap<>();
+        Map<Integer, Integer> mergeClassIndexMap = new HashMap<>();
+        Map<Integer, Integer> mergeMetaDataMap = new HashMap<>();
+        Map<Integer, Integer> mergeScriptInfoMap = new HashMap<>();
+
+        mergeABC(secondABC, mergeStringMap, mergeIntMap, mergeUIntMap, mergeDoubleMap, mergeFloatMap, mergeFloat4Map, mergeDecimalMap, mergeNamespaceMap, mergeNamespaceSetMap, mergeMultinameMap, mergeMethodInfoMap, mergeMethodBodyMap, mergeClassIndexMap, mergeMetaDataMap, mergeScriptInfoMap);
+    }
+
+    /**
+     * Merges second ABC to this one. Gets mapping of indices.
+     *
+     * @param secondABC
+     * @param mergeStringMap
+     * @param mergeIntMap
+     * @param mergeUIntMap
+     * @param mergeDoubleMap
+     * @param mergeFloatMap
+     * @param mergeFloat4Map
+     * @param mergeDecimalMap
+     * @param mergeNamespaceMap
+     * @param mergeNamespaceSetMap
+     * @param mergeMultinameMap
+     * @param mergeMethodInfoMap
+     * @param mergeMethodBodyMap
+     * @param mergeClassIndexMap
+     * @param mergeMetaDataMap
+     * @param mergeScriptInfoMap
+     */
+    public void mergeABC(ABC secondABC,
+            Map<Integer, Integer> mergeStringMap,
+            Map<Integer, Integer> mergeIntMap,
+            Map<Integer, Integer> mergeUIntMap,
+            Map<Integer, Integer> mergeDoubleMap,
+            Map<Integer, Integer> mergeFloatMap,
+            Map<Integer, Integer> mergeFloat4Map,
+            Map<Integer, Integer> mergeDecimalMap,
+            Map<Integer, Integer> mergeNamespaceMap,
+            Map<Integer, Integer> mergeNamespaceSetMap,
+            Map<Integer, Integer> mergeMultinameMap,
+            Map<Integer, Integer> mergeMethodInfoMap,
+            Map<Integer, Integer> mergeMethodBodyMap,
+            Map<Integer, Integer> mergeClassIndexMap,
+            Map<Integer, Integer> mergeMetaDataMap,
+            Map<Integer, Integer> mergeScriptInfoMap
+    ) {
+
+        if (!version.equals(secondABC.version)) {
+            throw new RuntimeException("ABC versions mismatch");
+        }
+        //Constants
+        constants.merge(secondABC.constants, mergeStringMap, mergeIntMap, mergeUIntMap, mergeDoubleMap, mergeFloatMap, mergeFloat4Map, mergeDecimalMap, mergeNamespaceMap, mergeNamespaceSetMap, mergeMultinameMap);
+
+        //Metadata
+        for (int m = 0; m < secondABC.metadata_info.size(); m++) {
+            MetadataInfo secondMetadataInfo = secondABC.metadata_info.get(m);
+            MetadataInfo newMetadataInfo = new MetadataInfo();
+            newMetadataInfo.name_index = mergeStringMap.get(secondMetadataInfo.name_index);
+            newMetadataInfo.keys = new int[secondMetadataInfo.keys.length];
+            newMetadataInfo.values = new int[secondMetadataInfo.values.length];
+            for (int i = 0; i < secondMetadataInfo.keys.length; i++) {
+                newMetadataInfo.keys[i] = mergeStringMap.get(secondMetadataInfo.keys[i]);
+                newMetadataInfo.values[i] = mergeStringMap.get(secondMetadataInfo.values[i]);
+            }
+            int newIndex = metadata_info.size();
+            metadata_info.add(newMetadataInfo);
+            mergeMetaDataMap.put(m, newIndex);
+        }
+
+        //Method Info
+        for (int i = 0; i < secondABC.method_info.size(); i++) {
+            MethodInfo secondMethodInfo = secondABC.method_info.get(i);
+            int newParamTypes[] = new int[secondMethodInfo.param_types.length];
+            for (int t = 0; t < secondMethodInfo.param_types.length; t++) {
+                newParamTypes[t] = mergeMultinameMap.get(secondMethodInfo.param_types[t]);
+            }
+            int newParamNames[] = new int[secondMethodInfo.paramNames.length];
+            for (int n = 0; n < secondMethodInfo.paramNames.length; n++) {
+                newParamNames[n] = mergeStringMap.get(secondMethodInfo.paramNames[n]);
+            }
+            int newRetType = mergeMultinameMap.get(secondMethodInfo.ret_type);
+            int newNameIndex = mergeStringMap.get(secondMethodInfo.name_index);
+            ValueKind newOptional[] = new ValueKind[secondMethodInfo.optional.length];
+            for (int k = 0; k < secondMethodInfo.optional.length; k++) {
+                int vkind = secondMethodInfo.optional[k].value_kind;
+                Map<Integer, Integer> valueMergeMap = null;
+                switch (vkind) {
+                    case ValueKind.CONSTANT_Utf8:
+                        valueMergeMap = mergeStringMap;
+                        break;
+                    case ValueKind.CONSTANT_Int:
+                        valueMergeMap = mergeIntMap;
+                        break;
+                    case ValueKind.CONSTANT_UInt:
+                        valueMergeMap = mergeUIntMap;
+                        break;
+                    case ValueKind.CONSTANT_Double:
+                        valueMergeMap = mergeDoubleMap;
+                        break;
+                    case ValueKind.CONSTANT_DecimalOrFloat:
+                        //assuming the second ABC has same decimal/float support
+                        if (hasDecimalSupport()) {
+                            valueMergeMap = mergeDecimalMap;
+                        } else if (hasFloatSupport()) {
+                            valueMergeMap = mergeFloatMap;
+                        } else {
+                            //should not happen
+                        }
+                        break;
+                    case ValueKind.CONSTANT_Float4:
+                        if (hasFloatSupport()) {
+                            valueMergeMap = mergeFloat4Map;
+                        }
+                        break;
+                    case ValueKind.CONSTANT_ExplicitNamespace:
+                    case ValueKind.CONSTANT_Namespace:
+                    case ValueKind.CONSTANT_PackageInternalNs:
+                    case ValueKind.CONSTANT_PackageNamespace:
+                    case ValueKind.CONSTANT_ProtectedNamespace:
+                    case ValueKind.CONSTANT_PrivateNs:
+                    case ValueKind.CONSTANT_StaticProtectedNs:
+                        valueMergeMap = mergeNamespaceMap;
+                        break;
+                }
+
+                int newValueIndex = valueMergeMap != null ? valueMergeMap.get(secondMethodInfo.optional[k].value_index) : secondMethodInfo.optional[k].value_index;
+                newOptional[k] = new ValueKind(newValueIndex, vkind);
+            }
+
+            MethodInfo newMethodInfo = new MethodInfo(newParamTypes, newRetType, newNameIndex, secondMethodInfo.flags, newOptional, newParamNames);
+            int newIndex = addMethodInfo(newMethodInfo);
+            mergeMethodInfoMap.put(i, newIndex);
+        }
+
+        int classFirstIndex = class_info.size();
+        //Class/Instance
+        for (int c = 0; c < secondABC.class_info.size(); c++) {
+            ClassInfo secondClassInfo = secondABC.class_info.get(c);
+            ClassInfo newClassInfo = new ClassInfo();
+            int newIndex = class_info.size();
+            class_info.add(newClassInfo);
+            mergeClassIndexMap.put(c, newIndex);
+            newClassInfo.cinit_index = mergeMethodInfoMap.get(secondClassInfo.cinit_index);
+
+            newClassInfo.lastDispId = secondClassInfo.lastDispId;
+            InstanceInfo secondInstanceInfo = secondABC.instance_info.get(c);
+            InstanceInfo newInstanceInfo = new InstanceInfo();
+            newInstanceInfo.iinit_index = mergeMethodInfoMap.get(secondInstanceInfo.iinit_index);
+            newInstanceInfo.super_index = mergeMultinameMap.get(secondInstanceInfo.super_index);
+            newInstanceInfo.interfaces = new int[secondInstanceInfo.interfaces.length];
+            for (int i = 0; i < secondInstanceInfo.interfaces.length; i++) {
+                newInstanceInfo.interfaces[i] = mergeMultinameMap.get(secondInstanceInfo.interfaces[i]);
+            }
+            newInstanceInfo.protectedNS = mergeNamespaceMap.get(secondInstanceInfo.protectedNS);
+            newInstanceInfo.name_index = mergeMultinameMap.get(secondInstanceInfo.name_index);
+            newInstanceInfo.flags = secondInstanceInfo.flags;
+            instance_info.add(newInstanceInfo);
+
+            //do traits in second step as some classes may depend on other classes
+        }
+
+        //Class/Instance traits
+        for (int c = 0; c < secondABC.class_info.size(); c++) {
+            ClassInfo secondClassInfo = secondABC.class_info.get(c);
+            InstanceInfo secondInstanceInfo = secondABC.instance_info.get(c);
+            ClassInfo newClassInfo = class_info.get(classFirstIndex + c);
+            InstanceInfo newInstanceInfo = instance_info.get(classFirstIndex + c);
+            newClassInfo.static_traits = mergeTraits(secondClassInfo.static_traits, mergeMultinameMap, mergeStringMap, mergeIntMap, mergeUIntMap, mergeDoubleMap, mergeFloatMap, mergeFloat4Map, mergeDecimalMap, mergeNamespaceMap, mergeMetaDataMap, mergeMethodInfoMap, mergeClassIndexMap);
+            newInstanceInfo.instance_traits = mergeTraits(secondInstanceInfo.instance_traits, mergeMultinameMap, mergeStringMap, mergeIntMap, mergeUIntMap, mergeDoubleMap, mergeFloatMap, mergeFloat4Map, mergeDecimalMap, mergeNamespaceMap, mergeMetaDataMap, mergeMethodInfoMap, mergeClassIndexMap);
+        }
+
+        //Scripts
+        for (int s = 0; s < secondABC.script_info.size(); s++) {
+            ScriptInfo secondScriptInfo = secondABC.script_info.get(s);
+            ScriptInfo newScriptInfo = new ScriptInfo();
+            newScriptInfo.init_index = mergeMethodInfoMap.get(secondScriptInfo.init_index);
+            newScriptInfo.traits = mergeTraits(secondScriptInfo.traits, mergeMultinameMap, mergeStringMap, mergeIntMap, mergeUIntMap, mergeDoubleMap, mergeFloatMap, mergeFloat4Map, mergeDecimalMap, mergeNamespaceMap, mergeMetaDataMap, mergeMethodInfoMap, mergeClassIndexMap);
+            int newIndex = script_info.size();
+            script_info.add(newScriptInfo);
+            mergeScriptInfoMap.put(s, newIndex);
+        }
+
+        //Method bodies
+        for (int b = 0; b < secondABC.bodies.size(); b++) {
+            MethodBody secondBody = secondABC.bodies.get(b);
+            MethodBody newBody = secondBody.clone(true);
+            newBody.method_info = mergeMethodInfoMap.get(secondBody.method_info);
+            for (int e = 0; e < secondBody.exceptions.length; e++) {
+                newBody.exceptions[e].name_index = mergeMultinameMap.get(secondBody.exceptions[e].name_index);
+                newBody.exceptions[e].type_index = mergeMultinameMap.get(secondBody.exceptions[e].type_index);
+            }
+            AVM2Code newCode = newBody.getCode();
+            for (AVM2Instruction newIns : newCode.code) {
+                int newOperands[] = newIns.operands == null ? null : newIns.operands.clone();
+                boolean modified = false;
+                if (newIns.operands != null) {
+                    for (int i = 0; i < newIns.definition.operands.length; i++) {
+                        Map<Integer, Integer> mergeMap = null;
+                        switch (newIns.definition.operands[i]) {
+                            case AVM2Code.DAT_CLASS_INDEX:
+                                mergeMap = mergeClassIndexMap;
+                                break;
+                            case AVM2Code.DAT_STRING_INDEX:
+                                mergeMap = mergeStringMap;
+                                break;
+                            case AVM2Code.DAT_INT_INDEX:
+                                mergeMap = mergeIntMap;
+                                break;
+                            case AVM2Code.DAT_UINT_INDEX:
+                                mergeMap = mergeUIntMap;
+                                break;
+                            case AVM2Code.DAT_DOUBLE_INDEX:
+                                mergeMap = mergeDoubleMap;
+                                break;
+                            case AVM2Code.DAT_DECIMAL_INDEX:
+                                mergeMap = mergeDecimalMap;
+                                break;
+                            case AVM2Code.DAT_FLOAT_INDEX:
+                                mergeMap = mergeFloatMap;
+                                break;
+                            case AVM2Code.DAT_FLOAT4_INDEX:
+                                mergeMap = mergeFloat4Map;
+                                break;
+                            case AVM2Code.DAT_NAMESPACE_INDEX:
+                                mergeMap = mergeNamespaceMap;
+                                break;
+                            case AVM2Code.DAT_METHOD_INDEX:
+                                mergeMap = mergeMethodInfoMap;
+                                break;
+                            case AVM2Code.DAT_MULTINAME_INDEX:
+                                mergeMap = mergeMultinameMap;
+                                break;
+                        }
+                        if (mergeMap != null) {
+                            newOperands[i] = mergeMap.get(newIns.operands[i]);
+                            modified = true;
+                        }
+                    }
+                }
+                if (modified) {
+                    newIns.setOperands(newOperands, newCode, newBody);
+                }
+                newBody.traits = mergeTraits(secondBody.traits, mergeMultinameMap, mergeStringMap, mergeIntMap, mergeUIntMap, mergeDoubleMap, mergeFloatMap, mergeFloat4Map, mergeDecimalMap, mergeNamespaceMap, mergeMetaDataMap, mergeMethodInfoMap, mergeClassIndexMap);
+            }
+            newBody.setModified();
+            int newIndex = bodies.size();
+            bodies.add(newBody);
+            mergeMethodBodyMap.put(b, newIndex);
+        }
+
+        //clear caches
+        abcMethodIndexing = null;
+        getSwf().clearScriptCache();
+        ((Tag) parentTag).setModified(true);
+    }
+
+    private Traits mergeTraits(Traits secondTraits, Map<Integer, Integer> mergeMultinameMap,
+            Map<Integer, Integer> mergeStringMap,
+            Map<Integer, Integer> mergeIntMap,
+            Map<Integer, Integer> mergeUIntMap,
+            Map<Integer, Integer> mergeDoubleMap,
+            Map<Integer, Integer> mergeFloatMap,
+            Map<Integer, Integer> mergeFloat4Map,
+            Map<Integer, Integer> mergeDecimalMap,
+            Map<Integer, Integer> mergeNamespaceMap,
+            Map<Integer, Integer> mergeMetaDataMap,
+            Map<Integer, Integer> mergeMethodInfoMap,
+            Map<Integer, Integer> mergeClassIndexMap) {
+        Traits newTraits = new Traits();
+        for (Trait t : secondTraits.traits) {
+            Trait newTrait = null;
+            if (t instanceof TraitMethodGetterSetter) {
+                newTrait = mergeTrait((TraitMethodGetterSetter) t, mergeMultinameMap, mergeMethodInfoMap, mergeMetaDataMap);
+            } else if (t instanceof TraitSlotConst) {
+                newTrait = mergeTrait((TraitSlotConst) t, mergeMultinameMap, mergeStringMap, mergeIntMap, mergeUIntMap, mergeDoubleMap, mergeFloatMap, mergeFloat4Map, mergeDecimalMap, mergeNamespaceMap, mergeMetaDataMap);
+            } else if (t instanceof TraitFunction) {
+                newTrait = mergeTrait((TraitFunction) t, mergeMultinameMap, mergeMethodInfoMap, mergeMetaDataMap);
+            } else if (t instanceof TraitClass) {
+                newTrait = mergeTrait((TraitClass) t, mergeClassIndexMap, mergeMultinameMap, mergeMetaDataMap);
+            } else {
+                //should not happen
+            }
+
+            newTraits.addTrait(newTrait);
+
+        }
+        return newTraits;
+    }
+
+    private TraitMethodGetterSetter mergeTrait(TraitMethodGetterSetter secondTrait, Map<Integer, Integer> mergeMultinameMap, Map<Integer, Integer> mergeMethodInfoMap, Map<Integer, Integer> mergeMetaDataMap) {
+        TraitMethodGetterSetter newTrait = secondTrait.clone();
+        newTrait.method_info = mergeMethodInfoMap.get(secondTrait.method_info);
+        newTrait.name_index = mergeMultinameMap.get(secondTrait.name_index);
+        for (int m = 0; m < secondTrait.metadata.length; m++) {
+            newTrait.metadata[m] = mergeMetaDataMap.get(secondTrait.metadata[m]);
+        }
+        return newTrait;
+    }
+
+    private TraitSlotConst mergeTrait(TraitSlotConst secondTrait, Map<Integer, Integer> mergeMultinameMap,
+            Map<Integer, Integer> mergeStringMap,
+            Map<Integer, Integer> mergeIntMap,
+            Map<Integer, Integer> mergeUIntMap,
+            Map<Integer, Integer> mergeDoubleMap,
+            Map<Integer, Integer> mergeFloatMap,
+            Map<Integer, Integer> mergeFloat4Map,
+            Map<Integer, Integer> mergeDecimalMap,
+            Map<Integer, Integer> mergeNamespaceMap,
+            Map<Integer, Integer> mergeMetaDataMap
+    ) {
+        TraitSlotConst newTrait = secondTrait.clone();
+        newTrait.name_index = mergeMultinameMap.get(secondTrait.name_index);
+        for (int m = 0; m < secondTrait.metadata.length; m++) {
+            newTrait.metadata[m] = mergeMetaDataMap.get(secondTrait.metadata[m]);
+        }
+        newTrait.type_index = mergeMultinameMap.get(secondTrait.type_index);
+        Map<Integer, Integer> valueMergeMap = null;
+
+        switch (newTrait.value_kind) {
+            case ValueKind.CONSTANT_Utf8:
+                valueMergeMap = mergeStringMap;
+                break;
+            case ValueKind.CONSTANT_Int:
+                valueMergeMap = mergeIntMap;
+                break;
+            case ValueKind.CONSTANT_UInt:
+                valueMergeMap = mergeUIntMap;
+                break;
+            case ValueKind.CONSTANT_Double:
+                valueMergeMap = mergeDoubleMap;
+                break;
+            case ValueKind.CONSTANT_DecimalOrFloat:
+                //assuming the second ABC has same decimal/float support
+                if (hasDecimalSupport()) {
+                    valueMergeMap = mergeDecimalMap;
+                } else if (hasFloatSupport()) {
+                    valueMergeMap = mergeFloatMap;
+                } else {
+                    //should not happen
+                }
+                break;
+            case ValueKind.CONSTANT_Float4:
+                if (hasFloatSupport()) {
+                    valueMergeMap = mergeFloat4Map;
+                }
+                break;
+            case ValueKind.CONSTANT_ExplicitNamespace:
+            case ValueKind.CONSTANT_Namespace:
+            case ValueKind.CONSTANT_PackageInternalNs:
+            case ValueKind.CONSTANT_PackageNamespace:
+            case ValueKind.CONSTANT_PrivateNs:
+            case ValueKind.CONSTANT_ProtectedNamespace:
+            case ValueKind.CONSTANT_StaticProtectedNs:
+                valueMergeMap = mergeNamespaceMap;
+                break;
+        }
+        if (valueMergeMap != null) {
+            newTrait.value_index = valueMergeMap.get(secondTrait.value_index);
+        }
+        return newTrait; //TODO
+    }
+
+    private TraitFunction mergeTrait(TraitFunction secondTrait, Map<Integer, Integer> mergeMultinameMap, Map<Integer, Integer> mergeMethodInfoMap, Map<Integer, Integer> mergeMetaDataMap) {
+        TraitFunction newTrait = secondTrait.clone();
+        newTrait.method_info = mergeMethodInfoMap.get(secondTrait.method_info);
+        newTrait.name_index = mergeMultinameMap.get(secondTrait.name_index);
+        for (int m = 0; m < secondTrait.metadata.length; m++) {
+            newTrait.metadata[m] = mergeMetaDataMap.get(secondTrait.metadata[m]);
+        }
+        return newTrait;
+    }
+
+    private TraitClass mergeTrait(TraitClass secondTrait, Map<Integer, Integer> mergeClassMap, Map<Integer, Integer> mergeMultinameMap, Map<Integer, Integer> mergeMetaDataMap) {
+        TraitClass newTrait = secondTrait.clone();
+        newTrait.class_info = mergeClassMap.get(secondTrait.class_info);
+        newTrait.name_index = mergeMultinameMap.get(secondTrait.name_index);
+        for (int m = 0; m < secondTrait.metadata.length; m++) {
+            newTrait.metadata[m] = mergeMetaDataMap.get(secondTrait.metadata[m]);
+        }
+        return newTrait;
     }
 }

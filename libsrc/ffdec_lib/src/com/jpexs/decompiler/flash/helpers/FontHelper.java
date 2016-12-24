@@ -63,19 +63,19 @@ public class FontHelper {
             Object fm = getFontManager();
             Class<?> clFm = Class.forName("sun.font.SunFontManager");
 
-            //Delete cached installed names
+            // Delete cached installed names
             Field inField = clFm.getDeclaredField("installedNames");
             inField.setAccessible(true);
             inField.set(null, null);
             inField.setAccessible(false);
 
-            //Delete cached family names
+            // Delete cached family names
             Field allFamField = clFm.getDeclaredField("allFamilies");
             allFamField.setAccessible(true);
             allFamField.set(fm, null);
             allFamField.setAccessible(false);
 
-            //Delete cached fonts
+            // Delete cached fonts
             Field allFonField = clFm.getDeclaredField("allFonts");
             allFonField.setAccessible(true);
             allFonField.set(fm, null);
@@ -93,7 +93,7 @@ public class FontHelper {
         List<String> javaFonts = Arrays.asList("Dialog", "DialogInput", "Monospaced", "Serif", "SansSerif");
         for (Font f : fonts) {
             String fam = f.getFamily(Locale.ENGLISH);
-            //Do not want Java logical fonts
+            // Do not want Java logical fonts
             if (javaFonts.contains(fam)) {
                 continue;
             }
@@ -105,6 +105,31 @@ public class FontHelper {
         }
 
         return ret;
+    }
+
+    public static String fontToString(Font font) {
+        int style = font.getStyle();
+        String styleString;
+        switch (style) {
+            case 1:
+                styleString = "Bold";
+                break;
+            case 2:
+                styleString = "Italic";
+                break;
+            case 3:
+                styleString = "BoldItalic";
+                break;
+            default:
+                styleString = "Plain";
+                break;
+        }
+
+        return font.getName() + "-" + styleString + "-" + font.getSize();
+    }
+
+    public static Font stringToFont(String fontString) {
+        return Font.decode(fontString);
     }
 
     /**

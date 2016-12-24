@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.abc.CachedDecompilation;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
@@ -38,6 +37,7 @@ import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.editor.DebuggableEditorPane;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
@@ -60,15 +60,7 @@ import jsyntaxpane.TokenType;
  */
 public class DecompiledEditorPane extends DebuggableEditorPane implements CaretListener {
 
-    private List<Highlighting> highlights = new ArrayList<>();
-
-    private List<Highlighting> specialHighlights = new ArrayList<>();
-
-    private List<Highlighting> traitHighlights = new ArrayList<>();
-
-    private List<Highlighting> methodHighlights = new ArrayList<>();
-
-    private List<Highlighting> classHighlights = new ArrayList<>();
+    private HighlightedText highlightedText = new HighlightedText();
 
     private Highlighting currentMethodHighlight;
 
@@ -122,7 +114,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
     }
 
     public void setNoTrait() {
-        abcPanel.detailPanel.showCard(DetailPanel.UNSUPPORTED_TRAIT_CARD, null);
+        abcPanel.detailPanel.showCard(DetailPanel.UNSUPPORTED_TRAIT_CARD, null, 0);
     }
 
     public void hilightSpecial(HighlightSpecialType type, long index) {
@@ -140,9 +132,9 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         }
 
         List<Highlighting> allh = new ArrayList<>();
-        for (Highlighting h : traitHighlights) {
+        for (Highlighting h : highlightedText.getTraitHighlights()) {
             if (h.getProperties().index == lastTraitIndex) {
-                for (Highlighting sh : specialHighlights) {
+                for (Highlighting sh : highlightedText.getSpecialHighlights()) {
                     if (sh.startPos >= h.startPos && (sh.startPos + sh.len < h.startPos + h.len)) {
                         allh.add(sh);
                     }
@@ -150,7 +142,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
             }
         }
         if (currentMethodHighlight != null) {
-            for (Highlighting h : specialHighlights) {
+            for (Highlighting h : highlightedText.getSpecialHighlights()) {
                 if (h.startPos >= startPos && (h.startPos + h.len < endPos)) {
                     allh.add(h);
                 }
@@ -173,9 +165,9 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         if (currentMethodHighlight == null) {
             return;
         }
-        for (Highlighting h : traitHighlights) {
+        for (Highlighting h : highlightedText.getTraitHighlights()) {
             if (h.getProperties().index == lastTraitIndex) {
-                Highlighting h2 = Highlighting.searchOffset(highlights, offset, h.startPos, h.startPos + h.len);
+                Highlighting h2 = Highlighting.searchOffset(highlightedText.getInstructionHighlights(), offset, h.startPos, h.startPos + h.len);
                 if (h2 != null) {
                     ignoreCarret = true;
                     if (h2.startPos <= getDocument().getLength()) {
@@ -193,7 +185,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         this.classIndex = classIndex;
     }
 
-    private boolean displayMethod(int pos, int methodIndex, String name, Trait trait, boolean isStatic) {
+    private boolean displayMethod(int pos, int methodIndex, String name, Trait trait, int traitIndex, boolean isStatic) {
         ABC abc = getABC();
         if (abc == null) {
             return false;
@@ -216,7 +208,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                 trait = null;
             }
         }
-        abcPanel.detailPanel.showCard(DetailPanel.METHOD_TRAIT_CARD, trait);
+        abcPanel.detailPanel.showCard(DetailPanel.METHOD_GETTER_SETTER_TRAIT_CARD, trait, traitIndex);
         MethodCodePanel methodCodePanel = abcPanel.detailPanel.methodTraitPanel.methodCodePanel;
         if (reset || (methodCodePanel.getBodyIndex() != bi)) {
             methodCodePanel.setBodyIndex(scriptName, bi, abc, name, trait, script.scriptIndex);
@@ -224,12 +216,12 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
             this.isStatic = isStatic;
         }
         boolean success = false;
-        Highlighting h = Highlighting.searchPos(highlights, pos);
+        Highlighting h = Highlighting.searchPos(highlightedText.getInstructionHighlights(), pos);
         if (h != null) {
             methodCodePanel.hilighOffset(h.getProperties().offset);
             success = true;
         }
-        Highlighting sh = Highlighting.searchPos(specialHighlights, pos);
+        Highlighting sh = Highlighting.searchPos(highlightedText.getSpecialHighlights(), pos);
         if (sh != null) {
             methodCodePanel.hilighSpecial(sh.getProperties().subtype, sh.getProperties().specialValue);
             success = true;
@@ -258,20 +250,20 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
     }
 
     public int getLocalDeclarationOfPos(int pos, Reference<DottedChain> type) {
-        Highlighting sh = Highlighting.searchPos(specialHighlights, pos);
-        Highlighting h = Highlighting.searchPos(highlights, pos);
+        Highlighting sh = Highlighting.searchPos(highlightedText.getSpecialHighlights(), pos);
+        Highlighting h = Highlighting.searchPos(highlightedText.getInstructionHighlights(), pos);
 
         if (h == null) {
             return -1;
         }
 
-        List<Highlighting> tms = Highlighting.searchAllPos(methodHighlights, pos);
+        List<Highlighting> tms = Highlighting.searchAllPos(highlightedText.getMethodHighlights(), pos);
         if (tms.isEmpty()) {
             return -1;
         }
         for (Highlighting tm : tms) {
 
-            List<Highlighting> tm_tms = Highlighting.searchAllIndexes(methodHighlights, tm.getProperties().index);
+            List<Highlighting> tm_tms = Highlighting.searchAllIndexes(highlightedText.getMethodHighlights(), tm.getProperties().index);
             //is it already declaration?
             if (h.getProperties().declaration || (sh != null && sh.getProperties().declaration)) {
                 return -1; //no jump
@@ -279,10 +271,10 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
 
             String lname = h.getProperties().localName;
             if ("this".equals(lname)) {
-                Highlighting ch = Highlighting.searchPos(classHighlights, pos);
+                Highlighting ch = Highlighting.searchPos(highlightedText.getClassHighlights(), pos);
                 int cindex = (int) ch.getProperties().index;
                 ABC abc = getABC();
-                type.setVal(abc.instance_info.get(cindex).getName(abc.constants).getNameWithNamespace(abc.constants));
+                type.setVal(abc.instance_info.get(cindex).getName(abc.constants).getNameWithNamespace(abc.constants, true));
                 return ch.startPos;
             }
 
@@ -298,9 +290,9 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
             search.declaration = true;
 
             for (Highlighting tm1 : tm_tms) {
-                Highlighting rh = Highlighting.search(highlights, search, tm1.startPos, tm1.startPos + tm1.len);
+                Highlighting rh = Highlighting.search(highlightedText.getInstructionHighlights(), search, tm1.startPos, tm1.startPos + tm1.len);
                 if (rh == null) {
-                    rh = Highlighting.search(specialHighlights, search, tm1.startPos, tm1.startPos + tm1.len);
+                    rh = Highlighting.search(highlightedText.getSpecialHighlights(), search, tm1.startPos, tm1.startPos + tm1.len);
                 }
                 if (rh != null) {
                     type.setVal(rh.getProperties().declaredType);
@@ -333,7 +325,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                 break;
             }
         }
-        if (t.type != TokenType.IDENTIFIER && t.type != TokenType.KEYWORD || t.type == TokenType.REGEX) {
+        if (t.type != TokenType.IDENTIFIER && t.type != TokenType.KEYWORD && t.type != TokenType.REGEX) {
             return false;
         }
         Reference<DottedChain> locTypeRef = new Reference<>(DottedChain.EMPTY);
@@ -343,9 +335,8 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
             return false;
         }
         boolean found;
-        t = sd.getNextToken(t);
-        while (t != lastToken && !currentType.equals(DottedChain.ALL)) {
-            t = sd.getNextToken(t);
+
+        while (!currentType.equals(DottedChain.ALL)) {
             String ident = t.getString(sd);
             found = false;
             List<ABCContainerTag> abcList = getABC().getSwf().getAbcList();
@@ -357,13 +348,13 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                     InstanceInfo ii = a.instance_info.get(cindex);
                     for (int j = 0; j < ii.instance_traits.traits.size(); j++) {
                         Trait tr = ii.instance_traits.traits.get(j);
-                        if (ident.equals(tr.getName(a).getName(a.constants, null, false /*NOT RAW!*/))) {
+                        if (ident.equals(tr.getName(a).getName(a.constants, null, false /*NOT RAW!*/, true))) {
                             classIndex.setVal(cindex);
                             abcIndex.setVal(i);
                             traitIndex.setVal(j);
                             classTrait.setVal(false);
                             multinameIndex.setVal(tr.name_index);
-                            currentType = ii.getName(a.constants).getNameWithNamespace(a.constants);
+                            currentType = ii.getName(a.constants).getNameWithNamespace(a.constants, true);
                             found = true;
                             break loopi;
                         }
@@ -372,13 +363,13 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                     ClassInfo ci = a.class_info.get(cindex);
                     for (int j = 0; j < ci.static_traits.traits.size(); j++) {
                         Trait tr = ci.static_traits.traits.get(j);
-                        if (ident.equals(tr.getName(a).getName(a.constants, null, false /*NOT RAW!*/))) {
+                        if (ident.equals(tr.getName(a).getName(a.constants, null, false /*NOT RAW!*/, true))) {
                             classIndex.setVal(cindex);
                             abcIndex.setVal(i);
                             traitIndex.setVal(j);
                             classTrait.setVal(true);
                             multinameIndex.setVal(tr.name_index);
-                            currentType = ii.getName(a.constants).getNameWithNamespace(a.constants);
+                            currentType = ii.getName(a.constants).getNameWithNamespace(a.constants, true);
                             found = true;
                             break loopi;
                         }
@@ -389,10 +380,14 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                 return false;
             }
 
+            if (t == lastToken) {
+                break;
+            }
             t = sd.getNextToken(t);
             if (!".".equals(t.getString(sd))) {
                 break;
             }
+            t = sd.getNextToken(t);
         }
         return true;
     }
@@ -411,7 +406,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
     }
 
     public int _getMultinameAtPos(int pos, boolean codeOnly) {
-        Highlighting tm = Highlighting.searchPos(methodHighlights, pos);
+        Highlighting tm = Highlighting.searchPos(highlightedText.getMethodHighlights(), pos);
         Trait currentTrait = null;
         int currentMethod = -1;
         ABC abc = getABC();
@@ -420,7 +415,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
             int mi = (int) tm.getProperties().index;
             currentMethod = mi;
             int bi = abc.findBodyIndex(mi);
-            Highlighting h = Highlighting.searchPos(highlights, pos);
+            Highlighting h = Highlighting.searchPos(highlightedText.getInstructionHighlights(), pos);
             if (h != null) {
                 long highlightOffset = h.getProperties().offset;
                 List<AVM2Instruction> list = abc.bodies.get(bi).getCode().code;
@@ -440,7 +435,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                 if (selIns != null) {
                     //long inspos = highlightOffset - selIns.offset;
                     if (!codeOnly && ((selIns.definition instanceof ConstructSuperIns) || (selIns.definition instanceof CallSuperIns) || (selIns.definition instanceof CallSuperVoidIns))) {
-                        Highlighting tc = Highlighting.searchPos(classHighlights, pos);
+                        Highlighting tc = Highlighting.searchPos(highlightedText.getClassHighlights(), pos);
                         if (tc != null) {
                             int cindex = (int) tc.getProperties().index;
                             if (cindex > -1) {
@@ -462,9 +457,9 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
             return -1;
         }
 
-        Highlighting ch = Highlighting.searchPos(classHighlights, pos);
+        Highlighting ch = Highlighting.searchPos(highlightedText.getClassHighlights(), pos);
         if (ch != null) {
-            Highlighting th = Highlighting.searchPos(traitHighlights, pos);
+            Highlighting th = Highlighting.searchPos(highlightedText.getTraitHighlights(), pos);
             if (th != null) {
                 currentTrait = abc.findTraitByTraitId((int) ch.getProperties().index, (int) th.getProperties().index);
             }
@@ -473,7 +468,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         if (currentTrait instanceof TraitMethodGetterSetter) {
             currentMethod = ((TraitMethodGetterSetter) currentTrait).method_info;
         }
-        Highlighting sh = Highlighting.searchPos(specialHighlights, pos);
+        Highlighting sh = Highlighting.searchPos(highlightedText.getSpecialHighlights(), pos);
         if (sh != null) {
             switch (sh.getProperties().subtype) {
                 case TYPE_NAME:
@@ -481,7 +476,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                     for (int i = 1; i < abc.constants.getMultinameCount(); i++) {
                         Multiname m = abc.constants.getMultiname(i);
                         if (m != null) {
-                            if (typeName.equals(m.getNameWithNamespace(abc.constants).toRawString())) {
+                            if (typeName.equals(m.getNameWithNamespace(abc.constants, true).toRawString())) {
                                 return i;
                             }
                         }
@@ -527,32 +522,32 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setIgnoreCarret(true);
         try {
             classIndex = -1;
-            Highlighting cm = Highlighting.searchPos(classHighlights, pos);
+            Highlighting cm = Highlighting.searchPos(highlightedText.getClassHighlights(), pos);
             if (cm != null) {
                 classIndex = (int) cm.getProperties().index;
             }
             displayClass(classIndex, script.scriptIndex);
-            Highlighting tm = Highlighting.searchPos(methodHighlights, pos);
+            Highlighting tm = Highlighting.searchPos(highlightedText.getMethodHighlights(), pos);
             if (tm != null) {
                 String name = "";
                 if (classIndex > -1) {
-                    name = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants).toPrintableString(true);
+                    name = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants, true).toPrintableString(true);
                 }
 
                 Trait currentTrait = null;
-                currentTraitHighlight = Highlighting.searchPos(traitHighlights, pos);
+                currentTraitHighlight = Highlighting.searchPos(highlightedText.getTraitHighlights(), pos);
                 if (currentTraitHighlight != null) {
                     lastTraitIndex = (int) currentTraitHighlight.getProperties().index;
                     if (classIndex != -1) {
                         currentTrait = getCurrentTrait();
                         isStatic = abc.isStaticTraitId(classIndex, lastTraitIndex);
                         if (currentTrait != null) {
-                            name += ":" + currentTrait.getName(abc).getName(abc.constants, null, false);
+                            name += ":" + currentTrait.getName(abc).getName(abc.constants, null, false, true);
                         }
                     }
                 }
 
-                displayMethod(pos, (int) tm.getProperties().index, name, currentTrait, isStatic);
+                displayMethod(pos, (int) tm.getProperties().index, name, currentTrait, lastTraitIndex, isStatic);
                 currentMethodHighlight = tm;
                 return;
             }
@@ -563,7 +558,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                 return;
             }
             Trait currentTrait;
-            currentTraitHighlight = Highlighting.searchPos(traitHighlights, pos);
+            currentTraitHighlight = Highlighting.searchPos(highlightedText.getTraitHighlights(), pos);
             if (currentTraitHighlight != null) {
                 lastTraitIndex = (int) currentTraitHighlight.getProperties().index;
                 currentTrait = getCurrentTrait();
@@ -572,12 +567,13 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                         abcPanel.detailPanel.slotConstTraitPanel.load((TraitSlotConst) currentTrait, abc,
                                 abc.isStaticTraitId(classIndex, lastTraitIndex));
                         final Trait ftrait = currentTrait;
+                        final int ftraitIndex = lastTraitIndex;
                         View.execInEventDispatch(() -> {
-                            abcPanel.detailPanel.showCard(DetailPanel.SLOT_CONST_TRAIT_CARD, ftrait);
+                            abcPanel.detailPanel.showCard(DetailPanel.SLOT_CONST_TRAIT_CARD, ftrait, ftraitIndex);
                         });
                         abcPanel.detailPanel.setEditMode(false);
                         currentMethodHighlight = null;
-                        Highlighting spec = Highlighting.searchPos(specialHighlights, pos, currentTraitHighlight.startPos, currentTraitHighlight.startPos + currentTraitHighlight.len);
+                        Highlighting spec = Highlighting.searchPos(highlightedText.getSpecialHighlights(), pos, currentTraitHighlight.startPos, currentTraitHighlight.startPos + currentTraitHighlight.len);
                         if (spec != null) {
                             abcPanel.detailPanel.slotConstTraitPanel.hilightSpecial(spec);
                         }
@@ -587,14 +583,14 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                 }
                 currentMethodHighlight = null;
                 //currentTrait = null;
-                String name = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants).toPrintableString(true);
+                String name = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants, true).toPrintableString(true);
                 currentTrait = getCurrentTrait();
                 isStatic = abc.isStaticTraitId(classIndex, lastTraitIndex);
                 if (currentTrait != null) {
-                    name += ":" + currentTrait.getName(abc).getName(abc.constants, null, false);
+                    name += ":" + currentTrait.getName(abc).getName(abc.constants, null, false, true);
                 }
 
-                displayMethod(pos, abc.findMethodIdByTraitId(classIndex, lastTraitIndex), name, currentTrait, isStatic);
+                displayMethod(pos, abc.findMethodIdByTraitId(classIndex, lastTraitIndex), name, currentTrait, lastTraitIndex, isStatic);
                 return;
             }
             setNoTrait();
@@ -610,9 +606,9 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
     public void gotoTrait(int traitId) {
         boolean isScriptInit = traitId == GraphTextWriter.TRAIT_SCRIPT_INITIALIZER;
 
-        Highlighting tc = Highlighting.searchIndex(classHighlights, classIndex);
+        Highlighting tc = Highlighting.searchIndex(highlightedText.getClassHighlights(), classIndex);
         if (tc != null || isScriptInit) {
-            Highlighting th = Highlighting.searchIndex(traitHighlights, traitId, isScriptInit || tc == null ? 0 : tc.startPos, isScriptInit || tc == null ? -1 : tc.startPos + tc.len);
+            Highlighting th = Highlighting.searchIndex(highlightedText.getTraitHighlights(), traitId, isScriptInit || tc == null ? 0 : tc.startPos, isScriptInit || tc == null ? -1 : tc.startPos + tc.len);
             int pos = 0;
             if (th != null) {
                 if (th.len > 1) {
@@ -666,17 +662,14 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
             nscript = abc.script_info.get(scriptIndex);
         }
         if (nscript == null) {
-            highlights = new ArrayList<>();
-            specialHighlights = new ArrayList<>();
-            traitHighlights = new ArrayList<>();
-            methodHighlights = new ArrayList<>();
+            highlightedText = new HighlightedText();
             this.script = scriptLeaf;
             return;
         }
         setText("// " + AppStrings.translate("pleasewait") + "...");
 
         this.script = scriptLeaf;
-        CachedDecompilation cd = null;
+        HighlightedText cd = null;
         try {
             cd = SWF.getCached(scriptLeaf);
         } catch (InterruptedException ex) {
@@ -684,16 +677,12 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
 
         if (cd != null) {
             String hilightedCode = cd.text;
-            highlights = cd.getInstructionHighlights();
-            specialHighlights = cd.getSpecialHighligths();
-            traitHighlights = cd.getTraitHighlights();
-            methodHighlights = cd.getMethodHighlights();
-            classHighlights = cd.getClassHighlights();
+            highlightedText = cd;
             setText(hilightedCode);
 
-            if (classHighlights.size() > 0) {
+            if (highlightedText.getClassHighlights().size() > 0) {
                 try {
-                    setCaretPosition(classHighlights.get(0).startPos);
+                    setCaretPosition(highlightedText.getClassHighlights().get(0).startPos);
                 } catch (Exception ex) { //sometimes happens
                     //ignore
                 }

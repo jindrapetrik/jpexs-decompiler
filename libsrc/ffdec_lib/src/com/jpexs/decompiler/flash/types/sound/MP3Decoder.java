@@ -17,8 +17,8 @@
 package com.jpexs.decompiler.flash.types.sound;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import javazoom.jl.decoder.Bitstream;
 import javazoom.jl.decoder.BitstreamException;
@@ -33,16 +33,86 @@ import javazoom.jl.decoder.SampleBuffer;
  */
 public class MP3Decoder extends SoundDecoder {
 
+    private final Decoder decoder = new Decoder();
+
+    private final MyInputStream inputStream = new MyInputStream();
+
+    private final Bitstream bitStream = new Bitstream(inputStream);
+
+    class MyInputStream extends InputStream {
+
+        byte[] buf = new byte[4096];
+
+        int pos = 0;
+
+        int remaining = 0;
+
+        public void add(byte[] data) {
+            if (data == null || data.length == 0) {
+                return;
+            }
+
+            int remaining = this.remaining;
+            int requiredSize = data.length + remaining;
+            byte[] oldBuf = this.buf;
+            byte[] buf = oldBuf;
+            int pos = this.pos;
+            if (requiredSize > buf.length) {
+                int newSize = buf.length;
+                while (requiredSize > newSize) {
+                    newSize *= 2;
+                }
+
+                buf = new byte[newSize];
+                this.buf = buf;
+            }
+
+            if (remaining > 0) {
+                System.arraycopy(oldBuf, pos, buf, 0, remaining);
+            }
+
+            this.pos = 0;
+
+            System.arraycopy(data, 0, buf, remaining, data.length);
+            this.remaining = remaining + data.length;
+        }
+
+        @Override
+        public int read() throws IOException {
+            if (remaining > 0) {
+                int result = buf[pos] & 0xff;
+                remaining--;
+                pos++;
+                return result;
+            }
+
+            return -1;
+        }
+
+        @Override
+        public int read(byte[] b, int off, int len) throws IOException {
+            len = Math.min(len, remaining);
+            if (len > 0) {
+                System.arraycopy(buf, pos, b, off, len);
+                remaining -= len;
+                pos += len;
+            }
+
+            return len;
+        }
+    }
+
     public MP3Decoder(SoundFormat soundFormat) {
         super(soundFormat);
     }
 
     @Override
     public void decode(SWFInputStream sis, OutputStream os) throws IOException {
-        Decoder decoder = new Decoder();
-        Bitstream bitstream = new Bitstream(new ByteArrayInputStream(sis.readBytesEx(sis.available(), "soundStream")));
+        byte[] data = sis.readBytesEx(sis.available(), "soundStream");
+        inputStream.add(data);
+
         SampleBuffer buf;
-        while ((buf = readFrame(decoder, bitstream)) != null) {
+        while ((buf = readFrame(decoder, bitStream)) != null) {
             short[] audio = buf.getBuffer();
             byte[] d = new byte[buf.getBufferLength() * 2];
             for (int i = 0; i < buf.getBufferLength(); i++) {

@@ -55,6 +55,8 @@ public class SearchDialog extends AppDialog {
 
     public JRadioButton searchInASRadioButton = new JRadioButton(translate("checkbox.searchAS"));
 
+    public JRadioButton searchInPCodeRadioButton = new JRadioButton(translate("checkbox.searchPCode"));
+
     public JRadioButton searchInTextsRadioButton = new JRadioButton(translate("checkbox.searchText"));
 
     private int result = ERROR_OPTION;
@@ -99,12 +101,15 @@ public class SearchDialog extends AppDialog {
         if (!replace) {
             ButtonGroup group = new ButtonGroup();
             group.add(searchInASRadioButton);
+            group.add(searchInPCodeRadioButton);
             group.add(searchInTextsRadioButton);
 
             JPanel rbPanel = new JPanel(new FlowLayout());
             searchInASRadioButton.setSelected(true);
+            searchInPCodeRadioButton.setSelected(false);
             searchInTextsRadioButton.setSelected(false);
             rbPanel.add(searchInASRadioButton);
+            rbPanel.add(searchInPCodeRadioButton);
             rbPanel.add(searchInTextsRadioButton);
             cnt.add(rbPanel);
         }

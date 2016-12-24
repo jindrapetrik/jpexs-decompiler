@@ -28,39 +28,41 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class DottedChain implements Serializable {
+public class DottedChain implements Serializable, Comparable<DottedChain> {
+
+    public static final String NO_SUFFIX = "";
 
     public static final DottedChain EMPTY = new DottedChain(true);
 
-    public static final DottedChain TOPLEVEL = new DottedChain();
+    public static final DottedChain TOPLEVEL = new DottedChain(new String[]{}, NO_SUFFIX);
 
-    public static final DottedChain BOOLEAN = new DottedChain("Boolean");
+    public static final DottedChain BOOLEAN = new DottedChain(new String[]{"Boolean"}, NO_SUFFIX);
 
-    public static final DottedChain STRING = new DottedChain("String");
+    public static final DottedChain STRING = new DottedChain(new String[]{"String"}, NO_SUFFIX);
 
-    public static final DottedChain ARRAY = new DottedChain("Array");
+    public static final DottedChain ARRAY = new DottedChain(new String[]{"Array"}, NO_SUFFIX);
 
-    public static final DottedChain NUMBER = new DottedChain("Number");
+    public static final DottedChain NUMBER = new DottedChain(new String[]{"Number"}, NO_SUFFIX);
 
-    public static final DottedChain OBJECT = new DottedChain("Object");
+    public static final DottedChain OBJECT = new DottedChain(new String[]{"Object"}, NO_SUFFIX);
 
-    public static final DottedChain INT = new DottedChain("int");
+    public static final DottedChain INT = new DottedChain(new String[]{"int"}, NO_SUFFIX);
 
-    public static final DottedChain UINT = new DottedChain("uint");
+    public static final DottedChain UINT = new DottedChain(new String[]{"uint"}, NO_SUFFIX);
 
-    public static final DottedChain UNDEFINED = new DottedChain("Undefined");
+    public static final DottedChain UNDEFINED = new DottedChain(new String[]{"Undefined"}, NO_SUFFIX);
 
-    public static final DottedChain XML = new DottedChain("XML");
+    public static final DottedChain XML = new DottedChain(new String[]{"XML"}, NO_SUFFIX);
 
-    public static final DottedChain NULL = new DottedChain("null");
+    public static final DottedChain NULL = new DottedChain(new String[]{"null"}, NO_SUFFIX);
 
-    public static final DottedChain FUNCTION = new DottedChain("Function");
+    public static final DottedChain FUNCTION = new DottedChain(new String[]{"Function"}, NO_SUFFIX);
 
-    public static final DottedChain VOID = new DottedChain("void");
+    public static final DottedChain VOID = new DottedChain(new String[]{"void"}, NO_SUFFIX);
 
-    public static final DottedChain NAMESPACE = new DottedChain("Namespace");
+    public static final DottedChain NAMESPACE = new DottedChain(new String[]{"Namespace"}, NO_SUFFIX);
 
-    public static final DottedChain ALL = new DottedChain("*");
+    public static final DottedChain ALL = new DottedChain(new String[]{"*"}, NO_SUFFIX);
 
     private final String[] parts;
 
@@ -70,13 +72,25 @@ public class DottedChain implements Serializable {
 
     private boolean isNull = false;
 
-    public static final DottedChain parse(String name) {
+    private String namespaceSuffix = "";
+
+    public String getNamespaceSuffix() {
+        return namespaceSuffix;
+    }
+
+    public static final DottedChain parseWithSuffix(String name) {
         if (name == null) {
             return DottedChain.EMPTY;
         } else if (name.isEmpty()) {
             return DottedChain.TOPLEVEL;
         } else {
-            return new DottedChain(name.split("\\."));
+            String nameNoSuffix = name;
+            String namespaceSuffix = "";
+            if (name.matches(".*#[0-9]+$")) {
+                nameNoSuffix = name.substring(0, name.lastIndexOf("#"));
+                namespaceSuffix = name.substring(name.lastIndexOf("#"));
+            }
+            return new DottedChain(nameNoSuffix.split("\\."), namespaceSuffix);
         }
     }
 
@@ -88,7 +102,7 @@ public class DottedChain implements Serializable {
     }
 
     public DottedChain(DottedChain src) {
-        this(src.parts);
+        this(src.parts, src.namespaceSuffix);
         this.isNull = src.isNull;
     }
 
@@ -98,7 +112,10 @@ public class DottedChain implements Serializable {
         hash = calcHash();
     }
 
-    public DottedChain(String... parts) {
+    /*public DottedChain(String onePart, String namespaceSuffix) {
+        this(new String[]{onePart}, namespaceSuffix);
+    }*/
+    public DottedChain(String[] parts, String namespaceSuffix) {
         if (parts.length == 1 && parts[0].isEmpty()) {
             length = 0;
             this.parts = new String[0];
@@ -107,6 +124,7 @@ public class DottedChain implements Serializable {
             this.parts = parts;
         }
         hash = calcHash();
+        this.namespaceSuffix = namespaceSuffix;
     }
 
     private DottedChain(String[] parts, int length) {
@@ -165,7 +183,17 @@ public class DottedChain implements Serializable {
         return new DottedChain(parts, length - 1);
     }
 
-    public DottedChain add(String name) {
+    public DottedChain addWithSuffix(String name) {
+        String addedNameNoSuffix = name;
+        String addedNamespaceSuffix = "";
+        if (name != null && name.matches(".*#[0-9]+$")) {
+            addedNameNoSuffix = name.substring(0, name.lastIndexOf("#"));
+            addedNamespaceSuffix = name.substring(name.lastIndexOf("#"));
+        }
+        return add(addedNameNoSuffix, addedNamespaceSuffix);
+    }
+
+    public DottedChain add(String name, String namespaceSuffix) {
         if (name == null) {
             return new DottedChain(this);
         }
@@ -175,10 +203,10 @@ public class DottedChain implements Serializable {
         }
 
         nparts[nparts.length - 1] = name;
-        return new DottedChain(nparts);
+        return new DottedChain(nparts, namespaceSuffix);
     }
 
-    protected String toString(boolean as3, boolean raw) {
+    protected String toString(boolean as3, boolean raw, boolean withSuffix) {
         if (isNull) {
             return "";
         }
@@ -195,6 +223,9 @@ public class DottedChain implements Serializable {
             String part = parts[i];
             boolean lastStar = i == length - 1 && "*".equals(part);
             ret.append((raw || lastStar) ? part : IdentifiersDeobfuscation.printIdentifier(as3, part));
+        }
+        if (withSuffix) {
+            ret.append(namespaceSuffix);
         }
         return ret.toString();
     }
@@ -223,11 +254,11 @@ public class DottedChain implements Serializable {
     }
 
     public String toPrintableString(boolean as3) {
-        return toString(as3, false);
+        return toString(as3, false, true);
     }
 
-    public String toRawString() {
-        return toString(false/*ignored*/, true);
+    public String toRawString() { //Is SUFFIX correctly handled?
+        return toString(false/*ignored*/, true, true);
     }
 
     @Override
@@ -277,5 +308,10 @@ public class DottedChain implements Serializable {
         }
 
         return true;
+    }
+
+    @Override
+    public int compareTo(DottedChain o) {
+        return toRawString().compareTo(o.toRawString());
     }
 }

@@ -496,7 +496,12 @@ public abstract class TextTag extends DrawableTag {
                 } else if (entry instanceof DynamicTextGlyphEntry) {
                     DynamicTextGlyphEntry dynamicEntry = (DynamicTextGlyphEntry) entry;
                     if (dynamicEntry.fontFace != null) {
-                        shape = SHAPERECORD.fontCharacterToSHAPE(new Font(dynamicEntry.fontFace, dynamicEntry.fontStyle, 12), (int) Math.round(divider * 1024), dynamicEntry.character);
+                        FontTag fnt = swf.getFontByName(dynamicEntry.fontFace);
+                        if (fnt != null && entry.glyphIndex != -1) {
+                            shape = fnt.getGlyphShapeTable().get(entry.glyphIndex);
+                        } else {
+                            shape = SHAPERECORD.fontCharacterToSHAPE(new Font(dynamicEntry.fontFace, dynamicEntry.fontStyle, 12), (int) Math.round(divider * 1024), dynamicEntry.character);
+                        }
                     }
                 }
 

@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.annotations.EnumValue;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.flash.types.sound.MP3FRAME;
@@ -57,9 +58,21 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
     public int soundId;
 
     @SWFType(value = BasicType.UB, count = 4)
+    @EnumValue(value = SoundFormat.FORMAT_UNCOMPRESSED_NATIVE_ENDIAN, text = "Uncompressed, native-endian")
+    @EnumValue(value = SoundFormat.FORMAT_ADPCM, text = "ADPCM")
+    @EnumValue(value = SoundFormat.FORMAT_MP3, text = "MP3", minSwfVersion = 4)
+    @EnumValue(value = SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN, text = "Uncompressed, little-endian", minSwfVersion = 4)
+    @EnumValue(value = SoundFormat.FORMAT_NELLYMOSER16KHZ, text = "Nellymoser 16 kHz", minSwfVersion = 10)
+    @EnumValue(value = SoundFormat.FORMAT_NELLYMOSER8KHZ, text = "Nellymoser 8 kHz", minSwfVersion = 10)
+    @EnumValue(value = SoundFormat.FORMAT_NELLYMOSER, text = "Nellymoser", minSwfVersion = 6)
+    @EnumValue(value = SoundFormat.FORMAT_SPEEX, text = "Speex", minSwfVersion = 10)
     public int soundFormat;
 
     @SWFType(value = BasicType.UB, count = 2)
+    @EnumValue(value = 0, text = "5.5 kHz")
+    @EnumValue(value = 1, text = "11 kHz")
+    @EnumValue(value = 2, text = "22 kHz")
+    @EnumValue(value = 3, text = "44 kHz")
     public int soundRate;
 
     public boolean soundSize;

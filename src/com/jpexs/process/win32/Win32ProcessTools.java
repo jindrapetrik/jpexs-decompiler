@@ -438,13 +438,11 @@ public class Win32ProcessTools extends ProcessTools {
                         bufSize = maxsize - pos;
                     }
                 } while (bufSize > 0);
-            } else {
-                if (hasGuard(mbi)) {
-                    if (unsetGuard(hOtherProcess, mbi)) {
-                        guardedPages.add(pg);
-                        pg--;
-                        continue;
-                    }
+            } else if (hasGuard(mbi)) {
+                if (unsetGuard(hOtherProcess, mbi)) {
+                    guardedPages.add(pg);
+                    pg--;
+                    continue;
                 }
             }
             actualPos += mbi.regionSize.longValue();

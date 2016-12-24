@@ -263,7 +263,7 @@ public class AdobeFlashExecutor {
 
              cnt++;
              }*/
-            /*try {
+ /*try {
              String res = flash.CallFunction("<invoke name=\"testFunc\" returntype=\"xml\"><arguments><string>something</string></arguments></invoke>");
              //String str = flash.GetVariable("_root.myText.text");
              throw new Error(res + " " + body.getCode().toString() + "");

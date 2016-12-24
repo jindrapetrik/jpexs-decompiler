@@ -128,7 +128,7 @@ public class AS3ScriptExporter {
                                                 if (((SetLocalAVM2Item) asg).regIndex == ((LocalRegAVM2Item) sp.object).regIndex) {
                                                     GraphTargetItem val = sp.value;
                                                     if (sp.propertyName instanceof FullMultinameAVM2Item) {
-                                                        String propName = pack.abc.constants.getMultiname(((FullMultinameAVM2Item) sp.propertyName).multinameIndex).getName(pack.abc.constants, new ArrayList<>(), true);
+                                                        String propName = pack.abc.constants.getMultiname(((FullMultinameAVM2Item) sp.propertyName).multinameIndex).getName(pack.abc.constants, new ArrayList<>(), true, true);
                                                         if (val instanceof CallPropertyAVM2Item) {
                                                             CallPropertyAVM2Item cap = (CallPropertyAVM2Item) val;
                                                             if (cp.propertyName instanceof FullMultinameAVM2Item) {
@@ -216,7 +216,7 @@ public class AS3ScriptExporter {
     private String getTagName(ScriptPack pack, int classMIndex, int nameMindex, Map<String, String> namespaces) {
         Multiname m = pack.abc.constants.getMultiname(classMIndex);
         Multiname mn = pack.abc.constants.getMultiname(nameMindex);
-        String parentName = mn.getName(pack.abc.constants, new ArrayList<>(), true);
+        String parentName = mn.getName(pack.abc.constants, new ArrayList<>(), true, true);
         String pkg = m.getNamespace(pack.abc.constants).getName(pack.abc.constants).toRawString();
         pkg += ".*";
         String ns = null;
@@ -276,7 +276,7 @@ public class AS3ScriptExporter {
                         if (it instanceof InitPropertyAVM2Item) {
                             InitPropertyAVM2Item ip = (InitPropertyAVM2Item) it;
                             if (ip.object instanceof ThisAVM2Item) {
-                                String propName = pack.abc.constants.getMultiname(ip.propertyName.multinameIndex).getName(pack.abc.constants, new ArrayList<>(), true);
+                                String propName = pack.abc.constants.getMultiname(ip.propertyName.multinameIndex).getName(pack.abc.constants, new ArrayList<>(), true, true);
                                 GraphTargetItem val = ((InitPropertyAVM2Item) it).value;
                                 if (val instanceof CallPropertyAVM2Item) {
                                     CallPropertyAVM2Item cp = (CallPropertyAVM2Item) val;
@@ -296,7 +296,7 @@ public class AS3ScriptExporter {
                                     ConstructPropAVM2Item cp = (ConstructPropAVM2Item) val;
                                     if (cp.propertyName instanceof FullMultinameAVM2Item) {
                                         Multiname m = pack.abc.constants.getMultiname(((FullMultinameAVM2Item) cp.propertyName).multinameIndex);
-                                        if ("mx.core.DeferredInstanceFromFunction".equals("" + m.getNameWithNamespace(pack.abc.constants))) {
+                                        if ("mx.core.DeferredInstanceFromFunction".equals("" + m.getNameWithNamespace(pack.abc.constants, true))) {
                                             if (!cp.args.isEmpty()) {
                                                 if (cp.args.get(0) instanceof GetPropertyAVM2Item) {
                                                     GetPropertyAVM2Item gp = (GetPropertyAVM2Item) cp.args.get(0);

@@ -49,7 +49,7 @@ public class NamespaceItem {
     }
 
     public NamespaceItem(String name, int kind) {
-        this.name = DottedChain.parse(name);
+        this.name = DottedChain.parseWithSuffix(name);
         this.kind = kind;
     }
 

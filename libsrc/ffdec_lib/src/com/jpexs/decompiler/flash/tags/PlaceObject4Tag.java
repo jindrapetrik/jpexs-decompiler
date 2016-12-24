@@ -39,7 +39,6 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
 import com.jpexs.helpers.ByteArrayRange;
-import com.jpexs.helpers.Helper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -508,8 +507,13 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
 
     @Override
     public void setCharacterId(int characterId) {
-        placeFlagHasCharacter = true;
-        this.characterId = characterId;
+        if (characterId >= 0) {
+            placeFlagHasCharacter = true;
+            this.characterId = characterId;
+        } else {
+            placeFlagHasCharacter = false;
+            this.characterId = -1;
+        }
     }
 
     @Override

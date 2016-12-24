@@ -186,13 +186,13 @@ public class OceanicSkin extends SubstanceSkin {
 
         this.addOverlayPainter(new BottomLineOverlayPainter(
                 new ColorSchemeSingleColorQuery() {
-                    @Override
-                    public Color query(SubstanceColorScheme scheme) {
-                        Color fg = scheme.getForegroundColor();
-                        return new Color(fg.getRed(), fg.getGreen(), fg
-                                .getBlue(), 72);
-                    }
-                }), DecorationAreaType.PRIMARY_TITLE_PANE,
+            @Override
+            public Color query(SubstanceColorScheme scheme) {
+                Color fg = scheme.getForegroundColor();
+                return new Color(fg.getRed(), fg.getGreen(), fg
+                        .getBlue(), 72);
+            }
+        }), DecorationAreaType.PRIMARY_TITLE_PANE,
                 DecorationAreaType.SECONDARY_TITLE_PANE);
 
         this.buttonShaper = new ClassicButtonShaper();
@@ -216,12 +216,12 @@ public class OceanicSkin extends SubstanceSkin {
                 "Oceanic Inner", outerBorderPainter, new int[]{
                     0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF},
                 new ColorSchemeTransform() {
-                    @Override
-                    public SubstanceColorScheme transform(
-                            SubstanceColorScheme scheme) {
-                                return scheme.tint(0.8f);
-                            }
-                });
+            @Override
+            public SubstanceColorScheme transform(
+                    SubstanceColorScheme scheme) {
+                return scheme.tint(0.8f);
+            }
+        });
         this.borderPainter = new CompositeBorderPainter("Oceanic",
                 outerBorderPainter, innerBorderPainter);
 

@@ -42,17 +42,17 @@ import java.util.List;
  */
 public class InitVectorAVM2Item extends AVM2Item {
 
-    public static final DottedChain VECTOR_PACKAGE = new DottedChain("__AS3__", "vec");
+    public static final DottedChain VECTOR_PACKAGE = new DottedChain(new String[]{"__AS3__", "vec"}, "");
 
-    public static final DottedChain VECTOR_FQN = new DottedChain("__AS3__", "vec", "Vector");
+    public static final DottedChain VECTOR_FQN = new DottedChain(new String[]{"__AS3__", "vec", "Vector"}, "");
 
-    public static final DottedChain VECTOR_INT = new DottedChain("__AS3__", "vec", "Vector$int");
+    public static final DottedChain VECTOR_INT = new DottedChain(new String[]{"__AS3__", "vec", "Vector$int"}, "");
 
-    public static final DottedChain VECTOR_DOUBLE = new DottedChain("__AS3__", "vec", "Vector$double");
+    public static final DottedChain VECTOR_DOUBLE = new DottedChain(new String[]{"__AS3__", "vec", "Vector$double"}, "");
 
-    public static final DottedChain VECTOR_UINT = new DottedChain("__AS3__", "vec", "Vector$uint");
+    public static final DottedChain VECTOR_UINT = new DottedChain(new String[]{"__AS3__", "vec", "Vector$uint"}, "");
 
-    public static final DottedChain VECTOR_OBJECT = new DottedChain("__AS3__", "vec", "Vector$object");
+    public static final DottedChain VECTOR_OBJECT = new DottedChain(new String[]{"__AS3__", "vec", "Vector$object"}, "");
 
     public GraphTargetItem subtype;
 

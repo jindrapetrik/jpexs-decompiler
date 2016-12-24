@@ -27,7 +27,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Wrapper around the Properties class with supprt for Heirarchical confogurations
+ * Wrapper around the Properties class with support for Hierarchical configurations
  * and more functionality.
  *
  * Except for the getXXXX methods, all other Map Interface methods operate on the

@@ -20,6 +20,8 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
+import com.jpexs.decompiler.flash.exporters.script.Dependency;
+import com.jpexs.decompiler.flash.exporters.script.DependencyParser;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
@@ -63,7 +65,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
         }
         getModifiers(abc, isStatic, writer);
         writer.hilightSpecial("function ", HighlightSpecialType.TRAIT_TYPE);
-        writer.hilightSpecial(abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false), HighlightSpecialType.TRAIT_NAME);
+        writer.hilightSpecial(abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false, true), HighlightSpecialType.TRAIT_NAME);
         writer.appendNoHilight("(");
         abc.method_info.get(method_info).getParamStr(writer, abc.constants, body, abc, fullyQualifiedNames);
         writer.appendNoHilight(") : ");
@@ -85,7 +87,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
         writer.startBlock();
         int bodyIndex = abc.findBodyIndex(method_info);
         if (bodyIndex != -1) {
-            abc.bodies.get(bodyIndex).toString(path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false), exportMode, abc, this, writer, fullyQualifiedNames);
+            abc.bodies.get(bodyIndex).toString(path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false, true), exportMode, abc, this, writer, fullyQualifiedNames);
         }
         writer.endBlock();
 
@@ -102,7 +104,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
         convertHeader(parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
         int bodyIndex = abc.findBodyIndex(method_info);
         if (bodyIndex != -1) {
-            abc.bodies.get(bodyIndex).convert(convertData, path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false), exportMode, isStatic, method_info, scriptIndex, classIndex, abc, this, new ScopeStack(), 0, writer, fullyQualifiedNames, null, true);
+            abc.bodies.get(bodyIndex).convert(convertData, path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false, true), exportMode, isStatic, method_info, scriptIndex, classIndex, abc, this, new ScopeStack(), 0, writer, fullyQualifiedNames, null, true);
         }
         writer.endMethod();
     }
@@ -123,14 +125,23 @@ public class TraitFunction extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public void getImportsUsages(String customNs, ABC abc, List<DottedChain> imports, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) {
+    public void getDependencies(String customNs, ABC abc, List<Dependency> dependencies, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) {
         if (ignorePackage == null) {
             ignorePackage = getPackage(abc);
         }
-        super.getImportsUsages(customNs, abc, imports, uses, ignorePackage, fullyQualifiedNames);
+        super.getDependencies(customNs, abc, dependencies, uses, ignorePackage, fullyQualifiedNames);
         //if (method_info != 0)
         {
-            parseImportsUsagesFromMethodInfo(customNs, abc, method_info, imports, uses, ignorePackage, fullyQualifiedNames, new ArrayList<>());
+            DependencyParser.parseDependenciesFromMethodInfo(customNs, abc, method_info, dependencies, uses, ignorePackage, fullyQualifiedNames, new ArrayList<>());
         }
+    }
+
+    @Override
+    public GraphTextWriter convertTraitHeader(ABC abc, GraphTextWriter writer) {
+        convertCommonHeaderFlags("function", abc, writer);
+        writer.newLine();
+        writer.appendNoHilight("slotid ");
+        writer.hilightSpecial(Integer.toString(slot_id), HighlightSpecialType.SLOT_ID);
+        return writer;
     }
 }

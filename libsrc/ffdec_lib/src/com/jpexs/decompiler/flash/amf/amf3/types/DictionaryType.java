@@ -1,11 +1,11 @@
 package com.jpexs.decompiler.flash.amf.amf3.types;
 
 import com.jpexs.decompiler.flash.amf.amf3.ListMap;
+import com.jpexs.decompiler.flash.amf.amf3.WithSubValues;
 import com.jpexs.decompiler.flash.exporters.amf.amf3.Amf3Exporter;
 import java.util.ArrayList;
-import java.util.List;
-import com.jpexs.decompiler.flash.amf.amf3.WithSubValues;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class DictionaryType extends ListMap<Object, Object> implements WithSubValues, Amf3ValueType {

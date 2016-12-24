@@ -20,13 +20,14 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
-import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
+import com.jpexs.decompiler.flash.importers.As3ScriptReplaceException;
+import com.jpexs.decompiler.flash.importers.As3ScriptReplacerFactory;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -54,6 +55,7 @@ public class DirectEditingTest extends FileTestBase {
         Configuration.autoDeobfuscate.set(false);
         Configuration.simplifyExpressions.set(false);
         Configuration._debugCopy.set(false);
+        Configuration.useFlexAs3Compiler.set(false);
     }
 
     public static final String TESTDATADIR = "testdata/directediting";
@@ -90,9 +92,11 @@ public class DirectEditingTest extends FileTestBase {
                         try {
                             en.toSource(htw, abc.script_info.get(s).traits.traits, new ConvertData(), ScriptExportMode.AS, false);
                             String original = htw.toString();
-                            abc.replaceScriptPack(en, original);
+                            abc.replaceScriptPack(As3ScriptReplacerFactory.createFFDec() /*TODO: test the otherone*/, en, original);
+                        } catch (As3ScriptReplaceException ex) {
+                            fail("Exception during decompilation - file: " + filePath + " class: " + classPathString + " msg:" + ex.getMessage(), ex);
                         } catch (Exception ex) {
-                            fail("Exception during decompilation - file: " + filePath + " class: " + classPathString, ex);
+                            fail("Exception during decompilation - file: " + filePath + " class: " + classPathString + " msg:" + ex.getMessage(), ex);
                             throw ex;
                         }
                     }
@@ -103,7 +107,7 @@ public class DirectEditingTest extends FileTestBase {
                 for (ASMSource asm : asms.values()) {
                     try {
                         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
-                        Action.actionsToSource(asm, asm.getActions(), asm.toString()/*FIXME?*/, writer);
+                        asm.getActionScriptSource(writer, null);
                         String as = writer.toString();
                         as = asm.removePrefixAndSuffix(as);
                         ActionScript2Parser par = new ActionScript2Parser(swf.version);
@@ -113,7 +117,7 @@ public class DirectEditingTest extends FileTestBase {
                             fail("Unable to parse: " + as + "/" + asm.toString(), ex);
                         }
                         writer = new HighlightedTextWriter(new CodeFormatting(), false);
-                        Action.actionsToSource(asm, asm.getActions(), asm.toString()/*FIXME?*/, writer);
+                        asm.getActionScriptSource(writer, null);
                         String as2 = writer.toString();
                         as2 = asm.removePrefixAndSuffix(as2);
                         try {
@@ -122,7 +126,7 @@ public class DirectEditingTest extends FileTestBase {
                             fail("Unable to parse: " + asm.getSwf().getShortFileName() + "/" + asm.toString(), ex);
                         }
                         writer = new HighlightedTextWriter(new CodeFormatting(), false);
-                        Action.actionsToSource(asm, asm.getActions(), asm.toString()/*FIXME?*/, writer);
+                        asm.getActionScriptSource(writer, null);
                         String as3 = writer.toString();
                         as3 = asm.removePrefixAndSuffix(as3);
                         if (!as3.equals(as2)) {
@@ -141,7 +145,7 @@ public class DirectEditingTest extends FileTestBase {
             }
             //TODO: try tu run it in debug flashplayer (?)
         } catch (Exception ex) {
-            fail("Exception during decompilation: " + filePath, ex);
+            fail("Exception during decompilation: " + filePath + ":" + ex.getMessage(), ex);
         }
     }
 

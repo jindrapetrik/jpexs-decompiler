@@ -605,7 +605,9 @@ public class FontPanel extends JPanel {
     }
 
     private void buttonSetAdvanceValuesActionPerformed(ActionEvent evt) {
-        fontTag.setAdvanceValues(((FontFace) fontFaceSelection.getSelectedItem()).font);
+        if (View.showConfirmDialog(null, AppStrings.translate("message.font.setadvancevalues"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, Configuration.showSetAdvanceValuesMessage, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION) {
+            fontTag.setAdvanceValues(((FontFace) fontFaceSelection.getSelectedItem()).font);
+        }
     }
 
     private void formComponentResized(ComponentEvent evt) {

@@ -19,6 +19,8 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.debugger.flash.Debugger;
 import com.jpexs.debugger.flash.DebuggerCommands;
 import com.jpexs.debugger.flash.Variable;
+import com.jpexs.debugger.flash.VariableType;
+import com.jpexs.debugger.flash.messages.in.InCallFunction;
 import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.SWF;
@@ -91,6 +93,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -204,6 +207,29 @@ public class Main {
 
     public static synchronized boolean isRunning() {
         return runProcess != null && !runProcessDebug;
+    }
+
+    /**
+     * FIXME!
+     *
+     * @param v
+     */
+    public static synchronized void dumpBytes(Variable v) {
+        InCallFunction icf;
+        try {
+            long objectId = 0l;
+            if ((v.vType == VariableType.OBJECT || v.vType == VariableType.MOVIECLIP)) {
+                objectId = (Long) v.value;
+            }
+            Object oldPos = getDebugHandler().getVariable(objectId, "position", true).parent.value;
+            getDebugHandler().setVariable(objectId, "position", VariableType.NUMBER, 0);
+            icf = getDebugHandler().callFunction(false, "readUTF", v, new ArrayList<>());
+            System.out.println("Result=" + icf.variables.get(0).value);
+            getDebugHandler().setVariable(objectId, "position", VariableType.NUMBER, oldPos);
+        } catch (DebuggerHandler.ActionScriptException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 
     public static synchronized boolean addWatch(Variable v, long v_id, boolean watchRead, boolean watchWrite) {
@@ -1205,7 +1231,6 @@ public class Main {
                 return OpenFileResult.NOT_FOUND;
             }
             swfFile = file.getCanonicalPath();
-            Configuration.addRecentFile(swfFile);
             SWFSourceInfo sourceInfo = new SWFSourceInfo(null, swfFile, fileTitle);
             OpenFileResult openResult = openFile(sourceInfo);
             return openResult;
@@ -1245,6 +1270,14 @@ public class Main {
         }
 
         loadingDialog.setVisible(true);
+
+        for (int i = 0; i < newSourceInfos.length; i++) {
+            SWFSourceInfo si = newSourceInfos[i];
+            String fileName = si.getFile();
+            if (fileName != null) {
+                Configuration.addRecentFile(fileName);
+            }
+        }
 
         OpenFileWorker wrk = new OpenFileWorker(newSourceInfos, executeAfterOpen, reloadIndices);
         wrk.execute();
@@ -1401,7 +1434,7 @@ public class Main {
         }
         fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
         FileFilter allSupportedFilter = new FileFilter() {
-            private final String[] supportedExtensions = new String[]{".swf", ".gfx", ".swc", ".zip"};
+            private final String[] supportedExtensions = new String[]{".swf", ".gfx", ".swc", ".zip", ".iggy"};
 
             @Override
             public boolean accept(File f) {
@@ -1459,6 +1492,19 @@ public class Main {
             }
         };
         fc.addChoosableFileFilter(gfxFilter);
+
+        FileFilter iggyFilter = new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return (f.getName().toLowerCase().endsWith(".iggy")) || (f.isDirectory());
+            }
+
+            @Override
+            public String getDescription() {
+                return AppStrings.translate("filter.iggy");
+            }
+        };
+        fc.addChoosableFileFilter(iggyFilter);
 
         FileFilter zipFilter = new FileFilter() {
             @Override
@@ -1862,6 +1908,7 @@ public class Main {
      */
     public static void main(String[] args) throws IOException {
         setSessionLoaded(false);
+
         clearTemp();
 
         try {
@@ -1883,6 +1930,7 @@ public class Main {
 
         if (args.length == 0) {
             initGui();
+            checkLibraryVersion();
             View.execInEventDispatch(() -> {
                 if (Configuration.allowOnlyOneInstance.get() && FirstInstance.focus()) { //Try to focus first instance
                     Main.exit();
@@ -1892,6 +1940,7 @@ public class Main {
                 }
             });
         } else {
+            checkLibraryVersion();
             setSessionLoaded(true);
             String[] filesToOpen = CommandLineArgumentParser.parseArguments(args);
             if (filesToOpen != null && filesToOpen.length > 0) {
@@ -1907,6 +1956,13 @@ public class Main {
                     }
                 });
             }
+        }
+    }
+
+    private static void checkLibraryVersion() {
+        if (!ApplicationInfo.version.equals("unknown") && !ApplicationInfo.libraryVersion.equals("unknown")
+                && !Objects.equals(ApplicationInfo.version, ApplicationInfo.libraryVersion)) {
+            logger.log(Level.WARNING, "Application version is different from library version. FFDec may not work properly.");
         }
     }
 

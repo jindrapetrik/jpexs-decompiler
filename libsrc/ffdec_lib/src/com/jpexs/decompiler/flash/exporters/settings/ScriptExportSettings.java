@@ -41,6 +41,7 @@ public class ScriptExportSettings {
     public String getFileExtension() {
         switch (mode) {
             case AS:
+            case AS_METHOD_STUBS:
                 return ".as";
             case PCODE:
             case PCODE_HEX:

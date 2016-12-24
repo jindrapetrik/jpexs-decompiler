@@ -120,7 +120,6 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -149,6 +148,18 @@ public class SwfXmlImporter {
         } catch (ParserConfigurationException | SAXException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
+    }
+
+    public Object importObject(String xml, Class requiredType, SWF swf) throws IOException {
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        try {
+            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+            Document doc = docBuilder.parse(new InputSource(new StringReader(xml)));
+            return processObject(doc.getDocumentElement(), requiredType, swf, null);
+        } catch (ParserConfigurationException | SAXException | IllegalArgumentException | IllegalAccessException | NoSuchMethodException | InstantiationException | InvocationTargetException ex) {
+            Logger.getLogger(SwfXmlImporter.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
 
     private Field getField(Class cls, String name) throws NoSuchFieldException {
@@ -243,7 +254,7 @@ public class SwfXmlImporter {
                         setFieldValue(field, obj, childObj);
                     }
                 } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException | NoSuchMethodException | InstantiationException | InvocationTargetException ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, "Error while getting val from class " + cls + " field: " + name, ex);
                 }
             }
         }

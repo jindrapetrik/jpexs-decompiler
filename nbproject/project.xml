@@ -262,6 +262,21 @@
                         <location>jpexs_website.properties</location>
                     </source-file>
                     <source-file>
+                        <location>version.properties</location>
+                    </source-file>
+                    <source-file>
+                        <location>CHANGELOG.md</location>
+                    </source-file>
+                    <source-file>
+                        <location>.gitignore</location>
+                    </source-file>
+                    <source-file>
+                        <location>.gitattributes</location>
+                    </source-file>
+                    <source-file>
+                        <location>.travis.yml</location>
+                    </source-file>
+                    <source-file>
                         <location>nbproject/project.xml</location>
                     </source-file>
                     <source-file>

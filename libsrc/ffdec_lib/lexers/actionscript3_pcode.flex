@@ -158,7 +158,17 @@ ExceptionTarget = "exceptiontarget "{PositiveNumberLiteral}":"
   "code"                        {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_CODE, yytext());}
   "trait"                       {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_TRAIT, yytext());}
   "method"                      {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_METHOD, yytext());}
+  "metadata"                    {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_METADATA_BLOCK, yytext());}
+  "item"                        {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_ITEM, yytext());}
+  "end"                         {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_END, yytext());}
   
+/*in params too:*/
+  "dispid"                      {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_DISPID, yytext());}
+  "slotid"                      {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_SLOTID, yytext());}
+  "value"                       {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_VALUE, yytext());}
+  "type"                        {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_TYPE, yytext());}
+  
+
   
   /* identifiers */ 
   {InstructionName}                   { yybegin(PARAMETERS);
@@ -226,6 +236,7 @@ ExceptionTarget = "exceptiontarget "{PositiveNumberLiteral}":"
   "dispid"                      {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_DISPID, yytext());}
   "slotid"                      {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_SLOTID, yytext());}
   "value"                       {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_VALUE, yytext());}
+  "flag"                        {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_FLAG, yytext());}
   
 
 

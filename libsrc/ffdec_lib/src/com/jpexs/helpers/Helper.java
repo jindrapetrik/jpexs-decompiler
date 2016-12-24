@@ -746,6 +746,16 @@ public class Helper {
         }
     }
 
+    public static void appendFile(String file, byte[]... data) {
+        try (FileOutputStream fos = new FileOutputStream(file, true)) {
+            for (byte[] d : data) {
+                fos.write(d);
+            }
+        } catch (IOException ex) {
+            // ignore
+        }
+    }
+
     public static void writeFile(String file, byte[]... data) {
         try (FileOutputStream fos = new FileOutputStream(file)) {
             for (byte[] d : data) {

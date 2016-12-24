@@ -53,7 +53,8 @@ public class ImageImporter extends TagImporter {
 
         if (tagType == 0) {
             if (it instanceof DefineBitsTag) {
-                tagType = DefineBitsTag.ID;
+                // DefineBits tag shoud be imported as DefineBitsJPEG2 tag
+                tagType = DefineBitsJPEG2Tag.ID;
             } else {
                 tagType = it.getId();
             }

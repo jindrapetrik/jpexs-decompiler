@@ -192,7 +192,6 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
     private boolean saveAs(SWF swf, SaveFileMode mode) {
         if (Main.saveFileDialog(swf, mode)) {
-            mainFrame.setTitle(ApplicationInfo.applicationVerName + (Configuration.displayFileName.get() ? " - " + swf.getFileTitle() : ""));
             updateComponents(swf);
             return true;
         }
@@ -355,6 +354,14 @@ public abstract class MainFrameMenu implements MenuBuilder {
         }
 
         mainFrame.getPanel().renameOneIdentifier(swf);
+    }
+
+    protected void renameColliding(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return;
+        }
+
+        mainFrame.getPanel().renameColliding(swf);
     }
 
     protected void renameInvalidIdentifiers(ActionEvent evt) {
@@ -718,6 +725,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         setMenuEnabled("/tools/deobfuscation", swfSelected);
         setMenuEnabled("/tools/deobfuscation/renameOneIdentifier", swfSelected && !isWorking);
         setMenuEnabled("/tools/deobfuscation/renameInvalidIdentifiers", swfSelected && !isWorking);
+        setMenuEnabled("/tools/deobfuscation/renameColliding", swfSelected && !isWorking);
         setMenuEnabled("/tools/deobfuscation/deobfuscation", hasAbc);
 
         setMenuEnabled("/tools/search", swfSelected);
@@ -754,7 +762,17 @@ public abstract class MainFrameMenu implements MenuBuilder {
         setMenuEnabled("/debugging/debug/continue", isDebugPaused);
         //setMenuEnabled("/debugging/debug/stack", isDebugPaused);
         //setMenuEnabled("/debugging/debug/watch", isDebugPaused);
+        StringBuilder titleBuilder = new StringBuilder();
+        titleBuilder.append(ApplicationInfo.applicationVerName);
 
+        if (Configuration.displayFileName.get() && swf != null) {
+            titleBuilder.append(" - ");
+            if (swf.swfList != null && swf.swfList.isBundle()) {
+                titleBuilder.append(swf.swfList.name).append("/");
+            }
+            titleBuilder.append(swf.getFileTitle());
+        }
+        mainFrame.setTitle(titleBuilder.toString());
     }
 
     private void registerHotKeys() {
@@ -889,6 +907,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addMenuItem("/tools/deobfuscation", translate("menu.tools.deobfuscation"), "deobfuscate16", null, 0, null, false, null, false);
         addMenuItem("/tools/deobfuscation/renameOneIdentifier", translate("menu.tools.deobfuscation.globalrename"), "rename16", this::renameOneIdentifier, PRIORITY_MEDIUM, null, true, null, false);
         addMenuItem("/tools/deobfuscation/renameInvalidIdentifiers", translate("menu.tools.deobfuscation.renameinvalid"), "renameall16", this::renameInvalidIdentifiers, PRIORITY_MEDIUM, null, true, null, false);
+        addMenuItem("/tools/deobfuscation/renameColliding", translate("menu.tools.deobfuscation.renameColliding"), "renameall16", this::renameColliding, PRIORITY_MEDIUM, null, true, null, false);
         addMenuItem("/tools/deobfuscation/deobfuscation", translate("menu.tools.deobfuscation.pcode"), "deobfuscate32", this::deobfuscationActionPerformed, PRIORITY_TOP, null, true, null, false);
         finishMenu("/tools/deobfuscation");
 

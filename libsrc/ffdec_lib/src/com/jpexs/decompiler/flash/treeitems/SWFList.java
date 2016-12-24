@@ -130,6 +130,9 @@ public class SWFList implements List<SWF>, SWFContainerItem {
 
     @Override
     public SWF get(int i) {
+        if (i < 0 || i >= swfs.size()) {
+            return null;
+        }
         return swfs.get(i);
     }
 

@@ -19,37 +19,29 @@ package com.jpexs.decompiler.flash.abc.types.traits;
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ClassPath;
-import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
-import com.jpexs.decompiler.flash.abc.avm2.AVM2Deobfuscation;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.AlchemyTypeIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewFunctionIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrictIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetLexIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.AsTypeIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceIns;
-import com.jpexs.decompiler.flash.abc.avm2.model.InitVectorAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NameValuePair;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewObjectAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.StringAVM2Item;
-import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
-import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
-import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
+import com.jpexs.decompiler.flash.exporters.script.Dependency;
+import com.jpexs.decompiler.flash.exporters.script.DependencyParser;
+import com.jpexs.decompiler.flash.exporters.script.DependencyType;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
 import java.io.Serializable;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,6 +76,8 @@ public abstract class Trait implements Cloneable, Serializable {
     public static final int ATTR_Override = 0x2;
 
     public static final int ATTR_Metadata = 0x4;
+
+    public static final int ATTR_0x8 = 0x8; //unknown
 
     public static final int TRAIT_SLOT = 0;
 
@@ -124,11 +118,11 @@ public abstract class Trait implements Cloneable, Serializable {
             public var attr2;
              */
             if (parent instanceof TraitClass) {
-                String thisName = getName(abc).getName(abc.constants, new ArrayList<>(), true);
+                String thisName = getName(abc).getName(abc.constants, new ArrayList<>(), true, true);
                 List<Trait> classTraits = abc.class_info.get(((TraitClass) parent).class_info).static_traits.traits;
                 for (Trait t : classTraits) {
                     if (t.kindType == Trait.TRAIT_SLOT) {
-                        if ("_skinParts".equals(t.getName(abc).getName(abc.constants, new ArrayList<>(), true))) {
+                        if ("_skinParts".equals(t.getName(abc).getName(abc.constants, new ArrayList<>(), true, true))) {
                             if (t.getName(abc).getNamespace(abc.constants).kind == Namespace.KIND_PRIVATE) {
                                 if (convertData.assignedValues.containsKey(t)) {
                                     if (convertData.assignedValues.get(t).value instanceof NewObjectAVM2Item) {
@@ -169,129 +163,18 @@ public abstract class Trait implements Cloneable, Serializable {
         return ret;
     }
 
-    protected void parseImportsUsagesFromMultiname(String ignoredCustom, ABC abc, List<DottedChain> imports, List<String> uses, Multiname m, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) {
-        if (m != null) {
-            if (m.kind == Multiname.TYPENAME) {
-                if (m.qname_index != 0) {
-                    parseImportsUsagesFromMultiname(ignoredCustom, abc, imports, uses, abc.constants.getMultiname(m.qname_index), ignorePackage, fullyQualifiedNames);
-                }
-                for (Integer i : m.params) {
-                    if (i != 0) {
-                        parseImportsUsagesFromMultiname(ignoredCustom, abc, imports, uses, abc.constants.getMultiname(i), ignorePackage, fullyQualifiedNames);
-                    }
-                }
-                return;
-            }
-            Namespace ns = m.getNamespace(abc.constants);
-            String name = m.getName(abc.constants, fullyQualifiedNames, true);
-            NamespaceSet nss = m.getNamespaceSet(abc.constants);
-            if (ns != null) {
-                parseImportsUsagesFromNS(ignoredCustom, abc, imports, uses, m.namespace_index, ignorePackage, name);
-            }
-            if (nss != null) {
-                for (int n : nss.namespaces) {
-                    parseImportsUsagesFromNS(ignoredCustom, abc, imports, uses, n, ignorePackage, nss.namespaces.length > 1 ? "" : name);
-                }
-            }
-        }
-    }
-
-    private boolean parseUsagesFromNS(String ignoredCustom, ABC abc, List<DottedChain> imports, List<String> uses, int namespace_index, DottedChain ignorePackage, String name) {
-        Namespace ns = abc.constants.getNamespace(namespace_index);
-
-        if (ns.kind == Namespace.KIND_NAMESPACE) {
-            String nsVal = ns.getName(abc.constants).toRawString();
-            for (ABCContainerTag abcTag : abc.getAbcTags()) {
-                DottedChain nsimport = abcTag.getABC().nsValueToName(nsVal);
-                if (nsimport.equals(AVM2Deobfuscation.BUILTIN)) {
-                    return true; //handled, but import/use not added
-                }
-                if (!nsimport.isEmpty()) {
-
-                    if (!nsimport.getWithoutLast().equals(ignorePackage) && !imports.contains(nsimport)) {
-                        imports.add(nsimport);
-                    }
-                    if (ignoredCustom != null && nsVal.equals(ignoredCustom)) {
-                        return true;
-                    }
-                    if (!uses.contains(nsimport.getLast())) {
-                        uses.add(nsimport.getLast());
-                    }
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    protected void parseImportsUsagesFromNS(String ignoredCustom, ABC abc, List<DottedChain> imports, List<String> uses, int namespace_index, DottedChain ignorePackage, String name) {
-        Namespace ns = abc.constants.getNamespace(namespace_index);
-        if (name.isEmpty()) {
-            name = "*";
-        }
-        DottedChain newimport = ns.getName(abc.constants);
-
-        if (parseUsagesFromNS(ignoredCustom, abc, imports, uses, namespace_index, ignorePackage, name)) {
-            return;
-        } else if ((ns.kind != Namespace.KIND_PACKAGE) && (ns.kind != Namespace.KIND_PACKAGE_INTERNAL)) {
-            return;
-        }
-        newimport = newimport.add(name);
-        if (!imports.contains(newimport)) {
-            DottedChain pkg = newimport.getWithoutLast(); //.substring(0, newimport.lastIndexOf('.'));
-            if (pkg.equals(InitVectorAVM2Item.VECTOR_PACKAGE)) { //special case - is imported always
-                return;
-            }
-            if (!pkg.equals(ignorePackage)) {
-                imports.add(newimport);
-            }
-        }
-        //}
-    }
-
-    protected void parseUsagesFromMultiname(String ignoredCustom, ABC abc, List<DottedChain> imports, List<String> uses, Multiname m, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) {
-        if (m != null) {
-            if (m.kind == Multiname.TYPENAME) {
-                if (m.qname_index != 0) {
-                    parseUsagesFromMultiname(ignoredCustom, abc, imports, uses, abc.constants.getMultiname(m.qname_index), ignorePackage, fullyQualifiedNames);
-                }
-                for (Integer i : m.params) {
-                    if (i != 0) {
-                        parseUsagesFromMultiname(ignoredCustom, abc, imports, uses, abc.constants.getMultiname(i), ignorePackage, fullyQualifiedNames);
-                    }
-                }
-                return;
-            }
-            Namespace ns = m.getNamespace(abc.constants);
-            String name = m.getName(abc.constants, fullyQualifiedNames, false);
-            NamespaceSet nss = m.getNamespaceSet(abc.constants);
-            if (ns != null) {
-                parseUsagesFromNS(ignoredCustom, abc, imports, uses, m.namespace_index, ignorePackage, name);
-            }
-            if (nss != null) {
-                if (nss.namespaces.length == 1) {
-                    parseUsagesFromNS(ignoredCustom, abc, imports, uses, nss.namespaces[0], ignorePackage, name);
-                } else {
-                    for (int n : nss.namespaces) {
-                        parseUsagesFromNS(ignoredCustom, abc, imports, uses, n, ignorePackage, "");
-                    }
-                }
-            }
-        }
-    }
-
     protected DottedChain getPackage(ABC abc) {
         return getName(abc).getNamespace(abc.constants).getName(abc.constants);
     }
 
-    public void getImportsUsages(String ignoredCustom, ABC abc, List<DottedChain> imports, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) {
+    public void getDependencies(String ignoredCustom, ABC abc, List<Dependency> dependencies, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) {
         if (ignoredCustom == null) {
             Namespace n = getName(abc).getNamespace(abc.constants);
             if (n.kind == Namespace.KIND_NAMESPACE) {
                 ignoredCustom = n.getName(abc.constants).toRawString();
             }
         }
-        parseUsagesFromMultiname(ignoredCustom, abc, imports, uses, getName(abc), ignorePackage, fullyQualifiedNames);
+        DependencyParser.parseUsagesFromMultiname(ignoredCustom, abc, dependencies, uses, getName(abc), ignorePackage, fullyQualifiedNames, DependencyType.NAMESPACE);
     }
 
     private static final String[] builtInClasses = {"ArgumentError", "arguments", "Array", "Boolean", "Class", "Date", "DefinitionError", "Error", "EvalError", "Function", "int", "JSON", "Math", "Namespace", "Number", "Object", "QName", "RangeError", "ReferenceError", "RegExp", "SecurityError", "String", "SyntaxError", "TypeError", "uint", "URIError", "VerifyError", "XML", "XMLList"};
@@ -320,24 +203,37 @@ public abstract class Trait implements Cloneable, Serializable {
         }
 
         //imports
-        List<DottedChain> imports = new ArrayList<>();
+        List<Dependency> dependencies = new ArrayList<>();
         List<String> uses = new ArrayList<>();
         String customNs = null;
         Namespace ns = getName(abc).getNamespace(abc.constants);
         if (ns.kind == Namespace.KIND_NAMESPACE) {
             customNs = ns.getName(abc.constants).toRawString();
         }
-        getImportsUsages(customNs, abc, imports, uses, ignorePackage, new ArrayList<>());
+        getDependencies(customNs, abc, dependencies, uses, ignorePackage, new ArrayList<>());
+
+        List<DottedChain> imports = new ArrayList<>();
+        for (Dependency d : dependencies) {
+            if (!imports.contains(d.getId())) {
+                imports.add(d.getId());
+            }
+        }
 
         List<String> importnames = new ArrayList<>();
         importnames.addAll(namesInThisPackage);
+        importnames.addAll(Arrays.asList(builtInClasses));
         for (int i = 0; i < imports.size(); i++) {
             DottedChain ipath = imports.get(i);
-            String name = ipath.getLast();
-            if (importnames.contains(name) || isBuiltInClass(name)) {
+            if (ipath.getWithoutLast().equals(ignorePackage)) { //do not check classes from same package, they are imported automatically
                 imports.remove(i);
                 i--;
-                fullyQualifiedNames.add(new DottedChain(name));
+                continue;
+            }
+            String name = ipath.getLast();
+            if (importnames.contains(name)) {
+                imports.remove(i);
+                i--;
+                fullyQualifiedNames.add(DottedChain.parseWithSuffix(name));
             } else {
                 importnames.add(name);
             }
@@ -350,7 +246,7 @@ public abstract class Trait implements Cloneable, Serializable {
             if (name.equals("*")) {
                 continue;
             }
-            DottedChain dAll = pkg.add("*");
+            DottedChain dAll = pkg.addWithSuffix("*");
             if (imports.contains(dAll)) {
                 imports.remove(i);
                 i--;
@@ -358,6 +254,7 @@ public abstract class Trait implements Cloneable, Serializable {
         }
 
         boolean hasImport = false;
+        Collections.sort(imports);
         for (DottedChain imp : imports) {
             if (imp.size() > 1) {  //No imports from root package
                 writer.appendNoHilight("import " + imp.toPrintableString(true) + ";").newLine();
@@ -372,64 +269,6 @@ public abstract class Trait implements Cloneable, Serializable {
         }
         if (uses.size() > 0) {
             writer.newLine();
-        }
-    }
-
-    protected void parseImportsUsagesFromMethodInfo(String ignoredCustom, ABC abc, int method_index, List<DottedChain> imports, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<Integer> visitedMethods) {
-        if ((method_index < 0) || (method_index >= abc.method_info.size())) {
-            return;
-        }
-        visitedMethods.add(method_index);
-        if (abc.method_info.get(method_index).ret_type != 0) {
-            parseImportsUsagesFromMultiname(ignoredCustom, abc, imports, uses, abc.constants.getMultiname(abc.method_info.get(method_index).ret_type), ignorePackage, fullyQualifiedNames);
-        }
-        for (int t : abc.method_info.get(method_index).param_types) {
-            if (t != 0) {
-                parseImportsUsagesFromMultiname(ignoredCustom, abc, imports, uses, abc.constants.getMultiname(t), ignorePackage, fullyQualifiedNames);
-            }
-        }
-        MethodBody body = abc.findBody(method_index);
-        if (body != null) {
-            body.traits.getImportsUsages(ignoredCustom, abc, imports, uses, ignorePackage, fullyQualifiedNames);
-            for (ABCException ex : body.exceptions) {
-                parseImportsUsagesFromMultiname(ignoredCustom, abc, imports, uses, abc.constants.getMultiname(ex.type_index), ignorePackage, fullyQualifiedNames);
-            }
-            for (AVM2Instruction ins : body.getCode().code) {
-                if (ins.definition instanceof AlchemyTypeIns) {
-                    DottedChain nimport = AlchemyTypeIns.ALCHEMY_PACKAGE.add(ins.definition.instructionName);
-                    if (!imports.contains(nimport)) {
-                        imports.add(nimport);
-                    }
-                }
-                if (ins.definition instanceof NewFunctionIns) {
-                    if (ins.operands[0] != method_index) {
-                        if (!visitedMethods.contains(ins.operands[0])) {
-                            parseImportsUsagesFromMethodInfo(ignoredCustom, abc, ins.operands[0], imports, uses, ignorePackage, fullyQualifiedNames, visitedMethods);
-                        }
-                    }
-                }
-                if ((ins.definition instanceof FindPropertyStrictIns)
-                        || (ins.definition instanceof FindPropertyIns)
-                        || (ins.definition instanceof GetLexIns)
-                        || (ins.definition instanceof CoerceIns)
-                        || (ins.definition instanceof AsTypeIns)) {
-                    int m = ins.operands[0];
-                    if (m != 0) {
-                        if (m < abc.constants.getMultinameCount()) {
-                            parseImportsUsagesFromMultiname(ignoredCustom, abc, imports, uses, abc.constants.getMultiname(m), ignorePackage, fullyQualifiedNames);
-                        }
-                    }
-                } else {
-                    for (int k = 0; k < ins.definition.operands.length; k++) {
-                        if (ins.definition.operands[k] == AVM2Code.DAT_MULTINAME_INDEX) {
-                            int multinameIndex = ins.operands[k];
-                            if (multinameIndex < abc.constants.getMultinameCount()) {
-                                parseUsagesFromMultiname(ignoredCustom, abc, imports, uses, abc.constants.getMultiname(multinameIndex), ignorePackage, fullyQualifiedNames);
-                            }
-                        }
-                    }
-                }
-            }
         }
     }
 
@@ -545,6 +384,66 @@ public abstract class Trait implements Cloneable, Serializable {
     public void convert(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
     }
 
+    public abstract GraphTextWriter convertTraitHeader(ABC abc, GraphTextWriter writer);
+
+    public GraphTextWriter convertCommonHeaderFlags(String traitType, ABC abc, GraphTextWriter writer) {
+        writer.appendNoHilight("trait ");
+        writer.hilightSpecial(traitType, HighlightSpecialType.TRAIT_TYPE);
+        writer.appendNoHilight(" ");
+        writer.hilightSpecial(abc.constants.multinameToString(name_index), HighlightSpecialType.TRAIT_NAME);
+
+        if ((kindFlags & ATTR_Final) > 0) {
+            writer.newLine();
+            writer.append("flag ");
+            writer.hilightSpecial("FINAL", HighlightSpecialType.ATTR_FINAL);
+        }
+        if ((kindFlags & ATTR_Override) > 0) {
+            writer.newLine();
+            writer.append("flag ");
+            writer.hilightSpecial("OVERRIDE", HighlightSpecialType.ATTR_OVERRIDE);
+        }
+        if ((kindFlags & ATTR_Metadata) > 0) {
+            writer.newLine();
+            writer.append("flag ");
+            writer.hilightSpecial("METADATA", HighlightSpecialType.ATTR_METADATA);
+        }
+        if ((kindFlags & ATTR_0x8) > 0) {
+            writer.newLine();
+            writer.append("flag ");
+            writer.hilightSpecial("0x8", HighlightSpecialType.ATTR_0x8);
+        }
+        if ((kindFlags & ATTR_Metadata) > 0) {
+            writer.newLine();
+            for (int m : metadata) {
+                writer.append("metadata");
+                writer.append("\"");
+                writer.append(Helper.escapeActionScriptString(abc.constants.getString(abc.metadata_info.get(m).name_index)));
+                writer.append("\"");
+                writer.newLine();
+                if (m >= 0 && m < abc.metadata_info.size()) {
+                    for (int i = 0; i < abc.metadata_info.get(m).keys.length; i++) {
+                        int key = abc.metadata_info.get(m).keys[i];
+                        int val = abc.metadata_info.get(m).values[i];
+                        writer.append("item ");
+
+                        writer.append("\"");
+                        writer.append(Helper.escapeActionScriptString(abc.constants.getString(key)));
+                        writer.append("\"");
+
+                        writer.append(" ");
+
+                        writer.append("\"");
+                        writer.append(Helper.escapeActionScriptString(abc.constants.getString(val)));
+                        writer.append("\"");
+                        writer.newLine();
+                    }
+                }
+                writer.append("end ; metadata");
+            }
+        }
+        return writer;
+    }
+
     public GraphTextWriter toStringPackaged(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
         Namespace ns = abc.constants.getMultiname(name_index).getNamespace(abc.constants);
         if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
@@ -592,8 +491,9 @@ public abstract class Trait implements Cloneable, Serializable {
         Multiname name = getName(abc);
         Namespace ns = name.getNamespace(abc.constants);
         DottedChain packageName = ns == null ? DottedChain.EMPTY : ns.getName(abc.constants);
-        String objectName = name.getName(abc.constants, null, true);
-        return new ClassPath(packageName, objectName); //assume not null name
+        String objectName = name.getName(abc.constants, null, true, false);
+        String namespaceSuffix = name.getNamespaceSuffix();
+        return new ClassPath(packageName, objectName, namespaceSuffix); //assume not null name
     }
 
     @Override

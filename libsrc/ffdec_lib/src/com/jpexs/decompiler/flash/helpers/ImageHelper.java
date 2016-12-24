@@ -103,19 +103,17 @@ public class ImageHelper {
         String formatName = getImageFormatString(format).toUpperCase(Locale.ENGLISH);
         if (format == ImageFormat.JPEG) {
             image = fixImageIOJpegBug(image);
-        } else {
-            if (image.getType() == BufferedImage.TYPE_INT_ARGB_PRE) {
-                BufferedImage image2 = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
-                int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
-                divideAlpha(pixels);
+        } else if (image.getType() == BufferedImage.TYPE_INT_ARGB_PRE) {
+            BufferedImage image2 = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+            int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+            divideAlpha(pixels);
 
-                int[] pixels2 = ((DataBufferInt) image2.getRaster().getDataBuffer()).getData();
-                for (int i = 0; i < pixels.length; i++) {
-                    pixels2[i] = pixels[i];
-                }
-
-                image = image2;
+            int[] pixels2 = ((DataBufferInt) image2.getRaster().getDataBuffer()).getData();
+            for (int i = 0; i < pixels.length; i++) {
+                pixels2[i] = pixels[i];
             }
+
+            image = image2;
         }
 
         try {

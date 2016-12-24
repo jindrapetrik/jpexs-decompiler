@@ -78,7 +78,8 @@ public class ScriptInfo {
             if ((ns.kind == Namespace.KIND_PACKAGE_INTERNAL)
                     || (ns.kind == Namespace.KIND_PACKAGE)) {
                 DottedChain packageName = ns.getName(abc.constants); // assume not null package
-                String objectName = name.getName(abc.constants, null, true);
+                String objectName = name.getName(abc.constants, null, true, false);
+                String namespaceSuffix = name.getNamespaceSuffix();
                 List<Integer> traitIndices = new ArrayList<>();
 
                 traitIndices.add(j);
@@ -88,13 +89,31 @@ public class ScriptInfo {
                 }
 
                 if (packagePrefix == null || packageName.toPrintableString(true).startsWith(packagePrefix)) {
-                    ClassPath cp = new ClassPath(packageName, objectName);
+                    ClassPath cp = new ClassPath(packageName, objectName, namespaceSuffix);
                     ret.add(new ScriptPack(cp, abc, allAbcs, scriptIndex, traitIndices));
                 }
             }
         }
         if (ret.size() == 1) {
             ret.get(0).isSimple = true;
+        }
+        if (ret.isEmpty() && !otherTraits.isEmpty()) { //no public/package internal traits to determine common pack name
+            //make each trait separate pack
+            for (int traitIndex : otherTraits) {
+                Trait t = traits.traits.get(traitIndex);
+                Multiname name = t.getName(abc);
+                Namespace ns = name.getNamespace(abc.constants);
+
+                DottedChain packageName = ns.getName(abc.constants);
+                String objectName = name.getName(abc.constants, null, true, false);
+                String namespaceSuffix = name.getNamespaceSuffix();
+
+                List<Integer> traitIndices = new ArrayList<>();
+
+                traitIndices.add(traitIndex);
+                ClassPath cp = new ClassPath(packageName, objectName, namespaceSuffix);
+                ret.add(new ScriptPack(cp, abc, allAbcs, scriptIndex, traitIndices));
+            }
         }
         return ret;
     }

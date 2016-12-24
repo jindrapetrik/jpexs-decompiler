@@ -29,7 +29,6 @@ import com.jpexs.decompiler.flash.gui.controls.NoneSelectedButtonGroup;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import javax.swing.Box;
@@ -53,6 +52,7 @@ public class MethodCodePanel extends JPanel {
     private final JToggleButton hexButton;
 
     private final JToggleButton hexOnlyButton;
+
     private final DocsPanel docsPanel;
 
     public void refreshMarkers() {
@@ -120,7 +120,7 @@ public class MethodCodePanel extends JPanel {
         sourceTextArea.addDocsListener(docsPanel);
         add(new JPersistentSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(sourceTextArea), new JScrollPane(docsPanel), Configuration.guiAvm2DocsSplitPaneDividerLocationPercent));
         sourceTextArea.changeContentType("text/flasm3");
-        sourceTextArea.setFont(new Font("Monospaced", Font.PLAIN, sourceTextArea.getFont().getSize()));
+        sourceTextArea.setFont(Configuration.getSourceFont());
 
         buttonsPanel = new JPanel();
         buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.X_AXIS));

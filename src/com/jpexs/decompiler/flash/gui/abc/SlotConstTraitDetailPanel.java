@@ -101,16 +101,8 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
         this.abc = abc;
         this.trait = trait;
         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
-        writer.appendNoHilight("trait ");
-        writer.hilightSpecial(abc.constants.multinameToString(trait.name_index), HighlightSpecialType.TRAIT_NAME);
-        writer.appendNoHilight(" ");
-        writer.hilightSpecial(trait.isConst() ? "const" : "slot", HighlightSpecialType.TRAIT_TYPE);
-        writer.appendNoHilight(" slotid ");
-        writer.hilightSpecial(Integer.toString(trait.slot_id), HighlightSpecialType.SLOT_ID);
-        writer.appendNoHilight(" type ");
-        writer.hilightSpecial(abc.constants.multinameToString(trait.type_index), HighlightSpecialType.TRAIT_TYPE_NAME);
-        writer.appendNoHilight(" value ");
-        writer.hilightSpecial((new ValueKind(trait.value_index, trait.value_kind).toASMString(abc.constants)), HighlightSpecialType.TRAIT_VALUE);
+        trait.convertTraitHeader(abc, writer);
+        writer.appendNoHilight("end ; trait");
         String s = writer.toString();
         specialHilights = writer.specialHilights;
         showWarning = trait.isConst() || isStatic;
@@ -120,7 +112,7 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
     @Override
     public boolean save() {
         try {//(slotConstEditor.getText(), trait, abc)
-            if (!ASM3Parser.parseSlotConst(new StringReader(slotConstEditor.getText()), abc.constants, trait)) {
+            if (!ASM3Parser.parseSlotConst(abc, new StringReader(slotConstEditor.getText()), abc.constants, trait)) {
                 return false;
             }
         } catch (AVM2ParseException ex) {
@@ -131,6 +123,7 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
             return false;
         }
 
+        abc.refreshMultinameNamespaceSuffixes();
         ((Tag) abc.parentTag).setModified(true);
         return true;
     }

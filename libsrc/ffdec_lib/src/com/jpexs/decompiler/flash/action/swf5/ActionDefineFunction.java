@@ -170,7 +170,14 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
 
     @Override
     public void translateContainer(List<List<GraphTargetItem>> content, GraphSourceItem lineStartItem, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-        FunctionActionItem fti = new FunctionActionItem(this, lineStartItem, functionName, paramNames, getRegNames(), content.get(0), constantPool, 1, new ArrayList<>());
+        List<FunctionActionItem> funcList = new ArrayList<>();
+        for (String key : functions.keySet()) {
+            GraphTargetItem val = functions.get(key);
+            if (val instanceof FunctionActionItem) {
+                funcList.add((FunctionActionItem) val);
+            }
+        }
+        FunctionActionItem fti = new FunctionActionItem(this, lineStartItem, functionName, paramNames, getRegNames(), content.get(0), constantPool, 1, new ArrayList<>(), funcList);
         //ActionGraph.translateViaGraph(regNames, variables, functions, code, version)
         stack.push(fti);
         functions.put(functionName, fti);

@@ -37,6 +37,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
 import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -98,7 +99,7 @@ public class ScriptPack extends AS3ClassTreeItem {
     }
 
     public ScriptPack(ClassPath path, ABC abc, List<ABC> allAbcs, int scriptIndex, List<Integer> traitIndices) {
-        super(path.className, path);
+        super(path.className, path.namespaceSuffix, path);
         this.abc = abc;
         this.scriptIndex = scriptIndex;
         this.traitIndices = traitIndices;
@@ -124,7 +125,7 @@ public class ScriptPack extends AS3ClassTreeItem {
             Multiname name = abc.script_info.get(scriptIndex).traits.traits.get(t).getName(abc);
             Namespace ns = name.getNamespace(abc.constants);
             if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
-                scriptName = name.getName(abc.constants, null, false);
+                scriptName = name.getName(abc.constants, null, false, true);
             }
         }
         return scriptName;
@@ -200,12 +201,14 @@ public class ScriptPack extends AS3ClassTreeItem {
             //TODO: handle this better in GUI(?)
             writer.startTrait(GraphTextWriter.TRAIT_SCRIPT_INITIALIZER);
             writer.startMethod(script_init);
-            if (!scriptInitializerIsEmpty) {
-                writer.startBlock();
-                abc.bodies.get(bodyIndex).toString(path +/*packageName +*/ "/.scriptinitializer", exportMode, abc, null, writer, new ArrayList<>());
-                writer.endBlock();
-            } else {
-                writer.append(" ");
+            if (exportMode != ScriptExportMode.AS_METHOD_STUBS) {
+                if (!scriptInitializerIsEmpty) {
+                    writer.startBlock();
+                    abc.bodies.get(bodyIndex).toString(path +/*packageName +*/ "/.scriptinitializer", exportMode, abc, null, writer, new ArrayList<>());
+                    writer.endBlock();
+                } else {
+                    writer.append(" ");
+                }
             }
             writer.endMethod();
             writer.endTrait();
@@ -335,7 +338,7 @@ public class ScriptPack extends AS3ClassTreeItem {
 
         Set<Integer> lonelyBody = new HashSet<>();
         try {
-            CachedDecompilation decompiled = SWF.getCached(this);
+            HighlightedText decompiled = SWF.getCached(this);
             int line = 1;
             String txt = decompiled.text;
             txt = txt.replace("\r", "");
@@ -343,21 +346,21 @@ public class ScriptPack extends AS3ClassTreeItem {
             for (int i = 0; i < txt.length(); i++) {
                 blk:
                 {
-                    Highlighting sh = Highlighting.searchPos(decompiled.specialHilights, i);
+                    Highlighting sh = Highlighting.searchPos(decompiled.getSpecialHighlights(), i);
 
-                    Highlighting cls = Highlighting.searchPos(decompiled.classHilights, i);
+                    Highlighting cls = Highlighting.searchPos(decompiled.getClassHighlights(), i);
                     /*if (cls == null) {
                      continue;
                      }*/
-                    Highlighting trt = Highlighting.searchPos(decompiled.traitHilights, i);
+                    Highlighting trt = Highlighting.searchPos(decompiled.getTraitHighlights(), i);
                     /*if (trt == null) {
                      continue;
                      }*/
-                    Highlighting method = Highlighting.searchPos(decompiled.methodHilights, i);
+                    Highlighting method = Highlighting.searchPos(decompiled.getMethodHighlights(), i);
                     if (method == null) {
                         break blk;
                     }
-                    Highlighting instr = Highlighting.searchPos(decompiled.instructionHilights, i); //h
+                    Highlighting instr = Highlighting.searchPos(decompiled.getInstructionHighlights(), i); //h
                     /*if (instr == null) {
                      continue;
                      }*/
@@ -529,18 +532,18 @@ public class ScriptPack extends AS3ClassTreeItem {
         Map<Integer, String> bodyToIdentifier = new HashMap<>();
 
         try {
-            CachedDecompilation decompiled = SWF.getCached(this);
+            HighlightedText decompiled = SWF.getCached(this);
             String txt = decompiled.text;
             txt = txt.replace("\r", "");
 
             for (int i = 0; i < txt.length(); i++) {
                 blk:
                 {
-                    Highlighting sh = Highlighting.searchPos(decompiled.specialHilights, i);
+                    Highlighting sh = Highlighting.searchPos(decompiled.getSpecialHighlights(), i);
 
-                    Highlighting cls = Highlighting.searchPos(decompiled.classHilights, i);
-                    Highlighting trt = Highlighting.searchPos(decompiled.traitHilights, i);
-                    Highlighting method = Highlighting.searchPos(decompiled.methodHilights, i);
+                    Highlighting cls = Highlighting.searchPos(decompiled.getClassHighlights(), i);
+                    Highlighting trt = Highlighting.searchPos(decompiled.getTraitHighlights(), i);
+                    Highlighting method = Highlighting.searchPos(decompiled.getMethodHighlights(), i);
                     if (method == null) {
                         break blk;
                     }

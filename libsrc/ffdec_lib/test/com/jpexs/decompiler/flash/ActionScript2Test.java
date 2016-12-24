@@ -845,4 +845,46 @@ public class ActionScript2Test extends ActionScript2TestBase {
                 + "trace(\"afterSwitch\");\r\n"
         );
     }
+
+    public void frame63_functionVariablesTest() {
+        compareSrc(63, "function outfunc()\r\n"
+                + "{\r\n"
+                + "var _loc2_ = function()\r\n"
+                + "{\r\n"
+                + "var a = 5;\r\n"
+                + "var _loc3_ = 6;\r\n"
+                + "var _loc2_ = function()\r\n"
+                + "{\r\n"
+                + "var _loc1_ = a + 2;\r\n"
+                + "trace(_loc1_);\r\n"
+                + "return _loc1_;\r\n"
+                + "};\r\n"
+                + "return _loc2_();\r\n"
+                + "};\r\n"
+                + "return _loc2_();\r\n"
+                + "}\r\n"
+                + "trace(\"functionVariablesTest\");\r\n"
+        );
+    }
+
+    @Test
+    public void frame64_functionInnerParametersTest() {
+        compareSrc(64, "function outfunc()\r\n"
+                + "{\r\n"
+                + "var _loc2_ = function(a, x)\r\n"
+                + "{\r\n"
+                + "var _loc3_ = a + 3 + x;\r\n"
+                + "var _loc2_ = function()\r\n"
+                + "{\r\n"
+                + "var _loc1_ = a + 2;\r\n"
+                + "trace(_loc1_);\r\n"
+                + "return _loc1_;\r\n"
+                + "};\r\n"
+                + "return _loc2_();\r\n"
+                + "};\r\n"
+                + "return _loc2_(5,2);\r\n"
+                + "}\r\n"
+                + "trace(\"functionInnerParametersTest\");\r\n"
+        );
+    }
 }

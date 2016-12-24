@@ -304,7 +304,7 @@ public class ActionScript3Parser {
                 s = lex();
                 GraphTargetItem ns = null;
                 if (s.type == SymbolType.NAMESPACE_OP) {
-                    ns = new UnresolvedAVM2Item(new ArrayList<>(), importedClasses, false, null, lexer.yyline(), new DottedChain(propName), null, openedNamespaces);
+                    ns = new UnresolvedAVM2Item(new ArrayList<>(), importedClasses, false, null, lexer.yyline(), new DottedChain(new String[]{propName}, "" /*FIXME ???*/), null, openedNamespaces);
                     variables.add((UnresolvedAVM2Item) ns);
                     s = lex();
                     if (s.type == SymbolType.BRACKET_OPEN) {
@@ -337,7 +337,7 @@ public class ActionScript3Parser {
 
     private GraphTargetItem name(List<List<NamespaceItem>> allOpenedNamespaces, TypeItem thisType, NamespaceItem pkg, Reference<Boolean> needsActivation, boolean typeOnly, List<NamespaceItem> openedNamespaces, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, List<AssignableAVM2Item> variables, List<DottedChain> importedClasses) throws IOException, AVM2ParseException {
         ParsedSymbol s = lex();
-        DottedChain name = new DottedChain();
+        DottedChain name = new DottedChain(new String[]{}, "");
         String name2 = "";
         if (s.type == SymbolType.ATTRIBUTE) {
             name2 += "@";
@@ -348,7 +348,7 @@ public class ActionScript3Parser {
         s = lex();
         boolean attrBracket = false;
 
-        name = name.add(name2);
+        name = name.addWithSuffix(name2);
         while (s.isType(SymbolType.DOT)) {
             //name += s.value.toString(); //. or ::
             s = lex();
@@ -371,7 +371,7 @@ public class ActionScript3Parser {
                 expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER, SymbolType.NAMESPACE, SymbolType.MULTIPLY);
                 name2 += s.value.toString();
             }
-            name = name.add(name2);
+            name = name.addWithSuffix(name2);
             s = lex();
         }
         String nsname = null;
@@ -402,7 +402,7 @@ public class ActionScript3Parser {
             if (attr) {
                 nsname = nsname.substring(1);
             }
-            UnresolvedAVM2Item ns = new UnresolvedAVM2Item(new ArrayList<>(), importedClasses, typeOnly, null, lexer.yyline(), new DottedChain(nsname), null, openedNamespaces);
+            UnresolvedAVM2Item ns = new UnresolvedAVM2Item(new ArrayList<>(), importedClasses, typeOnly, null, lexer.yyline(), new DottedChain(new String[]{nsname}, ""), null, openedNamespaces);
             variables.add(ns);
             ret = new NamespacedAVM2Item(ns, nsprop, nspropItem, ret, attr, openedNamespaces, null);
         }
@@ -618,7 +618,7 @@ public class ActionScript3Parser {
 
         looptraits:
         while (true) {
-            TypeItem thisType = new TypeItem(pkg.name.add(classNameStr));
+            TypeItem thisType = new TypeItem(pkg.name.addWithSuffix(classNameStr));
             boolean isGetter = false;
             boolean isSetter = false;
             boolean isOverride = false;
@@ -884,13 +884,13 @@ public class ActionScript3Parser {
             s = lex();
             if (s.type != SymbolType.CURLY_OPEN) {
                 expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
-                pkgName = pkgName.add(s.value.toString());
+                pkgName = pkgName.addWithSuffix(s.value.toString());
                 s = lex();
             }
             while (s.type == SymbolType.DOT) {
                 s = lex();
                 expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
-                pkgName = pkgName.add(s.value.toString());
+                pkgName = pkgName.addWithSuffix(s.value.toString());
                 s = lex();
             }
             expected(s, lexer.yyline(), SymbolType.CURLY_OPEN);
@@ -1744,7 +1744,7 @@ public class ActionScript3Parser {
                         for (AssignableAVM2Item a : catchVars) {
                             if (a instanceof UnresolvedAVM2Item) {
                                 UnresolvedAVM2Item ui = (UnresolvedAVM2Item) a;
-                                if (ui.getVariableName().equals(DottedChain.parse(e.getVariableName()))) {
+                                if (ui.getVariableName().equals(DottedChain.parseWithSuffix(e.getVariableName()))) {
                                     try {
                                         ui.resolve(null, new ArrayList<>(), new ArrayList<>(), abcIndex, new ArrayList<>(), variables);
                                     } catch (CompilationException ex) {
@@ -1767,7 +1767,7 @@ public class ActionScript3Parser {
                         if (av instanceof UnresolvedAVM2Item) {
                             UnresolvedAVM2Item ui = (UnresolvedAVM2Item) av;
                             for (NameAVM2Item e : catchExceptions) {
-                                if (ui.getVariableName().equals(DottedChain.parse(e.getVariableName()))) {
+                                if (ui.getVariableName().equals(DottedChain.parseWithSuffix(e.getVariableName()))) {
                                     try {
                                         ui.resolve(null, new ArrayList<>(), new ArrayList<>(), abcIndex, new ArrayList<>(), variables);
                                     } catch (CompilationException ex) {
@@ -2486,8 +2486,8 @@ public class ActionScript3Parser {
             }
             s = lex();
             expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
-            DottedChain fullName = new DottedChain();
-            fullName = fullName.add(s.value.toString());
+            DottedChain fullName = new DottedChain(new String[]{}, "");
+            fullName = fullName.addWithSuffix(s.value.toString());
             s = lex();
             boolean isStar = false;
             while (s.type == SymbolType.DOT) {
@@ -2499,7 +2499,7 @@ public class ActionScript3Parser {
                     break;
                 }
                 expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
-                fullName = fullName.add(s.value.toString());
+                fullName = fullName.addWithSuffix(s.value.toString());
                 s = lex();
             }
 
@@ -2564,6 +2564,7 @@ public class ActionScript3Parser {
         for (ABC a : otherAbcs) {
             abcIndex.addAbc(a);
         }
+
         abcIndex.addAbc(abc);
     }
 
@@ -2572,6 +2573,7 @@ public class ActionScript3Parser {
             if (Configuration.getPlayerSWC() == null) {
                 throw new IOException("Player SWC library not found, please place it to " + Configuration.getFlashLibPath());
             }
+
             SWC swc = new SWC(new FileInputStream(Configuration.getPlayerSWC()));
             SWF swf = new SWF(swc.getSWF("library.swf"), true);
             playerGlobalAbcIndex = new AbcIndexing(swf);

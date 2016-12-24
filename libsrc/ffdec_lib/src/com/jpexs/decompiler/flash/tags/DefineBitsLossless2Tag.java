@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.types.ALPHABITMAPDATA;
 import com.jpexs.decompiler.flash.types.ALPHACOLORMAPDATA;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
+import com.jpexs.decompiler.flash.types.annotations.EnumValue;
 import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
@@ -54,6 +55,8 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
     public static final String NAME = "DefineBitsLossless2";
 
     @SWFType(BasicType.UI8)
+    @EnumValue(value = FORMAT_8BIT_COLORMAPPED, text = "8-bit colormapped")
+    @EnumValue(value = FORMAT_32BIT_ARGB, text = "32-bit ARGB")
     public int bitmapFormat;
 
     @SWFType(BasicType.UI16)
@@ -241,10 +244,10 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
 
         ALPHACOLORMAPDATA colorMapData = null;
         ALPHABITMAPDATA bitmapData = null;
-        if (bitmapFormat == DefineBitsLossless2Tag.FORMAT_8BIT_COLORMAPPED) {
+        if (bitmapFormat == FORMAT_8BIT_COLORMAPPED) {
             colorMapData = getColorMapData();
         }
-        if (bitmapFormat == DefineBitsLossless2Tag.FORMAT_32BIT_ARGB) {
+        if (bitmapFormat == FORMAT_32BIT_ARGB) {
             bitmapData = getBitmapData();
         }
         int pos32aligned = 0;
@@ -252,13 +255,13 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
         for (int y = 0; y < bitmapHeight; y++) {
             for (int x = 0; x < bitmapWidth; x++) {
                 int c = 0;
-                if ((bitmapFormat == DefineBitsLossless2Tag.FORMAT_8BIT_COLORMAPPED)) {
+                if ((bitmapFormat == FORMAT_8BIT_COLORMAPPED)) {
                     int colorTableIndex = colorMapData.colorMapPixelData[pos32aligned] & 0xff;
                     if (colorTableIndex < colorMapData.colorTableRGB.length) {
                         c = colorMapData.colorTableRGB[colorTableIndex];
                     }
                 }
-                if ((bitmapFormat == DefineBitsLossless2Tag.FORMAT_32BIT_ARGB)) {
+                if ((bitmapFormat == FORMAT_32BIT_ARGB)) {
                     c = bitmapData.bitmapPixelData[pos];
                 }
 

@@ -61,7 +61,7 @@ public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assign
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        getSrcData().localName = slotName == null ? "/*UnknownSlot*/" : slotName.getName(localData.constantsAvm2, localData.fullyQualifiedNames, false);
+        getSrcData().localName = slotName == null ? "/*UnknownSlot*/" : slotName.getName(localData.constantsAvm2, localData.fullyQualifiedNames, false, true);
         if (getSrcData().localName.equals(value.toString(localData))) {
             //assigning parameters to activation reg
             return writer;
@@ -75,14 +75,14 @@ public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assign
     }
 
     public String getNameAsStr(LocalData localData) {
-        return slotName == null ? "/*UnknownSlot*/" : slotName.getName(localData.constantsAvm2, localData.fullyQualifiedNames, false);
+        return slotName == null ? "/*UnknownSlot*/" : slotName.getName(localData.constantsAvm2, localData.fullyQualifiedNames, false, true);
     }
 
     public GraphTextWriter getName(GraphTextWriter writer, LocalData localData) {
         if (slotName == null) {
             return writer.append("/*UnknownSlot*/");
         }
-        return writer.append(slotName.getName(localData.constantsAvm2, localData.fullyQualifiedNames, false));
+        return writer.append(slotName.getName(localData.constantsAvm2, localData.fullyQualifiedNames, false, true));
     }
 
     @Override

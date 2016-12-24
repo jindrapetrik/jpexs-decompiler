@@ -132,6 +132,8 @@ public class View {
 
     public static final TexturePaint transparentPaint;
 
+    private static FontPolicy defaultFontPolicy;
+
     private static final Color transparentColor1 = new Color(0x99, 0x99, 0x99);
 
     private static final Color transparentColor2 = new Color(0x66, 0x66, 0x66);
@@ -152,7 +154,7 @@ public class View {
      */
     public static void setLookAndFeel() {
 
-        //Save default font for Chinese characters
+        // Save default font for Chinese characters
         final Font defaultFont = (new JLabel()).getFont();
         try {
 
@@ -193,14 +195,18 @@ public class View {
             UIManager.put("FormattedTextField.background", Color.white);
             UIManager.put("CommandButtonUI", MyCommandButtonUI.class.getName());
 
-            FontPolicy pol = SubstanceLookAndFeel.getFontPolicy();
+            if (defaultFontPolicy == null) {
+                defaultFontPolicy = SubstanceLookAndFeel.getFontPolicy();
+            }
+
+            FontPolicy pol = defaultFontPolicy;
             final FontSet fs = pol.getFontSet("Substance", null);
 
-            //Restore default font for chinese characters
+            double fontSizeMultiplier = Configuration.guiFontSizeMultiplier.get();
+
+            // Restore default font for chinese characters
             SubstanceLookAndFeel.setFontPolicy(new FontPolicy() {
-
                 private final FontSet fontSet = new FontSet() {
-
                     private FontUIResource controlFont;
 
                     private FontUIResource menuFont;
@@ -213,11 +219,15 @@ public class View {
 
                     private FontUIResource messageFont;
 
+                    private int getFontSize(int defaultFontSize) {
+                        return (int) (defaultFontSize * fontSizeMultiplier);
+                    }
+
                     @Override
                     public FontUIResource getControlFont() {
                         if (controlFont == null) {
                             FontUIResource f = fs.getControlFont();
-                            controlFont = new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
+                            controlFont = new FontUIResource(defaultFont.getName(), f.getStyle(), getFontSize(f.getSize()));
                         }
                         return controlFont;
                     }
@@ -226,7 +236,7 @@ public class View {
                     public FontUIResource getMenuFont() {
                         if (menuFont == null) {
                             FontUIResource f = fs.getMenuFont();
-                            menuFont = new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
+                            menuFont = new FontUIResource(defaultFont.getName(), f.getStyle(), getFontSize(f.getSize()));
                         }
                         return menuFont;
                     }
@@ -235,7 +245,7 @@ public class View {
                     public FontUIResource getTitleFont() {
                         if (titleFont == null) {
                             FontUIResource f = fs.getTitleFont();
-                            titleFont = new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
+                            titleFont = new FontUIResource(defaultFont.getName(), f.getStyle(), getFontSize(f.getSize()));
                         }
                         return titleFont;
                     }
@@ -244,7 +254,7 @@ public class View {
                     public FontUIResource getWindowTitleFont() {
                         if (windowTitleFont == null) {
                             FontUIResource f = fs.getWindowTitleFont();
-                            windowTitleFont = new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
+                            windowTitleFont = new FontUIResource(defaultFont.getName(), f.getStyle(), getFontSize(f.getSize()));
                         }
                         return windowTitleFont;
                     }
@@ -253,7 +263,7 @@ public class View {
                     public FontUIResource getSmallFont() {
                         if (smallFont == null) {
                             FontUIResource f = fs.getSmallFont();
-                            smallFont = new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
+                            smallFont = new FontUIResource(defaultFont.getName(), f.getStyle(), getFontSize(f.getSize()));
                         }
                         return smallFont;
                     }
@@ -262,7 +272,7 @@ public class View {
                     public FontUIResource getMessageFont() {
                         if (messageFont == null) {
                             FontUIResource f = fs.getMessageFont();
-                            messageFont = new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
+                            messageFont = new FontUIResource(defaultFont.getName(), f.getStyle(), getFontSize(f.getSize()));
                         }
                         return messageFont;
                     }

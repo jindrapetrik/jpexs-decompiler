@@ -312,7 +312,7 @@ public class DefineFontTag extends FontTag {
         if (fontInfoTag == null) {
             return false;
         }
-        
+
         int code = (int) character;
         int pos = -1;
         List<Integer> codeTable = fontInfoTag.getCodeTable();
@@ -335,12 +335,12 @@ public class DefineFontTag extends FontTag {
         fontInfoTag.removeFontCharacter(pos);
 
         shiftGlyphIndices(fontId, pos + 1, false);
-        
+
         setModified(true);
         getSwf().clearImageCache();
         return true;
     }
-    
+
     @Override
     public void setAdvanceValues(Font font) {
         throw new UnsupportedOperationException("Setting the advance values for DefineFontTag is not supported.");

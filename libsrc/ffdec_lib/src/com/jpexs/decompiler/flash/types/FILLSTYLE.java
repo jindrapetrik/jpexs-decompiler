@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.tags.DefineShape3Tag;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.ConditionalType;
+import com.jpexs.decompiler.flash.types.annotations.EnumValue;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
@@ -33,6 +34,14 @@ import java.util.Set;
 public class FILLSTYLE implements NeedsCharacters, Serializable {
 
     @SWFType(BasicType.UI8)
+    @EnumValue(value = SOLID, text = "Solid")
+    @EnumValue(value = LINEAR_GRADIENT, text = "Linear gradient")
+    @EnumValue(value = RADIAL_GRADIENT, text = "Radial gradient")
+    @EnumValue(value = FOCAL_RADIAL_GRADIENT, text = "Focal radial gradient", minSwfVersion = 8)
+    @EnumValue(value = REPEATING_BITMAP, text = "Repeating bitmap")
+    @EnumValue(value = CLIPPED_BITMAP, text = "Clipped bitmap")
+    @EnumValue(value = NON_SMOOTHED_REPEATING_BITMAP, text = "Non smoothed repeating bitmap")
+    @EnumValue(value = NON_SMOOTHED_CLIPPED_BITMAP, text = "Non smoothed clipped bitmap")
     public int fillStyleType;
 
     public static final int SOLID = 0x0;

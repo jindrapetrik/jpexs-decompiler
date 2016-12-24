@@ -22,7 +22,21 @@ import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFCompression;
 import com.jpexs.decompiler.flash.SWFInputStream;
-import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.ScriptPack;
+import com.jpexs.decompiler.flash.abc.avm2.model.CallPropertyAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.ThisAVM2Item;
+import com.jpexs.decompiler.flash.abc.types.ConvertData;
+import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
+import com.jpexs.decompiler.flash.abc.types.MethodBody;
+import com.jpexs.decompiler.flash.abc.types.Namespace;
+import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
+import com.jpexs.decompiler.flash.abc.types.traits.Trait;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.amf.amf3.Amf3Value;
 import com.jpexs.decompiler.flash.amf.amf3.types.ObjectType;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -33,7 +47,10 @@ import com.jpexs.decompiler.flash.exporters.modes.MovieExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.SoundExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.NulWriter;
+import com.jpexs.decompiler.flash.helpers.StringBuilderTextWriter;
 import com.jpexs.decompiler.flash.tags.CSMTextSettingsTag;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
 import com.jpexs.decompiler.flash.tags.DefineButtonCxformTag;
@@ -109,6 +126,8 @@ import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.decompiler.flash.types.sound.MP3FRAME;
 import com.jpexs.decompiler.flash.types.sound.MP3SOUNDDATA;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
+import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.SerializableImage;
@@ -473,8 +492,8 @@ public class XFLConverter {
         int hintedY = 0;
         int correctX = 0;
         int correctY = 0;
-        int lastCorrectX = 0;
-        int lastCorrectY = 0;
+        int lastCorrectX;
+        int lastCorrectY;
         for (SHAPERECORD rec : shapeRecords) {
             SHAPERECORD ch = rec.clone();
             lastCorrectX = correctX;
@@ -1331,7 +1350,7 @@ public class XFLConverter {
         if (tag instanceof DefineButtonTag) {
             writer.writeStartElement("Actionscript");
             writer.writeStartElement("script");
-            writer.writeCData("on(press){\r\n" + convertActionScript(new ButtonAction((DefineButtonTag) tag)) + "}");
+            writer.writeCData("on(press){\r\n" + convertActionScript12(new ButtonAction((DefineButtonTag) tag)) + "}");
             writer.writeEndElement();
             writer.writeEndElement();
         }
@@ -1342,7 +1361,7 @@ public class XFLConverter {
                 writer.writeStartElement("script");
                 StringBuilder sbActions = new StringBuilder();
                 for (BUTTONCONDACTION bca : db2.actions) {
-                    sbActions.append(convertActionScript(bca));
+                    sbActions.append(convertActionScript12(bca));
                 }
                 writer.writeCData(sbActions.toString());
                 writer.writeEndElement();
@@ -1354,7 +1373,7 @@ public class XFLConverter {
             writer.writeStartElement("script");
             StringBuilder sbActions = new StringBuilder();
             for (CLIPACTIONRECORD rec : clipActions.clipActionRecords) {
-                sbActions.append(convertActionScript(rec));
+                sbActions.append(convertActionScript12(rec));
             }
             writer.writeCData(sbActions.toString());
             writer.writeEndElement();
@@ -1411,10 +1430,10 @@ public class XFLConverter {
         writer.writeEndElement();
     }
 
-    private static String convertActionScript(ASMSource as) {
+    private static String convertActionScript12(ASMSource as) {
         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
         try {
-            Action.actionsToSource(as, as.getActions(), as.toString()/*FIXME?*/, writer);
+            as.getActionScriptSource(writer, null);
         } catch (InterruptedException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
@@ -1426,15 +1445,15 @@ public class XFLConverter {
         return date.getTime() / 1000;
     }
 
-    private void convertLibrary(SWF swf, Map<Integer, String> characterVariables, Map<Integer, String> characterClasses, List<Integer> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, HashMap<Integer, CharacterTag> characters, HashMap<String, byte[]> files, HashMap<String, byte[]> datfiles, FLAVersion flaVersion, XFLXmlWriter writer) throws XMLStreamException {
+    private void convertLibrary(SWF swf, Map<Integer, String> characterVariables, Map<Integer, String> characterClasses, Map<Integer, ScriptPack> characterScriptPacks, List<Integer> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, HashMap<Integer, CharacterTag> characters, HashMap<String, byte[]> files, HashMap<String, byte[]> datfiles, FLAVersion flaVersion, XFLXmlWriter writer) throws XMLStreamException {
 
         //TODO: Imported assets
         //linkageImportForRS="true" linkageIdentifier="xxx" linkageURL="yyy.swf"
         convertMedia(swf, characterVariables, characterClasses, nonLibraryShapes, backgroundColor, tags, characters, files, datfiles, flaVersion, writer);
-        convertSymbols(swf, characterVariables, characterClasses, nonLibraryShapes, backgroundColor, tags, characters, files, datfiles, flaVersion, writer);
+        convertSymbols(swf, characterVariables, characterClasses, characterScriptPacks, nonLibraryShapes, backgroundColor, tags, characters, files, datfiles, flaVersion, writer);
     }
 
-    private void convertSymbols(SWF swf, Map<Integer, String> characterVariables, Map<Integer, String> characterClasses, List<Integer> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, HashMap<Integer, CharacterTag> characters, HashMap<String, byte[]> files, HashMap<String, byte[]> datfiles, FLAVersion flaVersion, XFLXmlWriter writer) throws XMLStreamException {
+    private void convertSymbols(SWF swf, Map<Integer, String> characterVariables, Map<Integer, String> characterClasses, Map<Integer, ScriptPack> characterScriptPacks, List<Integer> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, HashMap<Integer, CharacterTag> characters, HashMap<String, byte[]> files, HashMap<String, byte[]> datfiles, FLAVersion flaVersion, XFLXmlWriter writer) throws XMLStreamException {
         boolean hasSymbol = false;
         for (int ch : characters.keySet()) {
             CharacterTag symbol = characters.get(ch);
@@ -1590,7 +1609,9 @@ public class XFLConverter {
                     if (sprite.getTags().isEmpty()) { //probably AS2 class
                         continue;
                     }
-                    convertTimeline(sprite.spriteId, nonLibraryShapes, backgroundColor, tags, sprite.getTags(), characters, "Symbol " + symbol.getCharacterId(), flaVersion, files, symbolStr);
+                    final ScriptPack spriteScriptPack = characterScriptPacks.containsKey(sprite.spriteId) ? characterScriptPacks.get(sprite.spriteId) : null;
+                    convertTimeline(sprite.spriteId, nonLibraryShapes, backgroundColor, tags, sprite.getTags(), characters, "Symbol " + symbol.getCharacterId(), flaVersion, files, symbolStr, spriteScriptPack);
+
                 } else if (symbol instanceof ShapeTag) {
                     itemIcon = "1";
                     ShapeTag shape = (ShapeTag) symbol;
@@ -2402,7 +2423,113 @@ public class XFLConverter {
         writer.writeEndElement();
     }
 
-    private boolean convertActionScriptLayer(int spriteId, ReadOnlyTagList tags, ReadOnlyTagList timeLineTags, String backgroundColor, XFLXmlWriter writer) throws XMLStreamException {
+    private static int getPackMainClassId(ScriptPack pack) {
+        ABC abc = pack.abc;
+        ScriptInfo script = abc.script_info.get(pack.scriptIndex);
+        for (int traitIndex : pack.traitIndices) {
+            Trait trait = script.traits.traits.get(traitIndex);
+            if (trait instanceof TraitClass) {
+                TraitClass tc = (TraitClass) trait;
+                Namespace traitNameNamespace = abc.constants.getNamespace(trait.getName(abc).namespace_index);
+                if (traitNameNamespace.kind == Namespace.KIND_PACKAGE) { //its public class
+                    //assuming the one public class in the pack is the class we are looking for
+                    return tc.class_info;
+                }
+            }
+        }
+        return -1;
+    }
+
+    private static Map<Integer, String> getFrameScriptsFromPack(ScriptPack pack) {
+        Map<Integer, String> ret = new HashMap<>();
+        int classIndex = getPackMainClassId(pack);
+        if (classIndex > -1) {
+            ABC abc = pack.abc;
+            InstanceInfo instanceInfo = abc.instance_info.get(classIndex);
+            int constructorMethodIndex = instanceInfo.iinit_index;
+            MethodBody constructorBody = abc.findBody(constructorMethodIndex);
+            try {
+                if (constructorBody.convertedItems == null) {
+                    constructorBody.convert(new ConvertData(), "??", ScriptExportMode.AS, true, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true);
+                }
+
+                Map<Integer, Integer> frameToTraitMultiname = new HashMap<>();
+
+                //find all addFrameScript(xx,this.method) in constructor
+                /*
+                It looks like this:
+                CallPropertyAVM2Item
+                ->propertyName == FullMultinameAVM2Item
+                        -> resolvedMultinameName (String) "addFrameScript"
+                ->arguments
+                        ->0 IntegerValueAVM2Item
+                                ->value (Long) 0    - zero based
+                        ->1 GetPropertyAVM2Item
+                                ->object (ThisAVM2Item)
+                                ->propertyName (FullMultinameAvm2Item)
+                                        ->multinameIndex
+                                        ->resolvedMultinameName (String) "frame1"
+                 */
+                if (constructorBody.convertedItems != null) {
+                    for (GraphTargetItem ti : constructorBody.convertedItems) {
+                        if (ti instanceof CallPropertyAVM2Item) {
+                            CallPropertyAVM2Item callProp = (CallPropertyAVM2Item) ti;
+                            if (callProp.propertyName instanceof FullMultinameAVM2Item) {
+                                FullMultinameAVM2Item propName = (FullMultinameAVM2Item) callProp.propertyName;
+                                if ("addFrameScript".equals(propName.resolvedMultinameName)) {
+                                    if (callProp.arguments.size() == 2) {
+                                        if (callProp.arguments.get(0) instanceof IntegerValueAVM2Item) {
+                                            IntegerValueAVM2Item frameItem = (IntegerValueAVM2Item) callProp.arguments.get(0);
+                                            int frame = frameItem.intValue();
+                                            if (callProp.arguments.get(1) instanceof GetPropertyAVM2Item) {
+                                                GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) callProp.arguments.get(1);
+                                                if (getProp.object instanceof ThisAVM2Item) {
+                                                    if (getProp.propertyName instanceof FullMultinameAVM2Item) {
+                                                        FullMultinameAVM2Item framePropName = (FullMultinameAVM2Item) getProp.propertyName;
+                                                        int multinameIndex = framePropName.multinameIndex;
+                                                        frameToTraitMultiname.put(frame, multinameIndex);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Map<Integer, TraitMethodGetterSetter> multinameToMethodTrait = new HashMap<>();
+                for (Trait trait : instanceInfo.instance_traits.traits) {
+                    if (trait instanceof TraitMethodGetterSetter) {
+                        multinameToMethodTrait.put(trait.name_index, (TraitMethodGetterSetter) trait);
+                    }
+                }
+
+                for (int frame : frameToTraitMultiname.keySet()) {
+                    int multiName = frameToTraitMultiname.get(frame);
+                    if (multinameToMethodTrait.containsKey(multiName)) {
+                        TraitMethodGetterSetter methodTrait = multinameToMethodTrait.get(multiName);
+                        int methodIndex = methodTrait.method_info;
+                        MethodBody frameBody = abc.findBody(methodIndex);
+
+                        StringBuilder scriptBuilder = new StringBuilder();
+                        frameBody.convert(new ConvertData(), "??", ScriptExportMode.AS, false, methodIndex, pack.scriptIndex, classIndex, abc, methodTrait, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true);
+                        StringBuilderTextWriter writer = new StringBuilderTextWriter(Configuration.getCodeFormatting(), scriptBuilder);
+                        frameBody.toString("??", ScriptExportMode.AS, abc, methodTrait, writer, new ArrayList<>());
+
+                        String script = scriptBuilder.toString();
+                        ret.put(frame, script);
+                    }
+                }
+
+            } catch (InterruptedException ex) {
+                //ignore
+            }
+        }
+        return ret;
+    }
+
+    private boolean convertActionScriptLayer(int spriteId, ReadOnlyTagList tags, ReadOnlyTagList timeLineTags, String backgroundColor, XFLXmlWriter writer, ScriptPack scriptPack) throws XMLStreamException {
         boolean hasScript = false;
 
         String script = "";
@@ -2412,17 +2539,28 @@ public class XFLConverter {
             if (t instanceof DoInitActionTag) {
                 DoInitActionTag dia = (DoInitActionTag) t;
                 if (dia.spriteId == spriteId) {
-                    script += convertActionScript(dia);
+                    script += convertActionScript12(dia);
                 }
             }
         }
         if (!script.isEmpty()) {
             script = "#initclip\r\n" + script + "#endinitclip\r\n";
         }
+
+        Map<Integer, String> frameToScriptMap = new HashMap<>();
+
+        if (scriptPack != null) {
+            frameToScriptMap = getFrameScriptsFromPack(scriptPack);
+        }
+
         for (Tag t : timeLineTags) {
             if (t instanceof DoActionTag) {
                 DoActionTag da = (DoActionTag) t;
-                script += convertActionScript(da);
+                script += convertActionScript12(da);
+            }
+            if (frameToScriptMap.containsKey(frame)) {
+                script += frameToScriptMap.get(frame);
+                frameToScriptMap.remove(frame);
             }
             if (t instanceof ShowFrameTag) {
 
@@ -2617,12 +2755,12 @@ public class XFLConverter {
         return outlineColor.toHexRGB();
     }
 
-    private void convertTimeline(int spriteId, List<Integer> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, HashMap<Integer, CharacterTag> characters, String name, FLAVersion flaVersion, HashMap<String, byte[]> files, XFLXmlWriter writer) throws XMLStreamException {
+    private void convertTimeline(int spriteId, List<Integer> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, HashMap<Integer, CharacterTag> characters, String name, FLAVersion flaVersion, HashMap<String, byte[]> files, XFLXmlWriter writer, ScriptPack scriptPack) throws XMLStreamException {
         writer.writeStartElement("DOMTimeline", new String[]{"name", name});
         writer.writeStartElement("layers");
 
         boolean hasLabel = convertLabelsLayer(spriteId, tags, timelineTags, backgroundColor, writer);
-        boolean hasScript = convertActionScriptLayer(spriteId, tags, timelineTags, backgroundColor, writer);
+        boolean hasScript = convertActionScriptLayer(spriteId, tags, timelineTags, backgroundColor, writer, scriptPack);
 
         int index = 0;
 
@@ -2717,6 +2855,30 @@ public class XFLConverter {
                 fos.write(data);
             }
         }, handler).run();
+    }
+
+    private static Map<Integer, ScriptPack> getCharacterScriptPacks(SWF swf, Map<Integer, String> characterClasses) {
+        Map<Integer, ScriptPack> ret = new HashMap<>();
+
+        Map<String, Integer> classToId = new HashMap<>();
+        for (int id : characterClasses.keySet()) {
+            classToId.put(characterClasses.get(id), id);
+        }
+
+        List<String> allClasses = new ArrayList<>(characterClasses.values());
+        List<ScriptPack> packs = new ArrayList<>();
+        try {
+            packs = swf.getScriptPacksByClassNames(allClasses);
+        } catch (Exception ex) {
+            //ignore
+        }
+        for (ScriptPack pack : packs) {
+            String packClass = pack.getClassPath().toRawString();
+            if (classToId.containsKey(packClass)) {
+                ret.put(classToId.get(packClass), pack);
+            }
+        }
+        return ret;
     }
 
     private static Map<Integer, String> getCharacterClasses(ReadOnlyTagList tags) {
@@ -3152,6 +3314,7 @@ public class XFLConverter {
         HashMap<Integer, CharacterTag> characters = getCharacters(swf.getTags());
         List<Integer> nonLibraryShapes = getNonLibraryShapes(swf.getTags(), characters);
         Map<Integer, String> characterClasses = getCharacterClasses(swf.getTags());
+        Map<Integer, ScriptPack> characterScriptPacks = getCharacterScriptPacks(swf, characterClasses);
         Map<Integer, String> characterVariables = getCharacterVariables(swf.getTags());
         boolean hasAmfMetadata = hasAmfMetadata(swf);
 
@@ -3194,10 +3357,11 @@ public class XFLConverter {
             }
 
             convertFonts(swf.getTags(), domDocument);
-            convertLibrary(swf, characterVariables, characterClasses, nonLibraryShapes, backgroundColor, swf.getTags(), characters, files, datfiles, flaVersion, domDocument);
+            convertLibrary(swf, characterVariables, characterClasses, characterScriptPacks, nonLibraryShapes, backgroundColor, swf.getTags(), characters, files, datfiles, flaVersion, domDocument);
 
             domDocument.writeStartElement("timelines");
-            convertTimeline(0, nonLibraryShapes, backgroundColor, swf.getTags(), swf.getTags(), characters, "Scene 1", flaVersion, files, domDocument);
+            ScriptPack documentScriptPack = characterScriptPacks.containsKey(0) ? characterScriptPacks.get(0) : null;
+            convertTimeline(0, nonLibraryShapes, backgroundColor, swf.getTags(), swf.getTags(), characters, "Scene 1", flaVersion, files, domDocument, documentScriptPack);
             domDocument.writeEndElement();
 
             if (hasAmfMetadata) {
@@ -3228,7 +3392,7 @@ public class XFLConverter {
                         if (characters.get(chid) instanceof DefineSpriteTag) {
                             DefineSpriteTag sprite = (DefineSpriteTag) characters.get(chid);
                             if (sprite.getTags().isEmpty()) {
-                                String data = convertActionScript(dia);
+                                String data = convertActionScript12(dia);
                                 String expName = dia.getSwf().getExportName(dia.spriteId);
                                 expName = expName != null ? expName : "_unk_";
                                 String expPath = expName;
@@ -3541,7 +3705,7 @@ public class XFLConverter {
         if (useAS3 && settings.exportScript) {
             try {
                 ScriptExportSettings scriptExportSettings = new ScriptExportSettings(ScriptExportMode.AS, false);
-                swf.exportActionScript(handler, Path.combine(outDir.getAbsolutePath(), "scripts"), scriptExportSettings, parallel, null);
+                swf.exportActionScript(handler, outDir.getAbsolutePath(), scriptExportSettings, parallel, null);
             } catch (Exception ex) {
                 logger.log(Level.SEVERE, "Error during ActionScript3 export", ex);
             }

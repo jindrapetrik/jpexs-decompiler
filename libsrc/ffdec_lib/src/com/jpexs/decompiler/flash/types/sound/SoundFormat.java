@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.types.sound;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -198,12 +199,16 @@ public class SoundFormat {
         }
     }
 
-    public boolean createWav(List<SWFInputStream> siss, OutputStream os) {
+    public boolean createWav(List<ByteArrayRange> dataRanges, OutputStream os) throws IOException {
         ensureFormat();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        for (SWFInputStream sis : siss) {
-            decode(sis, baos);
+        SoundDecoder decoder = getDecoder();
+        for (ByteArrayRange dataRange : dataRanges) {
+            SWFInputStream sis = new SWFInputStream(null, dataRange.getArray(), 0, dataRange.getPos() + dataRange.getLength());
+            sis.seek(dataRange.getPos());
+            decoder.decode(sis, baos);
         }
+
         try {
             createWavFromPcmData(os, samplingRate, true, stereo, baos.toByteArray());
             return true;

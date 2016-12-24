@@ -45,6 +45,16 @@ public interface ASMSource extends Exportable {
     public GraphTextWriter getASMSource(ScriptExportMode exportMode, GraphTextWriter writer, ActionList actions) throws InterruptedException;
 
     /**
+     * Converts actions to ActionScript source
+     *
+     * @param writer
+     * @param actions
+     * @return ASM source
+     * @throws java.lang.InterruptedException
+     */
+    public GraphTextWriter getActionScriptSource(GraphTextWriter writer, ActionList actions) throws InterruptedException;
+
+    /**
      * Whether or not this object contains ASM source
      *
      * @return True when contains

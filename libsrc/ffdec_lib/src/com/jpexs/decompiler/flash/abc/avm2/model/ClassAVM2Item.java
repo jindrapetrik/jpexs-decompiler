@@ -37,7 +37,7 @@ public class ClassAVM2Item extends AVM2Item {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
-        return writer.append(className.getName(localData.constantsAvm2, localData.fullyQualifiedNames, false));
+        return writer.append(className.getName(localData.constantsAvm2, localData.fullyQualifiedNames, false, true));
     }
 
     @Override

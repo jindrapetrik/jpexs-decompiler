@@ -158,7 +158,7 @@ public class PlaceObject2Tag extends PlaceObjectTypeTag implements ASMSourceCont
         this.placeFlagHasRatio = ratio >= 0;
         this.placeFlagHasColorTransform = colorTransform != null;
         this.placeFlagHasMatrix = matrix != null;
-        this.placeFlagHasCharacter = characterId > 0;
+        this.placeFlagHasCharacter = characterId >= 0;
         this.placeFlagMove = placeFlagMove;
         this.depth = depth;
         this.characterId = characterId;
@@ -317,8 +317,13 @@ public class PlaceObject2Tag extends PlaceObjectTypeTag implements ASMSourceCont
 
     @Override
     public void setCharacterId(int characterId) {
-        placeFlagHasCharacter = true;
-        this.characterId = characterId;
+        if (characterId >= 0) {
+            placeFlagHasCharacter = true;
+            this.characterId = characterId;
+        } else {
+            placeFlagHasCharacter = false;
+            this.characterId = -1;
+        }
     }
 
     @Override

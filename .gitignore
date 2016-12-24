@@ -43,6 +43,7 @@ hs_err_pid*.log
 /libsrc/ffdec_lib/testdata/directediting/
 /libsrc/ffdec_lib/coverage.ec
 /libsrc/ffdec_lib/revision.txt
+/libsrc/ffdec_lib/releases/
 /libsrc/gif/nbproject/private/
 /libsrc/gif/build/
 /libsrc/jpproxy/nbproject/private/
@@ -59,6 +60,7 @@ hs_err_pid*.log
 /libsrc/uploader/dist/
 /jpexs_website.properties
 /version.properties
+/libsrc/ffdec_lib/version.properties
 /tools.properties
 /nbproject/private/
 /libsrc/cmykjpeg/build/

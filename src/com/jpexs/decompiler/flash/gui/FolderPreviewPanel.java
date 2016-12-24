@@ -100,7 +100,6 @@ public class FolderPreviewPanel extends JPanel {
         cachedPreviews = Cache.getInstance(false, false, "preview");
 
         addMouseListener(new MouseAdapter() {
-
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() > 1) {
@@ -154,7 +153,6 @@ public class FolderPreviewPanel extends JPanel {
                 }
                 repaint();
             }
-
         });
     }
 

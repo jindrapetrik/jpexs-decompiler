@@ -571,7 +571,7 @@ public class DebuggerHandler implements DebugConnectionListener {
 
                     Matcher m;
                     if ((m = patAS3.matcher(name)).matches()) {
-                        String clsName = m.group(3);
+                        String clsNameWithSuffix = m.group(3);
                         String pkg = m.group(2).replace("\\", ".");
                         m = patAS3PCode.matcher(name);
 
@@ -579,10 +579,10 @@ public class DebuggerHandler implements DebugConnectionListener {
                             moduleToClassIndex.put(file, Integer.parseInt(m.group(3)));
                             moduleToTraitIndex.put(file, Integer.parseInt(m.group(4)));
                             moduleToMethodIndex.put(file, Integer.parseInt(m.group(5)));
-                            name = DottedChain.parse(pkg).add(clsName).toString();
+                            name = DottedChain.parseWithSuffix(pkg).addWithSuffix(clsNameWithSuffix).toString();
                             name = "#PCODE abc:" + m.group(1) + ",body:" + m.group(6) + ";" + name;
                         } else {
-                            name = DottedChain.parse(pkg).add(clsName).toString();
+                            name = DottedChain.parseWithSuffix(pkg).addWithSuffix(clsNameWithSuffix).toString();
                         }
                     }
                     modulePaths.put(file, name);

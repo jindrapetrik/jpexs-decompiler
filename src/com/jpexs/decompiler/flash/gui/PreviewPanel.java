@@ -77,7 +77,6 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.io.BufferedInputStream;
@@ -400,7 +399,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         //metadataEditor.setContentType("text/xml");
         metadataEditor.setEditable(false);
 
-        metadataEditor.setFont(new Font("Monospaced", Font.PLAIN, metadataEditor.getFont().getSize()));
+        metadataEditor.setFont(Configuration.getSourceFont());
         metadataEditor.changeContentType("text/xml");
         metadataEditor.addTextChangedListener(this::metadataTextChanged);
 
@@ -750,7 +749,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 if (treeItem instanceof Frame) {
                     Frame fn = (Frame) treeItem;
                     Timelined parent = fn.timeline.timelined;
-                    List<Integer> doneCharacters = new ArrayList<>();
+
+                    Set<Integer> doneCharacters = new HashSet<>();
                     for (Tag t : parent.getTags()) {
                         if (t instanceof FileAttributesTag || t instanceof SetBackgroundColorTag) {
                             continue;
@@ -770,18 +770,14 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                             }
                         }
 
-                        if (t instanceof ShowFrameTag || t instanceof PlaceObjectTypeTag || t instanceof RemoveTag) {
-                            continue;
-                        }
-
+                        //if (t instanceof ShowFrameTag || t instanceof PlaceObjectTypeTag || t instanceof RemoveTag) {
+                        //    continue;
+                        //}
                         if (t instanceof CharacterTag) {
                             int characterId = ((CharacterTag) t).getCharacterId();
-                            if (!doneCharacters.contains(characterId)) {
-                                doneCharacters.add(((CharacterTag) t).getCharacterId());
-                            }
+                            doneCharacters.add(characterId);
+                            writeTag(t, sos2);
                         }
-
-                        writeTag(t, sos2);
                     }
 
                     RECT r = parent.getRect();
@@ -800,7 +796,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                     if (treeItem instanceof DefineSpriteTag) {
                         isSprite = true;
                     }
-                    int chtId = 0;
+                    int chtId = -1;
                     if (treeItem instanceof CharacterTag) {
                         chtId = ((CharacterTag) treeItem).getCharacterId();
                     }
@@ -1072,7 +1068,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                         for (VideoFrameTag f : frs) {
                             if (!first) {
                                 ratio++;
-                                new PlaceObject2Tag(swf, true, 1, 0, null, null, ratio, null, -1, null).writeTag(sos2);
+                                new PlaceObject2Tag(swf, true, 1, -1, null, null, ratio, null, -1, null).writeTag(sos2);
                             }
                             f.writeTag(sos2);
                             new ShowFrameTag(swf).writeTag(sos2);
@@ -1139,7 +1135,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         try {
             tempFile = File.createTempFile("ffdec_view_", ".swf");
             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
-                swf.saveTo(fos);
+                swf.saveTo(fos, false);
             }
             //Inject Loader
             if (swf.isAS3() && Configuration.autoOpenLoadedSWFs.get() && !Configuration.internalFlashViewer.get() && !DebuggerTools.hasDebugger(swf)) {

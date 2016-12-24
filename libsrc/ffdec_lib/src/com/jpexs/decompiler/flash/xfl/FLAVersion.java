@@ -29,11 +29,11 @@ public enum FLAVersion {
     CS5_5("CS5.5", "Flash CS 5.5", "2.1", 11),
     CS6("CS6", "Flash CS 6", "2.2", 17),
     CC("CC", "Flash CC", "2.4", Integer.MAX_VALUE) {
-                @Override
-                public int minASVersion() {
-                    return 3; //AS 1/2 not supported anymore
-                }
-            };
+        @Override
+        public int minASVersion() {
+            return 3; //AS 1/2 not supported anymore
+        }
+    };
 
     private final String xflVersion;
 

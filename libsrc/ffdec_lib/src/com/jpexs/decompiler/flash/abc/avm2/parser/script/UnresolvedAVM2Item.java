@@ -116,14 +116,14 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         }
         return -1;
     }
+
     /*
      public GraphTargetItem getNs() {
      return ns;
      }
      */
-
     public void appendName(String name) {
-        this.name = this.name.add(name);
+        this.name = this.name.addWithSuffix(name);
     }
 
     public void setDefinition(boolean definition) {
@@ -354,7 +354,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         //Search for types in opened namespaces
         for (NamespaceItem n : openedNamespaces) {
             Namespace ons = abc.getSelectedAbc().constants.getNamespace(n.getCpoolIndex(abc));
-            TypeItem ti = new TypeItem(ons.getName(abc.getSelectedAbc().constants).add(name.get(0)));
+            TypeItem ti = new TypeItem(ons.getName(abc.getSelectedAbc().constants).addWithSuffix(name.get(0)));
             AbcIndexing.ClassIndex ci = abc.findClass(ti);
             if (ci != null) {
                 if (!subtypes.isEmpty() && name.size() > 1) {
@@ -393,7 +393,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                 if (ci == null) {
                     ntype = new TypeItem("Object");
                 } else {
-                    ntype = new TypeItem(ci.abc.instance_info.get(ci.index).getName(ci.abc.constants).getNameWithNamespace(ci.abc.constants));
+                    ntype = new TypeItem(ci.abc.instance_info.get(ci.index).getName(ci.abc.constants).getNameWithNamespace(ci.abc.constants, true));
                 }
             }
 

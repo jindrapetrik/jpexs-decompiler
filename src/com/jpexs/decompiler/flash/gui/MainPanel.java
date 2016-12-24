@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AbcMultiNameCollisionFixer;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.DeobfuscationLevel;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -73,6 +74,7 @@ import com.jpexs.decompiler.flash.exporters.settings.SpriteExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
 import com.jpexs.decompiler.flash.exporters.swf.SwfJavaExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfXmlExporter;
+import com.jpexs.decompiler.flash.flexsdk.MxmlcAs3ScriptReplacer;
 import com.jpexs.decompiler.flash.gui.abc.ABCPanel;
 import com.jpexs.decompiler.flash.gui.abc.ABCPanelSearchResult;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
@@ -94,7 +96,10 @@ import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.helpers.Freed;
 import com.jpexs.decompiler.flash.importers.AS2ScriptImporter;
 import com.jpexs.decompiler.flash.importers.AS3ScriptImporter;
+import com.jpexs.decompiler.flash.importers.As3ScriptReplacerFactory;
+import com.jpexs.decompiler.flash.importers.As3ScriptReplacerInterface;
 import com.jpexs.decompiler.flash.importers.BinaryDataImporter;
+import com.jpexs.decompiler.flash.importers.FFDecAs3ScriptReplacer;
 import com.jpexs.decompiler.flash.importers.ImageImporter;
 import com.jpexs.decompiler.flash.importers.ShapeImporter;
 import com.jpexs.decompiler.flash.importers.SwfXmlImporter;
@@ -823,8 +828,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     private void updateUi(final SWF swf) {
 
-        mainFrame.setTitle(ApplicationInfo.applicationVerName + (Configuration.displayFileName.get() ? " - " + swf.getFileTitle() : ""));
-
         List<ABCContainerTag> abcList = swf.getAbcList();
 
         boolean hasAbc = !abcList.isEmpty();
@@ -861,11 +864,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 ? translate("message.confirm.closeAll")
                 : translate("message.confirm.close").replace("{swfName}", swfList.toString());
 
-        if (View.showConfirmDialog(this, message, translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, Configuration.showCloseConfirmation, JOptionPane.OK_OPTION) != JOptionPane.OK_OPTION) {
-            return false;
-        }
-
-        return true;
+        return View.showConfirmDialog(this, message, translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, Configuration.showCloseConfirmation, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION;
     }
 
     public boolean isModified() {
@@ -1700,16 +1699,19 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 boolean ignoreCase = searchDialog.ignoreCaseCheckBox.isSelected();
                 boolean regexp = searchDialog.regexpCheckBox.isSelected();
 
-                if (searchDialog.searchInASRadioButton.isSelected()) {
+                boolean scriptSearch = searchDialog.searchInASRadioButton.isSelected()
+                        || searchDialog.searchInPCodeRadioButton.isSelected();
+                if (scriptSearch) {
+                    boolean pCodeSearch = searchDialog.searchInPCodeRadioButton.isSelected();
                     new CancellableWorker<Void>() {
                         @Override
                         protected Void doInBackground() throws Exception {
                             List<ABCPanelSearchResult> abcResult = null;
                             List<ActionSearchResult> actionResult = null;
                             if (swf.isAS3()) {
-                                abcResult = getABCPanel().search(swf, txt, ignoreCase, regexp, this);
+                                abcResult = getABCPanel().search(swf, txt, ignoreCase, regexp, pCodeSearch, this);
                             } else {
-                                actionResult = getActionPanel().search(swf, txt, ignoreCase, regexp, this);
+                                actionResult = getActionPanel().search(swf, txt, ignoreCase, regexp, pCodeSearch, this);
                             }
 
                             List<ABCPanelSearchResult> fAbcResult = abcResult;
@@ -1911,6 +1913,48 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
         reload(true);
         updateClassesList();
+    }
+
+    public void renameColliding(final SWF swf) {
+        if (swf == null) {
+            return;
+        }
+        if (confirmExperimental()) {
+            new CancellableWorker<Integer>() {
+                @Override
+                protected Integer doInBackground() throws Exception {
+                    AbcMultiNameCollisionFixer fixer = new AbcMultiNameCollisionFixer();
+                    return fixer.fixCollisions(swf);
+                }
+
+                @Override
+                protected void onStart() {
+                    Main.startWork(translate("work.renaming.identifiers") + "...", this);
+                }
+
+                @Override
+                protected void done() {
+                    View.execInEventDispatch(() -> {
+                        try {
+                            int cnt = get();
+                            Main.stopWork();
+                            View.showMessageDialog(null, translate("message.rename.renamed").replace("%count%", Integer.toString(cnt)));
+                            swf.assignClassesToSymbols();
+                            swf.clearScriptCache();
+                            if (abcPanel != null) {
+                                abcPanel.reload();
+                            }
+                            updateClassesList();
+                            reload(true);
+                        } catch (Exception ex) {
+                            logger.log(Level.SEVERE, "Error during renaming identifiers", ex);
+                            Main.stopWork();
+                            View.showMessageDialog(null, translate("error.occured").replace("%error%", ex.getClass().getSimpleName()));
+                        }
+                    });
+                }
+            }.execute();
+        }
     }
 
     public void renameOneIdentifier(final SWF swf) {
@@ -2143,7 +2187,32 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
     }
 
+    public As3ScriptReplacerInterface getAs3ScriptReplacer() {
+        As3ScriptReplacerInterface r = As3ScriptReplacerFactory.createByConfig();
+        if (!r.isAvailable()) {
+            if (r instanceof MxmlcAs3ScriptReplacer) {
+                if (View.showConfirmDialog(null, AppStrings.translate("message.flexpath.notset"), AppStrings.translate("error"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION) {
+                    Main.advancedSettings("paths");
+                }
+            } else if (r instanceof FFDecAs3ScriptReplacer) {
+                if (View.showConfirmDialog(this, AppStrings.translate("message.playerpath.lib.notset"), AppStrings.translate("message.action.playerglobal.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION) {
+                    Main.advancedSettings("paths");
+                }
+            } else {
+                //Not translated yet - just in case there are more Script replacers in the future. Unused now.
+                View.showConfirmDialog(this, "Current script replacer is not available", "Script replacer not available", JOptionPane.OK_OPTION, JOptionPane.ERROR_MESSAGE);
+            }
+            return null;
+        }
+        return r;
+    }
+
     public void importScript(final SWF swf) {
+        As3ScriptReplacerInterface as3ScriptReplacer = getAs3ScriptReplacer();
+        if (as3ScriptReplacer == null) {
+            return;
+        }
+        String flexLocation = Configuration.flexSdkLocation.get();
         JFileChooser chooser = new JFileChooser();
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("import.select.directory"));
@@ -2154,7 +2223,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             String scriptsFolder = Path.combine(selFile, ScriptExportSettings.EXPORT_FOLDER_NAME);
 
             int countAs2 = new AS2ScriptImporter().importScripts(scriptsFolder, swf.getASMs(true));
-            int countAs3 = new AS3ScriptImporter().importScripts(scriptsFolder, swf.getAS3Packs());
+            int countAs3 = new AS3ScriptImporter().importScripts(as3ScriptReplacer, scriptsFolder, swf.getAS3Packs());
 
             if (countAs3 > 0) {
                 updateClassesList();
@@ -2908,11 +2977,13 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 // show welcome panel after closing swfs
                 updateUi();
             } else {
-                if (swf == null) {
+                if (swf == null && swfs.get(0) != null) {
                     swf = swfs.get(0).get(0);
                 }
 
-                updateUi(swf);
+                if (swf != null) {
+                    updateUi(swf);
+                }
             }
         } else {
             updateUi();
@@ -3228,7 +3299,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
 
         // save last selected node to config
-        if (treeItem != null) {
+        if (treeItem != null && !(treeItem instanceof SWFList)) {
             SWF swf = treeItem.getSwf();
             if (swf != null) {
                 swf = swf.getRootSwf();
@@ -3273,10 +3344,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 setSourceWorker = null;
             }
             if (!Main.isInited() || !Main.isWorking() || Main.isDebugging()) {
+                ABCPanel abcPanel = getABCPanel();
                 CancellableWorker worker = new CancellableWorker() {
                     @Override
                     protected Void doInBackground() throws Exception {
-                        ABCPanel abcPanel = getABCPanel();
                         abcPanel.detailPanel.methodTraitPanel.methodCodePanel.clear();
                         abcPanel.setAbc(scriptLeaf.abc);
                         abcPanel.decompiledTextArea.setScript(scriptLeaf, true);
@@ -3296,7 +3367,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                             try {
                                 get();
                             } catch (CancellationException ex) {
-                                getABCPanel().decompiledTextArea.setText("// " + AppStrings.translate("work.canceled"));
+                                abcPanel.decompiledTextArea.setText("// " + AppStrings.translate("work.canceled"));
                             } catch (Exception ex) {
                                 logger.log(Level.SEVERE, "Error", ex);
                                 getABCPanel().decompiledTextArea.setText("// " + AppStrings.translate("decompilationError") + ": " + ex);

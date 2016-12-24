@@ -243,10 +243,8 @@ public abstract class GraphTextWriter {
             if (formatting.spaceBeforeParenthesesMethodCallParentheses) {
                 space();
             }
-        } else {
-            if (formatting.spaceBeforeParenthesesMethodCallEmptyParentheses) {
-                space();
-            }
+        } else if (formatting.spaceBeforeParenthesesMethodCallEmptyParentheses) {
+            space();
         }
         return this;
     }

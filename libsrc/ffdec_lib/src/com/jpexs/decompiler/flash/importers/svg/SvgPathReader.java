@@ -78,27 +78,33 @@ public class SvgPathReader {
         int startPos = pos;
 
         readWhiteSpaces();
-        char ch = str.charAt(pos);
+
+        char ch;
+        ch = str.charAt(pos);
         if (ch == '-') {
             pos++;
         }
 
         digitSequence();
-        ch = str.charAt(pos);
-        if (ch == '.') {
-            pos++;
-            digitSequence();
+        if (hasNext()) {
+            ch = str.charAt(pos);
+            if (ch == '.') {
+                pos++;
+                digitSequence();
+            }
         }
 
-        ch = str.charAt(pos);
-        if (ch == 'e') {
-            pos++;
+        if (hasNext()) {
             ch = str.charAt(pos);
-            if (ch == '-') {
+            if (ch == 'e') {
                 pos++;
-            }
+                ch = str.charAt(pos);
+                if (ch == '-') {
+                    pos++;
+                }
 
-            digitSequence();
+                digitSequence();
+            }
         }
 
         boolean ok = false;

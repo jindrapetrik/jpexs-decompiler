@@ -318,8 +318,13 @@ public class BitmapExporter extends ShapeExporterBase {
 
                 fillPaint = new TexturePaint(img.getBufferedImage(), new java.awt.Rectangle(img.getWidth(), img.getHeight()));
                 fillTransform = matrix.toTransform();
+                return;
             }
         }
+
+        // fill with red in case any error
+        fillPaint = Color.RED;
+        fillTransform = matrix.toTransform();
     }
 
     @Override

@@ -33,7 +33,6 @@ import com.jpexs.decompiler.flash.tags.text.TextParseException;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -101,7 +100,7 @@ public class TextPanel extends JPanel implements TagEditorPanel {
         topPanel.add(textSearchPanel);
         textValue = new LineMarkedEditorPane();
         add(new JScrollPane(textValue), BorderLayout.CENTER);
-        textValue.setFont(new Font("Monospaced", Font.PLAIN, textValue.getFont().getSize()));
+        textValue.setFont(Configuration.getSourceFont());
         textValue.changeContentType("text/swftext");
         textValue.addTextChangedListener(this::textChanged);
 
@@ -212,7 +211,7 @@ public class TextPanel extends JPanel implements TagEditorPanel {
         textValue.requestFocusInWindow();
         if (textTag != null && !isModified()) {
             HighlightedText text = textTag.getFormattedText(false);
-            for (Highlighting highlight : text.specialHilights) {
+            for (Highlighting highlight : text.getSpecialHighlights()) {
                 if (highlight.getProperties().subtype == HighlightSpecialType.TEXT) {
                     textValue.select(highlight.startPos, highlight.startPos + highlight.len);
                     break;
@@ -230,7 +229,7 @@ public class TextPanel extends JPanel implements TagEditorPanel {
 
             HighlightedText text = textTag.getFormattedText(false);
             boolean allUpper = true;
-            for (Highlighting highlight : text.specialHilights) {
+            for (Highlighting highlight : text.getSpecialHighlights()) {
                 if (highlight.getProperties().subtype == HighlightSpecialType.TEXT) {
                     int hStart = highlight.startPos;
                     int hEnd = highlight.startPos + highlight.len;
@@ -251,7 +250,7 @@ public class TextPanel extends JPanel implements TagEditorPanel {
                 }
             }
 
-            for (Highlighting highlight : text.specialHilights) {
+            for (Highlighting highlight : text.getSpecialHighlights()) {
                 if (highlight.getProperties().subtype == HighlightSpecialType.TEXT) {
                     int hStart = highlight.startPos;
                     int hEnd = highlight.startPos + highlight.len;
@@ -392,12 +391,10 @@ public class TextPanel extends JPanel implements TagEditorPanel {
             try {
                 TextTag copyTextTag = (TextTag) textTag.cloneTag();
                 if (copyTextTag.setFormattedText(new MissingCharacterHandler() {
-
                     @Override
                     public boolean handle(TextTag textTag, FontTag font, char character) {
                         return false;
                     }
-
                 }, textValue.getText(), null)) {
                     ok = true;
                     mainPanel.showTextTagWithNewValue(textTag, copyTextTag);

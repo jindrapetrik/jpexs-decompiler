@@ -31,6 +31,7 @@ import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
+import java.awt.Color;
 
 /**
  *
@@ -272,8 +273,11 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                 fillData.append("\tvar fimg = ctrans.applyToImage(imageObj").append(bitmapId).append(");\r\n");
                 fillData.append("\tvar pat=ctx.createPattern(fimg,\"repeat\");\r\n");
                 fillData.append("\tctx.fillStyle = pat;\r\n");
+                return;
             }
         }
+
+        fillData.append("\tctx.fillStyle=").append(color(Color.RED.getRGB())).append(";\r\n");
     }
 
     @Override

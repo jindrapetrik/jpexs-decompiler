@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
+import com.jpexs.decompiler.flash.types.annotations.EnumValue;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
@@ -51,6 +52,10 @@ public class SoundStreamHeadTag extends Tag implements SoundStreamHeadTypeTag {
     public int reserved;
 
     @SWFType(value = BasicType.UB, count = 2)
+    @EnumValue(value = 0, text = "5.5 kHz")
+    @EnumValue(value = 1, text = "11 kHz")
+    @EnumValue(value = 2, text = "22 kHz")
+    @EnumValue(value = 3, text = "44 kHz")
     public int playBackSoundRate;
 
     public boolean playBackSoundSize;
@@ -58,9 +63,15 @@ public class SoundStreamHeadTag extends Tag implements SoundStreamHeadTypeTag {
     public boolean playBackSoundType;
 
     @SWFType(value = BasicType.UB, count = 4)
+    @EnumValue(value = SoundFormat.FORMAT_ADPCM, text = "ADPCM")
+    @EnumValue(value = SoundFormat.FORMAT_MP3, text = "MP3", minSwfVersion = 4)
     public int streamSoundCompression;
 
     @SWFType(value = BasicType.UB, count = 2)
+    @EnumValue(value = 0, text = "5.5 kHz")
+    @EnumValue(value = 1, text = "11 kHz")
+    @EnumValue(value = 2, text = "22 kHz")
+    @EnumValue(value = 3, text = "44 kHz")
     public int streamSoundRate;
 
     public boolean streamSoundSize;
@@ -217,12 +228,14 @@ public class SoundStreamHeadTag extends Tag implements SoundStreamHeadTypeTag {
     public List<ByteArrayRange> getRawSoundData() {
         List<ByteArrayRange> ret = new ArrayList<>();
         List<SoundStreamBlockTag> blocks = getBlocks();
-        for (SoundStreamBlockTag block : blocks) {
-            ByteArrayRange data = block.streamSoundData;
-            if (streamSoundCompression == SoundFormat.FORMAT_MP3) {
-                ret.add(data.getSubRange(4, data.getLength() - 4));
-            } else {
-                ret.add(data);
+        if (blocks != null) {
+            for (SoundStreamBlockTag block : blocks) {
+                ByteArrayRange data = block.streamSoundData;
+                if (streamSoundCompression == SoundFormat.FORMAT_MP3) {
+                    ret.add(data.getSubRange(4, data.getLength() - 4));
+                } else {
+                    ret.add(data);
+                }
             }
         }
         return ret;

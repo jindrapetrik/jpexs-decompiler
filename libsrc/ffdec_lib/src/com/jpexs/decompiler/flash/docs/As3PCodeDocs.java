@@ -28,15 +28,12 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-public class As3PCodeDocs {
+public class As3PCodeDocs extends AbstractDocs {
 
-    private static ResourceBundle prop;
+    static ResourceBundle prop;
+    private static final Map<AVM2InstructionFlag, String> flagDescriptions = new HashMap<>();
 
-    private static Map<AVM2InstructionFlag, String> flagDescriptions = new HashMap<>();
-
-    private static Cache<String, String> docsCache = Cache.getInstance(false, true, "as3DocsCache");
-
-    private static Map<String, InstructionDefinition> nameToDef = new HashMap<>();
+    private final static Map<String, InstructionDefinition> nameToDef = new HashMap<>();
 
     static final String NEWLINE = "\r\n";
 
@@ -80,56 +77,6 @@ public class As3PCodeDocs {
             return null;
         }
         return getDocsForIns(nameToDef.get(insName), showDataSize, ui, withStyle);
-    }
-
-    private static String getProperty(String name) {
-        if (prop.containsKey(name)) {
-            return Helper.escapeHTML(prop.getString(name));
-        }
-        return null;
-    }
-
-    private static String htmlFooter() {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("</html>");
-        return sb.toString();
-    }
-
-    private static String meta(String name, String content) {
-        return "\t\t<meta name=\"" + name + "\" content=\"" + content + "\">" + NEWLINE;
-    }
-
-    private static String metaProp(String name, String content) {
-        return "\t\t<meta property=\"" + name + "\" content=\"" + content + "\">" + NEWLINE;
-    }
-
-    private static String meta(String name, Date content) {
-        return "\t\t<meta name=\"" + name + "\" content=\"" + getISO8601StringForDate(content) + "\">" + NEWLINE;
-    }
-
-    private static String htmlHeader(String js, String style) {
-        Date dateGenerated = new Date();
-        StringBuilder sb = new StringBuilder();
-        sb.append("<!DOCTYPE html>").append(NEWLINE).
-                append("<html>").append(NEWLINE).
-                append("\t<head>").append(NEWLINE);
-        if (style != null && !style.isEmpty()) {
-            sb.append("\t\t<style>").append(style).append("</style>").append(NEWLINE);
-        }
-        if (js != null && !js.isEmpty()) {
-            sb.append("\t\t<script>").append(js).append("</script>").append(NEWLINE);
-        }
-        sb.append("\t\t<meta charset=\"UTF-8\">").append(NEWLINE).
-                append(meta("generator", ApplicationInfo.applicationVerName)).
-                append(meta("description", getProperty("ui.list.pageDescription"))).
-                append(metaProp("og:title", getProperty("ui.list.pageTitle"))).
-                append(metaProp("og:type", "article")).
-                append(metaProp("og:description", getProperty("ui.list.pageDescription"))).
-                append(meta("date", dateGenerated)).
-                append("\t\t<title>").append(getProperty("ui.list.documentTitle")).append("</title>").append(NEWLINE).
-                append("\t</head>").append(NEWLINE);
-        return sb.toString();
     }
 
     public static String getDocsForIns(InstructionDefinition def, boolean showDataSize, boolean ui, boolean standalone) {
@@ -225,8 +172,8 @@ public class As3PCodeDocs {
                     }
                 }
             }
-            sb.append("</div>").append(NEWLINE);
         }
+        sb.append("</div>").append(NEWLINE);
 
         sb.append("<div class=\"short-description\">").append(insShortDescription).append("</div>").append(NEWLINE);
 
@@ -267,23 +214,6 @@ public class As3PCodeDocs {
         return r;
     }
 
-    public static String getStyle() {
-        String cached = docsCache.get("__style");
-        if (cached != null) {
-            return cached;
-        }
-        String style = "";
-        InputStream is = As3PCodeDocs.class.getResourceAsStream("/com/jpexs/decompiler/flash/docs/docs.css");
-        if (is == null) {
-            Logger.getLogger(As3PCodeDocs.class.getName()).log(Level.SEVERE, "docs.css needed for documentation not found");
-        } else {
-            style = new String(Helper.readStream(is), Utf8Helper.charset);
-        }
-
-        docsCache.put("__style", style);
-        return style;
-    }
-
     public static String getJs() {
         String cached = docsCache.get("__js");
         if (cached != null) {
@@ -299,12 +229,6 @@ public class As3PCodeDocs {
 
         docsCache.put("__js", js);
         return js;
-    }
-
-    private static String getISO8601StringForDate(Date date) {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
-        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        return dateFormat.format(date);
     }
 
     public static String getAllInstructionDocs() {
@@ -352,5 +276,36 @@ public class As3PCodeDocs {
 
     public static void main(String[] args) throws UnsupportedEncodingException {
         System.out.println(getAllInstructionDocs());
+    }
+
+    protected static String htmlHeader(String js, String style) {
+        Date dateGenerated = new Date();
+        StringBuilder sb = new StringBuilder();
+        sb.append("<!DOCTYPE html>").append(NEWLINE).
+                append("<html>").append(NEWLINE).
+                append("\t<head>").append(NEWLINE);
+        if (style != null && !style.isEmpty()) {
+            sb.append("\t\t<style>").append(style).append("</style>").append(NEWLINE);
+        }
+        if (js != null && !js.isEmpty()) {
+            sb.append("\t\t<script>").append(js).append("</script>").append(NEWLINE);
+        }
+        sb.append("\t\t<meta charset=\"UTF-8\">").append(NEWLINE).
+                append(meta("generator", ApplicationInfo.applicationVerName)).
+                append(meta("description", getProperty("ui.list.pageDescription"))).
+                append(metaProp("og:title", getProperty("ui.list.pageTitle"))).
+                append(metaProp("og:type", "article")).
+                append(metaProp("og:description", getProperty("ui.list.pageDescription"))).
+                append(meta("date", dateGenerated)).
+                append("\t\t<title>").append(getProperty("ui.list.documentTitle")).append("</title>").append(NEWLINE).
+                append("\t</head>").append(NEWLINE);
+        return sb.toString();
+    }
+
+    protected static String getProperty(String name) {
+        if (prop.containsKey(name)) {
+            return Helper.escapeHTML(prop.getString(name));
+        }
+        return null;
     }
 }

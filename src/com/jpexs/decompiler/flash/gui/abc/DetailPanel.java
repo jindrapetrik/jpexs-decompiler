@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.gui.HeaderLabel;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.TagEditorPanel;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.helpers.CancellableWorker;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -52,7 +53,7 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
 
     public SlotConstTraitDetailPanel slotConstTraitPanel;
 
-    public static final String METHOD_TRAIT_CARD = "abc.detail.methodtrait";
+    public static final String METHOD_GETTER_SETTER_TRAIT_CARD = "abc.detail.methodtrait";
 
     public static final String UNSUPPORTED_TRAIT_CARD = "abc.detail.unsupported";
 
@@ -62,7 +63,7 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
 
     public JButton saveButton = new JButton(AppStrings.translate("button.save"), View.getIcon("save16"));
 
-    public JButton editButton = new JButton(AppStrings.translate("button.edit"), View.getIcon("edit16"));
+    public JButton editButton = new JButton(AppStrings.translate("button.edit.script.disassembled"), View.getIcon("edit16"));
 
     public JButton cancelButton = new JButton(AppStrings.translate("button.cancel"), View.getIcon("cancel16"));
 
@@ -90,7 +91,7 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
         CardLayout layout = new CardLayout();
         innerPanel.setLayout(layout);
         methodTraitPanel = new MethodTraitDetailPanel(abcPanel);
-        cardMap.put(METHOD_TRAIT_CARD, methodTraitPanel);
+        cardMap.put(METHOD_GETTER_SETTER_TRAIT_CARD, methodTraitPanel);
 
         unsupportedTraitPanel = new JPanel(new BorderLayout());
         JLabel unsup = new JLabel("<html>" + AppStrings.translate("info.selecttrait") + "</html>", SwingConstants.CENTER);
@@ -193,7 +194,7 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
         selectedLabel.setIcon(val ? View.getIcon("editing16") : null);
     }
 
-    public void showCard(final String name, final Trait trait) {
+    public void showCard(final String name, final Trait trait, int traitIndex) {
         View.execInEventDispatch(() -> {
             CardLayout layout = (CardLayout) innerPanel.getLayout();
             layout.show(innerPanel, name);
@@ -222,13 +223,70 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
             }
 
             selectedCard = name;
-            selectedLabel.setText(AppStrings.translate(name));
+            String detailTitleStr = AppStrings.translate("panel.disassembled") + AppStrings.translate("abc.detail.split") + "%pcode_type%";
+            String traitStr = AppStrings.translate("abc.detail.trait");
+            String pcodeTypeStr = null;
+
+            if (trait != null) {
+                String traitTypeLang;
+                switch (trait.kindType) {
+                    case Trait.TRAIT_CLASS:
+                        traitTypeLang = "abc.detail.trait.class";
+                        break;
+                    case Trait.TRAIT_CONST:
+                        traitTypeLang = "abc.detail.trait.const";
+                        break;
+                    case Trait.TRAIT_FUNCTION:
+                        traitTypeLang = "abc.detail.trait.function";
+                        break;
+                    case Trait.TRAIT_GETTER:
+                        traitTypeLang = "abc.detail.trait.getter";
+                        break;
+                    case Trait.TRAIT_METHOD:
+                        traitTypeLang = "abc.detail.trait.method";
+                        break;
+                    case Trait.TRAIT_SETTER:
+                        traitTypeLang = "abc.detail.trait.setter";
+                        break;
+                    case Trait.TRAIT_SLOT:
+                        traitTypeLang = "abc.detail.trait.slot";
+                        break;
+                    default:
+                        traitTypeLang = "abc.detail.unsupported";
+                }
+                traitStr = traitStr.replace("%trait_type%", AppStrings.translate(traitTypeLang));
+                pcodeTypeStr = traitStr;
+            }
+            String specialMethodTypeLang = null;
+            switch (traitIndex) {
+                case GraphTextWriter.TRAIT_SCRIPT_INITIALIZER:
+                    specialMethodTypeLang = "abc.detail.specialmethod.scriptinitializer";
+                    break;
+                case GraphTextWriter.TRAIT_CLASS_INITIALIZER:
+                    specialMethodTypeLang = "abc.detail.specialmethod.classinitializer";
+                    break;
+                case GraphTextWriter.TRAIT_INSTANCE_INITIALIZER:
+                    specialMethodTypeLang = "abc.detail.specialmethod.instanceinitializer";
+                    break;
+            }
+            if (specialMethodTypeLang != null) {
+                String specialMethodStr = AppStrings.translate("abc.detail.specialmethod").replace("%specialmethod_type%", AppStrings.translate(specialMethodTypeLang));
+                pcodeTypeStr = specialMethodStr;
+            }
+            if (pcodeTypeStr == null) {
+                if (METHOD_GETTER_SETTER_TRAIT_CARD.equals(name) && trait == null) {
+                    pcodeTypeStr = AppStrings.translate("abc.detail.innerfunction");
+                } else {
+                    pcodeTypeStr = AppStrings.translate("abc.detail.unsupported");
+                }
+            }
+            detailTitleStr = detailTitleStr.replace("%pcode_type%", pcodeTypeStr);
+
+            selectedLabel.setText(detailTitleStr);
             if (trait == null) {
                 traitNameLabel.setText("-");
-            } else {
-                if (abcPanel != null) {
-                    traitNameLabel.setText(trait.getName(abcPanel.abc).getName(abcPanel.abc.constants, null, false));
-                }
+            } else if (abcPanel != null) {
+                traitNameLabel.setText(trait.getName(abcPanel.abc).getName(abcPanel.abc.constants, null, false, true));
             }
         });
 

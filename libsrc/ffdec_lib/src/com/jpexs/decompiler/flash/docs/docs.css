@@ -1,5 +1,6 @@
 html, body {margin:0px; padding: 0px;}
 .instruction {background-color: #f5f5b5; color:black;}
+.otherdoc {background-color: #f5f5b5; color:black;}
 li.instruction-item {list-style:none; padding:0px;border:1px solid black; border-bottom:none; border-collapse:collapse; }
 ul.instruction-list {padding-left:0; display:table; border-bottom:1px solid black;}
 strong.instruction-name {font-weight: bold; color: blue;}
@@ -13,3 +14,6 @@ body {font-family: serif;}
 h1, h2, h3, h4, h5 {font-family: sans-serif;}
 .instruction-signature {font-family: "Courier New", monospace; font-size: 1.05em;}
 .filter {font-family: sans-serif; }
+.path {font-weight: bold; color: blue;}
+.path-block {}
+.path-docs {}

@@ -75,6 +75,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ShapeExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.SoundExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.SpriteExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.TextExportMode;
+import com.jpexs.decompiler.flash.exporters.script.LinkReportExporter;
 import com.jpexs.decompiler.flash.exporters.settings.BinaryDataExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.ButtonExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.FontExportSettings;
@@ -87,7 +88,9 @@ import com.jpexs.decompiler.flash.exporters.settings.ShapeExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.SoundExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.SpriteExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
+import com.jpexs.decompiler.flash.exporters.swf.SwfToSwcExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfXmlExporter;
+import com.jpexs.decompiler.flash.flexsdk.MxmlcAs3ScriptReplacer;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.SearchInMemory;
@@ -98,7 +101,12 @@ import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.importers.AS2ScriptImporter;
 import com.jpexs.decompiler.flash.importers.AS3ScriptImporter;
+import com.jpexs.decompiler.flash.importers.As3ScriptReplaceException;
+import com.jpexs.decompiler.flash.importers.As3ScriptReplaceExceptionItem;
+import com.jpexs.decompiler.flash.importers.As3ScriptReplacerFactory;
+import com.jpexs.decompiler.flash.importers.As3ScriptReplacerInterface;
 import com.jpexs.decompiler.flash.importers.BinaryDataImporter;
+import com.jpexs.decompiler.flash.importers.FFDecAs3ScriptReplacer;
 import com.jpexs.decompiler.flash.importers.FontImporter;
 import com.jpexs.decompiler.flash.importers.ImageImporter;
 import com.jpexs.decompiler.flash.importers.MorphShapeImporter;
@@ -107,6 +115,7 @@ import com.jpexs.decompiler.flash.importers.SwfXmlImporter;
 import com.jpexs.decompiler.flash.importers.TextImporter;
 import com.jpexs.decompiler.flash.importers.amf.amf3.Amf3Importer;
 import com.jpexs.decompiler.flash.importers.amf.amf3.Amf3ParseException;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
@@ -156,7 +165,6 @@ import com.sun.jna.platform.win32.Kernel32;
 import gnu.jpdf.PDFJob;
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.awt.print.PageFormat;
 import java.awt.print.Paper;
@@ -577,6 +585,27 @@ public class CommandLineArgumentParser {
             out.println("  ...<swffile>: SWF file to search instance in");
         }
 
+        if (filter == null || filter.equals("linkreport")) {
+            out.println(" " + (cnt++) + ") -linkReport [-outfile <outfile>] <swffile>");
+            out.println("  ...generates linker report for the swffile");
+            out.println("  ...-outfile <outfile> (optional): Saves XML report to <outfile>. When ommited, the report is printed to stdout.");
+            out.println("  ...<swffile>: SWF file to search instance in");
+        }
+
+        if (filter == null || filter.equals("swf2swc")) {
+            out.println(" " + (cnt++) + ") -swf2swc <outfile> <swffile>");
+            out.println("  ...generates SWC file from SWF");
+            out.println("  ...<outfile>: Where to save SWC file");
+            out.println("  ...<swffile>: Input SWF file");
+        }
+
+        if (filter == null || filter.equals("abcmerge")) {
+            out.println(" " + (cnt++) + ") -abcmerge <outfile> <swffile>");
+            out.println("  ...merge all ABC tags in SWF file to one");
+            out.println("  ...<outfile>: Where to save merged file");
+            out.println("  ...<swffile>: Input SWF file");
+        }
+
         printCmdLineUsageExamples(out, filter);
     }
 
@@ -792,7 +821,13 @@ public class CommandLineArgumentParser {
             command = nextParam.substring(1);
         }
 
-        if (command.equals("getinstancemetadata")) {
+        if (command.equals("abcmerge")) {
+            parseAbcMerge(args);
+        } else if (command.equals("swf2swc")) {
+            parseSwf2Swc(args);
+        } else if (command.equals("linkreport")) {
+            parseLinkReport(selectionClasses, args);
+        } else if (command.equals("getinstancemetadata")) {
             parseGetInstanceMetadata(args);
         } else if (command.equals("setinstancemetadata")) {
             parseSetInstanceMetadata(args);
@@ -985,6 +1020,83 @@ public class CommandLineArgumentParser {
             badArguments("config");
         }
         setConfigurations(args.pop());
+    }
+
+    private static void parseAbcMerge(Stack<String> args) {
+        if (args.size() < 2) {
+            badArguments("abcmerge");
+        }
+        final File outFile = new File(args.pop());
+        final File swfFile = new File(args.pop());
+        processModifySWF(swfFile, outFile, null, (SWF swf, OutputStream stdout) -> {
+            List<ABCContainerTag> abcList = swf.getAbcList();
+            if (!abcList.isEmpty() && abcList.size() > 1) {
+                ABC firstAbc = abcList.get(0).getABC();
+                for (int i = 1; i < abcList.size(); i++) {
+                    firstAbc.mergeABC(abcList.get(i).getABC());
+                }
+                for (int i = 1; i < abcList.size(); i++) {
+                    swf.removeTag((Tag) abcList.get(i));
+                }
+            }
+        });
+
+    }
+
+    private static void parseSwf2Swc(Stack<String> args) {
+        if (args.size() < 2) {
+            badArguments("swf2swc");
+        }
+        final File outFile = new File(args.pop());
+        final File swfFile = new File(args.pop());
+        processReadSWF(swfFile, null, (SWF swf, OutputStream stdout) -> {
+            SwfToSwcExporter exporter = new SwfToSwcExporter();
+            exporter.exportSwf(swf, outFile, false);
+        });
+    }
+
+    private static void parseLinkReport(List<String> selectionClasses, Stack<String> args) {
+        if (args.isEmpty()) {
+            badArguments("linkreport");
+        }
+        File stdOutFile = null;
+        File swfFile = null;
+        while (!args.isEmpty()) {
+            String paramName = args.pop().toLowerCase();
+            switch (paramName) {
+                case "-outfile":
+                    if (args.empty()) {
+                        System.err.println("Missing output file");
+                        badArguments("linkreport");
+                    }
+                    stdOutFile = new File(args.pop());
+                    break;
+                default:
+                    if (!args.isEmpty()) {
+                        badArguments("linkreport");
+                    }
+                    swfFile = new File(paramName);
+            }
+        }
+        if (swfFile == null) {
+            System.err.println("No SWF file specified");
+            badArguments("getinstancemetadata");
+        }
+        processReadSWF(swfFile, stdOutFile, (SWF swf, OutputStream stdout) -> {
+            LinkReportExporter lre = new LinkReportExporter();
+
+            List<ScriptPack> reportPacks;
+            try {
+                reportPacks = selectionClasses != null ? swf.getScriptPacksByClassNames(selectionClasses) : swf.getAS3Packs();
+            } catch (Exception ex) {
+                System.err.println("Error while getting packs");
+                System.exit(1);
+                return;
+            }
+
+            String reportStr = lre.generateReport(swf, reportPacks, null);
+            stdout.write(reportStr.getBytes("UTF-8"));
+        });
     }
 
     private static void parseGetInstanceMetadata(Stack<String> args) {
@@ -3294,6 +3406,13 @@ public class CommandLineArgumentParser {
     }
 
     private static void parseImportScript(Stack<String> args) {
+
+        String flexLocation = Configuration.flexSdkLocation.get();
+        if (flexLocation.isEmpty() || (!new File(flexLocation).exists())) {
+            System.err.println("Flex SDK path not set");
+            System.exit(1);
+        }
+
         if (args.size() < 3) {
             badArguments("importscript");
         }
@@ -3305,7 +3424,7 @@ public class CommandLineArgumentParser {
                 SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
                 String scriptsFolder = Path.combine(args.pop(), ScriptExportSettings.EXPORT_FOLDER_NAME);
                 new AS2ScriptImporter().importScripts(scriptsFolder, swf.getASMs(true));
-                new AS3ScriptImporter().importScripts(scriptsFolder, swf.getAS3Packs());
+                new AS3ScriptImporter().importScripts(As3ScriptReplacerFactory.createByConfig(), scriptsFolder, swf.getAS3Packs());
 
                 try {
                     try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(outFile))) {
@@ -3385,7 +3504,7 @@ public class CommandLineArgumentParser {
             mb.setCodeBytes(data);
         } else {
             try {
-                AVM2Code acode = ASM3Parser.parse(new StringReader(text), abc.constants, trait, new MissingSymbolHandler() {
+                AVM2Code acode = ASM3Parser.parse(abc, new StringReader(text), trait, new MissingSymbolHandler() {
                     //no longer ask for adding new constants
                     @Override
                     public boolean missingString(String value) {
@@ -3436,23 +3555,35 @@ public class CommandLineArgumentParser {
     private static void replaceAS3(String as, ScriptPack pack) throws IOException, InterruptedException {
         System.out.println("Replace AS3");
         System.out.println("Warning: This feature is EXPERIMENTAL");
-        File swc = Configuration.getPlayerSWC();
-        if (swc == null) {
-            final String adobePage = "http://www.adobe.com/support/flashplayer/downloads.html";
-            System.err.println("For ActionScript 3 direct editation, a library called \"PlayerGlobal.swc\" needs to be downloaded from Adobe homepage:");
-            System.err.println(adobePage);
-            System.err.println("Download the library called PlayerGlobal(.swc), and place it to directory");
-            System.err.println(Configuration.getFlashLibPath().getAbsolutePath());
+        As3ScriptReplacerInterface scriptReplacer = As3ScriptReplacerFactory.createByConfig();
+        if (!scriptReplacer.isAvailable()) {
+            System.err.println("Current script replacer is not available.");
+            if (scriptReplacer instanceof FFDecAs3ScriptReplacer) {
+                System.err.println("Current replacer: FFDec");
+                final String adobePage = "http://www.adobe.com/support/flashplayer/downloads.html";
+                System.err.println("For ActionScript 3 direct editation, a library called \"PlayerGlobal.swc\" needs to be downloaded from Adobe homepage:");
+                System.err.println(adobePage);
+                System.err.println("Download the library called PlayerGlobal(.swc), and place it to directory");
+                System.err.println(Configuration.getFlashLibPath().getAbsolutePath());
+            } else if (scriptReplacer instanceof MxmlcAs3ScriptReplacer) {
+                System.err.println("Current replacer: Flex SDK");
+                final String flexPage = "http://www.adobe.com/devnet/flex/flex-sdk-download.html";
+                System.err.println("For ActionScript 3 direct editation, Flex SDK needs to be download");
+                System.err.println(flexPage);
+                System.err.println("Download FLEX Sdk, unzip it to some directory and set its directory path in the configuration");
+
+            } else {
+
+            }
             System.exit(1);
         }
 
         try {
-            pack.abc.replaceScriptPack(pack, as);
-        } catch (AVM2ParseException ex) {
-            System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)));
-            System.exit(1);
-        } catch (CompilationException ex) {
-            System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)));
+            pack.abc.replaceScriptPack(scriptReplacer, pack, as);
+        } catch (As3ScriptReplaceException asre) {
+            for (As3ScriptReplaceExceptionItem item : asre.getExceptionItems()) {
+                logger.log(Level.SEVERE, "%error% on line %line%, column %col%, file: %file%".replace("%error%", item.getMessage()).replace("%line%", Long.toString(item.getLine())).replace("%file%", item.getFile()).replace("%col%", "" + item.getCol()));
+            }
             System.exit(1);
         }
     }
@@ -3618,7 +3749,7 @@ public class CommandLineArgumentParser {
         String dcs = swf.getDocumentClass();
         if (dcs != null) {
             if (dcs.contains(".")) {
-                DottedChain dc = new DottedChain(dcs.split("\\."));
+                DottedChain dc = DottedChain.parseWithSuffix(dcs);
                 pw.println("documentClass=" + dc.toPrintableString(true));
             } else {
                 pw.println("documentClass=" + IdentifiersDeobfuscation.printIdentifier(true, dcs));

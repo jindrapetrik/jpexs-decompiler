@@ -23,6 +23,8 @@ import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
+import com.jpexs.decompiler.flash.exporters.script.Dependency;
+import com.jpexs.decompiler.flash.exporters.script.DependencyParser;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
@@ -58,11 +60,11 @@ public class TraitMethodGetterSetter extends Trait {
     }
 
     @Override
-    public void getImportsUsages(String customNs, ABC abc, List<DottedChain> imports, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) {
+    public void getDependencies(String customNs, ABC abc, List<Dependency> dependencies, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) {
         if (ignorePackage == null) {
             ignorePackage = getPackage(abc);
         }
-        super.getImportsUsages(customNs, abc, imports, uses, ignorePackage, fullyQualifiedNames);
+        super.getDependencies(customNs, abc, dependencies, uses, ignorePackage, fullyQualifiedNames);
 
         if (customNs == null) {
             Namespace n = getName(abc).getNamespace(abc.constants);
@@ -72,7 +74,7 @@ public class TraitMethodGetterSetter extends Trait {
         }
         //if (method_info != 0)
         {
-            parseImportsUsagesFromMethodInfo(customNs, abc, method_info, imports, uses, ignorePackage, fullyQualifiedNames, new ArrayList<>());
+            DependencyParser.parseDependenciesFromMethodInfo(customNs, abc, method_info, dependencies, uses, ignorePackage, fullyQualifiedNames, new ArrayList<>());
         }
     }
 
@@ -93,7 +95,7 @@ public class TraitMethodGetterSetter extends Trait {
 
         getModifiers(abc, isStatic, writer);
         writer.hilightSpecial("function " + addKind, HighlightSpecialType.TRAIT_TYPE);
-        writer.hilightSpecial(getName(abc).getName(abc.constants, fullyQualifiedNames, false), HighlightSpecialType.TRAIT_NAME);
+        writer.hilightSpecial(getName(abc).getName(abc.constants, fullyQualifiedNames, false, true), HighlightSpecialType.TRAIT_NAME);
         writer.appendNoHilight("(");
         abc.method_info.get(method_info).getParamStr(writer, abc.constants, body, abc, fullyQualifiedNames);
         writer.appendNoHilight(") : ");
@@ -107,12 +109,14 @@ public class TraitMethodGetterSetter extends Trait {
             writeImportsUsages(abc, writer, getPackage(abc), fullyQualifiedNames);
         }
         writer.startMethod(method_info);
-        path = path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames, false);
+        path = path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames, false, true);
         convertHeader(parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
         int bodyIndex = abc.findBodyIndex(method_info);
-        if (!(classIndex != -1 && abc.instance_info.get(classIndex).isInterface() || bodyIndex == -1)) {
-            if (bodyIndex != -1) {
-                abc.bodies.get(bodyIndex).convert(convertData, path, exportMode, isStatic, method_info, scriptIndex, classIndex, abc, this, new ScopeStack(), 0, writer, fullyQualifiedNames, null, true);
+        if (exportMode != ScriptExportMode.AS_METHOD_STUBS) {
+            if (!(classIndex != -1 && abc.instance_info.get(classIndex).isInterface() || bodyIndex == -1)) {
+                if (bodyIndex != -1) {
+                    abc.bodies.get(bodyIndex).convert(convertData, path, exportMode, isStatic, method_info, scriptIndex, classIndex, abc, this, new ScopeStack(), 0, writer, fullyQualifiedNames, null, true);
+                }
             }
         }
         writer.endMethod();
@@ -126,15 +130,40 @@ public class TraitMethodGetterSetter extends Trait {
         }
         getMetaData(parent, convertData, abc, writer);
         writer.startMethod(method_info);
-        path = path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames, false);
+        path = path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames, false, true);
         toStringHeader(parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
         int bodyIndex = abc.findBodyIndex(method_info);
         if (classIndex != -1 && abc.instance_info.get(classIndex).isInterface() || bodyIndex == -1) {
             writer.appendNoHilight(";");
         } else {
             writer.startBlock();
-            if (bodyIndex != -1) {
-                abc.bodies.get(bodyIndex).toString(path, exportMode, abc, this, writer, fullyQualifiedNames);
+            if (exportMode != ScriptExportMode.AS_METHOD_STUBS) {
+                if (exportMode != ScriptExportMode.AS) {
+                    convertTraitHeader(abc, writer);
+                }
+                if (bodyIndex != -1) {
+                    abc.bodies.get(bodyIndex).toString(path, exportMode, abc, this, writer, fullyQualifiedNames);
+                }
+            } else {
+                String retTypeRaw = abc.method_info.get(method_info).getReturnTypeRaw(abc.constants, fullyQualifiedNames);
+                switch (retTypeRaw) {
+                    case "void":
+                        break;
+                    case "int":
+                    case "uint":
+                        writer.append("return 0; //autogenerated").newLine();
+                        break;
+                    case "double":
+                    case "float":
+                        writer.append("return 0.0; //autogenerated").newLine();
+                        break;
+                    case "String":
+                        writer.append("return \"\"; //autogenerated").newLine();
+                        break;
+                    default:
+                        writer.append("return null; //autogenerated").newLine();
+                        break;
+                }
             }
             writer.endBlock();
         }
@@ -161,10 +190,10 @@ public class TraitMethodGetterSetter extends Trait {
     @Override
     public boolean isVisible(boolean isStatic, ABC abc) {
         if (Configuration.handleSkinPartsAutomatically.get()) {
-            if ("skinParts".equals(getName(abc).getName(abc.constants, new ArrayList<>(), true))) {
+            if ("skinParts".equals(getName(abc).getName(abc.constants, new ArrayList<>(), true, true))) {
                 if (kindType == TRAIT_GETTER) {
                     MethodInfo mi = abc.method_info.get(method_info);
-                    if (mi.param_types.length == 0 && "Object".equals(abc.constants.getMultiname(mi.ret_type).getNameWithNamespace(abc.constants).toRawString())) {
+                    if (mi.param_types.length == 0 && "Object".equals(abc.constants.getMultiname(mi.ret_type).getNameWithNamespace(abc.constants, true).toRawString())) {
                         if (abc.constants.getNamespace(abc.constants.getMultiname(name_index).namespace_index).kind == Namespace.KIND_PROTECTED) {
                             return false;
                         }
@@ -176,4 +205,24 @@ public class TraitMethodGetterSetter extends Trait {
         return true;
     }
 
+    @Override
+    public GraphTextWriter convertTraitHeader(ABC abc, GraphTextWriter writer) {
+
+        switch (kindType) {
+            case Trait.TRAIT_METHOD:
+                convertCommonHeaderFlags("method", abc, writer);
+                break;
+            case Trait.TRAIT_GETTER:
+                convertCommonHeaderFlags("getter", abc, writer);
+                break;
+            case Trait.TRAIT_SETTER:
+                convertCommonHeaderFlags("setter", abc, writer);
+                break;
+        }
+        writer.newLine();
+        writer.appendNoHilight("dispid ");
+        writer.hilightSpecial("" + disp_id, HighlightSpecialType.DISP_ID);
+        writer.newLine();
+        return writer;
+    }
 }

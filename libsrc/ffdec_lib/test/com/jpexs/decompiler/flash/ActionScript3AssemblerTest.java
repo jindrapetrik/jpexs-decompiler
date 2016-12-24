@@ -88,7 +88,7 @@ public class ActionScript3AssemblerTest extends ActionScriptTestBase {
                 + "returnvoid\r\n";
 
         MethodBody b = new MethodBody(getABC(), new Traits(), new byte[0], new ABCException[0]);
-        AVM2Code code = ASM3Parser.parse(new StringReader(str), getABC().constants, null, b, new MethodInfo());
+        AVM2Code code = ASM3Parser.parse(getABC(), new StringReader(str), null, b, new MethodInfo());
         b.setCode(code);
         return b;
     }
@@ -152,7 +152,7 @@ public class ActionScript3AssemblerTest extends ActionScriptTestBase {
                 + "pushbyte 1\r\n";
 
         MethodBody b = new MethodBody(getABC(), new Traits(), new byte[0], new ABCException[0]);
-        AVM2Code code = ASM3Parser.parse(new StringReader(str), getABC().constants, null, b, new MethodInfo());
+        AVM2Code code = ASM3Parser.parse(getABC(), new StringReader(str), null, b, new MethodInfo());
 
         long to = code.getEndOffset();
         Map<Long, Integer> expected = new HashMap<>();

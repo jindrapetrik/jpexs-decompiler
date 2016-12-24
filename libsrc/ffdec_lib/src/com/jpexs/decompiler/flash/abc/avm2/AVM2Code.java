@@ -1100,6 +1100,11 @@ public class AVM2Code implements Cloneable {
         }
     }
 
+    public void setInstructionOperand(int ip, int operandIndex, int value, MethodBody body) {
+        int oldVal = code.get(ip).operands[ip];
+        code.get(ip).operands[ip] = value;
+    }
+
     public byte[] getBytes() {
         return getBytes(null);
     }
@@ -1147,45 +1152,15 @@ public class AVM2Code implements Cloneable {
 
     public String toASMSource(AVM2ConstantPool constants) {
         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
-        toASMSource(constants, null, null, null, new ArrayList<>(), ScriptExportMode.PCODE, writer);
+        toASMSource(constants, null, null, new ArrayList<>(), ScriptExportMode.PCODE, writer);
         return writer.toString();
     }
 
-    public GraphTextWriter toASMSource(AVM2ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, ScriptExportMode exportMode, GraphTextWriter writer) {
-        return toASMSource(constants, trait, info, body, new ArrayList<>(), exportMode, writer);
+    public GraphTextWriter toASMSource(AVM2ConstantPool constants, MethodInfo info, MethodBody body, ScriptExportMode exportMode, GraphTextWriter writer) {
+        return toASMSource(constants, info, body, new ArrayList<>(), exportMode, writer);
     }
 
-    public GraphTextWriter toASMSource(AVM2ConstantPool constants, Trait trait, MethodInfo info, MethodBody body, List<Integer> outputMap, ScriptExportMode exportMode, GraphTextWriter writer) {
-        if (trait != null) {
-            if (trait instanceof TraitFunction) {
-                TraitFunction tf = (TraitFunction) trait;
-                writer.appendNoHilight("trait ");
-                writer.hilightSpecial("function ", HighlightSpecialType.TRAIT_TYPE);
-                writer.hilightSpecial(constants.multinameToString(tf.name_index), HighlightSpecialType.TRAIT_NAME);
-                writer.appendNoHilight(" slotid ");
-                writer.hilightSpecial("" + tf.slot_id, HighlightSpecialType.SLOT_ID);
-                writer.newLine();
-            }
-            if (trait instanceof TraitMethodGetterSetter) {
-                TraitMethodGetterSetter tm = (TraitMethodGetterSetter) trait;
-                writer.appendNoHilight("trait ");
-                switch (tm.kindType) {
-                    case Trait.TRAIT_METHOD:
-                        writer.hilightSpecial("method ", HighlightSpecialType.TRAIT_TYPE);
-                        break;
-                    case Trait.TRAIT_GETTER:
-                        writer.hilightSpecial("getter ", HighlightSpecialType.TRAIT_TYPE);
-                        break;
-                    case Trait.TRAIT_SETTER:
-                        writer.hilightSpecial("setter ", HighlightSpecialType.TRAIT_TYPE);
-                        break;
-                }
-                writer.hilightSpecial(constants.multinameToString(tm.name_index), HighlightSpecialType.TRAIT_NAME);
-                writer.appendNoHilight(" dispid ");
-                writer.hilightSpecial("" + tm.disp_id, HighlightSpecialType.DISP_ID);
-                writer.newLine();
-            }
-        }
+    public GraphTextWriter toASMSource(AVM2ConstantPool constants, MethodInfo info, MethodBody body, List<Integer> outputMap, ScriptExportMode exportMode, GraphTextWriter writer) {
 
         if (info != null) {
             writer.appendNoHilight("method").newLine();
@@ -1312,7 +1287,6 @@ public class AVM2Code implements Cloneable {
 
         writer.newLine();
         writer.appendNoHilight("code").newLine();
-
         int ip = 0;
         int largeLimit = 20000;
         boolean markOffsets = code.size() <= largeLimit;
@@ -1356,6 +1330,13 @@ public class AVM2Code implements Cloneable {
             }
         } else if (exportMode == ScriptExportMode.CONSTANTS) {
             writer.appendNoHilight("Constant export mode is not supported.").newLine();
+        }
+        writer.appendNoHilight("end ; code").newLine();
+        if (body != null) {
+            writer.appendNoHilight("end ; body").newLine();
+        }
+        if (info != null) {
+            writer.appendNoHilight("end ; method").newLine();
         }
 
         return writer;
@@ -1638,7 +1619,7 @@ public class AVM2Code implements Cloneable {
              }
              }//*/
 
-            /*if ((ip + 2 < code.size()) && (ins.definition instanceof NewCatchIns)) { // Filling local register in catch clause
+ /*if ((ip + 2 < code.size()) && (ins.definition instanceof NewCatchIns)) { // Filling local register in catch clause
              if (code.get(ip + 1).definition instanceof DupIns) {
              if (code.get(ip + 2).definition instanceof SetLocalTypeIns) {
              ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames);
@@ -1773,7 +1754,7 @@ public class AVM2Code implements Cloneable {
                                         if (code.get(ip + plus + 2).definition instanceof SwapIns) {
                                             if (code.get(ip + plus + 4).definition instanceof PopScopeIns) {
                                                 if (code.get(ip + plus + 3).definition instanceof SetPropertyIns) {
-                                                    functionName = abc.constants.getMultiname(code.get(ip + plus + 3).operands[0]).getName(abc.constants, fullyQualifiedNames, true);
+                                                    functionName = abc.constants.getMultiname(code.get(ip + plus + 3).operands[0]).getName(abc.constants, fullyQualifiedNames, true, true);
                                                     scopeStack.pop();// with
                                                     output.remove(output.size() - 1); // with
                                                     ip = ip + plus + 4; // +1 below
@@ -2059,7 +2040,7 @@ public class AVM2Code implements Cloneable {
 
                                             if (value instanceof NewFunctionAVM2Item) {
                                                 NewFunctionAVM2Item f = (NewFunctionAVM2Item) value;
-                                                f.functionName = tsc.getName(abc).getName(abc.constants, fullyQualifiedNames, true);
+                                                f.functionName = tsc.getName(abc).getName(abc.constants, fullyQualifiedNames, true, true);
                                             }
                                             AssignedValue av = new AssignedValue(value, initializerType, methodIndex);
                                             convertData.assignedValues.put(tsc, av);
@@ -2104,7 +2085,7 @@ public class AVM2Code implements Cloneable {
             if (param_types[i] == 0) {
                 type = TypeItem.UNBOUNDED;
             } else {
-                type = new TypeItem(abc.constants.getMultiname(param_types[i]).getNameWithNamespace(abc.constants));
+                type = new TypeItem(abc.constants.getMultiname(param_types[i]).getNameWithNamespace(abc.constants, true));
             }
             if (d.length > r) {
                 d[r] = new DeclarationAVM2Item(new SetLocalAVM2Item(null, null, r, new NullAVM2Item(null, null)), type);
@@ -2145,6 +2126,38 @@ public class AVM2Code implements Cloneable {
         return list;
     }
 
+    public void updateInstructionByteCountByAddr(long instructionAddress, int byteDelta, MethodBody body) {
+        if (byteDelta != 0) {
+            updateOffsets(new OffsetUpdater() {
+
+                @Override
+                public long updateInstructionOffset(long address) {
+                    if (address > instructionAddress) {
+                        return address + byteDelta;
+                    }
+                    return address;
+                }
+
+                @Override
+                public int updateOperandOffset(long insAddr, long targetAddress, int offset) {
+                    if (targetAddress > instructionAddress && insAddr <= instructionAddress) {
+                        return offset + byteDelta;
+                    }
+                    if (targetAddress <= instructionAddress && insAddr > instructionAddress) {
+                        return offset - byteDelta;
+                    }
+                    return offset;
+                }
+            }, body);
+            body.setModified();
+        }
+    }
+
+    public void updateInstructionByteCount(int pos, int byteDelta, MethodBody body) {
+        AVM2Instruction instruction = code.get(pos);
+        updateInstructionByteCountByAddr(instruction.getAddress(), byteDelta, body);
+    }
+
     public void updateOffsets(OffsetUpdater updater, MethodBody body) {
         for (int i = 0; i < code.size(); i++) {
             AVM2Instruction ins = code.get(i);
@@ -2161,8 +2174,7 @@ public class AVM2Code implements Cloneable {
              ins.operands[j] = updater.updateOperandOffset(target, ins.operands[j]);
              }
              }*/ //Faster, but not so universal
-            {
-                if (ins.definition instanceof IfTypeIns) {
+             if (ins.definition instanceof IfTypeIns) {
                     long target = ins.getTargetAddress();
                     try {
                         ins.operands[0] = updater.updateOperandOffset(ins.getAddress(), target, ins.operands[0]);
@@ -2170,8 +2182,8 @@ public class AVM2Code implements Cloneable {
                         throw new ConvertException("Invalid offset (" + ins + ")", i);
                     }
                 }
-            }
             ins.setAddress(updater.updateInstructionOffset(ins.getAddress()));
+            //Note: changing operands here does not change instruction byte length as offsets are always S24 (not variable length)
         }
 
         for (ABCException ex : body.exceptions) {

@@ -539,7 +539,7 @@ public class FlashPlayerTest {
              }
              }*/
 
-            /*if (!ffdecResult.equals(flashResult)) {
+ /*if (!ffdecResult.equals(flashResult)) {
              LocalDataArea lda = new LocalDataArea();
              for (Action a : task.actions) {
              if (!a.execute(lda)) {

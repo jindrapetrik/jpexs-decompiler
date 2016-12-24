@@ -30,47 +30,55 @@ public class HighlightedText implements Serializable {
 
     public String text;
 
-    public List<Highlighting> traitHilights;
+    private final List<Highlighting> traitHighlights;
 
-    public List<Highlighting> classHilights;
+    private final List<Highlighting> classHighlights;
 
-    public List<Highlighting> methodHilights;
+    private final List<Highlighting> methodHighlights;
 
-    public List<Highlighting> instructionHilights;
+    private final List<Highlighting> instructionHighlights;
 
-    public List<Highlighting> specialHilights;
+    private final List<Highlighting> specialHighlights;
 
     public List<Highlighting> getTraitHighlights() {
-        return traitHilights;
+        return traitHighlights;
     }
 
     public List<Highlighting> getMethodHighlights() {
-        return methodHilights;
+        return methodHighlights;
     }
 
     public List<Highlighting> getClassHighlights() {
-        return classHilights;
+        return classHighlights;
     }
 
-    public List<Highlighting> getSpecialHighligths() {
-        return specialHilights;
+    public List<Highlighting> getInstructionHighlights() {
+        return instructionHighlights;
+    }
+
+    public List<Highlighting> getSpecialHighlights() {
+        return specialHighlights;
     }
 
     public HighlightedText(HighlightedTextWriter writer) {
         this.text = writer.toString();
-        this.traitHilights = writer.traitHilights;
-        this.classHilights = writer.classHilights;
-        this.methodHilights = writer.methodHilights;
-        this.instructionHilights = writer.instructionHilights;
-        this.specialHilights = writer.specialHilights;
+        this.traitHighlights = writer.traitHilights;
+        this.classHighlights = writer.classHilights;
+        this.methodHighlights = writer.methodHilights;
+        this.instructionHighlights = writer.instructionHilights;
+        this.specialHighlights = writer.specialHilights;
+    }
+
+    public HighlightedText() {
+        this("");
     }
 
     public HighlightedText(String text) {
         this.text = text;
-        this.traitHilights = new ArrayList<>();
-        this.classHilights = new ArrayList<>();
-        this.methodHilights = new ArrayList<>();
-        this.instructionHilights = new ArrayList<>();
-        this.specialHilights = new ArrayList<>();
+        this.traitHighlights = new ArrayList<>();
+        this.classHighlights = new ArrayList<>();
+        this.methodHighlights = new ArrayList<>();
+        this.instructionHighlights = new ArrayList<>();
+        this.specialHighlights = new ArrayList<>();
     }
 }

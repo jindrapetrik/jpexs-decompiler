@@ -161,7 +161,7 @@ public class AVM2DeobfuscatorSimpleOld extends SWFDecompilerAdapter {
             AVM2Instruction ins = code.code.get(i);
             if (ins.definition instanceof JumpIns) {
                 long address = ins.getTargetAddress();
-                jumpTargets.add( code.adr2pos(address) );
+                jumpTargets.add(code.adr2pos(address));
             }
         }
 
@@ -294,9 +294,8 @@ public class AVM2DeobfuscatorSimpleOld extends SWFDecompilerAdapter {
 
             if (inlineIns.contains(ins)) {
                 if (def instanceof SetLocalTypeIns) {
-                    InstructionDefinition prevDef = code.code.get(idx-1).definition;
-                    if ((prevDef instanceof DupIns && !jumpTargets.contains(idx-2)) || !jumpTargets.contains(idx-1))
-                    {
+                    InstructionDefinition prevDef = code.code.get(idx - 1).definition;
+                    if ((prevDef instanceof DupIns && !jumpTargets.contains(idx - 2)) || !jumpTargets.contains(idx - 1)) {
                         int regId = ((SetLocalTypeIns) def).getRegisterId(ins);
                         staticRegs.put(regId, localData.localRegs.get(regId).getNotCoerced());
                         code.replaceInstruction(idx, new AVM2Instruction(0, DeobfuscatePopIns.getInstance(), null), body);

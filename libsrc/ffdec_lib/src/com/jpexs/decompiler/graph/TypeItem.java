@@ -43,7 +43,7 @@ public class TypeItem extends GraphTargetItem {
     public final DottedChain fullTypeName;
 
     public TypeItem(String s) {
-        this(s == null ? new DottedChain() : new DottedChain(s.split("\\.")));
+        this(s == null ? new DottedChain(new String[]{}, "") : DottedChain.parseWithSuffix(s));
     }
 
     public TypeItem(DottedChain fullTypeName) {
@@ -78,7 +78,7 @@ public class TypeItem extends GraphTargetItem {
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         boolean as3 = localData.constantsAvm2 != null;
 
-        if (localData.fullyQualifiedNames.contains(new DottedChain(fullTypeName.getLast()))) {
+        if (localData.fullyQualifiedNames.contains(DottedChain.parseWithSuffix(fullTypeName.getLast()))) {
             writer.hilightSpecial(fullTypeName.toPrintableString(as3), HighlightSpecialType.TYPE_NAME, fullTypeName.toRawString());
         } else {
             writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(as3, fullTypeName.getLast()), HighlightSpecialType.TYPE_NAME, fullTypeName.toRawString());

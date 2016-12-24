@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.RunnableIOExResult;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
@@ -32,7 +33,6 @@ import com.jpexs.helpers.stat.Statistics;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 
@@ -104,14 +104,15 @@ public class ExportScriptTask implements Callable<File> {
                         asm.getASMSource(exportMode, writer2, null);
                         asm.getActionSourceSuffix(writer2);
                     } else {
-                        List<Action> as;
+                        ActionList as;
                         try (Statistics s = new Statistics("ASMSource.getActions")) {
                             as = asm.getActions();
                         }
+
                         Action.setActionsAddresses(as, 0);
 
                         try (Statistics s = new Statistics("Action.actionsToSource")) {
-                            Action.actionsToSource(asm, as, asm.toString()/*FIXME?*/, writer2);
+                            asm.getActionScriptSource(writer2, as);
                         }
                     }
                 }

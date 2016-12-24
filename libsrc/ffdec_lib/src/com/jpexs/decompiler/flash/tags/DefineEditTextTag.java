@@ -52,6 +52,7 @@ import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
+import com.jpexs.decompiler.flash.types.annotations.EnumValue;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
@@ -146,6 +147,10 @@ public class DefineEditTextTag extends TextTag {
 
     @SWFType(BasicType.UI8)
     @Conditional("hasLayout")
+    @EnumValue(value = ALIGN_LEFT, text = "Left")
+    @EnumValue(value = ALIGN_RIGHT, text = "Right")
+    @EnumValue(value = ALIGN_CENTER, text = "Center")
+    @EnumValue(value = ALIGN_JUSTIFY, text = "Justify")
     public int align;
 
     @SWFType(BasicType.UI16)
@@ -168,6 +173,14 @@ public class DefineEditTextTag extends TextTag {
 
     @Conditional("hasText")
     public String initialText;
+
+    public static final int ALIGN_LEFT = 0;
+
+    public static final int ALIGN_RIGHT = 1;
+
+    public static final int ALIGN_CENTER = 2;
+
+    public static final int ALIGN_JUSTIFY = 3;
 
     /**
      * Constructor
@@ -381,7 +394,6 @@ public class DefineEditTextTag extends TextTag {
             try {
                 saxParser = factory.newSAXParser();
                 DefaultHandler handler = new DefaultHandler() {
-
                     @Override
                     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
                         TextStyle style = styles.peek();
@@ -418,7 +430,7 @@ public class DefineEditTextTag extends TextTag {
                                     char firstChar = size.charAt(0);
                                     if (firstChar != '+' && firstChar != '-') {
                                         int fontSize = Integer.parseInt(size);
-                                        style.fontHeight = (int) Math.round(fontSize * (style.font == null ? 1 : style.font.getDivider()));
+                                        style.fontHeight = (int) Math.round(fontSize * SWF.unitDivisor);
                                         style.fontLeading = leading;
                                     } else {
                                         // todo: parse relative sizes
@@ -428,6 +440,11 @@ public class DefineEditTextTag extends TextTag {
                                  {
                                     if (face != null && face.length() > 0) {
                                         style.fontFace = face;
+                                        FontTag insideFont = swf.getFontByName(face);
+                                        style.font = insideFont;
+                                        if (insideFont != null) {
+                                            style.fontFace = null;
+                                        }
                                     }
                                 }
                                 // todo: parse the following attributes: letterSpacing, kerning
@@ -581,7 +598,7 @@ public class DefineEditTextTag extends TextTag {
     public boolean setFormattedText(MissingCharacterHandler missingCharHandler, String formattedText, String[] texts) throws TextParseException {
         try {
             TextLexer lexer = new TextLexer(new StringReader(formattedText));
-            ParsedSymbol s = null;
+            ParsedSymbol s;
             formattedText = "";
             RECT bounds = new RECT(this.bounds);
             boolean wordWrap = false;
@@ -691,7 +708,7 @@ public class DefineEditTextTag extends TextTag {
                                     useOutlines = true;
                                 }
                                 break;
-                            case "font":
+                            case "font"://note: height parameter must be also present
                                 try {
                                     fontId = Integer.parseInt(paramValue);
 
@@ -699,6 +716,7 @@ public class DefineEditTextTag extends TextTag {
                                     if (ft == null) {
                                         throw new TextParseException("Font not found.", lexer.yyline());
                                     }
+                                    hasFont = true;
                                 } catch (NumberFormatException ne) {
                                     throw new TextParseException("Invalid font value. Number expected. Found: " + paramValue, lexer.yyline());
                                 }
@@ -707,8 +725,9 @@ public class DefineEditTextTag extends TextTag {
                                 fontClass = paramValue;
                                 break;
                             case "height":
-                                try {
+                                try {//TODO: font parameter must be also present
                                     fontHeight = Integer.parseInt(paramValue);
+                                    hasFont = true;
                                 } catch (NumberFormatException ne) {
                                     throw new TextParseException("Invalid height value. Number expected. Found: " + paramValue, lexer.yyline());
                                 }
@@ -900,6 +919,14 @@ public class DefineEditTextTag extends TextTag {
         if (hasFont) {
             needed.add(fontId);
         }
+        if (html && hasText) {
+            List<CharacterWithStyle> chs = getTextWithStyle();
+            for (CharacterWithStyle ch : chs) {
+                if (ch.style.font != null) {
+                    needed.add(ch.style.font.getFontId());
+                }
+            }
+        }
     }
 
     @Override
@@ -984,26 +1011,23 @@ public class DefineEditTextTag extends TextTag {
                     if (i + 1 < txt.size()) {
                         nextChar = txt.get(i + 1).character;
                     }
-                    int advance;
+
                     FontTag font = lastStyle.font;
                     DynamicTextGlyphEntry ge = new DynamicTextGlyphEntry();
                     ge.fontFace = lastStyle.fontFace;
+                    if (ge.fontFace == null && font != null) {
+                        ge.fontFace = font.getFontName();
+                    }
+
                     ge.fontStyle = (lastStyle.bold ? Font.BOLD : 0) | (lastStyle.italic ? Font.ITALIC : 0);
                     ge.character = c;
-                    ge.glyphIndex = font == null ? -1 : font.charToGlyph(c);
-                    if (font != null && font.hasLayout()) {
-                        int kerningAdjustment = 0;
-                        if (nextChar != null) {
-                            kerningAdjustment = font.getCharKerningAdjustment(c, nextChar);
-                            kerningAdjustment /= font.getDivider();
-                        }
-                        advance = (int) Math.round(Math.round((double) lastStyle.fontHeight * (font.getGlyphAdvance(ge.glyphIndex) + kerningAdjustment) / (font.getDivider() * 1024.0)));
-                    } else {
-                        String fontName = lastStyle.fontFace != null ? lastStyle.fontFace : FontTag.defaultFontName;
-                        int fontStyle = font == null ? ge.fontStyle : font.getFontStyle();
-                        advance = (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(fontName, fontStyle, (int) (lastStyle.fontHeight / SWF.unitDivisor), c, nextChar));
-                    }
-                    ge.glyphAdvance = advance;
+
+                    ge.glyphIndex = -1; // always use system character glyphs in edit text
+
+                    String fontName = ge.fontFace != null ? ge.fontFace : FontTag.defaultFontName;
+                    int fontStyle = font == null ? ge.fontStyle : font.getFontStyle();
+                    ge.glyphAdvance = (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(fontName, fontStyle, (int) (lastStyle.fontHeight / SWF.unitDivisor), c, nextChar));
+
                     textModel.addGlyph(c, ge);
                     if (Character.isWhitespace(c)) {
                         lastWasWhiteSpace = true;
@@ -1092,16 +1116,16 @@ public class DefineEditTextTag extends TextTag {
                 yOffset += currentOffset;
                 int alignOffset = 0;
                 switch (align) {
-                    case 0: // left
+                    case ALIGN_LEFT:
                         alignOffset = 0;
                         break;
-                    case 1: // right
+                    case ALIGN_RIGHT:
                         alignOffset = bounds.getWidth() - width;
                         break;
-                    case 2: // center
+                    case ALIGN_CENTER:
                         alignOffset = (bounds.getWidth() - width) / 2;
                         break;
-                    case 3: // justify
+                    case ALIGN_JUSTIFY:
                         // todo;
                         break;
                 }
@@ -1118,6 +1142,10 @@ public class DefineEditTextTag extends TextTag {
                             fid = ft.getFontId();
                         }
                     }
+                    if (tr.style.font != null) {
+                        fid = tr.style.font.getFontId();
+                    }
+
                     tr2.styleFlagsHasFont = fid != 0;
                     tr2.fontId = fid;
                     tr2.textHeight = tr.style.fontHeight;

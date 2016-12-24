@@ -33,6 +33,8 @@ public class ApplicationInfo {
 
     public static final String VENDOR = "JPEXS";
 
+    public static String libraryVersion = "";
+
     public static String version = "";
 
     public static String revision = "";
@@ -65,6 +67,25 @@ public class ApplicationInfo {
 
     static {
         loadProperties();
+        loadLibraryVersion();
+    }
+
+    private static void loadLibraryVersion() {
+        Properties prop = new Properties();
+        try {
+            prop.load(SWF.class.getResourceAsStream("/project.properties"));
+            String version = prop.getProperty("version");
+            int version_build = Integer.parseInt(prop.getProperty("version.build"));
+            boolean nightly = prop.getProperty("nightly").equals("true");
+            if (nightly) {
+                version = version + " nightly build " + version_build;
+            }
+
+            libraryVersion = version;
+        } catch (IOException | NullPointerException | NumberFormatException ex) {
+            // ignore
+            libraryVersion = "unknown";
+        }
     }
 
     private static void loadProperties() {

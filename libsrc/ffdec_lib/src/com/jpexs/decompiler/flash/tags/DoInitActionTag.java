@@ -144,6 +144,15 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
     }
 
     @Override
+    public GraphTextWriter getActionScriptSource(GraphTextWriter writer, ActionList actions) throws InterruptedException {
+        if (actions == null) {
+            actions = getActions();
+        }
+
+        return Action.actionsToSource(this, actions, toString()/*FIXME?*/, writer);
+    }
+
+    @Override
     public ActionList getActions() throws InterruptedException {
         return SWF.getCachedActionList(this, listeners);
     }

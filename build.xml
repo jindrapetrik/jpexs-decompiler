@@ -62,7 +62,7 @@
         <property name="private" value="true" />        
     </target>
     <target name="-loadversion-prop" if="newversion.type">
-        <loadproperties srcfile="version.properties" prefix="version"/> 
+        <loadproperties srcfile="${version_info}" prefix="version"/> 
         <property name="version" value="${version.major}.${version.minor}.${version.release}" />
         <property name="version.number" value="${version.major}.${version.minor}.${version.release}.${version.build}" />  
         <script language="javascript">
@@ -75,7 +75,7 @@
     
  
 
-    <target name="compile" depends="build_lib">
+    <target name="compile" depends="build_lib,-copy-lib">
         <!--<delete dir="${compile.dir}"/>-->        
         <mkdir dir="${compile.dir}"/>
         <javac srcdir="${src.dir}" destdir="${compile.dir}" includes="**/*.java" target="${target.java}" source="${target.java}" debug="true"
@@ -109,6 +109,10 @@
         </javac>
     </target>
 
+    <target name="-test-halt-always">
+        <property name="test.halt.failure" value="true" />
+    </target>
+
     <target name="-test-halt-newver" if="new.version">
         <property name="test.halt.failure" value="true" />
     </target>
@@ -116,6 +120,9 @@
         <property name="test.halt.failure" value="false" />
     </target>
 
+    <target name="testhalt" depends="-test-halt-always,test">
+        
+    </target>
     <target name="test" depends="-test-halt-newver,-test-halt-nonewver,test_lib,compile,compile-tests">
         <delete dir="${test.result.dir}"/>
         <mkdir dir="${test.result.dir}"/>
@@ -181,9 +188,9 @@
         <echo level="info" message="Setup created in ${exe.file}"/>
     </target>
     
-    <target name="library" depends="-loadversion,build_lib">
+    <target name="library" depends="-loadversion,release_lib,-copy-lib">
         <mkdir dir="${releases.dir}"/>
-        <copy file="${core.lib.path}" tofile="${releases.dir}/${prefix.filename}_${version}${version.suffix}_lib.jar"/>
+        <copy file="${lib.file}" todir="${releases.dir}" />
     </target>
     
     <target name="archive" depends="-loadversion,dist">
@@ -273,7 +280,7 @@
 </pkg-info>]]></echo>
 
 
-        <mkbom destfile="${app.installer.dir}/flat/base.pkg/Bom">
+        <mkbom destfile="${basedir}/${app.installer.dir}/flat/base.pkg/Bom">
             <tarfileset dir="${app.installer.dir}/root" uid="0" gid="80" includes="Applications/${app.osx.dir}.app/Contents/MacOS/${app.osx.dir}" filemode="755" />            
             <tarfileset dir="${app.installer.dir}/root" uid="0" gid="80">
                 <exclude name="Applications/${app.osx.dir}.app/Contents/Resources/${app.script}" />
@@ -308,8 +315,8 @@
 </installer-script>]]></echo>                       
        <property name="pkg.file" value="${releases.dir}/${prefix.filename}_${version}${version.suffix}.pkg"/> 
               
-       <xar destfile="${pkg.file}" compression="none">
-           <tarfileset dir="${app.installer.dir}/flat" />
+       <xar destfile="${basedir}/${pkg.file}" compression="none">
+           <tarfileset dir="${app.installer.dir}/flat" group="staff" gid="20" username="builder" uid="501" />
        </xar>                 
     </target>
     
@@ -348,6 +355,7 @@
             <fileset dir="${dist.dir}" />
         </copy>                  
         <fixcrlf srcdir="${app.bundle.dir}/${app.osx.dir}.app/Contents/Resources/" eol="lf" includes="**/*.txt" preservelastmodified="true" />
+        <fixcrlf srcdir="${app.bundle.dir}/${app.osx.dir}.app/Contents/Resources/" eol="lf" includes="**/*.md" preservelastmodified="true" />    
     </target>
     
     <target name="osx-app-archive" depends="osx-app-bundle">        
@@ -460,7 +468,7 @@
 
     </target>
 
-    <target name="release" depends="library,archive,deb,osx-app-archive,installer,osx-app-installer,locales">        
+    <target name="release" depends="library,archive,deb,osx-app-archive,installer,osx-app-installer,locales">
 
     </target>
          
@@ -503,7 +511,7 @@
             <arg value="${newversion.type}" />
             
         </java>        
-        <echo file="version.properties" message="${newversion.prop}" force=""/>
+        <echo file="${version_info}" message="${newversion.prop}" force=""/>
     </target>
     
     <target name="-upload-do" if="upload.config.exists">
@@ -556,6 +564,11 @@
             <arg value="-file" />
             <arg value="fileLang" />
             <arg value="${lang.file}" />
+            
+            <arg value="-file" />
+            <arg value="fileLib" />
+            <arg value="${lib.file}" />
+            
         </java>
     </target>
     
@@ -590,6 +603,8 @@
         <copy todir="${dist.dir}">
             <fileset dir="${resources.dir}" includes="**/*.*"/>
         </copy>
+        <copy todir="${dist.dir}" file="${changelog.file}"/>
+        <fixcrlf srcdir="${dist.dir}" includes="**/*.md" eol="crlf" preservelastmodified="true" />        
         <fixcrlf srcdir="${dist.dir}" includes="**/*.txt" eol="crlf" preservelastmodified="true" />
         <fixcrlf srcdir="${dist.dir}" includes="**/*.sh" eol="lf" preservelastmodified="true" />
         <fixcrlf srcdir="${dist.dir}" includes="**/*.bat" eol="crlf" preservelastmodified="true" />
@@ -654,15 +669,25 @@
     </target>
     <target name="-timestamp" depends="-loadversion,git-tag">
         <tstamp>
-            <format property="BUILTAT" pattern="MM/dd/yyyy hh:mm aa" timezone="CET"/>
-            <format property="VERDATE" pattern="yyyyddMM_hhmm" timezone="CET"/>
+            <format property="BUILTAT" pattern="MM/dd/yyyy hh:mm aa" timezone="CET" locale="en"/>
+            <format property="VERDATE" pattern="yyyyddMM_hhmm" timezone="CET" locale="en"/>
         </tstamp>        
         <echo level="info" message="Version: ${version}"/>
     </target>
     
-    <target name="build_lib">
+    <target name="release_lib" depends="git-tag,-loadversion,-save-version-info,-suffix">
+        <copy file="${version_info}" tofile="${core.lib.version_info}" />        
+        <ant antfile="${core.lib.script}" target="release" inheritAll="false" usenativebasedir="true"/>
+        <property  name="lib.file" value="${lib.releases.dir}/${lib.prefix.filename}_${version}${version.suffix}.zip" />
+    </target>
+    
+    <target name="build_lib" depends="-loadversion,-save-version-info">
+        <copy file="${version_info}" tofile="${core.lib.version_info}" />
         <ant antfile="${core.lib.script}" target="build" inheritAll="false" usenativebasedir="true"/>
-        <copy file="${core.lib.path}" todir="${lib.dir}" />
+    </target>
+    
+    <target name="-copy-lib">
+        <copy file="${core.lib.path}" todir="${lib.dir}" />    
     </target>
     
     <target name="clean_lib">
@@ -718,7 +743,7 @@
         
     </target>
     
-    <target name="build" depends="-loadversion,build_lib,-timestamp,-suffix,compile">        
+    <target name="build" depends="-loadversion,build_lib,-copy-lib,-timestamp,-suffix,compile">        
         <mkdir dir="${dist.dir}"/>
         <!-- <delete dir="${dist.lib.dir}"/> -->
         <mkdir dir="${dist.lib.dir}"/>
@@ -837,20 +862,8 @@
         <!-- NOTHING -->       
     </target>
     
-    <target name="-git-commit-versioninfo">        
-        <exec executable="git" failonerror="true">
-            <arg value="add"/>            
-            <arg value="version.properties"/>
-        </exec>
-        <exec executable="git" failonerror="true">
-            <arg value="commit"/>            
-            <arg value="-m"/>
-            <arg value="version changed to ${newversion.major}.${newversion.minor}.${newversion.release} build ${newversion.build}"/>
-        </exec> 
-    </target>
-    
     <target name="-loadoldversion">
-        <loadproperties srcfile="version.properties" prefix="oldversion" />
+        <loadproperties srcfile="${version_info}" prefix="oldversion" />
     </target>
     
     <target name="-inc-major">
@@ -870,17 +883,17 @@
     </target>   
     
     <target name="-save-version-info-file">        
-        <propertyfile file="version.properties"
+        <propertyfile file="${version_info}"
                       comment="DO NOT MODIFY - it is updated automatically with the build script">                               
-            <entry key="major" value="${newversion.major}"/>
-            <entry key="minor" value="${newversion.minor}"/>
-            <entry key="release" value="${newversion.release}"/>
-            <entry key="build" value="${newversion.build}"/>
-            <entry key="debug" value="${newversion.debug}"/>
+            <entry key="major" value="${version.major}"/>
+            <entry key="minor" value="${version.minor}"/>
+            <entry key="release" value="${version.release}"/>
+            <entry key="build" value="${version.build}"/>
+            <entry key="debug" value="${version.debug}"/>
         </propertyfile>        
     </target>     
     
-    <target name="-save-version-info" depends="-save-version-info-file,-git-commit-versioninfo">        
+    <target name="-save-version-info" depends="-save-version-info-file">
         
     </target>
     
@@ -908,16 +921,105 @@
     
     <target name="upload-last" depends="all,-upload">
         
-    </target>       
+    </target>
     
+        
+    <target name="windows-home" >
+        
+    </target>
+                  
+    
+    <property environment="env" />
+    
+    <condition property="windows_appdata_isset">
+        <and>
+            <os family="windows"/>                
+            <isset property="env.APPDATA" />
+        </and>
+    </condition>
+    <condition property="windows_home_isset">
+        <and>
+            <isset property="user.home" />
+            <os family="windows"/>                            
+        </and>
+    </condition>
+    
+    <condition property="osx_home_isset">
+        <and>
+            <isset property="user.home" />
+            <os family="mac"/>                    
+        </and>        
+    </condition>
+    
+    
+    <condition property="os_specific_home_isset">
+        <or>
+            <isset property="osx_home_isset" />
+            <isset property="windows_appdata_isset" />                            
+            <isset property="windows_home_isset" />  
+        </or>        
+    </condition>
+    
+    <target name="-get-env">
+        <property environment="env"/>
+    </target>
+    
+    <target name="-get-home-from-user-windows-appdata" if="windows_appdata_isset">
+        <property name="app.homedir" value="${env.APPDATA}\${vendor}\${project.name}" />
+        <echo message="Detected homedir in Windows APPDATA: ${app.homedir}" level="info"/>
+    </target>
+    
+    <target name="-get-home-from-user-windows-home" if="windows_home_isset" unless="windows_appdata_isset">
+        <property name="app.homedir" value="${user.home}\Application Data\${vendor}\${project.name}" />
+        <echo message="Detected homedir in Windows home Application Data: ${app.homedir}" level="info"/>
+    </target>
+    <target name="-get-home-from-user-osx-home" if="osx_home_isset">
+        <property name="app.homedir" value="${user.home}/Library/Application Support/${project.name}" />
+        <echo message="Detected homedir in OSX: ${app.homedir}" level="info"/>
+    </target>   
+       
+    <target name="-get-home-from-user" if="user.home" unless="os_specific_home_isset">
+        <property name="app.homedir" value="${user.home}/.${project.name}" />
+        <echo message="Detected homedir in user home: ${app.homedir}" level="info"/>
+    </target>   
+    
+    <target name="-get-home-no" unless="user.home">
+        <property name="app.homedir" value="." />
+        <echo message="Detected homedir in current dir: ${app.homedir}" level="info"/>
+    </target>   
+                                                                                                                                                                                                                                                                                                    
+    <target name="-get-home" depends="-get-home-from-user-windows-appdata,-get-home-from-user-windows-home,-get-home-from-user-osx-home,-get-home-from-user,-get-home-no">        
+        
+    </target>
+    
+    <target name="-get-playerglobal-home" depends="-get-home">
+        <property name="playerglobal.homedir" value="${app.homedir}/flashlib"/>
+        <mkdir dir="${playerglobal.homedir}"/>
+        <echo message="PlayerGlobal homedir: ${playerglobal.homedir}" level="info"/>
+    </target>
+    
+    <target name="download-playerglobal" depends="-get-playerglobal-home">
+        <tempfile property="adobe.temp.file" prefix="adobepages" suffix=".html" deleteonexit="true" />
+        <get src="${adobe.playerglobal.pages.url}" dest="${adobe.temp.file}" />       
+        <replaceregexp flags="s" file="${adobe.temp.file}" match=".*&lt;a href=&quot;([^&quot;]+)&quot;&gt;&lt;img[^&gt;]*/&gt;Download the playerglobal\.swc to target the latest version APIs&lt;/a&gt;.*" replace="\1" />
+        <loadfile srcfile="${adobe.temp.file}" property="playerglobal.url" />
+        <replaceregexp file="${adobe.temp.file}" match=".*/([^/]+\.swc)$" replace="\1" />        
+        <loadfile srcfile="${adobe.temp.file}" property="playerglobal.filename" />
+        <get src="${playerglobal.url}" dest="${playerglobal.homedir}/${playerglobal.filename}" />
+        <delete file="${adobe.temp.file}"/>
+    </target>
     <target name="fix-src-endoflines">
         <fixcrlf srcdir="${src.dir}" includes="**/*.java" />
         <fixcrlf srcdir="${src.dir}" includes="**/*.properties" />
         <fixcrlf srcdir="${src.dir}" includes="**/*.txt" />        
+        <fixcrlf srcdir="${src.dir}" includes="**/*.md" />
         <fixcrlf srcdir="${src.dir}" includes="**/*.xml" />                
         <fixcrlf srcdir="${src.dir}" includes="**/*.flex" />                        
         <fixcrlf srcdir="${src.dir}" includes="**/*.bat" eol="crlf" />
         <fixcrlf srcdir="${src.dir}" includes="**/*.sh" eol="lf" />
         <ant antfile="${core.lib.script}" target="fix-src-endoflines" inheritAll="false" usenativebasedir="true" />        
+    </target>
+    <target name="deps" depends="download-playerglobal">
+        
     </target>                 
 </project>

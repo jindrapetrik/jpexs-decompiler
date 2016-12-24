@@ -27,7 +27,6 @@ import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
-import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.Reference;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
@@ -69,10 +68,13 @@ import com.jpexs.decompiler.flash.gui.abc.tablemodels.UIntTableModel;
 import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
 import com.jpexs.decompiler.flash.gui.editor.LinkHandler;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
+import com.jpexs.decompiler.flash.importers.As3ScriptReplaceException;
+import com.jpexs.decompiler.flash.importers.As3ScriptReplaceExceptionItem;
+import com.jpexs.decompiler.flash.importers.As3ScriptReplacerInterface;
+import com.jpexs.decompiler.flash.importers.FFDecAs3ScriptReplacer;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
-import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import de.hameister.treetable.MyTreeTable;
@@ -80,7 +82,6 @@ import de.hameister.treetable.MyTreeTableModel;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -92,7 +93,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -116,6 +116,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
+import javax.swing.SwingWorker;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.EventListenerList;
 import javax.swing.event.TableModelListener;
@@ -133,6 +134,10 @@ import jsyntaxpane.TokenType;
  * @author JPEXS
  */
 public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABCPanelSearchResult>, TagEditorPanel {
+
+    private As3ScriptReplacerInterface scriptReplacer = null;
+
+    private ScriptPack pack = null;
 
     private final MainPanel mainPanel;
 
@@ -170,7 +175,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
     private final JLabel experimentalLabel = new JLabel(AppStrings.translate("action.edit.experimental"));
 
-    private final JButton editDecompiledButton = new JButton(AppStrings.translate("button.edit"), View.getIcon("edit16"));
+    private final JButton editDecompiledButton = new JButton(AppStrings.translate("button.edit.script.decompiled"), View.getIcon("edit16"));
 
     private final JButton saveDecompiledButton = new JButton(AppStrings.translate("button.save"), View.getIcon("save16"));
 
@@ -182,7 +187,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         return mainPanel;
     }
 
-    public List<ABCPanelSearchResult> search(final SWF swf, final String txt, boolean ignoreCase, boolean regexp, CancellableWorker<Void> worker) {
+    public List<ABCPanelSearchResult> search(final SWF swf, final String txt, boolean ignoreCase, boolean regexp, boolean pcode, CancellableWorker<Void> worker) {
+        // todo: pcode seach
         List<String> ignoredClasses = new ArrayList<>();
         List<String> ignoredNss = new ArrayList<>();
 
@@ -208,7 +214,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
                         continue;
                     }
                     if (Configuration._ignoreAdditionalFlexClasses.get()) {
-                        String fullName = pack.getClassPath().packageStr.add(pack.getClassPath().className).toRawString();
+                        String fullName = pack.getClassPath().packageStr.add(pack.getClassPath().className, pack.getClassPath().namespaceSuffix).toRawString();
                         if (ignoredClasses.contains(fullName)) {
                             continue;
                         }
@@ -304,25 +310,25 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
         public List<VariableNode> path = new ArrayList<>();
 
-        public Long parentId;
+        public Variable var;
+
+        public Variable varInsideGetter;
+
+        public Long parentObjectId;
 
         public int level;
 
-        public Variable thisVar;
+        public Variable trait;
 
-        public Variable thisTrait;
+        public long traitId;
 
-        public long thisTraitId;
-
-        private List<Variable> childs;
-
-        private List<Variable> childTraits;
+        private List<VariableNode> childs;
 
         @Override
         public int hashCode() {
             int hash = 3;
-            hash = 53 * hash + Objects.hashCode(this.parentId);
-            hash = 53 * hash + (this.thisVar == null ? 0 : Objects.hashCode(this.thisVar.name));
+            hash = 53 * hash + Objects.hashCode(this.parentObjectId);
+            hash = 53 * hash + (this.var == null ? 0 : Objects.hashCode(this.var.name));
             return hash;
         }
 
@@ -338,19 +344,19 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
                 return false;
             }
             final VariableNode other = (VariableNode) obj;
-            if (!Objects.equals(this.parentId, other.parentId)) {
+            if (!Objects.equals(this.parentObjectId, other.parentObjectId)) {
                 return false;
             }
-            if (this.thisVar == null && other.thisVar == null) {
+            if (this.var == null && other.var == null) {
                 return true;
             }
-            if (this.thisVar == null) {
+            if (this.var == null) {
                 return false;
             }
-            if (other.thisVar == null) {
+            if (other.var == null) {
                 return false;
             }
-            return Objects.equals(this.thisVar.name, other.thisVar.name);
+            return Objects.equals(this.var.name, other.var.name);
         }
 
         public boolean loaded = false;
@@ -364,31 +370,41 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
             if (level == 0) {
                 return "root"; //TODO: localize?
             }
-            return thisVar.name;
+            return var.name;
         }
 
         private void refresh() {
             if (path.size() > 1) {
                 path.get(path.size() - 2).reloadChildren();
-            } else {
-                //Main.getDebugHandler().refreshFrame();
-                //InFrame fr = Main.getDebugHandler().getFrame();
             }
         }
 
         private void reloadChildren() {
-            InGetVariable igv = Main.getDebugHandler().getVariable(parentId, thisVar.name, true);
             childs = new ArrayList<>();
-            childTraits = new ArrayList<>();
-            if (thisVar.vType != VariableType.FUNCTION || ((thisVar.flags & VariableFlags.HAS_GETTER) > 0)) {
-                thisVar = igv.parent;
+
+            if ("".equals(var.name)) {
+                return;
+            }
+            InGetVariable igv;
+
+            Long objectId = varToObjectId(varInsideGetter);
+
+            if (parentObjectId == 0 && objectId != 0) {
+                igv = Main.getDebugHandler().getVariable(objectId, "", true);
+            } else {
+                igv = Main.getDebugHandler().getVariable(parentObjectId, var.name, true);
+            }
+
+            //current var is getter function - set it to value really got
+            //if ((var.flags & VariableFlags.HAS_GETTER) > 0)
+            {
+                varInsideGetter = igv.parent;
             }
             Variable curTrait = null;
-
             for (int i = 0; i < igv.childs.size(); i++) {
                 if (!isTraits(igv.childs.get(i))) {
-                    childs.add(igv.childs.get(i));
-                    childTraits.add(curTrait);
+                    Long parentObjectId = varToObjectId(var);
+                    childs.add(new VariableNode(path, level + 1, igv.childs.get(i), parentObjectId, curTrait));//igv.parentId
                 } else {
                     curTrait = igv.childs.get(i);
                 }
@@ -404,14 +420,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
         public VariableNode getChildAt(int index) {
             ensureLoaded();
-            Long parId = 0L;
-            if (thisVar != null && (thisVar.vType == VariableType.OBJECT || thisVar.vType == VariableType.MOVIECLIP)) {
-                parId = (Long) thisVar.value;
-            }
-            VariableNode vn = new VariableNode(level + 1, childs.get(index), parId, childTraits.get(index));
-            vn.path.addAll(path);
-            vn.path.add(vn);
-            return vn;
+            return childs.get(index);
         }
 
         public int getChildCount() {
@@ -419,27 +428,40 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
             return childs.size();
         }
 
-        public VariableNode(int level, Variable thisVar, Long parentId, Variable thisTrait) {
-            this.parentId = parentId;
-            this.thisVar = thisVar;
+        public VariableNode(List<VariableNode> parentPath, int level, Variable var, Long parentObjectId, Variable trait) {
+            this.var = var;
+            this.parentObjectId = parentObjectId;
             this.level = level;
-            this.thisTrait = thisTrait;
+            this.trait = trait;
+            this.path.addAll(parentPath);
+            this.path.add(this);
+            loaded = false;
         }
 
-        public VariableNode(int level, Variable thisVar, Long parentId, Variable thisTrait, Long thisTraitId, List<Variable> vars, List<Variable> varTraits) {
-            this.parentId = parentId;
-
-            this.thisVar = thisVar;
-
+        public VariableNode(List<VariableNode> parentPath, int level, Variable var, Long parentObjectId, Variable trait, List<VariableNode> subvars) {
+            this.var = var;
+            this.parentObjectId = parentObjectId;
             this.level = level;
-            this.childs = vars;
+            this.trait = trait;
 
-            this.thisTrait = thisTrait;
-
-            this.childTraits = varTraits;
+            this.childs = subvars;
+            this.path.addAll(parentPath);
             this.path.add(this);
-
+            for (VariableNode vn : subvars) {
+                vn.path.clear();
+                vn.path.addAll(this.path);
+                vn.path.add(vn);
+            }
             loaded = true;
+        }
+    }
+
+    public static Long varToObjectId(Variable var) {
+        if (var != null && (var.vType == VariableType.OBJECT)) //|| var.vType == VariableType.MOVIECLIP)) {
+        {
+            return (Long) var.value;
+        } else {
+            return 0L;
         }
     }
 
@@ -465,27 +487,54 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
         public VariablesTableModel(MyTreeTable ttable, List<Variable> vars, List<Long> parentIds) {
             this.ttable = ttable;
-            List<Variable> varTraits = new ArrayList<>();
+
+            List<VariableNode> childs = new ArrayList<>();
+
             for (int i = 0; i < vars.size(); i++) {
-                varTraits.add(null);
+                childs.add(new VariableNode(new ArrayList<>(), 1, vars.get(i), 0L/*parentIds.get(i)*/, null));
             }
-            root = new VariableNode(0, null, 0L, null, 0L, vars, varTraits);
+            root = new VariableNode(new ArrayList<>(), 0, null, 0L, null, childs);
         }
 
         @Override
         public int getColumnCount() {
-            return 3;
+            return 6;
         }
+
+        public Variable getVarAt(Object node) {
+            if (node == root) {
+                return null;
+            }
+            return ((VariableNode) node).var;
+        }
+
+        private static final int COLUMN_NAME = 0;
+
+        private static final int COLUMN_TRAIT = 1;
+
+        private static final int COLUMN_SCOPE = 2;
+
+        private static final int COLUMN_FLAGS = 3;
+
+        private static final int COLUMN_TYPE = 4;
+
+        private static final int COLUMN_VALUE = 5;
 
         @Override
         public String getColumnName(int columnIndex) {
             switch (columnIndex) {
-                case 0:
+                case COLUMN_NAME:
                     return AppStrings.translate("variables.column.name");
-                case 1:
+                case COLUMN_SCOPE:
+                    return AppStrings.translate("variables.column.scope");
+                case COLUMN_FLAGS:
+                    return AppStrings.translate("variables.column.flags");
+                case COLUMN_TYPE:
                     return AppStrings.translate("variables.column.type");
-                case 2:
+                case COLUMN_VALUE:
                     return AppStrings.translate("variables.column.value");
+                case COLUMN_TRAIT:
+                    return AppStrings.translate("variables.column.trait");
                 default:
                     return null;
             }
@@ -493,10 +542,116 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
         @Override
         public Class<?> getColumnClass(int columnIndex) {
-            if (columnIndex == 0) {
+            if (columnIndex == COLUMN_NAME) {
                 return MyTreeTableModel.class;
             }
             return String.class;
+        }
+
+        private String flagsToScopeString(int flags) {
+            int scope = flags & VariableFlags.SCOPE_MASK;
+            switch (scope) {
+                case VariableFlags.PRIVATE_SCOPE:
+                    return "private";
+                case VariableFlags.PROTECTED_SCOPE:
+                    return "protected";
+                case VariableFlags.PUBLIC_SCOPE:
+                    return "public";
+                case VariableFlags.NAMESPACE_SCOPE:
+                    return "namespace";
+                case VariableFlags.INTERNAL_SCOPE:
+                    return "internal";
+                default:
+                    return "?";
+            }
+        }
+
+        /*
+        1 DONT_ENUMERATE
+        2 ?
+        4 READ_ONLY
+        8 ?
+        16 ?
+        32 IS_LOCAL
+        64
+        128
+        256
+        512
+        1024
+        2048
+        4096
+        8192
+        16384
+        32768
+        65536 IS_ARGUMENT
+        131072 IS_DYNAMIC
+        262144 IS_EXCEPTION
+        524288 HAS_GETTER
+        1048576 HAS_SETTER
+        2097152 IS_STATIC
+        4194304 IS_CONST
+        8388608,16777216,33554432 SCOPE
+        67108864 IS_CLASS
+         */
+        private String flagsToString(int flags) {
+
+            Integer unknownFlags[] = new Integer[]{
+                2,
+                8,
+                16,
+                64,
+                128,
+                256,
+                512,
+                1024,
+                2048,
+                4096,
+                8192,
+                16384,
+                32768
+            };
+            List<String> flagsStr = new ArrayList<>();
+
+            if ((flags & VariableFlags.DONT_ENUMERATE) > 0) {
+                flagsStr.add("dontEnumerate");
+            }
+            for (Integer f : unknownFlags) {
+                if ((flags & f) > 0) {
+                    flagsStr.add("unk" + f);
+                }
+            }
+            if ((flags & VariableFlags.HAS_GETTER) > 0) {
+                flagsStr.add("get");
+            }
+            if ((flags & VariableFlags.HAS_SETTER) > 0) {
+                flagsStr.add("set");
+            }
+            if ((flags & VariableFlags.READ_ONLY) > 0) {
+                flagsStr.add("readonly");
+            }
+            if ((flags & VariableFlags.IS_CONST) > 0) {
+                flagsStr.add("const");
+            }
+            if ((flags & VariableFlags.IS_DYNAMIC) > 0) {
+                flagsStr.add("dynamic");
+            }
+            if ((flags & VariableFlags.IS_CLASS) > 0) {
+                flagsStr.add("class");
+            }
+            if ((flags & VariableFlags.IS_ARGUMENT) > 0) {
+                flagsStr.add("argument");
+            }
+            if ((flags & VariableFlags.IS_EXCEPTION) > 0) {
+                flagsStr.add("exception");
+            }
+            if ((flags & VariableFlags.IS_LOCAL) > 0) {
+                flagsStr.add("local");
+            }
+            if ((flags & VariableFlags.IS_STATIC) > 0) {
+                flagsStr.add("static");
+            }
+
+            return String.join(", ", flagsStr);
         }
 
         @Override
@@ -507,39 +662,59 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
                 }
                 return "";
             }
-            Variable v = ((VariableNode) node).thisVar;
+            Variable var = ((VariableNode) node).var;
+            Variable var_getter = ((VariableNode) node).varInsideGetter;
+            Variable trait = ((VariableNode) node).trait;
+            boolean readOnly = (var.flags & VariableFlags.READ_ONLY) > 0;
+            boolean hasGetter = (var.flags & VariableFlags.HAS_GETTER) > 0;
+            boolean hasSetter = (var.flags & VariableFlags.HAS_SETTER) > 0;
+            boolean onlySetter = hasSetter && !hasGetter;
+
+            //String flagStr = flagsToString(var.flags);
+            Variable val = var;
+            if (var_getter != null) {
+                val = var_getter;
+            }
 
             switch (columnIndex) {
-                case 0:
-                    return v.name;
-                case 1:
-                    String typeStr = v.getTypeAsStr();
+                case COLUMN_NAME:
+                    return var.name;
+                case COLUMN_SCOPE:
+                    return flagsToScopeString(var.flags);
+                case COLUMN_FLAGS:
+                    return flagsToString(var.flags);
+                case COLUMN_TYPE:
+                    String typeStr = val.getTypeAsStr();
                     if ("Object".equals(typeStr)) {
-                        typeStr = v.className;
+                        typeStr = val.className;
                     }
                     if ("Object".equals(typeStr)) {
-                        typeStr = v.typeName;
+                        typeStr = val.typeName;
                     }
                     return typeStr;
-                case 2:
-                    switch (v.vType) {
+                case COLUMN_VALUE:
+                    switch (val.vType) {
                         case VariableType.OBJECT:
                         case VariableType.MOVIECLIP:
                         case VariableType.FUNCTION:
-                            return v.getTypeAsStr() + "(" + v.value + ")";
+                            return var.getTypeAsStr() + "(" + val.value + ")";
                         case VariableType.STRING:
-                            return "\"" + Helper.escapeActionScriptString("" + v.value) + "\"";
+                            return "\"" + Helper.escapeActionScriptString("" + val.value) + "\"";
                         default:
-                            return EcmaScript.toString(v.value);
+                            return EcmaScript.toString(val.value);
                     }
-
+                case COLUMN_TRAIT:
+                    if (trait != null) {
+                        return trait.name;
+                    }
+                    return "";
             }
             return null;
         }
 
         @Override
         public boolean isCellEditable(Object node, int column) {
-            return column == 0 || (column == 2 && node != root && ((VariableNode) node).thisVar.isPrimitive);
+            return column == COLUMN_NAME || (column == COLUMN_VALUE && node != root && ((VariableNode) node).var.isPrimitive);
         }
 
         @Override
@@ -575,7 +750,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
                 default:
                     return;
             }
-            Main.getDebugHandler().setVariable(((VariableNode) node).parentId, ((VariableNode) node).thisVar.name, valType, symb.value);
+            Main.getDebugHandler().setVariable(((VariableNode) node).parentObjectId, ((VariableNode) node).var.name, valType, symb.value);
             //((VariableNode) node).refresh();
             Object[] path = new Object[((VariableNode) node).path.size()];
             for (int i = 0; i < path.length; i++) {
@@ -685,7 +860,6 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         decompiledTextArea.addTextChangedListener(this::decompiledTextAreaTextChanged);
 
         decompiledTextArea.setLinkHandler(new LinkHandler() {
-
             @Override
             public boolean isLink(Token token) {
                 return hasDeclaration(token.start);
@@ -754,7 +928,6 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         panB.add(decLabel, BorderLayout.NORTH);
 
         Main.getDebugHandler().addConnectionListener(new DebuggerHandler.ConnectionListener() {
-
             @Override
             public void connected() {
                 decButtonsPan.setVisible(false);
@@ -781,7 +954,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         splitPane.setContinuousLayout(true);
 
         decompiledTextArea.changeContentType("text/actionscript");
-        decompiledTextArea.setFont(new Font("Monospaced", Font.PLAIN, decompiledTextArea.getFont().getSize()));
+        decompiledTextArea.setFont(Configuration.getSourceFont());
 
         View.addEditorAction(decompiledTextArea, new AbstractAction() {
             @Override
@@ -881,7 +1054,10 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
             return false; //?
         }
         SyntaxDocument sd = (SyntaxDocument) decompiledTextArea.getDocument();
-        Token t = sd.getTokenAt(pos + 1);
+        Token currentChartoken = sd.getTokenAt(pos);
+        Token nextChartoken = sd.getTokenAt(pos + 1);
+
+        Token t = currentChartoken != null && currentChartoken.length == 1 ? currentChartoken : nextChartoken;
         if (t == null || (t.type != TokenType.IDENTIFIER && t.type != TokenType.KEYWORD && t.type != TokenType.REGEX)) {
             return false;
         }
@@ -935,7 +1111,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         Reference<Integer> multinameIndexRef = new Reference<>(0);
 
         if (decompiledTextArea.getPropertyTypeAtPos(pos, abcIndex, classIndex, traitIndex, classTrait, multinameIndexRef)) {
-            UsageFrame.gotoUsage(ABCPanel.this, new TraitMultinameUsage(getAbcList().get(abcIndex.getVal()).getABC(), multinameIndexRef.getVal(), classIndex.getVal(), traitIndex.getVal(), classTrait.getVal(), null, -1) {
+            UsageFrame.gotoUsage(ABCPanel.this, new TraitMultinameUsage(getAbcList().get(abcIndex.getVal()).getABC(), multinameIndexRef.getVal(), decompiledTextArea.getScriptLeaf().scriptIndex, classIndex.getVal(), traitIndex.getVal(), classTrait.getVal() ? TraitMultinameUsage.TRAITS_TYPE_CLASS : TraitMultinameUsage.TRAITS_TYPE_INSTANCE, null, -1) {
             });
             return;
         }
@@ -1077,7 +1253,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
                 ClassPath classPath = item.getClassPath();
 
                 // first check the className to avoid calling unnecessary toString
-                if (name.endsWith(classPath.className) && classPath.toRawString().equals(name)) {
+                if (name.endsWith(classPath.className + classPath.namespaceSuffix) && classPath.toRawString().equals(name)) {
                     pack = item;
                     break;
                 }
@@ -1123,7 +1299,6 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
     public void setDecompiledEditMode(boolean val) {
         View.execInEventDispatch(new Runnable() {
-
             @Override
             public void run() {
                 if (val) {
@@ -1150,36 +1325,40 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
     }
 
     private void editDecompiledButtonActionPerformed(ActionEvent evt) {
-        File swc = Configuration.getPlayerSWC();
-        if (swc == null || !swc.exists()) {
-            if (View.showConfirmDialog(this, AppStrings.translate("message.playerpath.lib.notset"), AppStrings.translate("message.action.playerglobal.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE) == JOptionPane.OK_OPTION) {
-                Main.advancedSettings("paths");
-                return;
-            }
+        scriptReplacer = mainPanel.getAs3ScriptReplacer();
+        if (scriptReplacer == null) {
+            return;
         }
+
         if (View.showConfirmDialog(null, AppStrings.translate("message.confirm.experimental.function"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, Configuration.warningExperimentalAS3Edit, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION) {
+            pack = decompiledTextArea.getScriptLeaf();
             setDecompiledEditMode(true);
+            SwingWorker initReplaceWorker = new SwingWorker() {
+                @Override
+                protected Object doInBackground() throws Exception {
+                    scriptReplacer.initReplacement(pack);
+                    return null;
+                }
+            };
+            initReplaceWorker.execute();
         }
     }
 
     private void cancelDecompiledButtonActionPerformed(ActionEvent evt) {
         setDecompiledEditMode(false);
+        if (scriptReplacer != null) {
+            scriptReplacer.deinitReplacement(pack);
+        }
     }
 
     private void saveDecompiledButtonActionPerformed(ActionEvent evt) {
-        ScriptPack pack = decompiledTextArea.getScriptLeaf();
         int oldIndex = pack.scriptIndex;
         SWF.uncache(pack);
-
         try {
             String oldSp = pack.getClassPath().toRawString();
-            /*List<ScriptPack> packs = abc.script_info.get(oldIndex).getPacks(abc, oldIndex, null, pack.allABCs);
-             if (!packs.isEmpty()) {
-
-             }*/
-
             String as = decompiledTextArea.getText();
-            abc.replaceScriptPack(pack, as);
+            abc.replaceScriptPack(scriptReplacer, pack, as);
+            scriptReplacer.deinitReplacement(pack);
             lastDecompiled = as;
             setDecompiledEditMode(false);
             mainPanel.updateClassesList();
@@ -1190,16 +1369,41 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
             reload();
             View.showMessageDialog(this, AppStrings.translate("message.action.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showCodeSavedMessage);
-        } catch (AVM2ParseException ex) {
+        } catch (As3ScriptReplaceException asre) {
+            StringBuilder sb = new StringBuilder();
+            int firstErrorLine = As3ScriptReplaceExceptionItem.LINE_UNKNOWN;
+            int firstErrorCol = As3ScriptReplaceExceptionItem.COL_UNKNOWN;
+            String firstErrorText = null;
             abc.script_info.get(oldIndex).delete(abc, false);
-            decompiledTextArea.gotoLine((int) ex.line);
-            decompiledTextArea.markError();
-            View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-        } catch (CompilationException ex) {
-            abc.script_info.get(oldIndex).delete(abc, false);
-            decompiledTextArea.gotoLine((int) ex.line);
-            decompiledTextArea.markError();
-            View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+
+            for (As3ScriptReplaceExceptionItem item : asre.getExceptionItems()) {
+                if (firstErrorLine == As3ScriptReplaceExceptionItem.LINE_UNKNOWN) {
+                    firstErrorLine = item.getLine();
+                    firstErrorCol = item.getCol();
+                }
+                if (firstErrorText == null) {
+                    firstErrorText = item.getMessage();
+                }
+                sb.append(item.getFile()).append(":").append(item.getLine()).append(" (column ").append(item.getCol()).append(")").append(":").append("\n");
+                sb.append("  ").append(item.getMessage());
+                sb.append("\n");
+                sb.append("\n");
+            }
+            if (firstErrorLine != As3ScriptReplaceExceptionItem.LINE_UNKNOWN) {
+                if (firstErrorCol != As3ScriptReplaceExceptionItem.COL_UNKNOWN) {
+                    decompiledTextArea.gotoLineCol(firstErrorLine, firstErrorCol);
+                } else {
+                    decompiledTextArea.gotoLine(firstErrorLine);
+                }
+                decompiledTextArea.markError();
+            }
+
+            if (scriptReplacer instanceof FFDecAs3ScriptReplacer) { //oldStyle error display - single error, no column
+                View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", firstErrorText).replace("%line%", Long.toString(firstErrorLine)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+            } else {
+                View.showMessageDialog(this, sb.toString(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+            }
+            decompiledTextArea.requestFocus();
 
         } catch (Throwable ex) {
             Logger.getLogger(ABCPanel.class

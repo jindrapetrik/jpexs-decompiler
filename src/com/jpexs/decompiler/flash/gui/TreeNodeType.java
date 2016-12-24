@@ -44,6 +44,7 @@ public enum TreeNodeType {
     BUNDLE_ZIP,
     BUNDLE_SWC,
     BUNDLE_BINARY,
+    BUNDLE_IGGY,
     HEADER,
     SET_BACKGROUNDCOLOR,
     FILE_ATTRIBUTES,

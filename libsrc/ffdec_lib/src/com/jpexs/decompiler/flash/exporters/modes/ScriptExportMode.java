@@ -22,5 +22,5 @@ package com.jpexs.decompiler.flash.exporters.modes;
  */
 public enum ScriptExportMode {
 
-    AS, PCODE, PCODE_HEX, HEX, CONSTANTS;
+    AS, PCODE, PCODE_HEX, HEX, CONSTANTS, AS_METHOD_STUBS;
 }
