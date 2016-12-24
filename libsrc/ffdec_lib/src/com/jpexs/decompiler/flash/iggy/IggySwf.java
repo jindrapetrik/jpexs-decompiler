@@ -22,6 +22,7 @@ public class IggySwf implements StructureInterface {
     String name;
 
     private List<IggyFont> fonts = new ArrayList<>();
+
     // private List<Long> font_data_addresses = new ArrayList<>();
     private List<IggyFont> add_fonts = new ArrayList<>();
 //    private List<Long> add_font_data_addresses = new ArrayList<>();
@@ -31,7 +32,9 @@ public class IggySwf implements StructureInterface {
     public IggySwf(ReadDataStreamInterface stream) throws IOException {
         readFromDataStream(stream);
     }
+
     private List<IggyText> texts = new ArrayList<>();
+
     //private List<Long> text_data_addresses = new ArrayList<>();
     private List<IggyText> add_texts = new ArrayList<>();
     //private List<Long> add_text_data_addresses = new ArrayList<>();
@@ -39,13 +42,18 @@ public class IggySwf implements StructureInterface {
     //private byte font_add_data[];
     //private List<Long> font_additional_size = new ArrayList<>();
     private IggyFontBinInfo font_bin_info[];
+
     private List<String> sequenceNames = new ArrayList<>();
     //private List<Long> sequenceValues = new ArrayList<>();
 
     private IggyFontTypeInfo type_info[];
+
     private String type_info_name[];
+
     private IggyDeclStrings decl_strings;
+
     private long ofs_additional;
+
     private long additional_address;
 
     public IggyFlashHeader64 getHdr() {
@@ -79,7 +87,7 @@ public class IggySwf implements StructureInterface {
         if (pad8 > 8) {
             s.seek(pad8, SeekMode.CUR);
         }
-        //here is offset [2]  - 232        
+        //here is offset [2]  - 232
         s.seek(hdr.getBaseAddress(), SeekMode.SET);
         s.readUI64(); //pad 1
 
@@ -147,7 +155,7 @@ public class IggySwf implements StructureInterface {
             }
         }
         s.seek(hdr.getFontEndAddress(), SeekMode.SET);
-        //here is offset [4]  - 856 ?        
+        //here is offset [4]  - 856 ?
         font_bin_info = new IggyFontBinInfo[(int) hdr.font_count];
         for (int i = 0; i < hdr.font_count; i++) {
             font_bin_info[i] = new IggyFontBinInfo(s);
@@ -335,5 +343,4 @@ public class IggySwf implements StructureInterface {
     public IggyDeclStrings getDeclStrings() {
         return decl_strings;
     }
-
 }

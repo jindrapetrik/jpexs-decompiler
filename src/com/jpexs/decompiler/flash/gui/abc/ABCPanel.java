@@ -68,6 +68,7 @@ import com.jpexs.decompiler.flash.gui.abc.tablemodels.UIntTableModel;
 import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
 import com.jpexs.decompiler.flash.gui.editor.LinkHandler;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
+import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.importers.As3ScriptReplaceException;
 import com.jpexs.decompiler.flash.importers.As3ScriptReplaceExceptionItem;
 import com.jpexs.decompiler.flash.importers.As3ScriptReplacerInterface;
@@ -100,6 +101,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -207,38 +209,45 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
                         ? Pattern.compile(txt, ignoreCase ? (Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE) : 0)
                         : Pattern.compile(Pattern.quote(txt), ignoreCase ? (Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE) : 0);
                 int pos = 0;
-                loop:
-                for (final ScriptPack pack : allpacks) {
-                    pos++;
-                    if (!pack.isSimple && Configuration.ignoreCLikePackages.get()) {
-                        continue;
-                    }
-                    if (Configuration._ignoreAdditionalFlexClasses.get()) {
-                        String fullName = pack.getClassPath().packageStr.add(pack.getClassPath().className, pack.getClassPath().namespaceSuffix).toRawString();
-                        if (ignoredClasses.contains(fullName)) {
+                List<Future<HighlightedText>> futures = new ArrayList<>();
+                try {
+                    loop:
+                    for (final ScriptPack pack : allpacks) {
+                        pos++;
+                        if (!pack.isSimple && Configuration.ignoreCLikePackages.get()) {
                             continue;
                         }
-                        for (String ns : ignoredNss) {
-                            if (fullName.startsWith(ns + ".")) {
-                                continue loop;
+                        if (Configuration._ignoreAdditionalFlexClasses.get()) {
+                            String fullName = pack.getClassPath().packageStr.add(pack.getClassPath().className, pack.getClassPath().namespaceSuffix).toRawString();
+                            if (ignoredClasses.contains(fullName)) {
+                                continue;
+                            }
+                            for (String ns : ignoredNss) {
+                                if (fullName.startsWith(ns + ".")) {
+                                    continue loop;
+                                }
                             }
                         }
-                    }
 
-                    String workText = AppStrings.translate("work.searching");
-                    String decAdd = "";
-                    if (!SWF.isCached(pack)) {
-                        decAdd = ", " + AppStrings.translate("work.decompiling");
-                    }
-
-                    Main.startWork(workText + " \"" + txt + "\"" + decAdd + " - (" + pos + "/" + allpacks.size() + ") " + pack.getClassPath().toString() + "... ", worker);
-                    try {
-                        if (pat.matcher(SWF.getCached(pack).text).find()) {
-                            ABCPanelSearchResult searchResult = new ABCPanelSearchResult(pack);
-                            found.add(searchResult);
+                        String workText = AppStrings.translate("work.searching");
+                        String decAdd = "";
+                        if (!SWF.isCached(pack)) {
+                            decAdd = ", " + AppStrings.translate("work.decompiling");
                         }
-                    } catch (InterruptedException ex) {
-                        break;
+
+                        Main.startWork(workText + " \"" + txt + "\"" + decAdd + " - (" + pos + "/" + allpacks.size() + ") " + pack.getClassPath().toString() + "... ", worker);
+                        Future<HighlightedText> text = SWF.getCachedFuture(pack, (HighlightedText result) -> {
+                            if (pat.matcher(result.text).find()) {
+                                ABCPanelSearchResult searchResult = new ABCPanelSearchResult(pack);
+                                found.add(searchResult);
+                            }
+                        });
+
+                        futures.add(text);
+                    }
+                } catch (InterruptedException ex) {
+                    for (Future<HighlightedText> future : futures) {
+                        future.cancel(true);
                     }
                 }
             }

@@ -10,10 +10,7 @@ import com.jpexs.decompiler.flash.iggy.streams.TemporaryDataStream;
 import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -31,8 +28,11 @@ public class IggyFile implements StructureInterface {
     final static Logger LOGGER = Logger.getLogger(IggyFile.class.getName());
 
     private File originalFile;
+
     private IggyHeader header;
+
     private List<IggySubFileEntry> subFileEntries = new ArrayList<>();
+
     private List<byte[]> subFileEntriesData = new ArrayList<>();
 
     private IggySwf iggySwf;
@@ -240,5 +240,4 @@ public class IggyFile implements StructureInterface {
         }
 
     }
-
 }

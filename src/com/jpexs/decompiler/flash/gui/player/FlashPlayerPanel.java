@@ -172,7 +172,7 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
                 }
             };
 
-            // hack: Kernel32.INSTANCE.ConnectNamedPipe never completes in AciveXControl static constructor
+            // hack: Kernel32.INSTANCE.ConnectNamedPipe never completes in ActiveXControl static constructor
             flash = CancellableWorker.call(callable, 5, TimeUnit.SECONDS);
         } catch (ActiveXException | TimeoutException | InterruptedException | ExecutionException ex) {
             throw new FlashUnsupportedException();
@@ -205,7 +205,6 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
 
         timer = new Timer();
         timer.schedule(new TimerTask() {
-
             private boolean isPlaying = false;
 
             private int currentFrame = 0;

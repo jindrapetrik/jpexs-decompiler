@@ -3,27 +3,17 @@ package com.jpexs.decompiler.flash.iggy.conversion;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFBundle;
 import com.jpexs.decompiler.flash.iggy.IggyFile;
-import com.jpexs.decompiler.flash.iggy.IggyFont;
-import com.jpexs.decompiler.flash.tags.DefineFont2Tag;
-import com.jpexs.decompiler.flash.tags.Tag;
-import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
-import com.jpexs.helpers.ReReadableInputStream;
 import com.jpexs.helpers.streams.SeekableInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -116,5 +106,4 @@ public class IggySwfBundle implements SWFBundle {
         }
 
     }
-
 }

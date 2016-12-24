@@ -36,7 +36,6 @@ import com.jpexs.decompiler.flash.abc.avm2.model.StringAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
-import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
@@ -70,6 +69,9 @@ import com.jpexs.decompiler.flash.action.swf5.ActionNewMethod;
 import com.jpexs.decompiler.flash.action.swf5.ActionNewObject;
 import com.jpexs.decompiler.flash.action.swf5.ActionSetMember;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
+import com.jpexs.decompiler.flash.cache.AS2Cache;
+import com.jpexs.decompiler.flash.cache.AS3Cache;
+import com.jpexs.decompiler.flash.cache.ScriptDecompiledListener;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSwfNode;
@@ -156,6 +158,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.ImmediateFuture;
 import com.jpexs.helpers.NulStream;
 import com.jpexs.helpers.ProgressListener;
 import com.jpexs.helpers.SerializableImage;
@@ -187,6 +190,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.DeflaterOutputStream;
@@ -338,13 +342,12 @@ public final class SWF implements SWFContainerItem, Timelined {
     private final Cache<SoundTag, byte[]> soundCache = Cache.getInstance(false, false, "sound");
 
     @Internal
-    private final Cache<ASMSource, ActionList> as2PcodeCache = Cache.getInstance(true, true, "as2pcode");
+    public final AS2Cache as2Cache = new AS2Cache();
 
     @Internal
-    private final Cache<ASMSource, HighlightedText> as2Cache = Cache.getInstance(true, false, "as2");
+    public final AS3Cache as3Cache = new AS3Cache();
 
-    @Internal
-    private final Cache<ScriptPack, HighlightedText> as3Cache = Cache.getInstance(true, false, "as3");
+    private static final DecompilerPool decompilerPool = new DecompilerPool();
 
     public static List<String> swfSignatures = Arrays.asList(
             "FWS", // Uncompressed Flash
@@ -395,7 +398,6 @@ public final class SWF implements SWFContainerItem, Timelined {
             swfList.swfs.clear();
         }
 
-        as2PcodeCache.clear();
         as2Cache.clear();
         as3Cache.clear();
         frameCache.clear();
@@ -2543,7 +2545,6 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     public void clearScriptCache() {
-        as2PcodeCache.clear();
         as2Cache.clear();
         as3Cache.clear();
         IdentifiersDeobfuscation.clearCache();
@@ -2582,31 +2583,71 @@ public final class SWF implements SWFContainerItem, Timelined {
     public static void uncache(ASMSource src) {
         if (src != null) {
             SWF swf = src.getSwf();
-            swf.as2Cache.remove(src);
-            swf.as2PcodeCache.remove(src);
+            if (swf != null) {
+                swf.as2Cache.remove(src);
+            }
         }
     }
 
     public static void uncache(ScriptPack pack) {
         if (pack != null) {
-            pack.getSwf().as3Cache.remove(pack);
+            SWF swf = pack.getSwf();
+            if (swf != null) {
+                swf.as3Cache.remove(pack);
+            }
         }
     }
 
     public static boolean isCached(ASMSource src) {
-        return src.getSwf().as2Cache.contains(src);
+        if (src != null) {
+            SWF swf = src.getSwf();
+            if (swf != null) {
+                return swf.as2Cache.isCached(src);
+            }
+        }
+
+        return false;
     }
 
     public static boolean isCached(ScriptPack pack) {
-        return pack.getSwf().as3Cache.contains(pack);
+        if (pack != null) {
+            SWF swf = pack.getSwf();
+            if (swf != null) {
+                return swf.as3Cache.isCached(pack);
+            }
+        }
+
+        return false;
+    }
+
+    public static HighlightedText getFromCache(ASMSource src) {
+        if (src != null) {
+            SWF swf = src.getSwf();
+            if (swf != null) {
+                return swf.as2Cache.get(src);
+            }
+        }
+
+        return null;
+    }
+
+    public static HighlightedText getFromCache(ScriptPack pack) {
+        if (pack != null) {
+            SWF swf = pack.getSwf();
+            if (swf != null) {
+                return swf.as3Cache.get(pack);
+            }
+        }
+
+        return null;
     }
 
     public static ActionList getCachedActionList(ASMSource src, final List<DisassemblyListener> listeners) throws InterruptedException {
         synchronized (src) {
             SWF swf = src.getSwf();
             int deobfuscationMode = Configuration.autoDeobfuscate.get() ? 1 : 0;
-            if (swf != null && swf.as2PcodeCache.contains(src)) {
-                ActionList result = swf.as2PcodeCache.get(src);
+            if (swf != null && swf.as2Cache.isPcodeCached(src)) {
+                ActionList result = swf.as2Cache.getPcode(src);
                 if (result.deobfuscationMode == deobfuscationMode) {
                     return result;
                 }
@@ -2625,7 +2666,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 list.fileData = actionBytes.getArray();
                 list.deobfuscationMode = deobfuscationMode;
                 if (swf != null) {
-                    swf.as2PcodeCache.put(src, list);
+                    swf.as2Cache.put(src, list);
                 }
 
                 return list;
@@ -2638,49 +2679,68 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
     }
 
-    public static HighlightedText getFromCache(ASMSource src) {
-        SWF swf = src.getSwf();
-        if (swf.as2Cache.contains(src)) {
-            return swf.as2Cache.get(src);
-        }
-
-        return null;
-    }
-
     public static HighlightedText getCached(ASMSource src, ActionList actions) throws InterruptedException {
         SWF swf = src.getSwf();
-        if (swf.as2Cache.contains(src)) {
-            return swf.as2Cache.get(src);
+        HighlightedText res;
+        if (swf != null) {
+            res = swf.as2Cache.get(src);
+            if (res != null) {
+                return res;
+            }
         }
 
-        HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
-        writer.startFunction("!script");
-        src.getActionScriptSource(writer, actions);
-        writer.endFunction();
-
-        HighlightedText res = new HighlightedText(writer);
-        swf.as2Cache.put(src, res);
-        return res;
+        return decompilerPool.decompile(src, actions);
     }
 
     public static HighlightedText getCached(ScriptPack pack) throws InterruptedException {
         SWF swf = pack.getSwf();
-        if (swf.as3Cache.contains(pack)) {
-            return swf.as3Cache.get(pack);
+        HighlightedText res;
+        if (swf != null) {
+            res = swf.as3Cache.get(pack);
+            if (res != null) {
+                return res;
+            }
         }
 
-        int scriptIndex = pack.scriptIndex;
-        ScriptInfo script = null;
-        if (scriptIndex > -1) {
-            script = pack.abc.script_info.get(scriptIndex);
-        }
-        boolean parallel = Configuration.parallelSpeedUp.get();
-        HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
-        pack.toSource(writer, script == null ? null : script.traits.traits, new ConvertData(), ScriptExportMode.AS, parallel);
-        HighlightedText res = new HighlightedText(writer);
-        swf.as3Cache.put(pack, res);
+        return decompilerPool.decompile(pack);
+    }
 
-        return res;
+    public static Future<HighlightedText> getCachedFuture(ASMSource src, ActionList actions, ScriptDecompiledListener<HighlightedText> listener) throws InterruptedException {
+        SWF swf = src.getSwf();
+        HighlightedText res;
+        if (swf != null) {
+            res = swf.as2Cache.get(src);
+            if (res != null) {
+                if (listener != null) {
+                    listener.onComplete(res);
+                }
+
+                return new ImmediateFuture<>(res);
+            }
+        }
+
+        return decompilerPool.submitTask(src, actions, listener);
+    }
+
+    public static Future<HighlightedText> getCachedFuture(ScriptPack pack, ScriptDecompiledListener<HighlightedText> listener) throws InterruptedException {
+        SWF swf = pack.getSwf();
+        HighlightedText res;
+        if (swf != null) {
+            res = swf.as3Cache.get(pack);
+            if (res != null) {
+                if (listener != null) {
+                    listener.onComplete(res);
+                }
+
+                return new ImmediateFuture<>(res);
+            }
+        }
+
+        return decompilerPool.submitTask(pack, listener);
+    }
+
+    public DecompilerPool getDecompilerPool() {
+        return decompilerPool;
     }
 
     public Cache<CharacterTag, RECT> getRectCache() {
@@ -2898,7 +2958,8 @@ public final class SWF implements SWFContainerItem, Timelined {
             timelined.setModified(true);
             timelined.resetTimeline();
         } else // timeline should be always the swf here
-         if (removeDependencies) {
+        {
+            if (removeDependencies) {
                 removeTagWithDependenciesFromTimeline(tag, timelined.getTimeline());
                 timelined.setModified(true);
             } else {
@@ -2907,6 +2968,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                     timelined.setModified(true);
                 }
             }
+        }
     }
 
     @Override

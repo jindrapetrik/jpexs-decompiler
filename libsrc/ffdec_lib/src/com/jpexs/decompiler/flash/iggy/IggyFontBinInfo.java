@@ -16,24 +16,34 @@ public class IggyFontBinInfo implements StructureInterface {
 
     @IggyFieldType(DataType.uint64_t)
     long size_of_this_info = STRUCT_SIZE;
+
     @IggyFieldType(value = DataType.uint16_t, count = 4)
     int font_specific[];
+
     @IggyFieldType(DataType.float_t)
     float normX;
+
     @IggyFieldType(DataType.float_t)
     float zero;
+
     @IggyFieldType(DataType.float_t)
     float zero2;
+
     @IggyFieldType(DataType.float_t)
     float normY;
+
     @IggyFieldType(DataType.float_t)
     float minSize;
+
     @IggyFieldType(DataType.float_t)
     float maxSize;
+
     @IggyFieldType(DataType.uint64_t)
     long order_in_iggy_file;
+
     @IggyFieldType(DataType.int64_t)
     long address_back; //relative
+
     @IggyFieldType(value = DataType.uint8_t, count = 40)
     byte pad[];
 
@@ -59,7 +69,7 @@ public class IggyFontBinInfo implements StructureInterface {
         maxSize = s.readFloat();
         order_in_iggy_file = s.readUI64();
         address_back = s.readSI64();
-//if(address_back + s.position() -  8 != text_offsets[i]) Printf("Wrong iggy font format (bininfo-offsetback) (%u)!\n",i); 
+//if(address_back + s.position() -  8 != text_offsets[i]) Printf("Wrong iggy font format (bininfo-offsetback) (%u)!\n",i);
         pad = s.readBytes(40);
     }
 
@@ -79,5 +89,4 @@ public class IggyFontBinInfo implements StructureInterface {
         s.writeSI64(address_back);
         s.writeBytes(pad);
     }
-
 }

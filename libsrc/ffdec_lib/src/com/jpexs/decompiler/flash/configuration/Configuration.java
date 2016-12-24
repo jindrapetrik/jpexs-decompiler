@@ -57,7 +57,7 @@ import javax.swing.JOptionPane;
  *
  * @author JPEXS
  */
-public class Configuration {
+public final class Configuration {
 
     private static final String CONFIG_NAME = "config.bin";
 
@@ -83,7 +83,7 @@ public class Configuration {
 
     @ConfigurationDefaultInt(10)
     @ConfigurationCategory("decompilation")
-    public static final ConfigurationItem<Integer> parallelSpeedUpThreadCount = null;
+    private static final ConfigurationItem<Integer> parallelSpeedUpThreadCount = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("script")
@@ -926,7 +926,7 @@ public class Configuration {
     }
 
     public static Map<String, Field> getConfigurationFields() {
-        Field[] fields = Configuration.class.getFields();
+        Field[] fields = Configuration.class.getDeclaredFields();
         Map<String, Field> result = new HashMap<>();
         for (Field field : fields) {
             if (ConfigurationItem.class.isAssignableFrom(field.getType())) {

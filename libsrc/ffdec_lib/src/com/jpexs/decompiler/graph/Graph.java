@@ -1040,8 +1040,8 @@ public class Graph {
     private void getPrecontinues(String path, BaseLocalData localData, GraphPart parent, GraphPart part, Set<GraphPart> allParts, List<Loop> loops, List<GraphPart> stopPart) throws InterruptedException {
         try {
             markLevels(path, localData, part, allParts, loops);
-        } catch (ThreadDeath | InterruptedException iex) {
-            throw iex;
+        } catch (ThreadDeath | InterruptedException ex) {
+            throw ex;
         } catch (Throwable ex) {
             //It is unusual code so markLevels failed, nevermind, it can still work
         }

@@ -18,64 +18,94 @@ public class IggyFlashHeader32 implements IggyFlashHeaderInterface {
 
     @IggyFieldType(DataType.uint32_t)
     long main_offset; // 0 Relative offset to first section (matches sizeof header)
+
     @IggyFieldType(DataType.uint32_t)
     long as3_section_offset; // 4  Relative offset to as3 file names table...
+
     @IggyFieldType(DataType.uint32_t)
     long unk_offset; // 8   relative offset to something
+
     @IggyFieldType(DataType.uint32_t)
     long unk_offset2; // 0xC  relative offset to something
+
     @IggyFieldType(DataType.uint32_t)
     long unk_offset3; //  0x10 relative offset to something
+
     @IggyFieldType(DataType.uint32_t)
     long unk_offset4; // 0x14 relative offset to something
+
     @IggyFieldType(DataType.uint32_t)
     long xmin; //0x18 in pixels
+
     @IggyFieldType(DataType.uint32_t)
     long ymin; //0x0C in pixels
+
     @IggyFieldType(DataType.uint32_t)
     long xmax; // 0x20 in pixels
+
     @IggyFieldType(DataType.uint32_t)
     long ymax; // 0x24 in pixels
+
     @IggyFieldType(DataType.uint32_t)
     long unk_28; // probably number of blocks/objects after header
+
     @IggyFieldType(DataType.uint32_t)
     long unk_2C;
+
     @IggyFieldType(DataType.uint32_t)
     long unk_30;
+
     @IggyFieldType(DataType.uint32_t)
     long unk_34;
+
     @IggyFieldType(DataType.uint32_t)
     long unk_38;
+
     @IggyFieldType(DataType.uint32_t)
     long unk_3C;
+
     @IggyFieldType(DataType.float_t)
     float frameRate;
+
     @IggyFieldType(DataType.uint32_t)
     long unk_44;
+
     @IggyFieldType(DataType.uint32_t)
     long unk_48;
+
     @IggyFieldType(DataType.uint32_t)
     long unk_4C;
+
     @IggyFieldType(DataType.uint32_t)
     long names_offset; // 0x50 relative offset to the names/import section of the file
+
     @IggyFieldType(DataType.uint32_t)
     long unk_offset5; // 0x54 relative offset to something
+
     @IggyFieldType(DataType.uint64_t)
     long unk_58; // Maybe number of imports/names pointed by names_offset
+
     @IggyFieldType(DataType.uint32_t)
     long last_section_offset; // 0x60 relative offset, points to the small last section of the file
+
     @IggyFieldType(DataType.uint32_t)
     long unk_offset6; // 0x64 relative offset to something
+
     @IggyFieldType(DataType.uint32_t)
     long as3_code_offset; // 0x68 relative offset to as3 code (8 bytes header + abc blob)
+
     @IggyFieldType(DataType.uint32_t)
     long as3_names_offset; // 0x6C relative offset to as3 file names table (or classes names or whatever)
+
     @IggyFieldType(DataType.uint32_t)
     long unk_70;
+
     @IggyFieldType(DataType.uint32_t)
     long unk_74;
+
     @IggyFieldType(DataType.uint32_t)
     long unk_78; // Maybe number of classes / as3 names
+
     @IggyFieldType(DataType.uint32_t)
     long unk_7C;
 

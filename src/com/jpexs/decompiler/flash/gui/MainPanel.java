@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.ApplicationInfo;
+import com.jpexs.decompiler.flash.DecompilerPool;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.SWF;
@@ -244,6 +245,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     private final TimelineViewPanel timelineViewPanel;
 
     private final MainFrameStatusPanel statusPanel;
+
+    private Thread taskThread;
 
     private final MainFrameMenu mainMenu;
 
@@ -843,6 +846,29 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
 
         mainMenu.updateComponents(swf);
+
+        if (taskThread != null) {
+            taskThread.interrupt();
+        }
+
+        Thread t = new Thread() {
+            @Override
+            public void run() {
+                while (!Thread.currentThread().isInterrupted()) {
+                    DecompilerPool d = swf.getDecompilerPool();
+                    statusPanel.setStatus(swf.getFileTitle() + " " + d.getStat());
+
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException ex) {
+                        break;
+                    }
+                }
+            }
+        };
+
+        t.start();
+        taskThread = t;
     }
 
     private void updateUi() {
