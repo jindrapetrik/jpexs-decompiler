@@ -22,5 +22,7 @@ package com.jpexs.decompiler.flash.search;
  */
 public interface ScriptSearchListener {
 
-    public void onWork(String message);
+    public void onDecompile(int pos, int total, String name);
+
+    public void onSearch(int pos, int total, String name);
 }

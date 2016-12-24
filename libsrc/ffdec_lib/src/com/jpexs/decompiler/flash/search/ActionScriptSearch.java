@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.search;
 
-import com.jpexs.decompiler.flash.AppResources;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.cache.ScriptDecompiledListener;
@@ -50,8 +49,6 @@ public class ActionScriptSearch {
 
             int pos = 0;
             List<Future<HighlightedText>> futures = new ArrayList<>();
-            String workText = AppResources.translate("work.searching");
-            String decAdd = ", " + AppResources.translate("work.decompiling");
             try {
                 for (Map.Entry<String, ASMSource> item : asms.entrySet()) {
                     pos++;
@@ -71,14 +68,14 @@ public class ActionScriptSearch {
                             @Override
                             public void onStart() {
                                 if (listener != null) {
-                                    listener.onWork(workText + " \"" + txt + "\"" + decAdd + " - (" + fpos + "/" + asms.size() + ") " + item.getKey() + "... ");
+                                    listener.onDecompile(fpos, asms.size(), item.getKey());
                                 }
                             }
 
                             @Override
                             public void onComplete(HighlightedText result) {
                                 if (listener != null) {
-                                    listener.onWork(workText + " \"" + txt + "\"" + decAdd + " - (" + fpos + "/" + asms.size() + ") " + item.getKey() + "... ");
+                                    listener.onSearch(fpos, asms.size(), item.getKey());
                                 }
 
                                 if (pat.matcher(result.text).find()) {
@@ -121,8 +118,6 @@ public class ActionScriptSearch {
 
             int pos = 0;
             List<Future<HighlightedText>> futures = new ArrayList<>();
-            String workText = AppResources.translate("work.searching");
-            String decAdd = ", " + AppResources.translate("work.decompiling");
             try {
                 loop:
                 for (final ScriptPack pack : allpacks) {
@@ -147,14 +142,14 @@ public class ActionScriptSearch {
                         @Override
                         public void onStart() {
                             if (listener != null) {
-                                listener.onWork(workText + " \"" + txt + "\"" + decAdd + " - (" + fpos + "/" + allpacks.size() + ") " + pack.getClassPath().toString() + "... ");
+                                listener.onDecompile(fpos, allpacks.size(), pack.getClassPath().toString());
                             }
                         }
 
                         @Override
                         public void onComplete(HighlightedText result) {
                             if (listener != null) {
-                                listener.onWork(workText + " \"" + txt + "\" - (" + fpos + "/" + allpacks.size() + ") " + pack.getClassPath().toString() + "... ");
+                                listener.onSearch(fpos, allpacks.size(), pack.getClassPath().toString());
                             }
 
                             if (pat.matcher(result.text).find()) {

@@ -192,10 +192,18 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
     public List<ABCSearchResult> search(final SWF swf, final String txt, boolean ignoreCase, boolean regexp, boolean pcode, CancellableWorker<Void> worker) {
         if (txt != null && !txt.isEmpty()) {
             searchPanel.setOptions(ignoreCase, regexp);
+
+            String workText = AppStrings.translate("work.searching");
+            String decAdd = AppStrings.translate("work.decompiling");
             return new ActionScriptSearch().searchAs3(swf, txt, ignoreCase, regexp, pcode, new ScriptSearchListener() {
                 @Override
-                public void onWork(String message) {
-                    Main.startWork(message, worker);
+                public void onDecompile(int pos, int total, String name) {
+                    Main.startWork(workText + " \"" + txt + "\", " + decAdd + " - (" + pos + "/" + total + ") " + name + "... ", worker);
+                }
+
+                @Override
+                public void onSearch(int pos, int total, String name) {
+                    Main.startWork(workText + " \"" + txt + "\" - (" + pos + "/" + total + ") " + name + "... ", worker);
                 }
             });
         }
