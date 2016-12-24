@@ -13,44 +13,44 @@ All notable changes to this project will be documented in this file.
 - AS3 decompilation - colliding trait/class names handling - show hash suffix with namespace index on such cases
 - Deobfuscation Tool - Fix colliding trait/classes via toolbar command
 - Auto rename identifiers option now fixes colliding trait/classes aswell
-- #1254 FLA export - detecting scripts on AS3 timeline
-- #907 FFDec Library JAR file has version inside it.
-- #1311, #1313 actionScript source font size
+- [#1254] FLA export - detecting scripts on AS3 timeline
+- [#907] FFDec Library JAR file has version inside it.
+- [#1311], [#1313] actionScript source font size
 - Display warning when library version and GUI version mismatch
 - Changelog file
-- #1308 Search by all P-code files (AS 1/2 only)
+- [#1308] Search by all P-code files (AS 1/2 only)
 
 ### Changed
-- #1189 AS3 - sort imports to have same order always
+- [#1189] AS3 - sort imports to have same order always
 - GUI: AS3 P-code header show actual trait type and method type
 - GUI: Script editing buttons now named "Edit ActionScript" and "Edit P-code"
 - Set advance values button has confirm dialog with information
-- #1274 Linux package no longer requires Oracle Java only
+- [#1274] Linux package no longer requires Oracle Java only
 - Library now packaged inside ZIP file
 
 ### Fixed
 - P-code docs formatting fix
 - Export dialog - handling sprite and SWF frames correctly
-- #1275 debugger - show local variables fixes
+- [#1275] debugger - show local variables fixes
 - AS3 p-code editing - popup docs correctly displayed when label on line start
-- #1278 replacing DefineBits error
-- #1281 DefineFont 2/3 getting character advance value when replacing fix
+- [#1278] replacing DefineBits error
+- [#1281] DefineFont 2/3 getting character advance value when replacing fix
 - Set advance values button - Do not set advance if the char cannot be displayed in source font
 - AS3 Goto declaration for single character names
 - Identifier renaming for top level classes
 - AS3 direct editation not correctly saving local register names
-- #1254 FLA export - placing AS3 classes to FLA directory instead of scripts dir
+- [#1254] FLA export - placing AS3 classes to FLA directory instead of scripts dir
 - Mac OS X installer fix (.pkg)
-- #1289 AS1/2 direct editation - variables used in inner functions must not be stored in local registers
-- #1283 AS3 Unbounded Vector - Vector<*> decompilation and direct editation fix
-- #1294 Font editation (DefineFont2/3) - correct switching of wide character codes
-- #1302 Callpropvoid instruction docblock not correct
-- #1309 recent files not getting updates
-- #1312 faster colliding usages finder
-- #1303 garbled text when exporting frame with text
-- #1314 user interface: button order
-- Internal viewer shows red image when bitmap fill is not available (see issue #1320)
-- #1323 Audio playback fails
+- [#1289] AS1/2 direct editation - variables used in inner functions must not be stored in local registers
+- [#1283] AS3 Unbounded Vector - Vector<*> decompilation and direct editation fix
+- [#1294] Font editation (DefineFont2/3) - correct switching of wide character codes
+- [#1302] Callpropvoid instruction docblock not correct
+- [#1309] recent files not getting updates
+- [#1312] faster colliding usages finder
+- [#1303] garbled text when exporting frame with text
+- [#1314] user interface: button order
+- Internal viewer shows red image when bitmap fill is not available (see issue [#1320])
+- [#1323] Audio playback fails
 
 ## [9.0.0] - 2016-08-12
 ### Added
@@ -1229,7 +1229,6 @@ All notable changes to this project will be documented in this file.
 - Memory limit decreased - FFDec was not working on 32 bit JVM.
 
 ## [1.6.3] - 2013-06-20
-
 ### Changed
 - Parallel SpeedUp can be disabled in menu
 - Better loop detection
@@ -1481,7 +1480,6 @@ All notable changes to this project will be documented in this file.
 - AS3: Method info editor fixed
 - Edittext & Button displaying
 
-## [1.2.0 update 1] - 2013-01-19
 ## [1.2.0] - 2013-01-19
 ### Added
 - Displaying various SWF objects (shapes, sprites,...) with flash player library (Windows only, sorry).
@@ -1683,8 +1681,7 @@ All notable changes to this project will be documented in this file.
 [1.4.0 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.4.0...version1.4.0u1
 [1.4.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.3.1...version1.4.0
 [1.3.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.3.0...version1.3.1
-[1.3.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.2.0u1...version1.3.0
-[1.2.0 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.2.0...version1.2.0u1
+[1.3.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.2.0...version1.3.0
 [1.2.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.1.0...version1.2.0
 [1.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.0.1...version1.1.0
 [1.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.0.0...version1.0.1
@@ -1694,12 +1691,12 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
-[#1162]: https://www.free-decompiler.com/flash/issues/1162
 [#1156]: https://www.free-decompiler.com/flash/issues/1156
 [#1171]: https://www.free-decompiler.com/flash/issues/1171
-[#1199]: https://www.free-decompiler.com/flash/issues/1199
 [#1170]: https://www.free-decompiler.com/flash/issues/1170
 [#1241]: https://www.free-decompiler.com/flash/issues/1241
+[#1162]: https://www.free-decompiler.com/flash/issues/1162
+[#1199]: https://www.free-decompiler.com/flash/issues/1199
 [#1151]: https://www.free-decompiler.com/flash/issues/1151
 [#1128]: https://www.free-decompiler.com/flash/issues/1128
 [#1163]: https://www.free-decompiler.com/flash/issues/1163
@@ -1720,13 +1717,13 @@ All notable changes to this project will be documented in this file.
 [#1265]: https://www.free-decompiler.com/flash/issues/1265
 [#1268]: https://www.free-decompiler.com/flash/issues/1268
 [#1161]: https://www.free-decompiler.com/flash/issues/1161
-[#1145]: https://www.free-decompiler.com/flash/issues/1145
 [#1118]: https://www.free-decompiler.com/flash/issues/1118
 [#409]: https://www.free-decompiler.com/flash/issues/409
 [#1132]: https://www.free-decompiler.com/flash/issues/1132
 [#1134]: https://www.free-decompiler.com/flash/issues/1134
 [#1121]: https://www.free-decompiler.com/flash/issues/1121
 [#1052]: https://www.free-decompiler.com/flash/issues/1052
+[#1145]: https://www.free-decompiler.com/flash/issues/1145
 [#758]: https://www.free-decompiler.com/flash/issues/758
 [#1096]: https://www.free-decompiler.com/flash/issues/1096
 [#1104]: https://www.free-decompiler.com/flash/issues/1104
@@ -1762,8 +1759,8 @@ All notable changes to this project will be documented in this file.
 [#1008]: https://www.free-decompiler.com/flash/issues/1008
 [#1004]: https://www.free-decompiler.com/flash/issues/1004
 [#933]: https://www.free-decompiler.com/flash/issues/933
-[#418]: https://www.free-decompiler.com/flash/issues/418
 [#1062]: https://www.free-decompiler.com/flash/issues/1062
+[#418]: https://www.free-decompiler.com/flash/issues/418
 [#1047]: https://www.free-decompiler.com/flash/issues/1047
 [#812]: https://www.free-decompiler.com/flash/issues/812
 [#1056]: https://www.free-decompiler.com/flash/issues/1056
@@ -1790,10 +1787,10 @@ All notable changes to this project will be documented in this file.
 [#1000]: https://www.free-decompiler.com/flash/issues/1000
 [#1017]: https://www.free-decompiler.com/flash/issues/1017
 [#1030]: https://www.free-decompiler.com/flash/issues/1030
+[#949]: https://www.free-decompiler.com/flash/issues/949
 [#944]: https://www.free-decompiler.com/flash/issues/944
 [#939]: https://www.free-decompiler.com/flash/issues/939
 [#942]: https://www.free-decompiler.com/flash/issues/942
-[#949]: https://www.free-decompiler.com/flash/issues/949
 [#952]: https://www.free-decompiler.com/flash/issues/952
 [#858]: https://www.free-decompiler.com/flash/issues/858
 [#905]: https://www.free-decompiler.com/flash/issues/905
@@ -1822,9 +1819,9 @@ All notable changes to this project will be documented in this file.
 [#760]: https://www.free-decompiler.com/flash/issues/760
 [#887]: https://www.free-decompiler.com/flash/issues/887
 [#842]: https://www.free-decompiler.com/flash/issues/842
+[#841]: https://www.free-decompiler.com/flash/issues/841
 [#772]: https://www.free-decompiler.com/flash/issues/772
 [#762]: https://www.free-decompiler.com/flash/issues/762
-[#841]: https://www.free-decompiler.com/flash/issues/841
 [#862]: https://www.free-decompiler.com/flash/issues/862
 [#865]: https://www.free-decompiler.com/flash/issues/865
 [#613]: https://www.free-decompiler.com/flash/issues/613
@@ -1834,12 +1831,12 @@ All notable changes to this project will be documented in this file.
 [#728]: https://www.free-decompiler.com/flash/issues/728
 [#857]: https://www.free-decompiler.com/flash/issues/857
 [#860]: https://www.free-decompiler.com/flash/issues/860
-[#350]: https://www.free-decompiler.com/flash/issues/350
 [#824]: https://www.free-decompiler.com/flash/issues/824
 [#809]: https://www.free-decompiler.com/flash/issues/809
 [#805]: https://www.free-decompiler.com/flash/issues/805
 [#825]: https://www.free-decompiler.com/flash/issues/825
 [#737]: https://www.free-decompiler.com/flash/issues/737
+[#350]: https://www.free-decompiler.com/flash/issues/350
 [#814]: https://www.free-decompiler.com/flash/issues/814
 [#816]: https://www.free-decompiler.com/flash/issues/816
 [#835]: https://www.free-decompiler.com/flash/issues/835
@@ -1883,10 +1880,10 @@ All notable changes to this project will be documented in this file.
 [#715]: https://www.free-decompiler.com/flash/issues/715
 [#635]: https://www.free-decompiler.com/flash/issues/635
 [#726]: https://www.free-decompiler.com/flash/issues/726
-[#720]: https://www.free-decompiler.com/flash/issues/720
 [#716]: https://www.free-decompiler.com/flash/issues/716
 [#717]: https://www.free-decompiler.com/flash/issues/717
 [#718]: https://www.free-decompiler.com/flash/issues/718
+[#720]: https://www.free-decompiler.com/flash/issues/720
 [#719]: https://www.free-decompiler.com/flash/issues/719
 [#723]: https://www.free-decompiler.com/flash/issues/723
 [#288]: https://www.free-decompiler.com/flash/issues/288
@@ -1938,9 +1935,9 @@ All notable changes to this project will be documented in this file.
 [#593]: https://www.free-decompiler.com/flash/issues/593
 [#594]: https://www.free-decompiler.com/flash/issues/594
 [#579]: https://www.free-decompiler.com/flash/issues/579
+[#428]: https://www.free-decompiler.com/flash/issues/428
 [#337]: https://www.free-decompiler.com/flash/issues/337
 [#584]: https://www.free-decompiler.com/flash/issues/584
-[#428]: https://www.free-decompiler.com/flash/issues/428
 [#576]: https://www.free-decompiler.com/flash/issues/576
 [#250]: https://www.free-decompiler.com/flash/issues/250
 [#580]: https://www.free-decompiler.com/flash/issues/580
@@ -1988,20 +1985,20 @@ All notable changes to this project will be documented in this file.
 [#303]: https://www.free-decompiler.com/flash/issues/303
 [#324]: https://www.free-decompiler.com/flash/issues/324
 [#346]: https://www.free-decompiler.com/flash/issues/346
-[#369]: https://www.free-decompiler.com/flash/issues/369
 [#371]: https://www.free-decompiler.com/flash/issues/371
-[#390]: https://www.free-decompiler.com/flash/issues/390
 [#426]: https://www.free-decompiler.com/flash/issues/426
-[#453]: https://www.free-decompiler.com/flash/issues/453
 [#457]: https://www.free-decompiler.com/flash/issues/457
 [#458]: https://www.free-decompiler.com/flash/issues/458
-[#459]: https://www.free-decompiler.com/flash/issues/459
 [#460]: https://www.free-decompiler.com/flash/issues/460
-[#461]: https://www.free-decompiler.com/flash/issues/461
 [#462]: https://www.free-decompiler.com/flash/issues/462
 [#463]: https://www.free-decompiler.com/flash/issues/463
 [#465]: https://www.free-decompiler.com/flash/issues/465
 [#466]: https://www.free-decompiler.com/flash/issues/466
+[#369]: https://www.free-decompiler.com/flash/issues/369
+[#390]: https://www.free-decompiler.com/flash/issues/390
+[#453]: https://www.free-decompiler.com/flash/issues/453
+[#459]: https://www.free-decompiler.com/flash/issues/459
+[#461]: https://www.free-decompiler.com/flash/issues/461
 [#451]: https://www.free-decompiler.com/flash/issues/451
 [#454]: https://www.free-decompiler.com/flash/issues/454
 [#455]: https://www.free-decompiler.com/flash/issues/455
@@ -2037,8 +2034,8 @@ All notable changes to this project will be documented in this file.
 [#357]: https://www.free-decompiler.com/flash/issues/357
 [#391]: https://www.free-decompiler.com/flash/issues/391
 [#395]: https://www.free-decompiler.com/flash/issues/395
-[#301]: https://www.free-decompiler.com/flash/issues/301
 [#334]: https://www.free-decompiler.com/flash/issues/334
+[#301]: https://www.free-decompiler.com/flash/issues/301
 [#383]: https://www.free-decompiler.com/flash/issues/383
 [#386]: https://www.free-decompiler.com/flash/issues/386
 [#367]: https://www.free-decompiler.com/flash/issues/367
@@ -2080,12 +2077,12 @@ All notable changes to this project will be documented in this file.
 [#319]: https://www.free-decompiler.com/flash/issues/319
 [#323]: https://www.free-decompiler.com/flash/issues/323
 [#223]: https://www.free-decompiler.com/flash/issues/223
-[#258]: https://www.free-decompiler.com/flash/issues/258
 [#261]: https://www.free-decompiler.com/flash/issues/261
-[#267]: https://www.free-decompiler.com/flash/issues/267
 [#269]: https://www.free-decompiler.com/flash/issues/269
 [#274]: https://www.free-decompiler.com/flash/issues/274
 [#275]: https://www.free-decompiler.com/flash/issues/275
+[#258]: https://www.free-decompiler.com/flash/issues/258
+[#267]: https://www.free-decompiler.com/flash/issues/267
 [#286]: https://www.free-decompiler.com/flash/issues/286
 [#233]: https://www.free-decompiler.com/flash/issues/233
 [#235]: https://www.free-decompiler.com/flash/issues/235
@@ -2122,11 +2119,11 @@ All notable changes to this project will be documented in this file.
 [#239]: https://www.free-decompiler.com/flash/issues/239
 [#240]: https://www.free-decompiler.com/flash/issues/240
 [#237]: https://www.free-decompiler.com/flash/issues/237
-[#207]: https://www.free-decompiler.com/flash/issues/207
 [#217]: https://www.free-decompiler.com/flash/issues/217
 [#219]: https://www.free-decompiler.com/flash/issues/219
 [#224]: https://www.free-decompiler.com/flash/issues/224
 [#121]: https://www.free-decompiler.com/flash/issues/121
+[#207]: https://www.free-decompiler.com/flash/issues/207
 [#151]: https://www.free-decompiler.com/flash/issues/151
 [#171]: https://www.free-decompiler.com/flash/issues/171
 [#206]: https://www.free-decompiler.com/flash/issues/206
@@ -2147,14 +2144,14 @@ All notable changes to this project will be documented in this file.
 [#197]: https://www.free-decompiler.com/flash/issues/197
 [#216]: https://www.free-decompiler.com/flash/issues/216
 [#168]: https://www.free-decompiler.com/flash/issues/168
+[#176]: https://www.free-decompiler.com/flash/issues/176
+[#177]: https://www.free-decompiler.com/flash/issues/177
+[#202]: https://www.free-decompiler.com/flash/issues/202
 [#173]: https://www.free-decompiler.com/flash/issues/173
 [#190]: https://www.free-decompiler.com/flash/issues/190
 [#129]: https://www.free-decompiler.com/flash/issues/129
 [#153]: https://www.free-decompiler.com/flash/issues/153
-[#176]: https://www.free-decompiler.com/flash/issues/176
-[#177]: https://www.free-decompiler.com/flash/issues/177
 [#180]: https://www.free-decompiler.com/flash/issues/180
-[#202]: https://www.free-decompiler.com/flash/issues/202
 [#136]: https://www.free-decompiler.com/flash/issues/136
 [#179]: https://www.free-decompiler.com/flash/issues/179
 [#144]: https://www.free-decompiler.com/flash/issues/144
@@ -2180,9 +2177,9 @@ All notable changes to this project will be documented in this file.
 [#117]: https://www.free-decompiler.com/flash/issues/117
 [#127]: https://www.free-decompiler.com/flash/issues/127
 [#134]: https://www.free-decompiler.com/flash/issues/134
+[#155]: https://www.free-decompiler.com/flash/issues/155
 [#142]: https://www.free-decompiler.com/flash/issues/142
 [#146]: https://www.free-decompiler.com/flash/issues/146
-[#155]: https://www.free-decompiler.com/flash/issues/155
 [#130]: https://www.free-decompiler.com/flash/issues/130
 [#132]: https://www.free-decompiler.com/flash/issues/132
 [#145]: https://www.free-decompiler.com/flash/issues/145
