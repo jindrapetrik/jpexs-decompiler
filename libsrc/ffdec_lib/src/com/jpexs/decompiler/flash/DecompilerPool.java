@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
+import com.jpexs.helpers.ImmediateFuture;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -51,10 +52,13 @@ public class DecompilerPool {
     }
 
     public Future<HighlightedText> submitTask(ASMSource src, ActionList actions, ScriptDecompiledListener<HighlightedText> listener) {
-        Future<HighlightedText> f = executor.submit(new Callable<HighlightedText>() {
+        Callable<HighlightedText> callable = new Callable<HighlightedText>() {
             @Override
             public HighlightedText call() throws Exception {
-                Thread.sleep(10000);
+                if (listener != null) {
+                    listener.onStart();
+                }
+
                 HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
                 writer.startFunction("!script");
                 src.getActionScriptSource(writer, actions);
@@ -72,22 +76,25 @@ public class DecompilerPool {
 
                 return result;
             }
-        });
+        };
 
-        return f;
+        return submit(callable);
     }
 
     public Future<HighlightedText> submitTask(ScriptPack pack, ScriptDecompiledListener<HighlightedText> listener) {
-        Future<HighlightedText> f = executor.submit(new Callable<HighlightedText>() {
+        Callable<HighlightedText> callable = new Callable<HighlightedText>() {
             @Override
             public HighlightedText call() throws Exception {
+                if (listener != null) {
+                    listener.onStart();
+                }
+
                 int scriptIndex = pack.scriptIndex;
                 ScriptInfo script = null;
                 if (scriptIndex > -1) {
                     script = pack.abc.script_info.get(scriptIndex);
                 }
                 boolean parallel = Configuration.parallelSpeedUp.get();
-                Thread.sleep(10000);
                 HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
                 pack.toSource(writer, script == null ? null : script.traits.traits, new ConvertData(), ScriptExportMode.AS, parallel);
 
@@ -103,9 +110,30 @@ public class DecompilerPool {
 
                 return result;
             }
-        });
+        };
 
-        return f;
+        return submit(callable);
+    }
+
+    private Future<HighlightedText> submit(Callable<HighlightedText> callable) {
+        boolean parallel = Configuration.parallelSpeedUp.get();
+        if (parallel) {
+            Future<HighlightedText> f = executor.submit(callable);
+            return f;
+        } else {
+            boolean cancelled = false;
+            Throwable throwable = null;
+            HighlightedText result = null;
+            try {
+                result = callable.call();
+            } catch (InterruptedException ex) {
+                cancelled = true;
+            } catch (Exception ex) {
+                throwable = ex;
+            }
+
+            return new ImmediateFuture<>(result, throwable, cancelled);
+        }
     }
 
     public String getStat() {

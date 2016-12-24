@@ -360,6 +360,7 @@ public class AdvancedSettingsDialog extends AppDialog {
                 String locName = locNames.get(name);
 
                 try {
+                    field.setAccessible(true);
                     ConfigurationItem item = (ConfigurationItem) field.get(null);
 
                     ParameterizedType listType = (ParameterizedType) field.getGenericType();
@@ -580,6 +581,7 @@ public class AdvancedSettingsDialog extends AppDialog {
             Field field = fields.get(name);
             ConfigurationItem item = null;
             try {
+                field.setAccessible(true);
                 item = (ConfigurationItem) field.get(null);
             } catch (IllegalArgumentException | IllegalAccessException ex) {
                 // Reflection exceptions. This should never happen

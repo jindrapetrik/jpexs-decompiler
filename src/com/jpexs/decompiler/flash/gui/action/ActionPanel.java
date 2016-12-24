@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.action.parser.script.ParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.script.SymbolType;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
+import com.jpexs.decompiler.flash.cache.ScriptDecompiledListener;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.gui.AppStrings;
@@ -69,6 +70,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -256,30 +258,48 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
             } else {
                 pat = Pattern.compile(Pattern.quote(txt), ignoreCase ? (Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE) : 0);
             }
-            int pos = 0;
-            for (Entry<String, ASMSource> item : asms.entrySet()) {
-                pos++;
-                String workText = AppStrings.translate("work.searching");
-                String decAdd = "";
-                ASMSource asm = item.getValue();
-                if (!pcode && !SWF.isCached(asm)) {
-                    decAdd = ", " + AppStrings.translate("work.decompiling");
-                }
 
-                Main.startWork(workText + " \"" + txt + "\"" + decAdd + " - (" + pos + "/" + asms.size() + ") " + item.getKey() + "... ", worker);
-                try {
+            int pos = 0;
+            List<Future<HighlightedText>> futures = new ArrayList<>();
+            String workText = AppStrings.translate("work.searching");
+            String decAdd = ", " + AppStrings.translate("work.decompiling");
+            try {
+                for (Entry<String, ASMSource> item : asms.entrySet()) {
+                    pos++;
+                    ASMSource asm = item.getValue();
+
                     if (pcode) {
+                        Main.startWork(workText + " \"" + txt + "\" - (" + pos + "/" + asms.size() + ") " + item.getKey() + "... ", worker);
                         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
                         asm.getASMSource(ScriptExportMode.PCODE, writer, null);
                         String text = writer.toString();
                         if (pat.matcher(text).find()) {
                             found.add(new ActionSearchResult(asm, pcode, item.getKey()));
                         }
-                    } else if (pat.matcher(SWF.getCached(asm, null).text).find()) {
-                        found.add(new ActionSearchResult(asm, pcode, item.getKey()));
+                    } else {
+                        int fpos = pos;
+                        Future<HighlightedText> text = SWF.getCachedFuture(asm, null, new ScriptDecompiledListener<HighlightedText>() {
+                            @Override
+                            public void onStart() {
+                                Main.startWork(workText + " \"" + txt + "\"" + decAdd + " - (" + fpos + "/" + asms.size() + ") " + item.getKey() + "... ", worker);
+                            }
+
+                            @Override
+                            public void onComplete(HighlightedText result) {
+                                Main.startWork(workText + " \"" + txt + "\"" + decAdd + " - (" + fpos + "/" + asms.size() + ") " + item.getKey() + "... ", worker);
+                                if (pat.matcher(result.text).find()) {
+                                    ActionSearchResult searchResult = new ActionSearchResult(asm, pcode, item.getKey());
+                                    found.add(searchResult);
+                                }
+                            }
+                        });
+
+                        futures.add(text);
                     }
-                } catch (InterruptedException ex) {
-                    break;
+                }
+            } catch (InterruptedException ex) {
+                for (Future<HighlightedText> future : futures) {
+                    future.cancel(true);
                 }
             }
 

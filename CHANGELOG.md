@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- [#1240] AS search using multiple threads when parallel speedup is enabled
 
 ## [10.0.0] - 2016-12-24
 ### Added

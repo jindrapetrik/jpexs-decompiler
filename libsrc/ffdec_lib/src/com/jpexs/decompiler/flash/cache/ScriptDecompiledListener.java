@@ -20,8 +20,9 @@ package com.jpexs.decompiler.flash.cache;
  *
  * @author JPEXS
  */
-@FunctionalInterface
 public interface ScriptDecompiledListener<T> {
+
+    public void onStart();
 
     public void onComplete(T result);
 }

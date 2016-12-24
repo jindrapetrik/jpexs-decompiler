@@ -44,6 +44,7 @@ import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScriptLexer;
 import com.jpexs.decompiler.flash.action.parser.script.ParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.script.SymbolType;
+import com.jpexs.decompiler.flash.cache.ScriptDecompiledListener;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.gui.AppDialog;
@@ -101,6 +102,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -208,8 +210,11 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
                 final Pattern pat = regexp
                         ? Pattern.compile(txt, ignoreCase ? (Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE) : 0)
                         : Pattern.compile(Pattern.quote(txt), ignoreCase ? (Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE) : 0);
+
                 int pos = 0;
                 List<Future<HighlightedText>> futures = new ArrayList<>();
+                String workText = AppStrings.translate("work.searching");
+                String decAdd = ", " + AppStrings.translate("work.decompiling");
                 try {
                     loop:
                     for (final ScriptPack pack : allpacks) {
@@ -229,21 +234,32 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
                             }
                         }
 
-                        String workText = AppStrings.translate("work.searching");
-                        String decAdd = "";
-                        if (!SWF.isCached(pack)) {
-                            decAdd = ", " + AppStrings.translate("work.decompiling");
-                        }
+                        int fpos = pos;
+                        Future<HighlightedText> text = SWF.getCachedFuture(pack, new ScriptDecompiledListener<HighlightedText>() {
+                            @Override
+                            public void onStart() {
+                                Main.startWork(workText + " \"" + txt + "\"" + decAdd + " - (" + fpos + "/" + allpacks.size() + ") " + pack.getClassPath().toString() + "... ", worker);
+                            }
 
-                        Main.startWork(workText + " \"" + txt + "\"" + decAdd + " - (" + pos + "/" + allpacks.size() + ") " + pack.getClassPath().toString() + "... ", worker);
-                        Future<HighlightedText> text = SWF.getCachedFuture(pack, (HighlightedText result) -> {
-                            if (pat.matcher(result.text).find()) {
-                                ABCPanelSearchResult searchResult = new ABCPanelSearchResult(pack);
-                                found.add(searchResult);
+                            @Override
+                            public void onComplete(HighlightedText result) {
+                                Main.startWork(workText + " \"" + txt + "\" - (" + fpos + "/" + allpacks.size() + ") " + pack.getClassPath().toString() + "... ", worker);
+                                if (pat.matcher(result.text).find()) {
+                                    ABCPanelSearchResult searchResult = new ABCPanelSearchResult(pack);
+                                    found.add(searchResult);
+                                }
                             }
                         });
 
                         futures.add(text);
+                    }
+
+                    for (Future<HighlightedText> future : futures) {
+                        try {
+                            future.get();
+                        } catch (ExecutionException ex) {
+                            Logger.getLogger(ABCPanel.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }
                 } catch (InterruptedException ex) {
                     for (Future<HighlightedText> future : futures) {
