@@ -14,7 +14,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.gui.abc;
+package com.jpexs.decompiler.flash.search;
 
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 
@@ -22,11 +22,11 @@ import com.jpexs.decompiler.flash.abc.ScriptPack;
  *
  * @author JPEXS
  */
-public class ABCPanelSearchResult {
+public class ABCSearchResult {
 
     private final ScriptPack scriptPack;
 
-    public ABCPanelSearchResult(ScriptPack scriptPack) {
+    public ABCSearchResult(ScriptPack scriptPack) {
         this.scriptPack = scriptPack;
     }
 

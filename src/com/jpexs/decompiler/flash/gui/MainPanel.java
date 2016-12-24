@@ -77,12 +77,10 @@ import com.jpexs.decompiler.flash.exporters.swf.SwfJavaExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfXmlExporter;
 import com.jpexs.decompiler.flash.flexsdk.MxmlcAs3ScriptReplacer;
 import com.jpexs.decompiler.flash.gui.abc.ABCPanel;
-import com.jpexs.decompiler.flash.gui.abc.ABCPanelSearchResult;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.gui.abc.DecompiledEditorPane;
 import com.jpexs.decompiler.flash.gui.abc.DeobfuscationDialog;
 import com.jpexs.decompiler.flash.gui.action.ActionPanel;
-import com.jpexs.decompiler.flash.gui.action.ActionSearchResult;
 import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
 import com.jpexs.decompiler.flash.gui.dumpview.DumpTree;
 import com.jpexs.decompiler.flash.gui.dumpview.DumpTreeModel;
@@ -107,6 +105,8 @@ import com.jpexs.decompiler.flash.importers.SwfXmlImporter;
 import com.jpexs.decompiler.flash.importers.SymbolClassImporter;
 import com.jpexs.decompiler.flash.importers.TextImporter;
 import com.jpexs.decompiler.flash.importers.svg.SvgImporter;
+import com.jpexs.decompiler.flash.search.ABCSearchResult;
+import com.jpexs.decompiler.flash.search.ActionSearchResult;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
@@ -1734,7 +1734,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     new CancellableWorker<Void>() {
                         @Override
                         protected Void doInBackground() throws Exception {
-                            List<ABCPanelSearchResult> abcResult = null;
+                            List<ABCSearchResult> abcResult = null;
                             List<ActionSearchResult> actionResult = null;
                             if (swf.isAS3()) {
                                 abcResult = getABCPanel().search(swf, txt, ignoreCase, regexp, pCodeSearch, this);
@@ -1742,14 +1742,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                                 actionResult = getActionPanel().search(swf, txt, ignoreCase, regexp, pCodeSearch, this);
                             }
 
-                            List<ABCPanelSearchResult> fAbcResult = abcResult;
+                            List<ABCSearchResult> fAbcResult = abcResult;
                             List<ActionSearchResult> fActionResult = actionResult;
                             View.execInEventDispatch(() -> {
                                 boolean found = false;
                                 if (fAbcResult != null) {
                                     found = true;
                                     getABCPanel().searchPanel.setSearchText(txt);
-                                    SearchResultsDialog<ABCPanelSearchResult> sr = new SearchResultsDialog<>(getMainFrame().getWindow(), txt, getABCPanel());
+                                    SearchResultsDialog<ABCSearchResult> sr = new SearchResultsDialog<>(getMainFrame().getWindow(), txt, getABCPanel());
                                     sr.setResults(fAbcResult);
                                     sr.setVisible(true);
                                 } else if (fActionResult != null) {

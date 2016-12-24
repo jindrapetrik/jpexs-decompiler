@@ -44,7 +44,6 @@ import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScriptLexer;
 import com.jpexs.decompiler.flash.action.parser.script.ParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.script.SymbolType;
-import com.jpexs.decompiler.flash.cache.ScriptDecompiledListener;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.gui.AppDialog;
@@ -69,11 +68,13 @@ import com.jpexs.decompiler.flash.gui.abc.tablemodels.UIntTableModel;
 import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
 import com.jpexs.decompiler.flash.gui.editor.LinkHandler;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
-import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.importers.As3ScriptReplaceException;
 import com.jpexs.decompiler.flash.importers.As3ScriptReplaceExceptionItem;
 import com.jpexs.decompiler.flash.importers.As3ScriptReplacerInterface;
 import com.jpexs.decompiler.flash.importers.FFDecAs3ScriptReplacer;
+import com.jpexs.decompiler.flash.search.ABCSearchResult;
+import com.jpexs.decompiler.flash.search.ActionScriptSearch;
+import com.jpexs.decompiler.flash.search.ScriptSearchListener;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
@@ -102,11 +103,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -137,7 +135,7 @@ import jsyntaxpane.TokenType;
  *
  * @author JPEXS
  */
-public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABCPanelSearchResult>, TagEditorPanel {
+public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABCSearchResult>, TagEditorPanel {
 
     private As3ScriptReplacerInterface scriptReplacer = null;
 
@@ -169,7 +167,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
     public final JTabbedPane tabbedPane;
 
-    public final SearchPanel<ABCPanelSearchResult> searchPanel;
+    public final SearchPanel<ABCSearchResult> searchPanel;
 
     private NewTraitDialog newTraitDialog;
 
@@ -191,84 +189,15 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         return mainPanel;
     }
 
-    public List<ABCPanelSearchResult> search(final SWF swf, final String txt, boolean ignoreCase, boolean regexp, boolean pcode, CancellableWorker<Void> worker) {
-        // todo: pcode seach
-        List<String> ignoredClasses = new ArrayList<>();
-        List<String> ignoredNss = new ArrayList<>();
-
-        if (Configuration._ignoreAdditionalFlexClasses.get()) {
-            abc.getSwf().getFlexMainClass(ignoredClasses, ignoredNss);
-        }
+    public List<ABCSearchResult> search(final SWF swf, final String txt, boolean ignoreCase, boolean regexp, boolean pcode, CancellableWorker<Void> worker) {
         if (txt != null && !txt.isEmpty()) {
             searchPanel.setOptions(ignoreCase, regexp);
-            TagTreeModel ttm = (TagTreeModel) mainPanel.tagTree.getModel();
-            TreeItem scriptsNode = ttm.getScriptsNode(swf);
-            final List<ABCPanelSearchResult> found = new ArrayList<>();
-            if (scriptsNode instanceof ClassesListTreeModel) {
-                ClassesListTreeModel clModel = (ClassesListTreeModel) scriptsNode;
-                List<ScriptPack> allpacks = clModel.getList();
-                final Pattern pat = regexp
-                        ? Pattern.compile(txt, ignoreCase ? (Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE) : 0)
-                        : Pattern.compile(Pattern.quote(txt), ignoreCase ? (Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE) : 0);
-
-                int pos = 0;
-                List<Future<HighlightedText>> futures = new ArrayList<>();
-                String workText = AppStrings.translate("work.searching");
-                String decAdd = ", " + AppStrings.translate("work.decompiling");
-                try {
-                    loop:
-                    for (final ScriptPack pack : allpacks) {
-                        pos++;
-                        if (!pack.isSimple && Configuration.ignoreCLikePackages.get()) {
-                            continue;
-                        }
-                        if (Configuration._ignoreAdditionalFlexClasses.get()) {
-                            String fullName = pack.getClassPath().packageStr.add(pack.getClassPath().className, pack.getClassPath().namespaceSuffix).toRawString();
-                            if (ignoredClasses.contains(fullName)) {
-                                continue;
-                            }
-                            for (String ns : ignoredNss) {
-                                if (fullName.startsWith(ns + ".")) {
-                                    continue loop;
-                                }
-                            }
-                        }
-
-                        int fpos = pos;
-                        Future<HighlightedText> text = SWF.getCachedFuture(pack, new ScriptDecompiledListener<HighlightedText>() {
-                            @Override
-                            public void onStart() {
-                                Main.startWork(workText + " \"" + txt + "\"" + decAdd + " - (" + fpos + "/" + allpacks.size() + ") " + pack.getClassPath().toString() + "... ", worker);
-                            }
-
-                            @Override
-                            public void onComplete(HighlightedText result) {
-                                Main.startWork(workText + " \"" + txt + "\" - (" + fpos + "/" + allpacks.size() + ") " + pack.getClassPath().toString() + "... ", worker);
-                                if (pat.matcher(result.text).find()) {
-                                    ABCPanelSearchResult searchResult = new ABCPanelSearchResult(pack);
-                                    found.add(searchResult);
-                                }
-                            }
-                        });
-
-                        futures.add(text);
-                    }
-
-                    for (Future<HighlightedText> future : futures) {
-                        try {
-                            future.get();
-                        } catch (ExecutionException ex) {
-                            Logger.getLogger(ABCPanel.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                    }
-                } catch (InterruptedException ex) {
-                    for (Future<HighlightedText> future : futures) {
-                        future.cancel(true);
-                    }
+            return new ActionScriptSearch().searchAs3(swf, txt, ignoreCase, regexp, pcode, new ScriptSearchListener() {
+                @Override
+                public void onWork(String message) {
+                    Main.startWork(message, worker);
                 }
-            }
-
-            return found;
+            });
         }
 
         return null;
@@ -1275,6 +1204,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
                 if (!item.isSimple && Configuration.ignoreCLikePackages.get()) {
                     continue;
                 }
+
                 ClassPath classPath = item.getClassPath();
 
                 // first check the className to avoid calling unnecessary toString
@@ -1283,6 +1213,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
                     break;
                 }
             }
+
             if (pack != null) {
                 hilightScript(pack);
             }
@@ -1305,7 +1236,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
     }
 
     @Override
-    public void updateSearchPos(ABCPanelSearchResult item) {
+    public void updateSearchPos(ABCSearchResult item) {
         ScriptPack pack = item.getScriptPack();
         setAbc(pack.abc);
         decompiledTextArea.setScript(pack, false);

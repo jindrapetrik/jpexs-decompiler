@@ -30,7 +30,6 @@ import com.jpexs.decompiler.flash.action.parser.script.ParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.script.SymbolType;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
-import com.jpexs.decompiler.flash.cache.ScriptDecompiledListener;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.gui.AppStrings;
@@ -53,6 +52,9 @@ import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
+import com.jpexs.decompiler.flash.search.ActionScriptSearch;
+import com.jpexs.decompiler.flash.search.ActionSearchResult;
+import com.jpexs.decompiler.flash.search.ScriptSearchListener;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.helpers.CancellableWorker;
@@ -64,16 +66,11 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.CancellationException;
-import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -250,60 +247,12 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
     public List<ActionSearchResult> search(SWF swf, final String txt, boolean ignoreCase, boolean regexp, boolean pcode, CancellableWorker<Void> worker) {
         if (txt != null && !txt.isEmpty()) {
             searchPanel.setOptions(ignoreCase, regexp);
-            Map<String, ASMSource> asms = swf.getASMs(false);
-            final List<ActionSearchResult> found = new ArrayList<>();
-            Pattern pat;
-            if (regexp) {
-                pat = Pattern.compile(txt, ignoreCase ? (Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE) : 0);
-            } else {
-                pat = Pattern.compile(Pattern.quote(txt), ignoreCase ? (Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE) : 0);
-            }
-
-            int pos = 0;
-            List<Future<HighlightedText>> futures = new ArrayList<>();
-            String workText = AppStrings.translate("work.searching");
-            String decAdd = ", " + AppStrings.translate("work.decompiling");
-            try {
-                for (Entry<String, ASMSource> item : asms.entrySet()) {
-                    pos++;
-                    ASMSource asm = item.getValue();
-
-                    if (pcode) {
-                        Main.startWork(workText + " \"" + txt + "\" - (" + pos + "/" + asms.size() + ") " + item.getKey() + "... ", worker);
-                        HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
-                        asm.getASMSource(ScriptExportMode.PCODE, writer, null);
-                        String text = writer.toString();
-                        if (pat.matcher(text).find()) {
-                            found.add(new ActionSearchResult(asm, pcode, item.getKey()));
-                        }
-                    } else {
-                        int fpos = pos;
-                        Future<HighlightedText> text = SWF.getCachedFuture(asm, null, new ScriptDecompiledListener<HighlightedText>() {
-                            @Override
-                            public void onStart() {
-                                Main.startWork(workText + " \"" + txt + "\"" + decAdd + " - (" + fpos + "/" + asms.size() + ") " + item.getKey() + "... ", worker);
-                            }
-
-                            @Override
-                            public void onComplete(HighlightedText result) {
-                                Main.startWork(workText + " \"" + txt + "\"" + decAdd + " - (" + fpos + "/" + asms.size() + ") " + item.getKey() + "... ", worker);
-                                if (pat.matcher(result.text).find()) {
-                                    ActionSearchResult searchResult = new ActionSearchResult(asm, pcode, item.getKey());
-                                    found.add(searchResult);
-                                }
-                            }
-                        });
-
-                        futures.add(text);
-                    }
+            return new ActionScriptSearch().searchAs2(swf, txt, ignoreCase, regexp, pcode, new ScriptSearchListener() {
+                @Override
+                public void onWork(String message) {
+                    Main.startWork(message, worker);
                 }
-            } catch (InterruptedException ex) {
-                for (Future<HighlightedText> future : futures) {
-                    future.cancel(true);
-                }
-            }
-
-            return found;
+            });
         }
 
         return null;
