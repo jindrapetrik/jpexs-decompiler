@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 ### Added
-- Iggy Files support - reading and (limited) editation of fonts, texts and AS3
+- Iggy Files support - reading and (limited) editation of fonts, texts and AS3 - 64 bit variant only
 - optional AS3 direct editation with Flex SDK
 - AS3 p-code editing - metadata read/write support
 - AS3 p-code editing - end of the block command like in RABCDasm

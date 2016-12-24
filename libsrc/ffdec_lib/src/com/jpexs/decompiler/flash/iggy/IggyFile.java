@@ -199,6 +199,9 @@ public class IggyFile implements StructureInterface {
     @Override
     public void readFromDataStream(ReadDataStreamInterface stream) throws IOException {
         header = new IggyHeader(stream);
+        if (!header.is64()) {
+            throw new IOException("32 bit iggy files are not (yet) supported, sorry");
+        }
         for (int i = 0; i < header.getNumSubfiles(); i++) {
             subFileEntries.add(new IggySubFileEntry(stream));
         }
