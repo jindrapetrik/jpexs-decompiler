@@ -169,7 +169,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
     public void clearSource() {
         lastCode = null;
         lastASM = null;
-        lastDecompiled = null;
+        lastDecompiled = new HighlightedText();
         searchPanel.clear();
         src = null;
         srcWithHex = null;
@@ -267,56 +267,56 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
     }
 
     private void setDecompiledText(final String scriptName, final String text) {
-        View.execInEventDispatch(() -> {
-            ignoreCarret = true;
-            decompiledEditor.setScriptName(scriptName);
-            decompiledEditor.setText(text);
-            ignoreCarret = false;
-        });
+        ignoreCarret = true;
+        decompiledEditor.setScriptName(scriptName);
+        decompiledEditor.setText(text);
+        ignoreCarret = false;
     }
 
     private void setEditorText(final String scriptName, final String text, final String contentType) {
-        View.execInEventDispatch(() -> {
-            ignoreCarret = true;
-            editor.setScriptName("#PCODE " + scriptName);
-            editor.changeContentType(contentType);
-            editor.setText(text);
-            ignoreCarret = false;
-        });
+        ignoreCarret = true;
+        editor.setScriptName("#PCODE " + scriptName);
+        editor.changeContentType(contentType);
+        editor.setText(text);
+        ignoreCarret = false;
     }
 
     private void setText(final HighlightedText text, final String contentType, final String scriptName) {
-        View.execInEventDispatch(() -> {
-            int pos = editor.getCaretPosition();
-            Highlighting lastH = null;
-            for (Highlighting h : disassembledText.getInstructionHighlights()) {
-                if (pos < h.startPos) {
-                    break;
-                }
-                lastH = h;
+        int pos = editor.getCaretPosition();
+        Highlighting lastH = null;
+        for (Highlighting h : disassembledText.getInstructionHighlights()) {
+            if (pos < h.startPos) {
+                break;
             }
-            Long offset = lastH == null ? 0 : lastH.getProperties().offset;
-            disassembledText = text;
-            setEditorText(scriptName, text.text, contentType);
-            Highlighting h = Highlighting.searchOffset(disassembledText.getInstructionHighlights(), offset);
-            if (h != null) {
-                if (h.startPos <= editor.getDocument().getLength()) {
-                    editor.setCaretPosition(h.startPos);
-                }
+            lastH = h;
+        }
+        Long offset = lastH == null ? 0 : lastH.getProperties().offset;
+        disassembledText = text;
+        setEditorText(scriptName, text.text, contentType);
+        Highlighting h = Highlighting.searchOffset(disassembledText.getInstructionHighlights(), offset);
+        if (h != null) {
+            if (h.startPos <= editor.getDocument().getLength()) {
+                editor.setCaretPosition(h.startPos);
             }
-        });
+        }
     }
 
-    private HighlightedText getHighlightedText(ScriptExportMode exportMode) {
+    private HighlightedText getHighlightedText(ScriptExportMode exportMode, ActionList actions) {
+        if (actions == null) {
+            logger.log(Level.WARNING, "Action list is null");
+            return new HighlightedText();
+        }
+
         ASMSource asm = (ASMSource) src;
         DisassemblyListener listener = getDisassemblyListener();
         asm.addDisassemblyListener(listener);
         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
         try {
-            asm.getASMSource(exportMode, writer, lastCode);
+            asm.getASMSource(exportMode, writer, actions);
         } catch (InterruptedException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
+
         asm.removeDisassemblyListener(listener);
         return new HighlightedText(writer);
     }
@@ -327,20 +327,20 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         resolveConstantsButton.setVisible(exportMode != ScriptExportMode.CONSTANTS && exportMode != ScriptExportMode.HEX);
     }
 
-    public void setHex(ScriptExportMode exportMode, String scriptName) {
+    private void setHex(ScriptExportMode exportMode, String scriptName, ActionList actions) {
         updateHexButtons(exportMode);
 
         switch (exportMode) {
             case PCODE:
                 if (srcNoHex == null) {
-                    srcNoHex = getHighlightedText(exportMode);
+                    srcNoHex = getHighlightedText(exportMode, actions);
                 }
 
                 setText(srcNoHex, "text/flasm", scriptName);
                 break;
             case PCODE_HEX:
                 if (srcWithHex == null) {
-                    srcWithHex = getHighlightedText(exportMode);
+                    srcWithHex = getHighlightedText(exportMode, actions);
                 }
 
                 setText(srcWithHex, "text/flasm", scriptName);
@@ -356,7 +356,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
                 break;
             case CONSTANTS:
                 if (srcConstants == null) {
-                    srcConstants = getHighlightedText(exportMode);
+                    srcConstants = getHighlightedText(exportMode, actions);
                 }
 
                 setText(srcConstants, "text/plain", scriptName);
@@ -380,8 +380,11 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
                 if (((newpercent > percent) || (!this.phase.equals(phase))) && newpercent <= 100) {
                     percent = newpercent;
                     this.phase = phase;
+
                     // todo: honfika: it is very slow to show every percent
-                    setEditorText("-", "; " + AppStrings.translate("work.disassembling") + " - " + phase + " " + percent + "%...", "text/flasm");
+                    View.execInEventDispatch(() -> {
+                        setEditorText("-", "; " + AppStrings.translate("work.disassembling") + " - " + phase + " " + percent + "%...", "text/flasm");
+                    });
                 }
             }
 
@@ -418,49 +421,72 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         }
 
         boolean decompile = Configuration.decompile.get();
+        HighlightedText decompiledText = null;
         if (!decompile) {
-            lastDecompiled = new HighlightedText(Helper.getDecompilationSkippedComment());
-            setDecompiledText(asm.getScriptName(), lastDecompiled.text);
+            decompiledText = new HighlightedText(Helper.getDecompilationSkippedComment());
+            lastDecompiled = decompiledText;
+            setDecompiledText(asm.getScriptName(), decompiledText.text);
         } else {
-            HighlightedText sc = SWF.getFromCache(asm);
-            if (sc != null) {
-                decompile = false;
-                lastDecompiled = sc;
+            decompiledText = SWF.getFromCache(asm);
+            if (decompiledText != null) {
+                lastDecompiled = decompiledText;
                 lastASM = asm;
                 setDecompiledText(lastASM.getScriptName(), lastDecompiled.text);
             }
         }
 
-        if (!decompile) {
+        if (decompiledText != null) {
             setDecompiledEditMode(false);
         }
 
-        final boolean decompileNeeded = decompile;
+        ActionList actions = SWF.getActionListFromCache(asm);
+        if (actions != null) {
+            lastCode = actions;
+            setHex(getExportMode(), asm.getScriptName(), actions);
+            setEditMode(false);
+        }
+
+        boolean disassemblingNeeded = actions == null;
+        boolean decompileNeeded = decompiledText == null;
 
         CancellableWorker worker = new CancellableWorker() {
             @Override
             protected Void doInBackground() throws Exception {
 
-                setEditorText(asm.getScriptName(), "; " + AppStrings.translate("work.disassembling") + "...", "text/flasm");
-                if (decompileNeeded) {
-                    setDecompiledText("-", "// " + AppStrings.translate("work.waitingfordissasembly") + "...");
-                }
-                DisassemblyListener listener = getDisassemblyListener();
-                asm.addDisassemblyListener(listener);
-                ActionList actions = asm.getActions();
-                lastCode = actions;
-                asm.removeDisassemblyListener(listener);
-                setHex(getExportMode(), asm.getScriptName());
-                if (decompileNeeded) {
-                    setDecompiledText("-", "// " + AppStrings.translate("work.decompiling") + "...");
+                ActionList innerActions = actions;
+                if (disassemblingNeeded) {
+                    View.execInEventDispatch(() -> {
+                        setEditorText(asm.getScriptName(), "; " + AppStrings.translate("work.disassembling") + "...", "text/flasm");
+                        if (decompileNeeded) {
+                            setDecompiledText("-", "// " + AppStrings.translate("work.waitingfordissasembly") + "...");
+                        }
+                    });
 
-                    HighlightedText sc = SWF.getCached(asm, actions);
-                    lastDecompiled = sc;
-                    lastASM = asm;
-                    setDecompiledText(lastASM.getScriptName(), lastDecompiled.text);
-                    setDecompiledEditMode(false);
+                    DisassemblyListener listener = getDisassemblyListener();
+                    asm.addDisassemblyListener(listener);
+                    innerActions = asm.getActions();
+                    asm.removeDisassemblyListener(listener);
+
+                    lastCode = innerActions;
+                    ActionList finalActions = innerActions;
+                    View.execInEventDispatch(() -> {
+                        setHex(getExportMode(), asm.getScriptName(), finalActions);
+                    });
                 }
-                setEditMode(false);
+
+                if (decompileNeeded) {
+                    View.execInEventDispatch(() -> {
+                        setDecompiledText("-", "// " + AppStrings.translate("work.decompiling") + "...");
+                    });
+
+                    HighlightedText htext = SWF.getCached(asm, innerActions);
+                    lastDecompiled = htext;
+                    lastASM = asm;
+
+                    View.execInEventDispatch(() -> {
+                        setDecompiledText(lastASM.getScriptName(), htext.text);
+                    });
+                }
 
                 return null;
             }
@@ -479,6 +505,14 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
                         setEditorText("-", "; " + AppStrings.translate("work.canceled"), "text/flasm");
                     } catch (Exception ex) {
                         setDecompiledText("-", "// " + AppStrings.translate("decompilationError") + ": " + ex);
+                    }
+
+                    if (disassemblingNeeded) {
+                        setEditMode(false);
+                    }
+
+                    if (decompileNeeded) {
+                        setDecompiledEditMode(false);
                     }
                 });
             }
@@ -821,65 +855,62 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
     }
 
     public void setEditMode(boolean val) {
-        View.execInEventDispatch(() -> {
-            if (val) {
-                if (hexOnlyButton.isSelected()) {
-                    setHex(ScriptExportMode.HEX, src.getScriptName());
-                } else if (constantsViewButton.isSelected()) {
-                    setHex(ScriptExportMode.CONSTANTS, src.getScriptName());
-                } else {
-                    setHex(ScriptExportMode.PCODE, src.getScriptName());
-                }
+        if (val) {
+            if (hexOnlyButton.isSelected()) {
+                setHex(ScriptExportMode.HEX, src.getScriptName(), lastCode);
+            } else if (constantsViewButton.isSelected()) {
+                setHex(ScriptExportMode.CONSTANTS, src.getScriptName(), lastCode);
+            } else {
+                setHex(ScriptExportMode.PCODE, src.getScriptName(), lastCode);
             }
+        }
 
-            editor.setEditable(val);
-            saveButton.setVisible(val);
-            saveButton.setEnabled(false);
-            editButton.setVisible(!val);
-            cancelButton.setVisible(val);
+        editor.setEditable(val);
+        saveButton.setVisible(val);
+        saveButton.setEnabled(false);
+        editButton.setVisible(!val);
+        cancelButton.setVisible(val);
 
-            editor.getCaret().setVisible(true);
-            asmLabel.setIcon(val ? View.getIcon("editing16") : null); // this line is not working
-            topButtonsPan.setVisible(!val);
-            editMode = val;
-            editor.requestFocusInWindow();
-        });
+        editor.getCaret().setVisible(true);
+        asmLabel.setIcon(val ? View.getIcon("editing16") : null); // this line is not working
+        topButtonsPan.setVisible(!val);
+        editMode = val;
+        editor.requestFocusInWindow();
     }
 
     public void setDecompiledEditMode(boolean val) {
         if (lastASM == null) {
             return;
         }
-        View.execInEventDispatch(() -> {
-            int lastLine = decompiledEditor.getLine();
-            int prefLines = lastASM.getPrefixLineCount();
-            if (val) {
-                String newText = lastASM.removePrefixAndSuffix(lastDecompiled.text);
-                setDecompiledText(lastASM.getScriptName(), newText);
-                if (lastLine > -1) {
-                    if (lastLine - prefLines >= 0) {
-                        decompiledEditor.gotoLine(lastLine - prefLines + 1);
-                    }
-                }
-            } else {
-                setDecompiledText(lastASM.getScriptName(), lastDecompiled.text);
-                if (lastLine > -1) {
-                    decompiledEditor.gotoLine(lastLine + prefLines + 1);
+
+        int lastLine = decompiledEditor.getLine();
+        int prefLines = lastASM.getPrefixLineCount();
+        if (val) {
+            String newText = lastASM.removePrefixAndSuffix(lastDecompiled.text);
+            setDecompiledText(lastASM.getScriptName(), newText);
+            if (lastLine > -1) {
+                if (lastLine - prefLines >= 0) {
+                    decompiledEditor.gotoLine(lastLine - prefLines + 1);
                 }
             }
+        } else {
+            setDecompiledText(lastASM.getScriptName(), lastDecompiled.text);
+            if (lastLine > -1) {
+                decompiledEditor.gotoLine(lastLine + prefLines + 1);
+            }
+        }
 
-            decompiledEditor.setEditable(val);
-            saveDecompiledButton.setVisible(val);
-            saveDecompiledButton.setEnabled(false);
-            editDecompiledButton.setVisible(!val);
-            experimentalLabel.setVisible(!val);
-            cancelDecompiledButton.setVisible(val);
+        decompiledEditor.setEditable(val);
+        saveDecompiledButton.setVisible(val);
+        saveDecompiledButton.setEnabled(false);
+        editDecompiledButton.setVisible(!val);
+        experimentalLabel.setVisible(!val);
+        cancelDecompiledButton.setVisible(val);
 
-            decompiledEditor.getCaret().setVisible(true);
-            decLabel.setIcon(val ? View.getIcon("editing16") : null);
-            editDecompiledMode = val;
-            decompiledEditor.requestFocusInWindow();
-        });
+        decompiledEditor.getCaret().setVisible(true);
+        decLabel.setIcon(val ? View.getIcon("editing16") : null);
+        editDecompiledMode = val;
+        decompiledEditor.requestFocusInWindow();
     }
 
     private void graphButtonActionPerformed(ActionEvent evt) {
@@ -898,15 +929,15 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
     }
 
     private void hexButtonActionPerformed(ActionEvent evt) {
-        setHex(getExportMode(), src.getScriptName());
+        setHex(getExportMode(), src.getScriptName(), lastCode);
     }
 
     private void hexOnlyButtonActionPerformed(ActionEvent evt) {
-        setHex(getExportMode(), src.getScriptName());
+        setHex(getExportMode(), src.getScriptName(), lastCode);
     }
 
     private void constantsViewButtonActionPerformed(ActionEvent evt) {
-        setHex(getExportMode(), src.getScriptName());
+        setHex(getExportMode(), src.getScriptName(), lastCode);
     }
 
     private void resolveConstantsButtonActionPerformed(ActionEvent evt) {
@@ -916,7 +947,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         srcWithHex = null;
         srcNoHex = null;
         // srcHexOnly = null; is not needed since it does not contains the resolved constant names
-        setHex(getExportMode(), src.getScriptName());
+        setHex(getExportMode(), src.getScriptName(), lastCode);
     }
 
     private void showFileOffsetInPcodeHexButtonActionPerformed(ActionEvent evt) {
@@ -924,7 +955,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         Configuration.showFileOffsetInPcodeHex.set(resolve);
 
         srcWithHex = null;
-        setHex(getExportMode(), src.getScriptName());
+        setHex(getExportMode(), src.getScriptName(), lastCode);
     }
 
     private void showOriginalBytesInPcodeHexButtonActionPerformed(ActionEvent evt) {
@@ -932,12 +963,12 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         Configuration.showOriginalBytesInPcodeHex.set(resolve);
 
         srcWithHex = null;
-        setHex(getExportMode(), src.getScriptName());
+        setHex(getExportMode(), src.getScriptName(), lastCode);
     }
 
     private void cancelActionButtonActionPerformed(ActionEvent evt) {
         setEditMode(false);
-        setHex(getExportMode(), src.getScriptName());
+        setHex(getExportMode(), src.getScriptName(), lastCode);
     }
 
     private void saveActionButtonActionPerformed(ActionEvent evt) {

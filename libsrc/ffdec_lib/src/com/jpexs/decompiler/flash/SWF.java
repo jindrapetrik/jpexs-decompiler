@@ -2609,6 +2609,17 @@ public final class SWF implements SWFContainerItem, Timelined {
         return false;
     }
 
+    public static boolean isActionListCached(ASMSource src) {
+        if (src != null) {
+            SWF swf = src.getSwf();
+            if (swf != null) {
+                return swf.as2Cache.isPCodeCached(src);
+            }
+        }
+
+        return false;
+    }
+
     public static boolean isCached(ScriptPack pack) {
         if (pack != null) {
             SWF swf = pack.getSwf();
@@ -2631,6 +2642,17 @@ public final class SWF implements SWFContainerItem, Timelined {
         return null;
     }
 
+    public static ActionList getActionListFromCache(ASMSource src) {
+        if (src != null) {
+            SWF swf = src.getSwf();
+            if (swf != null) {
+                return swf.as2Cache.getPCode(src);
+            }
+        }
+
+        return null;
+    }
+
     public static HighlightedText getFromCache(ScriptPack pack) {
         if (pack != null) {
             SWF swf = pack.getSwf();
@@ -2646,8 +2668,8 @@ public final class SWF implements SWFContainerItem, Timelined {
         synchronized (src) {
             SWF swf = src.getSwf();
             int deobfuscationMode = Configuration.autoDeobfuscate.get() ? 1 : 0;
-            if (swf != null && swf.as2Cache.isPcodeCached(src)) {
-                ActionList result = swf.as2Cache.getPcode(src);
+            if (swf != null && swf.as2Cache.isPCodeCached(src)) {
+                ActionList result = swf.as2Cache.getPCode(src);
                 if (result.deobfuscationMode == deobfuscationMode) {
                     return result;
                 }
@@ -2958,7 +2980,8 @@ public final class SWF implements SWFContainerItem, Timelined {
             timelined.setModified(true);
             timelined.resetTimeline();
         } else // timeline should be always the swf here
-         if (removeDependencies) {
+        {
+            if (removeDependencies) {
                 removeTagWithDependenciesFromTimeline(tag, timelined.getTimeline());
                 timelined.setModified(true);
             } else {
@@ -2967,6 +2990,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                     timelined.setModified(true);
                 }
             }
+        }
     }
 
     @Override

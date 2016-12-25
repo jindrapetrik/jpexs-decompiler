@@ -40,7 +40,7 @@ public class AS2Cache {
         return cache.contains(src);
     }
 
-    public boolean isPcodeCached(ASMSource src) {
+    public boolean isPCodeCached(ASMSource src) {
         return pcodeCache.contains(src);
     }
 
@@ -48,7 +48,7 @@ public class AS2Cache {
         return cache.get(src);
     }
 
-    public ActionList getPcode(ASMSource src) {
+    public ActionList getPCode(ASMSource src) {
         return pcodeCache.get(src);
     }
 

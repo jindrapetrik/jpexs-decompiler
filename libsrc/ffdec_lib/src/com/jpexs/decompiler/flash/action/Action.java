@@ -106,7 +106,7 @@ import java.util.logging.Logger;
  */
 public abstract class Action implements GraphSourceItem {
 
-    private static final int INFORM_LISTENER_RESOLUTION = 100;
+    private static final int INFORM_LISTENER_RESOLUTION = 1000;
 
     private boolean ignored = false;
 
@@ -474,11 +474,9 @@ public abstract class Action implements GraphSourceItem {
     }
 
     private static void informListeners(List<DisassemblyListener> listeners, int pos, int count) {
-        if (pos % INFORM_LISTENER_RESOLUTION == 0) {
-            DisassemblyListener[] listenersArray = listeners.toArray(new DisassemblyListener[listeners.size()]);
-            for (DisassemblyListener listener : listenersArray) {
-                listener.progressToString(pos + 1, count);
-            }
+        DisassemblyListener[] listenersArray = listeners.toArray(new DisassemblyListener[listeners.size()]);
+        for (DisassemblyListener listener : listenersArray) {
+            listener.progressToString(pos + 1, count);
         }
     }
 
@@ -507,11 +505,14 @@ public abstract class Action implements GraphSourceItem {
         HashMap<Long, List<GraphSourceItemContainer>> containers = new HashMap<>();
         HashMap<GraphSourceItemContainer, Integer> containersPos = new HashMap<>();
         offset = address;
-        int pos = 0;
         boolean lastPush = false;
         byte[] fileData = list.fileData;
-        for (Action a : list) {
-            informListeners(listeners, pos, list.size());
+        for (int pos = 0; pos < list.size(); pos++) {
+            Action a = list.get(pos);
+
+            if ((pos + 1) % INFORM_LISTENER_RESOLUTION == 0) {
+                informListeners(listeners, pos, list.size());
+            }
 
             if (exportMode == ScriptExportMode.PCODE_HEX) {
                 if (lastPush) {
@@ -671,8 +672,8 @@ public abstract class Action implements GraphSourceItem {
             }
 
             offset += a.getTotalActionLength();
-            pos++;
         }
+
         if (lastPush) {
             writer.newLine();
         }

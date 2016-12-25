@@ -314,7 +314,6 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
         //No standard AddKeyListener as we want to catch Ctrl globally no matter of focus
         KeyboardFocusManager.getCurrentKeyboardFocusManager()
                 .addKeyEventPostProcessor(new KeyEventPostProcessor() {
-
                     @Override
                     public boolean postProcessKeyEvent(KeyEvent e) {
                         if (e.getID() == KeyEvent.KEY_PRESSED) {
@@ -478,6 +477,7 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
         if (Configuration._debugMode.get() && t != null && t.length() > truncateLimit) {
             t = t.substring(0, truncateLimit) + "\r\n" + AppStrings.translate("editorTruncateWarning").replace("%chars%", Integer.toString(truncateLimit));
         }
+
         super.setText(t);
         setCaretPosition(0); //scroll to top
     }
