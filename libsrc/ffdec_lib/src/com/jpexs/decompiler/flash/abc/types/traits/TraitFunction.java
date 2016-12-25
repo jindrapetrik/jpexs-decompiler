@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.exporters.script.DependencyParser;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
+import com.jpexs.decompiler.flash.search.MethodId;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.helpers.Helper;
@@ -143,5 +144,10 @@ public class TraitFunction extends Trait implements TraitWithSlot {
         writer.appendNoHilight("slotid ");
         writer.hilightSpecial(Integer.toString(slot_id), HighlightSpecialType.SLOT_ID);
         return writer;
+    }
+
+    @Override
+    public void getMethodInfos(ABC abc, int classIndex, List<MethodId> methodInfos) {
+        methodInfos.add(new MethodId(classIndex, method_info));
     }
 }

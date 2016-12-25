@@ -117,15 +117,17 @@ public class TraitsListItem {
                 }
             } else if (isStatic) {
                 ConvertData convertData = new ConvertData();
-                abc.class_info.get(classIndex).static_traits.traits.get(index).convertHeader(null, convertData, "", abc, true, ScriptExportMode.AS, scriptIndex, classIndex, new NulWriter(), new ArrayList<>(), false);
+                Trait trait = abc.class_info.get(classIndex).static_traits.traits.get(index);
+                trait.convertHeader(null, convertData, "", abc, true, ScriptExportMode.AS, scriptIndex, classIndex, new NulWriter(), new ArrayList<>(), false);
                 HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
-                abc.class_info.get(classIndex).static_traits.traits.get(index).toStringHeader(null, convertData, "", abc, true, ScriptExportMode.AS, scriptIndex, classIndex, writer, new ArrayList<>(), false);
+                trait.toStringHeader(null, convertData, "", abc, true, ScriptExportMode.AS, scriptIndex, classIndex, writer, new ArrayList<>(), false);
                 s = writer.toString();
             } else {
                 ConvertData convertData = new ConvertData();
-                abc.instance_info.get(classIndex).instance_traits.traits.get(index).convertHeader(null, convertData, "", abc, false, ScriptExportMode.AS, scriptIndex, classIndex, new NulWriter(), new ArrayList<>(), false);
+                Trait trait = abc.instance_info.get(classIndex).instance_traits.traits.get(index);
+                trait.convertHeader(null, convertData, "", abc, false, ScriptExportMode.AS, scriptIndex, classIndex, new NulWriter(), new ArrayList<>(), false);
                 HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
-                abc.instance_info.get(classIndex).instance_traits.traits.get(index).toStringHeader(null, convertData, "", abc, false, ScriptExportMode.AS, scriptIndex, classIndex, writer, new ArrayList<>(), false);
+                trait.toStringHeader(null, convertData, "", abc, false, ScriptExportMode.AS, scriptIndex, classIndex, writer, new ArrayList<>(), false);
                 s = writer.toString();
             }
         } catch (InterruptedException ex) {
@@ -144,7 +146,6 @@ public class TraitsListItem {
     }
 
     public enum Type {
-
         METHOD,
         VAR,
         CONST,

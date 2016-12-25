@@ -34,6 +34,7 @@ import com.jpexs.decompiler.flash.exporters.script.DependencyType;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
+import com.jpexs.decompiler.flash.search.MethodId;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
@@ -110,8 +111,8 @@ public abstract class Trait implements Cloneable, Serializable {
         }
         if (Configuration.handleSkinPartsAutomatically.get()) {
             /*
-            private static var _skinParts:Object = {"attr":false,"attr2":true};  
-               => 
+            private static var _skinParts:Object = {"attr":false,"attr2":true};
+               =>
             [SkinPart required="false"]
             public var attr;
             [SkinPart required="true"]
@@ -509,4 +510,6 @@ public abstract class Trait implements Cloneable, Serializable {
     public boolean isVisible(boolean isStatic, ABC abc) {
         return true;
     }
+
+    public abstract void getMethodInfos(ABC abc, int classIndex, List<MethodId> methodInfos);
 }

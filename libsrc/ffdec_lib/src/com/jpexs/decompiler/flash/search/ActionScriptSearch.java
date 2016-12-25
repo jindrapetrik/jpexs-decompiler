@@ -17,7 +17,9 @@
 package com.jpexs.decompiler.flash.search;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
+import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.cache.ScriptDecompiledListener;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
@@ -55,7 +57,10 @@ public class ActionScriptSearch {
                     ASMSource asm = item.getValue();
 
                     if (pcode) {
-                        //Main.startWork(workText + " \"" + txt + "\" - (" + pos + "/" + asms.size() + ") " + item.getKey() + "... ", worker);
+                        if (listener != null) {
+                            listener.onSearch(pos, asms.size(), item.getKey());
+                        }
+
                         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
                         asm.getASMSource(ScriptExportMode.PCODE, writer, null);
                         String text = writer.toString();
@@ -137,29 +142,53 @@ public class ActionScriptSearch {
                         }
                     }
 
-                    int fpos = pos;
-                    Future<HighlightedText> text = SWF.getCachedFuture(pack, new ScriptDecompiledListener<HighlightedText>() {
-                        @Override
-                        public void onStart() {
-                            if (listener != null) {
-                                listener.onDecompile(fpos, allpacks.size(), pack.getClassPath().toString());
-                            }
+                    if (pcode) {
+                        if (listener != null) {
+                            listener.onSearch(pos, allpacks.size(), pack.getClassPath().toString());
                         }
 
-                        @Override
-                        public void onComplete(HighlightedText result) {
-                            if (listener != null) {
-                                listener.onSearch(fpos, allpacks.size(), pack.getClassPath().toString());
-                            }
+                        List<MethodId> methodInfos = new ArrayList<>();
+                        pack.getMethodInfos(methodInfos);
 
-                            if (pat.matcher(result.text).find()) {
-                                ABCSearchResult searchResult = new ABCSearchResult(pack);
-                                found.add(searchResult);
+                        ABC abc = pack.abc;
+                        for (MethodId methodInfo : methodInfos) {
+                            int bodyIndex = abc.findBodyIndex(methodInfo.getMethodIndex());
+                            if (bodyIndex != -1) {
+                                MethodBody body = abc.bodies.get(bodyIndex);
+                                HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
+                                abc.bodies.get(bodyIndex).getCode().toASMSource(abc.constants, abc.method_info.get(body.method_info), body, ScriptExportMode.PCODE, writer);
+                                String text = writer.toString();
+                                if (pat.matcher(text).find()) {
+                                    ABCSearchResult searchResult = new ABCSearchResult(pack, methodInfo.getClassIndex(), methodInfo.getMethodIndex());
+                                    found.add(searchResult);
+                                }
                             }
                         }
-                    });
+                    } else {
+                        int fpos = pos;
+                        Future<HighlightedText> text = SWF.getCachedFuture(pack, new ScriptDecompiledListener<HighlightedText>() {
+                            @Override
+                            public void onStart() {
+                                if (listener != null) {
+                                    listener.onDecompile(fpos, allpacks.size(), pack.getClassPath().toString());
+                                }
+                            }
 
-                    futures.add(text);
+                            @Override
+                            public void onComplete(HighlightedText result) {
+                                if (listener != null) {
+                                    listener.onSearch(fpos, allpacks.size(), pack.getClassPath().toString());
+                                }
+
+                                if (pat.matcher(result.text).find()) {
+                                    ABCSearchResult searchResult = new ABCSearchResult(pack);
+                                    found.add(searchResult);
+                                }
+                            }
+                        });
+
+                        futures.add(text);
+                    }
                 }
 
                 for (Future<HighlightedText> future : futures) {

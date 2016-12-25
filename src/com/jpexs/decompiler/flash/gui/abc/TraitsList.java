@@ -74,9 +74,9 @@ public class TraitsList extends JList<Object> implements ListSelectionListener {
         if (classIndex >= abc.instance_info.size()) {
             return;
         }
+
         this.classIndex = classIndex;
         setModel(new TraitsListModel(abc, classIndex, scriptIndex, sorted));
-
     }
 
     private int lastSelected = -1;

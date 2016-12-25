@@ -31,6 +31,7 @@ import com.jpexs.decompiler.flash.exporters.script.DependencyType;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
+import com.jpexs.decompiler.flash.search.MethodId;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TypeItem;
@@ -274,5 +275,22 @@ public class TraitClass extends Trait implements TraitWithSlot {
         writer.hilightSpecial(Integer.toString(slot_id), HighlightSpecialType.SLOT_ID);
         writer.newLine();
         return writer;
+    }
+
+    @Override
+    public void getMethodInfos(ABC abc, int classIndex, List<MethodId> methodInfos) {
+        InstanceInfo instanceInfo = abc.instance_info.get(class_info);
+        ClassInfo classInfo = abc.class_info.get(class_info);
+
+        //class initializer
+        methodInfos.add(new MethodId(class_info, classInfo.cinit_index));
+
+        //constructor - instance initializer
+        methodInfos.add(new MethodId(class_info, instanceInfo.iinit_index));
+
+        //static variables,constants & methods
+        classInfo.static_traits.getMethodInfos(abc, class_info, methodInfos);
+
+        instanceInfo.instance_traits.getMethodInfos(abc, class_info, methodInfos);
     }
 }

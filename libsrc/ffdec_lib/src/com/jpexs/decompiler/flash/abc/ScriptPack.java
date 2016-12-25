@@ -40,6 +40,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
+import com.jpexs.decompiler.flash.search.MethodId;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
 import com.jpexs.decompiler.graph.DottedChain;
@@ -615,5 +616,16 @@ public class ScriptPack extends AS3ClassTreeItem {
         }
 
         ((Tag) abc.parentTag).setModified(true);
+    }
+
+    public void getMethodInfos(List<MethodId> methodInfos) {
+        int script_init = abc.script_info.get(scriptIndex).init_index;
+        methodInfos.add(new MethodId(-1, script_init));
+
+        List<Trait> traits = abc.script_info.get(scriptIndex).traits.traits;
+        for (int t = 0; t < traitIndices.size(); t++) {
+            Trait trait = traits.get(t);
+            trait.getMethodInfos(abc, -1, methodInfos);
+        }
     }
 }

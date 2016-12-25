@@ -32,6 +32,7 @@ import com.jpexs.decompiler.flash.exporters.script.DependencyType;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
+import com.jpexs.decompiler.flash.search.MethodId;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -245,4 +246,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         return writer;
     }
 
+    @Override
+    public void getMethodInfos(ABC abc, int classIndex, List<MethodId> methodInfos) {
+    }
 }

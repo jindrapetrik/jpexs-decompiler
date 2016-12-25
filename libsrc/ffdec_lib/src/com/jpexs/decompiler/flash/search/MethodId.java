@@ -16,34 +16,19 @@
  */
 package com.jpexs.decompiler.flash.search;
 
-import com.jpexs.decompiler.flash.abc.ScriptPack;
-
 /**
  *
  * @author JPEXS
  */
-public class ABCSearchResult {
-
-    private final ScriptPack scriptPack;
+public class MethodId {
 
     private final int classIndex;
 
     private final int methodIndex;
 
-    public ABCSearchResult(ScriptPack scriptPack) {
-        this.scriptPack = scriptPack;
-        classIndex = 0;
-        methodIndex = 0;
-    }
-
-    public ABCSearchResult(ScriptPack scriptPack, int classIndex, int methodIndex) {
-        this.scriptPack = scriptPack;
+    public MethodId(int classIndex, int methodIndex) {
         this.classIndex = classIndex;
         this.methodIndex = methodIndex;
-    }
-
-    public ScriptPack getScriptPack() {
-        return scriptPack;
     }
 
     public int getClassIndex() {
@@ -52,10 +37,5 @@ public class ABCSearchResult {
 
     public int getMethodIndex() {
         return methodIndex;
-    }
-
-    @Override
-    public String toString() {
-        return scriptPack.getClassPath().toString();
     }
 }
