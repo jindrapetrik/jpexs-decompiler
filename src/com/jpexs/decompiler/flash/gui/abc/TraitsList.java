@@ -89,7 +89,6 @@ public class TraitsList extends JList<Object> implements ListSelectionListener {
         lastSelected = getSelectedIndex();
         TraitsListItem sel = (TraitsListItem) getSelectedValue();
         abcPanel.decompiledTextArea.gotoTrait(sel == null ? -1 : sel.getGlobalTraitId());
-
     }
 
     @Override

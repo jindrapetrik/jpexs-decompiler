@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import java.util.ArrayList;
@@ -66,16 +67,13 @@ public class TraitsListItem {
     public int getGlobalTraitId() {
         if (type == Type.INITIALIZER) {
             if (!isStatic) {
-                return -1;
-                //return abc.class_info.get(classIndex).static_traits.traits.size() + abc.instance_info.get(classIndex).instance_traits.traits.size();
+                return GraphTextWriter.TRAIT_INSTANCE_INITIALIZER;
             } else {
-                return -2;
-                //return abc.class_info.get(classIndex).static_traits.traits.size() + abc.instance_info.get(classIndex).instance_traits.traits.size() + 1;
+                return GraphTextWriter.TRAIT_CLASS_INITIALIZER;
             }
         }
         if (type == Type.SCRIPT_INITIALIZER) {
-            //return abc.class_info.get(classIndex).static_traits.traits.size() + abc.instance_info.get(classIndex).instance_traits.traits.size() + 2;
-            return -3;
+            return GraphTextWriter.TRAIT_SCRIPT_INITIALIZER;
         }
         if (isStatic) {
             return index;
