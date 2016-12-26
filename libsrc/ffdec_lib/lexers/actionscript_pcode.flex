@@ -70,7 +70,7 @@ WhiteSpace = [ \t\f]+
 
 Identifier = [:jletter:][:jletterdigit:]*
 
-InstructionName = [a-zA-Z][a-zA-Z0-9_]*
+InstructionName = [:jletter:][:jletterdigit:]*
 
 Label = {Identifier}:
 

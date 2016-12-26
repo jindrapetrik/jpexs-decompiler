@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 - [#1240] AS search using multiple threads when parallel speedup is enabled
+- [#1308] Search by all P-code files in AS3
+
+### Fixed
+- [#1327] P-code editing: error message and syntax highlighting fixed when instruction name contains upper cased letter
 
 ## [10.0.0] - 2016-12-24
 ### Added
