@@ -90,14 +90,14 @@ public class ABCSearchResult {
 
         ABC abc = scriptPack.abc;
 
-        int instanceTraitCount = abc.instance_info.get(classIndex).instance_traits.traits.size();
-        boolean isStatic = traitId >= instanceTraitCount;
+        int staticTraitCount = abc.class_info.get(classIndex).static_traits.traits.size();
+        boolean isStatic = traitId < staticTraitCount;
 
         if (isStatic) {
-            int index = traitId - instanceTraitCount;
-            return abc.class_info.get(classIndex).static_traits.traits.get(index).getName(abc).getName(abc.constants, null, false, true);
+            return abc.class_info.get(classIndex).static_traits.traits.get(traitId).getName(abc).getName(abc.constants, null, false, true);
         } else {
-            return abc.instance_info.get(classIndex).instance_traits.traits.get(traitId).getName(abc).getName(abc.constants, null, false, true);
+            int index = traitId - staticTraitCount;
+            return abc.instance_info.get(classIndex).instance_traits.traits.get(index).getName(abc).getName(abc.constants, null, false, true);
         }
     }
 
