@@ -19,14 +19,12 @@ package com.jpexs.decompiler.flash.gui.abc;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
-import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
-import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitType;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
-import com.jpexs.decompiler.flash.gui.AppStrings;
-import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
+import com.jpexs.decompiler.flash.search.ABCSearchResult;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,7 +35,7 @@ import java.util.logging.Logger;
  */
 public class TraitsListItem {
 
-    private final Type type;
+    private final TraitType type;
 
     private final boolean isStatic;
 
@@ -49,13 +47,13 @@ public class TraitsListItem {
 
     private final int scriptIndex;
 
-    public String STR_INSTANCE_INITIALIZER = AppStrings.translate("abc.traitslist.instanceinitializer");
+    public static String STR_INSTANCE_INITIALIZER = ABCSearchResult.STR_INSTANCE_INITIALIZER;
 
-    public String STR_CLASS_INITIALIZER = AppStrings.translate("abc.traitslist.classinitializer");
+    public static String STR_CLASS_INITIALIZER = ABCSearchResult.STR_CLASS_INITIALIZER;
 
-    public String STR_SCRIPT_INITIALIZER = AppStrings.translate("abc.traitslist.scriptinitializer");
+    public static String STR_SCRIPT_INITIALIZER = ABCSearchResult.STR_SCRIPT_INITIALIZER;
 
-    public TraitsListItem(Type type, int index, boolean isStatic, ABC abc, int classIndex, int scriptIndex) {
+    public TraitsListItem(TraitType type, int index, boolean isStatic, ABC abc, int classIndex, int scriptIndex) {
         this.type = type;
         this.index = index;
         this.isStatic = isStatic;
@@ -65,33 +63,19 @@ public class TraitsListItem {
     }
 
     public int getGlobalTraitId() {
-        if (type == Type.INITIALIZER) {
-            if (!isStatic) {
-                return GraphTextWriter.TRAIT_INSTANCE_INITIALIZER;
-            } else {
-                return GraphTextWriter.TRAIT_CLASS_INITIALIZER;
-            }
-        }
-        if (type == Type.SCRIPT_INITIALIZER) {
-            return GraphTextWriter.TRAIT_SCRIPT_INITIALIZER;
-        }
-        if (isStatic) {
-            return index;
-        } else {
-            return abc.class_info.get(classIndex).static_traits.traits.size() + index;
-        }
+        return abc.getGlobalTraitId(type, isStatic, classIndex, index);
     }
 
     public String toStringName() {
 
-        if (type == Type.INITIALIZER) {
+        if (type == TraitType.INITIALIZER) {
             if (!isStatic) {
                 return "__" + STR_INSTANCE_INITIALIZER;
             } else {
                 return "__" + STR_CLASS_INITIALIZER;
             }
         }
-        if (type == Type.SCRIPT_INITIALIZER) {
+        if (type == TraitType.SCRIPT_INITIALIZER) {
             return "__" + STR_SCRIPT_INITIALIZER;
         }
         if (isStatic) {
@@ -105,9 +89,9 @@ public class TraitsListItem {
     public String toString() {
         String s = "";
         try {
-            if (type == Type.SCRIPT_INITIALIZER) {
+            if (type == TraitType.SCRIPT_INITIALIZER) {
                 s = STR_SCRIPT_INITIALIZER;
-            } else if (type == Type.INITIALIZER) {
+            } else if (type == TraitType.INITIALIZER) {
                 if (!isStatic) {
                     s = STR_INSTANCE_INITIALIZER;
                 } else {
@@ -135,7 +119,7 @@ public class TraitsListItem {
         return s;
     }
 
-    public Type getType() {
+    public TraitType getType() {
         return type;
     }
 
@@ -143,25 +127,11 @@ public class TraitsListItem {
         return isStatic;
     }
 
-    public enum Type {
-        METHOD,
-        VAR,
-        CONST,
-        INITIALIZER,
-        SCRIPT_INITIALIZER;
+    public int getClassIndex() {
+        return classIndex;
+    }
 
-        public static Type getTypeForTrait(Trait t) {
-            if (t instanceof TraitMethodGetterSetter) {
-                return METHOD;
-            }
-            if (t instanceof TraitSlotConst) {
-                if (((TraitSlotConst) t).isConst()) {
-                    return CONST;
-                } else {
-                    return VAR;
-                }
-            }
-            return null;
-        }
+    public int getIndex() {
+        return index;
     }
 }

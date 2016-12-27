@@ -278,19 +278,19 @@ public class TraitClass extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public void getMethodInfos(ABC abc, int classIndex, List<MethodId> methodInfos) {
+    public void getMethodInfos(ABC abc, int traitId, int classIndex, List<MethodId> methodInfos) {
         InstanceInfo instanceInfo = abc.instance_info.get(class_info);
         ClassInfo classInfo = abc.class_info.get(class_info);
 
         //class initializer
-        methodInfos.add(new MethodId(class_info, classInfo.cinit_index));
+        methodInfos.add(new MethodId(GraphTextWriter.TRAIT_CLASS_INITIALIZER, class_info, classInfo.cinit_index));
 
         //constructor - instance initializer
-        methodInfos.add(new MethodId(class_info, instanceInfo.iinit_index));
+        methodInfos.add(new MethodId(GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, class_info, instanceInfo.iinit_index));
 
         //static variables,constants & methods
-        classInfo.static_traits.getMethodInfos(abc, class_info, methodInfos);
+        classInfo.static_traits.getMethodInfos(abc, true, class_info, methodInfos);
 
-        instanceInfo.instance_traits.getMethodInfos(abc, class_info, methodInfos);
+        instanceInfo.instance_traits.getMethodInfos(abc, false, class_info, methodInfos);
     }
 }

@@ -1249,10 +1249,20 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         setAbc(pack.abc);
         decompiledTextArea.setScript(pack, false);
         hilightScript(pack);
+
+        boolean pcode = item.isPcode();
+        if (pcode) {
+            decompiledTextArea.gotoTrait(item.getTraitId());
+        }
+
         decompiledTextArea.setCaretPosition(0);
 
         View.execInEventDispatchLater(() -> {
-            searchPanel.showQuickFindDialog(decompiledTextArea);
+            if (pcode) {
+                searchPanel.showQuickFindDialog(detailPanel.methodTraitPanel.methodCodePanel.getSourceTextArea());
+            } else {
+                searchPanel.showQuickFindDialog(decompiledTextArea);
+            }
         });
 
     }

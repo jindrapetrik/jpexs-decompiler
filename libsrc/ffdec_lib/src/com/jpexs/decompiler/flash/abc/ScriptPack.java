@@ -620,12 +620,12 @@ public class ScriptPack extends AS3ClassTreeItem {
 
     public void getMethodInfos(List<MethodId> methodInfos) {
         int script_init = abc.script_info.get(scriptIndex).init_index;
-        methodInfos.add(new MethodId(-1, script_init));
+        methodInfos.add(new MethodId(GraphTextWriter.TRAIT_SCRIPT_INITIALIZER, -1, script_init));
 
         List<Trait> traits = abc.script_info.get(scriptIndex).traits.traits;
-        for (int t = 0; t < traitIndices.size(); t++) {
+        for (int t : traitIndices) {
             Trait trait = traits.get(t);
-            trait.getMethodInfos(abc, -1, methodInfos);
+            trait.getMethodInfos(abc, GraphTextWriter.TRAIT_UNKNOWN, -1, methodInfos);
         }
     }
 }

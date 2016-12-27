@@ -228,7 +228,7 @@ public class TraitMethodGetterSetter extends Trait {
     }
 
     @Override
-    public void getMethodInfos(ABC abc, int classIndex, List<MethodId> methodInfos) {
-        methodInfos.add(new MethodId(classIndex, method_info));
+    public void getMethodInfos(ABC abc, int traitId, int classIndex, List<MethodId> methodInfos) {
+        methodInfos.add(new MethodId(traitId, classIndex, method_info));
     }
 }

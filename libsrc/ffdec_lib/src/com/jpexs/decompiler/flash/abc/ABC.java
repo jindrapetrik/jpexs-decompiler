@@ -41,6 +41,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitType;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.abc.usages.ClassNameMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.ConstVarNameMultinameUsage;
@@ -58,6 +59,7 @@ import com.jpexs.decompiler.flash.abc.usages.TypeNameMultinameUsage;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecial;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecialType;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.importers.As3ScriptReplaceException;
 import com.jpexs.decompiler.flash.importers.As3ScriptReplacerInterface;
@@ -1424,6 +1426,30 @@ public class ABC {
             }
         }
         return null;
+    }
+
+    public int getGlobalTraitId(TraitType type, boolean isStatic, int classIndex, int index) {
+        if (type == TraitType.INITIALIZER) {
+            if (!isStatic) {
+                return GraphTextWriter.TRAIT_INSTANCE_INITIALIZER;
+            } else {
+                return GraphTextWriter.TRAIT_CLASS_INITIALIZER;
+            }
+        }
+
+        if (type == TraitType.SCRIPT_INITIALIZER) {
+            return GraphTextWriter.TRAIT_SCRIPT_INITIALIZER;
+        }
+
+        if (classIndex == -1) {
+            return index;
+        }
+
+        if (isStatic) {
+            return index;
+        } else {
+            return class_info.get(classIndex).static_traits.traits.size() + index;
+        }
     }
 
     private void removeClassFromTraits(Traits traits, int index) {

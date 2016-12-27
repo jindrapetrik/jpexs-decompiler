@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -88,7 +89,7 @@ public class TraitsList extends JList<Object> implements ListSelectionListener {
         }
         lastSelected = getSelectedIndex();
         TraitsListItem sel = (TraitsListItem) getSelectedValue();
-        abcPanel.decompiledTextArea.gotoTrait(sel == null ? -1 : sel.getGlobalTraitId());
+        abcPanel.decompiledTextArea.gotoTrait(sel == null ? GraphTextWriter.TRAIT_UNKNOWN : sel.getGlobalTraitId());
     }
 
     @Override

@@ -171,12 +171,7 @@ public class Traits implements Cloneable, Serializable {
                 continue;
             }
             writer.newLine();
-            int h = t;
-            if (classIndex != -1) {
-                if (!isStatic) {
-                    h += abc.class_info.get(classIndex).static_traits.traits.size();
-                }
-            }
+            int h = abc.getGlobalTraitId(TraitType.METHOD /*non-initializer*/, isStatic, classIndex, t);
             if (trait instanceof TraitClass) {
                 writer.startClass(((TraitClass) trait).class_info);
             } else {
@@ -252,10 +247,10 @@ public class Traits implements Cloneable, Serializable {
         }
     }
 
-    public void getMethodInfos(ABC abc, int classIndex, List<MethodId> methodInfos) {
+    public void getMethodInfos(ABC abc, boolean isStatic, int classIndex, List<MethodId> methodInfos) {
         for (int t = 0; t < traits.size(); t++) {
             Trait trait = traits.get(t);
-            trait.getMethodInfos(abc, classIndex, methodInfos);
+            trait.getMethodInfos(abc, abc.getGlobalTraitId(TraitType.METHOD /*non-initializer*/, isStatic, classIndex, t), classIndex, methodInfos);
         }
     }
 }

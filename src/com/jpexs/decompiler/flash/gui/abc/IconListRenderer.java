@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui.abc;
 
+import com.jpexs.decompiler.flash.abc.types.traits.TraitType;
 import com.jpexs.decompiler.flash.gui.View;
 import java.awt.Component;
 import java.net.URL;
@@ -62,22 +63,26 @@ public class IconListRenderer extends DefaultListCellRenderer {
         // Get icon to use for the list item value
         TraitsListItem tli = (TraitsListItem) value;
 
-        if (tli.getType() == TraitsListItem.Type.CONST) {
+        if (tli.getType() == TraitType.CONST) {
             label.setIcon(constIcon);
         }
-        if (tli.getType() == TraitsListItem.Type.VAR) {
+
+        if (tli.getType() == TraitType.VAR) {
             label.setIcon(variableIcon);
         }
-        if (tli.getType() == TraitsListItem.Type.METHOD) {
-            label.setIcon(functionIcon);
-        }
-        if (tli.getType() == TraitsListItem.Type.INITIALIZER) {
+
+        if (tli.getType() == TraitType.METHOD) {
             label.setIcon(functionIcon);
         }
 
-        if (tli.getType() == TraitsListItem.Type.SCRIPT_INITIALIZER) {
+        if (tli.getType() == TraitType.INITIALIZER) {
             label.setIcon(functionIcon);
         }
+
+        if (tli.getType() == TraitType.SCRIPT_INITIALIZER) {
+            label.setIcon(functionIcon);
+        }
+
         return label;
     }
 }

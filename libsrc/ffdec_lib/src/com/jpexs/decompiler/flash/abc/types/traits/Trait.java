@@ -511,5 +511,5 @@ public abstract class Trait implements Cloneable, Serializable {
         return true;
     }
 
-    public abstract void getMethodInfos(ABC abc, int classIndex, List<MethodId> methodInfos);
+    public abstract void getMethodInfos(ABC abc, int traitId, int classIndex, List<MethodId> methodInfos);
 }

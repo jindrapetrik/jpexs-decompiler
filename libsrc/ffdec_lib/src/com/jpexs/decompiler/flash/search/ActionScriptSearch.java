@@ -159,7 +159,7 @@ public class ActionScriptSearch {
                                 abc.bodies.get(bodyIndex).getCode().toASMSource(abc.constants, abc.method_info.get(body.method_info), body, ScriptExportMode.PCODE, writer);
                                 String text = writer.toString();
                                 if (pat.matcher(text).find()) {
-                                    ABCSearchResult searchResult = new ABCSearchResult(pack, methodInfo.getClassIndex(), methodInfo.getMethodIndex());
+                                    ABCSearchResult searchResult = new ABCSearchResult(pack, methodInfo.getClassIndex(), methodInfo.getTraitId());
                                     found.add(searchResult);
                                 }
                             }

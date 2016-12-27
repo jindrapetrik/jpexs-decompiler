@@ -16,7 +16,10 @@
  */
 package com.jpexs.decompiler.flash.search;
 
+import com.jpexs.decompiler.flash.AppResources;
+import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 
 /**
  *
@@ -24,38 +27,85 @@ import com.jpexs.decompiler.flash.abc.ScriptPack;
  */
 public class ABCSearchResult {
 
+    public static String STR_INSTANCE_INITIALIZER = AppResources.translate("trait.instanceinitializer");
+
+    public static String STR_CLASS_INITIALIZER = AppResources.translate("trait.classinitializer");
+
+    public static String STR_SCRIPT_INITIALIZER = AppResources.translate("trait.scriptinitializer");
+
     private final ScriptPack scriptPack;
+
+    private final boolean pcode;
 
     private final int classIndex;
 
-    private final int methodIndex;
+    private final int traitId;
 
     public ABCSearchResult(ScriptPack scriptPack) {
         this.scriptPack = scriptPack;
+        pcode = false;
         classIndex = 0;
-        methodIndex = 0;
+        traitId = GraphTextWriter.TRAIT_UNKNOWN;
     }
 
-    public ABCSearchResult(ScriptPack scriptPack, int classIndex, int methodIndex) {
+    public ABCSearchResult(ScriptPack scriptPack, int classIndex, int traitId) {
         this.scriptPack = scriptPack;
+        pcode = true;
         this.classIndex = classIndex;
-        this.methodIndex = methodIndex;
+        this.traitId = traitId;
     }
 
     public ScriptPack getScriptPack() {
         return scriptPack;
     }
 
-    public int getClassIndex() {
-        return classIndex;
+    public boolean isPcode() {
+        return pcode;
     }
 
-    public int getMethodIndex() {
-        return methodIndex;
+    public int getTraitId() {
+        return traitId;
+    }
+
+    private String getTraitName() {
+        if (traitId == GraphTextWriter.TRAIT_SCRIPT_INITIALIZER) {
+            return STR_SCRIPT_INITIALIZER;
+        }
+
+        if (classIndex == -1) {
+            return null;
+        }
+
+        if (traitId == GraphTextWriter.TRAIT_CLASS_INITIALIZER) {
+            return STR_CLASS_INITIALIZER;
+        }
+
+        if (traitId == GraphTextWriter.TRAIT_INSTANCE_INITIALIZER) {
+            return STR_INSTANCE_INITIALIZER;
+        }
+
+        ABC abc = scriptPack.abc;
+
+        int instanceTraitCount = abc.instance_info.get(classIndex).instance_traits.traits.size();
+        boolean isStatic = traitId >= instanceTraitCount;
+
+        if (isStatic) {
+            int index = traitId - instanceTraitCount;
+            return abc.class_info.get(classIndex).static_traits.traits.get(index).getName(abc).getName(abc.constants, null, false, true);
+        } else {
+            return abc.instance_info.get(classIndex).instance_traits.traits.get(traitId).getName(abc).getName(abc.constants, null, false, true);
+        }
     }
 
     @Override
     public String toString() {
-        return scriptPack.getClassPath().toString();
+        String result = scriptPack.getClassPath().toString();
+
+        if (pcode) {
+            result += "/";
+            result += getTraitName();
+        }
+
+        return result;
     }
 }

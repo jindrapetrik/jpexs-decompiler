@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitType;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -58,24 +59,26 @@ public final class TraitsListModel implements ListModel<Object> {
         if (classIndex > -1) {
             List<Trait> traits = abc.class_info.get(classIndex).static_traits.traits;
             for (int t = 0; t < traits.size(); t++) {
-                if (traits.get(t).isVisible(true, abc)) {
-                    items.add(new TraitsListItem(TraitsListItem.Type.getTypeForTrait(traits.get(t)), t, true, abc, classIndex, scriptIndex));
+                Trait trait = traits.get(t);
+                if (trait.isVisible(true, abc)) {
+                    items.add(new TraitsListItem(TraitType.getTypeForTrait(trait), t, true, abc, classIndex, scriptIndex));
                 }
             }
 
             traits = abc.instance_info.get(classIndex).instance_traits.traits;
             for (int t = 0; t < traits.size(); t++) {
-                if (traits.get(t).isVisible(false, abc)) {
-                    items.add(new TraitsListItem(TraitsListItem.Type.getTypeForTrait(traits.get(t)), t, false, abc, classIndex, scriptIndex));
+                Trait trait = traits.get(t);
+                if (trait.isVisible(false, abc)) {
+                    items.add(new TraitsListItem(TraitType.getTypeForTrait(trait), t, false, abc, classIndex, scriptIndex));
                 }
             }
 
-            items.add(new TraitsListItem(TraitsListItem.Type.INITIALIZER, 0, false, abc, classIndex, scriptIndex));
-            items.add(new TraitsListItem(TraitsListItem.Type.INITIALIZER, 0, true, abc, classIndex, scriptIndex));
+            items.add(new TraitsListItem(TraitType.INITIALIZER, 0, false, abc, classIndex, scriptIndex));
+            items.add(new TraitsListItem(TraitType.INITIALIZER, 0, true, abc, classIndex, scriptIndex));
         }
 
         if (Configuration.enableScriptInitializerDisplay.get()) {
-            items.add(new TraitsListItem(TraitsListItem.Type.SCRIPT_INITIALIZER, 0, true, abc, classIndex, scriptIndex));
+            items.add(new TraitsListItem(TraitType.SCRIPT_INITIALIZER, 0, true, abc, classIndex, scriptIndex));
         }
     }
 

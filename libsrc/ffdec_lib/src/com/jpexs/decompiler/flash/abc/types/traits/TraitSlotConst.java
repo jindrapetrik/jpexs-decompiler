@@ -247,6 +247,6 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public void getMethodInfos(ABC abc, int classIndex, List<MethodId> methodInfos) {
+    public void getMethodInfos(ABC abc, int traitId, int classIndex, List<MethodId> methodInfos) {
     }
 }

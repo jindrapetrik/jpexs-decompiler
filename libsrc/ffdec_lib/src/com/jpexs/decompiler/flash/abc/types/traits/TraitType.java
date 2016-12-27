@@ -14,35 +14,30 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.search;
+package com.jpexs.decompiler.flash.abc.types.traits;
 
 /**
  *
  * @author JPEXS
  */
-public class MethodId {
+public enum TraitType {
+    METHOD,
+    VAR,
+    CONST,
+    INITIALIZER,
+    SCRIPT_INITIALIZER;
 
-    private final int traitId;
-
-    private final int classIndex;
-
-    private final int methodIndex;
-
-    public MethodId(int traitId, int classIndex, int methodIndex) {
-        this.traitId = traitId;
-        this.classIndex = classIndex;
-        this.methodIndex = methodIndex;
-    }
-
-    public int getClassIndex() {
-        return classIndex;
-    }
-
-    public int getMethodIndex() {
-        return methodIndex;
-    }
-
-    public int getTraitId() {
-        return traitId;
+    public static TraitType getTypeForTrait(Trait t) {
+        if (t instanceof TraitMethodGetterSetter) {
+            return METHOD;
+        }
+        if (t instanceof TraitSlotConst) {
+            if (((TraitSlotConst) t).isConst()) {
+                return CONST;
+            } else {
+                return VAR;
+            }
+        }
+        return null;
     }
 }

@@ -608,7 +608,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
 
         Highlighting tc = Highlighting.searchIndex(highlightedText.getClassHighlights(), classIndex);
         if (tc != null || isScriptInit) {
-            Highlighting th = Highlighting.searchIndex(highlightedText.getTraitHighlights(), traitId, isScriptInit || tc == null ? 0 : tc.startPos, isScriptInit || tc == null ? -1 : tc.startPos + tc.len);
+            Highlighting th = Highlighting.searchIndex(highlightedText.getTraitHighlights(), traitId, isScriptInit ? 0 : tc.startPos, isScriptInit ? -1 : tc.startPos + tc.len);
             int pos = 0;
             if (th != null) {
                 if (th.len > 1) {
