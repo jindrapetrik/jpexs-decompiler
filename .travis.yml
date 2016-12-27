@@ -5,3 +5,9 @@ before_install:
     - ./travis/before_install.sh
 install: ./travis/install.sh
 script: ./travis/script.sh
+notifications:
+  email:
+    recipients:
+      - developers@free-decompiler.com    
+    on_success: change
+    on_failure: always
