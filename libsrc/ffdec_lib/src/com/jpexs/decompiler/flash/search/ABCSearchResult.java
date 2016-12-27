@@ -63,6 +63,10 @@ public class ABCSearchResult {
         return pcode;
     }
 
+    public int getClassIndex() {
+        return classIndex;
+    }
+
     public int getTraitId() {
         return traitId;
     }

@@ -1252,6 +1252,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
         boolean pcode = item.isPcode();
         if (pcode) {
+            decompiledTextArea.setClassIndex(item.getClassIndex());
             decompiledTextArea.gotoTrait(item.getTraitId());
         }
 
