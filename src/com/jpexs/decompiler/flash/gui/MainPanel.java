@@ -1073,7 +1073,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 }
 
                 int fmulCount = mulCount;
-                View.execInEventDispatchLater(() -> {
+                View.execInEventDispatch(() -> {
                     View.showMessageDialog(null, translate("rename.finished.multiname").replace("%count%", Integer.toString(fmulCount)));
                     if (abcPanel != null) {
                         abcPanel.reload();
@@ -2378,7 +2378,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         long timeAfter = System.currentTimeMillis();
                         final long timeMs = timeAfter - timeBefore;
 
-                        View.execInEventDispatchLater(() -> {
+                        View.execInEventDispatch(() -> {
                             setStatus(translate("export.finishedin").replace("%time%", Helper.formatTimeSec(timeMs)));
                         });
                     }

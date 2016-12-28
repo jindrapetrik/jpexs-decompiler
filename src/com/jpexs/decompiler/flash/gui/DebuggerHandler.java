@@ -493,8 +493,7 @@ public class DebuggerHandler implements DebugConnectionListener {
 
     @Override
     public void failedListen(IOException ex) {
-        View.execInEventDispatchLater(new Runnable() {
-
+        View.execInEventDispatch(new Runnable() {
             @Override
             public void run() {
                 disconnect();
@@ -629,7 +628,7 @@ public class DebuggerHandler implements DebugConnectionListener {
                 public void message(InSwfInfo t) {
                     for (InSwfInfo.SwfInfo s : t.swfInfos) {
                         swfs.add(s);
-                        View.execInEventDispatchLater(new Runnable() {
+                        View.execInEventDispatch(new Runnable() {
                             @Override
                             public void run() {
                                 try {
@@ -643,7 +642,6 @@ public class DebuggerHandler implements DebugConnectionListener {
                     }
                     con.dropMessage(t);
                 }
-
             });
 
             InSetBreakpoint isb = con.getMessage(InSetBreakpoint.class);
@@ -668,7 +666,6 @@ public class DebuggerHandler implements DebugConnectionListener {
                 connected = true;
             }
             con.addMessageListener(new DebugMessageListener<InAskBreakpoints>() {
-
                 @Override
                 public void message(InAskBreakpoints message) {
 
@@ -687,7 +684,6 @@ public class DebuggerHandler implements DebugConnectionListener {
                 }
             });
             con.addMessageListener(new DebugMessageListener<InBreakAt>() {
-
                 @Override
                 public void message(InBreakAt message) {
                     synchronized (DebuggerHandler.this) {
@@ -752,7 +748,6 @@ public class DebuggerHandler implements DebugConnectionListener {
             }
 
             con.addMessageListener(new DebugMessageListener<InTrace>() {
-
                 @Override
                 public void message(InTrace tr) {
                     for (TraceListener l : traceListeners) {

@@ -1255,15 +1255,14 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         View.checkAccess();
 
         TagTreeModel ttm = (TagTreeModel) mainPanel.tagTree.getModel();
-        TreePath tp0 = ttm.getTreePath(pack);
-        if (tp0 == null) {
+        TreePath tp = ttm.getTreePath(pack);
+        if (tp == null) {
             mainPanel.closeTagTreeSearch();
-            tp0 = ttm.getTreePath(pack);
+            tp = ttm.getTreePath(pack);
         }
-        final TreePath tp = tp0;
+
         mainPanel.tagTree.setSelectionPath(tp);
         mainPanel.tagTree.scrollPathToVisible(tp);
-
     }
 
     @Override
@@ -1272,22 +1271,34 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
         ScriptPack pack = item.getScriptPack();
         setAbc(pack.abc);
+
+        Runnable setScriptComplete = new Runnable() {
+            @Override
+            public void run() {
+                decompiledTextArea.removeScriptListener(this);
+                hilightScript(pack);
+
+                boolean pcode = item.isPcode();
+                if (pcode) {
+                    decompiledTextArea.setClassIndex(item.getClassIndex());
+                    decompiledTextArea.gotoTrait(item.getTraitId());
+                } else {
+                    decompiledTextArea.setCaretPosition(0);
+                }
+
+                decompiledTextArea.caretUpdate(null);
+
+                if (pcode) {
+                    searchPanel.showQuickFindDialog(detailPanel.methodTraitPanel.methodCodePanel.getSourceTextArea());
+                } else {
+                    searchPanel.showQuickFindDialog(decompiledTextArea);
+                }
+            }
+        };
+
+        decompiledTextArea.addScriptListener(setScriptComplete);
+
         decompiledTextArea.setScript(pack, false);
-        hilightScript(pack);
-
-        boolean pcode = item.isPcode();
-        if (pcode) {
-            decompiledTextArea.setClassIndex(item.getClassIndex());
-            decompiledTextArea.gotoTrait(item.getTraitId());
-        }
-
-        decompiledTextArea.setCaretPosition(0);
-
-        if (pcode) {
-            searchPanel.showQuickFindDialog(detailPanel.methodTraitPanel.methodCodePanel.getSourceTextArea());
-        } else {
-            searchPanel.showQuickFindDialog(decompiledTextArea);
-        }
     }
 
     public boolean isDirectEditing() {

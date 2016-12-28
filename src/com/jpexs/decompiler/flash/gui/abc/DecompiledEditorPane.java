@@ -666,8 +666,10 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         }
 
         if (!force && this.script == scriptLeaf) {
+            fireScript();
             return;
         }
+
         String sn = scriptLeaf.getClassPath().toString();
         setScriptName(sn);
         abcPanel.scriptNameLabel.setText(sn);

@@ -305,7 +305,6 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
             if (((TraitDetail) cardMap.get(selectedCard)).save()) {
                 DecompiledEditorPane decompiledTextArea = abcPanel.decompiledTextArea;
                 int lastTrait = decompiledTextArea.lastTraitIndex;
-                decompiledTextArea.reloadClass();
 
                 Runnable reloadComplete = new Runnable() {
                     @Override
@@ -318,6 +317,7 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
                 };
 
                 decompiledTextArea.addScriptListener(reloadComplete);
+                decompiledTextArea.reloadClass();
             }
         }
     }

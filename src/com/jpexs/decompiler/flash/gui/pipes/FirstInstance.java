@@ -83,7 +83,7 @@ public class FirstInstance {
                                                 fileNames[i] = ois.readUTF();
                                             }
 
-                                            View.execInEventDispatchLater(() -> {
+                                            View.execInEventDispatch(() -> {
                                                 for (int i = 0; i < cnt; i++) {
                                                     Main.openFile(fileNames[i], null);
                                                 }
@@ -91,7 +91,7 @@ public class FirstInstance {
                                         //no break - focus too
                                         case "focus":
 
-                                            View.execInEventDispatchLater(new Runnable() {
+                                            View.execInEventDispatch(new Runnable() {
                                                 @Override
                                                 public void run() {
                                                     Window wnd = Main.getMainFrame().getWindow();
