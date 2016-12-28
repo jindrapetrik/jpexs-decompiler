@@ -103,11 +103,13 @@ public class UsageFrame extends AppDialog implements MouseListener {
         if (usage instanceof InsideClassMultinameUsageInterface) {
             final InsideClassMultinameUsageInterface icu = (InsideClassMultinameUsageInterface) usage;
 
-            Runnable settrait = new Runnable() {
+            DecompiledEditorPane decompiledTextArea = abcPanel.decompiledTextArea;
+            ABC abc = abcPanel.abc;
+            Runnable setTrait = new Runnable() {
                 @Override
                 public void run() {
-                    abcPanel.decompiledTextArea.removeScriptListener(this);
-                    abcPanel.decompiledTextArea.setClassIndex(icu.getClassIndex());
+                    decompiledTextArea.removeScriptListener(this);
+                    decompiledTextArea.setClassIndex(icu.getClassIndex());
                     if (usage instanceof TraitMultinameUsage) {
                         TraitMultinameUsage tmu = (TraitMultinameUsage) usage;
                         int traitIndex;
@@ -117,23 +119,23 @@ public class UsageFrame extends AppDialog implements MouseListener {
                             traitIndex = tmu.getTraitIndex();
                         }
                         if (tmu.getTraitsType() == TraitMultinameUsage.TRAITS_TYPE_INSTANCE) {
-                            traitIndex += abcPanel.abc.class_info.get(tmu.getClassIndex()).static_traits.traits.size();
+                            traitIndex += abc.class_info.get(tmu.getClassIndex()).static_traits.traits.size();
                         }
                         if (tmu instanceof MethodMultinameUsage) {
                             MethodMultinameUsage mmu = (MethodMultinameUsage) usage;
                             if (mmu.isInitializer() == true) {
-                                traitIndex = abcPanel.abc.class_info.get(mmu.getClassIndex()).static_traits.traits.size() + abcPanel.abc.instance_info.get(mmu.getClassIndex()).instance_traits.traits.size() + (mmu.getTraitsType() == TraitMultinameUsage.TRAITS_TYPE_CLASS ? 1 : 0);
+                                traitIndex = abc.class_info.get(mmu.getClassIndex()).static_traits.traits.size() + abc.instance_info.get(mmu.getClassIndex()).instance_traits.traits.size() + (mmu.getTraitsType() == TraitMultinameUsage.TRAITS_TYPE_CLASS ? 1 : 0);
                             }
                         }
-                        abcPanel.decompiledTextArea.gotoTrait(traitIndex);
+                        decompiledTextArea.gotoTrait(traitIndex);
                     }
                 }
             };
 
-            if (abcPanel.decompiledTextArea.getClassIndex() == icu.getClassIndex() && abcPanel.abc == icu.getAbc()) {
-                settrait.run();
+            if (decompiledTextArea.getClassIndex() == icu.getClassIndex() && abc == icu.getAbc()) {
+                setTrait.run();
             } else {
-                abcPanel.decompiledTextArea.addScriptListener(settrait);
+                decompiledTextArea.addScriptListener(setTrait);
                 abcPanel.hilightScript(abcPanel.getSwf(), icu.getAbc().instance_info.get(icu.getClassIndex()).getName(icu.getAbc().constants).getNameWithNamespace(icu.getAbc().constants, true).toRawString());
             }
         }

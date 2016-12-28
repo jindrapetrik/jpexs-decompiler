@@ -156,9 +156,9 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
 
     private HighlightedText srcConstants;
 
-    private HighlightedText disassembledText = new HighlightedText();
+    private HighlightedText disassembledText = HighlightedText.EMPTY;
 
-    private HighlightedText lastDecompiled = new HighlightedText();
+    private HighlightedText lastDecompiled = HighlightedText.EMPTY;
 
     private ASMSource lastASM;
 
@@ -171,7 +171,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
 
         lastCode = null;
         lastASM = null;
-        lastDecompiled = new HighlightedText();
+        lastDecompiled = HighlightedText.EMPTY;
         searchPanel.clear();
         src = null;
         srcWithHex = null;
@@ -314,7 +314,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
     private HighlightedText getHighlightedText(ScriptExportMode exportMode, ActionList actions) {
         if (actions == null) {
             logger.log(Level.WARNING, "Action list is null");
-            return new HighlightedText();
+            return HighlightedText.EMPTY;
         }
 
         ASMSource asm = (ASMSource) src;
@@ -439,104 +439,93 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         HighlightedText decompiledText = null;
         if (!decompile) {
             decompiledText = new HighlightedText(Helper.getDecompilationSkippedComment());
-            lastDecompiled = decompiledText;
-            setDecompiledText(asm.getScriptName(), decompiledText.text);
         } else {
             decompiledText = SWF.getFromCache(asm);
-            if (decompiledText != null) {
-                lastDecompiled = decompiledText;
-                lastASM = asm;
-                setDecompiledText(lastASM.getScriptName(), lastDecompiled.text);
-            }
         }
 
-        if (decompiledText != null) {
-            setDecompiledEditMode(false);
-        }
+        setDecompiledEditMode(false);
+        setEditMode(false);
 
         ActionList actions = SWF.getActionListFromCache(asm);
-        if (actions != null) {
-            lastCode = actions;
-            setHex(getExportMode(), asm.getScriptName(), actions);
-            setEditMode(false);
-        }
 
         boolean disassemblingNeeded = actions == null;
         boolean decompileNeeded = decompiledText == null;
 
-        CancellableWorker worker = new CancellableWorker() {
-            @Override
-            protected Void doInBackground() throws Exception {
+        if (disassemblingNeeded || decompileNeeded) {
+            CancellableWorker worker = new CancellableWorker() {
+                @Override
+                protected Void doInBackground() throws Exception {
 
-                ActionList innerActions = actions;
-                if (disassemblingNeeded) {
-                    View.execInEventDispatch(() -> {
-                        setEditorText(asm.getScriptName(), "; " + AppStrings.translate("work.disassembling") + "...", "text/flasm");
-                        if (decompileNeeded) {
-                            setDecompiledText("-", "// " + AppStrings.translate("work.waitingfordissasembly") + "...");
-                        }
-                    });
-
-                    DisassemblyListener listener = getDisassemblyListener();
-                    asm.addDisassemblyListener(listener);
-                    innerActions = asm.getActions();
-                    asm.removeDisassemblyListener(listener);
-
-                    lastCode = innerActions;
-                    ActionList finalActions = innerActions;
-                    View.execInEventDispatch(() -> {
-                        setHex(getExportMode(), asm.getScriptName(), finalActions);
-                    });
-                }
-
-                if (decompileNeeded) {
-                    View.execInEventDispatch(() -> {
-                        setDecompiledText("-", "// " + AppStrings.translate("work.decompiling") + "...");
-                    });
-
-                    HighlightedText htext = SWF.getCached(asm, innerActions);
-                    lastDecompiled = htext;
-                    lastASM = asm;
-
-                    View.execInEventDispatch(() -> {
-                        setDecompiledText(lastASM.getScriptName(), htext.text);
-                    });
-                }
-
-                return null;
-            }
-
-            @Override
-            protected void done() {
-                View.execInEventDispatch(() -> {
-                    setSourceWorker = null;
-                    if (!Main.isDebugging()) {
-                        Main.stopWork();
-                    }
-
-                    try {
-                        get();
-                    } catch (CancellationException ex) {
-                        setEditorText("-", "; " + AppStrings.translate("work.canceled"), "text/flasm");
-                    } catch (Exception ex) {
-                        setDecompiledText("-", "// " + AppStrings.translate("decompilationError") + ": " + ex);
-                    }
-
+                    ActionList innerActions = actions;
                     if (disassemblingNeeded) {
-                        setEditMode(false);
+                        View.execInEventDispatch(() -> {
+                            setEditorText(asm.getScriptName(), "; " + AppStrings.translate("work.disassembling") + "...", "text/flasm");
+                            if (decompileNeeded) {
+                                setDecompiledText("-", "// " + AppStrings.translate("work.waitingfordissasembly") + "...");
+                            }
+                        });
+
+                        DisassemblyListener listener = getDisassemblyListener();
+                        asm.addDisassemblyListener(listener);
+                        innerActions = asm.getActions();
+                        asm.removeDisassemblyListener(listener);
                     }
 
                     if (decompileNeeded) {
-                        setDecompiledEditMode(false);
+                        View.execInEventDispatch(() -> {
+                            setDecompiledText("-", "// " + AppStrings.translate("work.decompiling") + "...");
+                        });
+
+                        HighlightedText htext = SWF.getCached(asm, innerActions);
+                        setSourceCompleted(asm, htext, innerActions);
                     }
-                });
+
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    View.execInEventDispatch(() -> {
+                        setSourceWorker = null;
+                        if (!Main.isDebugging()) {
+                            Main.stopWork();
+                        }
+
+                        try {
+                            get();
+                        } catch (CancellationException ex) {
+                            setEditorText("-", "; " + AppStrings.translate("work.canceled"), "text/flasm");
+                        } catch (Exception ex) {
+                            logger.log(Level.SEVERE, "Error", ex);
+                            setDecompiledText("-", "// " + AppStrings.translate("decompilationError") + ": " + ex);
+                        }
+                    });
+                }
+            };
+
+            worker.execute();
+            setSourceWorker = worker;
+            if (!Main.isDebugging()) {
+                Main.startWork(AppStrings.translate("work.decompiling") + "...", worker);
             }
-        };
-        worker.execute();
-        setSourceWorker = worker;
-        if (!Main.isDebugging()) {
-            Main.startWork(AppStrings.translate("work.decompiling") + "...", worker);
+        } else {
+            setSourceCompleted(asm, decompiledText, actions);
         }
+    }
+
+    private void setSourceCompleted(ASMSource asm, HighlightedText decompiledText, ActionList actions) {
+        View.checkAccess();
+
+        if (decompiledText == null) {
+            decompiledText = HighlightedText.EMPTY;
+        }
+
+        lastASM = asm;
+        lastCode = actions;
+        lastDecompiled = decompiledText;
+
+        setHex(getExportMode(), asm.getScriptName(), actions);
+        setDecompiledText(asm.getScriptName(), decompiledText.text);
     }
 
     public void hilightOffset(long offset) {

@@ -196,7 +196,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -326,8 +325,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     private final TagInfoPanel tagInfoPanel;
 
     private TreePanelMode treePanelMode;
-
-    private CancellableWorker setSourceWorker;
 
     public TreeItem oldItem;
 
@@ -3414,48 +3411,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         if (treeItem instanceof ScriptPack) {
             final ScriptPack scriptLeaf = (ScriptPack) treeItem;
-            if (setSourceWorker != null) {
-                setSourceWorker.cancel(true);
-                setSourceWorker = null;
-            }
             if (!Main.isInited() || !Main.isWorking() || Main.isDebugging()) {
                 ABCPanel abcPanel = getABCPanel();
                 abcPanel.detailPanel.methodTraitPanel.methodCodePanel.clear();
                 abcPanel.setAbc(scriptLeaf.abc);
-
-                CancellableWorker worker = new CancellableWorker() {
-                    @Override
-                    protected Void doInBackground() throws Exception {
-                        abcPanel.decompiledTextArea.setScript(scriptLeaf, true);
-                        abcPanel.decompiledTextArea.setNoTrait();
-                        return null;
-                    }
-
-                    @Override
-                    protected void onStart() {
-                        Main.startWork(translate("work.decompiling") + "...", this);
-                    }
-
-                    @Override
-                    protected void done() {
-                        View.execInEventDispatch(() -> {
-                            setSourceWorker = null;
-                            try {
-                                get();
-                            } catch (CancellationException ex) {
-                                abcPanel.decompiledTextArea.setText("// " + AppStrings.translate("work.canceled"));
-                            } catch (Exception ex) {
-                                logger.log(Level.SEVERE, "Error", ex);
-                                getABCPanel().decompiledTextArea.setText("// " + AppStrings.translate("decompilationError") + ": " + ex);
-                            }
-
-                            Main.stopWork();
-                        });
-                    }
-                };
-
-                worker.execute();
-                setSourceWorker = worker;
+                abcPanel.decompiledTextArea.setScript(scriptLeaf, true);
+                abcPanel.decompiledTextArea.setNoTrait();
             }
 
             showDetail(DETAILCARDAS3NAVIGATOR);

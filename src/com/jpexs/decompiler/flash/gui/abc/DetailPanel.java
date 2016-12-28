@@ -25,7 +25,6 @@ import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.TagEditorPanel;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
-import com.jpexs.helpers.CancellableWorker;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.FlowLayout;
@@ -130,7 +129,6 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
         buttonsPanel.setVisible(false);
 
         conListener = new DebuggerHandler.ConnectionListener() {
-
             @Override
             public void connected() {
                 synchronized (DetailPanel.this) {
@@ -305,23 +303,21 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
     private void saveButtonActionPerformed(ActionEvent evt) {
         if (cardMap.get(selectedCard) instanceof TraitDetail) {
             if (((TraitDetail) cardMap.get(selectedCard)).save()) {
-                CancellableWorker worker = new CancellableWorker() {
+                DecompiledEditorPane decompiledTextArea = abcPanel.decompiledTextArea;
+                int lastTrait = decompiledTextArea.lastTraitIndex;
+                decompiledTextArea.reloadClass();
 
+                Runnable reloadComplete = new Runnable() {
                     @Override
-                    public Void doInBackground() throws Exception {
-                        int lasttrait = abcPanel.decompiledTextArea.lastTraitIndex;
-                        abcPanel.decompiledTextArea.reloadClass();
-                        abcPanel.decompiledTextArea.gotoTrait(lasttrait);
-                        return null;
-                    }
-
-                    @Override
-                    protected void done() {
+                    public void run() {
+                        decompiledTextArea.removeScriptListener(this);
+                        decompiledTextArea.gotoTrait(lastTrait);
                         setEditMode(false);
                         View.showMessageDialog(null, AppStrings.translate("message.trait.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showTraitSavedMessage);
                     }
                 };
-                worker.execute();
+
+                decompiledTextArea.addScriptListener(reloadComplete);
             }
         }
     }

@@ -34,6 +34,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.editor.DebuggableEditorPane;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -43,11 +44,15 @@ import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.graph.DottedChain;
+import com.jpexs.helpers.CancellableWorker;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.CancellationException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import jsyntaxpane.SyntaxDocument;
@@ -60,7 +65,9 @@ import jsyntaxpane.TokenType;
  */
 public class DecompiledEditorPane extends DebuggableEditorPane implements CaretListener {
 
-    private HighlightedText highlightedText = new HighlightedText();
+    private static final Logger logger = Logger.getLogger(DecompiledEditorPane.class.getName());
+
+    private HighlightedText highlightedText = HighlightedText.EMPTY;
 
     private Highlighting currentMethodHighlight;
 
@@ -79,6 +86,8 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
     private int classIndex = -1;
 
     private boolean isStatic = false;
+
+    private CancellableWorker setSourceWorker;
 
     private final List<Runnable> scriptListeners = new ArrayList<>();
 
@@ -649,6 +658,13 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
     }
 
     public void setScript(ScriptPack scriptLeaf, boolean force) {
+        View.checkAccess();
+
+        if (setSourceWorker != null) {
+            setSourceWorker.cancel(true);
+            setSourceWorker = null;
+        }
+
         if (!force && this.script == scriptLeaf) {
             return;
         }
@@ -661,23 +677,76 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         if (scriptIndex > -1) {
             nscript = abc.script_info.get(scriptIndex);
         }
+
         if (nscript == null) {
-            highlightedText = new HighlightedText();
-            this.script = scriptLeaf;
+            highlightedText = HighlightedText.EMPTY;
             return;
         }
-        setText("// " + AppStrings.translate("pleasewait") + "...");
 
-        this.script = scriptLeaf;
-        HighlightedText cd = null;
-        try {
-            cd = SWF.getCached(scriptLeaf);
-        } catch (InterruptedException ex) {
+        HighlightedText decompiledText = SWF.getFromCache(scriptLeaf);
+
+        boolean decompileNeeded = decompiledText == null;
+
+        if (decompileNeeded) {
+            CancellableWorker worker = new CancellableWorker() {
+                @Override
+                protected Void doInBackground() throws Exception {
+
+                    if (decompileNeeded) {
+                        View.execInEventDispatch(() -> {
+                            setText("// " + AppStrings.translate("work.decompiling") + "...");
+                        });
+
+                        HighlightedText htext = SWF.getCached(scriptLeaf);
+                        View.execInEventDispatch(() -> {
+                            setSourceCompleted(scriptLeaf, htext);
+                        });
+                    }
+
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    View.execInEventDispatch(() -> {
+                        setSourceWorker = null;
+                        if (!Main.isDebugging()) {
+                            Main.stopWork();
+                        }
+
+                        try {
+                            get();
+                        } catch (CancellationException ex) {
+                            setText("// " + AppStrings.translate("work.canceled"));
+                        } catch (Exception ex) {
+                            logger.log(Level.SEVERE, "Error", ex);
+                            setText("// " + AppStrings.translate("decompilationError") + ": " + ex);
+                        }
+                    });
+                }
+            };
+
+            worker.execute();
+            setSourceWorker = worker;
+            if (!Main.isDebugging()) {
+                Main.startWork(AppStrings.translate("work.decompiling") + "...", worker);
+            }
+        } else {
+            setSourceCompleted(scriptLeaf, decompiledText);
+        }
+    }
+
+    private void setSourceCompleted(ScriptPack scriptLeaf, HighlightedText decompiledText) {
+        View.checkAccess();
+
+        if (decompiledText == null) {
+            decompiledText = HighlightedText.EMPTY;
         }
 
-        if (cd != null) {
-            String hilightedCode = cd.text;
-            highlightedText = cd;
+        script = scriptLeaf;
+        highlightedText = decompiledText;
+        if (decompiledText != null) {
+            String hilightedCode = decompiledText.text;
             setText(hilightedCode);
 
             if (highlightedText.getClassHighlights().size() > 0) {
@@ -688,15 +757,19 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                 }
             }
         }
+
         fireScript();
     }
 
     public void reloadClass() {
+        View.checkAccess();
+
         int ci = classIndex;
         SWF.uncache(script);
         if (script != null && getABC() != null) {
             setScript(script, true);
         }
+
         setNoTrait();
         setClassIndex(ci);
     }

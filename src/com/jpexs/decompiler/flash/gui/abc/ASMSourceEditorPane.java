@@ -76,7 +76,7 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
         return scriptIndex;
     }
 
-    private HighlightedText highlightedText = new HighlightedText();
+    private HighlightedText highlightedText = HighlightedText.EMPTY;
 
     private final List<DocsListener> docsListeners = new ArrayList<>();
 

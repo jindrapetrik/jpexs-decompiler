@@ -28,6 +28,8 @@ import java.util.List;
  */
 public class HighlightedText implements Serializable {
 
+    public static HighlightedText EMPTY = new HighlightedText();
+
     public String text;
 
     private final List<Highlighting> traitHighlights;
@@ -69,7 +71,7 @@ public class HighlightedText implements Serializable {
         this.specialHighlights = writer.specialHilights;
     }
 
-    public HighlightedText() {
+    private HighlightedText() {
         this("");
     }
 
