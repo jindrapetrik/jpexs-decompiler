@@ -186,6 +186,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
     private String lastDecompiled = null;
 
     public MainPanel getMainPanel() {
+        View.checkAccess();
+
         return mainPanel;
     }
 
@@ -212,9 +214,12 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
     }
 
     public void setAbc(ABC abc) {
+        View.checkAccess();
+
         if (abc == this.abc) {
             return;
         }
+
         this.abc = abc;
         setDecompiledEditMode(false);
         navigator.setAbc(abc);
@@ -222,6 +227,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
     }
 
     public void updateConstList() {
+        View.checkAccess();
+
         switch (constantTypeList.getSelectedIndex()) {
             case 0:
                 View.autoResizeColWidth(constantTable, new UIntTableModel(abc));
@@ -262,6 +269,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
     }
 
     public void clearSwf() {
+        View.checkAccess();
+
         this.abc = null;
         constantTable.setModel(new DefaultTableModel());
         navigator.clearAbc();
@@ -1003,10 +1012,14 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
     }
 
     private boolean isModified() {
+        View.checkAccess();
+
         return saveDecompiledButton.isVisible() && saveDecompiledButton.isEnabled();
     }
 
     private void setModified(boolean value) {
+        View.checkAccess();
+
         saveDecompiledButton.setEnabled(value);
         cancelDecompiledButton.setEnabled(value);
     }
@@ -1066,6 +1079,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
     }
 
     private void gotoDeclaration(int pos) {
+        View.checkAccess();
+
         Reference<Integer> abcIndex = new Reference<>(0);
         Reference<Integer> classIndex = new Reference<>(0);
         Reference<Integer> traitIndex = new Reference<>(0);
@@ -1177,6 +1192,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
     }
 
     public void reload() {
+        View.checkAccess();
+
         lastDecompiled = "";
         SWF swf = getSwf();
         if (swf != null) {
@@ -1189,6 +1206,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
     @Override
     public void itemStateChanged(ItemEvent e) {
+        View.checkAccess();
+
         if (e.getSource() == constantTypeList) {
             int index = ((JComboBox) e.getSource()).getSelectedIndex();
             if (index == -1) {
@@ -1199,10 +1218,14 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
     }
 
     public void display() {
+        View.checkAccess();
+
         setVisible(true);
     }
 
     public void hilightScript(SWF swf, String name) {
+        View.checkAccess();
+
         TagTreeModel ttm = (TagTreeModel) mainPanel.tagTree.getModel();
         TreeItem scriptsNode = ttm.getScriptsNode(swf);
         if (scriptsNode instanceof ClassesListTreeModel) {
@@ -1229,6 +1252,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
     }
 
     public void hilightScript(ScriptPack pack) {
+        View.checkAccess();
+
         TagTreeModel ttm = (TagTreeModel) mainPanel.tagTree.getModel();
         TreePath tp0 = ttm.getTreePath(pack);
         if (tp0 == null) {
@@ -1236,15 +1261,15 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
             tp0 = ttm.getTreePath(pack);
         }
         final TreePath tp = tp0;
-        View.execInEventDispatchLater(() -> {
-            mainPanel.tagTree.setSelectionPath(tp);
-            mainPanel.tagTree.scrollPathToVisible(tp);
-        });
+        mainPanel.tagTree.setSelectionPath(tp);
+        mainPanel.tagTree.scrollPathToVisible(tp);
 
     }
 
     @Override
     public void updateSearchPos(ABCSearchResult item) {
+        View.checkAccess();
+
         ScriptPack pack = item.getScriptPack();
         setAbc(pack.abc);
         decompiledTextArea.setScript(pack, false);
@@ -1258,45 +1283,38 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
         decompiledTextArea.setCaretPosition(0);
 
-        View.execInEventDispatchLater(() -> {
-            if (pcode) {
-                searchPanel.showQuickFindDialog(detailPanel.methodTraitPanel.methodCodePanel.getSourceTextArea());
-            } else {
-                searchPanel.showQuickFindDialog(decompiledTextArea);
-            }
-        });
-
+        if (pcode) {
+            searchPanel.showQuickFindDialog(detailPanel.methodTraitPanel.methodCodePanel.getSourceTextArea());
+        } else {
+            searchPanel.showQuickFindDialog(decompiledTextArea);
+        }
     }
 
     public boolean isDirectEditing() {
+        View.checkAccess();
+
         return saveDecompiledButton.isVisible() && saveDecompiledButton.isEnabled();
     }
 
     public void setDecompiledEditMode(boolean val) {
-        View.execInEventDispatch(new Runnable() {
-            @Override
-            public void run() {
-                if (val) {
-                    lastDecompiled = decompiledTextArea.getText();
-                } else {
-                    decompiledTextArea.setText(lastDecompiled);
-                }
+        if (val) {
+            lastDecompiled = decompiledTextArea.getText();
+        } else {
+            decompiledTextArea.setText(lastDecompiled);
+        }
 
-                decompiledTextArea.setEditable(val);
-                saveDecompiledButton.setVisible(val);
-                saveDecompiledButton.setEnabled(false);
-                editDecompiledButton.setVisible(!val);
-                experimentalLabel.setVisible(!val);
-                cancelDecompiledButton.setVisible(val);
-                decompiledTextArea.getCaret().setVisible(true);
-                decLabel.setIcon(val ? View.getIcon("editing16") : null);
-                detailPanel.setVisible(!val);
+        decompiledTextArea.setEditable(val);
+        saveDecompiledButton.setVisible(val);
+        saveDecompiledButton.setEnabled(false);
+        editDecompiledButton.setVisible(!val);
+        experimentalLabel.setVisible(!val);
+        cancelDecompiledButton.setVisible(val);
+        decompiledTextArea.getCaret().setVisible(true);
+        decLabel.setIcon(val ? View.getIcon("editing16") : null);
+        detailPanel.setVisible(!val);
 
-                decompiledTextArea.ignoreCarret = val;
-                decompiledTextArea.requestFocusInWindow();
-            }
-        });
-
+        decompiledTextArea.ignoreCarret = val;
+        decompiledTextArea.requestFocusInWindow();
     }
 
     private void editDecompiledButtonActionPerformed(ActionEvent evt) {
@@ -1493,12 +1511,16 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
     @Override
     public boolean tryAutoSave() {
+        View.checkAccess();
+
         // todo: implement
         return false;
     }
 
     @Override
     public boolean isEditing() {
+        View.checkAccess();
+
         return detailPanel.isEditing() || isModified();
     }
 }

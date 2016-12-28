@@ -1220,10 +1220,14 @@ public class Main {
     }
 
     public static OpenFileResult openFile(String swfFile, String fileTitle) {
+        View.checkAccess();
+
         return openFile(swfFile, fileTitle, null);
     }
 
     public static OpenFileResult openFile(String swfFile, String fileTitle, Runnable executeAfterOpen) {
+        View.checkAccess();
+
         try {
             File file = new File(swfFile);
             if (!file.exists()) {
@@ -1241,26 +1245,38 @@ public class Main {
     }
 
     public static OpenFileResult openFile(SWFSourceInfo sourceInfo) {
+        View.checkAccess();
+
         return openFile(new SWFSourceInfo[]{sourceInfo});
     }
 
     public static OpenFileResult openFile(SWFSourceInfo sourceInfo, Runnable executeAfterOpen) {
+        View.checkAccess();
+
         return openFile(new SWFSourceInfo[]{sourceInfo}, executeAfterOpen);
     }
 
     public static OpenFileResult openFile(SWFSourceInfo sourceInfo, Runnable executeAfterOpen, int reloadIndex) {
+        View.checkAccess();
+
         return openFile(new SWFSourceInfo[]{sourceInfo}, executeAfterOpen, new int[]{reloadIndex});
     }
 
     public static OpenFileResult openFile(SWFSourceInfo[] newSourceInfos) {
+        View.checkAccess();
+
         return openFile(newSourceInfos, null);
     }
 
     public static OpenFileResult openFile(SWFSourceInfo[] newSourceInfos, Runnable executeAfterOpen) {
+        View.checkAccess();
+
         return openFile(newSourceInfos, executeAfterOpen, null);
     }
 
     public static OpenFileResult openFile(SWFSourceInfo[] newSourceInfos, Runnable executeAfterOpen, int[] reloadIndices) {
+        View.checkAccess();
+
         if (mainFrame != null && !Configuration.openMultipleFiles.get()) {
             sourceInfos.clear();
             mainFrame.getPanel().closeAll(false);
@@ -1292,16 +1308,21 @@ public class Main {
     }
 
     public static void closeFile(SWFList swf) {
+        View.checkAccess();
+
         sourceInfos.remove(swf.sourceInfo);
         mainFrame.getPanel().close(swf);
     }
 
     public static void reloadFile(SWFList swf) {
-        //mainFrame.getPanel().close(swf);
+        View.checkAccess();
+
         openFile(swf.sourceInfo, null, sourceInfos.indexOf(swf.sourceInfo));
     }
 
     public static boolean closeAll() {
+        View.checkAccess();
+
         boolean closeResult = mainFrame.getPanel().closeAll(true);
         if (closeResult) {
             sourceInfos.clear();
@@ -1428,6 +1449,8 @@ public class Main {
     }
 
     public static boolean openFileDialog() {
+        View.checkAccess();
+
         JFileChooser fc = new JFileChooser();
         if (Configuration.openMultipleFiles.get()) {
             fc.setMultiSelectionEnabled(true);

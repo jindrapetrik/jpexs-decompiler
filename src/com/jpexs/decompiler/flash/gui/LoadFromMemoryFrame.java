@@ -115,7 +115,6 @@ public class LoadFromMemoryFrame extends AppFrame {
         @Override
         protected List<SwfInMemory> doInBackground() throws Exception {
             return new SearchInMemory(new SearchInMemoryListener() {
-
                 @Override
                 public void publish(Object... chunks) {
                     SelectProcessWorker.this.publish(chunks);
@@ -151,6 +150,8 @@ public class LoadFromMemoryFrame extends AppFrame {
     }
 
     private void openSwf() {
+        View.checkAccess();
+
         if (foundIs == null) {
             return;
         }

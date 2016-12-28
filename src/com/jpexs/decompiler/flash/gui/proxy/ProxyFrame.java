@@ -225,7 +225,6 @@ public class ProxyFrame extends AppFrame implements CatchedListener, MouseListen
         }
 
         tableModel = new DefaultTableModel(data, columnNames) {
-
             @Override
             public Class<?> getColumnClass(int columnIndex) {
                 Class[] classes = new Class[]{String.class, SizeItem.class, String.class};
@@ -236,7 +235,6 @@ public class ProxyFrame extends AppFrame implements CatchedListener, MouseListen
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
-
         };
         replacementsTable = new JTable(tableModel);
 
@@ -349,6 +347,8 @@ public class ProxyFrame extends AppFrame implements CatchedListener, MouseListen
     }
 
     private void open() {
+        View.checkAccess();
+
         if (replacementsTable.getSelectedRow() > -1) {
             Replacement r = replacements.get(replacementsTable.getRowSorter().convertRowIndexToModel(replacementsTable.getSelectedRow()));
             Main.openFile(r.targetFile, r.urlPattern);

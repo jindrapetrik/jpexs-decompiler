@@ -497,17 +497,16 @@ public class AdvancedSettingsDialog extends AppDialog {
         }
     }
 
-    private void showRestartConfirmDialod() {
+    private void showRestartConfirmDialog() {
         if (View.showConfirmDialog(this, translate("advancedSettings.restartConfirmation"), AppStrings.translate("message.warning"), JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-            View.execInEventDispatchLater(() -> {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(AdvancedSettingsDialog.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                SelectLanguageDialog.reloadUi();
-            });
+            try {
+                // todo: honfika: why?
+                Thread.sleep(1000);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(AdvancedSettingsDialog.class.getName()).log(Level.SEVERE, null, ex);
+            }
 
+            SelectLanguageDialog.reloadUi();
         }
     }
 
@@ -597,7 +596,7 @@ public class AdvancedSettingsDialog extends AppDialog {
         Configuration.saveConfig();
         setVisible(false);
         if (modified) {
-            showRestartConfirmDialod();
+            showRestartConfirmDialog();
         }
     }
 
@@ -620,6 +619,6 @@ public class AdvancedSettingsDialog extends AppDialog {
         }
         Configuration.saveConfig();
         setVisible(false);
-        showRestartConfirmDialod();
+        showRestartConfirmDialog();
     }
 }

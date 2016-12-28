@@ -191,6 +191,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     private boolean saveAs(SWF swf, SaveFileMode mode) {
+        View.checkAccess();
+
         if (Main.saveFileDialog(swf, mode)) {
             updateComponents(swf);
             return true;
@@ -273,6 +275,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     protected boolean export(boolean onlySelected) {
+        View.checkAccess();
+
         if (swf != null) {
             mainFrame.getPanel().export(onlySelected);
             return true;
@@ -318,6 +322,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     protected boolean search(ActionEvent evt, Boolean searchInText) {
+        View.checkAccess();
+
         if (swf != null) {
             mainFrame.getPanel().searchInActionScriptOrText(searchInText, swf);
             return true;
@@ -357,6 +363,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     protected void renameColliding(ActionEvent evt) {
+        View.checkAccess();
+
         if (Main.isWorking()) {
             return;
         }
@@ -365,6 +373,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     protected void renameInvalidIdentifiers(ActionEvent evt) {
+        View.checkAccess();
+
         if (Main.isWorking()) {
             return;
         }

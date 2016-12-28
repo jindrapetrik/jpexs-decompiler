@@ -438,6 +438,12 @@ public class View {
         }
     }
 
+    public static void checkAccess() {
+        if (!SwingUtilities.isEventDispatchThread()) {
+            throw new RuntimeException("This method should be called from UI thread.");
+        }
+    }
+
     public static void execInEventDispatch(Runnable r) {
         if (SwingUtilities.isEventDispatchThread()) {
             r.run();

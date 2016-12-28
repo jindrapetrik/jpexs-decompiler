@@ -87,6 +87,8 @@ public class SearchPanel<E> extends JPanel {
     }
 
     public boolean setResults(List<E> results) {
+        View.checkAccess();
+
         found = results;
         if (found.isEmpty()) {
             setVisible(false);
@@ -104,20 +106,24 @@ public class SearchPanel<E> extends JPanel {
     }
 
     public void setPos(int pos) {
+        View.checkAccess();
+
         foundPos = pos;
         doUpdate();
     }
 
     public void clear() {
+        View.checkAccess();
+
         foundPos = 0;
         found.clear();
     }
 
     private void doUpdate() {
-        View.execInEventDispatchLater(() -> {
-            searchPos.setText((foundPos + 1) + "/" + found.size());
-            listener.updateSearchPos(found.get(foundPos));
-        });
+        View.checkAccess();
+
+        searchPos.setText((foundPos + 1) + "/" + found.size());
+        listener.updateSearchPos(found.get(foundPos));
     }
 
     private void cancelButtonActionPerformed(ActionEvent evt) {

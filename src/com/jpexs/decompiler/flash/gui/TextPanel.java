@@ -322,9 +322,7 @@ public class TextPanel extends JPanel implements TagEditorPanel {
 
     public void updateSearchPos() {
         textValue.setCaretPosition(0);
-        View.execInEventDispatchLater(() -> {
-            textSearchPanel.showQuickFindDialog(textValue);
-        });
+        textSearchPanel.showQuickFindDialog(textValue);
     }
 
     private void editText() {
@@ -349,7 +347,7 @@ public class TextPanel extends JPanel implements TagEditorPanel {
     }
 
     private void textAlign(TextAlign textAlign) {
-        if (mainPanel.alignText(textTag, textAlign)) {
+        if (textTag.alignText(textAlign)) {
             updateButtonsVisibility();
             textTag.getSwf().clearImageCache();
             mainPanel.repaintTree();
@@ -357,7 +355,7 @@ public class TextPanel extends JPanel implements TagEditorPanel {
     }
 
     private void translateX(int delta, int repeatCount) {
-        if (mainPanel.translateText(textTag, delta * (repeatCount + 1))) {
+        if (textTag.translateText(delta * (repeatCount + 1))) {
             updateButtonsVisibility();
             textTag.getSwf().clearImageCache();
             mainPanel.repaintTree();

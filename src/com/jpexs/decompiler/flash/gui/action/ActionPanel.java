@@ -167,6 +167,8 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
     private CancellableWorker setSourceWorker;
 
     public void clearSource() {
+        View.checkAccess();
+
         lastCode = null;
         lastASM = null;
         lastDecompiled = new HighlightedText();
@@ -179,6 +181,8 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
     }
 
     public String getStringUnderCursor() {
+        View.checkAccess();
+
         int pos = decompiledEditor.getCaretPosition();
 
         SyntaxDocument sDoc = ActionUtils.getSyntaxDocument(decompiledEditor);
@@ -267,6 +271,8 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
     }
 
     private void setDecompiledText(final String scriptName, final String text) {
+        View.checkAccess();
+
         ignoreCarret = true;
         decompiledEditor.setScriptName(scriptName);
         decompiledEditor.setText(text);
@@ -274,6 +280,8 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
     }
 
     private void setEditorText(final String scriptName, final String text, final String contentType) {
+        View.checkAccess();
+
         ignoreCarret = true;
         editor.setScriptName("#PCODE " + scriptName);
         editor.changeContentType(contentType);
@@ -282,6 +290,8 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
     }
 
     private void setText(final HighlightedText text, final String contentType, final String scriptName) {
+        View.checkAccess();
+
         int pos = editor.getCaretPosition();
         Highlighting lastH = null;
         for (Highlighting h : disassembledText.getInstructionHighlights()) {
@@ -322,12 +332,15 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
     }
 
     private void updateHexButtons(ScriptExportMode exportMode) {
+        View.checkAccess();
+
         showFileOffsetInPcodeHexButton.setVisible(exportMode == ScriptExportMode.PCODE_HEX);
         showOriginalBytesInPcodeHexButton.setVisible(exportMode == ScriptExportMode.PCODE_HEX);
         resolveConstantsButton.setVisible(exportMode != ScriptExportMode.CONSTANTS && exportMode != ScriptExportMode.HEX);
     }
 
     private void setHex(ScriptExportMode exportMode, String scriptName, ActionList actions) {
+        View.checkAccess();
         updateHexButtons(exportMode);
 
         switch (exportMode) {
@@ -407,6 +420,8 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
     }
 
     public void setSource(final ASMSource src, final boolean useCache) {
+        View.checkAccess();
+
         if (setSourceWorker != null) {
             setSourceWorker.cancel(true);
             setSourceWorker = null;
@@ -525,9 +540,12 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
     }
 
     public void hilightOffset(long offset) {
+        View.checkAccess();
     }
 
     public int getLocalDeclarationOfPos(int pos) {
+        View.checkAccess();
+
         Highlighting sh = Highlighting.searchPos(lastDecompiled.getSpecialHighlights(), pos);
         Highlighting h = Highlighting.searchPos(lastDecompiled.getInstructionHighlights(), pos);
 
@@ -837,24 +855,34 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
     }
 
     private boolean isModified() {
+        View.checkAccess();
+
         return saveButton.isVisible() && saveButton.isEnabled();
     }
 
     private void setModified(boolean value) {
+        View.checkAccess();
+
         saveButton.setEnabled(value);
         cancelButton.setEnabled(value);
     }
 
     private boolean isDecompiledModified() {
+        View.checkAccess();
+
         return saveDecompiledButton.isVisible() && saveDecompiledButton.isEnabled();
     }
 
     private void setDecompiledModified(boolean value) {
+        View.checkAccess();
+
         saveDecompiledButton.setEnabled(value);
         cancelDecompiledButton.setEnabled(value);
     }
 
     public void setEditMode(boolean val) {
+        View.checkAccess();
+
         if (val) {
             if (hexOnlyButton.isSelected()) {
                 setHex(ScriptExportMode.HEX, src.getScriptName(), lastCode);
@@ -879,6 +907,8 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
     }
 
     public void setDecompiledEditMode(boolean val) {
+        View.checkAccess();
+
         if (lastASM == null) {
             return;
         }
@@ -1049,29 +1079,33 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
 
     @Override
     public void updateSearchPos(ActionSearchResult item) {
+        View.checkAccess();
+
         TagTreeModel ttm = (TagTreeModel) mainPanel.tagTree.getModel();
         TreePath tp = ttm.getTreePath(item.getSrc());
         mainPanel.tagTree.setSelectionPath(tp);
         mainPanel.tagTree.scrollPathToVisible(tp);
         decompiledEditor.setCaretPosition(0);
 
-        View.execInEventDispatchLater(() -> {
-            if (item.isPcode()) {
-                searchPanel.showQuickFindDialog(editor);
-            } else {
-                searchPanel.showQuickFindDialog(decompiledEditor);
-            }
-        });
+        if (item.isPcode()) {
+            searchPanel.showQuickFindDialog(editor);
+        } else {
+            searchPanel.showQuickFindDialog(decompiledEditor);
+        }
     }
 
     @Override
     public boolean tryAutoSave() {
+        View.checkAccess();
+
         // todo: implement
         return false;
     }
 
     @Override
     public boolean isEditing() {
+        View.checkAccess();
+
         return (saveButton.isVisible() && saveButton.isEnabled())
                 || (saveDecompiledButton.isVisible() && saveDecompiledButton.isEnabled());
     }

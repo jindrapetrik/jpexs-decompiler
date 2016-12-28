@@ -98,6 +98,8 @@ public class UsageFrame extends AppDialog implements MouseListener {
     }
 
     public static void gotoUsage(final ABCPanel abcPanel, final MultinameUsage usage) {
+        View.checkAccess();
+
         if (usage instanceof InsideClassMultinameUsageInterface) {
             final InsideClassMultinameUsageInterface icu = (InsideClassMultinameUsageInterface) usage;
 

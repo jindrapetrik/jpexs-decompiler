@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui.pipes;
 
 import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.gui.Main;
+import com.jpexs.decompiler.flash.gui.View;
 import com.sun.jna.Platform;
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.WinError;
@@ -77,13 +78,20 @@ public class FirstInstance {
                                     switch (command) {
                                         case "open":
                                             int cnt = ois.readInt();
+                                            String[] fileNames = new String[cnt];
                                             for (int i = 0; i < cnt; i++) {
-                                                Main.openFile(ois.readUTF(), null);
+                                                fileNames[i] = ois.readUTF();
                                             }
+
+                                            View.execInEventDispatchLater(() -> {
+                                                for (int i = 0; i < cnt; i++) {
+                                                    Main.openFile(fileNames[i], null);
+                                                }
+                                            });
                                         //no break - focus too
                                         case "focus":
 
-                                            java.awt.EventQueue.invokeLater(new Runnable() {
+                                            View.execInEventDispatchLater(new Runnable() {
                                                 @Override
                                                 public void run() {
                                                     Window wnd = Main.getMainFrame().getWindow();

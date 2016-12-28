@@ -111,9 +111,7 @@ public class SearchResultsDialog<E> extends AppDialog {
 
     private void gotoElement() {
         if (resultsList.getSelectedIndex() != -1) {
-            View.execInEventDispatchLater(() -> {
-                listener.updateSearchPos(resultsList.getSelectedValue());
-            });
+            listener.updateSearchPos(resultsList.getSelectedValue());
         }
     }
 }
