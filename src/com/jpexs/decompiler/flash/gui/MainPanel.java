@@ -684,9 +684,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         });
         searchPanel.add(closeSearchButton, BorderLayout.EAST);
         searchPanel.setVisible(false);
-        treePanel = new JPanel(new CardLayout());
-        treePanel.add(createResourcesViewCard(), RESOURCES_VIEW);
-        treePanel.add(createDumpViewCard(), DUMP_VIEW);
+
+        LazyCardLayout treePanelLayout = new LazyCardLayout();
+        treePanelLayout.registerLayout(createResourcesViewCard(), RESOURCES_VIEW);
+        treePanelLayout.registerLayout(createDumpViewCard(), DUMP_VIEW);
+        treePanel = new JPanel(treePanelLayout);
+
         //treePanel.add(searchPanel, BorderLayout.SOUTH);
         //searchPanel.setVisible(false);
         filterField.getDocument().addDocumentListener(new DocumentListener() {
@@ -719,13 +722,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         timelineViewPanel = new TimelineViewPanel();
 
-        CardLayout cl3 = new CardLayout();
-        contentPanel = new JPanel(cl3);
+        contentPanel = new JPanel(new CardLayout());
         contentPanel.add(welcomePanel, WELCOME_PANEL);
         contentPanel.add(splitPane1, SPLIT_PANE1);
         contentPanel.add(timelineViewPanel, TIMELINE_PANEL);
         add(contentPanel);
-        cl3.show(contentPanel, WELCOME_PANEL);
+        showContentPanelCard(WELCOME_PANEL);
 
         tagTree.addKeyListener(new KeyAdapter() {
             @Override
@@ -846,8 +848,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
 
         if (isWelcomeScreen) {
-            CardLayout cl = (CardLayout) (contentPanel.getLayout());
-            cl.show(contentPanel, SPLIT_PANE1);
+            showContentPanelCard(SPLIT_PANE1);
             isWelcomeScreen = false;
         }
 
@@ -883,8 +884,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         View.checkAccess();
 
         if (!isWelcomeScreen && swfs.isEmpty()) {
-            CardLayout cl = (CardLayout) (contentPanel.getLayout());
-            cl.show(contentPanel, WELCOME_PANEL);
+            showContentPanelCard(WELCOME_PANEL);
             isWelcomeScreen = true;
             closeTagTreeSearch();
         }
@@ -3157,27 +3157,35 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         return r;
     }
 
-    public boolean showView(int view) {
-
+    private void showContentPanelCard(String card) {
         CardLayout cl = (CardLayout) (contentPanel.getLayout());
-        CardLayout cl2 = (CardLayout) (treePanel.getLayout());
+        cl.show(contentPanel, card);
+    }
+
+    private void showTreePanelCard(String card) {
+        CardLayout cl = (CardLayout) (treePanel.getLayout());
+        cl.show(treePanel, card);
+    }
+
+    public boolean showView(int view) {
+        View.checkAccess();
 
         setTreeModel(view);
         switch (view) {
             case VIEW_DUMP:
                 if (!isWelcomeScreen) {
-                    cl.show(contentPanel, SPLIT_PANE1);
+                    showContentPanelCard(SPLIT_PANE1);
                 }
-                cl2.show(treePanel, DUMP_VIEW);
+                showTreePanelCard(DUMP_VIEW);
                 treePanelMode = TreePanelMode.DUMP_TREE;
                 showDetail(DETAILCARDEMPTYPANEL);
                 reload(true);
                 return true;
             case VIEW_RESOURCES:
                 if (!isWelcomeScreen) {
-                    cl.show(contentPanel, SPLIT_PANE1);
+                    showContentPanelCard(SPLIT_PANE1);
                 }
-                cl2.show(treePanel, RESOURCES_VIEW);
+                showTreePanelCard(RESOURCES_VIEW);
 
                 treePanelMode = TreePanelMode.TAG_TREE;
 
@@ -3204,7 +3212,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     } else {
                         timelineViewPanel.setTimelined(swf);
                     }
-                    cl.show(contentPanel, TIMELINE_PANEL);
+                    showContentPanelCard(TIMELINE_PANEL);
                     return true;
                 }
                 return false;

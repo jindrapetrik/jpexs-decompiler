@@ -477,7 +477,9 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
                         });
 
                         HighlightedText htext = SWF.getCached(asm, innerActions);
-                        setSourceCompleted(asm, htext, innerActions);
+                        View.execInEventDispatch(() -> {
+                            setSourceCompleted(asm, htext, innerActions);
+                        });
                     }
 
                     return null;
