@@ -85,7 +85,6 @@ public class AdobeFlashExecutor {
         flash.setAllowScriptAccess("always");
         flash.setAllowNetworking("all");
         flash.addFSCommandListener(new ActiveXEventListener() {
-
             @Override
             public void onEvent(ActiveXEvent axe) {
                 resultRef.setVal((String) axe.args.get("args"));
@@ -363,6 +362,7 @@ public class AdobeFlashExecutor {
         methodBody.max_scope_depth = 10;
 
         methodBody.setCode(code);
+        methodBody.autoFillMaxRegs(abc);
 
         return methodTrait.name_index;
     }

@@ -42,6 +42,11 @@ public class AsTypeIns extends InstructionDefinition {
     }
 
     @Override
+    public boolean isNotCompileTimeSupported() {
+        return true;
+    }
+
+    @Override
     public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
         //Long typeIndex = ins.getParamAsLong(constants, 0);
         Object obj = lda.operandStack.pop();

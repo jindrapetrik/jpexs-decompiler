@@ -475,4 +475,19 @@ public final class MethodBody implements Cloneable {
         }
         return true;
     }
+
+    public boolean autoFillMaxRegs(ABC abc) {
+        CodeStats stats = getCode().getMaxLocal();
+        if (stats == null) {
+            return false;
+        }
+        max_regs = stats.maxlocal;
+        MethodInfo mi = abc.method_info.get(method_info);
+        int min_regs = mi.param_types.length + 1 + (mi.flagNeed_rest() ? 1 : 0);
+        if (max_regs < min_regs) {
+            max_regs = min_regs;
+        }
+
+        return true;
+    }
 }

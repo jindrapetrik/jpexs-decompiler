@@ -449,7 +449,6 @@ public class AVM2SourceGenerator implements SourceGenerator {
         ));
 
         GraphTargetItem assigned = new GraphTargetItem() {
-
             @Override
             public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
                 return null;
@@ -2125,11 +2124,17 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 continue;
             }
             if (item instanceof InterfaceAVM2Item) {
-                generateClass(((InterfaceAVM2Item) item).pkg.getCpoolIndex(abcIndex), abcIndex.getSelectedAbc().class_info.get(((TraitClass) traits[k]).class_info), abcIndex.getSelectedAbc().instance_info.get(((TraitClass) traits[k]).class_info), initScopes.get(traits[k]), ((InterfaceAVM2Item) item).pkg.name, localData, (InterfaceAVM2Item) item, class_index);
+                ABC abc = abcIndex.getSelectedAbc();
+                TraitClass trait = (TraitClass) traits[k];
+                InterfaceAVM2Item iitem = (InterfaceAVM2Item) item;
+                generateClass(iitem.pkg.getCpoolIndex(abcIndex), abc.class_info.get(trait.class_info), abc.instance_info.get(trait.class_info), initScopes.get(trait), iitem.pkg.name, localData, iitem, class_index);
             }
 
             if (item instanceof ClassAVM2Item) {
-                generateClass(((ClassAVM2Item) item).pkg.getCpoolIndex(abcIndex), abcIndex.getSelectedAbc().class_info.get(((TraitClass) traits[k]).class_info), abcIndex.getSelectedAbc().instance_info.get(((TraitClass) traits[k]).class_info), initScopes.get(traits[k]), ((ClassAVM2Item) item).pkg.name, localData, (ClassAVM2Item) item, class_index);
+                ABC abc = abcIndex.getSelectedAbc();
+                TraitClass trait = (TraitClass) traits[k];
+                ClassAVM2Item citem = (ClassAVM2Item) item;
+                generateClass(citem.pkg.getCpoolIndex(abcIndex), abc.class_info.get(trait.class_info), abc.instance_info.get(trait.class_info), initScopes.get(trait), citem.pkg.name, localData, citem, class_index);
             }
             if ((item instanceof MethodAVM2Item) || (item instanceof GetterAVM2Item) || (item instanceof SetterAVM2Item)) {
                 MethodAVM2Item mai = (MethodAVM2Item) item;
@@ -2713,5 +2718,4 @@ public class AVM2SourceGenerator implements SourceGenerator {
         List<GraphSourceItem> ret = new ArrayList<>();
         return ret;
     }
-
 }

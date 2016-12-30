@@ -49,7 +49,9 @@ import org.testng.annotations.Test;
  *
  * @author JPEXS
  */
-public class ActionScript3DeobfuscatorTest extends ActionScript2TestBase {
+public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
+
+    protected SWF swf;
 
     @BeforeClass
     public void init() throws IOException, InterruptedException {
@@ -67,7 +69,6 @@ public class ActionScript3DeobfuscatorTest extends ActionScript2TestBase {
                 + str
                 + "returnvoid\r\n";
         final ABC abc = new ABC(new ABCContainerTag() {
-
             @Override
             public ABC getABC() {
                 return null;
@@ -96,7 +97,6 @@ public class ActionScript3DeobfuscatorTest extends ActionScript2TestBase {
     private String recompile(String str) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
         str = "package { public class Test {  public static function trace(s){ } public static function test(){ " + str + " }   }  }";
         final ABC abc = new ABC(new ABCContainerTag() {
-
             @Override
             public ABC getABC() {
                 return null;

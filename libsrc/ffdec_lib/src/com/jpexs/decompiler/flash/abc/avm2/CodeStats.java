@@ -57,6 +57,9 @@ public class CodeStats {
         return writer;
     }
 
+    public CodeStats() {
+    }
+
     public CodeStats(AVM2Code code) {
         instructionStats = new InstructionStats[code.code.size()];
         for (int i = 0; i < code.code.size(); i++) {
