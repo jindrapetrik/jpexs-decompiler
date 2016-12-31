@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - [#1240] AS search using multiple threads when parallel speedup is enabled
 - [#1308] Search by all P-code files in AS3
+- [#1333] Exporting sprites as swf files
 
 ### Fixed
 - [#1327] P-code editing: error message and syntax highlighting fixed when instruction name contains upper cased letter

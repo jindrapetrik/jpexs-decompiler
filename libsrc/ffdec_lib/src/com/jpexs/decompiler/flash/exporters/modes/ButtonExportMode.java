@@ -21,8 +21,8 @@ package com.jpexs.decompiler.flash.exporters.modes;
  * @author JPEXS
  */
 public enum ButtonExportMode {
-
     PNG,
     SVG,
-    BMP
+    BMP,
+    SWF,
 }

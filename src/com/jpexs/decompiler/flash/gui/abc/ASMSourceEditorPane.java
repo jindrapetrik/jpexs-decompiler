@@ -429,7 +429,7 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
         int caretPos = getCaretPosition();
         Flasm3Lexer lexer = new Flasm3Lexer(new StringReader(getText().replace("\r\n", "\n")));
         ParsedSymbol symb;
-        String lastLevel = null;
+        String lastLevel;
         final Integer singleUse[] = new Integer[]{
             ParsedSymbol.TYPE_KEYWORD_FINAL,
             ParsedSymbol.TYPE_KEYWORD_OVERRIDE,

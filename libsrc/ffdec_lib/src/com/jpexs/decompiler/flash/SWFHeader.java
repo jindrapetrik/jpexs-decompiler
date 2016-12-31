@@ -46,4 +46,9 @@ public class SWFHeader {
      * ScaleForm GFx
      */
     public boolean gfx = false;
+
+    /**
+     * Frame rate
+     */
+    public float frameRate;
 }

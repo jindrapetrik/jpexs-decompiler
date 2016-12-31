@@ -218,6 +218,7 @@ public class CommandLineArgumentParser {
     private static String stdErr = null;
 
     private static final String METADATA_FORMAT_JSLIKE = "jslike";
+
     private static final String METADATA_FORMAT_RAW = "raw";
 
     @SuppressWarnings("unchecked")
@@ -1238,7 +1239,6 @@ public class CommandLineArgumentParser {
                 }
                 return false;
             }
-
         });
         System.exit(0);
     }
@@ -1449,7 +1449,6 @@ public class CommandLineArgumentParser {
                 }
                 return false;
             }
-
         });
         System.exit(0);
     }
@@ -1579,7 +1578,6 @@ public class CommandLineArgumentParser {
                 }
                 return false;
             }
-
         });
         System.exit(0);
 
@@ -2221,7 +2219,7 @@ public class CommandLineArgumentParser {
                     SpriteExportSettings ses = new SpriteExportSettings(enumFromStr(formats.get("sprite"), SpriteExportMode.class), zoom);
                     for (CharacterTag c : swf.getCharacters().values()) {
                         if (c instanceof DefineSpriteTag) {
-                            frameExporter.exportFrames(handler, outDir + (multipleExportTypes ? File.separator + SpriteExportSettings.EXPORT_FOLDER_NAME : ""), swf, c.getCharacterId(), null, ses, evl);
+                            frameExporter.exportSpriteFrames(handler, outDir + (multipleExportTypes ? File.separator + SpriteExportSettings.EXPORT_FOLDER_NAME : ""), swf, c.getCharacterId(), null, ses, evl);
                         }
                     }
                 }
@@ -2231,9 +2229,7 @@ public class CommandLineArgumentParser {
                     ButtonExportSettings bes = new ButtonExportSettings(enumFromStr(formats.get("button"), ButtonExportMode.class), zoom);
                     for (CharacterTag c : swf.getCharacters().values()) {
                         if (c instanceof ButtonTag) {
-                            List<Integer> frameNums = new ArrayList<>();
-                            frameNums.add(0); // todo: export all frames
-                            frameExporter.exportFrames(handler, outDir + (multipleExportTypes ? File.separator + ButtonExportSettings.EXPORT_FOLDER_NAME : ""), swf, c.getCharacterId(), frameNums, bes, evl);
+                            frameExporter.exportButtonFrames(handler, outDir + (multipleExportTypes ? File.separator + ButtonExportSettings.EXPORT_FOLDER_NAME : ""), swf, c.getCharacterId(), null, bes, evl);
                         }
                     }
                 }
@@ -2660,7 +2656,6 @@ public class CommandLineArgumentParser {
 
             try {
                 new SearchInMemory(new SearchInMemoryListener() {
-
                     @Override
                     public void publish(Object... chunks) {
                         for (Object s : chunks) {
@@ -2872,7 +2867,6 @@ public class CommandLineArgumentParser {
                         } else if (characterTag instanceof TextTag) {
                             TextTag textTag = (TextTag) characterTag;
                             new TextImporter(new MissingCharacterHandler(), new TextImportErrorHandler() {
-
                                 @Override
                                 public boolean handle(TextTag textTag) {
                                     String msg = "Error during text import.";
@@ -3540,7 +3534,6 @@ public class CommandLineArgumentParser {
                     public boolean missingFloat4(Float4 value) {
                         return true;
                     }
-
                 }, abc.bodies.get(bodyIndex), abc.method_info.get(abc.bodies.get(bodyIndex).method_info));
                 //acode.getBytes(abc.bodies.get(bodyIndex).getCodeBytes());
                 abc.bodies.get(bodyIndex).setCode(acode);
@@ -4033,5 +4026,4 @@ public class CommandLineArgumentParser {
             }
         }
     }
-
 }

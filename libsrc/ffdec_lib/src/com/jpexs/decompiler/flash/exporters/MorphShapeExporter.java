@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.modes.MorphShapeExportMode;
@@ -44,6 +45,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -83,9 +86,8 @@ public class MorphShapeExporter {
                 if (t instanceof CharacterTag) {
                     characterID = ((CharacterTag) t).getCharacterId();
                 }
-                String ext = settings.mode == MorphShapeExportMode.CANVAS ? "html" : "svg";
 
-                final File file = new File(outdir + File.separator + characterID + "." + ext);
+                final File file = new File(outdir + File.separator + characterID + settings.getFileExtension());
                 new RetryTask(() -> {
                     MorphShapeTag mst = (MorphShapeTag) t;
                     switch (settings.mode) {
@@ -115,6 +117,16 @@ public class MorphShapeExporter {
                                 SWF.writeLibrary(ct.getSwf(), needed, baos);
                                 fos.write(Utf8Helper.getBytes(cse.getHtml(new String(baos.toByteArray(), Utf8Helper.charset), SWF.getTypePrefix(mst) + mst.getCharacterId(), mst.getRect())));
                             }
+                            break;
+                        case SWF:
+                            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
+                                try {
+                                    new PreviewExporter().exportSwf(fos, mst, null, 0);
+                                } catch (ActionParseException ex) {
+                                    Logger.getLogger(MorphShapeExporter.class.getName()).log(Level.SEVERE, null, ex);
+                                }
+                            }
+
                             break;
                     }
                 }, handler).run();

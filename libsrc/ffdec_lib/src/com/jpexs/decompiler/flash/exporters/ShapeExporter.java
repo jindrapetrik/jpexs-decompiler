@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
@@ -50,6 +51,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -85,19 +88,7 @@ public class ShapeExporter {
                     evl.handleExportingEvent("shape", currentIndex, count, t.getName());
                 }
 
-                int characterID = st.getCharacterId();
-                String ext = ".svg";
-                if (settings.mode == ShapeExportMode.PNG) {
-                    ext = ".png";
-                }
-                if (settings.mode == ShapeExportMode.BMP) {
-                    ext = ".bmp";
-                }
-                if (settings.mode == ShapeExportMode.CANVAS) {
-                    ext = ".html";
-                }
-
-                final File file = new File(outdir + File.separator + Helper.makeFileName(st.getCharacterExportFileName() + ext));
+                final File file = new File(outdir + File.separator + Helper.makeFileName(st.getCharacterExportFileName() + settings.getFileExtension()));
                 new RetryTask(() -> {
                     switch (settings.mode) {
                         case SVG:
@@ -142,6 +133,16 @@ public class ShapeExporter {
                                 SWF.writeLibrary(st.getSwf(), needed, baos);
                                 fos.write(Utf8Helper.getBytes(cse.getHtml(new String(baos.toByteArray(), Utf8Helper.charset), SWF.getTypePrefix(st) + st.getCharacterId(), st.getRect())));
                             }
+                            break;
+                        case SWF:
+                            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
+                                try {
+                                    new PreviewExporter().exportSwf(fos, st, null, 0);
+                                } catch (ActionParseException ex) {
+                                    Logger.getLogger(MorphShapeExporter.class.getName()).log(Level.SEVERE, null, ex);
+                                }
+                            }
+
                             break;
                     }
                 }, handler).run();

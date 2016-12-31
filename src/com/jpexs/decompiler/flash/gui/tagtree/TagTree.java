@@ -537,7 +537,12 @@ public class TagTree extends JTree {
         if (mainPanel.folderPreviewPanel.selectedItems.isEmpty()) {
             sel = getAllSelected();
         } else {
-            sel = new ArrayList<>(mainPanel.folderPreviewPanel.selectedItems.values());
+            sel = new ArrayList<>();
+
+            for (TreeItem treeItem : mainPanel.folderPreviewPanel.selectedItems.values()) {
+                sel.add(treeItem);
+                getAllSubs(treeItem, sel);
+            }
         }
         return getSelection(swf, sel);
     }
@@ -568,6 +573,9 @@ public class TagTree extends JTree {
                     ret.add(d);
                 }
                 if (nodeType == TreeNodeType.MORPH_SHAPE) {
+                    ret.add(d);
+                }
+                if (nodeType == TreeNodeType.SPRITE) {
                     ret.add(d);
                 }
                 if (nodeType == TreeNodeType.BUTTON) {

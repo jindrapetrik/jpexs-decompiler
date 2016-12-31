@@ -34,4 +34,17 @@ public class MorphShapeExportSettings {
         this.mode = mode;
         this.zoom = zoom;
     }
+
+    public String getFileExtension() {
+        switch (mode) {
+            case SVG:
+                return ".svg";
+            case CANVAS:
+                return ".html";
+            case SWF:
+                return ".swf";
+            default:
+                throw new Error("Unsupported morphshape export mode: " + mode);
+        }
+    }
 }

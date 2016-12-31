@@ -42,6 +42,7 @@ import com.jpexs.decompiler.flash.exporters.FrameExporter;
 import com.jpexs.decompiler.flash.exporters.ImageExporter;
 import com.jpexs.decompiler.flash.exporters.MorphShapeExporter;
 import com.jpexs.decompiler.flash.exporters.MovieExporter;
+import com.jpexs.decompiler.flash.exporters.PreviewExporter;
 import com.jpexs.decompiler.flash.exporters.ShapeExporter;
 import com.jpexs.decompiler.flash.exporters.SoundExporter;
 import com.jpexs.decompiler.flash.exporters.SymbolClassExporter;
@@ -327,11 +328,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     private TreePanelMode treePanelMode;
 
     public TreeItem oldItem;
-
-    // play morph shape in 2 second(s)
-    public static final int MORPH_SHAPE_ANIMATION_LENGTH = 2;
-
-    public static final int MORPH_SHAPE_ANIMATION_FRAME_RATE = 30;
 
     private static final Logger logger = Logger.getLogger(MainPanel.class.getName());
 
@@ -1121,7 +1117,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public List<File> exportSelection(AbortRetryIgnoreHandler handler, String selFile, ExportDialog export) throws IOException, InterruptedException {
 
         List<File> ret = new ArrayList<>();
-        List<TreeItem> sel = folderPreviewPanel.selectedItems.isEmpty() ? tagTree.getAllSelected() : new ArrayList<>(folderPreviewPanel.selectedItems.values());
+        List<TreeItem> sel = tagTree.getSelection(getCurrentSwf());
 
         Set<SWF> usedSwfs = new HashSet<>();
         for (TreeItem d : sel) {
@@ -1137,6 +1133,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             List<Tag> images = new ArrayList<>();
             List<Tag> shapes = new ArrayList<>();
             List<Tag> morphshapes = new ArrayList<>();
+            List<Tag> sprites = new ArrayList<>();
             List<Tag> buttons = new ArrayList<>();
             List<Tag> movies = new ArrayList<>();
             List<Tag> sounds = new ArrayList<>();
@@ -1175,6 +1172,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     if (nodeType == TreeNodeType.MORPH_SHAPE) {
                         morphshapes.add((Tag) d);
                     }
+                    if (nodeType == TreeNodeType.SPRITE) {
+                        sprites.add((Tag) d);
+                    }
                     if (nodeType == TreeNodeType.AS) {
                         as12scripts.add(d);
                     }
@@ -1211,11 +1211,17 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     if (!frames.containsKey(parentId)) {
                         frames.put(parentId, new ArrayList<>());
                     }
+
                     frames.get(parentId).add(frame);
                 }
+
                 if (d instanceof ScriptPack) {
                     as3scripts.add((ScriptPack) d);
                 }
+            }
+
+            for (Tag sprite : sprites) {
+                frames.put(((DefineSpriteTag) sprite).getCharacterId(), null);
             }
 
             String selFile2;
@@ -1275,12 +1281,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
             if (export.isOptionEnabled(FrameExportMode.class)) {
                 FrameExportSettings fes = new FrameExportSettings(export.getValue(FrameExportMode.class), export.getZoom());
-                for (Entry<Integer, List<Integer>> entry : frames.entrySet()) {
-                    int containerId = entry.getKey();
-                    if (containerId == 0) {
-                        String subFolder = FrameExportSettings.EXPORT_FOLDER_NAME;
-                        ret.addAll(frameExporter.exportFrames(handler, selFile2 + File.separator + subFolder, swf, containerId, entry.getValue(), fes, evl));
-                    }
+                if (frames.containsKey(0)) {
+                    String subFolder = FrameExportSettings.EXPORT_FOLDER_NAME;
+                    ret.addAll(frameExporter.exportFrames(handler, selFile2 + File.separator + subFolder, swf, 0, frames.get(0), fes, evl));
                 }
             }
 
@@ -1290,7 +1293,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     int containerId = entry.getKey();
                     if (containerId != 0) {
                         String subFolder = SpriteExportSettings.EXPORT_FOLDER_NAME;
-                        ret.addAll(frameExporter.exportFrames(handler, selFile2 + File.separator + subFolder, swf, containerId, entry.getValue(), ses, evl));
+                        ret.addAll(frameExporter.exportSpriteFrames(handler, selFile2 + File.separator + subFolder, swf, containerId, entry.getValue(), ses, evl));
                     }
                 }
             }
@@ -1300,9 +1303,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 for (Tag tag : buttons) {
                     ButtonTag button = (ButtonTag) tag;
                     String subFolder = ButtonExportSettings.EXPORT_FOLDER_NAME;
-                    List<Integer> frameNums = new ArrayList<>();
-                    frameNums.add(0); // todo: export all frames
-                    ret.addAll(frameExporter.exportFrames(handler, selFile2 + File.separator + subFolder, swf, button.getCharacterId(), frameNums, bes, evl));
+                    ret.addAll(frameExporter.exportButtonFrames(handler, selFile2 + File.separator + subFolder, swf, button.getCharacterId(), null, bes, evl));
                 }
             }
 
@@ -1399,7 +1400,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             SpriteExportSettings ses = new SpriteExportSettings(export.getValue(SpriteExportMode.class), export.getZoom());
             for (CharacterTag c : swf.getCharacters().values()) {
                 if (c instanceof DefineSpriteTag) {
-                    frameExporter.exportFrames(handler, Path.combine(selFile, SpriteExportSettings.EXPORT_FOLDER_NAME), swf, c.getCharacterId(), null, ses, evl);
+                    frameExporter.exportSpriteFrames(handler, Path.combine(selFile, SpriteExportSettings.EXPORT_FOLDER_NAME), swf, c.getCharacterId(), null, ses, evl);
                 }
             }
         }
@@ -1408,9 +1409,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             ButtonExportSettings bes = new ButtonExportSettings(export.getValue(ButtonExportMode.class), export.getZoom());
             for (CharacterTag c : swf.getCharacters().values()) {
                 if (c instanceof ButtonTag) {
-                    List<Integer> frameNums = new ArrayList<>();
-                    frameNums.add(0); // todo: export all frames
-                    frameExporter.exportFrames(handler, Path.combine(selFile, ButtonExportSettings.EXPORT_FOLDER_NAME), swf, c.getCharacterId(), frameNums, bes, evl);
+                    frameExporter.exportButtonFrames(handler, Path.combine(selFile, ButtonExportSettings.EXPORT_FOLDER_NAME), swf, c.getCharacterId(), null, bes, evl);
                 }
             }
         }
@@ -1513,7 +1512,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 SpriteExportSettings ses = new SpriteExportSettings(exportMode, export.getZoom());
                 for (CharacterTag c : swf.getCharacters().values()) {
                     if (c instanceof DefineSpriteTag) {
-                        frameExporter.exportFrames(handler, Path.combine(selFile, SpriteExportSettings.EXPORT_FOLDER_NAME, exportMode.name()), swf, c.getCharacterId(), null, ses, evl);
+                        frameExporter.exportSpriteFrames(handler, Path.combine(selFile, SpriteExportSettings.EXPORT_FOLDER_NAME, exportMode.name()), swf, c.getCharacterId(), null, ses, evl);
                     }
                 }
             }
@@ -1524,9 +1523,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 ButtonExportSettings bes = new ButtonExportSettings(exportMode, export.getZoom());
                 for (CharacterTag c : swf.getCharacters().values()) {
                     if (c instanceof ButtonTag) {
-                        List<Integer> frameNums = new ArrayList<>();
-                        frameNums.add(0); // todo: export all frames
-                        frameExporter.exportFrames(handler, Path.combine(selFile, ButtonExportSettings.EXPORT_FOLDER_NAME, exportMode.name()), swf, c.getCharacterId(), frameNums, bes, evl);
+                        frameExporter.exportButtonFrames(handler, Path.combine(selFile, ButtonExportSettings.EXPORT_FOLDER_NAME, exportMode.name()), swf, c.getCharacterId(), null, bes, evl);
                     }
                 }
             }
@@ -3618,8 +3615,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
             private void initTimeline(Timeline timeline) {
                 if (tag instanceof MorphShapeTag) {
-                    timeline.frameRate = MORPH_SHAPE_ANIMATION_FRAME_RATE;
-                    int framesCnt = (int) (timeline.frameRate * MORPH_SHAPE_ANIMATION_LENGTH);
+                    timeline.frameRate = PreviewExporter.MORPH_SHAPE_ANIMATION_FRAME_RATE;
+                    int framesCnt = (int) (timeline.frameRate * PreviewExporter.MORPH_SHAPE_ANIMATION_LENGTH);
                     for (int i = 0; i < framesCnt; i++) {
                         Frame f = new Frame(timeline, i);
                         DepthState ds = new DepthState(tag.getSwf(), f);

@@ -1490,7 +1490,27 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
     }
 
+    public static SWFHeader decodeHeader(byte[] headerData) throws IOException {
+        String signature = new String(headerData, 0, 3, Utf8Helper.charset);
+        if (!swfSignatures.contains(signature)) {
+            throw new SwfOpenException("Invalid SWF file, wrong signature.");
+        }
+
+        int version = headerData[3];
+        long fileSize;
+        try (SWFInputStream sis = new SWFInputStream(null, Arrays.copyOfRange(headerData, 4, 8), 4, 4)) {
+            fileSize = sis.readUI32("fileSize");
+        }
+
+        SWFHeader header = new SWFHeader();
+        header.version = version;
+        header.fileSize = fileSize;
+        header.gfx = headerData[1] == 'F' && headerData[2] == 'X';
+        return header;
+    }
+
     private static SWFHeader decompress(InputStream is, OutputStream os, boolean allowUncompressed) throws IOException {
+
         byte[] hdr = new byte[8];
 
         // SWFheader: signature, version and fileSize
@@ -1498,25 +1518,12 @@ public final class SWF implements SWFContainerItem, Timelined {
             throw new SwfOpenException("SWF header is too short");
         }
 
-        String signature = new String(hdr, 0, 3, Utf8Helper.charset);
-        if (!swfSignatures.contains(signature)) {
-            throw new SwfOpenException("Invalid SWF file, wrong signature.");
-        }
+        SWFHeader header = decodeHeader(hdr);
+        long fileSize = header.fileSize;
 
-        int version = hdr[3];
-        long fileSize;
-        try (SWFInputStream sis = new SWFInputStream(null, Arrays.copyOfRange(hdr, 4, 8), 4, 4)) {
-            fileSize = sis.readUI32("fileSize");
-        }
-
-        SWFHeader header = new SWFHeader();
-        header.version = version;
-        header.fileSize = fileSize;
-        header.gfx = hdr[1] == 'F' && hdr[2] == 'X';
-
-        try (SWFOutputStream sos = new SWFOutputStream(os, version)) {
+        try (SWFOutputStream sos = new SWFOutputStream(os, header.version)) {
             sos.write(getHeaderBytes(SWFCompression.NONE, header.gfx));
-            sos.writeUI8(version);
+            sos.writeUI8(header.version);
             sos.writeUI32(fileSize);
 
             switch (hdr[0]) {
@@ -2980,8 +2987,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             timelined.setModified(true);
             timelined.resetTimeline();
         } else // timeline should be always the swf here
-        {
-            if (removeDependencies) {
+         if (removeDependencies) {
                 removeTagWithDependenciesFromTimeline(tag, timelined.getTimeline());
                 timelined.setModified(true);
             } else {
@@ -2990,7 +2996,6 @@ public final class SWF implements SWFContainerItem, Timelined {
                     timelined.setModified(true);
                 }
             }
-        }
     }
 
     @Override

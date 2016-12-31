@@ -21,12 +21,12 @@ package com.jpexs.decompiler.flash.exporters.modes;
  * @author JPEXS
  */
 public enum SpriteExportMode {
-
     PNG,
     GIF,
     AVI,
     SVG,
     CANVAS,
     PDF,
-    BMP
+    BMP,
+    SWF,
 }
