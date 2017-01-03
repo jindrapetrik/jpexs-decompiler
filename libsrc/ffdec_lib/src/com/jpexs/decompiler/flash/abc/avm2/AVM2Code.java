@@ -2187,10 +2187,12 @@ public class AVM2Code implements Cloneable {
             //Note: changing operands here does not change instruction byte length as offsets are always S24 (not variable length)
         }
 
-        for (ABCException ex : body.exceptions) {
-            ex.start = updater.updateOperandOffset(-1, ex.start, ex.start);
-            ex.end = updater.updateOperandOffset(-1, ex.end, ex.end);
-            ex.target = updater.updateOperandOffset(-1, ex.target, ex.target);
+        if (body != null) {
+            for (ABCException ex : body.exceptions) {
+                ex.start = updater.updateOperandOffset(-1, ex.start, ex.start);
+                ex.end = updater.updateOperandOffset(-1, ex.end, ex.end);
+                ex.target = updater.updateOperandOffset(-1, ex.target, ex.target);
+            }
         }
     }
 
