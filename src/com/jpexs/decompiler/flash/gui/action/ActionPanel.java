@@ -901,24 +901,22 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
     public void setDecompiledEditMode(boolean val) {
         View.checkAccess();
 
-        if (lastASM == null) {
-            return;
-        }
-
-        int lastLine = decompiledEditor.getLine();
-        int prefLines = lastASM.getPrefixLineCount();
-        if (val) {
-            String newText = lastASM.removePrefixAndSuffix(lastDecompiled.text);
-            setDecompiledText(lastASM.getScriptName(), newText);
-            if (lastLine > -1) {
-                if (lastLine - prefLines >= 0) {
-                    decompiledEditor.gotoLine(lastLine - prefLines + 1);
+        if (src != null) {
+            int lastLine = decompiledEditor.getLine();
+            int prefLines = src.getPrefixLineCount();
+            if (val) {
+                String newText = src.removePrefixAndSuffix(lastDecompiled.text);
+                setDecompiledText(src.getScriptName(), newText);
+                if (lastLine > -1) {
+                    if (lastLine - prefLines >= 0) {
+                        decompiledEditor.gotoLine(lastLine - prefLines + 1);
+                    }
                 }
-            }
-        } else {
-            setDecompiledText(lastASM.getScriptName(), lastDecompiled.text);
-            if (lastLine > -1) {
-                decompiledEditor.gotoLine(lastLine + prefLines + 1);
+            } else {
+                setDecompiledText(src.getScriptName(), lastDecompiled.text);
+                if (lastLine > -1) {
+                    decompiledEditor.gotoLine(lastLine + prefLines + 1);
+                }
             }
         }
 
