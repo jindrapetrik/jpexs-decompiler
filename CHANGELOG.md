@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - [#1327] P-code editing: error message and syntax highlighting fixed when instruction name contains upper cased letter
 - [#1343] AS 1/2 direct editation critical bug
+- [#1348] Cannot properly export frame with cyrillic symbols to SVG
 
 ## [10.0.0] - 2016-12-24
 ### Added

@@ -74,7 +74,7 @@ public class SVGExporter {
 
     public Map<Tag, String> exportedTags = new HashMap<>();
 
-    public Map<Tag, Map<Character, String>> exportedChars = new HashMap<>();
+    public Map<Tag, Map<Integer, String>> exportedChars = new HashMap<>();
 
     private final Map<String, Integer> lastIds = new HashMap<>();
 

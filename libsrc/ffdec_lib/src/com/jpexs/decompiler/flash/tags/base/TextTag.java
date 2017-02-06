@@ -736,11 +736,11 @@ public abstract class TextTag extends DrawableTag {
                         char ch = font.glyphToChar(entry.glyphIndex);
 
                         String charId = null;
-                        Map<Character, String> chs;
+                        Map<Integer, String> chs;
                         if (exporter.exportedChars.containsKey(font)) {
                             chs = exporter.exportedChars.get(font);
-                            if (chs.containsKey(ch)) {
-                                charId = chs.get(ch);
+                            if (chs.containsKey(entry.glyphIndex)) {
+                                charId = chs.get(entry.glyphIndex);
                             }
                         } else {
                             chs = new HashMap<>();
@@ -753,7 +753,7 @@ public abstract class TextTag extends DrawableTag {
                             SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, shape, exporter, null, colorTransform, zoom);
                             shapeExporter.export();
                             exporter.endGroup();
-                            chs.put(ch, charId);
+                            chs.put(entry.glyphIndex, charId);
                         }
 
                         Element charImage = exporter.addUse(mat, bounds, charId, null);

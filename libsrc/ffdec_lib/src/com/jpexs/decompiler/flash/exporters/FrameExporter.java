@@ -201,7 +201,7 @@ public class FrameExporter {
                 final Color fbackgroundColor = null;
                 new RetryTask(() -> {
                     int frame = fframes.get(fi);
-                    File f = new File(foutdir + File.separator + frame + ".svg");
+                    File f = new File(foutdir + File.separator + (frame + 1) + ".svg");
                     try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(f))) {
                         ExportRectangle rect = new ExportRectangle(tim.displayRect);
                         rect.xMax *= settings.zoom;
@@ -361,7 +361,7 @@ public class FrameExporter {
             } else {
                 for (Integer frame : fframes) {
                     new RetryTask(() -> {
-                        File f = new File(foutdir + File.separator + frame + ".swf");
+                        File f = new File(foutdir + File.separator + (frame + 1) + ".swf");
                         Frame fn = (Frame) tim.getFrame(frame);
 
                         try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(f))) {
