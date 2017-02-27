@@ -1562,39 +1562,43 @@ public class XFLConverter {
                                         }
                                     }
                                     CharacterTag character = characters.get(rec.characterId);
-                                    MATRIX matrix = rec.placeMatrix;
-                                    XFLXmlWriter recCharWriter = new XFLXmlWriter();
+                                    if (character != null) {
+                                        MATRIX matrix = rec.placeMatrix;
+                                        XFLXmlWriter recCharWriter = new XFLXmlWriter();
 
-                                    int characterId = character.getCharacterId();
-                                    if ((character instanceof ShapeTag) && (nonLibraryShapes.contains(characterId))) {
-                                        ShapeTag shape = (ShapeTag) character;
-                                        convertShape(characters, matrix, shape.getShapeNum(), shape.getShapes().shapeRecords, shape.getShapes().fillStyles, shape.getShapes().lineStyles, false, false, recCharWriter);
-                                    } else if (character instanceof TextTag) {
-                                        convertText(null, (TextTag) character, matrix, filters, null, recCharWriter);
-                                    } else if (character instanceof DefineVideoStreamTag) {
-                                        convertVideoInstance(null, matrix, (DefineVideoStreamTag) character, null, recCharWriter);
-                                    } else {
-                                        convertSymbolInstance(null, matrix, colorTransformAlpha, false, blendMode, filters, true, null, null, null, characters.get(rec.characterId), characters, tags, flaVersion, recCharWriter);
-                                    }
+                                        int characterId = character.getCharacterId();
+                                        if ((character instanceof ShapeTag) && (nonLibraryShapes.contains(characterId))) {
+                                            ShapeTag shape = (ShapeTag) character;
+                                            convertShape(characters, matrix, shape.getShapeNum(), shape.getShapes().shapeRecords, shape.getShapes().fillStyles, shape.getShapes().lineStyles, false, false, recCharWriter);
+                                        } else if (character instanceof TextTag) {
+                                            convertText(null, (TextTag) character, matrix, filters, null, recCharWriter);
+                                        } else if (character instanceof DefineVideoStreamTag) {
+                                            convertVideoInstance(null, matrix, (DefineVideoStreamTag) character, null, recCharWriter);
+                                        } else {
+                                            convertSymbolInstance(null, matrix, colorTransformAlpha, false, blendMode, filters, true, null, null, null, characters.get(rec.characterId), characters, tags, flaVersion, recCharWriter);
+                                        }
 
-                                    int duration = frame - lastFrame;
-                                    lastFrame = frame;
-                                    if (duration > 0) {
-                                        if (duration > 1) {
+                                        int duration = frame - lastFrame;
+                                        lastFrame = frame;
+                                        if (duration > 0) {
+                                            if (duration > 1) {
+                                                symbolStr.writeStartElement("DOMFrame", new String[]{
+                                                    "index", Integer.toString(frame - duration),
+                                                    "duration", Integer.toString(duration - 1),
+                                                    "keyMode", Integer.toString(KEY_MODE_NORMAL),});
+                                                symbolStr.writeElementValue("elements", "");
+                                                symbolStr.writeEndElement();
+                                            }
                                             symbolStr.writeStartElement("DOMFrame", new String[]{
-                                                "index", Integer.toString(frame - duration),
-                                                "duration", Integer.toString(duration - 1),
+                                                "index", Integer.toString(frame - 1),
                                                 "keyMode", Integer.toString(KEY_MODE_NORMAL),});
-                                            symbolStr.writeElementValue("elements", "");
+                                            symbolStr.writeStartElement("elements");
+                                            symbolStr.writeCharactersRaw(recCharWriter.toString());
+                                            symbolStr.writeEndElement();
                                             symbolStr.writeEndElement();
                                         }
-                                        symbolStr.writeStartElement("DOMFrame", new String[]{
-                                            "index", Integer.toString(frame - 1),
-                                            "keyMode", Integer.toString(KEY_MODE_NORMAL),});
-                                        symbolStr.writeStartElement("elements");
-                                        symbolStr.writeCharactersRaw(recCharWriter.toString());
-                                        symbolStr.writeEndElement();
-                                        symbolStr.writeEndElement();
+                                    } else {
+                                        logger.log(Level.WARNING, "Character with id={0} was not found.", rec.characterId);
                                     }
                                 }
                             }
@@ -3997,11 +4001,19 @@ public class XFLConverter {
                     //kerning  ?
                     String ls = attributes.getValue("letterSpacing");
                     if (ls != null) {
-                        letterSpacing = Double.parseDouble(ls);
+                        try {
+                            letterSpacing = Double.parseDouble(ls);
+                        } catch (NumberFormatException ex) {
+                            logger.log(Level.WARNING, "Invalid letter spacing value: {0}", ls);
+                        }
                     }
                     String s = attributes.getValue("size");
                     if (s != null) {
-                        size = Integer.parseInt(s);
+                        try {
+                            size = Integer.parseInt(s);
+                        } catch (NumberFormatException ex) {
+                            logger.log(Level.WARNING, "Invalid font size: {0}", s);
+                        }
                     }
                     String c = attributes.getValue("color");
                     if (c != null) {

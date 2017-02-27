@@ -341,8 +341,10 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
             Rectangle r;
             try {
                 r = modelToView(pos);
-                if (lastPos.x < r.x) {
-                    pos--;
+                if (r != null) {
+                    if (lastPos.x < r.x) {
+                        pos--;
+                    }
                 }
             } catch (BadLocationException ex) {
                 //ignore
