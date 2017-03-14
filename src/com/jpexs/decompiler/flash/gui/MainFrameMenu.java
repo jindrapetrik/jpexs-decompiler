@@ -533,7 +533,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
     protected boolean reloadActionPerformed(ActionEvent evt) {
         if (swf != null) {
-            if (View.showConfirmDialog(null, translate("message.confirm.reload"), translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+            if (!Configuration.showCloseConfirmation.get() || View.showConfirmDialog(null, translate("message.confirm.reload"), translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
                 Main.reloadFile(swf.swfList);
             }
         }
@@ -542,7 +542,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
     protected boolean reloadAllActionPerformed(ActionEvent evt) {
         if (swf != null) {
-            if (View.showConfirmDialog(null, translate("message.confirm.reloadAll"), translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+            if (!Configuration.showCloseConfirmation.get() || View.showConfirmDialog(null, translate("message.confirm.reloadAll"), translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
                 Main.reloadApp();
             }
 
