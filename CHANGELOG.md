@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 - [#1343] AS 1/2 direct editation critical bug
 - [#1348] Cannot properly export frame with cyrillic symbols to SVG
 - [#1354] Various FLA export problem fixes
+- [#1367] Raw edit conditional type fix.
 
 ## [10.0.0] - 2016-12-24
 ### Added

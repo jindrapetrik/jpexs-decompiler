@@ -53,6 +53,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  * Represents Tag inside SWF file
@@ -60,6 +61,8 @@ import java.util.Set;
  * @author JPEXS
  */
 public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
+
+    private static final Logger logger = Logger.getLogger(Tag.class.getName());
 
     /**
      * Identifier of tag type

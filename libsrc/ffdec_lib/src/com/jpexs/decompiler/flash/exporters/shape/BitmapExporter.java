@@ -46,6 +46,8 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.NoninvertibleTransformException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -84,6 +86,8 @@ public class BitmapExporter extends ShapeExporterBase {
     private Stroke defaultStroke;
 
     private Matrix strokeTransformation;
+
+    private static boolean linearGradientColorWarnignShown = false;
 
     private class TransformedStroke implements Stroke {
 
@@ -238,7 +242,17 @@ public class BitmapExporter extends ShapeExporterBase {
                     cm = MultipleGradientPaint.CycleMethod.REPEAT;
                 }
 
-                fillPaint = new LinearGradientPaint(POINT_NEG16384_0, POINT_16384_0, ratiosArr, colorsArr, cm, cstype, IDENTITY_TRANSFORM);
+                if (colorsArr.length >= 2) {
+                    fillPaint = new LinearGradientPaint(POINT_NEG16384_0, POINT_16384_0, ratiosArr, colorsArr, cm, cstype, IDENTITY_TRANSFORM);
+                } else {
+                    if (!linearGradientColorWarnignShown) {
+                        Logger.getLogger(BitmapExporter.class.getName()).log(Level.WARNING, "Linear gradient fill should have at least 2 gradient records.");
+                        linearGradientColorWarnignShown = true;
+                    }
+
+                    fillPaint = null;
+                }
+
                 fillTransform = matrix.toTransform();
             }
             break;

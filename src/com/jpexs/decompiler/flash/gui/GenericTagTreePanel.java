@@ -34,6 +34,7 @@ import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
+import com.jpexs.decompiler.flash.types.annotations.ConditionalType;
 import com.jpexs.decompiler.flash.types.annotations.EnumValue;
 import com.jpexs.decompiler.flash.types.annotations.EnumValues;
 import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
@@ -478,13 +479,16 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
     private static final class FieldNode extends DefaultMutableTreeNode {
 
+        private Tag tag;
+
         private Object obj;
 
         private FieldSet fieldSet;
 
         private int index;
 
-        public FieldNode(Object obj, FieldSet fieldSet, int index) {
+        public FieldNode(Tag tag, Object obj, FieldSet fieldSet, int index) {
+            this.tag = tag;
             this.obj = obj;
             this.fieldSet = fieldSet;
             this.index = index;
@@ -682,7 +686,28 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 Object val = ReflectionTools.getValue(obj, fieldSet.get(fieldIndex), index);
                 if (val == null) {
                     try {
-                        val = ReflectionTools.newInstanceOf(fieldSet.get(fieldIndex).getType());
+                        Class type = fieldSet.get(fieldIndex).getType();
+                        ConditionalType cond = fieldSet.get(fieldIndex).getAnnotation(ConditionalType.class);
+                        if (cond != null) {
+                            boolean condEnabled = false;
+                            int[] tags = cond.tags();
+                            if (tags != null && tags.length > 0) {
+                                int tagId = tag.getId();
+                                for (int i = 0; i < tags.length; i++) {
+                                    if (tags[i] == tagId) {
+                                        condEnabled = true;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            // todo: check other condition filters
+                            if (condEnabled) {
+                                type = cond.type();
+                            }
+                        }
+
+                        val = ReflectionTools.newInstanceOf(type);
                         ReflectionTools.setValue(obj, fieldSet.get(fieldIndex), index, val);
                     } catch (InstantiationException | IllegalAccessException ex) {
                         logger.log(Level.SEVERE, null, ex);
@@ -725,7 +750,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
     private static class MyTreeModel extends DefaultTreeModel {
 
-        private final Object mtroot;
+        private final Tag mtroot;
 
         private final List<TreeModelListener> listeners = new ArrayList<>();
 
@@ -814,15 +839,15 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
         private Object getChild(Object parent, int index, boolean limited) {
             if (parent == mtroot) {
-                return new FieldNode(mtroot, filterFields(this, mtroot.getClass().getSimpleName(), mtroot.getClass(), limited).get(index), -1);
+                return new FieldNode(mtroot, mtroot, filterFields(this, mtroot.getClass().getSimpleName(), mtroot.getClass(), limited).get(index), -1);
             }
             FieldNode fnode = (FieldNode) parent;
             Field field = fnode.fieldSet.get(FIELD_INDEX);
             if (ReflectionTools.needsIndex(field) && (fnode.index == -1)) { //Arrays ot Lists
-                return new FieldNode(fnode.obj, fnode.fieldSet, index);
+                return new FieldNode(mtroot, fnode.obj, fnode.fieldSet, index);
             }
             parent = fnode.getValue(FIELD_INDEX);
-            return new FieldNode(parent, filterFields(this, getNodePathName(fnode), parent.getClass(), limited).get(index), -1);
+            return new FieldNode(mtroot, parent, filterFields(this, getNodePathName(fnode), parent.getClass(), limited).get(index), -1);
         }
 
         @Override

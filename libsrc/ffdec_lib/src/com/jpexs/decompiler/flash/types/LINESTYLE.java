@@ -33,7 +33,7 @@ public class LINESTYLE implements NeedsCharacters, Serializable {
     @SWFType(BasicType.UI16)
     public int width;
 
-    @ConditionalType(tags = {DefineShape3Tag.ID, DefineShape4Tag.ID}, type = RGBA.class)
+    @ConditionalType(type = RGBA.class, tags = {DefineShape3Tag.ID, DefineShape4Tag.ID})
     public RGB color;
 
     @Override

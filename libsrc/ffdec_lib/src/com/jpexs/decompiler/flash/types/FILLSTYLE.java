@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.tags.DefineShape3Tag;
+import com.jpexs.decompiler.flash.tags.DefineShape4Tag;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.ConditionalType;
@@ -66,7 +67,8 @@ public class FILLSTYLE implements NeedsCharacters, Serializable {
     @Internal
     public boolean inShape3;
 
-    @ConditionalType(type = RGBA.class, tags = DefineShape3Tag.ID)
+    @Conditional(value = "fillStyleType", options = {SOLID})
+    @ConditionalType(type = RGBA.class, tags = {DefineShape3Tag.ID, DefineShape4Tag.ID})
     public RGB color;
 
     @Conditional(value = "fillStyleType", options = {LINEAR_GRADIENT, RADIAL_GRADIENT, FOCAL_RADIAL_GRADIENT})
