@@ -26,13 +26,14 @@ import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.Set;
 
 /**
  *
  * @author JPEXS
  */
-public class FILLSTYLE implements NeedsCharacters, Serializable {
+public class FILLSTYLE implements NeedsCharacters, FieldChangeObserver, Serializable {
 
     @SWFType(BasicType.UI8)
     @EnumValue(value = SOLID, text = "Solid")
@@ -119,5 +120,27 @@ public class FILLSTYLE implements NeedsCharacters, Serializable {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void fieldChanged(Field field) {
+        if ((fillStyleType == FILLSTYLE.LINEAR_GRADIENT)
+                || (fillStyleType == FILLSTYLE.RADIAL_GRADIENT)) {
+            if (gradient instanceof FOCALGRADIENT) {
+                GRADIENT g = new GRADIENT();
+                g.spreadMode = gradient.spreadMode;
+                g.interpolationMode = gradient.interpolationMode;
+                g.gradientRecords = gradient.gradientRecords;
+                gradient = g;
+            }
+        } else if (fillStyleType == FILLSTYLE.FOCAL_RADIAL_GRADIENT) {
+            if (!(gradient instanceof FOCALGRADIENT)) {
+                FOCALGRADIENT g = new FOCALGRADIENT();
+                g.spreadMode = gradient.spreadMode;
+                g.interpolationMode = gradient.interpolationMode;
+                g.gradientRecords = gradient.gradientRecords;
+                gradient = g;
+            }
+        }
     }
 }

@@ -701,7 +701,6 @@ public class GenericTagTreePanel extends GenericTagPanel {
                                 }
                             }
 
-                            // todo: check other condition filters
                             if (condEnabled) {
                                 type = cond.type();
                             }
@@ -790,8 +789,8 @@ public class GenericTagTreePanel extends GenericTagPanel {
                     String parentPath = currentPath.indexOf('.') == -1 ? "" : currentPath.substring(0, currentPath.lastIndexOf('.'));
                     try {
                         for (String cname : ev.getFields()) {
-                            String fullParh = parentPath + "." + cname;
-                            if (fullParh.equals(dependence)) {
+                            String fullPath = parentPath + "." + cname;
+                            if (fullPath.equals(dependence)) {
                                 ret.add(fnode);
                                 break;
                             }

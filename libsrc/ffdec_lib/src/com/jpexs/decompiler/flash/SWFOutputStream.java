@@ -1201,8 +1201,7 @@ public class SWFOutputStream extends OutputStream {
         if ((value.fillStyleType == FILLSTYLE.LINEAR_GRADIENT)
                 || (value.fillStyleType == FILLSTYLE.RADIAL_GRADIENT)) {
             writeGRADIENT(value.gradient, shapeNum);
-        }
-        if (value.fillStyleType == FILLSTYLE.FOCAL_RADIAL_GRADIENT) {
+        } else if (value.fillStyleType == FILLSTYLE.FOCAL_RADIAL_GRADIENT) {
             writeFOCALGRADIENT((FOCALGRADIENT) value.gradient, shapeNum);
         }
 

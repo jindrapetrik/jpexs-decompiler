@@ -16,6 +16,7 @@
  */
 package com.jpexs.helpers;
 
+import com.jpexs.decompiler.flash.types.FieldChangeObserver;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFField;
 import java.lang.reflect.Array;
@@ -125,8 +126,15 @@ public class ReflectionTools {
         return 0;
     }
 
+    private static void notifyFieldChanged(Object obj, Field field) {
+        if (obj != null && obj instanceof FieldChangeObserver) {
+            ((FieldChangeObserver) obj).fieldChanged(field);
+        }
+    }
+
     public static void setValue(Object obj, Field field, Object newValue) throws IllegalArgumentException, IllegalAccessException {
         field.set(obj, newValue);
+        notifyFieldChanged(obj, field);
     }
 
     @SuppressWarnings("unchecked")
@@ -146,6 +154,7 @@ public class ReflectionTools {
             Array.set(value, index, newValue);
         } else {
             field.set(obj, newValue);
+            notifyFieldChanged(obj, field);
         }
     }
 
@@ -303,6 +312,7 @@ public class ReflectionTools {
         }
         try {
             field.set(object, copy);
+            notifyFieldChanged(object, field);
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             logger.log(Level.SEVERE, null, ex);
             return false;

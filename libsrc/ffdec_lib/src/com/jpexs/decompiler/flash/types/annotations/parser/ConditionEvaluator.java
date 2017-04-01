@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.types.annotations.parser;
 
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
+import com.jpexs.decompiler.flash.types.annotations.ConditionalType;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.EmptyStackException;
@@ -31,10 +32,14 @@ import java.util.Stack;
  */
 public class ConditionEvaluator {
 
-    private final Conditional cond;
+    private final String[] values;
 
     public ConditionEvaluator(Conditional cond) {
-        this.cond = cond;
+        values = cond.value();
+    }
+
+    public ConditionEvaluator(ConditionalType cond) {
+        values = cond.value();
     }
 
     private void expressionRest(Map<String, Boolean> fields, Stack<Boolean> stack, ConditionLexer lex) throws IOException, AnnotationParseException {
@@ -114,7 +119,7 @@ public class ConditionEvaluator {
     }
 
     private String prepareCond() {
-        String[] vals = cond.value();
+        String[] vals = values;
         if (vals == null || vals.length == 0) {
             return "";
         }
