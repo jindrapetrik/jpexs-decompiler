@@ -2371,7 +2371,9 @@ public class AVM2Code implements Cloneable {
             pos = code.size();
         }
         final int byteCount = instruction.getBytesLength();
-        if (pos == code.size()) {
+        if (code.size() == 0) {
+            instruction.setAddress(0);
+        } else if (pos == code.size()) {
             instruction.setAddress(code.get(pos - 1).getAddress() + code.get(pos - 1).getBytesLength());
         } else {
             instruction.setAddress(code.get(pos).getAddress());
