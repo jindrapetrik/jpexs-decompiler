@@ -250,7 +250,11 @@ public class BitmapExporter extends ShapeExporterBase {
                         linearGradientColorWarnignShown = true;
                     }
 
-                    fillPaint = null;
+                    if (colorsArr.length == 1) {
+                        fillPaint = colorsArr[0];
+                    } else {
+                        fillPaint = null;
+                    }
                 }
 
                 fillTransform = matrix.toTransform();
