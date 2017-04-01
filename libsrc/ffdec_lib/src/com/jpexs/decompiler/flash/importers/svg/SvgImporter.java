@@ -103,10 +103,6 @@ public class SvgImporter {
         RECT rect = st.getRect();
         int origXmin = rect.Xmin;
         int origYmin = rect.Ymin;
-        rect.Xmin -= origXmin;
-        rect.Xmax -= origXmin;
-        rect.Ymin -= origYmin;
-        rect.Ymax -= origYmin;
 
         shapes.shapeRecords = new ArrayList<>();
 
@@ -175,6 +171,10 @@ public class SvgImporter {
             Matrix transform = new Matrix();
 
             if (!fill) {
+                rect.Xmin -= origXmin;
+                rect.Xmax -= origXmin;
+                rect.Ymin -= origYmin;
+                rect.Ymax -= origYmin;
                 rect.Xmin = (int) Math.round(viewBox.x * SWF.unitDivisor);
                 rect.Ymin = (int) Math.round(viewBox.y * SWF.unitDivisor);
                 rect.Xmax = (int) Math.round((viewBox.x + viewBox.width) * SWF.unitDivisor);
@@ -183,6 +183,7 @@ public class SvgImporter {
                 double ratioX = rect.getWidth() / width / SWF.unitDivisor;
                 double ratioY = rect.getHeight() / height / SWF.unitDivisor;
                 transform = Matrix.getScaleInstance(ratioX, ratioY);
+                transform.translate(origXmin / SWF.unitDivisor, origYmin / SWF.unitDivisor);
             }
 
             processSvgObject(idMap, shapeNum, shapes, rootElement, transform, style);
