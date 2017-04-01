@@ -43,6 +43,12 @@ public final class Matrix implements Cloneable {
         return mat;
     }
 
+    public static Matrix getScaleInstance(double scaleX, double scaleY) {
+        Matrix mat = new Matrix();
+        mat.scale(scaleX, scaleY);
+        return mat;
+    }
+
     public static Matrix getTranslateInstance(double x, double y) {
         Matrix mat = new Matrix();
         mat.translate(x, y);
@@ -198,6 +204,13 @@ public final class Matrix implements Cloneable {
         scaleY *= factor;
         rotateSkew0 *= factor;
         rotateSkew1 *= factor;
+    }
+
+    public void scale(double factorX, double factorY) {
+        scaleX *= factorX;
+        scaleY *= factorY;
+        rotateSkew0 *= factorX;
+        rotateSkew1 *= factorY;
     }
 
     public Matrix concatenate(Matrix m) {
