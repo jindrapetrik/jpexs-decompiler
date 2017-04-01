@@ -428,37 +428,34 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
         return new Point2D.Double(x, y);
     }
 
-    public static SHAPE resizeSHAPE(SHAPE shp, double multiplier) {
-        SHAPE ret = new SHAPE();
-        ret.numFillBits = shp.numFillBits;
-        ret.numLineBits = shp.numLineBits;
-        List<SHAPERECORD> recs = new ArrayList<>();
-        for (SHAPERECORD r : shp.shapeRecords) {
-            SHAPERECORD c = r.clone();
-            if (c instanceof StyleChangeRecord) {
-                StyleChangeRecord scr = (StyleChangeRecord) c;
-                scr.moveDeltaX = (int) (multiplier * scr.moveDeltaX);
-                scr.moveDeltaY = (int) (multiplier * scr.moveDeltaY);
-                scr.calculateBits();
-            }
-            if (c instanceof CurvedEdgeRecord) {
-                CurvedEdgeRecord cer = (CurvedEdgeRecord) c;
-                cer.controlDeltaX = (int) (multiplier * cer.controlDeltaX);
-                cer.controlDeltaY = (int) (multiplier * cer.controlDeltaY);
-                cer.anchorDeltaX = (int) (multiplier * cer.anchorDeltaX);
-                cer.anchorDeltaY = (int) (multiplier * cer.anchorDeltaY);
-                cer.calculateBits();
-            }
-            if (c instanceof StraightEdgeRecord) {
-                StraightEdgeRecord ser = (StraightEdgeRecord) c;
-                ser.deltaX = (int) (multiplier * ser.deltaX);
-                ser.deltaY = (int) (multiplier * ser.deltaY);
-                ser.calculateBits();
-            }
-            recs.add(c);
+    public SHAPERECORD resize(double multiplier) {
+        return resize(multiplier, multiplier);
+    }
+
+    public SHAPERECORD resize(double multiplierX, double multiplierY) {
+        SHAPERECORD c = clone();
+        if (c instanceof StyleChangeRecord) {
+            StyleChangeRecord scr = (StyleChangeRecord) c;
+            scr.moveDeltaX = (int) (multiplierX * scr.moveDeltaX);
+            scr.moveDeltaY = (int) (multiplierY * scr.moveDeltaY);
+            scr.calculateBits();
         }
-        ret.shapeRecords = recs;
-        return ret;
+        if (c instanceof CurvedEdgeRecord) {
+            CurvedEdgeRecord cer = (CurvedEdgeRecord) c;
+            cer.controlDeltaX = (int) (multiplierX * cer.controlDeltaX);
+            cer.controlDeltaY = (int) (multiplierY * cer.controlDeltaY);
+            cer.anchorDeltaX = (int) (multiplierX * cer.anchorDeltaX);
+            cer.anchorDeltaY = (int) (multiplierY * cer.anchorDeltaY);
+            cer.calculateBits();
+        }
+        if (c instanceof StraightEdgeRecord) {
+            StraightEdgeRecord ser = (StraightEdgeRecord) c;
+            ser.deltaX = (int) (multiplierX * ser.deltaX);
+            ser.deltaY = (int) (multiplierY * ser.deltaY);
+            ser.calculateBits();
+        }
+
+        return c;
     }
 
     public static Shape moveShapeToStart(Shape s) {

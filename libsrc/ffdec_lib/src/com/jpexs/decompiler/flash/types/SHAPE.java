@@ -99,6 +99,24 @@ public class SHAPE implements NeedsCharacters, Serializable {
         return area;
     }
 
+    public SHAPE resize(double multiplier) {
+        return resize(multiplier, multiplier);
+    }
+
+    public SHAPE resize(double multiplierX, double multiplierY) {
+        SHAPE ret = new SHAPE();
+        ret.numFillBits = numFillBits;
+        ret.numLineBits = numLineBits;
+        List<SHAPERECORD> recs = new ArrayList<>();
+        for (SHAPERECORD r : shapeRecords) {
+            SHAPERECORD c = r.resize(multiplierX, multiplierY);
+            recs.add(c);
+        }
+
+        ret.shapeRecords = recs;
+        return ret;
+    }
+
     public static SHAPE createEmpty(int shapeNum) {
         SHAPE ret = new SHAPE();
         ret.shapeRecords = new ArrayList<>();

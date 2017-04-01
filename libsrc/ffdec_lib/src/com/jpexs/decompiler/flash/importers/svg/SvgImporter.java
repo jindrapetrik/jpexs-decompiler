@@ -185,6 +185,12 @@ public class SvgImporter {
             rect.Ymin = (int) Math.round(viewBox.y * SWF.unitDivisor);
             rect.Xmax = (int) Math.round((viewBox.x + viewBox.width) * SWF.unitDivisor);
             rect.Ymax = (int) Math.round((viewBox.y + viewBox.height) * SWF.unitDivisor);
+        } else if (viewBox != null) {
+            double width = viewBox.width * SWF.unitDivisor;
+            double height = viewBox.height * SWF.unitDivisor;
+            double radioX = rect.getWidth() / width;
+            double radioY = rect.getHeight() / height;
+            shapes = shapes.resize(radioX, radioY);
         }
 
         st.shapes = shapes;

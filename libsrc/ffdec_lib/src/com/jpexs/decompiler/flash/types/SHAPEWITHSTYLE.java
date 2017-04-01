@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -62,6 +63,23 @@ public class SHAPEWITHSTYLE extends SHAPE implements NeedsCharacters, Serializab
             modified |= r.removeCharacter(characterId);
         }
         return modified;
+    }
+
+    @Override
+    public SHAPEWITHSTYLE resize(double multiplierX, double multiplierY) {
+        SHAPEWITHSTYLE ret = new SHAPEWITHSTYLE();
+        ret.numFillBits = numFillBits;
+        ret.numLineBits = numLineBits;
+        List<SHAPERECORD> recs = new ArrayList<>();
+        for (SHAPERECORD r : shapeRecords) {
+            SHAPERECORD c = r.resize(multiplierX, multiplierY);
+            recs.add(c);
+        }
+
+        ret.shapeRecords = recs;
+        ret.fillStyles = fillStyles; // todo: clone?
+        ret.lineStyles = lineStyles; // todo: clone?
+        return ret;
     }
 
     public static SHAPEWITHSTYLE createEmpty(int shapeNum) {
