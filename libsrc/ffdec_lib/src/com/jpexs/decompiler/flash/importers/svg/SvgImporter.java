@@ -183,7 +183,7 @@ public class SvgImporter {
                 double ratioX = rect.getWidth() / width / SWF.unitDivisor;
                 double ratioY = rect.getHeight() / height / SWF.unitDivisor;
                 transform = Matrix.getScaleInstance(ratioX, ratioY);
-                transform.translate(origXmin / SWF.unitDivisor, origYmin / SWF.unitDivisor);
+                transform.translate(origXmin / SWF.unitDivisor / ratioX, origYmin / SWF.unitDivisor / ratioY);
             }
 
             processSvgObject(idMap, shapeNum, shapes, rootElement, transform, style);
