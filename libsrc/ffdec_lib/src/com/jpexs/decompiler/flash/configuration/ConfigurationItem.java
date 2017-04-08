@@ -16,8 +16,13 @@
  */
 package com.jpexs.decompiler.flash.configuration;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -92,6 +97,37 @@ public class ConfigurationItem<T> {
 
     public boolean isModified() {
         return modified;
+    }
+
+    public static ConfigurationItem<?> getItem(Field field) {
+        try {
+            field.setAccessible(true);
+            ConfigurationItem<?> item = (ConfigurationItem<?>) field.get(null);
+            return item;
+        } catch (IllegalArgumentException | IllegalAccessException ex) {
+            Logger.getLogger(ConfigurationItem.class.getName()).log(Level.SEVERE, null, ex);
+            throw new Error(ex);
+        }
+    }
+
+    public static Class<?> getConfigurationFieldType(Field field) {
+        Type type = ((ParameterizedType) (field.getGenericType())).getActualTypeArguments()[0];
+        if (type instanceof Class<?>) {
+            return (Class<?>) type;
+        } else {
+            return (Class<?>) ((ParameterizedType) type).getRawType();
+        }
+    }
+
+    public static String getName(Field field) {
+        ConfigurationName annotation = field.getAnnotation(ConfigurationName.class);
+        String name = annotation == null ? field.getName() : annotation.value();
+        return name;
+    }
+
+    public static boolean isInternal(Field field) {
+        ConfigurationInternal cint = field.getAnnotation(ConfigurationInternal.class);
+        return cint != null;
     }
 
     @Override

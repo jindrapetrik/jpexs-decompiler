@@ -33,8 +33,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -865,13 +863,7 @@ public final class Configuration {
                 if (config.containsKey(name)) {
                     value = config.get(name);
 
-                    Class<?> type;
-                    Type type2 = ((ParameterizedType) (field.getGenericType())).getActualTypeArguments()[0];
-                    if (type2 instanceof Class<?>) {
-                        type = (Class<?>) type2;
-                    } else {
-                        type = (Class<?>) ((ParameterizedType) type2).getRawType();
-                    }
+                    Class<?> type = ConfigurationItem.getConfigurationFieldType(field);
                     if (value != null && !type.isAssignableFrom(value.getClass())) {
                         System.out.println("Configuration item has a wrong type: " + name + " expected: " + type.getSimpleName() + " actual: " + value.getClass().getSimpleName());
                         value = null;
@@ -926,12 +918,19 @@ public final class Configuration {
     }
 
     public static Map<String, Field> getConfigurationFields() {
+        return getConfigurationFields(false);
+    }
+
+    public static Map<String, Field> getConfigurationFields(boolean lowerCaseNames) {
         Field[] fields = Configuration.class.getDeclaredFields();
         Map<String, Field> result = new HashMap<>();
         for (Field field : fields) {
             if (ConfigurationItem.class.isAssignableFrom(field.getType())) {
-                ConfigurationName annotation = field.getAnnotation(ConfigurationName.class);
-                String name = annotation == null ? field.getName() : annotation.value();
+                String name = ConfigurationItem.getName(field);
+                if (lowerCaseNames) {
+                    name = name.toLowerCase();
+                }
+
                 result.put(name, field);
             }
         }

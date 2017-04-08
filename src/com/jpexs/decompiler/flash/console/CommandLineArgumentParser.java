@@ -184,9 +184,15 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -221,32 +227,72 @@ public class CommandLineArgumentParser {
 
     private static final String METADATA_FORMAT_RAW = "raw";
 
-    @SuppressWarnings("unchecked")
-    private static final ConfigurationItem<Boolean>[] commandlineConfigBoolean = new ConfigurationItem[]{
-        Configuration.decompile,
-        Configuration.parallelSpeedUp,
-        Configuration.internalFlashViewer,
-        Configuration.autoDeobfuscate,
-        Configuration.cacheOnDisk,
-        Configuration.cacheImages,
-        Configuration.overwriteExistingFiles,
-        Configuration.autoRenameIdentifiers,
-        Configuration.decimalAddress,
-        Configuration.showAllAddresses,
-        Configuration.smartNumberFormatting,
-        Configuration.enableScriptInitializerDisplay,
-        Configuration.resolveConstants,
-        Configuration.textExportSingleFile,
-        Configuration.scriptExportSingleFile,
-        Configuration.packJavaScripts,
-        Configuration.showMethodBodyId,
-        Configuration.getLocalNamesFromDebugInfo,
-        Configuration.ignoreCLikePackages,
-        Configuration.shapeImportUseNonSmoothedFill
-    };
-
     public static boolean isCommandLineMode() {
         return commandLineMode;
+    }
+
+    public static void printConfigurationSettings() {
+        Map<String, Field> fields = Configuration.getConfigurationFields();
+        String[] keys = new String[fields.size()];
+        keys = fields.keySet().toArray(keys);
+        Arrays.sort(keys);
+
+        System.out.println("Available keys[current setting]-type:");
+        for (String name : keys) {
+            Field field = fields.get(name);
+            if (ConfigurationItem.isInternal(field)) {
+                continue;
+            }
+
+            ConfigurationItem<?> item = ConfigurationItem.getItem(field);
+            Object value = item.get();
+            Class<?> type = ConfigurationItem.getConfigurationFieldType(field);
+            String valueString = objectToString(value, type);
+            String typeString = objectTypeToString(type);
+
+            if (typeString != null) {
+                System.out.println(name + "[" + valueString + "]-" + typeString);
+            }
+        }
+    }
+
+    private static String objectTypeToString(Class<?> type) {
+        if (type == String.class) {
+            return "string";
+        } else if (type == Calendar.class) {
+            return "date";
+        } else if ((type == Integer.class) || (type == Long.class)) {
+            return "integer";
+        } else if ((type == Double.class) || (type == Float.class)) {
+            return "float";
+        } else if (type == Boolean.class) {
+            return "bool";
+        } else if (type.isEnum()) {
+            return "enum";
+        }
+
+        return null;
+    }
+
+    private static String objectToString(Object obj, Class<?> type) {
+        if (obj == null) {
+            return "null";
+        }
+
+        if (type == String.class) {
+            //return '"' + obj.toString() + '"';
+            return obj.toString();
+        } else if (type == Calendar.class) {
+            return new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(((Calendar) obj).getTime());
+        } else if ((type == Integer.class) || (type == Long.class) || (type == Double.class) || (type == Float.class)) {
+            return obj.toString();
+        } else if (type == Boolean.class) {
+            return ((boolean) (Boolean) obj) ? "true" : "false";
+        } else if (type.isEnum()) {
+            return obj.toString();
+        }
+
+        return null;
     }
 
     public static void printCmdLineUsage(String filter, boolean webHelp) {
@@ -426,14 +472,7 @@ public class CommandLineArgumentParser {
 
         if (filter == null || filter.equals("config")) {
             out.println(" " + (cnt++) + ") -config key=value[,key2=value2][,key3=value3...] [other parameters]");
-            out.print("  ...Sets configuration values. ");
-            if (!webHelp) {
-                out.print("Available keys[current setting]:");
-                for (ConfigurationItem item : commandlineConfigBoolean) {
-                    out.print(" " + item + "[" + item.get() + "]");
-                }
-            }
-
+            out.print("  ...Sets configuration values. Use -listconfigs command to list the available configuration settings.");
             out.println();
             out.println("    Values are boolean, you can use 0/1, true/false, on/off or yes/no.");
             out.println("    If no other parameters passed, configuration is saved. Otherwise it is used only once.");
@@ -904,6 +943,10 @@ public class CommandLineArgumentParser {
             parseCompareResources(args);
         } else if (nextParam.equals("--resourcedates")) {
             parseResourceDates(args);
+        } else if (nextParam.equals("-listconfigs")) {
+            printHeader();
+            printConfigurationSettings();
+            System.exit(0);
         } else if (nextParam.equals("-help") || nextParam.equals("--help") || nextParam.equals("/?") || nextParam.equals("\\_") /* /? translates as this on windows */) {
             printHeader();
             printCmdLineUsage(null, false);
@@ -966,6 +1009,7 @@ public class CommandLineArgumentParser {
         System.exit(1);
     }
 
+    @SuppressWarnings("unchecked")
     private static void setConfigurations(String cfgStr) {
         String[] cfgs;
         if (cfgStr.contains(",")) {
@@ -974,27 +1018,56 @@ public class CommandLineArgumentParser {
             cfgs = new String[]{cfgStr};
         }
 
+        Map<String, Field> fields = Configuration.getConfigurationFields(true);
         for (String c : cfgs) {
-            String[] cp;
-            if (c.contains("=")) {
-                cp = c.split("=");
-            } else {
-                cp = new String[]{c, "1"};
+            String[] cp = c.split("=");
+            if (cp.length == 1) {
+                cp = new String[]{cp[0], "1"};
             }
-            String key = cp[0];
-            String value = cp[1];
-            for (ConfigurationItem<Boolean> item : commandlineConfigBoolean) {
-                if (key.toLowerCase().equals(item.getName().toLowerCase())) {
-                    if (value != null) {
-                        Boolean bValue = parseBooleanConfigValue(value);
-                        if (bValue != null) {
-                            System.out.println("Config " + item.getName() + " set to " + bValue);
-                            item.set(bValue);
-                        } else {
-                            System.out.println("Invalid config value for " + item.getName() + ": " + value);
-                        }
-                    }
+
+            Field field = fields.get(cp[0].toLowerCase());
+            ConfigurationItem<?> item = ConfigurationItem.getItem(field);
+            String stringValue = cp[1];
+            Class<?> type = ConfigurationItem.getConfigurationFieldType(field);
+
+            if (type == String.class) {
+                System.out.println("Config " + item.getName() + " set to " + stringValue);
+                ((ConfigurationItem<String>) item).set(stringValue);
+            } else if (type == Calendar.class) {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                Date dateValue;
+                try {
+                    dateValue = dateFormat.parse(stringValue);
+                    GregorianCalendar calendarValue = new GregorianCalendar();
+                    calendarValue.setTime(dateValue);
+                    ((ConfigurationItem<Calendar>) item).set(calendarValue);
+                } catch (ParseException ex) {
+                    Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, null, ex);
                 }
+            } else if (type == Integer.class) {
+                int intValue = Integer.parseInt(stringValue);
+                ((ConfigurationItem<Integer>) item).set(intValue);
+            } else if ((type == Integer.class) || (type == Long.class)) {
+                long longValue = Long.parseLong(stringValue);
+                ((ConfigurationItem<Long>) item).set(longValue);
+            } else if (type == Double.class) {
+                double doubleValue = Double.parseDouble(stringValue);
+                ((ConfigurationItem<Double>) item).set(doubleValue);
+            } else if (type == Float.class) {
+                float floatValue = Float.parseFloat(stringValue);
+                ((ConfigurationItem<Float>) item).set(floatValue);
+            } else if (type == Boolean.class) {
+                Boolean boolValue = parseBooleanConfigValue(stringValue);
+                if (boolValue != null) {
+                    System.out.println("Config " + item.getName() + " set to " + boolValue);
+                    ((ConfigurationItem<Boolean>) item).set(boolValue);
+                } else {
+                    System.out.println("Invalid config value for " + item.getName() + ": " + stringValue);
+                }
+            } else if (type.isEnum()) {
+                Enum enumValue = Enum.valueOf((Class) type, stringValue);
+                ConfigurationItem uncheckedItem = (ConfigurationItem) item;
+                uncheckedItem.set(enumValue);
             }
         }
     }
@@ -1009,9 +1082,11 @@ public class CommandLineArgumentParser {
         if (value.equals("0") || value.equals("false") || value.equals("no") || value.equals("off")) {
             bValue = false;
         }
+
         if (value.equals("1") || value.equals("true") || value.equals("yes") || value.equals("on")) {
             bValue = true;
         }
+
         return bValue;
     }
 
@@ -1020,6 +1095,7 @@ public class CommandLineArgumentParser {
             System.err.println("Config values expected");
             badArguments("config");
         }
+
         setConfigurations(args.pop());
     }
 

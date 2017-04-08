@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationCategory;
 import com.jpexs.decompiler.flash.configuration.ConfigurationDirectory;
 import com.jpexs.decompiler.flash.configuration.ConfigurationFile;
-import com.jpexs.decompiler.flash.configuration.ConfigurationInternal;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
 import com.jpexs.decompiler.flash.gui.helpers.SpringUtilities;
 import com.jpexs.helpers.Helper;
@@ -337,8 +336,7 @@ public class AdvancedSettingsDialog extends AppDialog {
                     locName = resourceBundle.getString("config.name." + name);
                 } else { //if it is undocumented, then it must have ConfigurationInternal annotation
                     Field f = fields.get(name);
-                    ConfigurationInternal cint = f.getAnnotation(ConfigurationInternal.class);
-                    if (cint == null) {
+                    if (ConfigurationItem.isInternal(f)) {
                         throw new RuntimeException("Missing configuration name: " + name);
                     }
 
