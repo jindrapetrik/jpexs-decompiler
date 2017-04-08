@@ -336,7 +336,7 @@ public class AdvancedSettingsDialog extends AppDialog {
                     locName = resourceBundle.getString("config.name." + name);
                 } else { //if it is undocumented, then it must have ConfigurationInternal annotation
                     Field f = fields.get(name);
-                    if (ConfigurationItem.isInternal(f)) {
+                    if (!ConfigurationItem.isInternal(f)) {
                         throw new RuntimeException("Missing configuration name: " + name);
                     }
 
