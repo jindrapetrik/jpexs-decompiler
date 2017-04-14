@@ -99,7 +99,7 @@ public class ExportDialog extends AppDialog {
         {ButtonTag.class},
         {FontTag.class},
         {MorphShapeTag.class},
-        {SymbolClassTypeTag.class}
+        {SymbolClassTypeTag.class},
     };
 
     //Enum classes for values
@@ -116,14 +116,16 @@ public class ExportDialog extends AppDialog {
         ButtonExportMode.class,
         FontExportMode.class,
         MorphShapeExportMode.class,
-        SymbolClassExportMode.class
+        SymbolClassExportMode.class,
     };
 
     Class[] zoomClasses = {
         ShapeExportMode.class,
+        MorphShapeExportMode.class,
         TextExportMode.class,
         FrameExportMode.class,
-        MorphShapeExportMode.class
+        SpriteExportMode.class,
+        ButtonExportMode.class,
     };
 
     private final JComboBox[] combos;
