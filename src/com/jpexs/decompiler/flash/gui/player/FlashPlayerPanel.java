@@ -43,6 +43,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,6 +53,8 @@ import java.util.regex.Pattern;
  * @author JPEXS
  */
 public final class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
+
+    private static final Logger logger = Logger.getLogger(FlashPlayerPanel.class.getName());
 
     private final int setMovieDelay = Configuration.setMovieDelay.get();
 
@@ -175,6 +179,7 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
             // hack: Kernel32.INSTANCE.ConnectNamedPipe never completes in ActiveXControl static constructor
             flash = CancellableWorker.call(callable, 5, TimeUnit.SECONDS);
         } catch (ActiveXException | TimeoutException | InterruptedException | ExecutionException ex) {
+            logger.log(Level.WARNING, "Cannot initialize flash panel", ex);
             throw new FlashUnsupportedException();
         }
 
