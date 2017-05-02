@@ -44,6 +44,8 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
 
     protected int lastPatternId;
 
+    protected int lastFilterId;
+
     private final Color defaultColor;
 
     private final SWF swf;
@@ -106,6 +108,25 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
             if (img != null) {
                 if (colorTransform != null) {
                     colorTransform.apply(img);
+                }
+                if (colorTransform != null){
+                    lastFilterId++;
+                    String filterId = "FilterID_";
+                    filterId += lastFilterId;
+                    Element filter = exporter.createElement("filter");
+                    filter.setAttribute("id", filterId);
+                    Element feColorMatrix = exporter.createElement("feColorMatrix");
+                    feColorMatrix.setAttribute("in", "SourceGraphic");
+                    feColorMatrix.setAttribute("type", "matrix");
+                    feColorMatrix.setAttribute("values", "" +
+                            colorTransform.getRedMulti() + " 0 0 0 " + colorTransform.getRedAdd() + ", " +
+                            "0 " + colorTransform.getGreenMulti() + " 0 0 " + colorTransform.getGreenAdd() + ", " +
+                            "0 0 " + colorTransform.getBlueMulti() + " 0 " + colorTransform.getBlueAdd() + ", " +
+                            "0 0 0 " + colorTransform.getAlphaMulti() + " " + colorTransform.getAlphaAdd());
+
+                    filter.appendChild(feColorMatrix);
+                    exporter.addToGroup(filter);
+                    path.setAttribute("filter", "url(#" + filterId + ")");
                 }
 
                 int width = img.getWidth();
