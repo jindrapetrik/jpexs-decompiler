@@ -137,7 +137,7 @@ public class IntegerValueAVM2Item extends NumberValueAVM2Item implements Integer
         if (value >= -128 && value <= 127) {
             ins = new AVM2Instruction(0, AVM2Instructions.PushByte, new int[]{(int) (long) value});
         } else if (value >= -32768 && value <= 32767) {
-            ins = new AVM2Instruction(0, AVM2Instructions.PushShort, new int[]{((int) (long) value) & 0xffff});
+            ins = new AVM2Instruction(0, AVM2Instructions.PushShort, new int[]{((int) (long) value)});
         } else {
             ins = new AVM2Instruction(0, AVM2Instructions.PushInt, new int[]{((AVM2SourceGenerator) generator).abcIndex.getSelectedAbc().constants.getIntId(value, true)});
         }
