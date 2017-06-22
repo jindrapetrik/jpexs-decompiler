@@ -42,6 +42,8 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
 
     protected Element path;
 
+    protected int id;
+
     protected int lastPatternId;
 
     private final Color defaultColor;
@@ -50,9 +52,10 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
 
     private final SVGExporter exporter;
 
-    public SVGMorphShapeExporter(SWF swf, SHAPE shape, SHAPE endShape, SVGExporter exporter, Color defaultColor, ColorTransform colorTransform, double zoom) {
+    public SVGMorphShapeExporter(SWF swf, SHAPE shape, SHAPE endShape, int id, SVGExporter exporter, Color defaultColor, ColorTransform colorTransform, double zoom) {
         super(shape, endShape, colorTransform, zoom);
         this.swf = swf;
+        this.id = id;
         this.defaultColor = defaultColor;
         this.exporter = exporter;
     }
@@ -114,7 +117,7 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
                 int width = img.getWidth();
                 int height = img.getHeight();
                 lastPatternId++;
-                String patternId = "PatternID_" + lastPatternId;
+                String patternId = "PatternID_" + id + "_" + lastPatternId;
                 ImageFormat format = image.getImageFormat();
                 byte[] imageData = Helper.readStream(image.getImageData());
                 String base64ImgData = Helper.byteArrayToBase64String(imageData);

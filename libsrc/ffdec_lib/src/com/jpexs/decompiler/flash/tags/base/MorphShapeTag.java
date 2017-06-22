@@ -293,11 +293,11 @@ public abstract class MorphShapeTag extends DrawableTag {
         if (ratio == -2) {
             SHAPEWITHSTYLE beginShapes = getShapeAtRatio(0);
             SHAPEWITHSTYLE endShapes = getShapeAtRatio(65535);
-            SVGMorphShapeExporter shapeExporter = new SVGMorphShapeExporter(swf, beginShapes, endShapes, exporter, null, colorTransform, 1);
+            SVGMorphShapeExporter shapeExporter = new SVGMorphShapeExporter(swf, beginShapes, endShapes, getCharacterId(), exporter, null, colorTransform, 1);
             shapeExporter.export();
         } else {
             SHAPEWITHSTYLE shapes = getShapeAtRatio(ratio);
-            SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, shapes, exporter, null, colorTransform, 1);
+            SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, shapes, getCharacterId(), exporter, null, colorTransform, 1);
             shapeExporter.export();
         }
     }

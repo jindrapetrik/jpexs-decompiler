@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 - [#1348] Cannot properly export frame with cyrillic symbols to SVG
 - [#1354] Various FLA export problem fixes
 - [#1367] Raw edit conditional type fix.
+- [#1401] SVG export: duplicate pattern IDs fixed
 
 ## [10.0.0] - 2016-12-24
 ### Added

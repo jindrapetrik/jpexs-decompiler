@@ -701,7 +701,7 @@ public class DebuggerHandler implements DebugConnectionListener {
                             newBreakScriptName = modulePaths.get(message.file);
 
                         } else if (breakReason.reason != InBreakReason.REASON_SCRIPT_LOADED) {
-                            Logger.getLogger(DebuggerCommands.class.getName()).log(Level.SEVERE, "Invalid file: " + message.file);
+                            Logger.getLogger(DebuggerCommands.class.getName()).log(Level.SEVERE, "Invalid file: {0}", message.file);
                             return;
                         }
 

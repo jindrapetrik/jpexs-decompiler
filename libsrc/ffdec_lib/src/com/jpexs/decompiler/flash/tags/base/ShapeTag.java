@@ -180,7 +180,7 @@ public abstract class ShapeTag extends DrawableTag implements LazyObject {
 
     @Override
     public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) throws IOException {
-        SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, getShapes(), exporter, null, colorTransform, 1);
+        SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, getShapes(), getCharacterId(), exporter, null, colorTransform, 1);
         shapeExporter.export();
     }
 

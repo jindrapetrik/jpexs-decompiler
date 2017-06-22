@@ -236,7 +236,7 @@ public abstract class ImageTag extends DrawableTag {
 
     @Override
     public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) throws IOException {
-        SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, getShape(), exporter, null, colorTransform, 1);
+        SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, getShape(), getCharacterId(), exporter, null, colorTransform, 1);
         shapeExporter.export();
     }
 

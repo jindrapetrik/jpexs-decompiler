@@ -438,7 +438,7 @@ public abstract class TextTag extends DrawableTag {
     public static void drawBorderSVG(SWF swf, SVGExporter exporter, RGB borderColor, RGB fillColor, RECT rect, MATRIX textMatrix, ColorTransform colorTransform, double zoom) {
         exporter.createSubGroup(new Matrix(textMatrix), null);
         SHAPE shape = getBorderShape(borderColor, fillColor, rect);
-        SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, shape, exporter, null, colorTransform, zoom);
+        SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, shape, 0, exporter, null, colorTransform, zoom);
         shapeExporter.export();
         exporter.endGroup();
     }
@@ -750,7 +750,7 @@ public abstract class TextTag extends DrawableTag {
                         if (charId == null) {
                             charId = exporter.getUniqueId(Helper.getValidHtmlId("font_" + font.getFontNameIntag() + "_" + ch));
                             exporter.createDefGroup(null, charId);
-                            SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, shape, exporter, null, colorTransform, zoom);
+                            SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, shape, 0, exporter, null, colorTransform, zoom);
                             shapeExporter.export();
                             exporter.endGroup();
                             chs.put(entry.glyphIndex, charId);
