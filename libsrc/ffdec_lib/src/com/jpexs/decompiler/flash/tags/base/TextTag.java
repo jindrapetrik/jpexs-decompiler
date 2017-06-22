@@ -752,12 +752,11 @@ public abstract class TextTag extends DrawableTag {
                             exporter.createDefGroup(null, charId);
                             SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, shape, 0, exporter, null, colorTransform, zoom);
                             shapeExporter.export();
-                            if (exporter.endGroup()) {
-                                chs.put(entry.glyphIndex, charId);
+                            if (!exporter.endGroup()) {
+                                charId = "";
                             }
-                            else {
-                                chs.put(entry.glyphIndex, "");
-                            }
+
+                            chs.put(entry.glyphIndex, charId);
                         }
 
                         if (!"".equals(charId)) {
