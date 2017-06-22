@@ -144,11 +144,14 @@ public class SVGExporter {
         _svgGs.add(g);
     }
 
-    public void endGroup() {
+    public boolean endGroup() {
         Element g = _svgGs.pop();
         if (g.getChildNodes().getLength() == 0) {
             g.getParentNode().removeChild(g);
+            return false;
         }
+        
+        return true;
     }
 
     public final Element createSubGroup(Matrix transform, String id) {

@@ -752,15 +752,21 @@ public abstract class TextTag extends DrawableTag {
                             exporter.createDefGroup(null, charId);
                             SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, shape, 0, exporter, null, colorTransform, zoom);
                             shapeExporter.export();
-                            exporter.endGroup();
-                            chs.put(entry.glyphIndex, charId);
+                            if (exporter.endGroup()) {
+                                chs.put(entry.glyphIndex, charId);
+                            }
+                            else {
+                                chs.put(entry.glyphIndex, "");
+                            }
                         }
 
-                        Element charImage = exporter.addUse(mat, bounds, charId, null);
-                        RGBA colorA = new RGBA(textColor);
-                        charImage.setAttribute("fill", colorA.toHexRGB());
-                        if (colorA.alpha != 255) {
-                            charImage.setAttribute("fill-opacity", Float.toString(colorA.getAlphaFloat()));
+                        if (!"".equals(charId)) {
+                            Element charImage = exporter.addUse(mat, bounds, charId, null);
+                            RGBA colorA = new RGBA(textColor);
+                            charImage.setAttribute("fill", colorA.toHexRGB());
+                            if (colorA.alpha != 255) {
+                                charImage.setAttribute("fill-opacity", Float.toString(colorA.getAlphaFloat()));
+                            }
                         }
 
                         x += entry.glyphAdvance;
