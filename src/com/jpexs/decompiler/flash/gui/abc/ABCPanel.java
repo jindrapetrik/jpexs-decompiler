@@ -119,6 +119,7 @@ import javax.swing.JTable;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
+import javax.swing.ToolTipManager;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.EventListenerList;
 import javax.swing.event.TableModelListener;
@@ -820,6 +821,31 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
                 }
             }
         }
+        
+        public String TryGetDebugHoverToolTipText(String varName) {
+            String lowerName      = varName.toLowerCase();
+            StringBuilder builder = new StringBuilder();
+            
+            FindVarAndAppendDataToString(root, lowerName, builder);
+            String text = builder.toString();
+            
+            if (text == null || text.isEmpty())
+                return null;
+            else
+                return "<html>" + text + "</html>";
+        }
+
+        private void FindVarAndAppendDataToString(VariableNode node, String lowerVarName, StringBuilder builder) {
+            if (node.var != null && node.var.name.toLowerCase().contains(lowerVarName)) {
+                builder.append(node.var.name + ": " + node.var.getValueAsStr() + "<br>");
+            }
+            
+            if (node.childs != null) {
+                for (int i = 0; i < node.childs.size(); i++) {
+                    FindVarAndAppendDataToString(node.childs.get(i), lowerVarName, builder);
+                }
+            }
+        }
     }
 
     public ABCPanel(MainPanel mainPanel) {
@@ -847,6 +873,28 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
             }
         });
 
+        // Register the component on the tooltip manager
+        // So that #getToolTipText(MouseEvent) gets invoked when the mouse
+        // hovers the component, and we can show debug information
+        ToolTipManager.sharedInstance().registerComponent(decompiledTextArea);
+        decompiledTextArea.addMouseListener(new MouseAdapter() 
+        {    
+            final int initialTimeout = ToolTipManager.sharedInstance().getInitialDelay();
+            final int dismissTimeout = ToolTipManager.sharedInstance().getDismissDelay();
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                ToolTipManager.sharedInstance().setInitialDelay(0);
+                ToolTipManager.sharedInstance().setDismissDelay(1000 * 1000);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                ToolTipManager.sharedInstance().setInitialDelay(initialTimeout);
+                ToolTipManager.sharedInstance().setDismissDelay(dismissTimeout);
+            }
+        });
+        
         searchPanel = new SearchPanel<>(new FlowLayout(), this);
 
         decompiledScrollPane = new JScrollPane(decompiledTextArea);
@@ -1533,5 +1581,9 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         View.checkAccess();
 
         return detailPanel.isEditing() || isModified();
+    }
+    
+    public DebugPanel getDebugPanel() {
+        return debugPanel;
     }
 }

@@ -84,6 +84,7 @@ import javax.swing.SwingConstants;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.text.Highlighter;
+import javax.swing.text.JTextComponent;
 import javax.swing.tree.TreePath;
 import jsyntaxpane.SyntaxDocument;
 import jsyntaxpane.Token;
@@ -182,10 +183,12 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
 
     public String getStringUnderCursor() {
         View.checkAccess();
-
         int pos = decompiledEditor.getCaretPosition();
-
-        SyntaxDocument sDoc = ActionUtils.getSyntaxDocument(decompiledEditor);
+        return getStringUnderPosition(pos, decompiledEditor);
+    }
+    
+    public String getStringUnderPosition(int pos, JTextComponent component) {
+        SyntaxDocument sDoc = ActionUtils.getSyntaxDocument(component);
         if (sDoc != null) {
             Token t = sDoc.getTokenAt(pos + 1);
             String ident = null;

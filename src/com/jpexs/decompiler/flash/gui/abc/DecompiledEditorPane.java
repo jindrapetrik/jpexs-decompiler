@@ -46,6 +46,7 @@ import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.CancellableWorker;
 import java.awt.Point;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -788,5 +789,25 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
     public void setText(String t) {
         super.setText(t);
         setCaretPosition(0);
+    }
+
+    @Override
+    public String getToolTipText(MouseEvent e) {    
+        // not debugging: so return existing text
+        if (abcPanel.getDebugPanel().localsTable == null)
+           return super.getToolTipText();
+                
+        final Point point       = new Point(e.getX(), e.getY());
+        final int pos           = abcPanel.decompiledTextArea.viewToModel(point);
+        final String identifier = abcPanel.getMainPanel().getActionPanel().getStringUnderPosition(pos, abcPanel.decompiledTextArea);
+
+        if (identifier != null && !identifier.isEmpty())
+        {
+            String tooltipText = abcPanel.getDebugPanel().localsTable.TryGetDebugHoverToolTipText(identifier);
+            return (tooltipText == null ? super.getToolTipText() : tooltipText);
+        }
+        
+        // not found: so return existing text
+        return super.getToolTipText();
     }
 }
