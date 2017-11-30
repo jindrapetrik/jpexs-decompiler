@@ -85,6 +85,8 @@ public class DebugPanel extends JPanel {
 
     private boolean loading = false;
 
+    public ABCPanel.VariablesTableModel localsTable;
+    
     public static enum SelectedTab {
 
         LOG, STACK, SCOPECHAIN, LOCALS, REGISTERS, CALLSTACK, CONSTANTPOOL
@@ -346,6 +348,7 @@ public class DebugPanel extends JPanel {
                 synchronized (DebugPanel.this) {
 
                     SelectedTab oldSel = selectedTab;
+                    localsTable = null;
                     InFrame f = Main.getDebugHandler().getFrame();
                     if (f != null) {
 
@@ -362,7 +365,8 @@ public class DebugPanel extends JPanel {
                         localIds.addAll(f.argumentFrameIds);
                         localIds.addAll(f.frameIds);
 
-                        safeSetTreeModel(debugLocalsTable, new ABCPanel.VariablesTableModel(debugLocalsTable, locals, localIds));
+                        localsTable = new ABCPanel.VariablesTableModel(debugLocalsTable, locals, localIds);
+                        safeSetTreeModel(debugLocalsTable, localsTable);
                         safeSetTreeModel(debugScopeTable, new ABCPanel.VariablesTableModel(debugScopeTable, f.scopeChain, f.scopeChainFrameIds));
 
                         /*TableModelListener refreshListener = new TableModelListener() {

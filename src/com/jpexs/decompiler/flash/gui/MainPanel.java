@@ -823,7 +823,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         return abcPanel;
     }
 
-    private ActionPanel getActionPanel() {
+    public ActionPanel getActionPanel() {
         if (actionPanel == null) {
             actionPanel = new ActionPanel(MainPanel.this);
             displayPanel.add(actionPanel, CARDACTIONSCRIPTPANEL);
