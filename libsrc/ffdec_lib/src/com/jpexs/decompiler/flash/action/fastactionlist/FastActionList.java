@@ -463,14 +463,17 @@ public class FastActionList implements Collection<ActionItem> {
             return;
         }
 
-        do {
+        while (true) {
             if (!item.excluded) {
                 item = removeItem(item);
                 continue;
             }
 
             item = item.next;
-        } while (item != firstItem);
+            if (item == firstItem) {
+                break;
+            }
+        }
     }
 
     public int getUnreachableActionCount(ActionItem jump, ActionItem jumpTarget) {
