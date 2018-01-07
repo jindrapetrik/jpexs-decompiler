@@ -1662,12 +1662,16 @@ public class Main {
                     SWF swf = Main.getMainFrame().getPanel().getCurrentSwf();
 
                     String title = swf == null ? "?" : swf.getFileTitle();
-                    title = title + ":" + hash;
-                    String tfile;
+                    final String titleWithHash = title + ":" + hash;
                     try {
-                        tfile = tempFile(title);
+                        final String tfile = tempFile(titleWithHash);
                         Helper.writeFile(tfile, data);
-                        openFile(new SWFSourceInfo(null, tfile, title));
+                        View.execInEventDispatch(new Runnable() {
+                            @Override
+                            public void run() {
+                                openFile(new SWFSourceInfo(null, tfile, titleWithHash));
+                            }
+                        });
                     } catch (IOException ex) {
                         logger.log(Level.SEVERE, "Cannot create tempfile");
                     }
