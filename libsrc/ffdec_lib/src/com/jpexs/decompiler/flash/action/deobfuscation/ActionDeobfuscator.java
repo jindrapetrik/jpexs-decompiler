@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.deobfuscation;
 
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
@@ -433,13 +434,7 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
     }
 
     protected boolean isFakeName(String name) {
-        for (char ch : name.toCharArray()) {
-            if (ch > 31) {
-                return false;
-            }
-        }
-
-        return true;
+        return !IdentifiersDeobfuscation.isValidName(false, name);
     }
 
     private void executeActions(ActionItem item, LocalDataArea localData, ActionConstantPool constantPool, ExecutionResult result, Map<String, Object> fakeFunctions, boolean useVariables, boolean allowGetUninitializedVariables) throws InterruptedException {
