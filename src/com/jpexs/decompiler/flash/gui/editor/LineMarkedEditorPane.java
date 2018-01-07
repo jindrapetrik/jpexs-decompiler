@@ -215,11 +215,17 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
     }
 
     public void gotoLine(int line) {
-        setCaretPosition(ActionUtils.getDocumentPosition(this, line, 0));
+        int pos = ActionUtils.getDocumentPosition(this, line, 0);
+        if (pos != -1) {
+            setCaretPosition(pos);
+        }
     }
 
     public void gotoLineCol(int line, int column) {
-        setCaretPosition(ActionUtils.getDocumentPosition(this, line, column));
+        int pos = ActionUtils.getDocumentPosition(this, line, column);
+        if (pos != -1) {
+            setCaretPosition(pos);
+        }
     }
 
     public Point getLineLocation(int line) {
