@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
 - [#1367] Raw edit conditional type fix.
 - [#1401] SVG export: duplicate pattern IDs fixed
 - [#1402] SVG export: certain font characters not exported properly fixed
+- [#1430] AS 1/2 deobfuscation fixes
 
 ## [10.0.0] - 2016-12-24
 ### Added
