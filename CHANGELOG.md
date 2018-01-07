@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 - [#1333] Exporting sprites as swf files
 - [#1365] Allow to configure all types of configuration settings from command line
 - [#1369] Allow zoom in sprite (and button) export
+- Debug tooltips on hover
 
 ### Fixed
 - [#1327] P-code editing: error message and syntax highlighting fixed when instruction name contains upper cased letter
