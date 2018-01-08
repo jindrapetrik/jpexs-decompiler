@@ -54,7 +54,7 @@ public class NewVersionDialog extends AppDialog {
         JEditorPane changesText = new JEditorPane();
         changesText.setEditable(false);
         changesText.setFont(UIManager.getFont("TextField.font"));
-        SimpleDateFormat serverFormatter = new SimpleDateFormat("MM/dd/yyyy");
+        SimpleDateFormat serverFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         DateFormat formatter;
         String customFormat = translate("customDateFormat");
         if (customFormat.equals("default")) {
@@ -72,7 +72,7 @@ public class NewVersionDialog extends AppDialog {
                 changesStr.append("<hr />");
             }
             first = false;
-            changesStr.append("<b>").append(translate("version")).append(" ").append(v.versionName).append("</b><br />");
+            changesStr.append("<b>").append(v.versionName).append("</b><br />");
             String releaseDate = v.releaseDate;
             try {
                 Date date = serverFormatter.parse(releaseDate);
@@ -81,17 +81,10 @@ public class NewVersionDialog extends AppDialog {
                 Logger.getLogger(NewVersionDialog.class.getName()).log(Level.SEVERE, null, ex);
             }
             changesStr.append(translate("releasedate")).append(" ").append(releaseDate);
-            if (!v.changes.isEmpty()) {
-                changesStr.append("<br />");
-                changesStr.append("<pre>");
-                for (String type : v.changes.keySet()) {
-                    changesStr.append(type).append(":" + "<br />");
-                    for (String ch : v.changes.get(type)) {
-                        changesStr.append(" - ").append(ch).append("<br />");
-                    }
-                }
-                changesStr.append("</pre>");
-            }
+            changesStr.append("<br />");
+            changesStr.append("<pre>");
+            changesStr.append(v.description);
+            changesStr.append("</pre>");
         }
 
         changesStr.append("</html>");
@@ -102,7 +95,7 @@ public class NewVersionDialog extends AppDialog {
         changesText.setContentType("text/html");
         changesText.setText(changesStr.toString());
         if (latestVersion != null) {
-            JLabel newAvailableLabel = new JLabel("<html><b><center>" + translate("newversionavailable") + " " + latestVersion.appName + " " + translate("version") + " " + latestVersion.versionName + "</center></b></html>", SwingConstants.CENTER);
+            JLabel newAvailableLabel = new JLabel("<html><b><center>" + translate("newversionavailable") + " " + latestVersion.versionName + "</center></b></html>", SwingConstants.CENTER);
             newAvailableLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
             cnt.add(newAvailableLabel);
         }
@@ -140,16 +133,11 @@ public class NewVersionDialog extends AppDialog {
     }
 
     private void okButtonActionPerformed(ActionEvent evt) {
-        String url;
-        if (latestVersion.updateLink != null) {
-            url = latestVersion.updateLink;
-        } else {
-            url = ApplicationInfo.updateUrl;
-        }
+        String url = ApplicationInfo.UPDATE_URL;
         if (View.navigateUrl(url)) {
             Main.exit();
         } else {
-            View.showMessageDialog(null, translate("newvermessage").replace("%oldAppName%", ApplicationInfo.SHORT_APPLICATION_NAME).replace("%newAppName%", latestVersion.appName).replace("%projectPage%", ApplicationInfo.PROJECT_PAGE), translate("newversion"), JOptionPane.INFORMATION_MESSAGE);
+            View.showMessageDialog(null, translate("newvermessage").replace("%oldAppName%", ApplicationInfo.SHORT_APPLICATION_NAME).replace("%newAppName%", latestVersion.versionName).replace("%projectPage%", ApplicationInfo.PROJECT_PAGE), translate("newversion"), JOptionPane.INFORMATION_MESSAGE);
         }
 
         setVisible(false);

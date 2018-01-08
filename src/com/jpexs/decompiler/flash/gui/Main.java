@@ -16,6 +16,10 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonArray;
+import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
 import com.jpexs.debugger.flash.Debugger;
 import com.jpexs.debugger.flash.DebuggerCommands;
 import com.jpexs.debugger.flash.Variable;
@@ -2168,29 +2172,10 @@ public class Main {
         }
     }
 
-    public static boolean checkForUpdates() {
-        String currentVersion = ApplicationInfo.version;
-        if (currentVersion.equals("unknown")) {
-            // sometimes during development the version information is not available
-            return false;
-        }
-
-        List<String> accepted = new ArrayList<>();
-        if (Configuration.checkForUpdatesStable.get()) {
-            accepted.add("stable");
-        }
-        if (Configuration.checkForUpdatesNightly.get()) {
-            accepted.add("nightly");
-        }
-
-        if (accepted.isEmpty()) {
-            return false;
-        }
-
-        String acceptVersions = String.join(",", accepted);
+    private static JsonValue urlGetJson(String getUrl) {
         try {
             String proxyAddress = Configuration.updateProxyAddress.get();
-            URL url = new URL(ApplicationInfo.updateCheckUrl);
+            URL url = new URL(getUrl);
 
             URLConnection uc;
             if (proxyAddress != null && !proxyAddress.isEmpty()) {
@@ -2205,114 +2190,88 @@ public class Main {
             } else {
                 uc = url.openConnection();
             }
-            uc.setRequestProperty("X-Accept-Versions", acceptVersions);
-            uc.setRequestProperty("X-Update-Major", "" + UPDATE_SYSTEM_MAJOR);
-            uc.setRequestProperty("X-Update-Minor", "" + UPDATE_SYSTEM_MINOR);
             uc.setRequestProperty("User-Agent", ApplicationInfo.shortApplicationVerName);
-            String currentLoc = Configuration.locale.get("en");
-            uc.setRequestProperty("Accept-Language", currentLoc + ("en".equals(currentLoc) ? "" : ", en;q=0.8"));
-
             uc.connect();
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(uc.getInputStream()));
-            String s;
-            final java.util.List<Version> versions = new ArrayList<>();
-            String header = "";
-            Pattern headerPat = Pattern.compile("\\[([a-zA-Z0-9]+)\\]");
-            int updateMajor;
-            int updateMinor;
-            Version ver = null;
-            while ((s = br.readLine()) != null) {
-
-                Matcher m = headerPat.matcher(s);
-                if (m.matches()) {
-                    header = m.group(1);
-                    if (header.equals("version")) {
-                        ver = new Version();
-                        versions.add(ver);
-                    }
-                    if (header.equals("noversion")) {
-                        break;
-                    }
-                } else if (s.contains("=")) {
-                    String key = s.substring(0, s.indexOf('='));
-                    String val = s.substring(s.indexOf('=') + 1);
-                    if ("updateSystem".equals(header)) {
-                        if (key.equals("majorVersion")) {
-                            updateMajor = Integer.parseInt(val);
-                            if (updateMajor > UPDATE_SYSTEM_MAJOR) {
-                                break;
-                            }
-                        }
-                        if (key.equals("minorVersion")) {
-                            updateMinor = Integer.parseInt(val);
-                        }
-                    }
-                    if ("version".equals(header) && (ver != null)) {
-                        if (key.equals("versionId")) {
-                            ver.versionId = Integer.parseInt(val);
-                        }
-                        if (key.equals("versionName")) {
-                            ver.versionName = val;
-                        }
-                        if (key.equals("nightly")) {
-                            ver.nightly = val.equals("true");
-                        }
-                        if (key.equals("revision")) {
-                            ver.revision = val;
-                        }
-                        if (key.equals("build")) {
-                            ver.build = Integer.parseInt(val);
-                        }
-                        if (key.equals("major")) {
-                            ver.major = Integer.parseInt(val);
-                        }
-                        if (key.equals("minor")) {
-                            ver.minor = Integer.parseInt(val);
-                        }
-                        if (key.equals("release")) {
-                            ver.release = Integer.parseInt(val);
-                        }
-                        if (key.equals("longVersionName")) {
-                            ver.longVersionName = val;
-                        }
-                        if (key.equals("releaseDate")) {
-                            ver.releaseDate = val;
-                        }
-                        if (key.equals("appName")) {
-                            ver.appName = val;
-                        }
-                        if (key.equals("appFullName")) {
-                            ver.appFullName = val;
-                        }
-                        if (key.equals("updateLink")) {
-                            ver.updateLink = val;
-                        }
-                        if (key.equals("change[]")) {
-                            String changeType = val.substring(0, val.indexOf('|'));
-                            String change = val.substring(val.indexOf('|') + 1);
-                            if (!ver.changes.containsKey(changeType)) {
-                                ver.changes.put(changeType, new ArrayList<>());
-                            }
-                            List<String> chlist = ver.changes.get(changeType);
-                            chlist.add(change);
-                        }
-                    }
-                }
-            }
-
-            if (!versions.isEmpty()) {
-                View.execInEventDispatch(() -> {
-                    NewVersionDialog newVersionDialog = new NewVersionDialog(versions);
-                    newVersionDialog.setVisible(true);
-                    Configuration.lastUpdatesCheckDate.set(Calendar.getInstance());
-                });
-
-                return true;
-            }
+            JsonValue value = Json.parse(new InputStreamReader(uc.getInputStream()));
+            return value;
         } catch (IOException | NumberFormatException ex) {
+            return null;
+        }
+    }
+
+    public static boolean checkForUpdates() {
+        String currentVersion = ApplicationInfo.version;
+        if (currentVersion.equals("unknown")) {
+            // sometimes during development the version information is not available
             return false;
         }
+
+        boolean showStable = Configuration.checkForUpdatesStable.get();
+        boolean showNightly = Configuration.checkForUpdatesNightly.get();
+
+        if (!showStable && !showNightly) {
+            return false;
+        }
+
+        String currentTagName;
+        if (ApplicationInfo.nightly) {
+            currentTagName = "nightly" + ApplicationInfo.version_build;
+        } else {
+            currentTagName = "version" + ApplicationInfo.version_major + "." + ApplicationInfo.version_minor + "." + ApplicationInfo.version_release;
+        }
+
+        if (!showNightly) {
+            //prereleases are not shown as latest, when checking latest nightly, this is useless
+            JsonValue latestVersionInfoJson = urlGetJson(ApplicationInfo.GITHUB_RELEASES_LATEST_URL);
+            if (latestVersionInfoJson == null) {
+                return false;
+            }
+            String latestTagName = latestVersionInfoJson.asObject().get("tag_name").asString();
+            if (currentTagName.equals(latestTagName)) {
+                //no new version
+                return false;
+            }
+        }
+
+        JsonValue allChangesInfoJson = urlGetJson(ApplicationInfo.GITHUB_RELEASES_URL);
+        if (allChangesInfoJson == null) {
+            return false;
+        }
+        JsonArray arr = allChangesInfoJson.asArray();
+        final java.util.List<Version> versions = new ArrayList<>();
+        for (int i = 0; i < arr.size(); i++) {
+            JsonObject versionObj = arr.get(i).asObject();
+            String tagName = versionObj.get("tag_name").asString();
+            if (currentVersion.equals(tagName)) {
+                //Stop at current version, do not display more
+                break;
+            }
+            Version v = new Version();
+            v.versionName = versionObj.get("name").asString();
+            v.description = versionObj.get("body").asString();
+            v.releaseDate = versionObj.get("published_at").asString();
+            boolean isNightly = versionObj.get("prerelease").asBoolean();
+            if (isNightly && !showNightly) {
+                continue;
+            }
+
+            if (!isNightly && !showStable) {
+                continue;
+            }
+
+            versions.add(v);
+        }
+
+        if (!versions.isEmpty()) {
+            View.execInEventDispatch(() -> {
+                NewVersionDialog newVersionDialog = new NewVersionDialog(versions);
+                newVersionDialog.setVisible(true);
+                Configuration.lastUpdatesCheckDate.set(Calendar.getInstance());
+            });
+
+            return true;
+        }
+
         Configuration.lastUpdatesCheckDate.set(Calendar.getInstance());
         return false;
     }
