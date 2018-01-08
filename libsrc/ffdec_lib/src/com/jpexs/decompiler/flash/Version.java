@@ -26,31 +26,13 @@ import java.util.Map;
  */
 public class Version {
 
-    public int versionId;
-
-    public String revision;
+    public String tagName;
 
     public String versionName;
 
-    public String longVersionName;
-
     public String releaseDate;
 
-    public String appName;
+    public boolean prerelease;
 
-    public String appFullName;
-
-    public String updateLink;
-
-    public int major;
-
-    public int minor;
-
-    public int release;
-
-    public int build;
-
-    public boolean nightly;
-
-    public Map<String, List<String>> changes = new HashMap<>();
+    public String description;
 }

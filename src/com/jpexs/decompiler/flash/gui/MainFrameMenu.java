@@ -506,7 +506,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
             return;
         }
 
-        String helpUsURL = ApplicationInfo.PROJECT_PAGE + "/help_us.html?utm_source=app&utm_medium=menu&utm_campaign=app";
+        String helpUsURL = ApplicationInfo.PROJECT_PAGE;
         if (!View.navigateUrl(helpUsURL)) {
             View.showMessageDialog(null, translate("message.helpus").replace("%url%", helpUsURL));
         }
@@ -751,7 +751,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         setMenuEnabled("_/checkUpdates", !isWorking);
         setMenuEnabled("/help/checkUpdates", !isWorking);
-        setMenuEnabled("/help/helpUs", !isWorking);
+        //setMenuEnabled("/help/helpUs", !isWorking);
         setMenuEnabled("/help/homePage", !isWorking);
         setMenuEnabled("_/about", !isWorking);
         setMenuEnabled("/help/about", !isWorking);
@@ -1030,7 +1030,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         //Help
         addMenuItem("/help", translate("menu.help"), null, null, 0, null, false, null, false);
-        addMenuItem("/help/helpUs", translate("menu.help.helpus"), "donate32", this::helpUsActionPerformed, PRIORITY_TOP, null, true, null, false);
+        //addMenuItem("/help/helpUs", translate("menu.help.helpus"), "donate32", this::helpUsActionPerformed, PRIORITY_TOP, null, true, null, false);
         addMenuItem("/help/homePage", translate("menu.help.homepage"), "homepage16", this::homePageActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         addSeparator("/help");
         addMenuItem("/help/checkUpdates", translate("menu.help.checkupdates"), "update16", this::checkUpdatesActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
