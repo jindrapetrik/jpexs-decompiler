@@ -1,6 +1,4 @@
 #!/bin/bash
-# where nsis-3.0-src.tar.bz2, nsis-3.0-addon.zip, launch4j-3.9-linux.tgz is located on the web
-tools_mirror=https://www.free-decompiler.com/flash/travis_tools
 
 # Exit immediately on first error
 set -e
@@ -20,7 +18,8 @@ sudo apt-get install -y php5-cli
 # create directory where tools will be downloaded and installed
 mkdir $tools_dir
 
-#Download and unpack NSIS sources - Tool for making windows installers
+cp ./travis/tools/nsis-3.0-src.tar.bz2 .
+#Unpack NSIS sources - Tool for making windows installers
 wget -q $tools_mirror/nsis-3.0-src.tar.bz2
 bzip2 -d nsis-3.0-src.tar.bz2
 tar xvf nsis-3.0-src.tar -C $tools_dir >/dev/null  
@@ -33,12 +32,12 @@ mkdir share
 ln -s $tools_dir/nsis-3.0-src share/nsis
 cd -  
 
-#Download and extract some binary additional sources which NSIS needs and are part of Windows ZIP file
-wget -q $tools_mirror/nsis-3.0-addon.zip
+#Extract some binary additional sources which NSIS needs and are part of Windows ZIP file
+cp ./travis/tools/nsis-3.0-addon.zip .
 unzip -u nsis-3.0-addon.zip -d $tools_dir/nsis-3.0-src
 
-#Download and extract launch4j - tool for creating EXE file from Java
-wget -q $tools_mirror/launch4j-3.9-linux.tgz
+#Extract launch4j - tool for creating EXE file from Java
+cp ./travis/tools/launch4j-3.9-linux.tgz .
 tar zxvf launch4j-3.9-linux.tgz -C $tools_dir >/dev/null
 
 #Create tools.properties with paths to NSIS and launch4j
