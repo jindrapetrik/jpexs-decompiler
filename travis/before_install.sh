@@ -18,9 +18,8 @@ sudo apt-get install -y php5-cli
 # create directory where tools will be downloaded and installed
 mkdir $tools_dir
 
-cp ./travis/tools/nsis-3.0-src.tar.bz2 .
+cp ./travis/tools/nsis-3.0-src.tar.bz2 ./
 #Unpack NSIS sources - Tool for making windows installers
-wget -q $tools_mirror/nsis-3.0-src.tar.bz2
 bzip2 -d nsis-3.0-src.tar.bz2
 tar xvf nsis-3.0-src.tar -C $tools_dir >/dev/null  
 
@@ -33,11 +32,11 @@ ln -s $tools_dir/nsis-3.0-src share/nsis
 cd -  
 
 #Extract some binary additional sources which NSIS needs and are part of Windows ZIP file
-cp ./travis/tools/nsis-3.0-addon.zip .
+cp ./travis/tools/nsis-3.0-addon.zip ./
 unzip -u nsis-3.0-addon.zip -d $tools_dir/nsis-3.0-src
 
 #Extract launch4j - tool for creating EXE file from Java
-cp ./travis/tools/launch4j-3.9-linux.tgz .
+cp ./travis/tools/launch4j-3.9-linux.tgz ./
 tar zxvf launch4j-3.9-linux.tgz -C $tools_dir >/dev/null
 
 #Create tools.properties with paths to NSIS and launch4j
