@@ -4,10 +4,16 @@ before_install:
     - sudo chmod a+x ./travis/*.sh
     - ./travis/before_install.sh
 install: ./travis/install.sh
-script: ./travis/script.sh
+script: "source ./travis/script.sh"
 notifications:
   email:
     recipients:
       - developers@free-decompiler.com    
     on_success: change
     on_failure: always
+after_success: "source ./travis/after_success.sh"
+branches:
+  #it is not tagged as nightly
+  #commits marked as nightly were already built
+  only:
+    - /^(?!nightly).*/    
