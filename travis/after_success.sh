@@ -55,4 +55,3 @@ if [ "$DO_DEPLOY" = 1 ]; then
     git push --quiet myorigin :refs/tags/$DEPLOY_RELEASE_TO_REMOVE > /dev/null 2>&1        
   fi  
 fi
-         
