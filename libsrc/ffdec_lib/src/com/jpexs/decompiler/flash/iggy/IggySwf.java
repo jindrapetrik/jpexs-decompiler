@@ -22,7 +22,6 @@ public class IggySwf implements StructureInterface {
     String name;
 
     private List<IggyFont> fonts = new ArrayList<>();
-
     // private List<Long> font_data_addresses = new ArrayList<>();
     private List<IggyFont> add_fonts = new ArrayList<>();
 //    private List<Long> add_font_data_addresses = new ArrayList<>();
@@ -34,7 +33,6 @@ public class IggySwf implements StructureInterface {
     }
 
     private List<IggyText> texts = new ArrayList<>();
-
     //private List<Long> text_data_addresses = new ArrayList<>();
     private List<IggyText> add_texts = new ArrayList<>();
     //private List<Long> add_text_data_addresses = new ArrayList<>();
@@ -42,7 +40,6 @@ public class IggySwf implements StructureInterface {
     //private byte font_add_data[];
     //private List<Long> font_additional_size = new ArrayList<>();
     private IggyFontBinInfo font_bin_info[];
-
     private List<String> sequenceNames = new ArrayList<>();
     //private List<Long> sequenceValues = new ArrayList<>();
 
