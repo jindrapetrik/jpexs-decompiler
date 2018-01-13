@@ -11,6 +11,11 @@ sudo apt-get install -y zlib1g-dev
 sudo apt-get install -y lib32ncurses5 lib32z1
 #For unpacking unzip :-)
 sudo apt-get install -y unzip
+#For deploying
+sudo apt-get install -y jq
+sudo apt-get install -y curl
+#For parsing changelog
+sudo apt-get install -y php5-cli
 
 # create directory where tools will be downloaded and installed
 mkdir $tools_dir

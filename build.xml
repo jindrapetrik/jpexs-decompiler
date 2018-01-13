@@ -476,129 +476,10 @@
         
     </target>                    
     
-    <target name="-upload-fail" unless="upload.config.exists">
-        <fail message="Cannot upload - Website properties file missing. Create file named jpexs_website.properties and put username=xxx, password=yyy lines in there" />             
-    </target>
-    
     <target name="-set-none-newversion" unless="newversion.type">
         <property name="newversion.type" value="none"/>
-    </target>
-    <target name="-check-version-online" depends="-set-none-newversion,git-tag">      
-        <loadproperties srcfile="jpexs_website.properties" prefix="website"/>
-        <echo level="info">Checking version online: ${newversion.type}...</echo>
-        <!-- Note: You must have developer account to upload to JPEXS website -->
-        <java jar="${ant.lib.dir}/uploader.jar" fork="true" failonerror="true" outputproperty="newversion.prop">    
-            <arg value="${website.version.url}" />                
-
-            <arg value="-field" />
-            <arg value="mode" />
-            <arg value="commandline" />
-            
-            <arg value="-field" />
-            <arg value="set_username" />
-            <arg value="${website.username}" />
-
-            <arg value="-field" />
-            <arg value="set_password" />            
-            <arg value="${website.password}" />  
-            
-            <arg value="-field" />
-            <arg value="revision" />            
-            <arg value="${git.tag}" />
-            
-            <arg value="-field" />
-            <arg value="new" />            
-            <arg value="${newversion.type}" />
-            
-        </java>        
-        <echo file="${version_info}" message="${newversion.prop}" force=""/>
-    </target>
-    
-    <target name="-upload-do" if="upload.config.exists">
-        <loadproperties srcfile="jpexs_website.properties" prefix="website"/>
-        <echo level="info">Uploading...</echo>
-        <!-- Note: You must have developer account to upload to JPEXS website -->
-        <java jar="${ant.lib.dir}/uploader.jar" fork="true" failonerror="true">    
-            <arg value="${website.upload.url}" />                
-
-            <arg value="-field" />
-            <arg value="mode" />
-            <arg value="commandline" />
-            
-            <arg value="-field" />
-            <arg value="set_username" />
-            <arg value="${website.username}" />
-
-            <arg value="-field" />
-            <arg value="set_password" />            
-            <arg value="${website.password}" />  
-            
-            <arg value="-${upload.form.new.type}" />
-            <arg value="new" />            
-            <arg value="${upload.form.new.value}" />
-            
-            <arg value="-${upload.form.fixed.type}" />
-            <arg value="fixed" />            
-            <arg value="${upload.form.fixed.value}" />
-
-            <arg value="-file" />
-            <arg value="fileExe" />
-            <arg value="${exe.file}" />
-
-            <arg value="-file" />
-            <arg value="fileZip" />
-            <arg value="${zip.file}" />
-            
-            <arg value="-file" />
-            <arg value="fileOSXZip" />
-            <arg value="${osx.zip.file}" />
-            
-            <arg value="-file" />
-            <arg value="filePkg" />
-            <arg value="${pkg.file}" />
-            
-            <arg value="-file" />
-            <arg value="fileDeb" />
-            <arg value="${deb.file}" />
-
-            <arg value="-file" />
-            <arg value="fileLang" />
-            <arg value="${lang.file}" />
-            
-            <arg value="-file" />
-            <arg value="fileLib" />
-            <arg value="${lib.file}" />
-            
-        </java>
-    </target>
-    
-    
-    <target name="-upload-check-config">
-        <available file="jpexs_website.properties" property="upload.config.exists"/>
-    </target>
-    
-    <!-- Prepare upload dialog to not show (no changes in nightly) -->
-    <target name="-upload-check-nightly" if="nightly">
-        <property name="upload.form.new.type" value="emptyfield" />
-        <property name="upload.form.new.value" value="" />
-        
-        <property name="upload.form.fixed.type" value="emptyfield" />
-        <property name="upload.form.fixed.value" value="" />
-    </target>
-    
-    <!-- Prepare upload dialog to show -->
-    <target name="-upload-check-stable" unless="nightly">
-        <property name="upload.form.new.type" value="textarea" />
-        <property name="upload.form.new.value" value="New:" />
-        
-        <property name="upload.form.fixed.type" value="textarea" />
-        <property name="upload.form.fixed.value" value="Fixed:" />
-    </target>
-    
-    <target name="-upload" depends="-upload-check-nightly,-upload-check-stable,-upload-check-config,-upload-do,-upload-fail">        
-               
     </target>    
-    
+        
     <target name="dist" depends="build,exe">
         <copy todir="${dist.dir}">
             <fileset dir="${resources.dir}" includes="**/*.*"/>
@@ -901,29 +782,10 @@
         <property name="new.version" value="1" />
     </target>
     
-    <target name="new-version-major" depends="git-pull,-new-version-set,-inc-major,-check-version-online,all,-upload,git-push">
+    <target name="new-version" depends="-new-version-set,-set-none-newversion,all">
         
-    </target>
+    </target>          
     
-    <target name="new-version-minor" depends="git-pull,-new-version-set,-inc-minor,-check-version-online,all,-upload,git-push">
-        
-    </target>
-    
-    <target name="new-version-release" depends="git-pull,-new-version-set,-inc-release,-check-version-online,all,-upload,git-push">
-       
-    </target>
-       
-        
-    <target name="new-version-nightlybuild" depends="git-pull,-new-version-set,-inc-nightlybuild,-check-version-online,all,-upload,git-push">
-
-    </target>
-    
-    
-    <target name="upload-last" depends="all,-upload">
-        
-    </target>
-    
-        
     <target name="windows-home" >
         
     </target>
