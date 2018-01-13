@@ -47,8 +47,8 @@ else
       ant all            
     fi
   else
-    #if we are on dev branch
-    if [ $TRAVIS_BRANCH = "dev" ]; then    
+    #if we are on dev branch and it's not a pull request
+    if [ $TRAVIS_BRANCH = "dev" && $TRAVIS_PULL_REQUEST = "false" ]; then       
       # create nightly build...
       
       TAGGER_NAME="Travis CI"
@@ -66,7 +66,7 @@ else
       
       
       #generate prop file
-      VERSION_NUMBER=`echo $TRAVIS_TAG|sed 's/version//'`      
+      VERSION_NUMBER=$LAST_STABLE_VER     
       VERSION_MAJOR=`echo $VERSION_NUMBER|cut -d '.' -f 1`
       VERSION_MINOR=`echo $VERSION_NUMBER|cut -d '.' -f 2`
       VERSION_RELEASE=`echo $VERSION_NUMBER|cut -d '.' -f 3`                    
