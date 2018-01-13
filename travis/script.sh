@@ -102,5 +102,8 @@ else
           export DEPLOY_FILEVER_TAG="${VERSION_NUMBER}_nightly"
           export DO_DEPLOY=1                    
         fi
-    fi
+    else
+        #tag not set - regular build
+        ant all
+    fi    
 fi
