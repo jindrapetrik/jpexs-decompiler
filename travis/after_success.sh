@@ -18,16 +18,17 @@ if [ "$DO_DEPLOY" = 1 ]; then
   
   #List of files to upload
   DEPLOY_ATTACH_FILES_JSON='[
-{"file_name":"ffdec_${DEPLOY_FILEVER_TAG}_setup.exe","content_type":"application/exe"},
-{"file_name":"ffdec_${DEPLOY_FILEVER_TAG}.zip","content_type":"application/zip"},
-{"file_name":"ffdec_${DEPLOY_FILEVER_TAG}.deb","content_type":"application/vnd.debian.binary-package"},
-{"file_name":"ffdec_${DEPLOY_FILEVER_TAG}.pkg","content_type":"application/x-newton-compatible-pkg"},
-{"file_name":"ffdec_${DEPLOY_FILEVER_TAG}_macosx.zip","content_type":"application/zip"},
-{"file_name":"ffdec_${DEPLOY_FILEVER_TAG}_lang.zip","content_type":"application/zip"},
-{"file_name":"ffdec_lib_${DEPLOY_FILEVER_TAG}.zip","content_type":"application/zip"}
+{"file_name":"ffdec_'$DEPLOY_FILEVER_TAG'_setup.exe","content_type":"application/exe"},
+{"file_name":"ffdec_'$DEPLOY_FILEVER_TAG'.zip","content_type":"application/zip"},
+{"file_name":"ffdec_'$DEPLOY_FILEVER_TAG'.deb","content_type":"application/vnd.debian.binary-package"},
+{"file_name":"ffdec_'$DEPLOY_FILEVER_TAG'.pkg","content_type":"application/x-newton-compatible-pkg"},
+{"file_name":"ffdec_'$DEPLOY_FILEVER_TAG'_macosx.zip","content_type":"application/zip"},
+{"file_name":"ffdec_'$DEPLOY_FILEVER_TAG'_lang.zip","content_type":"application/zip"},
+{"file_name":"ffdec_lib_'$DEPLOY_FILEVER_TAG'.zip","content_type":"application/zip"}
 ]';
 
   #Attaching files...
+  echo "Attaching files..."
   NUM_FILES=`echo "$DEPLOY_ATTACH_FILES_JSON"|jq ".|length"`
   
   for (( i=0; i<$NUM_FILES; i++ ))
@@ -36,6 +37,10 @@ if [ "$DO_DEPLOY" = 1 ]; then
     CONTENT_TYPE=`echo "$ITEM_JSON"|jq --raw-output '.content_type'`
     FILE_NAME=`echo "$ITEM_JSON"|jq --raw-output '.file_name'`
     FILE_PATH=releases/$FILE_NAME
+    echo "Attaching $FILE_PATH ..."
+    if [ ! -f $FILE_PATH ]; then
+      echo "WARNING: File $FILE_PATH does not exist!"
+    fi
     
     curl --silent --request POST --data-binary @$FILE_PATH --header "Content-Type: $CONTENT_TYPE" --header "Accept: application/vnd.github.manifold-preview" --user $GITHUB_USER:$GITHUB_ACCESS_TOKEN https://uploads.github.com/repos/$GITHUB_REPO/releases/$RELEASE_ID/assets?name=$FILE_NAME>/dev/null
   done
@@ -54,4 +59,5 @@ if [ "$DO_DEPLOY" = 1 ]; then
     git tag -d $DEPLOY_RELEASE_TO_REMOVE
     git push --quiet myorigin :refs/tags/$DEPLOY_RELEASE_TO_REMOVE > /dev/null 2>&1        
   fi  
+  echo "FINISHED"
 fi
