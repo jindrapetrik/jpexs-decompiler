@@ -48,7 +48,7 @@ else
     fi
   else
     #if we are on dev branch and it's not a pull request
-    if [ $TRAVIS_BRANCH = "dev" && $TRAVIS_PULL_REQUEST = "false" ]; then       
+    if [ $TRAVIS_BRANCH = "dev" ] && [ $TRAVIS_PULL_REQUEST = "false" ]; then       
       # create nightly build...
       
       TAGGER_NAME="Travis CI"
