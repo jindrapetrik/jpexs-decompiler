@@ -901,6 +901,10 @@
         <property name="new.version" value="1" />
     </target>
     
+    <target name="new-version" depends="-new-version-set,-set-none-newversion,all">
+        
+    </target>
+    
     <target name="new-version-major" depends="git-pull,-new-version-set,-inc-major,-check-version-online,all,-upload,git-push">
         
     </target>
