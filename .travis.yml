@@ -2,8 +2,8 @@ language: java
 jdk: [oraclejdk8]
 before_install: 
     - sudo chmod a+x ./travis/*.sh
-    - ./travis/before_install.sh
-install: ./travis/install.sh
+    - "./travis/before_install.sh"
+install: "./travis/install.sh"
 script: "source ./travis/script.sh"
 notifications:
   email:
