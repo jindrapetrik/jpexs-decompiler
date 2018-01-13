@@ -478,37 +478,7 @@
     
     <target name="-set-none-newversion" unless="newversion.type">
         <property name="newversion.type" value="none"/>
-    </target>
-    <target name="-check-version-online" depends="-set-none-newversion,git-tag">      
-        <loadproperties srcfile="jpexs_website.properties" prefix="website"/>
-        <echo level="info">Checking version online: ${newversion.type}...</echo>
-        <!-- Note: You must have developer account to upload to JPEXS website -->
-        <java jar="${ant.lib.dir}/uploader.jar" fork="true" failonerror="true" outputproperty="newversion.prop">    
-            <arg value="${website.version.url}" />                
-
-            <arg value="-field" />
-            <arg value="mode" />
-            <arg value="commandline" />
-            
-            <arg value="-field" />
-            <arg value="set_username" />
-            <arg value="${website.username}" />
-
-            <arg value="-field" />
-            <arg value="set_password" />            
-            <arg value="${website.password}" />  
-            
-            <arg value="-field" />
-            <arg value="revision" />            
-            <arg value="${git.tag}" />
-            
-            <arg value="-field" />
-            <arg value="new" />            
-            <arg value="${newversion.type}" />
-            
-        </java>        
-        <echo file="${version_info}" message="${newversion.prop}" force=""/>
-    </target>
+    </target>    
         
     <target name="dist" depends="build,exe">
         <copy todir="${dist.dir}">
