@@ -99,7 +99,7 @@ else
       export DEPLOY_DESCRIPTION=`php ./travis/extract_changelog.php Unreleased`
       export DEPLOY_COMMITISH="dev"
       export DEPLOY_PRERELEASE=true
-      export DEPLOY_FILEVER_TAG="${VERSION_NUMBER}_nightly"
+      export DEPLOY_FILEVER_TAG="${VERSION_NUMBER}_nightly${NEXT_NIGHTLY_VER}"
       export DO_DEPLOY=1
     else
       #tag not set - regular build
