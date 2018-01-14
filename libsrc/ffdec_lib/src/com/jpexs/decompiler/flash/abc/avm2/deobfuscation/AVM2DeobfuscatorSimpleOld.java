@@ -160,7 +160,7 @@ public class AVM2DeobfuscatorSimpleOld extends SWFDecompilerAdapter {
         }
 
         // find jump targets
-        List<Integer> jumpTargets = new ArrayList<Integer>();
+        List<Integer> jumpTargets = new ArrayList<>();
         for (int i = 0; i < code.code.size(); i++) {
             AVM2Instruction ins = code.code.get(i);
             if (ins.definition instanceof JumpIns) {
