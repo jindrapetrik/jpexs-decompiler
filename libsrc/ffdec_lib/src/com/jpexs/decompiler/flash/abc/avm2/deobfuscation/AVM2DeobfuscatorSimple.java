@@ -153,9 +153,10 @@ public class AVM2DeobfuscatorSimple extends SWFDecompilerAdapter {
 
     protected boolean removeNullPushes(AVM2Code code, MethodBody body) throws InterruptedException {
         boolean result = false;
+        Set<Long> offsets = code.getImportantOffsets(body, true);
+
         // Deliberately skip over instruction zero
         for (int i = 1; i < code.code.size(); i++) {
-            Set<Long> offsets = code.getImportantOffsets(body, true);
             AVM2Instruction ins1 = code.code.get(i - 1);
             AVM2Instruction ins2 = code.code.get(i);
             if (ins2.definition instanceof PopIns
@@ -179,6 +180,7 @@ public class AVM2DeobfuscatorSimple extends SWFDecompilerAdapter {
                 i--;
                 code.removeInstruction(i, body);
                 i--;
+                offsets = code.getImportantOffsets(body, true); //update offsets, they changed because of removing instruction
                 result = true;
             }
         }
