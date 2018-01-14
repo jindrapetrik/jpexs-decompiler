@@ -220,7 +220,6 @@ public class AVM2DeobfuscatorSimpleOld extends SWFDecompilerAdapter {
                     || ins1.definition instanceof PushDoubleIns
                     || ins1.definition instanceof PushFalseIns
                     || ins1.definition instanceof PushIntIns
-                    || ins1.definition instanceof PushIntegerTypeIns
                     || ins1.definition instanceof PushNanIns
                     || ins1.definition instanceof PushNullIns
                     || ins1.definition instanceof PushShortIns
