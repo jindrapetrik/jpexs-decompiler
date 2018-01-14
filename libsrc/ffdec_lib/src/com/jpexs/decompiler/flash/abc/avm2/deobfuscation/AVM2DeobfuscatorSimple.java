@@ -154,34 +154,36 @@ public class AVM2DeobfuscatorSimple extends SWFDecompilerAdapter {
     protected boolean removeNullPushes(AVM2Code code, MethodBody body) throws InterruptedException {
         boolean result = false;
         // Deliberately skip over instruction zero
-        for(int i = 1; i < code.code.size(); i++) {
+        for (int i = 1; i < code.code.size(); i++) {
             Set<Long> offsets = code.getImportantOffsets(body, true);
             AVM2Instruction ins1 = code.code.get(i - 1);
             AVM2Instruction ins2 = code.code.get(i);
-            if(ins2.definition instanceof PopIns &&
-                !offsets.contains(ins2.getAddress()) &&
-                (ins1.definition instanceof PushByteIns ||
-                ins1.definition instanceof PushDoubleIns ||
-                ins1.definition instanceof PushFalseIns ||
-                ins1.definition instanceof PushIntIns ||
-                ins1.definition instanceof PushIntegerTypeIns ||
-                ins1.definition instanceof PushNanIns ||
-                ins1.definition instanceof PushNullIns ||
-                ins1.definition instanceof PushShortIns ||
-                ins1.definition instanceof PushStringIns ||
-                ins1.definition instanceof PushTrueIns ||
-                ins1.definition instanceof PushUIntIns ||
-                ins1.definition instanceof PushUndefinedIns)
-            ) {
+            if (ins2.definition instanceof PopIns
+                    && !offsets.contains(ins2.getAddress())
+                    && (ins1.definition instanceof PushByteIns
+                    || ins1.definition instanceof PushDoubleIns
+                    || ins1.definition instanceof PushFalseIns
+                    || ins1.definition instanceof PushIntIns
+                    || ins1.definition instanceof PushIntegerTypeIns
+                    || ins1.definition instanceof PushNanIns
+                    || ins1.definition instanceof PushNullIns
+                    || ins1.definition instanceof PushShortIns
+                    || ins1.definition instanceof PushStringIns
+                    || ins1.definition instanceof PushTrueIns
+                    || ins1.definition instanceof PushUIntIns
+                    || ins1.definition instanceof PushUndefinedIns)) {
                 if (Thread.currentThread().isInterrupted()) {
                     throw new InterruptedException();
                 }
 
-                code.removeInstruction(i - 1, body); i--;
-                code.removeInstruction(i, body); i--;
+                code.removeInstruction(i - 1, body);
+                i--;
+                code.removeInstruction(i, body);
+                i--;
                 result = true;
             }
-        } return result;
+        }
+        return result;
     }
 
     protected void initLocalRegs(LocalDataArea localData, int localReservedCount, int maxRegs, boolean executeFromFirst) {
