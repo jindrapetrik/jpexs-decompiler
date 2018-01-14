@@ -52,7 +52,7 @@ if [ "$DO_DEPLOY" = 1 ]; then
   
   FOOTER_WORK_ICONS=''
       for WORKS in ${WORKS_KEYS[@]}; do     
-         FOOTER_WORK_ICONS="$FOOTER_WORK_ICONS[${WORKS}_icon]: $ICONS_URL/images/os/24/${WORKS}.png
+         FOOTER_WORK_ICONS="$FOOTER_WORK_ICONS[${WORKS}_icon]: $ICONS_URL/os/24/${WORKS}.png
 "
        done
   
@@ -82,6 +82,7 @@ if [ "$DO_DEPLOY" = 1 ]; then
   FULL_MSG="$BODY
 ## What's new:
 $DEPLOY_DESCRIPTION
+
 $FOOTER"  
   
   
