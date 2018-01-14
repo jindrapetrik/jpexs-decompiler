@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - [#1365] Allow to configure all types of configuration settings from command line
 - [#1369] Allow zoom in sprite (and button) export
 - Debug tooltips on hover
+- AS3 deobfuscation - removing push instructions immediately followed by pop
 
 ### Fixed
 - [#1327] P-code editing: error message and syntax highlighting fixed when instruction name contains upper cased letter
@@ -1618,7 +1619,8 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Initial public release
 
-[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version9.0.0...dev
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version10.0.0...dev
+[10.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version9.0.0...version10.0.0
 [9.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version8.0.1...version9.0.0
 [8.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version8.0.0...version8.0.1
 [8.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version7.1.2...version8.0.0
