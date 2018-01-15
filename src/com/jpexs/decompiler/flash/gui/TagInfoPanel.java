@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.tags.TagInfo;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.util.List;
 import java.util.MissingResourceException;
 import java.util.logging.Level;
