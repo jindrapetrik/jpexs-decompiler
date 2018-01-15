@@ -30,19 +30,12 @@ import java.util.Collections;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.event.TableModelListener;
-import javax.swing.table.TableModel;
 import javax.swing.JEditorPane;
 
-import java.awt.Component;
 import java.awt.Font;
-import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLDocument;
 
 /**
