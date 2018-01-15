@@ -24,12 +24,26 @@ import java.util.List;
 import java.util.MissingResourceException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.ArrayList;
+import java.util.Collections;
+
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
+import javax.swing.JEditorPane;
+
+import java.awt.Component;
+import java.awt.Font;
+import javax.swing.JOptionPane;
+import javax.swing.UIManager;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.text.html.HTML;
+import javax.swing.text.html.HTMLDocument;
 
 /**
  *
@@ -39,114 +53,130 @@ public class TagInfoPanel extends JPanel {
 
     private final MainPanel mainPanel;
 
-    private final JTable infoTable = new JTable();
+    private final JEditorPane editorPane = new JEditorPane();
 
     private TagInfo tagInfo = new TagInfo();
 
     public TagInfoPanel(MainPanel mainPanel) {
         this.mainPanel = mainPanel;
-        infoTable.setModel(new InfoTableModel("general"));
         setLayout(new BorderLayout());
-        infoTable.setAutoCreateRowSorter(true);
         JLabel topLabel = new JLabel(AppStrings.translate("taginfo.header"), JLabel.CENTER);
         add(topLabel, BorderLayout.NORTH);
-        add(new JScrollPane(infoTable), BorderLayout.CENTER);
+        add(new JScrollPane(editorPane), BorderLayout.CENTER);
+
+        editorPane.setContentType("text/html");
+        editorPane.setEditable(false);
+
+        HyperlinkListener listener = new HyperlinkListener() {
+            @Override
+            public void hyperlinkUpdate(HyperlinkEvent hyperLink) {
+
+                if (HyperlinkEvent.EventType.ACTIVATED.equals(hyperLink.getEventType())) {
+                    String url = hyperLink.getDescription();
+                    String strId = url.substring(7);
+                    Integer id = Integer.parseInt(strId);
+
+                    mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentSwf().getCharacter(id));
+                }
+            }
+
+        };
+
+        editorPane.addHyperlinkListener(listener);
     }
 
     public void setTagInfos(TagInfo tagInfo) {
         this.tagInfo = tagInfo;
-        infoTable.setBackground(Color.WHITE);
-        infoTable.setModel(new InfoTableModel("general"));
+        buildHtmlContent();
     }
 
-    private class InfoTableModel implements TableModel {
+    private void buildHtmlContent() {
+        String categoryName = "general";
+        String result = "<html><body><table cellspacing='0' cellpadding='0'>";
+        Boolean flipFlop = false;
 
-        private final String categoryName;
+        List<TagInfo.TagInfoItem> items = tagInfo.getInfos().get(categoryName);
 
-        public InfoTableModel(String categoryName) {
-            this.categoryName = categoryName;
-        }
+        result += "<tr bgcolor='#FDFDFD'>";
+        result += "<td width='50%' style='text-align:center;'>";
+        result += mainPanel.translate("tagInfo.header.name");
+        result += "</td>";
+        result += "<td width='50%' style='text-align:center;'>";
+        result += mainPanel.translate("tagInfo.header.value");
+        result += "</td>";
+        result += "</tr>";
 
-        @Override
-        public int getRowCount() {
-            List<TagInfo.TagInfoItem> category = tagInfo.getInfos().get(categoryName);
-            if (category != null) {
-                return category.size();
-            }
+        for(TagInfo.TagInfoItem item : items) {
+            Boolean convertToCharacterList;
 
-            return 0;
-        }
+            flipFlop = !flipFlop;
 
-        @Override
-        public int getColumnCount() {
-            return 2;
-        }
+            result += "<tr bgcolor='" + (flipFlop ? "#FDFDFD" : "#F4F4F4") + "'>";
 
-        @Override
-        public String getColumnName(int columnIndex) {
-            switch (columnIndex) {
-                case 0:
-                    return mainPanel.translate("tagInfo.header.name");
-                case 1:
-                    return mainPanel.translate("tagInfo.header.value");
-            }
+            String name = item.getName();
+            String key = "tagInfo." + name;
 
-            return null;
-        }
+            convertToCharacterList = name == "dependentCharacters" || name == "neededCharacters";
 
-        @Override
-        public Class<?> getColumnClass(int columnIndex) {
-            return String.class;
-        }
-
-        @Override
-        public boolean isCellEditable(int rowIndex, int columnIndex) {
-            return false;
-        }
-
-        @Override
-        public Object getValueAt(int rowIndex, int columnIndex) {
-            List<TagInfo.TagInfoItem> category = tagInfo.getInfos().get(categoryName);
-            if (category != null) {
-                TagInfo.TagInfoItem item = category.get(rowIndex);
-
-                switch (columnIndex) {
-                    case 0:
-                        String name = item.getName();
-                        String key = "tagInfo." + name;
-                        try {
-                            name = mainPanel.translate(key);
-                        } catch (MissingResourceException mes) {
-                            if (Configuration._debugMode.get()) {
-                                Logger.getLogger(TagInfoPanel.class.getName()).log(Level.WARNING, "Resource not found: {0}", key);
-                            }
-                        }
-
-                        return name;
-                    case 1:
-                        Object value = item.getValue();
-                        if (value instanceof Boolean) {
-                            boolean boolValue = (boolean) value;
-                            return boolValue ? AppStrings.translate("yes") : AppStrings.translate("no");
-                        }
-
-                        return "" + value;
+            try {
+                name = mainPanel.translate(key);
+            } catch (MissingResourceException mes) {
+                if (Configuration._debugMode.get()) {
+                    Logger.getLogger(TagInfoPanel.class.getName()).log(Level.WARNING, "Resource not found: {0}", key);
                 }
             }
 
-            return null;
+            result += "<td>" + name + "</td>";
+
+            Object value = item.getValue();
+            if (value instanceof Boolean) {
+                boolean boolValue = (boolean) value;
+                value = boolValue ? AppStrings.translate("yes") : AppStrings.translate("no");
+            } else if(convertToCharacterList) {
+                String strValue = (String) value;
+                String[] strIds = strValue.split(", ");
+                List<Integer> sortedIds = new ArrayList<Integer>();
+                strValue = "";
+
+                for(String strId : strIds) {
+                    sortedIds.add(Integer.parseInt(strId));
+                }
+
+                Collections.sort(sortedIds);
+
+                for(int id : sortedIds) {
+                    strValue += "<a href='jump://" + id + "'>" + id + "</a>, ";
+                }
+
+                value = strValue.substring(0, strValue.length() - 2);
+            }
+
+            result += "<td>" + value + "</td>";
+
+            result += "</tr>";
         }
 
-        @Override
-        public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-        }
+        result += "</table></body></html>";
 
-        @Override
-        public void addTableModelListener(TableModelListener l) {
-        }
+        editorPane.setText(result);
 
-        @Override
-        public void removeTableModelListener(TableModelListener l) {
-        }
+        Font font = UIManager.getFont("Label.font");
+        String bodyRule = "body { font-family: " + font.getFamily() + ";"
+            + " font-size: " + font.getSize() + "pt;"
+            + "}"
+            + " table {"
+            + " width:100%;"
+            + " color:#053E6A;"
+            + " padding:1px;"
+            + "}"
+            + "td { border: 1px solid #e4e4e4; }"
+            + "html { border: 1px solid #789AC4; }"
+            ;
+
+        ((HTMLDocument)editorPane.getDocument()).getStyleSheet().addRule(bodyRule);
+
+        editorPane.setOpaque(false);
+        editorPane.setBorder(null);
+        editorPane.setEditable(false);
     }
 }
