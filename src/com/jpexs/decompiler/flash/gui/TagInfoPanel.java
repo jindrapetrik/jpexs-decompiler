@@ -128,7 +128,7 @@ public class TagInfoPanel extends JPanel {
             } else if (convertToCharacterList) {
                 String strValue = (String) value;
                 String[] strIds = strValue.split(", ");
-                List<Integer> sortedIds = new ArrayList<Integer>();
+                List<Integer> sortedIds = new ArrayList<>();
                 strValue = "";
 
                 for (String strId : strIds) {
