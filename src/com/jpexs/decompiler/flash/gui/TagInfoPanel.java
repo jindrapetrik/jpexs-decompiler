@@ -108,7 +108,7 @@ public class TagInfoPanel extends JPanel {
             String name = item.getName();
             String key = "tagInfo." + name;
 
-            convertToCharacterList = name == "dependentCharacters" || name == "neededCharacters";
+            convertToCharacterList = name.equals("dependentCharacters") || name.equals("neededCharacters");
 
             try {
                 name = mainPanel.translate(key);
