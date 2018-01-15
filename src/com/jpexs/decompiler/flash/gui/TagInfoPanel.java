@@ -106,7 +106,7 @@ public class TagInfoPanel extends JPanel {
         result += "</td>";
         result += "</tr>";
 
-        for(TagInfo.TagInfoItem item : items) {
+        for (TagInfo.TagInfoItem item : items) {
             Boolean convertToCharacterList;
 
             flipFlop = !flipFlop;
@@ -132,19 +132,19 @@ public class TagInfoPanel extends JPanel {
             if (value instanceof Boolean) {
                 boolean boolValue = (boolean) value;
                 value = boolValue ? AppStrings.translate("yes") : AppStrings.translate("no");
-            } else if(convertToCharacterList) {
+            } else if (convertToCharacterList) {
                 String strValue = (String) value;
                 String[] strIds = strValue.split(", ");
                 List<Integer> sortedIds = new ArrayList<Integer>();
                 strValue = "";
 
-                for(String strId : strIds) {
+                for (String strId : strIds) {
                     sortedIds.add(Integer.parseInt(strId));
                 }
 
                 Collections.sort(sortedIds);
 
-                for(int id : sortedIds) {
+                for (int id : sortedIds) {
                     strValue += "<a href='jump://" + id + "'>" + id + "</a>, ";
                 }
 
@@ -162,18 +162,17 @@ public class TagInfoPanel extends JPanel {
 
         Font font = UIManager.getFont("Label.font");
         String bodyRule = "body { font-family: " + font.getFamily() + ";"
-            + " font-size: " + font.getSize() + "pt;"
-            + "}"
-            + " table {"
-            + " width:100%;"
-            + " color:#053E6A;"
-            + " padding:1px;"
-            + "}"
-            + "td { border: 1px solid #e4e4e4; }"
-            + "html { border: 1px solid #789AC4; }"
-            ;
+                + " font-size: " + font.getSize() + "pt;"
+                + "}"
+                + " table {"
+                + " width:100%;"
+                + " color:#053E6A;"
+                + " padding:1px;"
+                + "}"
+                + "td { border: 1px solid #e4e4e4; }"
+                + "html { border: 1px solid #789AC4; }";
 
-        ((HTMLDocument)editorPane.getDocument()).getStyleSheet().addRule(bodyRule);
+        ((HTMLDocument) editorPane.getDocument()).getStyleSheet().addRule(bodyRule);
 
         editorPane.setOpaque(false);
         editorPane.setBorder(null);
