@@ -1502,6 +1502,11 @@ All notable changes to this project will be documented in this file.
 - AS3: Method info editor fixed
 - Edittext & Button displaying
 
+## [1.2.0 update 1] - 2013-01-19
+## Fixed
+- [#27] Problems on loading DefineSceneAndFrameLabel
+- CSMTextSettings tag writing fix
+
 ## [1.2.0] - 2013-01-19
 ### Added
 - Displaying various SWF objects (shapes, sprites,...) with flash player library (Windows only, sorry).
