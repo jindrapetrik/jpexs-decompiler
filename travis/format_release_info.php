@@ -78,7 +78,7 @@ else //-json
       fwrite(STDERR,"Datafile $json_file does not exist\n");
       exit(1);
    }
-   $files = json_decode(file_get_contents($json_file));
+   $files = json_decode(file_get_contents($json_file),true);
    if($files === null)
    {
       fwrite(STDERR,"Cannot load data from $json_file\n");
