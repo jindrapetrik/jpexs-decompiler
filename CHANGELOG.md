@@ -11,6 +11,14 @@ All notable changes to this project will be documented in this file.
 - Debug tooltips on hover
 - AS3 deobfuscation - removing push instructions immediately followed by pop
 
+### Changed
+- Homepage is now on GitHub jindrapetrik/jpexs-decompiler instead of free-decompiler.com
+- Update checking now checks changes on GitHub releases
+
+### Removed
+- Removed help us section
+- Removed changeslog from new version dialog
+
 ### Fixed
 - [#1327] P-code editing: error message and syntax highlighting fixed when instruction name contains upper cased letter
 - [#1343] AS 1/2 direct editation critical bug
