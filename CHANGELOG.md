@@ -1717,7 +1717,8 @@ All notable changes to this project will be documented in this file.
 [1.4.0 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.4.0...version1.4.0u1
 [1.4.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.3.1...version1.4.0
 [1.3.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.3.0...version1.3.1
-[1.3.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.2.0...version1.3.0
+[1.3.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.2.0u1...version1.3.0
+[1.2.0 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.2.0...version1.2.0u1
 [1.2.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.1.0...version1.2.0
 [1.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.0.1...version1.1.0
 [1.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.0.0...version1.0.1
