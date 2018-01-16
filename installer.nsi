@@ -402,11 +402,6 @@ var SMDir
   Exch $R2
 !macroend
 
-Function HelpUsClick
-  ExecShell "Open" "https://www.free-decompiler.com/flash/help_us.html"
-FunctionEnd
-
-
 !define un.StrRep "!insertmacro un.StrRep"
 !macro un.StrRep output string old new
     Push `${string}`
@@ -496,26 +491,6 @@ Function AddContextClick
   ${NSD_GetState} $1 $AddToContextMenu
 FunctionEnd
 */
-Function CUSTOM_PAGE_HELPUS
-
-  nsDialogs::create /NOUNLOAD 1018
-  pop $1
-
-
-  !insertmacro MUI_HEADER_TEXT "$(STRING_HELP_US)" "$(STRING_HELP_US_DOYOU)"
-  ${NSD_CreateLabel} 0 0 100% 50  "$(STRING_HELP_US_FREE)"
-  pop $1
-  ${NSD_CreateLabel} 0 75 100% 50  "$(STRING_HELP_US_DONATE)"
-  pop $1
-  ${NSD_CreateLabel} 0 150 200 25  "$(STRING_HELP_US_MORE)"
-  pop $1
-  ${NSD_CreateButton} 225 145 80 25 "$(STRING_HELP_US_BUTTON)"
-  pop $1
-  ${NSD_OnClick} $1 HelpUsClick
-  nsDialogs::Show
-
-FunctionEnd
-
 
 Function IndexOf
 Exch $R0
