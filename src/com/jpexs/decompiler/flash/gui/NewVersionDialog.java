@@ -48,7 +48,7 @@ public class NewVersionDialog extends AppDialog {
     private Version latestVersion;
 
     public NewVersionDialog(List<Version> versions) {
-        setSize(new Dimension(500, 300));
+        setSize(new Dimension(300, 150));
         Container cnt = getContentPane();
         cnt.setLayout(new BoxLayout(cnt, BoxLayout.PAGE_AXIS));
         JEditorPane changesText = new JEditorPane();
@@ -95,20 +95,33 @@ public class NewVersionDialog extends AppDialog {
         changesText.setContentType("text/html");
         changesText.setText(changesStr.toString());
         if (latestVersion != null) {
+            String releaseDate = latestVersion.releaseDate;
+            try {
+                Date date = serverFormatter.parse(releaseDate);
+                releaseDate = formatter.format(date);
+            } catch (ParseException ex) {
+                Logger.getLogger(NewVersionDialog.class.getName()).log(Level.SEVERE, null, ex);
+            }
             JLabel newAvailableLabel = new JLabel("<html><b><center>" + translate("newversionavailable") + " " + latestVersion.versionName + "</center></b></html>", SwingConstants.CENTER);
             newAvailableLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
             cnt.add(newAvailableLabel);
+
+            JPanel spacePanel = new JPanel();
+            spacePanel.setMinimumSize(new Dimension(1, 10));
+            cnt.add(spacePanel);
+
+            JLabel releaseDateLabel = new JLabel("<html><center>" + translate("releasedate") + " " + releaseDate + "</center></html>", SwingConstants.CENTER);
+            cnt.add(releaseDateLabel);
+
+            JPanel spacePanel2 = new JPanel();
+            spacePanel2.setMinimumSize(new Dimension(1, 10));
+            cnt.add(spacePanel2);
+
+            releaseDateLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
         }
 
-        JLabel changeslogLabel = new JLabel("<html>" + translate("changeslog") + "</html>");
-        changeslogLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
-        cnt.add(changeslogLabel);
-
-        JScrollPane span = new JScrollPane(changesText);
-        span.setAlignmentX(JLabel.CENTER_ALIGNMENT);
-        cnt.add(span);
         JPanel buttonsPanel = new JPanel(new FlowLayout());
-        JButton buttonOk = new JButton(translate("button.ok"));
+        JButton buttonOk = new JButton(AppStrings.translate("menu.help.homepage")); //"Visit homepage"
         buttonOk.addActionListener(this::okButtonActionPerformed);
 
         JButton buttonCancel = new JButton(translate("button.cancel"));
@@ -118,9 +131,6 @@ public class NewVersionDialog extends AppDialog {
         buttonsPanel.add(buttonCancel);
         buttonsPanel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
 
-        JLabel downloadNowLabel = new JLabel("<html><b><center>" + translate("downloadnow") + "</center></b></html>", SwingConstants.CENTER);
-        downloadNowLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
-        cnt.add(downloadNowLabel);
         cnt.add(buttonsPanel);
 
         setResizable(false);

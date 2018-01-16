@@ -2248,7 +2248,10 @@ public class Main {
             }
             Version v = new Version();
             v.versionName = versionObj.get("name").asString();
-            v.description = versionObj.get("body").asString();
+            //v.description = versionObj.get("body").asString();
+            //Note: "body" is Markdown formatted and contains other things than changeslog, 
+            //we cannot show it in FFDec correctly.
+            v.description = "";
             v.releaseDate = versionObj.get("published_at").asString();
             boolean isNightly = versionObj.get("prerelease").asBoolean();
             if (isNightly && !showNightly) {
