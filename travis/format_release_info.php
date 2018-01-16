@@ -173,6 +173,19 @@ foreach ($files as $f) {
 }
 
 $changelog_data = get_changelog_section($changelog_path,$changelog_section);
+$full_changelog = file_get_contents($changelog_path);
+if(preg_match_all('/\[([^\]]+)\][^(]/', $changelog_data."\n",$m))      
+{
+   $references = $m[1];
+   foreach($references as $r)
+   {
+      if(preg_match("/\[".preg_quote($r,"/")."\]:(.*)/", $full_changelog,$m2)){
+         $referenced_link = trim($m2[1]);
+         $footer_links[$r] = $referenced_link;         
+      }
+   }   
+}
+
 if($changelog_data === false)
 {
    fwrite(STDERR, "Cannot load changelog data\n");
