@@ -442,13 +442,13 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - Better gif exporter
-- [#772]: closing loading dialog now cancels the loading of the swf
+- [#772] closing loading dialog now cancels the loading of the swf
 - [#762] export pcode with different extension
 
 ### Fixed
 - CRITICAL: Update System Bug causing updates not working
 - [#862] AS3 asm: do not read beyond return/throw instructions
-- [#865], [#613]: ribbon prefered width fix
+- [#865], [#613] ribbon prefered width fix
 - [#868] export path fix, allow to export buttons
 - [#865] TagTree font size problem on high resolution screens
 - [#713],[#807] Installer for 4.0+ fails to access Adobe Website
@@ -463,7 +463,7 @@ All notable changes to this project will be documented in this file.
 
 ## [5.0.1] - 2015-04-18
 ### Fixed
-- [#860]: Opening bundle (zip, swc, any binary file) files fixed
+- [#860] Opening bundle (zip, swc, any binary file) files fixed
 
 ## [5.0.0] - 2015-04-18
 ### Added
@@ -591,13 +591,13 @@ All notable changes to this project will be documented in this file.
 - [#716],[#717],[#718] Proxy - save SWF, replace, copy URL, filesizes, table design
 
 ### Changed
-- [#720]: edited shape tag is not marked as modified after replacing
+- [#720] edited shape tag is not marked as modified after replacing
 - reorganized about dialog
 
 ### Fixed
 - [#719] null swf name in Proxy after cancelling rename dialog
 - flashplayer - font display
-- [#723]: saving swf with invalid referenced characters
+- [#723] saving swf with invalid referenced characters
 - DefineCompactedFont paging
 - [#288] Less memory usage during FLA export
 - Corrected syntax hilighting for AS3 P-code
@@ -794,7 +794,7 @@ All notable changes to this project will be documented in this file.
 - Advanced settings dialog with tabs, config names, descriptions
 
 ### Fixed
-- [#561], [#509], [#433]: AS3 EmptyStackException fix - correct hasnext2 arguments
+- [#561], [#509], [#433] AS3 EmptyStackException fix - correct hasnext2 arguments
 - Internal viewer: Filters fix
 
 ## [2.0.1 update 2] - 2014-04-05
@@ -817,7 +817,7 @@ All notable changes to this project will be documented in this file.
 - Internal viewer: Sounds on stage
 - All sounds to WAV export
 - Internal viewer: Showing texts, dynamic text border/fill
-- [#504]: Unicode characters in JSyntaxPane
+- [#504] Unicode characters in JSyntaxPane
 - Internal viewer: showing object under cursor
 - Folder icons
 - Sound/Image format on command line.
@@ -844,7 +844,7 @@ All notable changes to this project will be documented in this file.
 - Generic tag tree editor
 - Timeline view (stub only)
 - FLA export to CS5, CS5.5, CC format (previously only CS6 was supported)
-- [#513]: command line option to extract swf from binary file
+- [#513] command line option to extract swf from binary file
 - Configurable code formatting (Indentation + brace position)
 - [#262] Export FLA: Font character ranges export
 - Configurable checking for updates
