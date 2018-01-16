@@ -527,7 +527,7 @@
         </copy>                                
         <echo file="${locales.target.dir}/readme.txt">${project.name} ${version}${version.suffix} localization pack
             -------------------------------------------------------------------            
-            Please follow instructions on https://www.free-decompiler.com/flash/translations/
+            Please follow instructions on https://github.com/jindrapetrik/jpexs-decompiler
         </echo>
         <property name="lang.file" value="${releases.dir}/${prefix.filename}_${version}${version.suffix}_lang.zip" />
         <zip destfile="${lang.file}" basedir="${locales.target.dir}"/>
