@@ -11,7 +11,7 @@
   !define APP_VER "0.0"
   !define APP_VER_MAJOR 0
   !define APP_VER_MINOR 0
-  !define APP_URL "https://www.free-decompiler.com/flash/"
+  !define APP_URL "https://github.com/jindrapetrik/jpexs-decompiler"
   !define APP_PUBLISHER "JPEXS"
   !define APP_NAME "JPEXS Free Flash Decompiler"
   !define JRE_VERSION "1.8"
@@ -304,7 +304,7 @@ var SMDir
   !insertmacro MUI_PAGE_STARTMENU 0 $SMDir
   ;Page custom CUSTOM_PAGE_CONTEXTMENU
   !insertmacro MUI_PAGE_INSTFILES
-  Page custom CUSTOM_PAGE_HELPUS
+  ;Page custom CUSTOM_PAGE_HELPUS
 !define MUI_FINISHPAGE_RUN "$INSTDIR\${APP_EXENAME}"
   !insertmacro MUI_PAGE_FINISH
 
