@@ -125,7 +125,7 @@ The application was made in Czech republic.
 ## Licenses + Acknowledgments
 ### Application
 
-FFDec Application is licensed with GNU GPL v3, see the [LICENSE.md](LICENSE.md).
+FFDec Application is licensed with GNU GPL v3, see the [license.txt](license.txt).
 It uses modified code of these libraries:
 
 * [JSyntaxPane] (Code editor) - Apache License 2.0
