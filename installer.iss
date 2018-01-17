@@ -4,7 +4,7 @@
 #define MyAppName "JPEXS Free Flash Decompiler"
 #include "installer.cfg"
 #define MyAppPublisher "JPEXS"
-#define MyAppURL "http://www.free-decompiler.com/flash/"
+#define MyAppURL "https://github.com/jindrapetrik/jpexs-decompiler"
 #define MyAppExeName "ffdec.exe"
 
 [Setup]

@@ -1,19 +1,18 @@
 /*
- *  Copyright (C) 2010-2016 JPEXS, All rights reserved.
- *
+ *  Copyright (C) 2010-2018 JPEXS, All rights reserved.
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
+ * License along with this library. */
 package com.jpexs.decompiler.flash;
 
 import java.io.IOException;
@@ -53,17 +52,24 @@ public class ApplicationInfo {
 
     public static String shortApplicationVerName;
 
-    public static final String PROJECT_PAGE = "https://www.free-decompiler.com/flash";
+    public static final String GIT_HUB_PROJECT = "jindrapetrik/jpexs-decompiler";
+
+    public static final String PROJECT_PAGE = "https://github.com/" + GIT_HUB_PROJECT;
 
     /**
      * URL for checking new updates
      */
-    public static String updateCheckUrl = "https://www.free-decompiler.com/flash/update/check/?currentVersion=<version>&currentRevision=<revision>&currentVersionMajor=<version.major>&currentVersionMinor=<version.minor>&currentVersionRelease=<version.release>&currentVersionBuild=<version.build>&currentNightly=<nightly>";
+    public static final String GITHUB_RELEASES_LATEST_URL = "https://api.github.com/repos/" + GIT_HUB_PROJECT + "/releases/latest";
+
+    /**
+     * URL for checking new updates
+     */
+    public static final String GITHUB_RELEASES_URL = "https://api.github.com/repos/" + GIT_HUB_PROJECT + "/releases";
 
     /**
      * URL for doing update
      */
-    public static String updateUrl = "https://www.free-decompiler.com/flash/update/update/?currentVersion=<version>&currentRevision=<revision>&currentVersionMajor=<version.major>&currentVersionMinor=<version.minor>&currentVersionRelease=<version.release>&currentVersionBuild=<version.build>&currentNightly=<nightly>";
+    public static String UPDATE_URL = PROJECT_PAGE;
 
     static {
         loadProperties();
@@ -105,26 +111,6 @@ public class ApplicationInfo {
         } catch (IOException | NullPointerException | NumberFormatException ex) {
             // ignore
             version = "unknown";
-        }
-        try {
-            updateCheckUrl = updateCheckUrl
-                    .replace("<revision>", URLEncoder.encode(revision, "UTF-8"))
-                    .replace("<version>", URLEncoder.encode(version, "UTF-8"))
-                    .replace("<version.major>", "" + version_major)
-                    .replace("<version.minor>", "" + version_minor)
-                    .replace("<version.release>", "" + version_release)
-                    .replace("<version.build>", "" + version_build)
-                    .replace("<nightly>", nightly ? "1" : "0");
-            updateUrl = updateUrl
-                    .replace("<revision>", URLEncoder.encode(revision, "UTF-8"))
-                    .replace("<version>", URLEncoder.encode(version, "UTF-8"))
-                    .replace("<version.major>", "" + version_major)
-                    .replace("<version.minor>", "" + version_minor)
-                    .replace("<version.release>", "" + version_release)
-                    .replace("<version.build>", "" + version_build)
-                    .replace("<nightly>", nightly ? "1" : "0");
-        } catch (UnsupportedEncodingException e) {
-
         }
         applicationVerName = APPLICATION_NAME + " v." + version;
         shortApplicationVerName = SHORT_APPLICATION_NAME + " v." + version;

@@ -11,7 +11,7 @@
   !define APP_VER "0.0"
   !define APP_VER_MAJOR 0
   !define APP_VER_MINOR 0
-  !define APP_URL "https://www.free-decompiler.com/flash/"
+  !define APP_URL "https://github.com/jindrapetrik/jpexs-decompiler"
   !define APP_PUBLISHER "JPEXS"
   !define APP_NAME "JPEXS Free Flash Decompiler"
   !define JRE_VERSION "1.8"
@@ -304,7 +304,7 @@ var SMDir
   !insertmacro MUI_PAGE_STARTMENU 0 $SMDir
   ;Page custom CUSTOM_PAGE_CONTEXTMENU
   !insertmacro MUI_PAGE_INSTFILES
-  Page custom CUSTOM_PAGE_HELPUS
+  ;Page custom CUSTOM_PAGE_HELPUS
 !define MUI_FINISHPAGE_RUN "$INSTDIR\${APP_EXENAME}"
   !insertmacro MUI_PAGE_FINISH
 
@@ -402,11 +402,6 @@ var SMDir
   Exch $R2
 !macroend
 
-Function HelpUsClick
-  ExecShell "Open" "https://www.free-decompiler.com/flash/help_us.html"
-FunctionEnd
-
-
 !define un.StrRep "!insertmacro un.StrRep"
 !macro un.StrRep output string old new
     Push `${string}`
@@ -496,26 +491,6 @@ Function AddContextClick
   ${NSD_GetState} $1 $AddToContextMenu
 FunctionEnd
 */
-Function CUSTOM_PAGE_HELPUS
-
-  nsDialogs::create /NOUNLOAD 1018
-  pop $1
-
-
-  !insertmacro MUI_HEADER_TEXT "$(STRING_HELP_US)" "$(STRING_HELP_US_DOYOU)"
-  ${NSD_CreateLabel} 0 0 100% 50  "$(STRING_HELP_US_FREE)"
-  pop $1
-  ${NSD_CreateLabel} 0 75 100% 50  "$(STRING_HELP_US_DONATE)"
-  pop $1
-  ${NSD_CreateLabel} 0 150 200 25  "$(STRING_HELP_US_MORE)"
-  pop $1
-  ${NSD_CreateButton} 225 145 80 25 "$(STRING_HELP_US_BUTTON)"
-  pop $1
-  ${NSD_OnClick} $1 HelpUsClick
-  nsDialogs::Show
-
-FunctionEnd
-
 
 Function IndexOf
 Exch $R0
