@@ -48,7 +48,7 @@
     <target name="-loadversion" depends="-loadversion-prop,-loadversion-private">
         
     </target>
-    <target name="-loadversion-private" unless="newversion.type">
+    <target name="-loadversion-private" unless="new.version">
         <property name="version.major" value="0" />
         <property name="version.minor" value="0" />
         <property name="version.release" value="0" />
@@ -61,7 +61,7 @@
         <property name="version.number" value="${version.major}.${version.minor}.${version.release}.${version.build}" />  
         <property name="private" value="true" />        
     </target>
-    <target name="-loadversion-prop" if="newversion.type">
+    <target name="-loadversion-prop" if="new.version">
         <loadproperties srcfile="${version_info}" prefix="version"/> 
         <property name="version" value="${version.major}.${version.minor}.${version.release}" />
         <property name="version.number" value="${version.major}.${version.minor}.${version.release}.${version.build}" />  
@@ -474,11 +474,7 @@
          
     <target name="all" depends="clean,build,test,javadoc,release">    
         
-    </target>                    
-    
-    <target name="-set-none-newversion" unless="newversion.type">
-        <property name="newversion.type" value="none"/>
-    </target>    
+    </target>                         
         
     <target name="dist" depends="build,exe">
         <copy todir="${dist.dir}">
@@ -746,23 +742,7 @@
     <target name="-loadoldversion">
         <loadproperties srcfile="${version_info}" prefix="oldversion" />
     </target>
-    
-    <target name="-inc-major">
-        <property name="newversion.type" value="major"/>
-    </target>
-    
-    <target name="-inc-minor">
-        <property name="newversion.type" value="minor"/>
-    </target>
-    
-    <target name="-inc-release">
-        <property name="newversion.type" value="release"/> 
-    </target>
-    
-    <target name="-inc-nightlybuild">
-        <property name="newversion.type" value="nightly"/>
-    </target>   
-    
+        
     <target name="-save-version-info-file">        
         <propertyfile file="${version_info}"
                       comment="DO NOT MODIFY - it is updated automatically with the build script">                               
@@ -782,7 +762,7 @@
         <property name="new.version" value="1" />
     </target>
     
-    <target name="new-version" depends="-new-version-set,-set-none-newversion,all">
+    <target name="new-version" depends="-new-version-set,all">
         
     </target>          
     

@@ -207,7 +207,7 @@
         <property name="version.number" value="${version.major}.${version.minor}.${version.release}.${version.build}" />  
         <script language="javascript">
             
-            if(project.getProperty("version.build")=="0") {
+            if(project.getProperty("version.major")=="0") {
                 project.setProperty("private",true);                
             } else if(project.getProperty("version.debug")=="true") {
                 project.setProperty("nightly",true);
