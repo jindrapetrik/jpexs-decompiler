@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [11.0.0] - 2018-01-17
 ### Added
 - [#1240] AS search using multiple threads when parallel speedup is enabled
 - [#1308] Search by all P-code files in AS3
@@ -1632,7 +1632,8 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Initial public release
 
-[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version10.0.0...dev
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version11.0.0...dev
+[11.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version10.0.0...version11.0.0
 [10.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version9.0.0...version10.0.0
 [9.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version8.0.1...version9.0.0
 [8.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version8.0.0...version8.0.1
