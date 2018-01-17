@@ -8,8 +8,13 @@ For information how to install, use the software, list of features, etc., visit 
 ## Free-Decompiler.com website
 In the past (before 2018), we were using *free-decompiler.com* domain as HomePage, GitHub for source code, now we moved all information to Github.
 
-## Download appplication
+## Download application
 Fow downloading the app, see [releases section](https://github.com/jindrapetrik/jpexs-decompiler/releases)
+
+## Issue tracker
+For bug reporting and/or feature requests, our own Issue tracker exists :
+[https://www.free-decompiler.com/flash/issues](https://www.free-decompiler.com/flash/issues),
+but as of 2018/01, our support is *very limited*.
 
 ## Source code
 ### How to get source
