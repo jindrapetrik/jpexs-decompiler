@@ -1,19 +1,18 @@
 /*
- *  Copyright (C) 2010-2016 JPEXS, All rights reserved.
- *
+ *  Copyright (C) 2010-2018 JPEXS, All rights reserved.
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
+ * License along with this library. */
 package com.jpexs.decompiler.flash.exporters;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
@@ -21,6 +20,7 @@ import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.modes.MorphShapeExportMode;
@@ -44,6 +44,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -83,9 +85,8 @@ public class MorphShapeExporter {
                 if (t instanceof CharacterTag) {
                     characterID = ((CharacterTag) t).getCharacterId();
                 }
-                String ext = settings.mode == MorphShapeExportMode.CANVAS ? "html" : "svg";
 
-                final File file = new File(outdir + File.separator + characterID + "." + ext);
+                final File file = new File(outdir + File.separator + characterID + settings.getFileExtension());
                 new RetryTask(() -> {
                     MorphShapeTag mst = (MorphShapeTag) t;
                     switch (settings.mode) {
@@ -115,6 +116,16 @@ public class MorphShapeExporter {
                                 SWF.writeLibrary(ct.getSwf(), needed, baos);
                                 fos.write(Utf8Helper.getBytes(cse.getHtml(new String(baos.toByteArray(), Utf8Helper.charset), SWF.getTypePrefix(mst) + mst.getCharacterId(), mst.getRect())));
                             }
+                            break;
+                        case SWF:
+                            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
+                                try {
+                                    new PreviewExporter().exportSwf(fos, mst, null, 0);
+                                } catch (ActionParseException ex) {
+                                    Logger.getLogger(MorphShapeExporter.class.getName()).log(Level.SEVERE, null, ex);
+                                }
+                            }
+
                             break;
                     }
                 }, handler).run();

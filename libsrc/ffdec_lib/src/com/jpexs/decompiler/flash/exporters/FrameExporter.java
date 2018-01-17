@@ -1,19 +1,18 @@
 /*
- *  Copyright (C) 2010-2016 JPEXS, All rights reserved.
- *
+ *  Copyright (C) 2010-2018 JPEXS, All rights reserved.
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
+ * License along with this library. */
 package com.jpexs.decompiler.flash.exporters;
 
 import com.jpacker.JPacker;
@@ -21,6 +20,7 @@ import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
@@ -91,7 +91,7 @@ public class FrameExporter {
 
     private static final Logger logger = Logger.getLogger(FrameExporter.class.getName());
 
-    public List<File> exportFrames(AbortRetryIgnoreHandler handler, String outdir, SWF swf, int containerId, List<Integer> frames, ButtonExportSettings settings, EventListener evl) throws IOException, InterruptedException {
+    public List<File> exportButtonFrames(AbortRetryIgnoreHandler handler, String outdir, SWF swf, int containerId, List<Integer> frames, ButtonExportSettings settings, EventListener evl) throws IOException, InterruptedException {
         FrameExportMode fem;
         switch (settings.mode) {
             case BMP:
@@ -103,15 +103,23 @@ public class FrameExporter {
             case SVG:
                 fem = FrameExportMode.SVG;
                 break;
+            case SWF:
+                fem = FrameExportMode.SWF;
+                break;
             default:
-                throw new Error("Unsupported button export mode");
+                throw new Error("Unsupported button export mode: " + settings.mode);
+        }
+
+        if (frames == null) {
+            frames = new ArrayList<>();
+            frames.add(0); // todo: export all frames
         }
 
         FrameExportSettings fes = new FrameExportSettings(fem, settings.zoom);
         return exportFrames(handler, outdir, swf, containerId, frames, fes, evl);
     }
 
-    public List<File> exportFrames(AbortRetryIgnoreHandler handler, String outdir, SWF swf, int containerId, List<Integer> frames, SpriteExportSettings settings, EventListener evl) throws IOException, InterruptedException {
+    public List<File> exportSpriteFrames(AbortRetryIgnoreHandler handler, String outdir, SWF swf, int containerId, List<Integer> frames, SpriteExportSettings settings, EventListener evl) throws IOException, InterruptedException {
         FrameExportMode fem;
         switch (settings.mode) {
             case PNG:
@@ -134,6 +142,9 @@ public class FrameExporter {
                 break;
             case BMP:
                 fem = FrameExportMode.BMP;
+                break;
+            case SWF:
+                fem = FrameExportMode.SWF;
                 break;
             default:
                 throw new Error("Unsupported sprite export mode");
@@ -159,11 +170,11 @@ public class FrameExporter {
 
         final Timeline tim = tim0;
 
+        boolean exportAll = frames == null;
         if (frames == null) {
-            int frameCnt = tim.getFrameCount();
             frames = new ArrayList<>();
-            for (int i = 0; i < frameCnt; i++) {
-                frames.add(i);
+            for (Frame frame : tim.getFrames()) {
+                frames.add(frame.frame);
             }
         }
 
@@ -189,7 +200,7 @@ public class FrameExporter {
                 final Color fbackgroundColor = null;
                 new RetryTask(() -> {
                     int frame = fframes.get(fi);
-                    File f = new File(foutdir + File.separator + frame + ".svg");
+                    File f = new File(foutdir + File.separator + (frame + 1) + ".svg");
                     try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(f))) {
                         ExportRectangle rect = new ExportRectangle(tim.displayRect);
                         rect.xMax *= settings.zoom;
@@ -330,10 +341,44 @@ public class FrameExporter {
             return ret;
         }
 
-        final Timeline ftim = tim;
+        if (settings.mode == FrameExportMode.SWF) {
+            Color fBackgroundColor = backgroundColor;
+            if (exportAll) {
+                new RetryTask(() -> {
+                    File f = new File(foutdir + File.separator + "frames.swf");
+
+                    try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(f))) {
+                        try {
+                            new PreviewExporter().exportSwf(fos, swf.getCharacter(containerId), fBackgroundColor, 0);
+                        } catch (ActionParseException ex) {
+                            Logger.getLogger(MorphShapeExporter.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+
+                    ret.add(f);
+                }, handler).run();
+            } else {
+                for (Integer frame : fframes) {
+                    new RetryTask(() -> {
+                        File f = new File(foutdir + File.separator + (frame + 1) + ".swf");
+                        Frame fn = (Frame) tim.getFrame(frame);
+
+                        try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(f))) {
+                            try {
+                                new PreviewExporter().exportSwf(fos, fn, fBackgroundColor, 0);
+                            } catch (ActionParseException ex) {
+                                Logger.getLogger(MorphShapeExporter.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+
+                        ret.add(f);
+                    }, handler).run();
+                }
+            }
+        }
+
         final Color fbackgroundColor = backgroundColor;
         final Iterator<BufferedImage> frameImages = new Iterator<BufferedImage>() {
-
             private int pos = 0;
 
             @Override
@@ -360,7 +405,7 @@ public class FrameExporter {
                 }
 
                 int fframe = fframes.get(pos++);
-                BufferedImage result = SWF.frameToImageGet(ftim, fframe, fframe, null, 0, ftim.displayRect, new Matrix(), null, fbackgroundColor, settings.zoom).getBufferedImage();
+                BufferedImage result = SWF.frameToImageGet(tim, fframe, fframe, null, 0, tim.displayRect, new Matrix(), null, fbackgroundColor, settings.zoom).getBufferedImage();
 
                 if (evl != null) {
                     evl.handleExportedEvent("frame", pos, fframes.size(), tagName);

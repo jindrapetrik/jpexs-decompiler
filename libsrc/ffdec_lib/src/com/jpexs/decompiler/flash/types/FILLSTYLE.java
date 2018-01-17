@@ -1,22 +1,22 @@
 /*
- *  Copyright (C) 2010-2016 JPEXS, All rights reserved.
- *
+ *  Copyright (C) 2010-2018 JPEXS, All rights reserved.
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
+ * License along with this library. */
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.tags.DefineShape3Tag;
+import com.jpexs.decompiler.flash.tags.DefineShape4Tag;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.ConditionalType;
@@ -25,13 +25,14 @@ import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.Set;
 
 /**
  *
  * @author JPEXS
  */
-public class FILLSTYLE implements NeedsCharacters, Serializable {
+public class FILLSTYLE implements NeedsCharacters, FieldChangeObserver, Serializable {
 
     @SWFType(BasicType.UI8)
     @EnumValue(value = SOLID, text = "Solid")
@@ -66,7 +67,8 @@ public class FILLSTYLE implements NeedsCharacters, Serializable {
     @Internal
     public boolean inShape3;
 
-    @ConditionalType(type = RGBA.class, tags = DefineShape3Tag.ID)
+    @Conditional(value = "fillStyleType", options = {SOLID})
+    @ConditionalType(type = RGBA.class, tags = {DefineShape3Tag.ID, DefineShape4Tag.ID})
     public RGB color;
 
     @Conditional(value = "fillStyleType", options = {LINEAR_GRADIENT, RADIAL_GRADIENT, FOCAL_RADIAL_GRADIENT})
@@ -117,5 +119,27 @@ public class FILLSTYLE implements NeedsCharacters, Serializable {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void fieldChanged(Field field) {
+        if ((fillStyleType == FILLSTYLE.LINEAR_GRADIENT)
+                || (fillStyleType == FILLSTYLE.RADIAL_GRADIENT)) {
+            if (gradient instanceof FOCALGRADIENT) {
+                GRADIENT g = new GRADIENT();
+                g.spreadMode = gradient.spreadMode;
+                g.interpolationMode = gradient.interpolationMode;
+                g.gradientRecords = gradient.gradientRecords;
+                gradient = g;
+            }
+        } else if (fillStyleType == FILLSTYLE.FOCAL_RADIAL_GRADIENT) {
+            if (!(gradient instanceof FOCALGRADIENT)) {
+                FOCALGRADIENT g = new FOCALGRADIENT();
+                g.spreadMode = gradient.spreadMode;
+                g.interpolationMode = gradient.interpolationMode;
+                g.gradientRecords = gradient.gradientRecords;
+                gradient = g;
+            }
+        }
     }
 }

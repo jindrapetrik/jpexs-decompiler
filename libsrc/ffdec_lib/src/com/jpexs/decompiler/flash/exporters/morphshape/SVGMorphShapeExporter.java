@@ -1,19 +1,18 @@
 /*
- *  Copyright (C) 2010-2016 JPEXS, All rights reserved.
- *
+ *  Copyright (C) 2010-2018 JPEXS, All rights reserved.
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
+ * License along with this library. */
 package com.jpexs.decompiler.flash.exporters.morphshape;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -42,6 +41,8 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
 
     protected Element path;
 
+    protected int id;
+
     protected int lastPatternId;
 
     private final Color defaultColor;
@@ -50,9 +51,10 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
 
     private final SVGExporter exporter;
 
-    public SVGMorphShapeExporter(SWF swf, SHAPE shape, SHAPE endShape, SVGExporter exporter, Color defaultColor, ColorTransform colorTransform, double zoom) {
+    public SVGMorphShapeExporter(SWF swf, SHAPE shape, SHAPE endShape, int id, SVGExporter exporter, Color defaultColor, ColorTransform colorTransform, double zoom) {
         super(shape, endShape, colorTransform, zoom);
         this.swf = swf;
+        this.id = id;
         this.defaultColor = defaultColor;
         this.exporter = exporter;
     }
@@ -114,7 +116,7 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
                 int width = img.getWidth();
                 int height = img.getHeight();
                 lastPatternId++;
-                String patternId = "PatternID_" + lastPatternId;
+                String patternId = "PatternID_" + id + "_" + lastPatternId;
                 ImageFormat format = image.getImageFormat();
                 byte[] imageData = Helper.readStream(image.getImageData());
                 String base64ImgData = Helper.byteArrayToBase64String(imageData);

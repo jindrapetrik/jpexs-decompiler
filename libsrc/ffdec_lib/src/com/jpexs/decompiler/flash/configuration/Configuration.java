@@ -1,19 +1,18 @@
 /*
- *  Copyright (C) 2010-2016 JPEXS, All rights reserved.
- *
+ *  Copyright (C) 2010-2018 JPEXS, All rights reserved.
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
+ * License along with this library. */
 package com.jpexs.decompiler.flash.configuration;
 
 import com.jpexs.decompiler.flash.ApplicationInfo;
@@ -33,8 +32,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -57,7 +54,7 @@ import javax.swing.JOptionPane;
  *
  * @author JPEXS
  */
-public class Configuration {
+public final class Configuration {
 
     private static final String CONFIG_NAME = "config.bin";
 
@@ -83,7 +80,7 @@ public class Configuration {
 
     @ConfigurationDefaultInt(10)
     @ConfigurationCategory("decompilation")
-    public static final ConfigurationItem<Integer> parallelSpeedUpThreadCount = null;
+    private static final ConfigurationItem<Integer> parallelSpeedUpThreadCount = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("script")
@@ -865,13 +862,7 @@ public class Configuration {
                 if (config.containsKey(name)) {
                     value = config.get(name);
 
-                    Class<?> type;
-                    Type type2 = ((ParameterizedType) (field.getGenericType())).getActualTypeArguments()[0];
-                    if (type2 instanceof Class<?>) {
-                        type = (Class<?>) type2;
-                    } else {
-                        type = (Class<?>) ((ParameterizedType) type2).getRawType();
-                    }
+                    Class<?> type = ConfigurationItem.getConfigurationFieldType(field);
                     if (value != null && !type.isAssignableFrom(value.getClass())) {
                         System.out.println("Configuration item has a wrong type: " + name + " expected: " + type.getSimpleName() + " actual: " + value.getClass().getSimpleName());
                         value = null;
@@ -926,12 +917,19 @@ public class Configuration {
     }
 
     public static Map<String, Field> getConfigurationFields() {
-        Field[] fields = Configuration.class.getFields();
+        return getConfigurationFields(false);
+    }
+
+    public static Map<String, Field> getConfigurationFields(boolean lowerCaseNames) {
+        Field[] fields = Configuration.class.getDeclaredFields();
         Map<String, Field> result = new HashMap<>();
         for (Field field : fields) {
             if (ConfigurationItem.class.isAssignableFrom(field.getType())) {
-                ConfigurationName annotation = field.getAnnotation(ConfigurationName.class);
-                String name = annotation == null ? field.getName() : annotation.value();
+                String name = ConfigurationItem.getName(field);
+                if (lowerCaseNames) {
+                    name = name.toLowerCase();
+                }
+
                 result.put(name, field);
             }
         }

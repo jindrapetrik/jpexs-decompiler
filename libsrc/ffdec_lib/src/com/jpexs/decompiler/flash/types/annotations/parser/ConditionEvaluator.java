@@ -1,22 +1,22 @@
 /*
- *  Copyright (C) 2010-2016 JPEXS, All rights reserved.
- *
+ *  Copyright (C) 2010-2018 JPEXS, All rights reserved.
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
+ * License along with this library. */
 package com.jpexs.decompiler.flash.types.annotations.parser;
 
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
+import com.jpexs.decompiler.flash.types.annotations.ConditionalType;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.EmptyStackException;
@@ -31,10 +31,14 @@ import java.util.Stack;
  */
 public class ConditionEvaluator {
 
-    private final Conditional cond;
+    private final String[] values;
 
     public ConditionEvaluator(Conditional cond) {
-        this.cond = cond;
+        values = cond.value();
+    }
+
+    public ConditionEvaluator(ConditionalType cond) {
+        values = cond.value();
     }
 
     private void expressionRest(Map<String, Boolean> fields, Stack<Boolean> stack, ConditionLexer lex) throws IOException, AnnotationParseException {
@@ -114,7 +118,7 @@ public class ConditionEvaluator {
     }
 
     private String prepareCond() {
-        String[] vals = cond.value();
+        String[] vals = values;
         if (vals == null || vals.length == 0) {
             return "";
         }

@@ -1,23 +1,24 @@
 /*
- * Copyright (C) 2010-2016 JPEXS
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  Copyright (C) 2010-2018 JPEXS
+ * 
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.jpexs.decompiler.flash.gui.pipes;
 
 import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.gui.Main;
+import com.jpexs.decompiler.flash.gui.View;
 import com.sun.jna.Platform;
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.WinError;
@@ -77,13 +78,20 @@ public class FirstInstance {
                                     switch (command) {
                                         case "open":
                                             int cnt = ois.readInt();
+                                            String[] fileNames = new String[cnt];
                                             for (int i = 0; i < cnt; i++) {
-                                                Main.openFile(ois.readUTF(), null);
+                                                fileNames[i] = ois.readUTF();
                                             }
+
+                                            View.execInEventDispatch(() -> {
+                                                for (int i = 0; i < cnt; i++) {
+                                                    Main.openFile(fileNames[i], null);
+                                                }
+                                            });
                                         //no break - focus too
                                         case "focus":
 
-                                            java.awt.EventQueue.invokeLater(new Runnable() {
+                                            View.execInEventDispatch(new Runnable() {
                                                 @Override
                                                 public void run() {
                                                     Window wnd = Main.getMainFrame().getWindow();

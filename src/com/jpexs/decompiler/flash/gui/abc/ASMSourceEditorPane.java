@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2016 JPEXS
- *
+ *  Copyright (C) 2010-2018 JPEXS
+ * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *
+ * 
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *
+ * 
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -76,7 +76,7 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
         return scriptIndex;
     }
 
-    private HighlightedText highlightedText = new HighlightedText();
+    private HighlightedText highlightedText = HighlightedText.EMPTY;
 
     private final List<DocsListener> docsListeners = new ArrayList<>();
 
@@ -121,7 +121,8 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
         if (trait != null && exportMode != ScriptExportMode.AS && exportMode != ScriptExportMode.AS_METHOD_STUBS) {
             trait.convertTraitHeader(abc, writer);
         }
-        abc.bodies.get(bodyIndex).getCode().toASMSource(abc.constants, abc.method_info.get(abc.bodies.get(bodyIndex).method_info), abc.bodies.get(bodyIndex), exportMode, writer);
+        MethodBody body = abc.bodies.get(bodyIndex);
+        abc.bodies.get(bodyIndex).getCode().toASMSource(abc.constants, abc.method_info.get(body.method_info), body, exportMode, writer);
         if (trait != null) {
             writer.appendNoHilight("end ; trait").newLine();
         }
@@ -428,7 +429,7 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
         int caretPos = getCaretPosition();
         Flasm3Lexer lexer = new Flasm3Lexer(new StringReader(getText().replace("\r\n", "\n")));
         ParsedSymbol symb;
-        String lastLevel = null;
+        String lastLevel;
         final Integer singleUse[] = new Integer[]{
             ParsedSymbol.TYPE_KEYWORD_FINAL,
             ParsedSymbol.TYPE_KEYWORD_OVERRIDE,

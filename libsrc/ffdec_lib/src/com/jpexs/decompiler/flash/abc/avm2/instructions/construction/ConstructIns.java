@@ -1,19 +1,18 @@
 /*
- *  Copyright (C) 2010-2016 JPEXS, All rights reserved.
- *
+ *  Copyright (C) 2010-2018 JPEXS, All rights reserved.
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
+ * License along with this library. */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.construction;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -34,9 +33,11 @@ import com.jpexs.decompiler.flash.abc.avm2.model.RegExpAvm2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.StringAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.XMLAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.AddAVM2Item;
+import com.jpexs.decompiler.flash.ecma.ObjectType;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -50,17 +51,27 @@ public class ConstructIns extends InstructionDefinition {
     }
 
     @Override
+    public boolean isNotCompileTimeSupported() {
+        return true;
+    }
+
+    @Override
     public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
-        /*int argCount = ins.getParamAsLong(constants, 0).intValue();
-         List<Object> passArguments = new ArrayList<Object>();
-         for (int i = argCount - 1; i >= 0; i--) {
-         passArguments.set(i, lda.operandStack.pop());
-         }
-         Object obj = lda.operandStack.pop();*/
+        int argCount = ins.getParamAsLong(constants, 0).intValue();
+        List<Object> passArguments = new ArrayList<Object>();
+        for (int i = argCount - 1; i >= 0; i--) {
+            passArguments.set(i, lda.operandStack.pop());
+        }
+
+        Object obj = lda.operandStack.pop();
         //lda.executionException = "Cannot call constructor";
-        return false;
-        //call construct property of obj
+
+        ObjectType result = new ObjectType(new HashMap<>());
+        //todo: call construct property of obj
+
         //push new instance
+        lda.operandStack.push(result);
+        return true;
     }
 
     public static boolean walkXML(GraphTargetItem item, List<GraphTargetItem> list) {

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2016 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2018 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -15,6 +15,7 @@
  * License along with this library. */
 package com.jpexs.helpers;
 
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -29,8 +30,20 @@ public class ImmediateFuture<V> implements Future<V> {
 
     private final V value;
 
+    private final Throwable throwable;
+
+    private final boolean cancelled;
+
     public ImmediateFuture(V value) {
         this.value = value;
+        throwable = null;
+        cancelled = false;
+    }
+
+    public ImmediateFuture(V value, Throwable throwable, boolean cancelled) {
+        this.value = value;
+        this.throwable = throwable;
+        this.cancelled = cancelled;
     }
 
     @Override
@@ -40,7 +53,7 @@ public class ImmediateFuture<V> implements Future<V> {
 
     @Override
     public boolean isCancelled() {
-        return false;
+        return cancelled;
     }
 
     @Override
@@ -50,11 +63,19 @@ public class ImmediateFuture<V> implements Future<V> {
 
     @Override
     public V get() throws InterruptedException, ExecutionException {
+        if (cancelled) {
+            throw new CancellationException();
+        }
+
+        if (throwable != null) {
+            throw new ExecutionException(throwable);
+        }
+
         return value;
     }
 
     @Override
     public V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-        return value;
+        return get();
     }
 }

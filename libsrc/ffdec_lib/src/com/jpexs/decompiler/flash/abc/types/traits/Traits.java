@@ -1,19 +1,18 @@
 /*
- *  Copyright (C) 2010-2016 JPEXS, All rights reserved.
- *
+ *  Copyright (C) 2010-2018 JPEXS, All rights reserved.
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
+ * License along with this library. */
 package com.jpexs.decompiler.flash.abc.types.traits;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -23,6 +22,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.script.Dependency;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
+import com.jpexs.decompiler.flash.search.MethodId;
 import com.jpexs.decompiler.graph.DottedChain;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -170,12 +170,7 @@ public class Traits implements Cloneable, Serializable {
                 continue;
             }
             writer.newLine();
-            int h = t;
-            if (classIndex != -1) {
-                if (!isStatic) {
-                    h += abc.class_info.get(classIndex).static_traits.traits.size();
-                }
-            }
+            int h = abc.getGlobalTraitId(TraitType.METHOD /*non-initializer*/, isStatic, classIndex, t);
             if (trait instanceof TraitClass) {
                 writer.startClass(((TraitClass) trait).class_info);
             } else {
@@ -248,6 +243,13 @@ public class Traits implements Cloneable, Serializable {
     public void getDependencies(String customNs, ABC abc, List<Dependency> dependencies, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) {
         for (Trait t : traits) {
             t.getDependencies(customNs, abc, dependencies, uses, ignorePackage, fullyQualifiedNames);
+        }
+    }
+
+    public void getMethodInfos(ABC abc, boolean isStatic, int classIndex, List<MethodId> methodInfos) {
+        for (int t = 0; t < traits.size(); t++) {
+            Trait trait = traits.get(t);
+            trait.getMethodInfos(abc, abc.getGlobalTraitId(TraitType.METHOD /*non-initializer*/, isStatic, classIndex, t), classIndex, methodInfos);
         }
     }
 }

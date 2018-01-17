@@ -1,21 +1,25 @@
 /*
- *  Copyright (C) 2010-2016 JPEXS
- *
+ *  Copyright (C) 2010-2018 JPEXS
+ * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *
+ * 
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *
+ * 
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonArray;
+import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
 import com.jpexs.debugger.flash.Debugger;
 import com.jpexs.debugger.flash.DebuggerCommands;
 import com.jpexs.debugger.flash.Variable;
@@ -1220,10 +1224,14 @@ public class Main {
     }
 
     public static OpenFileResult openFile(String swfFile, String fileTitle) {
+        View.checkAccess();
+
         return openFile(swfFile, fileTitle, null);
     }
 
     public static OpenFileResult openFile(String swfFile, String fileTitle, Runnable executeAfterOpen) {
+        View.checkAccess();
+
         try {
             File file = new File(swfFile);
             if (!file.exists()) {
@@ -1241,26 +1249,38 @@ public class Main {
     }
 
     public static OpenFileResult openFile(SWFSourceInfo sourceInfo) {
+        View.checkAccess();
+
         return openFile(new SWFSourceInfo[]{sourceInfo});
     }
 
     public static OpenFileResult openFile(SWFSourceInfo sourceInfo, Runnable executeAfterOpen) {
+        View.checkAccess();
+
         return openFile(new SWFSourceInfo[]{sourceInfo}, executeAfterOpen);
     }
 
     public static OpenFileResult openFile(SWFSourceInfo sourceInfo, Runnable executeAfterOpen, int reloadIndex) {
+        View.checkAccess();
+
         return openFile(new SWFSourceInfo[]{sourceInfo}, executeAfterOpen, new int[]{reloadIndex});
     }
 
     public static OpenFileResult openFile(SWFSourceInfo[] newSourceInfos) {
+        View.checkAccess();
+
         return openFile(newSourceInfos, null);
     }
 
     public static OpenFileResult openFile(SWFSourceInfo[] newSourceInfos, Runnable executeAfterOpen) {
+        View.checkAccess();
+
         return openFile(newSourceInfos, executeAfterOpen, null);
     }
 
     public static OpenFileResult openFile(SWFSourceInfo[] newSourceInfos, Runnable executeAfterOpen, int[] reloadIndices) {
+        View.checkAccess();
+
         if (mainFrame != null && !Configuration.openMultipleFiles.get()) {
             sourceInfos.clear();
             mainFrame.getPanel().closeAll(false);
@@ -1292,16 +1312,21 @@ public class Main {
     }
 
     public static void closeFile(SWFList swf) {
+        View.checkAccess();
+
         sourceInfos.remove(swf.sourceInfo);
         mainFrame.getPanel().close(swf);
     }
 
     public static void reloadFile(SWFList swf) {
-        //mainFrame.getPanel().close(swf);
+        View.checkAccess();
+
         openFile(swf.sourceInfo, null, sourceInfos.indexOf(swf.sourceInfo));
     }
 
     public static boolean closeAll() {
+        View.checkAccess();
+
         boolean closeResult = mainFrame.getPanel().closeAll(true);
         if (closeResult) {
             sourceInfos.clear();
@@ -1428,6 +1453,8 @@ public class Main {
     }
 
     public static boolean openFileDialog() {
+        View.checkAccess();
+
         JFileChooser fc = new JFileChooser();
         if (Configuration.openMultipleFiles.get()) {
             fc.setMultiSelectionEnabled(true);
@@ -1639,12 +1666,16 @@ public class Main {
                     SWF swf = Main.getMainFrame().getPanel().getCurrentSwf();
 
                     String title = swf == null ? "?" : swf.getFileTitle();
-                    title = title + ":" + hash;
-                    String tfile;
+                    final String titleWithHash = title + ":" + hash;
                     try {
-                        tfile = tempFile(title);
+                        final String tfile = tempFile(titleWithHash);
                         Helper.writeFile(tfile, data);
-                        openFile(new SWFSourceInfo(null, tfile, title));
+                        View.execInEventDispatch(new Runnable() {
+                            @Override
+                            public void run() {
+                                openFile(new SWFSourceInfo(null, tfile, titleWithHash));
+                            }
+                        });
                     } catch (IOException ex) {
                         logger.log(Level.SEVERE, "Cannot create tempfile");
                     }
@@ -2141,29 +2172,10 @@ public class Main {
         }
     }
 
-    public static boolean checkForUpdates() {
-        String currentVersion = ApplicationInfo.version;
-        if (currentVersion.equals("unknown")) {
-            // sometimes during development the version information is not available
-            return false;
-        }
-
-        List<String> accepted = new ArrayList<>();
-        if (Configuration.checkForUpdatesStable.get()) {
-            accepted.add("stable");
-        }
-        if (Configuration.checkForUpdatesNightly.get()) {
-            accepted.add("nightly");
-        }
-
-        if (accepted.isEmpty()) {
-            return false;
-        }
-
-        String acceptVersions = String.join(",", accepted);
+    private static JsonValue urlGetJson(String getUrl) {
         try {
             String proxyAddress = Configuration.updateProxyAddress.get();
-            URL url = new URL(ApplicationInfo.updateCheckUrl);
+            URL url = new URL(getUrl);
 
             URLConnection uc;
             if (proxyAddress != null && !proxyAddress.isEmpty()) {
@@ -2178,114 +2190,91 @@ public class Main {
             } else {
                 uc = url.openConnection();
             }
-            uc.setRequestProperty("X-Accept-Versions", acceptVersions);
-            uc.setRequestProperty("X-Update-Major", "" + UPDATE_SYSTEM_MAJOR);
-            uc.setRequestProperty("X-Update-Minor", "" + UPDATE_SYSTEM_MINOR);
             uc.setRequestProperty("User-Agent", ApplicationInfo.shortApplicationVerName);
-            String currentLoc = Configuration.locale.get("en");
-            uc.setRequestProperty("Accept-Language", currentLoc + ("en".equals(currentLoc) ? "" : ", en;q=0.8"));
-
             uc.connect();
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(uc.getInputStream()));
-            String s;
-            final java.util.List<Version> versions = new ArrayList<>();
-            String header = "";
-            Pattern headerPat = Pattern.compile("\\[([a-zA-Z0-9]+)\\]");
-            int updateMajor;
-            int updateMinor;
-            Version ver = null;
-            while ((s = br.readLine()) != null) {
-
-                Matcher m = headerPat.matcher(s);
-                if (m.matches()) {
-                    header = m.group(1);
-                    if (header.equals("version")) {
-                        ver = new Version();
-                        versions.add(ver);
-                    }
-                    if (header.equals("noversion")) {
-                        break;
-                    }
-                } else if (s.contains("=")) {
-                    String key = s.substring(0, s.indexOf('='));
-                    String val = s.substring(s.indexOf('=') + 1);
-                    if ("updateSystem".equals(header)) {
-                        if (key.equals("majorVersion")) {
-                            updateMajor = Integer.parseInt(val);
-                            if (updateMajor > UPDATE_SYSTEM_MAJOR) {
-                                break;
-                            }
-                        }
-                        if (key.equals("minorVersion")) {
-                            updateMinor = Integer.parseInt(val);
-                        }
-                    }
-                    if ("version".equals(header) && (ver != null)) {
-                        if (key.equals("versionId")) {
-                            ver.versionId = Integer.parseInt(val);
-                        }
-                        if (key.equals("versionName")) {
-                            ver.versionName = val;
-                        }
-                        if (key.equals("nightly")) {
-                            ver.nightly = val.equals("true");
-                        }
-                        if (key.equals("revision")) {
-                            ver.revision = val;
-                        }
-                        if (key.equals("build")) {
-                            ver.build = Integer.parseInt(val);
-                        }
-                        if (key.equals("major")) {
-                            ver.major = Integer.parseInt(val);
-                        }
-                        if (key.equals("minor")) {
-                            ver.minor = Integer.parseInt(val);
-                        }
-                        if (key.equals("release")) {
-                            ver.release = Integer.parseInt(val);
-                        }
-                        if (key.equals("longVersionName")) {
-                            ver.longVersionName = val;
-                        }
-                        if (key.equals("releaseDate")) {
-                            ver.releaseDate = val;
-                        }
-                        if (key.equals("appName")) {
-                            ver.appName = val;
-                        }
-                        if (key.equals("appFullName")) {
-                            ver.appFullName = val;
-                        }
-                        if (key.equals("updateLink")) {
-                            ver.updateLink = val;
-                        }
-                        if (key.equals("change[]")) {
-                            String changeType = val.substring(0, val.indexOf('|'));
-                            String change = val.substring(val.indexOf('|') + 1);
-                            if (!ver.changes.containsKey(changeType)) {
-                                ver.changes.put(changeType, new ArrayList<>());
-                            }
-                            List<String> chlist = ver.changes.get(changeType);
-                            chlist.add(change);
-                        }
-                    }
-                }
-            }
-
-            if (!versions.isEmpty()) {
-                View.execInEventDispatch(() -> {
-                    NewVersionDialog newVersionDialog = new NewVersionDialog(versions);
-                    newVersionDialog.setVisible(true);
-                    Configuration.lastUpdatesCheckDate.set(Calendar.getInstance());
-                });
-
-                return true;
-            }
+            JsonValue value = Json.parse(new InputStreamReader(uc.getInputStream()));
+            return value;
         } catch (IOException | NumberFormatException ex) {
+            return null;
+        }
+    }
+
+    public static boolean checkForUpdates() {
+        String currentVersion = ApplicationInfo.version;
+        if (currentVersion.equals("unknown")) {
+            // sometimes during development the version information is not available
             return false;
         }
+
+        boolean showStable = Configuration.checkForUpdatesStable.get();
+        boolean showNightly = Configuration.checkForUpdatesNightly.get();
+
+        if (!showStable && !showNightly) {
+            return false;
+        }
+
+        String currentTagName;
+        if (ApplicationInfo.nightly) {
+            currentTagName = "nightly" + ApplicationInfo.version_build;
+        } else {
+            currentTagName = "version" + ApplicationInfo.version_major + "." + ApplicationInfo.version_minor + "." + ApplicationInfo.version_release;
+        }
+
+        if (!showNightly) {
+            //prereleases are not shown as latest, when checking latest nightly, this is useless
+            JsonValue latestVersionInfoJson = urlGetJson(ApplicationInfo.GITHUB_RELEASES_LATEST_URL);
+            if (latestVersionInfoJson == null) {
+                return false;
+            }
+            String latestTagName = latestVersionInfoJson.asObject().get("tag_name").asString();
+            if (currentTagName.equals(latestTagName)) {
+                //no new version
+                return false;
+            }
+        }
+
+        JsonValue allChangesInfoJson = urlGetJson(ApplicationInfo.GITHUB_RELEASES_URL);
+        if (allChangesInfoJson == null) {
+            return false;
+        }
+        JsonArray arr = allChangesInfoJson.asArray();
+        final java.util.List<Version> versions = new ArrayList<>();
+        for (int i = 0; i < arr.size(); i++) {
+            JsonObject versionObj = arr.get(i).asObject();
+            String tagName = versionObj.get("tag_name").asString();
+            if (currentVersion.equals(tagName)) {
+                //Stop at current version, do not display more
+                break;
+            }
+            Version v = new Version();
+            v.versionName = versionObj.get("name").asString();
+            //v.description = versionObj.get("body").asString();
+            //Note: "body" is Markdown formatted and contains other things than changeslog, 
+            //we cannot show it in FFDec correctly.
+            v.description = "";
+            v.releaseDate = versionObj.get("published_at").asString();
+            boolean isNightly = versionObj.get("prerelease").asBoolean();
+            if (isNightly && !showNightly) {
+                continue;
+            }
+
+            if (!isNightly && !showStable) {
+                continue;
+            }
+
+            versions.add(v);
+        }
+
+        if (!versions.isEmpty()) {
+            View.execInEventDispatch(() -> {
+                NewVersionDialog newVersionDialog = new NewVersionDialog(versions);
+                newVersionDialog.setVisible(true);
+                Configuration.lastUpdatesCheckDate.set(Calendar.getInstance());
+            });
+
+            return true;
+        }
+
         Configuration.lastUpdatesCheckDate.set(Calendar.getInstance());
         return false;
     }
@@ -2342,7 +2331,7 @@ public class Main {
             @Override
             public void uncaughtException(Thread t, Throwable e) {
                 logger.log(Level.SEVERE, "Uncaught exception in thread: " + t.getName(), e);
-                if (e instanceof OutOfMemoryError || !Helper.is64BitJre() && Helper.is64BitOs()) {
+                if (e instanceof OutOfMemoryError && !Helper.is64BitJre() && Helper.is64BitOs()) {
                     View.showMessageDialog(null, AppStrings.translate("message.warning.outOfMemory32BitJre"), AppStrings.translate("message.warning"), JOptionPane.WARNING_MESSAGE);
                 }
             }

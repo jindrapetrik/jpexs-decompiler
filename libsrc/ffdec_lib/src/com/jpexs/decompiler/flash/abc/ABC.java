@@ -1,19 +1,18 @@
 /*
- *  Copyright (C) 2010-2016 JPEXS, All rights reserved.
- *
+ *  Copyright (C) 2010-2018 JPEXS, All rights reserved.
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
+ * License along with this library. */
 package com.jpexs.decompiler.flash.abc;
 
 import com.jpexs.decompiler.flash.EndOfStreamException;
@@ -41,6 +40,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitType;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.abc.usages.ClassNameMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.ConstVarNameMultinameUsage;
@@ -58,6 +58,7 @@ import com.jpexs.decompiler.flash.abc.usages.TypeNameMultinameUsage;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecial;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecialType;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.importers.As3ScriptReplaceException;
 import com.jpexs.decompiler.flash.importers.As3ScriptReplacerInterface;
@@ -1424,6 +1425,30 @@ public class ABC {
             }
         }
         return null;
+    }
+
+    public int getGlobalTraitId(TraitType type, boolean isStatic, int classIndex, int index) {
+        if (type == TraitType.INITIALIZER) {
+            if (!isStatic) {
+                return GraphTextWriter.TRAIT_INSTANCE_INITIALIZER;
+            } else {
+                return GraphTextWriter.TRAIT_CLASS_INITIALIZER;
+            }
+        }
+
+        if (type == TraitType.SCRIPT_INITIALIZER) {
+            return GraphTextWriter.TRAIT_SCRIPT_INITIALIZER;
+        }
+
+        if (classIndex == -1) {
+            return index;
+        }
+
+        if (isStatic) {
+            return index;
+        } else {
+            return class_info.get(classIndex).static_traits.traits.size() + index;
+        }
     }
 
     private void removeClassFromTraits(Traits traits, int index) {

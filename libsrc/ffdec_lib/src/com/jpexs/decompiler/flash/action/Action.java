@@ -1,19 +1,18 @@
 /*
- *  Copyright (C) 2010-2016 JPEXS, All rights reserved.
- *
+ *  Copyright (C) 2010-2018 JPEXS, All rights reserved.
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
+ * License along with this library. */
 package com.jpexs.decompiler.flash.action;
 
 import com.jpexs.decompiler.flash.AppResources;
@@ -106,7 +105,7 @@ import java.util.logging.Logger;
  */
 public abstract class Action implements GraphSourceItem {
 
-    private static final int INFORM_LISTENER_RESOLUTION = 100;
+    private static final int INFORM_LISTENER_RESOLUTION = 1000;
 
     private boolean ignored = false;
 
@@ -474,11 +473,9 @@ public abstract class Action implements GraphSourceItem {
     }
 
     private static void informListeners(List<DisassemblyListener> listeners, int pos, int count) {
-        if (pos % INFORM_LISTENER_RESOLUTION == 0) {
-            DisassemblyListener[] listenersArray = listeners.toArray(new DisassemblyListener[listeners.size()]);
-            for (DisassemblyListener listener : listenersArray) {
-                listener.progressToString(pos + 1, count);
-            }
+        DisassemblyListener[] listenersArray = listeners.toArray(new DisassemblyListener[listeners.size()]);
+        for (DisassemblyListener listener : listenersArray) {
+            listener.progressToString(pos + 1, count);
         }
     }
 
@@ -507,11 +504,14 @@ public abstract class Action implements GraphSourceItem {
         HashMap<Long, List<GraphSourceItemContainer>> containers = new HashMap<>();
         HashMap<GraphSourceItemContainer, Integer> containersPos = new HashMap<>();
         offset = address;
-        int pos = 0;
         boolean lastPush = false;
         byte[] fileData = list.fileData;
-        for (Action a : list) {
-            informListeners(listeners, pos, list.size());
+        for (int pos = 0; pos < list.size(); pos++) {
+            Action a = list.get(pos);
+
+            if ((pos + 1) % INFORM_LISTENER_RESOLUTION == 0) {
+                informListeners(listeners, pos, list.size());
+            }
 
             if (exportMode == ScriptExportMode.PCODE_HEX) {
                 if (lastPush) {
@@ -671,8 +671,8 @@ public abstract class Action implements GraphSourceItem {
             }
 
             offset += a.getTotalActionLength();
-            pos++;
         }
+
         if (lastPush) {
             writer.newLine();
         }

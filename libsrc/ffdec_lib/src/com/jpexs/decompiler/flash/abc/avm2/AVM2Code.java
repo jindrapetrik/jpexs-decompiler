@@ -1,19 +1,18 @@
 /*
- *  Copyright (C) 2010-2016 JPEXS, All rights reserved.
- *
+ *  Copyright (C) 2010-2018 JPEXS, All rights reserved.
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
+ * License along with this library. */
 package com.jpexs.decompiler.flash.abc.avm2;
 
 import com.jpexs.decompiler.flash.EndOfStreamException;
@@ -274,8 +273,6 @@ import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.ValueKind;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
-import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
-import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -746,7 +743,9 @@ public class AVM2Code implements Cloneable {
         lda.runtimeInfo = runtimeInfo;
 
         for (AVM2Instruction ins : code) {
-            ins.definition.verify(lda, constants, ins);
+            if (!(ins.definition instanceof CallSuperVoidIns)) {
+                ins.definition.verify(lda, constants, ins);
+            }
         }
 
         while (pos < code.size()) {
@@ -2129,7 +2128,6 @@ public class AVM2Code implements Cloneable {
     public void updateInstructionByteCountByAddr(long instructionAddress, int byteDelta, MethodBody body) {
         if (byteDelta != 0) {
             updateOffsets(new OffsetUpdater() {
-
                 @Override
                 public long updateInstructionOffset(long address) {
                     if (address > instructionAddress) {
@@ -2174,7 +2172,8 @@ public class AVM2Code implements Cloneable {
              ins.operands[j] = updater.updateOperandOffset(target, ins.operands[j]);
              }
              }*/ //Faster, but not so universal
-             if (ins.definition instanceof IfTypeIns) {
+            {
+                if (ins.definition instanceof IfTypeIns) {
                     long target = ins.getTargetAddress();
                     try {
                         ins.operands[0] = updater.updateOperandOffset(ins.getAddress(), target, ins.operands[0]);
@@ -2182,14 +2181,17 @@ public class AVM2Code implements Cloneable {
                         throw new ConvertException("Invalid offset (" + ins + ")", i);
                     }
                 }
+            }
             ins.setAddress(updater.updateInstructionOffset(ins.getAddress()));
             //Note: changing operands here does not change instruction byte length as offsets are always S24 (not variable length)
         }
 
-        for (ABCException ex : body.exceptions) {
-            ex.start = updater.updateOperandOffset(-1, ex.start, ex.start);
-            ex.end = updater.updateOperandOffset(-1, ex.end, ex.end);
-            ex.target = updater.updateOperandOffset(-1, ex.target, ex.target);
+        if (body != null) {
+            for (ABCException ex : body.exceptions) {
+                ex.start = updater.updateOperandOffset(-1, ex.start, ex.start);
+                ex.end = updater.updateOperandOffset(-1, ex.end, ex.end);
+                ex.target = updater.updateOperandOffset(-1, ex.target, ex.target);
+            }
         }
     }
 
@@ -2200,7 +2202,6 @@ public class AVM2Code implements Cloneable {
         final List<Long> insAddrToRemove = new ArrayList<>();
         final long endOffset = getEndOffset();
         updateOffsets(new OffsetUpdater() {
-
             @Override
             public long updateInstructionOffset(long address) {
                 return address;
@@ -2213,7 +2214,6 @@ public class AVM2Code implements Cloneable {
                 }
                 return offset;
             }
-
         }, body);
 
         boolean someIgnored = false;
@@ -2232,7 +2232,6 @@ public class AVM2Code implements Cloneable {
 
     public void checkValidOffsets(MethodBody body) {
         updateOffsets(new OffsetUpdater() {
-
             @Override
             public long updateInstructionOffset(long address) {
                 adr2pos(address);
@@ -2247,7 +2246,6 @@ public class AVM2Code implements Cloneable {
                 adr2pos(targetAddress);
                 return offset;
             }
-
         }, body);
     }
 
@@ -2329,7 +2327,6 @@ public class AVM2Code implements Cloneable {
 
         if (byteDelta != 0) {
             updateOffsets(new OffsetUpdater() {
-
                 @Override
                 public long updateInstructionOffset(long address) {
                     if (address > instruction.getAddress()) {
@@ -2373,14 +2370,15 @@ public class AVM2Code implements Cloneable {
             pos = code.size();
         }
         final int byteCount = instruction.getBytesLength();
-        if (pos == code.size()) {
+        if (code.size() == 0) {
+            instruction.setAddress(0);
+        } else if (pos == code.size()) {
             instruction.setAddress(code.get(pos - 1).getAddress() + code.get(pos - 1).getBytesLength());
         } else {
             instruction.setAddress(code.get(pos).getAddress());
         }
         final long x = instruction.getAddress();
         updateOffsets(new OffsetUpdater() {
-
             @Override
             public long updateInstructionOffset(long offset) {
                 if (offset >= x) {
@@ -2609,6 +2607,27 @@ public class AVM2Code implements Cloneable {
             }
         }
         //stats.maxscope+=initScope;
+        return stats;
+    }
+
+    // simplified version of getStats. This method calculates only the maxlocal value
+    public CodeStats getMaxLocal() {
+        CodeStats stats = new CodeStats();
+        for (AVM2Instruction ins : code) {
+            if (ins.definition instanceof SetLocalTypeIns) {
+                handleRegister(stats, ((SetLocalTypeIns) ins.definition).getRegisterId(ins));
+            } else if (ins.definition instanceof GetLocalTypeIns) {
+                handleRegister(stats, ((GetLocalTypeIns) ins.definition).getRegisterId(ins));
+            } else {
+                for (int i = 0; i < ins.definition.operands.length; i++) {
+                    int op = ins.definition.operands[i];
+                    if (op == DAT_LOCAL_REG_INDEX) {
+                        handleRegister(stats, ins.operands[i]);
+                    }
+                }
+            }
+        }
+
         return stats;
     }
 

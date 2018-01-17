@@ -2,6 +2,34 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- [#1240] AS search using multiple threads when parallel speedup is enabled
+- [#1308] Search by all P-code files in AS3
+- [#1333] Exporting sprites as swf files
+- [#1365] Allow to configure all types of configuration settings from command line
+- [#1369] Allow zoom in sprite (and button) export
+- Debug tooltips on hover
+- AS3 deobfuscation - removing push instructions immediately followed by pop
+
+### Changed
+- Homepage is now on GitHub jindrapetrik/jpexs-decompiler instead of free-decompiler.com
+- Update checking now checks changes on GitHub releases
+
+### Removed
+- Removed help us section
+- Removed changeslog from new version dialog
+
+### Fixed
+- [#1327] P-code editing: error message and syntax highlighting fixed when instruction name contains upper cased letter
+- [#1343] AS 1/2 direct editation critical bug
+- [#1348] Cannot properly export frame with cyrillic symbols to SVG
+- [#1354] Various FLA export problem fixes
+- [#1367] Raw edit conditional type fix.
+- [#1401] SVG export: duplicate pattern IDs fixed
+- [#1402] SVG export: certain font characters not exported properly fixed
+- [#1430] AS 1/2 deobfuscation fixes
+- Opening loaded SWF files during run fixed
+- Not opening first script when clicked on app startup
 
 ## [10.0.0] - 2016-12-24
 ### Added
@@ -414,13 +442,13 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - Better gif exporter
-- [#772]: closing loading dialog now cancels the loading of the swf
+- [#772] closing loading dialog now cancels the loading of the swf
 - [#762] export pcode with different extension
 
 ### Fixed
 - CRITICAL: Update System Bug causing updates not working
 - [#862] AS3 asm: do not read beyond return/throw instructions
-- [#865], [#613]: ribbon prefered width fix
+- [#865], [#613] ribbon prefered width fix
 - [#868] export path fix, allow to export buttons
 - [#865] TagTree font size problem on high resolution screens
 - [#713],[#807] Installer for 4.0+ fails to access Adobe Website
@@ -435,7 +463,7 @@ All notable changes to this project will be documented in this file.
 
 ## [5.0.1] - 2015-04-18
 ### Fixed
-- [#860]: Opening bundle (zip, swc, any binary file) files fixed
+- [#860] Opening bundle (zip, swc, any binary file) files fixed
 
 ## [5.0.0] - 2015-04-18
 ### Added
@@ -563,13 +591,13 @@ All notable changes to this project will be documented in this file.
 - [#716],[#717],[#718] Proxy - save SWF, replace, copy URL, filesizes, table design
 
 ### Changed
-- [#720]: edited shape tag is not marked as modified after replacing
+- [#720] edited shape tag is not marked as modified after replacing
 - reorganized about dialog
 
 ### Fixed
 - [#719] null swf name in Proxy after cancelling rename dialog
 - flashplayer - font display
-- [#723]: saving swf with invalid referenced characters
+- [#723] saving swf with invalid referenced characters
 - DefineCompactedFont paging
 - [#288] Less memory usage during FLA export
 - Corrected syntax hilighting for AS3 P-code
@@ -766,7 +794,7 @@ All notable changes to this project will be documented in this file.
 - Advanced settings dialog with tabs, config names, descriptions
 
 ### Fixed
-- [#561], [#509], [#433]: AS3 EmptyStackException fix - correct hasnext2 arguments
+- [#561], [#509], [#433] AS3 EmptyStackException fix - correct hasnext2 arguments
 - Internal viewer: Filters fix
 
 ## [2.0.1 update 2] - 2014-04-05
@@ -789,7 +817,7 @@ All notable changes to this project will be documented in this file.
 - Internal viewer: Sounds on stage
 - All sounds to WAV export
 - Internal viewer: Showing texts, dynamic text border/fill
-- [#504]: Unicode characters in JSyntaxPane
+- [#504] Unicode characters in JSyntaxPane
 - Internal viewer: showing object under cursor
 - Folder icons
 - Sound/Image format on command line.
@@ -816,7 +844,7 @@ All notable changes to this project will be documented in this file.
 - Generic tag tree editor
 - Timeline view (stub only)
 - FLA export to CS5, CS5.5, CC format (previously only CS6 was supported)
-- [#513]: command line option to extract swf from binary file
+- [#513] command line option to extract swf from binary file
 - Configurable code formatting (Indentation + brace position)
 - [#262] Export FLA: Font character ranges export
 - Configurable checking for updates
@@ -1482,6 +1510,11 @@ All notable changes to this project will be documented in this file.
 - AS3: Method info editor fixed
 - Edittext & Button displaying
 
+## [1.2.0 update 1] - 2013-01-19
+## Fixed
+- [#27] Problems on loading DefineSceneAndFrameLabel
+- CSMTextSettings tag writing fix
+
 ## [1.2.0] - 2013-01-19
 ### Added
 - Displaying various SWF objects (shapes, sprites,...) with flash player library (Windows only, sorry).
@@ -1599,7 +1632,8 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Initial public release
 
-[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version9.0.0...dev
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version10.0.0...dev
+[10.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version9.0.0...version10.0.0
 [9.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version8.0.1...version9.0.0
 [8.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version8.0.0...version8.0.1
 [8.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version7.1.2...version8.0.0
@@ -1683,7 +1717,8 @@ All notable changes to this project will be documented in this file.
 [1.4.0 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.4.0...version1.4.0u1
 [1.4.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.3.1...version1.4.0
 [1.3.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.3.0...version1.3.1
-[1.3.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.2.0...version1.3.0
+[1.3.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.2.0u1...version1.3.0
+[1.2.0 update 1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.2.0...version1.2.0u1
 [1.2.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.1.0...version1.2.0
 [1.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.0.1...version1.1.0
 [1.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version1.0.0...version1.0.1
@@ -2270,3 +2305,38 @@ All notable changes to this project will be documented in this file.
 [#35]: https://www.free-decompiler.com/flash/issues/35
 [#32]: https://www.free-decompiler.com/flash/issues/32
 [#31]: https://www.free-decompiler.com/flash/issues/31
+[#1240]: https://www.free-decompiler.com/flash/issues/1240
+[#1308]: https://www.free-decompiler.com/flash/issues/1308
+[#1333]: https://www.free-decompiler.com/flash/issues/1333
+[#1365]: https://www.free-decompiler.com/flash/issues/1365
+[#1369]: https://www.free-decompiler.com/flash/issues/1369
+[#1327]: https://www.free-decompiler.com/flash/issues/1327
+[#1343]: https://www.free-decompiler.com/flash/issues/1343
+[#1348]: https://www.free-decompiler.com/flash/issues/1348
+[#1354]: https://www.free-decompiler.com/flash/issues/1354
+[#1367]: https://www.free-decompiler.com/flash/issues/1367
+[#1401]: https://www.free-decompiler.com/flash/issues/1401
+[#1402]: https://www.free-decompiler.com/flash/issues/1402
+[#1430]: https://www.free-decompiler.com/flash/issues/1430
+[#1254]: https://www.free-decompiler.com/flash/issues/1254
+[#907]: https://www.free-decompiler.com/flash/issues/907
+[#1311]: https://www.free-decompiler.com/flash/issues/1311
+[#1313]: https://www.free-decompiler.com/flash/issues/1313
+[#1308]: https://www.free-decompiler.com/flash/issues/1308
+[#1189]: https://www.free-decompiler.com/flash/issues/1189
+[#1274]: https://www.free-decompiler.com/flash/issues/1274
+[#1275]: https://www.free-decompiler.com/flash/issues/1275
+[#1278]: https://www.free-decompiler.com/flash/issues/1278
+[#1281]: https://www.free-decompiler.com/flash/issues/1281
+[#1254]: https://www.free-decompiler.com/flash/issues/1254
+[#1289]: https://www.free-decompiler.com/flash/issues/1289
+[#1283]: https://www.free-decompiler.com/flash/issues/1283
+[#1294]: https://www.free-decompiler.com/flash/issues/1294
+[#1302]: https://www.free-decompiler.com/flash/issues/1302
+[#1309]: https://www.free-decompiler.com/flash/issues/1309
+[#1312]: https://www.free-decompiler.com/flash/issues/1312
+[#1303]: https://www.free-decompiler.com/flash/issues/1303
+[#1314]: https://www.free-decompiler.com/flash/issues/1314
+[#1320]: https://www.free-decompiler.com/flash/issues/1320
+[#1323]: https://www.free-decompiler.com/flash/issues/1323
+[#27]: https://www.free-decompiler.com/flash/issues/27

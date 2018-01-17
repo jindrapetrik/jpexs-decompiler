@@ -1,18 +1,18 @@
 /*
- * Copyright (C) 2010-2016 JPEXS
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  Copyright (C) 2010-2018 JPEXS
+ * 
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.jpexs.decompiler.flash.gui;
 
@@ -85,6 +85,8 @@ public class DebugPanel extends JPanel {
 
     private boolean loading = false;
 
+    public ABCPanel.VariablesTableModel localsTable;
+    
     public static enum SelectedTab {
 
         LOG, STACK, SCOPECHAIN, LOCALS, REGISTERS, CALLSTACK, CONSTANTPOOL
@@ -346,6 +348,7 @@ public class DebugPanel extends JPanel {
                 synchronized (DebugPanel.this) {
 
                     SelectedTab oldSel = selectedTab;
+                    localsTable = null;
                     InFrame f = Main.getDebugHandler().getFrame();
                     if (f != null) {
 
@@ -362,7 +365,8 @@ public class DebugPanel extends JPanel {
                         localIds.addAll(f.argumentFrameIds);
                         localIds.addAll(f.frameIds);
 
-                        safeSetTreeModel(debugLocalsTable, new ABCPanel.VariablesTableModel(debugLocalsTable, locals, localIds));
+                        localsTable = new ABCPanel.VariablesTableModel(debugLocalsTable, locals, localIds);
+                        safeSetTreeModel(debugLocalsTable, localsTable);
                         safeSetTreeModel(debugScopeTable, new ABCPanel.VariablesTableModel(debugScopeTable, f.scopeChain, f.scopeChainFrameIds));
 
                         /*TableModelListener refreshListener = new TableModelListener() {

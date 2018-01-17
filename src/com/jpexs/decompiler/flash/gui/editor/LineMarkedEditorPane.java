@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2016 JPEXS
- *
+ *  Copyright (C) 2010-2018 JPEXS
+ * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *
+ * 
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *
+ * 
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -215,11 +215,17 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
     }
 
     public void gotoLine(int line) {
-        setCaretPosition(ActionUtils.getDocumentPosition(this, line, 0));
+        int pos = ActionUtils.getDocumentPosition(this, line, 0);
+        if (pos != -1) {
+            setCaretPosition(pos);
+        }
     }
 
     public void gotoLineCol(int line, int column) {
-        setCaretPosition(ActionUtils.getDocumentPosition(this, line, column));
+        int pos = ActionUtils.getDocumentPosition(this, line, column);
+        if (pos != -1) {
+            setCaretPosition(pos);
+        }
     }
 
     public Point getLineLocation(int line) {
@@ -314,7 +320,6 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
         //No standard AddKeyListener as we want to catch Ctrl globally no matter of focus
         KeyboardFocusManager.getCurrentKeyboardFocusManager()
                 .addKeyEventPostProcessor(new KeyEventPostProcessor() {
-
                     @Override
                     public boolean postProcessKeyEvent(KeyEvent e) {
                         if (e.getID() == KeyEvent.KEY_PRESSED) {
@@ -342,8 +347,10 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
             Rectangle r;
             try {
                 r = modelToView(pos);
-                if (lastPos.x < r.x) {
-                    pos--;
+                if (r != null) {
+                    if (lastPos.x < r.x) {
+                        pos--;
+                    }
                 }
             } catch (BadLocationException ex) {
                 //ignore
@@ -478,6 +485,7 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
         if (Configuration._debugMode.get() && t != null && t.length() > truncateLimit) {
             t = t.substring(0, truncateLimit) + "\r\n" + AppStrings.translate("editorTruncateWarning").replace("%chars%", Integer.toString(truncateLimit));
         }
+
         super.setText(t);
         setCaretPosition(0); //scroll to top
     }

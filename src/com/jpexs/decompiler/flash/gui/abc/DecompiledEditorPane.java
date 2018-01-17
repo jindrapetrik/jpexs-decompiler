@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2016 JPEXS
- *
+ *  Copyright (C) 2010-2018 JPEXS
+ * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *
+ * 
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *
+ * 
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -34,6 +34,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.editor.DebuggableEditorPane;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -43,11 +44,16 @@ import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.graph.DottedChain;
+import com.jpexs.helpers.CancellableWorker;
 import java.awt.Point;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.CancellationException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import jsyntaxpane.SyntaxDocument;
@@ -60,7 +66,9 @@ import jsyntaxpane.TokenType;
  */
 public class DecompiledEditorPane extends DebuggableEditorPane implements CaretListener {
 
-    private HighlightedText highlightedText = new HighlightedText();
+    private static final Logger logger = Logger.getLogger(DecompiledEditorPane.class.getName());
+
+    private HighlightedText highlightedText = HighlightedText.EMPTY;
 
     private Highlighting currentMethodHighlight;
 
@@ -79,6 +87,8 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
     private int classIndex = -1;
 
     private boolean isStatic = false;
+
+    private CancellableWorker setSourceWorker;
 
     private final List<Runnable> scriptListeners = new ArrayList<>();
 
@@ -608,7 +618,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
 
         Highlighting tc = Highlighting.searchIndex(highlightedText.getClassHighlights(), classIndex);
         if (tc != null || isScriptInit) {
-            Highlighting th = Highlighting.searchIndex(highlightedText.getTraitHighlights(), traitId, isScriptInit || tc == null ? 0 : tc.startPos, isScriptInit || tc == null ? -1 : tc.startPos + tc.len);
+            Highlighting th = Highlighting.searchIndex(highlightedText.getTraitHighlights(), traitId, isScriptInit ? 0 : tc.startPos, isScriptInit ? -1 : tc.startPos + tc.len);
             int pos = 0;
             if (th != null) {
                 if (th.len > 1) {
@@ -649,9 +659,18 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
     }
 
     public void setScript(ScriptPack scriptLeaf, boolean force) {
+        View.checkAccess();
+
+        if (setSourceWorker != null) {
+            setSourceWorker.cancel(true);
+            setSourceWorker = null;
+        }
+
         if (!force && this.script == scriptLeaf) {
+            fireScript();
             return;
         }
+
         String sn = scriptLeaf.getClassPath().toString();
         setScriptName(sn);
         abcPanel.scriptNameLabel.setText(sn);
@@ -661,23 +680,76 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         if (scriptIndex > -1) {
             nscript = abc.script_info.get(scriptIndex);
         }
+
         if (nscript == null) {
-            highlightedText = new HighlightedText();
-            this.script = scriptLeaf;
+            highlightedText = HighlightedText.EMPTY;
             return;
         }
-        setText("// " + AppStrings.translate("pleasewait") + "...");
 
-        this.script = scriptLeaf;
-        HighlightedText cd = null;
-        try {
-            cd = SWF.getCached(scriptLeaf);
-        } catch (InterruptedException ex) {
+        HighlightedText decompiledText = SWF.getFromCache(scriptLeaf);
+
+        boolean decompileNeeded = decompiledText == null;
+
+        if (decompileNeeded) {
+            CancellableWorker worker = new CancellableWorker() {
+                @Override
+                protected Void doInBackground() throws Exception {
+
+                    if (decompileNeeded) {
+                        View.execInEventDispatch(() -> {
+                            setText("// " + AppStrings.translate("work.decompiling") + "...");
+                        });
+
+                        HighlightedText htext = SWF.getCached(scriptLeaf);
+                        View.execInEventDispatch(() -> {
+                            setSourceCompleted(scriptLeaf, htext);
+                        });
+                    }
+
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    View.execInEventDispatch(() -> {
+                        setSourceWorker = null;
+                        if (!Main.isDebugging()) {
+                            Main.stopWork();
+                        }
+
+                        try {
+                            get();
+                        } catch (CancellationException ex) {
+                            setText("// " + AppStrings.translate("work.canceled"));
+                        } catch (Exception ex) {
+                            logger.log(Level.SEVERE, "Error", ex);
+                            setText("// " + AppStrings.translate("decompilationError") + ": " + ex);
+                        }
+                    });
+                }
+            };
+
+            worker.execute();
+            setSourceWorker = worker;
+            if (!Main.isDebugging()) {
+                Main.startWork(AppStrings.translate("work.decompiling") + "...", worker);
+            }
+        } else {
+            setSourceCompleted(scriptLeaf, decompiledText);
+        }
+    }
+
+    private void setSourceCompleted(ScriptPack scriptLeaf, HighlightedText decompiledText) {
+        View.checkAccess();
+
+        if (decompiledText == null) {
+            decompiledText = HighlightedText.EMPTY;
         }
 
-        if (cd != null) {
-            String hilightedCode = cd.text;
-            highlightedText = cd;
+        script = scriptLeaf;
+        highlightedText = decompiledText;
+        if (decompiledText != null) {
+            String hilightedCode = decompiledText.text;
             setText(hilightedCode);
 
             if (highlightedText.getClassHighlights().size() > 0) {
@@ -688,15 +760,19 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                 }
             }
         }
+
         fireScript();
     }
 
     public void reloadClass() {
+        View.checkAccess();
+
         int ci = classIndex;
         SWF.uncache(script);
         if (script != null && getABC() != null) {
             setScript(script, true);
         }
+
         setNoTrait();
         setClassIndex(ci);
     }
@@ -713,5 +789,25 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
     public void setText(String t) {
         super.setText(t);
         setCaretPosition(0);
+    }
+
+    @Override
+    public String getToolTipText(MouseEvent e) {    
+        // not debugging: so return existing text
+        if (abcPanel.getDebugPanel().localsTable == null)
+           return super.getToolTipText();
+                
+        final Point point       = new Point(e.getX(), e.getY());
+        final int pos           = abcPanel.decompiledTextArea.viewToModel(point);
+        final String identifier = abcPanel.getMainPanel().getActionPanel().getStringUnderPosition(pos, abcPanel.decompiledTextArea);
+
+        if (identifier != null && !identifier.isEmpty())
+        {
+            String tooltipText = abcPanel.getDebugPanel().localsTable.TryGetDebugHoverToolTipText(identifier);
+            return (tooltipText == null ? super.getToolTipText() : tooltipText);
+        }
+        
+        // not found: so return existing text
+        return super.getToolTipText();
     }
 }

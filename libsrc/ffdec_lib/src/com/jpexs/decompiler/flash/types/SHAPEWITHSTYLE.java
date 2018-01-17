@@ -1,19 +1,18 @@
 /*
- *  Copyright (C) 2010-2016 JPEXS, All rights reserved.
- *
+ *  Copyright (C) 2010-2018 JPEXS, All rights reserved.
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
+ * License along with this library. */
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
@@ -21,6 +20,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -62,6 +62,23 @@ public class SHAPEWITHSTYLE extends SHAPE implements NeedsCharacters, Serializab
             modified |= r.removeCharacter(characterId);
         }
         return modified;
+    }
+
+    @Override
+    public SHAPEWITHSTYLE resize(double multiplierX, double multiplierY) {
+        SHAPEWITHSTYLE ret = new SHAPEWITHSTYLE();
+        ret.numFillBits = numFillBits;
+        ret.numLineBits = numLineBits;
+        List<SHAPERECORD> recs = new ArrayList<>();
+        for (SHAPERECORD r : shapeRecords) {
+            SHAPERECORD c = r.resize(multiplierX, multiplierY);
+            recs.add(c);
+        }
+
+        ret.shapeRecords = recs;
+        ret.fillStyles = fillStyles; // todo: clone?
+        ret.lineStyles = lineStyles; // todo: clone?
+        return ret;
     }
 
     public static SHAPEWITHSTYLE createEmpty(int shapeNum) {

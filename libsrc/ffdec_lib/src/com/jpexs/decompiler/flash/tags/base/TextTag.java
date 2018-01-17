@@ -1,19 +1,18 @@
 /*
- *  Copyright (C) 2010-2016 JPEXS, All rights reserved.
- *
+ *  Copyright (C) 2010-2018 JPEXS, All rights reserved.
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
+ * License along with this library. */
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -438,7 +437,7 @@ public abstract class TextTag extends DrawableTag {
     public static void drawBorderSVG(SWF swf, SVGExporter exporter, RGB borderColor, RGB fillColor, RECT rect, MATRIX textMatrix, ColorTransform colorTransform, double zoom) {
         exporter.createSubGroup(new Matrix(textMatrix), null);
         SHAPE shape = getBorderShape(borderColor, fillColor, rect);
-        SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, shape, exporter, null, colorTransform, zoom);
+        SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, shape, 0, exporter, null, colorTransform, zoom);
         shapeExporter.export();
         exporter.endGroup();
     }
@@ -736,11 +735,11 @@ public abstract class TextTag extends DrawableTag {
                         char ch = font.glyphToChar(entry.glyphIndex);
 
                         String charId = null;
-                        Map<Character, String> chs;
+                        Map<Integer, String> chs;
                         if (exporter.exportedChars.containsKey(font)) {
                             chs = exporter.exportedChars.get(font);
-                            if (chs.containsKey(ch)) {
-                                charId = chs.get(ch);
+                            if (chs.containsKey(entry.glyphIndex)) {
+                                charId = chs.get(entry.glyphIndex);
                             }
                         } else {
                             chs = new HashMap<>();
@@ -750,17 +749,22 @@ public abstract class TextTag extends DrawableTag {
                         if (charId == null) {
                             charId = exporter.getUniqueId(Helper.getValidHtmlId("font_" + font.getFontNameIntag() + "_" + ch));
                             exporter.createDefGroup(null, charId);
-                            SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, shape, exporter, null, colorTransform, zoom);
+                            SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, shape, 0, exporter, null, colorTransform, zoom);
                             shapeExporter.export();
-                            exporter.endGroup();
-                            chs.put(ch, charId);
+                            if (!exporter.endGroup()) {
+                                charId = "";
+                            }
+
+                            chs.put(entry.glyphIndex, charId);
                         }
 
-                        Element charImage = exporter.addUse(mat, bounds, charId, null);
-                        RGBA colorA = new RGBA(textColor);
-                        charImage.setAttribute("fill", colorA.toHexRGB());
-                        if (colorA.alpha != 255) {
-                            charImage.setAttribute("fill-opacity", Float.toString(colorA.getAlphaFloat()));
+                        if (!"".equals(charId)) {
+                            Element charImage = exporter.addUse(mat, bounds, charId, null);
+                            RGBA colorA = new RGBA(textColor);
+                            charImage.setAttribute("fill", colorA.toHexRGB());
+                            if (colorA.alpha != 255) {
+                                charImage.setAttribute("fill-opacity", Float.toString(colorA.getAlphaFloat()));
+                            }
                         }
 
                         x += entry.glyphAdvance;

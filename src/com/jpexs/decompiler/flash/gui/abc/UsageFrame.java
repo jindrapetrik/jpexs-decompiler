@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2016 JPEXS
- *
+ *  Copyright (C) 2010-2018 JPEXS
+ * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *
+ * 
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *
+ * 
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -98,14 +98,18 @@ public class UsageFrame extends AppDialog implements MouseListener {
     }
 
     public static void gotoUsage(final ABCPanel abcPanel, final MultinameUsage usage) {
+        View.checkAccess();
+
         if (usage instanceof InsideClassMultinameUsageInterface) {
             final InsideClassMultinameUsageInterface icu = (InsideClassMultinameUsageInterface) usage;
 
-            Runnable settrait = new Runnable() {
+            DecompiledEditorPane decompiledTextArea = abcPanel.decompiledTextArea;
+            ABC abc = abcPanel.abc;
+            Runnable setTrait = new Runnable() {
                 @Override
                 public void run() {
-                    abcPanel.decompiledTextArea.removeScriptListener(this);
-                    abcPanel.decompiledTextArea.setClassIndex(icu.getClassIndex());
+                    decompiledTextArea.removeScriptListener(this);
+                    decompiledTextArea.setClassIndex(icu.getClassIndex());
                     if (usage instanceof TraitMultinameUsage) {
                         TraitMultinameUsage tmu = (TraitMultinameUsage) usage;
                         int traitIndex;
@@ -115,23 +119,23 @@ public class UsageFrame extends AppDialog implements MouseListener {
                             traitIndex = tmu.getTraitIndex();
                         }
                         if (tmu.getTraitsType() == TraitMultinameUsage.TRAITS_TYPE_INSTANCE) {
-                            traitIndex += abcPanel.abc.class_info.get(tmu.getClassIndex()).static_traits.traits.size();
+                            traitIndex += abc.class_info.get(tmu.getClassIndex()).static_traits.traits.size();
                         }
                         if (tmu instanceof MethodMultinameUsage) {
                             MethodMultinameUsage mmu = (MethodMultinameUsage) usage;
                             if (mmu.isInitializer() == true) {
-                                traitIndex = abcPanel.abc.class_info.get(mmu.getClassIndex()).static_traits.traits.size() + abcPanel.abc.instance_info.get(mmu.getClassIndex()).instance_traits.traits.size() + (mmu.getTraitsType() == TraitMultinameUsage.TRAITS_TYPE_CLASS ? 1 : 0);
+                                traitIndex = abc.class_info.get(mmu.getClassIndex()).static_traits.traits.size() + abc.instance_info.get(mmu.getClassIndex()).instance_traits.traits.size() + (mmu.getTraitsType() == TraitMultinameUsage.TRAITS_TYPE_CLASS ? 1 : 0);
                             }
                         }
-                        abcPanel.decompiledTextArea.gotoTrait(traitIndex);
+                        decompiledTextArea.gotoTrait(traitIndex);
                     }
                 }
             };
 
-            if (abcPanel.decompiledTextArea.getClassIndex() == icu.getClassIndex() && abcPanel.abc == icu.getAbc()) {
-                settrait.run();
+            if (decompiledTextArea.getClassIndex() == icu.getClassIndex() && abc == icu.getAbc()) {
+                setTrait.run();
             } else {
-                abcPanel.decompiledTextArea.addScriptListener(settrait);
+                decompiledTextArea.addScriptListener(setTrait);
                 abcPanel.hilightScript(abcPanel.getSwf(), icu.getAbc().instance_info.get(icu.getClassIndex()).getName(icu.getAbc().constants).getNameWithNamespace(icu.getAbc().constants, true).toRawString());
             }
         }

@@ -1,19 +1,18 @@
 /*
- *  Copyright (C) 2010-2016 JPEXS, All rights reserved.
- *
+ *  Copyright (C) 2010-2018 JPEXS, All rights reserved.
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
+ * License along with this library. */
 package com.jpexs.decompiler.flash.abc.types.traits;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -31,6 +30,7 @@ import com.jpexs.decompiler.flash.exporters.script.DependencyType;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
+import com.jpexs.decompiler.flash.search.MethodId;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TypeItem;
@@ -274,5 +274,22 @@ public class TraitClass extends Trait implements TraitWithSlot {
         writer.hilightSpecial(Integer.toString(slot_id), HighlightSpecialType.SLOT_ID);
         writer.newLine();
         return writer;
+    }
+
+    @Override
+    public void getMethodInfos(ABC abc, int traitId, int classIndex, List<MethodId> methodInfos) {
+        InstanceInfo instanceInfo = abc.instance_info.get(class_info);
+        ClassInfo classInfo = abc.class_info.get(class_info);
+
+        //class initializer
+        methodInfos.add(new MethodId(GraphTextWriter.TRAIT_CLASS_INITIALIZER, class_info, classInfo.cinit_index));
+
+        //constructor - instance initializer
+        methodInfos.add(new MethodId(GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, class_info, instanceInfo.iinit_index));
+
+        //static variables,constants & methods
+        classInfo.static_traits.getMethodInfos(abc, true, class_info, methodInfos);
+
+        instanceInfo.instance_traits.getMethodInfos(abc, false, class_info, methodInfos);
     }
 }

@@ -1,19 +1,18 @@
 /*
- *  Copyright (C) 2010-2016 JPEXS, All rights reserved.
- *
+ *  Copyright (C) 2010-2018 JPEXS, All rights reserved.
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
+ * License along with this library. */
 package com.jpexs.decompiler.flash.importers.svg;
 
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
@@ -100,6 +99,10 @@ public class SvgImporter {
         shapes.lineStyles.lineStyles = new LINESTYLE[0];
 
         int shapeNum = st.getShapeNum();
+        RECT rect = st.getRect();
+        int origXmin = rect.Xmin;
+        int origYmin = rect.Ymin;
+
         shapes.shapeRecords = new ArrayList<>();
 
         Rectangle2D.Double viewBox = null;
@@ -165,27 +168,29 @@ public class SvgImporter {
 
             SvgStyle style = new SvgStyle(this, idMap, rootElement);
             Matrix transform = new Matrix();
+
+            if (!fill) {
+                rect.Xmin -= origXmin;
+                rect.Xmax -= origXmin;
+                rect.Ymin -= origYmin;
+                rect.Ymax -= origYmin;
+                rect.Xmin = (int) Math.round(viewBox.x * SWF.unitDivisor);
+                rect.Ymin = (int) Math.round(viewBox.y * SWF.unitDivisor);
+                rect.Xmax = (int) Math.round((viewBox.x + viewBox.width) * SWF.unitDivisor);
+                rect.Ymax = (int) Math.round((viewBox.y + viewBox.height) * SWF.unitDivisor);
+            } else {
+                double ratioX = rect.getWidth() / width / SWF.unitDivisor;
+                double ratioY = rect.getHeight() / height / SWF.unitDivisor;
+                transform = Matrix.getScaleInstance(ratioX, ratioY);
+                transform.translate(origXmin / SWF.unitDivisor / ratioX, origYmin / SWF.unitDivisor / ratioY);
+            }
+
             processSvgObject(idMap, shapeNum, shapes, rootElement, transform, style);
         } catch (SAXException | IOException | ParserConfigurationException ex) {
             Logger.getLogger(ShapeImporter.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         shapes.shapeRecords.add(new EndShapeRecord());
-
-        RECT rect = st.getRect();
-        int origXmin = rect.Xmin;
-        int origYmin = rect.Ymin;
-        rect.Xmin -= origXmin;
-        rect.Xmax -= origXmin;
-        rect.Ymin -= origYmin;
-        rect.Ymax -= origYmin;
-
-        if (!fill && viewBox != null) {
-            rect.Xmin = (int) Math.round(viewBox.x * SWF.unitDivisor);
-            rect.Ymin = (int) Math.round(viewBox.y * SWF.unitDivisor);
-            rect.Xmax = (int) Math.round((viewBox.x + viewBox.width) * SWF.unitDivisor);
-            rect.Ymax = (int) Math.round((viewBox.y + viewBox.height) * SWF.unitDivisor);
-        }
 
         st.shapes = shapes;
         st.setModified(true);
@@ -273,7 +278,13 @@ public class SvgImporter {
             double x = x0;
             double y = y0;
             Point p;
-            char cmd = Character.toUpperCase(command.command);
+
+            boolean isRelative = Character.isLowerCase(command.command);
+            if (isRelative) {
+                throw new Error("processCommands is called with relative command");
+            }
+
+            char cmd = command.command;
             switch (cmd) {
                 case 'M':
                     StyleChangeRecord scr = new StyleChangeRecord();
@@ -292,18 +303,18 @@ public class SvgImporter {
                     p = transform2.transform(x, y);
                     scr.moveDeltaX = (int) Math.round(p.x);
                     scr.moveDeltaY = (int) Math.round(p.y);
-                    prevPoint = p;
+                    prevPoint = new Point(scr.moveDeltaX, scr.moveDeltaY);
                     scr.stateMoveTo = true;
 
                     newRecords.add(scr);
-                    startPoint = p;
+                    startPoint = prevPoint;
                     break;
                 case 'Z':
                     StraightEdgeRecord serz = new StraightEdgeRecord();
                     p = startPoint;
                     serz.deltaX = (int) Math.round(p.x - prevPoint.x);
                     serz.deltaY = (int) Math.round(p.y - prevPoint.y);
-                    prevPoint = p;
+                    prevPoint = new Point(prevPoint.x + serz.deltaX, prevPoint.y + serz.deltaY);
                     serz.generalLineFlag = true;
                     newRecords.add(serz);
                     if (lineStyle2Obj != null) {
@@ -318,7 +329,7 @@ public class SvgImporter {
                     p = transform2.transform(x, y);
                     serl.deltaX = (int) Math.round(p.x - prevPoint.x);
                     serl.deltaY = (int) Math.round(p.y - prevPoint.y);
-                    prevPoint = p;
+                    prevPoint = new Point(prevPoint.x + serl.deltaX, prevPoint.y + serl.deltaY);
                     serl.generalLineFlag = true;
                     serl.simplify();
                     newRecords.add(serl);
@@ -329,7 +340,7 @@ public class SvgImporter {
 
                     p = transform2.transform(x, y);
                     serh.deltaX = (int) Math.round(p.x - prevPoint.x);
-                    prevPoint = p;
+                    prevPoint = new Point(prevPoint.x + serh.deltaX, prevPoint.y/* + serh.deltaY*/);
                     newRecords.add(serh);
                     break;
                 case 'V':
@@ -338,7 +349,7 @@ public class SvgImporter {
 
                     p = transform2.transform(x, y);
                     serv.deltaY = (int) Math.round(p.y - prevPoint.y);
-                    prevPoint = p;
+                    prevPoint = new Point(prevPoint.x/* + serv.deltaX*/, prevPoint.y + serv.deltaY);
                     serv.vertLineFlag = true;
                     newRecords.add(serv);
                     break;
@@ -350,7 +361,7 @@ public class SvgImporter {
                     p = transform2.transform(x, y);
                     cer.controlDeltaX = (int) Math.round(p.x - prevPoint.x);
                     cer.controlDeltaY = (int) Math.round(p.y - prevPoint.y);
-                    prevPoint = p;
+                    prevPoint = new Point(prevPoint.x + cer.controlDeltaX, prevPoint.y + cer.controlDeltaY);
 
                     x = command.params[2];
                     y = command.params[3];
@@ -358,7 +369,7 @@ public class SvgImporter {
                     p = transform2.transform(x, y);
                     cer.anchorDeltaX = (int) Math.round(p.x - prevPoint.x);
                     cer.anchorDeltaY = (int) Math.round(p.y - prevPoint.y);
-                    prevPoint = p;
+                    prevPoint = new Point(prevPoint.x + cer.anchorDeltaX, prevPoint.y + cer.anchorDeltaY);
                     newRecords.add(cer);
                     break;
                 case 'C':
@@ -394,12 +405,12 @@ public class SvgImporter {
                         p = new Point(quadCoordinates.get(i++), quadCoordinates.get(i++));
                         cerc.controlDeltaX = (int) Math.round(p.x - prevPoint.x);
                         cerc.controlDeltaY = (int) Math.round(p.y - prevPoint.y);
-                        prevPoint = p;
+                        prevPoint = new Point(prevPoint.x + cerc.controlDeltaX, prevPoint.y + cerc.controlDeltaY);
 
                         p = new Point(quadCoordinates.get(i++), quadCoordinates.get(i++));
                         cerc.anchorDeltaX = (int) Math.round(p.x - prevPoint.x);
                         cerc.anchorDeltaY = (int) Math.round(p.y - prevPoint.y);
-                        prevPoint = p;
+                        prevPoint = new Point(prevPoint.x + cerc.anchorDeltaX, prevPoint.y + cerc.anchorDeltaY);
                         newRecords.add(cerc);
                     }
 

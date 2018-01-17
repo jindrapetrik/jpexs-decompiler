@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2016 JPEXS
- *
+ *  Copyright (C) 2010-2018 JPEXS
+ * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *
+ * 
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *
+ * 
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -25,7 +25,6 @@ import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.TagEditorPanel;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
-import com.jpexs.helpers.CancellableWorker;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.FlowLayout;
@@ -130,7 +129,6 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
         buttonsPanel.setVisible(false);
 
         conListener = new DebuggerHandler.ConnectionListener() {
-
             @Override
             public void connected() {
                 synchronized (DetailPanel.this) {
@@ -305,23 +303,21 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
     private void saveButtonActionPerformed(ActionEvent evt) {
         if (cardMap.get(selectedCard) instanceof TraitDetail) {
             if (((TraitDetail) cardMap.get(selectedCard)).save()) {
-                CancellableWorker worker = new CancellableWorker() {
+                DecompiledEditorPane decompiledTextArea = abcPanel.decompiledTextArea;
+                int lastTrait = decompiledTextArea.lastTraitIndex;
 
+                Runnable reloadComplete = new Runnable() {
                     @Override
-                    public Void doInBackground() throws Exception {
-                        int lasttrait = abcPanel.decompiledTextArea.lastTraitIndex;
-                        abcPanel.decompiledTextArea.reloadClass();
-                        abcPanel.decompiledTextArea.gotoTrait(lasttrait);
-                        return null;
-                    }
-
-                    @Override
-                    protected void done() {
+                    public void run() {
+                        decompiledTextArea.removeScriptListener(this);
+                        decompiledTextArea.gotoTrait(lastTrait);
                         setEditMode(false);
                         View.showMessageDialog(null, AppStrings.translate("message.trait.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showTraitSavedMessage);
                     }
                 };
-                worker.execute();
+
+                decompiledTextArea.addScriptListener(reloadComplete);
+                decompiledTextArea.reloadClass();
             }
         }
     }

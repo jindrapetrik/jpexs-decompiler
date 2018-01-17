@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2016 JPEXS
- *
+ *  Copyright (C) 2010-2018 JPEXS
+ * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *
+ * 
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *
+ * 
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -181,12 +181,10 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
         frameLabel = new JLabel("0", SwingConstants.CENTER);
         frameLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         frameLabel.addMouseMotionListener(new MouseMotionAdapter() {
-
             @Override
             public void mouseMoved(MouseEvent e) {
 
             }
-
         });
 
         frameLabel.setVisible(false);
@@ -194,7 +192,6 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
         zeroCharacterWidth = frameLabel.getFontMetrics(notUnderlinedFont).stringWidth("0");
 
         frameLabel.addMouseListener(new MouseAdapter() {
-
             @Override
             public void mouseEntered(MouseEvent e) {
                 frameLabel.setFont(underlinedFont);
@@ -212,7 +209,6 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
                     mainPanel.gotoFrame(gotoFrame);
                 }
             }
-
         });
         timeLabel = new JLabel("(00:00.00)");
         totalTimeLabel = new JLabel("(00:00.00)");
@@ -441,11 +437,10 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
         gotoPanel.add(new JLabel(AppStrings.translate("preview.gotoframe.dialog.message").replace("%min%", "1").replace("%max%", "" + display.getTotalFrames())), BorderLayout.NORTH);
         gotoPanel.add(frameField, BorderLayout.CENTER);
         gotoPanel.addAncestorListener(new AncestorListener() {
-
             @Override
             public void ancestorAdded(AncestorEvent event) {
                 final AncestorListener al = this;
-                View.execInEventDispatchLater(() -> {
+                View.execInEventDispatch(() -> {
                     frameField.selectAll();
                     frameField.requestFocusInWindow();
                     gotoPanel.removeAncestorListener(al);

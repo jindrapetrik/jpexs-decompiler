@@ -1,19 +1,18 @@
 /*
- *  Copyright (C) 2010-2016 JPEXS, All rights reserved.
- *
+ *  Copyright (C) 2010-2018 JPEXS, All rights reserved.
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
+ * License along with this library. */
 package com.jpexs.decompiler.flash.exporters.commonshape;
 
 import com.jpexs.decompiler.flash.types.MATRIX;
@@ -40,6 +39,12 @@ public final class Matrix implements Cloneable {
     public static Matrix getScaleInstance(double scale) {
         Matrix mat = new Matrix();
         mat.scale(scale);
+        return mat;
+    }
+
+    public static Matrix getScaleInstance(double scaleX, double scaleY) {
+        Matrix mat = new Matrix();
+        mat.scale(scaleX, scaleY);
         return mat;
     }
 
@@ -198,6 +203,13 @@ public final class Matrix implements Cloneable {
         scaleY *= factor;
         rotateSkew0 *= factor;
         rotateSkew1 *= factor;
+    }
+
+    public void scale(double factorX, double factorY) {
+        scaleX *= factorX;
+        scaleY *= factorY;
+        rotateSkew0 *= factorX;
+        rotateSkew1 *= factorY;
     }
 
     public Matrix concatenate(Matrix m) {

@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2016 JPEXS
- *
+ *  Copyright (C) 2010-2018 JPEXS
+ * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *
+ * 
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *
+ * 
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -117,13 +117,13 @@ public class AboutDialog extends AppDialog {
         authorLabel.setHorizontalAlignment(SwingConstants.CENTER);
         cp.add(authorLabel);
 
-        JLabel dateLabel = new JLabel("2010-2016");
+        JLabel dateLabel = new JLabel("2010-2018");
         dateLabel.setAlignmentX(0.5f);
         //dateLabel.setPreferredSize(new Dimension(300, 10));
         dateLabel.setHorizontalAlignment(SwingConstants.CENTER);
         cp.add(dateLabel);
 
-        LinkLabel wwwLabel = new LinkLabel(ApplicationInfo.PROJECT_PAGE, ApplicationInfo.PROJECT_PAGE + "?utm_source=app&utm_medium=about&utm_campaign=app");
+        LinkLabel wwwLabel = new LinkLabel(ApplicationInfo.PROJECT_PAGE, ApplicationInfo.PROJECT_PAGE);
         wwwLabel.setAlignmentX(0.5f);
         wwwLabel.setForeground(Color.blue);
         //wwwLabel.setPreferredSize(new Dimension(300, 25));

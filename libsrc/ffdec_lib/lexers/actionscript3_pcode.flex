@@ -88,7 +88,7 @@ Multiname = m\[[0-9]+\]
 
 Identifier = [:jletter:][:jletterdigit:]*
 
-InstructionName = [a-z][a-z0-9_]*
+InstructionName = [:jletter:][:jletterdigit:]*
 
 Label = {Identifier}:
 

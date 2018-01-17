@@ -1,3 +1,18 @@
+/*
+ *  Copyright (C) 2010-2018 JPEXS, All rights reserved.
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3.0 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. */
 package com.jpexs.decompiler.flash.iggy;
 
 import com.jpexs.decompiler.flash.iggy.annotations.FieldPrinter;
@@ -9,7 +24,7 @@ import java.lang.reflect.Field;
 
 /**
  *
- * @author Jindra
+ * @author JPEXS
  *
  * Based of works of somebody called eternity.
  */
@@ -17,62 +32,91 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
 
     @IggyFieldType(DataType.uint64_t)
     long off_base; // 0 Relative offset to first section (matches sizeof header);
+
     @IggyFieldType(DataType.uint64_t)
     long off_sequence_end; // 8  Relative offset to as3 file names table...
+
     @IggyFieldType(DataType.uint64_t)
     long off_font_end; // 0x10   relative offset to something
+
     @IggyFieldType(DataType.uint64_t)
     long off_sequence_start1; // 0x18  relative offset to something
+
     @IggyFieldType(DataType.uint64_t)
     long off_sequence_start2; //  0x20 relative offset to something
+
     @IggyFieldType(DataType.uint64_t)
     long off_sequence_start3; // 0x28 names_offset; 0x50 relative pointer to the names/import section of the file
+
     @IggyFieldType(DataType.uint32_t)
     long xmin; // 0x30 in pixels
+
     @IggyFieldType(DataType.uint32_t)
     long ymin; // 0x34 in pixels
+
     @IggyFieldType(DataType.uint32_t)
     long xmax; // 0x38 in pixels
+
     @IggyFieldType(DataType.uint32_t)
     long ymax; // 0x3C in pixels
+
     @IggyFieldType(DataType.uint32_t)
-    long unk_40; // probably numer of blocks/objects after header
+    long unk_40; // probably number of blocks/objects after header
+
     @IggyFieldType(DataType.uint32_t)
     long unk_44;
+
     @IggyFieldType(DataType.uint32_t)
     long unk_48;
+
     @IggyFieldType(DataType.uint32_t)
     long unk_4C;
+
     @IggyFieldType(DataType.uint32_t)
     long unk_50;
+
     @IggyFieldType(DataType.uint32_t)
     long unk_54;
+
     @IggyFieldType(DataType.float_t)
     float frame_rate;
+
     @IggyFieldType(DataType.uint32_t)
     long unk_5C;
+
     @IggyFieldType(DataType.uint64_t)
     long imported_guid;
+
     @IggyFieldType(DataType.uint64_t)
     long my_guid; // same for some fonts (eng + chinese)
+
     @IggyFieldType(DataType.uint64_t)
     long off_names; // 0x70 relative offset to the names/import section of the file  - end of fonts
+
     @IggyFieldType(DataType.uint64_t)
     long off_unk78; // 0x78 relative offset to something
+
     @IggyFieldType(DataType.uint64_t)
     long unk80;
+
     @IggyFieldType(DataType.uint64_t)
     long off_last_section;
+
     @IggyFieldType(DataType.uint64_t)
     long off_flash_filename;
+
     @IggyFieldType(DataType.uint64_t)
     long off_decl_strings;
+
     @IggyFieldType(DataType.uint64_t)
     long off_type_of_fonts;
+
     @IggyFieldType(DataType.uint64_t)
     long flags;
+
     @IggyFieldType(DataType.uint32_t)
     long font_count;
+
     @IggyFieldType(DataType.uint32_t)
     long zero2;
 
@@ -87,29 +131,51 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
     }
 
     private long base_address;
+
     private long sequence_end_address;
+
     private long font_end_address;
+
     private long sequence_start_address1;
+
     private long sequence_start_address2;
+
     private long sequence_start_address3;
+
     private long names_address;
+
     private long unk78_address;
+
     private long last_section_address;
+
     private long flash_filename_address;
+
     private long decl_strings_address;
+
     private long type_fonts_address;
 
     private long base_ofs_pos;
+
     private long sequence_end_ofs_pos;
+
     private long font_end_ofs_pos;
+
     private long sequence_start1_ofs_pos;
+
     private long sequence_start2_ofs_pos;
+
     private long sequence_start3_ofs_pos;
+
     private long names_ofs_pos;
+
     private long unk78_ofs_pos;
+
     private long last_section_ofs_pos;
+
     private long flash_filename_ofs_pos;
+
     private long decl_strings_ofs_pos;
+
     private long type_fonts_ofs_pos;
 
     public long getBase_ofs_pos() {
@@ -389,5 +455,4 @@ public class IggyFlashHeader64 implements IggyFlashHeaderInterface {
     public float getFrameRate() {
         return frame_rate;
     }
-
 }

@@ -35,6 +35,9 @@
 *.sh text eol=lf
 *.bat text eol=crlf
 
+# PHP scripts
+*.php text
+
 # Delphi sources
 *.dpr text eol=crlf
 *.dfm text eol=crlf

@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2016 JPEXS
- *
+ *  Copyright (C) 2010-2018 JPEXS
+ * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *
+ * 
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *
+ * 
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationCategory;
 import com.jpexs.decompiler.flash.configuration.ConfigurationDirectory;
 import com.jpexs.decompiler.flash.configuration.ConfigurationFile;
-import com.jpexs.decompiler.flash.configuration.ConfigurationInternal;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
 import com.jpexs.decompiler.flash.gui.helpers.SpringUtilities;
 import com.jpexs.helpers.Helper;
@@ -337,8 +336,7 @@ public class AdvancedSettingsDialog extends AppDialog {
                     locName = resourceBundle.getString("config.name." + name);
                 } else { //if it is undocumented, then it must have ConfigurationInternal annotation
                     Field f = fields.get(name);
-                    ConfigurationInternal cint = f.getAnnotation(ConfigurationInternal.class);
-                    if (cint == null) {
+                    if (!ConfigurationItem.isInternal(f)) {
                         throw new RuntimeException("Missing configuration name: " + name);
                     }
 
@@ -360,6 +358,7 @@ public class AdvancedSettingsDialog extends AppDialog {
                 String locName = locNames.get(name);
 
                 try {
+                    field.setAccessible(true);
                     ConfigurationItem item = (ConfigurationItem) field.get(null);
 
                     ParameterizedType listType = (ParameterizedType) field.getGenericType();
@@ -496,17 +495,16 @@ public class AdvancedSettingsDialog extends AppDialog {
         }
     }
 
-    private void showRestartConfirmDialod() {
+    private void showRestartConfirmDialog() {
         if (View.showConfirmDialog(this, translate("advancedSettings.restartConfirmation"), AppStrings.translate("message.warning"), JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-            View.execInEventDispatchLater(() -> {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(AdvancedSettingsDialog.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                SelectLanguageDialog.reloadUi();
-            });
+            try {
+                // todo: honfika: why?
+                Thread.sleep(1000);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(AdvancedSettingsDialog.class.getName()).log(Level.SEVERE, null, ex);
+            }
 
+            SelectLanguageDialog.reloadUi();
         }
     }
 
@@ -580,6 +578,7 @@ public class AdvancedSettingsDialog extends AppDialog {
             Field field = fields.get(name);
             ConfigurationItem item = null;
             try {
+                field.setAccessible(true);
                 item = (ConfigurationItem) field.get(null);
             } catch (IllegalArgumentException | IllegalAccessException ex) {
                 // Reflection exceptions. This should never happen
@@ -595,7 +594,7 @@ public class AdvancedSettingsDialog extends AppDialog {
         Configuration.saveConfig();
         setVisible(false);
         if (modified) {
-            showRestartConfirmDialod();
+            showRestartConfirmDialog();
         }
     }
 
@@ -618,6 +617,6 @@ public class AdvancedSettingsDialog extends AppDialog {
         }
         Configuration.saveConfig();
         setVisible(false);
-        showRestartConfirmDialod();
+        showRestartConfirmDialog();
     }
 }

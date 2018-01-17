@@ -1,21 +1,22 @@
 /*
- *  Copyright (C) 2010-2016 JPEXS
- *
+ *  Copyright (C) 2010-2018 JPEXS
+ * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *
+ * 
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *
+ * 
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Runtime;
@@ -25,6 +26,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.IfTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
+import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionLocalData;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
@@ -73,10 +75,15 @@ import com.jpexs.decompiler.flash.action.swf6.ActionStringGreater;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.helpers.Helper;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -94,7 +101,83 @@ public class FlashPlayerTest {
 
     private final Random random = new Random();
 
-    private final AVM2RuntimeInfo adobeRuntime = new AVM2RuntimeInfo(AVM2Runtime.ADOBE_FLASH, 19, false);
+    private final AVM2RuntimeInfo adobeRuntime = new AVM2RuntimeInfo(AVM2Runtime.ADOBE_FLASH, 19, true);
+
+    //@Test
+    public void testAs3Files() throws IOException, InterruptedException {
+        List<String> files = new ArrayList<>();
+        File dir = new File("..\\swf");
+        if (dir.exists()) {
+            File[] fs = dir.listFiles(new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String name) {
+                    return name.toLowerCase().endsWith(".swf") && !name.toLowerCase().endsWith(".recompiled.swf");
+                }
+            });
+            for (File f : fs) {
+                files.add(dir.getAbsolutePath() + File.separator + f.getName());
+            }
+        }
+
+        for (String file : files) {
+            SWF swf = new SWF(new BufferedInputStream(new FileInputStream(file)), true);
+            List<ABCContainerTag> abcs = swf.getAbcList();
+            for (ABCContainerTag abcContainer : abcs) {
+                ABC abc = abcContainer.getABC();
+
+                for (MethodBody body : abc.bodies) {
+                    if (body.method_info != 55) {
+                        continue;
+                    }
+
+                    AVM2Code code = body.getCode();
+
+                    AdobeFlashExecutor adobeExecutor = new AdobeFlashExecutor();
+
+                    adobeExecutor.loadTestSwf();
+                    ABC testAbc = adobeExecutor.as3TestSwfAbcTag.getABC();
+                    testAbc.constants.ensureStringCapacity(1000000);
+                    testAbc.constants.ensureMultinameCapacity(1000000);
+
+                    List<AS3ExecuteTask> tasks = new ArrayList<>();
+                    {
+                        AS3ExecuteTask task = new AS3ExecuteTask();
+                        task.description = swf.getFileTitle() + " " + body.method_info;
+                        while (code.code.size() > 9) {
+                            code.code.remove(code.code.size() - 1);
+                        }
+                        task.code = code;
+                        tasks.add(task);
+                    }
+
+                    adobeExecutor.executeAvm2(tasks);
+
+                    for (AS3ExecuteTask task : tasks) {
+
+                        String ffdecExecuteResult;
+                        try {
+                            Object res = task.code.execute(new HashMap<>(), testAbc.constants, adobeRuntime);
+                            ffdecExecuteResult = "Result:" + EcmaScript.toString(res) + " Type:" + EcmaScript.typeString(res);
+                        } catch (AVM2ExecutionException ex) {
+                            ffdecExecuteResult = "Error:" + ex.getMessage();
+                        }
+
+                        task.ffdecResult = ffdecExecuteResult;
+                    }
+
+                    for (AS3ExecuteTask task : tasks) {
+                        System.out.println("Flash result (" + task.description + "): " + task.flashResult);
+                        System.out.println("FFDec execte result: " + task.ffdecResult);
+                        if (!task.ffdecResult.equals(task.flashResult)) {
+                            System.out.println(code.toASMSource(testAbc.constants));
+                        }
+
+                        assertEquals(task.ffdecResult, task.flashResult);
+                    }
+                }
+            }
+        }
+    }
 
     //@Test
     public void testAs3Pushes() throws IOException, InterruptedException {
@@ -119,20 +202,23 @@ public class FlashPlayerTest {
             AS3ExecuteTask task = new AS3ExecuteTask();
             task.description = p1 + ", " + pushes[p1].definition.instructionName;
             task.code = ccode;
+            tasks.add(task);
+        }
 
+        adobeExecutor.executeAvm2(tasks);
+
+        for (AS3ExecuteTask task : tasks) {
             String ffdecExecuteResult;
             try {
-                Object res = ccode.execute(new HashMap<>(), abc.constants, adobeRuntime);
+                Object res = task.code.execute(new HashMap<>(), abc.constants, adobeRuntime);
                 ffdecExecuteResult = "Result:" + EcmaScript.toString(res) + " Type:" + EcmaScript.typeString(res);
             } catch (AVM2ExecutionException ex) {
                 ffdecExecuteResult = "Error:" + ex.getMessage();
             }
 
             task.ffdecResult = ffdecExecuteResult;
-            tasks.add(task);
         }
 
-        adobeExecutor.executeAvm2(tasks);
         for (AS3ExecuteTask task : tasks) {
             System.out.println("Flash result (" + task.description + "): " + task.flashResult);
             System.out.println("FFDec execte result: " + task.ffdecResult);

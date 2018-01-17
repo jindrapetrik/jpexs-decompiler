@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2016 JPEXS
- *
+ *  Copyright (C) 2010-2018 JPEXS
+ * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *
+ * 
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *
+ * 
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -43,6 +43,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,6 +53,8 @@ import java.util.regex.Pattern;
  * @author JPEXS
  */
 public final class FlashPlayerPanel extends Panel implements Closeable, MediaDisplay {
+
+    private static final Logger logger = Logger.getLogger(FlashPlayerPanel.class.getName());
 
     private final int setMovieDelay = Configuration.setMovieDelay.get();
 
@@ -172,9 +176,10 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
                 }
             };
 
-            // hack: Kernel32.INSTANCE.ConnectNamedPipe never completes in AciveXControl static constructor
+            // hack: Kernel32.INSTANCE.ConnectNamedPipe never completes in ActiveXControl static constructor
             flash = CancellableWorker.call(callable, 5, TimeUnit.SECONDS);
         } catch (ActiveXException | TimeoutException | InterruptedException | ExecutionException ex) {
+            logger.log(Level.WARNING, "Cannot initialize flash panel", ex);
             throw new FlashUnsupportedException();
         }
 
@@ -205,7 +210,6 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
 
         timer = new Timer();
         timer.schedule(new TimerTask() {
-
             private boolean isPlaying = false;
 
             private int currentFrame = 0;

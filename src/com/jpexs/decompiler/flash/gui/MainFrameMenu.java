@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2016 JPEXS
- *
+ *  Copyright (C) 2010-2018 JPEXS
+ * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *
+ * 
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *
+ * 
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -191,6 +191,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     private boolean saveAs(SWF swf, SaveFileMode mode) {
+        View.checkAccess();
+
         if (Main.saveFileDialog(swf, mode)) {
             updateComponents(swf);
             return true;
@@ -273,6 +275,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     protected boolean export(boolean onlySelected) {
+        View.checkAccess();
+
         if (swf != null) {
             mainFrame.getPanel().export(onlySelected);
             return true;
@@ -318,6 +322,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     protected boolean search(ActionEvent evt, Boolean searchInText) {
+        View.checkAccess();
+
         if (swf != null) {
             mainFrame.getPanel().searchInActionScriptOrText(searchInText, swf);
             return true;
@@ -357,6 +363,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     protected void renameColliding(ActionEvent evt) {
+        View.checkAccess();
+
         if (Main.isWorking()) {
             return;
         }
@@ -365,6 +373,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     protected void renameInvalidIdentifiers(ActionEvent evt) {
+        View.checkAccess();
+
         if (Main.isWorking()) {
             return;
         }
@@ -496,7 +506,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
             return;
         }
 
-        String helpUsURL = ApplicationInfo.PROJECT_PAGE + "/help_us.html?utm_source=app&utm_medium=menu&utm_campaign=app";
+        String helpUsURL = ApplicationInfo.PROJECT_PAGE;
         if (!View.navigateUrl(helpUsURL)) {
             View.showMessageDialog(null, translate("message.helpus").replace("%url%", helpUsURL));
         }
@@ -507,7 +517,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
             return;
         }
 
-        String homePageURL = ApplicationInfo.PROJECT_PAGE + "?utm_source=app&utm_medium=menu&utm_campaign=app";
+        String homePageURL = ApplicationInfo.PROJECT_PAGE;
         if (!View.navigateUrl(homePageURL)) {
             View.showMessageDialog(null, translate("message.homepage").replace("%url%", homePageURL));
         }
@@ -523,7 +533,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
     protected boolean reloadActionPerformed(ActionEvent evt) {
         if (swf != null) {
-            if (View.showConfirmDialog(null, translate("message.confirm.reload"), translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+            if (!Configuration.showCloseConfirmation.get() || View.showConfirmDialog(null, translate("message.confirm.reload"), translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
                 Main.reloadFile(swf.swfList);
             }
         }
@@ -532,7 +542,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
     protected boolean reloadAllActionPerformed(ActionEvent evt) {
         if (swf != null) {
-            if (View.showConfirmDialog(null, translate("message.confirm.reloadAll"), translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+            if (!Configuration.showCloseConfirmation.get() || View.showConfirmDialog(null, translate("message.confirm.reloadAll"), translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
                 Main.reloadApp();
             }
 
@@ -741,7 +751,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         setMenuEnabled("_/checkUpdates", !isWorking);
         setMenuEnabled("/help/checkUpdates", !isWorking);
-        setMenuEnabled("/help/helpUs", !isWorking);
+        //setMenuEnabled("/help/helpUs", !isWorking);
         setMenuEnabled("/help/homePage", !isWorking);
         setMenuEnabled("_/about", !isWorking);
         setMenuEnabled("/help/about", !isWorking);
@@ -1020,7 +1030,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         //Help
         addMenuItem("/help", translate("menu.help"), null, null, 0, null, false, null, false);
-        addMenuItem("/help/helpUs", translate("menu.help.helpus"), "donate32", this::helpUsActionPerformed, PRIORITY_TOP, null, true, null, false);
+        //addMenuItem("/help/helpUs", translate("menu.help.helpus"), "donate32", this::helpUsActionPerformed, PRIORITY_TOP, null, true, null, false);
         addMenuItem("/help/homePage", translate("menu.help.homepage"), "homepage16", this::homePageActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         addSeparator("/help");
         addMenuItem("/help/checkUpdates", translate("menu.help.checkupdates"), "update16", this::checkUpdatesActionPerformed, PRIORITY_MEDIUM, null, true, null, false);

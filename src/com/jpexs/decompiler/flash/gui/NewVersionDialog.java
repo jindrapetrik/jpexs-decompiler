@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2016 JPEXS
- *
+ *  Copyright (C) 2010-2018 JPEXS
+ * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *
+ * 
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *
+ * 
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -48,13 +48,13 @@ public class NewVersionDialog extends AppDialog {
     private Version latestVersion;
 
     public NewVersionDialog(List<Version> versions) {
-        setSize(new Dimension(500, 300));
+        setSize(new Dimension(300, 150));
         Container cnt = getContentPane();
         cnt.setLayout(new BoxLayout(cnt, BoxLayout.PAGE_AXIS));
         JEditorPane changesText = new JEditorPane();
         changesText.setEditable(false);
         changesText.setFont(UIManager.getFont("TextField.font"));
-        SimpleDateFormat serverFormatter = new SimpleDateFormat("MM/dd/yyyy");
+        SimpleDateFormat serverFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         DateFormat formatter;
         String customFormat = translate("customDateFormat");
         if (customFormat.equals("default")) {
@@ -72,7 +72,7 @@ public class NewVersionDialog extends AppDialog {
                 changesStr.append("<hr />");
             }
             first = false;
-            changesStr.append("<b>").append(translate("version")).append(" ").append(v.versionName).append("</b><br />");
+            changesStr.append("<b>").append(v.versionName).append("</b><br />");
             String releaseDate = v.releaseDate;
             try {
                 Date date = serverFormatter.parse(releaseDate);
@@ -81,17 +81,10 @@ public class NewVersionDialog extends AppDialog {
                 Logger.getLogger(NewVersionDialog.class.getName()).log(Level.SEVERE, null, ex);
             }
             changesStr.append(translate("releasedate")).append(" ").append(releaseDate);
-            if (!v.changes.isEmpty()) {
-                changesStr.append("<br />");
-                changesStr.append("<pre>");
-                for (String type : v.changes.keySet()) {
-                    changesStr.append(type).append(":" + "<br />");
-                    for (String ch : v.changes.get(type)) {
-                        changesStr.append(" - ").append(ch).append("<br />");
-                    }
-                }
-                changesStr.append("</pre>");
-            }
+            changesStr.append("<br />");
+            changesStr.append("<pre>");
+            changesStr.append(v.description);
+            changesStr.append("</pre>");
         }
 
         changesStr.append("</html>");
@@ -102,20 +95,33 @@ public class NewVersionDialog extends AppDialog {
         changesText.setContentType("text/html");
         changesText.setText(changesStr.toString());
         if (latestVersion != null) {
-            JLabel newAvailableLabel = new JLabel("<html><b><center>" + translate("newversionavailable") + " " + latestVersion.appName + " " + translate("version") + " " + latestVersion.versionName + "</center></b></html>", SwingConstants.CENTER);
+            String releaseDate = latestVersion.releaseDate;
+            try {
+                Date date = serverFormatter.parse(releaseDate);
+                releaseDate = formatter.format(date);
+            } catch (ParseException ex) {
+                Logger.getLogger(NewVersionDialog.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            JLabel newAvailableLabel = new JLabel("<html><b><center>" + translate("newversionavailable") + " " + latestVersion.versionName + "</center></b></html>", SwingConstants.CENTER);
             newAvailableLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
             cnt.add(newAvailableLabel);
+
+            JPanel spacePanel = new JPanel();
+            spacePanel.setMinimumSize(new Dimension(1, 10));
+            cnt.add(spacePanel);
+
+            JLabel releaseDateLabel = new JLabel("<html><center>" + translate("releasedate") + " " + releaseDate + "</center></html>", SwingConstants.CENTER);
+            cnt.add(releaseDateLabel);
+
+            JPanel spacePanel2 = new JPanel();
+            spacePanel2.setMinimumSize(new Dimension(1, 10));
+            cnt.add(spacePanel2);
+
+            releaseDateLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
         }
 
-        JLabel changeslogLabel = new JLabel("<html>" + translate("changeslog") + "</html>");
-        changeslogLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
-        cnt.add(changeslogLabel);
-
-        JScrollPane span = new JScrollPane(changesText);
-        span.setAlignmentX(JLabel.CENTER_ALIGNMENT);
-        cnt.add(span);
         JPanel buttonsPanel = new JPanel(new FlowLayout());
-        JButton buttonOk = new JButton(translate("button.ok"));
+        JButton buttonOk = new JButton(AppStrings.translate("menu.help.homepage")); //"Visit homepage"
         buttonOk.addActionListener(this::okButtonActionPerformed);
 
         JButton buttonCancel = new JButton(translate("button.cancel"));
@@ -125,9 +131,6 @@ public class NewVersionDialog extends AppDialog {
         buttonsPanel.add(buttonCancel);
         buttonsPanel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
 
-        JLabel downloadNowLabel = new JLabel("<html><b><center>" + translate("downloadnow") + "</center></b></html>", SwingConstants.CENTER);
-        downloadNowLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
-        cnt.add(downloadNowLabel);
         cnt.add(buttonsPanel);
 
         setResizable(false);
@@ -140,16 +143,11 @@ public class NewVersionDialog extends AppDialog {
     }
 
     private void okButtonActionPerformed(ActionEvent evt) {
-        String url;
-        if (latestVersion.updateLink != null) {
-            url = latestVersion.updateLink;
-        } else {
-            url = ApplicationInfo.updateUrl;
-        }
+        String url = ApplicationInfo.UPDATE_URL;
         if (View.navigateUrl(url)) {
             Main.exit();
         } else {
-            View.showMessageDialog(null, translate("newvermessage").replace("%oldAppName%", ApplicationInfo.SHORT_APPLICATION_NAME).replace("%newAppName%", latestVersion.appName).replace("%projectPage%", ApplicationInfo.PROJECT_PAGE), translate("newversion"), JOptionPane.INFORMATION_MESSAGE);
+            View.showMessageDialog(null, translate("newvermessage").replace("%oldAppName%", ApplicationInfo.SHORT_APPLICATION_NAME).replace("%newAppName%", latestVersion.versionName).replace("%projectPage%", ApplicationInfo.PROJECT_PAGE), translate("newversion"), JOptionPane.INFORMATION_MESSAGE);
         }
 
         setVisible(false);

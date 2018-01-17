@@ -1,19 +1,18 @@
 /*
- *  Copyright (C) 2010-2016 JPEXS, All rights reserved.
- *
+ *  Copyright (C) 2010-2018 JPEXS, All rights reserved.
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
+ * License along with this library. */
 package com.jpexs.decompiler.flash.exporters.commonshape;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -74,7 +73,7 @@ public class SVGExporter {
 
     public Map<Tag, String> exportedTags = new HashMap<>();
 
-    public Map<Tag, Map<Character, String>> exportedChars = new HashMap<>();
+    public Map<Tag, Map<Integer, String>> exportedChars = new HashMap<>();
 
     private final Map<String, Integer> lastIds = new HashMap<>();
 
@@ -144,11 +143,14 @@ public class SVGExporter {
         _svgGs.add(g);
     }
 
-    public void endGroup() {
+    public boolean endGroup() {
         Element g = _svgGs.pop();
         if (g.getChildNodes().getLength() == 0) {
             g.getParentNode().removeChild(g);
+            return false;
         }
+        
+        return true;
     }
 
     public final Element createSubGroup(Matrix transform, String id) {

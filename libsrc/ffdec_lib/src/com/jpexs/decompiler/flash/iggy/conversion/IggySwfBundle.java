@@ -1,29 +1,34 @@
+/*
+ *  Copyright (C) 2010-2018 JPEXS, All rights reserved.
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3.0 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. */
 package com.jpexs.decompiler.flash.iggy.conversion;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFBundle;
 import com.jpexs.decompiler.flash.iggy.IggyFile;
-import com.jpexs.decompiler.flash.iggy.IggyFont;
-import com.jpexs.decompiler.flash.tags.DefineFont2Tag;
-import com.jpexs.decompiler.flash.tags.Tag;
-import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
-import com.jpexs.helpers.ReReadableInputStream;
 import com.jpexs.helpers.streams.SeekableInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -116,5 +121,4 @@ public class IggySwfBundle implements SWFBundle {
         }
 
     }
-
 }

@@ -1,18 +1,18 @@
 /*
- * Copyright (C) 2010-2016 JPEXS, All rights reserved.
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
+ *  Copyright (C) 2010-2018 JPEXS
+ * 
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.jpexs.decompiler.flash.gui;
 
@@ -493,8 +493,7 @@ public class DebuggerHandler implements DebugConnectionListener {
 
     @Override
     public void failedListen(IOException ex) {
-        View.execInEventDispatchLater(new Runnable() {
-
+        View.execInEventDispatch(new Runnable() {
             @Override
             public void run() {
                 disconnect();
@@ -629,7 +628,7 @@ public class DebuggerHandler implements DebugConnectionListener {
                 public void message(InSwfInfo t) {
                     for (InSwfInfo.SwfInfo s : t.swfInfos) {
                         swfs.add(s);
-                        View.execInEventDispatchLater(new Runnable() {
+                        View.execInEventDispatch(new Runnable() {
                             @Override
                             public void run() {
                                 try {
@@ -643,7 +642,6 @@ public class DebuggerHandler implements DebugConnectionListener {
                     }
                     con.dropMessage(t);
                 }
-
             });
 
             InSetBreakpoint isb = con.getMessage(InSetBreakpoint.class);
@@ -668,7 +666,6 @@ public class DebuggerHandler implements DebugConnectionListener {
                 connected = true;
             }
             con.addMessageListener(new DebugMessageListener<InAskBreakpoints>() {
-
                 @Override
                 public void message(InAskBreakpoints message) {
 
@@ -687,7 +684,6 @@ public class DebuggerHandler implements DebugConnectionListener {
                 }
             });
             con.addMessageListener(new DebugMessageListener<InBreakAt>() {
-
                 @Override
                 public void message(InBreakAt message) {
                     synchronized (DebuggerHandler.this) {
@@ -705,7 +701,7 @@ public class DebuggerHandler implements DebugConnectionListener {
                             newBreakScriptName = modulePaths.get(message.file);
 
                         } else if (breakReason.reason != InBreakReason.REASON_SCRIPT_LOADED) {
-                            Logger.getLogger(DebuggerCommands.class.getName()).log(Level.SEVERE, "Invalid file: " + message.file);
+                            Logger.getLogger(DebuggerCommands.class.getName()).log(Level.SEVERE, "Invalid file: {0}", message.file);
                             return;
                         }
 
@@ -752,7 +748,6 @@ public class DebuggerHandler implements DebugConnectionListener {
             }
 
             con.addMessageListener(new DebugMessageListener<InTrace>() {
-
                 @Override
                 public void message(InTrace tr) {
                     for (TraceListener l : traceListeners) {

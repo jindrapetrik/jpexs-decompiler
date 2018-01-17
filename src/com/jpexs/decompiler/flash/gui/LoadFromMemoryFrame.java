@@ -1,16 +1,16 @@
 /*
- *  Copyright (C) 2010-2016 JPEXS
- *
+ *  Copyright (C) 2010-2018 JPEXS
+ * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *
+ * 
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *
+ * 
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -115,7 +115,6 @@ public class LoadFromMemoryFrame extends AppFrame {
         @Override
         protected List<SwfInMemory> doInBackground() throws Exception {
             return new SearchInMemory(new SearchInMemoryListener() {
-
                 @Override
                 public void publish(Object... chunks) {
                     SelectProcessWorker.this.publish(chunks);
@@ -151,6 +150,8 @@ public class LoadFromMemoryFrame extends AppFrame {
     }
 
     private void openSwf() {
+        View.checkAccess();
+
         if (foundIs == null) {
             return;
         }

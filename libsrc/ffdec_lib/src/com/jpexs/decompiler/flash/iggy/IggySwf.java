@@ -1,3 +1,18 @@
+/*
+ *  Copyright (C) 2010-2018 JPEXS, All rights reserved.
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3.0 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. */
 package com.jpexs.decompiler.flash.iggy;
 
 import com.jpexs.decompiler.flash.iggy.annotations.IggyFieldType;
@@ -31,6 +46,7 @@ public class IggySwf implements StructureInterface {
     public IggySwf(ReadDataStreamInterface stream) throws IOException {
         readFromDataStream(stream);
     }
+
     private List<IggyText> texts = new ArrayList<>();
     //private List<Long> text_data_addresses = new ArrayList<>();
     private List<IggyText> add_texts = new ArrayList<>();
@@ -43,9 +59,13 @@ public class IggySwf implements StructureInterface {
     //private List<Long> sequenceValues = new ArrayList<>();
 
     private IggyFontTypeInfo type_info[];
+
     private String type_info_name[];
+
     private IggyDeclStrings decl_strings;
+
     private long ofs_additional;
+
     private long additional_address;
 
     public IggyFlashHeader64 getHdr() {
@@ -79,7 +99,7 @@ public class IggySwf implements StructureInterface {
         if (pad8 > 8) {
             s.seek(pad8, SeekMode.CUR);
         }
-        //here is offset [2]  - 232        
+        //here is offset [2]  - 232
         s.seek(hdr.getBaseAddress(), SeekMode.SET);
         s.readUI64(); //pad 1
 
@@ -147,7 +167,7 @@ public class IggySwf implements StructureInterface {
             }
         }
         s.seek(hdr.getFontEndAddress(), SeekMode.SET);
-        //here is offset [4]  - 856 ?        
+        //here is offset [4]  - 856 ?
         font_bin_info = new IggyFontBinInfo[(int) hdr.font_count];
         for (int i = 0; i < hdr.font_count; i++) {
             font_bin_info[i] = new IggyFontBinInfo(s);
@@ -335,5 +355,4 @@ public class IggySwf implements StructureInterface {
     public IggyDeclStrings getDeclStrings() {
         return decl_strings;
     }
-
 }
