@@ -38,7 +38,7 @@ else
       # release standard version based on tag
       export DEPLOY_TAG_NAME=$TRAVIS_TAG
       export DEPLOY_VERSION_NAME="version $VERSION_NUMBER"
-      export DEPLOY_DESCRIPTION=`php ./travis/extract_changelog.php -filever $VERSION_NUMBER $VERSION_NUMBER $DEPLOY_TAG_NAME ./CHANGELOG.md "$TRAVIS_REPO_SLUG"`
+      export DEPLOY_DESCRIPTION=`php ./travis/format_release_info.php -filever $VERSION_NUMBER $VERSION_NUMBER $DEPLOY_TAG_NAME ./CHANGELOG.md "$TRAVIS_REPO_SLUG"`
       export DEPLOY_COMMITISH="master"
       export DEPLOY_PRERELEASE=false
       export DEPLOY_FILEVER_TAG="$VERSION_NUMBER"          
