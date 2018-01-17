@@ -8,7 +8,7 @@ For information how to install, use the software, list of features, etc., visit 
 ## Free-Decompiler.com website
 In the past (before 2018), we were using free-decompiler.com domain as HomePage, GitHub for source code, now we moved all information to Github.
 
-## Source-code
+## Source code
 ### How to get source
  You can make local copy of the sources with the following command:
 ```
