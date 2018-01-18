@@ -1,6 +1,8 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
 ## [11.0.0] - 2018-01-17
 ### Added
 - [#1240] AS search using multiple threads when parallel speedup is enabled
