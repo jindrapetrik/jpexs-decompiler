@@ -133,13 +133,24 @@ function get_changelog_section($changelog_file, $section_name) {
    return $x;
 }
 
+$do_images = true;
+
+if($do_images)
+{
   $ossupport_map=[
   "windows" => "Works on Windows",
   "linux" => "Works on Linux",
   "macosx" => "Works with Mac OSX",
   "java" => "Works on java"
   ];
-
+}else{
+$ossupport_map=[
+  "windows" => "Win",
+  "linux" => "Lin",
+  "macosx" => "Mac",
+  "java" => "Java"
+  ];
+}
 
 
 $ICONS_URL = "https://github.com/jindrapetrik/jpexs-decompiler/wiki/images";
@@ -151,16 +162,37 @@ $body .= "## Downloads:\n".
       "| Name | File | OS |\n".
       "|---|---|---|\n";      
 
+
+
 $footer_links = [];
 foreach ($files as $f) {
-   $footer_links[$f["type_icon"]."_icon"] = $ICONS_URL."/downloads/16/".$f["type_icon"].".png";
+   if($do_images) {      
+      $footer_links[$f["type_icon"]."_icon"] = $ICONS_URL."/downloads/16/".$f["type_icon"].".png";   
+   }
    $footer_links[$f["file_name"]] = 'https://github.com/'.$github_repo.'/releases/download/'.$version_tag.'/'.$f["file_name"];
-   $body .= "| **".$f["type_name"]."** | ![".$f["type_name"]."][".$f["type_icon"]."_icon] [".$f["file_name"]."] | ";
+   $body .= "| **".$f["type_name"]."** | ";
+   if($do_images)
+   {
+      $body .= "![".$f["type_name"]."][".$f["type_icon"]."_icon]";   
+   }
+   $body .= " [".$f["file_name"]."] | ";
+   $ossup_titles = [];
    foreach ($f["ossupport"] as $ossupport)
    {
-      $footer_links[$ossupport."_icon"] = $ICONS_URL."/os/24/".$ossupport.".png";   
+      if($do_images)
+      {
+         $footer_links[$ossupport."_icon"] = $ICONS_URL."/os/24/".$ossupport.".png";         
+      }
       $ossupport_title = $ossupport_map[$ossupport];
-      $body .= "![".$ossupport_title."][".$ossupport."_icon]";
+      $ossup_titles[] = $ossupport_title;
+      if($do_images)
+      {
+         $body .= "![".$ossupport_title."][".$ossupport."_icon]";
+      }
+   }
+   if(!$do_images)
+   {
+      $body .= implode(", ",$ossup_titles);
    }
    $body .= " |\n";
 }
