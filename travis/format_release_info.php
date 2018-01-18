@@ -157,6 +157,13 @@ $ICONS_URL = "https://github.com/jindrapetrik/jpexs-decompiler/wiki/images";
 
 $body = "";
 
+$is_prerelease = $changelog_section === "Unreleased";
+
+if($is_prerelease) {
+   $body .= "## Prerelease WARNING\n".
+            "**This is prerelease nightly version. It should *NOT* be considered as stable.**\n\n";
+}   
+
 $body .= "## Downloads:\n".
       "\n".
       "| Name | File | OS |\n".
@@ -225,7 +232,12 @@ if($changelog_data === false)
 }
 
 $body .= "\n";
-$body .= "## What's new:\n";
+if($is_prerelease)
+{
+   $body .= "## What's new since last stable version:\n";
+}else{
+   $body .= "## What's new:\n";
+}
 $body .= $changelog_data;
 $body .= "\n";
 foreach($footer_links as $title=>$link)
