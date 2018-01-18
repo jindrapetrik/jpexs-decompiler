@@ -217,8 +217,16 @@ foreach ($files as $f) {
 $changelog_data = get_changelog_section($changelog_path,$changelog_section);
 if($changelog_data === false)
 {
-   fwrite(STDERR, "Cannot load changelog data\n");
-   exit(1);
+   if($is_prerelease)
+   {
+      //[Unreleased section may be missing]
+      $changelog_data = "";
+   }
+   else
+   {
+      fwrite(STDERR, "Cannot load changelog data\n");
+      exit(1);
+   }   
 }
 $full_changelog = file_get_contents($changelog_path);
 if(preg_match_all('/\[([^\]]+)\][^(]/', $changelog_data."\n",$m))      
