@@ -129,6 +129,9 @@ function get_changelog_section($changelog_file, $section_name) {
    if ($x === false) {
       return false;
    }
+   if(trim($x) === "") { //No Unreleased version data for example
+      return "";
+   }
    $x = substr($x, strpos($x, "\n") + 1); //from start of the line
    return $x;
 }
@@ -212,6 +215,11 @@ foreach ($files as $f) {
 }
 
 $changelog_data = get_changelog_section($changelog_path,$changelog_section);
+if($changelog_data === false)
+{
+   fwrite(STDERR, "Cannot load changelog data\n");
+   exit(1);
+}
 $full_changelog = file_get_contents($changelog_path);
 if(preg_match_all('/\[([^\]]+)\][^(]/', $changelog_data."\n",$m))      
 {
@@ -225,11 +233,6 @@ if(preg_match_all('/\[([^\]]+)\][^(]/', $changelog_data."\n",$m))
    }   
 }
 
-if($changelog_data === false)
-{
-   fwrite(STDERR, "Cannot load changelog data\n");
-   exit(1);
-}
 
 $body .= "\n";
 if($is_prerelease)
@@ -238,6 +241,11 @@ if($is_prerelease)
 }else{
    $body .= "## What's new:\n";
 }
+if($changelog_data === "")
+{
+   $body .= "No notable changes yet\n";
+}
+
 $body .= $changelog_data;
 $body .= "\n";
 foreach($footer_links as $title=>$link)
