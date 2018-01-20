@@ -1315,10 +1315,10 @@ public abstract class Action implements GraphSourceItem {
                                             } else if (sm.object.value instanceof SetMemberActionItem) {
                                                 SetMemberActionItem sm2 = (SetMemberActionItem) sm.object.value;
                                                 if ((sm2.objectName instanceof DirectValueActionItem) && "prototype".equals(((DirectValueActionItem) sm2.objectName).getAsString())) {
-                                                    classReg = treg.getRegId();
+                                                    instanceReg = treg.getRegId();
                                                     extendsOp = getWithoutGlobal(sm2.object);
                                                 } else {
-                                                    instanceReg = treg.getRegId();
+                                                    classReg = treg.getRegId();
                                                     GraphTargetItem val = sm2.value;
                                                     if (val instanceof StoreRegisterActionItem) {
                                                         val = val.value;
