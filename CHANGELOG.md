@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Fixed
+- Accessing font list on demand - prevents loading X11 on systems without UI
 
 ## [11.0.0] - 2018-01-17
 ### Added
