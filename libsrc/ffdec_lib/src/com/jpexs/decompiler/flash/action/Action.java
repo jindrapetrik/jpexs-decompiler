@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action;
 
 import com.jpexs.decompiler.flash.AppResources;
@@ -1231,118 +1232,144 @@ public abstract class Action implements GraphSourceItem {
                 if (it.expression instanceof NotItem) {
                     NotItem nti = (NotItem) it.expression;
                     if ((nti.value instanceof GetMemberActionItem) || (nti.value instanceof GetVariableActionItem)) {
-                        if (true) { //it.onFalse.isEmpty()){ //||(it.onFalse.get(0) instanceof UnsupportedActionItem)) {
-                            if ((it.onTrue.size() == 1) && (it.onTrue.get(0) instanceof SetMemberActionItem) && (((SetMemberActionItem) it.onTrue.get(0)).value instanceof NewObjectActionItem)) {
-                                // ignore
-                            } else {
-                                List<GraphTargetItem> parts = it.onTrue;
-                                className = getWithoutGlobal(nti.value);
-                                if (parts.size() >= 1) {
-                                    int ipos = 0;
+                        if ((it.onTrue.size() == 1) && (it.onTrue.get(0) instanceof SetMemberActionItem) && (((SetMemberActionItem) it.onTrue.get(0)).value instanceof NewObjectActionItem)) {
+                            // ignore
+                        } else {
+                            List<GraphTargetItem> parts = it.onTrue;
+                            className = getWithoutGlobal(nti.value);
+                            if (parts.size() >= 1) {
+                                int ipos = 0;
 
-                                    while ((parts.get(ipos) instanceof PopItem) || ((parts.get(ipos) instanceof IfItem) && ((((IfItem) parts.get(ipos)).onTrue.size() == 1) && (((IfItem) parts.get(ipos)).onTrue.get(0) instanceof SetMemberActionItem) && (((SetMemberActionItem) ((IfItem) parts.get(ipos)).onTrue.get(0)).value instanceof NewObjectActionItem)))) {
-                                        ipos++;
-                                    }
-                                    if (parts.get(ipos) instanceof ExtendsActionItem) {
-                                        ExtendsActionItem et = (ExtendsActionItem) parts.get(ipos);
-                                        extendsOp = getWithoutGlobal(et.superclass);
-                                        ipos++;
-                                    }
-                                    if (parts.get(ipos) instanceof StoreRegisterActionItem) {
-                                        StoreRegisterActionItem sr = (StoreRegisterActionItem) parts.get(ipos);
-                                        int instanceReg = sr.register.number;
-                                        if (sr.value instanceof GetMemberActionItem) {
-                                            GetMemberActionItem gm = (GetMemberActionItem) sr.value;
-                                            //gm.memberName should be "prototype"
-                                            if (gm.object instanceof TemporaryRegister) {
-                                                TemporaryRegister tm = (TemporaryRegister) gm.object;
-                                                int classReg = tm.getRegId();
-                                                if (tm.value instanceof SetMemberActionItem) {
-                                                    SetMemberActionItem sm = (SetMemberActionItem) tm.value;
-                                                    if (sm.value instanceof StoreRegisterActionItem) {
-                                                        sr = (StoreRegisterActionItem) sm.value;
-                                                        if (sr.value instanceof FunctionActionItem) {
-                                                            ((FunctionActionItem) (sr.value)).calculatedFunctionName = (className instanceof GetMemberActionItem) ? ((GetMemberActionItem) className).memberName : className;
-                                                            functions.add((FunctionActionItem) sr.value);
-
-                                                            for (; ipos < parts.size(); ipos++) {
-                                                                if (parts.get(ipos) instanceof ImplementsOpActionItem) {
-                                                                    ImplementsOpActionItem io = (ImplementsOpActionItem) parts.get(ipos);
-                                                                    implementsOp = io.superclasses;
-                                                                    continue;
-                                                                }
-                                                                if (parts.get(ipos) instanceof SetMemberActionItem) {
-                                                                    sm = (SetMemberActionItem) parts.get(ipos);
-                                                                    int rnum = -1;
-                                                                    if (sm.object instanceof DirectValueActionItem) {
-                                                                        DirectValueActionItem dv = (DirectValueActionItem) sm.object;
-                                                                        if (dv.value instanceof RegisterNumber) {
-                                                                            RegisterNumber rn = (RegisterNumber) dv.value;
-                                                                            rnum = rn.number;
-                                                                        }
-                                                                    }
-                                                                    if (sm.object instanceof TemporaryRegister) {
-                                                                        rnum = ((TemporaryRegister) sm.object).getRegId();
-                                                                    }
-                                                                    if (rnum == instanceReg) {
-                                                                        if (sm.value instanceof FunctionActionItem) {
-                                                                            ((FunctionActionItem) sm.value).calculatedFunctionName = sm.objectName;
-                                                                            functions.add((FunctionActionItem) sm.value);
-                                                                        } else {
-                                                                            vars.add(new MyEntry<>(sm.objectName, sm.value));
-                                                                        }
-                                                                    } else if (rnum == classReg) {
-                                                                        if (sm.value instanceof FunctionActionItem) {
-                                                                            ((FunctionActionItem) sm.value).calculatedFunctionName = sm.objectName;
-                                                                            staticFunctions.add((FunctionActionItem) sm.value);
-                                                                        } else {
-                                                                            staticVars.add(new MyEntry<>(sm.objectName, sm.value));
-                                                                        }
-                                                                    }
-
-                                                                }
-                                                            }
-
-                                                        }
-
+                                while ((parts.get(ipos) instanceof PopItem) || ((parts.get(ipos) instanceof IfItem) && ((((IfItem) parts.get(ipos)).onTrue.size() == 1) && (((IfItem) parts.get(ipos)).onTrue.get(0) instanceof SetMemberActionItem) && (((SetMemberActionItem) ((IfItem) parts.get(ipos)).onTrue.get(0)).value instanceof NewObjectActionItem)))) {
+                                    ipos++;
+                                }
+                                if (parts.get(ipos) instanceof ExtendsActionItem) {
+                                    ExtendsActionItem et = (ExtendsActionItem) parts.get(ipos);
+                                    extendsOp = getWithoutGlobal(et.superclass);
+                                    ipos++;
+                                }
+                                int instanceReg = -1;
+                                int classReg = -1;
+                                if (parts.get(ipos) instanceof StoreRegisterActionItem) {
+                                    StoreRegisterActionItem sr = (StoreRegisterActionItem) parts.get(ipos);
+                                    instanceReg = sr.register.number;
+                                    if (sr.value instanceof GetMemberActionItem) {
+                                        GetMemberActionItem gm = (GetMemberActionItem) sr.value;
+                                        //gm.memberName should be "prototype"
+                                        if (gm.object instanceof TemporaryRegister) {
+                                            TemporaryRegister tm = (TemporaryRegister) gm.object;
+                                            classReg = tm.getRegId();
+                                            if (tm.value instanceof SetMemberActionItem) {
+                                                SetMemberActionItem sm = (SetMemberActionItem) tm.value;
+                                                if (sm.value instanceof StoreRegisterActionItem) {
+                                                    sr = (StoreRegisterActionItem) sm.value;
+                                                    if (sr.value instanceof FunctionActionItem) {
+                                                        ((FunctionActionItem) (sr.value)).calculatedFunctionName = (className instanceof GetMemberActionItem) ? ((GetMemberActionItem) className).memberName : className;
+                                                        functions.add((FunctionActionItem) sr.value);
                                                     }
+
                                                 }
-                                                List<GraphTargetItem> output2 = new ArrayList<>();
-                                                for (int i = 0; i < prevCount; i++) {
-                                                    output2.add(output.get(i));
-                                                }
-                                                output2.add(new ClassActionItem(className, extendsOp, implementsOp, null/*FIXME*/, functions, vars, staticFunctions, staticVars));
-                                                return output2;
                                             }
                                         }
-                                    } else if (parts.get(ipos) instanceof SetMemberActionItem) {
-                                        SetMemberActionItem sm = (SetMemberActionItem) parts.get(0);
-                                        if (sm.value instanceof FunctionActionItem) {
-                                            FunctionActionItem f = (FunctionActionItem) sm.value;
-                                            if (f.actions.isEmpty()) {
-                                                if (parts.size() == 2) {
-                                                    if (parts.get(1) instanceof ImplementsOpActionItem) {
-                                                        ImplementsOpActionItem iot = (ImplementsOpActionItem) parts.get(1);
-                                                        implementsOp = iot.superclasses;
-                                                    } else {
-                                                        //ok = false;
-                                                        break;
+                                    }
+                                } else if (parts.get(ipos) instanceof SetMemberActionItem) {
+                                    SetMemberActionItem sm = (SetMemberActionItem) parts.get(0);
+                                    if (sm.value instanceof FunctionActionItem) {
+                                        FunctionActionItem f = (FunctionActionItem) sm.value;
+                                        if (f.actions.isEmpty()) {
+                                            if (parts.size() == 2) {
+                                                if (parts.get(1) instanceof ImplementsOpActionItem) {
+                                                    ImplementsOpActionItem iot = (ImplementsOpActionItem) parts.get(1);
+                                                    implementsOp = iot.superclasses;
+                                                } else {
+                                                    //ok = false;
+                                                    break;
+                                                }
+                                            }
+                                            List<GraphTargetItem> output2 = new ArrayList<>();
+                                            for (int i = 0; i < prevCount; i++) {
+                                                output2.add(output.get(i));
+                                            }
+                                            output2.add(new InterfaceActionItem(sm.objectName, implementsOp));
+                                            return output2;
+                                        }
+                                    }
+                                }
+
+                                GraphTargetItem constructor = null;
+                                for (; ipos < parts.size(); ipos++) {
+                                    if (parts.get(ipos) instanceof ImplementsOpActionItem) {
+                                        ImplementsOpActionItem io = (ImplementsOpActionItem) parts.get(ipos);
+                                        implementsOp = io.superclasses;
+                                        continue;
+                                    }
+                                    if (parts.get(ipos) instanceof SetMemberActionItem) {
+                                        SetMemberActionItem sm = (SetMemberActionItem) parts.get(ipos);
+
+                                        if (sm.object instanceof TemporaryRegister) {
+                                            TemporaryRegister treg = (TemporaryRegister) sm.object;
+                                            if (classReg > -1 && treg.getRegId() == classReg) {
+
+                                            } else if (instanceReg > -1 && treg.getRegId() == instanceReg) {
+
+                                            } else if (sm.object.value instanceof SetMemberActionItem) {
+                                                SetMemberActionItem sm2 = (SetMemberActionItem) sm.object.value;
+                                                if ((sm2.objectName instanceof DirectValueActionItem) && "prototype".equals(((DirectValueActionItem) sm2.objectName).getAsString())) {
+                                                    classReg = treg.getRegId();
+                                                    extendsOp = getWithoutGlobal(sm2.object);
+                                                } else {
+                                                    instanceReg = treg.getRegId();
+                                                    GraphTargetItem val = sm2.value;
+                                                    if (val instanceof StoreRegisterActionItem) {
+                                                        val = val.value;
+                                                    }
+                                                    if (val instanceof FunctionActionItem) {
+                                                        constructor = val;
+                                                        ((FunctionActionItem) (constructor)).calculatedFunctionName = (className instanceof GetMemberActionItem) ? ((GetMemberActionItem) className).memberName : className;
                                                     }
                                                 }
-                                                List<GraphTargetItem> output2 = new ArrayList<>();
-                                                for (int i = 0; i < prevCount; i++) {
-                                                    output2.add(output.get(i));
-                                                }
-                                                output2.add(new InterfaceActionItem(sm.objectName, implementsOp));
-                                                return output2;
+                                            }
+
+                                        }
+
+                                        int rnum = -1;
+                                        if (sm.object instanceof DirectValueActionItem) {
+                                            DirectValueActionItem dv = (DirectValueActionItem) sm.object;
+                                            if (dv.value instanceof RegisterNumber) {
+                                                RegisterNumber rn = (RegisterNumber) dv.value;
+                                                rnum = rn.number;
+                                            }
+                                        }
+                                        if (sm.object instanceof TemporaryRegister) {
+                                            rnum = ((TemporaryRegister) sm.object).getRegId();
+                                        }
+                                        if (rnum == instanceReg) {
+                                            if (sm.value instanceof FunctionActionItem) {
+                                                ((FunctionActionItem) sm.value).calculatedFunctionName = sm.objectName;
+                                                functions.add((FunctionActionItem) sm.value);
+                                            } else {
+                                                vars.add(new MyEntry<>(sm.objectName, sm.value));
+                                            }
+                                        } else if (rnum == classReg) {
+                                            if (sm.value instanceof FunctionActionItem) {
+                                                ((FunctionActionItem) sm.value).calculatedFunctionName = sm.objectName;
+                                                staticFunctions.add((FunctionActionItem) sm.value);
+                                            } else {
+                                                staticVars.add(new MyEntry<>(sm.objectName, sm.value));
                                             }
                                         }
                                     }
                                 }
+                                List<GraphTargetItem> output2 = new ArrayList<>();
+                                for (int i = 0; i < prevCount; i++) {
+                                    output2.add(output.get(i));
+                                }
+                                output2.add(new ClassActionItem(className, extendsOp, implementsOp, constructor, functions, vars, staticFunctions, staticVars));
+                                return output2;
+
                             }
-                        } else {
-                            //ok = false;
                         }
+
                     } else {
                         ok = false;
                     }
