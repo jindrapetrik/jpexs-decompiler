@@ -1912,7 +1912,8 @@ public class ActionScript2Parser {
                             orderedConstantPool.add(cval);
                         }
                         if (canChangeConstantIndices) {
-                            ci.index = orderedIndex;
+                            //Do NOT change ci.index directly - it may be cloned from other location
+                            ap.values.set(i, new ConstantIndex(orderedIndex));
                         }
                     }
                 }
@@ -1922,6 +1923,7 @@ public class ActionScript2Parser {
         if (!canChangeConstantIndices) {
             //generate again, as number of bytes per ActionPush can change
             srcList = generateActionList(tree, orderedConstantPool);
+            //FIXME!!!
         }
 
         for (GraphSourceItem s : srcList) {
