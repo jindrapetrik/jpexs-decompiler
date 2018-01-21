@@ -1879,66 +1879,77 @@ public class ActionScript2Parser {
         return gen.generate(localData, tree);
     }
 
-    public List<Action> actionsFromTree(List<GraphTargetItem> tree, List<String> constantPoolDraft) throws CompilationException {
+    private List<Action> actionsFromTree(List<GraphTargetItem> tree, List<String> constantPool, boolean doOrder) throws CompilationException, NeedsGenerateAgainException {
         List<Action> ret = new ArrayList<>();
 
-        List<GraphSourceItem> srcList = generateActionList(tree, constantPoolDraft);
+        List<GraphSourceItem> srcList = generateActionList(tree, constantPool);
 
-        List<String> orderedConstantPool = new ArrayList<>();
+        if (doOrder) {
+            List<String> orderedConstantPool = new ArrayList<>();
+            boolean canChangeInPlace;
+            int lastIndex = constantPool.size() - 1;
+            if (lastIndex <= ActionPush.MAX_CONSTANT_INDEX_TYPE8) {
+                //can change constant indices as ActionPush contains always 1 byte per constant
+                canChangeInPlace = true;
+            } else {
+                //variable number bytes per ActionPush constant, 
+                //must generate again to make relative offsets in jumps work
+                canChangeInPlace = false;
+            }
 
-        boolean canChangeConstantIndices;
-        int lastIndex = constantPoolDraft.size() - 1;
-        if (lastIndex <= ActionPush.MAX_CONSTANT_INDEX_TYPE8) {
-            //can change constant indices as ActionPush contains always 1 byte per constant
-            canChangeConstantIndices = true;
-        } else {
-            //variable number bytes per ActionPush constant, 
-            //must generate again to make relative offsets in jumps work
-            canChangeConstantIndices = false;
-        }
-
-        //create ordered constant pool, update constantindices if they can be changed
-        for (GraphSourceItem src : srcList) {
-            if (src instanceof ActionPush) {
-                ActionPush ap = (ActionPush) src;
-                for (int i = 0; i < ap.values.size(); i++) {
-                    Object val = ap.values.get(i);
-                    if (val instanceof ConstantIndex) {
-                        ConstantIndex ci = (ConstantIndex) val;
-                        String cval = constantPoolDraft.get(ci.index);
-                        int orderedIndex = orderedConstantPool.indexOf(cval);
-                        if (orderedIndex == -1) {
-                            orderedIndex = orderedConstantPool.size();
-                            orderedConstantPool.add(cval);
-                        }
-                        if (canChangeConstantIndices) {
-                            //Do NOT change ci.index directly - it may be cloned from other location
-                            ap.values.set(i, new ConstantIndex(orderedIndex));
+            //create ordered constant pool, update constantindices when we can changeinplace
+            for (GraphSourceItem src : srcList) {
+                if (src instanceof ActionPush) {
+                    ActionPush ap = (ActionPush) src;
+                    for (int i = 0; i < ap.values.size(); i++) {
+                        Object val = ap.values.get(i);
+                        if (val instanceof ConstantIndex) {
+                            ConstantIndex ci = (ConstantIndex) val;
+                            String cval = constantPool.get(ci.index);
+                            int orderedIndex = orderedConstantPool.indexOf(cval);
+                            if (orderedIndex == -1) {
+                                orderedIndex = orderedConstantPool.size();
+                                orderedConstantPool.add(cval);
+                            }
+                            if (canChangeInPlace) {
+                                //Do NOT change ci.index directly - it may be cloned from other location
+                                ap.values.set(i, new ConstantIndex(orderedIndex));
+                            }
                         }
                     }
                 }
             }
+            if (!canChangeInPlace) {
+                //generate again, as number of bytes per ActionPush can change
+                throw new NeedsGenerateAgainException(orderedConstantPool);
+            }
+            constantPool = orderedConstantPool;
         }
-
-        if (!canChangeConstantIndices) {
-            //generate again, as number of bytes per ActionPush can change
-            srcList = generateActionList(tree, orderedConstantPool);
-            //FIXME!!!
-        }
-
         for (GraphSourceItem s : srcList) {
             if (s instanceof Action) {
                 ret.add((Action) s);
             }
         }
-        ret.add(0, new ActionConstantPool(orderedConstantPool));
+        ret.add(0, new ActionConstantPool(constantPool));
         return ret;
     }
 
     public List<Action> actionsFromString(String s) throws ActionParseException, IOException, CompilationException {
-        List<String> constantPool = new ArrayList<>();
-        List<GraphTargetItem> tree = treeFromString(s, constantPool);
-        return actionsFromTree(tree, constantPool);
+        try {
+            List<String> constantPool = new ArrayList<>();
+            List<GraphTargetItem> tree = treeFromString(s, constantPool);
+            return actionsFromTree(tree, constantPool, true);
+        } catch (NeedsGenerateAgainException nga) {
+            //Can happen when constantpool needs reordering and number of constants > 256
+            try {
+                List<String> newConstantPool = nga.getNewConstantPool();
+                List<GraphTargetItem> tree = treeFromString(s, newConstantPool);
+                return actionsFromTree(tree, newConstantPool, false /*do not order again*/);
+            } catch (NeedsGenerateAgainException ex) {
+                //should not happen as doOrder parameter is set to false 
+                return new ArrayList<>();
+            }
+        }
     }
 
     private void versionRequired(ParsedSymbol s, int min) throws ActionParseException {

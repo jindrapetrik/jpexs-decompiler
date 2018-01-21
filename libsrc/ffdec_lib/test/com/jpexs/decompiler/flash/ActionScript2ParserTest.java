@@ -12,10 +12,12 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
+import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.graph.CompilationException;
 import java.io.IOException;
@@ -90,5 +92,23 @@ public class ActionScript2ParserTest extends ActionScript2TestBase {
                 + "      var x = 1;\n"
                 + "   };\n"
                 + "}");
+    }
+
+    @Test
+    private void testAS2SimpleConstantPoolOrder() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < ActionPush.MAX_CONSTANT_INDEX_TYPE8; i++) {
+            sb.append("trace(\"" + i + "\");\n");
+        }
+        parseAS2(sb.toString());
+    }
+
+    @Test
+    private void testAS2LargeConstantPoolOrder() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < ActionPush.MAX_CONSTANT_INDEX_TYPE8 + 100; i++) {
+            sb.append("trace(\"" + i + "\");\n");
+        }
+        parseAS2(sb.toString());
     }
 }
