@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import SevenZip.Compression.LZMA.Decoder;
@@ -2297,9 +2298,15 @@ public final class SWF implements SWFContainerItem, Timelined {
                     if (it instanceof ClassActionItem) {
                         ClassActionItem cti = (ClassActionItem) it;
                         List<GraphTargetItem> methods = new ArrayList<>();
-                        methods.addAll(cti.functions);
-                        methods.addAll(cti.staticFunctions);
+                        List<GraphTargetItem> vars = new ArrayList<>();
 
+                        for (MyEntry<GraphTargetItem, GraphTargetItem> trait : cti.traits) {
+                            if (trait.getValue() instanceof FunctionActionItem) {
+                                methods.add(trait.getValue());
+                            } else {
+                                vars.add(trait.getValue());
+                            }
+                        }
                         for (GraphTargetItem gti : methods) {
                             if (gti instanceof FunctionActionItem) {
                                 FunctionActionItem fun = (FunctionActionItem) gti;
@@ -2314,13 +2321,6 @@ public final class SWF implements SWFContainerItem, Timelined {
                             }
                         }
 
-                        List<GraphTargetItem> vars = new ArrayList<>();
-                        for (MyEntry<GraphTargetItem, GraphTargetItem> item : cti.vars) {
-                            vars.add(item.getKey());
-                        }
-                        for (MyEntry<GraphTargetItem, GraphTargetItem> item : cti.staticVars) {
-                            vars.add(item.getKey());
-                        }
                         for (GraphTargetItem gti : vars) {
                             if (gti instanceof DirectValueActionItem) {
                                 DirectValueActionItem dvf = (DirectValueActionItem) gti;
