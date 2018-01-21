@@ -349,6 +349,8 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     private static final DecompilerPool decompilerPool = new DecompilerPool();
 
+    public static final String AS2_PKG_PREFIX = "__Packages.";
+
     public static List<String> swfSignatures = Arrays.asList(
             "FWS", // Uncompressed Flash
             "CWS", // ZLib compressed Flash
@@ -2276,10 +2278,9 @@ public final class SWF implements SWFContainerItem, Timelined {
                 DoInitActionTag dia = (DoInitActionTag) t;
                 String exportName = getExportName(dia.spriteId);
                 exportName = exportName != null ? exportName : "_unk_";
-                final String pkgPrefix = "__Packages.";
                 String[] classNameParts = null;
-                if (exportName.startsWith(pkgPrefix)) {
-                    String className = exportName.substring(pkgPrefix.length());
+                if (exportName.startsWith(AS2_PKG_PREFIX)) {
+                    String className = exportName.substring(AS2_PKG_PREFIX.length());
                     if (className.contains(".")) {
                         classNameParts = className.split("\\.");
                     } else {

@@ -315,6 +315,7 @@ public class ActionScript2Test extends ActionScript2TestBase {
                 + "var tg = new com.jpexs.TestSetterGetter();\r\n"
                 + "var tcg = new com.jpexs.TestCallSetterGetter();\r\n"
                 + "var tvm = new com.jpexs.TestVarsMethods();\r\n"
+                + "var tmo = new com.jpexs.TestMaintainOrder();\r\n"
         );
     }
 
