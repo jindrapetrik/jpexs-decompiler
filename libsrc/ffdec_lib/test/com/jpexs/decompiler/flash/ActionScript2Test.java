@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.action.Action;
@@ -311,6 +312,9 @@ public class ActionScript2Test extends ActionScript2TestBase {
                 + "var mt = new com.jpexs.MyTest();\r\n"
                 + "mt.test();\r\n"
                 + "var c = new Cox(box1);\r\n"
+                + "var tg = new com.jpexs.TestSetterGetter();\r\n"
+                + "var tcg = new com.jpexs.TestCallSetterGetter();\r\n"
+                + "var tvm = new com.jpexs.TestVarsMethods();\r\n"
         );
     }
 
