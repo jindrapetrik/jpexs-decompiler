@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.parser.script;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -338,11 +339,8 @@ public class ActionScript2Parser {
          globalClassTypeStr.addAll(nameStr);*/
 
         ParsedSymbol s;
-        FunctionActionItem constr = null;
-        List<GraphTargetItem> staticFunctions = new ArrayList<>();
-        List<MyEntry<GraphTargetItem, GraphTargetItem>> staticVars = new ArrayList<>();
-        List<GraphTargetItem> instanceFunctions = new ArrayList<>();
-        List<MyEntry<GraphTargetItem, GraphTargetItem>> vars = new ArrayList<>();
+        List<MyEntry<GraphTargetItem, GraphTargetItem>> traits = new ArrayList<>();
+        List<Boolean> traitsStatic = new ArrayList<>();
 
         String classNameStr = "";
         if (nameStr instanceof GetMemberActionItem) {
@@ -373,16 +371,21 @@ public class ActionScript2Parser {
                     expected(s, lexer.yyline(), SymbolType.IDENTIFIER, SymbolGroup.GLOBALFUNC);
                     String fname = s.value.toString();
                     if (fname.equals(classNameStr)) { //constructor
-                        constr = (function(!isInterface, "", true, variables, functions));
-                    } else if (!isInterface) {
+                        //actually there's no difference, it's instance trait
+                    }
+                    if (!isInterface) {
                         if (isStatic) {
                             FunctionActionItem ft = function(!isInterface, "", true, variables, functions);
                             ft.calculatedFunctionName = pushConst(fname);
-                            staticFunctions.add(ft);
+                            //staticFunctions.add(ft);
+                            traits.add(new MyEntry<>(ft.calculatedFunctionName, ft));
+                            traitsStatic.add(true);
                         } else {
                             FunctionActionItem ft = function(!isInterface, "", true, variables, functions);
                             ft.calculatedFunctionName = pushConst(fname);
-                            instanceFunctions.add(ft);
+                            //instanceFunctions.add(ft);
+                            traits.add(new MyEntry<>(ft.calculatedFunctionName, ft));
+                            traitsStatic.add(false);
                         }
                     }
                     break;
@@ -396,11 +399,8 @@ public class ActionScript2Parser {
                         s = lex();
                     }
                     if (s.type == SymbolType.ASSIGN) {
-                        if (isStatic) {
-                            staticVars.add(new MyEntry<>(pushConst(ident), expression(false, false, true, variables, functions)));
-                        } else {
-                            vars.add(new MyEntry<>(pushConst(ident), expression(false, false, true, variables, functions)));
-                        }
+                        traits.add(new MyEntry<>(pushConst(ident), expression(false, false, true, variables, functions)));
+                        traitsStatic.add(isStatic);
                         s = lex();
                     }
                     if (s.type != SymbolType.SEMICOLON) {
@@ -417,7 +417,7 @@ public class ActionScript2Parser {
         if (isInterface) {
             return new InterfaceActionItem(nameStr, implementsStr);
         } else {
-            return new ClassActionItem(nameStr, extendsStr, implementsStr, constr, instanceFunctions, vars, staticFunctions, staticVars);
+            return new ClassActionItem(nameStr, extendsStr, implementsStr, traits, traitsStatic);
         }
     }
 

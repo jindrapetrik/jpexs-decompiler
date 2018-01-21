@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.Reference;
 import com.jpexs.decompiler.flash.action.deobfuscation.ActionDeobfuscator;
 import com.jpexs.decompiler.flash.action.model.ActionItem;
+import com.jpexs.decompiler.flash.action.model.CallMethodActionItem;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.ExtendsActionItem;
@@ -79,6 +80,7 @@ import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.NotItem;
 import com.jpexs.decompiler.graph.model.PopItem;
+import com.jpexs.decompiler.graph.model.PushItem;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.CancellableWorker;
@@ -1217,10 +1219,8 @@ public abstract class Action implements GraphSourceItem {
             //return output;
         }
         List<GraphTargetItem> ret = new ArrayList<>();
-        List<GraphTargetItem> functions = new ArrayList<>();
-        List<GraphTargetItem> staticFunctions = new ArrayList<>();
-        List<MyEntry<GraphTargetItem, GraphTargetItem>> vars = new ArrayList<>();
-        List<MyEntry<GraphTargetItem, GraphTargetItem>> staticVars = new ArrayList<>();
+        List<MyEntry<GraphTargetItem, GraphTargetItem>> traits = new ArrayList<>();
+        List<Boolean> traitsStatic = new ArrayList<>();
         GraphTargetItem className;
         GraphTargetItem extendsOp = null;
         List<GraphTargetItem> implementsOp = new ArrayList<>();
@@ -1264,8 +1264,10 @@ public abstract class Action implements GraphSourceItem {
                                                 if (sm.value instanceof StoreRegisterActionItem) {
                                                     sr = (StoreRegisterActionItem) sm.value;
                                                     if (sr.value instanceof FunctionActionItem) {
-                                                        ((FunctionActionItem) (sr.value)).calculatedFunctionName = (className instanceof GetMemberActionItem) ? ((GetMemberActionItem) className).memberName : className;
-                                                        functions.add((FunctionActionItem) sr.value);
+                                                        ((FunctionActionItem) (sr.value)).calculatedFunctionName = sm.objectName; //(className instanceof GetMemberActionItem) ? ((GetMemberActionItem) className).memberName : className;
+                                                        //This is probably a constructor
+                                                        traits.add(new MyEntry<>(((FunctionActionItem) (sr.value)).calculatedFunctionName, ((FunctionActionItem) sr.value)));
+                                                        traitsStatic.add(false);
                                                     }
 
                                                 }
@@ -1296,14 +1298,12 @@ public abstract class Action implements GraphSourceItem {
                                     }
                                 }
 
-                                GraphTargetItem constructor = null;
                                 for (; ipos < parts.size(); ipos++) {
                                     if (parts.get(ipos) instanceof ImplementsOpActionItem) {
                                         ImplementsOpActionItem io = (ImplementsOpActionItem) parts.get(ipos);
                                         implementsOp = io.superclasses;
                                         continue;
-                                    }
-                                    if (parts.get(ipos) instanceof SetMemberActionItem) {
+                                    } else if (parts.get(ipos) instanceof SetMemberActionItem) {
                                         SetMemberActionItem sm = (SetMemberActionItem) parts.get(ipos);
 
                                         if (sm.object instanceof TemporaryRegister) {
@@ -1324,8 +1324,8 @@ public abstract class Action implements GraphSourceItem {
                                                         val = val.value;
                                                     }
                                                     if (val instanceof FunctionActionItem) {
-                                                        constructor = val;
-                                                        ((FunctionActionItem) (constructor)).calculatedFunctionName = (className instanceof GetMemberActionItem) ? ((GetMemberActionItem) className).memberName : className;
+                                                        //Is this a constructor?
+                                                        //((FunctionActionItem) (constructor)).calculatedFunctionName = (className instanceof GetMemberActionItem) ? ((GetMemberActionItem) className).memberName : className;
                                                     }
                                                 }
                                             }
@@ -1343,19 +1343,92 @@ public abstract class Action implements GraphSourceItem {
                                         if (sm.object instanceof TemporaryRegister) {
                                             rnum = ((TemporaryRegister) sm.object).getRegId();
                                         }
-                                        if (rnum == instanceReg) {
+
+                                        if (rnum == instanceReg || rnum == classReg) {
                                             if (sm.value instanceof FunctionActionItem) {
                                                 ((FunctionActionItem) sm.value).calculatedFunctionName = sm.objectName;
-                                                functions.add((FunctionActionItem) sm.value);
-                                            } else {
-                                                vars.add(new MyEntry<>(sm.objectName, sm.value));
                                             }
-                                        } else if (rnum == classReg) {
-                                            if (sm.value instanceof FunctionActionItem) {
-                                                ((FunctionActionItem) sm.value).calculatedFunctionName = sm.objectName;
-                                                staticFunctions.add((FunctionActionItem) sm.value);
-                                            } else {
-                                                staticVars.add(new MyEntry<>(sm.objectName, sm.value));
+                                            traits.add(new MyEntry<>(sm.objectName, sm.value));
+                                            traitsStatic.add(rnum == classReg);
+                                        }
+                                    } else if (parts.get(ipos) instanceof PushItem) {
+                                        if (parts.get(ipos).value instanceof CallMethodActionItem) {
+                                            CallMethodActionItem cm = (CallMethodActionItem) parts.get(ipos).value;
+                                            if (cm.methodName instanceof DirectValueActionItem) {
+                                                if ("addProperty".equals(((DirectValueActionItem) cm.methodName).getAsString())) {
+                                                    int rnum = -1;
+                                                    if (cm.scriptObject instanceof DirectValueActionItem) {
+                                                        DirectValueActionItem dv = (DirectValueActionItem) cm.scriptObject;
+                                                        if (dv.value instanceof RegisterNumber) {
+                                                            RegisterNumber rn = (RegisterNumber) dv.value;
+                                                            rnum = rn.number;
+                                                        }
+                                                    }
+                                                    if (cm.scriptObject instanceof TemporaryRegister) {
+                                                        rnum = ((TemporaryRegister) cm.scriptObject).getRegId();
+                                                    }
+
+                                                    if (cm.arguments.size() > 1) {
+                                                        GraphTargetItem propertyName = cm.arguments.get(0); //name                                                            
+                                                        GraphTargetItem propertyGetter = cm.arguments.get(1); //getter
+                                                        GraphTargetItem propertySetter = cm.arguments.get(2); //setter
+                                                        if ((propertyName instanceof DirectValueActionItem) && ((DirectValueActionItem) propertyName).isString()) {
+                                                            String propertyNameStr = ((DirectValueActionItem) propertyName).getAsString();
+                                                            if (propertyGetter instanceof GetMemberActionItem) {
+                                                                if (((GetMemberActionItem) propertyGetter).object instanceof TemporaryRegister) {
+                                                                    if (((TemporaryRegister) ((GetMemberActionItem) propertyGetter).object).getRegId() == rnum) {
+                                                                        if (((GetMemberActionItem) propertyGetter).memberName instanceof DirectValueActionItem) {
+                                                                            DirectValueActionItem mNameDv = (DirectValueActionItem) ((GetMemberActionItem) propertyGetter).memberName;
+                                                                            if (mNameDv.isString()) {
+                                                                                String getterNameStr = mNameDv.getAsString();
+                                                                                if (getterNameStr.equals("__get__" + propertyNameStr)) {
+                                                                                    //TODO: handle setter
+                                                                                }
+                                                                            }
+                                                                        }
+
+                                                                    }
+                                                                }
+                                                            } else if (propertyGetter instanceof FunctionActionItem) {
+                                                                FunctionActionItem getterFunc = (FunctionActionItem) propertyGetter;
+                                                                if (getterFunc.actions.isEmpty() && getterFunc.functionName.isEmpty() && ((FunctionActionItem) propertyGetter).paramNames.isEmpty()) {
+                                                                    //well, no getter then
+                                                                } else {
+                                                                    logger.severe("unexpected getter value for property " + propertyNameStr);
+                                                                }
+                                                            } else {
+                                                                logger.severe("unexpected getter value for property " + propertyNameStr + ": " + propertyGetter.getClass().getSimpleName());
+                                                            }
+
+                                                            if (propertySetter instanceof GetMemberActionItem) {
+                                                                if (((GetMemberActionItem) propertySetter).object instanceof TemporaryRegister) {
+                                                                    if (((TemporaryRegister) ((GetMemberActionItem) propertySetter).object).getRegId() == rnum) {
+                                                                        if (((GetMemberActionItem) propertySetter).memberName instanceof DirectValueActionItem) {
+                                                                            DirectValueActionItem mNameDv = (DirectValueActionItem) ((GetMemberActionItem) propertySetter).memberName;
+                                                                            if (mNameDv.isString()) {
+                                                                                String getterNameStr = mNameDv.getAsString();
+                                                                                if (getterNameStr.equals("__set__" + propertyNameStr)) {
+                                                                                    //TODO: handle setter
+                                                                                }
+                                                                            }
+                                                                        }
+
+                                                                    }
+                                                                }
+                                                            } else if (propertySetter instanceof FunctionActionItem) {
+                                                                FunctionActionItem setterFunc = (FunctionActionItem) propertySetter;
+                                                                if (setterFunc.actions.isEmpty() && setterFunc.functionName.isEmpty() && ((FunctionActionItem) propertySetter).paramNames.isEmpty()) {
+                                                                    //well, no setter then
+                                                                } else {
+                                                                    logger.severe("unexpected setter value for property " + propertyNameStr);
+                                                                }
+                                                                //no setter                                                                
+                                                            } else {
+                                                                logger.severe("unexpected setter value for property " + propertyNameStr + ": " + propertySetter.getClass().getSimpleName());
+                                                            }
+                                                        }
+                                                    }
+                                                }
                                             }
                                         }
                                     }
@@ -1364,7 +1437,7 @@ public abstract class Action implements GraphSourceItem {
                                 for (int i = 0; i < prevCount; i++) {
                                     output2.add(output.get(i));
                                 }
-                                output2.add(new ClassActionItem(className, extendsOp, implementsOp, constructor, functions, vars, staticFunctions, staticVars));
+                                output2.add(new ClassActionItem(className, extendsOp, implementsOp, traits, traitsStatic));
                                 return output2;
 
                             }
