@@ -12,9 +12,11 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.helpers.collections;
 
+import java.io.Serializable;
 import java.util.Map.Entry;
 import java.util.Objects;
 
@@ -24,7 +26,7 @@ import java.util.Objects;
  * @param <V> Value
  * @author JPEXS
  */
-public class MyEntry<K, V> implements Entry<K, V> {
+public class MyEntry<K, V> implements Entry<K, V>, Serializable {
 
     private final K key;
 
