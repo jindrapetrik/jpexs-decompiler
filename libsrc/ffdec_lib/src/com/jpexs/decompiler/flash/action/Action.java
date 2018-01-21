@@ -1431,15 +1431,25 @@ public abstract class Action implements GraphSourceItem {
                                                 }
                                             }
                                         }
+                                    } else {
+                                        break;
                                     }
                                 }
-                                List<GraphTargetItem> output2 = new ArrayList<>();
-                                for (int i = 0; i < prevCount; i++) {
-                                    output2.add(output.get(i));
-                                }
-                                output2.add(new ClassActionItem(className, extendsOp, implementsOp, traits, traitsStatic));
-                                return output2;
+                                boolean isAClass = !(traits.isEmpty() && extendsOp == null && implementsOp.isEmpty());
 
+                                if (isAClass) {
+                                    List<GraphTargetItem> output2 = new ArrayList<>();
+                                    for (int i = 0; i < prevCount; i++) {
+                                        output2.add(output.get(i));
+                                    }
+                                    output2.add(new ClassActionItem(className, extendsOp, implementsOp, traits, traitsStatic));
+                                    return output2;
+                                } else {
+                                    ok = false;
+                                }
+
+                            } else {
+                                ok = false;
                             }
                         }
 
