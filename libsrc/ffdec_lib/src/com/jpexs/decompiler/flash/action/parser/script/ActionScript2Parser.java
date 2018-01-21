@@ -120,6 +120,7 @@ import com.jpexs.decompiler.flash.action.model.operations.SubtractActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.URShiftActionItem;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
+import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
 import com.jpexs.decompiler.flash.action.swf5.ActionConstantPool;
 import com.jpexs.decompiler.flash.ecma.Null;
@@ -1872,18 +1873,63 @@ public class ActionScript2Parser {
         return retTree;
     }
 
-    public List<Action> actionsFromTree(List<GraphTargetItem> tree, List<String> constantPool) throws CompilationException {
+    private List<GraphSourceItem> generateActionList(List<GraphTargetItem> tree, List<String> constantPool) throws CompilationException {
         ActionSourceGenerator gen = new ActionSourceGenerator(swfVersion, constantPool);
+        SourceGeneratorLocalData localData = new SourceGeneratorLocalData(new HashMap<>(), 0, Boolean.FALSE, 0);
+        return gen.generate(localData, tree);
+    }
+
+    public List<Action> actionsFromTree(List<GraphTargetItem> tree, List<String> constantPoolDraft) throws CompilationException {
         List<Action> ret = new ArrayList<>();
-        SourceGeneratorLocalData localData = new SourceGeneratorLocalData(
-                new HashMap<>(), 0, Boolean.FALSE, 0);
-        List<GraphSourceItem> srcList = gen.generate(localData, tree);
+
+        List<GraphSourceItem> srcList = generateActionList(tree, constantPoolDraft);
+
+        List<String> orderedConstantPool = new ArrayList<>();
+
+        boolean canChangeConstantIndices;
+        int lastIndex = constantPoolDraft.size() - 1;
+        if (lastIndex <= ActionPush.MAX_CONSTANT_INDEX_TYPE8) {
+            //can change constant indices as ActionPush contains always 1 byte per constant
+            canChangeConstantIndices = true;
+        } else {
+            //variable number bytes per ActionPush constant, 
+            //must generate again to make relative offsets in jumps work
+            canChangeConstantIndices = false;
+        }
+
+        //create ordered constant pool, update constantindices if they can be changed
+        for (GraphSourceItem src : srcList) {
+            if (src instanceof ActionPush) {
+                ActionPush ap = (ActionPush) src;
+                for (int i = 0; i < ap.values.size(); i++) {
+                    Object val = ap.values.get(i);
+                    if (val instanceof ConstantIndex) {
+                        ConstantIndex ci = (ConstantIndex) val;
+                        String cval = constantPoolDraft.get(ci.index);
+                        int orderedIndex = orderedConstantPool.indexOf(cval);
+                        if (orderedIndex == -1) {
+                            orderedIndex = orderedConstantPool.size();
+                            orderedConstantPool.add(cval);
+                        }
+                        if (canChangeConstantIndices) {
+                            ci.index = orderedIndex;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!canChangeConstantIndices) {
+            //generate again, as number of bytes per ActionPush can change
+            srcList = generateActionList(tree, orderedConstantPool);
+        }
+
         for (GraphSourceItem s : srcList) {
             if (s instanceof Action) {
                 ret.add((Action) s);
             }
         }
-        ret.add(0, new ActionConstantPool(constantPool));
+        ret.add(0, new ActionConstantPool(orderedConstantPool));
         return ret;
     }
 

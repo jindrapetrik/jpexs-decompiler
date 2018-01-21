@@ -724,12 +724,12 @@ public class ActionSourceGenerator implements SourceGenerator {
                     if (pass == 1 && isFunc) { //Add methods in first pass
                         FunctionActionItem fi = (FunctionActionItem) en.getValue();
                         ifbody.add(new ActionPush(new RegisterNumber(traitsStatic.get(t) ? 1 : 2)));
-                        ifbody.add(new ActionPush(getName(en.getKey())));
+                        ifbody.add(pushConst(getName(en.getKey())));
                         ifbody.addAll(toActionList(fi.toSource(localData, this)));
                         ifbody.add(new ActionSetMember());
                     } else if (pass == 2 && !isFunc) { //add variables in second pass
                         ifbody.add(new ActionPush(new RegisterNumber(traitsStatic.get(t) ? 1 : 2)));
-                        ifbody.add(new ActionPush(getName(en.getKey())));
+                        ifbody.add(pushConst(getName(en.getKey())));
                         ifbody.addAll(toActionList(en.getValue().toSource(localData, this)));
                         ifbody.add(new ActionSetMember());
                     }
