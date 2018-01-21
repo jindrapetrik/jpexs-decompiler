@@ -678,6 +678,7 @@ public class ActionSourceGenerator implements SourceGenerator {
             ret.add(new ActionNot());
             ret.add(new ActionIf(Action.actionsToBytes(notBody, false, SWF.DEFAULT_VERSION).length));
             ret.addAll(notBody);
+            ret.add(new ActionPop());
         }
         List<Action> ifbody = new ArrayList<>();
         List<String> globalClassTypeStr = new ArrayList<>();
@@ -713,22 +714,25 @@ public class ActionSourceGenerator implements SourceGenerator {
             constr = (typeToActions(globalClassTypeStr, constr));
         }
         if (!isInterface) {
-            for (int t = 0; t < traits.size(); t++) {
-                if (constructorIndex == t) { //constructor already handled
-                    continue;
-                }
-                MyEntry<GraphTargetItem, GraphTargetItem> en = traits.get(t);
-                if (en.getValue() instanceof FunctionActionItem) {
-                    FunctionActionItem fi = (FunctionActionItem) en.getValue();
-                    ifbody.add(new ActionPush(new RegisterNumber(traitsStatic.get(t) ? 1 : 2)));
-                    ifbody.add(new ActionPush(getName(en.getKey())));
-                    ifbody.addAll(toActionList(fi.toSource(localData, this)));
-                    ifbody.add(new ActionSetMember());
-                } else {
-                    ifbody.add(new ActionPush(new RegisterNumber(traitsStatic.get(t) ? 1 : 2)));
-                    ifbody.add(new ActionPush(getName(en.getKey())));
-                    ifbody.addAll(toActionList(en.getValue().toSource(localData, this)));
-                    ifbody.add(new ActionSetMember());
+            for (int pass = 1; pass <= 2; pass++) { //two passes, methods first, then variables
+                for (int t = 0; t < traits.size(); t++) {
+                    if (constructorIndex == t) { //constructor already handled
+                        continue;
+                    }
+                    MyEntry<GraphTargetItem, GraphTargetItem> en = traits.get(t);
+                    boolean isFunc = (en.getValue() instanceof FunctionActionItem);
+                    if (pass == 1 && isFunc) { //Add methods in first pass
+                        FunctionActionItem fi = (FunctionActionItem) en.getValue();
+                        ifbody.add(new ActionPush(new RegisterNumber(traitsStatic.get(t) ? 1 : 2)));
+                        ifbody.add(new ActionPush(getName(en.getKey())));
+                        ifbody.addAll(toActionList(fi.toSource(localData, this)));
+                        ifbody.add(new ActionSetMember());
+                    } else if (pass == 2 && !isFunc) { //add variables in second pass
+                        ifbody.add(new ActionPush(new RegisterNumber(traitsStatic.get(t) ? 1 : 2)));
+                        ifbody.add(new ActionPush(getName(en.getKey())));
+                        ifbody.addAll(toActionList(en.getValue().toSource(localData, this)));
+                        ifbody.add(new ActionSetMember());
+                    }
                 }
             }
         }
