@@ -2,8 +2,12 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- AS2 classes: maintain order of variables, and methods (place variables before methods)
+
 ### Fixed
 - Accessing font list on demand - prevents loading X11 on systems without UI
+- Better AS2 class detection
 
 ## [11.0.0] - 2018-01-17
 ### Added
