@@ -5,9 +5,13 @@ All notable changes to this project will be documented in this file.
 ### Added
 - AS2 classes: maintain order of variables, and methods (place variables before methods)
 
+### Changed
+- AS1/2 direct editation - generated constantpool is sorted according to ActionPush position
+ 
 ### Fixed
 - Accessing font list on demand - prevents loading X11 on systems without UI
 - Better AS2 class detection
+- AS2 direct editation - not generating Pop in class header ifs
 
 ## [11.0.0] - 2018-01-17
 ### Added
