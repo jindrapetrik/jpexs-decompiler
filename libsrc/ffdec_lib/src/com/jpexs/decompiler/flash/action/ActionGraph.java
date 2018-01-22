@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
@@ -81,7 +82,7 @@ public class ActionGraph extends Graph {
     }
 
     @Override
-    public void finalProcessStack(TranslateStack stack, List<GraphTargetItem> output) {
+    public void finalProcessStack(TranslateStack stack, List<GraphTargetItem> output, String path) {
         if (stack.size() > 0) {
             for (int i = stack.size() - 1; i >= 0; i--) {
                 //System.err.println(stack.get(i));
@@ -96,12 +97,10 @@ public class ActionGraph extends Graph {
     }
 
     @Override
-    protected void finalProcess(List<GraphTargetItem> list, int level, FinalProcessLocalData localData) throws InterruptedException {
-        List<GraphTargetItem> ret = Action.checkClass(list);
-        if (ret != list) {
-            list.clear();
-            list.addAll(ret);
-        }
+    protected void finalProcess(List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) throws InterruptedException {
+
+        ActionScript2ClassDetector detector = new ActionScript2ClassDetector();
+        detector.checkClass(list, path);
         int targetStart;
         int targetEnd;
 
@@ -188,7 +187,7 @@ public class ActionGraph extends Graph {
             }
         }
         //Handle for loops at the end:
-        super.finalProcess(list, level, localData);
+        super.finalProcess(list, level, localData, path);
 
     }
 

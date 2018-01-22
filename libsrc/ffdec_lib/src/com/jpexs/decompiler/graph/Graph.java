@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
@@ -643,25 +644,25 @@ public class Graph {
          System.err.println("</loopspre>");//*/
         List<GraphTargetItem> ret = printGraph(new HashMap<>(), new HashMap<>(), localData, stack, allParts, null, heads.get(0), null, loops, staticOperation, path);
         processIfs(ret);
-        finalProcessStack(stack, ret);
-        finalProcessAll(ret, 0, new FinalProcessLocalData());
+        finalProcessStack(stack, ret, path);
+        finalProcessAll(ret, 0, new FinalProcessLocalData(), path);
         return ret;
     }
 
-    public void finalProcessStack(TranslateStack stack, List<GraphTargetItem> output) {
+    public void finalProcessStack(TranslateStack stack, List<GraphTargetItem> output, String path) {
     }
 
-    private void finalProcessAll(List<GraphTargetItem> list, int level, FinalProcessLocalData localData) throws InterruptedException {
-        finalProcess(list, level, localData);
+    private void finalProcessAll(List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) throws InterruptedException {
+        finalProcess(list, level, localData, path);
         for (GraphTargetItem item : list) {
             if (item instanceof Block) {
                 List<List<GraphTargetItem>> subs = ((Block) item).getSubs();
                 for (List<GraphTargetItem> sub : subs) {
-                    finalProcessAll(sub, level + 1, localData);
+                    finalProcessAll(sub, level + 1, localData, path);
                 }
             }
         }
-        finalProcessAfter(list, level, localData);
+        finalProcessAfter(list, level, localData, path);
     }
 
     private boolean processSubBlk(Block b, GraphTargetItem replacement) {
@@ -703,7 +704,7 @@ public class Graph {
         return allSubPush && atleastOne;
     }
 
-    protected void finalProcessAfter(List<GraphTargetItem> list, int level, FinalProcessLocalData localData) {
+    protected void finalProcessAfter(List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) {
         if (list.size() >= 2) {
             if (list.get(list.size() - 1) instanceof ExitItem) {
                 ExitItem e = (ExitItem) list.get(list.size() - 1);
@@ -719,7 +720,7 @@ public class Graph {
         }
     }
 
-    protected void finalProcess(List<GraphTargetItem> list, int level, FinalProcessLocalData localData) throws InterruptedException {
+    protected void finalProcess(List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) throws InterruptedException {
 
         //For detection based on debug line information
         boolean[] toDelete = new boolean[list.size()];
