@@ -312,16 +312,16 @@ public class ActionScript2ClassDetector {
             for (int checkPos = pos; checkPos < commands.size(); checkPos++) {
                 GraphTargetItem t = commands.get(checkPos);
                 if (t instanceof IfItem) {
-                    IfItem it = (IfItem) t;
-                    if (it.expression instanceof NotItem) {
-                        NotItem nti = (NotItem) it.expression;
+                    IfItem ifItem = (IfItem) t;
+                    if (ifItem.expression instanceof NotItem) {
+                        NotItem nti = (NotItem) ifItem.expression;
                         GraphTargetItem condType = nti.value;
                         Reference<String> newMemberNameRef = new Reference<>("");
                         if (isMemberOfPath(condType, pathToSearchInIfCond, newMemberNameRef)) {
                             pathToSearchInIfCond.add(newMemberNameRef.getVal());
 
                             //_global.a.b.c = new Object();  
-                            if ((it.onTrue.size() == 1) && (it.onTrue.get(0) instanceof SetMemberActionItem) && (((SetMemberActionItem) it.onTrue.get(0)).value instanceof NewObjectActionItem)) {
+                            if ((ifItem.onTrue.size() == 1) && (ifItem.onTrue.get(0) instanceof SetMemberActionItem) && (((SetMemberActionItem) ifItem.onTrue.get(0)).value instanceof NewObjectActionItem)) {
                                 //skip §§pop item if its there right after if
                                 if (checkPos + 1 < commands.size()) {
                                     GraphTargetItem tnext = commands.get(checkPos + 1);
@@ -332,22 +332,26 @@ public class ActionScript2ClassDetector {
                                 continue loopcheck;
                             }
 
-                            List<GraphTargetItem> parts = it.onTrue;
+                            List<GraphTargetItem> parts = ifItem.onTrue;
 
-                            List<String> classNamePath = pathToSearchInIfCond;
-                            classNamePath.remove(0); //remove "_global"
-
-                            int ppos = 0;
-                            GraphTargetItem item = parts.get(ppos);
-                            GraphTargetItem extendsOp = null;
-                            List<GraphTargetItem> implementsOp = new ArrayList<>();
-                            if (item instanceof ExtendsActionItem) {
-                                ExtendsActionItem et = (ExtendsActionItem) parts.get(ppos);
-                                extendsOp = getWithoutGlobal(et.superclass);
-                                ppos++;
-                                item = parts.get(ppos);
-                            }
                             try {
+                                if (!ifItem.onFalse.isEmpty()) {
+                                    throw new AssertException("else clause of the if is not empty");
+                                }
+
+                                List<String> classNamePath = pathToSearchInIfCond;
+                                classNamePath.remove(0); //remove "_global"
+
+                                int ppos = 0;
+                                GraphTargetItem item = parts.get(ppos);
+                                GraphTargetItem extendsOp = null;
+                                List<GraphTargetItem> implementsOp = new ArrayList<>();
+                                if (item instanceof ExtendsActionItem) {
+                                    ExtendsActionItem et = (ExtendsActionItem) parts.get(ppos);
+                                    extendsOp = getWithoutGlobal(et.superclass);
+                                    ppos++;
+                                    item = parts.get(ppos);
+                                }
                                 int instanceReg = -1;
                                 int classReg = -1;
                                 GraphTargetItem classNameTargetPath = null;
@@ -537,104 +541,103 @@ public class ActionScript2ClassDetector {
                                 looppushes:
                                 for (; ppos < parts.size(); ppos++) {
                                     item = parts.get(ppos);
-                                    if (item instanceof PushItem) {
+                                    GraphTargetItem curItem = item;
+                                    if (item instanceof PushItem) { //push is optional
                                         PushItem pi = (PushItem) item;
-                                        if (pi.value instanceof CallMethodActionItem) {
-                                            CallMethodActionItem cm = (CallMethodActionItem) pi.value;
-                                            String pushMethodName = getAsString(cm.methodName, "push methodName");
-                                            if ("addProperty".equals(pushMethodName)) {
-                                                int rnumObject = getAsRegisterNum(cm.scriptObject, "addProperty not on register");
-                                                if ((rnumObject != instanceReg) && (rnumObject != classReg)) {
-                                                    throw new AssertException("unexpected addProperty object register " + rnumObject);
-                                                }
+                                        curItem = pi.value;
+                                    }
+                                    if (curItem instanceof CallMethodActionItem) {
+                                        CallMethodActionItem cm = (CallMethodActionItem) curItem;
+                                        String pushMethodName = getAsString(cm.methodName, "push methodName");
+                                        if ("addProperty".equals(pushMethodName)) {
+                                            int rnumObject = getAsRegisterNum(cm.scriptObject, "addProperty not on register");
+                                            if ((rnumObject != instanceReg) && (rnumObject != classReg)) {
+                                                throw new AssertException("unexpected addProperty object register " + rnumObject);
+                                            }
 
-                                                if (cm.arguments.size() != 3) {
-                                                    throw new AssertException("invalid number of arguments to addProperty: " + cm.arguments.size());
+                                            if (cm.arguments.size() != 3) {
+                                                throw new AssertException("invalid number of arguments to addProperty: " + cm.arguments.size());
+                                            }
+                                            GraphTargetItem propertyName = cm.arguments.get(0);
+                                            GraphTargetItem propertyGetter = cm.arguments.get(1);
+                                            GraphTargetItem propertySetter = cm.arguments.get(2);
+                                            String propertyNameStr = getAsString(propertyName, "propertyName");
+                                            if (propertyGetter instanceof GetMemberActionItem) {
+                                                int regId = getAsRegisterNum(((GetMemberActionItem) propertyGetter).object, "getter member not register");
+                                                if (rnumObject != regId) {
+                                                    throw new AssertException("getter register does not match property register " + regId + " <=> " + rnumObject);
                                                 }
-                                                GraphTargetItem propertyName = cm.arguments.get(0);
-                                                GraphTargetItem propertyGetter = cm.arguments.get(1);
-                                                GraphTargetItem propertySetter = cm.arguments.get(2);
-                                                String propertyNameStr = getAsString(propertyName, "propertyName");
-                                                if (propertyGetter instanceof GetMemberActionItem) {
-                                                    int regId = getAsRegisterNum(((GetMemberActionItem) propertyGetter).object, "getter member not register");
-                                                    if (rnumObject != regId) {
-                                                        throw new AssertException("getter register does not match property register " + regId + " <=> " + rnumObject);
-                                                    }
-                                                    String getterNameStr = getAsString(((GetMemberActionItem) propertyGetter).memberName, "getter memberName");
-                                                    if (!(getterNameStr.equals("__get__" + propertyNameStr))) {
-                                                        throw new AssertException("getter does not match property name");
-                                                    }
-                                                    //TODO: handle getter HERE                                                                                                       
+                                                String getterNameStr = getAsString(((GetMemberActionItem) propertyGetter).memberName, "getter memberName");
+                                                if (!(getterNameStr.equals("__get__" + propertyNameStr))) {
+                                                    throw new AssertException("getter does not match property name");
+                                                }
+                                                //TODO: handle getter HERE                                                                                                       
 
-                                                } else if (propertyGetter instanceof FunctionActionItem) {
-                                                    FunctionActionItem getterFunc = (FunctionActionItem) propertyGetter;
-                                                    if (!(getterFunc.actions.isEmpty() && getterFunc.functionName.isEmpty() && ((FunctionActionItem) propertyGetter).paramNames.isEmpty())) {
-                                                        logger.severe("Cannot detect class - unexpected getter value for property " + propertyNameStr);
-                                                        break loopcheck;
-                                                    }
-                                                    //we got empty getter
-                                                } else {
-                                                    logger.severe("Cannot detect class - unexpected getter value for property " + propertyNameStr + ": " + propertyGetter.getClass().getSimpleName());
+                                            } else if (propertyGetter instanceof FunctionActionItem) {
+                                                FunctionActionItem getterFunc = (FunctionActionItem) propertyGetter;
+                                                if (!(getterFunc.actions.isEmpty() && getterFunc.functionName.isEmpty() && ((FunctionActionItem) propertyGetter).paramNames.isEmpty())) {
+                                                    logger.severe("Cannot detect class - unexpected getter value for property " + propertyNameStr);
                                                     break loopcheck;
                                                 }
-
-                                                if (propertySetter instanceof GetMemberActionItem) {
-                                                    int regId = getAsRegisterNum(((GetMemberActionItem) propertySetter).object, "setter member");
-                                                    if (rnumObject != regId) {
-                                                        throw new AssertException("setter register does not match property register " + regId + " <=> " + rnumObject);
-                                                    }
-                                                    String setterNameStr = getAsString(((GetMemberActionItem) propertySetter).memberName, "setter memberNAme");
-                                                    if (!(setterNameStr.equals("__set__" + propertyNameStr))) {
-                                                        throw new AssertException("setter does not match property name");
-                                                    }
-                                                    //TODO: handle setter HERE
-                                                } else if (propertySetter instanceof FunctionActionItem) {
-                                                    FunctionActionItem setterFunc = (FunctionActionItem) propertySetter;
-                                                    if (!(setterFunc.actions.isEmpty() && setterFunc.functionName.isEmpty() && ((FunctionActionItem) propertySetter).paramNames.isEmpty())) {
-                                                        throw new AssertException("unexpected getter value for property " + propertyNameStr);
-                                                    }
-                                                    //we got empty setter
-                                                } else {
-                                                    throw new AssertException("unexpected setter value for property " + propertyNameStr + ": " + propertySetter.getClass().getSimpleName());
-                                                }
-
+                                                //we got empty getter
                                             } else {
-                                                throw new AssertException("unknown push method name: " + pushMethodName);
+                                                logger.severe("Cannot detect class - unexpected getter value for property " + propertyNameStr + ": " + propertyGetter.getClass().getSimpleName());
+                                                break loopcheck;
                                             }
 
-                                        } else if (pi.value instanceof CallFunctionActionItem) {
-                                            CallFunctionActionItem cf = (CallFunctionActionItem) pi.value;
-                                            String funName = getAsString(cf.functionName, "pushitem function name");
-                                            if (funName.equals("ASSetPropFlags")) {
-                                                //it should be ASSetPropFlags(a.b.c.D.prototype,null,1) as it sets prototype to hidden
-                                                //see http://www.ryanjuckett.com/programming/how-to-use-assetpropflags-in-actionscript-2-0/
-                                                if (cf.arguments.size() != 3) {
-                                                    throw new AssertException("Invalid number of arguments to ASSetPropFlags:" + cf.arguments.size() + ", 3 expected");
+                                            if (propertySetter instanceof GetMemberActionItem) {
+                                                int regId = getAsRegisterNum(((GetMemberActionItem) propertySetter).object, "setter member");
+                                                if (rnumObject != regId) {
+                                                    throw new AssertException("setter register does not match property register " + regId + " <=> " + rnumObject);
                                                 }
-                                                GraphTargetItem obj = cf.arguments.get(0);
-                                                GraphTargetItem props = cf.arguments.get(1);
-                                                GraphTargetItem flags = cf.arguments.get(2);
-                                                List<String> path = getMembersPath(obj);
-                                                if (path != null && !path.isEmpty() && "_global".equals(path.get(0))) { //For classes in toplevel package, there's _global in path
-                                                    path.remove(0); //remove that _global
+                                                String setterNameStr = getAsString(((GetMemberActionItem) propertySetter).memberName, "setter memberNAme");
+                                                if (!(setterNameStr.equals("__set__" + propertyNameStr))) {
+                                                    throw new AssertException("setter does not match property name");
                                                 }
-                                                List<String> classPathWithPrototype = new ArrayList<>();
-                                                classPathWithPrototype.addAll(classNamePath);
-                                                classPathWithPrototype.add("prototype");
-                                                if (!classPathWithPrototype.equals(path)) {
-                                                    throw new AssertException("ASSetPropFlags not on prototype");
+                                                //TODO: handle setter HERE
+                                            } else if (propertySetter instanceof FunctionActionItem) {
+                                                FunctionActionItem setterFunc = (FunctionActionItem) propertySetter;
+                                                if (!(setterFunc.actions.isEmpty() && setterFunc.functionName.isEmpty() && ((FunctionActionItem) propertySetter).paramNames.isEmpty())) {
+                                                    throw new AssertException("unexpected getter value for property " + propertyNameStr);
                                                 }
-                                                if (!((props instanceof DirectValueActionItem) && (((DirectValueActionItem) props).value == Null.INSTANCE))) {
-                                                    throw new AssertException("ASSetPropFlags properties param not null");
-                                                }
-                                                if (!((flags instanceof DirectValueActionItem) && (((DirectValueActionItem) flags).value == (Long) 1L))) {
-                                                    throw new AssertException("ASSetPropFlags flags not set to 1");
-                                                }
+                                                //we got empty setter
                                             } else {
-                                                throw new AssertException("unknown pushitem function call " + funName);
+                                                throw new AssertException("unexpected setter value for property " + propertyNameStr + ": " + propertySetter.getClass().getSimpleName());
+                                            }
+
+                                        } else {
+                                            throw new AssertException("unknown push method name: " + pushMethodName);
+                                        }
+                                    } else if (curItem instanceof CallFunctionActionItem) {
+                                        CallFunctionActionItem cf = (CallFunctionActionItem) curItem;
+                                        String funName = getAsString(cf.functionName, "pushitem function name");
+                                        if (funName.equals("ASSetPropFlags")) {
+                                            //it should be ASSetPropFlags(a.b.c.D.prototype,null,1) as it sets prototype to hidden
+                                            //see http://www.ryanjuckett.com/programming/how-to-use-assetpropflags-in-actionscript-2-0/
+                                            if (cf.arguments.size() != 3) {
+                                                throw new AssertException("Invalid number of arguments to ASSetPropFlags:" + cf.arguments.size() + ", 3 expected");
+                                            }
+                                            GraphTargetItem obj = cf.arguments.get(0);
+                                            GraphTargetItem props = cf.arguments.get(1);
+                                            GraphTargetItem flags = cf.arguments.get(2);
+                                            List<String> path = getMembersPath(obj);
+                                            if (path != null && !path.isEmpty() && "_global".equals(path.get(0))) { //For classes in toplevel package, there's _global in path
+                                                path.remove(0); //remove that _global
+                                            }
+                                            List<String> classPathWithPrototype = new ArrayList<>();
+                                            classPathWithPrototype.addAll(classNamePath);
+                                            classPathWithPrototype.add("prototype");
+                                            if (!classPathWithPrototype.equals(path)) {
+                                                throw new AssertException("ASSetPropFlags not on prototype");
+                                            }
+                                            if (!((props instanceof DirectValueActionItem) && (((DirectValueActionItem) props).value == Null.INSTANCE))) {
+                                                throw new AssertException("ASSetPropFlags properties param not null");
+                                            }
+                                            if (!((flags instanceof DirectValueActionItem) && (((DirectValueActionItem) flags).value == (Long) 1L))) {
+                                                throw new AssertException("ASSetPropFlags flags not set to 1");
                                             }
                                         } else {
-                                            throw new AssertException("unknown pushitem - " + pi.value.getClass().getSimpleName());
+                                            throw new AssertException("unknown pushitem function call " + funName);
                                         }
                                     } else {
                                         throw new AssertException("unknown item - " + item.getClass().getSimpleName());
@@ -662,6 +665,11 @@ public class ActionScript2ClassDetector {
                                     if (commands.get(pos + 1) instanceof PopItem) {
                                         commands.remove(pos + 1);
                                     }
+                                }
+
+                                //???? fid 963
+                                if (!ifItem.onFalse.isEmpty()) {
+                                    commands.addAll(pos + 1, ifItem.onFalse);
                                 }
 
                                 // goto next line and check next classes
