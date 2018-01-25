@@ -336,7 +336,13 @@ public class ActionScript2ClassDetector {
 
                             try {
                                 if (!ifItem.onFalse.isEmpty()) {
-                                    throw new AssertException("else clause of the if is not empty");
+                                    //throw new AssertException("else clause of the if is not empty");
+                                    //Note: When there is an else block, it may mean
+                                    //that the class was too long to fit maximum of
+                                    //jump bytes so the jump target is other invalid location
+                                    //(usually negative - will probably lead to other SWF tags)
+
+                                    //so we will rather silently ignore onFalse section
                                 }
 
                                 List<String> classNamePath = pathToSearchInIfCond;
@@ -665,11 +671,6 @@ public class ActionScript2ClassDetector {
                                     if (commands.get(pos + 1) instanceof PopItem) {
                                         commands.remove(pos + 1);
                                     }
-                                }
-
-                                //???? fid 963
-                                if (!ifItem.onFalse.isEmpty()) {
-                                    commands.addAll(pos + 1, ifItem.onFalse);
                                 }
 
                                 // goto next line and check next classes
