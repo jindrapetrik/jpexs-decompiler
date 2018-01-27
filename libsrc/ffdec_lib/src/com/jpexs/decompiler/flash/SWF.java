@@ -1968,6 +1968,7 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     private static void getVariables(ConstantPool constantPool, BaseLocalData localData, TranslateStack stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, List<MyEntry<DirectValueActionItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, List<Integer> visited, HashMap<DirectValueActionItem, String> usageTypes, String path) throws InterruptedException {
+        ActionLocalData aLocalData = (ActionLocalData) localData;
         boolean debugMode = false;
         while ((ip > -1) && ip < code.size()) {
             if (visited.contains(ip)) {
@@ -2034,7 +2035,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                     ip = code.adr2pos(addr);
                     addr += size;
                     int nextip = code.adr2pos(addr);
-                    getVariables(variables, functions, strings, usageTypes, new ActionGraphSource(code.getActions().subList(ip, nextip), code.version, new HashMap<>(), new HashMap<>(), new HashMap<>()), 0, path + (cntName == null ? "" : "/" + cntName));
+                    getVariables(aLocalData.insideDoInitAction, variables, functions, strings, usageTypes, new ActionGraphSource(aLocalData.insideDoInitAction, code.getActions().subList(ip, nextip), code.version, new HashMap<>(), new HashMap<>(), new HashMap<>()), 0, path + (cntName == null ? "" : "/" + cntName));
                     ip = nextip;
                 }
                 List<List<GraphTargetItem>> r = new ArrayList<>();
@@ -2125,8 +2126,8 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
     }
 
-    private static void getVariables(List<MyEntry<DirectValueActionItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, HashMap<DirectValueActionItem, String> usageTypes, ActionGraphSource code, int addr, String path) throws InterruptedException {
-        ActionLocalData localData = new ActionLocalData();
+    private static void getVariables(boolean insideDoInitAction, List<MyEntry<DirectValueActionItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, HashMap<DirectValueActionItem, String> usageTypes, ActionGraphSource code, int addr, String path) throws InterruptedException {
+        ActionLocalData localData = new ActionLocalData(insideDoInitAction);
         getVariables(null, localData, new TranslateStack(path), new ArrayList<>(), code, code.adr2pos(addr), variables, functions, strings, new ArrayList<>(), usageTypes, path);
     }
 
@@ -2134,7 +2135,8 @@ public final class SWF implements SWFContainerItem, Timelined {
         List<MyEntry<DirectValueActionItem, ConstantPool>> ret = new ArrayList<>();
         ActionList actions = src.getActions();
         actionsMap.put(src, actions);
-        getVariables(variables, functions, strings, usageTypes, new ActionGraphSource(actions, version, new HashMap<>(), new HashMap<>(), new HashMap<>()), 0, path);
+        boolean insideDoInitAction = src instanceof DoInitActionTag;
+        getVariables(insideDoInitAction, variables, functions, strings, usageTypes, new ActionGraphSource(insideDoInitAction, actions, version, new HashMap<>(), new HashMap<>(), new HashMap<>()), 0, path);
         return ret;
     }
 
@@ -2290,7 +2292,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 int staticOperation = Graph.SOP_USE_STATIC; //(Boolean) Configuration.getConfig("autoDeobfuscate", true) ? Graph.SOP_SKIP_STATIC : Graph.SOP_USE_STATIC;
                 List<GraphTargetItem> dec;
                 try {
-                    dec = Action.actionsToTree(dia.getActions(), version, staticOperation, ""/*FIXME*/);
+                    dec = Action.actionsToTree(true /*Yes, inside doInitAction*/, dia.getActions(), version, staticOperation, ""/*FIXME*/);
                 } catch (EmptyStackException ex) {
                     continue;
                 }

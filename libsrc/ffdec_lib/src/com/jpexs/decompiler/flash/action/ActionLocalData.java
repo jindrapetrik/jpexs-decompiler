@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
@@ -34,21 +35,26 @@ public class ActionLocalData extends BaseLocalData {
 
     public GraphSourceItem lineStartAction;
 
-    public ActionLocalData() {
+    public boolean insideDoInitAction;
+
+    public ActionLocalData(boolean insideDoInitAction) {
         regNames = new HashMap<>();
         variables = new HashMap<>();
         functions = new HashMap<>();
+        this.insideDoInitAction = insideDoInitAction;
     }
 
-    public ActionLocalData(HashMap<Integer, String> regNames) {
+    public ActionLocalData(boolean insideDoInitAction, HashMap<Integer, String> regNames) {
         this.regNames = regNames;
         variables = new HashMap<>();
         functions = new HashMap<>();
+        this.insideDoInitAction = insideDoInitAction;
     }
 
-    public ActionLocalData(HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+    public ActionLocalData(boolean insideDoInitAction, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
         this.regNames = regNames;
         this.variables = variables;
         this.functions = functions;
+        this.insideDoInitAction = insideDoInitAction;
     }
 }

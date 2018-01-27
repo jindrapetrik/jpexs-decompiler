@@ -559,7 +559,7 @@ public class FlashPlayerTest {
                     task.actions = newActions;
 
                     List<GraphTargetItem> output = new ArrayList<>();
-                    ActionLocalData localData = new ActionLocalData();
+                    ActionLocalData localData = new ActionLocalData(false);
                     TranslateStack stack = new TranslateStack("");
                     for (Action a : newActions) {
                         a.translate(localData, stack, output, Graph.SOP_USE_STATIC, "");

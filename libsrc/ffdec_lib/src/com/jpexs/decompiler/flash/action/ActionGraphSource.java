@@ -46,16 +46,19 @@ public class ActionGraphSource extends GraphSource {
 
     private final HashMap<String, GraphTargetItem> functions;
 
+    private final boolean insideDoInitAction;
+
     public List<Action> getActions() {
         return actions;
     }
 
-    public ActionGraphSource(List<Action> actions, int version, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+    public ActionGraphSource(boolean insideDoInitAction, List<Action> actions, int version, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
         this.actions = actions;
         this.version = version;
         this.registerNames = registerNames;
         this.variables = variables;
         this.functions = functions;
+        this.insideDoInitAction = insideDoInitAction;
     }
 
     @Override
@@ -81,7 +84,7 @@ public class ActionGraphSource extends GraphSource {
     public List<GraphTargetItem> translatePart(GraphPart part, BaseLocalData localData, TranslateStack stack, int start, int end, int staticOperation, String path) throws InterruptedException {
         Reference<GraphSourceItem> fi = new Reference<>(localData.lineStartInstruction);
 
-        List<GraphTargetItem> r = Action.actionsPartToTree(fi, registerNames, variables, functions, stack, actions, start, end, version, staticOperation, path);
+        List<GraphTargetItem> r = Action.actionsPartToTree(this.insideDoInitAction, fi, registerNames, variables, functions, stack, actions, start, end, version, staticOperation, path);
         localData.lineStartInstruction = fi.getVal();
         return r;
     }

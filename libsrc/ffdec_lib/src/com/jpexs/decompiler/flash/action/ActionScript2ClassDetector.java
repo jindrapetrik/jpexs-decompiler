@@ -229,7 +229,7 @@ public class ActionScript2ClassDetector {
         }
     }
      */
-    public static GraphTargetItem getWithoutGlobal(GraphTargetItem ti) {
+    private static GraphTargetItem getWithoutGlobal(GraphTargetItem ti) {
         GraphTargetItem t = ti;
         if (!(t instanceof GetMemberActionItem)) {
             return ti;

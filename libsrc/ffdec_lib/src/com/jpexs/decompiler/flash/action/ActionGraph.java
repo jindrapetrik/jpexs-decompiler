@@ -63,20 +63,21 @@ import java.util.Set;
  */
 public class ActionGraph extends Graph {
 
-    public ActionGraph(List<Action> code, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int version) {
-        super(new ActionGraphSource(code, version, registerNames, variables, functions), new ArrayList<>());
-        //this.version = version;
-        /*heads = makeGraph(code, new ArrayList<GraphPart>());
-         for (GraphPart head : heads) {
-         fixGraph(head);
-         makeMulti(head, new ArrayList<GraphPart>());
-         }*/
+    private boolean insideDoInitAction;
+
+    public ActionGraph(boolean insideDoInitAction, List<Action> code, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int version) {
+        super(new ActionGraphSource(insideDoInitAction, code, version, registerNames, variables, functions), new ArrayList<>());
+        this.insideDoInitAction = insideDoInitAction;
     }
 
-    public static List<GraphTargetItem> translateViaGraph(HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path) throws InterruptedException {
+    public boolean isInsideDoInitAction() {
+        return insideDoInitAction;
+    }
 
-        ActionGraph g = new ActionGraph(code, registerNames, variables, functions, version);
-        ActionLocalData localData = new ActionLocalData(registerNames);
+    public static List<GraphTargetItem> translateViaGraph(boolean insideDoInitAction, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path) throws InterruptedException {
+
+        ActionGraph g = new ActionGraph(insideDoInitAction, code, registerNames, variables, functions, version);
+        ActionLocalData localData = new ActionLocalData(insideDoInitAction, registerNames);
         g.init(localData);
         return g.translate(localData, staticOperation, path);
     }
@@ -99,8 +100,10 @@ public class ActionGraph extends Graph {
     @Override
     protected void finalProcess(List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) throws InterruptedException {
 
-        ActionScript2ClassDetector detector = new ActionScript2ClassDetector();
-        detector.checkClass(list, path);
+        if (insideDoInitAction) {
+            ActionScript2ClassDetector detector = new ActionScript2ClassDetector();
+            detector.checkClass(list, path);
+        }
         int targetStart;
         int targetEnd;
 
