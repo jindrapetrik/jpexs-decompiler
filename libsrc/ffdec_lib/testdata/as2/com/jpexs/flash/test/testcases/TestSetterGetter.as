@@ -1,4 +1,4 @@
-﻿class com.jpexs.TestSetterGetter {
+class com.jpexs.flash.test.testcases.TestSetterGetter {
 	
 	private var priv_myvar:Number;
 	

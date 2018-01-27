@@ -30,12 +30,17 @@ import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.fail;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.fail;
 
 /**
  *
  * @author JPEXS
  */
-public class ActionScript2TestClasses extends ActionScript2TestBase {
+public class ActionScript2ClassesTest extends ActionScript2TestBase {
+
+    private final String BASE_TEST_PACKAGE = "com.jpexs.flash.test.testcases";
 
     @BeforeClass
     public void init() throws IOException, InterruptedException {
@@ -47,8 +52,8 @@ public class ActionScript2TestClasses extends ActionScript2TestBase {
         swf = new SWF(new BufferedInputStream(new FileInputStream("testdata/as2/as2.swf")), false);
     }
 
-    private void compareSrc(String classFullName, String expectedResult) {
-        DoInitActionTag dia = getClassSource(classFullName);
+    private void compareSrc(String testClassName, String expectedClassContents) {
+        DoInitActionTag dia = getClassSource(BASE_TEST_PACKAGE + "." + testClassName);
         assertNotNull(dia);
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
         try {
@@ -57,7 +62,10 @@ public class ActionScript2TestClasses extends ActionScript2TestBase {
             fail();
         }
         String actualResult = cleanPCode(writer.toString());
-        expectedResult = cleanPCode(expectedResult);
+        String expectedResult = cleanPCode("class " + BASE_TEST_PACKAGE + "." + testClassName + "\r\n"
+                + "{\r\n"
+                + expectedClassContents + "\r\n"
+                + "}");
         assertEquals(actualResult, expectedResult);
     }
 
@@ -79,9 +87,7 @@ public class ActionScript2TestClasses extends ActionScript2TestBase {
 
     @Test
     public void testVarsMethods() {
-        compareSrc("com.jpexs.TestVarsMethods", "class com.jpexs.TestVarsMethods\r\n"
-                + "{\r\n"
-                + "var instVar = 1;\r\n"
+        compareSrc("TestVarsMethods", "var instVar = 1;\r\n"
                 + "static var statVar = 2;\r\n"
                 + "function TestVarsMethods()\r\n"
                 + "{\r\n"
@@ -95,14 +101,12 @@ public class ActionScript2TestClasses extends ActionScript2TestBase {
                 + "{\r\n"
                 + "trace(\"static method\");\r\n"
                 + "}\r\n"
-                + "}");
+        );
     }
 
     @Test
     public void testMaintainOrder() {
-        compareSrc("com.jpexs.TestMaintainOrder", "class com.jpexs.TestMaintainOrder\r\n"
-                + "{\r\n"
-                + "var a = 1;\r\n"
+        compareSrc("TestMaintainOrder", "var a = 1;\r\n"
                 + "static var b = 2;\r\n"
                 + "var c = 3;\r\n"
                 + "static var d = 4;\r\n"
@@ -140,7 +144,6 @@ public class ActionScript2TestClasses extends ActionScript2TestBase {
                 + "function _x2()\r\n"
                 + "{\r\n"
                 + "trace(\"after _x1\");\r\n"
-                + "}\r\n"
-                + "}");
+                + "}\r\n");
     }
 }

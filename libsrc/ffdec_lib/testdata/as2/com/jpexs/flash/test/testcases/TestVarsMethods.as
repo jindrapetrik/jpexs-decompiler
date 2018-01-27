@@ -1,4 +1,4 @@
-﻿class com.jpexs.TestVarsMethods {
+class com.jpexs.flash.test.testcases.TestVarsMethods {
 	
 		public var instVar:Number = 1;
 		public static var statVar:Number = 2;

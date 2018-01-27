@@ -91,7 +91,7 @@ public class ActionScript2Test extends ActionScript2TestBase {
     @Test
     public void frame24_unicodeTest() {
         compareSrc(24, "trace(\"unicodeTest\");\r\n"
-                + "var k = \"\u05d4\u05d9\u05e4\u05d5\u05e4\u05d5\u05d8\u05de\u05d9, \u05d0\u05d5 \u05d0\";\r\n"
+                + "var k = \"היפופוטמי, או א\";\r\n"
                 + "trace(k);\r\n"
         );
     }
@@ -309,13 +309,7 @@ public class ActionScript2Test extends ActionScript2TestBase {
                 + "ship.moveUp(0.2);\r\n"
                 + "enemy.moveRight(230);\r\n"
                 + "enemy.moveLeft(100);\r\n"
-                + "var mt = new com.jpexs.MyTest();\r\n"
-                + "mt.test();\r\n"
                 + "var c = new Cox(box1);\r\n"
-                + "var tg = new com.jpexs.TestSetterGetter();\r\n"
-                + "var tcg = new com.jpexs.TestCallSetterGetter();\r\n"
-                + "var tvm = new com.jpexs.TestVarsMethods();\r\n"
-                + "var tmo = new com.jpexs.TestMaintainOrder();\r\n"
         );
     }
 
@@ -672,7 +666,7 @@ public class ActionScript2Test extends ActionScript2TestBase {
     @Test
     public void frame55_pushTest() {
         compareSrc(55, "trace(\"pushTest\");\r\n"
-                + "53;"
+                + "53;\r\n"
         );
     }
 
@@ -811,6 +805,28 @@ public class ActionScript2Test extends ActionScript2TestBase {
     }
 
     @Test
+    public void frame60_numbersTest() {
+        compareSrc(60, "trace(\"numbersTest\");\r\n"
+                + "var x = null;\r\n"
+                + "trace(\"null:\" + x);\r\n"
+                + "x = true;\r\n"
+                + "trace(\"true:\" + x);\r\n"
+                + "x = false;\r\n"
+                + "trace(\"false:\" + x);\r\n"
+                + "x = 1;\r\n"
+                + "trace(\"1:\" + x);\r\n"
+                + "x = 2147483647;\r\n"
+                + "trace(\"0x7fffffff:\" + x);\r\n"
+                + "x = 2147483648;\r\n"
+                + "trace(\"0x80000000:\" + x);\r\n"
+                + "x = -2147483648;\r\n"
+                + "trace(\"-0x80000000:\" + x);\r\n"
+                + "x = -2147483649;\r\n"
+                + "trace(\"-0x80000001:\" + x);\r\n"
+        );
+    }
+
+    @Test
     public void frame61_switchDefaultTest() {
         compareSrc(61, "trace(\"switchDefaultTest\");\r\n"
                 + "var k = 5;\r\n"
@@ -850,6 +866,7 @@ public class ActionScript2Test extends ActionScript2TestBase {
         );
     }
 
+    @Test
     public void frame63_functionVariablesTest() {
         compareSrc(63, "function outfunc()\r\n"
                 + "{\r\n"
@@ -889,6 +906,14 @@ public class ActionScript2Test extends ActionScript2TestBase {
                 + "return _loc2_(5,2);\r\n"
                 + "}\r\n"
                 + "trace(\"functionInnerParametersTest\");\r\n"
+        );
+    }
+
+    @Test
+    public void frame65_loadClassesTest() {
+        compareSrc(65, "trace(\"loadClassesTest\");\r\n"
+                + "var tst = new com.jpexs.flash.test.TestLoader();\r\n"
+                + "tst.includeTests();\r\n"
         );
     }
 }

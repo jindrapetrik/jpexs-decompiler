@@ -1,4 +1,4 @@
-﻿class com.jpexs.TestMaintainOrder {
+class com.jpexs.flash.test.testcases.TestMaintainOrder {
 	
 		public var a:Number = 1;
 		public static var b:Number = 2;
