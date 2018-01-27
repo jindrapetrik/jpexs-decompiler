@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 - Better AS2 class detection
 - AS1/2 break statement decompilation in for..in loops
 - AS2 direct editation - not generating Pop in class header ifs
+- AS1/2 deobfuscation - ActionRandom fixed for nonpositive numbers
 
 ## [11.0.0] - 2018-01-17
 ### Added
