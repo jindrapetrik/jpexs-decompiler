@@ -48,17 +48,20 @@ public class ActionGraphSource extends GraphSource {
 
     private final boolean insideDoInitAction;
 
+    private final String path;
+
     public List<Action> getActions() {
         return actions;
     }
 
-    public ActionGraphSource(boolean insideDoInitAction, List<Action> actions, int version, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+    public ActionGraphSource(String path, boolean insideDoInitAction, List<Action> actions, int version, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
         this.actions = actions;
         this.version = version;
         this.registerNames = registerNames;
         this.variables = variables;
         this.functions = functions;
         this.insideDoInitAction = insideDoInitAction;
+        this.path = path;
     }
 
     @Override
@@ -139,7 +142,7 @@ public class ActionGraphSource extends GraphSource {
             }
             //ret = adr2posInside(adr);
             if (ret == -1) {
-                Logger.getLogger(ActionGraphSource.class.getName()).log(Level.SEVERE, "Address loc" + Helper.formatAddress(adr) + " not found");
+                Logger.getLogger(ActionGraphSource.class.getName()).log(Level.SEVERE, "{0} - address loc{1} not found", new Object[]{path, Helper.formatAddress(adr)});
                 /*System.err.println("Addr loc"+Helper.formatAddress(adr)+" not found");
                  int pos=0;
                  for(long l:posCache){

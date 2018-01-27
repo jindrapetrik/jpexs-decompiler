@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 - AS2 classes: maintain order of variables, and methods (place variables before methods)
+- AS1/2: displaying script path in the error log when jump to invalid address
 
 ### Changed
 - AS1/2 direct editation - generated constantpool is sorted according to ActionPush position

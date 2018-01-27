@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.DisassemblyListener;
@@ -140,7 +141,7 @@ public class DoActionTag extends Tag implements ASMSource {
             actions = getActions();
         }
 
-        return Action.actionsToSource(this, actions, toString()/*FIXME?*/, writer);
+        return Action.actionsToSource(this, actions, getScriptName(), writer);
     }
 
     /**

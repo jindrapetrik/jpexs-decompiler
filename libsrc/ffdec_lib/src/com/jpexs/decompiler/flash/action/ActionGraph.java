@@ -65,8 +65,8 @@ public class ActionGraph extends Graph {
 
     private boolean insideDoInitAction;
 
-    public ActionGraph(boolean insideDoInitAction, List<Action> code, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int version) {
-        super(new ActionGraphSource(insideDoInitAction, code, version, registerNames, variables, functions), new ArrayList<>());
+    public ActionGraph(String path, boolean insideDoInitAction, List<Action> code, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int version) {
+        super(new ActionGraphSource(path, insideDoInitAction, code, version, registerNames, variables, functions), new ArrayList<>());
         this.insideDoInitAction = insideDoInitAction;
     }
 
@@ -76,7 +76,7 @@ public class ActionGraph extends Graph {
 
     public static List<GraphTargetItem> translateViaGraph(boolean insideDoInitAction, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path) throws InterruptedException {
 
-        ActionGraph g = new ActionGraph(insideDoInitAction, code, registerNames, variables, functions, version);
+        ActionGraph g = new ActionGraph(path, insideDoInitAction, code, registerNames, variables, functions, version);
         ActionLocalData localData = new ActionLocalData(insideDoInitAction, registerNames);
         g.init(localData);
         return g.translate(localData, staticOperation, path);
