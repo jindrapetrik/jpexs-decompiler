@@ -456,15 +456,15 @@ public class ActionGraph extends Graph {
     @Override
     protected int checkIp(int ip) {
         int oldIp = ip;
-        //return in for..in
+        //return/break in for..in
         GraphSourceItem action = code.get(ip);
         if ((action instanceof ActionPush) && (((ActionPush) action).values.size() == 1) && (((ActionPush) action).values.get(0) == Null.INSTANCE)) {
-            if (ip + 4 < code.size()) {
+            if (ip + 3 <= code.size()) {
                 if ((code.get(ip + 1) instanceof ActionEquals) || (code.get(ip + 1) instanceof ActionEquals2)) {
                     if (code.get(ip + 2) instanceof ActionNot) {
                         if (code.get(ip + 3) instanceof ActionIf) {
                             ActionIf aif = (ActionIf) code.get(ip + 3);
-                            if (code.adr2pos(code.pos2adr(ip + 4) + aif.getJumpOffset()) == ip) {
+                            if (code.adr2pos(code.pos2adr(ip + 3) + 5 /*IF numbytes*/ + aif.getJumpOffset()) == ip) {
                                 ip += 4;
                             }
                         }
@@ -473,6 +473,9 @@ public class ActionGraph extends Graph {
             }
         }
         if (oldIp != ip) {
+            if (ip == code.size()) { //no next checkIp call since its after code size
+                return ip;
+            }
             return checkIp(ip);
         }
         return ip;

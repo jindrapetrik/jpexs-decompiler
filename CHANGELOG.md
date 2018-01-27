@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - Accessing font list on demand - prevents loading X11 on systems without UI
 - Better AS2 class detection
+- AS1/2 break statement decompilation in for..in loops
 - AS2 direct editation - not generating Pop in class header ifs
 
 ## [11.0.0] - 2018-01-17
