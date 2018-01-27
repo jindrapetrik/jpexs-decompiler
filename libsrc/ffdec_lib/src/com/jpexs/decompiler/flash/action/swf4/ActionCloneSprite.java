@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
@@ -21,6 +22,7 @@ import com.jpexs.decompiler.flash.action.ActionScriptObject;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.CloneSpriteActionItem;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -53,8 +55,11 @@ public class ActionCloneSprite extends Action {
         int depth = EcmaScript.toInt32(lda.stack.pop());
         String source = EcmaScript.toString(lda.stack.pop());
         String target = EcmaScript.toString(lda.stack.pop());
-        lda.stage.setMember(target, ((ActionScriptObject) lda.stage.getMember(source)).clone());
-        lda.stage.addToDisplayList(depth, lda.stage.getMember(target));
+        Object clonedMember = lda.stage.getMember(source);
+        if (clonedMember != Undefined.INSTANCE) {
+            lda.stage.setMember(target, ((ActionScriptObject) clonedMember).clone());
+            lda.stage.addToDisplayList(depth, lda.stage.getMember(target));
+        }
         return true;
     }
 

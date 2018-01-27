@@ -12,9 +12,11 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action;
 
+import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -181,6 +183,6 @@ public class ActionScriptObject implements Cloneable {
                 }
             }
         }
-        return null;
+        return Undefined.INSTANCE;
     }
 }
