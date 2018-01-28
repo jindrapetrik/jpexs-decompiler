@@ -1692,10 +1692,9 @@ public class Graph {
             //makeAllCommands(currentRet, stack);
             stack = (TranslateStack) stack.clone();
             stack.clear();
-            loopItem = new UniversalLoopItem(null, localData.lineStartInstruction, currentLoop);
+            loopItem = new UniversalLoopItem(null, localData.lineStartInstruction, currentLoop, new ArrayList<>());
             //loopItem.commands=printGraph(visited, localData, stack, allParts, parent, part, stopPart, loops);
             currentRet.add(loopItem);
-            loopItem.commands = new ArrayList<>();
             currentRet = loopItem.commands;
             //return ret;
         }
@@ -2073,6 +2072,7 @@ public class Graph {
                     List<GraphTargetItem> bodyBranch = null;
                     boolean inverted = false;
                     boolean breakpos2 = false;
+                    BreakItem addBreakItem = null;
                     if ((ifi.onTrue.size() == 1) && (ifi.onTrue.get(0) instanceof BreakItem)) {
                         BreakItem bi = (BreakItem) ifi.onTrue.get(0);
                         if (bi.loopId == currentLoop.id) {
@@ -2086,12 +2086,13 @@ public class Graph {
                         }
                     } else if (loopItem.commands.size() == 2 && (loopItem.commands.get(1) instanceof BreakItem)) {
                         BreakItem bi = (BreakItem) loopItem.commands.get(1);
-                        if (bi.loopId == currentLoop.id) {
-                            if (ifi.onTrue.isEmpty()) {
-                                inverted = true;
-                            }
-                            bodyBranch = inverted ? ifi.onFalse : ifi.onTrue;
-                            breakpos2 = true;
+                        if (ifi.onTrue.isEmpty()) {
+                            inverted = true;
+                        }
+                        bodyBranch = inverted ? ifi.onFalse : ifi.onTrue;
+                        breakpos2 = true;
+                        if (bi.loopId != currentLoop.id) { //it's break of another parent loop
+                            addBreakItem = bi; //we must add it after the loop
                         }
                     }
                     if (bodyBranch != null) {
@@ -2129,6 +2130,9 @@ public class Graph {
                             ret.add(index, li = new ForItem(expr.getSrc(), expr.getLineStartItem(), currentLoop, new ArrayList<>(), exprList.get(exprList.size() - 1), finalComm, commands));
                         } else {
                             ret.add(index, li = new WhileItem(expr.getSrc(), expr.getLineStartItem(), currentLoop, exprList, commands));
+                        }
+                        if (addBreakItem != null) {
+                            ret.add(index + 1, addBreakItem);
                         }
 
                         loopTypeFound = true;
