@@ -326,6 +326,7 @@ public class ActionGraph extends Graph {
                         caseBodyParts.add(i, defaultPart);
                         caseValues.add(caseValuesMap.get(i));
                         hasDefault = true;
+                        break;
                     }
                 }
 
