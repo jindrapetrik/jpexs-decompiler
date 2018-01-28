@@ -302,15 +302,14 @@ public class ActionGraph extends Graph {
                 stack.push(set);
             } else {
                 part = part.nextParts.get(1);
-                //caseBodyParts.add(part);
                 GraphPart defaultPart = part;
                 if (code.size() > defaultPart.start && code.get(defaultPart.start) instanceof ActionJump) {
                     defaultPart = defaultPart.nextParts.get(0);
                 }
 
-                List<GraphTargetItem> caseValues = new ArrayList<>();
                 boolean hasDefault = false;
                 /*
+                case 4:
                 case 5:
                 default: 
                     trace("5 & def");
@@ -318,13 +317,12 @@ public class ActionGraph extends Graph {
                 case 6:
                 
                  */
-                for (int i = 0; i < caseBodyParts.size(); i++) {
-                    caseValues.add(caseValuesMap.get(i));
+                //must go backwards to hit case 5, not case 4
+                for (int i = caseBodyParts.size() - 1; i >= 0; i--) {
                     if (caseBodyParts.get(i) == defaultPart) {
-                        i++;
-                        caseValuesMap.add(i, new DefaultItem());
-                        caseBodyParts.add(i, defaultPart);
-                        caseValues.add(caseValuesMap.get(i));
+                        DefaultItem di = new DefaultItem();
+                        caseValuesMap.add(i + 1, di);
+                        caseBodyParts.add(i + 1, defaultPart);
                         hasDefault = true;
                         break;
                     }
@@ -332,21 +330,48 @@ public class ActionGraph extends Graph {
 
                 if (!hasDefault) {
                     /*
+                    case 1:
+                        trace("1");
+                    case 2:
+                        trace("2"); //no break
                     default:
                         trace("def");
-                    case 1:
-                        trace("1");                    
+                        ...
+                    case 3:  
                      */
-                    for (int i = 0; i < caseBodyParts.size(); i++) {
-                        if (defaultPart.leadsTo(localData, this, code, caseBodyParts.get(i), loops)) {
-                            caseValuesMap.add(i, new DefaultItem());
-                            caseBodyParts.add(i, defaultPart);
-                            caseValues.add(i, caseValuesMap.get(i));
+                    //must go backwards to hit case 2, not case 1
+                    for (int i = caseBodyParts.size() - 1; i >= 0; i--) {
+                        if (caseBodyParts.get(i).leadsTo(localData, this, code, defaultPart, loops)) {
+                            DefaultItem di = new DefaultItem();
+                            caseValuesMap.add(i + 1, di);
+                            caseBodyParts.add(i + 1, defaultPart);
                             hasDefault = true;
                             break;
                         }
                     }
                 }
+
+                if (!hasDefault) {
+                    /*
+                    case 1:
+                        trace("1");
+                        break;
+                    default:
+                        trace("def"); //no break
+                    case 2:
+                        trace("2");                    
+                     */
+                    for (int i = 0; i < caseBodyParts.size(); i++) {
+                        if (defaultPart.leadsTo(localData, this, code, caseBodyParts.get(i), loops)) {
+                            DefaultItem di = new DefaultItem();
+                            caseValuesMap.add(i, di);
+                            caseBodyParts.add(i, defaultPart);
+                            hasDefault = true;
+                            break;
+                        }
+                    }
+                }
+
                 if (!hasDefault) {
                     /*
                         case 1:
@@ -358,7 +383,6 @@ public class ActionGraph extends Graph {
                      */
                     caseValuesMap.add(new DefaultItem());
                     caseBodyParts.add(defaultPart);
-                    caseValues.add(caseValuesMap.get(caseValuesMap.size() - 1));
                 }
 
                 GraphPart breakPart = getMostCommonPart(localData, caseBodyParts, loops);
@@ -373,7 +397,7 @@ public class ActionGraph extends Graph {
                 loops.add(currentLoop);
                 List<Integer> valuesMapping = new ArrayList<>();
                 List<GraphPart> caseBodies = new ArrayList<>();
-                for (int i = 0; i < caseValues.size(); i++) {
+                for (int i = 0; i < caseValuesMap.size(); i++) {
                     GraphPart cur = caseBodyParts.get(i);
                     if (!caseBodies.contains(cur)) {
                         caseBodies.add(cur);
@@ -422,15 +446,16 @@ public class ActionGraph extends Graph {
                     }
                     if (lastc.isEmpty()) {
                         int cnt2 = 0;
-                        if (caseValues.get(caseValues.size() - 1) instanceof DefaultItem) {
+                        if (caseValuesMap.get(caseValuesMap.size() - 1) instanceof DefaultItem) {
                             for (int i = valuesMapping.size() - 1; i >= 0; i--) {
                                 if (valuesMapping.get(i) == caseCommands.size() - 1) {
                                     cnt2++;
                                 }
                             }
+
+                            caseValuesMap.remove(caseValuesMap.size() - 1);
+                            valuesMapping.remove(valuesMapping.size() - 1);
                             if (cnt2 == 1) {
-                                caseValues.remove(caseValues.size() - 1);
-                                valuesMapping.remove(valuesMapping.size() - 1);
                                 caseCommands.remove(lastc);
                             }
                         }
@@ -442,13 +467,12 @@ public class ActionGraph extends Graph {
                     if (!lastc.isEmpty() && (lastc.get(lastc.size() - 1) instanceof BreakItem)) {
                         BreakItem bi = (BreakItem) lastc.get(lastc.size() - 1);
                         lastc.remove(lastc.size() - 1);
-
                     }
                 }
 
                 ret = new ArrayList<>();
                 ret.addAll(output);
-                SwitchItem sti = new SwitchItem(null, switchStartItem, currentLoop, switchedObject, caseValues, caseCommands, valuesMapping);
+                SwitchItem sti = new SwitchItem(null, switchStartItem, currentLoop, switchedObject, caseValuesMap, caseCommands, valuesMapping);
                 ret.add(sti);
                 currentLoop.phase = 2;
                 if (next != null) {
