@@ -1152,14 +1152,25 @@ public class ActionScript2Parser {
                 s = lex();
                 boolean found = false;
                 List<List<GraphTargetItem>> catchCommands = null;
-                List<GraphTargetItem> catchExceptions = new ArrayList<>();
-                if (s.type == SymbolType.CATCH) {
+                List<GraphTargetItem> catchExceptionNames = new ArrayList<>();
+                List<GraphTargetItem> catchExceptionTypes = new ArrayList<>();
+
+                while (s.type == SymbolType.CATCH) {
                     expectedType(SymbolType.PARENT_OPEN);
                     s = lex();
                     expected(s, lexer.yyline(), SymbolType.IDENTIFIER, SymbolType.STRING);
-                    catchExceptions.add(pushConst((String) s.value));
+                    catchExceptionNames.add(pushConst((String) s.value));
+                    s = lex();
+                    if (s.type == SymbolType.COLON) {
+                        catchExceptionTypes.add(type(variables));
+                    } else {
+                        catchExceptionTypes.add(null);
+                        lexer.pushback(s);
+                    }
                     expectedType(SymbolType.PARENT_CLOSE);
-                    catchCommands = new ArrayList<>();
+                    if (catchCommands == null) {
+                        catchCommands = new ArrayList<>();
+                    }
                     List<GraphTargetItem> cc = new ArrayList<>();
                     cc.add(command(inFunction, inMethod, forinlevel, true, variables, functions));
                     catchCommands.add(cc);
@@ -1177,7 +1188,7 @@ public class ActionScript2Parser {
                     expected(s, lexer.yyline(), SymbolType.CATCH, SymbolType.FINALLY);
                 }
                 lexer.pushback(s);
-                ret = new TryActionItem(tryCommands, catchExceptions, catchCommands, finallyCommands);
+                ret = new TryActionItem(tryCommands, catchExceptionNames, catchExceptionTypes, catchCommands, finallyCommands);
                 break;
             case THROW:
                 ret = new ThrowActionItem(null, null, expression(inFunction, inMethod, true, variables, functions));
