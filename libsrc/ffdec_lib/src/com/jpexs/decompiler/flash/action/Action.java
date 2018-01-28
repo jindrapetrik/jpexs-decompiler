@@ -1077,7 +1077,7 @@ public abstract class Action implements GraphSourceItem {
                         if (actions.get(ip + 2) instanceof ActionNot) {
                             if (actions.get(ip + 3) instanceof ActionIf) {
                                 ActionIf aif = (ActionIf) actions.get(ip + 3);
-                                if (adr2ip(actions, ip2adr(actions, ip + 4) + aif.getJumpOffset()) == ip) {
+                                if (adr2ip(actions, ip2adr(actions, ip + 3) + 5 + aif.getJumpOffset()) == ip) {
                                     ip += 4;
                                     continue;
                                 }
@@ -1087,99 +1087,13 @@ public abstract class Action implements GraphSourceItem {
                 }
             }
 
-            /*ActionJump && ActionIf removed*/
- /*if ((action instanceof ActionEnumerate2) || (action instanceof ActionEnumerate)) {
-             loopStart = ip + 1;
-             isForIn = true;
-             ip += 4;
-             action.translate(localData, stack, output);
-             EnumerateActionItem en = (EnumerateActionItem) stack.peek();
-             inItem = en.object;
-             continue;
-             } else*/ /*if (action instanceof ActionTry) {
-             ActionTry atry = (ActionTry) action;
-             List<GraphTargetItem> tryCommands = ActionGraph.translateViaGraph(registerNames, variables, functions, atry.tryBody, version);
-             ActionItem catchName;
-             if (atry.catchInRegisterFlag) {
-             catchName = new DirectValueActionItem(atry, -1, new RegisterNumber(atry.catchRegister), new ArrayList<>());
-             } else {
-             catchName = new DirectValueActionItem(atry, -1, atry.catchName, new ArrayList<>());
-             }
-             List<GraphTargetItem> catchExceptions = new ArrayList<GraphTargetItem>();
-             catchExceptions.add(catchName);
-             List<List<GraphTargetItem>> catchCommands = new ArrayList<List<GraphTargetItem>>();
-             catchCommands.add(ActionGraph.translateViaGraph(registerNames, variables, functions, atry.catchBody, version));
-             List<GraphTargetItem> finallyCommands = ActionGraph.translateViaGraph(registerNames, variables, functions, atry.finallyBody, version);
-             output.add(new TryActionItem(tryCommands, catchExceptions, catchCommands, finallyCommands));
-             } else  if (action instanceof ActionWith) {
-             ActionWith awith = (ActionWith) action;
-             List<GraphTargetItem> withCommands = ActionGraph.translateViaGraph(registerNames, variables, functions,new ArrayList<Action>() , version); //TODO:parse with actions
-             output.add(new WithActionItem(action, stack.pop(), withCommands));
-             } else */ if (false) {
-            } /*if (action instanceof ActionStoreRegister) {
-             if ((ip + 1 <= end) && (actions.get(ip + 1) instanceof ActionPop)) {
-             action.translate(localData, stack, output);
-             stack.pop();
-             ip++;
-             } else {
-             try {
-             action.translate(localData, stack, output);
-             } catch (Exception ex) {
-             // ignore
-             }
-             }
-             } */ /*else if (action instanceof ActionStrictEquals) {
-             if ((ip + 1 < actions.size()) && (actions.get(ip + 1) instanceof ActionIf)) {
-             List<ActionItem> caseValues = new ArrayList<ActionItem>();
-             List<List<ActionItem>> caseCommands = new ArrayList<List<ActionItem>>();
-             caseValues.add(stack.pop());
-             ActionItem switchedObject = stack.pop();
-             if (output.size() > 0) {
-             if (output.get(output.size() - 1) instanceof StoreRegisterActionItem) {
-             output.remove(output.size() - 1);
-             }
-             }
-             int caseStart = ip + 2;
-             List<Integer> caseBodyIps = new ArrayList<Integer>();
-             long defaultAddr = 0;
-             caseBodyIps.add(adr2ip(actions, ((ActionIf) actions.get(ip + 1)).getRef(version), version));
-             ip++;
-             do {
-             ip++;
-             if ((actions.get(ip - 1) instanceof ActionStrictEquals) && (actions.get(ip) instanceof ActionIf)) {
-             caseValues.add(actionsToStackTree(registerNames, jumpsOrIfs, actions, constants, caseStart, ip - 2, version).pop());
-             caseStart = ip + 1;
-             caseBodyIps.add(adr2ip(actions, ((ActionIf) actions.get(ip)).getRef(version), version));
-             if (actions.get(ip + 1) instanceof ActionJump) {
-             defaultAddr = ((ActionJump) actions.get(ip + 1)).getRef(version);
-             ip = adr2ip(actions, defaultAddr, version);
-             break;
-             }
-             }
-             } while (ip < end);
-
-             for (int i = 0; i < caseBodyIps.size(); i++) {
-             int caseEnd = ip - 1;
-             if (i < caseBodyIps.size() - 1) {
-             caseEnd = caseBodyIps.get(i + 1) - 1;
-             }
-             caseCommands.add(actionsToTree(registerNames, unknownJumps, loopList, jumpsOrIfs, stack, constants, actions, caseBodyIps.get(i), caseEnd, version));
-             }
-             output.add(new SwitchActionItem(action, defaultAddr, switchedObject, caseValues, caseCommands, null));
-             continue;
-             } else {
-             action.translate(stack, constants, output, registerNames);
-             }
-             } */ else {
-
-                if (action instanceof ActionStore) {
-                    ActionStore store = (ActionStore) action;
-                    store.setStore(actions.subList(ip + 1, ip + 1 + store.getStoreSize()));
-                    ip = ip + 1 + store.getStoreSize() - 1/*ip++ will be next*/;
-                }
-
-                action.translate(localData, stack, output, staticOperation, path);
+            if (action instanceof ActionStore) {
+                ActionStore store = (ActionStore) action;
+                store.setStore(actions.subList(ip + 1, ip + 1 + store.getStoreSize()));
+                ip = ip + 1 + store.getStoreSize() - 1/*ip++ will be next*/;
             }
+
+            action.translate(localData, stack, output, staticOperation, path);
 
             ip++;
         }
