@@ -312,6 +312,14 @@ public class ActionGraph extends Graph {
 
                 List<GraphTargetItem> caseValues = new ArrayList<>();
                 boolean hasDefault = false;
+                /*
+                case 5:
+                default: 
+                    trace("5 & def");
+                    ...
+                case 6:
+                
+                 */
                 for (int i = 0; i < caseBodyParts.size(); i++) {
                     caseValues.add(caseValuesMap.get(i));
                     if (caseBodyParts.get(i) == defaultPart) {
@@ -324,8 +332,12 @@ public class ActionGraph extends Graph {
                 }
 
                 if (!hasDefault) {
-                    //List<GraphPart> stops = new ArrayList<>();                   
-                    //stops.addAll(caseBodyParts);
+                    /*
+                    default:
+                        trace("def");
+                    case 1:
+                        trace("1");                    
+                     */
                     for (int i = 0; i < caseBodyParts.size(); i++) {
                         if (defaultPart.leadsTo(localData, this, code, caseBodyParts.get(i), loops)) {
                             caseValuesMap.add(i, new DefaultItem());
@@ -337,21 +349,28 @@ public class ActionGraph extends Graph {
                     }
                 }
                 if (!hasDefault) {
+                    /*
+                        case 1:
+                        ...
+                        case 2:
+                        ...
+                        default:
+                            trace("def");                        
+                     */
                     caseValuesMap.add(new DefaultItem());
                     caseBodyParts.add(defaultPart);
                     caseValues.add(caseValuesMap.get(caseValuesMap.size() - 1));
                 }
 
                 List<List<GraphTargetItem>> caseCommands = new ArrayList<>();
-                GraphPart next;
-
-                next = breakPart;
+                GraphPart next = breakPart;
 
                 GraphTargetItem ti = checkLoop(next, stopPart, loops);
+
+                //create switch as new loop break command detection to work
                 currentLoop = new Loop(loops.size(), null, next);
                 currentLoop.phase = 1;
                 loops.add(currentLoop);
-                //switchLoc.getNextPartPath(new ArrayList<GraphPart>());
                 List<Integer> valuesMapping = new ArrayList<>();
                 List<GraphPart> caseBodies = new ArrayList<>();
                 for (int i = 0; i < caseValues.size(); i++) {
@@ -362,45 +381,36 @@ public class ActionGraph extends Graph {
                     valuesMapping.add(caseBodies.indexOf(cur));
                 }
 
-                /*List<GraphPart> ignored = new ArrayList<>();
-                 for (Loop l : loops) {
-                 ignored.add(l.loopContinue);
-                 }*/
                 for (int i = 0; i < caseBodies.size(); i++) {
-                    List<GraphTargetItem> cc = new ArrayList<>();
-                    GraphPart nextCase = null;
-                    nextCase = next;
+                    List<GraphTargetItem> currentCaseCommands = new ArrayList<>();
+                    GraphPart nextCase = next;
                     if (next != null) {
                         if (i < caseBodies.size() - 1) {
                             if (!caseBodies.get(i).leadsTo(localData, this, code, caseBodies.get(i + 1), loops)) {
-                                cc.add(new BreakItem(null, localData.lineStartInstruction, currentLoop.id));
+                                currentCaseCommands.add(new BreakItem(null, localData.lineStartInstruction, currentLoop.id));
                             } else {
                                 nextCase = caseBodies.get(i + 1);
                             }
                         }
                     }
                     List<GraphPart> stopPart2x = new ArrayList<>(stopPart);
-                    //stopPart2.add(nextCase);
                     for (GraphPart b : caseBodies) {
                         if (b != caseBodies.get(i)) {
                             stopPart2x.add(b);
                         }
                     }
-                    /*if (defaultPart != null) {
-                        stopPart2x.add(defaultPart);
-                    }*/
                     if (breakPart != null) {
                         stopPart2x.add(breakPart);
                     }
-                    cc.addAll(0, printGraph(partCodes, partCodePos, localData, stack, allParts, null, caseBodies.get(i), stopPart2x, loops, staticOperation, path));
-                    if (cc.size() >= 2) {
-                        if (cc.get(cc.size() - 1) instanceof BreakItem) {
-                            if ((cc.get(cc.size() - 2) instanceof ContinueItem) || (cc.get(cc.size() - 2) instanceof BreakItem)) {
-                                cc.remove(cc.size() - 1);
+                    currentCaseCommands.addAll(0, printGraph(partCodes, partCodePos, localData, stack, allParts, null, caseBodies.get(i), stopPart2x, loops, staticOperation, path));
+                    if (currentCaseCommands.size() >= 2) {
+                        if (currentCaseCommands.get(currentCaseCommands.size() - 1) instanceof BreakItem) {
+                            if ((currentCaseCommands.get(currentCaseCommands.size() - 2) instanceof ContinueItem) || (currentCaseCommands.get(currentCaseCommands.size() - 2) instanceof BreakItem)) {
+                                currentCaseCommands.remove(currentCaseCommands.size() - 1);
                             }
                         }
                     }
-                    caseCommands.add(cc);
+                    caseCommands.add(currentCaseCommands);
                 }
 
                 //If the lastone is default empty and alone, remove it
