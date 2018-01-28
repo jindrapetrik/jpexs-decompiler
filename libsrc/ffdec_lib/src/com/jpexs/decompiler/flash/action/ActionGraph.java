@@ -308,8 +308,6 @@ public class ActionGraph extends Graph {
                     defaultPart = defaultPart.nextParts.get(0);
                 }
 
-                GraphPart breakPart = getMostCommonPart(localData, caseBodyParts, loops);
-
                 List<GraphTargetItem> caseValues = new ArrayList<>();
                 boolean hasDefault = false;
                 /*
@@ -362,6 +360,7 @@ public class ActionGraph extends Graph {
                     caseValues.add(caseValuesMap.get(caseValuesMap.size() - 1));
                 }
 
+                GraphPart breakPart = getMostCommonPart(localData, caseBodyParts, loops);
                 List<List<GraphTargetItem>> caseCommands = new ArrayList<>();
                 GraphPart next = breakPart;
 
