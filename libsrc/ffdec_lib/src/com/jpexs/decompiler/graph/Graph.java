@@ -599,12 +599,17 @@ public class Graph {
         return g.translate(localData, staticOperation, path);
     }
 
+    protected void afterPopupateAllParts(Set<GraphPart> allParts) {
+
+    }
+
     public List<GraphTargetItem> translate(BaseLocalData localData, int staticOperation, String path) throws InterruptedException {
 
         Set<GraphPart> allParts = new HashSet<>();
         for (GraphPart head : heads) {
             populateParts(head, allParts);
         }
+        afterPopupateAllParts(allParts);
         if (debugPrintAllParts) {
             System.err.println("parts:");
             for (GraphPart p : allParts) {

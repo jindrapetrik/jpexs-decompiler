@@ -48,19 +48,22 @@ public class ActionGraphSource extends GraphSource {
 
     private final boolean insideDoInitAction;
 
+    private final boolean insideDefineFunction1;
+
     private final String path;
 
     public List<Action> getActions() {
         return actions;
     }
 
-    public ActionGraphSource(String path, boolean insideDoInitAction, List<Action> actions, int version, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+    public ActionGraphSource(String path, boolean insideDoInitAction, boolean insideDefineFunction1, List<Action> actions, int version, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
         this.actions = actions;
         this.version = version;
         this.registerNames = registerNames;
         this.variables = variables;
         this.functions = functions;
         this.insideDoInitAction = insideDoInitAction;
+        this.insideDefineFunction1 = insideDefineFunction1;
         this.path = path;
     }
 
@@ -87,7 +90,7 @@ public class ActionGraphSource extends GraphSource {
     public List<GraphTargetItem> translatePart(GraphPart part, BaseLocalData localData, TranslateStack stack, int start, int end, int staticOperation, String path) throws InterruptedException {
         Reference<GraphSourceItem> fi = new Reference<>(localData.lineStartInstruction);
 
-        List<GraphTargetItem> r = Action.actionsPartToTree(this.insideDoInitAction, fi, registerNames, variables, functions, stack, actions, start, end, version, staticOperation, path);
+        List<GraphTargetItem> r = Action.actionsPartToTree(this.insideDoInitAction, this.insideDefineFunction1, fi, registerNames, variables, functions, stack, actions, start, end, version, staticOperation, path);
         localData.lineStartInstruction = fi.getVal();
         return r;
     }

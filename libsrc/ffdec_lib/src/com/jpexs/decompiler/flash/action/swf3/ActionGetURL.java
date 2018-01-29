@@ -97,7 +97,7 @@ public class ActionGetURL extends Action {
     }
 
     @Override
-    public void translate(boolean insideDoInitAction, GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
+    public void translate(boolean insideDoInitAction, boolean insideDefineFunction1, GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         String fsCommandPrefix = "FSCommand:";
         if (urlString.startsWith(fsCommandPrefix) && targetString.isEmpty()) {
             String command = urlString.substring(fsCommandPrefix.length());

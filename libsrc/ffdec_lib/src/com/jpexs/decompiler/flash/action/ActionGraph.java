@@ -65,8 +65,8 @@ public class ActionGraph extends Graph {
 
     private boolean insideDoInitAction;
 
-    public ActionGraph(String path, boolean insideDoInitAction, List<Action> code, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int version) {
-        super(new ActionGraphSource(path, insideDoInitAction, code, version, registerNames, variables, functions), new ArrayList<>());
+    public ActionGraph(String path, boolean insideDoInitAction, boolean insideDefineFunction1, List<Action> code, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int version) {
+        super(new ActionGraphSource(path, insideDoInitAction, insideDefineFunction1, code, version, registerNames, variables, functions), new ArrayList<>());
         this.insideDoInitAction = insideDoInitAction;
     }
 
@@ -74,9 +74,17 @@ public class ActionGraph extends Graph {
         return insideDoInitAction;
     }
 
-    public static List<GraphTargetItem> translateViaGraph(boolean insideDoInitAction, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path) throws InterruptedException {
+    @Override
+    protected void afterPopupateAllParts(Set<GraphPart> allParts) {
 
-        ActionGraph g = new ActionGraph(path, insideDoInitAction, code, registerNames, variables, functions, version);
+    }
+
+    public static List<GraphTargetItem> translateViaGraph(boolean insideDoInitAction, boolean insideDefineFunction1, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path) throws InterruptedException {
+        if (insideDefineFunction1) {
+            ActionDefineFunctionPushRegistersCleaner fixer = new ActionDefineFunctionPushRegistersCleaner();
+            code = fixer.cleanPushRegisters(code);
+        }
+        ActionGraph g = new ActionGraph(path, insideDoInitAction, insideDefineFunction1, code, registerNames, variables, functions, version);
         ActionLocalData localData = new ActionLocalData(insideDoInitAction, registerNames);
         g.init(localData);
         return g.translate(localData, staticOperation, path);
