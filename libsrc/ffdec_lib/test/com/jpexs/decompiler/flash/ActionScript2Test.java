@@ -1935,4 +1935,17 @@ public class ActionScript2Test extends ActionScript2TestBase {
                 + "}\r\n"
         );
     }
+
+    @Test
+    public void frame69_forInBreakTest() {
+        compareSrc(69, "trace(\"forInBreakTest\");\r\n"
+                + "var obj = {a:5,b:6,c:7};\r\n"
+                + "for(var k in obj)\r\n"
+                + "{\r\n"
+                + "trace(k);\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "trace(\"after\");\r\n"
+        );
+    }
 }

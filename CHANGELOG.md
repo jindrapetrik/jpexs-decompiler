@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file.
 - AS2 direct editation - not generating Pop in class header ifs
 - AS1/2 deobfuscation - ActionRandom fixed for nonpositive numbers
 - AS1/2 switch statement detection - fixes of default section position
+- AS1/2: break on the end of for..in loop
 
 ## [11.0.0] - 2018-01-17
 ### Added

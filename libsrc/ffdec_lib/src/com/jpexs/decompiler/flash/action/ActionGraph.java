@@ -49,6 +49,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.DefaultItem;
+import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
 import java.util.ArrayList;
@@ -171,31 +172,48 @@ public class ActionGraph extends Graph {
         } while (again);
         for (int t = 1/*not first*/; t < list.size(); t++) {
             GraphTargetItem it = list.get(t);
+            List<GraphTargetItem> checkedBody = null;
+            GraphTargetItem checkedCondition = null;
+            Loop checkedLoop = null;
             if (it instanceof WhileItem) {
                 WhileItem wi = (WhileItem) it;
-                if ((!wi.commands.isEmpty()) && (wi.commands.get(0) instanceof SetTypeActionItem)) {
-                    SetTypeActionItem sti = (SetTypeActionItem) wi.commands.get(0);
-                    if (wi.expression.get(wi.expression.size() - 1) instanceof NeqActionItem) {
-                        NeqActionItem ne = (NeqActionItem) wi.expression.get(wi.expression.size() - 1);
-                        if (ne.rightSide instanceof DirectValueActionItem) {
-                            DirectValueActionItem dv = (DirectValueActionItem) ne.rightSide;
-                            if (dv.value == Null.INSTANCE) {
-                                GraphTargetItem en = list.get(t - 1);
-                                if (en instanceof EnumerateActionItem) {
-                                    EnumerateActionItem eti = (EnumerateActionItem) en;
-                                    list.remove(t);
-                                    wi.commands.remove(0);
-                                    list.add(t, new ForInActionItem(null, null, wi.loop, sti.getObject(), eti.object, wi.commands));
-                                    list.remove(t - 1);
-                                    t--;
+                checkedBody = wi.commands;
+                checkedCondition = wi.expression.get(wi.expression.size() - 1);
+                checkedLoop = wi.loop;
+            } else if (it instanceof IfItem) {
+                IfItem ifi = (IfItem) it;
+                if (ifi.onFalse.isEmpty()) {
+                    checkedBody = ifi.onTrue;
+                    checkedCondition = ifi.expression;
+                    checkedLoop = null;
+                }
+            }
+            if (checkedBody != null && (!checkedBody.isEmpty()) && (checkedBody.get(0) instanceof SetTypeActionItem)) {
+                SetTypeActionItem sti = (SetTypeActionItem) checkedBody.get(0);
+                if (checkedCondition instanceof NeqActionItem) {
+                    NeqActionItem ne = (NeqActionItem) checkedCondition;
+                    if (ne.rightSide instanceof DirectValueActionItem) {
+                        DirectValueActionItem dv = (DirectValueActionItem) ne.rightSide;
+                        if (dv.value == Null.INSTANCE) {
+                            GraphTargetItem en = list.get(t - 1);
+                            if (en instanceof EnumerateActionItem) {
+                                EnumerateActionItem eti = (EnumerateActionItem) en;
+                                list.remove(t);
+                                checkedBody.remove(0);
+                                if (checkedLoop == null) {
+                                    checkedLoop = new Loop(localData.loops.size(), null, null);
+                                    checkedBody.add(new BreakItem(null, null, checkedLoop.id));
                                 }
+                                list.add(t, new ForInActionItem(null, null, checkedLoop, sti.getObject(), eti.object, checkedBody));
+                                list.remove(t - 1);
+                                t--;
                             }
-
                         }
+
                     }
                 }
-
             }
+
         }
         //Handle for loops at the end:
         super.finalProcess(list, level, localData, path);

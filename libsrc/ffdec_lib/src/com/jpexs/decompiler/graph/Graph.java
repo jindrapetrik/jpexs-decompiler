@@ -676,7 +676,7 @@ public class Graph {
         List<GraphTargetItem> ret = printGraph(new HashMap<>(), new HashMap<>(), localData, stack, allParts, null, heads.get(0), null, loops, staticOperation, path);
         processIfs(ret);
         finalProcessStack(stack, ret, path);
-        finalProcessAll(ret, 0, new FinalProcessLocalData(), path);
+        finalProcessAll(ret, 0, new FinalProcessLocalData(loops), path);
         return ret;
     }
 
