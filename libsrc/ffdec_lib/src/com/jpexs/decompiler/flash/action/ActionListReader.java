@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action;
 
 import com.jpexs.decompiler.flash.DisassemblyListener;
@@ -31,7 +32,11 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.helpers.CancellableWorker;
+import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.stat.Statistics;
+import com.jpexs.helpers.utf8.Utf8Helper;
+import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -161,6 +166,15 @@ public class ActionListReader {
                 // keep orignal (not deobfuscated) actions
                 logger.log(Level.SEVERE, "Deobfuscation failed in: " + path, ex);
             }
+        }
+
+        //TODO: This cleaner needs to be executed only before actual decompilation, not when disassembly only
+        try {
+            new ActionDefineFunctionPushRegistersCleaner().actionListParsed(actions, sis.getSwf());
+        } catch (ThreadDeath | InterruptedException ex) {
+            throw ex;
+        } catch (Throwable ex) {
+            logger.log(Level.SEVERE, "Cleaning push registers in ActionDefineFunction failed: " + path, ex);
         }
 
         return actions;

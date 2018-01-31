@@ -37,8 +37,6 @@ public class ActionLocalData extends BaseLocalData {
 
     public boolean insideDoInitAction;
 
-    public boolean insideDefineFunction1 = false;
-
     public ActionLocalData(boolean insideDoInitAction) {
         regNames = new HashMap<>();
         variables = new HashMap<>();

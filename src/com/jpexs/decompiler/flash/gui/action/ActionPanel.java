@@ -941,7 +941,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         if (lastCode != null) {
             try {
                 boolean insideDoInitAction = (this.src instanceof DoInitActionTag);
-                GraphDialog gf = new GraphDialog(mainPanel.getMainFrame().getWindow(), new ActionGraph(this.src.getScriptName(), insideDoInitAction, false, lastCode, new HashMap<>(), new HashMap<>(), new HashMap<>(), SWF.DEFAULT_VERSION), "");
+                GraphDialog gf = new GraphDialog(mainPanel.getMainFrame().getWindow(), new ActionGraph(this.src.getScriptName(), insideDoInitAction, lastCode, new HashMap<>(), new HashMap<>(), new HashMap<>(), SWF.DEFAULT_VERSION), "");
                 gf.setVisible(true);
             } catch (InterruptedException ex) {
                 logger.log(Level.SEVERE, null, ex);

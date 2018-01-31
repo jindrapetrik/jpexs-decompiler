@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.flashlite;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
@@ -42,7 +43,7 @@ public class ActionFSCommand2 extends Action {
     }
 
     @Override
-    public void translate(boolean insideDoInitAction, boolean insideDefineFunction1, GraphSourceItem lineStartItem, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
+    public void translate(boolean insideDoInitAction, GraphSourceItem lineStartItem, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         long numArgs = popLong(stack);
         GraphTargetItem command = stack.pop();
         List<GraphTargetItem> args = new ArrayList<>();

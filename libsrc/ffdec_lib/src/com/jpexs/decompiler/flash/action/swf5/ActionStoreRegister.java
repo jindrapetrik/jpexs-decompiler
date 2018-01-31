@@ -97,7 +97,7 @@ public class ActionStoreRegister extends Action implements StoreTypeAction {
     }
 
     @Override
-    public void translate(boolean insideDoInitAction, boolean insideDefineFunction1, GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
+    public void translate(boolean insideDoInitAction, GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem value = stack.pop();
         RegisterNumber rn = new RegisterNumber(registerNumber);
         if (regNames.containsKey(registerNumber)) {

@@ -2035,7 +2035,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                     ip = code.adr2pos(addr);
                     addr += size;
                     int nextip = code.adr2pos(addr);
-                    getVariables(aLocalData.insideDoInitAction, variables, functions, strings, usageTypes, new ActionGraphSource(path, aLocalData.insideDoInitAction, (ins instanceof ActionDefineFunction), code.getActions().subList(ip, nextip), code.version, new HashMap<>(), new HashMap<>(), new HashMap<>()), 0, path + (cntName == null ? "" : "/" + cntName));
+                    getVariables(aLocalData.insideDoInitAction, variables, functions, strings, usageTypes, new ActionGraphSource(path, aLocalData.insideDoInitAction, code.getActions().subList(ip, nextip), code.version, new HashMap<>(), new HashMap<>(), new HashMap<>()), 0, path + (cntName == null ? "" : "/" + cntName));
                     ip = nextip;
                 }
                 List<List<GraphTargetItem>> r = new ArrayList<>();
@@ -2136,7 +2136,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         ActionList actions = src.getActions();
         actionsMap.put(src, actions);
         boolean insideDoInitAction = src instanceof DoInitActionTag;
-        getVariables(insideDoInitAction, variables, functions, strings, usageTypes, new ActionGraphSource(path, insideDoInitAction, insideDefineFunction1, actions, version, new HashMap<>(), new HashMap<>(), new HashMap<>()), 0, path);
+        getVariables(insideDoInitAction, variables, functions, strings, usageTypes, new ActionGraphSource(path, insideDoInitAction, actions, version, new HashMap<>(), new HashMap<>(), new HashMap<>()), 0, path);
         return ret;
     }
 
@@ -2292,7 +2292,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 int staticOperation = Graph.SOP_USE_STATIC; //(Boolean) Configuration.getConfig("autoDeobfuscate", true) ? Graph.SOP_SKIP_STATIC : Graph.SOP_USE_STATIC;
                 List<GraphTargetItem> dec;
                 try {
-                    dec = Action.actionsToTree(true /*Yes, inside doInitAction*/, false, dia.getActions(), version, staticOperation, ""/*FIXME*/);
+                    dec = Action.actionsToTree(true /*Yes, inside doInitAction*/, dia.getActions(), version, staticOperation, ""/*FIXME*/);
                 } catch (EmptyStackException ex) {
                     continue;
                 }
@@ -2989,7 +2989,8 @@ public final class SWF implements SWFContainerItem, Timelined {
             timelined.setModified(true);
             timelined.resetTimeline();
         } else // timeline should be always the swf here
-         if (removeDependencies) {
+        {
+            if (removeDependencies) {
                 removeTagWithDependenciesFromTimeline(tag, timelined.getTimeline());
                 timelined.setModified(true);
             } else {
@@ -2998,6 +2999,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                     timelined.setModified(true);
                 }
             }
+        }
     }
 
     @Override

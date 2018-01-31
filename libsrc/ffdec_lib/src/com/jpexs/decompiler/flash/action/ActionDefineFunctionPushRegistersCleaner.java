@@ -16,13 +16,16 @@
  */
 package com.jpexs.decompiler.flash.action;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.action.swf4.ActionJump;
 import com.jpexs.decompiler.flash.action.swf4.ActionPop;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
+import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
 import com.jpexs.decompiler.flash.action.swf5.ActionReturn;
 import com.jpexs.decompiler.flash.action.swf5.ActionStoreRegister;
 import com.jpexs.decompiler.flash.ecma.Undefined;
+import com.jpexs.decompiler.flash.helpers.SWFDecompilerAdapter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -44,13 +47,39 @@ import java.util.TreeSet;
  *
  * @author JPEXS
  */
-public class ActionDefineFunctionPushRegistersCleaner {
+public class ActionDefineFunctionPushRegistersCleaner extends SWFDecompilerAdapter {
 
-    public List<Action> cleanPushRegisters(List<Action> code) {
-        ActionList actionList = new ActionList(code);
+    @Override
+    public void actionListParsed(ActionList actions, SWF swf) throws InterruptedException {
+        cleanActionDefineFunctions(actions);
+    }
 
-        if (actionList.isEmpty()) {
-            return code;
+    private void cleanActionDefineFunctions(ActionList actions) {
+        for (int i = actions.size() - 1; i >= 0; i--) {
+            Action action = actions.get(i);
+            if (action instanceof ActionDefineFunction) {
+                ActionDefineFunction def = (ActionDefineFunction) action;
+
+                List<Long> sizes = def.getContainerSizes();
+                long endAddress = action.getAddress() + def.getHeaderSize() + sizes.get(0);
+                int lastIndex = actions.getIndexByAddress(endAddress);
+                int startIndex = i + 1;
+                int count = lastIndex - startIndex;
+                cleanPushRegisters(actions, startIndex, count);
+            }
+        }
+    }
+
+    /**
+     *
+     * @param code
+     * @param startIndex Index of first Action in DefineFunction body
+     * @param count Count of actions in DefineFunction
+     * @return
+     */
+    private boolean cleanPushRegisters(ActionList code, int startIndex, int count) {
+        if (count == 0) {
+            return false;
         }
 
         /*
@@ -58,10 +87,10 @@ public class ActionDefineFunctionPushRegistersCleaner {
         Push register1 register2 normalval
          */
         List<Integer> pushedRegisters = new ArrayList<>();
-        int pos = 0;
+        int pos = startIndex;
         loopregs:
-        while (actionList.get(pos) instanceof ActionPush) {
-            ActionPush ap = (ActionPush) actionList.get(pos);
+        while (code.get(pos) instanceof ActionPush) {
+            ActionPush ap = (ActionPush) code.get(pos);
             for (int i = 0; i < ap.values.size(); i++) {
                 if (ap.values.get(i) instanceof RegisterNumber) {
                     RegisterNumber rn = (RegisterNumber) ap.values.get(i);
@@ -71,9 +100,12 @@ public class ActionDefineFunctionPushRegistersCleaner {
                 }
             }
             pos++;
+            if (pos >= code.size()) {
+                return false;
+            }
         }
         if (pushedRegisters.isEmpty()) {
-            return code;
+            return false;
         }
 
         /*
@@ -95,131 +127,165 @@ public class ActionDefineFunctionPushRegistersCleaner {
         StoreRegister 1
         Pop
         
+        when original function has some returns, but no return at the end of function:
+        Push undefined
+        locjump: StoreRegister 0
+        Pop
+        ...
         
          */
         int returnReg = -1;
-        pos = actionList.size() - 1;
-        if (actionList.get(pos) instanceof ActionReturn) {
+        pos = startIndex + count - 1;
+        if (code.get(pos) instanceof ActionReturn) {
             pos--;
-            if (pos == -1) {
-                return code;
+            if (pos < startIndex) {
+                return false;
             }
-            if (!(actionList.get(pos) instanceof ActionPush)) {
-                return code;
+            if (!(code.get(pos) instanceof ActionPush)) {
+                return false;
             }
-            ActionPush pu = (ActionPush) actionList.get(pos);
+            ActionPush pu = (ActionPush) code.get(pos);
             if (pu.values.size() != 1) {
-                return code;
+                return false;
             }
             if (!(pu.values.get(0) instanceof RegisterNumber)) {
-                return code;
+                return false;
             }
             RegisterNumber rn = (RegisterNumber) pu.values.get(0);
             returnReg = rn.number;
             pos--;
-            if (pos == -1) {
-                return code;
+            if (pos < startIndex) {
+                return false;
             }
+
         }
         for (int i = 0; i < pushedRegisters.size(); i++) {
-            if (!(actionList.get(pos) instanceof ActionPop)) {
-                return code;
+            if (!(code.get(pos) instanceof ActionPop)) {
+                return false;
             }
             pos--;
-            if (pos == -1) {
-                return code;
+            if (pos < startIndex) {
+                return false;
             }
-            if (!(actionList.get(pos) instanceof ActionStoreRegister)) {
-                return code;
+            if (!(code.get(pos) instanceof ActionStoreRegister)) {
+                return false;
             }
-            ActionStoreRegister asr = (ActionStoreRegister) actionList.get(pos);
+            ActionStoreRegister asr = (ActionStoreRegister) code.get(pos);
             int expectedReg = pushedRegisters.get(i);
             if (asr.registerNumber != expectedReg) {
-                return code;
+                return false;
             }
             pos--;
-            if (pos == -1) {
-                return code;
+            if (pos < startIndex) {
+                return false;
             }
         }
 
-        Set<Integer> refPos = new TreeSet<>(new Comparator<Integer>() {
+        Set<Integer> jumpsToReturnPositions = new TreeSet<>(new Comparator<Integer>() {
             @Override
             public int compare(Integer o1, Integer o2) {
                 return o2 - o1; //biggest first
             }
         });
+
+        int posBeforeFinishPart;
+        Action actionBeforeFinishPart = null;
         if (returnReg > -1) {
-            if (!(actionList.get(pos) instanceof ActionPop)) {
-                return code;
+            if (!(code.get(pos) instanceof ActionPop)) {
+                return false;
             }
             pos--;
-            if (pos == -1) {
-                return code;
+            if (pos < startIndex) {
+                return false;
             }
-            if (!(actionList.get(pos) instanceof ActionStoreRegister)) {
-                return code;
+            if (!(code.get(pos) instanceof ActionStoreRegister)) {
+                return false;
             }
-            ActionStoreRegister asr = (ActionStoreRegister) actionList.get(pos);
+            ActionStoreRegister asr = (ActionStoreRegister) code.get(pos);
             int expectedReg = returnReg;
             if (asr.registerNumber != expectedReg) {
-                return code;
+                return false;
             }
 
-            if (!(actionList.get(pos - 1) instanceof ActionJump)) {
-                refPos.add(pos - 1);
-            }
-            Iterator<Action> ait = actionList.getReferencesFor(asr);
+            Iterator<Action> ait = code.getReferencesFor(asr);
             while (ait.hasNext()) {
                 Action a = ait.next();
-                refPos.add(actionList.indexOf(a));
+                if (!(a instanceof ActionJump)) {
+                    return false;
+                }
+                jumpsToReturnPositions.add(code.indexOf(a));
             }
             pos--;
+            if (!(code.get(pos) instanceof ActionJump)) {
+                actionBeforeFinishPart = code.get(pos);
+            }
+            posBeforeFinishPart = pos;
+        } else {
+            posBeforeFinishPart = pos;
         }
 
         //process code...
-        //TODO: make this somehow create new list instead of modifying current one
-        for (Integer jp : refPos) {
+        //replace jumps to return with returns
+        for (Integer jp : jumpsToReturnPositions) {
             int index = jp;
-            Action a = actionList.get(index);
-            if (a instanceof ActionJump) {
-                actionList.remove(index);
-                actionList.addAction(index, new ActionReturn());
-            } else if ((a instanceof ActionPush) && ((ActionPush) a).values.size() == 1 && ((ActionPush) a).values.get(0) == Undefined.INSTANCE) {
-                actionList.remove(a);
-            } else {
-                actionList.addAction(index + 1, new ActionReturn());
-                pos++;
+            code.removeAction(index);
+            code.addAction(index, new ActionReturn());
+        }
+
+        //previous action (not jump) also leads to finishpart, we might add return there aswell
+        if (returnReg > -1 && actionBeforeFinishPart != null) {
+            if ((actionBeforeFinishPart instanceof ActionPush) && ((ActionPush) actionBeforeFinishPart).values.size() == 1 && ((ActionPush) actionBeforeFinishPart).values.get(0) == Undefined.INSTANCE) {
+                //its return undefined, which is same as no return
+                code.removeAction(posBeforeFinishPart);
+                posBeforeFinishPart--;
+                count--;
+            } else if (actionBeforeFinishPart instanceof ActionReturn) {
+                //it was a jump that was replaced with Return
+            } else if (actionBeforeFinishPart instanceof ActionJump) {
+                //its jump to another location, we will not add return there
+            } else { //might be another returned value
+                posBeforeFinishPart++;
+                code.addAction(posBeforeFinishPart, new ActionReturn());
+                count++; //action added, but not removed, we increase total count
             }
         }
 
-        int posFromEnd = actionList.size() - pos - 1;
+        //remove finishPart
+        int removeStartIndex = posBeforeFinishPart + 1;
+        int removeCount = startIndex + count - removeStartIndex;
+        code.removeAction(removeStartIndex, removeCount);
 
-        actionList.removeAction(actionList.size() - posFromEnd, posFromEnd);
-
-        pos = 0;
-        int removedCnt = pushedRegisters.size();
+        //remove pushes from beginning part
+        pos = startIndex;
+        int registersLeft = pushedRegisters.size();
         loopregs2:
-        while (actionList.get(pos) instanceof ActionPush) {
-            ActionPush ap = (ActionPush) actionList.get(pos);
-            for (int i = 0; i < ap.values.size(); i++) {
-                if (ap.values.get(i) instanceof RegisterNumber) {
-                    ap.values.remove(i);
-                    i--;
-                    removedCnt--;
-                    if (ap.values.isEmpty()) {
-                        actionList.removeAction(pos);
-                    }
-                    if (removedCnt == 0) {
-                        break loopregs2;
-                    }
+        while (code.get(pos) instanceof ActionPush) {
+            ActionPush currentPush = (ActionPush) code.get(pos);
+
+            List<Object> currentPushedValues = currentPush.values;
+            List<Object> newPushedValues = new ArrayList<>();
+            for (int i = 0; i < currentPushedValues.size(); i++) {
+                if (registersLeft > 0 && currentPushedValues.get(i) instanceof RegisterNumber) {
+                    registersLeft--;
                 } else {
-                    break loopregs2;
+                    newPushedValues.add(currentPushedValues.get(i));
                 }
+            }
+            if (newPushedValues.size() != currentPushedValues.size()) {
+                code.removeAction(pos); //remove that push
+                if (!newPushedValues.isEmpty()) {
+                    ActionPush newPush = new ActionPush(newPushedValues.toArray());
+                    newPush.constantPool = currentPush.constantPool;
+                    code.addAction(pos, newPush); //replace with different push
+                } else {
+                    pos--; //action removed, but not added
+                }
+            }
+            if (registersLeft == 0) { //we removed all unwanted registers
+                break;
             }
             pos++;
         }
-
-        return actionList;
+        return true;
     }
 }
