@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraph;
+import com.jpexs.decompiler.flash.action.ActionGraphSource;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.ConstantPoolTooBigException;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
@@ -32,6 +33,7 @@ import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
+import com.jpexs.decompiler.flash.exporters.script.PcodeGraphVizExporter;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.DebugPanel;
 import com.jpexs.decompiler.flash.gui.DebuggerHandler;
@@ -48,8 +50,11 @@ import com.jpexs.decompiler.flash.gui.controls.NoneSelectedButtonGroup;
 import com.jpexs.decompiler.flash.gui.editor.DebuggableEditorPane;
 import com.jpexs.decompiler.flash.gui.editor.LinkHandler;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
+import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.NulWriter;
+import com.jpexs.decompiler.flash.helpers.StringBuilderTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.search.ActionScriptSearch;
@@ -58,12 +63,18 @@ import com.jpexs.decompiler.flash.search.ScriptSearchListener;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.CompilationException;
+import com.jpexs.decompiler.graph.GraphPart;
+import com.jpexs.decompiler.graph.GraphSource;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Insets;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.io.StringReader;
@@ -634,6 +645,11 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         graphButton.setToolTipText(AppStrings.translate("button.viewgraph"));
         graphButton.setMargin(new Insets(3, 3, 3, 3));
 
+        JButton copyGraphButton = new JButton(View.getIcon("graph16")); //TODO:icon
+        copyGraphButton.addActionListener(this::copyGraphActionButtonActionPerformed);
+        copyGraphButton.setToolTipText(AppStrings.translate("button.copygraph"));
+        copyGraphButton.setMargin(new Insets(3, 3, 3, 3));
+
         hexButton = new JToggleButton(View.getIcon("hexas16"));
         hexButton.addActionListener(this::hexButtonActionPerformed);
         hexButton.setToolTipText(AppStrings.translate("button.viewhexpcode"));
@@ -675,6 +691,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         topButtonsPan = new JPanel();
         topButtonsPan.setLayout(new BoxLayout(topButtonsPan, BoxLayout.X_AXIS));
         topButtonsPan.add(graphButton);
+        topButtonsPan.add(copyGraphButton);
         topButtonsPan.add(Box.createRigidArea(new Dimension(10, 0)));
         topButtonsPan.add(hexButton);
         topButtonsPan.add(hexOnlyButton);
@@ -994,6 +1011,22 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
     private void cancelActionButtonActionPerformed(ActionEvent evt) {
         setEditMode(false);
         setHex(getExportMode(), src.getScriptName(), lastCode);
+    }
+
+    private void copyGraphActionButtonActionPerformed(ActionEvent evt) {
+
+        try {
+            StringBuilder stringBuilder = new StringBuilder();
+            StringBuilderTextWriter stringBuilderWriter = new StringBuilderTextWriter(Configuration.getCodeFormatting(), stringBuilder);
+            new PcodeGraphVizExporter().export(src, stringBuilderWriter);
+
+            StringSelection stringSelection = new StringSelection(stringBuilder.toString());
+            Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
+            clpbrd.setContents(stringSelection, null);
+        } catch (Exception ex) {
+            //TODO let user know that something failed
+        }
+
     }
 
     private void saveActionButtonActionPerformed(ActionEvent evt) {
