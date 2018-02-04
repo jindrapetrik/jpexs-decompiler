@@ -11,7 +11,8 @@ All notable changes to this project will be documented in this file.
 - AS1/2: Try..catch with Error types - decompilation and direct editation
 - AS1/2: Properly handling of Flash7 scripts exported to Flash5/6 - ActionDefineFunction local registers
 - Export AS1/2 P-code as GraphViz
-- Copy AS1/2 GraphViz source to clipboard button
+- Display better Graph using GraphViz (Must be configured in Advanced settings / Path)
+- Copy AS1/2 Graph source (GraphViz) to clipboard - rightclick menu on graph
 
 ### Changed
 - AS1/2 direct editation - generated constantpool is sorted according to ActionPush position
