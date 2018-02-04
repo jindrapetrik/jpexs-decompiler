@@ -17,6 +17,8 @@
 package com.jpexs.decompiler.flash.action;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
+import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.helpers.Reference;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSource;
@@ -27,6 +29,7 @@ import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,7 +39,7 @@ import java.util.logging.Logger;
  */
 public class ActionGraphSource extends GraphSource {
 
-    private final List<Action> actions;
+    private final ActionList actions;
 
     public int version;
 
@@ -55,13 +58,26 @@ public class ActionGraphSource extends GraphSource {
     }
 
     public ActionGraphSource(String path, boolean insideDoInitAction, List<Action> actions, int version, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-        this.actions = actions;
+        this.actions = actions instanceof ActionList ? (ActionList) actions : new ActionList(actions);
         this.version = version;
         this.registerNames = registerNames;
         this.variables = variables;
         this.functions = functions;
         this.insideDoInitAction = insideDoInitAction;
         this.path = path;
+    }
+
+    @Override
+    public Set<Long> getImportantAddresses() {
+        return Action.getActionsAllRefs(actions);
+    }
+
+    @Override
+    public String insToString(int pos) {
+        if (pos < actions.size()) {
+            return actions.get(pos).getASMSource(actions, getImportantAddresses(), ScriptExportMode.PCODE);
+        }
+        return "";
     }
 
     @Override

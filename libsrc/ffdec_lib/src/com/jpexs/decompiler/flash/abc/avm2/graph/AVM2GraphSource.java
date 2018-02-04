@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.abc.avm2.ConvertOutput;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.helpers.Reference;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSource;
@@ -34,6 +35,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -83,6 +85,19 @@ public class AVM2GraphSource extends GraphSource {
         this.localRegAssigmentIps = localRegAssigmentIp;
         this.refs = refs;
         code.calculateDebugFileLine(abc);
+    }
+
+    @Override
+    public Set<Long> getImportantAddresses() {
+        return code.getImportantOffsets(body, false);
+    }
+
+    @Override
+    public String insToString(int pos) {
+        if (pos < code.code.size()) {
+            return code.code.get(pos).toStringNoAddress(abc.constants, fullyQualifiedNames);
+        }
+        return "";
     }
 
     @Override

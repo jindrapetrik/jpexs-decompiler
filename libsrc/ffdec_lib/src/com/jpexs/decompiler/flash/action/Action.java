@@ -347,6 +347,7 @@ public abstract class Action implements GraphSourceItem {
      *
      * @return Length
      */
+    @Override
     public final int getBytesLength() {
         return getContentBytesLength() + (actionCode >= 0x80 ? 3 : 1);
     }

@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
@@ -56,4 +57,6 @@ public interface GraphSourceItem extends Serializable, Cloneable {
     public int getLine();
 
     public String getFile();
+
+    public abstract int getBytesLength();
 }

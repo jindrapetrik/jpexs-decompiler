@@ -266,6 +266,16 @@ public class AVM2DeobfuscatorRegistersOld extends AVM2DeobfuscatorSimpleOld {
                         public long pos2adr(int pos) {
                             return code.pos2adr(pos);
                         }
+
+                        @Override
+                        public Set<Long> getImportantAddresses() {
+                            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                        }
+
+                        @Override
+                        public String insToString(int pos) {
+                            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                        }
                     });
                     idx = branches.get(0);
                     for (int n = 1; n < branches.size(); n++) {

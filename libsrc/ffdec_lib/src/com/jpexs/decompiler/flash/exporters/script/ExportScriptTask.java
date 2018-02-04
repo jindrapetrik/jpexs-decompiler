@@ -100,7 +100,7 @@ public class ExportScriptTask implements Callable<File> {
                         asm.getActionBytesAsHex(writer2);
                         asm.getActionSourceSuffix(writer2);
                     } else if (exportMode == ScriptExportMode.PCODE_GRAPHVIZ) {
-                        new PcodeGraphVizExporter().export(asm, writer2);
+                        new PcodeGraphVizExporter().exportAs12(asm, writer2);
                     } else if (exportMode != ScriptExportMode.AS) {
                         asm.getActionSourcePrefix(writer2);
                         asm.getASMSource(exportMode, writer2, null);

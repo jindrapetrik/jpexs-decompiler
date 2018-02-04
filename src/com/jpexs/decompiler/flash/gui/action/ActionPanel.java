@@ -1015,16 +1015,20 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
 
     private void copyGraphActionButtonActionPerformed(ActionEvent evt) {
 
+        StringBuilder stringBuilder = new StringBuilder();
         try {
-            StringBuilder stringBuilder = new StringBuilder();
             StringBuilderTextWriter stringBuilderWriter = new StringBuilderTextWriter(Configuration.getCodeFormatting(), stringBuilder);
-            new PcodeGraphVizExporter().export(src, stringBuilderWriter);
-
+            new PcodeGraphVizExporter().exportAs12(src, stringBuilderWriter);
+        } catch (Exception ex) {
+            logger.log(Level.SEVERE, "Error while generating graph", ex);
+            return;
+        }
+        try {
             StringSelection stringSelection = new StringSelection(stringBuilder.toString());
             Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
             clpbrd.setContents(stringSelection, null);
         } catch (Exception ex) {
-            //TODO let user know that something failed
+            logger.log(Level.SEVERE, "Cannot copy to clipboard", ex);
         }
 
     }

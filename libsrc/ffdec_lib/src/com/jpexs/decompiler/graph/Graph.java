@@ -80,6 +80,10 @@ public class Graph {
     private boolean debugGetLoops = false;
     private boolean debugPrintGraph = false;
 
+    public GraphSource getGraphCode() {
+        return code;
+    }
+
     /**
      * Identify loop exits
      *

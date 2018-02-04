@@ -17,17 +17,26 @@
 package com.jpexs.decompiler.flash.exporters.script;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2Graph;
+import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraph;
 import com.jpexs.decompiler.flash.action.ActionGraphSource;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.helpers.StringBuilderTextWriter;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
+import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphPart;
+import com.jpexs.decompiler.graph.GraphSource;
+import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -39,33 +48,49 @@ public class PcodeGraphVizExporter {
 
     private final String BLOCK_STYLE = "shape=\"box\"";
 
-    private String getBlockName(ActionList list, GraphPart part) {
-        long address = 0;
-        if (!list.isEmpty()) {
-            if (part.start >= list.size()) {
-                address = list.get(list.size() - 1).getAddress() + list.get(list.size() - 1).getBytesLength();
-            } else {
-                address = list.get(part.start).getAddress();
-            }
-        }
-
-        return "loc" + Helper.formatAddress(address);
+    private String getBlockName(GraphSource list, GraphPart part) {
+        return "loc" + Helper.formatAddress(list.pos2adr(part.start, true));
     }
 
-    private boolean isEndOfScript(ActionList list, GraphPart part) {
+    private boolean isEndOfScript(GraphSource list, GraphPart part) {
         if (part.start >= list.size()) {
             return true;
         }
         return false;
     }
 
-    public void export(ASMSource src, GraphTextWriter writer) throws InterruptedException {
+    private static void populateParts(GraphPart part, Set<GraphPart> allParts) {
+        if (allParts.contains(part)) {
+            return;
+        }
+        allParts.add(part);
+        for (GraphPart p : part.nextParts) {
+            populateParts(p, allParts);
+        }
+    }
+
+    public void exportAs12(ASMSource src, GraphTextWriter writer) throws InterruptedException {
         ActionList alist = src.getActions();
         ActionGraph gr = new ActionGraph("", false, alist, new HashMap<>(), new HashMap<>(), new HashMap<>(), SWF.DEFAULT_VERSION);
-        List<GraphPart> allBlocks = new ArrayList<>();
-        List<GraphPart> heads = gr.makeGraph(new ActionGraphSource("", false, alist, SWF.DEFAULT_VERSION, new HashMap<>(), new HashMap<>(), new HashMap<>()), allBlocks, new ArrayList<>());
+        export(gr, writer);
+    }
+
+    public void exportAs3(ABC abc, MethodBody body, GraphTextWriter writer) throws InterruptedException {
+        AVM2Graph gr = new AVM2Graph(body.getCode(), abc, body, false, -1, -1, new HashMap<>(), new ScopeStack(), new HashMap<>(), new ArrayList<>(), new HashMap<>(), body.getCode().visitCode(body));
+        export(gr, writer);
+    }
+
+    public void export(Graph graph, GraphTextWriter writer) throws InterruptedException {
+        graph.init(null);
+        GraphSource graphSource = graph.getGraphCode();
+        Set<GraphPart> allBlocks = new HashSet<>();
+        List<GraphPart> heads = graph.heads;
+        for (GraphPart h : heads) {
+            populateParts(h, allBlocks);
+        }
+
         writer.append("digraph pcode {\r\n");
-        Set<Long> knownAddresses = Action.getActionsAllRefs(alist);
+        Set<Long> knownAddresses = graphSource.getImportantAddresses();
         int h = 0;
         for (GraphPart head : heads) {
             String headName = "start";
@@ -74,26 +99,24 @@ public class PcodeGraphVizExporter {
                 headName = "start" + h;
             }
             writer.append(headName + " [shape=\"circle\"]\r\n");
-            writer.append(headName + ":s -> " + getBlockName(alist, head) + ":n;\r\n");
+            writer.append(headName + ":s -> " + getBlockName(graphSource, head) + ":n;\r\n");
         }
-        for (int i = 0; i < allBlocks.size(); i++) {
-
-            GraphPart part = allBlocks.get(i);
-            StringBuilder blkCode = new StringBuilder();
+        for (GraphPart part : allBlocks) {
+            StringBuilder blkCodeBuilder = new StringBuilder();
             for (int j = part.start; j <= part.end; j++) {
-                if (j < alist.size()) {
-                    if (knownAddresses.contains(alist.get(j).getAddress())) {
-                        blkCode.append("loc" + Helper.formatAddress(alist.get(j).getAddress())).append(":\\l");
+                if (j < graphSource.size()) {
+                    if (knownAddresses.contains(graphSource.get(j).getAddress())) {
+                        blkCodeBuilder.append("loc").append(Helper.formatAddress(graphSource.get(j).getAddress())).append(":\r\n");
                     }
-                    blkCode.append(alist.get(j).getASMSource(alist, knownAddresses, ScriptExportMode.PCODE)).append("\r\n");
+                    blkCodeBuilder.append(graphSource.insToString(j)).append("\r\n");
                 }
             }
-            String labelStr = blkCode.toString();
+            String labelStr = blkCodeBuilder.toString();
             labelStr = labelStr.replace("\"", "\\\"");
             labelStr = labelStr.replace("\r\n", "\\l");
-            String partBlockName = getBlockName(alist, part);
+            String partBlockName = getBlockName(graphSource, part);
             String blkStyle = BLOCK_STYLE;
-            if (isEndOfScript(alist, part)) {
+            if (isEndOfScript(graphSource, part)) {
                 blkStyle = "shape=\"circle\"";
                 labelStr = "FINISH";
             }
@@ -107,7 +130,7 @@ public class PcodeGraphVizExporter {
                 if (part.nextParts.size() == 2 && n == 1) {
                     orientation = "";
                 }
-                String nextBlockName = getBlockName(alist, next);
+                String nextBlockName = getBlockName(graphSource, next);
                 writer.append(partBlockName + orientation + " -> " + nextBlockName + ":n;\r\n");
             }
         }
