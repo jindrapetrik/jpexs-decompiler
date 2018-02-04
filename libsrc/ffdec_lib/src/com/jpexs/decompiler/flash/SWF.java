@@ -1711,8 +1711,9 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     private void getASMs(boolean exportFileNames, TreeItem treeItem, List<TreeItem> nodesToExport, boolean exportAll, Map<String, ASMSource> asmsToExport, String path) {
-        boolean exportNode = nodesToExport.contains(treeItem);
         TreeItem realItem = treeItem instanceof TagScript ? ((TagScript) treeItem).getTag() : treeItem;
+        boolean exportNode = nodesToExport.contains(treeItem) || nodesToExport.contains(realItem);
+
         if (realItem instanceof ASMSource && (exportAll || exportNode)) {
             String npath = path;
             String exPath = path;
@@ -2989,8 +2990,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             timelined.setModified(true);
             timelined.resetTimeline();
         } else // timeline should be always the swf here
-        {
-            if (removeDependencies) {
+         if (removeDependencies) {
                 removeTagWithDependenciesFromTimeline(tag, timelined.getTimeline());
                 timelined.setModified(true);
             } else {
@@ -2999,7 +2999,6 @@ public final class SWF implements SWFContainerItem, Timelined {
                     timelined.setModified(true);
                 }
             }
-        }
     }
 
     @Override
