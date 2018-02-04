@@ -645,11 +645,6 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         graphButton.setToolTipText(AppStrings.translate("button.viewgraph"));
         graphButton.setMargin(new Insets(3, 3, 3, 3));
 
-        JButton copyGraphButton = new JButton(View.getIcon("graph16")); //TODO:icon
-        copyGraphButton.addActionListener(this::copyGraphActionButtonActionPerformed);
-        copyGraphButton.setToolTipText(AppStrings.translate("button.copygraph"));
-        copyGraphButton.setMargin(new Insets(3, 3, 3, 3));
-
         hexButton = new JToggleButton(View.getIcon("hexas16"));
         hexButton.addActionListener(this::hexButtonActionPerformed);
         hexButton.setToolTipText(AppStrings.translate("button.viewhexpcode"));
@@ -691,7 +686,6 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         topButtonsPan = new JPanel();
         topButtonsPan.setLayout(new BoxLayout(topButtonsPan, BoxLayout.X_AXIS));
         topButtonsPan.add(graphButton);
-        topButtonsPan.add(copyGraphButton);
         topButtonsPan.add(Box.createRigidArea(new Dimension(10, 0)));
         topButtonsPan.add(hexButton);
         topButtonsPan.add(hexOnlyButton);
@@ -1011,26 +1005,6 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
     private void cancelActionButtonActionPerformed(ActionEvent evt) {
         setEditMode(false);
         setHex(getExportMode(), src.getScriptName(), lastCode);
-    }
-
-    private void copyGraphActionButtonActionPerformed(ActionEvent evt) {
-
-        StringBuilder stringBuilder = new StringBuilder();
-        try {
-            StringBuilderTextWriter stringBuilderWriter = new StringBuilderTextWriter(Configuration.getCodeFormatting(), stringBuilder);
-            new PcodeGraphVizExporter().exportAs12(src, stringBuilderWriter);
-        } catch (Exception ex) {
-            logger.log(Level.SEVERE, "Error while generating graph", ex);
-            return;
-        }
-        try {
-            StringSelection stringSelection = new StringSelection(stringBuilder.toString());
-            Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
-            clpbrd.setContents(stringSelection, null);
-        } catch (Exception ex) {
-            logger.log(Level.SEVERE, "Cannot copy to clipboard", ex);
-        }
-
     }
 
     private void saveActionButtonActionPerformed(ActionEvent evt) {
