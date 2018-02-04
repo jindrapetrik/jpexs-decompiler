@@ -45,6 +45,7 @@ import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.SymbolClassTypeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.timeline.Frame;
+import com.jpexs.decompiler.flash.timeline.TagScript;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -92,14 +93,14 @@ public class ExportDialog extends AppDialog {
         {ImageTag.class},
         {DefineVideoStreamTag.class},
         {SoundTag.class},
-        {ASMSource.class, ScriptPack.class},
+        {ASMSource.class, ScriptPack.class, TagScript.class},
         {DefineBinaryDataTag.class},
         {Frame.class},
         {Frame.class},
         {ButtonTag.class},
         {FontTag.class},
         {MorphShapeTag.class},
-        {SymbolClassTypeTag.class},
+        {SymbolClassTypeTag.class}
     };
 
     //Enum classes for values
@@ -116,7 +117,7 @@ public class ExportDialog extends AppDialog {
         ButtonExportMode.class,
         FontExportMode.class,
         MorphShapeExportMode.class,
-        SymbolClassExportMode.class,
+        SymbolClassExportMode.class
     };
 
     Class[] zoomClasses = {
@@ -125,7 +126,7 @@ public class ExportDialog extends AppDialog {
         TextExportMode.class,
         FrameExportMode.class,
         SpriteExportMode.class,
-        ButtonExportMode.class,
+        ButtonExportMode.class
     };
 
     private final JComboBox[] combos;
