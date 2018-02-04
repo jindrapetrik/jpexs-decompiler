@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.configuration;
 
 import com.jpexs.decompiler.flash.ApplicationInfo;
@@ -630,6 +631,11 @@ public final class Configuration {
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("ui")
     public static final ConfigurationItem<Boolean> showSetAdvanceValuesMessage = null;
+
+    @ConfigurationDefaultString("")
+    @ConfigurationCategory("paths")
+    @ConfigurationFile
+    public static final ConfigurationItem<String> graphVizDotLocation = null;
 
     private enum OSId {
         WINDOWS, OSX, UNIX
