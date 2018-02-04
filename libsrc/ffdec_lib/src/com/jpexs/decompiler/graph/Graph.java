@@ -2267,7 +2267,7 @@ public class Graph {
     protected void checkGraph(List<GraphPart> allBlocks) {
     }
 
-    private List<GraphPart> makeGraph(GraphSource code, List<GraphPart> allBlocks, List<Integer> alternateEntries) throws InterruptedException {
+    public List<GraphPart> makeGraph(GraphSource code, List<GraphPart> allBlocks, List<Integer> alternateEntries) throws InterruptedException {
         HashMap<Integer, List<Integer>> refs = code.visitCode(alternateEntries);
         List<GraphPart> ret = new ArrayList<>();
         boolean[] visited = new boolean[code.size()];
