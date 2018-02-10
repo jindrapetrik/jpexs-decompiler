@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.exporters.script.PcodeGraphVizExporter;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.StringBuilderTextWriter;
 import com.jpexs.decompiler.graph.Graph;
+import com.jpexs.graphs.graphviz.graph.operations.codestructure.CodeStructureModifyOperation;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -51,8 +52,11 @@ public class GraphVizGraphPanel extends AbstractGraphPanel {
         StringBuilder sb = new StringBuilder();
         StringBuilderTextWriter sbWriter = new StringBuilderTextWriter(null, sb);
         ex.export(graph, sbWriter);
+        String original = sb.toString();
+        CodeStructureModifyOperation structureModify = new CodeStructureModifyOperation();
+        String structured = structureModify.execute(original, null);
         try {
-            image = new GraphVizDotCommands().dotToImage(sb.toString());
+            image = new GraphVizDotCommands().dotToImage(structured);
         } catch (IOException ex1) {
             logger.log(Level.SEVERE, "Exporting image failed", ex1);
             image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);

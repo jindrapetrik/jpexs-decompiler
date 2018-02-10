@@ -48,6 +48,9 @@ public class PcodeGraphVizExporter {
 
     private final String BLOCK_STYLE = "shape=\"box\"";
 
+    private static final int INS_LEN_LIMIT = 50;
+    private static final String ELIPSIS = "...";
+
     private String getBlockName(GraphSource list, GraphPart part) {
         return "loc" + Helper.formatAddress(list.pos2adr(part.start, true));
     }
@@ -108,7 +111,11 @@ public class PcodeGraphVizExporter {
                     if (knownAddresses.contains(graphSource.get(j).getAddress())) {
                         blkCodeBuilder.append("loc").append(Helper.formatAddress(graphSource.get(j).getAddress())).append(":\r\n");
                     }
-                    blkCodeBuilder.append(graphSource.insToString(j)).append("\r\n");
+                    String insStr = graphSource.insToString(j);
+                    if (insStr.length() > INS_LEN_LIMIT) {
+                        insStr = insStr.substring(0, INS_LEN_LIMIT - ELIPSIS.length()) + ELIPSIS;
+                    }
+                    blkCodeBuilder.append(insStr).append("\r\n");
                 }
             }
             String labelStr = blkCodeBuilder.toString();
