@@ -1176,7 +1176,6 @@ public class AVM2Code implements Cloneable {
                 writer.appendNoHilight("flag ");
                 writer.hilightSpecial("HAS_OPTIONAL", HighlightSpecialType.FLAG_HAS_OPTIONAL);
                 writer.newLine();
-                writer.appendNoHilight("flag HAS_OPTIONAL").newLine();
             }
             if (info.flagHas_paramnames()) {
                 writer.appendNoHilight("flag ");
@@ -2173,8 +2172,7 @@ public class AVM2Code implements Cloneable {
              ins.operands[j] = updater.updateOperandOffset(target, ins.operands[j]);
              }
              }*/ //Faster, but not so universal
-            {
-                if (ins.definition instanceof IfTypeIns) {
+             if (ins.definition instanceof IfTypeIns) {
                     long target = ins.getTargetAddress();
                     try {
                         ins.operands[0] = updater.updateOperandOffset(ins.getAddress(), target, ins.operands[0]);
@@ -2182,7 +2180,6 @@ public class AVM2Code implements Cloneable {
                         throw new ConvertException("Invalid offset (" + ins + ")", i);
                     }
                 }
-            }
             ins.setAddress(updater.updateInstructionOffset(ins.getAddress()));
             //Note: changing operands here does not change instruction byte length as offsets are always S24 (not variable length)
         }
