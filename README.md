@@ -9,7 +9,8 @@ For information how to install, use the software, list of features, etc., visit 
 In the past (before 2018), we were using *free-decompiler.com* domain as HomePage, GitHub for source code, now we moved all information to Github.
 
 ## Download application
-Fow downloading the app, see [releases section](https://github.com/jindrapetrik/jpexs-decompiler/releases)
+Fow downloading the app, see [latest release](https://github.com/jindrapetrik/jpexs-decompiler/releases/latest).
+Older versions and nightly builds are availabe on [releases section](https://github.com/jindrapetrik/jpexs-decompiler/releases)
 
 ## Source code
 ### How to get source
