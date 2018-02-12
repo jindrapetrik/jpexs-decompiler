@@ -9,3 +9,6 @@ Make sure library part (libsrc/ffdec_lib) does not depend on GUI and does not co
 
 ## Tests
 Make sure existing tests pass.
+
+## Translations to other languages
+For information about localizations to other languages and how to contribute, see [TRANSLATIONS.md](TRANSLATIONS.md) file
