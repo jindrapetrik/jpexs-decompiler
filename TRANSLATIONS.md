@@ -21,7 +21,7 @@
 
 ## Preparing...
 Translators are working on these new translations: 
-- No new translations planned now...
+- Turkish
 
 ## New translation
 If you would like to translate FFDec to your language, please follow these steps:
