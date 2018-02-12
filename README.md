@@ -134,7 +134,7 @@ but as of 2018/01, our support is *very limited*.
 **Please contact us via Issue Tracker (see above)**
 
 In case the tracker or *free-decompiler.com* domain is down,
-email contact to JPEXS developer is `jindra.petrik@gmail.com`.
+emergency contact to JPEXS developer is `jindra.petrik@gmail.com`.
 
 ## Licenses + Acknowledgments
 ### Application
