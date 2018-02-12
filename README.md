@@ -3,14 +3,17 @@
 Opensource flash SWF decompiler and editor. Extract resources, convert SWF to FLA, edit ActionScript, replace images, sounds, texts or fonts. Various output formats available. Works with Java on Windows, Linux or MacOS.
 
 ## Application description and features
-For information how to install, use the software, list of features, etc., visit [FFDec Wiki](https://github.com/jindrapetrik/jpexs-decompiler/wiki/).
+For information about using the software, list of features, etc., visit [FFDec Wiki](https://github.com/jindrapetrik/jpexs-decompiler/wiki/).
 
 ## Free-Decompiler.com website
 In the past (before 2018), we were using *free-decompiler.com* domain as HomePage, GitHub for source code, now we moved all information to Github.
 
 ## Download application
-Fow downloading the app, see [latest release](https://github.com/jindrapetrik/jpexs-decompiler/releases/latest).
+For downloading the app, see [latest release](https://github.com/jindrapetrik/jpexs-decompiler/releases/latest).
 Older versions and nightly builds are availabe on [releases section](https://github.com/jindrapetrik/jpexs-decompiler/releases)
+
+### How to install
+See [installation section of wiki](https://github.com/jindrapetrik/jpexs-decompiler/wiki/Installation)
 
 ## Source code
 ### How to get source
