@@ -11,11 +11,6 @@ In the past (before 2018), we were using *free-decompiler.com* domain as HomePag
 ## Download application
 Fow downloading the app, see [releases section](https://github.com/jindrapetrik/jpexs-decompiler/releases)
 
-## Issue tracker
-For bug reporting and/or feature requests, our own Issue tracker exists :
-[https://www.free-decompiler.com/flash/issues](https://www.free-decompiler.com/flash/issues),
-but as of 2018/01, our support is *very limited*.
-
 ## Source code
 ### How to get source
  You can make local copy of the sources with the following command:
@@ -129,6 +124,17 @@ The application was made in Czech republic.
 * **realmaster42** - portugese-brasil translation
 * **Rtsjx** - chinese translation
 
+## Contact
+### Issue Tracker
+For bug reporting and/or feature requests, our own Issue tracker exists :
+[https://www.free-decompiler.com/flash/issues](https://www.free-decompiler.com/flash/issues),
+but as of 2018/01, our support is *very limited*.
+
+### Email contact
+**Please contact us via Issue Tracker (see above)**
+
+In case the tracker or *free-decompiler.com* domain is down,
+emergency contact to JPEXS developer is `jindra.petrik@gmail.com`.
 
 ## Licenses + Acknowledgments
 ### Application
