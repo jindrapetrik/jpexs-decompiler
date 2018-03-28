@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
@@ -61,6 +62,12 @@ public class ActionPush extends Action {
     public List<Object> replacement;
 
     public List<String> constantPool;
+
+    /**
+     * Maximum constant index for storing in type 8, greater indices must be
+     * stored in type 9
+     */
+    public static final int MAX_CONSTANT_INDEX_TYPE8 = 255;
 
     public ActionPush(int actionLength, SWFInputStream sis, int version) throws IOException {
         super(0x96, actionLength);
@@ -151,7 +158,7 @@ public class ActionPush extends Action {
                 }
             } else if (o instanceof ConstantIndex) {
                 int cIndex = ((ConstantIndex) o).index;
-                if (cIndex < 256) {
+                if (cIndex <= MAX_CONSTANT_INDEX_TYPE8) {
                     sos.writeUI8(8);
                     sos.writeUI8(cIndex);
                 } else {
@@ -382,7 +389,7 @@ public class ActionPush extends Action {
     }
 
     @Override
-    public void translate(GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
+    public void translate(boolean insideDoInitAction, GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         int pos = 0;
         for (Object o : values) {
             if (o instanceof ConstantIndex) {

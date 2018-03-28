@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
@@ -48,6 +49,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.DefaultItem;
+import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
 import java.util.ArrayList;
@@ -62,26 +64,31 @@ import java.util.Set;
  */
 public class ActionGraph extends Graph {
 
-    public ActionGraph(List<Action> code, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int version) {
-        super(new ActionGraphSource(code, version, registerNames, variables, functions), new ArrayList<>());
-        //this.version = version;
-        /*heads = makeGraph(code, new ArrayList<GraphPart>());
-         for (GraphPart head : heads) {
-         fixGraph(head);
-         makeMulti(head, new ArrayList<GraphPart>());
-         }*/
+    private boolean insideDoInitAction;
+
+    public ActionGraph(String path, boolean insideDoInitAction, List<Action> code, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int version) {
+        super(new ActionGraphSource(path, insideDoInitAction, code, version, registerNames, variables, functions), new ArrayList<>());
+        this.insideDoInitAction = insideDoInitAction;
     }
 
-    public static List<GraphTargetItem> translateViaGraph(HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path) throws InterruptedException {
+    public boolean isInsideDoInitAction() {
+        return insideDoInitAction;
+    }
 
-        ActionGraph g = new ActionGraph(code, registerNames, variables, functions, version);
-        ActionLocalData localData = new ActionLocalData(registerNames);
+    @Override
+    protected void afterPopupateAllParts(Set<GraphPart> allParts) {
+
+    }
+
+    public static List<GraphTargetItem> translateViaGraph(boolean insideDoInitAction, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path) throws InterruptedException {
+        ActionGraph g = new ActionGraph(path, insideDoInitAction, code, registerNames, variables, functions, version);
+        ActionLocalData localData = new ActionLocalData(insideDoInitAction, registerNames);
         g.init(localData);
         return g.translate(localData, staticOperation, path);
     }
 
     @Override
-    public void finalProcessStack(TranslateStack stack, List<GraphTargetItem> output) {
+    public void finalProcessStack(TranslateStack stack, List<GraphTargetItem> output, String path) {
         if (stack.size() > 0) {
             for (int i = stack.size() - 1; i >= 0; i--) {
                 //System.err.println(stack.get(i));
@@ -96,11 +103,11 @@ public class ActionGraph extends Graph {
     }
 
     @Override
-    protected void finalProcess(List<GraphTargetItem> list, int level, FinalProcessLocalData localData) throws InterruptedException {
-        List<GraphTargetItem> ret = Action.checkClass(list);
-        if (ret != list) {
-            list.clear();
-            list.addAll(ret);
+    protected void finalProcess(List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) throws InterruptedException {
+
+        if (insideDoInitAction) {
+            ActionScript2ClassDetector detector = new ActionScript2ClassDetector();
+            detector.checkClass(list, path);
         }
         int targetStart;
         int targetEnd;
@@ -161,34 +168,51 @@ public class ActionGraph extends Graph {
         } while (again);
         for (int t = 1/*not first*/; t < list.size(); t++) {
             GraphTargetItem it = list.get(t);
+            List<GraphTargetItem> checkedBody = null;
+            GraphTargetItem checkedCondition = null;
+            Loop checkedLoop = null;
             if (it instanceof WhileItem) {
                 WhileItem wi = (WhileItem) it;
-                if ((!wi.commands.isEmpty()) && (wi.commands.get(0) instanceof SetTypeActionItem)) {
-                    SetTypeActionItem sti = (SetTypeActionItem) wi.commands.get(0);
-                    if (wi.expression.get(wi.expression.size() - 1) instanceof NeqActionItem) {
-                        NeqActionItem ne = (NeqActionItem) wi.expression.get(wi.expression.size() - 1);
-                        if (ne.rightSide instanceof DirectValueActionItem) {
-                            DirectValueActionItem dv = (DirectValueActionItem) ne.rightSide;
-                            if (dv.value == Null.INSTANCE) {
-                                GraphTargetItem en = list.get(t - 1);
-                                if (en instanceof EnumerateActionItem) {
-                                    EnumerateActionItem eti = (EnumerateActionItem) en;
-                                    list.remove(t);
-                                    wi.commands.remove(0);
-                                    list.add(t, new ForInActionItem(null, null, wi.loop, sti.getObject(), eti.object, wi.commands));
-                                    list.remove(t - 1);
-                                    t--;
+                checkedBody = wi.commands;
+                checkedCondition = wi.expression.get(wi.expression.size() - 1);
+                checkedLoop = wi.loop;
+            } else if (it instanceof IfItem) {
+                IfItem ifi = (IfItem) it;
+                if (ifi.onFalse.isEmpty()) {
+                    checkedBody = ifi.onTrue;
+                    checkedCondition = ifi.expression;
+                    checkedLoop = null;
+                }
+            }
+            if (checkedBody != null && (!checkedBody.isEmpty()) && (checkedBody.get(0) instanceof SetTypeActionItem)) {
+                SetTypeActionItem sti = (SetTypeActionItem) checkedBody.get(0);
+                if (checkedCondition instanceof NeqActionItem) {
+                    NeqActionItem ne = (NeqActionItem) checkedCondition;
+                    if (ne.rightSide instanceof DirectValueActionItem) {
+                        DirectValueActionItem dv = (DirectValueActionItem) ne.rightSide;
+                        if (dv.value == Null.INSTANCE) {
+                            GraphTargetItem en = list.get(t - 1);
+                            if (en instanceof EnumerateActionItem) {
+                                EnumerateActionItem eti = (EnumerateActionItem) en;
+                                list.remove(t);
+                                checkedBody.remove(0);
+                                if (checkedLoop == null) {
+                                    checkedLoop = new Loop(localData.loops.size(), null, null);
+                                    checkedBody.add(new BreakItem(null, null, checkedLoop.id));
                                 }
+                                list.add(t, new ForInActionItem(null, null, checkedLoop, sti.getObject(), eti.object, checkedBody));
+                                list.remove(t - 1);
+                                t--;
                             }
-
                         }
+
                     }
                 }
-
             }
+
         }
         //Handle for loops at the end:
-        super.finalProcess(list, level, localData);
+        super.finalProcess(list, level, localData, path);
 
     }
 
@@ -300,59 +324,102 @@ public class ActionGraph extends Graph {
                 stack.push(set);
             } else {
                 part = part.nextParts.get(1);
-                //caseBodyParts.add(part);
                 GraphPart defaultPart = part;
                 if (code.size() > defaultPart.start && code.get(defaultPart.start) instanceof ActionJump) {
                     defaultPart = defaultPart.nextParts.get(0);
                 }
 
-                GraphPart breakPart = getMostCommonPart(localData, caseBodyParts, loops);
-
-                List<GraphTargetItem> caseValues = new ArrayList<>();
                 boolean hasDefault = false;
-                for (int i = 0; i < caseBodyParts.size(); i++) {
-                    caseValues.add(caseValuesMap.get(i));
+                /*
+                case 4:
+                case 5:
+                default: 
+                    trace("5 & def");
+                    ...
+                case 6:
+                
+                 */
+                //must go backwards to hit case 5, not case 4
+                for (int i = caseBodyParts.size() - 1; i >= 0; i--) {
                     if (caseBodyParts.get(i) == defaultPart) {
-                        i++;
-                        caseValuesMap.add(i, new DefaultItem());
-                        caseBodyParts.add(i, defaultPart);
-                        caseValues.add(caseValuesMap.get(i));
+                        DefaultItem di = new DefaultItem();
+                        caseValuesMap.add(i + 1, di);
+                        caseBodyParts.add(i + 1, defaultPart);
                         hasDefault = true;
+                        break;
                     }
                 }
 
                 if (!hasDefault) {
-                    //List<GraphPart> stops = new ArrayList<>();                   
-                    //stops.addAll(caseBodyParts);
-                    for (int i = 0; i < caseBodyParts.size(); i++) {
-                        if (defaultPart.leadsTo(localData, this, code, caseBodyParts.get(i), loops)) {
-                            caseValuesMap.add(i, new DefaultItem());
-                            caseBodyParts.add(i, defaultPart);
-                            caseValues.add(i, caseValuesMap.get(i));
+                    /*
+                    case 1:
+                        trace("1");
+                    case 2:
+                        trace("2"); //no break
+                    default:
+                        trace("def");
+                        ...
+                    case 3:  
+                     */
+                    //must go backwards to hit case 2, not case 1
+                    for (int i = caseBodyParts.size() - 1; i >= 0; i--) {
+                        if (caseBodyParts.get(i).leadsTo(localData, this, code, defaultPart, loops)) {
+                            DefaultItem di = new DefaultItem();
+                            caseValuesMap.add(i + 1, di);
+                            caseBodyParts.add(i + 1, defaultPart);
                             hasDefault = true;
                             break;
                         }
                     }
                 }
+
                 if (!hasDefault) {
-                    caseValuesMap.add(new DefaultItem());
-                    caseBodyParts.add(defaultPart);
-                    caseValues.add(caseValuesMap.get(caseValuesMap.size() - 1));
+                    /*
+                    case 1:
+                        trace("1");
+                        break;
+                    default:
+                        trace("def"); //no break
+                    case 2:
+                        trace("2");                    
+                     */
+                    for (int i = 0; i < caseBodyParts.size(); i++) {
+                        if (defaultPart.leadsTo(localData, this, code, caseBodyParts.get(i), loops)) {
+                            DefaultItem di = new DefaultItem();
+                            caseValuesMap.add(i, di);
+                            caseBodyParts.add(i, defaultPart);
+                            hasDefault = true;
+                            break;
+                        }
+                    }
                 }
 
-                List<List<GraphTargetItem>> caseCommands = new ArrayList<>();
-                GraphPart next;
+                if (!hasDefault) {
+                    /*
+                        case 1:
+                        ...
+                        case 2:
+                        ...
+                        default:
+                            trace("def");                        
+                     */
+                    caseValuesMap.add(new DefaultItem());
+                    caseBodyParts.add(defaultPart);
+                }
 
-                next = breakPart;
+                GraphPart breakPart = getMostCommonPart(localData, caseBodyParts, loops);
+                List<List<GraphTargetItem>> caseCommands = new ArrayList<>();
+                GraphPart next = breakPart;
 
                 GraphTargetItem ti = checkLoop(next, stopPart, loops);
+
+                //create switch as new loop break command detection to work
                 currentLoop = new Loop(loops.size(), null, next);
                 currentLoop.phase = 1;
                 loops.add(currentLoop);
-                //switchLoc.getNextPartPath(new ArrayList<GraphPart>());
                 List<Integer> valuesMapping = new ArrayList<>();
                 List<GraphPart> caseBodies = new ArrayList<>();
-                for (int i = 0; i < caseValues.size(); i++) {
+                for (int i = 0; i < caseValuesMap.size(); i++) {
                     GraphPart cur = caseBodyParts.get(i);
                     if (!caseBodies.contains(cur)) {
                         caseBodies.add(cur);
@@ -360,45 +427,36 @@ public class ActionGraph extends Graph {
                     valuesMapping.add(caseBodies.indexOf(cur));
                 }
 
-                /*List<GraphPart> ignored = new ArrayList<>();
-                 for (Loop l : loops) {
-                 ignored.add(l.loopContinue);
-                 }*/
                 for (int i = 0; i < caseBodies.size(); i++) {
-                    List<GraphTargetItem> cc = new ArrayList<>();
-                    GraphPart nextCase = null;
-                    nextCase = next;
+                    List<GraphTargetItem> currentCaseCommands = new ArrayList<>();
+                    GraphPart nextCase = next;
                     if (next != null) {
                         if (i < caseBodies.size() - 1) {
                             if (!caseBodies.get(i).leadsTo(localData, this, code, caseBodies.get(i + 1), loops)) {
-                                cc.add(new BreakItem(null, localData.lineStartInstruction, currentLoop.id));
+                                currentCaseCommands.add(new BreakItem(null, localData.lineStartInstruction, currentLoop.id));
                             } else {
                                 nextCase = caseBodies.get(i + 1);
                             }
                         }
                     }
                     List<GraphPart> stopPart2x = new ArrayList<>(stopPart);
-                    //stopPart2.add(nextCase);
                     for (GraphPart b : caseBodies) {
                         if (b != caseBodies.get(i)) {
                             stopPart2x.add(b);
                         }
                     }
-                    /*if (defaultPart != null) {
-                        stopPart2x.add(defaultPart);
-                    }*/
                     if (breakPart != null) {
                         stopPart2x.add(breakPart);
                     }
-                    cc.addAll(0, printGraph(partCodes, partCodePos, localData, stack, allParts, null, caseBodies.get(i), stopPart2x, loops, staticOperation, path));
-                    if (cc.size() >= 2) {
-                        if (cc.get(cc.size() - 1) instanceof BreakItem) {
-                            if ((cc.get(cc.size() - 2) instanceof ContinueItem) || (cc.get(cc.size() - 2) instanceof BreakItem)) {
-                                cc.remove(cc.size() - 1);
+                    currentCaseCommands.addAll(0, printGraph(partCodes, partCodePos, localData, stack, allParts, null, caseBodies.get(i), stopPart2x, loops, staticOperation, path));
+                    if (currentCaseCommands.size() >= 2) {
+                        if (currentCaseCommands.get(currentCaseCommands.size() - 1) instanceof BreakItem) {
+                            if ((currentCaseCommands.get(currentCaseCommands.size() - 2) instanceof ContinueItem) || (currentCaseCommands.get(currentCaseCommands.size() - 2) instanceof BreakItem)) {
+                                currentCaseCommands.remove(currentCaseCommands.size() - 1);
                             }
                         }
                     }
-                    caseCommands.add(cc);
+                    caseCommands.add(currentCaseCommands);
                 }
 
                 //If the lastone is default empty and alone, remove it
@@ -410,15 +468,16 @@ public class ActionGraph extends Graph {
                     }
                     if (lastc.isEmpty()) {
                         int cnt2 = 0;
-                        if (caseValues.get(caseValues.size() - 1) instanceof DefaultItem) {
+                        if (caseValuesMap.get(caseValuesMap.size() - 1) instanceof DefaultItem) {
                             for (int i = valuesMapping.size() - 1; i >= 0; i--) {
                                 if (valuesMapping.get(i) == caseCommands.size() - 1) {
                                     cnt2++;
                                 }
                             }
+
+                            caseValuesMap.remove(caseValuesMap.size() - 1);
+                            valuesMapping.remove(valuesMapping.size() - 1);
                             if (cnt2 == 1) {
-                                caseValues.remove(caseValues.size() - 1);
-                                valuesMapping.remove(valuesMapping.size() - 1);
                                 caseCommands.remove(lastc);
                             }
                         }
@@ -430,13 +489,12 @@ public class ActionGraph extends Graph {
                     if (!lastc.isEmpty() && (lastc.get(lastc.size() - 1) instanceof BreakItem)) {
                         BreakItem bi = (BreakItem) lastc.get(lastc.size() - 1);
                         lastc.remove(lastc.size() - 1);
-
                     }
                 }
 
                 ret = new ArrayList<>();
                 ret.addAll(output);
-                SwitchItem sti = new SwitchItem(null, switchStartItem, currentLoop, switchedObject, caseValues, caseCommands, valuesMapping);
+                SwitchItem sti = new SwitchItem(null, switchStartItem, currentLoop, switchedObject, caseValuesMap, caseCommands, valuesMapping);
                 ret.add(sti);
                 currentLoop.phase = 2;
                 if (next != null) {
@@ -454,15 +512,15 @@ public class ActionGraph extends Graph {
     @Override
     protected int checkIp(int ip) {
         int oldIp = ip;
-        //return in for..in
+        //return/break in for..in
         GraphSourceItem action = code.get(ip);
         if ((action instanceof ActionPush) && (((ActionPush) action).values.size() == 1) && (((ActionPush) action).values.get(0) == Null.INSTANCE)) {
-            if (ip + 4 < code.size()) {
+            if (ip + 3 <= code.size()) {
                 if ((code.get(ip + 1) instanceof ActionEquals) || (code.get(ip + 1) instanceof ActionEquals2)) {
                     if (code.get(ip + 2) instanceof ActionNot) {
                         if (code.get(ip + 3) instanceof ActionIf) {
                             ActionIf aif = (ActionIf) code.get(ip + 3);
-                            if (code.adr2pos(code.pos2adr(ip + 4) + aif.getJumpOffset()) == ip) {
+                            if (code.adr2pos(code.pos2adr(ip + 3) + 5 /*IF numbytes*/ + aif.getJumpOffset()) == ip) {
                                 ip += 4;
                             }
                         }
@@ -471,6 +529,9 @@ public class ActionGraph extends Graph {
             }
         }
         if (oldIp != ip) {
+            if (ip == code.size()) { //no next checkIp call since its after code size
+                return ip;
+            }
             return checkIp(ip);
         }
         return ip;

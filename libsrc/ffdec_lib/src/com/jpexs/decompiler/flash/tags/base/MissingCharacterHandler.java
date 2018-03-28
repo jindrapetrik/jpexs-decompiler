@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags.base;
 
 import java.awt.Font;
@@ -30,10 +31,10 @@ public class MissingCharacterHandler {
 
     public boolean handle(TextTag textTag, FontTag font, char character) {
         String fontName = font.getFontNameIntag();
-        if (!FontTag.installedFontsByFamily.containsKey(fontName)) {
+        if (!FontTag.getInstalledFontsByFamily().containsKey(fontName)) {
             return false;
         }
-        Map<String, Font> faces = FontTag.installedFontsByFamily.get(fontName);
+        Map<String, Font> faces = FontTag.getInstalledFontsByFamily().get(fontName);
 
         Font f = null;
         for (String face : faces.keySet()) {

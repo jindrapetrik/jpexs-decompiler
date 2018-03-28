@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.parser.script;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -655,7 +656,7 @@ public class ActionSourceGenerator implements SourceGenerator {
         return new ActionPush(new ConstantIndex(index));
     }
 
-    public List<GraphSourceItem> generateTraits(SourceGeneratorLocalData localData, boolean isInterface, GraphTargetItem name, GraphTargetItem extendsVal, List<GraphTargetItem> implementsStr, GraphTargetItem constructor, List<GraphTargetItem> functions, List<MyEntry<GraphTargetItem, GraphTargetItem>> vars, List<GraphTargetItem> staticFunctions, List<MyEntry<GraphTargetItem, GraphTargetItem>> staticVars) throws CompilationException {
+    public List<GraphSourceItem> generateTraits(SourceGeneratorLocalData localData, boolean isInterface, GraphTargetItem name, GraphTargetItem extendsVal, List<GraphTargetItem> implementsStr, List<MyEntry<GraphTargetItem, GraphTargetItem>> traits, List<Boolean> traitsStatic) throws CompilationException {
         List<String> extendsStr = getVarParts(extendsVal);
         List<GraphSourceItem> ret = new ArrayList<>();
         List<String> nameStr = getVarParts(name);
@@ -668,7 +669,7 @@ public class ActionSourceGenerator implements SourceGenerator {
             }
 
             List<Action> val = new ArrayList<>();
-            val.add(new ActionPush((Long) 0L));
+            val.add(new ActionPush((Double) 0.0));
             val.add(pushConst("Object"));
             val.add(new ActionNewObject());
             notBody.addAll(typeToActions(globalClassTypeStr, val));
@@ -677,12 +678,26 @@ public class ActionSourceGenerator implements SourceGenerator {
             ret.add(new ActionNot());
             ret.add(new ActionIf(Action.actionsToBytes(notBody, false, SWF.DEFAULT_VERSION).length));
             ret.addAll(notBody);
+            ret.add(new ActionPop());
         }
         List<Action> ifbody = new ArrayList<>();
         List<String> globalClassTypeStr = new ArrayList<>();
         globalClassTypeStr.add("_global");
         globalClassTypeStr.addAll(nameStr);
 
+        String constructorName = nameStr.get(nameStr.size() - 1); //com.jpexs.MyClass => MyClass
+        GraphTargetItem constructor = null;
+        int constructorIndex = -1;
+        for (int t = 0; t < traits.size(); t++) {
+            MyEntry<GraphTargetItem, GraphTargetItem> en = traits.get(t);
+            if (en.getValue() instanceof FunctionActionItem) {
+                if (constructorName.equals(getName(en.getKey()))) {
+                    constructorIndex = t;
+                    constructor = en.getValue();
+                    break;
+                }
+            }
+        }
         ParsedSymbol s = null;
         List<Action> constr = new ArrayList<>();
 
@@ -692,45 +707,40 @@ public class ActionSourceGenerator implements SourceGenerator {
             if (!isInterface) {
                 val.add(new ActionStoreRegister(1));
             }
-            constr.addAll(typeToActions(globalClassTypeStr, val));
+            constr.addAll(typeToActions(nameStr, val));
         } else {
             constr.addAll(toActionList(((FunctionActionItem) constructor).toSource(localData, this)));
             constr.add(new ActionStoreRegister(1));
-            constr = (typeToActions(globalClassTypeStr, constr));
+            constr = (typeToActions(nameStr, constr));
         }
         if (!isInterface) {
-            for (GraphTargetItem f : staticFunctions) {
-                FunctionActionItem fi = (FunctionActionItem) f;
-                ifbody.add(new ActionPush(new RegisterNumber(1/*static*/)));
-                ifbody.add(new ActionPush(getName(fi.calculatedFunctionName)));
-                ifbody.addAll(toActionList(fi.toSource(localData, this)));
-                ifbody.add(new ActionSetMember());
-            }
-            for (GraphTargetItem f : functions) {
-                FunctionActionItem fi = (FunctionActionItem) f;
-                ifbody.add(new ActionPush(new RegisterNumber(2/*instance*/)));
-                ifbody.add(new ActionPush(getName(fi.calculatedFunctionName)));
-                ifbody.addAll(toActionList(fi.toSource(localData, this)));
-                ifbody.add(new ActionSetMember());
-            }
-            for (MyEntry<GraphTargetItem, GraphTargetItem> en : staticVars) {
-                ifbody.add(new ActionPush(new RegisterNumber(1/*static*/)));
-                ifbody.add(new ActionPush(getName(en.getKey())));
-                ifbody.addAll(toActionList(en.getValue().toSource(localData, this)));
-                ifbody.add(new ActionSetMember());
-            }
-            for (MyEntry<GraphTargetItem, GraphTargetItem> en : vars) {
-                ifbody.add(new ActionPush(new RegisterNumber(2/*instance*/)));
-                ifbody.add(new ActionPush(getName(en.getKey())));
-                ifbody.addAll(toActionList(en.getValue().toSource(localData, this)));
-                ifbody.add(new ActionSetMember());
+            for (int pass = 1; pass <= 2; pass++) { //two passes, methods first, then variables
+                for (int t = 0; t < traits.size(); t++) {
+                    if (constructorIndex == t) { //constructor already handled
+                        continue;
+                    }
+                    MyEntry<GraphTargetItem, GraphTargetItem> en = traits.get(t);
+                    boolean isFunc = (en.getValue() instanceof FunctionActionItem);
+                    if (pass == 1 && isFunc) { //Add methods in first pass
+                        FunctionActionItem fi = (FunctionActionItem) en.getValue();
+                        ifbody.add(new ActionPush(new RegisterNumber(traitsStatic.get(t) ? 1 : 2)));
+                        ifbody.add(pushConst(getName(en.getKey())));
+                        ifbody.addAll(toActionList(fi.toSource(localData, this)));
+                        ifbody.add(new ActionSetMember());
+                    } else if (pass == 2 && !isFunc) { //add variables in second pass
+                        ifbody.add(new ActionPush(new RegisterNumber(traitsStatic.get(t) ? 1 : 2)));
+                        ifbody.add(pushConst(getName(en.getKey())));
+                        ifbody.addAll(toActionList(en.getValue().toSource(localData, this)));
+                        ifbody.add(new ActionSetMember());
+                    }
+                }
             }
         }
 
         if (!isInterface) {
             ifbody.add(new ActionPush((Long) 1L));
             ifbody.add(new ActionPush(Null.INSTANCE));
-            ifbody.addAll(typeToActions(globalClassTypeStr, null));
+            ifbody.addAll(typeToActions(nameStr, null));
             ifbody.add(pushConst("prototype"));
             ifbody.add(new ActionGetMember());
             ifbody.add(new ActionPush((Long) 3L));

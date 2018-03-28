@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
@@ -303,7 +304,7 @@ public class FunctionActionItem extends ActionItem {
             needsFun2 = true;
         }
         if (localData.inMethod) {
-            needsFun2 = true;
+            //needsFun2 = true;
         }
         if (localData.inFunction > 1) {
             needsFun2 = true;

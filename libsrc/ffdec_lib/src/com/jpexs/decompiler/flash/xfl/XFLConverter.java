@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.xfl;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
@@ -2358,7 +2359,7 @@ public class XFLConverter {
                     fontName = font.getFontNameIntag();
                 }
                 if (fontName == null) {
-                    fontName = FontTag.defaultFontName;
+                    fontName = FontTag.getDefaultFontName();
                 }
                 int fontStyle = font.getFontStyle();
                 String installedFont;
@@ -3035,7 +3036,7 @@ public class XFLConverter {
                         fontName = font.getFontNameIntag();
                     }
                     if (fontName == null) {
-                        fontName = FontTag.defaultFontName;
+                        fontName = FontTag.getDefaultFontName();
                     }
                     int fontStyle = 0;
                     if (font != null) {
@@ -3197,7 +3198,7 @@ public class XFLConverter {
                             fontName = ft.getFontNameIntag();
                         }
                         if (fontName == null) {
-                            fontName = FontTag.defaultFontName;
+                            fontName = FontTag.getDefaultFontName();
                         }
                         italic = ft.isItalic();
                         bold = ft.isBold();
@@ -3934,7 +3935,7 @@ public class XFLConverter {
                         fontName = ft.getFontNameIntag();
                     }
                     if (fontName == null) {
-                        fontName = FontTag.defaultFontName;
+                        fontName = FontTag.getDefaultFontName();
                     }
                     italic = ft.isItalic();
                     bold = ft.isBold();

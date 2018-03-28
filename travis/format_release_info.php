@@ -129,38 +129,80 @@ function get_changelog_section($changelog_file, $section_name) {
    if ($x === false) {
       return false;
    }
+   if(trim($x) === "") { //No Unreleased version data for example
+      return "";
+   }
    $x = substr($x, strpos($x, "\n") + 1); //from start of the line
    return $x;
 }
 
+$do_images = true;
+
+if($do_images)
+{
   $ossupport_map=[
   "windows" => "Works on Windows",
   "linux" => "Works on Linux",
   "macosx" => "Works with Mac OSX",
   "java" => "Works on java"
   ];
-
+}else{
+$ossupport_map=[
+  "windows" => "Win",
+  "linux" => "Lin",
+  "macosx" => "Mac",
+  "java" => "Java"
+  ];
+}
 
 
 $ICONS_URL = "https://github.com/jindrapetrik/jpexs-decompiler/wiki/images";
 
 $body = "";
 
+$is_prerelease = $changelog_section === "Unreleased";
+
+if($is_prerelease) {
+   $body .= "## Prerelease WARNING\n".
+            "**This is prerelease nightly version. It should *NOT* be considered as stable.**\n\n";
+}   
+
 $body .= "## Downloads:\n".
       "\n".
       "| Name | File | OS |\n".
       "|---|---|---|\n";      
 
+
+
 $footer_links = [];
 foreach ($files as $f) {
-   $footer_links[$f["type_icon"]."_icon"] = $ICONS_URL."/downloads/16/".$f["type_icon"].".png";
+   if($do_images) {      
+      $footer_links[$f["type_icon"]."_icon"] = $ICONS_URL."/downloads/16/".$f["type_icon"].".png";   
+   }
    $footer_links[$f["file_name"]] = 'https://github.com/'.$github_repo.'/releases/download/'.$version_tag.'/'.$f["file_name"];
-   $body .= "| **".$f["type_name"]."** | ![".$f["type_name"]."][".$f["type_icon"]."_icon] [".$f["file_name"]."] | ";
+   $body .= "| **".$f["type_name"]."** | ";
+   if($do_images)
+   {
+      $body .= "![".$f["type_name"]."][".$f["type_icon"]."_icon]";   
+   }
+   $body .= " [".$f["file_name"]."] | ";
+   $ossup_titles = [];
    foreach ($f["ossupport"] as $ossupport)
    {
-      $footer_links[$ossupport."_icon"] = $ICONS_URL."/os/24/".$ossupport.".png";   
+      if($do_images)
+      {
+         $footer_links[$ossupport."_icon"] = $ICONS_URL."/os/24/".$ossupport.".png";         
+      }
       $ossupport_title = $ossupport_map[$ossupport];
-      $body .= "![".$ossupport_title."][".$ossupport."_icon]";
+      $ossup_titles[] = $ossupport_title;
+      if($do_images)
+      {
+         $body .= "![".$ossupport_title."][".$ossupport."_icon]";
+      }
+   }
+   if(!$do_images)
+   {
+      $body .= implode(", ",$ossup_titles);
    }
    $body .= " |\n";
 }
@@ -173,6 +215,19 @@ foreach ($files as $f) {
 }
 
 $changelog_data = get_changelog_section($changelog_path,$changelog_section);
+if($changelog_data === false)
+{
+   if($is_prerelease)
+   {
+      //[Unreleased section may be missing]
+      $changelog_data = "";
+   }
+   else
+   {
+      fwrite(STDERR, "Cannot load changelog data\n");
+      exit(1);
+   }   
+}
 $full_changelog = file_get_contents($changelog_path);
 if(preg_match_all('/\[([^\]]+)\][^(]/', $changelog_data."\n",$m))      
 {
@@ -186,14 +241,19 @@ if(preg_match_all('/\[([^\]]+)\][^(]/', $changelog_data."\n",$m))
    }   
 }
 
-if($changelog_data === false)
-{
-   fwrite(STDERR, "Cannot load changelog data\n");
-   exit(1);
-}
 
 $body .= "\n";
-$body .= "## What's new:\n";
+if($is_prerelease)
+{
+   $body .= "## What's new since last stable version:\n";
+}else{
+   $body .= "## What's new:\n";
+}
+if($changelog_data === "")
+{
+   $body .= "No notable changes yet\n";
+}
+
 $body .= $changelog_data;
 $body .= "\n";
 foreach($footer_links as $title=>$link)

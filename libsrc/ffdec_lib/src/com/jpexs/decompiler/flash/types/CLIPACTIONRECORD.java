@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.DisassemblyListener;
@@ -197,7 +198,7 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable {
             actions = getActions();
         }
 
-        return Action.actionsToSource(this, actions, toString()/*FIXME?*/, writer);
+        return Action.actionsToSource(this, actions, getScriptName(), writer);
     }
 
     /**

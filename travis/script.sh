@@ -97,7 +97,7 @@ else
       export DEPLOY_FILEVER_TAG="${VERSION_NUMBER}_nightly${NEXT_NIGHTLY_VER}"                          
       export DEPLOY_RELEASE_TO_REMOVE=$LAST_NIGHTLY_TAG                                 
       export DEPLOY_TAG_NAME=$NEXT_NIGHTLY_TAG
-      export DEPLOY_VERSION_NAME="version $LAST_STABLE_VER nightly $NEXT_NIGHTLY_VER"
+      export DEPLOY_VERSION_NAME="(PREVIEW) version $LAST_STABLE_VER nightly $NEXT_NIGHTLY_VER"
       export DEPLOY_DESCRIPTION=`php ./travis/format_release_info.php -filever $DEPLOY_FILEVER_TAG Unreleased $DEPLOY_TAG_NAME ./CHANGELOG.md "$TRAVIS_REPO_SLUG"`
       export DEPLOY_COMMITISH="dev"
       export DEPLOY_PRERELEASE=true

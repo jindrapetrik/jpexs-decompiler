@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.parser.script;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -119,6 +120,7 @@ import com.jpexs.decompiler.flash.action.model.operations.SubtractActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.URShiftActionItem;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
+import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
 import com.jpexs.decompiler.flash.action.swf5.ActionConstantPool;
 import com.jpexs.decompiler.flash.ecma.Null;
@@ -338,11 +340,8 @@ public class ActionScript2Parser {
          globalClassTypeStr.addAll(nameStr);*/
 
         ParsedSymbol s;
-        FunctionActionItem constr = null;
-        List<GraphTargetItem> staticFunctions = new ArrayList<>();
-        List<MyEntry<GraphTargetItem, GraphTargetItem>> staticVars = new ArrayList<>();
-        List<GraphTargetItem> instanceFunctions = new ArrayList<>();
-        List<MyEntry<GraphTargetItem, GraphTargetItem>> vars = new ArrayList<>();
+        List<MyEntry<GraphTargetItem, GraphTargetItem>> traits = new ArrayList<>();
+        List<Boolean> traitsStatic = new ArrayList<>();
 
         String classNameStr = "";
         if (nameStr instanceof GetMemberActionItem) {
@@ -373,16 +372,21 @@ public class ActionScript2Parser {
                     expected(s, lexer.yyline(), SymbolType.IDENTIFIER, SymbolGroup.GLOBALFUNC);
                     String fname = s.value.toString();
                     if (fname.equals(classNameStr)) { //constructor
-                        constr = (function(!isInterface, "", true, variables, functions));
-                    } else if (!isInterface) {
+                        //actually there's no difference, it's instance trait
+                    }
+                    if (!isInterface) {
                         if (isStatic) {
                             FunctionActionItem ft = function(!isInterface, "", true, variables, functions);
                             ft.calculatedFunctionName = pushConst(fname);
-                            staticFunctions.add(ft);
+                            //staticFunctions.add(ft);
+                            traits.add(new MyEntry<>(ft.calculatedFunctionName, ft));
+                            traitsStatic.add(true);
                         } else {
                             FunctionActionItem ft = function(!isInterface, "", true, variables, functions);
                             ft.calculatedFunctionName = pushConst(fname);
-                            instanceFunctions.add(ft);
+                            //instanceFunctions.add(ft);
+                            traits.add(new MyEntry<>(ft.calculatedFunctionName, ft));
+                            traitsStatic.add(false);
                         }
                     }
                     break;
@@ -396,11 +400,8 @@ public class ActionScript2Parser {
                         s = lex();
                     }
                     if (s.type == SymbolType.ASSIGN) {
-                        if (isStatic) {
-                            staticVars.add(new MyEntry<>(pushConst(ident), expression(false, false, true, variables, functions)));
-                        } else {
-                            vars.add(new MyEntry<>(pushConst(ident), expression(false, false, true, variables, functions)));
-                        }
+                        traits.add(new MyEntry<>(pushConst(ident), expression(false, false, true, variables, functions)));
+                        traitsStatic.add(isStatic);
                         s = lex();
                     }
                     if (s.type != SymbolType.SEMICOLON) {
@@ -417,7 +418,7 @@ public class ActionScript2Parser {
         if (isInterface) {
             return new InterfaceActionItem(nameStr, implementsStr);
         } else {
-            return new ClassActionItem(nameStr, extendsStr, implementsStr, constr, instanceFunctions, vars, staticFunctions, staticVars);
+            return new ClassActionItem(nameStr, extendsStr, implementsStr, traits, traitsStatic);
         }
     }
 
@@ -1151,14 +1152,25 @@ public class ActionScript2Parser {
                 s = lex();
                 boolean found = false;
                 List<List<GraphTargetItem>> catchCommands = null;
-                List<GraphTargetItem> catchExceptions = new ArrayList<>();
-                if (s.type == SymbolType.CATCH) {
+                List<GraphTargetItem> catchExceptionNames = new ArrayList<>();
+                List<GraphTargetItem> catchExceptionTypes = new ArrayList<>();
+
+                while (s.type == SymbolType.CATCH) {
                     expectedType(SymbolType.PARENT_OPEN);
                     s = lex();
                     expected(s, lexer.yyline(), SymbolType.IDENTIFIER, SymbolType.STRING);
-                    catchExceptions.add(pushConst((String) s.value));
+                    catchExceptionNames.add(pushConst((String) s.value));
+                    s = lex();
+                    if (s.type == SymbolType.COLON) {
+                        catchExceptionTypes.add(type(variables));
+                    } else {
+                        catchExceptionTypes.add(null);
+                        lexer.pushback(s);
+                    }
                     expectedType(SymbolType.PARENT_CLOSE);
-                    catchCommands = new ArrayList<>();
+                    if (catchCommands == null) {
+                        catchCommands = new ArrayList<>();
+                    }
                     List<GraphTargetItem> cc = new ArrayList<>();
                     cc.add(command(inFunction, inMethod, forinlevel, true, variables, functions));
                     catchCommands.add(cc);
@@ -1176,7 +1188,7 @@ public class ActionScript2Parser {
                     expected(s, lexer.yyline(), SymbolType.CATCH, SymbolType.FINALLY);
                 }
                 lexer.pushback(s);
-                ret = new TryActionItem(tryCommands, catchExceptions, catchCommands, finallyCommands);
+                ret = new TryActionItem(tryCommands, catchExceptionNames, catchExceptionTypes, catchCommands, finallyCommands);
                 break;
             case THROW:
                 ret = new ThrowActionItem(null, null, expression(inFunction, inMethod, true, variables, functions));
@@ -1872,12 +1884,58 @@ public class ActionScript2Parser {
         return retTree;
     }
 
-    public List<Action> actionsFromTree(List<GraphTargetItem> tree, List<String> constantPool) throws CompilationException {
+    private List<GraphSourceItem> generateActionList(List<GraphTargetItem> tree, List<String> constantPool) throws CompilationException {
         ActionSourceGenerator gen = new ActionSourceGenerator(swfVersion, constantPool);
+        SourceGeneratorLocalData localData = new SourceGeneratorLocalData(new HashMap<>(), 0, Boolean.FALSE, 0);
+        return gen.generate(localData, tree);
+    }
+
+    private List<Action> actionsFromTree(List<GraphTargetItem> tree, List<String> constantPool, boolean doOrder) throws CompilationException, NeedsGenerateAgainException {
         List<Action> ret = new ArrayList<>();
-        SourceGeneratorLocalData localData = new SourceGeneratorLocalData(
-                new HashMap<>(), 0, Boolean.FALSE, 0);
-        List<GraphSourceItem> srcList = gen.generate(localData, tree);
+
+        List<GraphSourceItem> srcList = generateActionList(tree, constantPool);
+
+        if (doOrder) {
+            List<String> orderedConstantPool = new ArrayList<>();
+            boolean canChangeInPlace;
+            int lastIndex = constantPool.size() - 1;
+            if (lastIndex <= ActionPush.MAX_CONSTANT_INDEX_TYPE8) {
+                //can change constant indices as ActionPush contains always 1 byte per constant
+                canChangeInPlace = true;
+            } else {
+                //variable number bytes per ActionPush constant, 
+                //must generate again to make relative offsets in jumps work
+                canChangeInPlace = false;
+            }
+
+            //create ordered constant pool, update constantindices when we can changeinplace
+            for (GraphSourceItem src : srcList) {
+                if (src instanceof ActionPush) {
+                    ActionPush ap = (ActionPush) src;
+                    for (int i = 0; i < ap.values.size(); i++) {
+                        Object val = ap.values.get(i);
+                        if (val instanceof ConstantIndex) {
+                            ConstantIndex ci = (ConstantIndex) val;
+                            String cval = constantPool.get(ci.index);
+                            int orderedIndex = orderedConstantPool.indexOf(cval);
+                            if (orderedIndex == -1) {
+                                orderedIndex = orderedConstantPool.size();
+                                orderedConstantPool.add(cval);
+                            }
+                            if (canChangeInPlace) {
+                                //Do NOT change ci.index directly - it may be cloned from other location
+                                ap.values.set(i, new ConstantIndex(orderedIndex));
+                            }
+                        }
+                    }
+                }
+            }
+            if (!canChangeInPlace) {
+                //generate again, as number of bytes per ActionPush can change
+                throw new NeedsGenerateAgainException(orderedConstantPool);
+            }
+            constantPool = orderedConstantPool;
+        }
         for (GraphSourceItem s : srcList) {
             if (s instanceof Action) {
                 ret.add((Action) s);
@@ -1888,9 +1946,21 @@ public class ActionScript2Parser {
     }
 
     public List<Action> actionsFromString(String s) throws ActionParseException, IOException, CompilationException {
-        List<String> constantPool = new ArrayList<>();
-        List<GraphTargetItem> tree = treeFromString(s, constantPool);
-        return actionsFromTree(tree, constantPool);
+        try {
+            List<String> constantPool = new ArrayList<>();
+            List<GraphTargetItem> tree = treeFromString(s, constantPool);
+            return actionsFromTree(tree, constantPool, true);
+        } catch (NeedsGenerateAgainException nga) {
+            //Can happen when constantpool needs reordering and number of constants > 256
+            try {
+                List<String> newConstantPool = nga.getNewConstantPool();
+                List<GraphTargetItem> tree = treeFromString(s, newConstantPool);
+                return actionsFromTree(tree, newConstantPool, false /*do not order again*/);
+            } catch (NeedsGenerateAgainException ex) {
+                //should not happen as doOrder parameter is set to false 
+                return new ArrayList<>();
+            }
+        }
     }
 
     private void versionRequired(ParsedSymbol s, int min) throws ActionParseException {
