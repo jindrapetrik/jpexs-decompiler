@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  *
@@ -93,9 +94,9 @@ public class HttpResponseInfo {
         for (String h : headers) {
             if (h.contains(":")) {
                 String[] keyval = h.split(":");
-                String key = keyval[0].trim().toLowerCase();
+                String key = keyval[0].trim().toLowerCase(Locale.ENGLISH);
                 String val = keyval[1].trim();
-                if (header.toLowerCase().equals(key)) {
+                if (header.toLowerCase(Locale.ENGLISH).equals(key)) {
                     return val;
                 }
             }

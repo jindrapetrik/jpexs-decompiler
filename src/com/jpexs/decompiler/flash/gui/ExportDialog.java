@@ -54,6 +54,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -168,7 +169,7 @@ public class ExportDialog extends AppDialog {
             int selIndex = combos[i].getSelectedIndex();
             Class c = optionClasses[i];
             Object[] vals = c.getEnumConstants();
-            String key = optionNames[i] + "." + vals[selIndex].toString().toLowerCase();
+            String key = optionNames[i] + "." + vals[selIndex].toString().toLowerCase(Locale.ENGLISH);
             if (i > 0) {
                 cfg.append(",");
             }
@@ -276,7 +277,7 @@ public class ExportDialog extends AppDialog {
             int itemIndex = -1;
             for (int j = 0; j < vals.length; j++) {
 
-                String key = optionNames[i] + "." + vals[j].toString().toLowerCase();
+                String key = optionNames[i] + "." + vals[j].toString().toLowerCase(Locale.ENGLISH);
                 if (exportFormats.contains(key)) {
                     itemIndex = j;
                 }

@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
 import com.jpexs.decompiler.graph.DottedChain;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
@@ -80,11 +81,11 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
             getSwf().getFlexMainClass(ignoredClasses, ignoredNss);
         }
 
-        filter = (filter == null || filter.isEmpty()) ? null : filter.toLowerCase();
+        filter = (filter == null || filter.isEmpty()) ? null : filter.toLowerCase(Locale.ENGLISH);
         loop:
         for (ScriptPack item : list) {
             if (filter != null) {
-                if (!item.getClassPath().toString().toLowerCase().contains(filter)) {
+                if (!item.getClassPath().toString().toLowerCase(Locale.ENGLISH).contains(filter)) {
                     continue;
                 }
             }

@@ -121,6 +121,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import javax.swing.Icon;
 import javax.swing.JTree;
@@ -146,7 +147,7 @@ public class TagTree extends JTree {
         ICONS = new HashMap<>();
         for (TreeNodeType treeNodeType : TreeNodeType.values()) {
             if (treeNodeType != TreeNodeType.UNKNOWN && treeNodeType != TreeNodeType.SHOW_FRAME) {
-                String tagTypeStr = treeNodeType.toString().toLowerCase().replace("_", "");
+                String tagTypeStr = treeNodeType.toString().toLowerCase(Locale.ENGLISH).replace("_", "");
                 ICONS.put(treeNodeType, View.getIcon(tagTypeStr + "16"));
             }
         }
@@ -206,7 +207,7 @@ public class TagTree extends JTree {
                 FolderItem si = (FolderItem) val;
                 if (!TagTreeRoot.FOLDER_ROOT.equals(si.getName())) {
                     String itemName = "folder" + si.getName();
-                    setIcon(View.getIcon(itemName.toLowerCase() + "16"));
+                    setIcon(View.getIcon(itemName.toLowerCase(Locale.ENGLISH) + "16"));
                 }
             } else {
                 setIcon(ICONS.get(type));

@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.console;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
+import java.util.Locale;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -57,7 +58,7 @@ public class ConsoleAbortRetryIgnoreHandler implements AbortRetryIgnoreHandler {
         do {
             System.out.print("Select action: (A)bort, (R)Retry, (I)Ignore:");
             String n = sc.nextLine();
-            switch (n.toLowerCase()) {
+            switch (n.toLowerCase(Locale.ENGLISH)) {
                 case "a":
                     return AbortRetryIgnoreHandler.ABORT;
                 case "r":

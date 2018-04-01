@@ -193,6 +193,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
@@ -2108,7 +2109,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 FileFilter f = new FileFilter() {
                     @Override
                     public boolean accept(File f) {
-                        return f.isDirectory() || (f.getName().toLowerCase().endsWith(".fla"));
+                        return f.isDirectory() || (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".fla"));
                     }
 
                     @Override
@@ -2125,7 +2126,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 f = new FileFilter() {
                     @Override
                     public boolean accept(File f) {
-                        return f.isDirectory() || (f.getName().toLowerCase().endsWith(".xfl"));
+                        return f.isDirectory() || (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".xfl"));
                     }
 
                     @Override
@@ -2761,7 +2762,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 File selfile = Helper.fixDialogFile(selectedFile);
                 DefineSoundTag ds = (DefineSoundTag) item;
                 int soundFormat = SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN;
-                if (selfile.getName().toLowerCase().endsWith(".mp3")) {
+                if (selfile.getName().toLowerCase(Locale.ENGLISH).endsWith(".mp3")) {
                     soundFormat = SoundFormat.FORMAT_MP3;
                 }
 
@@ -2969,7 +2970,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     if (f.isDirectory()) {
                         return true;
                     }
-                    String fileName = f.getName().toLowerCase();
+                    String fileName = f.getName().toLowerCase(Locale.ENGLISH);
                     for (String ext : extensions) {
                         if (fileName.endsWith(ext)) {
                             return true;
