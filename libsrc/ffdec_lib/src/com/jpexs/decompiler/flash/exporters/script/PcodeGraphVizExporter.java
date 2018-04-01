@@ -16,15 +16,21 @@
  */
 package com.jpexs.decompiler.flash.exporters.script;
 
+import com.jpexs.decompiler.flash.AppResources;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2Graph;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.action.Action;
+import static com.jpexs.decompiler.flash.action.Action.adr2ip;
 import com.jpexs.decompiler.flash.action.ActionGraph;
 import com.jpexs.decompiler.flash.action.ActionGraphSource;
 import com.jpexs.decompiler.flash.action.ActionList;
+import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
+import com.jpexs.decompiler.flash.action.swf5.ActionWith;
+import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
+import com.jpexs.decompiler.flash.action.swf7.ActionTry;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.StringBuilderTextWriter;
@@ -32,13 +38,20 @@ import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSource;
+import com.jpexs.decompiler.graph.GraphSourceItemContainer;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.ScopeStack;
+import com.jpexs.decompiler.graph.TranslateException;
+import com.jpexs.decompiler.graph.model.CommentItem;
+import com.jpexs.graphs.graphviz.dot.parser.DotId;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 
 /**
  *
@@ -83,7 +96,7 @@ public class PcodeGraphVizExporter {
         export(gr, writer);
     }
 
-    public void export(Graph graph, GraphTextWriter writer) throws InterruptedException {
+    private void exportGraph(Graph graph, GraphTextWriter writer) throws InterruptedException {
         graph.init(null);
         GraphSource graphSource = graph.getGraphCode();
         Set<GraphPart> allBlocks = new HashSet<>();
@@ -92,7 +105,6 @@ public class PcodeGraphVizExporter {
             populateParts(h, allBlocks);
         }
 
-        writer.append("digraph pcode {\r\n");
         Set<Long> knownAddresses = graphSource.getImportantAddresses();
         int h = 0;
         for (GraphPart head : heads) {
@@ -140,6 +152,20 @@ public class PcodeGraphVizExporter {
                 String nextBlockName = getBlockName(graphSource, next);
                 writer.append(partBlockName + orientation + " -> " + nextBlockName + ":n;\r\n");
             }
+        }
+    }
+
+    public void export(Graph graph, GraphTextWriter writer) throws InterruptedException {
+        writer.append("digraph pcode {\r\n");
+        exportGraph(graph, writer);
+        int pos = 0;
+        Map<String, Graph> subgraphs = graph.getSubGraphs();
+        for (String name : subgraphs.keySet()) {
+            writer.append("subgraph cluster_" + pos + " {");
+            writer.append("label=" + new DotId(name, false) + ";\r\n");
+            pos++;
+            exportGraph(subgraphs.get(name), writer);
+            writer.append("}");
         }
         writer.append("}\r\n");
     }

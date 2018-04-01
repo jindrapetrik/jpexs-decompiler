@@ -20,6 +20,8 @@ import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.FinalProcessLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
+import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
+import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.model.AndItem;
 import com.jpexs.decompiler.graph.model.BreakItem;
@@ -51,6 +53,7 @@ import com.jpexs.decompiler.graph.model.WhileItem;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -82,6 +85,10 @@ public class Graph {
 
     public GraphSource getGraphCode() {
         return code;
+    }
+
+    public LinkedHashMap<String, Graph> getSubGraphs() {
+        return new LinkedHashMap<>();
     }
 
     /**
@@ -2348,7 +2355,18 @@ public class Graph {
                         endAddr += size;
                     }
                     ip = code.adr2pos(endAddr);
+
+                    if ((ins instanceof ActionDefineFunction) || (ins instanceof ActionDefineFunction2)) {
+                        part.end = lastIp;
+                        allBlocks.add(part);
+                        GraphPart gp = new GraphPart(ip, -1);
+                        gp.path = path;
+                        part.nextParts.add(gp);
+                        gp.refs.add(part);
+                        part = gp;
+                    }
                 }
+
                 continue;
             } else if (ins.isExit()) {
                 part.end = ip;
