@@ -123,6 +123,7 @@ The application was made in Czech republic.
 * **Laurent LOUVET** - french translation
 * **MaGiC** - portugese translation
 * **martinkoza** - polish translation
+* **Osman ÖZ** - turkish translation
 * **pepka** - ukrainian and dutch translation
 * **poxyran** - spanish translation
 * **realmaster42** - portugese-brasil translation
