@@ -2363,3 +2363,4 @@ All notable changes to this project will be documented in this file.
 [#1320]: https://www.free-decompiler.com/flash/issues/1320
 [#1323]: https://www.free-decompiler.com/flash/issues/1323
 [#27]: https://www.free-decompiler.com/flash/issues/27
+[#1449]: https://www.free-decompiler.com/flash/issues/1449
