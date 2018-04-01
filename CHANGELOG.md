@@ -3,6 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 ### Added
+- [#1449] Turkish translation by Osman ÖZ
 - AS2 classes: maintain order of variables, and methods (place variables before methods)
 - AS1/2: displaying script path in the error log when jump to invalid address
 - AS1/2: Try..catch with Error types - decompilation and direct editation
