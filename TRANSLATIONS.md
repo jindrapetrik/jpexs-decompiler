@@ -17,6 +17,7 @@
  - Russian
  - Spanish
  - Swedish
+ - Turkish
  - Ukrainian
 
 ## New translation
