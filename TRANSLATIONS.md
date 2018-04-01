@@ -19,17 +19,14 @@
  - Swedish
  - Ukrainian
 
-## Preparing...
-Translators are working on these new translations: 
-- Turkish
-
 ## New translation
 If you would like to translate FFDec to your language, please follow these steps:
 
-1. Check whether your language is not already present or in preparing state (see list on the top)
+1. Check whether your language is not already present in the development branch:
+[dev/TRANSLATIONS.md](https://github.com/jindrapetrik/jpexs-decompiler/blob/dev/TRANSLATIONS.md)
 2. Find out your language code (See [table](http://www.loc.gov/standards/iso639-2/php/code_list.php) )
 3. Create new issue in [issue tracker](https://www.free-decompiler.com/flash/issues/) containing your new language name + code. (You should register first)
-4. Download `Language pack for translators (zipped)` from latest (including nighlty) version on [releases page](https://github.com/jindrapetrik/jpexs-decompiler/releases)
+4. Download `Language pack for translators (zipped)` from latest (including nightly) version on [releases page](https://github.com/jindrapetrik/jpexs-decompiler/releases)
 5. The archive contains all language files for newest version of FFDec. Each language in this pack has files with its own suffix which is standard language code.
 6. Extract Language pack ZIP file
 7. Copy each `.properties` file without `_xx` suffix (english), to new file which has your language code suffix (`_cs` is for czech, etc...)
