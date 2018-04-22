@@ -23,6 +23,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2: Export selection dialog did not allow to select script export formats and/or export script at all
 - AS3 P-code - HAS_OPTIONAL flag in AVM2 code displayed twice
 - Turkish locale toLowerCase I problem fix - causing not loading main window at all
+- [#1456] jsyntaxpane (code display/editor) fixed for Java 9/10
 
 ## [11.0.0] - 2018-01-17
 ### Added
